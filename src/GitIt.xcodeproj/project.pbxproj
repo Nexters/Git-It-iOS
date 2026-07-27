@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C41ECA9B300F6C51001EE733 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C41ECA9A300F6C51001EE733 /* FirebaseAnalytics */; };
+		C41ECA9D300F6C51001EE733 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C41ECA9C300F6C51001EE733 /* FirebaseCrashlytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C40916AA3017997B00C21837 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -13,13 +18,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C4CF4D3F300B64D2005D51B4;
 			remoteInfo = GitIt;
-		};
-		C41ECA8C300F47FC001EE733 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C4CF4D38300B64D2005D51B4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C41ECA87300F47FC001EE733;
-			remoteInfo = Domain;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -47,15 +45,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C409172B3017A39C00C21837 /* GitIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitIt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C409172C3017A39C00C21837 /* Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Core.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C409172D3017A39C00C21837 /* Domain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Domain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C409172E3017A39C00C21837 /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C409172F3017A39C00C21837 /* UI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C40917303017A39C00C21837 /* Feature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Feature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C40917313017A39C00C21837 /* Utility.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Utility.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C40917323017A39C00C21837 /* Resource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Resource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C40917333017A39C00C21837 /* Test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C41ECA7C300F4794001EE733 /* Feature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Feature.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Feature.framework"; sourceTree = "<absolute>"; };
-		C41ECA7D300F4794001EE733 /* Resource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Resource.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Resource.framework"; sourceTree = "<absolute>"; };
-		C41ECA7E300F4794001EE733 /* UI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = UI.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/UI.framework"; sourceTree = "<absolute>"; };
-		C41ECA7F300F4794001EE733 /* Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Core.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Core.framework"; sourceTree = "<absolute>"; };
-		C41ECA81300F4794001EE733 /* Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Data.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Data.framework"; sourceTree = "<absolute>"; };
-		C41ECA82300F4794001EE733 /* Utility.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Utility.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Utility.framework"; sourceTree = "<absolute>"; };
-		C41ECA88300F47FC001EE733 /* Domain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Domain.framework; path = "/Users/jerry/Developer/current/Git-It-iOS/build/Debug-iphoneos/Domain.framework"; sourceTree = "<absolute>"; };
-		C41ECA97300F49CE001EE733 /* GitIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitIt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -172,6 +170,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C41ECA9B300F6C51001EE733 /* FirebaseAnalytics in Frameworks */,
+				C41ECA9D300F6C51001EE733 /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,7 +218,14 @@
 				C4CF4D96300D8BD1005D51B4 /* Utility */,
 				C4CD57A1300DAEFF000DE285 /* Resource */,
 				C40916A73017997B00C21837 /* Test */,
-				C41ECA97300F49CE001EE733 /* GitIt.app */,
+				C409172B3017A39C00C21837 /* GitIt.app */,
+				C409172C3017A39C00C21837 /* Core.framework */,
+				C409172D3017A39C00C21837 /* Domain.framework */,
+				C409172E3017A39C00C21837 /* Data.framework */,
+				C409172F3017A39C00C21837 /* UI.framework */,
+				C40917303017A39C00C21837 /* Feature.framework */,
+				C40917313017A39C00C21837 /* Utility.framework */,
+				C40917323017A39C00C21837 /* Resource.framework */,
 				C40917333017A39C00C21837 /* Test.xctest */,
 			);
 			sourceTree = "<group>";
@@ -321,7 +328,7 @@
 			packageProductDependencies = (
 			);
 			productName = Domain;
-			productReference = C41ECA88300F47FC001EE733 /* Domain.framework */;
+			productReference = C409172D3017A39C00C21837 /* Domain.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CD5755300DAB6D000DE285 /* UI */ = {
@@ -344,7 +351,7 @@
 			packageProductDependencies = (
 			);
 			productName = UI;
-			productReference = C41ECA7E300F4794001EE733 /* UI.framework */;
+			productReference = C409172F3017A39C00C21837 /* UI.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CD579F300DAEFF000DE285 /* Resource */ = {
@@ -367,7 +374,7 @@
 			packageProductDependencies = (
 			);
 			productName = Resource;
-			productReference = C41ECA7D300F4794001EE733 /* Resource.framework */;
+			productReference = C40917323017A39C00C21837 /* Resource.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CF4D3F300B64D2005D51B4 /* GitIt */ = {
@@ -383,16 +390,17 @@
 			buildRules = (
 			);
 			dependencies = (
-				C41ECA8D300F47FC001EE733 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C4CF4D42300B64D2005D51B4 /* App */,
 			);
 			name = GitIt;
 			packageProductDependencies = (
+				C41ECA9A300F6C51001EE733 /* FirebaseAnalytics */,
+				C41ECA9C300F6C51001EE733 /* FirebaseCrashlytics */,
 			);
 			productName = GitIt;
-			productReference = C41ECA97300F49CE001EE733 /* GitIt.app */;
+			productReference = C409172B3017A39C00C21837 /* GitIt.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C4CF4D73300B6642005D51B4 /* Core */ = {
@@ -415,7 +423,7 @@
 			packageProductDependencies = (
 			);
 			productName = Core;
-			productReference = C41ECA7F300F4794001EE733 /* Core.framework */;
+			productReference = C409172C3017A39C00C21837 /* Core.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CF4D83300B66C2005D51B4 /* Data */ = {
@@ -438,7 +446,7 @@
 			packageProductDependencies = (
 			);
 			productName = Data;
-			productReference = C41ECA81300F4794001EE733 /* Data.framework */;
+			productReference = C409172E3017A39C00C21837 /* Data.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CF4D94300D8BD1005D51B4 /* Utility */ = {
@@ -461,7 +469,7 @@
 			packageProductDependencies = (
 			);
 			productName = Utility;
-			productReference = C41ECA82300F4794001EE733 /* Utility.framework */;
+			productReference = C40917313017A39C00C21837 /* Utility.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		C4CF4DA4300D8CE4005D51B4 /* Feature */ = {
@@ -484,7 +492,7 @@
 			packageProductDependencies = (
 			);
 			productName = Feature;
-			productReference = C41ECA7C300F4794001EE733 /* Feature.framework */;
+			productReference = C40917303017A39C00C21837 /* Feature.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -493,7 +501,7 @@
 		C4CF4D38300B64D2005D51B4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
@@ -538,6 +546,8 @@
 			mainGroup = C4CF4D37300B64D2005D51B4;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				C41ECA98300F6BF3001EE733 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				C41ECA99300F6C51001EE733 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C4CF4D37300B64D2005D51B4;
@@ -695,11 +705,6 @@
 			target = C4CF4D3F300B64D2005D51B4 /* GitIt */;
 			targetProxy = C40916AA3017997B00C21837 /* PBXContainerItemProxy */;
 		};
-		C41ECA8D300F47FC001EE733 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C41ECA87300F47FC001EE733 /* Domain */;
-			targetProxy = C41ECA8C300F47FC001EE733 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -711,19 +716,20 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6924CABL23;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.Test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GitIt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GitIt";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
@@ -737,19 +743,20 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6924CABL23;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.Test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GitIt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GitIt";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
@@ -821,7 +828,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.Domain;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.domain;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -907,7 +914,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.ui;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.ui;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -993,7 +1000,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.resource;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.resource;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1015,6 +1022,8 @@
 		};
 		C4CF4D49300B64D2005D51B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = C4CF4D42300B64D2005D51B4 /* App */;
+			baseConfigurationReferenceRelativePath = Config/debug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1080,6 +1089,8 @@
 		};
 		C4CF4D4A300B64D2005D51B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = C4CF4D42300B64D2005D51B4 /* App */;
+			baseConfigurationReferenceRelativePath = Config/release.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1141,9 +1152,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/GitIt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6924CABL23;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1157,7 +1169,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1178,10 +1190,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = GitItRelease.entitlements;
+				CODE_SIGN_ENTITLEMENTS = App/GitIt.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6924CABL23;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1195,7 +1207,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1277,7 +1289,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.core;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.core;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1368,7 +1380,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.data;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.data;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1454,7 +1466,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.utility;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.utility;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1540,7 +1552,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.gitit.feature;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nexters.hytime.gitit.feature;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1579,7 +1591,7 @@
 				C41ECA93300F47FC001EE733 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CD575A300DAB6D000DE285 /* Build configuration list for PBXNativeTarget "UI" */ = {
 			isa = XCConfigurationList;
@@ -1588,7 +1600,7 @@
 				C4CD575C300DAB6D000DE285 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CD57A4300DAEFF000DE285 /* Build configuration list for PBXNativeTarget "Resource" */ = {
 			isa = XCConfigurationList;
@@ -1597,7 +1609,7 @@
 				C4CD57A6300DAEFF000DE285 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4D3B300B64D2005D51B4 /* Build configuration list for PBXProject "GitIt" */ = {
 			isa = XCConfigurationList;
@@ -1606,7 +1618,7 @@
 				C4CF4D4A300B64D2005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4D4B300B64D2005D51B4 /* Build configuration list for PBXNativeTarget "GitIt" */ = {
 			isa = XCConfigurationList;
@@ -1615,7 +1627,7 @@
 				C4CF4D4D300B64D2005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4D7C300B6642005D51B4 /* Build configuration list for PBXNativeTarget "Core" */ = {
 			isa = XCConfigurationList;
@@ -1624,7 +1636,7 @@
 				C4CF4D7E300B6642005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4D8C300B66C2005D51B4 /* Build configuration list for PBXNativeTarget "Data" */ = {
 			isa = XCConfigurationList;
@@ -1633,7 +1645,7 @@
 				C4CF4D8E300B66C2005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4D9D300D8BD1005D51B4 /* Build configuration list for PBXNativeTarget "Utility" */ = {
 			isa = XCConfigurationList;
@@ -1642,7 +1654,7 @@
 				C4CF4D9F300D8BD1005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		C4CF4DAD300D8CE4005D51B4 /* Build configuration list for PBXNativeTarget "Feature" */ = {
 			isa = XCConfigurationList;
@@ -1651,9 +1663,43 @@
 				C4CF4DAF300D8CE4005D51B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C41ECA98300F6BF3001EE733 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.26.0;
+			};
+			traits = (
+			);
+		};
+		C41ECA99300F6C51001EE733 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C41ECA9A300F6C51001EE733 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C41ECA99300F6C51001EE733 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C41ECA9C300F6C51001EE733 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C41ECA99300F6C51001EE733 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C4CF4D38300B64D2005D51B4 /* Project object */;
 }
