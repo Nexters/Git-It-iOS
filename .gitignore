@@ -139,8 +139,6 @@ playground.xcworkspace
 # Swift Package Manager
 # Package.resolved
 *.xcworkspacedata
-App/release.xcconfig
-App/debug.xcconfig
+src/App/Config
 .specify
 .agents
-GitIt.xcodeproj/xcshareddata
