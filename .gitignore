@@ -6,7 +6,8 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
+
 
 # Volume root files
 .DocumentRevisions-V100
@@ -139,6 +140,13 @@ playground.xcworkspace
 # Swift Package Manager
 # Package.resolved
 *.xcworkspacedata
-src/App/Config
-.specify
-.agents
+
+# Tuist
+source/.build/
+source/.tuist-cache/
+source/Tuist/Dependencies/
+source/**/.build/
+source/**/.swiftpm/
+source/**/Derived/
+source/**/*.xcodeproj/
+source/**/*.xcworkspace/

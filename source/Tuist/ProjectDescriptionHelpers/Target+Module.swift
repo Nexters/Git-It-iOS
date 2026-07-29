@@ -1,0 +1,52 @@
+import ProjectDescription
+
+extension Target {
+    static func module(
+        name: String,
+        resources: ResourceFileElements? = nil,
+        dependencies: [TargetDependency] = []
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .framework,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("17.0"),
+            infoPlist: .default,
+            sources: ["\(name)/**"],
+            resources: resources,
+            dependencies: dependencies,
+            settings: .settings(
+                base: [
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "SKIP_INSTALL": "YES",
+                    "SWIFT_VERSION": "5.0",
+                ]
+            )
+        )
+    }
+
+    static func resourceBundle(
+        name: String,
+        resources: ResourceFileElements
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .bundle,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("17.0"),
+            infoPlist: .default,
+            resources: resources,
+            settings: .settings(
+                base: [
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "SKIP_INSTALL": "YES",
+                ]
+            )
+        )
+    }
+}
