@@ -142,11 +142,15 @@ playground.xcworkspace
 *.xcworkspacedata
 
 # Tuist
-source/.build/
-source/.tuist-cache/
-source/Tuist/Dependencies/
-source/**/.build/
-source/**/.swiftpm/
-source/**/Derived/
-source/**/*.xcodeproj/
-source/**/*.xcworkspace/
+.tuist-cache/
+.swiftpm/
+Derived/
+*.xcodeproj/
+*.xcworkspace/
+*.code-workspace
+*.xcconfig
+
+# Generated build artifacts
+.build/
+specs/
+.claude
