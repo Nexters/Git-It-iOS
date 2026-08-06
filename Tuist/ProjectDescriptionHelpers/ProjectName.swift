@@ -35,11 +35,21 @@ extension ProjectName {
             case .UI:
                 UIModuleName.targets
             }
+        let options: Project.Options =
+            self == .App
+                ? .options(automaticSchemesOptions: .disabled)
+                : .options()
+        let schemes: [Scheme] =
+            self == .App
+                ? AppModuleName.schemes
+                : []
 
         return Project(
             name: rawValue,
             organizationName: "Nexters",
+            options: options,
             targets: targets,
+            schemes: schemes,
         )
     }
 }
