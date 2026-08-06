@@ -1,5 +1,7 @@
 import ProjectDescription
 
+// MARK: - FeatureModuleName
+
 enum FeatureModuleName: String, CaseIterable {
     case Feature
 }
@@ -9,17 +11,17 @@ extension FeatureModuleName {
         .module(
             name: rawValue,
             dependencies: [
+                .fromDI(.DIInterface),
                 .fromDomain(.Domain),
-                .fromUI(.DesignSystem),
                 .fromUI(.UIComponent),
                 .external(.ComposableArchitecture),
-            ]
+            ],
         )
     }
 }
 
 extension TargetDependency {
     static func fromFeature(_ name: FeatureModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Features")
+        .project(target: name.rawValue, path: "../Feature")
     }
 }

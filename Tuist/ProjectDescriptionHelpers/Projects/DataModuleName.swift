@@ -1,5 +1,7 @@
 import ProjectDescription
 
+// MARK: - DataModuleName
+
 enum DataModuleName: String, CaseIterable {
     case Data
 }
@@ -7,14 +9,7 @@ enum DataModuleName: String, CaseIterable {
 extension DataModuleName {
     var target: Target {
         .module(
-            name: rawValue,
-            dependencies: [
-                .fromCore(.Auth),
-                .fromCore(.Cache),
-                .fromCore(.HTTPClient),
-                .fromDomain(.Domain),
-                .fromUtility(.Utility),
-            ]
+            name: rawValue
         )
     }
 }

@@ -1,4 +1,4 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = ProjectName.Features.project
+let project = ProjectName.Feature.project

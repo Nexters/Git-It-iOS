@@ -1,36 +1,24 @@
 import ProjectDescription
 
-enum UIModuleName: String, CaseIterable {
+// MARK: - UIModuleName
+
+enum UIModuleName: String {
     case DesignSystem
     case UIComponent
-    case Resource
 }
 
 extension UIModuleName {
-    var target: Target {
-        switch self {
-        case .DesignSystem:
-            .module(
-                name: rawValue,
-                dependencies: [
-                    .target(name: UIModuleName.Resource.rawValue),
-                ]
-            )
-        case .UIComponent:
-            .module(
-                name: rawValue,
-                dependencies: [
-                    .target(name: UIModuleName.DesignSystem.rawValue),
-                    .target(name: UIModuleName.Resource.rawValue),
-                ]
-            )
-        case .Resource:
-            .resourceBundle(
-                name: rawValue,
-                resources: ["Resources/**"]
-            )
-        }
-    }
+    static let targets: [Target] = [
+        .module(
+            name: UIModuleName.UIComponent.rawValue,
+            dependencies: [
+                .target(name: UIModuleName.DesignSystem.rawValue)
+            ],
+        ),
+        .module(
+            name: UIModuleName.DesignSystem.rawValue
+        ),
+    ]
 }
 
 extension TargetDependency {

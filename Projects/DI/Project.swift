@@ -1,4 +1,4 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = ProjectName.Utility.project
+let project = ProjectName.DI.project

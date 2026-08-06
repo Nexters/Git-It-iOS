@@ -1,5 +1,7 @@
 import ProjectDescription
 
+// MARK: - DomainModuleName
+
 enum DomainModuleName: String, CaseIterable {
     case Domain
 }

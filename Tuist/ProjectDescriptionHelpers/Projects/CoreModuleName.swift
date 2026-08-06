@@ -1,15 +1,17 @@
 import ProjectDescription
 
-enum CoreModuleName: String, CaseIterable {
-    case Auth
-    case Cache
-    case HTTPClient
+// MARK: - CoreModuleName
+
+enum CoreModuleName: String {
+    case Utility
 }
 
 extension CoreModuleName {
-    var target: Target {
-        .module(name: rawValue)
-    }
+    static let targets: [Target] = [
+        .module(
+            name: CoreModuleName.Utility.rawValue
+        )
+    ]
 }
 
 extension TargetDependency {

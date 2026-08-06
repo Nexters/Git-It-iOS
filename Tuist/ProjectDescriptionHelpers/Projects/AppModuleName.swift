@@ -1,5 +1,7 @@
 import ProjectDescription
 
+// MARK: - AppModuleName
+
 enum AppModuleName: String, CaseIterable {
     case GitIt
 }
@@ -11,11 +13,11 @@ extension AppModuleName {
             destinations: .iOS,
             product: .app,
             bundleId: "com.nexters.hytime.gitit",
-            deploymentTargets: .iOS("17.0"),
+            deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "UIApplicationSceneManifest": [
-                        "UIApplicationSupportsMultipleScenes": false,
+                        "UIApplicationSupportsMultipleScenes": false
                     ],
                     "UIApplicationSupportsIndirectInputEvents": true,
                     "UILaunchScreen": [:],
@@ -36,16 +38,8 @@ extension AppModuleName {
             resources: ["Resources/**"],
             entitlements: .file(path: "GitIt.entitlements"),
             dependencies: [
-                .fromCore(.Auth),
-                .fromCore(.Cache),
-                .fromCore(.HTTPClient),
-                .fromDomain(.Domain),
-                .fromData(.Data),
-                .fromUI(.DesignSystem),
-                .fromUI(.UIComponent),
-                .fromUI(.Resource),
+                .fromDI(.DILive),
                 .fromFeature(.Feature),
-                .fromUtility(.Utility),
                 .external(.FirebaseAnalytics),
                 .external(.FirebaseCrashlytics),
             ],
@@ -57,10 +51,11 @@ extension AppModuleName {
                     "CURRENT_PROJECT_VERSION": "1",
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_PREVIEWS": "YES",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "MARKETING_VERSION": "1.0",
                     "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                     "SUPPORTS_MACCATALYST": "NO",
-                    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
+                    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
                     "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "NO",
                     "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                     "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
@@ -71,14 +66,14 @@ extension AppModuleName {
                 configurations: [
                     .debug(
                         name: "Debug",
-                        xcconfig: "Config/debug.xcconfig"
+                        xcconfig: "Config/debug.xcconfig",
                     ),
                     .release(
                         name: "Release",
-                        xcconfig: "Config/release.xcconfig"
+                        xcconfig: "Config/release.xcconfig",
                     ),
-                ]
-            )
+                ],
+            ),
         )
     }
 }
