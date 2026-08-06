@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# 스크립트 실행 중 에러가 발생하면 즉시 종료합니다.
+set -e
+
+# Git이 전달하는 커밋 메시지 파일(.git/COMMIT_EDITMSG)이 존재하는지 확인합니다.
+if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+  echo "오류: 커밋 메시지 파일이 전달되지 않았습니다." >&2
+  exit 2
+fi
+
+# 1. 주석을 제외한 실제 커밋 메시지 내용 추출
+commit_message_clean=$(git stripspace --strip-comments < "$1") || {
+  echo "오류: 커밋 메시지를 읽을 수 없습니다." >&2
+  exit 2
+}
+
+# 2. 첫 줄(제목) 가져오기
+commit_message_subject=$(echo "$commit_message_clean" | sed -n '1p')
+
+# 3. 정규식을 활용하여 "[태그] 내용" 형식인지 검증
+# 허용된 태그 목록 정의
+ALLOWED_TAGS="Init|Feat|Fix|Refactor|Test|Docs|Style|Perf|Build|CI|Chore|Rename|Remove|Revert"
+
+# 제목이 [Tag] Message 형식에 맞는지 확인
+if ! echo "$commit_message_subject" | grep -Eq "^\[($ALLOWED_TAGS)\] .+"; then
+  echo "오류[commit-convention.message-invalid]: 제목 형식 또는 tag가 올바르지 않습니다" >&2
+  echo "조치: [Tag] Message 형식과 허용 tag를 사용하세요" >&2
+  echo "규칙: .github/COMMIT_CONVENTION.md" >&2
+  exit 1
+fi
