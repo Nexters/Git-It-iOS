@@ -54,7 +54,7 @@ jobs:
             ~/.tuist/Cache
             Tuist/.build
             .build
-            .swift-style/.build
+            Tools/swift-style/.build
           key: ${{ runner.os }}-dependencies-${{ hashFiles('Tuist/Package.resolved', 'Tuist/Package.swift', 'Project.swift', 'Workspace.swift') }}
           restore-keys: |
             ${{ runner.os }}-dependencies-
@@ -66,7 +66,7 @@ jobs:
         run: tuist generate --no-open
 
       - name: Lint Swift style
-        run: .swift-style/scripts/lint.sh "${{ github.workspace }}/Projects/"
+        run: ./.githooks/swift-format/bin/run.sh lint
 
       - name: Build shared schemes
         run: ./.githooks/project-build/bin/run.sh build
