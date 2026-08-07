@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - release/**
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=26.0,name=iPhone 17
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Prepare CI configuration
+        run: |
+          mkdir -p Projects/Config
+          touch Projects/Config/debug.xcconfig
+          touch Projects/Config/release.xcconfig
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            tuist = "4.202.2"
+
+      - name: Verify toolchain
+        run: |
+          xcodebuild -version
+          tuist version
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.tuist/Cache
+            Tuist/.build
+            .build
+            .swift-style/.build
+          key: ${{ runner.os }}-dependencies-${{ hashFiles('Tuist/Package.resolved', 'Tuist/Package.swift', 'Project.swift', 'Workspace.swift') }}
+          restore-keys: |
+            ${{ runner.os }}-dependencies-
+
+      - name: Install dependencies
+        run: tuist install
+
+      - name: Generate workspace
+        run: tuist generate --no-open
+
+      - name: Lint Swift style
+        run: .swift-style/scripts/lint.sh "${{ github.workspace }}/Projects/"
+
+      - name: Build shared schemes
+        run: ./.githooks/project-build/bin/run.sh build
+
+      - name: Compile tests
+        run: ./.githooks/project-build/bin/run.sh compile
+
+      - name: Run tests
+        run: ./.githooks/project-build/bin/run.sh test
