@@ -148,6 +148,7 @@ Derived/
 *.xcodeproj/
 *.xcworkspace/
 *.code-workspace
+*.xcconfig
 
 # Generated build artifacts
 .build/
