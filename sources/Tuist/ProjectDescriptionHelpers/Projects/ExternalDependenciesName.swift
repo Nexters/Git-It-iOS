@@ -4,7 +4,6 @@ import ProjectDescription
 
 enum ExternalDependenciesName: String {
     case ComposableArchitecture
-    case Dependencies
     case FirebaseAnalytics
     case FirebaseCrashlytics
 }

@@ -8,6 +8,31 @@ enum AppModuleName: String, CaseIterable {
 }
 
 extension AppModuleName {
+    static let schemes: [Scheme] = [
+        .scheme(
+            name: AppModuleName.GitIt.rawValue,
+            shared: true,
+            buildAction: .buildAction(
+                targets: [
+                    .target(AppModuleName.GitIt.rawValue)
+                ]
+            ),
+            testAction: .targets([
+                .testableTarget(
+                    target: .target(AppModuleName.GitItTests.rawValue)
+                )
+            ]),
+            runAction: .runAction(
+                executable: .executable(.target(AppModuleName.GitIt.rawValue))
+            ),
+            archiveAction: .archiveAction(configuration: .release),
+            profileAction: .profileAction(
+                executable: .executable(.target(AppModuleName.GitIt.rawValue))
+            ),
+            analyzeAction: .analyzeAction(configuration: .debug),
+        )
+    ]
+
     var target: Target {
         switch self {
         case .GitIt:
@@ -35,13 +60,13 @@ extension AppModuleName {
                             "UIInterfaceOrientationLandscapeLeft",
                             "UIInterfaceOrientationLandscapeRight",
                         ],
-                    ],
+                    ]
                 ),
                 sources: ["Sources/**"],
                 resources: ["Resources/**"],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
-                    .fromDI(.DILive),
+                    .fromComposition(.Composition),
                     .fromFeature(.Feature),
                     .external(.FirebaseAnalytics),
                     .external(.FirebaseCrashlytics),
@@ -65,19 +90,10 @@ extension AppModuleName {
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
                         "TARGETED_DEVICE_FAMILY": "1,2",
-                    ],
-                    configurations: [
-                        .debug(
-                            name: "Debug",
-                            xcconfig: "Config/debug.xcconfig",
-                        ),
-                        .release(
-                            name: "Release",
-                            xcconfig: "Config/release.xcconfig",
-                        ),
-                    ],
+                    ]
                 ),
             )
+
         case .GitItTests:
             .target(
                 name: rawValue,
@@ -101,29 +117,4 @@ extension AppModuleName {
             )
         }
     }
-
-    static let schemes: [Scheme] = [
-        .scheme(
-            name: AppModuleName.GitIt.rawValue,
-            shared: true,
-            buildAction: .buildAction(
-                targets: [
-                    .target(AppModuleName.GitIt.rawValue)
-                ]
-            ),
-            testAction: .targets([
-                .testableTarget(
-                    target: .target(AppModuleName.GitItTests.rawValue)
-                )
-            ]),
-            runAction: .runAction(
-                executable: .executable(.target(AppModuleName.GitIt.rawValue))
-            ),
-            archiveAction: .archiveAction(configuration: .release),
-            profileAction: .profileAction(
-                executable: .executable(.target(AppModuleName.GitIt.rawValue))
-            ),
-            analyzeAction: .analyzeAction(configuration: .debug),
-        )
-    ]
 }

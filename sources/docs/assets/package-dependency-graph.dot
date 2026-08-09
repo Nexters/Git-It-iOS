@@ -1,0 +1,47 @@
+digraph PackageDependencyGraph {
+    graph [
+        rankdir = TB
+        newrank = true
+        splines = ortho
+        nodesep = 0.9
+        ranksep = 0.9
+        fontname = "Apple SD Gothic Neo"
+        fontsize = 13
+    ]
+
+    node [
+        shape = box
+        style = "rounded,filled"
+        fixedsize = true
+        width = 2.5
+        height = 0.72
+        fontname = "Apple SD Gothic Neo"
+        fontsize = 15
+        fontcolor = "#0f172a"
+        penwidth = 1.5
+    ]
+
+    edge [penwidth = 1.4, arrowsize = 0.75, color = "#475569"]
+
+    App         [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>App</B><BR/><FONT POINT-SIZE="10">Coordination · Navigation</FONT>>]
+    Composition [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Composition</B><BR/><FONT POINT-SIZE="10">Adapters · Wiring</FONT>>]
+    Feature     [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Feature</B><BR/><FONT POINT-SIZE="10">TCA · Presentation</FONT>>]
+    Domain      [fillcolor = "#d1fae5", color = "#059669", label = <<B>Domain</B><BR/><FONT POINT-SIZE="10">Business Rules</FONT>>]
+    Data        [fillcolor = "#fef3c7", color = "#d97706", label = <<B>Data</B><BR/><FONT POINT-SIZE="10">Data Management</FONT>>]
+    Core        [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>Core</B><BR/><FONT POINT-SIZE="10">Technology API</FONT>>]
+    UI          [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>UI</B><BR/><FONT POINT-SIZE="10">Design System</FONT>>]
+
+    { rank = same; Feature; Composition }
+    { rank = same; Domain; Data; Core; UI }
+
+    App -> Feature
+    App -> Composition
+    App -> Domain
+
+    Feature -> Domain
+    Feature -> UI
+
+    Composition -> Domain
+    Composition -> Data
+    Composition -> Core
+}

@@ -4,7 +4,7 @@ import ProjectDescription
 
 public enum ProjectName: String, CaseIterable {
     case App
-    case DI
+    case Composition
     case Feature
     case Domain
     case Data
@@ -22,8 +22,8 @@ extension ProjectName {
             switch self {
             case .App:
                 AppModuleName.allCases.map(\.target)
-            case .DI:
-                DIModuleName.targets
+            case .Composition:
+                CompositionModuleName.allCases.map(\.target)
             case .Feature:
                 FeatureModuleName.allCases.map(\.target)
             case .Domain:

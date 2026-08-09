@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - GitItApp
+
 @main
 struct GitItApp: App {
 

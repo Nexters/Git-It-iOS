@@ -11,7 +11,6 @@ extension FeatureModuleName {
         .module(
             name: rawValue,
             dependencies: [
-                .fromDI(.DIInterface),
                 .fromDomain(.Domain),
                 .fromUI(.UIComponent),
                 .external(.ComposableArchitecture),
