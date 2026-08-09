@@ -8,6 +8,25 @@ Git It의 iOS 애플리케이션 저장소입니다.
 - SwiftUI
 - Tuist
 
+## 프로젝트 초기화
+
+저장소를 처음 내려받은 후 다음 명령으로 Tuist 프로젝트 생성과 Git 훅 설치를 함께
+실행합니다.
+
+```sh
+make init
+```
+
+`make help`로 각 단계를 개별 실행하는 명령을 확인할 수 있습니다. Makefile은 각 기능의
+공개 `bin/` 명령만 순서대로 호출하며 별도 정책을 갖지 않습니다.
+
+`tuist generate`는 `sources/GitIt.xcworkspace`를 생성합니다. `make tuist`(또는
+`make init`)는 이어서 저장소 루트에 같은 워크스페이스를 가리키는 심볼릭 링크
+`GitIt.xcworkspace`를 만들어 루트에서 바로 Xcode로 열 수 있게 합니다. 실제 파일은
+`sources/` 아래에만 있으므로 Projects·Tuist 상대경로 참조가 깨지지 않으며, 빌드
+스크립트가 사용하는 `GIT_IT_WORKSPACE_PATH`도 `sources/GitIt.xcworkspace`를 그대로
+가리킵니다.
+
 ## 프로젝트 생성
 
 ```sh
@@ -83,7 +102,8 @@ pre-commit에서는 staged Swift 파일만 포매팅하고 결과가 Git index�
 
 ## Git 훅 설정
 
-저장소를 처음 내려받은 후 다음 명령을 실행합니다.
+저장소를 처음 내려받은 후 다음 명령을 실행합니다. `make init` 또는 `make hooks`로도 같은
+명령을 실행할 수 있습니다.
 
 ```sh
 ./tools/githooks/hook-management/bin/install.sh
@@ -105,7 +125,7 @@ pre-commit에서는 staged Swift 파일만 포매팅하고 결과가 Git index�
 
 `tools/githooks`, `tools/repository-paths`, `tools/script-verification`의 셸 스크립트는 다음
 명령으로 정적 검사와 회귀 테스트를 실행합니다. ShellCheck와 shfmt가 없으면 준비 명령을 먼저
-실행합니다.
+실행합니다. 준비 명령은 `make verify-tools`로도 실행할 수 있습니다.
 
 ```sh
 ./tools/script-verification/bin/prepare-tools.sh

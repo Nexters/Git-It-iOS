@@ -72,7 +72,8 @@ Derived/
 
 # Generated Xcode projects
 *.xcodeproj/
-*.xcworkspace/
+# 슬래시 없이 남겨 루트에 생성하는 워크스페이스 심볼릭 링크도 함께 무시합니다.
+*.xcworkspace
 *.code-workspace
 
 
