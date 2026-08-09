@@ -1,0 +1,14 @@
+{
+  "GIT_IT_PATHS_FILE": "tools/repository-paths/repository-paths.json",
+  "GIT_IT_IOS_ROOT": "sources",
+  "GIT_IT_PROJECTS_ROOT": "sources/Projects",
+  "GIT_IT_TUIST_ROOT": "sources/Tuist",
+  "GIT_IT_WORKSPACE_PATH": "sources/GitIt.xcworkspace",
+  "GIT_IT_DERIVED_DATA_PATH": "sources/DerivedData/PreCommit",
+  "GIT_IT_SWIFT_STYLE_ROOT": "tools/swift-style",
+  "GIT_IT_HOOKS_ROOT": "tools/githooks",
+  "GIT_IT_ARCHITECTURE_PATH": "sources/docs/architecture.md",
+  "GIT_IT_SWIFT_FORMAT_RUNNER": "tools/githooks/swift-format/bin/run.sh",
+  "GIT_IT_PROJECT_BUILD_RUNNER": "tools/githooks/project-build/bin/run.sh",
+  "GIT_IT_SCRIPT_VERIFICATION_RUNNER": "tools/script-verification/bin/run.sh"
+}
