@@ -54,6 +54,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
+## Allowed Write Paths
+
+This skill may modify only the newly resolved `specs/<feature>/**` directory and
+`.specify/feature.json`. It MUST NOT modify application code, project configuration,
+or any other feature directory.
+
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:

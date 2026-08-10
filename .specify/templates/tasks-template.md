@@ -25,6 +25,9 @@ description: "Task list template for feature implementation"
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
 - Paths shown below assume single project - adjust based on plan.md structure
+- Every task that changes a file MUST name its exact repository-relative path. Those
+  paths define the permitted write set for `/speckit-implement`; do not rely on a
+  broad directory-level allowance such as `sources/**`.
 
 <!--
   ============================================================================

@@ -54,6 +54,15 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
+## Allowed Write Paths
+
+This skill may modify only (1) files named by an incomplete task in the active
+`tasks.md`, and (2) checkbox states for completed tasks in that same `tasks.md`.
+Each implementation task MUST name an exact repository-relative path. A directory
+such as `sources/**` is not a blanket allowance. If a needed file is absent from the
+task list, stop and request an updated task instead of modifying it. Do not create or
+amend ignore files unless an active task explicitly names that exact ignore file.
+
 1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
@@ -97,7 +106,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read quickstart.md for integration scenarios
 
 4. **Project Setup Verification**:
-   - **REQUIRED**: Create/verify ignore files based on actual project setup:
+   - Inspect ignore files only. Create or amend an ignore file only when an incomplete
+     active task explicitly names that exact file.
 
    **Detection & Creation Logic**:
    - Check if the following command succeeds to determine if the repository is a git repo (create/verify .gitignore if so):

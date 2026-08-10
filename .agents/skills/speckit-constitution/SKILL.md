@@ -35,6 +35,13 @@ constitution-driven changes to the dependent artifacts identified in this comman
   as `/speckit-specify`, without invoking it.
 - If there are no non-governance intents, omit the `Next Actions` section.
 
+## Allowed Write Paths
+
+This skill may modify only `.specify/memory/constitution.md`, constitution-dependent
+files under `.specify/templates/`, and installed Spec-Kit skill instructions matching
+`.agents/skills/speckit-*/SKILL.md`. It MUST NOT modify application code, tests,
+project configuration, or unrelated agent instructions.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before constitution update)**:

@@ -54,6 +54,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
+## Allowed Write Paths
+
+This skill may modify only the active feature's `spec.md` and, when it exists, its
+`checklists/requirements.md` checkbox states. It MUST NOT create or modify plans,
+tasks, source files, or other checklist files.
+
 Goal: Detect and reduce ambiguity or missing decision points in the active feature specification and record the clarifications directly in the spec file.
 
 Note: This clarification workflow is expected to run (and be completed) BEFORE invoking `/speckit-plan`. If the user explicitly states they are skipping clarification (e.g., exploratory spike), you may proceed, but must warn that downstream rework risk increases.

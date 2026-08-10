@@ -85,6 +85,12 @@ of the code relative to the feature's artifacts — no git, no branch comparison
 When the codebase already satisfies everything, the command MUST leave `tasks.md`
 **byte-for-byte unchanged** (no empty Convergence header) and report a clean result.
 
+## Allowed Write Paths
+
+This skill may append one new `## Phase N: Convergence` section only to the active
+`specs/<feature>/tasks.md`. It has no permission to modify any other file, including
+task checkboxes, specifications, plans, source files, or configuration.
+
 **Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is
 **non-negotiable**. Code that violates a MUST principle is the highest-severity finding and
 produces a corresponding remediation task. If the constitution is an unfilled template,

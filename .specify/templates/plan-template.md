@@ -42,6 +42,11 @@
 
 [Gates determined based on constitution file]
 
+**Allowed write paths**: This command may update only this feature's `plan.md`,
+`research.md`, `data-model.md`, `quickstart.md`, and `contracts/**`. Record every
+implementation file outside these artifacts as an exact path in `tasks.md`; do not
+modify it during planning.
+
 ## Project Structure
 
 ### Documentation (this feature)

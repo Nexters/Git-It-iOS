@@ -54,6 +54,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
+## Allowed Write Paths
+
+This skill may modify only `specs/<feature>/tasks.md`. Every generated task that
+changes a file MUST include its exact repository-relative path; this is the write
+allowlist that `/speckit-implement` will use.
+
 1. **Setup**: Run `.specify/scripts/bash/setup-tasks.sh --json` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md` or `contracts/`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load design documents**: Read from FEATURE_DIR:
