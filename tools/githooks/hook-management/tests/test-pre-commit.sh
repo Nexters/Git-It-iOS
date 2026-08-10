@@ -10,6 +10,7 @@ config_relative=$("$source_paths" GIT_IT_PATHS_FILE)
 hooks_relative=$("$source_paths" GIT_IT_HOOKS_ROOT)
 swift_runner_relative=$("$source_paths" GIT_IT_SWIFT_FORMAT_RUNNER)
 project_runner_relative=$("$source_paths" GIT_IT_PROJECT_BUILD_RUNNER)
+script_tests_runner_relative=$("$source_paths" GIT_IT_SCRIPT_TEST_RUNNER)
 work=$(mktemp -d "${TMPDIR:-/tmp}/pre-commit-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 repository="$work/repository"
@@ -22,7 +23,7 @@ enabled="$stage_dir/enabled"
 PRE_COMMIT_LOG="$work/calls"
 export PRE_COMMIT_LOG
 
-for step in swift-format build compile test; do
+for step in script-tests swift-format build compile test; do
 	script="$stage_dir/$step.sh"
 	printf '%s\n' '#!/bin/sh' \
 		'printf "%s\n" "$(basename "$0" .sh)" >> "$PRE_COMMIT_LOG"' \
@@ -40,9 +41,9 @@ done
 
 # 2. 활성화한 단계를 고정 순서로 실행한다. enabled의 줄 순서는 따르지 않는다.
 : >"$PRE_COMMIT_LOG"
-printf '%s\n' '# 주석' '' 'test' 'compile' 'build' 'swift-format' >"$enabled"
+printf '%s\n' '# 주석' '' 'test' 'compile' 'build' 'swift-format' 'script-tests' >"$enabled"
 "$repository/$hooks_relative/pre-commit" >"$work/out" 2>"$work/err"
-expected=$(printf 'swift-format\nbuild\ncompile\ntest')
+expected=$(printf 'script-tests\nswift-format\nbuild\ncompile\ntest')
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ] || {
 	printf 'FAIL: pre-commit 실행 순서\n' >&2
 	exit 1
@@ -50,9 +51,9 @@ expected=$(printf 'swift-format\nbuild\ncompile\ntest')
 
 # 3. 활성화하지 않은 단계는 스크립트가 있어도 실행하지 않는다.
 : >"$PRE_COMMIT_LOG"
-printf '%s\n' 'swift-format' 'compile' >"$enabled"
+printf '%s\n' 'script-tests' 'swift-format' 'compile' >"$enabled"
 "$repository/$hooks_relative/pre-commit" >"$work/out" 2>"$work/err"
-expected=$(printf 'swift-format\ncompile')
+expected=$(printf 'script-tests\nswift-format\ncompile')
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ] || {
 	printf 'FAIL: 비활성 단계 실행\n' >&2
 	exit 1
@@ -60,7 +61,7 @@ expected=$(printf 'swift-format\ncompile')
 
 # 4. 한 단계가 실패하면 즉시 중단하고 종료 코드를 그대로 전파한다.
 : >"$PRE_COMMIT_LOG"
-printf '%s\n' 'swift-format' 'build' 'compile' 'test' >"$enabled"
+printf '%s\n' 'script-tests' 'swift-format' 'build' 'compile' 'test' >"$enabled"
 printf '%s\n' '#!/bin/sh' \
 	'printf "compile\n" >> "$PRE_COMMIT_LOG"' \
 	'exit 17' >"$stage_dir/compile.sh"
@@ -71,7 +72,7 @@ else
 	result=$?
 fi
 [ "$result" -eq 17 ]
-expected=$(printf 'swift-format\nbuild\ncompile')
+expected=$(printf 'script-tests\nswift-format\nbuild\ncompile')
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ]
 rg -q 'pre-commit.step-failed' "$work/err"
 if rg -q '^test$' "$PRE_COMMIT_LOG"; then
@@ -101,29 +102,34 @@ stage_repository="$work/stage-repository"
 mkdir -p "$stage_repository/$hooks_relative/pre-commit.d" \
 	"$(dirname -- "$stage_repository/${source_paths#"$root/"}")" \
 	"$(dirname -- "$stage_repository/$swift_runner_relative")" \
-	"$(dirname -- "$stage_repository/$project_runner_relative")"
+	"$(dirname -- "$stage_repository/$project_runner_relative")" \
+	"$(dirname -- "$stage_repository/$script_tests_runner_relative")"
 stage_repository=$(CDPATH='' cd -- "$stage_repository" && pwd -P)
 cp "$source_paths" "$stage_repository/${source_paths#"$root/"}"
 cp "$root/$config_relative" "$stage_repository/$config_relative"
-for step in swift-format build compile test; do
+for step in script-tests swift-format build compile test; do
 	cp "$root/$hooks_relative/pre-commit.d/$step.sh" "$stage_repository/$hooks_relative/pre-commit.d/$step.sh"
 done
 printf '%s\n' '#!/bin/sh' \
 	'printf "swift-format:%s:%s\\n" "$PWD" "$1" >> "$PRE_COMMIT_LOG"' >"$stage_repository/$swift_runner_relative"
 printf '%s\n' '#!/bin/sh' \
 	'printf "project-build:%s:%s\\n" "$PWD" "$1" >> "$PRE_COMMIT_LOG"' >"$stage_repository/$project_runner_relative"
+printf '%s\n' '#!/bin/sh' \
+	'printf "script-tests:%s\\n" "$PWD" >> "$PRE_COMMIT_LOG"' >"$stage_repository/$script_tests_runner_relative"
 chmod +x "$stage_repository/$swift_runner_relative" \
-	"$stage_repository/$project_runner_relative"
+	"$stage_repository/$project_runner_relative" \
+	"$stage_repository/$script_tests_runner_relative"
 : >"$PRE_COMMIT_LOG"
 (
 	cd /
+	"$stage_repository/$hooks_relative/pre-commit.d/script-tests.sh"
 	"$stage_repository/$hooks_relative/pre-commit.d/swift-format.sh"
 	"$stage_repository/$hooks_relative/pre-commit.d/build.sh"
 	"$stage_repository/$hooks_relative/pre-commit.d/compile.sh"
 	"$stage_repository/$hooks_relative/pre-commit.d/test.sh"
 )
-expected=$(printf 'swift-format:%s:staged\nproject-build:%s:build\nproject-build:%s:compile\nproject-build:%s:test' \
-	"$stage_repository" "$stage_repository" "$stage_repository" "$stage_repository")
+expected=$(printf 'script-tests:%s\nswift-format:%s:staged\nproject-build:%s:build\nproject-build:%s:compile\nproject-build:%s:test' \
+	"$stage_repository" "$stage_repository" "$stage_repository" "$stage_repository" "$stage_repository")
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ] || {
 	printf 'FAIL: 단계 스크립트가 자신의 저장소에서 실행되지 않음\n' >&2
 	exit 1

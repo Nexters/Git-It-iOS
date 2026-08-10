@@ -75,6 +75,7 @@ pre-commit에서는 staged Swift 파일만 포매팅하고 결과가 Git index�
 └── tools/
     ├── githooks/       # Git Hook 및 저장소 자동화
     ├── repository-paths/ # 저장소 공용 경로 관리
+    ├── script-tests/        # 프로젝트 셸 회귀 테스트 실행
     ├── script-verification/ # POSIX 셸 정적·회귀 검증
     └── swift-style/    # Swift 포맷·린트 도구
 ```
@@ -116,10 +117,17 @@ pre-commit에서는 staged Swift 파일만 포매팅하고 결과가 Git index�
 
 `pre-commit` 훅은 다음 순서로 공개 명령을 실행하며 한 단계가 실패하면 즉시 중단합니다.
 
-1. staged Swift 포매팅과 재스테이징 확인
-2. 전체 공유 scheme 일반 빌드
-3. 테스트 scheme 컴파일
-4. 컴파일된 테스트 실행
+1. 프로젝트 셸 회귀 테스트
+2. staged Swift 포매팅과 재스테이징 확인
+3. 전체 공유 scheme 일반 빌드
+4. 테스트 scheme 컴파일
+5. 컴파일된 테스트 실행
+
+셸 회귀 테스트는 CI와 같은 공개 명령으로 직접 실행할 수도 있습니다.
+
+```sh
+./tools/script-tests/bin/run.sh
+```
 
 ## 스크립트 공용 검증
 

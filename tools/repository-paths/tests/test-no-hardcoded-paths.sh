@@ -22,6 +22,7 @@ for key in \
 	GIT_IT_ARCHITECTURE_PATH \
 	GIT_IT_SWIFT_FORMAT_RUNNER \
 	GIT_IT_PROJECT_BUILD_RUNNER \
+	GIT_IT_SCRIPT_TEST_RUNNER \
 	GIT_IT_SCRIPT_VERIFICATION_RUNNER; do
 	value=$("$paths" "$key")
 	if rg -n -F --hidden --glob '!.git/**' --glob '!**/DerivedData/**' \

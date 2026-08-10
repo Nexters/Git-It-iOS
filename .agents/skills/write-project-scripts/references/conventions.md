@@ -24,7 +24,7 @@ Git 경로 collection은 `-z` 결과를 NUL 파일로 유지하고 `xargs -0`에
 
 `tools/githooks/commit-msg`는 커밋 컨벤션 검증 외의 책임을 갖지 않으며 `tools/githooks/`의 다른 명령이나 라이브러리를 호출 또는 source하지 않는다. 이 독립성 때문에 message file 읽기, 제목 정책 판정과 진단 렌더링을 한 파일에 함께 두되, 정책 함수는 명시적 문자열 인자만 받고 외부 상태를 변경하지 않는다. 이 예외의 영향 범위는 `commit-msg` 훅 하나이며 `scripts/` 기능 모듈의 계층 규칙을 완화하지 않는다.
 
-`tools/githooks/pre-commit`은 독립 훅 예외가 아니다. 훅과 단계 스크립트는 모두 자신의 물리 경로를 기준으로 실행 저장소를 찾고, 각 기능의 공개 `bin/`을 포매팅, 일반 빌드, 테스트 컴파일, 테스트 실행 순서로 fail-fast 호출한다. 기능 내부 파일을 source하거나 세부 정책을 다시 정의하지 않는다. staged 포매팅이 작업 트리를 변경하면 Git index에는 쓰지 않고 `swift-format.restage-required`로 커밋을 중단한다.
+`tools/githooks/pre-commit`은 독립 훅 예외가 아니다. 훅과 단계 스크립트는 모두 자신의 물리 경로를 기준으로 실행 저장소를 찾고, 각 기능의 공개 `bin/`을 셸 회귀, 포매팅, 일반 빌드, 테스트 컴파일, 테스트 실행 순서로 fail-fast 호출한다. 기능 내부 파일을 source하거나 세부 정책을 다시 정의하지 않는다. staged 포매팅이 작업 트리를 변경하면 Git index에는 쓰지 않고 `swift-format.restage-required`로 커밋을 중단한다.
 
 ## 주석 및 가독성
 

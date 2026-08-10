@@ -10,5 +10,6 @@
   "GIT_IT_ARCHITECTURE_PATH": "sources/docs/architecture.md",
   "GIT_IT_SWIFT_FORMAT_RUNNER": "tools/githooks/swift-format/bin/run.sh",
   "GIT_IT_PROJECT_BUILD_RUNNER": "tools/githooks/project-build/bin/run.sh",
+  "GIT_IT_SCRIPT_TEST_RUNNER": "tools/script-tests/bin/run.sh",
   "GIT_IT_SCRIPT_VERIFICATION_RUNNER": "tools/script-verification/bin/run.sh"
 }

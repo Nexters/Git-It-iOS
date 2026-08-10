@@ -31,6 +31,7 @@ result_policy_is_known_code() (
 		swift-format.restage-required | commit-convention.message-invalid | \
 		hook-management.install-failed | \
 		pre-commit.step-failed | \
+		script-tests.no-tests | script-tests.failed | \
 		script-verification.static-failed | \
 		script-verification.dependency-prepare-failed | \
 		script-verification.dependency-invalid | \

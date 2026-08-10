@@ -20,4 +20,5 @@
 #   compile        커밋 시간 증가 수용              (커밋 21)
 #   test           시뮬레이터 테스트 실행 가능 후   (커밋 22)
 
+script-tests
 swift-format
