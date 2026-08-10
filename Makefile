@@ -16,7 +16,7 @@ help: ## 사용 가능한 명령을 표시합니다
 
 init: tuist hooks ## Tuist 프로젝트 생성과 Git 훅 설치를 함께 실행합니다
 
-tuist: ## sources의 Tuist package를 설치·생성하고 루트에 워크스페이스 심볼릭 링크를 만듭니다
+tuist: ## iOS 프로젝트의 Tuist package를 설치·생성하고 루트에 워크스페이스 심볼릭 링크를 만듭니다
 	cd $(IOS_ROOT) && tuist install && tuist generate
 	rm -rf $(WORKSPACE_NAME)
 	ln -s $(WORKSPACE_PATH) $(WORKSPACE_NAME)

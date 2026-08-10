@@ -15,6 +15,30 @@ permissions:
   contents: read
 
 jobs:
+  script-tests:
+    name: script tests
+    runs-on: macos-26
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Run script tests
+        run: |
+          test_list="$RUNNER_TEMP/script-tests.txt"
+          find tools -type f -path '*/tests/test-*.sh' -print | LC_ALL=C sort > "$test_list"
+          [ -s "$test_list" ] || {
+            echo "No script tests found." >&2
+            exit 1
+          }
+          while IFS= read -r test_script; do
+            echo "Running $test_script"
+            /bin/sh "$test_script"
+          done < "$test_list"
+
   build-and-test:
     name: build
     runs-on: macos-26
