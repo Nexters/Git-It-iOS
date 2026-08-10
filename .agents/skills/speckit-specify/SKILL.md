@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before specification)**:
@@ -151,40 +157,40 @@ Given that feature description, do this:
    a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
 
       ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
+      # 명세 품질 체크리스트: [기능 이름]
 
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
+      **목적**: 계획 단계로 진행하기 전 명세의 완전성과 품질을 검증
+      **생성일**: [날짜]
+      **기능**: [spec.md 링크]
 
-      ## Content Quality
+      ## 내용 품질
 
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
+      - [ ] 구현 세부 사항(언어, 프레임워크, API)이 없다
+      - [ ] 사용자 가치와 비즈니스 요구에 집중한다
+      - [ ] 비기술 이해관계자도 이해할 수 있게 작성했다
+      - [ ] 모든 필수 섹션을 작성했다
 
-      ## Requirement Completeness
+      ## 요구사항 완전성
 
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
+      - [ ] [NEEDS CLARIFICATION] 표식이 남아 있지 않다
+      - [ ] 요구사항이 검증 가능하고 모호하지 않다
+      - [ ] 성공 기준이 측정 가능하다
+      - [ ] 성공 기준이 기술에 종속되지 않는다(구현 세부 사항 없음)
+      - [ ] 모든 수용 시나리오를 정의했다
+      - [ ] 예외·경계 사례를 식별했다
+      - [ ] 범위를 명확히 한정했다
+      - [ ] 의존성과 가정을 식별했다
 
-      ## Feature Readiness
+      ## 기능 준비 상태
 
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
+      - [ ] 모든 기능 요구사항에 명확한 수용 기준이 있다
+      - [ ] 사용자 시나리오가 핵심 흐름을 다룬다
+      - [ ] 기능이 성공 기준의 측정 가능한 결과를 충족한다
+      - [ ] 명세에 구현 세부 사항이 섞이지 않는다
 
-      ## Notes
+      ## 참고
 
-      - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
+      - 미완료 항목은 `/speckit-clarify` 또는 `/speckit-plan` 전에 명세를 보완해야 한다
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:

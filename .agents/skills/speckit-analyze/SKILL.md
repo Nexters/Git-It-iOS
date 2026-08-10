@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before analysis)**:
@@ -171,43 +177,45 @@ Use this heuristic to prioritize findings:
 
 Output a Markdown report (no file writes) with the following structure:
 
-## Specification Analysis Report
+## 명세 분석 보고서
 
-| ID | Category | Severity | Location(s) | Summary | Recommendation |
-|----|----------|----------|-------------|---------|----------------|
-| A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+| ID | 범주 | 심각도 | 위치 | 요약 | 권고 |
+|----|------|--------|------|------|------|
+| A1 | 중복 | 높음 | spec.md:L120-134 | 유사한 요구사항 두 개 ... | 표현을 통합하고 더 명확한 문구를 유지 |
 
 (Add one row per finding; generate stable IDs prefixed by category initial.)
 
-**Coverage Summary Table:**
+**추적 범위 요약 표:**
 
-| Requirement Key | Has Task? | Task IDs | Notes |
-|-----------------|-----------|----------|-------|
+| 요구사항 키 | 작업 존재 여부 | 작업 ID | 참고 |
+|------------|----------------|---------|------|
 
-**Constitution Alignment Issues:** (if any)
+**헌법 정합성 문제:** (있는 경우)
 
-**Unmapped Tasks:** (if any)
+**연결되지 않은 작업:** (있는 경우)
 
-**Metrics:**
+**지표:**
 
-- Total Requirements
-- Total Tasks
-- Coverage % (requirements with >=1 task)
-- Ambiguity Count
-- Duplication Count
-- Critical Issues Count
+- 전체 요구사항 수
+- 전체 작업 수
+- 추적 범위 %(하나 이상의 작업이 있는 요구사항)
+- 모호성 수
+- 중복 수
+- 중요 문제 수
 
-### 7. Provide Next Actions
+### 7. 다음 작업 제시
 
-At end of report, output a concise Next Actions block:
+보고서 끝에 간결한 다음 작업 블록을 출력한다.
 
-- If CRITICAL issues exist: Recommend resolving before `/speckit-implement`
-- If only LOW/MEDIUM: User may proceed, but provide improvement suggestions
-- Provide explicit command suggestions: e.g., "Run /speckit-specify with refinement", "Run /speckit-plan to adjust architecture", "Manually edit tasks.md to add coverage for 'performance-metrics'"
+- 중요 문제가 있으면 `/speckit-implement` 전에 해결하도록 권고한다.
+- 낮음/보통 문제만 있으면 진행할 수 있음을 알리되 개선안을 제공한다.
+- 예: "/speckit-specify로 명세 보완", "/speckit-plan으로 아키텍처 조정",
+  "tasks.md에 performance-metrics 추적 작업을 직접 추가"처럼 구체적인 명령을 제안한다.
 
 ### 8. Offer Remediation
 
-Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
+사용자에게 "상위 N개 문제에 대한 구체적인 개선 편집안을 제안할까요?"라고 묻는다.
+(사용자 승인 없이 자동으로 적용하지 않는다.)
 
 ### 9. Check for extension hooks
 

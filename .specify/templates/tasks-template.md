@@ -1,255 +1,256 @@
 ---
 
-description: "Task list template for feature implementation"
+description: "기능 구현 작업 목록 템플릿"
 ---
 
-# Tasks: [FEATURE NAME]
+# 작업 목록: [FEATURE NAME]
 
-**Input**: Design documents from `/specs/[###-feature-name]/`
+**입력**: `/specs/[###-feature-name]/`의 설계 문서
 
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**선행 조건**: plan.md(필수), spec.md(사용자 스토리에 필수), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**테스트**: 아래 예시에는 테스트 작업이 포함되어 있다. 테스트는 선택 사항이며 기능 명세에서
+명시적으로 요청한 경우에만 포함한다.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**구성**: 각 스토리를 독립적으로 구현하고 검증할 수 있도록 사용자 스토리별로 작업을 묶는다.
 
-## Format: `[ID] [P?] [Story] Description`
+## 형식: `[ID] [P?] [스토리] 설명`
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+- **[P]**: 병렬 실행 가능(서로 다른 파일, 의존성 없음)
+- **[스토리]**: 작업이 속한 사용자 스토리(예: US1, US2, US3)
+- 설명에는 정확한 파일 경로를 포함한다.
 
-## Path Conventions
+## 경로 규칙
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
-- Every task that changes a file MUST name its exact repository-relative path. Those
-  paths define the permitted write set for `/speckit-implement`; do not rely on a
-  broad directory-level allowance such as `sources/**`.
+- **단일 프로젝트**: 저장소 루트의 `src/`, `tests/`
+- **웹 앱**: `backend/src/`, `frontend/src/`
+- **모바일**: `api/src/`, `ios/src/` 또는 `android/src/`
+- 아래 경로는 단일 프로젝트를 가정하므로 plan.md 구조에 맞춰 조정한다.
+- 파일을 변경하는 모든 작업은 정확한 저장소 상대 경로를 적어야 한다. 그 경로가
+  `/speckit-implement`의 허용 수정 집합을 정의하므로 `sources/**` 같은 광범위한
+  디렉터리 허용에 의존하지 않는다.
 
 <!--
   ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
+  중요: 아래 작업은 형식을 보여 주기 위한 예시일 뿐이다.
 
-  The /speckit-tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
+  /speckit-tasks는 아래 작업을 다음을 바탕으로 한 실제 작업으로 반드시 교체해야 한다.
+  - spec.md의 사용자 스토리(우선순위 P1, P2, P3 등 포함)
+  - plan.md의 기능 요구사항
+  - data-model.md의 엔터티
+  - contracts/의 엔드포인트
 
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
+  각 스토리를 다음처럼 다룰 수 있도록 작업을 사용자 스토리별로 구성해야 한다.
+  - 독립적으로 구현
+  - 독립적으로 검증
+  - MVP 증분으로 제공
 
-  DO NOT keep these sample tasks in the generated tasks.md file.
+  생성된 tasks.md 파일에 이 예시 작업을 남기지 않는다.
   ============================================================================
 -->
 
-## Phase 1: Setup (Shared Infrastructure)
+## 단계 1: 준비(공통 기반)
 
-**Purpose**: Project initialization and basic structure
+**목적**: 프로젝트 초기화와 기본 구조 구성
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
-
----
-
-## Phase 2: Foundational (Blocking Prerequisites)
-
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
-
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
-
-Examples of foundational tasks (adjust based on your project):
-
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
-
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+- [ ] T001 구현 계획에 따른 프로젝트 구조 생성
+- [ ] T002 [language] 프로젝트를 [framework] 의존성과 함께 초기화
+- [ ] T003 [P] 린트와 포맷 도구 구성
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## 단계 2: 기반(차단 선행 조건)
 
-**Goal**: [Brief description of what this story delivers]
+**목적**: 어떤 사용자 스토리보다 먼저 완료되어야 하는 핵심 기반 구성
 
-**Independent Test**: [How to verify this story works on its own]
+**⚠️ 중요**: 이 단계가 완료되기 전에는 사용자 스토리 작업을 시작할 수 없다.
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+기반 작업 예시(프로젝트에 맞게 조정):
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+- [ ] T004 데이터베이스 스키마와 마이그레이션 기반 구성
+- [ ] T005 [P] 인증·권한 부여 기반 구현
+- [ ] T006 [P] API 라우팅과 미들웨어 구조 구성
+- [ ] T007 모든 스토리가 의존하는 기본 모델·엔터티 생성
+- [ ] T008 오류 처리와 로깅 기반 구성
+- [ ] T009 환경 설정 관리 구성
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Implementation for User Story 1
-
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
-
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+**점검 지점**: 기반 준비 완료 — 이제 사용자 스토리 구현을 병렬로 시작할 수 있다.
 
 ---
 
-## Phase 4: User Story 2 - [Title] (Priority: P2)
+## 단계 3: 사용자 스토리 1 - [제목] (우선순위: P1) 🎯 MVP
 
-**Goal**: [Brief description of what this story delivers]
+**목표**: [이 스토리가 제공하는 기능의 간단한 설명]
 
-**Independent Test**: [How to verify this story works on its own]
+**독립 테스트**: [이 스토리만으로 동작을 검증하는 방법]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### 사용자 스토리 1의 테스트(선택 사항 — 테스트를 요청한 경우만) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+> **참고: 구현 전에 이 테스트를 먼저 작성하고 실패하는지 확인한다.**
 
-### Implementation for User Story 2
+- [ ] T010 [P] [US1] tests/contract/test_[name].py에 [endpoint] 계약 테스트 작성
+- [ ] T011 [P] [US1] tests/integration/test_[name].py에 [사용자 여정] 통합 테스트 작성
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+### 사용자 스토리 1 구현
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+- [ ] T012 [P] [US1] src/models/[entity1].py에 [Entity1] 모델 생성
+- [ ] T013 [P] [US1] src/models/[entity2].py에 [Entity2] 모델 생성
+- [ ] T014 [US1] src/services/[service].py에 [Service] 구현(T012, T013에 의존)
+- [ ] T015 [US1] src/[location]/[file].py에 [endpoint/feature] 구현
+- [ ] T016 [US1] 유효성 검증과 오류 처리 추가
+- [ ] T017 [US1] 사용자 스토리 1 동작의 로깅 추가
 
----
-
-## Phase 5: User Story 3 - [Title] (Priority: P3)
-
-**Goal**: [Brief description of what this story delivers]
-
-**Independent Test**: [How to verify this story works on its own]
-
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
-
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
-
-### Implementation for User Story 3
-
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
-
-**Checkpoint**: All user stories should now be independently functional
+**점검 지점**: 이 시점에 사용자 스토리 1은 완전히 동작하고 독립적으로 테스트할 수 있어야 한다.
 
 ---
 
-[Add more user story phases as needed, following the same pattern]
+## 단계 4: 사용자 스토리 2 - [제목] (우선순위: P2)
+
+**목표**: [이 스토리가 제공하는 기능의 간단한 설명]
+
+**독립 테스트**: [이 스토리만으로 동작을 검증하는 방법]
+
+### 사용자 스토리 2의 테스트(선택 사항 — 테스트를 요청한 경우만) ⚠️
+
+- [ ] T018 [P] [US2] tests/contract/test_[name].py에 [endpoint] 계약 테스트 작성
+- [ ] T019 [P] [US2] tests/integration/test_[name].py에 [사용자 여정] 통합 테스트 작성
+
+### 사용자 스토리 2 구현
+
+- [ ] T020 [P] [US2] src/models/[entity].py에 [Entity] 모델 생성
+- [ ] T021 [US2] src/services/[service].py에 [Service] 구현
+- [ ] T022 [US2] src/[location]/[file].py에 [endpoint/feature] 구현
+- [ ] T023 [US2] 필요하면 사용자 스토리 1 구성 요소와 통합
+
+**점검 지점**: 이 시점에 사용자 스토리 1과 2가 모두 독립적으로 동작해야 한다.
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## 단계 5: 사용자 스토리 3 - [제목] (우선순위: P3)
 
-**Purpose**: Improvements that affect multiple user stories
+**목표**: [이 스토리가 제공하는 기능의 간단한 설명]
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+**독립 테스트**: [이 스토리만으로 동작을 검증하는 방법]
 
----
+### 사용자 스토리 3의 테스트(선택 사항 — 테스트를 요청한 경우만) ⚠️
 
-## Dependencies & Execution Order
+- [ ] T024 [P] [US3] tests/contract/test_[name].py에 [endpoint] 계약 테스트 작성
+- [ ] T025 [P] [US3] tests/integration/test_[name].py에 [사용자 여정] 통합 테스트 작성
 
-### Phase Dependencies
+### 사용자 스토리 3 구현
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
+- [ ] T026 [P] [US3] src/models/[entity].py에 [Entity] 모델 생성
+- [ ] T027 [US3] src/services/[service].py에 [Service] 구현
+- [ ] T028 [US3] src/[location]/[file].py에 [endpoint/feature] 구현
 
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
-
-### Within Each User Story
-
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
-- Core implementation before integration
-- Story complete before moving to next priority
-
-### Parallel Opportunities
-
-- All Setup tasks marked [P] can run in parallel
-- All Foundational tasks marked [P] can run in parallel (within Phase 2)
-- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
+**점검 지점**: 이제 모든 사용자 스토리가 독립적으로 동작해야 한다.
 
 ---
 
-## Parallel Example: User Story 1
+[필요하면 같은 형식으로 사용자 스토리 단계를 더 추가]
+
+---
+
+## 단계 N: 마무리와 횡단 관심사
+
+**목적**: 여러 사용자 스토리에 영향을 주는 개선
+
+- [ ] TXXX [P] docs/의 문서 갱신
+- [ ] TXXX 코드 정리와 리팩터링
+- [ ] TXXX 모든 스토리에 걸친 성능 최적화
+- [ ] TXXX [P] 요청된 경우 tests/unit/에 추가 단위 테스트 작성
+- [ ] TXXX 보안 강화
+- [ ] TXXX quickstart.md 검증 실행
+
+---
+
+## 의존성과 실행 순서
+
+### 단계 의존성
+
+- **준비(단계 1)**: 의존성이 없으므로 즉시 시작할 수 있다.
+- **기반(단계 2)**: 준비 완료에 의존하며 모든 사용자 스토리를 차단한다.
+- **사용자 스토리(단계 3+)**: 모두 기반 단계 완료에 의존한다.
+  - 인력이 있으면 사용자 스토리를 병렬로 진행할 수 있다.
+  - 또는 우선순위(P1 → P2 → P3) 순서로 순차 진행한다.
+- **마무리(최종 단계)**: 원하는 모든 사용자 스토리가 완료된 뒤 진행한다.
+
+### 사용자 스토리 의존성
+
+- **사용자 스토리 1(P1)**: 기반(단계 2) 후 시작하며 다른 스토리에 의존하지 않는다.
+- **사용자 스토리 2(P2)**: 기반(단계 2) 후 시작하며 US1과 통합할 수 있지만 독립적으로 검증 가능해야 한다.
+- **사용자 스토리 3(P3)**: 기반(단계 2) 후 시작하며 US1/US2와 통합할 수 있지만 독립적으로 검증 가능해야 한다.
+
+### 각 사용자 스토리 내부
+
+- 테스트를 포함하면 구현 전에 작성하고 실패해야 한다.
+- 모델을 서비스보다 먼저 작성한다.
+- 서비스를 엔드포인트보다 먼저 작성한다.
+- 핵심 구현을 통합보다 먼저 완료한다.
+- 다음 우선순위로 넘어가기 전에 스토리를 완료한다.
+
+### 병렬 실행 기회
+
+- [P]가 붙은 모든 준비 작업은 병렬로 실행할 수 있다.
+- [P]가 붙은 모든 기반 작업은 단계 2 안에서 병렬로 실행할 수 있다.
+- 기반 단계를 완료하면 팀 역량이 허용하는 한 모든 사용자 스토리를 병렬로 시작할 수 있다.
+- 사용자 스토리의 [P] 테스트는 모두 병렬로 실행할 수 있다.
+- 스토리 안의 [P] 모델은 병렬로 작업할 수 있다.
+- 서로 다른 사용자 스토리는 서로 다른 팀원이 병렬로 작업할 수 있다.
+
+---
+
+## 병렬 실행 예시: 사용자 스토리 1
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
+# 사용자 스토리 1의 모든 테스트를 함께 시작(테스트를 요청한 경우):
+작업: "tests/contract/test_[name].py에 [endpoint] 계약 테스트 작성"
+작업: "tests/integration/test_[name].py에 [사용자 여정] 통합 테스트 작성"
 
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
+# 사용자 스토리 1의 모든 모델을 함께 시작:
+작업: "src/models/[entity1].py에 [Entity1] 모델 생성"
+작업: "src/models/[entity2].py에 [Entity2] 모델 생성"
 ```
 
 ---
 
-## Implementation Strategy
+## 구현 전략
 
-### MVP First (User Story 1 Only)
+### MVP 우선(사용자 스토리 1만)
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
+1. 단계 1: 준비를 완료한다.
+2. 단계 2: 기반을 완료한다(중요 — 모든 스토리를 차단).
+3. 단계 3: 사용자 스토리 1을 완료한다.
+4. **중단 후 검증**: 사용자 스토리 1을 독립적으로 테스트한다.
+5. 준비되었으면 배포하거나 시연한다.
 
-### Incremental Delivery
+### 점진적 제공
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
+1. 준비 + 기반 완료 → 기반 준비 완료
+2. 사용자 스토리 1 추가 → 독립 테스트 → 배포/시연(MVP)
+3. 사용자 스토리 2 추가 → 독립 테스트 → 배포/시연
+4. 사용자 스토리 3 추가 → 독립 테스트 → 배포/시연
+5. 각 스토리는 이전 스토리를 손상하지 않고 가치를 더한다.
 
-### Parallel Team Strategy
+### 병렬 팀 전략
 
-With multiple developers:
+여러 개발자가 참여하는 경우:
 
-1. Team completes Setup + Foundational together
-2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories complete and integrate independently
+1. 팀이 준비 + 기반을 함께 완료한다.
+2. 기반을 마친 뒤:
+   - 개발자 A: 사용자 스토리 1
+   - 개발자 B: 사용자 스토리 2
+   - 개발자 C: 사용자 스토리 3
+3. 스토리를 독립적으로 완료하고 통합한다.
 
 ---
 
-## Notes
+## 참고
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Verify tests fail before implementing
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- [P] 작업 = 서로 다른 파일, 의존성 없음
+- [스토리] 라벨은 추적성을 위해 작업을 특정 사용자 스토리에 연결한다.
+- 각 사용자 스토리는 독립적으로 완료하고 테스트할 수 있어야 한다.
+- 구현 전에 테스트가 실패하는지 확인한다.
+- 각 작업 또는 논리적 작업 묶음 뒤에 커밋한다.
+- 각 점검 지점에서 멈춰 스토리를 독립적으로 검증한다.
+- 모호한 작업, 같은 파일 충돌, 독립성을 깨는 스토리 간 의존성을 피한다.

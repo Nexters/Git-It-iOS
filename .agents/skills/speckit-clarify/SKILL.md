@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before clarification)**:
@@ -181,9 +187,9 @@ Execution steps:
 6. Integration after EACH accepted answer (incremental update approach):
     - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
     - For the first integrated answer in this session:
-       - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
-       - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
-    - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
+       - `## 명확화` 섹션이 있는지 확인한다(없으면 명세 템플릿의 최상위 맥락/개요 섹션 바로 뒤에 만든다).
+       - 그 아래에 오늘 날짜의 `### 세션 YYYY-MM-DD` 하위 제목을 만든다(없으면 생성).
+    - 답변을 수락하면 즉시 `- 질문: <질문> → 답변: <최종 답변>` 형식의 항목을 추가한다.
     - Then immediately apply the clarification to the most appropriate section(s):
        - Functional ambiguity → Update or add a bullet in Functional Requirements.
        - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
@@ -201,7 +207,7 @@ Execution steps:
    - Total asked (accepted) questions ≤ 5.
    - Updated sections contain no lingering vague placeholders the new answer was meant to resolve.
    - No contradictory earlier statement remains (scan for now-invalid alternative choices removed).
-   - Markdown structure valid; only allowed new headings: `## Clarifications`, `### Session YYYY-MM-DD`.
+   - Markdown 구조가 유효하며 새로 허용되는 제목은 `## 명확화`, `### 세션 YYYY-MM-DD`뿐이다.
    - Terminology consistency: same canonical term used across all updated sections.
 
 8. Write the updated spec back to `FEATURE_SPEC`.

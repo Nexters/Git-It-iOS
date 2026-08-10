@@ -1,18 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 0.4.0 → 1.0.0
-- Modified principles: 4. 작업 범위 격리 → 4. 스킬별 수정 경로
-- Added sections: Spec-Kit 스킬별 허용 수정 경로 표
-- Removed sections: `sources/**`와 그 외 영역을 세션 단위로 분리하던 전역 범위 제한
-- Templates requiring updates: ✅ .specify/templates/plan-template.md
-- Templates requiring updates: ✅ .specify/templates/tasks-template.md
+- Version change: 1.0.0 → 1.1.0
+- Modified principles: 없음
+- Added sections: 6. 한국어 Spec-Kit 산출물
+- Removed sections: 없음
+- Templates requiring updates: ✅ .specify/templates/checklist-template.md, constitution-template.md, plan-template.md, spec-template.md, tasks-template.md
 - Commands requiring updates: ✅ .agents/skills/speckit-*/SKILL.md
+- Runtime guidance requiring updates: ✅ AGENTS.md
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.0.0<br>
+**버전**: 1.1.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-10
 
@@ -68,6 +68,19 @@ Sync Impact Report
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
+
+### 6. 한국어 Spec-Kit 산출물
+
+- Spec-Kit으로 작성하거나 갱신하는 헌법, 기능 명세, 구현 계획, 조사 문서, 데이터 모델,
+  계약 설명, 빠른 시작, 작업 목록, 체크리스트와 사용자 보고는 한국어로 작성합니다.
+- 코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리와 API의 고유 명칭은 원문을
+  유지합니다. `MUST`, `SHOULD`, `MAY`와 BDD 키워드는 의미 전달에 필요할 때만 병기할 수
+  있습니다.
+- 영어 기본 템플릿이나 스킬의 예시는 산출물의 언어 규칙을 약화하지 않습니다. 제목, 표의
+  열 이름, 체크리스트 항목과 설명을 포함한 모든 자연어 보일러플레이트를 한국어로
+  바꿉니다.
+- 산출물을 완료로 보고하기 전에 새로 작성한 자연어 본문과 고정 문구가 이 원칙을 따르는지
+  검토합니다.
 
 ## 적용
 
