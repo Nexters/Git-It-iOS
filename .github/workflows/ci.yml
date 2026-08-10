@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=26.0,name=iPhone 17
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
 
     steps:
       - name: Check out repository
@@ -65,13 +65,17 @@ jobs:
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
       - name: Lint Swift style
-        run: "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
+        run: |
+          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
       - name: Build shared schemes
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" build
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" build
 
       - name: Compile tests
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" compile
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
 
       - name: Run tests
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" test
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" test
