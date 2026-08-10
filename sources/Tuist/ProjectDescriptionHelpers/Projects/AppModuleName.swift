@@ -17,11 +17,6 @@ extension AppModuleName {
                     .target(AppModuleName.GitIt.rawValue)
                 ]
             ),
-            testAction: .targets([
-                .testableTarget(
-                    target: .target(AppModuleName.GitItTests.rawValue)
-                )
-            ]),
             runAction: .runAction(
                 executable: .executable(.target(AppModuleName.GitIt.rawValue))
             ),
@@ -30,7 +25,21 @@ extension AppModuleName {
                 executable: .executable(.target(AppModuleName.GitIt.rawValue))
             ),
             analyzeAction: .analyzeAction(configuration: .debug),
-        )
+        ),
+        .scheme(
+            name: AppModuleName.GitItTests.rawValue,
+            shared: true,
+            buildAction: .buildAction(
+                targets: [
+                    .target(AppModuleName.GitItTests.rawValue)
+                ]
+            ),
+            testAction: .targets([
+                .testableTarget(
+                    target: .target(AppModuleName.GitItTests.rawValue)
+                )
+            ]),
+        ),
     ]
 
     var target: Target {
@@ -103,9 +112,7 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
                 sources: ["Tests/**"],
-                dependencies: [
-                    .target(name: AppModuleName.GitIt.rawValue)
-                ],
+                dependencies: [],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",

@@ -42,6 +42,14 @@ project_xcodebuild_one() {
 	case "$project_xcodebuild_arch" in arm64 | x86_64) ;; *) return 2 ;; esac
 	case "$project_xcodebuild_action" in build | build-for-testing | test-without-building | test) ;; *) return 2 ;; esac
 
+	# 테스트 scheme만 별도 제품 디렉터리에 격리하고 compile과 test는 같은 빌드를 공유합니다.
+	if grep -q '<TestableReference' "$project_xcodebuild_scheme_file"; then
+		project_xcodebuild_derived="$project_xcodebuild_derived_root/TestSchemes/$project_xcodebuild_scheme"
+	else
+		project_xcodebuild_grep_exit=$?
+		[ "$project_xcodebuild_grep_exit" -eq 1 ] || return 2
+		project_xcodebuild_derived=$project_xcodebuild_derived_root
+	fi
 	printf '%s 시작: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
 	if xcodebuild \
 		-quiet \
@@ -49,7 +57,7 @@ project_xcodebuild_one() {
 		-scheme "$project_xcodebuild_scheme" \
 		-configuration Debug \
 		-destination "$project_xcodebuild_destination" \
-		-derivedDataPath "$project_xcodebuild_derived_root" \
+		-derivedDataPath "$project_xcodebuild_derived" \
 		-disableAutomaticPackageResolution \
 		-jobs 1 \
 		"$project_xcodebuild_action" \

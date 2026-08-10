@@ -13,6 +13,7 @@ source_paths="$root/tools/repository-paths/bin/repository-paths.sh"
 hooks_relative=$("$source_paths" GIT_IT_HOOKS_ROOT)
 projects_relative=$("$source_paths" GIT_IT_PROJECTS_ROOT)
 workspace_relative=$("$source_paths" GIT_IT_WORKSPACE_PATH)
+derived_relative=$("$source_paths" GIT_IT_DERIVED_DATA_PATH)
 config_relative=$("$source_paths" GIT_IT_PATHS_FILE)
 project_runner_relative=$("$source_paths" GIT_IT_PROJECT_BUILD_RUNNER)
 projects="$repository/$projects_relative"
@@ -44,6 +45,7 @@ printf '%s\n' '#!/bin/sh' \
 	'scheme=' \
 	'jobs=' \
 	'action=' \
+	'derived_data=' \
 	'index_store=false' \
 	'for argument do' \
 	'  case "$argument" in' \
@@ -54,17 +56,21 @@ printf '%s\n' '#!/bin/sh' \
 	'done' \
 	'while [ "$#" -gt 0 ]; do' \
 	'  if [ "$1" = -jobs ]; then jobs=$2; shift 2; continue; fi' \
+	'  if [ "$1" = -derivedDataPath ]; then derived_data=$2; shift 2; continue; fi' \
 	'  if [ "$1" = -scheme ]; then scheme=$2; shift 2; else shift; fi' \
 	'done' \
 	'[ "$jobs" = 1 ] || exit 91' \
 	'[ "$index_store" = true ] || exit 92' \
+	'case "$scheme" in Tests) expected_derived="$EXPECTED_DERIVED_ROOT/TestSchemes/$scheme" ;; *) expected_derived=$EXPECTED_DERIVED_ROOT ;; esac' \
+	'[ "$derived_data" = "$expected_derived" ] || exit 93' \
 	'printf "%s\t%s\n" "$action" "$scheme" >> "$PROJECT_ACTION_LOG"' \
 	'[ "$scheme" != Fail ]' >"$work/bin/xcodebuild"
 chmod +x "$work/bin/xcodebuild"
 
 PROJECT_ACTION_LOG="$work/action.log" PATH="$work/bin:$PATH"
+EXPECTED_DERIVED_ROOT="$(git -C "$repository" rev-parse --show-toplevel)/$derived_relative"
 GIT_IT_TEST_DESTINATION='platform=iOS Simulator,name=Test Device'
-export PROJECT_ACTION_LOG PATH GIT_IT_TEST_DESTINATION
+export PROJECT_ACTION_LOG PATH EXPECTED_DERIVED_ROOT GIT_IT_TEST_DESTINATION
 
 run_stage() (
 	stage=$1
