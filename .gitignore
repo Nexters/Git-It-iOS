@@ -1,14 +1,12 @@
 ### macOS
-# Finder metadata
-.DS_Store
 
-# Thumbnails
+.DS_Store
 ._*
 
 # Custom folder icons
-Icon
+Icon
 
-# Volume root files
+# Volume metadata
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -17,69 +15,90 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
+
 ### VS Code
-# VSCode settings (keep shared configuration)
+
+# Ignore personal configuration while keeping shared configuration
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# Local History for Visual Studio Code
 .history/
-
-# Built Visual Studio Code Extensions
 *.vsix
 
-### Xcode
-# Xcode user settings
+
+### Xcode / Swift
+
+# User-specific data
 xcuserdata/
 
-# Xcode build artifacts
+# Build artifacts
 build/
 DerivedData/
+.build/
 
-# Obj-C/Swift specific
+# Swift / Objective-C artifacts
 *.hmap
 *.ipa
-*.dSYM.zip
 *.dSYM
+*.dSYM.zip
 
-# Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Xcode state files
+# Xcode state
 *.xccheckout
 *.moved-aside
 *.xcuserstate
 *.xcscmblueprint
 
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+
+### Swift Package Manager
+
+.swiftpm/
+*.xcworkspacedata
+
+# Keep Package.resolved for reproducible dependency versions
+# Package.resolved
+
+
+### Tuist
+
+.tuist-cache/
+Derived/
+
+# Generated Xcode projects
+*.xcodeproj/
+# 슬래시 없이 남겨 루트에 생성하는 워크스페이스 심볼릭 링크도 함께 무시합니다.
+*.xcworkspace
+*.code-workspace
+
 
 ### Python
-# Byte-compiled files
+
+# Cache / compiled files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
 
-# Distribution / packaging
-build/
+# Distribution
 dist/
 *.egg-info/
 *.egg
 
-# dotenv environment variable files
+# Environment variables
 .env
 
 # Virtual environments
-.venv
+.venv/
 env/
 venv/
 
-# Unit test / coverage reports
+# Test / coverage
 htmlcov/
 .tox/
 .nox/
@@ -87,16 +106,18 @@ htmlcov/
 .coverage.*
 .pytest_cache/
 
-# Type checkers
+# Type checker
 .mypy_cache/
 
-# Jupyter Notebook
+# Jupyter
 .ipynb_checkpoints
 
-# pyenv
+# Keep project Python version if needed
 # .python-version
 
+
 ### Ruby
+
 # Build artifacts
 *.gem
 *.rbc
@@ -108,39 +129,22 @@ htmlcov/
 /.bundle/
 /vendor/bundle
 
-# Documentation cache and generated files
+# Documentation
 /.yardoc/
 /doc/
 /rdoc/
 
-# Remove Gemfile.lock from gitignore if creating an application, leave it for libraries
-Gemfile.lock
+# Keep Gemfile.lock for application projects
 # .ruby-version
 
-### Swift
-# Xcode user settings
-xcuserdata/
 
-# Xcode build data
-DerivedData/
+### Local-only
 
-# Swift/Obj-C specific
-*.hmap
+# Agent tool symlink to .agents
+.claude
 
-# App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
+# Spec Kit working feature state
+.specify/feature.json
 
-# Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Swift Package Manager
-# Package.resolved
-*.xcworkspacedata
-App/release.xcconfig
-App/debug.xcconfig
-.specify
-.agents
-GitIt.xcodeproj/xcshareddata
+# Machine-specific configuration
+*.xcconfig

@@ -1,0 +1,45 @@
+digraph PackageControlFlowGraph {
+    graph [
+        rankdir = TB
+        splines = ortho
+        ranksep = 0.40
+        fontname = "Apple SD Gothic Neo"
+    ]
+
+    node [
+        shape = box
+        style = "rounded,filled"
+        fixedsize = true
+        width = 3.95
+        height = 0.78
+        fontname = "Apple SD Gothic Neo"
+        fontsize = 13
+        fontcolor = "#0f172a"
+        penwidth = 1.5
+    ]
+
+    edge [color = "#475569", penwidth = 1.5, arrowsize = 0.78]
+
+    User             [fillcolor = "#f8fafc", color = "#64748b", label = <<B>User</B><BR/><FONT POINT-SIZE="11">사용자 입력</FONT>>]
+    FeatureRequest   [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Feature</B><BR/><FONT POINT-SIZE="11">Action 처리 · Domain 기능 호출</FONT>>]
+    DomainRequest    [fillcolor = "#d1fae5", color = "#059669", label = <<B>Domain</B><BR/><FONT POINT-SIZE="11">Use Case · Business Rule · Domain Port 호출</FONT>>]
+    DomainAdapterReq [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Composition · DomainDataAdapter</B><BR/><FONT POINT-SIZE="11">Domain 입력을 Data 입력으로 변환</FONT>>]
+    DataRequest      [fillcolor = "#fef3c7", color = "#d97706", label = <<B>Data</B><BR/><FONT POINT-SIZE="11">데이터 접근 · 캐시 · 저장 · DTO 처리</FONT>>]
+    CoreAdapterReq   [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Composition · DataCoreAdapter</B><BR/><FONT POINT-SIZE="11">Data 기술 요청을 Core API로 변환</FONT>>]
+    CoreRequest      [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>Core</B><BR/><FONT POINT-SIZE="11">프로젝트 기술 API로 외부 요청 실행</FONT>>]
+    External         [fillcolor = "#f8fafc", color = "#64748b", label = <<B>외부 시스템</B><BR/><FONT POINT-SIZE="11">서버 · 저장소 · 외부 SDK</FONT>>]
+    CoreResponse     [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>Core</B><BR/><FONT POINT-SIZE="11">기술 결과 · 기술 오류 반환</FONT>>]
+    CoreAdapterRes   [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Composition · DataCoreAdapter</B><BR/><FONT POINT-SIZE="11">Core 결과를 Data 계약 타입으로 변환</FONT>>]
+    DataResponse     [fillcolor = "#fef3c7", color = "#d97706", label = <<B>Data</B><BR/><FONT POINT-SIZE="11">Data 모델 · DTO · Data 오류 반환</FONT>>]
+    DomainAdapterRes [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Composition · DomainDataAdapter</B><BR/><FONT POINT-SIZE="11">Data 결과를 Domain 모델 · 오류로 변환</FONT>>]
+    DomainResponse   [fillcolor = "#d1fae5", color = "#059669", label = <<B>Domain</B><BR/><FONT POINT-SIZE="11">Domain 결과 반환</FONT>>]
+    FeatureResponse  [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Feature</B><BR/><FONT POINT-SIZE="11">결과 수신 · 상태 갱신 · Navigation Intent 출력</FONT>>]
+    UIRender         [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>UI</B><BR/><FONT POINT-SIZE="11">공용 컴포넌트로 화면 렌더링</FONT>>]
+    AppNavigation    [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>App</B><BR/><FONT POINT-SIZE="11">Navigation Intent 해석 · 화면 흐름 조정</FONT>>]
+
+    User -> FeatureRequest -> DomainRequest -> DomainAdapterReq -> DataRequest
+        -> CoreAdapterReq -> CoreRequest -> External -> CoreResponse -> CoreAdapterRes
+        -> DataResponse -> DomainAdapterRes -> DomainResponse -> FeatureResponse -> UIRender
+
+    FeatureResponse -> AppNavigation [style = dashed]
+}

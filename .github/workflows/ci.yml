@@ -15,13 +15,33 @@ permissions:
   contents: read
 
 jobs:
+  script-tests:
+    name: script tests
+    runs-on: macos-26
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install script test dependency
+        run: brew install ripgrep
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Run script tests
+        run: "$GIT_IT_SCRIPT_TEST_RUNNER"
+
   build-and-test:
     name: build
     runs-on: macos-26
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=26.0,name=iPhone 17
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
 
     steps:
       - name: Check out repository
@@ -65,13 +85,17 @@ jobs:
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
       - name: Lint Swift style
-        run: "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
+        run: |
+          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
       - name: Build shared schemes
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" build
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" build
 
       - name: Compile tests
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" compile
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
 
       - name: Run tests
-        run: "$GIT_IT_PROJECT_BUILD_RUNNER" test
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" test
