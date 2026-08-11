@@ -4,18 +4,45 @@ import ProjectDescription
 
 enum FeatureModuleName: String, CaseIterable {
     case Feature
+    case FeatureAuthentication
+    case FeatureAuthenticationTests
 }
 
 extension FeatureModuleName {
     var target: Target {
-        .module(
-            name: rawValue,
-            dependencies: [
-                .fromDomain(.Domain),
-                .fromUI(.UIComponent),
-                .external(.ComposableArchitecture),
-            ],
-        )
+        switch self {
+        case .Feature:
+            .module(
+                name: rawValue,
+                dependencies: [
+                    .fromDomain(.Domain),
+                    .fromUI(.UIComponent),
+                    .external(.ComposableArchitecture),
+                ],
+            )
+
+        case .FeatureAuthentication:
+            .module(
+                name: rawValue,
+                dependencies: [
+                    .fromDomain(.DomainAuthentication),
+                    .fromUI(.UIComponent),
+                    .external(.ComposableArchitecture),
+                ],
+            )
+
+        case .FeatureAuthenticationTests:
+            .testModule(
+                name: rawValue,
+                productionTarget: .target(
+                    name: FeatureModuleName.FeatureAuthentication.rawValue
+                ),
+                additionalDependencies: [
+                    .fromDomain(.DomainAuthentication),
+                    .external(.ComposableArchitecture),
+                ],
+            )
+        }
     }
 }
 

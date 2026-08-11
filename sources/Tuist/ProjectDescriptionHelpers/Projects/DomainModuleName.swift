@@ -4,11 +4,25 @@ import ProjectDescription
 
 enum DomainModuleName: String, CaseIterable {
     case Domain
+    case DomainAuthentication
+    case DomainAuthenticationTests
 }
 
 extension DomainModuleName {
     var target: Target {
-        .module(name: rawValue)
+        switch self {
+        case .Domain,
+             .DomainAuthentication:
+            .module(name: rawValue)
+
+        case .DomainAuthenticationTests:
+            .testModule(
+                name: rawValue,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainAuthentication.rawValue
+                ),
+            )
+        }
     }
 }
 

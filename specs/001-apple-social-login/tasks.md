@@ -40,23 +40,23 @@ project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_P
 **목적**: 인증 모듈과 독립 테스트 타겟을 Tuist graph에 등록하고 빈 타겟의 생성·빌드를
 검증한다.
 
-- [ ] T001 `sources/Tuist/ProjectDescriptionHelpers/Target+Module.swift`에 명시적인 테스트 타겟 이름, production 타겟 의존성, 추가 의존성을 받는 `testModule` factory를 추가한다
-- [ ] T002 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/CoreModuleName.swift`에 `CoreAuthentication`과 `CoreAuthenticationTests` 타겟을 등록하고 production 타겟에 `AuthenticationServices`·`Security` SDK 의존성, 테스트 타겟에 production 타겟 의존성을 선언한다
-- [ ] T003 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 프로젝트 내부 의존성이 없는 `DataAuthentication`과 이를 검증하는 `DataAuthenticationTests` 타겟을 등록한다
-- [ ] T004 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`에 프로젝트 내부 의존성이 없는 `DomainAuthentication`과 이를 검증하는 `DomainAuthenticationTests` 타겟을 등록한다
-- [ ] T005 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 `DomainAuthentication`·`UIComponent`·`ComposableArchitecture`에만 의존하는 `FeatureAuthentication`과 해당 테스트 타겟을 등록한다
-- [ ] T006 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `Composition` 타겟에 `DomainAuthentication`·`DataAuthentication`·`CoreAuthentication` 의존성을 추가하고 같은 경계를 검증하는 `CompositionTests` 타겟을 등록한다
-- [ ] T007 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitIt` 타겟에 `FeatureAuthentication`과 `DomainAuthentication` 의존성을 추가하되 기존 `Composition`·`Feature`·Firebase 의존성을 보존한다
-- [ ] T008 [P] `sources/Projects/Core/CoreAuthentication/Placeholder.swift`를 생성해 `CoreAuthentication` production 타겟의 초기 소스 glob을 충족한다
-- [ ] T009 [P] `sources/Projects/Core/CoreAuthenticationTests/Placeholder.swift`를 생성해 `CoreAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
-- [ ] T010 [P] `sources/Projects/Data/DataAuthentication/Placeholder.swift`를 생성해 `DataAuthentication` production 타겟의 초기 소스 glob을 충족한다
-- [ ] T011 [P] `sources/Projects/Data/DataAuthenticationTests/Placeholder.swift`를 생성해 `DataAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
-- [ ] T012 [P] `sources/Projects/Domain/DomainAuthentication/Placeholder.swift`를 생성해 `DomainAuthentication` production 타겟의 초기 소스 glob을 충족한다
-- [ ] T013 [P] `sources/Projects/Domain/DomainAuthenticationTests/Placeholder.swift`를 생성해 `DomainAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
-- [ ] T014 [P] `sources/Projects/Feature/FeatureAuthentication/Placeholder.swift`를 생성해 `FeatureAuthentication` production 타겟의 초기 소스 glob을 충족한다
-- [ ] T015 [P] `sources/Projects/Feature/FeatureAuthenticationTests/Placeholder.swift`를 생성해 `FeatureAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
-- [ ] T016 [P] `sources/Projects/Composition/CompositionTests/Placeholder.swift`를 생성해 `CompositionTests` 타겟의 초기 테스트 소스 glob을 충족한다
-- [ ] T017 [no-write] `sources/`에서 `tuist generate`를 실행한 뒤 저장소 루트에서 `project_build_runner build`와 `project_build_runner compile`을 순서대로 실행해 새 production·test 타겟이 graph와 테스트 scheme에 포함되는지 확인한다
+- [X] T001 `sources/Tuist/ProjectDescriptionHelpers/Target+Module.swift`에 명시적인 테스트 타겟 이름, production 타겟 의존성, 추가 의존성을 받는 `testModule` factory를 추가한다
+- [X] T002 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/CoreModuleName.swift`에 `CoreAuthentication`과 `CoreAuthenticationTests` 타겟을 등록하고 production 타겟에 `AuthenticationServices`·`Security` SDK 의존성, 테스트 타겟에 production 타겟 의존성을 선언한다
+- [X] T003 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 프로젝트 내부 의존성이 없는 `DataAuthentication`과 이를 검증하는 `DataAuthenticationTests` 타겟을 등록한다
+- [X] T004 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`에 프로젝트 내부 의존성이 없는 `DomainAuthentication`과 이를 검증하는 `DomainAuthenticationTests` 타겟을 등록한다
+- [X] T005 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 `DomainAuthentication`·`UIComponent`·`ComposableArchitecture`에만 의존하는 `FeatureAuthentication`과 해당 테스트 타겟을 등록한다
+- [X] T006 [P] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `Composition` 타겟에 `DomainAuthentication`·`DataAuthentication`·`CoreAuthentication` 의존성을 추가하고 같은 경계를 검증하는 `CompositionTests` 타겟을 등록한다
+- [X] T007 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitIt` 타겟에 `FeatureAuthentication`과 `DomainAuthentication` 의존성을 추가하되 기존 `Composition`·`Feature`·Firebase 의존성을 보존한다
+- [X] T008 [P] `sources/Projects/Core/CoreAuthentication/Placeholder.swift`를 생성해 `CoreAuthentication` production 타겟의 초기 소스 glob을 충족한다
+- [X] T009 [P] `sources/Projects/Core/CoreAuthenticationTests/Placeholder.swift`를 생성해 `CoreAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
+- [X] T010 [P] `sources/Projects/Data/DataAuthentication/Placeholder.swift`를 생성해 `DataAuthentication` production 타겟의 초기 소스 glob을 충족한다
+- [X] T011 [P] `sources/Projects/Data/DataAuthenticationTests/Placeholder.swift`를 생성해 `DataAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
+- [X] T012 [P] `sources/Projects/Domain/DomainAuthentication/Placeholder.swift`를 생성해 `DomainAuthentication` production 타겟의 초기 소스 glob을 충족한다
+- [X] T013 [P] `sources/Projects/Domain/DomainAuthenticationTests/Placeholder.swift`를 생성해 `DomainAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
+- [X] T014 [P] `sources/Projects/Feature/FeatureAuthentication/Placeholder.swift`를 생성해 `FeatureAuthentication` production 타겟의 초기 소스 glob을 충족한다
+- [X] T015 [P] `sources/Projects/Feature/FeatureAuthenticationTests/Placeholder.swift`를 생성해 `FeatureAuthenticationTests` 타겟의 초기 테스트 소스 glob을 충족한다
+- [X] T016 [P] `sources/Projects/Composition/CompositionTests/Placeholder.swift`를 생성해 `CompositionTests` 타겟의 초기 테스트 소스 glob을 충족한다
+- [X] T017 [no-write] `sources/`에서 `tuist generate`를 실행한 뒤 저장소 루트에서 `project_build_runner build`와 `project_build_runner compile`을 순서대로 실행해 새 production·test 타겟이 graph와 테스트 scheme에 포함되는지 확인한다
 
 ---
 
