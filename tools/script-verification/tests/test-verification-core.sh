@@ -41,17 +41,12 @@ fake_regression() {
 	printf 'regression\n' >>"$call_log"
 	return 1
 }
-fake_checklist() {
-	printf 'checklist\n' >>"$call_log"
-	return 0
-}
-if verify_run fake_dependency fake_static fake_regression fake_checklist; then
+if verify_run fake_dependency fake_static fake_regression; then
 	printf 'FAIL: 검증 실패 집계가 성공함\n' >&2
 	exit 1
 fi
 assert_equal 'dependency
 static
-regression
-checklist' "$(cat "$call_log")" 'fail-after-collect 흐름'
+regression' "$(cat "$call_log")" 'fail-after-collect 흐름'
 rm -f "$call_log"
 printf 'PASS: verification core\n'

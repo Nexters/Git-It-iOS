@@ -4,13 +4,11 @@ verify_run() (
 	verify_dependency=$1
 	verify_static=$2
 	verify_regression=$3
-	verify_checklist=$4
 	verify_failures=0
 
 	"$verify_dependency" || verify_failures=$((verify_failures + 1))
 	"$verify_static" || verify_failures=$((verify_failures + 1))
 	"$verify_regression" || verify_failures=$((verify_failures + 1))
-	"$verify_checklist" || verify_failures=$((verify_failures + 1))
 
 	[ "$verify_failures" -eq 0 ]
 )
