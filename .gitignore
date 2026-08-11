@@ -148,3 +148,8 @@ htmlcov/
 
 # Machine-specific configuration
 *.xcconfig
+.agents
+.specify/init-options.json
+.specify/integration.json
+.specify/integrations/codex.manifest.json
+.specify/integrations/speckit.manifest.json

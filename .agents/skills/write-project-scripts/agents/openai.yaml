@@ -1,4 +1,0 @@
-interface:
-  display_name: "프로젝트 스크립트 작성"
-  short_description: "POSIX 셸 스크립트 작성과 구조·정적 검증 수행"
-  default_prompt: "$write-project-scripts를 사용해 프로젝트 셸 스크립트를 작성하고 전체 검증을 실행해 주세요."
