@@ -1,20 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 0.4.0 → 1.0.0
-- Modified principles: 4. 작업 범위 격리 → 4. 스킬별 수정 경로
-- Added sections: Spec-Kit 스킬별 허용 수정 경로 표
-- Removed sections: `sources/**`와 그 외 영역을 세션 단위로 분리하던 전역 범위 제한
-- Templates requiring updates: ✅ .specify/templates/plan-template.md
-- Templates requiring updates: ✅ .specify/templates/tasks-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-*/SKILL.md
+- Version change: 1.0.0 → 1.1.0
+- Modified principles: 없음
+- Added principles: 6. Spec-Kit 산출 문서의 한국어 고정
+- Added sections: 없음
+- Removed sections: 없음
+- Templates requiring updates: ⚠ 보류 — `.specify/templates/plan-template.md`
+- Templates requiring updates: ⚠ 보류 — `.specify/templates/spec-template.md`
+- Templates requiring updates: ⚠ 보류 — `.specify/templates/tasks-template.md`
+- Templates requiring updates: ⚠ 보류 — `.specify/templates/checklist-template.md`
+- Templates requiring updates: ⚠ 보류 — `.specify/templates/constitution-template.md`
+- Commands requiring updates: ⚠ 보류 — 사용자 지정 정책 문서 단일 수정 범위
+- Follow-up TODOs: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.0.0<br>
+**버전**: 1.1.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-10
+**최종 수정일**: 2026-08-11
 
 ## 원칙
 
@@ -68,6 +73,24 @@ Sync Impact Report
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
+
+### 6. Spec-Kit 산출 문서의 한국어 고정
+
+- Spec-Kit 스킬이 생성하거나 수정하는 모든 사람이 읽는 산출물은 한국어로 작성해야
+  합니다(`MUST`). 이 규칙은 헌법, 기능 명세, 계획, 조사, 데이터 모델, 계약 설명,
+  빠른 시작 안내, 작업 목록, 체크리스트, 분석·완료 보고와 GitHub 이슈의 제목·본문에
+  적용합니다.
+- 제목, 섹션명, 표 머리글, 요구사항·시나리오·작업 설명, 체크리스트 항목, 주석과
+  사용자용 안내 문구도 한국어로 작성해야 합니다(`MUST`). 영문 템플릿을 사용한 경우
+  독자용 영문 골격과 예시 문구를 최종 산출물에 남겨서는 안 됩니다(`MUST NOT`).
+- 코드 식별자, API·타입·스키마·필드 이름, 파일 경로, 명령어, 브랜치 이름, 표준화된
+  식별자(`FR-001`, `SC-001`, `T001`, `[P]`, `[US1]`), 규범 키워드(`MUST`,
+  `SHOULD`, `MAY`, `MUST NOT`), 기술·제품의 공식 고유명사와 실행 가능한 구문은 원문을
+  유지합니다. 외국어 원문 인용이 정확성에 필요하면 인용문을 유지할 수 있지만 바로 이어
+  한국어 설명을 제공해야 합니다(`MUST`).
+- 각 Spec-Kit 스킬은 완료 전에 산출물의 독자용 문구를 검사해야 합니다. 허용된 예외가
+  아닌 외국어 문구가 남아 있으면 헌법 위반으로 처리하고 완료를 보고해서는 안 됩니다
+  (`MUST NOT`).
 
 ## 적용
 
