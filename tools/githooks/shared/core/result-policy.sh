@@ -35,8 +35,7 @@ result_policy_is_known_code() (
 		script-verification.static-failed | \
 		script-verification.dependency-prepare-failed | \
 		script-verification.dependency-invalid | \
-		script-verification.regression-failed | \
-		script-verification.architecture-incomplete) return 0 ;;
+		script-verification.regression-failed) return 0 ;;
 	*) return 1 ;;
 	esac
 )
