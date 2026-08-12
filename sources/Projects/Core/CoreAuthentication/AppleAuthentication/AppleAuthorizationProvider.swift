@@ -104,7 +104,10 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
         _ = try? complete(credential: coreCredential, state: attempt.state, attemptID: attempt.id)
     }
 
-    public func authorizationController(controller _: ASAuthorizationController, didCompleteWithError error: Error) {
+    public func authorizationController(
+        controller _: ASAuthorizationController,
+        didCompleteWithError error: Error,
+    ) {
         guard let attempt = state.withLock({ $0.currentAttempt }) else { return }
         if (error as? ASAuthorizationError)?.code == .canceled {
             try? cancel(attemptID: attempt.id)

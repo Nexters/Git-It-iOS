@@ -28,18 +28,28 @@ public final class KeychainStore: Sendable {
 
         // MARK: Fileprivate
 
-        fileprivate func save(_ value: Data, key: String, namespace: KeychainNamespace) {
+        fileprivate func save(
+            _ value: Data,
+            key: String,
+            namespace: KeychainNamespace,
+        ) {
             state.withLock { state in
                 state.accessibility = .whenUnlockedThisDeviceOnly
                 state.values["\(namespace.rawValue).\(key)"] = value
             }
         }
 
-        fileprivate func load(key: String, namespace: KeychainNamespace) -> Data? {
+        fileprivate func load(
+            key: String,
+            namespace: KeychainNamespace,
+        ) -> Data? {
             state.withLock { $0.values["\(namespace.rawValue).\(key)"] }
         }
 
-        fileprivate func delete(key: String, namespace: KeychainNamespace) {
+        fileprivate func delete(
+            key: String,
+            namespace: KeychainNamespace,
+        ) {
             _ = state.withLock { $0.values.removeValue(forKey: "\(namespace.rawValue).\(key)") }
         }
 
@@ -54,7 +64,11 @@ public final class KeychainStore: Sendable {
 
     }
 
-    public func save(_ value: Data, for key: String, in namespace: KeychainNamespace) throws {
+    public func save(
+        _ value: Data,
+        for key: String,
+        in namespace: KeychainNamespace,
+    ) throws {
         if let backend {
             backend.save(value, key: key, namespace: namespace)
             return
@@ -72,7 +86,10 @@ public final class KeychainStore: Sendable {
         }
     }
 
-    public func load(for key: String, in namespace: KeychainNamespace) throws -> Data? {
+    public func load(
+        for key: String,
+        in namespace: KeychainNamespace,
+    ) throws -> Data? {
         if let backend {
             return backend.load(key: key, namespace: namespace)
         }
@@ -88,7 +105,10 @@ public final class KeychainStore: Sendable {
         return value
     }
 
-    public func delete(for key: String, in namespace: KeychainNamespace) throws {
+    public func delete(
+        for key: String,
+        in namespace: KeychainNamespace,
+    ) throws {
         if let backend {
             backend.delete(key: key, namespace: namespace)
             return
@@ -101,7 +121,10 @@ public final class KeychainStore: Sendable {
 
     private let backend: InMemoryBackend?
 
-    private func attributes(key: String, namespace: KeychainNamespace) -> [CFString: Any] {
+    private func attributes(
+        key: String,
+        namespace: KeychainNamespace,
+    ) -> [CFString: Any] {
         [kSecClass: kSecClassGenericPassword, kSecAttrService: namespace.rawValue, kSecAttrAccount: key]
     }
 

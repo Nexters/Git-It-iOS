@@ -1,6 +1,9 @@
 import Foundation
 
 public struct RefreshResponseDTO: CustomDebugStringConvertible, CustomStringConvertible, Equatable, Sendable {
+
+    // MARK: Lifecycle
+
     public init(
         accessToken: String,
         accessExpiresAt: Date,
@@ -10,6 +13,8 @@ public struct RefreshResponseDTO: CustomDebugStringConvertible, CustomStringConv
         self.accessExpiresAt = accessExpiresAt
         self.replacementRefreshToken = replacementRefreshToken
     }
+
+    // MARK: Public
 
     public let accessToken: String
     public let accessExpiresAt: Date
@@ -22,4 +27,5 @@ public struct RefreshResponseDTO: CustomDebugStringConvertible, CustomStringConv
     public var debugDescription: String {
         description
     }
+
 }
