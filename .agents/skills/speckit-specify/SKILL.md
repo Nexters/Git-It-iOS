@@ -18,6 +18,22 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
 
+**Prepare a Git-flow branch name before dispatching `before_specify` hooks**:
+- Derive `SHORT_NAME` from the feature description using the short-name rules in step 1 below.
+- Determine `BRANCH_NAMESPACE` before branch creation:
+  - Use the user's explicit `feature`, `hotfix`, or `release` type when provided.
+  - Use `hotfix` only for an urgent fix to a production release.
+  - Use `release` for release preparation or stabilization.
+  - Otherwise default to `feature`, including ordinary defect work that is not a production hotfix.
+  - If explicit inputs indicate conflicting types, stop before creating a branch and resolve the conflict.
+- Construct `GIT_BRANCH_NAME` as `feature/<short-name>`, `hotfix/<short-name>`, or
+  `release/<version-or-short-name>`. Use lowercase kebab-case for feature/hotfix suffixes; a release
+  suffix may instead be a version identifier such as `v1.2.3`. A suffix MUST be non-empty and MUST
+  NOT contain another `/` or a repeated namespace.
+- If the user explicitly provided `GIT_BRANCH_NAME`, do not rewrite it. Validate that it has exactly
+  one allowed namespace and a valid suffix. An invalid explicit name is an error, not a policy bypass.
+- Pass the validated `GIT_BRANCH_NAME` to every executable `before_specify` hook.
+
 **Check for extension hooks (before specification)**:
 - Check if `.specify/extensions.yml` exists in the project root.
 - If it exists, read it and look for entries under the `hooks.before_specify` key
@@ -64,7 +80,7 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
 
 Given that feature description, do this:
 
-1. **Generate a concise short name** (2-4 words) for the feature:
+1. **Generate or reuse the concise `SHORT_NAME`** (2-4 words) for the feature:
    - Analyze the feature description and extract the most meaningful keywords
    - Create a 2-4 word short name that captures the essence of the feature
    - Use action-noun format when possible (e.g., "add-user-auth", "fix-payment-bug")
@@ -76,11 +92,20 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Branch creation** (optional, via hook):
+2. **Git-flow branch creation** (optional, via hook):
 
-   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
+   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have
+   created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`.
+   Verify that `BRANCH_NAME` exactly matches the validated `GIT_BRANCH_NAME`. A mismatched or
+   non-compliant result is an error and MUST NOT be reported as a successfully created branch.
 
-   If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
+   If no executable `before_specify` hook exists or the hook did not run, do not create or switch
+   branches in this core command. Retain `GIT_BRANCH_NAME` only as the planned name and record branch
+   status as `미생성` in the specification.
+
+   Do not invoke `.specify/scripts/bash/create-new-feature.sh` as a fallback. The installed legacy
+   script derives an `NNN-short-name` branch value and couples it to the spec directory, which is
+   incompatible with the required slash namespace and independent spec-directory resolution.
 
 3. **Create the spec feature directory**:
 
@@ -112,7 +137,8 @@ Given that feature description, do this:
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit-specify` invocation
-   - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
+   - The spec directory name and the git branch name are independent. The directory name MUST NOT
+     include the Git-flow namespace or `/`.
    - The spec directory and file are always created by this command, never by the hook
 
 4. Load the resolved active `spec-template` file to understand required sections.
@@ -144,7 +170,11 @@ Given that feature description, do this:
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 
-7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with
+   concrete details derived from the feature description (arguments) while preserving section order
+   and headings. Fill `Git-flow 유형` with `BRANCH_NAMESPACE`. Fill `기능 브랜치` with the verified
+   `BRANCH_NAME` only when the hook actually created/switched it; otherwise write
+   `미생성 (예정: GIT_BRANCH_NAME)`.
 
 8. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
@@ -278,10 +308,13 @@ Check if `.specify/extensions.yml` exists in the project root.
 Report completion to the user with:
 - `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
 - `SPEC_FILE` — the spec file path
+- `BRANCH_NAMESPACE` and `GIT_BRANCH_NAME` — the selected Git-flow type and validated branch name
+- Branch status — whether the hook actually created/switched the branch or it remains planned
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
-**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
+**NOTE:** Branch creation is handled only by the `before_specify` hook (git extension). Spec directory
+and file creation are always handled by this core command. Never claim that a planned branch was created.
 
 ## Quick Guidelines
 
@@ -347,5 +380,6 @@ Success criteria must be:
 ## Done When
 
 - [ ] Specification written to `SPEC_FILE` and validated against quality checklist
+- [ ] Git-flow namespace and branch status recorded without treating a planned branch as created
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with feature directory, spec file path, and checklist results

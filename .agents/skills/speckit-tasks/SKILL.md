@@ -74,23 +74,27 @@ allowlist that `/speckit-implement` will use.
    - If data-model.md exists: Extract entities and map to user stories
    - If contracts/ exists: Map interface contracts to user stories
    - If research.md exists: Extract decisions for setup tasks
-   - Generate tasks organized by user story (see Task Generation Rules below)
+   - 패키지를 최상위 실행 단위로 작업을 생성하고 사용자 스토리는 패키지 내부 추적 라벨로 유지
    - Generate dependency graph showing user story completion order
-   - Create parallel execution examples per user story
+   - 현재 패키지 내부에서만 허용되는 병렬 실행 예시 생성
    - Validate task completeness (each user story has all needed tasks, independently testable)
+   - 모든 파일 변경 작업을 정확히 하나의 패키지 단계에 명시적으로 배정하고, 명세가 변경하지 않는 패키지는
+     제외한 `Domain → Data → Core → Composition → UI → Feature → App` 순서로 패키지 단계를
+     최상위 실행 순서로 구성
+   - 각 적용 대상 패키지 단계 끝에 패키지 검증, 결과 보고와 다음 적용 대상 패키지 진행에
+     대한 명시적 사용자 승인 게이트를 두고, 패키지 단계 안에서 사용자 스토리 추적성을 유지
 
 4. **Generate tasks.md**: Read the tasks template from TASKS_TEMPLATE (from the JSON output above) and use it as structure. If TASKS_TEMPLATE is empty, fall back to `.specify/templates/tasks-template.md`. Fill with:
    - Correct feature name from plan.md
-   - Phase 1: Setup tasks (project initialization)
-   - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from spec.md)
+   - 정해진 순서에 따른 적용 대상 패키지별 단계. 준비·기반·마무리 작업도 별도 단계로 두지
+     않고 책임 패키지 단계에 배치하며 사용자 스토리 라벨 유지
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns
+   - 마지막 적용 대상 패키지 뒤에는 파일을 변경하지 않는 전체 기능 검증만 배치
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
    - Dependencies section showing story completion order
-   - Parallel execution examples per story
-   - Implementation strategy section (MVP first, incremental delivery)
+   - 현재 패키지 내부 병렬 실행 예시
+   - 패키지별 승인 진행과 사용자 스토리 추적 전략
 
 ## Mandatory Post-Execution Hooks
 
@@ -134,7 +138,7 @@ Output path to generated tasks.md and summary:
 - Task count per user story
 - Parallel opportunities identified
 - Independent test criteria for each story
-- Suggested MVP scope (typically just User Story 1)
+- Suggested MVP scope (보통 User Story 1이지만 패키지 순서와 승인 게이트는 모두 유지)
 - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 Context for task generation: $ARGUMENTS
@@ -143,7 +147,8 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 ## Task Generation Rules
 
-**CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
+**CRITICAL**: 작업은 패키지를 최상위 실행 단위로 구성한다. 사용자 스토리는 각 패키지
+단계 안에서 추적하고 독립 검증 기준을 유지한다.
 
 **Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
 
@@ -160,18 +165,17 @@ Every task MUST strictly follow this format:
 1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
 2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
 3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
-4. **[Story] label**: REQUIRED for user story phase tasks only
+4. **[Story] label**: 사용자 스토리 요구사항을 구현하는 작업에 사용
    - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
-   - Setup phase: NO story label
-   - Foundational phase: NO story label
-   - User Story phases: MUST have story label
-   - Polish phase: NO story label
+   - 공통 패키지 기반 작업: 스토리 라벨 없음
+   - 사용자 스토리 관련 작업: 해당 `[US#]` 라벨 필수
+   - 패키지 검증과 전체 읽기 전용 검증: 스토리 라벨 선택
 5. **Description**: Clear action with exact file path
 
 **Examples**:
 
-- ✅ CORRECT: `- [ ] T001 Create project structure per implementation plan`
-- ✅ CORRECT: `- [ ] T005 [P] Implement authentication middleware in src/middleware/auth.py`
+- ✅ CORRECT: `- [ ] T001 Create Domain structure in sources/Projects/Domain/FeatureName/`
+- ✅ CORRECT: `- [ ] T005 [P] Implement Domain model in sources/Projects/Domain/FeatureName/Model.swift`
 - ✅ CORRECT: `- [ ] T012 [P] [US1] Create User model in src/models/user.py`
 - ✅ CORRECT: `- [ ] T014 [US1] Implement UserService in src/services/user_service.py`
 - ❌ WRONG: `- [ ] Create User model` (missing ID and Story label)
@@ -181,40 +185,49 @@ Every task MUST strictly follow this format:
 
 ### Task Organization
 
-1. **From User Stories (spec.md)** - PRIMARY ORGANIZATION:
-   - Each user story (P1, P2, P3...) gets its own phase
-   - Map all related components to their story:
+1. **패키지 소유권 — PRIMARY ORGANIZATION**:
+   - 명세가 변경하는 패키지만 `Domain → Data → Core → Composition → UI → Feature → App`
+     순서의 최상위 단계로 생성
+   - 모든 파일 변경 작업은 정확히 하나의 패키지 단계에 배치
+   - 공용 파일이 여러 패키지 선언을 바꾸면 패키지별 작업으로 분리하고 해당 단계에서 필요한
+     선언만 변경하도록 설명
+   - 패키지 소유권이 모호하거나 분리할 수 없으면 tasks.md를 생성하지 말고 ERROR
+
+2. **From User Stories (spec.md)** - PACKAGE-INTERNAL TRACEABILITY:
+   - Map all related components to their story within each owning package:
      - Models needed for that story
      - Services needed for that story
      - Interfaces/UI needed for that story
      - If tests requested: Tests specific to that story
-   - Mark story dependencies (most stories should be independent)
+   - 사용자 스토리 독립성은 전체 패키지가 완료된 뒤의 수용 기준으로 유지
 
-2. **From Contracts**:
+3. **From Contracts**:
    - Map each interface contract → to the user story it serves
-   - If tests requested: Each interface contract → contract test task [P] before implementation in that story's phase
+   - If tests requested: 각 계약 테스트를 소유 패키지의 구현 전에 배치
 
-3. **From Data Model**:
+4. **From Data Model**:
    - Map each entity to the user story(ies) that need it
-   - If entity serves multiple stories: Put in earliest story or Setup phase
-   - Relationships → service layer tasks in appropriate story phase
+   - 여러 스토리가 사용하는 엔터티도 소유 패키지 단계에 배치하고 필요한 스토리 라벨을 병기
+   - Relationships → 소유 패키지의 적절한 작업에 배치
 
-4. **From Setup/Infrastructure**:
-   - Shared infrastructure → Setup phase (Phase 1)
-   - Foundational/blocking tasks → Foundational phase (Phase 2)
-   - Story-specific setup → within that story's phase
+5. **From Setup/Infrastructure/Polish**:
+   - 별도의 Setup, Foundational, Polish 구현 단계를 만들지 않음
+   - 준비·기반·정리 작업은 책임 패키지 단계에 배치
+   - 패키지에 속하지 않는 파일은 최초로 필요로 하는 책임 패키지를 명시
+   - 여러 패키지에 걸친 공용 파일 변경은 패키지별 작업으로 분리
+   - 전체 기능 검증은 마지막 패키지 뒤의 `[no-write]` 작업으로만 구성
 
 ### Phase Structure
 
-- **Phase 1**: Setup (project initialization)
-- **Phase 2**: Foundational (blocking prerequisites - MUST complete before user stories)
-- **Phase 3+**: User Stories in priority order (P1, P2, P3...)
-  - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
-  - Each phase should be a complete, independently testable increment
-- **Final Phase**: Polish & Cross-Cutting Concerns
+- **패키지 단계**: 적용 대상만 헌법 순서로 생성
+  - 각 단계 내부: 준비 → 테스트(요청된 경우) → 구현 → 정리 → 패키지 검증
+  - 각 단계 끝: 변경 파일과 검증 결과 보고 → 다음 적용 대상 패키지 명시적 승인 게이트
+- **전체 완료 검증**: 마지막 적용 대상 패키지 뒤에 읽기 전용 검증만 배치
 
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
+- [ ] 적용 대상 패키지가 헌법 순서로 배치되고 모든 파일 변경 작업의 단일 패키지 소유권 확인
+- [ ] 각 패키지 검증·결과 보고·승인 게이트와 마지막 읽기 전용 전체 검증 확인
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, story breakdown, and MVP scope

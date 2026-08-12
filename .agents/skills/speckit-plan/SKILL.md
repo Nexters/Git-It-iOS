@@ -71,6 +71,12 @@ paths for later task generation instead of modifying source, tests, or configura
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
    - Phase 1: Generate data-model.md, contracts/, quickstart.md
    - Re-evaluate Constitution Check post-design
+   - 명세가 변경하는 패키지를 식별하고, 적용되지 않는 패키지는 제외한 뒤 `Domain → Data →
+     Core → Composition → UI → Feature → App` 순서로 구현 경계를 기록
+   - 각 적용 대상 패키지는 구현, 검증, 결과 보고와 명시적 사용자 승인을 완료한 뒤에만 다음
+     적용 대상 패키지 파일을 변경할 수 있다고 기록
+   - 공용 구성 파일의 다중 패키지 변경은 패키지별 작업으로 분리하고, 패키지에 속하지 않는
+     파일 변경은 최초로 필요로 하는 책임 패키지에 명시적으로 배정. 배정이 불가능하면 ERROR
 
 ## Mandatory Post-Execution Hooks
 

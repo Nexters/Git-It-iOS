@@ -1,20 +1,23 @@
 <!--
 Sync Impact Report
-- Version change: 0.4.0 → 1.0.0
-- Modified principles: 4. 작업 범위 격리 → 4. 스킬별 수정 경로
-- Added sections: Spec-Kit 스킬별 허용 수정 경로 표
-- Removed sections: `sources/**`와 그 외 영역을 세션 단위로 분리하던 전역 범위 제한
-- Templates requiring updates: ✅ .specify/templates/plan-template.md
-- Templates requiring updates: ✅ .specify/templates/tasks-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-*/SKILL.md
+- Version change: 1.2.1 → 1.3.0
+- Modified principles: 없음
+- Added sections: 8. Git-flow 브랜치 네임스페이스
+- Removed sections: 없음
+- Templates requiring updates: ✅ .specify/templates/spec-template.md, plan-template.md; ✅ 변경 불필요 .specify/templates/tasks-template.md
+- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md; ✅ 변경 불필요 나머지 speckit-* 스킬
+- Runtime guidance requiring updates: ✅ 변경 불필요 AGENTS.md, README.md
+- Existing branch migration: ✅ 기존 브랜치는 소급 변경하지 않음; 새 브랜치 생성부터 적용
+- Follow-up TODO: ⚠ .specify/extensions.yml에 before_specify 훅이 없어 자동 브랜치 생성은 현재 비활성
+- Follow-up TODO: ⚠ .specify/scripts/bash/create-new-feature.sh는 NNN-short-name 형식과 Spec 디렉터리를 결합하는 레거시 도구이므로 새 정책에 사용 금지; 별도 스크립트 변경 작업 필요
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.0.0<br>
+**버전**: 1.3.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-10
+**최종 수정일**: 2026-08-12
 
 ## 원칙
 
@@ -68,6 +71,59 @@ Sync Impact Report
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
+
+### 6. 한국어 Spec-Kit 산출물
+
+- Spec-Kit으로 작성하거나 갱신하는 헌법, 기능 명세, 구현 계획, 조사 문서, 데이터 모델,
+  계약 설명, 빠른 시작, 작업 목록, 체크리스트와 사용자 보고는 한국어로 작성합니다.
+- 코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리와 API의 고유 명칭은 원문을
+  유지합니다. `MUST`, `SHOULD`, `MAY`와 BDD 키워드는 의미 전달에 필요할 때만 병기할 수
+  있습니다.
+- 영어 기본 템플릿이나 스킬의 예시는 산출물의 언어 규칙을 약화하지 않습니다. 제목, 표의
+  열 이름, 체크리스트 항목과 설명을 포함한 모든 자연어 보일러플레이트를 한국어로
+  바꿉니다.
+- 산출물을 완료로 보고하기 전에 새로 작성한 자연어 본문과 고정 문구가 이 원칙을 따르는지
+  검토합니다.
+
+### 7. 패키지 단위 구현 진행
+
+- 현재 명세가 변경하는 패키지 중 한 번에 하나의 패키지만 구현합니다.
+- 적용 대상 패키지는 `Domain → Data → Core → Composition → UI → Feature → App`
+  순서로 구현합니다. 현재 명세가 변경하지 않는 패키지는 건너뛰되, 나머지 적용 대상
+  패키지의 상대적 순서는 바꾸지 않습니다.
+- 현재 패키지의 모든 구현 작업과 검증을 완료하고, 변경 파일과 검증 결과를 사용자에게
+  보고한 뒤 다음 적용 대상 패키지로 진행해도 된다는 명시적 승인을 받아야 합니다.
+- 다음 적용 대상 패키지의 영향 분석은 승인 전에 수행하고 보고할 수 있지만, 그 패키지에
+  속한 파일은 승인 전에 생성, 수정 또는 삭제할 수 없습니다.
+- `tasks.md`는 각 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 위 순서에 따른
+  패키지별 단계와 각 단계 끝의 검증 및 승인 게이트를 명시해야 합니다.
+- 준비, 기반, 마무리와 횡단 관심사는 별도의 다중 패키지 구현 단계가 될 수 없습니다.
+  파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
+  파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
+  마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
+- 패키지 순서가 개정되면 이미 완료된 작업과 기존 변경은 이력으로 보존하되 더 수정하지
+  않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
+  패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
+
+### 8. Git-flow 브랜치 네임스페이스
+
+- `/speckit-specify`가 새 Git 브랜치를 생성할 때 브랜치 이름은 정확히 하나의 Git-flow
+  네임스페이스로 시작해야 합니다. 일반 기능은 `feature/<short-name>`, 운영 중인 배포본의
+  긴급 수정은 `hotfix/<short-name>`, 배포 준비와 안정화는
+  `release/<version-or-short-name>`을 사용합니다.
+- 사용자가 유형을 명시하면 그 값을 사용합니다. 명시하지 않은 경우 배포본의 긴급 수정은
+  `hotfix`, 배포 준비와 안정화는 `release`, 그 밖의 변경은 `feature`를 기본값으로
+  결정합니다. 서로 충돌하는 유형이 입력되면 브랜치를 생성하지 않고 충돌을 먼저 해소합니다.
+- `feature`와 `hotfix`의 접미사는 소문자 kebab-case를 사용합니다. `release` 접미사는
+  소문자 kebab-case 또는 `v1.2.3`과 같은 버전 식별자를 사용할 수 있습니다. 접미사는
+  비어 있거나 추가 `/`를 포함할 수 없으며 네임스페이스를 중복해서 붙일 수 없습니다.
+- 사용자가 `GIT_BRANCH_NAME`을 직접 제공해도 위 네임스페이스와 접미사 규칙을 검증해야
+  합니다. 명시값은 정책 검사를 우회하는 수단이 될 수 없습니다.
+- Spec 디렉터리 이름은 브랜치 이름과 독립적으로 유지하며 `/` 네임스페이스를 포함하지
+  않습니다. 명세에는 브랜치 유형과 실제 생성된 이름을 기록하고, 생성 훅이 없거나 실행되지
+  않았다면 생성된 것처럼 기록하지 않고 예정 이름과 미생성 상태를 구분합니다.
+- 이 원칙의 시행 전에 생성된 브랜치는 이력 보존을 위해 소급해 이름을 바꾸지 않습니다.
+  시행 후 새 브랜치를 생성하거나 기존 명세용 브랜치를 새로 만들 때부터 이 원칙을 적용합니다.
 
 ## 적용
 

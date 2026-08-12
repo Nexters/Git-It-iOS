@@ -4,12 +4,13 @@
 PATHS_SH := ./tools/repository-paths/bin/repository-paths.sh
 IOS_ROOT := $(shell $(PATHS_SH) GIT_IT_IOS_ROOT)
 HOOKS_ROOT := $(shell $(PATHS_SH) GIT_IT_HOOKS_ROOT)
+SWIFT_FORMAT_RUNNER := $(shell $(PATHS_SH) GIT_IT_SWIFT_FORMAT_RUNNER)
 WORKSPACE_PATH := $(shell $(PATHS_SH) GIT_IT_WORKSPACE_PATH)
 WORKSPACE_NAME := $(notdir $(WORKSPACE_PATH))
 
 .DEFAULT_GOAL := help
 
-.PHONY: help init tuist hooks verify-tools
+.PHONY: help init tuist hooks format verify-tools
 
 help: ## 사용 가능한 명령을 표시합니다
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  make %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -23,6 +24,9 @@ tuist: ## iOS 프로젝트의 Tuist package를 설치·생성하고 루트에 �
 
 hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh
+
+format: ## 프로젝트 전체 Swift 소스를 포맷합니다
+	$(SWIFT_FORMAT_RUNNER) format
 
 verify-tools: ## 셸 스크립트 검증에 필요한 ShellCheck·shfmt를 준비합니다
 	./tools/script-verification/bin/prepare-tools.sh
