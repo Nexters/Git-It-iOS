@@ -20,6 +20,12 @@ make init
 `make help`로 각 단계를 개별 실행하는 명령을 확인할 수 있습니다. Makefile은 각 기능의
 공개 `bin/` 명령만 순서대로 호출하며 별도 정책을 갖지 않습니다.
 
+프로젝트 전체 Swift 소스를 포맷하려면 다음 명령을 실행합니다.
+
+```sh
+make format
+```
+
 `tuist generate`는 `sources/GitIt.xcworkspace`를 생성합니다. `make tuist`(또는
 `make init`)는 이어서 저장소 루트에 같은 워크스페이스를 가리키는 심볼릭 링크
 `GitIt.xcworkspace`를 만들어 루트에서 바로 Xcode로 열 수 있게 합니다. 실제 파일은

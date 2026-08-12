@@ -1,6 +1,8 @@
 # 기능 명세: [FEATURE NAME]
 
-**기능 브랜치**: `[###-feature-name]`
+**Git-flow 유형**: `[feature | hotfix | release]`
+
+**기능 브랜치**: `[실제 생성된 브랜치 또는 "미생성 (예정: type/short-name)"]`
 
 **생성일**: [DATE]
 

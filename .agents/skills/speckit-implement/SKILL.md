@@ -157,24 +157,36 @@ amend ignore files unless an active task explicitly names that exact ignore file
    - **Kubernetes/k8s**: `*.secret.yaml`, `secrets/`, `.kube/`, `kubeconfig*`, `*.key`, `*.crt`
 
 5. Parse tasks.md structure and extract:
-   - **Task phases**: Setup, Tests, Core, Integration, Polish
+   - **패키지 단계**: `Domain`, `Data`, `Core`, `Composition`, `UI`, `Feature`, `App`
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
+   - **패키지 소유권**: 완료되지 않은 각 파일 변경 작업이 `tasks.md`에서 `Domain`, `Data`,
+     `Core`, `Composition`, `UI`, `Feature`, `App` 중 정확히 하나의 패키지 단계에 명시적으로
+     배정됐는지 검증
 
-6. Execute implementation following the task plan:
-   - **Phase-by-phase execution**: Complete each phase before moving to the next
+   패키지 소유권을 경로나 설명에서 추론해 새로 배정하지 않는다. 소유권이 없거나 여러
+   패키지에 걸친 작업, 별도 준비·기반·마무리 구현 단계가 있으면 파일을 수정하지 말고
+   `/speckit-tasks`로 작업 목록을 갱신하도록 요청한 뒤 중단한다.
+
+   `Domain → Data → Core → Composition → UI → Feature → App` 순서에서 완료되지 않은 작업이
+   있는 첫 패키지만 선택한다. 완료되지 않은 작업이 없는 패키지는 건너뛴다. 이번 실행에서는
+   이후 적용 대상 패키지가 소유한 파일을 수정해서는 안 된다.
+
+6. 선택한 패키지에 대해서만 작업 계획에 따라 구현한다:
+   - **패키지 내부 실행**: 선택한 패키지 단계의 준비, 테스트, 구현, 정리, 검증 순서 준수
    - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
    - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
    - **File-based coordination**: Tasks affecting the same files must run sequentially
-   - **Validation checkpoints**: Verify each phase completion before proceeding
+   - **검증 점검 지점**: 선택한 패키지의 구현과 검증을 완료한 뒤 중단
 
 7. Implementation execution rules:
-   - **Setup first**: Initialize project structure, dependencies, configuration
+   - **패키지 준비 우선**: 선택한 패키지에 명시적으로 배정된 구조·의존성·구성 작업만 수행
    - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
    - **Core development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
-   - **Polish and validation**: Unit tests, performance optimization, documentation
+   - **정리와 검증**: 선택한 패키지 소유 작업만 수행하고 전체 읽기 전용 검증은 마지막 적용
+     대상 패키지 완료 뒤에만 수행
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
@@ -185,16 +197,22 @@ amend ignore files unless an active task explicitly names that exact ignore file
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
 
 9. Completion validation:
-   - Verify all required tasks are completed
-   - Check that implemented features match the original specification
-   - Validate that tests pass and coverage meets requirements
+   - 선택한 패키지의 모든 필수 작업이 완료되었는지 확인
+   - 선택한 패키지 구현이 원래 명세와 일치하는지 확인
+   - 선택한 패키지의 필수 테스트 통과와 커버리지 요구사항 충족 여부 검증
    - Confirm the implementation follows the technical plan
+   - 선택한 패키지, 변경 파일과 정확한 검증 결과 보고
+   - 이후 적용 대상 패키지가 남아 있으면 명시적 사용자 승인을 요청하고 중단. 기능 구현이
+     완료되지 않았으므로 이 시점에는 필수 사후 훅을 실행하지 않음
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 
 ## Mandatory Post-Execution Hooks
 
 **You MUST complete this section before reporting completion to the user.**
+
+모든 적용 대상 패키지가 완료된 뒤에만 이 훅을 실행한다. 이후 적용 대상 패키지가 남아
+있으면 훅을 실행하지 않고 9단계의 패키지 승인 게이트에서 중단한다.
 
 Check if `.specify/extensions.yml` exists in the project root.
 - If it does not exist, or no hooks are registered under `hooks.after_implement`, skip to the Completion Report.
@@ -233,7 +251,7 @@ Report final status with summary of completed work.
 
 ## Done When
 
-- [ ] All tasks in tasks.md completed and marked `[X]`
+- [ ] 선택한 패키지의 모든 작업을 완료하고 `[X]`로 표시
 - [ ] Implementation validated against specification, plan, and test coverage
-- [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with summary of completed work
+- [ ] 모든 적용 대상 패키지가 완료된 경우에만 확장 훅 실행 또는 생략 처리
+- [ ] 패키지, 변경 파일과 검증 결과를 보고하고 다음 적용 대상 패키지 전에 명시적 승인 요청
