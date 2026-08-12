@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - DomainModuleName
 
 enum DomainModuleName: String, CaseIterable {
-    case Domain
     case DomainAuthentication
     case DomainAuthenticationTests
 }
@@ -11,8 +10,7 @@ enum DomainModuleName: String, CaseIterable {
 extension DomainModuleName {
     var target: Target {
         switch self {
-        case .Domain,
-             .DomainAuthentication:
+        case .DomainAuthentication:
             .module(name: rawValue)
 
         case .DomainAuthenticationTests:

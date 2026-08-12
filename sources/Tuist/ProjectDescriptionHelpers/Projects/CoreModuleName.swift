@@ -3,16 +3,12 @@ import ProjectDescription
 // MARK: - CoreModuleName
 
 enum CoreModuleName: String {
-    case Utility
     case CoreAuthentication
     case CoreAuthenticationTests
 }
 
 extension CoreModuleName {
     static let targets: [Target] = [
-        .module(
-            name: CoreModuleName.Utility.rawValue
-        ),
         .module(
             name: CoreModuleName.CoreAuthentication.rawValue,
             dependencies: [

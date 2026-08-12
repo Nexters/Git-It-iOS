@@ -14,11 +14,8 @@ extension CompositionModuleName {
             .module(
                 name: rawValue,
                 dependencies: [
-                    .fromDomain(.Domain),
                     .fromDomain(.DomainAuthentication),
-                    .fromData(.Data),
                     .fromData(.DataAuthentication),
-                    .fromCore(.Utility),
                     .fromCore(.CoreAuthentication),
                 ],
             )

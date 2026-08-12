@@ -35,14 +35,27 @@ extension ProjectName {
             case .UI:
                 UIModuleName.targets
             }
-        let options: Project.Options =
-            self == .App
-                ? .options(automaticSchemesOptions: .disabled)
-                : .options()
+        let options = Project.Options.options(automaticSchemesOptions: .disabled)
         let schemes: [Scheme] =
-            self == .App
-                ? AppModuleName.schemes
-                : []
+            switch self {
+            case .App:
+                AppModuleName.schemes
+            case .Composition:
+                [.module(name: "Composition", testTarget: "CompositionTests")]
+            case .Feature:
+                [.module(name: "FeatureAuthentication", testTarget: "FeatureAuthenticationTests")]
+            case .Domain:
+                [.module(name: "DomainAuthentication", testTarget: "DomainAuthenticationTests")]
+            case .Data:
+                [.module(name: "DataAuthentication", testTarget: "DataAuthenticationTests")]
+            case .Core:
+                [.module(name: "CoreAuthentication", testTarget: "CoreAuthenticationTests")]
+            case .UI:
+                [
+                    .module(name: "DesignSystem"),
+                    .module(name: "UIComponent"),
+                ]
+            }
 
         return Project(
             name: rawValue,
@@ -50,6 +63,22 @@ extension ProjectName {
             options: options,
             targets: targets,
             schemes: schemes,
+        )
+    }
+}
+
+extension Scheme {
+    fileprivate static func module(
+        name: String,
+        testTarget: String? = nil,
+    ) -> Self {
+        .scheme(
+            name: name,
+            shared: true,
+            buildAction: .buildAction(targets: [.target(name)]),
+            testAction: testTarget.map {
+                .targets([.testableTarget(target: .target($0))])
+            },
         )
     }
 }

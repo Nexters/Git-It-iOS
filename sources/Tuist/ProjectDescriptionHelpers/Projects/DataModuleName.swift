@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - DataModuleName
 
 enum DataModuleName: String, CaseIterable {
-    case Data
     case DataAuthentication
     case DataAuthenticationTests
 }
@@ -11,8 +10,7 @@ enum DataModuleName: String, CaseIterable {
 extension DataModuleName {
     var target: Target {
         switch self {
-        case .Data,
-             .DataAuthentication:
+        case .DataAuthentication:
             .module(
                 name: rawValue
             )

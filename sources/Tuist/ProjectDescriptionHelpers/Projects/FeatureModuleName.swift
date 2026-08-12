@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - FeatureModuleName
 
 enum FeatureModuleName: String, CaseIterable {
-    case Feature
     case FeatureAuthentication
     case FeatureAuthenticationTests
 }
@@ -11,16 +10,6 @@ enum FeatureModuleName: String, CaseIterable {
 extension FeatureModuleName {
     var target: Target {
         switch self {
-        case .Feature:
-            .module(
-                name: rawValue,
-                dependencies: [
-                    .fromDomain(.Domain),
-                    .fromUI(.UIComponent),
-                    .external(.ComposableArchitecture),
-                ],
-            )
-
         case .FeatureAuthentication:
             .module(
                 name: rawValue,

@@ -76,7 +76,6 @@ extension AppModuleName {
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
                     .fromComposition(.Composition),
-                    .fromFeature(.Feature),
                     .fromFeature(.FeatureAuthentication),
                     .fromDomain(.DomainAuthentication),
                     .external(.FirebaseAnalytics),
