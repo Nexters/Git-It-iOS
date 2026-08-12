@@ -179,44 +179,44 @@ Domain·Core·Apple 타입과 구현 기술 의존이 없는지 확인한다.
 
 ### 계약과 모델 — Red
 
-- [ ] T048 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/ExternalAuthenticationProviderContractTests.swift`에 method identifier 기반 인증·authorization 조회·변경 stream만 제공하고 Domain/Core/Apple 타입을 공개하지 않는 계약 테스트를 작성한다
-- [ ] T049 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/SessionRemoteContractTests.swift`에 세션 시작, token refresh, refresh token 폐기만 제공하고 공급자별 필드·Domain/Core 타입을 공개하지 않는 계약 테스트를 작성한다
-- [ ] T050 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/SessionStorageContractTests.swift`에 Git It 서버 세션의 원자적 저장·읽기·삭제만 제공하고 인증 참조를 취급하지 않는 계약 테스트를 작성한다
-- [ ] T051 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/AuthenticationAuthorizationStorageContractTests.swift`에 공급자 인증 참조의 저장·읽기·삭제만 제공하고 서버 세션을 취급하지 않는 계약 테스트를 작성한다
-- [ ] T052 [P] `sources/Projects/Data/DataAuthenticationTests/Models/ExternalAuthenticationEvidenceTests.swift`에 method identifier, 불투명 subject reference와 payload만 존재하고 payload가 로그·비교에 노출되지 않는지 검증하는 실패 테스트를 작성한다
-- [ ] T053 [P] `sources/Projects/Data/DataAuthenticationTests/Models/ExternalAuthorizationStateTests.swift`에 `active`·`inactive`·`temporarilyUnavailable`만 존재하고 Apple credential state case가 없는지 검증하는 실패 테스트를 작성한다
-- [ ] T054 [P] `sources/Projects/Data/DataAuthenticationTests/Errors/DataAuthenticationErrorTests.swift`에 취소, 일시 오류, 저장 실패, 세션 시작·refresh 거부·폐기 실패를 공급자 중립 의미로 분류하는 실패 테스트를 작성한다
-- [ ] T055 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/SessionStartRequestDTOTests.swift`에 method identifier와 불투명 단발성 payload만 전송 입력에 포함되고 Apple 필드명이 없는지 검증하는 실패 테스트를 작성한다
-- [ ] T056 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/SessionResponseDTOTests.swift`에 Git It 사용자, access/refresh token, access 만료만 세션 응답에 포함되는지 검증하는 실패 테스트를 작성한다
-- [ ] T057 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/RefreshDTOTests.swift`에 공급자와 무관한 refresh 요청·응답 및 거부·만료 처리 입력을 검증하는 실패 테스트를 작성한다
-- [ ] T058 [P] `sources/Projects/Data/DataAuthenticationTests/Models/StoredSessionTests.swift`에 서버 세션 저장 모델이 token·만료·사용자만 가지며 `appleUserID`와 인증 참조를 포함하지 않는지 검증하는 실패 테스트를 작성한다
-- [ ] T059 [P] `sources/Projects/Data/DataAuthenticationTests/Models/StoredAuthorizationReferenceTests.swift`에 method identifier와 불투명 subject reference가 서버 세션과 분리되는지 검증하는 실패 테스트를 작성한다
+- [X] T048 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/ExternalAuthenticationProviderContractTests.swift`에 method identifier 기반 인증·authorization 조회·변경 stream만 제공하고 Domain/Core/Apple 타입을 공개하지 않는 계약 테스트를 작성한다
+- [X] T049 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/SessionRemoteContractTests.swift`에 세션 시작, token refresh, refresh token 폐기만 제공하고 공급자별 필드·Domain/Core 타입을 공개하지 않는 계약 테스트를 작성한다
+- [X] T050 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/SessionStorageContractTests.swift`에 Git It 서버 세션의 원자적 저장·읽기·삭제만 제공하고 인증 참조를 취급하지 않는 계약 테스트를 작성한다
+- [X] T051 [P] `sources/Projects/Data/DataAuthenticationTests/Contracts/AuthenticationAuthorizationStorageContractTests.swift`에 공급자 인증 참조의 저장·읽기·삭제만 제공하고 서버 세션을 취급하지 않는 계약 테스트를 작성한다
+- [X] T052 [P] `sources/Projects/Data/DataAuthenticationTests/Models/ExternalAuthenticationEvidenceTests.swift`에 method identifier, 불투명 subject reference와 payload만 존재하고 payload가 로그·비교에 노출되지 않는지 검증하는 실패 테스트를 작성한다
+- [X] T053 [P] `sources/Projects/Data/DataAuthenticationTests/Models/ExternalAuthorizationStateTests.swift`에 `active`·`inactive`·`temporarilyUnavailable`만 존재하고 Apple credential state case가 없는지 검증하는 실패 테스트를 작성한다
+- [X] T054 [P] `sources/Projects/Data/DataAuthenticationTests/Errors/DataAuthenticationErrorTests.swift`에 취소, 일시 오류, 저장 실패, 세션 시작·refresh 거부·폐기 실패를 공급자 중립 의미로 분류하는 실패 테스트를 작성한다
+- [X] T055 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/SessionStartRequestDTOTests.swift`에 method identifier와 불투명 단발성 payload만 전송 입력에 포함되고 Apple 필드명이 없는지 검증하는 실패 테스트를 작성한다
+- [X] T056 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/SessionResponseDTOTests.swift`에 Git It 사용자, access/refresh token, access 만료만 세션 응답에 포함되는지 검증하는 실패 테스트를 작성한다
+- [X] T057 [P] `sources/Projects/Data/DataAuthenticationTests/DTOs/RefreshDTOTests.swift`에 공급자와 무관한 refresh 요청·응답 및 거부·만료 처리 입력을 검증하는 실패 테스트를 작성한다
+- [X] T058 [P] `sources/Projects/Data/DataAuthenticationTests/Models/StoredSessionTests.swift`에 서버 세션 저장 모델이 token·만료·사용자만 가지며 `appleUserID`와 인증 참조를 포함하지 않는지 검증하는 실패 테스트를 작성한다
+- [X] T059 [P] `sources/Projects/Data/DataAuthenticationTests/Models/StoredAuthorizationReferenceTests.swift`에 method identifier와 불투명 subject reference가 서버 세션과 분리되는지 검증하는 실패 테스트를 작성한다
 
 ### 계약과 모델 — Green
 
-- [ ] T060 [P] `sources/Projects/Data/DataAuthentication/Models/ExternalAuthenticationEvidence.swift`에 공급자 중립 method identifier·subject reference·opaque payload 모델을 정의해 T052을 통과시킨다
-- [ ] T061 [P] `sources/Projects/Data/DataAuthentication/Models/ExternalAuthorizationState.swift`에 `active`·`inactive`·`temporarilyUnavailable` 상태만 정의해 T053을 통과시킨다
-- [ ] T062 [P] `sources/Projects/Data/DataAuthentication/DTOs/SessionStartRequestDTO.swift`에 method identifier와 불투명 일회성 payload만 가진 세션 시작 요청을 정의해 T055를 통과시킨다
-- [ ] T063 [P] `sources/Projects/Data/DataAuthentication/DTOs/SessionResponseDTO.swift`에 Git It 사용자와 access/refresh token·만료를 가진 세션 응답을 정의해 T056을 통과시킨다
-- [ ] T064 [P] `sources/Projects/Data/DataAuthentication/DTOs/RefreshRequestDTO.swift`에 refresh token만 가진 공급자 중립 갱신 요청을 정의해 T057을 통과시킨다
-- [ ] T065 [P] `sources/Projects/Data/DataAuthentication/DTOs/RefreshResponseDTO.swift`에 새 access token·만료와 필요 시 교체 refresh token을 가진 갱신 응답을 정의해 T057을 통과시킨다
-- [ ] T066 [P] `sources/Projects/Data/DataAuthentication/Models/StoredSession.swift`에 access/refresh token·만료·사용자만 가진 서버 세션 저장 모델을 정의해 T058를 통과시킨다
-- [ ] T067 [P] `sources/Projects/Data/DataAuthentication/Models/StoredAuthorizationReference.swift`에 method identifier와 provider subject reference만 가진 인증 참조 저장 모델을 정의해 T059을 통과시킨다
-- [ ] T068 [P] `sources/Projects/Data/DataAuthentication/Errors/DataAuthenticationError.swift`에 외부 인증·저장·세션 시작·refresh·폐기 오류를 공급자 중립 의미로 정의해 T054을 통과시킨다
-- [ ] T069 [P] `sources/Projects/Data/DataAuthentication/Contracts/ExternalAuthenticationProvider.swift`에 인증, authorization 상태 조회와 변경 stream을 제공하는 `Sendable` 계약을 정의해 T048를 통과시킨다
-- [ ] T070 [P] `sources/Projects/Data/DataAuthentication/Contracts/SessionRemote.swift`에 공급자 중립 `startSession`, token refresh, refresh token 폐기 연산만 정의해 T049을 통과시킨다
-- [ ] T071 [P] `sources/Projects/Data/DataAuthentication/Contracts/SessionStorage.swift`에 Git It 서버 세션의 원자적 저장·읽기·삭제 계약만 정의해 T050를 통과시킨다
-- [ ] T072 [P] `sources/Projects/Data/DataAuthentication/Contracts/AuthenticationAuthorizationStorage.swift`에 공급자 인증 참조의 저장·읽기·삭제 계약만 정의해 T051를 통과시킨다
+- [X] T060 [P] `sources/Projects/Data/DataAuthentication/Models/ExternalAuthenticationEvidence.swift`에 공급자 중립 method identifier·subject reference·opaque payload 모델을 정의해 T052을 통과시킨다
+- [X] T061 [P] `sources/Projects/Data/DataAuthentication/Models/ExternalAuthorizationState.swift`에 `active`·`inactive`·`temporarilyUnavailable` 상태만 정의해 T053을 통과시킨다
+- [X] T062 [P] `sources/Projects/Data/DataAuthentication/DTOs/SessionStartRequestDTO.swift`에 method identifier와 불투명 일회성 payload만 가진 세션 시작 요청을 정의해 T055를 통과시킨다
+- [X] T063 [P] `sources/Projects/Data/DataAuthentication/DTOs/SessionResponseDTO.swift`에 Git It 사용자와 access/refresh token·만료를 가진 세션 응답을 정의해 T056을 통과시킨다
+- [X] T064 [P] `sources/Projects/Data/DataAuthentication/DTOs/RefreshRequestDTO.swift`에 refresh token만 가진 공급자 중립 갱신 요청을 정의해 T057을 통과시킨다
+- [X] T065 [P] `sources/Projects/Data/DataAuthentication/DTOs/RefreshResponseDTO.swift`에 새 access token·만료와 필요 시 교체 refresh token을 가진 갱신 응답을 정의해 T057을 통과시킨다
+- [X] T066 [P] `sources/Projects/Data/DataAuthentication/Models/StoredSession.swift`에 access/refresh token·만료·사용자만 가진 서버 세션 저장 모델을 정의해 T058를 통과시킨다
+- [X] T067 [P] `sources/Projects/Data/DataAuthentication/Models/StoredAuthorizationReference.swift`에 method identifier와 provider subject reference만 가진 인증 참조 저장 모델을 정의해 T059을 통과시킨다
+- [X] T068 [P] `sources/Projects/Data/DataAuthentication/Errors/DataAuthenticationError.swift`에 외부 인증·저장·세션 시작·refresh·폐기 오류를 공급자 중립 의미로 정의해 T054을 통과시킨다
+- [X] T069 [P] `sources/Projects/Data/DataAuthentication/Contracts/ExternalAuthenticationProvider.swift`에 인증, authorization 상태 조회와 변경 stream을 제공하는 `Sendable` 계약을 정의해 T048를 통과시킨다
+- [X] T070 [P] `sources/Projects/Data/DataAuthentication/Contracts/SessionRemote.swift`에 공급자 중립 `startSession`, token refresh, refresh token 폐기 연산만 정의해 T049을 통과시킨다
+- [X] T071 [P] `sources/Projects/Data/DataAuthentication/Contracts/SessionStorage.swift`에 Git It 서버 세션의 원자적 저장·읽기·삭제 계약만 정의해 T050를 통과시킨다
+- [X] T072 [P] `sources/Projects/Data/DataAuthentication/Contracts/AuthenticationAuthorizationStorage.swift`에 공급자 인증 참조의 저장·읽기·삭제 계약만 정의해 T051를 통과시킨다
 
 ### 패키지 횡단 관심사와 정리
 
-- [ ] T073 [P] `sources/Projects/Data/DataAuthenticationTests/Security/SensitiveValueExposureTests.swift`에 opaque payload와 token DTO가 `CustomStringConvertible`·디버그 출력·오류 메시지로 민감 값을 노출하지 않는지 검증하는 테스트를 작성한다
-- [ ] T074 [P] 구현 파일이 존재함을 확인한 뒤 `sources/Projects/Data/DataAuthentication/Placeholder.swift`를 삭제한다
-- [ ] T075 [P] 실제 테스트 파일이 존재함을 확인한 뒤 `sources/Projects/Data/DataAuthenticationTests/Placeholder.swift`를 삭제한다
+- [X] T073 [P] `sources/Projects/Data/DataAuthenticationTests/Security/SensitiveValueExposureTests.swift`에 opaque payload와 token DTO가 `CustomStringConvertible`·디버그 출력·오류 메시지로 민감 값을 노출하지 않는지 검증하는 테스트를 작성한다
+- [X] T074 [P] 구현 파일이 존재함을 확인한 뒤 `sources/Projects/Data/DataAuthentication/Placeholder.swift`를 삭제한다
+- [X] T075 [P] 실제 테스트 파일이 존재함을 확인한 뒤 `sources/Projects/Data/DataAuthenticationTests/Placeholder.swift`를 삭제한다
 
 ### 패키지 검증
 
-- [ ] T076 [no-write] `derived_data_root=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_DERIVED_DATA_PATH) && xcodebuild -workspace sources/GitIt.xcworkspace -scheme DataAuthentication -derivedDataPath "$derived_data_root/TestSchemes/DataAuthentication" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`를 실행해 Xcode 전역 Build Location과 격리된 Data 전체 테스트가 통과하고 `DataAuthentication` target이 다른 프로젝트 내부 패키지에 의존하지 않는지 확인한다
+- [X] T076 [no-write] `derived_data_root=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_DERIVED_DATA_PATH) && xcodebuild -workspace sources/GitIt.xcworkspace -scheme DataAuthentication -derivedDataPath "$derived_data_root/TestSchemes/DataAuthentication" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`를 실행해 Xcode 전역 Build Location과 격리된 Data 전체 테스트가 통과하고 `DataAuthentication` target이 다른 프로젝트 내부 패키지에 의존하지 않는지 확인한다
 
 **승인 게이트**: T048~T076의 변경과 검증 결과를 보고한 뒤 중단한다. 사용자가
 `Core` 시작을 승인하기 전에는 작업 패키지 3을 실행하지 않는다.
