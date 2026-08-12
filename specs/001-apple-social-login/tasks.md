@@ -239,27 +239,27 @@ CSPRNG를 Core test target에서 검증하고 Domain·Data 의미를 소유하�
 
 ### 기술 API — Red
 
-- [ ] T077 [P] `sources/Projects/Core/CoreAuthenticationTests/AppleAuthentication/AppleAuthorizationProviderTests.swift`에 명시적 시작, 선택 scope, 성공 credential 변환, 취소, state·attempt 불일치, 시도 만료, token/code 누락, 늦은 콜백 무시 테스트를 작성하고 실패를 확인한다
-- [ ] T078 [P] `sources/Projects/Core/CoreAuthenticationTests/AppleAuthentication/AppleCredentialStateProviderTests.swift`에 `authorized`·`revoked`·`notFound`·`transferred`와 revoked 알림·조회 오류를 Core 소유 상태로 격리하는 테스트를 작성하고 실패를 확인한다
-- [ ] T079 [P] `sources/Projects/Core/CoreAuthenticationTests/Keychain/KeychainStoreTests.swift`에 key namespace 분리, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` 상당 접근성, 원자적 CRUD와 오류 격리 테스트를 작성하고 실패를 확인한다
-- [ ] T080 [P] `sources/Projects/Core/CoreAuthenticationTests/RandomGenerator/SecureRandomGeneratorTests.swift`에 nonce·state·attemptID·grantID용 CSPRNG 출력의 길이, 고유성, 실패 전달 테스트를 작성하고 실패를 확인한다
+- [X] T077 [P] `sources/Projects/Core/CoreAuthenticationTests/AppleAuthentication/AppleAuthorizationProviderTests.swift`에 명시적 시작, 선택 scope, 성공 credential 변환, 취소, state·attempt 불일치, 시도 만료, token/code 누락, 늦은 콜백 무시 테스트를 작성하고 실패를 확인한다
+- [X] T078 [P] `sources/Projects/Core/CoreAuthenticationTests/AppleAuthentication/AppleCredentialStateProviderTests.swift`에 `authorized`·`revoked`·`notFound`·`transferred`와 revoked 알림·조회 오류를 Core 소유 상태로 격리하는 테스트를 작성하고 실패를 확인한다
+- [X] T079 [P] `sources/Projects/Core/CoreAuthenticationTests/Keychain/KeychainStoreTests.swift`에 key namespace 분리, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` 상당 접근성, 원자적 CRUD와 오류 격리 테스트를 작성하고 실패를 확인한다
+- [X] T080 [P] `sources/Projects/Core/CoreAuthenticationTests/RandomGenerator/SecureRandomGeneratorTests.swift`에 nonce·state·attemptID·grantID용 CSPRNG 출력의 길이, 고유성, 실패 전달 테스트를 작성하고 실패를 확인한다
 
 ### 기술 API — Green
 
-- [ ] T081 [P] `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleAuthorizationProvider.swift`에 `AuthenticationServices`를 Core 소유 요청·credential·오류 뒤에 격리하고 시도별 nonce·state·attemptID·expiresAt 검증과 취소를 지원하는 API를 구현해 T077을 통과시킨다
-- [ ] T082 [P] `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleCredentialStateProvider.swift`에 credential state 조회와 revoked 알림을 Core 소유 상태·stream으로 변환하는 API를 구현해 T078를 통과시킨다
-- [ ] T083 [P] `sources/Projects/Core/CoreAuthentication/Keychain/KeychainStore.swift`에 namespace별 기기 한정 Keychain CRUD와 원자적 저장·삭제 API를 구현해 T079을 통과시킨다
-- [ ] T084 [P] `sources/Projects/Core/CoreAuthentication/RandomGenerator/SecureRandomGenerator.swift`에 CSPRNG 기반 임의 값 생성 API를 구현해 T080를 통과시킨다
+- [X] T081 [P] `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleAuthorizationProvider.swift`, `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleAuthorizationAttempt.swift`, `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleCredential.swift`, `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleAuthorizationError.swift`로 Apple 인증 provider·시도·credential·오류를 파일별 Core 소유 타입으로 분리하고, `AuthenticationServices`를 provider 뒤에 격리하며 시도별 nonce·state·attemptID·expiresAt 검증과 취소를 유지해 T077을 통과시킨다
+- [X] T082 [P] `sources/Projects/Core/CoreAuthentication/AppleAuthentication/AppleCredentialStateProvider.swift`에 credential state 조회와 revoked 알림을 Core 소유 상태·stream으로 변환하는 API를 구현해 T078를 통과시킨다
+- [X] T083 [P] `sources/Projects/Core/CoreAuthentication/Keychain/KeychainStore.swift`, `sources/Projects/Core/CoreAuthentication/Keychain/KeychainNamespace.swift`, `sources/Projects/Core/CoreAuthentication/Keychain/KeychainAccessibility.swift`, `sources/Projects/Core/CoreAuthentication/Keychain/KeychainStoreError.swift`로 Keychain store·namespace·접근성·오류를 파일별 Core 소유 타입으로 분리하고, namespace별 기기 한정 Keychain CRUD와 원자적 저장·삭제 API를 유지해 T079을 통과시킨다
+- [X] T084 [P] `sources/Projects/Core/CoreAuthentication/RandomGenerator/SecureRandomGenerator.swift`에 CSPRNG 기반 임의 값 생성 API를 구현해 T080를 통과시킨다
 
 ### 패키지 횡단 관심사와 정리
 
-- [ ] T085 [P] `sources/Projects/Core/CoreAuthenticationTests/Security/SensitiveValueExposureTests.swift`에 Apple 원시 credential, nonce, state와 Keychain 값이 오류·설명 문자열에 포함되지 않는지 검증하는 테스트를 작성한다
-- [ ] T086 [P] 구현 파일이 존재함을 확인한 뒤 `sources/Projects/Core/CoreAuthentication/Placeholder.swift`를 삭제한다
-- [ ] T087 [P] 실제 테스트 파일이 존재함을 확인한 뒤 `sources/Projects/Core/CoreAuthenticationTests/Placeholder.swift`를 삭제한다
+- [X] T085 [P] `sources/Projects/Core/CoreAuthenticationTests/Security/SensitiveValueExposureTests.swift`에 Apple 원시 credential, nonce, state와 Keychain 값이 오류·설명 문자열에 포함되지 않는지 검증하는 테스트를 작성한다
+- [X] T086 [P] 구현 파일이 존재함을 확인한 뒤 `sources/Projects/Core/CoreAuthentication/Placeholder.swift`를 삭제한다
+- [X] T087 [P] 실제 테스트 파일이 존재함을 확인한 뒤 `sources/Projects/Core/CoreAuthenticationTests/Placeholder.swift`를 삭제한다
 
 ### 패키지 검증
 
-- [ ] T088 [no-write] `derived_data_root=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_DERIVED_DATA_PATH) && xcodebuild -workspace sources/GitIt.xcworkspace -scheme CoreAuthentication -derivedDataPath "$derived_data_root/TestSchemes/CoreAuthentication" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`를 실행해 Xcode 전역 Build Location과 격리된 Core 전체 테스트가 통과하고 `CoreAuthentication` target이 Domain·Data·Feature에 의존하지 않는지 확인한다
+- [X] T088 [no-write] `derived_data_root=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_DERIVED_DATA_PATH) && xcodebuild -workspace sources/GitIt.xcworkspace -scheme CoreAuthentication -derivedDataPath "$derived_data_root/TestSchemes/CoreAuthentication" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`를 실행해 Xcode 전역 Build Location과 격리된 Core 전체 테스트가 통과하고 `CoreAuthentication` target이 Domain·Data·Feature에 의존하지 않는지 확인한다
 
 **승인 게이트**: T077~T088의 변경과 검증 결과를 보고한 뒤 중단한다. 사용자가
 `Composition` 시작을 승인하기 전에는 작업 패키지 4를 실행하지 않는다.
