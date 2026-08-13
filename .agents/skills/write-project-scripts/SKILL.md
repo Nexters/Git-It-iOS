@@ -23,7 +23,7 @@ ShellCheck·shfmt 버전, checksum, 준비 또는 복구를 변경할 때만 [�
 5. 모든 스크립트 작성 시 과도한 복잡성을 피하고 단순화된 Clean Architecture(bin, core, tests)를 유지하며, 코드의 주요 동작과 단계마다 간단한 주석을 의무적으로 작성한다.
 6. Bash 전용 문법, 암묵적 전역 상태, 중요 생산 명령의 상태를 잃는 pipeline을 사용하지 않는다.
 7. 변경한 기능의 `tests/test-*.sh`를 `/bin/sh`로 직접 실행한다. 스킬의 검증기는 다른 기능 테스트를 대신 실행하지 않는다.
-8. [아키텍처 체크리스트](references/checklists/architecture.md)를 변경 범위에 맞게 검토한다. 구조적 예외가 생기면 이유, 영향과 검증하지 못한 범위를 문서에 기록한다.
+8. [아키텍처](references/architecture.md)와 [작성 컨벤션](references/conventions.md)을 변경 범위에 맞게 검토한다. 구조적 예외가 생기면 이유, 영향과 검증하지 못한 범위를 변경의 자연어 문서에 기록한다.
 9. 저장소 루트에서 다음 공용 검증을 실행한다.
 
 ```sh
