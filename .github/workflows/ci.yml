@@ -35,6 +35,35 @@ jobs:
       - name: Run script tests
         run: "$GIT_IT_SCRIPT_TEST_RUNNER"
 
+  lint:
+    name: lint
+    runs-on: macos-26
+    timeout-minutes: 15
+    continue-on-error: true
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Cache Swift style dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
+          key: ${{ runner.os }}-${{ runner.arch }}-swift-style-v1-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_SWIFT_STYLE_ROOT), format('{0}/Package.swift', env.GIT_IT_SWIFT_STYLE_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-swift-style-v1-
+
+      - name: Lint Swift style
+        run: |
+          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
+
   build-and-test:
     name: build
     runs-on: macos-26
@@ -83,11 +112,6 @@ jobs:
       - name: Generate workspace
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Lint Swift style
-        continue-on-error: true
-        run: |
-          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
       - name: Build shared schemes
         run: |
