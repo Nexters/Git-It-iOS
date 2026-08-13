@@ -465,3 +465,114 @@ Python의 `PyYAML` 가용성을 먼저 확인한다. cached 경로는 환경에 
 ### 연결
 
 없음
+
+## TS-20260813-002: 동시 pre-commit 실행의 Git index·SwiftPM cache 경합
+
+**기록일**: 2026-08-13
+**상태**: 해결
+**발생 단계**: staged 변경 커밋과 pre-commit 검증
+**관련 항목**: 커밋 `968d5b8`, `tools/githooks/pre-commit`,
+`tools/githooks/swift-format/bin/run.sh`
+
+### 증상
+
+같은 staged 변경에 대한 여러 `git commit` 시도가 겹친 뒤 세 개의 pre-commit 체인과 파일별
+`swift run` 포맷 작업이 동시에 남았다. 기존 두 커밋 시도는 각각 약 28분과 12분 동안
+실행됐지만 새 커밋이 생성되지 않았고, 뒤에 시작한 시도도 같은 SwiftPM build cache를
+기다렸다.
+
+### 영향
+
+어느 실행이 먼저 Git index와 작업 파일을 검사·변경·복구하고 실제 커밋을 만들지 예측할 수
+없어졌다. 완료되지 않은 실행을 실패로 보고 다시 커밋할수록 동일 staged 변경에 대한 훅이
+늘어나며 검증 시간과 index 상태 판단이 더 불명확해졌다.
+
+### 근거
+
+- `세션 019ffaf0-fba1-7573-a291-f6cd9ae9e4ac`의 프로세스 조회: 서로 다른 메시지의
+  `git commit` 세 개와 각 `pre-commit`·`swift-format/bin/run.sh staged` 하위 체인이 같은
+  저장소에서 동시에 실행 중이었다.
+- 같은 세션의 중단 직전 확인: 장시간 실행된 기존 두 훅이 남아 있었지만 `git log -1`은
+  여전히 `a50c7e7`이었고 staged 50개 파일은 보존돼 있었다.
+- `tools/githooks/swift-format/bin/run.sh:91-140`과
+  `tools/swift-style/scripts/format.sh:86-102`: staged 대상은 공통 Git index에서 읽고 같은
+  작업 파일을 검증하며, 파일별 `swift run`이 서브모듈의 공통 `.build/cache`를 사용한다.
+
+### 원인
+
+확정 원인은 이전 훅이 종료됐는지 확인하기 전에 동일 저장소에서 커밋을 재시도해 여러
+pre-commit 실행이 겹친 것이다. 현재 staged 포맷 훅은 실행별 임시 backup은 만들지만 Git
+index, 작업 파일과 Swift-Style `.build/cache`를 저장소 단위로 공유하므로 서로 독립적으로
+병행할 수 없다.
+
+### 조치
+
+사용자 지시에 따라 실행 중인 모든 커밋 훅과 하위 포맷 프로세스를 중단했다. 중단 뒤 새
+커밋이 없고 staged 50개 파일이 보존됐음을 확인한 다음, 추가 커밋 시도가 없는 상태에서
+`git commit -m '[Rename] 인증 계약과 로그인 세션 이름 명확화'`를 한 번만 실행했다.
+
+### 검증
+
+- 단일 pre-commit 실행: 셸 회귀 테스트 16개와 Swift 포맷 검증이 통과했다.
+- `git show -s 968d5b8`: `[Rename] 인증 계약과 로그인 세션 이름 명확화` 커밋이 생성됐다.
+- 현재 `git status --short`: 커밋 대상에서 제외한
+  `specs/001-apple-social-login/reviews/`만 untracked 상태다.
+
+### 재발 방지
+
+같은 저장소의 커밋과 staged 포맷 훅은 한 번에 하나만 실행한다. 실행이 오래 걸리거나 도구
+세션이 끊겨도 즉시 재시도하지 않고 `git log`, index 상태와 남은 `git commit`·pre-commit
+프로세스를 먼저 확인한다. 중복 실행이 있으면 소유자를 구분하고 사용자 승인 범위 안에서
+정리한 뒤 staged diff를 다시 검증하고 단일 실행으로 재개한다.
+
+### 연결
+
+`TK-20260813-003`
+
+## TS-20260813-003: Constitution 날짜 검증식의 줄 끝 형식 오판
+
+**기록일**: 2026-08-13
+**상태**: 해결
+**발생 단계**: `$speckit-constitution` 개정 검증
+**관련 항목**: `.specify/memory/constitution.md`
+
+### 증상
+
+Constitution의 버전·날짜 형식을 검사하는 셸 명령에서 `비준일`은 통과했지만
+`최종 수정일-format: FAIL ()`이 출력되고 명령이 종료 코드 1로 끝났다.
+
+### 영향
+
+실제 날짜가 `2026-08-13`으로 올바른데도 문서 형식 오류로 잘못 판정해 Constitution 개정
+검증을 완료할 수 없었다.
+
+### 근거
+
+- 최초 검증 명령: `최종 수정일-format: FAIL ()`과 종료 코드 1을 확인했다.
+- `.specify/memory/constitution.md:18-19`: `비준일` 줄은 `<br>`로 끝나지만 문서의 마지막
+  메타데이터인 `최종 수정일` 줄은 날짜로 끝난다.
+
+### 원인
+
+검증용 `sed` 정규식이 모든 날짜 메타데이터 줄 끝에 `<br>`이 있다고 가정했다. 실제 문서의
+날짜 값이나 ISO 형식 문제가 아니라 검사식이 두 줄의 Markdown 형식 차이를 반영하지 못한
+것이 원인이다.
+
+### 조치
+
+날짜 값만 추출한 뒤 `YYYY-MM-DD` 형식을 검사하도록 명령을 교정하고 같은 Constitution에
+다시 실행했다.
+
+### 검증
+
+- 교정한 날짜 형식 검사: `비준일`과 `최종 수정일` 모두 `PASS`인지 재확인한다.
+- `git diff --check`: Constitution과 연동 템플릿을 포함한 현재 변경에서 다시 확인한다.
+
+### 재발 방지
+
+Markdown 메타데이터를 검사할 때 표시용 `<br>` 유무를 값의 유효성 조건과 결합하지 않는다.
+먼저 필드 값을 추출하고 날짜·버전 자체의 형식을 별도로 검증한다.
+
+### 연결
+
+없음

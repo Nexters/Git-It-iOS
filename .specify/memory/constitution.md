@@ -1,20 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0 → 1.4.0
-- Modified principles: 4. 스킬별 수정 경로; 5. Spec-Kit 범위
-- Added sections: 9. Spec Kit 세션 지식 기록
+- Version change: 1.5.0 → 1.6.0
+- Modified principles: 없음
+- Added sections: 10. 책임과 문맥에 따른 네이밍
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md, tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
-- Commands requiring updates: ✅ speckit-troubleshooting, speckit-tacit-knowledge 추가; ✅ 기존 speckit-* 스킬 10개에 전용 기록 위임 게이트 전파; ✅ speckit-specify, speckit-tasks, speckit-implement, speckit-converge 독점 경로 동기화
-- Runtime guidance requiring updates: ⚠ AGENTS.md의 Spec-Kit 범위 표는 현재 스킬 허용 경로 밖이므로 별도 갱신 필요; ✅ 변경 불필요 README.md
-- Existing feature records: ✅ specs/001-apple-social-login/trouble-shooting.md 기존 내용 보존 및 전용 스킬로 TS-20260813-001 추가; ⏳ tacit-knowledge.md는 기록 조건을 처음 충족할 때 전용 스킬이 생성
-- Follow-up TODO: ⚠ 별도 지시로 AGENTS.md의 Spec-Kit 범위 표에 두 전용 스킬과 독점 경로를 반영
+- Templates requiring updates: ✅ .specify/templates/plan-template.md, .specify/templates/tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
+- Commands requiring updates: ✅ 변경 불필요 .agents/skills/speckit-*/SKILL.md 전체 검토
+- Runtime guidance requiring updates: ⚠ sources/docs/naming.md 신규 작성 후 sources/docs/architecture.md, package-rules/**, AGENTS.md에서 참조 필요; ⚠ AGENTS.md에 동일 checkout의 Git 실행 직렬화 절차 반영 필요; ✅ 변경 불필요 README.md
+- Evidence records: ✅ TK-20260813-001, TK-20260813-002와 현재 Domain·Data 공개 이름을 일반 원칙의 근거로 사용; 인증 기능의 구체 이름은 승격하지 않음
+- Follow-up TODO: ⚠ 별도 문서 작업으로 sources/docs/naming.md를 작성하고 Constitution 원칙 10의 세부 적용 예·예외를 연결
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.4.0<br>
+**버전**: 1.6.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-13
 
@@ -37,6 +37,16 @@ Sync Impact Report
 - 동작 변경에는 관련 빌드나 테스트 결과를 남깁니다.
 - 문서는 정의된 범위만 다루며, 아키텍처 문서는 구조 결정이 바뀔 때만 갱신합니다.
 - 원칙의 예외는 이유, 영향과 검증하지 못한 범위를 PR에 기록합니다.
+- 같은 checkout에서 `git commit`, pre-commit과 staged formatter처럼 Git index, 작업 파일
+  또는 저장소의 공유 formatter cache를 사용하는 변경 체인은 한 번에 하나만 실행해야
+  합니다. 기존 체인의 종료와 결과를 확인하기 전에는 같은 작업을 재시도하지 않습니다.
+- 변경 체인이 오래 실행되거나 실행 세션이 끊겼다는 사실만으로 실패를 선언하지 않습니다.
+  재시도 전에는 남은 관련 프로세스, 최신 커밋과 staged·unstaged 상태를 확인해 기존 실행의
+  완료 여부와 변경 소유권을 구분해야 합니다.
+- 중복 실행을 발견하면 임의로 종료하지 않습니다. 실행 소유자와 보존해야 할 index·작업
+  파일 상태를 확인하고, 중단이 필요하면 사용자 승인을 받은 뒤 단일 체인으로 재개합니다.
+- 이 직렬화 규칙은 작업 파일과 Git index를 변경하지 않는 읽기 전용 조회, 서로 다른
+  checkout의 작업, 실행별로 격리된 build·test 경로에는 적용하지 않습니다.
 
 ### 4. 스킬별 수정 경로
 
@@ -149,6 +159,29 @@ Sync Impact Report
 - 모든 근거는 이후 세션에서 다시 확인할 수 있어야 하며, 비밀, credential, token과
   개인정보는 `<redacted>`로 대체합니다. 해결 또는 검증 성공은 실제 성공 근거가 있을 때만
   기록합니다.
+
+### 10. 책임과 문맥에 따른 네이밍
+
+이름은 패키지와 선언 경계를 넘어 유지되는 계약입니다. 프로젝트가 소유하는 공개 API와
+경계를 넘는 값은 표면적인 통일보다 실제 책임과 독립적인 해석 가능성을 우선합니다.
+
+- 공개 타입, 프로토콜, 연산과 모델의 이름은 선언이 실제로 소유하는 책임을 식별하는 데
+  필요한 최소 문맥을 포함해야 합니다. 소유하지 않는 책임을 암시하거나 책임을 구분할 수
+  없는 일반 명칭으로 의미를 숨겨서는 안 됩니다.
+- 공통 접두어·접미어 또는 축약형은 표면적인 통일만을 위해 일괄 적용하지 않습니다. 개념의
+  충돌을 방지하거나 서로 다른 책임을 구분하는 근거가 있을 때만 사용하며, 축약 전 이름보다
+  책임과 범위를 불명확하게 만들어서는 안 됩니다.
+- 저장되거나 선언 경계를 넘어 전달되는 이름은 원래 선언을 보지 않아도 값의 목적을 식별할
+  수 있어야 하며, 구분에 필요한 경우 발급 주체, 수명 또는 소유 경계를 드러냅니다. 타입이나
+  메서드가 문맥을 명확히 제공하는 지역 매개변수에는 같은 수식어를 중복하지 않을 수 있습니다.
+- 외부 API, schema와 플랫폼이 고정한 이름은 원문을 보존합니다. 프로젝트가 소유하는
+  공급자 중립 경계에는 특정 공급자, 저장 기술 또는 실행 환경의 용어를 노출하지 않습니다.
+- 네이밍만 변경하는 작업은 동작, 상태 수명, 책임, 의존 방향 또는 외부 계약을 함께 바꾸지
+  않습니다. 함께 바꿔야 한다면 네이밍 변경과 설계·동작 변경을 분리하고 각 변경의 명세,
+  계획, 작업과 검증 범위를 별도로 정의해야 합니다.
+- 세부 적용 사례, 패키지별 어휘와 예외는 `sources/docs/naming.md`에 기록합니다. 해당 문서가
+  작성되기 전에는 이 원칙을 직접 적용합니다. 네이밍 가이드는 Constitution보다 우선할 수
+  없으며 특정 기능의 이름을 다른 기능에 일괄 적용하는 근거로 사용할 수 없습니다.
 
 ## 적용
 

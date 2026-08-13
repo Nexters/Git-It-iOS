@@ -73,3 +73,56 @@ Data와 후속 Composition 구현에서 같은 책임 기준으로 최종 이름
 ### 연결
 
 `TK-20260813-001`의 책임 우선 해석은 계승하되, 저장 값에 `providerSubjectReference`를 유지한다는 구체 판단은 이번 사용자 결정으로 폐기한다.
+
+## TK-20260813-003: staged 포맷 훅을 포함한 커밋의 저장소 단위 직렬화
+
+**기록일**: 2026-08-13
+**상태**: 검증됨
+**확신도**: 높음
+**적용 범위**: `Git-It-iOS` 한 checkout에서 staged Swift 변경을 커밋하고 pre-commit 훅을 실행하는 단계
+**관련 항목**: `TS-20260813-002`, 커밋 `968d5b8`
+
+### 해석
+
+이 저장소에서 staged Swift 변경을 커밋하는 작업은 개별 에이전트나 터미널의 독립 작업이
+아니라 Git index, 작업 파일과 Swift-Style cache를 함께 점유하는 저장소 단위 임계 구역으로
+취급해, 이전 훅의 종료와 결과를 확인한 뒤 하나씩 실행해야 한다.
+
+### 근거
+
+- `TS-20260813-002`, 세션 `019ffaf0-fba1-7573-a291-f6cd9ae9e4ac`: 동일 staged 변경에 대한
+  세 개의 `git commit`·pre-commit 체인이 겹쳤을 때 장시간 새 커밋이 생성되지 않았고,
+  전체 중단 후 경쟁 실행 없이 한 번만 재실행하자 훅 통과와 커밋 `968d5b8` 생성이
+  완료됐다.
+- `tools/githooks/swift-format/bin/run.sh:91-140`: staged 모드는 공통 Git index에서 대상
+  목록을 읽고 작업 파일을 backup·포맷·검증하며, 중단 시 같은 파일을 invocation 전 상태로
+  복원한다.
+- `tools/swift-style/scripts/format.sh:86-102`: 각 대상의 `swift run`이 동일 서브모듈의
+  `.build`와 `.build/cache/swiftformat.cache`·`swiftlint.cache`를 사용한다.
+
+### 적용과 제외
+
+- 적용: 같은 checkout에서 `git commit`, `tools/githooks/pre-commit` 또는
+  `swift-format/bin/run.sh staged`를 시작·재시도·중단할 때 기존 실행의 존재, 소유자와 index
+  상태를 먼저 확인하고 한 실행만 남긴다.
+- 제외: 작업 파일과 Git index를 수정하지 않는 읽기 전용 검토, 서로 다른 checkout의 작업,
+  또는 scheme별로 격리된 Derived Data를 명시한 테스트 실행까지 이 해석만으로 직렬화하지
+  않는다.
+
+### 반례와 불확실성
+
+향후 pre-commit 진입점에 저장소 단위 lock과 stale process 복구가 추가되거나 Swift-Style이
+실행별 build·cache 경로를 사용하면 병행 가능 범위가 달라질 수 있다. 이번 근거는 staged
+Swift 파일을 포함한 커밋에서 확인됐으며 Swift 파일이 전혀 없는 커밋의 병행 안전성은
+검증하지 않았다.
+
+### 검증 또는 승격 조건
+
+현재 훅 구조에서는 새 세션이 커밋 전에 기존 `git commit`·pre-commit 실행과 index 상태를
+확인하는 절차를 반복 적용한다. 프로젝트 명시 규칙으로 승격하려면 훅의 동시 실행 정책,
+lock 소유권과 stale lock 복구 절차를 셸 자동화 책임 범위에서 설계·테스트한 뒤 `AGENTS.md`
+또는 관련 스크립트 문서에 반영한다.
+
+### 연결
+
+`TS-20260813-002`
