@@ -1,23 +1,22 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.1 → 1.3.0
-- Modified principles: 없음
-- Added sections: 8. Git-flow 브랜치 네임스페이스
+- Version change: 1.3.0 → 1.4.0
+- Modified principles: 4. 스킬별 수정 경로; 5. Spec-Kit 범위
+- Added sections: 9. Spec Kit 세션 지식 기록
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/spec-template.md, plan-template.md; ✅ 변경 불필요 .specify/templates/tasks-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md; ✅ 변경 불필요 나머지 speckit-* 스킬
-- Runtime guidance requiring updates: ✅ 변경 불필요 AGENTS.md, README.md
-- Existing branch migration: ✅ 기존 브랜치는 소급 변경하지 않음; 새 브랜치 생성부터 적용
-- Follow-up TODO: ⚠ .specify/extensions.yml에 before_specify 훅이 없어 자동 브랜치 생성은 현재 비활성
-- Follow-up TODO: ⚠ .specify/scripts/bash/create-new-feature.sh는 NNN-short-name 형식과 Spec 디렉터리를 결합하는 레거시 도구이므로 새 정책에 사용 금지; 별도 스크립트 변경 작업 필요
+- Templates requiring updates: ✅ .specify/templates/plan-template.md, tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
+- Commands requiring updates: ✅ speckit-troubleshooting, speckit-tacit-knowledge 추가; ✅ 기존 speckit-* 스킬 10개에 전용 기록 위임 게이트 전파; ✅ speckit-specify, speckit-tasks, speckit-implement, speckit-converge 독점 경로 동기화
+- Runtime guidance requiring updates: ⚠ AGENTS.md의 Spec-Kit 범위 표는 현재 스킬 허용 경로 밖이므로 별도 갱신 필요; ✅ 변경 불필요 README.md
+- Existing feature records: ✅ specs/001-apple-social-login/trouble-shooting.md 기존 내용 보존 및 전용 스킬로 TS-20260813-001 추가; ⏳ tacit-knowledge.md는 기록 조건을 처음 충족할 때 전용 스킬이 생성
+- Follow-up TODO: ⚠ 별도 지시로 AGENTS.md의 Spec-Kit 범위 표에 두 전용 스킬과 독점 경로를 반영
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.3.0<br>
+**버전**: 1.4.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-12
+**최종 수정일**: 2026-08-13
 
 ## 원칙
 
@@ -46,7 +45,8 @@ Sync Impact Report
   스킬 또는 별도 사용자 지시가 필요합니다.
 - `/speckit-implement`는 활성 `tasks.md`에 정확히 명시된 파일과 `tasks.md`의 완료
   표시만 수정할 수 있습니다. `sources/**`는 구현 대상의 기본 위치일 뿐, 유일한
-  허용 경로가 아닙니다.
+  허용 경로가 아닙니다. `trouble-shooting.md`와 `tacit-knowledge.md`는 작업 목록에
+  적혀 있어도 구현 스킬이 수정할 수 없으며 각 전용 기록 스킬만 소유합니다.
 - 하나의 변경은 한 스킬의 허용 경로 안에서 완료합니다. 다른 스킬의 산출물 또는
   허용되지 않은 경로가 필요하면 중단하고 적절한 스킬을 실행하거나 사용자 승인을
   받습니다.
@@ -59,7 +59,7 @@ Sync Impact Report
 
 | 스킬 | 허용 수정 경로 |
 | --- | --- |
-| `speckit-specify` | `specs/<feature>/**`, `.specify/feature.json` |
+| `speckit-specify` | `trouble-shooting.md`, `tacit-knowledge.md`를 제외한 `specs/<feature>/**`, `.specify/feature.json` |
 | `speckit-clarify` | `specs/<feature>/spec.md`, `specs/<feature>/checklists/requirements.md` |
 | `speckit-plan` | `specs/<feature>/plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/**` |
 | `speckit-tasks` | `specs/<feature>/tasks.md` |
@@ -69,6 +69,8 @@ Sync Impact Report
 | `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일, `specs/<feature>/tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈 생성만 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
+| `speckit-troubleshooting` | `specs/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
+| `speckit-tacit-knowledge` | `specs/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
 
@@ -124,6 +126,29 @@ Sync Impact Report
   않았다면 생성된 것처럼 기록하지 않고 예정 이름과 미생성 상태를 구분합니다.
 - 이 원칙의 시행 전에 생성된 브랜치는 이력 보존을 위해 소급해 이름을 바꾸지 않습니다.
   시행 후 새 브랜치를 생성하거나 기존 명세용 브랜치를 새로 만들 때부터 이 원칙을 적용합니다.
+
+### 9. Spec Kit 세션 지식 기록
+
+- Spec Kit 세션에서 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면
+  `$speckit-troubleshooting`으로 활성 기능의 `trouble-shooting.md`에 증상, 영향, 근거,
+  원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. 발생하지 않은 위험이나 근거 없는
+  가능성은 기록하지 않습니다.
+- 여러 세션과 저장소 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
+  의사결정 기준 또는 반복 패턴을 해석하면 `$speckit-tacit-knowledge`로 활성 기능의
+  `tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도, 적용·제외 범위, 반례와 검증
+  조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의 복사는 기록하지 않습니다.
+- 두 기록은 append-only입니다. 기존 항목을 수정·삭제하지 않으며 교정, 재발, 반증과 상태
+  변화는 선행 ID를 참조하는 새 항목으로 남깁니다. 기록 조건을 충족하지 않으면 빈 파일이나
+  placeholder를 만들지 않습니다.
+- 문제 자체와 그 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단 기준은
+  `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록 ID를
+  연결합니다.
+- 기록은 Constitution, 명세, 계획, 작업 목록과 현재 소스보다 우선하지 않습니다. 암묵지를
+  규범, 요구사항, 설계 결정 또는 구현 작업으로 승격하려면 해당 산출물을 소유한 Spec Kit
+  스킬을 별도로 실행해야 합니다.
+- 모든 근거는 이후 세션에서 다시 확인할 수 있어야 하며, 비밀, credential, token과
+  개인정보는 `<redacted>`로 대체합니다. 해결 또는 검증 성공은 실제 성공 근거가 있을 때만
+  기록합니다.
 
 ## 적용
 

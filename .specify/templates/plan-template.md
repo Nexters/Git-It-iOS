@@ -54,6 +54,11 @@
 `quickstart.md`, `contracts/**`만 수정할 수 있다. 이 산출물 밖의 구현 파일은 정확한
 경로를 `tasks.md`에 기록하며 계획 단계에서는 수정하지 않는다.
 
+**세션 지식 기록**: 실제 문제가 발생하면 `/speckit-troubleshooting`, 여러 세션의 독립
+근거에서 암묵적인 판단 기준을 해석하면 `/speckit-tacit-knowledge`가 각 전용 파일에
+append-only로 기록한다. 두 파일은 계획 산출물이나 구현 작업이 아니며 조건을 충족하지
+않으면 빈 파일을 만들지 않는다.
+
 **패키지 진행**: 현재 명세가 변경하는 패키지를 식별하고 `Domain → Data → Core →
 Composition → UI → Feature → App` 순서로 구현 경계를 계획한다. 적용되지 않는 패키지는
 건너뛰며, 각 적용 대상 패키지는 구현·검증·결과 보고·사용자 승인 후에만 다음 패키지로
@@ -73,7 +78,9 @@ specs/[###-feature]/
 ├── data-model.md        # 1단계 산출물(/speckit-plan)
 ├── quickstart.md        # 1단계 산출물(/speckit-plan)
 ├── contracts/           # 1단계 산출물(/speckit-plan)
-└── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
+├── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
+├── trouble-shooting.md  # 문제 발생 시 /speckit-troubleshooting이 생성·추가
+└── tacit-knowledge.md   # 암묵지 해석 시 /speckit-tacit-knowledge가 생성·추가
 ```
 
 ### 소스 코드(저장소 루트)

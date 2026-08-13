@@ -410,3 +410,58 @@ staged 내용과 포맷 결과가 달라졌다.
 | `019ff547-8ad9-7531-9fa8-bbdf73de5f06` | Data TDD, 민감 값 redaction, Tuist graph 갱신 |
 | `019ff5e5-30e3-7352-aed6-dcd34d5a51f7` | Core `no_unchecked_sendable` 진단과 `Mutex` 교정 |
 | `019ff5f3-cdda-71c0-a731-4487da5b7af3` | CSPRNG와 서버 Mock 책임, 현재 서버 세션 구현 범위 확인 |
+
+## TS-20260813-001: 스킬 validator의 PyYAML 모듈 부재
+
+**기록일**: 2026-08-13
+**상태**: 완화
+**발생 단계**: `$skill-creator` 기반 Spec Kit 기록 스킬 검증
+**관련 항목**: `.agents/skills/speckit-troubleshooting/SKILL.md`,
+`.agents/skills/speckit-tacit-knowledge/SKILL.md`
+
+### 증상
+
+두 새 스킬에 `quick_validate.py`를 실행했을 때 기본 `python3`가 `yaml` 모듈을 가져오지
+못해 validator가 시작 전에 종료됐다. Codex workspace dependency Python으로 바꿔도 같은
+오류가 재현됐다.
+
+### 영향
+
+스킬 내용과 frontmatter가 올바르더라도 validator 자체의 런타임 의존성이 없어 검증 실패로
+보일 수 있었다. 이 상태에서 오류를 스킬 문법 문제로 해석하거나 검증을 생략할 위험이 있었다.
+
+### 근거
+
+- `python3 .../skill-creator/scripts/quick_validate.py
+  .agents/skills/speckit-troubleshooting`: `ModuleNotFoundError: No module named 'yaml'`
+- Codex workspace dependency의 `python3`로 같은 validator 실행: 동일한
+  `ModuleNotFoundError`
+- `/Users/jerry/.cache/uv/archive-v0/HiYdSTC7RnNqv5jB/lib/python3.14/site-packages/yaml/__init__.py`:
+  사용할 수 있는 cached `PyYAML` 모듈 확인
+
+### 원인
+
+기본 Python과 Codex workspace dependency Python의 import 경로에 validator가 요구하는
+`PyYAML`이 포함돼 있지 않았다. 새 스킬의 Markdown 또는 YAML frontmatter 오류는 아니었다.
+
+### 조치
+
+검증 프로세스에 cached `PyYAML`의 `site-packages` 경로를 `PYTHONPATH`로 지정하고 동일한
+validator를 다시 실행했다. 시스템 Python 환경이나 저장소 의존성은 변경하지 않았다.
+
+### 검증
+
+- `env PYTHONPATH=/Users/jerry/.cache/uv/archive-v0/HiYdSTC7RnNqv5jB/lib/python3.14/site-packages
+  python3 .../quick_validate.py .agents/skills/speckit-troubleshooting`: `Skill is valid!`
+- 같은 명령의 대상만 `.agents/skills/speckit-tacit-knowledge`로 변경: `Skill is valid!`
+
+### 재발 방지
+
+`quick_validate.py`가 `yaml` import 단계에서 실패하면 스킬 오류로 단정하지 않고 실행
+Python의 `PyYAML` 가용성을 먼저 확인한다. cached 경로는 환경에 따라 바뀔 수 있으므로
+현재 존재를 확인한 경로만 사용하고, 경로가 없으면 `PyYAML`을 제공하는 관리된 실행 환경을
+별도로 준비한다.
+
+### 연결
+
+없음
