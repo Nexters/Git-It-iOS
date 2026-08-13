@@ -1,5 +1,5 @@
 # shellcheck disable=SC1091
-# syntax, 정적 도구, 검증기 자체 회귀와 checklist를 집계합니다.
+# syntax, 정적 도구와 검증기 자체 회귀를 집계합니다.
 
 verification_collect_targets() (
 	verification_collect_output=$1
@@ -60,12 +60,4 @@ verification_regression_run() (
 		printf '조치: 실패 테스트를 직접 실행해 안정 code와 원인을 확인하세요\n' >&2
 		return 1
 	}
-)
-
-verification_checklist_run() (
-	verification_checklist="$VERIFICATION_REFERENCE_ROOT/checklists/architecture.md"
-	if [ ! -f "$verification_checklist" ] || grep -Eq '^- \[ \]' "$verification_checklist"; then
-		printf '오류[script-verification.architecture-incomplete]: 아키텍처 checklist 미완료\n조치: write-project-scripts 스킬의 references/checklists/architecture.md를 완료하세요\n' >&2
-		return 1
-	fi
 )

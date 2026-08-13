@@ -1,6 +1,6 @@
 root = true
 
-[tools/githooks/**]
+[tools/{githooks,repository-paths,script-tests,script-verification}/**]
 shell_variant = posix
 indent_style = tab
 switch_case_indent = false

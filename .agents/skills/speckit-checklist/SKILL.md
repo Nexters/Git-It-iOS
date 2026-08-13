@@ -8,9 +8,10 @@ metadata:
 ---
 
 
-## Checklist Purpose: "Unit Tests for English"
+## 체크리스트 목적: "요구사항 문서의 단위 테스트"
 
-**CRITICAL CONCEPT**: Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** - they validate the quality, clarity, and completeness of requirements in a given domain.
+**핵심 개념**: 체크리스트는 **요구사항 작성의 단위 테스트**다. 특정 영역의 요구사항이
+완전하고, 명확하며, 일관적인지 검증한다.
 
 **NOT for verification/testing**:
 
@@ -27,7 +28,8 @@ metadata:
 - ✅ "Are accessibility requirements defined for keyboard navigation?" (coverage)
 - ✅ "Does the spec define what happens when logo image fails to load?" (edge cases)
 
-**Metaphor**: If your spec is code written in English, the checklist is its unit test suite. You're testing whether the requirements are well-written, complete, unambiguous, and ready for implementation - NOT whether the implementation works.
+**비유**: 명세가 코드라면 체크리스트는 그 단위 테스트 모음이다. 구현이 동작하는지가
+아니라 요구사항이 잘 작성되고, 완전하며, 모호하지 않고 구현 준비가 되었는지를 검토한다.
 
 ## User Input
 
@@ -36,6 +38,21 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
 
 ## Pre-Execution Checks
 

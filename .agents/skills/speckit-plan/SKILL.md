@@ -16,6 +16,21 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before planning)**:
@@ -71,6 +86,12 @@ paths for later task generation instead of modifying source, tests, or configura
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
    - Phase 1: Generate data-model.md, contracts/, quickstart.md
    - Re-evaluate Constitution Check post-design
+   - 명세가 변경하는 패키지를 식별하고, 적용되지 않는 패키지는 제외한 뒤 `Domain → Data →
+     Core → Composition → UI → Feature → App` 순서로 구현 경계를 기록
+   - 각 적용 대상 패키지는 구현, 검증, 결과 보고와 명시적 사용자 승인을 완료한 뒤에만 다음
+     적용 대상 패키지 파일을 변경할 수 있다고 기록
+   - 공용 구성 파일의 다중 패키지 변경은 패키지별 작업으로 분리하고, 패키지에 속하지 않는
+     파일 변경은 최초로 필요로 하는 책임 패키지에 명시적으로 배정. 배정이 불가능하면 ERROR
 
 ## Mandatory Post-Execution Hooks
 
@@ -130,9 +151,9 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
    ```
 
 3. **Consolidate findings** in `research.md` using format:
-   - Decision: [what was chosen]
-   - Rationale: [why chosen]
-   - Alternatives considered: [what else evaluated]
+   - 결정: [선택한 내용]
+   - 근거: [선택한 이유]
+   - 검토한 대안: [함께 평가한 다른 선택지]
 
 **Output**: research.md with all NEEDS CLARIFICATION resolved
 

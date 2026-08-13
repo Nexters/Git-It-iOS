@@ -55,6 +55,31 @@ extension Target {
         )
     }
 
+    static func testModule(
+        name: String,
+        productionTarget: TargetDependency,
+        additionalDependencies: [TargetDependency] = [],
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["\(name)/**"],
+            dependencies: [productionTarget] + additionalDependencies,
+            settings: .settings(
+                base: [
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SWIFT_VERSION": "5.0",
+                ]
+            ),
+        )
+    }
+
     static func resourceBundle(
         name: String,
         resources: ResourceFileElements,

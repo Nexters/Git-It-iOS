@@ -16,7 +16,38 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+
 ## Pre-Execution Checks
+
+**Prepare a Git-flow branch name before dispatching `before_specify` hooks**:
+- Derive `SHORT_NAME` from the feature description using the short-name rules in step 1 below.
+- Determine `BRANCH_NAMESPACE` before branch creation:
+  - Use the user's explicit `feature`, `hotfix`, or `release` type when provided.
+  - Use `hotfix` only for an urgent fix to a production release.
+  - Use `release` for release preparation or stabilization.
+  - Otherwise default to `feature`, including ordinary defect work that is not a production hotfix.
+  - If explicit inputs indicate conflicting types, stop before creating a branch and resolve the conflict.
+- Construct `GIT_BRANCH_NAME` as `feature/<short-name>`, `hotfix/<short-name>`, or
+  `release/<version-or-short-name>`. Use lowercase kebab-case for feature/hotfix suffixes; a release
+  suffix may instead be a version identifier such as `v1.2.3`. A suffix MUST be non-empty and MUST
+  NOT contain another `/` or a repeated namespace.
+- If the user explicitly provided `GIT_BRANCH_NAME`, do not rewrite it. Validate that it has exactly
+  one allowed namespace and a valid suffix. An invalid explicit name is an error, not a policy bypass.
+- Pass the validated `GIT_BRANCH_NAME` to every executable `before_specify` hook.
 
 **Check for extension hooks (before specification)**:
 - Check if `.specify/extensions.yml` exists in the project root.
@@ -57,14 +88,16 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Allowed Write Paths
 
 This skill may modify only the newly resolved `specs/<feature>/**` directory and
-`.specify/feature.json`. It MUST NOT modify application code, project configuration,
-or any other feature directory.
+`.specify/feature.json`, except that `trouble-shooting.md` and `tacit-knowledge.md`
+remain exclusively owned by their dedicated recording skills. It MUST NOT create,
+modify, or delete those two records, application code, project configuration, or any
+other feature directory.
 
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
-1. **Generate a concise short name** (2-4 words) for the feature:
+1. **Generate or reuse the concise `SHORT_NAME`** (2-4 words) for the feature:
    - Analyze the feature description and extract the most meaningful keywords
    - Create a 2-4 word short name that captures the essence of the feature
    - Use action-noun format when possible (e.g., "add-user-auth", "fix-payment-bug")
@@ -76,11 +109,20 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Branch creation** (optional, via hook):
+2. **Git-flow branch creation** (optional, via hook):
 
-   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
+   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have
+   created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`.
+   Verify that `BRANCH_NAME` exactly matches the validated `GIT_BRANCH_NAME`. A mismatched or
+   non-compliant result is an error and MUST NOT be reported as a successfully created branch.
 
-   If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
+   If no executable `before_specify` hook exists or the hook did not run, do not create or switch
+   branches in this core command. Retain `GIT_BRANCH_NAME` only as the planned name and record branch
+   status as `미생성` in the specification.
+
+   Do not invoke `.specify/scripts/bash/create-new-feature.sh` as a fallback. The installed legacy
+   script derives an `NNN-short-name` branch value and couples it to the spec directory, which is
+   incompatible with the required slash namespace and independent spec-directory resolution.
 
 3. **Create the spec feature directory**:
 
@@ -112,7 +154,8 @@ Given that feature description, do this:
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit-specify` invocation
-   - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
+   - The spec directory name and the git branch name are independent. The directory name MUST NOT
+     include the Git-flow namespace or `/`.
    - The spec directory and file are always created by this command, never by the hook
 
 4. Load the resolved active `spec-template` file to understand required sections.
@@ -144,47 +187,51 @@ Given that feature description, do this:
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 
-7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with
+   concrete details derived from the feature description (arguments) while preserving section order
+   and headings. Fill `Git-flow 유형` with `BRANCH_NAMESPACE`. Fill `기능 브랜치` with the verified
+   `BRANCH_NAME` only when the hook actually created/switched it; otherwise write
+   `미생성 (예정: GIT_BRANCH_NAME)`.
 
 8. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
    a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
 
       ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
+      # 명세 품질 체크리스트: [기능 이름]
 
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
+      **목적**: 계획 단계로 진행하기 전 명세의 완전성과 품질을 검증
+      **생성일**: [날짜]
+      **기능**: [spec.md 링크]
 
-      ## Content Quality
+      ## 내용 품질
 
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
+      - [ ] 구현 세부 사항(언어, 프레임워크, API)이 없다
+      - [ ] 사용자 가치와 비즈니스 요구에 집중한다
+      - [ ] 비기술 이해관계자도 이해할 수 있게 작성했다
+      - [ ] 모든 필수 섹션을 작성했다
 
-      ## Requirement Completeness
+      ## 요구사항 완전성
 
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
+      - [ ] [NEEDS CLARIFICATION] 표식이 남아 있지 않다
+      - [ ] 요구사항이 검증 가능하고 모호하지 않다
+      - [ ] 성공 기준이 측정 가능하다
+      - [ ] 성공 기준이 기술에 종속되지 않는다(구현 세부 사항 없음)
+      - [ ] 모든 수용 시나리오를 정의했다
+      - [ ] 예외·경계 사례를 식별했다
+      - [ ] 범위를 명확히 한정했다
+      - [ ] 의존성과 가정을 식별했다
 
-      ## Feature Readiness
+      ## 기능 준비 상태
 
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
+      - [ ] 모든 기능 요구사항에 명확한 수용 기준이 있다
+      - [ ] 사용자 시나리오가 핵심 흐름을 다룬다
+      - [ ] 기능이 성공 기준의 측정 가능한 결과를 충족한다
+      - [ ] 명세에 구현 세부 사항이 섞이지 않는다
 
-      ## Notes
+      ## 참고
 
-      - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
+      - 미완료 항목은 `/speckit-clarify` 또는 `/speckit-plan` 전에 명세를 보완해야 한다
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -278,10 +325,13 @@ Check if `.specify/extensions.yml` exists in the project root.
 Report completion to the user with:
 - `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
 - `SPEC_FILE` — the spec file path
+- `BRANCH_NAMESPACE` and `GIT_BRANCH_NAME` — the selected Git-flow type and validated branch name
+- Branch status — whether the hook actually created/switched the branch or it remains planned
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
-**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
+**NOTE:** Branch creation is handled only by the `before_specify` hook (git extension). Spec directory
+and file creation are always handled by this core command. Never claim that a planned branch was created.
 
 ## Quick Guidelines
 
@@ -347,5 +397,6 @@ Success criteria must be:
 ## Done When
 
 - [ ] Specification written to `SPEC_FILE` and validated against quality checklist
+- [ ] Git-flow namespace and branch status recorded without treating a planned branch as created
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with feature directory, spec file path, and checklist results

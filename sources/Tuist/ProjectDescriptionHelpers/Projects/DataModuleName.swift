@@ -3,14 +3,26 @@ import ProjectDescription
 // MARK: - DataModuleName
 
 enum DataModuleName: String, CaseIterable {
-    case Data
+    case DataAuthentication
+    case DataAuthenticationTests
 }
 
 extension DataModuleName {
     var target: Target {
-        .module(
-            name: rawValue
-        )
+        switch self {
+        case .DataAuthentication:
+            .module(
+                name: rawValue
+            )
+
+        case .DataAuthenticationTests:
+            .testModule(
+                name: rawValue,
+                productionTarget: .target(
+                    name: DataModuleName.DataAuthentication.rawValue
+                ),
+            )
+        }
     }
 }
 
