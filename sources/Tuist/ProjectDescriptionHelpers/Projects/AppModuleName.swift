@@ -77,6 +77,7 @@ extension AppModuleName {
                 dependencies: [
                     .fromComposition(.Composition),
                     .fromFeature(.Feature),
+                    .fromDomain(.DomainAuthentication),
                     .external(.FirebaseAnalytics),
                     .external(.FirebaseCrashlytics),
                 ],

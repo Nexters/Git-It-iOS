@@ -16,6 +16,21 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before implementation)**:
@@ -62,6 +77,8 @@ Each implementation task MUST name an exact repository-relative path. A director
 such as `sources/**` is not a blanket allowance. If a needed file is absent from the
 task list, stop and request an updated task instead of modifying it. Do not create or
 amend ignore files unless an active task explicitly names that exact ignore file.
+`trouble-shooting.md` and `tacit-knowledge.md` are never implementation-owned paths,
+even if a task names them; use the dedicated recording skill instead.
 
 1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 

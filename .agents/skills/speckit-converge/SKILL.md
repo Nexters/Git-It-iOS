@@ -16,6 +16,21 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before convergence)**:
@@ -74,22 +89,24 @@ of the code relative to the feature's artifacts — no git, no branch comparison
 ## Operating Constraints
 
 **APPEND-ONLY, NEVER REWRITE**: The command's **only** write is appending a new
-`## Phase N: Convergence` section to `tasks.md`. It MUST NOT:
+`## 단계 N: 수렴` 섹션을 `tasks.md` 끝에 추가한다. 이 스킬은 다음을 해서는 안 된다.
 
 - modify `spec.md` or `plan.md` in any way;
 - rewrite, renumber, reorder, or delete any existing task (including tasks from a prior
   Convergence phase);
 - modify, create, or delete any application code — completing the appended tasks is the
-  job of `/speckit-implement`.
+  job of `/speckit-implement`;
+- append tasks that create or update `trouble-shooting.md` or `tacit-knowledge.md` — those
+  event-driven records belong only to their dedicated skills.
 
 When the codebase already satisfies everything, the command MUST leave `tasks.md`
 **byte-for-byte unchanged** (no empty Convergence header) and report a clean result.
 
 ## Allowed Write Paths
 
-This skill may append one new `## Phase N: Convergence` section only to the active
-`specs/<feature>/tasks.md`. It has no permission to modify any other file, including
-task checkboxes, specifications, plans, source files, or configuration.
+이 스킬은 활성 기능의 `specs/<feature>/tasks.md`에 새 `## 단계 N: 수렴` 섹션 하나만
+추가할 수 있다. 작업 체크박스, 명세, 계획, 소스 파일, 설정을 포함한 그 밖의 파일을
+수정할 권한은 없다.
 
 **Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is
 **non-negotiable**. Code that violates a MUST principle is the highest-severity finding and
@@ -188,19 +205,19 @@ severity, and a short human-readable description with the evidence (the file/are
 
 Before appending anything, output a compact, severity-graded summary (no file writes yet):
 
-## Convergence Findings
+## 수렴 점검 결과
 
-| ID | Gap Type | Severity | Source | Evidence | Remaining Work |
-|----|----------|----------|--------|----------|----------------|
-| F1 | missing  | HIGH     | FR-008 | Example: no append-only guard detected in path/to/module.py when writing tasks.md | Add append-only enforcement |
+| ID | 누락 유형 | 심각도 | 출처 | 근거 | 남은 작업 |
+|----|-----------|--------|------|------|----------|
+| F1 | 누락 | 높음 | FR-008 | 예: tasks.md 작성 시 path/to/module.py에 append-only 보호가 없음 | append-only 강제 추가 |
 
-**Summary metrics:**
+**요약 지표:**
 
-- Requirements / acceptance criteria checked
-- Plan decisions checked
-- Constitution principles checked (or "skipped — template")
-- Findings by gap type (missing / partial / contradicts / unrequested)
-- Findings by severity
+- 점검한 요구사항 / 수용 기준
+- 점검한 계획 결정
+- 점검한 헌법 원칙(또는 "생략 — 템플릿")
+- 누락 유형별 발견 사항(누락 / 부분 구현 / 모순 / 범위 외)
+- 심각도별 발견 사항
 
 ### 7. Append Convergence Tasks (or report converged)
 
@@ -210,7 +227,7 @@ Append to the **end** of `tasks.md`, per the append contract:
 
 1. Scan all existing task IDs; let `M` be the maximum. Determine the next phase number `N`
    (highest existing phase + 1).
-2. Write a single new section header `## Phase N: Convergence`.
+2. 새 섹션 제목 `## 단계 N: 수렴` 하나를 작성한다.
 3. Emit one checklist item per actionable finding, ordered CRITICAL/HIGH first, assigning
    zero-padded IDs `T{M+1:03d}, T{M+2:03d}, …`:
 
@@ -238,10 +255,10 @@ Append to the **end** of `tasks.md`, per the append contract:
 **If there are no actionable findings** (`converged` outcome):
 
 - Do **not** modify `tasks.md` at all — no empty phase header.
-- Report: **"✅ Converged — the implementation satisfies the spec, plan, and tasks."**
+- 보고: **"✅ 수렴 완료 — 구현이 명세, 계획, 작업을 충족합니다."**
 - Include the summary counts of what was checked.
 
-### 8. Provide Next Actions (Handoff)
+### 8. 다음 작업 제시(인계)
 
 - On `tasks_appended`: state how many tasks were appended under which phase, and recommend
   running `/speckit-implement` to complete them; note that a follow-up converge

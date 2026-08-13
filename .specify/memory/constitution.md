@@ -1,23 +1,22 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.1 → 1.3.0
+- Version change: 1.5.0 → 1.6.0
 - Modified principles: 없음
-- Added sections: 8. Git-flow 브랜치 네임스페이스
+- Added sections: 10. 책임과 문맥에 따른 네이밍
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/spec-template.md, plan-template.md; ✅ 변경 불필요 .specify/templates/tasks-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md; ✅ 변경 불필요 나머지 speckit-* 스킬
-- Runtime guidance requiring updates: ✅ 변경 불필요 AGENTS.md, README.md
-- Existing branch migration: ✅ 기존 브랜치는 소급 변경하지 않음; 새 브랜치 생성부터 적용
-- Follow-up TODO: ⚠ .specify/extensions.yml에 before_specify 훅이 없어 자동 브랜치 생성은 현재 비활성
-- Follow-up TODO: ⚠ .specify/scripts/bash/create-new-feature.sh는 NNN-short-name 형식과 Spec 디렉터리를 결합하는 레거시 도구이므로 새 정책에 사용 금지; 별도 스크립트 변경 작업 필요
+- Templates requiring updates: ✅ .specify/templates/plan-template.md, .specify/templates/tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
+- Commands requiring updates: ✅ 변경 불필요 .agents/skills/speckit-*/SKILL.md 전체 검토
+- Runtime guidance requiring updates: ⚠ sources/docs/naming.md 신규 작성 후 sources/docs/architecture.md, package-rules/**, AGENTS.md에서 참조 필요; ⚠ AGENTS.md에 동일 checkout의 Git 실행 직렬화 절차 반영 필요; ✅ 변경 불필요 README.md
+- Evidence records: ✅ TK-20260813-001, TK-20260813-002와 현재 Domain·Data 공개 이름을 일반 원칙의 근거로 사용; 인증 기능의 구체 이름은 승격하지 않음
+- Follow-up TODO: ⚠ 별도 문서 작업으로 sources/docs/naming.md를 작성하고 Constitution 원칙 10의 세부 적용 예·예외를 연결
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.3.0<br>
+**버전**: 1.6.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-12
+**최종 수정일**: 2026-08-13
 
 ## 원칙
 
@@ -38,6 +37,16 @@ Sync Impact Report
 - 동작 변경에는 관련 빌드나 테스트 결과를 남깁니다.
 - 문서는 정의된 범위만 다루며, 아키텍처 문서는 구조 결정이 바뀔 때만 갱신합니다.
 - 원칙의 예외는 이유, 영향과 검증하지 못한 범위를 PR에 기록합니다.
+- 같은 checkout에서 `git commit`, pre-commit과 staged formatter처럼 Git index, 작업 파일
+  또는 저장소의 공유 formatter cache를 사용하는 변경 체인은 한 번에 하나만 실행해야
+  합니다. 기존 체인의 종료와 결과를 확인하기 전에는 같은 작업을 재시도하지 않습니다.
+- 변경 체인이 오래 실행되거나 실행 세션이 끊겼다는 사실만으로 실패를 선언하지 않습니다.
+  재시도 전에는 남은 관련 프로세스, 최신 커밋과 staged·unstaged 상태를 확인해 기존 실행의
+  완료 여부와 변경 소유권을 구분해야 합니다.
+- 중복 실행을 발견하면 임의로 종료하지 않습니다. 실행 소유자와 보존해야 할 index·작업
+  파일 상태를 확인하고, 중단이 필요하면 사용자 승인을 받은 뒤 단일 체인으로 재개합니다.
+- 이 직렬화 규칙은 작업 파일과 Git index를 변경하지 않는 읽기 전용 조회, 서로 다른
+  checkout의 작업, 실행별로 격리된 build·test 경로에는 적용하지 않습니다.
 
 ### 4. 스킬별 수정 경로
 
@@ -46,7 +55,8 @@ Sync Impact Report
   스킬 또는 별도 사용자 지시가 필요합니다.
 - `/speckit-implement`는 활성 `tasks.md`에 정확히 명시된 파일과 `tasks.md`의 완료
   표시만 수정할 수 있습니다. `sources/**`는 구현 대상의 기본 위치일 뿐, 유일한
-  허용 경로가 아닙니다.
+  허용 경로가 아닙니다. `trouble-shooting.md`와 `tacit-knowledge.md`는 작업 목록에
+  적혀 있어도 구현 스킬이 수정할 수 없으며 각 전용 기록 스킬만 소유합니다.
 - 하나의 변경은 한 스킬의 허용 경로 안에서 완료합니다. 다른 스킬의 산출물 또는
   허용되지 않은 경로가 필요하면 중단하고 적절한 스킬을 실행하거나 사용자 승인을
   받습니다.
@@ -59,7 +69,7 @@ Sync Impact Report
 
 | 스킬 | 허용 수정 경로 |
 | --- | --- |
-| `speckit-specify` | `specs/<feature>/**`, `.specify/feature.json` |
+| `speckit-specify` | `trouble-shooting.md`, `tacit-knowledge.md`를 제외한 `specs/<feature>/**`, `.specify/feature.json` |
 | `speckit-clarify` | `specs/<feature>/spec.md`, `specs/<feature>/checklists/requirements.md` |
 | `speckit-plan` | `specs/<feature>/plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/**` |
 | `speckit-tasks` | `specs/<feature>/tasks.md` |
@@ -69,6 +79,8 @@ Sync Impact Report
 | `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일, `specs/<feature>/tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈 생성만 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
+| `speckit-troubleshooting` | `specs/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
+| `speckit-tacit-knowledge` | `specs/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
 
@@ -124,6 +136,52 @@ Sync Impact Report
   않았다면 생성된 것처럼 기록하지 않고 예정 이름과 미생성 상태를 구분합니다.
 - 이 원칙의 시행 전에 생성된 브랜치는 이력 보존을 위해 소급해 이름을 바꾸지 않습니다.
   시행 후 새 브랜치를 생성하거나 기존 명세용 브랜치를 새로 만들 때부터 이 원칙을 적용합니다.
+
+### 9. Spec Kit 세션 지식 기록
+
+- Spec Kit 세션에서 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면
+  `$speckit-troubleshooting`으로 활성 기능의 `trouble-shooting.md`에 증상, 영향, 근거,
+  원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. 발생하지 않은 위험이나 근거 없는
+  가능성은 기록하지 않습니다.
+- 여러 세션과 저장소 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
+  의사결정 기준 또는 반복 패턴을 해석하면 `$speckit-tacit-knowledge`로 활성 기능의
+  `tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도, 적용·제외 범위, 반례와 검증
+  조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의 복사는 기록하지 않습니다.
+- 두 기록은 append-only입니다. 기존 항목을 수정·삭제하지 않으며 교정, 재발, 반증과 상태
+  변화는 선행 ID를 참조하는 새 항목으로 남깁니다. 기록 조건을 충족하지 않으면 빈 파일이나
+  placeholder를 만들지 않습니다.
+- 문제 자체와 그 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단 기준은
+  `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록 ID를
+  연결합니다.
+- 기록은 Constitution, 명세, 계획, 작업 목록과 현재 소스보다 우선하지 않습니다. 암묵지를
+  규범, 요구사항, 설계 결정 또는 구현 작업으로 승격하려면 해당 산출물을 소유한 Spec Kit
+  스킬을 별도로 실행해야 합니다.
+- 모든 근거는 이후 세션에서 다시 확인할 수 있어야 하며, 비밀, credential, token과
+  개인정보는 `<redacted>`로 대체합니다. 해결 또는 검증 성공은 실제 성공 근거가 있을 때만
+  기록합니다.
+
+### 10. 책임과 문맥에 따른 네이밍
+
+이름은 패키지와 선언 경계를 넘어 유지되는 계약입니다. 프로젝트가 소유하는 공개 API와
+경계를 넘는 값은 표면적인 통일보다 실제 책임과 독립적인 해석 가능성을 우선합니다.
+
+- 공개 타입, 프로토콜, 연산과 모델의 이름은 선언이 실제로 소유하는 책임을 식별하는 데
+  필요한 최소 문맥을 포함해야 합니다. 소유하지 않는 책임을 암시하거나 책임을 구분할 수
+  없는 일반 명칭으로 의미를 숨겨서는 안 됩니다.
+- 공통 접두어·접미어 또는 축약형은 표면적인 통일만을 위해 일괄 적용하지 않습니다. 개념의
+  충돌을 방지하거나 서로 다른 책임을 구분하는 근거가 있을 때만 사용하며, 축약 전 이름보다
+  책임과 범위를 불명확하게 만들어서는 안 됩니다.
+- 저장되거나 선언 경계를 넘어 전달되는 이름은 원래 선언을 보지 않아도 값의 목적을 식별할
+  수 있어야 하며, 구분에 필요한 경우 발급 주체, 수명 또는 소유 경계를 드러냅니다. 타입이나
+  메서드가 문맥을 명확히 제공하는 지역 매개변수에는 같은 수식어를 중복하지 않을 수 있습니다.
+- 외부 API, schema와 플랫폼이 고정한 이름은 원문을 보존합니다. 프로젝트가 소유하는
+  공급자 중립 경계에는 특정 공급자, 저장 기술 또는 실행 환경의 용어를 노출하지 않습니다.
+- 네이밍만 변경하는 작업은 동작, 상태 수명, 책임, 의존 방향 또는 외부 계약을 함께 바꾸지
+  않습니다. 함께 바꿔야 한다면 네이밍 변경과 설계·동작 변경을 분리하고 각 변경의 명세,
+  계획, 작업과 검증 범위를 별도로 정의해야 합니다.
+- 세부 적용 사례, 패키지별 어휘와 예외는 `sources/docs/naming.md`에 기록합니다. 해당 문서가
+  작성되기 전에는 이 원칙을 직접 적용합니다. 네이밍 가이드는 Constitution보다 우선할 수
+  없으며 특정 기능의 이름을 다른 기능에 일괄 적용하는 근거로 사용할 수 없습니다.
 
 ## 적용
 

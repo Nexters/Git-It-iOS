@@ -1,13 +1,13 @@
 ---
 
-description: "Task list template for feature implementation"
+description: "기능 구현 작업 목록 템플릿"
 ---
 
-# Tasks: [FEATURE NAME]
+# 작업 목록: [FEATURE NAME]
 
-**Input**: Design documents from `/specs/[###-feature-name]/`
+**입력**: `/specs/[###-feature-name]/`의 설계 문서
 
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**선행 조건**: plan.md(필수), spec.md(사용자 스토리에 필수), research.md, data-model.md, contracts/
 
 **테스트**: 테스트 작업은 기능 명세에서 요청했거나 TDD가 요구된 경우에만 포함한다.
 
@@ -22,6 +22,8 @@ Feature → App` 순서로 배치한다.
 - **[no-write]**: 추적 파일을 변경하지 않는 명령 실행 또는 수동 검증
 - 파일 변경 작업은 정확한 저장소 상대 경로 하나와 정확히 하나의 책임 패키지를 가져야 한다.
 - 서로 다른 패키지는 같은 의존 깊이에 있어도 승인 게이트를 넘어 병렬 실행하지 않는다.
+- 공개 API의 신설·rename 작업은 확정한 식별자와 책임을 설명에 명시한다. 네이밍 변경과
+  동작·상태 수명·책임·의존 방향 변경은 하나의 작업으로 합치지 않는다.
 
 ## 패키지 소유권 규칙
 
@@ -32,6 +34,8 @@ Feature → App` 순서로 배치한다.
 - 패키지에 속하지 않는 파일 변경은 그 변경을 최초로 필요로 하는 책임 패키지에 명시적으로
   배정한다. 배정할 수 없거나 하나의 작업을 분리할 수 없으면 작업 생성을 중단한다.
 - 전체 기능을 대상으로 하는 검증은 마지막 적용 대상 패키지 뒤에 `[no-write]`로만 둔다.
+- `trouble-shooting.md`와 `tacit-knowledge.md` 기록은 구현 작업이나 패키지 소유 파일로
+  만들지 않는다. 조건이 발생한 세션에서 각 전용 Spec Kit 스킬이 별도로 기록한다.
 
 <!--
   ============================================================================
@@ -111,7 +115,7 @@ Feature → App` 순서로 배치한다.
 - [ ] TXXX [no-write] 전체 build·compile·test를 실행하고 결과를 기록한다
 - [ ] TXXX [no-write] 사용자 스토리별 독립 수용 시나리오를 검증한다
 
-## Dependencies & Execution Order
+## 의존성과 실행 순서
 
 ### 패키지 순서와 승인 게이트
 
@@ -138,7 +142,7 @@ Feature → App` 순서로 배치한다.
 - 같은 파일을 변경하는 작업과 Red → Green 의존 작업은 순차 실행한다.
 - 다른 패키지의 작업은 병렬 실행하지 않는다.
 
-## Implementation Strategy
+## 구현 전략
 
 1. 헌법 순서에서 첫 미완료 적용 대상 패키지만 선택한다.
 2. 그 패키지의 준비·테스트·구현·정리·검증을 모두 완료한다.
@@ -146,9 +150,10 @@ Feature → App` 순서로 배치한다.
 4. 명시적 승인 후 다음 적용 대상 패키지에서 같은 절차를 반복한다.
 5. 마지막 패키지 완료 뒤에만 전체 읽기 전용 검증과 사용자 스토리 수용 검증을 실행한다.
 
-## Notes
+## 참고
 
 - 작업 ID는 실제 실행 순서대로 증가한다.
 - 파일 변경 작업은 정확한 경로를 포함해야 한다.
 - 사용자 스토리 독립성은 유지하되 구현·승인 단위는 패키지다.
 - 모호한 소유권, 다중 패키지 작업, 승인 게이트를 넘는 병렬 실행을 허용하지 않는다.
+- 문제 해결과 암묵지 기록을 구현 작업 ID로 생성하지 않는다.

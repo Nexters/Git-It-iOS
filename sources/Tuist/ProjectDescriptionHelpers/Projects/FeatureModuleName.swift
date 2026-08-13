@@ -8,19 +8,20 @@ enum FeatureModuleName: String, CaseIterable {
 
 extension FeatureModuleName {
     var target: Target {
-        .module(
-            name: rawValue,
-            dependencies: [
-                .fromDomain(.Domain),
-                .fromUI(.UIComponent),
-                .external(.ComposableArchitecture),
-            ],
-        )
+        switch self {
+        case .Feature:
+            .module(
+                name: rawValue
+            )
+        }
     }
 }
 
 extension TargetDependency {
     static func fromFeature(_ name: FeatureModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Feature")
+        .project(
+            target: name.rawValue,
+            path: "../Feature",
+        )
     }
 }

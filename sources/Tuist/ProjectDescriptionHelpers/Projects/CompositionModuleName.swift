@@ -4,18 +4,35 @@ import ProjectDescription
 
 enum CompositionModuleName: String, CaseIterable {
     case Composition
+    case CompositionTests
 }
 
 extension CompositionModuleName {
     var target: Target {
-        .module(
-            name: rawValue,
-            dependencies: [
-                .fromDomain(.Domain),
-                .fromData(.Data),
-                .fromCore(.Utility),
-            ],
-        )
+        switch self {
+        case .Composition:
+            .module(
+                name: rawValue,
+                dependencies: [
+                    .fromDomain(.DomainAuthentication),
+                    .fromData(.DataAuthentication),
+                    .fromCore(.CoreAuthentication),
+                ],
+            )
+
+        case .CompositionTests:
+            .testModule(
+                name: rawValue,
+                productionTarget: .target(
+                    name: CompositionModuleName.Composition.rawValue
+                ),
+                additionalDependencies: [
+                    .fromDomain(.DomainAuthentication),
+                    .fromData(.DataAuthentication),
+                    .fromCore(.CoreAuthentication),
+                ],
+            )
+        }
     }
 }
 

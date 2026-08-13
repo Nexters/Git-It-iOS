@@ -16,6 +16,21 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## 산출물 언어
+
+이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
+코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
+원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
+
+## 세션 지식 기록 위임
+
+- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
+  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
+- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
+  `$speckit-tacit-knowledge`를 별도로 적용한다.
+- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
+  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before tasks generation)**:
@@ -59,6 +74,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 This skill may modify only `specs/<feature>/tasks.md`. Every generated task that
 changes a file MUST include its exact repository-relative path; this is the write
 allowlist that `/speckit-implement` will use.
+
+`trouble-shooting.md`와 `tacit-knowledge.md`는 구현 작업으로 생성하지 않는다. 실제 문제나
+복수 세션 기반 암묵지 해석이 발생한 세션에서 각 전용 기록 스킬이 별도로 처리한다.
 
 1. **Setup**: Run `.specify/scripts/bash/setup-tasks.sh --json` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md` or `contracts/`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
@@ -149,6 +167,9 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 **CRITICAL**: 작업은 패키지를 최상위 실행 단위로 구성한다. 사용자 스토리는 각 패키지
 단계 안에서 추적하고 독립 검증 기준을 유지한다.
+
+**SESSION RECORDS ARE NOT TASKS**: `trouble-shooting.md`와 `tacit-knowledge.md`의 생성·추가를
+작업 ID, 패키지 작업 또는 전체 완료 검증으로 만들지 않는다.
 
 **Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
 

@@ -20,6 +20,10 @@ pre_commit_main() (
 		return 2
 	}
 
+	# Git hook이 주입한 저장소 환경은 단계의 fixture 저장소 Git 명령을 오염시킵니다.
+	unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE GIT_OBJECT_DIRECTORY
+	unset GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_PREFIX
+
 	# 자기 경로를 기준으로 해석합니다. 저장소 루트를 조회하면 임시 저장소로 복사돼
 	# 실행될 때 원본 저장소의 단계를 실행하게 됩니다.
 	pre_commit_stage_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)/pre-commit.d

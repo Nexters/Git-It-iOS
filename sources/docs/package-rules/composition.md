@@ -12,6 +12,7 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 
 ## 정책
 
+- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 Adapter, 조립, 구현 선택과 객체 수명 책임을 드러내고 새로운 Domain·Data 책임을 암시해서는 안 됩니다.
 - 모든 내부 target은 Adapter 구현, 객체 생성, 구현 선택 또는 수명 관리에 기여해야 합니다.
 - Domain이 정의한 계약은 Data가 제공하는 기능을 이용한 Adapter로 충족해야 합니다.
 - Data가 정의한 기술 계약은 Core가 제공하는 내부 API를 이용한 Adapter로 충족해야 합니다.
