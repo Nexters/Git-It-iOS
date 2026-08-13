@@ -27,6 +27,9 @@ extension CoreModuleName {
 
 extension TargetDependency {
     static func fromCore(_ name: CoreModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Core")
+        .project(
+            target: name.rawValue,
+            path: "../Core"
+        )
     }
 }

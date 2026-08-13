@@ -28,6 +28,9 @@ extension DataModuleName {
 
 extension TargetDependency {
     static func fromData(_ name: DataModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Data")
+        .project(
+            target: name.rawValue,
+            path: "../Data"
+        )
     }
 }

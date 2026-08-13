@@ -21,7 +21,7 @@ extension TargetDependency {
     static func fromFeature(_ name: FeatureModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../Feature",
+            path: "../Feature"
         )
     }
 }

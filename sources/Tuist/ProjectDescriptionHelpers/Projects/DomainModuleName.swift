@@ -26,6 +26,9 @@ extension DomainModuleName {
 
 extension TargetDependency {
     static func fromDomain(_ name: DomainModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Domain")
+        .project(
+            target: name.rawValue,
+            path: "../Domain"
+        )
     }
 }
