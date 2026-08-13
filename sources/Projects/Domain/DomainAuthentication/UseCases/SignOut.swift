@@ -5,21 +5,21 @@ public struct SignOut: Sendable {
 
     public init(
         authenticationRepository: any AuthenticationRepository,
-        sessionRepository: any SessionRepository,
+        loginSessionRepository: any LoginSessionRepository,
     ) {
         self.authenticationRepository = authenticationRepository
-        self.sessionRepository = sessionRepository
+        self.loginSessionRepository = loginSessionRepository
     }
 
     // MARK: Public
 
     public func callAsFunction() async -> AuthenticationOutcome {
         do {
-            try await sessionRepository.signOut()
+            try await loginSessionRepository.signOut()
         } catch { }
 
         do {
-            try await authenticationRepository.clearAuthorization()
+            try await authenticationRepository.clearAuthentication()
         } catch { }
 
         return .unauthenticated
@@ -28,6 +28,6 @@ public struct SignOut: Sendable {
     // MARK: Private
 
     private let authenticationRepository: any AuthenticationRepository
-    private let sessionRepository: any SessionRepository
+    private let loginSessionRepository: any LoginSessionRepository
 
 }

@@ -70,17 +70,32 @@ public final class KeychainStore: Sendable {
         in namespace: KeychainNamespace,
     ) throws {
         if let backend {
-            backend.save(value, key: key, namespace: namespace)
+            backend.save(
+                value,
+                key: key,
+                namespace: namespace,
+            )
             return
         }
-        let query = attributes(key: key, namespace: namespace)
+        let query = attributes(
+            key: key,
+            namespace: namespace,
+        )
         let update: [CFString: Any] = [kSecValueData: value]
-        let status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
+        let status = SecItemUpdate(
+            query as CFDictionary,
+            update as CFDictionary,
+        )
         if status == errSecItemNotFound {
             var item = query
             item[kSecValueData] = value
             item[kSecAttrAccessible] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-            guard SecItemAdd(item as CFDictionary, nil) == errSecSuccess else { throw KeychainStoreError.unavailable }
+            guard
+                SecItemAdd(
+                    item as CFDictionary,
+                    nil,
+                ) == errSecSuccess
+            else { throw KeychainStoreError.unavailable }
         } else if status != errSecSuccess {
             throw KeychainStoreError.unavailable
         }
@@ -91,13 +106,22 @@ public final class KeychainStore: Sendable {
         in namespace: KeychainNamespace,
     ) throws -> Data? {
         if let backend {
-            return backend.load(key: key, namespace: namespace)
+            return backend.load(
+                key: key,
+                namespace: namespace,
+            )
         }
-        var query = attributes(key: key, namespace: namespace)
+        var query = attributes(
+            key: key,
+            namespace: namespace,
+        )
         query[kSecReturnData] = true
         query[kSecMatchLimit] = kSecMatchLimitOne
         var result: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        let status = SecItemCopyMatching(
+            query as CFDictionary,
+            &result,
+        )
         if status == errSecItemNotFound {
             return nil
         }
@@ -110,10 +134,16 @@ public final class KeychainStore: Sendable {
         in namespace: KeychainNamespace,
     ) throws {
         if let backend {
-            backend.delete(key: key, namespace: namespace)
+            backend.delete(
+                key: key,
+                namespace: namespace,
+            )
             return
         }
-        let status = SecItemDelete(attributes(key: key, namespace: namespace) as CFDictionary)
+        let status = SecItemDelete(attributes(
+            key: key,
+            namespace: namespace,
+        ) as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else { throw KeychainStoreError.unavailable }
     }
 

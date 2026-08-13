@@ -1,4 +1,4 @@
-public enum AuthenticationAuthorizationStatus: CaseIterable, Equatable, Sendable {
+public enum AuthorizationStatus: CaseIterable, Equatable, Sendable {
     case authorized
     case reauthenticationRequired
     case temporarilyUnavailable

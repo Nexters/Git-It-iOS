@@ -2,11 +2,11 @@ import Testing
 
 @testable import DataAuthentication
 
-@Suite("외부 인증 evidence")
-struct ExternalAuthenticationEvidenceTests {
+@Suite("AuthenticationEvidence")
+struct AuthenticationEvidenceTests {
     @Test
     func `공급자 중립 참조와 불투명 payload만 보유한다`() {
-        let evidence = ExternalAuthenticationEvidence(
+        let evidence = AuthenticationEvidence(
             methodIdentifier: "social-provider",
             providerSubjectReference: "subject-reference",
             opaquePayload: .init(bytes: [1, 2, 3]),

@@ -18,7 +18,9 @@ public actor AppleCredentialStateProvider {
     // MARK: Lifecycle
 
     public init() {
-        stateLookup = Self.liveState
+        stateLookup = { userID in
+            try await Self.liveState(for: userID)
+        }
     }
 
     init(stateLookup: @escaping @Sendable (String) async throws -> AppleCredentialState) {

@@ -12,12 +12,32 @@ struct KeychainStoreTests {
         let session = KeychainNamespace("session")
         let authorization = KeychainNamespace("authorization")
 
-        try store.save(Data([1]), for: "token", in: session)
-        try store.save(Data([2]), for: "token", in: authorization)
-        #expect(try store.load(for: "token", in: session) == Data([1]))
-        #expect(try store.load(for: "token", in: authorization) == Data([2]))
+        try store.save(
+            Data([1]),
+            for: "token",
+            in: session,
+        )
+        try store.save(
+            Data([2]),
+            for: "token",
+            in: authorization,
+        )
+        #expect(try store.load(
+            for: "token",
+            in: session,
+        ) == Data([1]))
+        #expect(try store.load(
+            for: "token",
+            in: authorization,
+        ) == Data([2]))
         #expect(backend.accessibility == .whenUnlockedThisDeviceOnly)
-        try store.delete(for: "token", in: session)
-        #expect(try store.load(for: "token", in: session) == nil)
+        try store.delete(
+            for: "token",
+            in: session,
+        )
+        #expect(try store.load(
+            for: "token",
+            in: session,
+        ) == nil)
     }
 }

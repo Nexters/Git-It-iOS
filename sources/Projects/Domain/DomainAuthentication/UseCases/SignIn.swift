@@ -5,10 +5,10 @@ public struct SignIn: Sendable {
 
     public init(
         authenticationRepository: any AuthenticationRepository,
-        sessionRepository: any SessionRepository,
+        loginSessionRepository: any LoginSessionRepository,
     ) {
         self.authenticationRepository = authenticationRepository
-        self.sessionRepository = sessionRepository
+        self.loginSessionRepository = loginSessionRepository
     }
 
     // MARK: Public
@@ -25,10 +25,10 @@ public struct SignIn: Sendable {
         }
 
         do {
-            let user = try await sessionRepository.start(with: grant)
+            let user = try await loginSessionRepository.start(with: grant)
             return .authenticated(user)
-        } catch let error as SessionError {
-            await clearAuthorization()
+        } catch let error as LoginSessionError {
+            await clearAuthentication()
 
             switch error {
             case .temporarilyUnavailable:
@@ -39,7 +39,7 @@ public struct SignIn: Sendable {
                 return .unauthenticated
             }
         } catch {
-            await clearAuthorization()
+            await clearAuthentication()
             return .recoverableFailure
         }
     }
@@ -47,11 +47,11 @@ public struct SignIn: Sendable {
     // MARK: Private
 
     private let authenticationRepository: any AuthenticationRepository
-    private let sessionRepository: any SessionRepository
+    private let loginSessionRepository: any LoginSessionRepository
 
-    private func clearAuthorization() async {
+    private func clearAuthentication() async {
         do {
-            try await authenticationRepository.clearAuthorization()
+            try await authenticationRepository.clearAuthentication()
         } catch { }
     }
 

@@ -3,16 +3,16 @@ import Testing
 
 @testable import DataAuthentication
 
-@Suite("세션 응답 DTO")
-struct SessionResponseDTOTests {
+@Suite("LoginSessionResponseDTO")
+struct LoginSessionResponseDTOTests {
     @Test
     func `사용자와 Git It 세션 값만 보유한다`() {
-        let user = SessionResponseDTO.User(
+        let user = LoginSessionResponseDTO.User(
             id: "user-1",
             availability: .available,
             displayName: nil,
         )
-        let response = SessionResponseDTO(
+        let response = LoginSessionResponseDTO(
             user: user,
             accessToken: "access-secret",
             refreshToken: "refresh-secret",

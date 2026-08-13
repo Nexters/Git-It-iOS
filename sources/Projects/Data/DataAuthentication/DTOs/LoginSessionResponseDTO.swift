@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SessionResponseDTO: CustomDebugStringConvertible, CustomStringConvertible, Equatable, Sendable {
+public struct LoginSessionResponseDTO: CustomDebugStringConvertible, CustomStringConvertible, Equatable, Sendable {
 
     // MARK: Lifecycle
 
@@ -45,7 +45,7 @@ public struct SessionResponseDTO: CustomDebugStringConvertible, CustomStringConv
     public let accessExpiresAt: Date
 
     public var description: String {
-        "SessionResponseDTO(user: \(user.id), session: <redacted>)"
+        "LoginSessionResponseDTO(user: \(user.id), session: <redacted>)"
     }
 
     public var debugDescription: String {

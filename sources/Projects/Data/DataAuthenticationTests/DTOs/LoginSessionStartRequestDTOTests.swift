@@ -2,11 +2,11 @@ import Testing
 
 @testable import DataAuthentication
 
-@Suite("세션 시작 요청 DTO")
-struct SessionStartRequestDTOTests {
+@Suite("LoginSessionStartRequestDTO")
+struct LoginSessionStartRequestDTOTests {
     @Test
     func `공급자 중립 방식과 단발성 payload만 보유한다`() {
-        let request = SessionStartRequestDTO(
+        let request = LoginSessionStartRequestDTO(
             methodIdentifier: "social-provider",
             opaquePayload: .init(bytes: [7, 8, 9]),
         )

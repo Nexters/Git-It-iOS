@@ -2,10 +2,10 @@ import Testing
 
 @testable import DomainAuthentication
 
-// MARK: - SessionRepositoryContractTests
+// MARK: - LoginSessionRepositoryContractTests
 
-@Suite("SessionRepository 계약")
-struct SessionRepositoryContractTests {
+@Suite("LoginSessionRepository 계약")
+struct LoginSessionRepositoryContractTests {
     @Test
     func `grant 기반 시작과 복원 및 로그아웃만 제공한다`() async throws {
         let grant = AuthenticationGrant(
@@ -17,7 +17,7 @@ struct SessionRepositoryContractTests {
             availability: .available,
             displayName: nil,
         )
-        let repository = SessionRepositoryContractProbe(user: user)
+        let repository = LoginSessionRepositoryContractProbe(user: user)
 
         let startedUser = try await repository.start(with: grant)
         let restoredUser = try await repository.restore()
@@ -35,9 +35,9 @@ struct SessionRepositoryContractTests {
     }
 }
 
-// MARK: - SessionRepositoryContractProbe
+// MARK: - LoginSessionRepositoryContractProbe
 
-private actor SessionRepositoryContractProbe: SessionRepository {
+private actor LoginSessionRepositoryContractProbe: LoginSessionRepository {
 
     // MARK: Lifecycle
 

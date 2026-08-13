@@ -19,7 +19,7 @@ struct AuthenticationRepositoryContractTests {
         let changes = await repository.authorizationChanges()
         var iterator = changes.makeAsyncIterator()
         let change = await iterator.next()
-        try await repository.clearAuthorization()
+        try await repository.clearAuthentication()
 
         #expect(grant == expectedGrant)
         #expect(status == .authorized)
@@ -29,7 +29,7 @@ struct AuthenticationRepositoryContractTests {
                 .authenticate(.apple),
                 .authorizationStatus,
                 .authorizationChanges,
-                .clearAuthorization,
+                .clearAuthentication,
             ]
         )
     }
@@ -51,7 +51,7 @@ private actor AuthenticationRepositoryContractProbe: AuthenticationRepository {
         case authenticate(AuthenticationMethod)
         case authorizationStatus
         case authorizationChanges
-        case clearAuthorization
+        case clearAuthentication
     }
 
     func authenticate(using method: AuthenticationMethod) async throws -> AuthenticationGrant {
@@ -59,12 +59,12 @@ private actor AuthenticationRepositoryContractProbe: AuthenticationRepository {
         return grant
     }
 
-    func authorizationStatus() async throws -> AuthenticationAuthorizationStatus {
+    func authorizationStatus() async throws -> AuthorizationStatus {
         calls.append(.authorizationStatus)
         return .authorized
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthenticationAuthorizationStatus> {
+    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
         calls.append(.authorizationChanges)
         return AsyncStream { continuation in
             continuation.yield(.reauthenticationRequired)
@@ -72,8 +72,8 @@ private actor AuthenticationRepositoryContractProbe: AuthenticationRepository {
         }
     }
 
-    func clearAuthorization() async throws {
-        calls.append(.clearAuthorization)
+    func clearAuthentication() async throws {
+        calls.append(.clearAuthentication)
     }
 
     func recordedCalls() -> [Call] {

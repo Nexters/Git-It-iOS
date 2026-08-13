@@ -1,4 +1,4 @@
-public enum SessionError: CaseIterable, Equatable, Error, Sendable {
+public enum LoginSessionError: CaseIterable, Equatable, Error, Sendable {
     case temporarilyUnavailable
     case refreshRejectedOrExpired
     case accountUnavailable

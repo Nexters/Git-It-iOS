@@ -1,4 +1,4 @@
-public struct ExternalAuthenticationEvidence: Sendable {
+public struct AuthenticationEvidence: Sendable {
 
     // MARK: Lifecycle
 

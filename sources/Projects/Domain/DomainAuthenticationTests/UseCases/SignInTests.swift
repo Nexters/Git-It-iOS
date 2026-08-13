@@ -9,7 +9,10 @@ struct SignInTests {
     @Test
     func `선택한 인증 방식으로 인증한 뒤 grant로 세션을 시작한다`() async {
         let recorder = SignInCallRecorder()
-        let grant = AuthenticationGrant(id: .init(rawValue: "grant-1"), method: .apple)
+        let grant = AuthenticationGrant(
+            id: .init(rawValue: "grant-1"),
+            method: .apple,
+        )
         let user = AuthenticatedUser(
             id: "user-1",
             availability: .available,
@@ -19,13 +22,13 @@ struct SignInTests {
             behavior: .succeed(grant),
             recorder: recorder,
         )
-        let sessionRepository = SignInSessionRepository(
+        let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .succeed(user),
             recorder: recorder,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
-            sessionRepository: sessionRepository,
+            loginSessionRepository: loginSessionRepository,
         )
 
         let outcome = await signIn(.apple)
@@ -41,13 +44,13 @@ struct SignInTests {
             behavior: .fail,
             recorder: recorder,
         )
-        let sessionRepository = SignInSessionRepository(
+        let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
-            sessionRepository: sessionRepository,
+            loginSessionRepository: loginSessionRepository,
         )
 
         let outcome = await signIn(.apple)
@@ -63,13 +66,13 @@ struct SignInTests {
             behavior: .cancel,
             recorder: recorder,
         )
-        let sessionRepository = SignInSessionRepository(
+        let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
-            sessionRepository: sessionRepository,
+            loginSessionRepository: loginSessionRepository,
         )
 
         let outcome = await signIn(.apple)
@@ -81,18 +84,21 @@ struct SignInTests {
     @Test
     func `세션 시작 실패 시 인증 참조를 정리한다`() async {
         let recorder = SignInCallRecorder()
-        let grant = AuthenticationGrant(id: .init(rawValue: "grant-1"), method: .apple)
+        let grant = AuthenticationGrant(
+            id: .init(rawValue: "grant-1"),
+            method: .apple,
+        )
         let authenticationRepository = SignInAuthenticationRepository(
             behavior: .succeed(grant),
             recorder: recorder,
         )
-        let sessionRepository = SignInSessionRepository(
+        let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
-            sessionRepository: sessionRepository,
+            loginSessionRepository: loginSessionRepository,
         )
 
         let outcome = await signIn(.apple)
@@ -102,7 +108,7 @@ struct SignInTests {
             await recorder.snapshot() == [
                 .authenticate(.apple),
                 .start(grant),
-                .clearAuthorization,
+                .clearAuthentication,
             ]
         )
     }
@@ -117,7 +123,7 @@ private actor SignInCallRecorder {
     enum Call: Equatable, Sendable {
         case authenticate(AuthenticationMethod)
         case start(AuthenticationGrant)
-        case clearAuthorization
+        case clearAuthentication
     }
 
     func append(_ call: Call) {
@@ -171,16 +177,16 @@ private actor SignInAuthenticationRepository: AuthenticationRepository {
         }
     }
 
-    func authorizationStatus() async throws -> AuthenticationAuthorizationStatus {
+    func authorizationStatus() async throws -> AuthorizationStatus {
         .authorized
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthenticationAuthorizationStatus> {
+    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
         AsyncStream { $0.finish() }
     }
 
-    func clearAuthorization() async throws {
-        await recorder.append(.clearAuthorization)
+    func clearAuthentication() async throws {
+        await recorder.append(.clearAuthentication)
     }
 
     // MARK: Private
@@ -190,9 +196,9 @@ private actor SignInAuthenticationRepository: AuthenticationRepository {
 
 }
 
-// MARK: - SignInSessionRepository
+// MARK: - SignInLoginSessionRepository
 
-private actor SignInSessionRepository: SessionRepository {
+private actor SignInLoginSessionRepository: LoginSessionRepository {
 
     // MARK: Lifecycle
 
@@ -219,7 +225,7 @@ private actor SignInSessionRepository: SessionRepository {
             return user
 
         case .fail:
-            throw SessionError.temporarilyUnavailable
+            throw LoginSessionError.temporarilyUnavailable
         }
     }
 

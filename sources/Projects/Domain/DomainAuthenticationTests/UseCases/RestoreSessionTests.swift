@@ -18,7 +18,7 @@ struct RestoreSessionTests {
         let outcome = await restoreSession()
 
         #expect(outcome == .unauthenticated)
-        #expect(await recorder.snapshot() == [.restore, .clearAuthorization])
+        #expect(await recorder.snapshot() == [.restore, .clearAuthentication])
     }
 
     @Test
@@ -83,7 +83,7 @@ struct RestoreSessionTests {
                 .restore,
                 .authorizationStatus,
                 .signOut,
-                .clearAuthorization,
+                .clearAuthentication,
             ]
         )
     }
@@ -115,14 +115,14 @@ struct RestoreSessionTests {
         let outcome = await restoreSession()
 
         #expect(outcome == .unauthenticated)
-        #expect(await recorder.snapshot() == [.restore, .signOut, .clearAuthorization])
+        #expect(await recorder.snapshot() == [.restore, .signOut, .clearAuthentication])
     }
 }
 
 extension RestoreSessionTests {
     private func makeRestoreSession(
-        sessionBehavior: RestoreSessionSessionRepository.Behavior,
-        authorizationStatus: AuthenticationAuthorizationStatus,
+        sessionBehavior: RestoreSessionLoginSessionRepository.Behavior,
+        authorizationStatus: AuthorizationStatus,
         recorder: RestoreSessionCallRecorder,
     ) -> RestoreSession {
         RestoreSession(
@@ -130,7 +130,7 @@ extension RestoreSessionTests {
                 status: authorizationStatus,
                 recorder: recorder,
             ),
-            sessionRepository: RestoreSessionSessionRepository(
+            loginSessionRepository: RestoreSessionLoginSessionRepository(
                 behavior: sessionBehavior,
                 recorder: recorder,
             ),
@@ -148,7 +148,7 @@ private actor RestoreSessionCallRecorder {
         case restore
         case authorizationStatus
         case signOut
-        case clearAuthorization
+        case clearAuthentication
     }
 
     func append(_ call: Call) {
@@ -172,7 +172,7 @@ private actor RestoreSessionAuthenticationRepository: AuthenticationRepository {
     // MARK: Lifecycle
 
     init(
-        status: AuthenticationAuthorizationStatus,
+        status: AuthorizationStatus,
         recorder: RestoreSessionCallRecorder,
     ) {
         self.status = status
@@ -185,29 +185,29 @@ private actor RestoreSessionAuthenticationRepository: AuthenticationRepository {
         throw AuthenticationError.temporarilyUnavailable
     }
 
-    func authorizationStatus() async throws -> AuthenticationAuthorizationStatus {
+    func authorizationStatus() async throws -> AuthorizationStatus {
         await recorder.append(.authorizationStatus)
         return status
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthenticationAuthorizationStatus> {
+    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
         AsyncStream { $0.finish() }
     }
 
-    func clearAuthorization() async throws {
-        await recorder.append(.clearAuthorization)
+    func clearAuthentication() async throws {
+        await recorder.append(.clearAuthentication)
     }
 
     // MARK: Private
 
     private let recorder: RestoreSessionCallRecorder
-    private let status: AuthenticationAuthorizationStatus
+    private let status: AuthorizationStatus
 
 }
 
-// MARK: - RestoreSessionSessionRepository
+// MARK: - RestoreSessionLoginSessionRepository
 
-private actor RestoreSessionSessionRepository: SessionRepository {
+private actor RestoreSessionLoginSessionRepository: LoginSessionRepository {
 
     // MARK: Lifecycle
 
@@ -224,11 +224,11 @@ private actor RestoreSessionSessionRepository: SessionRepository {
     enum Behavior: Sendable {
         case missing
         case restored(AuthenticatedUser)
-        case fail(SessionError)
+        case fail(LoginSessionError)
     }
 
     func start(with _: AuthenticationGrant) async throws -> AuthenticatedUser {
-        throw SessionError.temporarilyUnavailable
+        throw LoginSessionError.temporarilyUnavailable
     }
 
     func restore() async throws -> AuthenticatedUser? {

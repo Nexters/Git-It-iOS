@@ -4,10 +4,10 @@ public struct RestoreSession: Sendable {
 
     public init(
         authenticationRepository: any AuthenticationRepository,
-        sessionRepository: any SessionRepository,
+        loginSessionRepository: any LoginSessionRepository,
     ) {
         self.authenticationRepository = authenticationRepository
-        self.sessionRepository = sessionRepository
+        self.loginSessionRepository = loginSessionRepository
     }
 
     // MARK: Public
@@ -16,13 +16,13 @@ public struct RestoreSession: Sendable {
         let user: AuthenticatedUser
 
         do {
-            guard let restoredUser = try await sessionRepository.restore()
+            guard let restoredUser = try await loginSessionRepository.restore()
             else {
-                await clearAuthorization()
+                await clearAuthentication()
                 return .unauthenticated
             }
             user = restoredUser
-        } catch let error as SessionError {
+        } catch let error as LoginSessionError {
             return await outcome(for: error)
         } catch {
             return .recoverableFailure
@@ -54,9 +54,9 @@ public struct RestoreSession: Sendable {
     // MARK: Private
 
     private let authenticationRepository: any AuthenticationRepository
-    private let sessionRepository: any SessionRepository
+    private let loginSessionRepository: any LoginSessionRepository
 
-    private func outcome(for error: SessionError) async -> AuthenticationOutcome {
+    private func outcome(for error: LoginSessionError) async -> AuthenticationOutcome {
         switch error {
         case .temporarilyUnavailable:
             return .recoverableFailure
@@ -70,14 +70,14 @@ public struct RestoreSession: Sendable {
 
     private func clearInvalidSession() async {
         do {
-            try await sessionRepository.signOut()
+            try await loginSessionRepository.signOut()
         } catch { }
-        await clearAuthorization()
+        await clearAuthentication()
     }
 
-    private func clearAuthorization() async {
+    private func clearAuthentication() async {
         do {
-            try await authenticationRepository.clearAuthorization()
+            try await authenticationRepository.clearAuthentication()
         } catch { }
     }
 

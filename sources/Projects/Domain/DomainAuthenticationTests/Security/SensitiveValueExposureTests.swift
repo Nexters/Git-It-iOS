@@ -15,17 +15,20 @@ struct SensitiveValueExposureTests {
         )
         let values: [Any] = [
             AuthenticationMethod.apple,
-            AuthenticationGrant(id: .init(rawValue: "grant-1"), method: .apple),
+            AuthenticationGrant(
+                id: .init(rawValue: "grant-1"),
+                method: .apple,
+            ),
             user,
             AuthenticationOutcome.authenticated(user),
             AuthenticationOutcome.unauthenticated,
             AuthenticationOutcome.recoverableFailure,
-            AuthenticationAuthorizationStatus.authorized,
+            AuthorizationStatus.authorized,
             AuthenticationError.cancelled,
             AuthenticationError.temporarilyUnavailable,
-            SessionError.temporarilyUnavailable,
-            SessionError.refreshRejectedOrExpired,
-            SessionError.accountUnavailable,
+            LoginSessionError.temporarilyUnavailable,
+            LoginSessionError.refreshRejectedOrExpired,
+            LoginSessionError.accountUnavailable,
         ]
         let forbiddenTerms = [
             "authenticationservices",

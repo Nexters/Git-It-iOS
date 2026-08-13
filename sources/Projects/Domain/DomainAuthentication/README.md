@@ -11,10 +11,10 @@
 - `AuthenticatedUser`는 서버 사용자 ID, 계정 이용 가능 상태와 선택적 표시 이름을
   표현합니다.
 - `AuthenticationOutcome`은 인증된 사용자, 비인증, 복구 가능한 실패 중 하나입니다.
-- `AuthenticationAuthorizationStatus`는 인증됨, 재인증 필요, 일시적 조회 불가를
+- `AuthorizationStatus`는 인증됨, 재인증 필요, 일시적 조회 불가를
   구분합니다.
 - `AuthenticationError`는 사용자 취소와 일시적 외부 인증 실패를 구분합니다.
-- `SessionError`는 일시적 실패, refresh 거부 또는 만료, 계정 이용 불가를 구분합니다.
+- `LoginSessionError`는 일시적 실패, refresh 거부 또는 만료, 계정 이용 불가를 구분합니다.
 
 ## Repository 계약
 
@@ -25,7 +25,7 @@
 - authorization 상태 변경을 `AsyncStream`으로 제공합니다.
 - 남아 있는 인증 참조를 정리합니다.
 
-`SessionRepository`는 다음 Git It 세션 경계를 제공합니다.
+`LoginSessionRepository`는 다음 Git It 로그인 세션 경계를 제공합니다.
 
 - `AuthenticationGrant`로 세션을 시작합니다.
 - 저장된 세션을 복원하며 내부 refresh 결과를 함께 반환합니다.

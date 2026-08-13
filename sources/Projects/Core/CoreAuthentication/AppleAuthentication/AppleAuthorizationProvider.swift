@@ -101,7 +101,11 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
             fullName: credential.fullName?.formatted(),
         )
         guard let attempt = state.withLock({ $0.currentAttempt }) else { return }
-        _ = try? complete(credential: coreCredential, state: attempt.state, attemptID: attempt.id)
+        _ = try? complete(
+            credential: coreCredential,
+            state: attempt.state,
+            attemptID: attempt.id,
+        )
     }
 
     public func authorizationController(

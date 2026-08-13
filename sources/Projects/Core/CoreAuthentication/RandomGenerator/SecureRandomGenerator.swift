@@ -16,8 +16,17 @@ public struct SecureRandomGenerator: Sendable {
 
     public init() {
         bytes = { count in
-            var values = [UInt8](repeating: 0, count: count)
-            guard SecRandomCopyBytes(kSecRandomDefault, count, &values) == errSecSuccess else {
+            var values = [UInt8](
+                repeating: 0,
+                count: count,
+            )
+            guard
+                SecRandomCopyBytes(
+                    kSecRandomDefault,
+                    count,
+                    &values,
+                ) == errSecSuccess
+            else {
                 throw SecureRandomGeneratorError.unavailable
             }
             return values
@@ -35,9 +44,18 @@ public struct SecureRandomGenerator: Sendable {
         let requiredBytes = ((length + 3) / 4) * 3
         let encoded = Data(try bytes(requiredBytes))
             .base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
+            .replacingOccurrences(
+                of: "+",
+                with: "-",
+            )
+            .replacingOccurrences(
+                of: "/",
+                with: "_",
+            )
+            .replacingOccurrences(
+                of: "=",
+                with: "",
+            )
         return String(encoded.prefix(length))
     }
 

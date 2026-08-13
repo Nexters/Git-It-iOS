@@ -2,13 +2,13 @@ import Testing
 
 @testable import DataAuthentication
 
-// MARK: - ExternalAuthenticationProviderContractTests
+// MARK: - AuthenticationProviderContractTests
 
-@Suite("ExternalAuthenticationProvider 계약")
-struct ExternalAuthenticationProviderContractTests {
+@Suite("AuthenticationProvider 계약")
+struct AuthenticationProviderContractTests {
     @Test
     func `인증과 authorization 조회 및 변경만 제공한다`() async throws {
-        let provider = ExternalAuthenticationProviderProbe()
+        let provider = AuthenticationProviderProbe()
         let evidence = try await provider.authenticate(methodIdentifier: "social-provider")
         let state = try await provider.authorizationState(
             methodIdentifier: "social-provider",
@@ -26,11 +26,11 @@ struct ExternalAuthenticationProviderContractTests {
     }
 }
 
-// MARK: - ExternalAuthenticationProviderProbe
+// MARK: - AuthenticationProviderProbe
 
-private struct ExternalAuthenticationProviderProbe: ExternalAuthenticationProvider {
-    func authenticate(methodIdentifier: String) async throws -> ExternalAuthenticationEvidence {
-        ExternalAuthenticationEvidence(
+private struct AuthenticationProviderProbe: AuthenticationProvider {
+    func authenticate(methodIdentifier: String) async throws -> AuthenticationEvidence {
+        AuthenticationEvidence(
             methodIdentifier: methodIdentifier,
             providerSubjectReference: "subject-reference",
             opaquePayload: .init(bytes: [1]),
@@ -40,14 +40,14 @@ private struct ExternalAuthenticationProviderProbe: ExternalAuthenticationProvid
     func authorizationState(
         methodIdentifier _: String,
         subjectReference _: String,
-    ) async throws -> ExternalAuthorizationState {
+    ) async throws -> AuthorizationState {
         .active
     }
 
     func authorizationChanges(
         methodIdentifier _: String,
         subjectReference _: String,
-    ) async -> AsyncStream<ExternalAuthorizationState> {
+    ) async -> AsyncStream<AuthorizationState> {
         AsyncStream { continuation in
             continuation.yield(.inactive)
             continuation.finish()

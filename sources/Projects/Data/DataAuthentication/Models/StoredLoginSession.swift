@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StoredSession: CustomDebugStringConvertible, CustomStringConvertible, Equatable, Sendable {
+public struct StoredLoginSession: CustomDebugStringConvertible, CustomStringConvertible, Equatable, Sendable {
 
     // MARK: Lifecycle
 
@@ -8,7 +8,7 @@ public struct StoredSession: CustomDebugStringConvertible, CustomStringConvertib
         accessToken: String,
         refreshToken: String,
         accessExpiresAt: Date,
-        user: SessionResponseDTO.User,
+        user: LoginSessionResponseDTO.User,
     ) {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
@@ -21,10 +21,10 @@ public struct StoredSession: CustomDebugStringConvertible, CustomStringConvertib
     public let accessToken: String
     public let refreshToken: String
     public let accessExpiresAt: Date
-    public let user: SessionResponseDTO.User
+    public let user: LoginSessionResponseDTO.User
 
     public var description: String {
-        "StoredSession(<redacted>)"
+        "StoredLoginSession(<redacted>)"
     }
 
     public var debugDescription: String {

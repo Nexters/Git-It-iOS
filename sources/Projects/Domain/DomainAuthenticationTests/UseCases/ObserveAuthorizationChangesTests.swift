@@ -18,13 +18,13 @@ struct ObserveAuthorizationChangesTests {
             statuses: [.authorized, .temporarilyUnavailable, .reauthenticationRequired],
             recorder: recorder,
         )
-        let sessionRepository = AuthorizationChangesSessionRepository(
+        let loginSessionRepository = AuthorizationChangesLoginSessionRepository(
             restoredUser: user,
             recorder: recorder,
         )
         let observeAuthorizationChanges = ObserveAuthorizationChanges(
             authenticationRepository: authenticationRepository,
-            sessionRepository: sessionRepository,
+            loginSessionRepository: loginSessionRepository,
         )
 
         var outcomes = [AuthenticationOutcome]()
@@ -38,7 +38,7 @@ struct ObserveAuthorizationChangesTests {
                 .authorizationChanges,
                 .restore,
                 .signOut,
-                .clearAuthorization,
+                .clearAuthentication,
             ]
         )
     }
@@ -54,7 +54,7 @@ private actor AuthorizationChangesCallRecorder {
         case authorizationChanges
         case restore
         case signOut
-        case clearAuthorization
+        case clearAuthentication
     }
 
     func append(_ call: Call) {
@@ -78,7 +78,7 @@ private actor AuthorizationChangesAuthenticationRepository: AuthenticationReposi
     // MARK: Lifecycle
 
     init(
-        statuses: [AuthenticationAuthorizationStatus],
+        statuses: [AuthorizationStatus],
         recorder: AuthorizationChangesCallRecorder,
     ) {
         self.statuses = statuses
@@ -91,11 +91,11 @@ private actor AuthorizationChangesAuthenticationRepository: AuthenticationReposi
         throw AuthenticationError.temporarilyUnavailable
     }
 
-    func authorizationStatus() async throws -> AuthenticationAuthorizationStatus {
+    func authorizationStatus() async throws -> AuthorizationStatus {
         .authorized
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthenticationAuthorizationStatus> {
+    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
         await recorder.append(.authorizationChanges)
         let statuses = statuses
 
@@ -107,20 +107,20 @@ private actor AuthorizationChangesAuthenticationRepository: AuthenticationReposi
         }
     }
 
-    func clearAuthorization() async throws {
-        await recorder.append(.clearAuthorization)
+    func clearAuthentication() async throws {
+        await recorder.append(.clearAuthentication)
     }
 
     // MARK: Private
 
     private let recorder: AuthorizationChangesCallRecorder
-    private let statuses: [AuthenticationAuthorizationStatus]
+    private let statuses: [AuthorizationStatus]
 
 }
 
-// MARK: - AuthorizationChangesSessionRepository
+// MARK: - AuthorizationChangesLoginSessionRepository
 
-private actor AuthorizationChangesSessionRepository: SessionRepository {
+private actor AuthorizationChangesLoginSessionRepository: LoginSessionRepository {
 
     // MARK: Lifecycle
 

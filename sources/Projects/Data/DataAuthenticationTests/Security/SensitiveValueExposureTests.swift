@@ -10,12 +10,19 @@ struct SensitiveValueExposureTests {
         let payloadMarker = "payload-marker-9384"
         let accessMarker = "access-marker-5821"
         let refreshMarker = "refresh-marker-7492"
-        let payload = ExternalAuthenticationEvidence.OpaquePayload(bytes: Array(payloadMarker.utf8))
-        let user = SessionResponseDTO.User(id: "user-1", availability: .available, displayName: nil)
+        let payload = AuthenticationEvidence.OpaquePayload(bytes: Array(payloadMarker.utf8))
+        let user = LoginSessionResponseDTO.User(
+            id: "user-1",
+            availability: .available,
+            displayName: nil,
+        )
         let values: [Any] = [
             payload,
-            SessionStartRequestDTO(methodIdentifier: "social-provider", opaquePayload: payload),
-            SessionResponseDTO(
+            LoginSessionStartRequestDTO(
+                methodIdentifier: "social-provider",
+                opaquePayload: payload,
+            ),
+            LoginSessionResponseDTO(
                 user: user,
                 accessToken: accessMarker,
                 refreshToken: refreshMarker,
@@ -27,7 +34,7 @@ struct SensitiveValueExposureTests {
                 accessExpiresAt: Date(timeIntervalSince1970: 200),
                 replacementRefreshToken: refreshMarker,
             ),
-            StoredSession(
+            StoredLoginSession(
                 accessToken: accessMarker,
                 refreshToken: refreshMarker,
                 accessExpiresAt: Date(timeIntervalSince1970: 100),

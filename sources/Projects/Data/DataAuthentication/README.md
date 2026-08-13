@@ -6,20 +6,20 @@
 
 ## 공개 모델과 DTO
 
-- `ExternalAuthenticationEvidence`는 인증 방식 식별자, 공급자 subject 참조와 불투명
-  payload를 표현합니다. payload는 `Equatable`이 아니며 문자열·디버그 표현에서
-  숨겨집니다.
-- `ExternalAuthorizationState`는 `active`, `inactive`,
+- `AuthenticationEvidence`는 `methodIdentifier`, `providerSubjectReference`, 불투명
+  `opaquePayload`를 표현합니다. payload는 `Equatable`이 아니며 문자열·디버그
+  표현에서 숨겨집니다.
+- `AuthorizationState`는 `active`, `inactive`,
   `temporarilyUnavailable` 상태만 제공합니다.
-- `SessionStartRequestDTO`는 인증 방식 식별자와 단발성 불투명 payload로 세션 시작
+- `LoginSessionStartRequestDTO`는 인증 방식 식별자와 단발성 불투명 payload로 세션 시작
   입력을 표현합니다.
-- `SessionResponseDTO`는 Git It 사용자와 access token, refresh token, access 만료를
+- `LoginSessionResponseDTO`는 Git It 사용자와 access token, refresh token, access 만료를
   표현합니다. 사용자는 ID, 이용 가능 상태와 선택적 표시 이름을 가집니다.
 - `RefreshRequestDTO`는 refresh token으로 갱신 입력을, `RefreshResponseDTO`는 새
   access token·만료와 선택적 교체 refresh token으로 갱신 결과를 표현합니다.
-- `StoredSession`은 서버 세션 값과 사용자를 저장하는 모델입니다.
-- `StoredAuthorizationReference`는 서버 세션과 분리된 인증 방식 식별자 및 공급자
-  subject 참조를 저장합니다.
+- `StoredLoginSession`은 서버 세션 값과 사용자를 저장하는 모델입니다.
+- `StoredAuthorizationReference`는 서버 세션과 분리된 `methodIdentifier`와
+  `providerSubjectReference`를 저장합니다.
 - `DataAuthenticationError`는 취소, 일시적 이용 불가, 저장 실패, 세션 시작 거부,
   refresh 거부 또는 만료, refresh token 폐기 실패를 구분합니다.
 
@@ -27,10 +27,10 @@
 
 모든 계약은 `Sendable`입니다.
 
-- `ExternalAuthenticationProvider`는 방식 식별자로 인증하고, 해당 subject의
+- `AuthenticationProvider`는 방식 식별자로 인증하고, 해당 subject의
   authorization 상태 조회 및 상태 변경 stream을 제공합니다.
-- `SessionRemote`는 세션 시작, token 갱신, refresh token 폐기를 제공합니다.
-- `SessionStorage`는 서버 세션을 저장·읽기·삭제합니다.
+- `LoginSessionRemote`는 세션 시작, token 갱신, refresh token 폐기를 제공합니다.
+- `LoginSessionStorage`는 서버 세션을 저장·읽기·삭제합니다.
 - `AuthenticationAuthorizationStorage`는 공급자 인증 참조를 서버 세션과 분리해
   저장·읽기·삭제합니다.
 

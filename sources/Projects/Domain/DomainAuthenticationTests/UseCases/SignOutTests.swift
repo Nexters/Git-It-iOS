@@ -14,7 +14,7 @@ struct SignOutTests {
                 shouldFail: false,
                 recorder: recorder,
             ),
-            sessionRepository: SignOutSessionRepository(
+            loginSessionRepository: SignOutLoginSessionRepository(
                 shouldFail: false,
                 recorder: recorder,
             ),
@@ -23,7 +23,7 @@ struct SignOutTests {
         let outcome = await signOut()
 
         #expect(outcome == .unauthenticated)
-        #expect(await recorder.snapshot() == [.signOut, .clearAuthorization])
+        #expect(await recorder.snapshot() == [.signOut, .clearAuthentication])
     }
 
     @Test
@@ -34,7 +34,7 @@ struct SignOutTests {
                 shouldFail: true,
                 recorder: recorder,
             ),
-            sessionRepository: SignOutSessionRepository(
+            loginSessionRepository: SignOutLoginSessionRepository(
                 shouldFail: true,
                 recorder: recorder,
             ),
@@ -43,7 +43,7 @@ struct SignOutTests {
         let outcome = await signOut()
 
         #expect(outcome == .unauthenticated)
-        #expect(await recorder.snapshot() == [.signOut, .clearAuthorization])
+        #expect(await recorder.snapshot() == [.signOut, .clearAuthentication])
     }
 }
 
@@ -55,7 +55,7 @@ private actor SignOutCallRecorder {
 
     enum Call: Equatable, Sendable {
         case signOut
-        case clearAuthorization
+        case clearAuthentication
     }
 
     func append(_ call: Call) {
@@ -92,16 +92,16 @@ private actor SignOutAuthenticationRepository: AuthenticationRepository {
         throw AuthenticationError.temporarilyUnavailable
     }
 
-    func authorizationStatus() async throws -> AuthenticationAuthorizationStatus {
+    func authorizationStatus() async throws -> AuthorizationStatus {
         .temporarilyUnavailable
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthenticationAuthorizationStatus> {
+    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
         AsyncStream { $0.finish() }
     }
 
-    func clearAuthorization() async throws {
-        await recorder.append(.clearAuthorization)
+    func clearAuthentication() async throws {
+        await recorder.append(.clearAuthentication)
         if shouldFail {
             throw AuthenticationError.temporarilyUnavailable
         }
@@ -114,9 +114,9 @@ private actor SignOutAuthenticationRepository: AuthenticationRepository {
 
 }
 
-// MARK: - SignOutSessionRepository
+// MARK: - SignOutLoginSessionRepository
 
-private actor SignOutSessionRepository: SessionRepository {
+private actor SignOutLoginSessionRepository: LoginSessionRepository {
 
     // MARK: Lifecycle
 
@@ -131,7 +131,7 @@ private actor SignOutSessionRepository: SessionRepository {
     // MARK: Internal
 
     func start(with _: AuthenticationGrant) async throws -> AuthenticatedUser {
-        throw SessionError.temporarilyUnavailable
+        throw LoginSessionError.temporarilyUnavailable
     }
 
     func restore() async throws -> AuthenticatedUser? {
@@ -141,7 +141,7 @@ private actor SignOutSessionRepository: SessionRepository {
     func signOut() async throws {
         await recorder.append(.signOut)
         if shouldFail {
-            throw SessionError.temporarilyUnavailable
+            throw LoginSessionError.temporarilyUnavailable
         }
     }
 

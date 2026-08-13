@@ -3,7 +3,7 @@ import Testing
 
 @testable import DataAuthentication
 
-@Suite("세션 갱신 DTO")
+@Suite("로그인 세션 갱신 DTO")
 struct RefreshDTOTests {
     @Test
     func `공급자와 무관한 갱신 입력과 결과를 표현한다`() {
