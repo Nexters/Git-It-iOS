@@ -11,8 +11,16 @@ script_tests_main() (
 	script_tests_bin=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 	script_tests_root=$(CDPATH='' cd -- "$script_tests_bin/../../.." && pwd -P)
 	script_tests_suite=$(CDPATH='' cd -- "$script_tests_bin/.." && pwd -P)
+	script_tests_paths="$script_tests_root/tools/repository-paths/bin/repository-paths.sh"
+	[ -x "$script_tests_paths" ] || return 2
+	script_tests_projects=$("$script_tests_paths" --absolute GIT_IT_PROJECTS_ROOT) || return $?
+	script_tests_tuist=$("$script_tests_paths" --absolute GIT_IT_TUIST_ROOT) || return $?
+	. "$script_tests_suite/core/testable-schemes.sh"
 	. "$script_tests_suite/core/tests.sh"
 	. "$script_tests_suite/core/run.sh"
+	# 빈 테스트 번들이 공유 scheme에 들어가 XCTest 부트스트랩을 실패시키지 않게 막습니다.
+	script_tests_validate_testable_schemes "$script_tests_projects" \
+		"$script_tests_tuist/ProjectDescriptionHelpers/ProjectName.swift" || return $?
 	# 호출별 임시 경계에 NUL 테스트 목록을 보관하고 항상 정리합니다.
 	script_tests_work=$(mktemp -d "${TMPDIR:-/tmp}/git-it-script-tests.XXXXXX") || return 2
 	trap 'rm -rf "$script_tests_work"' EXIT

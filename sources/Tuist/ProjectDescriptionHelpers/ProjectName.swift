@@ -42,10 +42,7 @@ extension ProjectName {
                 AppModuleName.schemes
 
             case .Composition:
-                [.module(
-                    name: "Composition",
-                    testTarget: "CompositionTests",
-                )]
+                [.module(name: "Composition")]
 
             case .Feature:
                 [.module(name: "Feature")]
