@@ -12,6 +12,7 @@ App은 여러 Feature의 navigation intent를 애플리케이션 수준의 화�
 
 ## 정책
 
+- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 실행 진입점, 애플리케이션 전체 Navigation과 Feature↔Composition 연결 책임만 드러내야 합니다.
 - 모든 내부 target은 실행 진입점, 플랫폼 생명주기 연결, Feature↔Composition 조립 또는 Navigation에 기여해야 합니다.
 - Composition이 제공하는 dependency를 Feature initializer 또는 명시적인 초기화 인자에 주입해야 합니다.
 - Feature가 외부 화면 흐름 변경을 요청하면 App이 목적지와 전환 방식을 결정해야 합니다.

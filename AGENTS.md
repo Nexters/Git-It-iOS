@@ -7,8 +7,9 @@
 ## 우선순위
 
 1. [Constitution](.specify/memory/constitution.md) — 모든 문서보다 우선하는 상위 원칙
-2. [아키텍처 문서](sources/docs/architecture.md)와
-   [패키지별 규칙](sources/docs/package-rules/) — 모듈 책임과 의존성 규칙
+2. [아키텍처 문서](sources/docs/architecture.md),
+   [네이밍 가이드](sources/docs/naming.md)와
+   [패키지별 규칙](sources/docs/package-rules/) — 모듈 책임, 의존성과 공개 이름 규칙
 3. [`.github/COMMIT_CONVENTION.md`](.github/COMMIT_CONVENTION.md) — 커밋 메시지 규칙
 4. [README](README.md) — 초기화·빌드·훅 설치 절차
 5. 이 문서
@@ -67,6 +68,9 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
   [아키텍처 문서 7.1](sources/docs/architecture.md)을 참고합니다.
 - **의존성은 생성자 주입**으로 전달합니다. `@Dependency` 키, Service Locator, 전역
   mutable container를 production 의존성 전달 수단으로 쓰지 않습니다.
+- **공개 이름은 책임과 필요한 최소 문맥을 드러냅니다.** 일괄 접두어·접미어·축약을
+  적용하지 않고 외부 고정 명칭과 공급자 중립 경계를 구분하며, 세부 기준은
+  [네이밍 가이드](sources/docs/naming.md)를 따릅니다.
 - 패키지별 세부 규칙은 수정 전에 해당 문서를 확인합니다:
   [App](sources/docs/package-rules/app.md) ·
   [Composition](sources/docs/package-rules/composition.md) ·
