@@ -42,20 +42,16 @@ public struct SecureRandomGenerator: Sendable {
     public func value(length: Int) throws -> String {
         guard length > 0 else { throw SecureRandomGeneratorError.invalidLength }
         let requiredBytes = ((length + 3) / 4) * 3
-        let encoded = Data(try bytes(requiredBytes))
-            .base64EncodedString()
-            .replacingOccurrences(
-                of: "+",
-                with: "-",
-            )
-            .replacingOccurrences(
-                of: "/",
-                with: "_",
-            )
-            .replacingOccurrences(
-                of: "=",
-                with: "",
-            )
+        let encoded = String(
+            Data(try bytes(requiredBytes)).base64EncodedString().compactMap { character in
+                switch character {
+                case "+": "-"
+                case "/": "_"
+                case "=": nil
+                default: character
+                }
+            }
+        )
         return String(encoded.prefix(length))
     }
 

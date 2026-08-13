@@ -17,11 +17,13 @@ printf '%s\n' '#!/bin/sh' 'printf "second\\n"' >"$repository/tools/two/tests/tes
 # shellcheck disable=SC2016
 printf '%s\n' '#!/bin/sh' \
 	'[ -z "${GIT_IT_HOOKS_ROOT:-}" ] || exit 1' \
+	'[ -z "${GIT_DIR:-}" ] || exit 1' \
 	'printf isolated\\n' >"$repository/tools/two/tests/test-environment.sh"
 GIT_IT_HOOKS_ROOT='외부 훅 경로'
-export GIT_IT_HOOKS_ROOT
+GIT_DIR="$work/outside-git-dir"
+export GIT_IT_HOOKS_ROOT GIT_DIR
 script_tests_run "$repository" "$work/run" script_tests_collect script_tests_execute >"$work/out"
-unset GIT_IT_HOOKS_ROOT
+unset GIT_IT_HOOKS_ROOT GIT_DIR
 rg -q '^first$' "$work/out"
 rg -q '^second$' "$work/out"
 rg -q '^isolated$' "$work/out"

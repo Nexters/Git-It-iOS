@@ -26,6 +26,7 @@ export PRE_COMMIT_LOG
 for step in script-tests swift-format build compile test; do
 	script="$stage_dir/$step.sh"
 	printf '%s\n' '#!/bin/sh' \
+		'[ -z "${GIT_DIR:-}" ] || exit 1' \
 		'printf "%s\n" "$(basename "$0" .sh)" >> "$PRE_COMMIT_LOG"' \
 		'exit "${PRE_COMMIT_STUB_EXIT:-0}"' >"$script"
 	chmod +x "$script"
@@ -42,6 +43,8 @@ done
 # 2. 활성화한 단계를 고정 순서로 실행한다. enabled의 줄 순서는 따르지 않는다.
 : >"$PRE_COMMIT_LOG"
 printf '%s\n' '# 주석' '' 'test' 'compile' 'build' 'swift-format' 'script-tests' >"$enabled"
+GIT_DIR="$work/outside-git-dir"
+export GIT_DIR
 "$repository/$hooks_relative/pre-commit" >"$work/out" 2>"$work/err"
 expected=$(printf 'script-tests\nswift-format\nbuild\ncompile\ntest')
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ] || {
