@@ -40,16 +40,34 @@ extension ProjectName {
             switch self {
             case .App:
                 AppModuleName.schemes
+
             case .Composition:
-                [.module(name: "Composition", testTarget: "CompositionTests")]
+                [.module(
+                    name: "Composition",
+                    testTarget: "CompositionTests",
+                )]
+
             case .Feature:
-                [.module(name: "FeatureAuthentication", testTarget: "FeatureAuthenticationTests")]
+                [.module(name: "Feature")]
+
             case .Domain:
-                [.module(name: "DomainAuthentication", testTarget: "DomainAuthenticationTests")]
+                [.module(
+                    name: "DomainAuthentication",
+                    testTarget: "DomainAuthenticationTests",
+                )]
+
             case .Data:
-                [.module(name: "DataAuthentication", testTarget: "DataAuthenticationTests")]
+                [.module(
+                    name: "DataAuthentication",
+                    testTarget: "DataAuthenticationTests",
+                )]
+
             case .Core:
-                [.module(name: "CoreAuthentication", testTarget: "CoreAuthenticationTests")]
+                [.module(
+                    name: "CoreAuthentication",
+                    testTarget: "CoreAuthenticationTests",
+                )]
+
             case .UI:
                 [
                     .module(name: "DesignSystem"),
