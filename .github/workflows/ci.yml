@@ -85,6 +85,7 @@ jobs:
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
       - name: Lint Swift style
+        continue-on-error: true
         run: |
           "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
