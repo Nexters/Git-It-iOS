@@ -5,7 +5,7 @@ extension View {
         let color = Color(designSystem: token.colorToken)
         return overlay(Rectangle().stroke(
             color,
-            lineWidth: CGFloat(token.width)
+            lineWidth: CGFloat(token.width),
         ))
     }
 }

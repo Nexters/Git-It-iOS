@@ -20,7 +20,7 @@ struct FontRegistrationTests {
         for name in postScriptNames {
             #expect(UIFont(
                 name: name,
-                size: 12
+                size: 12,
             ) != nil, "\(name) 폰트가 등록되어야 한다")
         }
     }

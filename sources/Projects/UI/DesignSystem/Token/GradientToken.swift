@@ -58,11 +58,11 @@ extension GradientToken {
         stops: [
             Stop(
                 position: 0,
-                hex: "#3B3749"
+                hex: "#3B3749",
             ),
             Stop(
                 position: 1,
-                hex: "#56718A"
+                hex: "#56718A",
             ),
         ],
     )
@@ -74,11 +74,11 @@ extension GradientToken {
         stops: [
             Stop(
                 position: 0,
-                hex: "#141414"
+                hex: "#141414",
             ),
             Stop(
                 position: 1,
-                hex: "#A5C4F0"
+                hex: "#A5C4F0",
             ),
         ],
     )
@@ -90,11 +90,11 @@ extension GradientToken {
         stops: [
             Stop(
                 position: 0,
-                hex: "#82ACE5"
+                hex: "#82ACE5",
             ),
             Stop(
                 position: 1,
-                hex: "#D5E7FE"
+                hex: "#D5E7FE",
             ),
         ],
     )
@@ -105,11 +105,11 @@ extension GradientToken {
 
     private static let topToBottomStart = UnitPointRatio(
         x: 0.5,
-        y: 0
+        y: 0,
     )
     private static let topToBottomEnd = UnitPointRatio(
         x: 0.5,
-        y: 1
+        y: 1,
     )
 
 }

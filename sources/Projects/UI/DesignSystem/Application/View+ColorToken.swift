@@ -14,7 +14,7 @@ extension Color {
     public init(designSystem token: ColorToken) {
         self.init(
             designSystemHex: token.hex,
-            opacityPercent: token.opacityPercent
+            opacityPercent: token.opacityPercent,
         )
     }
 
@@ -37,7 +37,7 @@ extension Color {
             red: red,
             green: green,
             blue: blue,
-            opacity: alpha
+            opacity: alpha,
         )
     }
 }

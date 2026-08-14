@@ -73,43 +73,43 @@ extension DesignTokenSet {
 
         errors += Self.duplicateNameErrors(
             category: "ColorToken",
-            names: colors.map(\.name)
+            names: colors.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "GradientToken",
-            names: gradients.map(\.name)
+            names: gradients.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "FontFamilyToken",
-            names: fontFamilies.map(\.name)
+            names: fontFamilies.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "TextStyleToken",
-            names: textStyles.map(\.name)
+            names: textStyles.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "LayoutToken",
-            names: layouts.map(\.name)
+            names: layouts.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "OpacityToken",
-            names: opacities.map(\.name)
+            names: opacities.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "CornerRadiusToken",
-            names: cornerRadii.map(\.name)
+            names: cornerRadii.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "BorderToken",
-            names: borders.map(\.name)
+            names: borders.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "EffectToken",
-            names: effects.map(\.name)
+            names: effects.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "ControlSizeToken",
-            names: controlSizes.map(\.name)
+            names: controlSizes.map(\.name),
         )
 
         for gradient in gradients {
@@ -128,16 +128,14 @@ extension DesignTokenSet {
                 category: "OpacityToken",
                 name: opacity.name,
                 detail: "percent \(opacity.percent) not in 0...100",
-            )
-            )
+            ))
         }
         for controlSize in controlSizes where controlSize.value < 44 {
             errors.append(.outOfRange(
                 category: "ControlSizeToken",
                 name: controlSize.name,
                 detail: "value \(controlSize.value) < 44",
-            )
-            )
+            ))
         }
 
         let colorNames = Set(colors.map(\.name))
@@ -145,17 +143,15 @@ extension DesignTokenSet {
             errors.append(.danglingReference(
                 category: "BorderToken",
                 name: border.name,
-                reference: border.colorToken.name
-            )
-            )
+                reference: border.colorToken.name,
+            ))
         }
         for effect in effects where !colorNames.contains(effect.colorToken.name) {
             errors.append(.danglingReference(
                 category: "EffectToken",
                 name: effect.name,
-                reference: effect.colorToken.name
-            )
-            )
+                reference: effect.colorToken.name,
+            ))
         }
 
         return errors
@@ -173,7 +169,7 @@ extension DesignTokenSet {
             if !seen.insert(name).inserted {
                 errors.append(.duplicateName(
                     category: category,
-                    name: name
+                    name: name,
                 ))
             }
         }

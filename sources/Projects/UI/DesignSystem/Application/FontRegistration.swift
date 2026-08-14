@@ -13,14 +13,16 @@ enum FontRegistration {
             "PlusJakartaSans-Bold",
         ]
         for fileName in fileNames {
-            guard let url = Bundle.module.url(
-                forResource: fileName,
-                withExtension: "ttf"
-            ) else { continue }
+            guard
+                let url = Bundle.module.url(
+                    forResource: fileName,
+                    withExtension: "ttf",
+                )
+            else { continue }
             CTFontManagerRegisterFontsForURL(
                 url as CFURL,
                 .process,
-                nil
+                nil,
             )
         }
     }()

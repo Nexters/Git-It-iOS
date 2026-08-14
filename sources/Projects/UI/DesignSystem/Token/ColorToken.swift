@@ -35,130 +35,130 @@ extension ColorToken {
     public static let blue500 = ColorToken(
         name: "Blue500",
         group: .blue,
-        hex: "#2F3853"
+        hex: "#2F3853",
     )
     public static let blue400 = ColorToken(
         name: "Blue400",
         group: .blue,
-        hex: "#506381"
+        hex: "#506381",
     )
     public static let blue300 = ColorToken(
         name: "Blue300",
         group: .blue,
-        hex: "#7E94BB"
+        hex: "#7E94BB",
     )
     public static let blue200 = ColorToken(
         name: "Blue200",
         group: .blue,
-        hex: "#8BB5EF"
+        hex: "#8BB5EF",
     )
     public static let blue100 = ColorToken(
         name: "Blue100",
         group: .blue,
-        hex: "#B9D6FE"
+        hex: "#B9D6FE",
     )
 
     public static let purple500 = ColorToken(
         name: "Purple500",
         group: .purple,
-        hex: "#3B3749"
+        hex: "#3B3749",
     )
     public static let purple400 = ColorToken(
         name: "Purple400",
         group: .purple,
-        hex: "#585B6F"
+        hex: "#585B6F",
     )
     public static let purple300 = ColorToken(
         name: "Purple300",
         group: .purple,
-        hex: "#898DA6"
+        hex: "#898DA6",
     )
     public static let purple200 = ColorToken(
         name: "Purple200",
         group: .purple,
-        hex: "#A4A9C7"
+        hex: "#A4A9C7",
     )
     public static let purple100 = ColorToken(
         name: "Purple100",
         group: .purple,
-        hex: "#BDC2DC"
+        hex: "#BDC2DC",
     )
 
     public static let grey700 = ColorToken(
         name: "Grey700",
         group: .grey,
-        hex: "#141414"
+        hex: "#141414",
     )
     public static let grey600 = ColorToken(
         name: "Grey600",
         group: .grey,
-        hex: "#242425"
+        hex: "#242425",
     )
     public static let grey500 = ColorToken(
         name: "Grey500",
         group: .grey,
-        hex: "#3B3B3B"
+        hex: "#3B3B3B",
     )
     public static let grey400 = ColorToken(
         name: "Grey400",
         group: .grey,
-        hex: "#919191"
+        hex: "#919191",
     )
     public static let grey300 = ColorToken(
         name: "Grey300",
         group: .grey,
-        hex: "#BCBCBC"
+        hex: "#BCBCBC",
     )
     public static let grey200 = ColorToken(
         name: "Grey200",
         group: .grey,
-        hex: "#ECECEC"
+        hex: "#ECECEC",
     )
     public static let grey100 = ColorToken(
         name: "Grey100",
         group: .grey,
-        hex: "#FFFFFF"
+        hex: "#FFFFFF",
     )
 
     public static let white15 = ColorToken(
         name: "white 15",
         group: .opacity,
         hex: "#FFFFFF",
-        opacityPercent: 15
+        opacityPercent: 15,
     )
     public static let white30 = ColorToken(
         name: "white 30",
         group: .opacity,
         hex: "#FFFFFF",
-        opacityPercent: 30
+        opacityPercent: 30,
     )
     public static let white70 = ColorToken(
         name: "white 70",
         group: .opacity,
         hex: "#FFFFFF",
-        opacityPercent: 70
+        opacityPercent: 70,
     )
     public static let black70 = ColorToken(
         name: "Black 70",
         group: .opacity,
         hex: "#000000",
-        opacityPercent: 70
+        opacityPercent: 70,
     )
 
     public static let error = ColorToken(
         name: "Error",
         group: .state,
-        hex: "#FF3721"
+        hex: "#FF3721",
     )
     public static let caution = ColorToken(
         name: "Caution",
         group: .state,
-        hex: "#ECBD23"
+        hex: "#ECBD23",
     )
     public static let success = ColorToken(
         name: "Success",
         group: .state,
-        hex: "#249900"
+        hex: "#249900",
     )
 
     public static let all: [ColorToken] = [

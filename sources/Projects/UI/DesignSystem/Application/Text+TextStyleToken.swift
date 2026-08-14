@@ -14,7 +14,7 @@ extension Text {
             let character = attributed.characters[index]
             attributed[index..<nextIndex].font = TextStyleResolver.font(
                 for: character,
-                style: style
+                style: style,
             )
             index = nextIndex
         }
@@ -45,12 +45,12 @@ enum TextStyleResolver {
         if let postScriptName = familyToken.postScriptNames[style.weight] {
             return Font.custom(
                 postScriptName,
-                size: style.size
+                size: style.size,
             )
         }
         return Font.custom(
             familyToken.name,
-            size: style.size
+            size: style.size,
         ).weight(style.weight.swiftUIWeight)
     }
 
@@ -59,7 +59,7 @@ enum TextStyleResolver {
         let baselineLineHeight = style.size * 1.2
         return max(
             0,
-            targetLineHeight - baselineLineHeight
+            targetLineHeight - baselineLineHeight,
         )
     }
 }
@@ -76,12 +76,14 @@ extension TextStyleToken.Weight {
 
 extension Character {
     fileprivate var fontSelectionRole: FontFamilyToken.FontSelectionRole {
-        if unicodeScalars.contains(where: { scalar in
-            (0x0041...0x005A).contains(scalar.value) || (0x0061...0x007A).contains(scalar.value)
-        }) {
-            return .englishAlphabet
+        if
+            unicodeScalars.contains(where: { scalar in
+                (0x0041...0x005A).contains(scalar.value) || (0x0061...0x007A).contains(scalar.value)
+            })
+        {
+            .englishAlphabet
         } else {
-            return .default
+            .default
         }
     }
 }

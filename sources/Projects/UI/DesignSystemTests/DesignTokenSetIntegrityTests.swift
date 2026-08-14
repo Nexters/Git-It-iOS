@@ -27,10 +27,12 @@ struct DesignTokenSetIntegrityTests {
         )
         let errors = duplicated.validate()
         #expect(errors.contains {
-            if case .duplicateName(
-                _,
-                "Blue500"
-            ) = $0 {
+            if
+                case .duplicateName(
+                    _,
+                    "Blue500",
+                ) = $0
+            {
                 true
             } else {
                 false
@@ -44,20 +46,20 @@ struct DesignTokenSetIntegrityTests {
             name: "Invalid Gradient",
             start: .init(
                 x: 0.5,
-                y: 0
+                y: 0,
             ),
             end: .init(
                 x: 0.5,
-                y: 1
+                y: 1,
             ),
             stops: [
                 .init(
                     position: -0.1,
-                    hex: "#000000"
+                    hex: "#000000",
                 ),
                 .init(
                     position: 1,
-                    hex: "#FFFFFF"
+                    hex: "#FFFFFF",
                 ),
             ],
         )
@@ -97,7 +99,7 @@ struct DesignTokenSetIntegrityTests {
             effects: [],
             controlSizes: [ControlSizeToken(
                 name: "TooSmall",
-                value: 32
+                value: 32,
             )],
         )
         let errors = invalidSet.validate()
@@ -126,8 +128,8 @@ struct DesignTokenSetIntegrityTests {
                 colorToken: ColorToken(
                     name: "NotARealColor",
                     group: .state,
-                    hex: "#000000"
-                )
+                    hex: "#000000",
+                ),
             )],
             effects: [],
             controlSizes: [],

@@ -13,17 +13,17 @@ extension LinearGradient {
                 stops: token.stops.map { stop in
                     .init(
                         color: Color(designSystemHex: stop.hex),
-                        location: stop.position
+                        location: stop.position,
                     )
                 }
             ),
             startPoint: UnitPoint(
                 x: token.start.x,
-                y: token.start.y
+                y: token.start.y,
             ),
             endPoint: UnitPoint(
                 x: token.end.x,
-                y: token.end.y
+                y: token.end.y,
             ),
         )
     }
