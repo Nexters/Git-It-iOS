@@ -1,6 +1,6 @@
 # 조사 기록: Apple 소셜 로그인
 
-**기능**: `001-apple-social-login`  
+**기능**: `001-apple-social-login`
 **조사일**: 2026-08-10
 
 ## 1. Apple 인증 시작과 결과 검증

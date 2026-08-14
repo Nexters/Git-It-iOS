@@ -148,4 +148,3 @@ htmlcov/
 
 # Machine-specific configuration
 *.xcconfig
-sources/graph.png

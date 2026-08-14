@@ -18,7 +18,7 @@ Git 경로 collection은 `-z` 결과를 NUL 파일로 유지하고 `xargs -0`에
 
 정상 결과는 stdout, 실패와 복구 조치는 stderr에 출력한다. 예상 가능한 실패는 안정 code, 작업과 대상, 직접 원인, 사용자가 취할 조치를 제공한다. 대상 없음은 `skipped` 의미와 `swift-format.no-targets`를 출력하고 성공 종료한다. 새 안정 code는 `result-policy.sh`와 결과 계약, 관련 회귀를 한 논리 변경으로 갱신한다.
 
-예외가 필요하면 이유, 영향과 검증하지 못한 범위를 `references/checklists/architecture.md`에 기록한다. 설명 없는 예외는 허용하지 않는다.
+예외가 필요하면 이유, 영향과 검증하지 못한 범위를 변경의 자연어 문서에 기록한다. 설명 없는 예외는 허용하지 않는다.
 
 ## 독립 Git 훅 예외
 

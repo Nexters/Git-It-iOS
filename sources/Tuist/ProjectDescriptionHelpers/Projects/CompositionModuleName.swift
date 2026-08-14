@@ -38,6 +38,9 @@ extension CompositionModuleName {
 
 extension TargetDependency {
     static func fromComposition(_ name: CompositionModuleName) -> Self {
-        .project(target: name.rawValue, path: "../Composition")
+        .project(
+            target: name.rawValue,
+            path: "../Composition"
+        )
     }
 }
