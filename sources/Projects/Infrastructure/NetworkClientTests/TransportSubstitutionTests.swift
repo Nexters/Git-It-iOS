@@ -46,7 +46,13 @@ struct TransportSubstitutionTests {
     @Test
     func `기록된 전송 요청에서 조립 결과를 검사한다`() async throws {
         // 이 테스트는 공개 seam이 상위 계층 테스트에 제공해야 하는 관찰 가능성을 한 번에 검증합니다.
-        let transport = RecordingTransport([.response(.init(statusCode: 200, headers: [:], body: Data("{}".utf8)))])
+        let responseBody = TestPayload(id: 1, name: "응답")
+        let expectedBody = Data("encoded request".utf8)
+        let transport = RecordingTransport([.response(.init(
+            statusCode: 200,
+            headers: [:],
+            body: try JSONEncoder().encode(responseBody),
+        ))])
         let body = TestPayload(id: 11, name: "본문")
         let request = HTTPRequest(
             method: .patch,
@@ -56,7 +62,11 @@ struct TransportSubstitutionTests {
             responseTimeout: .seconds(3),
         )
 
-        _ = try await client(transport: transport, commonHeaders: ["Accept": "application/json"]).send(
+        _ = try await client(
+            transport: transport,
+            bodyCoding: StubBodyCoding(encodedBody: expectedBody),
+            commonHeaders: ["Accept": "application/json"],
+        ).send(
             request,
             body: body,
             expecting: TestPayload.self,
@@ -73,7 +83,6 @@ struct TransportSubstitutionTests {
         #expect(sent.url.absoluteString == "https://api.example.com/v1/items/11?q=a%2Bb")
         #expect(sent.headers["accept"] == "application/json")
         #expect(sent.headers["x-request"] == "request")
-        let expectedBody = try JSONEncoder().encode(body)
         #expect(sent.body == expectedBody)
         #expect(sent.responseTimeout == .seconds(3))
     }
@@ -102,11 +111,12 @@ struct TransportSubstitutionTests {
 
     private func client(
         transport: RecordingTransport,
+        bodyCoding: any HTTPBodyCoding = StubBodyCoding(),
         commonHeaders: HTTPHeaders = [:],
     ) -> HTTPClient {
         HTTPClient(
             baseURL: URL(string: "https://api.example.com/v1")!,
-            bodyCoding: StubBodyCoding(),
+            bodyCoding: bodyCoding,
             commonHeaders: commonHeaders,
             transport: transport,
         )

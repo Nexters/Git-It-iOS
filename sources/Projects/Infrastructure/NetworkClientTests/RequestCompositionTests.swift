@@ -102,8 +102,12 @@ struct RequestCompositionTests {
         // InfrastructureNetworkClient가 JSON 정책을 소유하지 않고 HTTPBodyCoding의 결과만 전달하는지 확인합니다.
         let transport = RecordingTransport([.response(successResponse())])
         let body = TestPayload(id: 1, name: "새 요청")
+        let expectedBody = Data("encoded request".utf8)
 
-        _ = try await client(transport: transport).send(
+        _ = try await client(
+            transport: transport,
+            bodyCoding: StubBodyCoding(encodedBody: expectedBody),
+        ).send(
             HTTPRequest(method: .post, path: "users"),
             body: body,
             expecting: TestPayload.self,
@@ -111,7 +115,6 @@ struct RequestCompositionTests {
 
         let requests = await transport.requests
         let sent = try #require(requests.first)
-        let expectedBody = try JSONEncoder().encode(body)
         #expect(sent.body == expectedBody)
     }
 
@@ -120,11 +123,12 @@ struct RequestCompositionTests {
     private func client(
         baseURL: URL = URL(string: "https://api.example.com/v1")!,
         transport: RecordingTransport,
+        bodyCoding: any HTTPBodyCoding = StubBodyCoding(),
         commonHeaders: HTTPHeaders = [:],
     ) -> HTTPClient {
         HTTPClient(
             baseURL: baseURL,
-            bodyCoding: StubBodyCoding(),
+            bodyCoding: bodyCoding,
             commonHeaders: commonHeaders,
             transport: transport,
         )

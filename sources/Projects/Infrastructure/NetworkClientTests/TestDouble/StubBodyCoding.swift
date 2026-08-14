@@ -24,7 +24,7 @@ enum StubBodyCodingError: Error {
 // MARK: - StubBodyCoding
 
 /// InfrastructureNetworkClient가 특정 본문 형식을 소유하지 않는다는 계약을 검증하기 위한 호출자 측 JSON 구현입니다.
-/// 세 플래그로 인코딩 실패, 디코딩 실패, 빈 본문 허용을 독립적으로 구성합니다.
+/// 실패 조건, 빈 본문 허용과 고정 인코딩 결과를 독립적으로 구성합니다.
 struct StubBodyCoding: HTTPBodyCoding {
 
     // MARK: Lifecycle
@@ -33,10 +33,12 @@ struct StubBodyCoding: HTTPBodyCoding {
         failsEncoding: Bool = false,
         failsDecoding: Bool = false,
         allowsEmptyBody: Bool = false,
+        encodedBody: Data? = nil,
     ) {
         self.failsEncoding = failsEncoding
         self.failsDecoding = failsDecoding
         self.allowsEmptyBody = allowsEmptyBody
+        self.encodedBody = encodedBody
     }
 
     // MARK: Internal
@@ -44,10 +46,14 @@ struct StubBodyCoding: HTTPBodyCoding {
     let failsEncoding: Bool
     let failsDecoding: Bool
     let allowsEmptyBody: Bool
+    let encodedBody: Data?
 
     func encode(_ body: some Encodable) throws -> Data {
         // 실패를 먼저 내보내면 HTTPClient가 전송 전에 requestEncodingFailed로 매핑하는지 확인할 수 있습니다.
         guard !failsEncoding else { throw StubBodyCodingError.expected }
+        if let encodedBody {
+            return encodedBody
+        }
         return try JSONEncoder().encode(body)
     }
 

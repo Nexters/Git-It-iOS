@@ -55,10 +55,10 @@ struct ErrorClassificationTests {
 
     @Test
     func `절대 요청 대상을 만들 수 없으면 전송 전에 중단한다`() async throws {
-        // 빈 baseURL은 상대 URL만 만들 수 있어 absolute transport request를 구성할 수 없습니다.
+        // 상대 baseURL은 scheme과 host가 없어 absolute transport request를 구성할 수 없습니다.
         let transport = RecordingTransport([.response(successResponse())])
         let client = HTTPClient(
-            baseURL: try #require(URL(string: "")),
+            baseURL: try #require(URL(string: "relative-base")),
             bodyCoding: StubBodyCoding(),
             transport: transport,
         )
