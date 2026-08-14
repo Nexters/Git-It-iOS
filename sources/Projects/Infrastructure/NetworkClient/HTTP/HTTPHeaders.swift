@@ -17,6 +17,16 @@ public struct HTTPHeaders: Equatable, Sendable, ExpressibleByDictionaryLiteral {
 
     // MARK: Public
 
+    public var names: [String] {
+        storage.keys.sorted()
+    }
+
+    public var all: [(name: String, value: String)] {
+        names.compactMap { name in
+            storage[name].map { (name: name, value: $0) }
+        }
+    }
+
     public subscript(name: String) -> String? {
         get {
             storage[normalized(name)]
@@ -34,16 +44,6 @@ public struct HTTPHeaders: Equatable, Sendable, ExpressibleByDictionaryLiteral {
         return result
     }
 
-    public var names: [String] {
-        storage.keys.sorted()
-    }
-
-    public var all: [(name: String, value: String)] {
-        names.compactMap { name in
-            storage[name].map { (name: name, value: $0) }
-        }
-    }
-
     // MARK: Private
 
     private var storage: [String: String]
@@ -51,4 +51,5 @@ public struct HTTPHeaders: Equatable, Sendable, ExpressibleByDictionaryLiteral {
     private func normalized(_ name: String) -> String {
         name.lowercased()
     }
+
 }

@@ -5,7 +5,10 @@ extension HTTPRequest {
 
         // MARK: Lifecycle
 
-        public init(name: String, value: String) {
+        public init(
+            name: String,
+            value: String,
+        ) {
             self.name = name
             self.value = value
         }
@@ -14,5 +17,6 @@ extension HTTPRequest {
 
         public let name: String
         public let value: String
+
     }
 }

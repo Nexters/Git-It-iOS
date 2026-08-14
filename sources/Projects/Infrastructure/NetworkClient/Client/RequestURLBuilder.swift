@@ -35,7 +35,7 @@ struct RequestURLBuilder {
     // MARK: Private
 
     private let queryAllowedCharacters = CharacterSet.urlQueryAllowed.subtracting(
-        CharacterSet(charactersIn: "+&=?#"),
+        CharacterSet(charactersIn: "+&=?#")
     )
 
     private func encodedQueryItem(_ item: HTTPRequest.QueryItem) throws(HTTPClientError) -> String {
@@ -47,4 +47,5 @@ struct RequestURLBuilder {
         }
         return "\(name)=\(value)"
     }
+
 }
