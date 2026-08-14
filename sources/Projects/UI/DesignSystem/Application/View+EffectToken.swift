@@ -2,8 +2,7 @@ import SwiftUI
 
 extension View {
     public func designSystemEffect(_ token: EffectToken) -> some View {
-        let colorToken = ColorToken.all.first { $0.name == token.colorRef }
-        let color = colorToken.map { Color(designSystem: $0) } ?? Color.clear
+        let color = Color(designSystem: token.colorToken)
         return shadow(
             color: color,
             radius: CGFloat(token.blur + token.spread),

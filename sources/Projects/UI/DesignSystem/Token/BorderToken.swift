@@ -4,16 +4,16 @@ public struct BorderToken: Sendable, Equatable {
     public init(
         name: String,
         width: Double,
-        colorRef: String,
+        colorToken: ColorToken,
     ) {
         self.name = name
         self.width = width
-        self.colorRef = colorRef
+        self.colorToken = colorToken
     }
 
     public let name: String
     public let width: Double
-    public let colorRef: String
+    public let colorToken: ColorToken
 }
 
 extension BorderToken {

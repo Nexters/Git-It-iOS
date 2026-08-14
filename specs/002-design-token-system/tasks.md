@@ -86,8 +86,8 @@ Core → Composition → UI → Feature → App` 순서에서 적용 대상은 `
   `red`·`green`·`blue`·`alpha`(`Double`, 0...1) 구조체를 구현한다(data-model.md
   RGBAComponents)
 - [ ] T009 [P] [US1] [US2] `sources/Projects/UI/DesignSystem/Token/FontFamilyToken.swift`에
-  `Name`(`notoSans`, `plusJakartaSans`)·`postScriptName`·`scriptScope`(`korean`,
-  `english`)를 구현한다. 한글과 기본 문자는 적용 계층에서 `notoSans`를 선택한다
+  `Name`(`notoSans`, `plusJakartaSans`)·`postScriptName`·`selectionRole`(`default`,
+  `englishAlphabet`)를 구현한다. ASCII 영문 알파벳 외 문자는 적용 계층에서 `notoSans`를 선택한다
   (data-model.md FontFamilyToken, FR-010)
 - [ ] T010 [P] [US1] [US2] `sources/Projects/UI/DesignSystem/Token/LayoutToken.swift`에
   `Name`(`margin`, `gutter`)·`value`를 구현한다(data-model.md LayoutToken, FR-013)

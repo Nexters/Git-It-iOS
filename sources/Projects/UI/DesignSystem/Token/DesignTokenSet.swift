@@ -44,7 +44,7 @@ public struct DesignTokenSet: Sendable {
 }
 
 extension DesignTokenSet {
-    public static let active = DesignTokenSet(
+    public static let current = DesignTokenSet(
         colors: ColorToken.all,
         gradients: GradientToken.all,
         fontFamilies: FontFamilyToken.all,
@@ -141,19 +141,19 @@ extension DesignTokenSet {
         }
 
         let colorNames = Set(colors.map(\.name))
-        for border in borders where !colorNames.contains(border.colorRef) {
+        for border in borders where !colorNames.contains(border.colorToken.name) {
             errors.append(.danglingReference(
                 category: "BorderToken",
                 name: border.name,
-                reference: border.colorRef
+                reference: border.colorToken.name
             )
             )
         }
-        for effect in effects where !colorNames.contains(effect.colorRef) {
+        for effect in effects where !colorNames.contains(effect.colorToken.name) {
             errors.append(.danglingReference(
                 category: "EffectToken",
                 name: effect.name,
-                reference: effect.colorRef
+                reference: effect.colorToken.name
             )
             )
         }

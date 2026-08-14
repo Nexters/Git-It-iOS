@@ -63,7 +63,7 @@ SC-005).
 |---|---|---|
 | `name` (case) | `FontFamilyToken.Name` | `.notoSans` `.plusJakartaSans` |
 | `postScriptName` | `String` | 실제 글꼴 리소스 이름 |
-| `scriptScope` | `FontFamilyToken.ScriptScope` | `.korean`(한글), `.english`(영문 알파벳). 기본 문자에는 적용 계층이 `Noto Sans`를 선택(FR-010) |
+| `selectionRole` | `FontFamilyToken.FontSelectionRole` | `.default`(ASCII 영문 알파벳 외 문자), `.englishAlphabet`(ASCII 영문 알파벳). 기본 선택은 `Noto Sans`다(FR-010) |
 
 **관계**: `TextStyleToken.fontFamilyPair`가 두 케이스를 고정 쌍으로 참조. 개별
 `TextStyleToken`이 하나만 선택하지 않는다(문자 단위 판별은 적용 시점 책임, FR-010·
@@ -100,7 +100,7 @@ pt 변환 로직을 포함하지 않는다(FR-011 위반 방지).
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `colors` | `[ColorToken.Name: ColorToken]` | 24개 전량 |
+| `colors` | `[ColorToken]` | 24개 전량 |
 | `gradients` | `[GradientToken.Name: GradientToken]` | 3개 전량 |
 | `fontFamilies` | `[FontFamilyToken.Name: FontFamilyToken]` | 2개 전량 |
 | `textStyles` | `[TextStyleToken.Name: TextStyleToken]` | 10개 전량 |

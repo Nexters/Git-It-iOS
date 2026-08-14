@@ -12,7 +12,7 @@ extension Text {
         while index < attributed.endIndex {
             let nextIndex = attributed.index(afterCharacter: index)
             let character = attributed.characters[index]
-            attributed[index..<nextIndex].font = TextStyleModifier.font(
+            attributed[index..<nextIndex].font = TextStyleResolver.font(
                 for: character,
                 style: style
             )
@@ -24,23 +24,22 @@ extension Text {
 
 extension View {
     public func designSystemLineSpacing(_ style: TextStyleToken) -> some View {
-        lineSpacing(TextStyleModifier.additionalLineSpacing(for: style))
+        lineSpacing(TextStyleResolver.additionalLineSpacing(for: style))
     }
 }
 
-// MARK: - TextStyleModifier
+// MARK: - TextStyleResolver
 
-enum TextStyleModifier {
+enum TextStyleResolver {
     static func font(
         for character: Character,
         style: TextStyleToken,
     ) -> Font {
         let familyToken: FontFamilyToken =
-            switch character.script {
-            case .korean,
-                 .default:
+            switch character.fontSelectionRole {
+            case .default:
                 .notoSans
-            case .english:
+            case .englishAlphabet:
                 .plusJakartaSans
             }
         if let postScriptName = familyToken.postScriptNames[style.weight] {
@@ -76,27 +75,13 @@ extension TextStyleToken.Weight {
 }
 
 extension Character {
-    fileprivate enum Script {
-        case korean
-        case english
-        case `default`
-    }
-
-    fileprivate var script: Script {
-        let isKorean = unicodeScalars.contains { scalar in
-            (0xAC00...0xD7A3).contains(scalar.value)
-                || (0x1100...0x11FF).contains(scalar.value)
-                || (0x3130...0x318F).contains(scalar.value)
-        }
-        if isKorean {
-            return .korean
-        }
-        let isEnglish = unicodeScalars.contains { scalar in
+    fileprivate var fontSelectionRole: FontFamilyToken.FontSelectionRole {
+        if unicodeScalars.contains(where: { scalar in
             (0x0041...0x005A).contains(scalar.value) || (0x0061...0x007A).contains(scalar.value)
+        }) {
+            return .englishAlphabet
+        } else {
+            return .default
         }
-        if isEnglish {
-            return .english
-        }
-        return .default
     }
 }

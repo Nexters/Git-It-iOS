@@ -3,8 +3,8 @@
 public struct GradientToken: Sendable, Equatable {
     public init(
         name: String,
-        start: Point,
-        end: Point,
+        start: UnitPointRatio,
+        end: UnitPointRatio,
         stops: [Stop],
     ) {
         self.name = name
@@ -14,13 +14,13 @@ public struct GradientToken: Sendable, Equatable {
     }
 
     public let name: String
-    public let start: Point
-    public let end: Point
+    public let start: UnitPointRatio
+    public let end: UnitPointRatio
     public let stops: [Stop]
 }
 
 extension GradientToken {
-    public struct Point: Sendable, Equatable {
+    public struct UnitPointRatio: Sendable, Equatable {
         public init(
             x: Double,
             y: Double,
@@ -103,11 +103,11 @@ extension GradientToken {
 
     // MARK: Private
 
-    private static let topToBottomStart = Point(
+    private static let topToBottomStart = UnitPointRatio(
         x: 0.5,
         y: 0
     )
-    private static let topToBottomEnd = Point(
+    private static let topToBottomEnd = UnitPointRatio(
         x: 0.5,
         y: 1
     )

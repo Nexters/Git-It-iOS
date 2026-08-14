@@ -6,8 +6,8 @@ import Testing
 struct DesignTokenSetIntegrityTests {
 
     @Test
-    func `활성 토큰 집합은 화면 렌더링 없이 검증 오류가 0건이다`() {
-        let errors = DesignTokenSet.active.validate()
+    func `현재 토큰 집합은 화면 렌더링 없이 검증 오류가 0건이다`() {
+        let errors = DesignTokenSet.current.validate()
         #expect(errors.isEmpty, "\(errors)")
     }
 
@@ -123,7 +123,11 @@ struct DesignTokenSetIntegrityTests {
             borders: [BorderToken(
                 name: "Broken",
                 width: 1,
-                colorRef: "NotARealColor"
+                colorToken: ColorToken(
+                    name: "NotARealColor",
+                    group: .state,
+                    hex: "#000000"
+                )
             )],
             effects: [],
             controlSizes: [],

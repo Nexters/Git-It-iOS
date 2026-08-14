@@ -7,14 +7,14 @@ public struct EffectToken: Sendable, Equatable {
     public init(
         name: String,
         kind: Kind,
-        colorRef: String,
+        colorToken: ColorToken,
         offset: Offset,
         blur: Double,
         spread: Double,
     ) {
         self.name = name
         self.kind = kind
-        self.colorRef = colorRef
+        self.colorToken = colorToken
         self.offset = offset
         self.blur = blur
         self.spread = spread
@@ -24,7 +24,7 @@ public struct EffectToken: Sendable, Equatable {
 
     public let name: String
     public let kind: Kind
-    public let colorRef: String
+    public let colorToken: ColorToken
     public let offset: Offset
     public let blur: Double
     public let spread: Double

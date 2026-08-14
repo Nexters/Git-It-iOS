@@ -20,7 +20,7 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 | 효과 | `EffectToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
 | 제어 크기 | `ControlSizeToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
 
-`DesignTokenSet.active`가 위 10개 카테고리를 취합한 유일한 활성 집합입니다.
+`DesignTokenSet.current`가 위 10개 카테고리를 취합한 유일한 토큰 집합입니다.
 `DesignTokenSet.validate()`로 화면 렌더링 없이 이름 유일성·값 범위·참조 무결성을 검사할
 수 있습니다.
 
@@ -48,6 +48,6 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 ## 소비 규칙
 
 - 사용처는 원시 색상 값·글꼴 이름·수치를 직접 기재하지 않고 토큰 이름으로만 참조합니다.
-- 활성 집합은 `DesignTokenSet.active` 하나뿐이며, 임의의 팔레트를 주입할 수 없습니다.
+- 현재 토큰 집합은 `DesignTokenSet.current` 하나뿐이며, 임의의 팔레트를 주입할 수 없습니다.
 - 신규 토큰(불투명도·모서리·선·효과·제어 크기)은 Figma 확인 전까지 비어 있습니다. 값이
   채워지기 전에는 해당 적용 모디파이어를 호출하는 소비 코드를 추가하지 마세요.
