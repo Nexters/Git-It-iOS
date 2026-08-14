@@ -69,6 +69,10 @@ extension ProjectName {
                         name: "InfrastructureNetworkClient",
                         testTarget: "InfrastructureNetworkClientTests",
                     ),
+                    .module(
+                        name: "InfrastructureCache",
+                        testTarget: "InfrastructureCacheTests",
+                    ),
                 ]
 
             case .UI:

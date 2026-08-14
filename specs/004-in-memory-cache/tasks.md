@@ -80,7 +80,7 @@ Value>`를 제공하는 `InfrastructureCache` target을 신설하고, 동시 접
 
 ### 준비와 기반
 
-- [ ] T001 [US1] [US2] [US3]
+- [X] T001 [US1] [US2] [US3]
   `sources/Tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift`에
   `InfrastructureCache`·`InfrastructureCacheTests` 케이스를 추가하고, `targets` 배열에
   `.module(name: InfrastructureModuleName.InfrastructureCache.rawValue, sourceDirectory:
@@ -90,31 +90,31 @@ Value>`를 제공하는 `InfrastructureCache` target을 신설하고, 동시 접
   추가한다. 이 enum은 `CaseIterable`이 아니므로 케이스 추가만으로는 target이 생성되지
   않는다. `InfrastructureCache`는 Swift 표준 라이브러리만 사용하므로 `.sdk` 의존성을
   추가하지 않는다(research.md §4)
-- [ ] T002 [US1] [US2] [US3]
+- [X] T002 [US1] [US2] [US3]
   `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `case .Infrastructure`
   schemes 배열에 `.module(name: "InfrastructureCache", testTarget:
   "InfrastructureCacheTests")`를 추가한다. `Project.Options`가 `automaticSchemesOptions:
   .disabled`이므로 이 등록이 없으면 `InfrastructureCache`는 빌드도 테스트도 되지 않고,
   `testTarget:`이 없으면 `tools/githooks/project-build`가 `<TestableReference` 부재로
   `compile`·`test` 대상에서 제외한다
-- [ ] T003 [no-write] 저장소 루트에서 `make tuist`를 실행하고,
+- [X] T003 [no-write] 저장소 루트에서 `make tuist`를 실행하고,
   `sources/Projects/Infrastructure/xcshareddata/xcschemes/InfrastructureCache.xcscheme`에
   `<TestableReference`가 포함되었는지 확인한다
 
 ### 테스트 (US1, US2, US3)
 
-- [ ] T004 [P] [US1]
+- [X] T004 [P] [US1]
   `sources/Projects/Infrastructure/CacheTests/StoreAndRetrieveTests.swift`에 quickstart
   A-1~A-2 검증을 작성한다: 빈 캐시에 저장한 직후 같은 키로 조회하면 저장한 값이 그대로
   반환되는지(US1-1, SC-001), 같은 키에 값을 다시 저장하면 이전 값이 아닌 새 값이
   반환되는지(US1-2, FR-004)
-- [ ] T005 [P] [US2]
+- [X] T005 [P] [US2]
   `sources/Projects/Infrastructure/CacheTests/RemoveAndClearTests.swift`에 quickstart
   B-1~B-4 검증을 작성한다: 키를 제거한 뒤 조회하면 `nil`이 반환되는지(US2-1, SC-003), 전체
   비우기 뒤 모든 키가 `nil`을 반환하는지(US2-2, SC-003), 존재하지 않는 키를 제거해도 오류
   없이 완료되는지(US2-3, FR-007), 저장된 적 없는 키를 조회해도 오류·예외 없이 `nil`이
   반환되는지(FR-003, SC-002)
-- [ ] T006 [P] [US3]
+- [X] T006 [P] [US3]
   `sources/Projects/Infrastructure/CacheTests/ConcurrentAccessTests.swift`에 quickstart
   C-1~C-2 검증을 작성한다. `withTaskGroup`으로 서로 다른 키 100개에 대한 저장 작업을 동시에
   발행한 뒤 모든 값이 유실·혼선 없이 각자의 값과 일치하는지(US3-1, SC-004), 같은 키에 대한
@@ -123,10 +123,14 @@ Value>`를 제공하는 `InfrastructureCache` target을 신설하고, 동시 접
 - [ ] T007 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
   InfrastructureCache -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`를 실행해
   T004~T006이 `InMemoryCache` 타입 미구현으로 컴파일 실패하는지 확인한다(Red 단계)
+  — **미실행**: T003(`tuist generate`)이 `InfrastructureCache`/`InfrastructureCacheTests`
+  target의 소스 glob 디렉터리가 비어 있으면 실패해, T004~T006과 T008을 먼저 작성해 두
+  디렉터리를 채운 뒤에야 T003을 실행할 수 있었다. 그 결과 Red 상태를 별도로 관찰하지
+  못했다. T009에서 Green 결과로 전 테스트 통과를 확인했다
 
 ### 구현
 
-- [ ] T008 [US1] [US2] [US3]
+- [X] T008 [US1] [US2] [US3]
   `sources/Projects/Infrastructure/Cache/InMemoryCache.swift`에 `public actor
   InMemoryCache<Key: Hashable & Sendable, Value: Sendable>`을 구현한다. 내부 상태는
   `Dictionary<Key, Value>` 하나만 둔다(research.md §4). `public init()`으로 빈 캐시를
@@ -140,11 +144,11 @@ Value>`를 제공하는 `InfrastructureCache` target을 신설하고, 동시 접
 
 ### 정리와 패키지 검증
 
-- [ ] T009 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
+- [X] T009 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
   InfrastructureCache -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`를 실행해
   T004~T006의 모든 테스트가 통과하는지 확인한다(Green 단계). 실패가 남으면 원인을 기록하고
   T008로 돌아간다
-- [ ] T010 [no-write] `InfrastructureCache`의 공개 선언을
+- [X] T010 [no-write] `InfrastructureCache`의 공개 선언을
   `contracts/in-memory-cache-api.md`의 공개 표면과 대조한다. 최상위 공개 타입이
   `InMemoryCache<Key, Value>` 하나이고 공개 연산이 `init()`, `store(_:forKey:)`,
   `value(forKey:)`, `removeValue(forKey:)`, `removeAll()` 다섯 개뿐인지, 명세가 요구하지
@@ -161,12 +165,12 @@ Value>`를 제공하는 `InfrastructureCache` target을 신설하고, 동시 접
 **선행 조건**: `Infrastructure` 패키지의 구현·검증·결과 보고가 완료되어야 한다. 이 단계는
 파일을 변경하지 않는다.
 
-- [ ] T011 [no-write] 저장소 루트에서
+- [X] T011 [no-write] 저장소 루트에서
   `project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh
   GIT_IT_PROJECT_BUILD_RUNNER)`로 경로를 구한 뒤 `"$project_build_runner" build`,
   `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고
   결과를 기록한다. 세 명령은 `sources/DerivedData/PreCommit`을 공유하므로 순차 실행한다
-- [ ] T012 [no-write] 사용자 스토리별 독립 수용 시나리오를 검증한다. US1은 quickstart
+- [X] T012 [no-write] 사용자 스토리별 독립 수용 시나리오를 검증한다. US1은 quickstart
   A-1~A-2, US2는 B-1~B-4, US3은 C-1~C-2의 결과로 확인하고, 검증 전 과정에서 화면 실행·네트워크
   접근·디스크 접근이 전혀 없었는지 함께 확인한다(SC-005)
 
