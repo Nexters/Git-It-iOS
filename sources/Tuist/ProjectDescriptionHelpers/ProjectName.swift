@@ -8,7 +8,7 @@ public enum ProjectName: String, CaseIterable {
     case Feature
     case Domain
     case Data
-    case Core
+    case Infrastructure
     case UI
 }
 
@@ -30,8 +30,8 @@ extension ProjectName {
                 DomainModuleName.allCases.map(\.target)
             case .Data:
                 DataModuleName.allCases.map(\.target)
-            case .Core:
-                CoreModuleName.targets
+            case .Infrastructure:
+                InfrastructureModuleName.targets
             case .UI:
                 UIModuleName.targets
             }
@@ -59,11 +59,17 @@ extension ProjectName {
                     testTarget: "DataAuthenticationTests",
                 )]
 
-            case .Core:
-                [.module(
-                    name: "CoreAuthentication",
-                    testTarget: "CoreAuthenticationTests",
-                )]
+            case .Infrastructure:
+                [
+                    .module(
+                        name: "InfrastructureAuthentication",
+                        testTarget: "InfrastructureAuthenticationTests",
+                    ),
+                    .module(
+                        name: "InfrastructureNetworkClient",
+                        testTarget: "InfrastructureNetworkClientTests",
+                    ),
+                ]
 
             case .UI:
                 [

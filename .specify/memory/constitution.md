@@ -1,22 +1,22 @@
 <!--
 Sync Impact Report
-- Version change: 1.5.0 → 1.6.0
-- Modified principles: 없음
-- Added sections: 10. 책임과 문맥에 따른 네이밍
+- Version change: 1.6.0 → 1.6.1
+- Modified principles: 7. 패키지 단위 구현 진행 — 기술 경계 패키지명을 Core에서 Infrastructure로 변경
+- Added sections: 없음
 - Removed sections: 없음
 - Templates requiring updates: ✅ .specify/templates/plan-template.md, .specify/templates/tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
-- Commands requiring updates: ✅ 변경 불필요 .agents/skills/speckit-*/SKILL.md 전체 검토
-- Runtime guidance requiring updates: ⚠ sources/docs/naming.md 신규 작성 후 sources/docs/architecture.md, package-rules/**, AGENTS.md에서 참조 필요; ⚠ AGENTS.md에 동일 checkout의 Git 실행 직렬화 절차 반영 필요; ✅ 변경 불필요 README.md
-- Evidence records: ✅ TK-20260813-001, TK-20260813-002와 현재 Domain·Data 공개 이름을 일반 원칙의 근거로 사용; 인증 기능의 구체 이름은 승격하지 않음
-- Follow-up TODO: ⚠ 별도 문서 작업으로 sources/docs/naming.md를 작성하고 Constitution 원칙 10의 세부 적용 예·예외를 연결
+- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md, .agents/skills/speckit-tasks/SKILL.md, .agents/skills/speckit-implement/SKILL.md, .agents/skills/speckit-converge/SKILL.md; ✅ 변경 불필요 나머지 speckit 스킬
+- Runtime guidance requiring updates: ⚠ AGENTS.md와 sources/docs/**는 패키지 rename 구현에서 갱신
+- Evidence records: 없음
+- Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.6.0<br>
+**버전**: 1.6.1<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-13
+**최종 수정일**: 2026-08-15
 
 ## 원칙
 
@@ -100,7 +100,7 @@ Sync Impact Report
 ### 7. 패키지 단위 구현 진행
 
 - 현재 명세가 변경하는 패키지 중 한 번에 하나의 패키지만 구현합니다.
-- 적용 대상 패키지는 `Domain → Data → Core → Composition → UI → Feature → App`
+- 적용 대상 패키지는 `Domain → Data → Infrastructure → Composition → UI → Feature → App`
   순서로 구현합니다. 현재 명세가 변경하지 않는 패키지는 건너뛰되, 나머지 적용 대상
   패키지의 상대적 순서는 바꾸지 않습니다.
 - 현재 패키지의 모든 구현 작업과 검증을 완료하고, 변경 파일과 검증 결과를 사용자에게

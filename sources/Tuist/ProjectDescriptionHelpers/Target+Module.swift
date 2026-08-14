@@ -3,6 +3,7 @@ import ProjectDescription
 extension Target {
     static func module(
         name: String,
+        sourceDirectory: String? = nil,
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
     ) -> Self {
@@ -13,7 +14,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(name)/**"],
+            sources: ["\(sourceDirectory ?? name)/**"],
             resources: resources,
             dependencies: dependencies,
             settings: .settings(
@@ -31,6 +32,7 @@ extension Target {
 
     static func internalStaticModule(
         name: String,
+        sourceDirectory: String? = nil,
         dependencies: [TargetDependency] = [],
     ) -> Self {
         .target(
@@ -40,7 +42,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(name)/**"],
+            sources: ["\(sourceDirectory ?? name)/**"],
             dependencies: dependencies,
             settings: .settings(
                 base: [
@@ -57,6 +59,7 @@ extension Target {
 
     static func testModule(
         name: String,
+        sourceDirectory: String? = nil,
         productionTarget: TargetDependency,
         additionalDependencies: [TargetDependency] = [],
     ) -> Self {
@@ -67,7 +70,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(name)/**"],
+            sources: ["\(sourceDirectory ?? name)/**"],
             dependencies: [productionTarget] + additionalDependencies,
             settings: .settings(
                 base: [
@@ -104,6 +107,7 @@ extension Target {
 
     static func testModule(
         name: String,
+        sourceDirectory: String? = nil,
         dependencies: [TargetDependency] = [],
     ) -> Self {
         .target(
@@ -113,7 +117,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(name)/**"],
+            sources: ["\(sourceDirectory ?? name)/**"],
             dependencies: dependencies,
             settings: .settings(
                 base: [

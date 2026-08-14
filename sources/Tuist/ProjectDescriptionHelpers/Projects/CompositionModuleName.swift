@@ -16,7 +16,7 @@ extension CompositionModuleName {
                 dependencies: [
                     .fromDomain(.DomainAuthentication),
                     .fromData(.DataAuthentication),
-                    .fromCore(.CoreAuthentication),
+                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -29,7 +29,7 @@ extension CompositionModuleName {
                 additionalDependencies: [
                     .fromDomain(.DomainAuthentication),
                     .fromData(.DataAuthentication),
-                    .fromCore(.CoreAuthentication),
+                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
         }

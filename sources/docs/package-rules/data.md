@@ -12,7 +12,7 @@ Data는 네트워크, 저장소, Keychain, 파일 시스템과 같은 외부 기
 
 ## 정책
 
-- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 획득·저장·캐시·동기화 책임과 DTO·저장 모델의 방향 및 수명을 드러내고 Domain 또는 Core 구현 용어를 노출해서는 안 됩니다.
+- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 획득·저장·캐시·동기화 책임과 DTO·저장 모델의 방향 및 수명을 드러내고 Domain 또는 Infrastructure 구현 용어를 노출해서는 안 됩니다.
 - 모든 내부 target은 서버 API, DTO, Data 모델, 데이터 접근, 캐시, 저장 또는 동기화 정책에 기여해야 합니다.
 - 서비스가 정의한 요청과 응답 형식은 Data가 소유한 DTO로 표현해야 합니다.
 - 데이터 획득 결과는 Data가 소유한 타입으로 반환해야 합니다.
@@ -25,7 +25,7 @@ Data는 네트워크, 저장소, Keychain, 파일 시스템과 같은 외부 기
 - 프로젝트 내부의 다른 패키지에 의존해서는 안 됩니다.
 - Domain 타입을 참조하거나 Domain 모델로 변환하는 API를 제공해서는 안 됩니다.
 - Domain Repository를 구현해서는 안 됩니다.
-- Core 타입 또는 외부 라이브러리의 구체 API를 직접 참조해서는 안 됩니다.
-- Data↔Core Adapter를 Data 내부에 구현해서는 안 됩니다.
+- Infrastructure 타입 또는 외부 라이브러리의 구체 API를 직접 참조해서는 안 됩니다.
+- Data↔Infrastructure Adapter를 Data 내부에 구현해서는 안 됩니다.
 - Domain 비즈니스 규칙을 정의해서는 안 됩니다.
 - 화면, 사용자 기능 상태 또는 Navigation을 소유해서는 안 됩니다.

@@ -12,7 +12,7 @@ description: "기능 구현 작업 목록 템플릿"
 **테스트**: 테스트 작업은 기능 명세에서 요청했거나 TDD가 요구된 경우에만 포함한다.
 
 **구성**: 패키지를 최상위 구현·승인 단위로 사용하고 사용자 스토리는 각 패키지 안에서
-추적한다. 현재 명세가 변경하는 패키지만 `Domain → Data → Core → Composition → UI →
+추적한다. 현재 명세가 변경하는 패키지만 `Domain → Data → Infrastructure → Composition → UI →
 Feature → App` 순서로 배치한다.
 
 ## 형식: `[ID] [P?] [스토리?] 설명`
@@ -42,7 +42,7 @@ Feature → App` 순서로 배치한다.
   중요: 아래 단계와 작업은 형식을 보여 주기 위한 예시다.
 
   /speckit-tasks는 명세에 적용되는 패키지만 남기고 실제 작업으로 교체해야 한다.
-  패키지 단계 순서는 Domain → Data → Core → Composition → UI → Feature → App이며,
+  패키지 단계 순서는 Domain → Data → Infrastructure → Composition → UI → Feature → App이며,
   사용자 스토리는 패키지 단계 안의 라벨과 하위 제목으로 추적한다.
   생성된 tasks.md에 자리표시자나 예시 작업을 남기지 않는다.
   ============================================================================
@@ -119,7 +119,7 @@ Feature → App` 순서로 배치한다.
 
 ### 패키지 순서와 승인 게이트
 
-- 현재 명세에 적용되는 패키지만 `Domain → Data → Core → Composition → UI → Feature →
+- 현재 명세에 적용되는 패키지만 `Domain → Data → Infrastructure → Composition → UI → Feature →
   App` 순서로 실행한다.
 - 한 번에 한 패키지만 구현한다. 현재 패키지의 모든 작업과 검증이 끝나기 전에는 다음
   패키지 작업을 시작하지 않는다.

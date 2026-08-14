@@ -97,7 +97,7 @@ allowlist that `/speckit-implement` will use.
    - 현재 패키지 내부에서만 허용되는 병렬 실행 예시 생성
    - Validate task completeness (each user story has all needed tasks, independently testable)
    - 모든 파일 변경 작업을 정확히 하나의 패키지 단계에 명시적으로 배정하고, 명세가 변경하지 않는 패키지는
-     제외한 `Domain → Data → Core → Composition → UI → Feature → App` 순서로 패키지 단계를
+     제외한 `Domain → Data → Infrastructure → Composition → UI → Feature → App` 순서로 패키지 단계를
      최상위 실행 순서로 구성
    - 각 적용 대상 패키지 단계 끝에 패키지 검증, 결과 보고와 다음 적용 대상 패키지 진행에
      대한 명시적 사용자 승인 게이트를 두고, 패키지 단계 안에서 사용자 스토리 추적성을 유지
@@ -207,7 +207,7 @@ Every task MUST strictly follow this format:
 ### Task Organization
 
 1. **패키지 소유권 — PRIMARY ORGANIZATION**:
-   - 명세가 변경하는 패키지만 `Domain → Data → Core → Composition → UI → Feature → App`
+   - 명세가 변경하는 패키지만 `Domain → Data → Infrastructure → Composition → UI → Feature → App`
      순서의 최상위 단계로 생성
    - 모든 파일 변경 작업은 정확히 하나의 패키지 단계에 배치
    - 공용 파일이 여러 패키지 선언을 바꾸면 패키지별 작업으로 분리하고 해당 단계에서 필요한
