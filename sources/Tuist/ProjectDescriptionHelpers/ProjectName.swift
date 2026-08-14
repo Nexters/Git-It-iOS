@@ -60,10 +60,16 @@ extension ProjectName {
                 )]
 
             case .Core:
-                [.module(
-                    name: "CoreAuthentication",
-                    testTarget: "CoreAuthenticationTests",
-                )]
+                [
+                    .module(
+                        name: "CoreAuthentication",
+                        testTarget: "CoreAuthenticationTests",
+                    ),
+                    .module(
+                        name: "CoreHTTP",
+                        testTarget: "CoreHTTPTests",
+                    ),
+                ]
 
             case .UI:
                 [

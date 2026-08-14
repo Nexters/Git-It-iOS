@@ -5,6 +5,8 @@ import ProjectDescription
 enum CoreModuleName: String {
     case CoreAuthentication
     case CoreAuthenticationTests
+    case CoreHTTP
+    case CoreHTTPTests
 }
 
 extension CoreModuleName {
@@ -20,6 +22,16 @@ extension CoreModuleName {
             name: CoreModuleName.CoreAuthenticationTests.rawValue,
             productionTarget: .target(
                 name: CoreModuleName.CoreAuthentication.rawValue
+            ),
+        ),
+        .module(
+            name: CoreModuleName.CoreHTTP.rawValue,
+            dependencies: [],
+        ),
+        .testModule(
+            name: CoreModuleName.CoreHTTPTests.rawValue,
+            productionTarget: .target(
+                name: CoreModuleName.CoreHTTP.rawValue
             ),
         ),
     ]
