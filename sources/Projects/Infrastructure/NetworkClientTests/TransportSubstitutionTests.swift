@@ -73,7 +73,8 @@ struct TransportSubstitutionTests {
         #expect(sent.url.absoluteString == "https://api.example.com/v1/items/11?q=a%2Bb")
         #expect(sent.headers["accept"] == "application/json")
         #expect(sent.headers["x-request"] == "request")
-        #expect(sent.body == try JSONEncoder().encode(body))
+        let expectedBody = try JSONEncoder().encode(body)
+        #expect(sent.body == expectedBody)
         #expect(sent.responseTimeout == .seconds(3))
     }
 

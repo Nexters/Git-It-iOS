@@ -110,7 +110,9 @@ struct RequestCompositionTests {
         )
 
         let requests = await transport.requests
-        #expect(try #require(requests.first).body == try JSONEncoder().encode(body))
+        let sent = try #require(requests.first)
+        let expectedBody = try JSONEncoder().encode(body)
+        #expect(sent.body == expectedBody)
     }
 
     // MARK: Private
