@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreAuthentication
+@testable import InfrastructureAuthentication
 
 @Suite("KeychainStore")
 struct KeychainStoreTests {

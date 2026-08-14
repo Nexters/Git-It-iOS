@@ -1,6 +1,6 @@
 import Foundation
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 /// 실제 URL Loading System을 사용하지 않고 `HTTPClient`의 경계 동작을 검증하는 전송 대역입니다.
 ///

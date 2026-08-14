@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 @Suite("HTTPClient 실패 분류")
 struct ErrorClassificationTests {

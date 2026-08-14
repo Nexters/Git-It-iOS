@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 @Suite("HTTPClient 동시성 격리")
 struct ConcurrencyIsolationTests {

@@ -1,6 +1,6 @@
 import Testing
 
-@testable import CoreAuthentication
+@testable import InfrastructureAuthentication
 
 @Suite("SecureRandomGenerator")
 struct SecureRandomGeneratorTests {

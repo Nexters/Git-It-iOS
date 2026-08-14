@@ -8,7 +8,7 @@
 
 ## 1. 설계 설명
 
-현재 아키텍처는 변경 가능성이 높은 Domain과 Data에 높은 테스트 독립성과 변경 격리를 제공합니다. Domain, Data, Core는 각각 독립적인 경계를 형성하고, Composition이 각 경계 사이의 Adapter와 실행 환경별 구현을 조립합니다.
+현재 아키텍처는 변경 가능성이 높은 Domain과 Data에 높은 테스트 독립성과 변경 격리를 제공합니다. Domain, Data, Infrastructure는 각각 독립적인 경계를 형성하고, Composition이 각 경계 사이의 Adapter와 실행 환경별 구현을 조립합니다.
 
 Feature는 TCA를 이용해 사용자 기능의 상태와 상호작용을 표현합니다. App은 Feature와 Composition을 연결하고 Feature 간 Navigation과 애플리케이션 전체 화면 흐름을 조정합니다. UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구성요소를 제공합니다.
 
@@ -19,11 +19,11 @@ Feature는 TCA를 이용해 사용자 기능의 상태와 상호작용을 표현
 | 패키지 | 책임 |
 |---|---|
 | App | Feature와 Composition의 연결, 애플리케이션 전체 Navigation과 화면 흐름 조정 |
-| Composition | Domain↔Data, Data↔Core Adapter 구현, 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
+| Composition | Domain↔Data, Data↔Infrastructure Adapter 구현, 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
 | Feature | TCA 기반 상태 관리, 사용자 상호작용, 화면 구성과 Presentation 흐름 |
 | Domain | 비즈니스 모델, 정책, 비즈니스 로직과 외부 기능에 대한 Domain 계약 |
 | Data | 데이터 획득·저장·캐시·동기화와 Data 소유 모델·DTO, 외부 기술 기능에 대한 Data 계약 |
-| Core | 외부 라이브러리·프레임워크·플랫폼 기능을 프로젝트 내부 기술 API로 변환 |
+| Infrastructure | 외부 라이브러리·프레임워크·플랫폼 기능을 프로젝트 내부 기술 API로 변환 |
 | UI | 여러 Feature가 공유하는 디자인 시스템과 재사용 가능한 UI 구성요소 |
 
 ### App
@@ -32,7 +32,7 @@ App은 **Coordination Layer**로서 Feature가 표현하는 사용자 흐름과 
 
 ### Composition
 
-Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data, Data와 Core 사이의 Adapter를 구현하고 실행 환경에 맞는 구체 구현, 객체 생성 순서와 수명을 결정합니다.
+Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data, Data와 Infrastructure 사이의 Adapter를 구현하고 실행 환경에 맞는 구체 구현, 객체 생성 순서와 수명을 결정합니다.
 
 ### Feature
 
@@ -46,9 +46,9 @@ Domain은 프로젝트의 비즈니스 언어와 규칙을 표현하는 핵심 �
 
 Data는 데이터의 획득, 저장, 캐시와 동기화를 담당하는 데이터 경계입니다. 서비스 API와 DTO, Data 모델과 데이터 처리 정책을 자신의 언어로 표현하고 필요한 외부 기술 기능의 계약을 소유합니다.
 
-### Core
+### Infrastructure
 
-Core는 외부 라이브러리, 플랫폼 기능과 기술 API를 프로젝트가 소유한 범용 기술 API로 변환하는 기술 경계입니다. 외부 기술의 타입과 오류를 프로젝트 내부 기술 타입과 오류로 변환합니다.
+Infrastructure는 외부 라이브러리, 플랫폼 기능과 기술 API를 프로젝트가 소유한 범용 기술 API로 변환하는 기술 경계입니다. 외부 기술의 타입과 오류를 프로젝트 내부 기술 타입과 오류로 변환합니다.
 
 ### UI
 
@@ -67,18 +67,18 @@ UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구
 | 패키지 | 허용 의존성 |
 |---|---|
 | App | Feature, Composition, Domain |
-| Composition | Domain, Data, Core |
+| Composition | Domain, Data, Infrastructure |
 | Feature | Domain, UI |
 | Domain | — |
 | Data | — |
-| Core | — |
+| Infrastructure | — |
 | UI | — |
 
 각 패키지는 실제 구현에 필요한 최소 의존성만 선언합니다.
 
 ![Git It iOS 패키지 컴파일 타임 의존성 그래프](./assets/package-dependency-graph.svg)
 
-Domain, Data, Core는 가장 엄격한 의존성 경계로 관리합니다. App, Feature, Composition은 실제 애플리케이션 조립과 사용자 흐름 구현에 필요한 범위에서 직접 연결합니다.
+Domain, Data, Infrastructure는 가장 엄격한 의존성 경계로 관리합니다. App, Feature, Composition은 실제 애플리케이션 조립과 사용자 흐름 구현에 필요한 범위에서 직접 연결합니다.
 
 ### 3.2 명시적 의존성 주입
 
@@ -150,7 +150,7 @@ Data UserDataStore
 
 Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
 
-#### Data ↔ Core
+#### Data ↔ Infrastructure
 
 Data는 네트워크, 저장소와 같은 외부 기술 기능에 필요한 계약을 Data의 언어로 정의합니다.
 
@@ -160,19 +160,19 @@ public protocol UserRemote: Sendable {
 }
 ```
 
-Composition의 Data↔Core Adapter는 Data 계약을 구현하고 Core API에 작업을 위임합니다.
+Composition의 Data↔Infrastructure Adapter는 Data 계약을 구현하고 Infrastructure API에 작업을 위임합니다.
 
 ```text
 Data UserRemote
       ↑
       │ implements
-Composition DataCoreAdapter
+Composition DataInfrastructureAdapter
       │ delegates
       ↓
-Core HTTPClient
+Infrastructure HTTPClient
 ```
 
-Adapter는 Data 계약의 요청·응답과 Core의 기술 API 사이를 변환합니다.
+Adapter는 Data 계약의 요청·응답과 Infrastructure의 기술 API 사이를 변환합니다.
 
 ### 3.4 Navigation과 화면 흐름
 
@@ -209,9 +209,9 @@ Composition · DomainDataAdapter
  ↓
 Data
  ↓
-Composition · DataCoreAdapter
+Composition · DataInfrastructureAdapter
  ↓
-Core
+Infrastructure
  ↓
 External System
 ```
@@ -221,9 +221,9 @@ External System
 ```text
 External System
  ↓
-Core result
+Infrastructure result
  ↓
-Composition · DataCoreAdapter
+Composition · DataInfrastructureAdapter
  ↓
 Data model / DTO
  ↓
@@ -255,7 +255,7 @@ App은 Feature가 출력한 애플리케이션 수준의 navigation intent를 �
 ### Composition Adapter
 
 - Data 모델과 Domain 모델 사이의 변환을 테스트합니다.
-- Data 계약과 Core API 사이의 요청·응답 변환을 테스트합니다.
+- Data 계약과 Infrastructure API 사이의 요청·응답 변환을 테스트합니다.
 - Adapter 테스트는 경계 변환과 위임 관계를 중심으로 구성합니다.
 
 ### Feature
@@ -269,11 +269,11 @@ App은 Feature가 출력한 애플리케이션 수준의 navigation intent를 �
 | 패키지 | 외부 패키지 의존성 | 정책 |
 |---|---|---|
 | App | 제한적 허용 | 애플리케이션 실행과 Navigation에 필요한 프레임워크를 사용합니다. |
-| Composition | 제한적 허용 | 조립과 Adapter 구현에 필요한 프로젝트 내부 패키지를 중심으로 구성하고 외부 기술 사용은 Core API를 통해 수행합니다. |
+| Composition | 제한적 허용 | 조립과 Adapter 구현에 필요한 프로젝트 내부 패키지를 중심으로 구성하고 외부 기술 사용은 Infrastructure API를 통해 수행합니다. |
 | Feature | 제한적 허용 | TCA와 Presentation 구현에 필요한 의존성을 사용합니다. |
 | Domain | Swift Standard Library | 비즈니스 의미와 계약을 Swift 언어 수준의 타입으로 표현합니다. |
 | Data | Swift Standard Library | 데이터 경계의 모델, 정책과 기술 계약을 프로젝트 소유 타입으로 표현합니다. |
-| Core | 허용 | 담당 기술 기능 구현에 필요한 외부 라이브러리를 사용합니다. |
+| Infrastructure | 허용 | 담당 기술 기능 구현에 필요한 외부 라이브러리를 사용합니다. |
 | UI | 제한적 허용 | UI 구현에 필요한 플랫폼 UI 프레임워크와 디자인 관련 기술을 사용합니다. |
 
 ## 7. 제약조건
@@ -284,22 +284,22 @@ App은 Feature가 출력한 애플리케이션 수준의 navigation intent를 �
 
 ```text
 Domain → Data
-Domain → Core
+Domain → Infrastructure
 Domain → Feature
 Domain → UI
 
 Data → Domain
-Data → Core
+Data → Infrastructure
 Data → Feature
 Data → UI
 
 Feature → Data
-Feature → Core
+Feature → Infrastructure
 Feature → Composition
 
-Core → Domain
-Core → Data
-Core → Feature
+Infrastructure → Domain
+Infrastructure → Data
+Infrastructure → Feature
 
 UI → Domain
 UI → Data
@@ -320,7 +320,7 @@ UI → Feature
 - Composition Adapter에서 Domain 비즈니스 규칙 또는 Data 처리 정책을 구현하지 않습니다.
 - Feature에서 Domain 비즈니스 규칙을 다시 구현하지 않습니다.
 - Data에서 Domain 모델 또는 Domain Repository 구현을 소유하지 않습니다.
-- Core에서 Domain 또는 Data의 의미를 소유하지 않습니다.
+- Infrastructure에서 Domain 또는 Data의 의미를 소유하지 않습니다.
 - UI에서 특정 Feature의 업무 상태와 화면 흐름을 소유하지 않습니다.
 
 App이 Feature와 Composition을 직접 연결하는 것은 이 아키텍처의 의도된 조립 방식입니다.
@@ -333,7 +333,7 @@ App이 Feature와 Composition을 직접 연결하는 것은 이 아키텍처의 
 - [Data 패키지 규칙](./package-rules/data.md)
 - [UI 패키지 규칙](./package-rules/ui.md)
 - [Domain 패키지 규칙](./package-rules/domain.md)
-- [Core 패키지 규칙](./package-rules/core.md)
+- [Infrastructure 패키지 규칙](./package-rules/infrastructure.md)
 
 ## 문서 변경 기준
 

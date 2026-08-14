@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 @Suite("HTTPClient 요청 구성")
 struct RequestCompositionTests {
@@ -99,7 +99,7 @@ struct RequestCompositionTests {
 
     @Test
     func `본문 변환 결과를 전송 수단에 그대로 전달한다`() async throws {
-        // CoreHTTP가 JSON 정책을 소유하지 않고 HTTPBodyCoding의 결과만 전달하는지 확인합니다.
+        // InfrastructureNetworkClient가 JSON 정책을 소유하지 않고 HTTPBodyCoding의 결과만 전달하는지 확인합니다.
         let transport = RecordingTransport([.response(successResponse())])
         let body = TestPayload(id: 1, name: "새 요청")
 

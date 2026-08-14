@@ -53,7 +53,7 @@
 - 서버 HTTP 요청·응답의 직렬화와 실제 endpoint 통신
 - Keychain·파일 시스템 등 영구 저장소의 실제 저장·삭제
 - Domain 모델 변환, Repository 구현 또는 유스케이스 흐름
-- Composition에서의 Data↔Core adapter 조립
+- Composition에서의 Data↔Infrastructure adapter 조립
 
 이 동작들은 해당 구현 타겟의 테스트가 추가되고 통과한 뒤 그 타겟의 문서에서 다룹니다.
 

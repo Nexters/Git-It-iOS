@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 @Suite("HTTPTransport 대체")
 struct TransportSubstitutionTests {

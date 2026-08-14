@@ -28,11 +28,11 @@ digraph PackageDependencyGraph {
     Feature     [fillcolor = "#ede9fe", color = "#7c3aed", label = <<B>Feature</B><BR/><FONT POINT-SIZE="10">TCA · Presentation</FONT>>]
     Domain      [fillcolor = "#d1fae5", color = "#059669", label = <<B>Domain</B><BR/><FONT POINT-SIZE="10">Business Rules</FONT>>]
     Data        [fillcolor = "#fef3c7", color = "#d97706", label = <<B>Data</B><BR/><FONT POINT-SIZE="10">Data Management</FONT>>]
-    Core        [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>Core</B><BR/><FONT POINT-SIZE="10">Technology API</FONT>>]
+    Infrastructure [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>Infrastructure</B><BR/><FONT POINT-SIZE="10">Technology API</FONT>>]
     UI          [fillcolor = "#dbeafe", color = "#2563eb", label = <<B>UI</B><BR/><FONT POINT-SIZE="10">Design System</FONT>>]
 
     { rank = same; Feature; Composition }
-    { rank = same; Domain; Data; Core; UI }
+    { rank = same; Domain; Data; Infrastructure; UI }
 
     App -> Feature
     App -> Composition
@@ -43,5 +43,5 @@ digraph PackageDependencyGraph {
 
     Composition -> Domain
     Composition -> Data
-    Composition -> Core
+    Composition -> Infrastructure
 }

@@ -13,7 +13,7 @@
 다음과 같이 프로젝트가 이름을 소유하는 선언과 값에 적용합니다.
 
 - 패키지 밖으로 공개되는 타입, 프로토콜, 연산과 프로퍼티
-- Domain·Data·Core 등 독립 경계가 정의하는 계약과 모델
+- Domain·Data·Infrastructure 등 독립 경계가 정의하는 계약과 모델
 - Adapter, initializer와 delegate를 통해 패키지 경계를 넘는 값
 - 저장되거나 비동기 작업 이후 다시 해석되는 값
 - 테스트 대역과 실행 환경별 구현이 함께 준수하는 프로젝트 소유 인터페이스
@@ -56,7 +56,7 @@
 - 프로토콜 이름은 구현체의 기술이 아니라 호출자에게 제공하는 능력과 책임을 표현합니다.
 - `Repository`, `Storage`, `Remote`, `Provider` 같은 역할어는 실제 연산 집합과 수명 경계가 해당 역할을 충족할 때만 사용합니다.
 - 하나의 프로토콜 이름이 서로 다른 책임을 감추면 계약을 먼저 분리할지 검토합니다. 이름으로 설계 문제를 덮지 않습니다.
-- Domain 계약은 비즈니스 언어, Data 계약은 데이터 처리에 필요한 기술 능력, Core API는 범용 기술 능력으로 표현합니다.
+- Domain 계약은 비즈니스 언어, Data 계약은 데이터 처리에 필요한 기술 능력, Infrastructure API는 범용 기술 능력으로 표현합니다.
 
 ### 3.3 연산
 
@@ -90,15 +90,27 @@
 
 | 패키지 | 이름이 사용하는 주된 문맥 | 이름에 노출하지 않는 문맥 |
 | --- | --- | --- |
-| App | 실행 진입점, 앱 전체 Navigation, Feature↔Composition 연결 | Domain 규칙, Data·Core 구현 기술 |
+| App | 실행 진입점, 앱 전체 Navigation, Feature↔Composition 연결 | Domain 규칙, Data·Infrastructure 구현 기술 |
 | Composition | Adapter, 조립, 구현 선택, 객체 수명 | 새로운 비즈니스 규칙, Data 처리 정책 |
 | Feature | 사용자 기능, Presentation 상태·Action·화면 흐름 | DTO, 저장·네트워크 기술, production 구현체 |
 | Domain | 비즈니스 모델·정책·Use Case·외부 기능 계약 | 공급자, 서버 schema, 저장·플랫폼 기술 |
-| Data | 획득·저장·캐시·동기화, DTO, 필요한 기술 계약 | Domain 모델·Repository, Core 구체 타입 |
-| Core | 범용 플랫폼·라이브러리 기술 능력 | Domain·Data 의미, 서비스 고유 schema |
+| Data | 획득·저장·캐시·동기화, DTO, 필요한 기술 계약 | Domain 모델·Repository, Infrastructure 구체 타입 |
+| Infrastructure | 범용 플랫폼·라이브러리 기술 능력 | Domain·Data 의미, 서비스 고유 schema |
 | UI | 디자인 토큰과 범용 UI 구성요소 | 특정 Feature 상태·업무 흐름·데이터 접근 |
 
 패키지 이름을 접두어처럼 붙여 경계를 표시하지 않습니다. 대신 선언 자체가 소유하는 책임을 표현합니다. 패키지 밖에서 충돌하거나 오해할 실제 근거가 있을 때만 구분 문맥을 추가합니다.
+
+### Target과 소스 폴더
+
+Tuist target 이름은 빌드 그래프에서 소속 패키지를 식별해야 하므로 필요한 패키지 문맥을
+포함할 수 있습니다. 반면 `sources/Projects/<패키지>/` 아래의 source·test 폴더는 이미
+패키지 문맥 안에 있으므로 target 이름의 패키지 접두어를 반복하지 않고 역할만 사용합니다.
+예를 들어 `InfrastructureAuthentication` target의 source·test 폴더는 각각
+`Authentication/`, `AuthenticationTests/`로 둡니다.
+
+새 target을 추가할 때는 `Target.module` 또는 `Target.testModule`의
+`sourceDirectory`를 명시해 이 경로를 설정합니다. target 이름을 source glob의 기본값으로
+그대로 사용하지 않습니다.
 
 ## 5. 접두어와 접미어
 
@@ -115,7 +127,7 @@
 - 같은 feature 또는 target 소속임을 표시하기 위한 공통 접두어
 - 이름 길이와 모양을 맞추기 위한 공통 접미어
 - 현재 책임이 아닌 향후 가능성을 나타내기 위한 `Manager`, `Service`, `Handler`
-- 패키지 이름을 반복하는 `Domain...`, `Data...`, `Core...` 접두어
+- 패키지 이름을 반복하는 `Domain...`, `Data...`, `Infrastructure...` 접두어
 
 ## 6. 축약과 약어
 
@@ -136,7 +148,7 @@
 - 플랫폼의 고유 타입명과 표준 약어를 프로젝트의 일반 네이밍 규칙으로 다시 쓰지 않습니다.
 - 외부 계약 변경을 프로젝트 내부 rename으로 위장하지 않습니다. 계약·mapping·호환성 변경으로 별도 검증합니다.
 
-프로젝트가 소유하는 공급자 중립 경계에는 특정 공급자, 저장 기술 또는 실행 환경의 용어를 노출하지 않습니다. 예를 들어 Domain의 인증 상태가 플랫폼 타입이나 특정 공급자의 credential 상태를 그대로 반환하면 안 됩니다. Data가 요구하는 저장 계약도 실제 책임이 값의 저장·조회·삭제라면 `Keychain` 같은 구현 기술을 계약 이름에 포함하지 않습니다. 특정 공급자나 기술 용어는 그 대상을 직접 감싸는 Core API 또는 외부 Adapter처럼 책임상 필요한 경계에만 둡니다.
+프로젝트가 소유하는 공급자 중립 경계에는 특정 공급자, 저장 기술 또는 실행 환경의 용어를 노출하지 않습니다. 예를 들어 Domain의 인증 상태가 플랫폼 타입이나 특정 공급자의 credential 상태를 그대로 반환하면 안 됩니다. Data가 요구하는 저장 계약도 실제 책임이 값의 저장·조회·삭제라면 `Keychain` 같은 구현 기술을 계약 이름에 포함하지 않습니다. 특정 공급자나 기술 용어는 그 대상을 직접 감싸는 Infrastructure API 또는 외부 Adapter처럼 책임상 필요한 경계에만 둡니다.
 
 공급자 중립은 가장 일반적인 단어로 이름을 흐리는 것과 다릅니다. 여러 공급자의 차이를 내부 계약에서 보존해야 한다면 프로젝트 소유의 중립적인 모델과 명시적인 변환으로 의미를 표현합니다.
 
@@ -167,8 +179,8 @@ rename은 기존 책임과 동작을 유지한 채 식별자와 그 참조를 �
 | 저장 후 독립적으로 해석되는 식별자 | 발급 주체가 실제로 구분되는 `issuerIdentifier` | 여러 발급 주체가 공존하는 모델의 `id` | 저장 문맥이 사라져도 값의 목적을 식별할 수 있어야 합니다. |
 | Data의 wire 응답 모델 | `ProfileResponseDTO` | Domain의 `ProfileDTO` | `DTO`는 실제 전송 경계에서만 역할을 설명합니다. |
 | 공급자 중립 Domain 상태 | 프로젝트 소유 `AuthorizationStatus` | 플랫폼 고유 credential 상태 타입 | 외부 공급자 타입을 Domain 계약에 노출하지 않습니다. |
-| Data가 요구하는 보안 저장 능력 | 책임 중심의 `CredentialStorage` | 구현 기술 중심의 `KeychainCredentialStorage` 프로토콜 | 구현 기술은 중립 계약이 아니라 Core 구현 경계에서 선택합니다. |
-| 플랫폼 API를 직접 감싸는 Core 타입 | 플랫폼 고유 명칭을 보존한 Adapter 이름 | 고유 명칭을 임의의 프로젝트 용어로 치환 | 외부 계약과의 대응을 숨기지 않습니다. |
+| Data가 요구하는 보안 저장 능력 | 책임 중심의 `CredentialStorage` | 구현 기술 중심의 `KeychainCredentialStorage` 프로토콜 | 구현 기술은 중립 계약이 아니라 Infrastructure 구현 경계에서 선택합니다. |
+| 플랫폼 API를 직접 감싸는 Infrastructure 타입 | 플랫폼 고유 명칭을 보존한 Adapter 이름 | 고유 명칭을 임의의 프로젝트 용어로 치환 | 외부 계약과의 대응을 숨기지 않습니다. |
 | 한 기능의 공개 타입 묶음 | 각 책임을 완전한 용어로 표현 | 모든 타입에 `Auth...` 같은 축약 접두어 적용 | 소속 표시만을 위한 일괄 축약은 책임을 설명하지 않습니다. |
 
 ## 10. 검토 체크리스트

@@ -168,19 +168,19 @@ even if a task names them; use the dedicated recording skill instead.
    - **Kubernetes/k8s**: `*.secret.yaml`, `secrets/`, `.kube/`, `kubeconfig*`, `*.key`, `*.crt`
 
 5. Parse tasks.md structure and extract:
-   - **패키지 단계**: `Domain`, `Data`, `Core`, `Composition`, `UI`, `Feature`, `App`
+   - **패키지 단계**: `Domain`, `Data`, `Infrastructure`, `Composition`, `UI`, `Feature`, `App`
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
    - **패키지 소유권**: 완료되지 않은 각 파일 변경 작업이 `tasks.md`에서 `Domain`, `Data`,
-     `Core`, `Composition`, `UI`, `Feature`, `App` 중 정확히 하나의 패키지 단계에 명시적으로
+     `Infrastructure`, `Composition`, `UI`, `Feature`, `App` 중 정확히 하나의 패키지 단계에 명시적으로
      배정됐는지 검증
 
    패키지 소유권을 경로나 설명에서 추론해 새로 배정하지 않는다. 소유권이 없거나 여러
    패키지에 걸친 작업, 별도 준비·기반·마무리 구현 단계가 있으면 파일을 수정하지 말고
    `/speckit-tasks`로 작업 목록을 갱신하도록 요청한 뒤 중단한다.
 
-   `Domain → Data → Core → Composition → UI → Feature → App` 순서에서 완료되지 않은 작업이
+   `Domain → Data → Infrastructure → Composition → UI → Feature → App` 순서에서 완료되지 않은 작업이
    있는 첫 패키지만 선택한다. 완료되지 않은 작업이 없는 패키지는 건너뛴다. 이번 실행에서는
    이후 적용 대상 패키지가 소유한 파일을 수정해서는 안 된다.
 
@@ -194,7 +194,7 @@ even if a task names them; use the dedicated recording skill instead.
 7. Implementation execution rules:
    - **패키지 준비 우선**: 선택한 패키지에 명시적으로 배정된 구조·의존성·구성 작업만 수행
    - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
-   - **Core development**: Implement models, services, CLI commands, endpoints
+   - **Infrastructure development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
    - **정리와 검증**: 선택한 패키지 소유 작업만 수행하고 전체 읽기 전용 검증은 마지막 적용
      대상 패키지 완료 뒤에만 수행

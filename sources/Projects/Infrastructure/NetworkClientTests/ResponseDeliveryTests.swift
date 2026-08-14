@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 @Suite("HTTPClient 응답 전달")
 struct ResponseDeliveryTests {
@@ -55,7 +55,7 @@ struct ResponseDeliveryTests {
 
     @Test
     func `빈 성공 본문은 본문 변환 규칙에 그대로 위임한다`() async throws {
-        // 204와 빈 바이트의 의미를 CoreHTTP가 고정하지 않고 호출자 규칙에 맡기는지 확인합니다.
+        // 204와 빈 바이트의 의미를 InfrastructureNetworkClient가 고정하지 않고 호출자 규칙에 맡기는지 확인합니다.
         let transport = RecordingTransport([.response(.init(statusCode: 204, headers: [:], body: Data()))])
         let client = HTTPClient(
             baseURL: try #require(URL(string: "https://api.example.com")),

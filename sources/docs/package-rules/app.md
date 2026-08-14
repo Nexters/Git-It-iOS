@@ -24,7 +24,7 @@ App은 여러 Feature의 navigation intent를 애플리케이션 수준의 화�
 
 - Domain의 비즈니스 규칙을 App에서 구현하거나 다시 판단해서는 안 됩니다.
 - Data 또는 Core의 구체 구현을 직접 생성하거나 사용해서는 안 됩니다.
-- Domain↔Data 또는 Data↔Core Adapter를 App에 구현해서는 안 됩니다.
+- Domain↔Data 또는 Data↔Infrastructure Adapter를 App에 구현해서는 안 됩니다.
 - Feature의 Presentation 상태나 화면 구현을 App에 옮겨서는 안 됩니다.
 - 공용 UI 구성요소를 소유하거나 UI 패키지에 직접 의존해서는 안 됩니다.
 - Service Locator나 전역 dependency container를 통해 Feature dependency를 조회하게 해서는 안 됩니다.

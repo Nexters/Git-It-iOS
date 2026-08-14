@@ -1,9 +1,9 @@
 import Foundation
 import Testing
 
-@testable import CoreAuthentication
+@testable import InfrastructureAuthentication
 
-@Suite("Core 민감 값 비노출")
+@Suite("Infrastructure 민감 값 비노출")
 struct SensitiveValueExposureTests {
     @Test
     func `Apple credential nonce state와 Keychain 값이 설명 문자열에 포함되지 않는다`() {

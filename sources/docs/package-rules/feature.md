@@ -12,7 +12,7 @@ Feature는 Domain이 제공하는 비즈니스 기능을 사용하고 UI가 제�
 
 ## 정책
 
-- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 사용자 기능과 Presentation 책임을 드러내고 Data·Core 또는 production 구현 문맥을 노출해서는 안 됩니다.
+- 공개 이름은 [네이밍 가이드](../naming.md)를 따르며 사용자 기능과 Presentation 책임을 드러내고 Data·Infrastructure 또는 production 구현 문맥을 노출해서는 안 됩니다.
 - 모든 내부 target은 하나 이상의 사용자 기능을 표현하는 화면, 상태, Action, Reducer 또는 Presentation 흐름을 소유해야 합니다.
 - 비즈니스 기능은 Domain이 제공하는 타입과 계약을 통해 사용해야 합니다.
 - 외부 Effect에 필요한 dependency는 initializer 또는 명시적인 초기화 인자로 주입받아야 합니다.

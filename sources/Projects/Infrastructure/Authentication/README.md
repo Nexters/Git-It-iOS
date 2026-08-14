@@ -1,8 +1,8 @@
-# CoreAuthentication
+# InfrastructureAuthentication
 
-`CoreAuthentication`은 Apple 인증, Apple credential 상태, Keychain, 암호학적으로 안전한
+`InfrastructureAuthentication`은 Apple 인증, Apple credential 상태, Keychain, 암호학적으로 안전한
 난수를 프로젝트 소유 기술 API로 감쌉니다. 이 문서는
-`CoreAuthenticationTests`에서 직접 검증하는 동작만 설명합니다.
+`InfrastructureAuthenticationTests`에서 직접 검증하는 동작만 설명합니다.
 
 ## Apple 인증 시도와 credential
 
@@ -17,7 +17,7 @@
   만료되지 않았으며 identity token과 authorization code가 존재할 때만 credential을
   반환합니다.
 - `cancel(attemptID:)`는 일치하는 현재 시도를 제거하고 `cancelled` 오류를 반환합니다.
-- 일치하지 않는 콜백, 만료된 시도, 누락된 credential은 각각 Core 소유 오류로
+- 일치하지 않는 콜백, 만료된 시도, 누락된 credential은 각각 Infrastructure 소유 오류로
   구분됩니다.
 
 `AppleCredential`은 user ID, Apple 원시 credential 값, 선택적 이메일·이름, 요청한
@@ -26,7 +26,7 @@ scope를 표현합니다. Apple 프레임워크 타입은 provider 구현 안에
 
 ## Apple credential 상태
 
-`AppleCredentialStateProvider`는 Apple platform 상태를 Core 타입으로 변환합니다.
+`AppleCredentialStateProvider`는 Apple platform 상태를 Infrastructure 타입으로 변환합니다.
 
 - `authorized`, `revoked`, `notFound`, `transferred` 상태를 구분합니다.
 - 상태 조회가 실패하면 `temporarilyUnavailable`을 반환합니다.
@@ -75,11 +75,11 @@ scope를 표현합니다. Apple 프레임워크 타입은 provider 구현 안에
 
 ## 검증 근거
 
-- Apple 인증 시도와 credential 검증: `CoreAuthenticationTests/AppleAuthentication/AppleAuthorizationProviderTests.swift`
-- credential 상태와 stream: `CoreAuthenticationTests/AppleAuthentication/AppleCredentialStateProviderTests.swift`
-- Keychain CRUD·namespace·접근성: `CoreAuthenticationTests/Keychain/KeychainStoreTests.swift`
-- CSPRNG 출력과 오류: `CoreAuthenticationTests/RandomGenerator/SecureRandomGeneratorTests.swift`
-- 민감 값 비노출: `CoreAuthenticationTests/Security/SensitiveValueExposureTests.swift`
+- Apple 인증 시도와 credential 검증: `AuthenticationTests/AppleAuthentication/AppleAuthorizationProviderTests.swift`
+- credential 상태와 stream: `AuthenticationTests/AppleAuthentication/AppleCredentialStateProviderTests.swift`
+- Keychain CRUD·namespace·접근성: `AuthenticationTests/Keychain/KeychainStoreTests.swift`
+- CSPRNG 출력과 오류: `AuthenticationTests/RandomGenerator/SecureRandomGeneratorTests.swift`
+- 민감 값 비노출: `AuthenticationTests/Security/SensitiveValueExposureTests.swift`
 
 문서의 보장 범위는 위 테스트와 함께 변경해야 합니다. 테스트로 검증되지 않은 계획,
 구현 의도 또는 다른 타겟의 동작을 보장된 기능으로 추가하지 않습니다.

@@ -1,6 +1,6 @@
 import Foundation
 
-@testable import CoreHTTP
+@testable import InfrastructureNetworkClient
 
 // MARK: - TestPayload
 
@@ -23,7 +23,7 @@ enum StubBodyCodingError: Error {
 
 // MARK: - StubBodyCoding
 
-/// CoreHTTP가 특정 본문 형식을 소유하지 않는다는 계약을 검증하기 위한 호출자 측 JSON 구현입니다.
+/// InfrastructureNetworkClient가 특정 본문 형식을 소유하지 않는다는 계약을 검증하기 위한 호출자 측 JSON 구현입니다.
 /// 세 플래그로 인코딩 실패, 디코딩 실패, 빈 본문 허용을 독립적으로 구성합니다.
 struct StubBodyCoding: HTTPBodyCoding {
 

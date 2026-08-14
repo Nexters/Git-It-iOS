@@ -22,7 +22,7 @@ Constitution과 하위 문서가 충돌하면 하위 문서를 Constitution에 �
   Architecture), Tuist 기반 멀티 패키지 구조.
 - 실제 소스는 `sources/` 아래에만 있습니다. 저장소 루트의 `GitIt.xcworkspace`는
   `sources/GitIt.xcworkspace`를 가리키는 심볼릭 링크입니다.
-- 패키지: `App`, `Composition`, `Feature`, `Domain`, `Data`, `Core`, `UI`.
+- 패키지: `App`, `Composition`, `Feature`, `Domain`, `Data`, `Infrastructure`, `UI`.
   각 패키지의 책임과 허용 의존 방향은 [아키텍처 문서](sources/docs/architecture.md)의
   표를 따릅니다. Domain/Data/Core는 프로젝트 내부 패키지에 의존하지 않습니다.
 
@@ -71,13 +71,16 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 - **공개 이름은 책임과 필요한 최소 문맥을 드러냅니다.** 일괄 접두어·접미어·축약을
   적용하지 않고 외부 고정 명칭과 공급자 중립 경계를 구분하며, 세부 기준은
   [네이밍 가이드](sources/docs/naming.md)를 따릅니다.
+- **Target과 폴더 이름을 구분합니다.** target은 패키지 문맥을 포함할 수 있지만,
+  `sources/Projects/<패키지>/` 안의 source·test 폴더는 역할만 사용합니다. 새 target은
+  `sourceDirectory`를 명시해 target 이름의 패키지 접두어를 폴더에 반복하지 않습니다.
 - 패키지별 세부 규칙은 수정 전에 해당 문서를 확인합니다:
   [App](sources/docs/package-rules/app.md) ·
   [Composition](sources/docs/package-rules/composition.md) ·
   [Feature](sources/docs/package-rules/feature.md) ·
   [Domain](sources/docs/package-rules/domain.md) ·
   [Data](sources/docs/package-rules/data.md) ·
-  [Core](sources/docs/package-rules/core.md) ·
+  [Infrastructure](sources/docs/package-rules/infrastructure.md) ·
   [UI](sources/docs/package-rules/ui.md)
 - Swift 포맷팅은 빌드 시 Swift Style의 `FormatSwift` 플러그인이 자동 적용합니다.
   별도로 포맷 도구를 수동 실행할 필요는 없지만, staged 파일과 포맷 결과가 다르면
