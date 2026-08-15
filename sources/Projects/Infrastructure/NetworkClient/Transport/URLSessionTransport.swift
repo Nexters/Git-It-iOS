@@ -64,10 +64,11 @@ struct URLSessionTransport: HTTPTransport {
     // MARK: Private
 
     private let session: URLSession
+
 }
 
-private extension Duration {
-    var timeInterval: TimeInterval {
+extension Duration {
+    fileprivate var timeInterval: TimeInterval {
         let components = components
         return TimeInterval(components.seconds) + TimeInterval(components.attoseconds) / 1_000_000_000_000_000_000
     }

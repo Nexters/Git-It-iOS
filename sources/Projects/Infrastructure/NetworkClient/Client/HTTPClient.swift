@@ -37,19 +37,19 @@ public struct HTTPClient: Sendable {
 
     // MARK: Public
 
-    public static let defaultResponseTimeout: Duration = .seconds(15)
+    public static let defaultResponseTimeout = Duration.seconds(15)
 
     public func send<ResponseBody: Decodable & Sendable>(
         _ request: HTTPRequest,
-        expecting: ResponseBody.Type,
+        expecting _: ResponseBody.Type,
     ) async throws(HTTPClientError) -> HTTPResponse<ResponseBody> {
         try await send(request, encodedBody: { nil }, expecting: ResponseBody.self)
     }
 
-    public func send<RequestBody: Encodable & Sendable, ResponseBody: Decodable & Sendable>(
+    public func send<ResponseBody: Decodable & Sendable>(
         _ request: HTTPRequest,
-        body: RequestBody,
-        expecting: ResponseBody.Type,
+        body: some Encodable & Sendable,
+        expecting _: ResponseBody.Type,
     ) async throws(HTTPClientError) -> HTTPResponse<ResponseBody> {
         try await send(
             request,
@@ -70,7 +70,7 @@ public struct HTTPClient: Sendable {
     private func send<ResponseBody: Decodable & Sendable>(
         _ request: HTTPRequest,
         encodedBody: () throws -> Data?,
-        expecting: ResponseBody.Type,
+        expecting _: ResponseBody.Type,
     ) async throws(HTTPClientError) -> HTTPResponse<ResponseBody> {
         let requestURL = try urlBuilder.build(
             baseURL: baseURL,
@@ -147,4 +147,5 @@ public struct HTTPClient: Sendable {
             throw clientError
         }
     }
+
 }

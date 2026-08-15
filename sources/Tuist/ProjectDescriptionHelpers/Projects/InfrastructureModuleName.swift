@@ -7,6 +7,8 @@ enum InfrastructureModuleName: String {
     case InfrastructureAuthenticationTests
     case InfrastructureNetworkClient
     case InfrastructureNetworkClientTests
+    case InfrastructureCache
+    case InfrastructureCacheTests
 }
 
 extension InfrastructureModuleName {
@@ -36,6 +38,18 @@ extension InfrastructureModuleName {
             sourceDirectory: "NetworkClientTests",
             productionTarget: .target(
                 name: InfrastructureModuleName.InfrastructureNetworkClient.rawValue
+            ),
+        ),
+        .module(
+            name: InfrastructureModuleName.InfrastructureCache.rawValue,
+            sourceDirectory: "Cache",
+            dependencies: [],
+        ),
+        .testModule(
+            name: InfrastructureModuleName.InfrastructureCacheTests.rawValue,
+            sourceDirectory: "CacheTests",
+            productionTarget: .target(
+                name: InfrastructureModuleName.InfrastructureCache.rawValue
             ),
         ),
     ]

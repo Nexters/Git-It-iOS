@@ -25,4 +25,5 @@ public struct HTTPRequest: Sendable {
     public var queryItems: [QueryItem]
     public var headers: HTTPHeaders
     public var responseTimeout: Duration?
+
 }
