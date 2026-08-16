@@ -104,7 +104,7 @@ Load only the minimal necessary context from each artifact:
 - Overview/Context
 - Functional Requirements
 - Success Criteria (measurable outcomes — e.g., performance, security, availability, user success, business impact)
-- User Stories
+- Change Scenarios (including user, developer, operator, or integrating-system scenarios)
 - Edge Cases (if present)
 
 **From plan.md:**
@@ -131,8 +131,8 @@ Load only the minimal necessary context from each artifact:
 Create internal representations (do not include raw artifacts in output):
 
 - **Requirements inventory**: For each Functional Requirement (FR-###) and Success Criterion (SC-###), record a stable key. Use the explicit FR-/SC- identifier as the primary key when present, and optionally also derive an imperative-phrase slug for readability (e.g., "User can upload file" → `user-can-upload-file`). Include only Success Criteria items that require buildable work (e.g., load-testing infrastructure, security audit tooling), and exclude post-launch outcome metrics and business KPIs (e.g., "Reduce support tickets by 50%").
-- **User story/action inventory**: Discrete user actions with acceptance criteria
-- **Task coverage mapping**: Map each task to one or more requirements or stories (inference by keyword / explicit reference patterns like IDs or key phrases)
+- **Change scenario/action inventory**: Discrete stakeholder actions or system conditions with acceptance criteria
+- **Task coverage mapping**: Map each task to one or more requirements or change scenarios (inference by keyword / explicit reference patterns like IDs or key phrases)
 - **Constitution rule set**: Extract principle names and MUST/SHOULD normative statements
 
 ### 4. Detection Passes (Token-Efficient Analysis)
@@ -152,7 +152,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 #### C. Underspecification
 
 - Requirements with verbs but missing object or measurable outcome
-- User stories missing acceptance criteria alignment
+- Change scenarios missing acceptance criteria alignment
 - Tasks referencing files or components not defined in spec/plan
 
 #### D. Constitution Alignment
@@ -163,7 +163,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 #### E. Coverage Gaps
 
 - Requirements with zero associated tasks
-- Tasks with no mapped requirement/story
+- Tasks with no mapped requirement/change scenario
 - Success Criteria requiring buildable work (performance, security, availability) not reflected in tasks
 
 #### F. Inconsistency

@@ -1,12 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 1.6.0 → 1.6.1
-- Modified principles: 7. 패키지 단위 구현 진행 — 기술 경계 패키지명을 Core에서 Infrastructure로 변경
+- Version change: 1.6.1 → 2.0.0
+- Modified principles: 4. 스킬별 수정 경로 — 사용자에게 관찰되는 동작 변경으로 한정하던
+  Spec 작성 대상을 내부 품질·구조·운영·개발 경험 변경까지 허용하도록 재정의
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md, .specify/templates/tasks-template.md; ✅ 변경 불필요 .specify/templates/spec-template.md, checklist-template.md, constitution-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md, .agents/skills/speckit-tasks/SKILL.md, .agents/skills/speckit-implement/SKILL.md, .agents/skills/speckit-converge/SKILL.md; ✅ 변경 불필요 나머지 speckit 스킬
-- Runtime guidance requiring updates: ⚠ AGENTS.md와 sources/docs/**는 패키지 rename 구현에서 갱신
+- Templates requiring updates: ✅ .specify/templates/spec-template.md,
+  .specify/templates/tasks-template.md; ✅ 검토 후 변경 불필요
+  .specify/templates/plan-template.md, checklist-template.md, constitution-template.md
+- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md,
+  .agents/skills/speckit-analyze/SKILL.md, .agents/skills/speckit-clarify/SKILL.md,
+  .agents/skills/speckit-converge/SKILL.md, .agents/skills/speckit-tasks/SKILL.md,
+  .agents/skills/speckit-taskstoissues/SKILL.md; ✅ 검토 후 변경 불필요 나머지 speckit 스킬
+- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ 변경 불필요 README.md, sources/docs/**
 - Evidence records: 없음
 - Follow-up TODO: 없음
 -->
@@ -14,9 +20,9 @@ Sync Impact Report
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 1.6.1<br>
+**버전**: 2.0.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-15
+**최종 수정일**: 2026-08-17
 
 ## 원칙
 
@@ -60,8 +66,12 @@ Sync Impact Report
 - 하나의 변경은 한 스킬의 허용 경로 안에서 완료합니다. 다른 스킬의 산출물 또는
   허용되지 않은 경로가 필요하면 중단하고 적절한 스킬을 실행하거나 사용자 승인을
   받습니다.
-- 기능 명세는 사용자가 관찰할 수 있는 동작이 바뀌는 변경에만 작성합니다. 외부 동작이
-  없는 리팩터링, 스타일과 의존성 갱신에는 작성하지 않습니다.
+- 기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질, 구조, 운영성, 개발 경험,
+  스타일과 의존성 변경에도 작성할 수 있습니다. 외부 동작이 없다는 이유만으로 명세 작성을
+  금지하지 않습니다.
+- 명세 작성 여부는 변경의 위험, 범위, 협업 비용과 검증 필요성을 기준으로 결정합니다.
+  내부 변경의 명세는 최종 사용자 가치를 꾸며내지 않고 개발자, 운영자, 연동 시스템 등 실제
+  이해관계자와 검증 가능한 결과를 명시해야 합니다.
 
 ### 5. Spec-Kit 범위
 
