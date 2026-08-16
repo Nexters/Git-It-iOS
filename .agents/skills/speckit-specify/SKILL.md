@@ -95,6 +95,12 @@ other feature directory.
 
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
+Specifications are permitted for both user-visible behavior and non-user-visible changes such as
+internal quality, architecture, operations, developer experience, style, or dependency work. Do not
+reject a specification because no end-user behavior changes. For an internal change, identify the
+actual stakeholder (for example, a developer, operator, or integrating system), describe verifiable
+outcomes, and do not fabricate end-user value.
+
 Given that feature description, do this:
 
 1. **Generate or reuse the concise `SHORT_NAME`** (2-4 words) for the feature:
@@ -166,24 +172,28 @@ Given that feature description, do this:
     1. Parse user description from arguments
        If empty: ERROR "No feature description provided"
     2. Extract key concepts from description
-       Identify: actors, actions, data, constraints
+       Identify: stakeholders/actors, actions or system conditions, data, constraints
     3. For unclear aspects:
        - Make informed guesses based on context and industry standards
        - Only mark with [NEEDS CLARIFICATION: specific question] if:
-         - The choice significantly impacts feature scope or user experience
+         - The choice significantly impacts scope, safety, quality, operations, or stakeholder experience
          - Multiple reasonable interpretations exist with different implications
          - No reasonable default exists
        - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
-       - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
-    4. Fill User Scenarios & Testing section
-       If no clear user flow: ERROR "Cannot determine user scenarios"
+       - Prioritize clarifications by impact: scope > security/privacy > quality/operations > stakeholder experience > technical details
+    4. Fill Change Scenarios & Testing section
+       - For user-visible work, describe user journeys
+       - For internal work, describe developer/operator/integrating-system workflows or system conditions
+       If no independently testable change scenario can be determined: ERROR "Cannot determine change scenarios"
     5. Generate Functional Requirements
        Each requirement must be testable
        Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
     6. Define Success Criteria
-       Create measurable, technology-agnostic outcomes
-       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
-       Each criterion must be verifiable without implementation details
+       Create measurable outcomes focused on the required result rather than a chosen implementation
+       Include metrics appropriate to the actual stakeholder or system (time, performance, volume,
+       compatibility, reliability, operational effort, task completion, or satisfaction)
+       Preserve a named technology, contract, tool, or version only when it is itself an explicit constraint
+       Each criterion must be verifiable without requiring an unstated design choice
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 
@@ -206,9 +216,9 @@ Given that feature description, do this:
 
       ## 내용 품질
 
-      - [ ] 구현 세부 사항(언어, 프레임워크, API)이 없다
-      - [ ] 사용자 가치와 비즈니스 요구에 집중한다
-      - [ ] 비기술 이해관계자도 이해할 수 있게 작성했다
+      - [ ] 구현 방법이 아니라 필요한 결과와 고정 제약에 집중한다
+      - [ ] 실제 이해관계자 가치와 변경 목적에 집중한다
+      - [ ] 대상 이해관계자가 이해할 수 있게 작성했다
       - [ ] 모든 필수 섹션을 작성했다
 
       ## 요구사항 완전성
@@ -216,7 +226,7 @@ Given that feature description, do this:
       - [ ] [NEEDS CLARIFICATION] 표식이 남아 있지 않다
       - [ ] 요구사항이 검증 가능하고 모호하지 않다
       - [ ] 성공 기준이 측정 가능하다
-      - [ ] 성공 기준이 기술에 종속되지 않는다(구현 세부 사항 없음)
+      - [ ] 성공 기준이 결과 중심이며 불필요한 설계 선택에 종속되지 않는다
       - [ ] 모든 수용 시나리오를 정의했다
       - [ ] 예외·경계 사례를 식별했다
       - [ ] 범위를 명확히 한정했다
@@ -225,9 +235,9 @@ Given that feature description, do this:
       ## 기능 준비 상태
 
       - [ ] 모든 기능 요구사항에 명확한 수용 기준이 있다
-      - [ ] 사용자 시나리오가 핵심 흐름을 다룬다
+      - [ ] 변경 시나리오가 핵심 흐름 또는 시스템 조건을 다룬다
       - [ ] 기능이 성공 기준의 측정 가능한 결과를 충족한다
-      - [ ] 명세에 구현 세부 사항이 섞이지 않는다
+      - [ ] 명세에 계획 단계에서 결정할 설계 세부 사항이 섞이지 않는다
 
       ## 참고
 
@@ -335,9 +345,9 @@ and file creation are always handled by this core command. Never claim that a pl
 
 ## Quick Guidelines
 
-- Focus on **WHAT** users need and **WHY**.
-- Avoid HOW to implement (no tech stack, APIs, code structure).
-- Written for business stakeholders, not developers.
+- Focus on **WHAT** outcome or constraint is needed and **WHY**.
+- Avoid detailed HOW-to design unless a technology, API, contract, tool, or version is itself a fixed requirement.
+- Write for the actual stakeholder: end user, business owner, developer, operator, or integrating system.
 - DO NOT create any checklists that are embedded in the spec. That will be a separate command.
 
 ### Section Requirements
@@ -353,14 +363,14 @@ When creating this spec from a user prompt:
 1. **Make informed guesses**: Use context, industry standards, and common patterns to fill gaps
 2. **Document assumptions**: Record reasonable defaults in the Assumptions section
 3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers - use only for critical decisions that:
-   - Significantly impact feature scope or user experience
+   - Significantly impact scope, safety, quality, operations, or stakeholder experience
    - Have multiple reasonable interpretations with different implications
    - Lack any reasonable default
-4. **Prioritize clarifications**: scope > security/privacy > user experience > technical details
+4. **Prioritize clarifications**: scope > security/privacy > quality/operations > stakeholder experience > technical details
 5. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
 6. **Common areas needing clarification** (only if no reasonable default exists):
    - Feature scope and boundaries (include/exclude specific use cases)
-   - User types and permissions (if multiple conflicting interpretations possible)
+   - Stakeholder/actor types and permissions (if multiple conflicting interpretations possible)
    - Security/compliance requirements (when legally/financially significant)
 
 **Examples of reasonable defaults** (don't ask about these):
@@ -376,9 +386,10 @@ When creating this spec from a user prompt:
 Success criteria must be:
 
 1. **Measurable**: Include specific metrics (time, percentage, count, rate)
-2. **Technology-agnostic**: No mention of frameworks, languages, databases, or tools
-3. **User-focused**: Describe outcomes from user/business perspective, not system internals
-4. **Verifiable**: Can be tested/validated without knowing implementation details
+2. **Outcome-focused**: Describe the required result, not an arbitrary implementation approach
+3. **Stakeholder-focused**: Describe outcomes for the actual user, business, developer, operator, or system boundary
+4. **Constraint-aware**: Preserve named technology or version only when the change explicitly targets it
+5. **Verifiable**: Can be tested or reviewed without an unstated design choice
 
 **Good examples**:
 
@@ -386,13 +397,15 @@ Success criteria must be:
 - "System supports 10,000 concurrent users"
 - "95% of searches return results in under 1 second"
 - "Task completion rate improves by 40%"
+- "All existing public contract checks pass before and after the refactoring"
+- "Dependency update removes all findings associated with the superseded version"
 
 **Bad examples** (implementation-focused):
 
-- "API response time is under 200ms" (too technical, use "Users see results instantly")
-- "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
-- "React components render efficiently" (framework-specific)
-- "Redis cache hit rate above 80%" (technology-specific)
+- "Create three Swift helper types" (prescribes structure without a required outcome)
+- "Use Redis for caching" (selects a design without stating the required behavior)
+- "Refactor cleanly" (not measurable)
+- "Upgrade dependencies" (does not identify the target constraint or completion evidence)
 
 ## Done When
 

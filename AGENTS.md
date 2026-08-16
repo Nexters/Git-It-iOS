@@ -116,8 +116,10 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈만 생성 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
 
-기능 명세는 사용자가 관찰 가능한 동작이 바뀌는 변경에만 작성합니다. 외부 동작이
-없는 리팩터링·스타일·의존성 갱신에는 작성하지 않습니다. 전체 원칙은
+기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질·구조·운영·개발 경험,
+리팩터링·스타일·의존성 갱신에도 작성할 수 있습니다. 작성 여부는 변경의 위험·범위·협업
+비용과 검증 필요성으로 결정하며, 내부 변경은 최종 사용자 가치를 꾸며내지 않고 실제
+이해관계자와 검증 가능한 결과를 명시합니다. 전체 원칙은
 [Constitution](.specify/memory/constitution.md)을 참고합니다.
 
 <!-- init-speckit-ko:start -->

@@ -93,9 +93,9 @@ Execution steps:
 3. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
    Functional Scope & Behavior:
-   - Core user goals & success criteria
+   - Core stakeholder or system goals & success criteria
    - Explicit out-of-scope declarations
-   - User roles / personas differentiation
+   - Stakeholder/actor roles and system-boundary differentiation
 
    Domain & Data Model:
    - Entities, attributes, relationships
@@ -103,8 +103,8 @@ Execution steps:
    - Lifecycle/state transitions
    - Data volume / scale assumptions
 
-   Interaction & UX Flow:
-   - Critical user journeys / sequences
+   Interaction & Workflow:
+   - Critical user, developer, operator, or integrating-system journeys / sequences
    - Error/empty/loading states
    - Accessibility or localization notes
 
@@ -201,7 +201,7 @@ Execution steps:
     - 답변을 수락하면 즉시 `- 질문: <질문> → 답변: <최종 답변>` 형식의 항목을 추가한다.
     - Then immediately apply the clarification to the most appropriate section(s):
        - Functional ambiguity → Update or add a bullet in Functional Requirements.
-       - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
+       - Stakeholder interaction / actor distinction → Update Change Scenarios or Actors subsection (if present) with clarified role, constraint, or scenario.
        - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
        - Non-functional constraint → Add/modify measurable criteria in Success Criteria > Measurable Outcomes (convert vague adjective to metric or explicit target).
        - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
