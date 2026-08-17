@@ -64,15 +64,11 @@ extension UIModuleName {
         ),
         .testModule(
             name: UIModuleName.DesignSystemTests.rawValue,
-            dependencies: [
-                .target(name: UIModuleName.DesignSystem.rawValue)
-            ],
+            productionTarget: .target(name: UIModuleName.DesignSystem.rawValue),
         ),
         .testModule(
             name: UIModuleName.UIComponentTests.rawValue,
-            dependencies: [
-                .target(name: UIModuleName.UIComponent.rawValue)
-            ],
+            productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
         ),
     ]
 }
