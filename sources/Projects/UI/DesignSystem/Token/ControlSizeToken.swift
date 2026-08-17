@@ -14,5 +14,10 @@ public struct ControlSizeToken: Sendable, Equatable {
 }
 
 extension ControlSizeToken {
-    public static let all = [ControlSizeToken]()
+    public static let action = ControlSizeToken(
+        name: "Action",
+        value: 54,
+    )
+
+    public static let all: [ControlSizeToken] = [action]
 }

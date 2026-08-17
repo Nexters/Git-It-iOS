@@ -15,6 +15,7 @@ struct DesignTokenSetIntegrityTests {
     func `카테고리 내부에 같은 이름의 토큰이 있으면 중복으로 감지된다`() {
         let duplicated = DesignTokenSet(
             colors: [ColorToken.blue500, ColorToken.blue500],
+            semanticColors: [],
             gradients: [],
             fontFamilies: [],
             textStyles: [],
@@ -65,6 +66,7 @@ struct DesignTokenSetIntegrityTests {
         )
         let invalidSet = DesignTokenSet(
             colors: [],
+            semanticColors: [],
             gradients: [invalidGradient],
             fontFamilies: [],
             textStyles: [],
@@ -89,6 +91,7 @@ struct DesignTokenSetIntegrityTests {
     func `제어 크기 값이 44 미만이면 값 범위 오류로 감지된다`() {
         let invalidSet = DesignTokenSet(
             colors: [],
+            semanticColors: [],
             gradients: [],
             fontFamilies: [],
             textStyles: [],
@@ -113,9 +116,42 @@ struct DesignTokenSetIntegrityTests {
     }
 
     @Test
+    func `SemanticColorToken이 존재하지 않는 색상 이름을 참조하면 참조 무결성 오류로 감지된다`() {
+        let invalidSet = DesignTokenSet(
+            colors: [ColorToken.blue500],
+            semanticColors: [SemanticColorToken(
+                name: "Broken",
+                colorToken: ColorToken(
+                    name: "NotARealColor",
+                    group: .state,
+                    hex: "#000000",
+                ),
+            )],
+            gradients: [],
+            fontFamilies: [],
+            textStyles: [],
+            layouts: [],
+            opacities: [],
+            cornerRadii: [],
+            borders: [],
+            effects: [],
+            controlSizes: [],
+        )
+        let errors = invalidSet.validate()
+        #expect(errors.contains {
+            if case .danglingReference = $0 {
+                true
+            } else {
+                false
+            }
+        })
+    }
+
+    @Test
     func `BorderToken이 존재하지 않는 색상 이름을 참조하면 참조 무결성 오류로 감지된다`() {
         let invalidSet = DesignTokenSet(
             colors: [ColorToken.blue500],
+            semanticColors: [],
             gradients: [],
             fontFamilies: [],
             textStyles: [],

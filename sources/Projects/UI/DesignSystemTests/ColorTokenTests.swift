@@ -57,8 +57,9 @@ struct ColorTokenTests {
     }
 
     @Test
-    func `불투명도 포함 흰색·검정 토큰 4종이 명세 값과 일치한다`() {
+    func `불투명도 포함 흰색·검정 토큰 5종이 명세 값과 일치한다`() {
         let expected: [(String, String, Double)] = [
+            ("white 5", "#FFFFFF", 5),
             ("white 15", "#FFFFFF", 15),
             ("white 30", "#FFFFFF", 30),
             ("white 70", "#FFFFFF", 70),
@@ -73,9 +74,11 @@ struct ColorTokenTests {
     }
 
     @Test
-    func `상태 색상 토큰 3종이 명세 값과 일치한다`() {
+    func `상태 색상 토큰 5종이 명세 값과 일치한다`() {
         let expected: [(String, String)] = [
             ("Error", "#FF3721"),
+            ("Correct", "#3E85FF"),
+            ("Incorrect", "#FF5656"),
             ("Caution", "#ECBD23"),
             ("Success", "#249900"),
         ]
@@ -87,8 +90,8 @@ struct ColorTokenTests {
     }
 
     @Test
-    func `색상 토큰 총 개수는 24개다`() {
-        #expect(ColorToken.all.count == 24)
+    func `색상 토큰 총 개수는 27개다`() {
+        #expect(ColorToken.all.count == 27)
     }
 
 }
