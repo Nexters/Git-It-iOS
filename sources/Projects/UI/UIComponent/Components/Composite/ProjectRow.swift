@@ -108,19 +108,16 @@ public struct ProjectRow<Thumbnail: View>: View {
             )
         }
     }
+    
+    private enum Constant {
+        static var thumbnailSize: CGFloat { 60 }
+        static var thumbnailSpacing: CGFloat { 14 }
+        static var titleSpacing: CGFloat { 2 }
+        static var minimumTrailingSpacing: CGFloat { 4 }
+        static var setSpacing: CGFloat { 10 }
+        static var contentPadding: CGFloat { 16 }
+    }
 
-}
-
-// MARK: - Constant
-
-/// 제네릭 타입은 static 저장 프로퍼티를 소유할 수 없으므로 파일 범위에 둡니다.
-private enum Constant {
-    static let thumbnailSize: CGFloat = 60
-    static let thumbnailSpacing: CGFloat = 14
-    static let titleSpacing: CGFloat = 2
-    static let minimumTrailingSpacing: CGFloat = 4
-    static let setSpacing: CGFloat = 10
-    static let contentPadding: CGFloat = 16
 }
 
 #Preview("Project Row") {

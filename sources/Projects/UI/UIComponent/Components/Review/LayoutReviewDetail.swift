@@ -67,19 +67,16 @@ public struct LayoutReviewDetail<Content: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var revealPadding: CGFloat { 12 }
+    }
+
     private let viewModel: ViewModel
     private let onClose: () -> Void
     private let onSelectVariant: (String) -> Void
     private let onSetReviewChromeVisibility: (Bool) -> Void
     private let content: Content
 
-}
-
-// MARK: - Constant
-
-/// 제네릭 타입은 static 저장 프로퍼티를 소유할 수 없으므로 파일 범위에 둡니다.
-private enum Constant {
-    static let revealPadding: CGFloat = 12
 }
 
 #Preview("Layout Review Detail") {

@@ -33,11 +33,23 @@ public struct EmptyState<Illustration: View>: View {
     public var body: some View {
         VStack(spacing: LayoutToken.margin.cgFloatValue) {
             illustration
-                .frame(width: Constant.illustrationSize, height: Constant.illustrationSize)
+                .frame(
+                    width: Constant.illustrationSize,
+                    height: Constant.illustrationSize
+                )
 
             VStack(spacing: Constant.textSpacing) {
-                StyledText.subtitle1(viewModel.title, alignment: .center)
-                StyledText.body2(viewModel.message, color: .grey400, alignment: .center)
+                StyledText
+                    .subtitle1(
+                        viewModel.title,
+                        alignment: .center
+                    )
+                StyledText
+                    .body2(
+                        viewModel.message,
+                        color: .grey400,
+                        alignment: .center
+                    )
             }
             .frame(maxWidth: Constant.textMaxWidth)
         }
@@ -47,25 +59,26 @@ public struct EmptyState<Illustration: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var illustrationSize: CGFloat { 128 }
+        static var textSpacing: CGFloat { 8 }
+        static var textMaxWidth: CGFloat { 320 }
+    }
+
     private let viewModel: ViewModel
     private let illustration: Illustration
 
 }
 
-// MARK: - Constant
-
-/// 제네릭 타입은 static 저장 프로퍼티를 소유할 수 없으므로 파일 범위에 둡니다.
-private enum Constant {
-    static let illustrationSize: CGFloat = 128
-    static let textSpacing: CGFloat = 8
-    static let textMaxWidth: CGFloat = 320
-}
-
 #Preview("Empty State") {
     EmptyState(
         viewModel: .init(
-            title: "Nothing saved yet.",
-            message: "아직 저장한 항목이 없습니다.\n다시 확인할 내용을 저장해 보세요.",
+            title: "projects = []",
+            message:
+            """
+            아직 저장한 항목이 없습니다.
+            다시 확인할 내용을 저장해 보세요.
+            """,
         )
     ) {
         ResourceImage(viewModel: .init(asset: .emptyState))

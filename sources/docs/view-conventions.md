@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-17
 
-**최종 수정일**: 2026-08-18 (3차)
+**최종 수정일**: 2026-08-18 (4차)
 
 이 문서는 UI 패키지의 재사용 컴포넌트와 Feature 패키지의 화면이 **공통으로** 지켜야
 하는 구현 컨벤션을 정의합니다. 두 패키지에 걸쳐 있어 한쪽 패키지 규칙 문서에만 두면
@@ -272,7 +272,7 @@ DesignSystem의 토큰 적용 API인 `Text.designSystemStyled(_:style:)`과
 ### 5.1 `Constant`
 
 상태와 무관한 수치, 정적 문자열, 플레이스홀더는 case 없는 `private enum Constant`의
-`static let`으로 정의합니다.
+`static` 멤버로 정의합니다. 비제네릭 View는 `static let` 저장 프로퍼티를 사용합니다.
 
 ```swift
 private enum Constant {
@@ -282,8 +282,25 @@ private enum Constant {
 }
 ```
 
-- `Constant`는 case, 인스턴스 멤버, `static var`, 연산 프로퍼티를 소유하지 않습니다.
-- `ViewModel`에 따라 달라지는 값은 상수가 아니므로 private 연산 프로퍼티로 표현합니다.
+**제네릭 View는 `static var` 연산 프로퍼티로 정의합니다.** Swift는 제네릭 타입에
+`static` 저장 프로퍼티를 허용하지 않으므로 `SheetSurface<Content>`처럼 제네릭
+파라미터를 갖는 View에서는 `static let`이 컴파일되지 않습니다. 이때 `Constant`를 파일
+최상위로 꺼내지 않고 리터럴을 반환하는 `static var`로 형태만 바꿔 View 안에 둡니다.
+
+```swift
+public struct SheetSurface<Content: View>: View {
+    private enum Constant {
+        static var grabberWidth: CGFloat { 48 }
+        static var grabberHeight: CGFloat { 4 }
+    }
+}
+```
+
+- `Constant`는 case와 인스턴스 멤버를 소유하지 않습니다.
+- `static var`는 제네릭 제약을 피하기 위한 형태이므로 리터럴만 반환하고 값을 계산하지
+  않습니다. 계산이 필요한 순간 그 값은 상수가 아닙니다.
+- `ViewModel`에 따라 달라지는 값은 상수가 아니므로 `Constant`가 아니라 View의 private
+  연산 프로퍼티로 표현합니다.
 - 여러 타입이 공유하는 값은 `Constant`에 복제하지 않고 §4.3에 따라 토큰으로 승격합니다.
 
 다음은 상수로 승격하지 않습니다.
@@ -372,14 +389,15 @@ Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는
 - 프로토콜은 타입에 중첩할 수 없습니다.
 - 제네릭 타입에 중첩한 타입은 제네릭 인자마다 다른 타입이 되어 호출부가
   `TabShell<A, B>.Item`처럼 인자를 적어야 합니다.
-- Swift는 제네릭 타입에 `static` 저장 프로퍼티를 허용하지 않으므로
-  `ScreenContainer<Content>`처럼 제네릭 파라미터를 갖는 View는 `Constant`를 중첩할 수
-  없습니다.
 
-해당하는 선언만 같은 파일의 최상위에 두고 이름에 소유 View를 남깁니다(`TabShellItem`,
-파일 최상위 `private enum Constant`). 이때도 나머지 규칙 — case 없는 열거형,
-`static let`, 변형 값의 소유 위치 — 은 동일하게 지킵니다. 예외는 중첩할 수 없는 선언
-하나에만 적용하며 같은 View의 다른 선언까지 최상위로 꺼내지 않습니다.
+해당하는 선언만 같은 파일의 최상위에 두고 이름에 소유 View를 남깁니다(`TabShellItem`).
+이때도 나머지 규칙 — 변형 값의 소유 위치, 접근 수준 — 은 동일하게 지킵니다. 예외는
+중첩할 수 없는 선언 하나에만 적용하며 같은 View의 다른 선언까지 최상위로 꺼내지
+않습니다.
+
+**제네릭 View의 `Constant`는 이 예외가 아닙니다.** `static` 저장 프로퍼티 제약은
+§5.1에 따라 `static var` 연산 프로퍼티로 해소하므로 `Constant`는 제네릭 View에서도
+중첩합니다.
 
 반대로 보조 타입을 중첩하려고 View를 제네릭으로 두지 않는 선택도 가능합니다.
 `ScreenHeader`는 아바타 슬롯을 `AnyView`로 지워 비제네릭을 유지합니다.
@@ -479,7 +497,8 @@ Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는
 - [ ] 최상위로 꺼낸 선언이 §5.4의 중첩 불가 사유에 해당하는가?
 - [ ] 중첩 타입 이름이 소유 View 이름을 반복하지 않는가?
 - [ ] 이름 없이 의미가 드러나지 않는 수치가 `Constant`에 있는가?
-- [ ] `Constant`에 case, `static var`, 연산 프로퍼티가 없는가?
+- [ ] `Constant`에 case와 인스턴스 멤버가 없고 멤버가 리터럴만 반환하는가?
+- [ ] 제네릭 View의 `Constant`가 파일 최상위가 아니라 View 안에 `static var`로 있는가?
 - [ ] 변형별 표현 값을 View가 아니라 `Style`이 소유하는가?
 - [ ] 화면 안에 별도 `View` 타입을 정의하지 않았는가?
 - [ ] 화면이 `preferredColorScheme`을 다시 지정하지 않는가?

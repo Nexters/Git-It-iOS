@@ -72,22 +72,19 @@ public struct SelectionCard<Thumbnail: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var thumbnailSize: CGFloat { 52 }
+        static var thumbnailSpacing: CGFloat { 16 }
+        static var titleSpacing: CGFloat { 4 }
+        static var badgeSpacing: CGFloat { 6 }
+        static var contentPadding: CGFloat { 14 }
+        static var minimumHeight: CGFloat { 80 }
+        static var borderWidth: CGFloat { 1 }
+    }
+
     private let viewModel: ViewModel
     private let thumbnail: Thumbnail
 
-}
-
-// MARK: - Constant
-
-/// 제네릭 타입은 static 저장 프로퍼티를 소유할 수 없으므로 파일 범위에 둡니다.
-private enum Constant {
-    static let thumbnailSize: CGFloat = 52
-    static let thumbnailSpacing: CGFloat = 16
-    static let titleSpacing: CGFloat = 4
-    static let badgeSpacing: CGFloat = 6
-    static let contentPadding: CGFloat = 14
-    static let minimumHeight: CGFloat = 80
-    static let borderWidth: CGFloat = 1
 }
 
 #Preview("Selection Card") {

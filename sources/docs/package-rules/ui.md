@@ -130,9 +130,10 @@ UI 패키지는 범용 시각 요소뿐 아니라 제품 고유의 표현 의미
 [View 컨벤션 §3](../view-conventions.md#3-공개-생성-경로)을 따릅니다.
 
 컴포넌트 로컬 상수는 컴포넌트에 중첩된 `private enum Constant` 네임스페이스 안에
-`static let` 저장 프로퍼티로만 정의합니다. 승격 기준은
-[View 컨벤션 §5.1](../view-conventions.md#51-constant), 제네릭 컴포넌트처럼 중첩할 수
-없는 경우는 [§5.4](../view-conventions.md#54-중첩할-수-없는-경우)를 따릅니다.
+정의합니다. 비제네릭 컴포넌트는 `static let` 저장 프로퍼티를, 제네릭 컴포넌트는
+`static` 저장 프로퍼티를 가질 수 없으므로 리터럴을 반환하는 `static var` 연산
+프로퍼티를 사용합니다. 승격 기준과 두 형태의 규칙은
+[View 컨벤션 §5.1](../view-conventions.md#51-constant)을 따릅니다.
 
 ```swift
 public struct TagBadge: View {

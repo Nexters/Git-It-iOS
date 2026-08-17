@@ -40,19 +40,16 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var grabberWidth: CGFloat { 48 }
+        static var grabberHeight: CGFloat { 4 }
+        static var grabberTopPadding: CGFloat { 8 }
+        static var grabberBottomPadding: CGFloat { 22 }
+        static var bottomPadding: CGFloat { 24 }
+    }
+
     private let content: Content
 
-}
-
-// MARK: - Constant
-
-/// 제네릭 타입은 static 저장 프로퍼티를 소유할 수 없으므로 파일 범위에 둡니다.
-private enum Constant {
-    static let grabberWidth: CGFloat = 48
-    static let grabberHeight: CGFloat = 4
-    static let grabberTopPadding: CGFloat = 8
-    static let grabberBottomPadding: CGFloat = 22
-    static let bottomPadding: CGFloat = 24
 }
 
 #Preview("Sheet Surface") {
