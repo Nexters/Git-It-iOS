@@ -105,6 +105,12 @@ extension TextStyleToken {
         size: 10,
         lineHeightPercent: 150,
     )
+    public static let tabItem = TextStyleToken(
+        name: "Tab Item",
+        weight: .regular,
+        size: 10,
+        lineHeightPercent: 150,
+    )
 
     public static let all: [TextStyleToken] = [
         headline1,
@@ -117,5 +123,6 @@ extension TextStyleToken {
         body3,
         caption1,
         caption2,
+        tabItem,
     ]
 }

@@ -32,6 +32,19 @@ extension ColorToken {
 }
 
 extension ColorToken {
+    public static let clear = ColorToken(
+        name: "Clear",
+        group: .opacity,
+        hex: "#000000",
+        opacityPercent: 0,
+    )
+
+    public static let white = ColorToken(
+        name: "White",
+        group: .opacity,
+        hex: "#FFFFFF",
+    )
+
     public static let blue500 = ColorToken(
         name: "Blue500",
         group: .blue,
@@ -120,6 +133,12 @@ extension ColorToken {
         hex: "#FFFFFF",
     )
 
+    public static let white5 = ColorToken(
+        name: "white 5",
+        group: .opacity,
+        hex: "#FFFFFF",
+        opacityPercent: 5,
+    )
     public static let white15 = ColorToken(
         name: "white 15",
         group: .opacity,
@@ -150,6 +169,16 @@ extension ColorToken {
         group: .state,
         hex: "#FF3721",
     )
+    public static let correct = ColorToken(
+        name: "Correct",
+        group: .state,
+        hex: "#3E85FF",
+    )
+    public static let incorrect = ColorToken(
+        name: "Incorrect",
+        group: .state,
+        hex: "#FF5656",
+    )
     public static let caution = ColorToken(
         name: "Caution",
         group: .state,
@@ -162,6 +191,8 @@ extension ColorToken {
     )
 
     public static let all: [ColorToken] = [
+        clear,
+        white,
         blue500,
         blue400,
         blue300,
@@ -179,11 +210,14 @@ extension ColorToken {
         grey300,
         grey200,
         grey100,
+        white5,
         white15,
         white30,
         white70,
         black70,
         error,
+        correct,
+        incorrect,
         caution,
         success,
     ]

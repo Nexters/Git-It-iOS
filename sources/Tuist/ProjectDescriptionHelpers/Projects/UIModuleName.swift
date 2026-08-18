@@ -51,9 +51,14 @@ extension UIModuleName {
         DesignSystemFontFamily.allCases.flatMap(\.resourceFileElements),
     )
 
+    private static let uiComponentImageResources: ResourceFileElements = .resources(
+        [.glob(pattern: "UIComponent/Resources/**")],
+    )
+
     static let targets: [Target] = [
         .module(
             name: UIModuleName.UIComponent.rawValue,
+            resources: Self.uiComponentImageResources,
             dependencies: [
                 .target(name: UIModuleName.DesignSystem.rawValue)
             ],
@@ -64,15 +69,11 @@ extension UIModuleName {
         ),
         .testModule(
             name: UIModuleName.DesignSystemTests.rawValue,
-            dependencies: [
-                .target(name: UIModuleName.DesignSystem.rawValue)
-            ],
+            productionTarget: .target(name: UIModuleName.DesignSystem.rawValue),
         ),
         .testModule(
             name: UIModuleName.UIComponentTests.rawValue,
-            dependencies: [
-                .target(name: UIModuleName.UIComponent.rawValue)
-            ],
+            productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
         ),
     ]
 }

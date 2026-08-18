@@ -8,6 +8,14 @@ extension View {
     public func designSystemBackground(_ token: ColorToken) -> some View {
         background(Color(designSystem: token))
     }
+
+    public func designSystemForeground(_ token: SemanticColorToken) -> some View {
+        designSystemForeground(token.colorToken)
+    }
+
+    public func designSystemBackground(_ token: SemanticColorToken) -> some View {
+        designSystemBackground(token.colorToken)
+    }
 }
 
 extension Color {
@@ -16,6 +24,10 @@ extension Color {
             designSystemHex: token.hex,
             opacityPercent: token.opacityPercent,
         )
+    }
+
+    public init(designSystem token: SemanticColorToken) {
+        self.init(designSystem: token.colorToken)
     }
 
     init(

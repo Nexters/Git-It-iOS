@@ -77,7 +77,10 @@ extension ProjectName {
 
             case .UI:
                 [
-                    .module(name: "DesignSystem"),
+                    .module(
+                        name: "DesignSystem",
+                        testTarget: "DesignSystemTests",
+                    ),
                     .module(name: "UIComponent"),
                 ]
             }

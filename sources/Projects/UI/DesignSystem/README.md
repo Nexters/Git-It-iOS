@@ -9,20 +9,30 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 
 | 카테고리 | 파일 | 원천 |
 | --- | --- | --- |
-| 색상 | `ColorToken.swift` | `specs/002-design-token-system` FR-005~FR-007 (24종) |
+| 색상 | `ColorToken.swift` | `specs/002-design-token-system` FR-005~FR-007 + Figma 추가분 (25종) |
+| 역할 색상 | `SemanticColorToken.swift` | 화면에서 반복되는 역할에 원시 색상을 연결 (9종) |
 | 그라데이션 | `GradientToken.swift` | 같은 명세 FR-008·FR-008a (3종) |
 | 글꼴 패밀리 | `FontFamilyToken.swift` | 같은 명세 FR-010 |
 | 텍스트 스타일 | `TextStyleToken.swift` | 같은 명세 FR-009 (10종) |
 | 레이아웃 | `LayoutToken.swift` | 같은 명세 FR-013 (`Margin`, `Gutter`) |
-| 불투명도 | `OpacityToken.swift` | `specs/003-common-ui-components` FR-007 (Figma 확인 대기, 현재 비어 있음) |
-| 모서리 | `CornerRadiusToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
-| 선 | `BorderToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
-| 효과 | `EffectToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
-| 제어 크기 | `ControlSizeToken.swift` | 같은 명세 FR-007 (Figma 확인 대기, 현재 비어 있음) |
+| 불투명도 | `OpacityToken.swift` | Figma 확인 대기, 현재 비어 있음 |
+| 모서리 | `CornerRadiusToken.swift` | Figma 컴포넌트 실측 (6종) |
+| 선 | `BorderToken.swift` | Figma 확인 대기, 현재 비어 있음 |
+| 효과 | `EffectToken.swift` | Figma 확인 대기, 현재 비어 있음 |
+| 제어 크기 | `ControlSizeToken.swift` | Figma 컴포넌트 실측 (`Action` 54pt) |
 
-`DesignTokenSet.current`가 위 10개 카테고리를 취합한 유일한 토큰 집합입니다.
+`DesignTokenSet.current`가 위 11개 카테고리를 취합한 유일한 토큰 집합입니다.
 `DesignTokenSet.validate()`로 화면 렌더링 없이 이름 유일성·값 범위·참조 무결성을 검사할
-수 있습니다.
+수 있습니다. `SemanticColorToken`과 `BorderToken`·`EffectToken`이 참조하는 색상 이름이
+`ColorToken.all`에 없으면 참조 무결성 오류로 보고합니다.
+
+### 원시 색상과 역할 색상
+
+`ColorToken`은 팔레트 위치(`grey600`, `blue100`)를, `SemanticColorToken`은 화면에서의
+역할(`cardBackground`, `brandAccent`)을 표현합니다. 역할이 바뀌면 참조하는 원시 토큰만
+교체하면 되도록 두 계층을 분리했으며, 정의 기준은
+[View 컨벤션 §4.1](../../../docs/view-conventions.md#41-의미-색상은-designsystem이-소유합니다)을
+따릅니다. 적용 API는 두 타입의 오버로드를 모두 제공하므로 호출 형태는 같습니다.
 
 ## 적용 계층
 
@@ -33,13 +43,16 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 | --- | --- |
 | `Text.designSystemStyled(_:style:)` | `TextStyleToken` — 글꼴·굵기·크기·자간을 한 번에 적용, 문자 단위 한글/영문 글꼴 전환 |
 | `View.designSystemLineSpacing(_:)` | `TextStyleToken` — 행간 백분율을 SwiftUI 줄 간격으로 변환하는 유일한 지점 |
-| `View.designSystemForeground(_:)` / `designSystemBackground(_:)` | `ColorToken` |
-| `View.designSystemBackground(_:)` (`GradientToken` 오버로드) | `GradientToken` |
+| `View.designSystemForeground(_:)` / `designSystemBackground(_:)`, `Color(designSystem:)` | `ColorToken` · `SemanticColorToken` |
+| `View.designSystemBackground(_:)` (`GradientToken` 오버로드), `LinearGradient(designSystem:)` | `GradientToken` |
 | `LayoutToken.cgFloatValue`, `View.designSystemScreenMargin(_:)` | `LayoutToken` |
-| `View.designSystemCornerRadius(_:)` | `CornerRadiusToken` |
+| `View.designSystemCornerRadius(_:)`, `RoundedRectangle(designSystem:)`, `UnevenRoundedRectangle(designSystemTopCorners:)` | `CornerRadiusToken` |
 | `View.designSystemBorder(_:)` | `BorderToken` |
 | `View.designSystemEffect(_:)` | `EffectToken` |
-| `View.designSystemControlSize(_:)` | `ControlSizeToken` |
+| `View.designSystemControlSize(_:)` / `designSystemControlHeight(_:)` | `ControlSizeToken` |
+
+`in:` 인자로 도형을 넘기는 위치는 `RoundedRectangle(designSystem:)`을 사용해
+`clipShape` 경로와 같은 토큰을 참조합니다.
 
 `Font/`에 번들된 Noto Sans KR·Plus Jakarta Sans 정적 TTF(Regular/Medium/Bold)는
 `FontRegistration.registerBundledFonts`가 프로세스 스코프에 1회 등록하며,
@@ -49,5 +62,9 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 
 - 사용처는 원시 색상 값·글꼴 이름·수치를 직접 기재하지 않고 토큰 이름으로만 참조합니다.
 - 현재 토큰 집합은 `DesignTokenSet.current` 하나뿐이며, 임의의 팔레트를 주입할 수 없습니다.
-- 신규 토큰(불투명도·모서리·선·효과·제어 크기)은 Figma 확인 전까지 비어 있습니다. 값이
-  채워지기 전에는 해당 적용 모디파이어를 호출하는 소비 코드를 추가하지 마세요.
+- 화면에서 반복되는 역할에는 원시 `ColorToken` 대신 `SemanticColorToken`을 사용하고,
+  `UIComponent`나 `Feature`에서 `extension Color`로 두 번째 시각 어휘를 만들지 않습니다.
+- 아직 비어 있는 토큰(불투명도·선·효과)은 Figma 확인 전까지 값이 없습니다. 값이 채워지기
+  전에는 해당 적용 모디파이어를 호출하는 소비 코드를 추가하지 마세요.
+- `ControlSizeToken`은 `validate()`에서 44pt 미만을 오류로 판정합니다. 더 작은 터치 대상은
+  토큰이 아니라 컴포넌트 로컬 상수로 두고 `contentShape`으로 44pt를 확보합니다.
