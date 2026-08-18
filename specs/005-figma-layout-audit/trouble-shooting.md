@@ -247,3 +247,45 @@ XCTest 생명주기에서 테스트용 객체를 재할당하더라도 IUO 대�
 ### 연결
 
 TS-20260819-003
+
+## TS-20260819-007: PR 검증에서 기본 Simulator 데이터 누락 재발
+
+**기록일**: 2026-08-19
+**상태**: 완화
+**발생 단계**: PR 생성 전 전체 회귀 검증
+**관련 항목**: T017, 커밋 `bdc150c`, TS-20260819-003
+
+### 증상
+
+공용 project runner의 `build`와 `compile`은 성공했지만 기본 이름 기반 `iPhone 17 Pro` destination으로 `test`를 실행하자 모든 testable scheme이 앱 또는 test runner를 시작하지 못했다.
+
+### 영향
+
+제품 코드 실패와 Simulator 등록 상태 오류를 분리하기 전에는 PR의 전체 테스트 성공을 확인할 수 없었다.
+
+### 근거
+
+- 공용 runner `build`: 12/12 성공.
+- 공용 runner `compile`: 9/9 성공.
+- 공용 runner `test`: `Unable to boot device because it cannot be located on disk`와 누락된 `iPhone 17 Pro` data 경로를 보고했다.
+- `xcrun simctl list devices`: 이름 기반 destination이 선택한 `iPhone 17 Pro`는 등록돼 있지만 data가 없고, 별도의 `default` Simulator는 Booted 상태였다.
+
+### 원인
+
+TS-20260819-003과 동일하게 Xcode에 등록된 이름 기반 `iPhone 17 Pro` 레코드와 실제 디스크 데이터가 불일치했다. 기본 Simulator 등록 자체의 복구는 수행하지 않았다.
+
+### 조치
+
+부팅된 `default` Simulator의 UUID를 `GIT_IT_TEST_DESTINATION='platform=iOS Simulator,id=<booted-device>'`로 지정해 공용 runner의 `test`를 다시 실행했다.
+
+### 검증
+
+- `GIT_IT_TEST_DESTINATION='platform=iOS Simulator,id=<booted-device>' <project-build-runner> test`: 9개 testable scheme 모두 성공.
+
+### 재발 방지
+
+이름 기반 기본 destination에서 data 누락 오류가 발생하면 코드나 scheme을 수정하기 전에 `simctl list devices`로 실제 부팅 가능한 기기를 확인하고 UUID 기반 destination으로 검증한다. 기본 `iPhone 17 Pro` 등록을 삭제·재생성하기 전까지 이름 기반 실행은 신뢰하지 않는다.
+
+### 연결
+
+TS-20260819-003
