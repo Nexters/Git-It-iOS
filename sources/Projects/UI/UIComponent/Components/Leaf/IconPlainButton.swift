@@ -50,22 +50,32 @@ public struct IconPlainButton: View {
 
     public var body: some View {
         Button(action: action) {
-            Image(viewModel.symbol, bundle: .module)
-                .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .designSystemForeground(viewModel.tintColor)
-                .frame(width: viewModel.iconSize, height: viewModel.iconSize)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ZStack {
+                Image(viewModel.symbol, bundle: .module)
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .designSystemForeground(viewModel.tintColor)
+                    .frame(width: viewModel.iconSize, height: viewModel.iconSize)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .frame(width: viewModel.size, height: viewModel.size)
+            .background(Color(designSystem: viewModel.backgroundColor), in: Circle())
+            .frame(
+                width: max(viewModel.size, Constant.minimumTouchSize),
+                height: max(viewModel.size, Constant.minimumTouchSize),
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .frame(width: viewModel.size, height: viewModel.size)
-        .background(Color(designSystem: viewModel.backgroundColor), in: Circle())
         .accessibilityLabel(viewModel.label)
-        .frame(width: viewModel.size + 2, height: viewModel.size + 2)
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static let minimumTouchSize: CGFloat = 44
+    }
 
     private let viewModel: ViewModel
     private let action: () -> Void

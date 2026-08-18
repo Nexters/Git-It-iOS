@@ -81,7 +81,23 @@ extension ProjectName {
                         name: "DesignSystem",
                         testTarget: "DesignSystemTests",
                     ),
-                    .module(name: "UIComponent"),
+                    .module(
+                        name: "UIComponent",
+                        testTarget: "UIComponentTests",
+                    ),
+                    .scheme(
+                        name: "UIComponentLayout",
+                        shared: true,
+                        buildAction: .buildAction(
+                            targets: [.target("UIComponentLayoutHarness")]
+                        ),
+                        testAction: .targets([
+                            .testableTarget(target: .target("UIComponentUITests"))
+                        ]),
+                        runAction: .runAction(
+                            executable: .executable(.target("UIComponentLayoutHarness"))
+                        ),
+                    ),
                 ]
             }
 

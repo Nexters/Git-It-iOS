@@ -56,6 +56,24 @@ public struct ActionButton: View {
         }
     }
 
+    public enum Size: Sendable, Equatable {
+        case large
+        case small
+
+        var surfaceHeight: CGFloat {
+            switch self {
+            case .large:
+                54
+            case .small:
+                40
+            }
+        }
+
+        var touchHeight: CGFloat {
+            max(surfaceHeight, 44)
+        }
+    }
+
     /// 기본 문구는 `title`, 서식이 필요한 문구는 `styled`로 전달합니다.
     public enum Label: Sendable, Equatable {
         case title(String)
@@ -69,20 +87,24 @@ public struct ActionButton: View {
         public init(
             title: String,
             style: Style = .primary,
+            size: Size = .large,
             isEnabled: Bool = true,
         ) {
             label = .title(title)
             self.style = style
+            self.size = size
             self.isEnabled = isEnabled
         }
 
         public init(
             styledText: StyledText.ViewModel,
             style: Style = .primary,
+            size: Size = .large,
             isEnabled: Bool = true,
         ) {
             label = .styled(styledText)
             self.style = style
+            self.size = size
             self.isEnabled = isEnabled
         }
 
@@ -90,107 +112,120 @@ public struct ActionButton: View {
 
         public let label: Label
         public let style: Style
+        public let size: Size
         public let isEnabled: Bool
 
     }
 
     public var body: some View {
         Button(action: action) {
-            content
-                .frame(maxWidth: .infinity)
-                .designSystemControlHeight(.action)
-                .background(
-                    viewModel.style.backgroundColor(isEnabled: viewModel.isEnabled),
-                    in: RoundedRectangle(designSystem: .large),
-                )
+            ZStack {
+                content
+                    .frame(maxWidth: .infinity)
+                    .frame(height: viewModel.size.surfaceHeight)
+                    .background(
+                        viewModel.style.backgroundColor(isEnabled: viewModel.isEnabled),
+                        in: RoundedRectangle(designSystem: .large),
+                    )
+            }
+            .frame(minHeight: viewModel.size.touchHeight)
+            .contentShape(Rectangle())
         }
         .disabled(!viewModel.isEnabled)
     }
 
     public static func primary(
         _ title: String,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .primary, isEnabled: isEnabled),
+            viewModel: .init(title: title, style: .primary, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func primary(
         styledText: StyledText.ViewModel,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(styledText: styledText, style: .primary, isEnabled: isEnabled),
+            viewModel: .init(styledText: styledText, style: .primary, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func secondary(
         _ title: String,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .secondary, isEnabled: isEnabled),
+            viewModel: .init(title: title, style: .secondary, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func secondary(
         styledText: StyledText.ViewModel,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(styledText: styledText, style: .secondary, isEnabled: isEnabled),
+            viewModel: .init(styledText: styledText, style: .secondary, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func destructive(
         _ title: String,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .destructive, isEnabled: isEnabled),
+            viewModel: .init(title: title, style: .destructive, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func destructive(
         styledText: StyledText.ViewModel,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(styledText: styledText, style: .destructive, isEnabled: isEnabled),
+            viewModel: .init(styledText: styledText, style: .destructive, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func text(
         _ title: String,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .text, isEnabled: isEnabled),
+            viewModel: .init(title: title, style: .text, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
 
     public static func text(
         styledText: StyledText.ViewModel,
+        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(styledText: styledText, style: .text, isEnabled: isEnabled),
+            viewModel: .init(styledText: styledText, style: .text, size: size, isEnabled: isEnabled),
             action: action,
         )
     }
