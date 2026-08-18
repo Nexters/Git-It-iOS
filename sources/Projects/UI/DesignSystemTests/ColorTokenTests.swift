@@ -90,8 +90,8 @@ struct ColorTokenTests {
     }
 
     @Test
-    func `색상 토큰 총 개수는 27개다`() {
-        #expect(ColorToken.all.count == 27)
+    func `색상 토큰 총 개수는 29개다`() {
+        #expect(ColorToken.all.count == 29)
     }
 
 }

@@ -32,22 +32,25 @@ public struct SavedQuestionCard: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+        VStack(alignment: .leading) {
             StyledText.caption1(viewModel.metadata, color: .grey300)
+                .padding(.top, 14)
             StyledText.subtitle3(viewModel.prompt)
+                .padding(.top, 10)
             HStack {
-                Image(systemName: "bookmark.fill")
+                Image( "ic-bookmark-filled", bundle: .module)
                     .designSystemForeground(.brandAccent)
-                    .accessibilityLabel("저장한 문제")
+                    .padding(.horizontal, 10)
                 Spacer()
                 Button(action: onActionTap) {
-                    TagBadge.accent(viewModel.actionTitle)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(viewModel.actionTitle)
+                    StyledText.body2(viewModel.actionTitle, color: .grey700, alignment: .center)
+                }.frame(width: 84, height: 36)
+                    .designSystemBackground(.blue100)
+                    .designSystemCornerRadius(.small)
             }
+            .padding(.vertical, 16)
         }
-        .padding(Constant.contentPadding)
+        .padding(.horizontal, Constant.contentPadding)
         .background(
             Color(designSystem: .cardBackground),
             in: RoundedRectangle(designSystem: .large),

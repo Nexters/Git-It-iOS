@@ -32,6 +32,19 @@ extension ColorToken {
 }
 
 extension ColorToken {
+    public static let clear = ColorToken(
+        name: "Clear",
+        group: .opacity,
+        hex: "#000000",
+        opacityPercent: 0,
+    )
+
+    public static let white = ColorToken(
+        name: "White",
+        group: .opacity,
+        hex: "#FFFFFF",
+    )
+
     public static let blue500 = ColorToken(
         name: "Blue500",
         group: .blue,
@@ -178,6 +191,8 @@ extension ColorToken {
     )
 
     public static let all: [ColorToken] = [
+        clear,
+        white,
         blue500,
         blue400,
         blue300,

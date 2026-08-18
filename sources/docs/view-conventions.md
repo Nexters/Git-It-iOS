@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-17
 
-**최종 수정일**: 2026-08-18 (4차)
+**최종 수정일**: 2026-08-18 (5차)
 
 이 문서는 UI 패키지의 재사용 컴포넌트와 Feature 패키지의 화면이 **공통으로** 지켜야
 하는 구현 컨벤션을 정의합니다. 두 패키지에 걸쳐 있어 한쪽 패키지 규칙 문서에만 두면
@@ -282,6 +282,23 @@ private enum Constant {
 }
 ```
 
+**그 View 안에서만 참조하는 디자인 토큰 값도 같은 방식으로 정의합니다.** `ColorToken`,
+`SemanticColorToken`, `TextStyleToken`처럼 §4의 토큰 카탈로그를 참조하는 값이라도 한
+View 안에서만 쓰이면 `body`에 리터럴로 흩어 두지 않고 `Constant`의 `static` 멤버로
+모읍니다. `body`를 읽을 때 그 값이 어떤 역할인지 이름으로 드러내고, 여러 곳에 흩어진
+같은 토큰 참조가 나중에 따로 바뀌는 것을 막기 위한 것입니다.
+
+```swift
+private enum Constant {
+    static let borderColor: ColorToken = .blue200
+    static let titleStyle: TextStyleToken = .subtitle3
+}
+```
+
+여러 View 또는 화면이 같은 토큰 참조를 공유하게 되면 `Constant`에 복제하지 않고
+§4.3의 기준에 따라 DesignSystem의 의미 토큰으로 승격합니다. `Constant`는 그 View
+하나에서만 의미를 갖는 참조만 소유합니다.
+
 **제네릭 View는 `static var` 연산 프로퍼티로 정의합니다.** Swift는 제네릭 타입에
 `static` 저장 프로퍼티를 허용하지 않으므로 `SheetSurface<Content>`처럼 제네릭
 파라미터를 갖는 View에서는 `static let`이 컴파일되지 않습니다. 이때 `Constant`를 파일
@@ -489,6 +506,8 @@ Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는
 - [ ] `extension Color`로 패키지 로컬 색상 이름을 추가하지 않았는가?
 - [ ] 여러 곳이 공유하는 수치를 토큰으로 승격했는가?
 - [ ] 문자열이 `StyledText` Typography 팩토리를 통과하는가?
+- [ ] 한 View 안에서만 쓰는 토큰 참조가 `body`에 흩어지지 않고 `Constant`의
+      `static` 멤버로 모여 있는가?
 
 ### 구조
 

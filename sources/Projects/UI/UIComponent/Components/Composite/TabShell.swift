@@ -34,7 +34,9 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                     }
                 }
                 .tabItem {
-                    Label(item.tabTitle, systemImage: item.tabSystemImage)
+                    Image(item.tabSystemImage, bundle: .module)
+                        .padding(.bottom, 4)
+                    Text.designSystemStyled(item.tabTitle, style: .tabItem)
                 }
                 .tag(item)
             }

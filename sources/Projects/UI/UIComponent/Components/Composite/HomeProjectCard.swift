@@ -20,6 +20,8 @@ public struct HomeProjectCard: View {
         case lightBlue
         case darkBlue
 
+        // MARK: Lifecycle
+
         public init(index: Int) {
             self =
                 switch index % 3 {
@@ -28,6 +30,8 @@ public struct HomeProjectCard: View {
                 default: .purple
                 }
         }
+
+        // MARK: Internal
 
         var rotationDegrees: Double {
             switch self {

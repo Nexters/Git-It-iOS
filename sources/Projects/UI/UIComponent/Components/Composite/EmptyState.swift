@@ -35,20 +35,20 @@ public struct EmptyState<Illustration: View>: View {
             illustration
                 .frame(
                     width: Constant.illustrationSize,
-                    height: Constant.illustrationSize
+                    height: Constant.illustrationSize,
                 )
 
             VStack(spacing: Constant.textSpacing) {
                 StyledText
                     .subtitle1(
                         viewModel.title,
-                        alignment: .center
+                        alignment: .center,
                     )
                 StyledText
                     .body2(
                         viewModel.message,
                         color: .grey400,
-                        alignment: .center
+                        alignment: .center,
                     )
             }
             .frame(maxWidth: Constant.textMaxWidth)
@@ -60,9 +60,17 @@ public struct EmptyState<Illustration: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var illustrationSize: CGFloat { 128 }
-        static var textSpacing: CGFloat { 8 }
-        static var textMaxWidth: CGFloat { 320 }
+        static var illustrationSize: CGFloat {
+            128
+        }
+
+        static var textSpacing: CGFloat {
+            8
+        }
+
+        static var textMaxWidth: CGFloat {
+            320
+        }
     }
 
     private let viewModel: ViewModel

@@ -6,7 +6,7 @@ import Testing
 struct TextStyleTokenTests {
 
     @Test
-    func `10개 텍스트 스타일의 굵기·크기·행간이 명세 값과 일치한다`() {
+    func `11개 텍스트 스타일의 굵기·크기·행간이 명세 값과 일치한다`() {
         let expected: [(String, TextStyleToken.Weight, Double, Double)] = [
             ("Headline 1", .bold, 30, 124),
             ("Headline 2", .bold, 28, 130),
@@ -18,6 +18,7 @@ struct TextStyleTokenTests {
             ("Body 3", .medium, 12, 150),
             ("Caption 1", .regular, 12, 150),
             ("Caption 2", .medium, 10, 150),
+            ("Tab Item", .regular, 10, 150),
         ]
         for (name, weight, size, lineHeightPercent) in expected {
             let token = TextStyleToken.all.first { $0.name == name }
@@ -38,8 +39,8 @@ struct TextStyleTokenTests {
     }
 
     @Test
-    func `텍스트 스타일 토큰 총 개수는 10개다`() {
-        #expect(TextStyleToken.all.count == 10)
+    func `텍스트 스타일 토큰 총 개수는 11개다`() {
+        #expect(TextStyleToken.all.count == 11)
     }
 
 }

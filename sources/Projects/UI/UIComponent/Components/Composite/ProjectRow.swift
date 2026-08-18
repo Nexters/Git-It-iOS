@@ -88,6 +88,32 @@ public struct ProjectRow<Thumbnail: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var thumbnailSize: CGFloat {
+            60
+        }
+
+        static var thumbnailSpacing: CGFloat {
+            14
+        }
+
+        static var titleSpacing: CGFloat {
+            2
+        }
+
+        static var minimumTrailingSpacing: CGFloat {
+            4
+        }
+
+        static var setSpacing: CGFloat {
+            10
+        }
+
+        static var contentPadding: CGFloat {
+            16
+        }
+    }
+
     private let viewModel: ViewModel
     private let onAccessoryTap: () -> Void
     private let thumbnail: Thumbnail
@@ -95,27 +121,17 @@ public struct ProjectRow<Thumbnail: View>: View {
     @ViewBuilder
     private var accessoryButton: some View {
         if viewModel.isDeleting {
-            IconButton.destructive(
+            IconGlassButton.destructive(
                 symbol: "minus",
                 label: "\(viewModel.name) 삭제",
                 action: onAccessoryTap,
             )
         } else {
-            IconButton.inverse(
-                symbol: "play.fill",
-                label: "\(viewModel.name) 학습 시작",
+            IconPlainButton(
+                viewModel: .init(symbol: "ic-play-1", label: "\(viewModel.name) 학습 시작"),
                 action: onAccessoryTap,
             )
         }
-    }
-    
-    private enum Constant {
-        static var thumbnailSize: CGFloat { 60 }
-        static var thumbnailSpacing: CGFloat { 14 }
-        static var titleSpacing: CGFloat { 2 }
-        static var minimumTrailingSpacing: CGFloat { 4 }
-        static var setSpacing: CGFloat { 10 }
-        static var contentPadding: CGFloat { 16 }
     }
 
 }

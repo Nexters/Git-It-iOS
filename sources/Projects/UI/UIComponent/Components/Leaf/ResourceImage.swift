@@ -22,6 +22,9 @@ public struct ResourceImage: View {
         case projectDetail = "project-detail"
         case projectNexters = "project-nexters"
         case selectionCardThumbnail = "selection-card-thumbnail"
+        case onboardingMockup1 = "onboarding-mockup-1"
+        case onboardingMockup2 = "onboarding-mockup-2"
+        case onboardingMockup3 = "onboarding-mockup-3"
 
         public var image: Image {
             Image(rawValue, bundle: .module)

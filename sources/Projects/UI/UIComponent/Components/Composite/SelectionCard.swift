@@ -33,7 +33,7 @@ public struct SelectionCard<Thumbnail: View>: View {
         public let title: String
         public let supportingText: String?
         public let badgeText: String?
-        public let isSelected: Bool
+        public var isSelected: Bool
     }
 
     public var body: some View {
@@ -73,13 +73,33 @@ public struct SelectionCard<Thumbnail: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var thumbnailSize: CGFloat { 52 }
-        static var thumbnailSpacing: CGFloat { 16 }
-        static var titleSpacing: CGFloat { 4 }
-        static var badgeSpacing: CGFloat { 6 }
-        static var contentPadding: CGFloat { 14 }
-        static var minimumHeight: CGFloat { 80 }
-        static var borderWidth: CGFloat { 1 }
+        static var thumbnailSize: CGFloat {
+            52
+        }
+
+        static var thumbnailSpacing: CGFloat {
+            16
+        }
+
+        static var titleSpacing: CGFloat {
+            3
+        }
+
+        static var badgeSpacing: CGFloat {
+            6
+        }
+
+        static var contentPadding: CGFloat {
+            14
+        }
+
+        static var minimumHeight: CGFloat {
+            80
+        }
+
+        static var borderWidth: CGFloat {
+            1
+        }
     }
 
     private let viewModel: ViewModel
@@ -103,7 +123,6 @@ public struct SelectionCard<Thumbnail: View>: View {
             viewModel: .init(
                 title: "프로젝트 경험이 있어요",
                 supportingText: "심화 문제와 서술형 비중 확대",
-                badgeText: "선택됨",
                 isSelected: true,
             )
         ) {

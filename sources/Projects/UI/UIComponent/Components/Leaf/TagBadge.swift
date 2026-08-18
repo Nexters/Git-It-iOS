@@ -16,6 +16,8 @@ public struct TagBadge: View {
         case accent
         case selected
 
+        // MARK: Internal
+
         var backgroundColor: ColorToken {
             switch self {
             case .neutral: .grey500

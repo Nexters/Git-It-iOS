@@ -37,26 +37,28 @@ public struct ScreenHeader: View {
         case inlineUser
         case largeTitle
 
+        // MARK: Internal
+
         /// `inlineUser`만 아바타를 세로로 감싸므로 컨트롤 행이 더 높습니다.
         var controlRowHeight: CGFloat {
             switch self {
             case .inlineUser:
-                return 66
+                66
             case .default,
                  .inlineTitle,
                  .largeTitle:
-                return 40
+                40
             }
         }
 
         var topPadding: CGFloat {
             switch self {
             case .inlineUser:
-                return 22
+                22
             case .default,
                  .inlineTitle,
                  .largeTitle:
-                return 0
+                0
             }
         }
 
@@ -64,11 +66,11 @@ public struct ScreenHeader: View {
         var titleSpacing: CGFloat {
             switch self {
             case .largeTitle:
-                return 16
+                16
             case .default,
                  .inlineTitle,
                  .inlineUser:
-                return 0
+                0
             }
         }
 
@@ -157,7 +159,7 @@ public struct ScreenHeader: View {
                 if viewModel.style.showsUserProfile {
                     userProfile
                 } else if let leading = viewModel.leading {
-                    IconButton.neutral(
+                    IconGlassButton.neutral(
                         symbol: leading.symbol,
                         label: leading.label,
                         action: onLeadingTap,
@@ -171,7 +173,7 @@ public struct ScreenHeader: View {
                 Spacer(minLength: 0)
 
                 if let trailing = viewModel.trailing {
-                    IconButton.neutral(
+                    IconGlassButton.neutral(
                         symbol: trailing.symbol,
                         label: trailing.label,
                         action: onTrailingTap,

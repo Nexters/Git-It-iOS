@@ -31,8 +31,13 @@ public struct BottomActionBar<Content: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var topPadding: CGFloat { 4 }
-        static var bottomPadding: CGFloat { 24 }
+        static var topPadding: CGFloat {
+            4
+        }
+
+        static var bottomPadding: CGFloat {
+            24
+        }
     }
 
     private let content: Content
