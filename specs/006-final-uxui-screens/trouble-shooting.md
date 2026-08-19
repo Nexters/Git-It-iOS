@@ -465,3 +465,79 @@ heading 순서와 파일 tail을 즉시 확인한다.
 ### 연결
 
 선행: 없음. 후속: 없음.
+
+## TS-20260819-010: Composition 테스트 scheme과 작업 소유 경로 불일치
+
+**기록일**: 2026-08-19
+
+**상태**: 미해결
+
+**발생 단계**: `$speckit-implement` Composition 패키지 `T016`~`T028` 사전 검증
+
+**관련 항목**: `T016`, `T020`, `T027`,
+`sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`
+
+### 증상
+
+`CompositionTests` target은 존재하지만 공유 `Composition` scheme의 test action에 연결되지
+않아 project build runner가 해당 테스트를 실행 대상으로 선택할 수 없다. 직접 target test
+실행과 build-only test products 실행도 scheme 또는 `build-for-testing` 산출물이 없어 실제
+테스트 실행으로 이어지지 않았다.
+
+### 영향
+
+`T017`~`T019`의 Red와 `T027`의 Green 테스트를 실제 실행했다는 근거를 만들 수 없다.
+scheme 연결을 소유하는 `ProjectName.swift`는 현재 Composition 작업의 허용 수정 경로에 없기
+때문에 `$speckit-implement`로 임의 수정할 수도 없다. 따라서 Composition 구현과 커밋을
+시작하지 않고 작업 목록 보정 단계에서 중단했다.
+
+### 근거
+
+- `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`: Composition scheme이
+  `.module(name: "Composition")`만 사용하고 `testTarget`을 전달하지 않는다.
+- 생성된 `Composition.xcscheme`: `<Testables>`가 비어 있다.
+- `tools/githooks/project-build/core/workspace.sh`: `<TestableReference`가 있는 공유
+  scheme만 testable 대상으로 판정한다.
+- `xcodebuild test -project ... -target CompositionTests -destination ...`: scheme을
+  지정해야 한다는 오류와 함께 종료 코드 65를 반환했다.
+- `xcodebuild test-without-building -testProductsPath ...`: test products `Info.plist`가
+  없고 `build-for-testing`을 다시 실행하라는 오류와 함께 종료 코드 66을 반환했다.
+- 현재 `tasks.md`의 Composition 소유 경로와 `T016`~`T026`에는
+  `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`가 없다.
+
+### 원인
+
+확정 원인은 Tuist 선언에서 `CompositionTests` target을 만들었지만 `Composition` 공유
+scheme의 test action에는 연결하지 않은 상태와, 그 연결 파일을 Composition 작업에 배정하지
+않은 `tasks.md`가 함께 존재하는 것이다. runner는 의도대로 test action이 비어 있는 scheme을
+제외하므로 runner 자체 오동작은 아니다.
+
+### 조치
+
+- 생성 scheme XML, `ProjectName.swift`와 project build runner의 testable scheme 판정 코드를
+  대조했다.
+- source를 수정하지 않는 직접 target test와 test products 실행 대안을 격리된
+  `/private/tmp` 경로에서 확인했지만 실제 테스트 실행 대안으로 성립하지 않았다.
+- 허용 범위를 우회해 `ProjectName.swift` 또는 생성 scheme을 수정하지 않았고 Composition
+  구현 파일도 생성하지 않았다.
+- `$speckit-tasks`로 `ProjectName.swift`의 Composition scheme 구획을 정확히 하나의
+  Composition 작업에 배정하는 보정은 미실행 상태다.
+
+### 검증
+
+- `git status --short --branch`: 기록 전 구현 변경이 없는 깨끗한 작업 트리를 확인했다.
+- `rg`로 생성 scheme의 `<Testables>`가 비어 있고 runner가 `<TestableReference`를 검사하는
+  것을 확인했다.
+- `CompositionTests` 실제 test 실행: 미실행. test action 연결이 없어 차단됨.
+- `T016`~`T028` 구현 및 커밋: 미실행.
+
+### 재발 방지
+
+새 test target 작업을 생성할 때 target 선언뿐 아니라 공유 scheme의 `testTarget` 연결과 그
+파일의 패키지 소유 작업을 함께 배정한다. Red 테스트를 작성하기 전 생성 scheme의
+`<TestableReference>`와 runner의 testable scheme 목록을 확인하며, 누락되면 구현 스킬의
+허용 범위를 넓혀 우회하지 않고 `$speckit-tasks`로 작업 목록을 먼저 보정한다.
+
+### 연결
+
+선행: `TS-20260819-009`. 후속: 없음.
