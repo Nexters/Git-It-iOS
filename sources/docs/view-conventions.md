@@ -21,7 +21,7 @@
 
 다음 선언에 적용합니다.
 
-- `sources/Projects/UI/UIComponent/Components/**`의 모든 컴포넌트
+- `sources/Projects/UI/Component/Components/**`의 모든 컴포넌트
 - `sources/Projects/UI/DesignSystem/**`의 토큰과 토큰 적용 API
 - `sources/Projects/Feature/Presentation/**`의 모든 화면과 화면 보조 선언
 

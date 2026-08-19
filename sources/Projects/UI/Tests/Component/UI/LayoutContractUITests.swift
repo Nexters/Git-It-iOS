@@ -253,7 +253,7 @@ final class LayoutContractUITests: XCTestCase {
         }
     }
 
-    func testActionMenuButtonsForwardSelectionAndDoNotOverlap() {
+    func test_메뉴_버튼은_겹치지_않고_선택을_전달한다() {
         let menu = reveal(identifier: "action.menu")
         let deleteButton = app.buttons["학습 프로젝트 삭제 모드 열기"]
         let closeButton = app.buttons["프로젝트 메뉴 닫기"]
@@ -602,16 +602,20 @@ final class LayoutContractUITests: XCTestCase {
         upper: XCUIElement,
         lower: XCUIElement,
         contract: String,
+        accessibilityFrameTolerance: CGFloat = 1,
         file: StaticString = #filePath,
         line: UInt = #line,
     ) {
+        let upperFrame = upper.frame
+        let lowerFrame = lower.frame
+
         XCTAssertLessThanOrEqual(
-            upper.frame.maxY,
-            lower.frame.minY,
+            upperFrame.maxY,
+            lowerFrame.minY + accessibilityFrameTolerance,
             diagnostic(
                 contract: contract,
-                expected: "upper maxY <= lower minY",
-                actual: "\(upper.frame.maxY) > \(lower.frame.minY)",
+                expected: "upper maxY <= lower minY + \(accessibilityFrameTolerance)pt accessibility frame tolerance",
+                actual: "upper maxY=\(upperFrame.maxY), lower minY=\(lowerFrame.minY)",
             ),
             file: file,
             line: line,

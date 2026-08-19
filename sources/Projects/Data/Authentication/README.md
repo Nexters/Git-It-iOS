@@ -59,10 +59,10 @@
 
 ## 검증 근거
 
-- 계약: `DataAuthenticationTests/Contracts/`
-- 모델·DTO·오류 의미: `DataAuthenticationTests/Models/`,
-  `DataAuthenticationTests/DTOs/`, `DataAuthenticationTests/Errors/`
-- 민감 값 비노출: `DataAuthenticationTests/Security/`
+- 계약: `Tests/Authentication/Contracts/`
+- 모델·DTO·오류 의미: `Tests/Authentication/Models/`,
+  `Tests/Authentication/DTOs/`, `Tests/Authentication/Errors/`
+- 민감 값 비노출: `Tests/Authentication/Security/`
 
 문서의 보장 범위는 위 테스트와 함께 변경해야 합니다. 테스트로 검증되지 않은 계획,
 구현 의도 또는 하위 타겟의 동작을 보장된 기능으로 추가하지 않습니다.

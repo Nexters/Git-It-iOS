@@ -8,39 +8,14 @@ enum AppModuleName: String, CaseIterable {
 }
 
 extension AppModuleName {
-    static let schemes: [Scheme] = [
-        .scheme(
-            name: AppModuleName.GitIt.rawValue,
-            shared: true,
-            buildAction: .buildAction(
-                targets: [
-                    .target(AppModuleName.GitIt.rawValue)
-                ]
-            ),
-            runAction: .runAction(
-                executable: .executable(.target(AppModuleName.GitIt.rawValue))
-            ),
-            archiveAction: .archiveAction(configuration: .release),
-            profileAction: .profileAction(
-                executable: .executable(.target(AppModuleName.GitIt.rawValue))
-            ),
-            analyzeAction: .analyzeAction(configuration: .debug),
-        ),
-        .scheme(
-            name: AppModuleName.GitItTests.rawValue,
-            shared: true,
-            buildAction: .buildAction(
-                targets: [
-                    .target(AppModuleName.GitItTests.rawValue)
-                ]
-            ),
-            testAction: .targets([
-                .testableTarget(
-                    target: .target(AppModuleName.GitItTests.rawValue)
-                )
-            ]),
-        ),
-    ]
+    var sourceDirectory: String {
+        return switch self {
+        case .GitIt:
+            "Sources"
+        case .GitItTests:
+            "Tests/GitIt"
+        }
+    }
 
     var target: Target {
         switch self {
@@ -71,11 +46,11 @@ extension AppModuleName {
                         ],
                     ]
                 ),
-                sources: ["Sources/**"],
+                sources: ["\(sourceDirectory)/**"],
                 resources: ["Resources/**"],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
-                    .fromComposition(.Composition),
+                    .fromComposition(.CompositionAdepter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
                     .external(.FirebaseAnalytics),
@@ -112,7 +87,7 @@ extension AppModuleName {
                 bundleId: "com.nexters.hytime.gitit.tests",
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
-                sources: ["Tests/**"],
+                sources: ["\(sourceDirectory)/**"],
                 dependencies: [],
                 settings: .settings(
                     base: [

@@ -11,18 +11,101 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 repository="$work/repository"
 projects="$repository/projects"
 scheme_source="$repository/tuist/ProjectDescriptionHelpers/ProjectName.swift"
+module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift"
+infrastructure_module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift"
+ui_module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift"
+app_module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift"
 mkdir -p "$(dirname -- "$scheme_source")" \
 	"$projects/ReadyTests" \
 	"$projects/EmptyTests" \
-	"$projects/AuthenticationTests"
+	"$projects/Infrastructure/Tests/Authentication" \
+	"$projects/Domain/Tests/LearningProject" \
+	"$projects/UI/Tests/Component/Unit" \
+	"$projects/UI/Tests/Component/UI" \
+	"$projects/App/Tests/GitIt" \
+	"$(dirname -- "$module_source")"
 
 printf '%s\n' \
+	'case .App:' \
+	'    [.package(' \
+	'        name: .App,' \
+	'        testTargets: [' \
+	'            AppModuleName.GitItTests.rawValue,' \
+	'        ],' \
+	'    )]' \
 	'case .Ready:' \
-	'    [.module(name: "Ready", testTarget: "ReadyTests")]' \
+	'    [.package(' \
+	'        name: .Ready,' \
+	'        testTargets: [' \
+	'            "ReadyTests",' \
+	'        ],' \
+	'    )]' \
 	'case .Empty:' \
-	'    [.module(name: "Empty", testTarget: "EmptyTests")]' \
+	'    [.package(' \
+	'        name: .Empty,' \
+	'        testTargets: [' \
+	'            "EmptyTests",' \
+	'        ],' \
+	'    )]' \
 	'case .Infrastructure:' \
-	'    [.module(name: "InfrastructureAuthentication", testTarget: "InfrastructureAuthenticationTests")]' >"$scheme_source"
+	'    [.package(' \
+	'        name: .Infrastructure,' \
+	'        testTargets: [' \
+	'            InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,' \
+	'        ],' \
+	'    )]' \
+	'case .Domain:' \
+	'    [.package(' \
+	'        name: .Domain,' \
+	'        testTargets: [' \
+	'            DomainModuleName.DomainLearningProjectTests.rawValue,' \
+	'        ],' \
+	'    )]' \
+	'case .UI:' \
+	'    [.package(' \
+	'        name: .UI,' \
+	'        testTargets: [' \
+	'            UIModuleName.UIComponentTests.rawValue,' \
+	'            UIModuleName.UIComponentUITests.rawValue,' \
+	'        ],' \
+	'    )]' >"$scheme_source"
+printf '%s\n' \
+	'var sourceDirectory: String {' \
+	'    rawValue.droppingPrefix("Domain")' \
+	'}' \
+	'var target: Target {' \
+	'    switch self {' \
+	'    case .DomainLearningProjectTests:' \
+	'        .testModule(' \
+	'            name: rawValue,' \
+	'            sourceDirectory: sourceDirectory,' \
+	'        )' \
+	'    }' \
+	'}' >"$module_source"
+printf '%s\n' \
+	'.testModule(' \
+	'    name: InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,' \
+	'    sourceDirectory: InfrastructureModuleName.InfrastructureAuthenticationTests.sourceDirectory,' \
+	')' >"$infrastructure_module_source"
+printf '%s\n' \
+	'case .UIComponentTests:' \
+	'case .UIComponentUITests:' \
+	'.testModule(' \
+	'    name: UIModuleName.UIComponentTests.rawValue,' \
+	'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
+	')' \
+	'.testModule(' \
+	'    name: UIModuleName.UIComponentUITests.rawValue,' \
+	'    sourceDirectory: UIModuleName.UIComponentUITests.sourceDirectory,' \
+	')' >"$ui_module_source"
+printf '%s\n' \
+	'case .GitItTests:' \
+	'    .target(' \
+	'        name: rawValue,' \
+	'sour''ces: ["\(sourceDirectory)/**"],' \
+	'    )' >"$app_module_source"
+printf '%s\n' 'import Testing' '@Test func appSample() {}' \
+	>"$projects/App/Tests/GitIt/GitItTests.swift"
 printf '%s\n' 'import Testing' '@Test func sample() {}' \
 	>"$projects/ReadyTests/ReadyTests.swift"
 printf '%s\n' '// placeholder' >"$projects/EmptyTests/Placeholder.swift"
@@ -43,6 +126,24 @@ fi
 rg -q 'script-tests.empty-test-target.*InfrastructureAuthenticationTests' "$work/err"
 
 printf '%s\n' 'import Testing' '@Test func authenticationSample() {}' \
-	>"$projects/AuthenticationTests/AuthenticationTests.swift"
+	>"$projects/Infrastructure/Tests/Authentication/AuthenticationTests.swift"
+printf '%s\n' 'import Testing' '@Test func domainLearningProjectSample() {}' \
+	>"$projects/Domain/Tests/LearningProject/LearningProjectTests.swift"
+if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
+	printf 'FAIL: Unit과 UI test target의 역할 폴더를 구분하지 못했습니다\n' >&2
+	exit 1
+fi
+rg -q 'script-tests.empty-test-target.*UIComponentTests' "$work/err"
+
+printf '%s\n' 'import Testing' '@Test func componentSample() {}' \
+	>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
+if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
+	printf 'FAIL: 패키지 scheme의 두 번째 test target을 검증하지 않았습니다\n' >&2
+	exit 1
+fi
+rg -q 'script-tests.empty-test-target.*UIComponentUITests' "$work/err"
+
+printf '%s\n' 'import XCTest' 'final class ComponentUITests: XCTestCase {}' \
+	>"$projects/UI/Tests/Component/UI/ComponentUITests.swift"
 script_tests_validate_testable_schemes "$projects" "$scheme_source"
 printf 'PASS: testable schemes\n'

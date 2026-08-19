@@ -11,6 +11,22 @@ enum UIModuleName: String {
     case UIComponentUITests
 }
 
+extension UIModuleName {
+    var sourceDirectory: String {
+        let directoryName = rawValue.droppingPrefix(ProjectName.UI.rawValue)
+        return switch self {
+        case .DesignSystem, .UIComponent, .UIComponentLayoutHarness:
+            directoryName
+        case .DesignSystemTests:
+            "\(directoryName.droppingSuffix("Tests"))"
+        case .UIComponentTests:
+            "\(directoryName.droppingSuffix("Tests"))/Unit"
+        case .UIComponentUITests:
+            "\(directoryName.droppingSuffix("UITests"))/UI"
+        }
+    }
+}
+
 private enum DesignSystemFontFamily: CaseIterable {
     case notoSansKR
     case plusJakartaSans
@@ -42,7 +58,7 @@ private enum DesignSystemFontFamily: CaseIterable {
     var resourceFileElements: [ResourceFileElement] {
         Weight.allCases.map {
             .glob(
-                pattern: "DesignSystem/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf",
+                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf",
             )
         }
     }
@@ -54,12 +70,13 @@ extension UIModuleName {
     )
 
     private static let uiComponentImageResources: ResourceFileElements = .resources(
-        [.glob(pattern: "UIComponent/Resources/**")],
+        [.glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Resources/**")],
     )
 
     static let targets: [Target] = [
         .module(
             name: UIModuleName.UIComponent.rawValue,
+            sourceDirectory: UIModuleName.UIComponent.sourceDirectory,
             resources: Self.uiComponentImageResources,
             dependencies: [
                 .target(name: UIModuleName.DesignSystem.rawValue)
@@ -67,14 +84,17 @@ extension UIModuleName {
         ),
         .module(
             name: UIModuleName.DesignSystem.rawValue,
+            sourceDirectory: UIModuleName.DesignSystem.sourceDirectory,
             resources: Self.designSystemFontResources,
         ),
         .testModule(
             name: UIModuleName.DesignSystemTests.rawValue,
+            sourceDirectory: UIModuleName.DesignSystemTests.sourceDirectory,
             productionTarget: .target(name: UIModuleName.DesignSystem.rawValue),
         ),
         .testModule(
             name: UIModuleName.UIComponentTests.rawValue,
+            sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
         ),
         .target(
@@ -89,7 +109,7 @@ extension UIModuleName {
                 ],
                 "UILaunchScreen": [:],
             ]),
-            sources: ["UIComponentLayoutHarness/**"],
+            sources: ["\(UIModuleName.UIComponentLayoutHarness.sourceDirectory)/**"],
             dependencies: [
                 .target(name: UIModuleName.UIComponent.rawValue),
                 .target(name: UIModuleName.DesignSystem.rawValue),
@@ -109,7 +129,7 @@ extension UIModuleName {
             bundleId: "com.nexters.hytime.gitit.uicomponentuitests",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["UIComponentUITests/**"],
+            sources: ["Tests/\(UIModuleName.UIComponentUITests.sourceDirectory)/**"],
             dependencies: [
                 .target(name: UIModuleName.UIComponentLayoutHarness.rawValue)
             ],

@@ -4,14 +4,45 @@ import ProjectDescription
 
 enum FeatureModuleName: String, CaseIterable {
     case Feature
+    case FeatureTests
 }
 
 extension FeatureModuleName {
+    var sourceDirectory: String {
+        let directoryName = rawValue.droppingPrefix(ProjectName.Feature.rawValue)
+        return switch self {
+        case .Feature:
+            directoryName.isEmpty ? "Presentation" : directoryName
+        case .FeatureTests:
+            directoryName.droppingSuffix("Tests")
+        }
+    }
+
     var target: Target {
         switch self {
         case .Feature:
             .module(
-                name: rawValue
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .external(.ComposableArchitecture),
+                    .fromDomain(.DomainLearningProject),
+                    .fromUI(.DesignSystem),
+                    .fromUI(.UIComponent),
+                ],
+            )
+
+        case .FeatureTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: FeatureModuleName.Feature.rawValue
+                ),
+                additionalDependencies: [
+                    .external(.ComposableArchitecture),
+                    .fromDomain(.DomainLearningProject),
+                ],
             )
         }
     }

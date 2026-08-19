@@ -3,16 +3,27 @@ import ProjectDescription
 // MARK: - CompositionModuleName
 
 enum CompositionModuleName: String, CaseIterable {
-    case Composition
-    case CompositionTests
+    case CompositionAdepter
+    case CompositionAdepterTests
 }
 
 extension CompositionModuleName {
+    var sourceDirectory: String {
+        let directoryName = rawValue.droppingPrefix(ProjectName.Composition.rawValue)
+        return switch self {
+        case .CompositionAdepter:
+            directoryName
+        case .CompositionAdepterTests:
+            directoryName.droppingSuffix("Tests")
+        }
+    }
+
     var target: Target {
         switch self {
-        case .Composition:
+        case .CompositionAdepter:
             .module(
                 name: rawValue,
+                sourceDirectory: sourceDirectory,
                 dependencies: [
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
@@ -21,11 +32,12 @@ extension CompositionModuleName {
                 ],
             )
 
-        case .CompositionTests:
+        case .CompositionAdepterTests:
             .testModule(
                 name: rawValue,
+                sourceDirectory: sourceDirectory,
                 productionTarget: .target(
-                    name: CompositionModuleName.Composition.rawValue
+                    name: CompositionModuleName.CompositionAdepter.rawValue
                 ),
                 additionalDependencies: [
                     .fromDomain(.DomainAuthentication),
