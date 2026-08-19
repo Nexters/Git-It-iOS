@@ -23,6 +23,16 @@ scheme_policy_decide() (
 	esac
 )
 
+scheme_policy_match_name() (
+	scheme_policy_filter=$1
+	scheme_policy_name=$2
+	if [ -z "$scheme_policy_filter" ] || [ "$scheme_policy_filter" = "$scheme_policy_name" ]; then
+		printf 'eligible\n'
+	else
+		printf 'ineligible\n'
+	fi
+)
+
 scheme_policy_xcode_action() (
 	case "$1" in
 	build) printf 'build\n' ;;

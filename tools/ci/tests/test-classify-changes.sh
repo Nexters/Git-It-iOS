@@ -55,6 +55,9 @@ run_classifier "$docs_base" "$docs_head"
 assert_flag docs_only true
 assert_flag swift_changed false
 assert_flag ui_changed false
+assert_flag build_required false
+assert_flag unit_tests_required false
+assert_flag ui_tests_required false
 
 # 한글 Swift 경로와 개행을 포함한 App 입력도 NUL 경계를 보존해 분류합니다.
 source_base=$docs_head
@@ -69,6 +72,9 @@ run_classifier "$source_base" "$source_head"
 assert_flag docs_only false
 assert_flag swift_changed true
 assert_flag tests_changed true
+assert_flag build_required true
+assert_flag unit_tests_required true
+assert_flag ui_tests_required false
 rg -q '\*\*변경 파일 수\*\*: 2$' "$summary"
 
 # UI 리소스는 Swift 파일이 아니어도 앱·단위·UI 검사를 모두 활성화합니다.
@@ -83,6 +89,9 @@ run_classifier "$ui_base" "$ui_head"
 assert_flag swift_changed true
 assert_flag tests_changed true
 assert_flag ui_changed true
+assert_flag build_required true
+assert_flag unit_tests_required true
+assert_flag ui_tests_required true
 
 # 알려지지 않은 비문서 입력은 검사를 생략하지 않고 보수적으로 승격합니다.
 unknown_base=$ui_head
@@ -95,6 +104,8 @@ run_classifier "$unknown_base" "$unknown_head"
 assert_flag docs_only false
 assert_flag swift_changed true
 assert_flag tests_changed true
+assert_flag build_required true
+assert_flag unit_tests_required true
 
 # 접근할 수 없는 base는 성공으로 오인하지 않습니다.
 if (

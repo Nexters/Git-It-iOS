@@ -29,6 +29,28 @@ project_build_main() (
 	project_build_derived=$("$project_build_paths" --absolute GIT_IT_DERIVED_DATA_PATH) || return $?
 	project_build_xcode_adapter="$project_build_module/core/xcodebuild.sh"
 	project_build_workspace_adapter="$project_build_module/core/workspace.sh"
+	project_build_scheme=${GIT_IT_PROJECT_SCHEME:-}
+	project_build_test_target=${GIT_IT_TEST_TARGET:-}
+
+	# 환경 선택자는 xcodebuild argv로 전달되므로 안전한 식별자만 허용합니다.
+	case "$project_build_scheme" in
+	'' | *[!A-Za-z0-9._-]*)
+		[ -z "$project_build_scheme" ] || {
+			printf '오류[common.invalid-input]: 유효하지 않은 GIT_IT_PROJECT_SCHEME=%s\n조치: 영문, 숫자, 점, 밑줄과 하이픈만 사용하세요\n' \
+				"$project_build_scheme" >&2
+			return 2
+		}
+		;;
+	esac
+	case "$project_build_test_target" in
+	'' | *[!A-Za-z0-9._-]*)
+		[ -z "$project_build_test_target" ] || {
+			printf '오류[common.invalid-input]: 유효하지 않은 GIT_IT_TEST_TARGET=%s\n조치: 영문, 숫자, 점, 밑줄과 하이픈만 사용하세요\n' \
+				"$project_build_test_target" >&2
+			return 2
+		}
+		;;
+	esac
 
 	. "$project_build_module/core/run-all.sh"
 	. "$project_build_module/core/scheme-policy.sh"
@@ -41,6 +63,10 @@ project_build_main() (
 	}
 	case "$project_build_operation" in
 	build)
+		[ -z "$project_build_test_target" ] || {
+			printf '오류[common.invalid-input]: build에는 GIT_IT_TEST_TARGET을 사용할 수 없습니다\n조치: compile 또는 test에서 테스트 target을 선택하세요\n' >&2
+			return 2
+		}
 		project_build_scope=all
 		project_build_destination='generic/platform=iOS Simulator'
 		;;
@@ -74,13 +100,13 @@ project_build_main() (
 
 	project_build_observe() {
 		project_workspace_observe "$project_build_projects" "$project_build_workspace" \
-			"$project_build_scope" \
+			"$project_build_scope" "$project_build_scheme" \
 			"$1" "$2" "$project_build_workspace_adapter"
 	}
 	project_build_execute() {
 		project_xcodebuild_all "$project_build_workspace" "$project_build_derived" \
 			"$project_build_destination" "$project_build_operation" "$project_build_action" \
-			"$1" "$2" "$project_build_xcode_adapter"
+			"$project_build_test_target" "$1" "$2" "$project_build_xcode_adapter"
 	}
 
 	if project_run_all project_build_observe project_build_execute \

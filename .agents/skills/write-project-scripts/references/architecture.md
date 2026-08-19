@@ -22,4 +22,6 @@
 
 ## 공개 계약
 
+`project-build/bin/run.sh`는 기본적으로 모든 적격 scheme과 test target을 처리한다. CI가 최소 단위로 분할할 때는 `GIT_IT_PROJECT_SCHEME`으로 scheme을 선택하고, `compile`과 `test`에 동일한 `GIT_IT_TEST_TARGET`을 전달해 같은 테스트 제품을 공유한다.
+
 사용자와 저장소 연동점은 각 기능의 `bin/`, 저장소 경로를 제공하는 `tools/repository-paths/bin/repository-paths.sh`, Git이 직접 호출하는 `tools/githooks/commit-msg`와 `tools/githooks/pre-commit`, 스킬이 제공하는 검증 명령뿐이다. CI workflow는 `tools/ci/bin/classify-changes.sh`와 `tools/ci/bin/gate-evaluate.sh`만 호출하고 내부 정책을 직접 사용하지 않는다. 내부 파일 경로와 함수명은 공개 API가 아니다. `commit-msg`는 커밋 메시지 파일 외의 프로젝트 스크립트나 기능 모듈에 의존하지 않는다. `pre-commit`은 `script-tests/bin/run.sh`, `swift-format/bin/run.sh staged`, `project-build/bin/run.sh build`, `project-build/bin/run.sh compile`, `project-build/bin/run.sh test`를 fail-fast 순서로 실행한다. `compile`은 테스트가 연결된 공유 scheme을 `build-for-testing`하고 `test`는 같은 Derived Data로 `test-without-building`한다. 새 공개 경로로 전환할 때 `tools/githooks`, Tuist, README와 스킬 참조 문서를 함께 갱신하고 이전 wrapper나 symlink를 남기지 않는다.

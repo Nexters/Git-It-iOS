@@ -39,4 +39,19 @@ rg -q 'ci.gate-evaluate.unknown-result' "$work/err"
 # workflow가 변경 분류기 결과를 evaluator에 전달하는지 함께 고정합니다.
 rg -q 'needs\.changes\.result' "$workflow"
 
+# lint 병렬화, build → compile → test 선행 관계와 5개 macOS shard 상한을 고정합니다.
+rg -q "needs\.changes\.outputs\.build_required == 'true'" "$workflow"
+rg -Fq '    name: lint (${{ matrix.project }})' "$workflow"
+rg -Fq 'lint "$GIT_IT_PROJECTS_ROOT/$GIT_IT_LINT_PROJECT"' "$workflow"
+[ "$(rg -o '"project":"[A-Za-z]+"' "$workflow" | wc -l | tr -d ' ')" -eq 7 ]
+rg -q '^  unit-compile:$' "$workflow"
+rg -q '^  ui-compile:$' "$workflow"
+rg -q '^      - app-build$' "$workflow"
+rg -q '^      - unit-compile$' "$workflow"
+rg -q '^      - ui-compile$' "$workflow"
+[ "$(rg -c '^      max-parallel: 5$' "$workflow")" -eq 4 ]
+rg -q 'actions/upload-artifact@v4' "$workflow"
+rg -q 'actions/download-artifact@v4' "$workflow"
+rg -q 'GIT_IT_TEST_TARGET:' "$workflow"
+
 printf 'PASS: CI gate evaluator\n'
