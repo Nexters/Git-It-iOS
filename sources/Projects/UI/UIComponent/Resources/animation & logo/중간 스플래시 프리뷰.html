@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Git-it Cursor Sequence Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&display=swap');
+  :root {
+    --bg: #101010;
+    --text: #f5f5f5;
+    --muted: #8a8a8a;
+    --accent: #8fb9ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #ededed;
+    font-family: "Plus Jakarta Sans", Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .stage {
+    position: relative;
+    width: min(810px, 100vw);
+    height: min(900px, 100vh);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hero {
+    text-align: center;
+    transform: translateY(-8px);
+  }
+  .line1 {
+    min-height: 31px;
+    margin-bottom: 28px;
+    color: var(--muted);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 22px;
+    line-height: 140%;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .line2 {
+    min-height: 67px;
+    color: var(--text);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 48px;
+    line-height: 140%;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .accent { color: var(--accent); }
+  .cursor {
+    display: inline-block;
+    width: 0.075em;
+    height: 0.92em;
+    margin-left: 0.08em;
+    vertical-align: -0.06em;
+    background: currentColor;
+    opacity: 1;
+  }
+  .blink { animation: blink 0.55s steps(1, end) infinite; }
+  .hidden { visibility: hidden; }
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  .controls {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+  }
+  button {
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.86);
+    padding: 11px 18px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <main class="stage">
+    <section class="hero">
+      <div class="line1">
+        <span id="hello"></span><span id="cursor1" class="cursor"></span>
+      </div>
+      <div class="line2">
+        <span id="lets"></span><span id="git" class="accent"></span><span id="cursor2" class="cursor accent hidden"></span>
+      </div>
+    </section>
+    <div class="controls"><button id="replay">다시 보기</button></div>
+  </main>
+<script>
+const helloText = 'Hello World';
+const letsText = 'Let’s ';
+const gitText = 'Git-it!';
+const hello = document.getElementById('hello');
+const lets = document.getElementById('lets');
+const git = document.getElementById('git');
+const c1 = document.getElementById('cursor1');
+const c2 = document.getElementById('cursor2');
+const replay = document.getElementById('replay');
+let timers = [];
+const wait = ms => new Promise(resolve => { const t = setTimeout(resolve, ms); timers.push(t); });
+async function typeInto(el, text, speed=72) {
+  el.textContent = '';
+  for (let i=0; i<text.length; i++) {
+    el.textContent += text[i];
+    await wait(speed);
+  }
+}
+async function run() {
+  timers.forEach(clearTimeout); timers = [];
+  hello.textContent = ''; lets.textContent = ''; git.textContent = '';
+  c1.className = 'cursor';
+  c2.className = 'cursor accent hidden';
+  await wait(200);
+  await typeInto(hello, helloText, 72);
+  c1.classList.add('blink');
+  await wait(500);
+  c1.classList.remove('blink');
+  c1.classList.add('hidden');
+  c2.classList.remove('hidden');
+  await typeInto(lets, letsText, 62);
+  await typeInto(git, gitText, 62);
+  c2.classList.add('blink');
+}
+replay.addEventListener('click', run);
+run();
+</script>
+</body>
+</html>
