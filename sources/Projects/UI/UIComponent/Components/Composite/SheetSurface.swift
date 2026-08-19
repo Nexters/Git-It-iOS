@@ -42,7 +42,7 @@ public struct SheetSurface<Content: View>: View {
 
     private enum Constant {
         static var grabberWidth: CGFloat {
-            48
+            58
         }
 
         static var grabberHeight: CGFloat {
@@ -50,11 +50,11 @@ public struct SheetSurface<Content: View>: View {
         }
 
         static var grabberTopPadding: CGFloat {
-            8
+            5
         }
 
         static var grabberBottomPadding: CGFloat {
-            22
+            7
         }
 
         static var bottomPadding: CGFloat {

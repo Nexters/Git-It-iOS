@@ -5,7 +5,8 @@ struct LayoutConstantContractTests {
     @Test
     func `action button sizes match figma`() {
         #expect(ActionButton.Size.large.surfaceHeight == 54)
-        #expect(ActionButton.Size.small.surfaceHeight == 40)
+        #expect(ActionButton.Size.medium.surfaceHeight == 40)
+        #expect(ActionButton.Size.small.surfaceHeight == 36)
     }
 
     @Test

@@ -27,7 +27,7 @@ public struct ActionButton: View {
         func backgroundColor(isEnabled: Bool) -> Color {
             switch self {
             case .text:
-                return .clear
+                return Color(designSystem: ColorToken.clear)
 
             case .secondary:
                 return Color(designSystem: SemanticColorToken.raisedBackground)
@@ -58,19 +58,28 @@ public struct ActionButton: View {
 
     public enum Size: Sendable, Equatable {
         case large
+        case medium
         case small
+
+        // MARK: Internal
 
         var surfaceHeight: CGFloat {
             switch self {
             case .large:
                 54
-            case .small:
+            case .medium:
                 40
+            case .small:
+                36
             }
         }
 
+        var minimumHitArea: CGFloat {
+            44
+        }
+
         var touchHeight: CGFloat {
-            max(surfaceHeight, 44)
+            max(surfaceHeight, minimumHitArea)
         }
     }
 

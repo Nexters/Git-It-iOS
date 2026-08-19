@@ -70,17 +70,19 @@ public struct ProjectRow<Thumbnail: View>: View {
             }
 
             if !viewModel.isDeleting {
-                ProgressView(value: viewModel.progress)
-                    .tint(Color(designSystem: .blue200))
+                ContinuousProgressBar(viewModel: .init(progress: viewModel.progress))
 
-                HStack(spacing: Constant.setSpacing) {
+                HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
                     TagBadge.neutral("Set \(viewModel.currentSet)")
                     StyledText.body2(viewModel.setTitle, color: .grey300)
                         .lineLimit(1)
                 }
             }
         }
-        .padding(Constant.contentPadding)
+        .padding(.top, Constant.topPadding)
+        .padding(.horizontal, Constant.horizontalPadding)
+        .padding(.bottom, Constant.bottomPadding)
+        .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .top)
         .designSystemBackground(.cardBackground)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
@@ -105,18 +107,36 @@ public struct ProjectRow<Thumbnail: View>: View {
             4
         }
 
-        static var setSpacing: CGFloat {
-            10
+        static var topPadding: CGFloat {
+            16
         }
 
-        static var contentPadding: CGFloat {
-            16
+        static var horizontalPadding: CGFloat {
+            18
+        }
+
+        static var bottomPadding: CGFloat {
+            18
+        }
+
+        static var defaultMinimumHeight: CGFloat {
+            150
+        }
+
+        static var deletingMinimumHeight: CGFloat {
+            94
         }
     }
 
     private let viewModel: ViewModel
     private let onAccessoryTap: () -> Void
     private let thumbnail: Thumbnail
+
+    private var minimumHeight: CGFloat {
+        viewModel.isDeleting
+            ? Constant.deletingMinimumHeight
+            : Constant.defaultMinimumHeight
+    }
 
     @ViewBuilder
     private var accessoryButton: some View {
