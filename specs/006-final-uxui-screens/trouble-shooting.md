@@ -541,3 +541,89 @@ scheme의 test action에는 연결하지 않은 상태와, 그 연결 파일을 
 ### 연결
 
 선행: `TS-20260819-009`. 후속: 없음.
+
+## TS-20260819-011: Composition 테스트 scheme 차단 해소와 검증 환경 재시도
+
+**기록일**: 2026-08-19
+
+**상태**: 해결
+
+**발생 단계**: `$speckit-tasks` 작업 보정 및 `$speckit-implement` Composition 패키지
+`T016`~`T028`
+
+**관련 항목**: `TS-20260819-010`, `T016`~`T028`, `a60ebd2`, `380c4b4`,
+`24d5068`
+
+### 증상
+
+선행 기록의 `CompositionTests` scheme 연결 누락을 보정한 뒤 Red·Green 검증을 재개했다.
+이 과정에서 sandbox 안의 `make tuist`가 Tuist 사용자 세션 디렉터리 쓰기 권한으로 실패했고,
+전체 변경 파일 lint도 SwiftPM·Clang 사용자 캐시 접근 제한으로 실패했다. 권한이 허용된
+환경에서 lint를 다시 실행하자 `CompositionModuleName.swift`의 기존 마지막 인자 쉼표 누락
+1건이 실제 형식 오류로 구분되어 검출됐다.
+
+### 영향
+
+scheme 차단이 해소되기 전에는 Composition 테스트 실행 증거를 만들 수 없었고, 이후의 권한
+실패를 제품 코드 또는 형식 오류로 오판할 수 있었다. 쉼표 오류를 교정하지 않으면 변경 파일
+전체 lint와 커밋 훅을 통과할 수 없었다.
+
+### 근거
+
+- `a60ebd2`: Composition 소유 경로에 `ProjectName.swift` 작업을 추가하고 scheme 전용 직접
+  `xcodebuild` 검증으로 `tasks.md`를 보정했다.
+- 생성된 `sources/Projects/Composition/Composition.xcodeproj/xcshareddata/xcschemes/Composition.xcscheme`:
+  `CompositionTests`의 `<TestableReference>`와 `BlueprintName`을 확인했다.
+- Red `xcodebuild test`: `Cannot find type 'SampleDeleteLearningProject' in scope`로 종료 코드
+  65를 반환해 환경이 아닌 구현 계약 부재 실패임을 확인했다.
+- sandbox `make tuist`: `/Users/jerry/.local/state/tuist/sessions/...`에 대한
+  `Permission denied`로 중단됐다.
+- sandbox Swift lint: `/Users/jerry/.cache/clang/ModuleCache`에 대한
+  `Operation not permitted`로 중단됐다.
+- 권한 허용 환경 Swift lint: `CompositionModuleName.swift:45:1`의 `trailingCommas` 1건을
+  보고했다.
+
+### 원인
+
+선행 차단의 확정 원인은 `Composition` scheme에 `CompositionTests` test action이 없고 이를
+수정할 파일이 작업 소유 경로에도 없던 것이다. 추가 실패의 원인은 sandbox가 Tuist와 SwiftPM,
+Clang의 사용자 상태·캐시 경로 쓰기를 허용하지 않은 환경 제약이다. 형식 실패의 확정 원인은
+이번에 수정한 `CompositionModuleName.swift`의 다중 인자 `.project` 호출 마지막 인자에 저장소
+규칙이 요구하는 쉼표가 없던 것이다.
+
+### 조치
+
+- `$speckit-tasks`로 `ProjectName.swift`를 독립 `T017`에 배정하고 이후 작업 ID를 연속으로
+  이동했으며, `T021`과 `T028`을 직접 격리 `xcodebuild` 검증으로 교정했다.
+- `ProjectName.swift`의 Composition scheme에 `testTarget: "CompositionTests"`를 연결했다.
+- Tuist 생성과 Swift lint는 같은 명령을 필요한 권한이 허용된 환경에서 다시 실행했다.
+- `CompositionModuleName.swift`의 `path: "../Composition"` 뒤에 마지막 인자 쉼표를 추가했다.
+- Red 실패 확인 뒤 actor 저장소, 두 Domain Protocol 구현, `AppComposition`과 13개 테스트를
+  구현하고 두 기능 커밋으로 분리했다.
+
+### 검증
+
+- `make tuist`: 권한 허용 환경에서 성공했고 생성 scheme의 `CompositionTests`
+  `<TestableReference>`를 확인했다.
+- 격리된 `xcodebuild build -workspace sources/GitIt.xcworkspace -scheme Composition`:
+  종료 코드 0.
+- 별도 격리 경로의 `xcodebuild test`: 종료 코드 0.
+- `xcrun xcresulttool get test-results summary`: 총 13개 중 통과 13, 실패 0, 건너뜀 0,
+  결과 `Passed`.
+- 변경 Swift 파일 저장소 lint: 형식 교정 뒤 0 violation.
+- 정적 검색: Composition production의 `FetchLearningProjectsMock`,
+  `DeleteLearningProjectMock`, `FeatureTests`, `Mock` 참조 0건이며 `live()`와 두 표본 구체
+  구현 선택 파일은 `AppComposition.swift` 한 곳이다.
+- `380c4b4`, `24d5068`: 두 커밋 모두 pre-commit 스크립트 회귀 검증을 통과했다.
+
+### 재발 방지
+
+새 test target을 추가하는 작업은 target, 공유 scheme test action과 정확한 소유 경로를 함께
+배정한다. 단일 scheme의 Red·Green은 runner가 scheme 인자를 지원하기 전까지 서로 다른 임시
+Derived Data를 지정한 직접 `xcodebuild`로 실행한다. Tuist·Swift lint가 사용자 상태 또는 캐시
+권한으로 실패하면 제품 실패와 분리해 같은 명령을 필요한 권한으로 재실행하고, 그 결과에서
+나온 실제 형식 오류를 별도로 교정한다.
+
+### 연결
+
+선행: `TS-20260819-010`. 후속: 없음.

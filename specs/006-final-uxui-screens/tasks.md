@@ -115,7 +115,7 @@
 ### 패키지 검증과 승인
 
 - [X] T028 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `Composition` scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 표본 조회·삭제·조립 테스트, production Mock 정의·참조 0건과 `live()` 구현 선택 지점 한 파일을 확인한다
-- [ ] T029 [no-write] T016~T028의 Composition 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 UI 진행에 대한 명시적 사용자 승인을 기다린다
+- [X] T029 [no-write] T016~T028의 Composition 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 UI 진행에 대한 명시적 사용자 승인을 기다린다
 
 **승인 게이트**: T029 승인 전에는 UI, Feature, App 파일을 생성·수정·삭제하지 않는다.
 
