@@ -4,6 +4,8 @@
 
 **작성일**: 2026-08-18
 
+**최종 수정일**: 2026-08-19
+
 **원천**: Figma export `사용한 컴포넌트.svg`, `사용한 아이콘.svg`
 
 이 문서는 디자인에서 확정된 컴포넌트·자산 목록과 `UIComponent` 구현 현황을 대응시킵니다.
@@ -21,11 +23,11 @@
 
 | Figma 컴포넌트 | 변형 | 구현 | 상태 | 비고 |
 | --- | --- | --- | --- | --- |
-| `Button` | Size LG·MD·SM × Style Primary·Secondary·Primary Text·Text × State Default·Pressing·Disabled·Error | `Leaf/ActionButton` | [x] | Style 4종·Disabled 대응. Size 분기와 Pressing·Error 상태 미대응 |
-| `Button - Liquid Glass - Icon` | Size MD·SM × Style 4종 × State 4종 | `Leaf/IconButton` | [x] | `.glass` 버튼 스타일 + tint 4종. Size 분기와 Pressing·Error 상태 미대응 |
+| `Button` | Size LG·MD·SM × Style Primary·Secondary·Primary Text·Text × State Default·Pressing·Disabled·Error | `Leaf/ActionButton` | [x] | Style 4종·LG 54pt·MD 40pt·SM 36pt·Disabled 대응. Pressing·Error 상태 미대응 |
+| `Button - Liquid Glass - Icon` | Size MD·SM × Style 4종 × State 4종 | `Leaf/IconGlassButton` | [x] | `.glass` 버튼 스타일 + tint 4종·MD·SM 대응. Pressing·Error 상태 미대응 |
 | `Button - Liquid Glass - Group` | Only Icon, Various | `Composite/ScreenHeader` 컨트롤 행 | [x] | 독립 컴포넌트가 아니라 헤더의 leading·trailing 슬롯으로 표현 |
 | `Tag` | Accent, Normal | `Leaf/TagBadge` | [x] | `neutral`·`accent`·`selected` 3종 |
-| `Dropdown menu` | 단일 | — | [ ] | 미구현 |
+| `Dropdown menu` | 단일 | `Composite/ActionMenu` | [x] | 불변 항목과 별도 선택 콜백, 항목별 VoiceOver 라벨 제공 |
 | `Text field` | Default, Active, Filled, Error | — | [ ] | 미구현 |
 | `Check List` | 단일 | — | [ ] | 미구현. `Sheet Modal` 안에서만 사용 |
 
@@ -38,14 +40,14 @@
 | `Sheet Modal` | 단일 | `Composite/SheetSurface` | [x] | Grabber + 상단 모서리 표면. Overlay(scrim)는 호출부 책임 |
 | `BottomNavigationBar`, `BottomNavigationBar-item` | selected, default | `Composite/TabShell`, `TabShellItem` | [x] | 탭 목록은 `TabShellItem` 준수 타입이 소유 |
 | `Modal` | Default, Progress, Text Field | — | [ ] | 미구현. `Text field`·`Progress Bar` 선행 필요 |
-| `top dim`, `bottom dim` | Default, 문제풀이용 | — | [ ] | 미구현 |
+| `top dim`, `bottom dim` | Default, 문제풀이용 | `Leaf/ScreenEdgeScrim` | [x] | 상·하단 그라데이션 변형. 사용자 상호작용을 가로채지 않음 |
 | — | — | `Composite/ScreenContainer` | [x] | Figma에 대응 컴포넌트가 없는 화면 배경·색 구성표 소유자 |
 
 ## 3. 진행 표시
 
 | Figma 컴포넌트 | 변형 | 구현 | 상태 | 비고 |
 | --- | --- | --- | --- | --- |
-| `bar` | 0%, 30%, 50%, 80%, 100% | — | [ ] | 미구현. 현재는 `ProjectRow`·`HomeProjectCard`가 각각 그림 |
+| `bar` | 0%, 30%, 50%, 80%, 100% | `Leaf/ContinuousProgressBar` | [x] | 0...1 연속 진행률과 6pt track·fill 표면 제공 |
 | `Progress Bar` | label Set + Bar | — | [ ] | 미구현. 라벨을 포함한 조합 |
 | — | — | `Leaf/ProgressSegments` | [x] | 문항 단위 세그먼트 표시. Figma `bar`(연속형)와 다른 계약 |
 
@@ -54,7 +56,8 @@
 | Figma 컴포넌트 | 변형 | 구현 | 상태 | 비고 |
 | --- | --- | --- | --- | --- |
 | `Card` | Purple, Blue, Navy | `Composite/HomeProjectCard` | [x] | `Variant` purple·lightBlue·darkBlue |
-| `학습세트 List-item` | Default, Variant2 | `Composite/ProjectRow` | [x] | Variant2를 `isDeleting`으로 표현 |
+| `ProjectList` | Default, Delete | `Composite/ProjectRow` | [x] | 연속 진행 바와 태그를 포함하고 `isDeleting`으로 상태 표현 |
+| `학습세트 List-item` | Default, Variant2 | — | [ ] | 320×130pt·세그먼트 진행 표시를 가진 별도 미구현 컴포넌트 |
 | `select card` | off, on | `Composite/SelectionCard` | [x] | `isSelected`로 테두리·trait 분기 |
 | `select card list` | Default, 1~5 | `Composite/SelectionCardList` | [x] | 선택 개수 변형은 항목 상태로 표현 |
 | `오픈소스 추천` | 단일 | — | [ ] | 미구현 |
@@ -76,7 +79,7 @@
 | 리스트 썸네일 `Illust_Levels_*` | Beginner, Junior, Mid, Senior | — | [ ] | 미구현. 4단계 레벨 일러스트 |
 | 리스트 썸네일 `Illust_Knowledge_*` | Basic, Intermediate, Advanced | — | [ ] | 미구현. 3단계 지식 일러스트 |
 | Empty 일러스트 | PNG | `ResourceImage.Asset.emptyState` + `Composite/EmptyState` | [x] | |
-| 리스트 썸네일 삭제 아이콘 | Trash | `IconButton.destructive` | [x] | SF Symbol `trash`로 대체 |
+| 리스트 썸네일 삭제 아이콘 | Trash | `IconGlassButton.destructive` | [x] | SF Symbol `trash`로 대체 |
 | 로딩 애니메이션 | JSON(Lottie) | — | [ ] | 미구현. Lottie 의존성 도입 여부 미결정 |
 | 알림 애니메이션 | JSON(Lottie) | — | [ ] | 미구현. 같은 의존성 결정에 묶임 |
 
@@ -100,16 +103,15 @@
 ## 8. 남은 작업 요약
 
 - [ ] `Text field` — `Modal`과 문항 화면의 선행 조건
-- [ ] `bar` / `Progress Bar` — 연속형 진행 표시를 컴포넌트로 승격
+- [ ] `Progress Bar` — 라벨을 포함한 진행 표시 조합
+- [ ] `학습세트 List-item` — 320×130pt·세그먼트 진행 표시 계약
 - [ ] `객관식문항-문제 풀이`, `객관식문항-답안`
 - [ ] `Modal` 3변형
-- [ ] `Dropdown menu`
 - [ ] `Check List`
 - [ ] `오픈소스 추천`
-- [ ] `top dim` / `bottom dim`
 - [ ] 레벨·지식 단계 썸네일 일러스트 자산
 - [ ] Lottie 애니메이션 2종과 의존성 결정
-- [ ] `ActionButton`·`IconButton`의 Size 분기와 Pressing·Error 상태
+- [ ] `ActionButton`·`IconGlassButton`의 Pressing·Error 상태
 
 ## 문서 변경 기준
 
