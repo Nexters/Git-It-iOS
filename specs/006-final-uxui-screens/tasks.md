@@ -140,42 +140,42 @@
 
 ### 테스트 — Red
 
-- [ ] T030 [P] [S3] `sources/Projects/UI/DesignSystemTests/LayoutTokenTests.swift`에 기존 20pt·12pt와 반복 간격 `compactSpacing` 8pt 및 토큰 총 개수 계약을 작성한다
-- [ ] T031 [P] [S4] `sources/Projects/UI/DesignSystemTests/SemanticColorTokenTests.swift`에 `progressTrack → grey500`, `progressFill → blue200` 참조 무결성 테스트를 작성한다
-- [ ] T032 [P] [S4] `sources/Projects/UI/DesignSystemTests/GradientTokenTests.swift`에 stop 불투명도, 상단 아래→위 0/0.25·alpha 0/0.5, 하단 위→아래 0.7/1·alpha 0.6/0 계약과 기존 3종 회귀를 작성한다
-- [ ] T033 [P] [S4] `sources/Projects/UI/DesignSystemTests/ColorTokenTests.swift`에 Figma 변수 25개의 이름·hex·opacity 전량 대조와 근거가 있는 저장소 전용 토큰 분리 검증을 추가한다
-- [ ] T034 [P] [S3] `sources/Projects/UI/UIComponentTests/ActionButtonSizeContractTests.swift`에 공개 `ActionButton.Size`의 LG 54·MD 40·SM 36pt 표면 계단과 모든 크기의 최소 44pt 터치 영역 구성 계약을 작성하고, `SheetSurface`·`ProjectRow`의 private 레이아웃 수치는 이 단위 테스트에 노출하지 않는다
-- [ ] T035 [S3] `sources/Projects/UI/UIComponentTests/LayoutConstantContractTests.swift`의 기존 `ActionButton.Size.small` 40pt 기대를 LG 54·MD 40·SM 36pt 계단으로 교정하고 `IconGlassButton` 크기 회귀 계약은 보존한다
-- [ ] T036 [P] [S2] `sources/Projects/UI/UIComponentTests/ContinuousProgressBarContractTests.swift`에 높이 6pt, 진행률 경계와 track·fill 의미 토큰 사용 계약을 작성한다
-- [ ] T037 [P] [S2] `sources/Projects/UI/UIComponentTests/ActionMenuContractTests.swift`에 메뉴 181×126pt, 내부 여백, 불변 ViewModel·선택 콜백 분리와 항목 VoiceOver 의미 계약을 작성한다
-- [ ] T038 [P] [S2] `sources/Projects/UI/UIComponentTests/ScreenEdgeScrimContractTests.swift`에 top·bottom 변형이 대응 GradientToken만 사용하고 사용자 상호작용을 가로채지 않는 계약을 작성한다
-- [ ] T039 [S2] `sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift`에 ActionButton 3크기, ProjectRow 기본·삭제, SheetSurface, ContinuousProgressBar, ActionMenu, ScreenEdgeScrim 시나리오와 실제 렌더 frame·padding을 읽을 고유 accessibility identifier를 추가한다
-- [ ] T040 [S3] `sources/Projects/UI/UIComponentUITests/LayoutContractUITests.swift`에 `SheetSurface` grabber 58×4pt·위 5pt·영역 16pt, `ProjectRow` 방향별 inset·기본 150pt·삭제 94pt, ActionButton 크기 계단, `tag.radius` 8pt 보존, 44×44pt 터치 영역, 계약 ID 진단과 최대 Dynamic Type 적응 검증을 추가한다
-- [ ] T041 [no-write] `DesignSystem`, `UIComponent`, `UIComponentLayout` 테스트를 실행해 T030~T040이 신규 토큰·컴포넌트와 기준선 불일치 때문에 예상대로 실패하는지 확인한다
+- [x] T030 [P] [S3] `sources/Projects/UI/DesignSystemTests/LayoutTokenTests.swift`에 기존 20pt·12pt와 반복 간격 `compactSpacing` 8pt 및 토큰 총 개수 계약을 작성한다
+- [x] T031 [P] [S4] `sources/Projects/UI/DesignSystemTests/SemanticColorTokenTests.swift`에 `progressTrack → grey500`, `progressFill → blue200` 참조 무결성 테스트를 작성한다
+- [x] T032 [P] [S4] `sources/Projects/UI/DesignSystemTests/GradientTokenTests.swift`에 stop 불투명도, 상단 아래→위 0/0.25·alpha 0/0.5, 하단 위→아래 0.7/1·alpha 0.6/0 계약과 기존 3종 회귀를 작성한다
+- [x] T033 [P] [S4] `sources/Projects/UI/DesignSystemTests/ColorTokenTests.swift`에 Figma 변수 25개의 이름·hex·opacity 전량 대조와 근거가 있는 저장소 전용 토큰 분리 검증을 추가한다
+- [x] T034 [P] [S3] `sources/Projects/UI/UIComponentTests/ActionButtonSizeContractTests.swift`에 공개 `ActionButton.Size`의 LG 54·MD 40·SM 36pt 표면 계단과 모든 크기의 최소 44pt 터치 영역 구성 계약을 작성하고, `SheetSurface`·`ProjectRow`의 private 레이아웃 수치는 이 단위 테스트에 노출하지 않는다
+- [x] T035 [S3] `sources/Projects/UI/UIComponentTests/LayoutConstantContractTests.swift`의 기존 `ActionButton.Size.small` 40pt 기대를 LG 54·MD 40·SM 36pt 계단으로 교정하고 `IconGlassButton` 크기 회귀 계약은 보존한다
+- [x] T036 [P] [S2] `sources/Projects/UI/UIComponentTests/ContinuousProgressBarContractTests.swift`에 높이 6pt, 진행률 경계와 track·fill 의미 토큰 사용 계약을 작성한다
+- [x] T037 [P] [S2] `sources/Projects/UI/UIComponentTests/ActionMenuContractTests.swift`에 메뉴 181×126pt, 내부 여백, 불변 ViewModel·선택 콜백 분리와 항목 VoiceOver 의미 계약을 작성한다
+- [x] T038 [P] [S2] `sources/Projects/UI/UIComponentTests/ScreenEdgeScrimContractTests.swift`에 top·bottom 변형이 대응 GradientToken만 사용하고 사용자 상호작용을 가로채지 않는 계약을 작성한다
+- [x] T039 [S2] `sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift`에 ActionButton 3크기, ProjectRow 기본·삭제, SheetSurface, ContinuousProgressBar, ActionMenu, ScreenEdgeScrim 시나리오와 실제 렌더 frame·padding을 읽을 고유 accessibility identifier를 추가한다
+- [x] T040 [S3] `sources/Projects/UI/UIComponentUITests/LayoutContractUITests.swift`에 `SheetSurface` grabber 58×4pt·위 5pt·영역 16pt, `ProjectRow` 방향별 inset·기본 최소 150pt·삭제 94pt, ActionButton 크기 계단, `tag.radius` 8pt 보존, 44×44pt 터치 영역, 계약 ID 진단과 최대 Dynamic Type 적응 검증을 추가한다
+- [x] T041 [no-write] `DesignSystem`, `UIComponent`, `UIComponentLayout` 테스트를 실행해 T030~T040이 신규 토큰·컴포넌트와 기준선 불일치 때문에 예상대로 실패하는지 확인한다
 
 ### DesignSystem 구현 — Green
 
-- [ ] T042 [P] [S3] `sources/Projects/UI/DesignSystem/Token/LayoutToken.swift`에 역할이 이름에서 드러나는 `compactSpacing` 8pt 토큰을 추가하고 `all`에 등록한다
-- [ ] T043 [P] [S4] `sources/Projects/UI/DesignSystem/Token/SemanticColorToken.swift`에 `progressTrack`과 `progressFill`을 각각 `grey500`, `blue200` 참조로 추가하고 `all`에 등록한다
-- [ ] T044 [S4] `sources/Projects/UI/DesignSystem/Token/GradientToken.swift`의 `Stop`에 기본값 1인 opacity를 추가하고 `topEdgeScrim`을 아래→위, `bottomEdgeScrim`을 위→아래 방향과 Figma 실측 정지점으로 정의한다
-- [ ] T045 [S4] `sources/Projects/UI/DesignSystem/Application/View+GradientToken.swift`가 각 `GradientToken.Stop.opacity`를 SwiftUI `Color`에 적용하도록 확장한다
+- [x] T042 [P] [S3] `sources/Projects/UI/DesignSystem/Token/LayoutToken.swift`에 역할이 이름에서 드러나는 `compactSpacing` 8pt 토큰을 추가하고 `all`에 등록한다
+- [x] T043 [P] [S4] `sources/Projects/UI/DesignSystem/Token/SemanticColorToken.swift`에 `progressTrack`과 `progressFill`을 각각 `grey500`, `blue200` 참조로 추가하고 `all`에 등록한다
+- [x] T044 [S4] `sources/Projects/UI/DesignSystem/Token/GradientToken.swift`의 `Stop`에 기본값 1인 opacity를 추가하고 `topEdgeScrim`을 아래→위, `bottomEdgeScrim`을 위→아래 방향과 Figma 실측 정지점으로 정의한다
+- [x] T045 [S4] `sources/Projects/UI/DesignSystem/Application/View+GradientToken.swift`가 각 `GradientToken.Stop.opacity`를 SwiftUI `Color`에 적용하도록 확장한다
 
 ### UIComponent 구현 — Green
 
-- [ ] T046 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ContinuousProgressBar.swift`에 0...1 진행률, 6pt 표면과 `progressTrack`·`progressFill`을 가진 화면 독립 말단 컴포넌트를 구현한다
-- [ ] T047 [P] [S2] `sources/Projects/UI/UIComponent/Components/Composite/ActionMenu.swift`에 불변 항목 ViewModel과 별도 선택 콜백, 181×126pt 메뉴 계약과 VoiceOver 라벨을 구현한다
-- [ ] T048 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ScreenEdgeScrim.swift`에 `topEdgeScrim`·`bottomEdgeScrim` 시각 변형과 hit testing 제외를 구현한다
-- [ ] T049 [P] [S3] `sources/Projects/UI/UIComponent/Components/Leaf/ActionButton.swift`의 `Size`를 LG 54·MD 40·SM 36pt 표면과 최소 44pt 터치 영역으로 교정하고 기존 생성 경로를 보존한다
-- [ ] T050 [P] [S3] `sources/Projects/UI/UIComponent/Components/Composite/SheetSurface.swift`의 grabber를 58×4pt, 위 5pt, grabber 영역 총 16pt로 교정하고 Figma 미확정값은 기존 근거 수준으로 유지한다
-- [ ] T051 [S2] `sources/Projects/UI/UIComponent/Components/Composite/ProjectRow.swift`가 위 16·좌우 18·아래 18pt inset, 기본 150pt·삭제 94pt 최소 높이, 8pt 세부 간격과 `ContinuousProgressBar`를 사용하도록 교정한다
-- [ ] T052 [S1] `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응을 Figma `ProjectList`로 정정하고 `학습세트 List-item`은 별도 미구현 컴포넌트로 유지하며 신규 컴포넌트 상태를 반영한다
-- [ ] T053 `sources/Projects/UI/UIComponentTests/Placeholder.swift`를 실제 UIComponent 테스트가 추가된 뒤 삭제한다
+- [x] T046 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ContinuousProgressBar.swift`에 0...1 진행률, 6pt 표면과 `progressTrack`·`progressFill`을 가진 화면 독립 말단 컴포넌트를 구현한다
+- [x] T047 [P] [S2] `sources/Projects/UI/UIComponent/Components/Composite/ActionMenu.swift`에 불변 항목 ViewModel과 별도 선택 콜백, 181×126pt 메뉴 계약과 VoiceOver 라벨을 구현한다
+- [x] T048 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ScreenEdgeScrim.swift`에 `topEdgeScrim`·`bottomEdgeScrim` 시각 변형과 hit testing 제외를 구현한다
+- [x] T049 [P] [S3] `sources/Projects/UI/UIComponent/Components/Leaf/ActionButton.swift`의 `Size`를 LG 54·MD 40·SM 36pt 표면과 최소 44pt 터치 영역으로 교정하고 기존 생성 경로를 보존한다
+- [x] T050 [P] [S3] `sources/Projects/UI/UIComponent/Components/Composite/SheetSurface.swift`의 grabber를 58×4pt, 위 5pt, grabber 영역 총 16pt로 교정하고 Figma 미확정값은 기존 근거 수준으로 유지한다
+- [x] T051 [S2] `sources/Projects/UI/UIComponent/Components/Composite/ProjectRow.swift`가 위 16·좌우 18·아래 18pt inset, 기본 150pt·삭제 94pt 최소 높이, 8pt 세부 간격과 `ContinuousProgressBar`를 사용하도록 교정한다
+- [x] T052 [S1] `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응을 Figma `ProjectList`로 정정하고 `학습세트 List-item`은 별도 미구현 컴포넌트로 유지하며 신규 컴포넌트 상태를 반영한다
+- [x] T053 `sources/Projects/UI/UIComponentTests/Placeholder.swift`를 실제 UIComponent 테스트가 추가된 뒤 삭제한다
 
 ### 패키지 검증과 승인
 
-- [ ] T054 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `DesignSystem`, `UIComponent`, `UIComponentLayout` 각 scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 색 변수 25개, 그라데이션 방향·정지점, 기준선 갱신 4개, `tag.radius` 8pt 보존, 44pt 터치 영역과 최대 Dynamic Type을 확인한다
-- [ ] T055 [no-write] `rg`와 diff 검토로 UI production 코드의 색 리터럴, `body` 직접 여백 수치, 둘 이상의 View에 복제된 로컬 여백 상수가 각각 0건이고 한 View 전용 `private enum Constant`만 허용되는지 확인한다
-- [ ] T056 [no-write] T030~T055의 UI 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Feature 진행에 대한 명시적 사용자 승인을 기다린다
+- [x] T054 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `DesignSystem`, `UIComponent`, `UIComponentLayout` 각 scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 색 변수 25개, 그라데이션 방향·정지점, 기준선 갱신 4개, `tag.radius` 8pt 보존, 44pt 터치 영역과 최대 Dynamic Type을 확인한다
+- [x] T055 [no-write] `rg`와 diff 검토로 UI production 코드의 색 리터럴, `body` 직접 여백 수치, 둘 이상의 View에 복제된 로컬 여백 상수가 각각 0건이고 한 View 전용 `private enum Constant`만 허용되는지 확인한다
+- [x] T056 [no-write] T030~T055의 UI 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Feature 진행에 대한 명시적 사용자 승인을 기다린다
 
 **승인 게이트**: T056 승인 전에는 Feature와 App 파일을 생성·수정·삭제하지 않는다.
 

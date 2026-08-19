@@ -627,3 +627,153 @@ Derived Data를 지정한 직접 `xcodebuild`로 실행한다. Tuist·Swift lint
 ### 연결
 
 선행: `TS-20260819-010`. 후속: 없음.
+
+## TS-20260819-012: UI 검증 명령과 기존 회귀 테스트의 작업 배정 누락
+
+**기록일**: 2026-08-19
+
+**상태**: 해결
+
+**발생 단계**: `$speckit-implement` UI 패키지 `T030`~`T056` 사전 검증
+
+**관련 항목**: `T035`, `T054`, `76ce6cb`, `804959e`
+
+### 증상
+
+초기 `T054`는 action 하나만 받는 project build runner에 scheme 인자를 함께 전달하도록 적혀
+있어 실행할 수 없었다. 또한 `ActionButton.Size.small == 40`을 기대하는 기존
+`LayoutConstantContractTests.swift`가 새 LG·MD·SM 계약과 충돌했지만, 그 파일은 최초 UI
+작업에 배정되지 않았다.
+
+### 영향
+
+원문 그대로는 UI package 세 scheme을 서로 격리해 검증할 수 없고, 새 Red 테스트를 통과시켜도
+작업 범위 밖의 기존 회귀 테스트가 Green을 막는다. 구현 스킬이 임의로 runner 인터페이스나
+미배정 테스트를 수정하면 작업 소유 경계를 위반하게 된다.
+
+### 근거
+
+- project build runner는 공개 입력으로 action 하나만 허용하며 scheme 인자를 받지 않는다.
+- `LayoutConstantContractTests.swift`는 기존 `ActionButton.Size.small.surfaceHeight == 40`을
+  단언했다.
+- `76ce6cb`은 `T054`를 scheme별 직접 `xcodebuild build`·`xcodebuild test`와 격리된
+  `-derivedDataPath`로 교정했다.
+- `804959e`는 기존 회귀 파일을 독립 `T035`에 배정하고 이후 작업 번호를 연속으로 이동했다.
+
+### 원인
+
+작업 생성 시 저장소 runner의 실제 인자 계약과 기존 UIComponent 테스트 인벤토리를 함께
+대조하지 않아, 실행할 수 없는 검증 명령과 누락된 회귀 파일 소유 범위가 만들어졌다.
+
+### 조치
+
+- UI 구현 전에 `tasks.md`만 두 작업 단위로 먼저 보정하고 각각 문서 커밋으로 고정했다.
+- 기존 회귀 기대를 LG 54pt·MD 40pt·SM 36pt 계단으로 교정하는 작업을 명시했다.
+- 최종 검증은 `DesignSystem`, `UIComponent`, `UIComponentLayout`마다 별도 임시 Derived Data를
+  사용하는 직접 `xcodebuild`로 수행했다.
+
+### 검증
+
+- 작업 ID가 `T001`~`T092`까지 중복과 누락 없이 연속임을 확인했다.
+- `make tuist`가 성공했다.
+- 세 scheme의 독립 build가 모두 종료 코드 0을 반환했다.
+- xcresult 요약은 `DesignSystem` 31/31, `UIComponent` 14/14,
+  `UIComponentLayout` 15/15 통과를 반환했다.
+
+### 재발 방지
+
+패키지 검증 작업을 생성할 때 runner의 실제 usage를 먼저 실행해 action·scheme 입력을 확인한다.
+기준선 변경은 신규 테스트만 검색하지 않고 같은 public API를 참조하는 기존 테스트를 `rg`로
+전량 찾아 정확한 수정 파일을 작업 소유 경로에 함께 배정한다.
+
+### 연결
+
+선행: `TS-20260819-011`. 후속: 없음.
+
+## TS-20260819-013: UI 렌더 계약 하네스의 좌표·픽셀 판독 오탐
+
+**기록일**: 2026-08-19
+
+**상태**: 해결
+
+**발생 단계**: `$speckit-implement` UI 패키지 `T039`~`T055` Red·Green 검증
+
+**관련 항목**: `T039`~`T055`, `04ea419`, `5005549`
+
+### 증상
+
+실제 컴포넌트 값을 교정한 뒤에도 UI 테스트가 단계별로 서로 다른 실패를 보고했다. 상위
+accessibility identifier가 자식 identifier를 가렸고, 기본 ProjectRow fixture의 긴 제목이
+최대 Dynamic Type 스트레스 조건과 섞였다. screenshot crop 뒤 Y축을 한 번 더 뒤집었으며,
+같은 RGB의 모든 픽셀을 하나의 bounds로 합쳐 우연히 일치한 단일 픽셀까지 측정했다. 캡슐과
+라운드 사각형의 strict RGB 경계는 안티앨리어싱 때문에 실제 폭과 반경도 축소·과대평가했다.
+
+정적 리뷰에서는 `ActionMenu`의 외부 `minHeight`가 명시된 아래 9pt 외에 21pt 빈 공간을
+추가하고, ProjectRow의 26pt 강제가 `TagBadge` 고유 높이를 overflow시키는 문제도 발견했다.
+
+### 영향
+
+제품 구현 실패와 테스트 하네스 오탐을 구분하지 않으면 Figma 확정값을 오탐에 맞춰 바꾸거나,
+Dynamic Type 콘텐츠를 clip하고도 Green으로 오판할 수 있었다. `swiftc -parse`만으로는 한때
+누락된 `return`도 검출하지 못해 실제 target typecheck가 별도로 필요했다.
+
+### 근거
+
+- 최초 visual Red: 기존 회귀를 포함해 7개 실패·4개 통과, identifier 보정 뒤 3개 실패·8개
+  통과.
+- 첫 Green 전체 실행: 15개 중 13개 통과, ProjectRow 162pt와 Sheet grabber 상대 좌표 실패.
+- fixture·crop 보정 뒤: ProjectRow 151.333pt, grabber strict 폭 57.333pt.
+- 잘못된 Y 반전·전역 union 경로에서는 thumbnail 60pt를 100pt, grabber top 5pt를
+  50.718pt로 오판했다.
+- 첫 전체 픽셀 보정 실행은 15개 중 13개 통과했고 progress fill 208pt를 207.333pt,
+  `tag.radius` 8pt를 9.7pt로 읽었다.
+- 최종 `/private/tmp/GitIt-006-T054-UIComponentLayout.xcresult`는 15개 전부 통과했다.
+
+### 원인
+
+- SwiftUI accessibility container의 상위 identifier가 결합된 자식 식별자를 덮었다.
+- 기본 크기와 최대 Dynamic Type fixture가 서로 다른 검증 목적을 공유했다.
+- upright screenshot에 불필요한 CGContext Y flip을 적용했고, RGB bounds가 연결 영역을
+  구분하지 않았다.
+- strict 단색 픽셀만 도형 경계로 취급해 캡슐 edge와 라운드 corner의 subpixel coverage를
+  버렸다.
+- `ActionMenu`는 126pt surface에서 위 8pt·아래 9pt를 뺀 109pt를 항목에 배분하지 않았고,
+  ProjectRow의 150pt는 Dynamic Type 계약상 고정 높이가 아니라 최소 높이인데 26pt 세부 영역을
+  강제했다.
+
+### 조치
+
+- 하위 실제 컴포넌트 identifier를 덮는 그룹 identifier를 제거하고 offscreen element를 찾는
+  `reveal` 경로를 추가했다.
+- 기본 fixture는 한 줄 문자열, 최대 Dynamic Type fixture는 긴 전체 접근성 문자열로 분리했다.
+- app screenshot을 element frame으로 crop한 뒤 추가 Y flip을 제거하고, 4-connected component
+  중 주 geometry marker만 선택했다.
+- 캡슐은 좌우 1px 안티앨리어싱 edge를 복원하고, Tag는 marker/background RGB projection의
+  50% coverage 교차점을 인접 pixel center 사이에서 보간해 반경을 추정했다. 이 RGB 허용치는
+  geometry 탐색에만 쓰며 색 정합 근거로 사용하지 않는다.
+- `ActionMenu`는 항목 2개에 54.5pt씩 배분해 8 + 54.5×2 + 9 = 126pt를 실제 frame으로 만들고,
+  항목이 늘면 최소 44pt를 보존하며 surface를 확장한다.
+- ProjectRow는 `TagBadge`를 압축하지 않고 150pt·94pt 최소 높이와 방향별 padding을 유지하며,
+  렌더 테스트가 실제 12pt·12pt 간격과 아래 18pt를 판정하도록 했다.
+- `xcodebuild build-for-testing`과 실제 UI test로 parse 외 typecheck·실행을 확인했다.
+
+### 검증
+
+- SheetSurface·ProjectRow·ActionMenu 선택 테스트 3/3 통과.
+- progress 0%·65%·100%와 Tag radius 선택 테스트 2/2 통과.
+- 전체 `UIComponentLayout` 15/15 통과, 실패·건너뜀 0.
+- `UIComponent` 14/14 통과로 `ActionMenu` 2·3항목 높이 계산과 신규 공개 계약을 확인했다.
+- 변경 Swift 파일 전체 저장소 formatter lint 0 violation, `git diff --check` 통과.
+- 토큰 밖 색 리터럴과 의미 있는 body 직접 여백 수치 검색은 각각 0건이다.
+
+### 재발 방지
+
+렌더 테스트는 접근성 식별자가 실제 자식에 남는지 Red 단계에서 먼저 확인한다. 색상 bounds는
+전역 union 대신 연결 영역을 사용하고, anti-aliased shape의 geometry는 coverage contour를
+subpixel로 복원한다. `swiftc -parse` 성공을 target typecheck로 간주하지 않는다. 고정 크기와
+최소 크기를 구분하고, 명시된 inset은 외부 min frame이 아니라 자식 frame의 실제 상대 좌표로
+검증한다.
+
+### 연결
+
+선행: `TS-20260819-012`. 후속: 없음.
