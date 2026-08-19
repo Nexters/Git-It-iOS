@@ -15,6 +15,7 @@ extension CompositionModuleName {
                 name: rawValue,
                 dependencies: [
                     .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
                     .fromData(.DataAuthentication),
                     .fromInfrastructure(.InfrastructureAuthentication),
                 ],
@@ -28,6 +29,7 @@ extension CompositionModuleName {
                 ),
                 additionalDependencies: [
                     .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
                     .fromData(.DataAuthentication),
                     .fromInfrastructure(.InfrastructureAuthentication),
                 ],
@@ -40,7 +42,7 @@ extension TargetDependency {
     static func fromComposition(_ name: CompositionModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../Composition"
+            path: "../Composition",
         )
     }
 }
