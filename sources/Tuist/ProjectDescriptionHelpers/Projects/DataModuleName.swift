@@ -5,6 +5,8 @@ import ProjectDescription
 enum DataModuleName: String, CaseIterable {
     case DataAuthentication
     case DataAuthenticationTests
+    case DataLearningProject
+    case DataLearningProjectTests
 }
 
 extension DataModuleName {
@@ -22,6 +24,19 @@ extension DataModuleName {
                     name: DataModuleName.DataAuthentication.rawValue
                 ),
             )
+
+        case .DataLearningProject:
+            .module(
+                name: rawValue
+            )
+
+        case .DataLearningProjectTests:
+            .testModule(
+                name: rawValue,
+                productionTarget: .target(
+                    name: DataModuleName.DataLearningProject.rawValue
+                ),
+            )
         }
     }
 }
@@ -30,7 +45,7 @@ extension TargetDependency {
     static func fromData(_ name: DataModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../Data"
+            path: "../Data",
         )
     }
 }
