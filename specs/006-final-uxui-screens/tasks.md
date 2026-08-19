@@ -56,16 +56,16 @@
 - [X] T006 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectID.swift`에 공백 제거 후 빈 원시값을 거부하고 원래 식별값을 보존하는 `Sendable`, `Hashable`, `Identifiable` 값 객체를 구현한다
 - [X] T007 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProgress.swift`에 `completedRatio`를 0...1로 고정하는 `Sendable`, `Equatable` 값 객체를 구현한다
 - [X] T008 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningSetMark.swift`에 1 이상의 `order`와 `title`을 보존하는 `Sendable`, `Equatable` 값 객체를 구현한다
-- [ ] T009 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectError.swift`에 `temporarilyUnavailable`, `projectUnavailable`만 표현하는 기술 중립 오류를 구현한다
+- [X] T009 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectError.swift`에 `temporarilyUnavailable`, `projectUnavailable`만 표현하는 기술 중립 오류를 구현한다
 - [X] T010 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectSummary.swift`에 식별자, 이름, 기술 목록, 진행 정보와 다음 세트 표시 정보를 가진 `Identifiable`, `Sendable`, `Equatable` 모델을 구현한다
 - [X] T011 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectPage.swift`에 프로젝트 요약 배열과 `hasNextPage`를 가진 `Sendable`, `Equatable` 모델을 구현한다
-- [ ] T012 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects.swift`에 `callAsFunction(page:size:) async throws -> LearningProjectPage`를 선언하는 `Sendable` Protocol을 구현한다
-- [ ] T013 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProject.swift`에 `callAsFunction(_:) async throws`를 선언하는 `Sendable` Protocol을 구현한다
+- [X] T012 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects.swift`에 `callAsFunction(page:size:) async throws -> LearningProjectPage`를 선언하는 `Sendable` Protocol을 구현한다
+- [X] T013 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProject.swift`에 `callAsFunction(_:) async throws`를 선언하는 `Sendable` Protocol을 구현한다
 
 ### 패키지 검증과 승인
 
-- [ ] T014 [no-write] `make tuist` 후 project build runner로 `DomainLearningProject`를 build·test하고 금지된 프로젝트 의존성 0건, 모델 테스트 통과, Domain source·test target의 `FetchLearningProjectsMock`·`DeleteLearningProjectMock` 정의 0건을 확인한다
-- [ ] T015 [no-write] T001~T014의 Domain 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Composition 진행에 대한 명시적 사용자 승인을 기다린다
+- [X] T014 [no-write] `make tuist` 후 project build runner로 `DomainLearningProject`를 build·test하고 금지된 프로젝트 의존성 0건, 모델 테스트 통과, Domain source·test target의 `FetchLearningProjectsMock`·`DeleteLearningProjectMock` 정의 0건을 확인한다
+- [X] T015 [no-write] T001~T014의 Domain 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Composition 진행에 대한 명시적 사용자 승인을 기다린다
 
 **승인 게이트**: T015 승인 전에는 Composition, UI, Feature, App 파일을 생성·수정·삭제하지
 않는다.
