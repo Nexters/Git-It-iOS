@@ -3,7 +3,7 @@
 **입력**: `/specs/006-final-uxui-screens/`의 `spec.md`, `plan.md`, `research.md`,
 `data-model.md`, `contracts/**`, `quickstart.md`
 
-**테스트**: 명세 FR-008, FR-022와 SC-003~SC-022가 자동 검증을 요구하므로 각 패키지에서
+**테스트**: 명세 FR-008, FR-022와 SC-003~SC-008, SC-010~SC-023이 자동 또는 정적 검증을 요구하므로 각 패키지에서
 테스트를 먼저 작성하고 예상한 이유로 실패하는지 확인한 뒤 구현한다.
 
 **적용 패키지**: `Domain → Composition → UI → Feature → App`. Data와 Infrastructure는
@@ -21,6 +21,9 @@
 
 모든 파일 변경 작업은 정확한 저장소 상대 경로 하나와 이 문서의 패키지 단계 하나에만
 속한다. 다른 패키지 단계의 작업은 승인 게이트를 넘어 병렬 실행하지 않는다.
+
+계약 문서의 `계획 상태`는 구현 책임과 검증 대상을 뜻하며, 현재 완료 상태는 이 문서의
+체크박스와 실제 빌드·테스트 결과가 소유한다. 계약에 동적인 현재 상태를 복제하지 않는다.
 
 ---
 
@@ -127,30 +130,32 @@
 공용 컴포넌트 기준선 4개를 교정하며 참조 화면에 필요한 화면 독립 표현 컴포넌트를 구현한다.
 
 **소유 경로**: `sources/Projects/UI/DesignSystem/**`,
-`sources/Projects/UI/DesignSystemTests/**`, `sources/Projects/UI/UIComponent/**`,
-`sources/Projects/UI/UIComponentTests/**`, `sources/Projects/UI/UIComponentLayoutHarness/**`,
-`sources/Projects/UI/UIComponentUITests/**`, `sources/docs/ui-component-checklist.md`
+`sources/Projects/UI/Tests/DesignSystem/**`, `sources/Projects/UI/Component/**`,
+`sources/Projects/UI/Tests/Component/Unit/**`, `sources/Projects/UI/ComponentLayoutHarness/**`,
+`sources/Projects/UI/Tests/Component/UI/**`, `sources/docs/ui-component-checklist.md`
 
 **관련 변경 시나리오**: S1, S2, S3, S4, S5
 
 **독립 검증**: UI package만으로 색 변수 25개 정합, 토큰 무결성, 컴포넌트 고정값
 `±0.5pt`, edge dim 방향·정지점, 44pt 터치 영역과 접근성 계약을 검증한다. `TagBadge`의
 8pt 반경은 변경 없이 회귀 검증하고, 참조 화면이 쓰지 않는 텍스트 스타일 불일치는 이번
-기능에서 값을 바꾸지 않는다.
+기능에서 값을 바꾸지 않는다. 참조 화면이 사용하는 여섯 `TextStyleToken`은 기존 단위
+테스트와 사용처 정적 검토로 Figma 스타일 대응을 확인한다. 기존 target을 재사용하므로
+`sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`는 변경하지 않는다.
 
 ### 테스트 — Red
 
-- [x] T030 [P] [S3] `sources/Projects/UI/DesignSystemTests/LayoutTokenTests.swift`에 기존 20pt·12pt와 반복 간격 `compactSpacing` 8pt 및 토큰 총 개수 계약을 작성한다
-- [x] T031 [P] [S4] `sources/Projects/UI/DesignSystemTests/SemanticColorTokenTests.swift`에 `progressTrack → grey500`, `progressFill → blue200` 참조 무결성 테스트를 작성한다
-- [x] T032 [P] [S4] `sources/Projects/UI/DesignSystemTests/GradientTokenTests.swift`에 stop 불투명도, 상단 아래→위 0/0.25·alpha 0/0.5, 하단 위→아래 0.7/1·alpha 0.6/0 계약과 기존 3종 회귀를 작성한다
-- [x] T033 [P] [S4] `sources/Projects/UI/DesignSystemTests/ColorTokenTests.swift`에 Figma 변수 25개의 이름·hex·opacity 전량 대조와 근거가 있는 저장소 전용 토큰 분리 검증을 추가한다
-- [x] T034 [P] [S3] `sources/Projects/UI/UIComponentTests/ActionButtonSizeContractTests.swift`에 공개 `ActionButton.Size`의 LG 54·MD 40·SM 36pt 표면 계단과 모든 크기의 최소 44pt 터치 영역 구성 계약을 작성하고, `SheetSurface`·`ProjectRow`의 private 레이아웃 수치는 이 단위 테스트에 노출하지 않는다
-- [x] T035 [S3] `sources/Projects/UI/UIComponentTests/LayoutConstantContractTests.swift`의 기존 `ActionButton.Size.small` 40pt 기대를 LG 54·MD 40·SM 36pt 계단으로 교정하고 `IconGlassButton` 크기 회귀 계약은 보존한다
-- [x] T036 [P] [S2] `sources/Projects/UI/UIComponentTests/ContinuousProgressBarContractTests.swift`에 높이 6pt, 진행률 경계와 track·fill 의미 토큰 사용 계약을 작성한다
-- [x] T037 [P] [S2] `sources/Projects/UI/UIComponentTests/ActionMenuContractTests.swift`에 메뉴 181×126pt, 내부 여백, 불변 ViewModel·선택 콜백 분리와 항목 VoiceOver 의미 계약을 작성한다
-- [x] T038 [P] [S2] `sources/Projects/UI/UIComponentTests/ScreenEdgeScrimContractTests.swift`에 top·bottom 변형이 대응 GradientToken만 사용하고 사용자 상호작용을 가로채지 않는 계약을 작성한다
-- [x] T039 [S2] `sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift`에 ActionButton 3크기, ProjectRow 기본·삭제, SheetSurface, ContinuousProgressBar, ActionMenu, ScreenEdgeScrim 시나리오와 실제 렌더 frame·padding을 읽을 고유 accessibility identifier를 추가한다
-- [x] T040 [S3] `sources/Projects/UI/UIComponentUITests/LayoutContractUITests.swift`에 `SheetSurface` grabber 58×4pt·위 5pt·영역 16pt, `ProjectRow` 방향별 inset·기본 최소 150pt·삭제 94pt, ActionButton 크기 계단, `tag.radius` 8pt 보존, 44×44pt 터치 영역, 계약 ID 진단과 최대 Dynamic Type 적응 검증을 추가한다
+- [x] T030 [P] [S3] `sources/Projects/UI/Tests/DesignSystem/LayoutTokenTests.swift`에 기존 20pt·12pt와 반복 간격 `compactSpacing` 8pt 및 토큰 총 개수 계약을 작성한다
+- [x] T031 [P] [S4] `sources/Projects/UI/Tests/DesignSystem/SemanticColorTokenTests.swift`에 `progressTrack → grey500`, `progressFill → blue200` 참조 무결성 테스트를 작성한다
+- [x] T032 [P] [S4] `sources/Projects/UI/Tests/DesignSystem/GradientTokenTests.swift`에 stop 불투명도, 상단 아래→위 0/0.25·alpha 0/0.5, 하단 위→아래 0.7/1·alpha 0.6/0 계약과 기존 3종 회귀를 작성한다
+- [x] T033 [P] [S4] `sources/Projects/UI/Tests/DesignSystem/ColorTokenTests.swift`에 Figma 변수 25개의 이름·hex·opacity 전량 대조와 근거가 있는 저장소 전용 토큰 분리 검증을 추가한다
+- [x] T034 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/ActionButtonSizeContractTests.swift`에 공개 `ActionButton.Size`의 LG 54·MD 40·SM 36pt 표면 계단과 모든 크기의 최소 44pt 터치 영역 구성 계약을 작성하고, `SheetSurface`·`ProjectRow`의 private 레이아웃 수치는 이 단위 테스트에 노출하지 않는다
+- [x] T035 [S3] `sources/Projects/UI/Tests/Component/Unit/LayoutConstantContractTests.swift`의 기존 `ActionButton.Size.small` 40pt 기대를 LG 54·MD 40·SM 36pt 계단으로 교정하고 `IconGlassButton` 크기 회귀 계약은 보존한다
+- [x] T036 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/ContinuousProgressBarContractTests.swift`에 높이 6pt, 진행률 경계와 track·fill 의미 토큰 사용 계약을 작성한다
+- [x] T037 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/ActionMenuContractTests.swift`에 메뉴 181×126pt, 내부 여백, 불변 ViewModel·선택 콜백 분리와 항목 VoiceOver 의미 계약을 작성한다
+- [x] T038 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/ScreenEdgeScrimContractTests.swift`에 top·bottom 변형이 대응 GradientToken만 사용하고 사용자 상호작용을 가로채지 않는 계약을 작성한다
+- [x] T039 [S2] `sources/Projects/UI/ComponentLayoutHarness/LayoutContractCatalog.swift`에 ActionButton 3크기, ProjectRow 기본·삭제, SheetSurface, ContinuousProgressBar, ActionMenu, ScreenEdgeScrim 시나리오와 실제 렌더 frame·padding을 읽을 고유 accessibility identifier를 추가한다
+- [x] T040 [S3] `sources/Projects/UI/Tests/Component/UI/LayoutContractUITests.swift`에 `SheetSurface` grabber 58×4pt·위 5pt·영역 16pt, `ProjectRow` 방향별 inset·기본 최소 150pt·삭제 94pt, ActionButton 크기 계단, `tag.radius` 8pt 보존, 44×44pt 터치 영역, 계약 ID 진단과 최대 Dynamic Type 적응 검증을 추가한다
 - [x] T041 [no-write] `DesignSystem`, `UIComponent`, `UIComponentLayout` 테스트를 실행해 T030~T040이 신규 토큰·컴포넌트와 기준선 불일치 때문에 예상대로 실패하는지 확인한다
 
 ### DesignSystem 구현 — Green
@@ -162,14 +167,14 @@
 
 ### UIComponent 구현 — Green
 
-- [x] T046 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ContinuousProgressBar.swift`에 0...1 진행률, 6pt 표면과 `progressTrack`·`progressFill`을 가진 화면 독립 말단 컴포넌트를 구현한다
-- [x] T047 [P] [S2] `sources/Projects/UI/UIComponent/Components/Composite/ActionMenu.swift`에 불변 항목 ViewModel과 별도 선택 콜백, 181×126pt 메뉴 계약과 VoiceOver 라벨을 구현한다
-- [x] T048 [P] [S2] `sources/Projects/UI/UIComponent/Components/Leaf/ScreenEdgeScrim.swift`에 `topEdgeScrim`·`bottomEdgeScrim` 시각 변형과 hit testing 제외를 구현한다
-- [x] T049 [P] [S3] `sources/Projects/UI/UIComponent/Components/Leaf/ActionButton.swift`의 `Size`를 LG 54·MD 40·SM 36pt 표면과 최소 44pt 터치 영역으로 교정하고 기존 생성 경로를 보존한다
-- [x] T050 [P] [S3] `sources/Projects/UI/UIComponent/Components/Composite/SheetSurface.swift`의 grabber를 58×4pt, 위 5pt, grabber 영역 총 16pt로 교정하고 Figma 미확정값은 기존 근거 수준으로 유지한다
-- [x] T051 [S2] `sources/Projects/UI/UIComponent/Components/Composite/ProjectRow.swift`가 위 16·좌우 18·아래 18pt inset, 기본 150pt·삭제 94pt 최소 높이, 8pt 세부 간격과 `ContinuousProgressBar`를 사용하도록 교정한다
+- [x] T046 [P] [S2] `sources/Projects/UI/Component/Components/Leaf/ContinuousProgressBar.swift`에 0...1 진행률, 6pt 표면과 `progressTrack`·`progressFill`을 가진 화면 독립 말단 컴포넌트를 구현한다
+- [x] T047 [P] [S2] `sources/Projects/UI/Component/Components/Composite/ActionMenu.swift`에 불변 항목 ViewModel과 별도 선택 콜백, 181×126pt 메뉴 계약과 VoiceOver 라벨을 구현한다
+- [x] T048 [P] [S2] `sources/Projects/UI/Component/Components/Leaf/ScreenEdgeScrim.swift`에 `topEdgeScrim`·`bottomEdgeScrim` 시각 변형과 hit testing 제외를 구현한다
+- [x] T049 [P] [S3] `sources/Projects/UI/Component/Components/Leaf/ActionButton.swift`의 `Size`를 LG 54·MD 40·SM 36pt 표면과 최소 44pt 터치 영역으로 교정하고 기존 생성 경로를 보존한다
+- [x] T050 [P] [S3] `sources/Projects/UI/Component/Components/Composite/SheetSurface.swift`의 grabber를 58×4pt, 위 5pt, grabber 영역 총 16pt로 교정하고 Figma 미확정값은 기존 근거 수준으로 유지한다
+- [x] T051 [S2] `sources/Projects/UI/Component/Components/Composite/ProjectRow.swift`가 위 16·좌우 18·아래 18pt inset, 기본 150pt·삭제 94pt 최소 높이, 8pt 세부 간격과 `ContinuousProgressBar`를 사용하도록 교정한다
 - [x] T052 [S1] `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응을 Figma `ProjectList`로 정정하고 `학습세트 List-item`은 별도 미구현 컴포넌트로 유지하며 신규 컴포넌트 상태를 반영한다
-- [x] T053 `sources/Projects/UI/UIComponentTests/Placeholder.swift`를 실제 UIComponent 테스트가 추가된 뒤 삭제한다
+- [x] T053 `sources/Projects/UI/Tests/Component/Unit/Placeholder.swift`를 실제 UIComponent 테스트가 추가된 뒤 삭제한다
 
 ### 패키지 검증과 승인
 
@@ -200,23 +205,23 @@ source는 Mock·Composition·Service Locator를 정의하거나 참조하지 않
 
 ### 준비와 target 선언
 
-- [ ] T057 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 source directory `Presentation`인 Feature target의 TCA·DomainLearningProject·DesignSystem·UIComponent 의존성과 source directory `FeatureTests`인 FeatureTests target의 Feature·DomainLearningProject·TCA test 의존성을 선언하고 공유 Mock target 의존성은 만들지 않는다
-- [ ] T058 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Feature scheme에 `FeatureTests` test action만 연결하고 다른 패키지 scheme 구획은 변경하지 않는다
+- [X] T057 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 source directory `Presentation`인 Feature target의 TCA·DomainLearningProject·DesignSystem·UIComponent 의존성과 source directory `FeatureTests`인 FeatureTests target의 Feature·DomainLearningProject·TCA test 의존성을 선언하고 공유 Mock target 의존성은 만들지 않는다
+- [X] T058 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Feature scheme에 `FeatureTests` test action만 연결하고 다른 패키지 scheme 구획은 변경하지 않는다
 
 ### 테스트 자산과 테스트 — Red
 
-- [ ] T059 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Mocks/FetchLearningProjectsMock.swift`에 제어 가능한 비동기 결과와 thread-safe page·size·호출 횟수 기록을 제공하는 로컬 Mock을 구현한다
-- [ ] T060 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Mocks/DeleteLearningProjectMock.swift`에 제어 가능한 비동기 결과와 thread-safe 프로젝트 식별자·호출 횟수 기록을 제공하는 로컬 Mock을 구현한다
-- [ ] T061 [P] [S2] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListLoadingTests.swift`에 최초 1회 조회, loading, loaded, empty, failed, failed 재시도의 loading 전이·재호출과 page·size 입력 검증을 작성한다
-- [ ] T062 [P] [S2] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListInteractionTests.swift`에 메뉴 열기·닫기, 삭제 모드 진입·종료, 확인·취소, 삭제 성공·실패와 학습 시작 delegate 전이를 작성한다
-- [ ] T063 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListDependencyIsolationTests.swift`에 두 로컬 Mock을 다른 Protocol 구현으로 교체해도 Reducer·View 수정 없이 상태 전이와 호출 검증이 유지되는지 작성한다
-- [ ] T064 [no-write] `make tuist` 후 project build runner로 `Feature` 테스트를 실행해 T061~T063이 누락된 Reducer·화면 상태 때문에 예상대로 실패하는지 확인한다
+- [X] T059 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Mocks/FetchLearningProjectsMock.swift`에 제어 가능한 비동기 결과와 thread-safe page·size·호출 횟수 기록을 제공하는 로컬 Mock을 구현한다
+- [X] T060 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Mocks/DeleteLearningProjectMock.swift`에 제어 가능한 비동기 결과와 thread-safe 프로젝트 식별자·호출 횟수 기록을 제공하는 로컬 Mock을 구현한다
+- [X] T061 [P] [S2] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListLoadingTests.swift`에 최초 1회 조회, loading, loaded, empty, failed, failed 재시도의 loading 전이·재호출과 page·size 입력 검증을 작성한다
+- [X] T062 [P] [S2] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListInteractionTests.swift`에 메뉴 열기·닫기, 삭제 모드 진입·종료, 확인·취소, 삭제 성공·실패와 학습 시작 delegate 전이를 작성한다
+- [X] T063 [P] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Tests/LearningProjectListDependencyIsolationTests.swift`에 두 로컬 Mock을 다른 Protocol 구현으로 교체해도 Reducer·View 수정 없이 상태 전이와 호출 검증이 유지되는지 작성한다
+- [X] T064 [no-write] `make tuist` 후 project build runner로 `Feature` 테스트를 실행해 T061~T063이 누락된 Reducer·화면 상태 때문에 예상대로 실패하는지 확인한다
 
 ### 구현 — Green
 
-- [ ] T065 [S2] `sources/Projects/Feature/Presentation/Screens/LearningProjectList/LearningProjectListFeature.swift`에 상태·Action·취소 가능한 Effect·delegate와 두 Protocol의 명시적 initializer 주입을 구현한다
-- [ ] T066 [S2] `sources/Projects/Feature/Presentation/Screens/LearningProjectList/LearningProjectListView.swift`에 loaded·empty·loading·failed·menu·deleting·confirmingDeletion 상태 분기와 공용 UIComponent ViewModel 변환을 구현한다
-- [ ] T067 `sources/Projects/Feature/Feature/Feature.swift`를 `Presentation` source directory 전환과 실제 화면 구현 완료 뒤 삭제한다
+- [X] T065 [S2] `sources/Projects/Feature/Presentation/Screens/LearningProjectList/LearningProjectListFeature.swift`에 상태·Action·취소 가능한 Effect·delegate와 두 Protocol의 명시적 initializer 주입을 구현한다
+- [X] T066 [S2] `sources/Projects/Feature/Presentation/Screens/LearningProjectList/LearningProjectListView.swift`에 loaded·empty·loading·failed·menu·deleting·confirmingDeletion 상태 분기와 공용 UIComponent ViewModel 변환을 구현한다
+- [X] T067 `sources/Projects/Feature/Feature/Feature.swift`를 `Presentation` source directory 전환과 실제 화면 구현 완료 뒤 삭제한다
 
 ### 패키지 검증과 승인
 
@@ -254,7 +259,7 @@ harness를 제공한다.
 - [ ] T072 [P] [S3] `sources/Projects/App/ScreenLayoutUITests/ReferenceScreenLayoutTests.swift`에 360pt 기준 목록·행·메뉴·시트·상하단 dim의 확정값 `±0.5pt` 검증과 production 수정 없이 assertion helper에 계약 20pt 대신 측정 21pt를 입력해 계약 ID·기대값·실제값 진단을 확인하는 짝 테스트를 작성한다
 - [ ] T073 [P] [S4] `sources/Projects/App/ScreenLayoutUITests/ReferenceScreenColorTests.swift`에 PNG를 sRGB 8-bit로 정규화하고 안정된 3×3pt 중앙값을 사용해 단색 `±1/255`, 반투명 합성 `±2/255`로 화면·행·진행 바·시트·scrim을 판정하며 production 수정 없이 assertion helper에 잘못된 RGBA와 올바른 RGBA를 주입하는 짝 테스트를 작성한다
 - [ ] T074 [P] [S2] `sources/Projects/App/ScreenLayoutUITests/ReferenceScreenInteractionTests.swift`에 메뉴, 삭제 모드, 확인 시트, 취소와 삭제 후 목록·빈 상태 전환을 작성한다
-- [ ] T075 [P] [S2] `sources/Projects/App/ScreenLayoutUITests/ReferenceScreenAccessibilityTests.swift`에 모든 조작 요소 44×44pt, 의미 있는 VoiceOver 라벨과 최대 Dynamic Type 비겹침·비잘림을 작성한다
+- [ ] T075 [P] [S2] `sources/Projects/App/ScreenLayoutUITests/ReferenceScreenAccessibilityTests.swift`에 모든 조작 요소 44×44pt, 의미 있는 VoiceOver 라벨과 최대 Dynamic Type 비겹침·비잘림을 작성하되 glyph 픽셀 비교는 사용하지 않는다
 - [ ] T076 [no-write] GitItTests와 ScreenLayout UI 테스트를 실행해 T071~T075이 앱 조립·harness·참조 화면·판정 helper 누락 때문에 예상대로 실패하는지 확인한다
 
 ### 제품 App 조립 — Green
@@ -284,10 +289,10 @@ harness를 제공한다.
 **선행 조건**: App 패키지의 구현·검증·결과 보고가 완료되고 사용자가 전체 검증 진행을
 명시적으로 승인해야 한다. 아래 작업은 추적 파일을 수정하지 않는다.
 
-- [ ] T086 [no-write] [S1] `specs/006-final-uxui-screens/contracts/screen-inventory.md`에서 프레임 65개가 G1~G5 또는 제외에 정확히 한 번 배정되고 `내용 미대조` 항목마다 담당 후속 기능이 있으며, 각 그룹의 시작 화면·연결 지점·공용 컴포넌트 단일 소유자가 존재하고 기록된 전환 100%가 `확정` 또는 `추정` 근거 수준을 가지며 추정 전환을 확정으로 기록한 건수가 0인지 검증한다(SC-022)
-- [ ] T087 [no-write] [S2] `specs/006-final-uxui-screens/contracts/reference-screen-layout.md`에 구현 위치·현재 구현 상태·상태별 근거 수준이 있고, loaded·empty·menu·deleting·confirmingDeletion 5개 launch scenario의 Figma 정밀 판정과 loading·failed 2개 launch scenario의 최소 렌더·failed 재시도를 앱에서 독립 실행하며 자리표시자·미구현 표시 0건을 확인한다
-- [ ] T088 [no-write] [S3] `ScreenLayout`을 360pt 기준과 최대 Dynamic Type에서 실행해 확정 여백·간격 100%가 `±0.5pt`이고 색 리터럴·`body` 직접 여백 수치·복제된 로컬 여백 상수와 텍스트 잘림·겹침이 각각 0건인지 확인한다
-- [ ] T089 [no-write] [S4] `DesignSystem`과 `ScreenLayout`으로 Figma 색 변수 25개, 상단 아래→위·하단 위→아래 edge dim, sRGB 판정 허용치와 production 수정 없이 주입한 잘못된·올바른 측정값의 항목별 실패·통과 진단을 확인한다
+- [ ] T086 [no-write] [S1] `specs/006-final-uxui-screens/contracts/screen-inventory.md`에서 프레임 65개가 G1~G5 또는 제외에 정확히 한 번만 배정되고 `내용 미대조` 항목마다 담당 후속 기능이 있으며, 각 그룹의 시작 화면·연결 지점·화면 단위 검수 경계·공용 컴포넌트 단일 소유자와 006 UI 기반의 전역 토큰 소유권·재사용 규칙·실행 시점 Constitution 원칙 7 참조가 존재하고, 기록된 전환 100%가 `확정` 또는 `추정` 근거 수준을 가지며 추정 전환을 확정으로 기록한 건수가 0인지 검증한다(FR-017, FR-019, FR-020, FR-028, SC-001, SC-013, SC-022)
+- [ ] T087 [no-write] [S2] `specs/006-final-uxui-screens/contracts/reference-screen-layout.md`에서 `screen.project.list`의 화면 목록 등재·선택 근거·구현 위치·계획 시 구현 대상·디자인 상태 5개와 운영 상태 2개의 근거 수준을 확인하고 동적인 현재 구현 상태 필드가 없는지 검증한 뒤, loaded·empty·menu·deleting·confirmingDeletion 5개 launch scenario의 Figma 정밀 판정과 loading·failed 2개 launch scenario의 최소 렌더·failed 재시도를 앱에서 독립 실행하며 앱 화면의 자리표시자·미구현 표시가 0건인지 확인한다(FR-001, FR-002, FR-009, FR-014, FR-021, SC-001, SC-002, SC-010, SC-012, SC-015)
+- [ ] T088 [no-write] [S3] `ScreenLayout`을 360pt 기준과 최대 Dynamic Type에서 실행해 확정 여백·간격 100%가 `±0.5pt`이고 색 리터럴·`body` 직접 여백 수치·복제된 로컬 여백 상수와 텍스트 잘림·겹침이 각각 0건인지 확인한다. `specs/006-final-uxui-screens/contracts/reference-screen-layout.md`의 여섯 typography 역할이 `subtitle1`·`subtitle2`·`subtitle3`·`body1`·`body2`·`caption1` 사용처 및 기존 `TextStyleTokenTests`와 일치하는지 정적으로 검증하고, typography 판정에는 glyph 픽셀 비교를 사용하지 않는다(FR-003, FR-005, FR-013, FR-018, SC-003, SC-004, SC-008, SC-023)
+- [ ] T089 [no-write] [S4] `DesignSystem`과 `ScreenLayout`으로 Figma 색 변수 25개, 상단 아래→위·하단 위→아래 edge dim, sRGB 판정 허용치와 production 수정 없이 주입한 잘못된·올바른 측정값의 항목별 실패·통과 진단을 확인하고, `component-correction.md` 기준선 갱신 4개 행의 이전값·새 값·Figma 근거가 모두 존재하는지 정적으로 검증한다(FR-004, FR-007, FR-008, FR-011, FR-029, SC-005, SC-014, SC-021)
 - [ ] T090 [no-write] [S5] `sources/Projects/Feature/FeatureTests/LearningProjectList/Mocks/**`만으로 Feature 상태 전이를 재실행해 Mock 정의 100%가 해당 테스트 target 안에 있는지 확인하고, `specs/006-final-uxui-screens/contracts/screen-inventory.md`의 G1~G5 모두에 Feature별 로컬 Mock 규칙이 적용되는지 검증한다
 - [ ] T091 [no-write] project build runner의 전체 `build`, `compile`, `test`를 순서대로 실행하고 기준선 갱신 4항목을 제외한 기존 자동 검증이 동일하게 통과하는지 기록한다
 - [ ] T092 [no-write] `git diff --check`와 `git status --short`로 후행 공백, 의도적 불일치 잔여물, tasks.md에 없는 변경, 생성 프로젝트·DerivedData의 추적 변경이 0건인지 확인한다
@@ -351,9 +356,9 @@ S1 화면·상수 계약 ─┬─→ S3 레이아웃 일치 ─┐
 
 | 시나리오 | 독립 검증 기준 |
 | --- | --- |
-| S1 | 화면 프레임 65개가 고유 식별자·그룹 또는 제외 사유·분류 상태를 갖고, `내용 미대조` 항목마다 담당 후속 기능이 있으며, 참조 화면은 구현 위치·현재 구현 상태·상세 계약의 항목별 근거 수준을 가진다. 그룹별 시작 화면·연결 지점·공용 컴포넌트 단일 소유자와 SC-022의 전환 근거 판정도 존재한다. |
+| S1 | 화면 프레임 65개가 고유 식별자·그룹 또는 제외 사유·분류 상태를 갖고, `내용 미대조` 항목마다 담당 후속 기능이 있으며, 참조 화면은 구현 위치·계획 시 구현 대상·검증 대상 상태·상세 계약의 항목별 근거 수준을 가진다. 그룹별 시작 화면·연결 지점·화면 단위 검수 경계·공용 컴포넌트 단일 소유자, 006 UI 기반의 전역 토큰 소유권과 SC-022의 전환 근거 판정도 존재한다. 현재 완료 상태는 체크박스와 실제 검증 결과로 판정한다. |
 | S2 | 앱에서 프로젝트 목록의 5개 디자인 상태와 2개 운영 상태에 독립적으로 도달하고, 디자인 상태는 Figma 정밀 판정, 운영 상태는 최소 렌더·failed 재시도를 통과하며, 대체 `AppComposition`을 주입해도 Feature·화면 코드는 바뀌지 않는다. |
-| S3 | 참조 화면과 공용 컴포넌트의 모든 확정 여백·간격이 360pt 기준 `±0.5pt`이고, 금지된 production 여백 리터럴·복제 상수가 없으며 최대 Dynamic Type에서 잘림·겹침이 없다. |
+| S3 | 참조 화면과 공용 컴포넌트의 모든 확정 여백·간격이 360pt 기준 `±0.5pt`이고, 금지된 production 여백 리터럴·복제 상수가 없으며 최대 Dynamic Type에서 잘림·겹침이 없다. 참조 화면의 여섯 텍스트 토큰은 Figma 스타일과 정적으로 대응하고 glyph 픽셀 비교는 하지 않는다. |
 | S4 | Figma 색 변수 25개와 edge dim 방향·정지점이 토큰과 일치하고 화면·컴포넌트에 색 리터럴이 없으며, 잘못된 측정값을 계약 ID·기대값·실제값으로 검출한다. |
 | S5 | 다섯 그룹의 계약이 완결되고 후속 Feature가 공유 Mock target이나 다른 FeatureTests 의존 없이 자기 테스트 target의 로컬 Mock과 기존 harness 패턴으로 시작할 수 있다. |
 

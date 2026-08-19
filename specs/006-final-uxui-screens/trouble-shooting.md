@@ -777,3 +777,434 @@ subpixel로 복원한다. `swiftc -parse` 성공을 target typecheck로 간주�
 ### 연결
 
 선행: `TS-20260819-012`. 후속: 없음.
+
+## TS-20260819-014: Feature 검증 명령과 source directory 준비 순서 불일치
+
+**기록일**: 2026-08-19
+**상태**: 해결
+**발생 단계**: `$speckit-implement` Feature 패키지 T057~T065 Red·Green 검증
+**관련 항목**: T057, T064, `sources/Projects/Feature/Presentation/**`,
+`specs/006-final-uxui-screens/quickstart.md`
+
+### 증상
+
+Feature target을 `Presentation` source directory로 전환한 직후 해당 디렉터리가 아직 없어 첫
+`make tuist`가 실패했다. 디렉터리를 만든 뒤에는 작업과 quickstart가 제시한
+`project_build_runner test Feature`가 runner의 실제 인자 계약과 맞지 않아
+`ACTION 한 개가 필요합니다`로 실패했다. 기본 destination의 이름 기반 simulator 항목도 데이터
+디렉터리가 없어 사용할 수 없었다.
+
+### 영향
+
+T064 Red 검증과 Feature Green 검증을 계획에 적힌 명령 그대로 실행할 수 없었다. source 생성,
+workspace 재생성과 scheme별 직접 `xcodebuild` 순서로 검증 경로를 교정해야 했다.
+
+### 근거
+
+- 첫 `make tuist`: `Presentation` source directory 부재로 project generation 실패.
+- `project_build_runner test Feature`: `ACTION 한 개가 필요합니다`를 반환해 현재 runner가 scheme
+  인자를 받지 않음을 확인했다.
+- `xcrun simctl list devices available`: 이름 기반 `iPhone 17 Pro` 대신 정상 데이터가 있는
+  `default`와 이 세션에서 만든 `GitItFeatureTests` UUID를 확인했다.
+
+### 원인
+
+source directory를 선언하는 T057과 실제 source를 만드는 T065 사이에 생성 명령을 실행했으며,
+작업·quickstart의 scheme 인자 예시가 현재 runner의 action-only 계약과 달랐다. simulator 이름은
+현재 설치 상태를 보장하는 안정적인 식별자가 아니었다.
+
+### 조치
+
+T065가 소유한 정확한 `Presentation/Screens/LearningProjectList` 경로를 먼저 만든 뒤
+`make tuist`를 다시 실행했다. scheme별 검증은 quickstart의 fallback에 따라
+`sources/GitIt.xcworkspace`와 격리 `-derivedDataPath`, 확인된 simulator UUID를 사용하는 직접
+`xcodebuild`로 전환했다.
+
+### 검증
+
+- `make tuist`: 재실행 성공.
+- `xcodebuild build -workspace sources/GitIt.xcworkspace -scheme Feature ...`: 성공.
+- runner의 scheme별 실행: 미지원 상태를 확인했으므로 재시도하지 않았다.
+
+### 재발 방지
+
+source directory 전환 task는 최소 source 경로가 생긴 뒤 Tuist를 생성한다. scheme별 검증 task를
+작성하거나 실행하기 전에 runner usage를 확인하고, 미지원이면 처음부터 workspace 직접 실행과
+격리 Derived Data를 사용한다. destination은 실행 직전 `simctl`로 유효한 UUID를 확인한다.
+
+### 연결
+
+선행: `TS-20260819-012`. 후속: `TS-20260819-015`.
+
+## TS-20260819-015: FeatureTests가 LocalStatusKit 메타데이터 실현 중 부트스트랩 충돌
+
+**기록일**: 2026-08-19
+**상태**: 환경 제약
+**발생 단계**: `$speckit-implement` Feature 패키지 T068 검증
+**관련 항목**: T061~T063, T065~T068,
+`sources/Projects/Feature/FeatureTests/LearningProjectList/**`
+
+### 증상
+
+최종 Feature source와 test bundle은 `build-for-testing`까지 성공했지만 격리 simulator에서
+`test-without-building`을 실행하면 테스트 본문에 진입하지 못하고 약 75초 뒤 `Early unexpected
+exit`로 종료됐다. crash report는 Apple 내부 `LocalStatusKit`의
+`PublishStatusInvocation` class metadata를 XCTest가 전체 class 목록에서 실현하는 중
+`EXC_BAD_ACCESS (SIGSEGV)`가 발생했음을 보여 준다.
+
+### 영향
+
+Reducer·View와 세 테스트 파일은 컴파일됐고 Feature production build도 성공했지만, 상태 전이와
+Effect 취소·오류 경로의 실행 검증을 완료할 수 없다. 따라서 T068·T069는 완료 처리할 수 없고,
+검증되지 않은 변경을 커밋하지 않은 채 Feature 패키지에서 중단해야 한다.
+
+### 근거
+
+- `xcodebuild build-for-testing ... -scheme Feature ...`: 성공하고
+  `Feature_iphonesimulator26.5-arm64.xctestrun`을 생성했다.
+- `xcodebuild test-without-building -xctestrun ... -destination
+  'platform=iOS Simulator,id=47B1E0AE-11C1-495B-BCE8-EE9C3E255104'`: 종료 코드 65,
+  `The test runner crashed while preparing to run tests`.
+- `/Users/jerry/Library/Logs/DiagnosticReports/xctest-2026-08-19-220431.ips`:
+  `PublishStatusInvocation` → `realizeAllClasses()` → `objc_copyClassList` →
+  `+[XCTestCase(RuntimeUtilities) allSubclasses]` 순서에서 `EXC_BAD_ACCESS`.
+- 같은 격리 simulator에서 기존 `DesignSystem` xctestrun은 종료 코드 0으로 통과했다.
+
+### 원인
+
+확정된 직접 원인은 XCTest 부트스트랩이 Apple 내부 `LocalStatusKit` class metadata를 실현하는
+과정의 메모리 접근 오류다. Feature 의존 그래프가 이 Apple framework를 로드하게 만드는 세부
+조건과 Xcode·iOS 26.5 runtime 중 어느 구성요소의 결함인지는 확인 중이다. 테스트 assertion이나
+Reducer 실행 실패는 테스트 본문에 진입하지 않아 원인으로 확인되지 않았다.
+
+### 조치
+
+기본 simulator, 이 세션의 새 simulator, scheme 실행과 생성된 `.xctestrun` 직접 실행으로 재현
+경로를 분리했다. 통과한 DesignSystem과 `.xctestrun`의 Main Thread Checker 주입 조건을 비교해
+동일함을 확인했으므로 진단 옵션을 임의로 끄지 않았다. Apple 공식 문서·포럼에서 해당 crash의
+확정 우회를 찾지 못해 product·Tuist 설정을 추측으로 변경하지 않았다.
+
+### 검증
+
+- Feature production `xcodebuild build`: 성공.
+- Feature `build-for-testing`: 성공, 테스트 source typecheck 완료.
+- Feature `.xctestrun` 직접 실행: 실패, 테스트 0건 실행 전 동일 crash.
+- 새 simulator에서 DesignSystem `.xctestrun`: 성공. simulator 전체 고장과는 구분됨.
+- Feature 상태 전이 assertion: 미실행. XCTest 부트스트랩 충돌로 테스트 본문에 도달하지 못함.
+
+### 재발 방지
+
+동일한 `PublishStatusInvocation`·`objc_copyClassList` stack이면 product assertion 실패로 분류하지
+않고 crash report와 테스트 실행 건수를 먼저 확인한다. Xcode 또는 simulator runtime 변경 뒤
+Feature `.xctestrun`을 다시 실행해 환경 상태 변화를 확인하고, 테스트가 실제로 시작되기 전에는
+T068을 완료로 표시하지 않는다.
+
+### 연결
+
+선행: `TS-20260819-014`. 후속: 없음.
+
+## TS-20260819-016: FeatureTests LocalStatusKit 부트스트랩 충돌 재발
+
+**기록일**: 2026-08-19
+**상태**: 환경 제약
+**발생 단계**: `$speckit-implement` Feature 패키지 T068 재검증
+**관련 항목**: T068, `TS-20260819-015`,
+`sources/Projects/Feature/FeatureTests/LearningProjectList/**`
+
+### 증상
+
+Feature 구현을 보존한 채 최신 workspace와 새로운 격리 Derived Data로 T068을 다시 실행했지만,
+테스트 본문 0건 상태에서 `Early unexpected exit`가 재발했다. 이번 실행도 XCTest가
+`LocalStatusKit`의 `PublishStatusInvocation` class metadata를 실현하는 중 같은 주소에서
+`EXC_BAD_ACCESS (SIGSEGV)`로 종료됐다.
+
+### 영향
+
+Feature production build와 test bundle 컴파일은 다시 성공했지만 상태 전이, Effect 취소·오류
+경로와 로컬 Mock 호출 검증은 여전히 실행되지 않았다. 따라서 T068·T069 완료 표시와 Feature
+단위 커밋을 진행할 수 없다.
+
+### 근거
+
+- `make tuist`: 성공해 현재 source 기준 workspace를 생성했다.
+- `xcodebuild build ... -scheme Feature ... -derivedDataPath
+  /private/tmp/GitIt-006-T068-Feature-Retry`: 종료 코드 0.
+- 같은 경로의 `xcodebuild build-for-testing`: 종료 코드 0,
+  `Feature_iphonesimulator26.5-arm64.xctestrun` 생성.
+- `xcodebuild test-without-building -xctestrun ... -destination
+  'platform=iOS Simulator,id=FF975095-E0FC-434D-89E9-E3EBA19EB913'`: 종료 코드 65,
+  25.5초 뒤 test runner bootstrap crash.
+- `/Users/jerry/Library/Logs/DiagnosticReports/xctest-2026-08-19-221415.ips`:
+  `KERN_INVALID_ADDRESS at 0x000000000bad4007`, `PublishStatusInvocation` →
+  `realizeAllClasses()` → `objc_copyClassList` →
+  `+[XCTestCase(RuntimeUtilities) allSubclasses]` 순서가 `TS-20260819-015`와 일치했다.
+
+### 원인
+
+확정된 직접 원인은 `TS-20260819-015`와 동일한 Apple 내부 `LocalStatusKit` metadata 실현
+오류다. 새 Derived Data와 workspace 재생성으로도 재발해 stale project·Feature build cache가
+직접 원인일 가능성은 낮아졌다. Feature 의존 그래프와 iOS 26.5 runtime 사이의 세부 유발 조건은
+확인 중이다.
+
+### 조치
+
+추적 source를 수정하지 않고 Tuist 재생성, 격리 production build, 격리 test bundle 컴파일과
+현재 부팅된 simulator UUID를 사용한 직접 `.xctestrun` 실행으로 다시 분리 검증했다. crash
+stack이 동일해 product·Tuist 설정을 추측으로 바꾸지 않았고 T068을 미완료로 유지했다.
+
+### 검증
+
+- Feature production build: 성공.
+- Feature test source typecheck와 링크: 성공.
+- Feature 테스트 실행: 실패, 테스트 본문 0건.
+- production의 Mock·`@Dependency`·Service Locator·Composition 참조: 정적 검색 0건.
+- 다른 test target 의존성: `FeatureTests`가 Feature·TCA·DomainLearningProject만 참조함을 확인.
+
+### 재발 방지
+
+같은 runtime에서 Derived Data만 바꾼 반복 실행은 복구 판정 근거로 삼지 않는다. Xcode 또는 iOS
+Simulator runtime이 변경된 뒤 crash stack과 실제 테스트 실행 건수를 다시 확인하고, 본문 실행이
+시작되기 전에는 T068과 커밋을 완료하지 않는다.
+
+### 연결
+
+선행: `TS-20260819-015`. 후속: 없음.
+
+## TS-20260819-017: Feature build 뒤 완료된 UI 파일에 Preview가 자동 추가됨
+
+**기록일**: 2026-08-19
+**상태**: 완화
+**발생 단계**: `$speckit-implement` Feature 패키지 T068 build 검증
+**관련 항목**: T068,
+`sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift`
+
+### 증상
+
+세션 시작 Git 상태에는 없던 `LayoutContractCatalog.swift` 변경이 Feature production build와
+`build-for-testing` 뒤 나타났다. 변경 내용은 파일 끝에 `LayoutContractCatalog()`를 표시하는
+`#Preview` 블록 4줄이 추가된 것이었다.
+
+### 영향
+
+완료·승인된 UI 패키지 파일이 Feature 허용 경로 밖에서 바뀌어 그대로 두면 패키지 승인 게이트와
+정확한 task write scope를 위반한다. Feature 변경 커밋에 섞이면 변경 소유권도 잘못 기록된다.
+
+### 근거
+
+- T068 시작 `git status --short`: UIComponentLayoutHarness 변경 없음.
+- Feature build·`build-for-testing` 뒤 `git status --short`:
+  `M sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift` 발생.
+- 해당 파일 diff: 기존 닫는 괄호 뒤 `#Preview { LayoutContractCatalog() }`만 추가됨.
+
+### 원인
+
+Feature build 과정에서 실행된 저장소의 Swift Style `FormatSwift` build plugin 이후 변경이
+발생한 것은 확인했다. plugin 내부의 어떤 규칙이 Preview를 추가했는지는 확인 중이며, 사용자가
+직접 수정한 증거는 세션 중 관찰되지 않았다.
+
+### 조치
+
+Feature 허용 범위 밖 변경을 즉시 분리해 추가된 Preview 블록만 역패치했다. 기존 UI 파일의 다른
+내용과 Feature 작업 파일은 변경하지 않았다. 원인 규칙 수정은 현재 task가 소유하지 않으므로
+수행하지 않았다.
+
+### 검증
+
+- 역패치 뒤 `git diff -- sources/Projects/UI/UIComponentLayoutHarness/LayoutContractCatalog.swift`:
+  출력 0건.
+- T068 재실행: 미실행. 재실행하면 동일 부수효과가 생길 수 있고 T068 자체가 이미
+  `TS-20260819-016`의 bootstrap crash로 중단됨.
+
+### 재발 방지
+
+Swift build 뒤에는 검증 대상 파일뿐 아니라 `git status --short`를 다시 확인해 build plugin의
+추적 파일 변경을 분리한다. 완료된 선행 패키지 파일이 바뀌면 후속 커밋에 포함하지 말고 시작
+상태와 diff를 대조해 이번 실행이 만든 변경만 복구한다.
+
+### 연결
+
+선행: `TS-20260819-016`. 후속: 없음.
+
+## TS-20260819-018: FeatureTests LocalStatusKit 부트스트랩 충돌 3차 재발
+
+**기록일**: 2026-08-19
+**상태**: 환경 제약
+**발생 단계**: `$speckit-implement` Feature 패키지 T068 재검증
+**관련 항목**: T068, `TS-20260819-015`, `TS-20260819-016`,
+`sources/Projects/Feature/FeatureTests/LearningProjectList/**`
+
+### 증상
+
+현재 source로 workspace를 다시 생성하고 Feature production build와 test bundle 컴파일을
+성공시킨 뒤, 데이터 디렉터리가 존재하는 iOS 26.5 simulator에서 테스트를 실행했지만 약
+75초 뒤 테스트 본문에 진입하지 못한 채 `Early unexpected exit`가 다시 발생했다. 최신 crash
+report도 XCTest가 `LocalStatusKit`의 `PublishStatusInvocation` metadata를 실현하는 중 같은
+주소에서 `EXC_BAD_ACCESS (SIGSEGV)`로 종료됐음을 보여 준다.
+
+### 영향
+
+Feature source와 테스트 자산은 컴파일·링크됐지만 상태 전이, Effect 취소·오류 경로와 로컬
+Mock 호출 assertion은 실행되지 않았다. 따라서 T068·T069를 완료 표시하거나 App 패키지로
+진행할 수 없다.
+
+### 근거
+
+- `make tuist`: 현재 source 기준 workspace 생성 성공.
+- `xcodebuild build -workspace sources/GitIt.xcworkspace -scheme Feature -destination
+  'platform=iOS Simulator,id=6CA6AEA3-FD6C-4549-A261-A29C6B0372C4' -derivedDataPath
+  /private/tmp/GitIt-006-T068-Feature-20260819-2348`: production build 성공.
+- `xcodebuild test ... -destination
+  'platform=iOS Simulator,id=FF975095-E0FC-434D-89E9-E3EBA19EB913'`: 종료 코드 65,
+  `Early unexpected exit`, 약 75.8초 뒤 bootstrap 종료.
+- `/private/tmp/GitIt-006-T068-Feature-20260819-2350.xcresult`: `FeatureTests`의 제품 테스트
+  통과 0건, bootstrap 오류 1건.
+- `/Users/jerry/Library/Logs/DiagnosticReports/xctest-2026-08-19-235117.ips`:
+  `KERN_INVALID_ADDRESS at 0x000000000bad4007`, `PublishStatusInvocation` →
+  `realizeAllClasses()` → `objc_copyClassList` →
+  `+[XCTestCase(RuntimeUtilities) allSubclasses]` 순서에서 충돌.
+
+### 원인
+
+확정된 직접 원인은 `TS-20260819-015`·`TS-20260819-016`과 동일한 Apple 내부
+`LocalStatusKit` class metadata 실현 오류다. 현재 workspace, 격리 Derived Data와 실제 데이터가
+존재하는 simulator에서도 재발해 stale project, Feature 컴파일 캐시와 simulator 데이터 부재는
+이 실행의 직접 원인이 아니다. Feature 의존 그래프와 Xcode 26.6·iOS 26.5 runtime 사이의 세부
+유발 조건은 확인 중이다.
+
+### 조치
+
+runner가 scheme 인자를 받지 않는 기존 `TS-20260819-014`의 제약에 따라 직접 `xcodebuild`로
+전환했다. `simctl list` 결과만 신뢰하지 않고 simulator 데이터 디렉터리 존재 여부를 확인해
+`default` UUID로 재실행했으며, product·Tuist 설정은 추측으로 변경하지 않았다.
+
+### 검증
+
+- Feature production build: 성공.
+- Feature test source typecheck와 test bundle 링크: 성공.
+- Feature 테스트 본문: 미실행. XCTest suite 구성 단계에서 충돌.
+- T068 상태 전이·Effect·Mock assertion: 미검증.
+
+### 재발 방지
+
+`simctl list devices available` 출력과 실제 simulator 데이터 디렉터리 존재 여부를 함께 확인한다.
+같은 `0x000000000bad4007`·`PublishStatusInvocation` stack이면 assertion 실패로 분류하지 않고
+Xcode 또는 iOS runtime 변경 뒤 실제 테스트 본문 실행 건수를 다시 확인한다.
+
+### 연결
+
+선행: `TS-20260819-015`, `TS-20260819-016`. 후속: 없음.
+
+## TS-20260820-001: macOS awk 캡처 배열 문법 비호환
+
+**기록일**: 2026-08-20
+**상태**: 해결
+**발생 단계**: `$speckit-analyze` 요구사항·작업 수 집계
+**관련 항목**: `specs/006-final-uxui-screens/spec.md`,
+`specs/006-final-uxui-screens/tasks.md`
+
+### 증상
+
+FR·SC 식별자 수를 집계하려고 `awk`의 `match`에 세 번째 캡처 배열 인자를 전달하자
+`awk: syntax error`로 종료되어 해당 명령의 FR·SC 집계값이 각각 0으로 출력됐다.
+
+### 영향
+
+첫 집계 명령의 요구사항 수를 분석 지표로 사용할 수 없었다. 명세·계획·작업·소스 파일은
+변경되지 않았고, 문서 연결성 판단은 대체 집계가 끝날 때까지 보류했다.
+
+### 근거
+
+- `awk 'match($0, /.../, m) { ... }' specs/006-final-uxui-screens/spec.md`:
+  `awk: syntax error at source line 1`로 실패했다.
+- `rg -o '\*\*FR-[0-9]{3}\*\*' ... | wc -l`과 대응 SC 명령: FR 29개,
+  SC 21개를 정상 집계했다.
+- `awk '/^- \\[[ xX]\\] T[0-9]+/{n++} END{print n}' .../tasks.md`: 작업 92개를
+  정상 집계했다.
+
+### 원인
+
+사용한 macOS `awk`가 GNU awk 확장인 `match`의 세 번째 캡처 배열 인자를 지원하지 않는데,
+지원 여부를 확인하지 않고 해당 문법을 사용했다.
+
+### 조치
+
+식별자 추출을 `rg -o`로, 개수 집계를 `wc -l`로 분리해 다시 실행했다. 실패한 `awk` 결과는
+폐기하고 대체 명령의 출력만 분석 지표에 사용했다.
+
+### 검증
+
+- `rg -o` 기반 재집계: 성공, FR 29개·SC 21개.
+- POSIX 범위의 단순 `awk` 작업 집계: 성공, T001~T092 총 92개.
+- 저장소 산출물 변경: 문제 해결 기록 외 미실행.
+
+### 재발 방지
+
+macOS 기본 `awk`를 사용할 때 `match`의 세 번째 배열 인자 같은 GNU 확장을 사용하지 않는다.
+단순 식별자 추출은 `rg -o`, 개수는 `wc -l`을 사용하고, 복합 파싱이 필요하면 먼저 도구
+호환성을 확인한다.
+
+### 연결
+
+선행·후속 문제 ID: 없음.
+
+## TS-20260820-002: UIComponent 타깃명과 Component 역할 폴더 혼동
+
+**기록일**: 2026-08-20
+**상태**: 해결
+**발생 단계**: `$speckit-plan` typography 적용 근거와 소스 경로 조사
+**관련 항목**: `specs/006-final-uxui-screens/plan.md`,
+`specs/006-final-uxui-screens/tasks.md`,
+`sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`
+
+### 증상
+
+UIComponent 구현 파일을 찾기 위해
+`rg --files sources/Projects/UI/UIComponent/Components`를 실행하자 대상 디렉터리가 없어
+명령이 실패했다.
+
+### 영향
+
+첫 탐색에서는 UIComponent의 실제 구현·테스트 경로와 typography 사용처를 확인할 수
+없었다. 실패한 탐색 자체는 파일을 변경하지 않았으며, 계획·작업 문서의 경로를 실제
+구조와 대조할 때까지 수정 판단을 보류했다.
+
+### 근거
+
+- `rg --files sources/Projects/UI/UIComponent/Components`: `No such file or directory`로
+  실패했다.
+- `rg --files sources/Projects/UI`: 실제 구현은 `sources/Projects/UI/Component/**`, 레이아웃
+  하네스는 `sources/Projects/UI/ComponentLayoutHarness/**`, 테스트는
+  `sources/Projects/UI/Tests/**` 아래에 있음을 확인했다.
+- `sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift:15-26`: 타깃의
+  `rawValue`에서 `UI` 접두어와 테스트 접미어를 제거해 역할 폴더를 계산한다.
+
+### 원인
+
+Tuist 타깃 이름 `UIComponent`를 실제 source 역할 폴더 이름과 같다고 가정했다. 저장소는
+타깃에는 패키지 문맥을 포함하지만 source·test 폴더에는 역할 이름만 두므로 실제 폴더는
+`Component`다.
+
+### 조치
+
+`sources/Projects/UI`에서 범위를 넓혀 파일을 다시 검색하고 `UIModuleName.sourceDirectory`의
+계산 규칙을 확인했다. 이후 `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`, 계약 문서와
+요구사항 체크리스트의 실행 경로를 현재 역할 폴더 기준으로 맞췄다.
+
+### 검증
+
+- `rg --files sources/Projects/UI | rg 'Component|TextStyleTokenTests'`: 실제 구현·테스트·하네스
+  경로 확인에 성공했다.
+- `rg 'sources/Projects/UI/(UIComponent|DesignSystemTests|UIComponentTests|UIComponentLayoutHarness|UIComponentUITests)'
+  specs/006-final-uxui-screens --glob '!trouble-shooting.md'`: 잔여 경로 0건.
+- `git diff --check`: 성공.
+
+### 재발 방지
+
+UI 패키지 경로를 문서화하거나 탐색하기 전에
+`sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`의
+`sourceDirectory`를 기준으로 타깃 이름과 역할 폴더를 구분한다. 경로를 확신할 수 없으면
+먼저 `rg --files sources/Projects/UI`에서 실제 파일을 찾는다.
+
+### 연결
+
+선행·후속 문제 ID: 없음.

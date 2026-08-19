@@ -12,6 +12,8 @@
   - [공용 컴포넌트 교정](./contracts/component-correction.md)
   - [참조 화면 레이아웃·상호작용](./contracts/reference-screen-layout.md)
   - [Use Case 계약](./contracts/use-case-contracts.md)
+- 계약 문서의 `계획 상태`는 구현 책임과 검증 대상을 뜻한다. 현재 완료 여부는 `tasks.md`의
+  완료 표시와 이 문서의 실제 빌드·테스트 결과로 판정한다.
 
 ## 패키지 승인 순서
 
@@ -66,6 +68,8 @@ project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_P
 기대 결과:
 
 - Figma 색 변수 25개와 `ColorToken`의 이름·값·불투명도가 전부 일치한다.
+- 참조 화면이 사용하는 `subtitle1`, `subtitle2`, `subtitle3`, `body1`, `body2`, `caption1`이
+  Figma 텍스트 스타일과 대응하고 기존 `TextStyleTokenTests`가 크기·굵기·행간을 검증한다.
 - [교정 계약](./contracts/component-correction.md)의 갱신 항목이 `±0.5pt` 안에 들어온다.
 - 모든 조작 컨트롤의 터치 영역이 44×44pt 이상이다.
 - 기준선을 갱신하지 않은 기존 DesignSystem·UIComponent 검증이 동일하게 통과한다.
@@ -104,6 +108,9 @@ project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_P
   재시도 조작이 조회 재호출과 상태 전이를 일으킨다. 두 상태에는 Figma 정밀 판정을 요구하지
   않는다.
 - 최대 Dynamic Type에서 텍스트 잘림과 겹침이 없다.
+- Typography 렌더 판정은 glyph 픽셀을 비교하지 않고 최대 Dynamic Type의 잘림·겹침만
+  확인한다. Figma 스타일↔`TextStyleToken` 대응은 정적 계약과 UI 패키지 단위 테스트가
+  담당한다.
 - 앱과 `ScreenLayoutHarness`의 production 의존성·링크 산출물에 Mock 심볼이나 별도 Mock
   모듈이 없다.
 - `AppComposition.live()`의 구현 선택을 대체해도 App·Feature 파일 변경 없이 같은 화면이

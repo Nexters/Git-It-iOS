@@ -14,7 +14,8 @@ Figma `최종 UXUI` 섹션의 기기 화면 프레임 65개를 목록화해 다�
 항목에 배정한다. 이름만으로 상태 변형을 확정할 수 없는 항목은 `내용 미대조`와 담당 그룹을
 기록하고 상세 대조를 후속 기능에 맡긴다. Figma 색 변수 25개와 저장소 토큰의 정합을
 확정하고, 참조 화면과 함께 교정하는 공용 컴포넌트에서 반복되는 레이아웃 값과 `C`
-기준선을 직접 실측값으로 승격·교정한다.
+기준선을 직접 실측값으로 승격·교정한다. 계약은 계획 시 구현 대상과 검증 대상 상태를
+보존하고, 동적인 현재 완료 상태는 `tasks.md`와 실제 빌드·테스트 결과가 소유한다.
 
 기반의 실제 동작은 `프로젝트` 목록 계열(`screen.project.list`)을 참조 화면으로 구현해
 증명한다. Domain은 조회·삭제 Use Case Protocol을 소유하고, Composition의 표본 구현을
@@ -45,11 +46,13 @@ Feature에 생성자 주입한다. 각 `FeatureTests`는 필요한 최소 Mock�
 
 **제약 조건**: 고정값 허용 오차 `±0.5pt`, 최소 터치 영역 44×44pt, 최대 Dynamic Type,
 색 리터럴·`body`의 직접 여백 수치·여러 View에 복제된 로컬 여백 상수 금지, 생성자 주입,
-Mock의 production target·배포 산출물 제외, 시스템 안전 영역 고정 금지
+Mock의 production target·배포 산출물 제외, 시스템 안전 영역 고정 금지, 참조 화면 typography는
+Figma 스타일↔`TextStyleToken` 정적 대응과 단위 테스트로 검증하고 glyph 픽셀 비교 제외
 
 **규모/범위**: Figma 프레임 65개 목록·그룹 계약과 5개 후속 그룹, 참조 화면 1개와 Figma
 디자인 상태 5개·운영 상태 2개, Use Case Protocol 2개, `FeatureTests` 로컬 Mock 2개, 색
-변수 25개, 공용 컴포넌트 기준선 갱신 4항목과 `TagBadge` 8pt 값 보존 회귀 검증 1항목
+변수 25개, 참조 화면 사용 텍스트 토큰 6종, 공용 컴포넌트 기준선 갱신 4항목과
+`TagBadge` 8pt 값 보존 회귀 검증 1항목
 
 ## 헌법 점검
 
@@ -62,7 +65,9 @@ Mock의 production target·배포 산출물 제외, 시스템 안전 영역 고�
   프로세스 수명 안에서만 유지한다. 개인정보·네트워크·영속 저장을 다루지 않는다.
 - **검증 가능한 변경**: Figma 근거가 있는 계약 ID마다 자동 검증을 연결하고, production
   값을 바꾸지 않은 채 assertion helper에 잘못된 측정값을 주입해 검출력을 확인한다.
-  기준선 갱신 항목은 이전값·새 값·Figma 노드를 기록한다.
+  기준선 갱신 항목은 이전값·새 값·Figma 노드를 기록한다. 참조 화면이 사용하는 텍스트
+  역할은 Figma 스타일과 `TextStyleToken` 대응을 정적 검증하고, UI 검증은 glyph 픽셀이
+  아니라 최대 Dynamic Type의 잘림·겹침을 판정한다.
 
 **브랜치 네임스페이스**: 이 헌법 개정 후 새로 생성한 브랜치는 `feature/`, `hotfix/`,
 `release/` 중 목적에 맞는 네임스페이스를 사용해야 한다. 개정 전에 생성된 기존 브랜치는
@@ -111,6 +116,11 @@ Composition → UI → Feature → App` 순서로 구현 경계를 계획한다.
 - `SheetSurface`와 `ProjectRow`의 레이아웃 수치는 컴포넌트의 `private enum Constant`에
   유지하고 테스트 전용 internal 측정 API를 추가하지 않는다. 정확한 수치는
   `UIComponentLayoutHarness`와 `UIComponentUITests`가 실제 렌더 결과로 검증한다.
+- 참조 화면 계약의 상태 필드는 계획 시 구현 대상과 검증 대상만 표현한다. 현재 완료 여부는
+  계약에 복제하지 않고 `tasks.md`의 완료 표시와 실제 빌드·테스트 결과로 판정한다.
+- 공용 컴포넌트는 분할 계약의 단일 구현 기능이 소유하고, 전역 DesignSystem 토큰은 006의
+  UI 기반이 소유한다. 후속 기능은 고정 패키지 순서를 계약에 복제하지 않고 실행 시점의
+  Constitution 원칙 7을 참조한다.
 - 모든 계획 산출물이 이 스킬의 허용 경로 안에 있고, 구현 경로는 아래 패키지 단계에만
   기록했다. 정당화가 필요한 헌법 위반은 없다.
 
@@ -147,11 +157,9 @@ sources/
 │   │   └── CompositionTests/LearningProject/
 │   ├── UI/
 │   │   ├── DesignSystem/{Token,Application}/
-│   │   ├── DesignSystemTests/
-│   │   ├── UIComponent/Components/{Leaf,Composite}/
-│   │   ├── UIComponentTests/
-│   │   ├── UIComponentLayoutHarness/
-│   │   └── UIComponentUITests/
+│   │   ├── Component/Components/{Leaf,Composite}/
+│   │   ├── ComponentLayoutHarness/
+│   │   └── Tests/{DesignSystem,Component/{Unit,UI}}/
 │   ├── Feature/
 │   │   ├── Presentation/Screens/LearningProjectList/
 │   │   └── FeatureTests/LearningProjectList/{Mocks,Tests}/
@@ -197,7 +205,9 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
 
 - 색·텍스트·레이아웃 토큰 정합을 검증하고 반복 8pt 토큰과 진행 표시 의미 색을 추가한다.
   참조 화면이 사용하지 않는 텍스트 스타일 불일치 2건은 값 변경 없이 후속 명세 대상으로
-  기록한다.
+  기록한다. 참조 화면이 사용하는 `subtitle1`, `subtitle2`, `subtitle3`, `body1`, `body2`,
+  `caption1`은 Figma 스타일과의 대응을 계약에 열거하고 기존 `TextStyleTokenTests`와
+  컴포넌트 사용처 정적 검토로 확인한다.
 - [컴포넌트 교정 계약](./contracts/component-correction.md)의 기준선 4개를 갱신해
   `ProjectRow`, `SheetSurface`, `ActionButton`을 교정한다. 이미 Figma 값 8pt를 사용하는
   `TagBadge`는 회귀 검증으로 값 보존과 근거 승격만 확인한다.
@@ -207,7 +217,9 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
 - 참조 화면에 필요한 `ActionMenu`, edge scrim 표현을 UIComponent가 소유한다. `top dim`은
   아래→위, `bottom dim`은 위→아래 방향과 실측 정지점을 자동 일치 판정에 포함한다.
 - `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응 정정은 UI 단계가 소유한다.
-- `UIModuleName.swift` 변경은 UI target 선언 변경과 함께 UI 단계가 소유한다.
+- 이 기능은 기존 DesignSystem·UIComponent·UIComponentLayout target과 scheme을 재사용하므로
+  `UIModuleName.swift`를 변경하지 않는다. 새 UI target 선언이 필요해지면 현재 계획을 먼저
+  갱신하고 UI 패키지 작업으로 배정한다.
 - DesignSystem·UIComponent 단위·렌더 검증과 기존 회귀 결과를 보고하고 승인을 받는다.
 
 ### 4. Feature
@@ -230,7 +242,8 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
 - `ScreenLayoutHarness`와 `ScreenLayoutUITests`를 App 프로젝트에 추가해 화면 상태별
   레이아웃·색·상호작용·Dynamic Type을 검증한다. Figma 디자인 상태 5개는 각각 launch
   scenario와 정밀 레이아웃·색 판정을 가지며, `loading`·`failed` 운영 상태 2개는 별도
-  launch scenario의 최소 렌더링과 `failed` 재시도만 판정한다.
+  launch scenario의 최소 렌더링과 `failed` 재시도만 판정한다. Typography UI 검증은 최대
+  Dynamic Type의 잘림·겹침만 판정하고 glyph 픽셀 일치는 요구하지 않는다.
 - `AppModuleName.swift`의 target·scheme 변경은 App 단계가 소유한다.
 - 제품 App과 검증 앱의 production 의존성·배포 산출물에 Mock 정의나 참조가 없음을
   확인한다.
@@ -241,7 +254,8 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
 `sources/Tuist/ProjectDescriptionHelpers/Projects/*.swift`는 각 패키지 단계에서 그 패키지
 선언 파일만 수정한다. `ProjectName.swift`처럼 여러 패키지 scheme을 함께 나열하는 파일이
 필요하면 패키지별 독립 작업으로 나누고, 최초로 필요한 Domain 단계부터 해당 패키지 관련
-구획만 변경한다. `sources/Tuist/Package.swift`는 TCA가 이미 선언되어 있어 변경하지 않는다.
+구획만 변경한다. `sources/Tuist/Package.swift`는 TCA가 이미 선언되어 있어 변경하지 않으며,
+`UIModuleName.swift`도 기존 UI target을 재사용하므로 변경하지 않는다.
 
 패키지 밖 문서 `sources/docs/ui-component-checklist.md`는 잘못된 UI 컴포넌트 대응을 처음
 교정하는 UI 단계에 배정한다. 이 밖에 어느 패키지에도 배정할 수 없는 구현 파일이 발견되면

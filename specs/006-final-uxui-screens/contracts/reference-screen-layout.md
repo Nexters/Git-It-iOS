@@ -5,7 +5,8 @@
 
 **구현 위치**: `sources/Projects/Feature/Presentation/Screens/LearningProjectList/LearningProjectListView.swift`
 
-**현재 구현 상태**: `미구현` — 006의 Feature 단계 구현 대상으로 계획됨
+**계획 상태**: `구현 대상` — 006의 Feature·App 단계에서 구현하고 검증한다. 현재 완료 여부는
+이 계약에 복제하지 않으며 `tasks.md`의 완료 표시와 실제 빌드·테스트 결과로 판정한다.
 
 ## 선택 근거
 
@@ -17,15 +18,15 @@
 
 ## 상태
 
-| 상태 ID | Figma 노드 | 근거 수준 | 표시 조건 | 현재 구현 상태 | 검증 수준 |
+| 상태 ID | Figma 노드 | 근거 수준 | 표시 조건 | 계획 상태 | 검증 수준 |
 | --- | --- | --- | --- | --- | --- |
-| `project.list.loaded` | `1542:19495` | A | 조회 성공, 항목 1개 이상 | 미구현 | launch + Figma 정밀 판정 |
-| `project.list.menu` | `1621:30331` | A | 상단 메뉴 버튼 선택 | 미구현 | launch + Figma 정밀 판정 |
-| `project.list.empty` | `1597:19052` | A | 조회 성공, 항목 0개 | 미구현 | launch + Figma 정밀 판정 |
-| `project.list.deleting` | `1621:23431`, `1621:30561` | A | 삭제 모드 진입 | 미구현 | launch + Figma 정밀 판정 |
-| `project.list.confirmingDeletion` | `1621:24059` | A | 삭제할 항목 선택 | 미구현 | launch + Figma 정밀 판정 |
-| `project.list.loading` | 직접 대응 프레임 없음 | 운영 | 최초 조회 중 | 미구현 | launch + 최소 렌더링 |
-| `project.list.failed` | 직접 대응 프레임 없음 | 운영 | 조회 실패 | 미구현 | launch + 최소 렌더링·재시도 전이 |
+| `project.list.loaded` | `1542:19495` | A | 조회 성공, 항목 1개 이상 | 구현 대상 | launch + Figma 정밀 판정 |
+| `project.list.menu` | `1621:30331` | A | 상단 메뉴 버튼 선택 | 구현 대상 | launch + Figma 정밀 판정 |
+| `project.list.empty` | `1597:19052` | A | 조회 성공, 항목 0개 | 구현 대상 | launch + Figma 정밀 판정 |
+| `project.list.deleting` | `1621:23431`, `1621:30561` | A | 삭제 모드 진입 | 구현 대상 | launch + Figma 정밀 판정 |
+| `project.list.confirmingDeletion` | `1621:24059` | A | 삭제할 항목 선택 | 구현 대상 | launch + Figma 정밀 판정 |
+| `project.list.loading` | 직접 대응 프레임 없음 | 운영 | 최초 조회 중 | 구현 대상 | launch + 최소 렌더링 |
+| `project.list.failed` | 직접 대응 프레임 없음 | 운영 | 조회 실패 | 구현 대상 | launch + 최소 렌더링·재시도 전이 |
 
 앞의 5개는 Figma 디자인 상태이고 뒤의 2개는 앱 운영 상태다. 운영 상태는 Figma 정밀
 레이아웃·색 판정에서 제외하지만 launch scenario와 명시된 동작 검증에서 제외하지 않는다.
@@ -71,6 +72,24 @@
 | `project.color.overlay` | 시트 배경 오버레이 | `scrim` | `#000000`, 70% | A |
 
 화면과 컴포넌트 코드에는 `Color(red:)`, hex 문자열 또는 숫자 RGB 값을 직접 쓰지 않는다.
+
+## Typography 적용
+
+참조 화면이 실제 사용하는 텍스트 역할만 Figma 로컬 스타일과 `TextStyleToken`에 대응한다.
+아래 여섯 토큰은 [디자인 토큰 정합 계약](./design-token-alignment.md)의 일치 항목이며,
+`Caption 2`와 `ENG/Subtitle 3` 불일치는 참조 화면에서 사용하지 않으므로 이 표에 포함하지 않는다.
+
+| 화면 역할 | 사용 위치 | Figma 스타일 | `TextStyleToken` | 검증 |
+| --- | --- | --- | --- | --- |
+| 화면 제목·빈 상태 제목 | `ScreenHeader`, `EmptyState` | `Subtitle 1` | `subtitle1` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+| 실패·삭제 확인 제목 | `LearningProjectListView`, `SheetSurface` | `Subtitle 2` | `subtitle2` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+| 프로젝트 이름 | `ProjectRow` | `Subtitle 3` | `subtitle3` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+| 버튼 제목 | `ActionButton` | `Body 1` | `body1` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+| 설명·세트 제목·태그·메뉴 | `LearningProjectListView`, `EmptyState`, `ProjectRow`, `TagBadge`, `ActionMenu` | `Body 2` | `body2` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+| 프로젝트 보조 정보 | `ProjectRow` | `Caption 1` | `caption1` | 토큰 값 단위 테스트 + 사용처 정적 검토 |
+
+UI 렌더 검증은 glyph 픽셀을 비교하지 않는다. 최대 Dynamic Type에서 텍스트가 잘리거나
+겹치지 않는지 판정하고, 정적 계약과 단위 테스트가 Figma 스타일↔토큰 대응을 소유한다.
 
 ## edge dim 그라데이션
 
