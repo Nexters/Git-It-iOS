@@ -61,7 +61,7 @@ description: "기능 구현 작업 목록 템플릿"
 
 ### 준비와 기반
 
-- [ ] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
+- [X] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
   `.Composition`/`.CompositionTests` 케이스 `dependencies`(`.CompositionTests`는
   `additionalDependencies`)에 `.fromDomain(.DomainLearningProject)`,
   `.fromData(.DataLearningProject)`, `.fromInfrastructure(.InfrastructureNetworkClient)`를
@@ -69,42 +69,42 @@ description: "기능 구현 작업 목록 템플릿"
 
 ### 테스트(FR-014)
 
-- [ ] T002 [P] [S1] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/ExternalRepositoryRemoteAdapterTests.swift`에
+- [X] T002 [P] [S1] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/ExternalRepositoryRemoteAdapterTests.swift`에
   contracts/github-composition-adapter.md "FR-014 테스트 매트릭스"의
   `ExternalRepositoryRemoteAdapter` 항목(성공, 404/403/5xx→`.other`,
   `connectionFailed`→`.offline`, `timedOut`/`.cancelled`/`.responseDecodingFailed`→`.other`,
   실제 구성된 `HTTPTransportRequest`의 URL이 `https://api.github.com/repos/{owner}/{name}`과
   일치)을 Fake `HTTPTransport`를 주입한 실제 `HTTPClient`로 검증하는 테스트를 작성한다
-- [ ] T003 [P] [S1] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/ExternalRepositoryLookupAdapterTests.swift`에
+- [X] T003 [P] [S1] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/ExternalRepositoryLookupAdapterTests.swift`에
   contracts/github-composition-adapter.md의 `ExternalRepositoryLookupAdapter` 항목(성공,
   `.offline` 전파, `.other` 전파)을 Fake `ExternalRepositoryRemote`로 검증하는 테스트를
   작성한다
-- [ ] T004 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/LearningProjectRemoteAdapterTests.swift`에
+- [X] T004 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/LearningProjectRemoteAdapterTests.swift`에
   contracts/git-it-server-composition-adapter.md "FR-014 테스트 매트릭스"의
   `LearningProjectRemoteAdapter` 항목(4개 메서드 성공, 400/401/404/500→대응
   `DataLearningProjectError`, `HTTPClientError`→`.unexpected`, `Authorization: Bearer` 헤더
   첨부 검증, 토큰 부재 시 401→`.unauthorized` 검증, 4개 메서드 요청 구성 검증)을 Fake
   `HTTPTransport` + Fake `LoginSessionStorage`를 주입한 실제 `HTTPClient`로 검증하는
   테스트를 작성한다
-- [ ] T005 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/LearningProjectRepositoryAdapterTests.swift`에
+- [X] T005 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProjectLifecycle/LearningProjectRepositoryAdapterTests.swift`에
   contracts/git-it-server-composition-adapter.md의 `LearningProjectRepositoryAdapter` 항목
   (4개 메서드 성공 시 Domain 모델 변환, `DataLearningProjectError` 4개 케이스 각각의
   `LearningProjectError` 변환)을 Fake `LearningProjectRemote`로 검증하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T006 [P] [S1] `sources/Projects/Composition/Composition/LearningProjectLifecycle/ExternalRepositoryRemoteAdapter.swift`에
+- [X] T006 [P] [S1] `sources/Projects/Composition/Composition/LearningProjectLifecycle/ExternalRepositoryRemoteAdapter.swift`에
   `init(httpClient: HTTPClient)`와 `ExternalRepositoryRemote` 프로토콜(`func
   repository(owner:name:) async throws -> GitHubRepositoryResponseDTO`)을 구현한다 — `GET
   {baseURL}/repos/{owner}/{name}`을 전송하고(FR-002), 성공 응답을 디코딩해 반환하며, 실패는
   data-model.md §1 오류 매핑 표대로 `DataExternalRepositoryError`로 던진다(FR-004·FR-010,
   재시도 없음 FR-015, 로깅 없음 FR-016)
-- [ ] T007 [P] [S1] `sources/Projects/Composition/Composition/LearningProjectLifecycle/ExternalRepositoryLookupAdapter.swift`에
+- [X] T007 [P] [S1] `sources/Projects/Composition/Composition/LearningProjectLifecycle/ExternalRepositoryLookupAdapter.swift`에
   `init(remote: ExternalRepositoryRemote)`와 `ExternalRepositoryLookup` 프로토콜(`func
   repository(owner:name:) async throws -> ExternalRepository`)을 구현한다 — `remote`가 반환한
   `GitHubRepositoryResponseDTO`를 `ExternalRepository`로 변환하고(FR-003),
   `DataExternalRepositoryError`를 대응 `ExternalRepositoryError`로 매핑해 다시 던진다
-- [ ] T008 [P] [S2] `sources/Projects/Composition/Composition/LearningProjectLifecycle/LearningProjectRemoteAdapter.swift`에
+- [X] T008 [P] [S2] `sources/Projects/Composition/Composition/LearningProjectLifecycle/LearningProjectRemoteAdapter.swift`에
   `init(httpClient: HTTPClient, sessionStorage: LoginSessionStorage)`와
   `LearningProjectRemote` 프로토콜(`registerProject`/`fetchProjects`/`fetchProjectDetail`/
   `deleteProject`)을 구현한다 — 매 호출 전 `sessionStorage.load()?.accessToken`으로
@@ -112,7 +112,7 @@ description: "기능 구현 작업 목록 템플릿"
   `/api/v1/projects` 엔드포인트를 전송하며(FR-006), 실패는 data-model.md §2 오류 매핑
   표대로 `DataLearningProjectError`로 던진다(FR-009·FR-010, 재시도 없음 FR-015, 로깅 없음
   FR-016)
-- [ ] T009 [P] [S2] `sources/Projects/Composition/Composition/LearningProjectLifecycle/LearningProjectRepositoryAdapter.swift`에
+- [X] T009 [P] [S2] `sources/Projects/Composition/Composition/LearningProjectLifecycle/LearningProjectRepositoryAdapter.swift`에
   `init(remote: LearningProjectRemote)`와 `LearningProjectRepository` 프로토콜(`register`/
   `fetchProjects`/`fetchProjectDetail`/`deleteProject`)을 구현한다 — `remote`가 반환한 DTO를
   007의 Domain 모델로 변환하고(FR-008, `register`의 `quizLevel`은 호출 시 전달받은 값을
@@ -120,7 +120,7 @@ description: "기능 구현 작업 목록 템플릿"
 
 ### 정리와 패키지 검증
 
-- [ ] T010 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme Composition
+- [X] T010 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme Composition
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`로 패키지를 검증한다(실패 0건,
   T002~T005의 테스트 매트릭스 전부 통과 확인)
 
@@ -133,9 +133,9 @@ description: "기능 구현 작업 목록 템플릿"
 
 **선행 조건**: `Composition` 패키지의 구현·검증·결과 보고가 완료되어야 한다.
 
-- [ ] T011 [no-write] `Composition` 스킴의 `xcodebuild test`를 재실행하고
+- [X] T011 [no-write] `Composition` 스킴의 `xcodebuild test`를 재실행하고
   quickstart.md 시나리오 1·2 절차와 대조해 결과를 기록한다
-- [ ] T012 [no-write] spec.md 시나리오 1·2의 수용 시나리오 3+6개 전체를 T002~T005 테스트
+- [X] T012 [no-write] spec.md 시나리오 1·2의 수용 시나리오 3+6개 전체를 T002~T005 테스트
   결과와 대조해 SC-001~SC-004가 충족되었는지 확인한다(로그인·세션 Adapter가 없어 실제 기기
   End-to-End 검증은 범위 밖이라는 점을 함께 기록한다)
 
