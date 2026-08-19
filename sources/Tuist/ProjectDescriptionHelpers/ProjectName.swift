@@ -48,10 +48,16 @@ extension ProjectName {
                 [.module(name: "Feature")]
 
             case .Domain:
-                [.module(
-                    name: "DomainAuthentication",
-                    testTarget: "DomainAuthenticationTests",
-                )]
+                [
+                    .module(
+                        name: "DomainAuthentication",
+                        testTarget: "DomainAuthenticationTests",
+                    ),
+                    .module(
+                        name: "DomainLearningProject",
+                        testTarget: "DomainLearningProjectTests",
+                    ),
+                ]
 
             case .Data:
                 [.module(

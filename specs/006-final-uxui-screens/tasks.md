@@ -42,23 +42,23 @@
 
 ### 준비와 target 선언
 
-- [ ] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`에 source directory가 각각 `LearningProject`, `LearningProjectTests`인 `DomainLearningProject`, `DomainLearningProjectTests` target과 test→production 의존성을 선언한다
-- [ ] T002 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Domain scheme 목록에 `DomainLearningProject`와 `DomainLearningProjectTests`를 연결하고 기존 인증 scheme 구획은 보존한다
+- [X] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`에 source directory가 각각 `LearningProject`, `LearningProjectTests`인 `DomainLearningProject`, `DomainLearningProjectTests` target과 test→production 의존성을 선언한다
+- [X] T002 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Domain scheme 목록에 `DomainLearningProject`와 `DomainLearningProjectTests`를 연결하고 기존 인증 scheme 구획은 보존한다
 
 ### 테스트 — Red
 
-- [ ] T003 [P] [S2] `sources/Projects/Domain/LearningProjectTests/Models/LearningProjectValueTests.swift`에 빈 식별자 거부, 진행률 0...1 고정, 세트 순서 1 이상 불변조건 테스트를 작성한다
-- [ ] T004 [P] [S2] `sources/Projects/Domain/LearningProjectTests/Models/LearningProjectCollectionTests.swift`에 요약 모델의 식별 가능성·값 보존과 페이지의 항목·다음 페이지 상태 테스트를 작성한다
-- [ ] T005 [no-write] `make tuist` 후 project build runner로 `DomainLearningProject` 테스트를 실행해 T003~T004가 누락된 모델 때문에 예상대로 실패하고, 실패 원인이 환경이 아닌 계약 부재인지 확인한다
+- [X] T003 [P] [S2] `sources/Projects/Domain/LearningProjectTests/Models/LearningProjectValueTests.swift`에 빈 식별자 거부, 진행률 0...1 고정, 세트 순서 1 이상 불변조건 테스트를 작성한다
+- [X] T004 [P] [S2] `sources/Projects/Domain/LearningProjectTests/Models/LearningProjectCollectionTests.swift`에 요약 모델의 식별 가능성·값 보존과 페이지의 항목·다음 페이지 상태 테스트를 작성한다
+- [X] T005 [no-write] `make tuist` 후 project build runner로 `DomainLearningProject` 테스트를 실행해 T003~T004가 누락된 모델 때문에 예상대로 실패하고, 실패 원인이 환경이 아닌 계약 부재인지 확인한다
 
 ### 구현 — Green
 
-- [ ] T006 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectID.swift`에 공백 제거 후 빈 원시값을 거부하고 원래 식별값을 보존하는 `Sendable`, `Hashable`, `Identifiable` 값 객체를 구현한다
-- [ ] T007 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProgress.swift`에 `completedRatio`를 0...1로 고정하는 `Sendable`, `Equatable` 값 객체를 구현한다
-- [ ] T008 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningSetMark.swift`에 1 이상의 `order`와 `title`을 보존하는 `Sendable`, `Equatable` 값 객체를 구현한다
+- [X] T006 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectID.swift`에 공백 제거 후 빈 원시값을 거부하고 원래 식별값을 보존하는 `Sendable`, `Hashable`, `Identifiable` 값 객체를 구현한다
+- [X] T007 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProgress.swift`에 `completedRatio`를 0...1로 고정하는 `Sendable`, `Equatable` 값 객체를 구현한다
+- [X] T008 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningSetMark.swift`에 1 이상의 `order`와 `title`을 보존하는 `Sendable`, `Equatable` 값 객체를 구현한다
 - [ ] T009 [P] [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectError.swift`에 `temporarilyUnavailable`, `projectUnavailable`만 표현하는 기술 중립 오류를 구현한다
-- [ ] T010 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectSummary.swift`에 식별자, 이름, 기술 목록, 진행 정보와 다음 세트 표시 정보를 가진 `Identifiable`, `Sendable`, `Equatable` 모델을 구현한다
-- [ ] T011 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectPage.swift`에 프로젝트 요약 배열과 `hasNextPage`를 가진 `Sendable`, `Equatable` 모델을 구현한다
+- [X] T010 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectSummary.swift`에 식별자, 이름, 기술 목록, 진행 정보와 다음 세트 표시 정보를 가진 `Identifiable`, `Sendable`, `Equatable` 모델을 구현한다
+- [X] T011 [S2] `sources/Projects/Domain/LearningProject/Models/LearningProjectPage.swift`에 프로젝트 요약 배열과 `hasNextPage`를 가진 `Sendable`, `Equatable` 모델을 구현한다
 - [ ] T012 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects.swift`에 `callAsFunction(page:size:) async throws -> LearningProjectPage`를 선언하는 `Sendable` Protocol을 구현한다
 - [ ] T013 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProject.swift`에 `callAsFunction(_:) async throws`를 선언하는 `Sendable` Protocol을 구현한다
 
