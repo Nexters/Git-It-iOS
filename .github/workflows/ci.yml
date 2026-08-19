@@ -15,34 +15,57 @@ permissions:
   contents: read
 
 jobs:
-  script-tests:
-    name: script tests
+  changes:
+    name: classify changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs_only: ${{ steps.classify.outputs.docs_only }}
+      scripts_changed: ${{ steps.classify.outputs.scripts_changed }}
+      swift_changed: ${{ steps.classify.outputs.swift_changed }}
+      ui_changed: ${{ steps.classify.outputs.ui_changed }}
+      project_config_changed: ${{ steps.classify.outputs.project_config_changed }}
+      workflow_changed: ${{ steps.classify.outputs.workflow_changed }}
+      tests_changed: ${{ steps.classify.outputs.tests_changed }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Classify changes
+        id: classify
+        run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+
+  script-quality:
+    name: script quality
+    needs: changes
+    if: ${{ needs.changes.outputs.scripts_changed == 'true' || needs.changes.outputs.workflow_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 10
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
           submodules: recursive
 
-      - name: Install script test dependency
-        run: brew install ripgrep
-
       - name: Load repository paths
         run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Install script test dependency
+        run: brew install ripgrep
 
       - name: Run script tests
         run: "$GIT_IT_SCRIPT_TEST_RUNNER"
 
-  lint:
+  swift-lint:
     name: lint
+    needs: changes
+    if: ${{ needs.changes.outputs.swift_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 15
     continue-on-error: true
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -64,14 +87,14 @@ jobs:
         run: |
           "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
-  build-and-test:
+  app-build:
     name: build
+    needs: changes
+    if: ${{ needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.project_config_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -87,11 +110,6 @@ jobs:
           mise_toml: |
             [tools]
             tuist = "4.202.2"
-
-      - name: Verify toolchain
-        run: |
-          xcodebuild -version
-          tuist version
 
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -117,6 +135,51 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" build
 
+  unit-tests:
+    name: unit tests
+    needs: changes
+    if: ${{ needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true' }}
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            tuist = "4.202.2"
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.tuist/Cache
+            ${{ env.GIT_IT_TUIST_ROOT }}/.build
+            .build
+            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
+          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-dependencies-
+
+      - name: Install dependencies
+        run: tuist install
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Generate workspace
+        run: tuist generate --no-open
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
       - name: Compile tests
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" compile
@@ -124,3 +187,79 @@ jobs:
       - name: Run tests
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" test
+
+  ui-tests:
+    name: ui tests
+    needs: changes
+    if: ${{ needs.changes.outputs.ui_changed == 'true' }}
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            tuist = "4.202.2"
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.tuist/Cache
+            ${{ env.GIT_IT_TUIST_ROOT }}/.build
+            .build
+            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
+          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-dependencies-
+
+      - name: Install dependencies
+        run: tuist install
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Generate workspace
+        run: tuist generate --no-open
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Compile tests
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
+
+      - name: Run tests
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" test
+
+  gate:
+    name: CI / gate
+    needs:
+      - changes
+      - script-quality
+      - app-build
+      - unit-tests
+      - ui-tests
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Evaluate gate
+        run: |
+          ./tools/ci/bin/gate-evaluate.sh \
+            "${{ needs.changes.result }}" \
+            "${{ needs.script-quality.result }}" \
+            "${{ needs.app-build.result }}" \
+            "${{ needs.unit-tests.result }}" \
+            "${{ needs.ui-tests.result }}"
