@@ -29,6 +29,9 @@ extension CompositionModuleName {
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataAuthentication),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .fromData(.DataLearningProject),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 
@@ -44,6 +47,9 @@ extension CompositionModuleName {
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataAuthentication),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .fromData(.DataLearningProject),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
         }
