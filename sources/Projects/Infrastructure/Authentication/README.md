@@ -75,11 +75,11 @@ scope를 표현합니다. Apple 프레임워크 타입은 provider 구현 안에
 
 ## 검증 근거
 
-- Apple 인증 시도와 credential 검증: `AuthenticationTests/AppleAuthentication/AppleAuthorizationProviderTests.swift`
-- credential 상태와 stream: `AuthenticationTests/AppleAuthentication/AppleCredentialStateProviderTests.swift`
-- Keychain CRUD·namespace·접근성: `AuthenticationTests/Keychain/KeychainStoreTests.swift`
-- CSPRNG 출력과 오류: `AuthenticationTests/RandomGenerator/SecureRandomGeneratorTests.swift`
-- 민감 값 비노출: `AuthenticationTests/Security/SensitiveValueExposureTests.swift`
+- Apple 인증 시도와 credential 검증: `Tests/Authentication/AppleAuthentication/AppleAuthorizationProviderTests.swift`
+- credential 상태와 stream: `Tests/Authentication/AppleAuthentication/AppleCredentialStateProviderTests.swift`
+- Keychain CRUD·namespace·접근성: `Tests/Authentication/Keychain/KeychainStoreTests.swift`
+- CSPRNG 출력과 오류: `Tests/Authentication/RandomGenerator/SecureRandomGeneratorTests.swift`
+- 민감 값 비노출: `Tests/Authentication/Security/SensitiveValueExposureTests.swift`
 
 문서의 보장 범위는 위 테스트와 함께 변경해야 합니다. 테스트로 검증되지 않은 계획,
 구현 의도 또는 다른 타겟의 동작을 보장된 기능으로 추가하지 않습니다.
