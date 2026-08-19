@@ -172,7 +172,7 @@
 
 ### 패키지 검증과 승인
 
-- [ ] T053 [no-write] `make tuist` 후 project build runner로 `DesignSystem`, `UIComponent`, `UIComponentLayout`을 build·test하고 색 변수 25개, 그라데이션 방향·정지점, 기준선 갱신 4개, `tag.radius` 8pt 보존, 44pt 터치 영역과 최대 Dynamic Type을 확인한다
+- [ ] T053 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `DesignSystem`, `UIComponent`, `UIComponentLayout` 각 scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 색 변수 25개, 그라데이션 방향·정지점, 기준선 갱신 4개, `tag.radius` 8pt 보존, 44pt 터치 영역과 최대 Dynamic Type을 확인한다
 - [ ] T054 [no-write] `rg`와 diff 검토로 UI production 코드의 색 리터럴, `body` 직접 여백 수치, 둘 이상의 View에 복제된 로컬 여백 상수가 각각 0건이고 한 View 전용 `private enum Constant`만 허용되는지 확인한다
 - [ ] T055 [no-write] T030~T054의 UI 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Feature 진행에 대한 명시적 사용자 승인을 기다린다
 
