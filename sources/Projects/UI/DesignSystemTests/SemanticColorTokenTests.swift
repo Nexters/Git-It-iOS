@@ -17,6 +17,8 @@ struct SemanticColorTokenTests {
             ("SecondaryText", "Grey300"),
             ("MutedText", "Grey400"),
             ("BrandAccent", "Blue100"),
+            ("ProgressTrack", "Grey500"),
+            ("ProgressFill", "Blue200"),
         ]
         for (name, colorName) in expected {
             let token = SemanticColorToken.all.first { $0.name == name }
@@ -37,8 +39,16 @@ struct SemanticColorTokenTests {
     }
 
     @Test
-    func `역할 색상 토큰 총 개수는 9개다`() {
-        #expect(SemanticColorToken.all.count == 9)
+    func `진행 바 역할 토큰은 트랙과 채움 원시 색상을 참조한다`() {
+        #expect(SemanticColorToken.progressTrack.colorToken == .grey500)
+        #expect(SemanticColorToken.progressFill.colorToken == .blue200)
+        #expect(SemanticColorToken.all.contains(.progressTrack))
+        #expect(SemanticColorToken.all.contains(.progressFill))
+    }
+
+    @Test
+    func `역할 색상 토큰 총 개수는 11개다`() {
+        #expect(SemanticColorToken.all.count == 11)
     }
 
 }

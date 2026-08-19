@@ -12,7 +12,7 @@ extension LinearGradient {
             gradient: Gradient(
                 stops: token.stops.map { stop in
                     .init(
-                        color: Color(designSystemHex: stop.hex),
+                        color: Color(designSystemHex: stop.hex).opacity(stop.opacity),
                         location: stop.position,
                     )
                 }
