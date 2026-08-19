@@ -124,6 +124,7 @@ public struct ProjectRow<Thumbnail: View>: View {
             IconGlassButton.destructive(
                 symbol: "minus",
                 label: "\(viewModel.name) 삭제",
+                size: .small,
                 action: onAccessoryTap,
             )
         } else {

@@ -37,6 +37,35 @@ public struct IconGlassButton: View {
         }
     }
 
+    public enum Size: Sendable, Equatable {
+        case medium
+        case small
+
+        // MARK: Internal
+
+        var surfaceSize: CGFloat {
+            switch self {
+            case .medium:
+                40
+            case .small:
+                36
+            }
+        }
+
+        var iconSize: CGFloat {
+            switch self {
+            case .medium:
+                17
+            case .small:
+                15
+            }
+        }
+
+        var touchSize: CGFloat {
+            44
+        }
+    }
+
     public struct ViewModel: Sendable, Equatable {
 
         // MARK: Lifecycle
@@ -45,13 +74,11 @@ public struct IconGlassButton: View {
             symbol: String,
             label: String,
             style: Style = .neutral,
-            iconSize: CGFloat = 17,
-            size: CGFloat = 36,
+            size: Size = .small,
         ) {
             self.symbol = symbol
             self.label = label
             self.style = style
-            self.iconSize = iconSize
             self.size = size
         }
 
@@ -62,35 +89,38 @@ public struct IconGlassButton: View {
         public let symbol: String
         public let label: String
         public let style: Style
-        public let iconSize: CGFloat
-        public let size: CGFloat
+        public let size: Size
 
     }
 
     public var body: some View {
         Button(action: action) {
             Image(systemName: viewModel.symbol)
-                .font(.system(size: viewModel.iconSize))
+                .font(.system(size: viewModel.size.iconSize))
                 .designSystemForeground(viewModel.style.tintColor)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(width: viewModel.size.surfaceSize, height: viewModel.size.surfaceSize)
+                .glassEffect(
+                    .regular
+                        .tint(Color(designSystem: viewModel.style.backgroundColor))
+                        .interactive(),
+                    in: .circle,
+                )
+                .frame(width: viewModel.size.touchSize, height: viewModel.size.touchSize)
+                .contentShape(Rectangle())
         }
-        .buttonStyle(.glass)
-        .buttonBorderShape(.circle)
-        .tint(Color(designSystem: viewModel.style.backgroundColor))
-        .frame(width: viewModel.size, height: viewModel.size)
+        .buttonStyle(.plain)
         .accessibilityLabel(viewModel.label)
-        .frame(width: viewModel.size + 2, height: viewModel.size + 2)
     }
 
     public static func neutral(
         symbol: String,
         label: String,
-        iconSize: CGFloat = 17,
-        size: CGFloat = 36,
+        size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .neutral, iconSize: iconSize, size: size),
+            viewModel: .init(symbol: symbol, label: label, style: .neutral, size: size),
             action: action,
         )
     }
@@ -98,12 +128,11 @@ public struct IconGlassButton: View {
     public static func accent(
         symbol: String,
         label: String,
-        iconSize: CGFloat = 17,
-        size: CGFloat = 36,
+        size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .accent, iconSize: iconSize, size: size),
+            viewModel: .init(symbol: symbol, label: label, style: .accent, size: size),
             action: action,
         )
     }
@@ -111,12 +140,11 @@ public struct IconGlassButton: View {
     public static func destructive(
         symbol: String,
         label: String,
-        iconSize: CGFloat = 17,
-        size: CGFloat = 36,
+        size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .destructive, iconSize: iconSize, size: size),
+            viewModel: .init(symbol: symbol, label: label, style: .destructive, size: size),
             action: action,
         )
     }
@@ -136,8 +164,8 @@ public struct IconGlassButton: View {
             IconGlassButton.destructive(symbol: "trash", label: "삭제하기")
         }
         HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-            IconGlassButton.neutral(symbol: "chevron.left", label: "뒤로 가기", iconSize: 12, size: 32)
-            IconGlassButton.accent(symbol: "bookmark", label: "저장하기", iconSize: 24, size: 56)
+            IconGlassButton.neutral(symbol: "chevron.left", label: "뒤로 가기", size: .small)
+            IconGlassButton.accent(symbol: "bookmark", label: "저장하기", size: .medium)
         }
     }
     .designSystemScreenMargin()

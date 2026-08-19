@@ -7,6 +7,8 @@ enum UIModuleName: String {
     case UIComponent
     case DesignSystemTests
     case UIComponentTests
+    case UIComponentLayoutHarness
+    case UIComponentUITests
 }
 
 private enum DesignSystemFontFamily: CaseIterable {
@@ -74,6 +76,49 @@ extension UIModuleName {
         .testModule(
             name: UIModuleName.UIComponentTests.rawValue,
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
+        ),
+        .target(
+            name: UIModuleName.UIComponentLayoutHarness.rawValue,
+            destinations: .iOS,
+            product: .app,
+            bundleId: "com.nexters.hytime.gitit.uicomponentlayoutharness",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .extendingDefault(with: [
+                "UIApplicationSceneManifest": [
+                    "UIApplicationSupportsMultipleScenes": false
+                ],
+                "UILaunchScreen": [:],
+            ]),
+            sources: ["UIComponentLayoutHarness/**"],
+            dependencies: [
+                .target(name: UIModuleName.UIComponent.rawValue),
+                .target(name: UIModuleName.DesignSystem.rawValue),
+            ],
+            settings: .settings(base: [
+                "CODE_SIGN_STYLE": "Automatic",
+                "DEVELOPMENT_TEAM": "6924CABL23",
+                "ENABLE_PREVIEWS": "YES",
+                "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                "SWIFT_VERSION": "5.0",
+            ]),
+        ),
+        .target(
+            name: UIModuleName.UIComponentUITests.rawValue,
+            destinations: .iOS,
+            product: .uiTests,
+            bundleId: "com.nexters.hytime.gitit.uicomponentuitests",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["UIComponentUITests/**"],
+            dependencies: [
+                .target(name: UIModuleName.UIComponentLayoutHarness.rawValue)
+            ],
+            settings: .settings(base: [
+                "CODE_SIGN_STYLE": "Automatic",
+                "DEVELOPMENT_TEAM": "6924CABL23",
+                "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                "SWIFT_VERSION": "5.0",
+            ]),
         ),
     ]
 }
