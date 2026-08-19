@@ -93,28 +93,28 @@
 
 ### 준비와 target 선언
 
-- [ ] T016 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 Composition production·test target에 `DomainLearningProject` 의존성만 추가하고 Mock 전용 target이나 FeatureTests 의존성은 추가하지 않는다
-- [ ] T017 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Composition scheme에 `CompositionTests` test action을 연결하고 Domain·Feature 등 다른 scheme 구획은 변경하지 않는다
+- [X] T016 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 Composition production·test target에 `DomainLearningProject` 의존성만 추가하고 Mock 전용 target이나 FeatureTests 의존성은 추가하지 않는다
+- [X] T017 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Composition scheme에 `CompositionTests` test action을 연결하고 Domain·Feature 등 다른 scheme 구획은 변경하지 않는다
 
 ### 테스트 — Red
 
-- [ ] T018 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProject/SampleFetchLearningProjectsTests.swift`에 초기 표본 페이지 반환, page·size 경계 전달과 삭제 뒤 조회 결과 반영 테스트를 작성한다
-- [ ] T019 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProject/SampleDeleteLearningProjectTests.swift`에 기존 식별자 삭제, 없는 식별자의 `projectUnavailable`과 프로세스 수명 상태 테스트를 작성한다
-- [ ] T020 [P] [S5] `sources/Projects/Composition/CompositionTests/LearningProject/AppCompositionTests.swift`에 `live()`와 `sample(fetch:)`의 `projects`·`failure`·`pending` 표본 동작이 두 Domain Protocol 실행 객체를 제공하고 대체 가능한지 검증한다
-- [ ] T021 [no-write] `make tuist` 후 `xcodebuild test -workspace sources/GitIt.xcworkspace -scheme Composition`을 임시 `-derivedDataPath`와 `-resultBundlePath`로 직접 실행해 T018~T020이 누락된 표본 저장소·Use Case 구현·조립 타입 때문에 예상대로 실패하고, 실패 원인이 환경이 아닌 계약 부재인지 확인한다
+- [X] T018 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProject/SampleFetchLearningProjectsTests.swift`에 초기 표본 페이지 반환, page·size 경계 전달과 삭제 뒤 조회 결과 반영 테스트를 작성한다
+- [X] T019 [P] [S2] `sources/Projects/Composition/CompositionTests/LearningProject/SampleDeleteLearningProjectTests.swift`에 기존 식별자 삭제, 없는 식별자의 `projectUnavailable`과 프로세스 수명 상태 테스트를 작성한다
+- [X] T020 [P] [S5] `sources/Projects/Composition/CompositionTests/LearningProject/AppCompositionTests.swift`에 `live()`와 `sample(fetch:)`의 `projects`·`failure`·`pending` 표본 동작이 두 Domain Protocol 실행 객체를 제공하고 대체 가능한지 검증한다
+- [X] T021 [no-write] `make tuist` 후 `xcodebuild test -workspace sources/GitIt.xcworkspace -scheme Composition`을 임시 `-derivedDataPath`와 `-resultBundlePath`로 직접 실행해 T018~T020이 누락된 표본 저장소·Use Case 구현·조립 타입 때문에 예상대로 실패하고, 실패 원인이 환경이 아닌 계약 부재인지 확인한다
 
 ### 구현 — Green
 
-- [ ] T022 [S2] `sources/Projects/Composition/Composition/LearningProject/SampleLearningProjectStore.swift`에 표본 목록의 프로세스 수명과 동시 접근을 소유하는 actor를 구현한다
-- [ ] T023 [P] [S2] `sources/Projects/Composition/Composition/LearningProject/SampleFetchLearningProjects.swift`에 저장소 값을 그대로 페이지로 반환하고 정렬·필터·재시도 정책을 갖지 않는 Protocol 구현을 추가한다
-- [ ] T024 [P] [S2] `sources/Projects/Composition/Composition/LearningProject/SampleDeleteLearningProject.swift`에 식별자 삭제와 `projectUnavailable`만 처리하는 Protocol 구현을 추가한다
-- [ ] T025 [S5] `sources/Projects/Composition/Composition/AppComposition.swift`에 두 Use Case 실행 객체를 노출하고 `live()`의 실행 구현 선택과 harness용 `sample(fetch:)`의 `projects`·`failure`·`pending` 표본 동작을 정의하되 Mock 명칭·FeatureTests 의존 없이 실제 구현 교체 지점을 이 파일 한 곳으로 유지한다
-- [ ] T026 `sources/Projects/Composition/Composition/Placeholder.swift`를 실제 Composition 소스가 생긴 뒤 삭제한다
-- [ ] T027 `sources/Projects/Composition/CompositionTests/Placeholder.swift`를 실제 Composition 테스트가 생긴 뒤 삭제한다
+- [X] T022 [S2] `sources/Projects/Composition/Composition/LearningProject/SampleLearningProjectStore.swift`에 표본 목록의 프로세스 수명과 동시 접근을 소유하는 actor를 구현한다
+- [X] T023 [P] [S2] `sources/Projects/Composition/Composition/LearningProject/SampleFetchLearningProjects.swift`에 저장소 값을 그대로 페이지로 반환하고 정렬·필터·재시도 정책을 갖지 않는 Protocol 구현을 추가한다
+- [X] T024 [P] [S2] `sources/Projects/Composition/Composition/LearningProject/SampleDeleteLearningProject.swift`에 식별자 삭제와 `projectUnavailable`만 처리하는 Protocol 구현을 추가한다
+- [X] T025 [S5] `sources/Projects/Composition/Composition/AppComposition.swift`에 두 Use Case 실행 객체를 노출하고 `live()`의 실행 구현 선택과 harness용 `sample(fetch:)`의 `projects`·`failure`·`pending` 표본 동작을 정의하되 Mock 명칭·FeatureTests 의존 없이 실제 구현 교체 지점을 이 파일 한 곳으로 유지한다
+- [X] T026 `sources/Projects/Composition/Composition/Placeholder.swift`를 실제 Composition 소스가 생긴 뒤 삭제한다
+- [X] T027 `sources/Projects/Composition/CompositionTests/Placeholder.swift`를 실제 Composition 테스트가 생긴 뒤 삭제한다
 
 ### 패키지 검증과 승인
 
-- [ ] T028 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `Composition` scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 표본 조회·삭제·조립 테스트, production Mock 정의·참조 0건과 `live()` 구현 선택 지점 한 파일을 확인한다
+- [X] T028 [no-write] `make tuist` 후 `xcodebuild build`와 `xcodebuild test`를 `sources/GitIt.xcworkspace`의 `Composition` scheme 및 서로 격리된 임시 `-derivedDataPath`로 직접 실행하고 표본 조회·삭제·조립 테스트, production Mock 정의·참조 0건과 `live()` 구현 선택 지점 한 파일을 확인한다
 - [ ] T029 [no-write] T016~T028의 Composition 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 UI 진행에 대한 명시적 사용자 승인을 기다린다
 
 **승인 게이트**: T029 승인 전에는 UI, Feature, App 파일을 생성·수정·삭제하지 않는다.
