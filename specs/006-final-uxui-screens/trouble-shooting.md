@@ -390,3 +390,78 @@ heading 순서와 파일 tail을 즉시 확인한다.
 ### 연결
 
 선행: `TS-20260819-007`. 후속: 없음.
+
+## TS-20260819-009: Domain 패키지 검증 명령과 실행 환경 불일치
+
+**상태**: 완화
+
+**발생 작업**: `$speckit-implement` Domain 패키지 `T001`~`T015`
+
+**관련 커밋**: `b812b19`, `f929842`
+
+### 증상
+
+- 새 `LearningProject` source directory가 아직 없을 때 `make tuist`가 source glob을
+  찾지 못해 generation 단계에서 실패했다.
+- `project-build` runner에 `test DomainLearningProject`를 전달하면 scheme을 받지 않고
+  `오류[common.invalid-input]: ACTION 한 개가 필요합니다`로 종료했다.
+- 이름 기반 `iPhone 17 Pro` destination은 디스크에서 사라진 simulator UUID를 선택해
+  test 실행 단계에서 boot에 실패했다.
+- sandbox 안에서는 CoreSimulator service와 SwiftPM cache 접근이 거부되어 사용 가능한
+  simulator 조회와 `swift-format` lint가 실패했다.
+
+이 문제들은 구현 계약과 무관하지만 Red 검증과 최종 build/test/lint를 차례로 막아,
+환경 또는 도구 인터페이스 실패를 제품 코드 실패로 오판할 위험이 있었다.
+
+### 근거
+
+- 최초 `make tuist`: `invalid source files globs ... LearningProject/** does not exist`.
+- `project_build_runner test DomainLearningProject`:
+  `오류[common.invalid-input]: ACTION 한 개가 필요합니다`.
+- 이름 기반 destination test:
+  `Unable to boot device because it cannot be located on disk`.
+- sandbox 안 `xcrun simctl list devices available`: CoreSimulator service 연결 실패.
+- 사용 가능한 booted UUID `FF975095-E0FC-434D-89E9-E3EBA19EB913`를 지정한 최종
+  `xcodebuild build`: `** BUILD SUCCEEDED **`.
+- 같은 UUID와 격리된 Derived Data/result bundle을 사용한 최종 test: 2개 suite의 5개
+  test가 모두 통과했고 `** TEST SUCCEEDED **`를 반환했다.
+
+### 원인
+
+- Tuist는 target source glob을 평가할 때 해당 directory가 실제로 존재해야 한다.
+- 현재 `project-build` runner의 공개 입력은 action 하나만 받으며, 작업 문서에 적힌
+  scheme 인자 형태와 일치하지 않는다.
+- 이름 기반 destination 해석이 현재 사용할 수 없는 과거 simulator UUID를 선택했다.
+- sandbox는 사용자 SwiftPM cache와 CoreSimulator service 접근 권한을 제공하지 않았다.
+
+### 조치
+
+- `T006`의 정확한 허용 경로에 `LearningProjectID.swift`를 먼저 만든 뒤 project를 다시
+  생성하고, 아직 구현하지 않은 나머지 모델을 참조하는 test로 Red를 확인했다.
+- 대상 scheme 검증은 절대 workspace 경로와 격리된 Derived Data를 지정한
+  `xcodebuild`로 실행했다.
+- 권한이 필요한 조회를 승인된 환경에서 다시 실행해 사용 가능한 simulator UUID를
+  확인하고 build/test destination에 직접 지정했다.
+- 동일한 관련 파일 범위의 formatter lint를 승인된 환경에서 다시 실행했다.
+
+### 검증
+
+- Red 단계에서 `LearningProjectID`, `LearningProgress`, `LearningSetMark`,
+  `LearningProjectSummary`, `LearningProjectPage` 부재로 compile 실패함을 확인했다.
+- 최종 `make tuist`와 `DomainLearningProject` build가 성공했다.
+- `DomainLearningProjectTests`의 2개 suite, 5개 test가 모두 통과했다.
+- 변경한 Domain/Tuist Swift 파일의 formatter lint가 0 violation으로 통과했다.
+- 두 구현 커밋의 pre-commit 회귀 테스트가 모두 통과했다.
+
+### 재발 방지
+
+- 새 source directory를 추가할 때는 해당 task가 허용한 실제 source 파일을 하나 이상
+  만든 뒤 `tuist generate`를 실행한다.
+- runner가 scheme 인자를 지원하기 전까지 단일 scheme 검증은 격리된 경로를 사용하는
+  직접 `xcodebuild`로 수행한다.
+- simulator는 사용 가능한 UUID를 확인해 명시하고, sandbox 권한 실패는 제품 실패로
+  해석하지 않고 같은 명령을 필요한 권한으로 재실행한다.
+
+### 연결
+
+선행: 없음. 후속: 없음.
