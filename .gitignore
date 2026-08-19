@@ -148,3 +148,5 @@ htmlcov/
 
 # Machine-specific configuration
 *.xcconfig
+sources/docs/git-it-domain-usecases/**
+sources/docs/Git-It-server-scheme.json

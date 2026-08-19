@@ -57,59 +57,59 @@ Domain 계약(`ExternalRepositoryLookup`, `LearningProjectRepository`) 및 모�
 
 ### 준비와 기반
 
-- [ ] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`의
+- [X] T001 `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`의
   `DomainModuleName` enum에 `DomainLearningProject`, `DomainLearningProjectTests` 케이스를
   추가하고, `DomainAuthentication`과 동일한 패턴으로 `target` 프로퍼티 분기(`.module`/
   `.testModule(productionTarget:)`)를 확장한다
-- [ ] T002 [P] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의
+- [X] T002 [P] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의
   `case .Domain` 스킴 배열에 `.module(name: "DomainLearningProject", testTarget:
   "DomainLearningProjectTests")` 항목을 기존 `DomainAuthentication` 항목 옆에 추가한다
   (Data 케이스는 이 작업에서 변경하지 않는다)
 
 ### 테스트(FR-025)
 
-- [ ] T003 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Models/ExternalRepositoryErrorTests.swift`에
+- [X] T003 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Models/ExternalRepositoryErrorTests.swift`에
   `ExternalRepositoryError`의 `CaseIterable` 전체 케이스(`invalidURLFormat`, `offline`,
   `other`)가 존재함을 검증하는 테스트를 작성한다(`AuthenticationErrorTests` 관례)
-- [ ] T004 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Models/QuizLevelTests.swift`에
+- [X] T004 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Models/QuizLevelTests.swift`에
   `QuizLevel`의 `CaseIterable` 전체 케이스(`l1`, `l2`, `l3`)를 검증하는 테스트를 작성한다
-- [ ] T005 [P] [S1] [S2] `sources/Projects/Domain/DomainLearningProjectTests/Models/QuizGenerationStatusTests.swift`에
+- [X] T005 [P] [S1] [S2] `sources/Projects/Domain/DomainLearningProjectTests/Models/QuizGenerationStatusTests.swift`에
   `QuizGenerationStatus`의 `CaseIterable` 전체 케이스 6개(`ready`~`completed`)를 검증하는
   테스트를 작성한다
-- [ ] T006 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProjectTests/Models/LearningProjectErrorTests.swift`에
+- [X] T006 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProjectTests/Models/LearningProjectErrorTests.swift`에
   `LearningProjectError`의 `CaseIterable` 전체 케이스(`invalidRequest`, `unauthorized`,
   `notFound`, `unexpected`)를 검증하는 테스트를 작성한다
-- [ ] T007 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/Models/LearningProjectDetailTests.swift`에
+- [X] T007 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/Models/LearningProjectDetailTests.swift`에
   `LearningProjectDetail.nextSet` 계산 프로퍼티를 검증하는 테스트 2개를 작성한다 — (1)
   `sets`에 `completedCount < problemCount`인 세트가 있을 때 그 첫 세트를 반환, (2) 모든
   세트가 `completedCount == problemCount`일 때 `nil`을 반환(FR-019, research.md 결정 9)
-- [ ] T008 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Contracts/ExternalRepositoryLookupContractTests.swift`에
+- [X] T008 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/Contracts/ExternalRepositoryLookupContractTests.swift`에
   `ExternalRepositoryLookup`을 채택한 Probe로 `repository(owner:name:)` 호출과 반환값을
   검증하는 계약 테스트를 작성한다(`AuthenticationRepositoryContractTests` 관례)
-- [ ] T009 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProjectTests/Contracts/LearningProjectRepositoryContractTests.swift`에
+- [X] T009 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProjectTests/Contracts/LearningProjectRepositoryContractTests.swift`에
   `LearningProjectRepository`를 채택한 Probe로 `register`/`fetchProjects`/
   `fetchProjectDetail`/`deleteProject` 4개 메서드 호출과 반환값을 검증하는 계약 테스트를
   작성한다
-- [ ] T010 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchExternalRepositoryTests.swift`에
+- [X] T010 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchExternalRepositoryTests.swift`에
   contracts/fetch-external-repository.md "FR-025 테스트 매트릭스"의 4개 경로(성공, URL
   형식 오류 시 Fake 미호출, `.offline` 그대로 전파, `.other` 그대로 전파)를 검증하는
   테스트를 작성한다
-- [ ] T011 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/CreateLearningProjectTests.swift`에
+- [X] T011 [P] [S1] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/CreateLearningProjectTests.swift`에
   contracts/create-learning-project.md "FR-025 테스트 매트릭스"의 5개 경로(신규 등록 성공,
   재등록 멱등 성공(FR-007), 삭제 후 복원 성공(FR-008), `.invalidRequest` 전파,
   `.unauthorized` 전파)를 검증하는 테스트를 작성한다
-- [ ] T012 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchLearningProjectsTests.swift`에
+- [X] T012 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchLearningProjectsTests.swift`에
   contracts/fetch-learning-projects.md "FR-025 테스트 매트릭스"의 3개 경로(성공 —
   진행률·`nextSetId`/`nextQuestionId`·`hasNext` 그대로 반환, 중복 필터링 없음 비-회귀
   (FR-014), `.unauthorized` 전파)를 검증하는 테스트를 작성한다
-- [ ] T013 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchLearningProjectDetailTests.swift`에
+- [X] T013 [P] [S2] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/FetchLearningProjectDetailTests.swift`에
   contracts/fetch-learning-project-detail.md "FR-025 테스트 매트릭스"의 3개 경로(진행 중
   세트 존재 시 `nextSet` 일치, 모두 완료 시 `nextSet == nil`, `.notFound` 전파(FR-018))를
   검증하는 테스트를 작성한다
-- [ ] T014 [P] [S3] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/DeleteLearningProjectTests.swift`에
+- [X] T014 [P] [S3] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/DeleteLearningProjectTests.swift`에
   contracts/delete-learning-project.md "FR-025 테스트 매트릭스"의 2개 경로(성공, `.notFound`
   전파(FR-022))를 검증하는 테스트를 작성한다
-- [ ] T015 [P] [S1] [S3] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/LearningProjectLifecycleTests.swift`에
+- [X] T015 [P] [S1] [S3] `sources/Projects/Domain/DomainLearningProjectTests/UseCases/LearningProjectLifecycleTests.swift`에
   두 개의 조합 계약 테스트를 작성한다 — (1) `FetchExternalRepository`가 반환한
   `ExternalRepository`를 `CreateLearningProject`에 그대로 전달해 `projectId`/`status`를
   확인(SC-001, quickstart.md 시나리오 1), (2) 같은 Fake `LearningProjectRepository`
@@ -119,74 +119,74 @@ Domain 계약(`ExternalRepositoryLookup`, `LearningProjectRepository`) 및 모�
 
 ### 구현
 
-- [ ] T016 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/ExternalRepository.swift`에
+- [X] T016 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/ExternalRepository.swift`에
   `canonicalURL`/`ownerName`/`repositoryName`/`imageURL`/`starCount`/`techStack` 필드를
   가진 `Sendable` 구조체를 구현한다(data-model.md §1 `ExternalRepository`)
-- [ ] T017 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/ExternalRepositoryError.swift`에
+- [X] T017 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/ExternalRepositoryError.swift`에
   `invalidURLFormat`/`offline`/`other` 3개 케이스를 가진
   `CaseIterable, Equatable, Error, Sendable` enum을 구현한다
-- [ ] T018 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/QuizLevel.swift`에
+- [X] T018 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/QuizLevel.swift`에
   `l1`/`l2`/`l3` 3개 케이스를 가진 `CaseIterable, Equatable, Sendable` enum을 구현한다
   (wire 표기는 노출하지 않는다)
-- [ ] T019 [P] [S1] [S2] `sources/Projects/Domain/DomainLearningProject/Models/QuizGenerationStatus.swift`에
+- [X] T019 [P] [S1] [S2] `sources/Projects/Domain/DomainLearningProject/Models/QuizGenerationStatus.swift`에
   `ready`/`analyzed`/`anchored`/`rejected`/`failed`/`completed` 6개 케이스를 가진
   `CaseIterable, Equatable, Sendable` enum을 구현한다
-- [ ] T020 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectRegistration.swift`에
+- [X] T020 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectRegistration.swift`에
   `projectId: String`/`status: QuizGenerationStatus`/`quizLevel: QuizLevel` 필드를 가진
   `Sendable` 구조체를 구현한다(data-model.md §1 `LearningProjectRegistration`)
-- [ ] T021 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectSummary.swift`에
+- [X] T021 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectSummary.swift`에
   `projectId`/`repositoryName`/`repositoryImageURL`/`techStack`/`currentSetLabel`/
   `currentSetTitle`/`nextSetId`/`nextQuestionId`/`overallProgressPercent` 필드를 가진
   `Sendable` 구조체를 구현한다
-- [ ] T022 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectPage.swift`에
+- [X] T022 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectPage.swift`에
   `items: [LearningProjectSummary]`/`hasNext: Bool` 필드를 가진 `Sendable` 구조체를
   구현한다
-- [ ] T023 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectSetProgress.swift`에
+- [X] T023 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectSetProgress.swift`에
   `setId`/`label`/`title`/`problemCount`/`completedCount` 필드를 가진 `Sendable` 구조체를
   구현한다
-- [ ] T024 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectDetail.swift`에
+- [X] T024 [P] [S2] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectDetail.swift`에
   `projectId`/`repositoryURL`/`repositoryName`/`repositoryImageURL`/`starCount`/
   `techStack`/`overallProgressPercent`/`nextQuestionId`/`sets: [LearningProjectSetProgress]`
   필드와 `nextSet: LearningProjectSetProgress?` 계산 프로퍼티(`sets`에서
   `completedCount < problemCount`인 첫 세트, FR-019)를 가진 `Sendable` 구조체를 구현한다
-- [ ] T025 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectError.swift`에
+- [X] T025 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProject/Models/LearningProjectError.swift`에
   `invalidRequest`/`unauthorized`/`notFound`/`unexpected` 4개 케이스를 가진
   `CaseIterable, Equatable, Error, Sendable` enum을 구현한다
-- [ ] T026 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Contracts/ExternalRepositoryLookup.swift`에
+- [X] T026 [P] [S1] `sources/Projects/Domain/DomainLearningProject/Contracts/ExternalRepositoryLookup.swift`에
   `func repository(owner: String, name: String) async throws -> ExternalRepository`를
   가진 `Sendable` 프로토콜을 구현한다(URL 파싱은 호출자 책임, `.invalidURLFormat`은 이
   메서드가 던지지 않음 — research.md 결정 4)
-- [ ] T027 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProject/Contracts/LearningProjectRepository.swift`에
+- [X] T027 [P] [S1] [S2] [S3] `sources/Projects/Domain/DomainLearningProject/Contracts/LearningProjectRepository.swift`에
   `register(githubRepoUrl:quizLevel:)`/`fetchProjects(page:size:)`/
   `fetchProjectDetail(projectId:)`/`deleteProject(projectId:)` 4개 메서드를 가진
   `Sendable` 프로토콜을 구현한다(research.md 결정 3 — 외부 시스템 단위 단일 계약)
-- [ ] T028 [P] [S1] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchExternalRepository.swift`에
+- [X] T028 [P] [S1] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchExternalRepository.swift`에
   `init(lookup: ExternalRepositoryLookup)`과
   `callAsFunction(url: String) async throws -> ExternalRepository`를 가진 `Sendable`
   구조체를 구현한다 — `url`에서 소유자·저장소 이름을 파싱(FR-001)해 성공하면
   `lookup.repository(owner:name:)`을 호출해 그대로 반환/재던짐하고, 실패하면 `lookup`을
   호출하지 않고 `.invalidURLFormat`을 던진다
-- [ ] T029 [P] [S1] `sources/Projects/Domain/DomainLearningProject/UseCases/CreateLearningProject.swift`에
+- [X] T029 [P] [S1] `sources/Projects/Domain/DomainLearningProject/UseCases/CreateLearningProject.swift`에
   `init(repository: LearningProjectRepository)`과
   `callAsFunction(githubRepoUrl: String, quizLevel: QuizLevel) async throws ->
   LearningProjectRegistration`을 가진 `Sendable` 구조체를 구현한다 — 입력을 그대로
   `repository.register`에 위임하고 결과를 그대로 반환한다(재등록·복원 판단은 재해석하지
   않음)
-- [ ] T030 [P] [S2] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchLearningProjects.swift`에
+- [X] T030 [P] [S2] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchLearningProjects.swift`에
   `init(repository: LearningProjectRepository)`과
   `callAsFunction(page: Int = 0, size: Int = 10) async throws -> LearningProjectPage`를
   가진 `Sendable` 구조체를 구현한다(FR-011 기본값)
-- [ ] T031 [P] [S2] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchLearningProjectDetail.swift`에
+- [X] T031 [P] [S2] `sources/Projects/Domain/DomainLearningProject/UseCases/FetchLearningProjectDetail.swift`에
   `init(repository: LearningProjectRepository)`과
   `callAsFunction(projectId: String) async throws -> LearningProjectDetail`을 가진
   `Sendable` 구조체를 구현한다
-- [ ] T032 [P] [S3] `sources/Projects/Domain/DomainLearningProject/UseCases/DeleteLearningProject.swift`에
+- [X] T032 [P] [S3] `sources/Projects/Domain/DomainLearningProject/UseCases/DeleteLearningProject.swift`에
   `init(repository: LearningProjectRepository)`과
   `callAsFunction(projectId: String) async throws`를 가진 `Sendable` 구조체를 구현한다
 
 ### 정리와 패키지 검증
 
-- [ ] T033 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
+- [X] T033 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
   DomainLearningProject -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`로
   패키지를 검증한다(실패 0건, T003~T015의 테스트 매트릭스 전부 통과 확인)
 
@@ -218,93 +218,93 @@ Composition Adapter가 위임할 Data 계약(`ExternalRepositoryRemote`,
 
 ### 준비와 기반
 
-- [ ] T034 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`의
+- [X] T034 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`의
   `DataModuleName` enum에 `DataLearningProject`, `DataLearningProjectTests` 케이스를
   추가하고, `DataAuthentication`과 동일한 패턴으로 `target` 프로퍼티 분기를 확장한다
-- [ ] T035 [P] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의
+- [X] T035 [P] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의
   `case .Data` 스킴 배열에 `.module(name: "DataLearningProject", testTarget:
   "DataLearningProjectTests")` 항목을 기존 `DataAuthentication` 항목 옆에 추가한다
 
 ### 테스트
 
-- [ ] T036 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/GitHubRepositoryResponseDTOTests.swift`에
+- [X] T036 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/GitHubRepositoryResponseDTOTests.swift`에
   GitHub API `GET /repos/{owner}/{repo}` 표준 응답 예시 JSON(`full_name`, `html_url`,
   중첩 `owner.avatar_url`, `stargazers_count`, `language`, `topics`)을
   `GitHubRepositoryResponseDTO`로 디코딩하는 테스트를 작성한다
-- [ ] T037 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/RegisterProjectRequestDTOTests.swift`에
+- [X] T037 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/RegisterProjectRequestDTOTests.swift`에
   `RegisterProjectRequestDTO`(`githubRepoUrl`, `quizLevel: QuizLevelDTO?`)가
   `RegisterProjectRequest` 스키마와 동일한 키로 인코딩되는지 검증하는 테스트를 작성한다
-- [ ] T038 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/RegisterProjectResponseDTOTests.swift`에
+- [X] T038 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/DTOs/RegisterProjectResponseDTOTests.swift`에
   `Git-It-server-scheme.json`의 `RegisterProjectResponse` 예시(`projectId`,
   `status: QuizGenerationStatusDTO`, `quizLevel` 필드 없음)를
   `RegisterProjectResponseDTO`로 디코딩하는 테스트를 작성한다
-- [ ] T039 [P] [S2] `sources/Projects/Data/DataLearningProjectTests/DTOs/ProjectListResponseDTOTests.swift`에
+- [X] T039 [P] [S2] `sources/Projects/Data/DataLearningProjectTests/DTOs/ProjectListResponseDTOTests.swift`에
   `Git-It-server-scheme.json`의 `GET /api/v1/projects` 예시 응답을
   `ProjectListResponseDTO`(중첩 `ProjectListItemDTO` 포함)로 디코딩하는 테스트를 작성한다
-- [ ] T040 [P] [S2] `sources/Projects/Data/DataLearningProjectTests/DTOs/ProjectDetailResponseDTOTests.swift`에
+- [X] T040 [P] [S2] `sources/Projects/Data/DataLearningProjectTests/DTOs/ProjectDetailResponseDTOTests.swift`에
   `Git-It-server-scheme.json`의 `GET /api/v1/projects/{projectId}` 예시 응답을
   `ProjectDetailResponseDTO`(중첩 `ProjectSetSummaryDTO` 배열 포함)로 디코딩하는 테스트를
   작성한다
-- [ ] T041 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Errors/DataExternalRepositoryErrorTests.swift`에
+- [X] T041 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Errors/DataExternalRepositoryErrorTests.swift`에
   `DataExternalRepositoryError`의 `CaseIterable` 전체 케이스(`offline`, `other`)를
   검증하는 테스트를 작성한다
-- [ ] T042 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Errors/DataLearningProjectErrorTests.swift`에
+- [X] T042 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Errors/DataLearningProjectErrorTests.swift`에
   `DataLearningProjectError`의 `CaseIterable` 전체 케이스(`invalidRequest`,
   `unauthorized`, `notFound`, `serverError`, `unexpected`)를 검증하는 테스트를 작성한다
-- [ ] T043 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/Contracts/ExternalRepositoryRemoteContractTests.swift`에
+- [X] T043 [P] [S1] `sources/Projects/Data/DataLearningProjectTests/Contracts/ExternalRepositoryRemoteContractTests.swift`에
   `ExternalRepositoryRemote`를 채택한 Probe로 `repository(owner:name:)` 호출과 반환값을
   검증하는 계약 테스트를 작성한다
-- [ ] T044 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Contracts/LearningProjectRemoteContractTests.swift`에
+- [X] T044 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProjectTests/Contracts/LearningProjectRemoteContractTests.swift`에
   `LearningProjectRemote`를 채택한 Probe로 `registerProject`/`fetchProjects`/
   `fetchProjectDetail`/`deleteProject` 4개 메서드 호출과 반환값을 검증하는 계약 테스트를
   작성한다
 
 ### 구현
 
-- [ ] T045 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/GitHubRepositoryResponseDTO.swift`에
+- [X] T045 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/GitHubRepositoryResponseDTO.swift`에
   `fullName`/`htmlURL`/`ownerAvatarURL`/`starCount`/`language`/`topics` 프로퍼티와
   `full_name`/`html_url`/중첩 `owner.avatar_url`/`stargazers_count`/`language`/`topics`
   wire 키에 대응하는 `CodingKeys`를 가진 `Codable` 구조체를 구현한다(data-model.md §2)
-- [ ] T046 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/RegisterProjectRequestDTO.swift`에
+- [X] T046 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/RegisterProjectRequestDTO.swift`에
   `githubRepoUrl: String`/`quizLevel: QuizLevelDTO?` 필드를 가진 `Codable` 구조체와,
   `L1`/`L2`/`L3` raw value를 가진 `QuizLevelDTO: String, Codable` enum을 같은 파일에
   구현한다
-- [ ] T047 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/RegisterProjectResponseDTO.swift`에
+- [X] T047 [P] [S1] `sources/Projects/Data/DataLearningProject/DTOs/RegisterProjectResponseDTO.swift`에
   `projectId: String`/`status: QuizGenerationStatusDTO` 필드를 가진 `Codable` 구조체와,
   `READY`/`ANALYZED`/`ANCHORED`/`REJECTED`/`FAILED`/`COMPLETED` raw value를 가진
   `QuizGenerationStatusDTO: String, Codable` enum을 같은 파일에 구현한다
-- [ ] T048 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectListResponseDTO.swift`에
+- [X] T048 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectListResponseDTO.swift`에
   `items: [ProjectListItemDTO]`/`hasNext: Bool` 필드를 가진 `Codable` 구조체를 구현한다
-- [ ] T049 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectListItemDTO.swift`에
+- [X] T049 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectListItemDTO.swift`에
   `projectId`/`repositoryName`/`repositoryImageUrl`/`techStack: [String]`/
   `currentSetLabel`/`currentSetTitle`/`nextSetId`/`nextQuestionId`/
   `overallProgressPercent: Int` 필드를 가진 `Codable` 구조체를 구현한다
-- [ ] T050 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectDetailResponseDTO.swift`에
+- [X] T050 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectDetailResponseDTO.swift`에
   `projectId`/`repositoryUrl`/`repositoryName`/`repositoryImageUrl`/`starCount: Int`/
   `techStack: [String]`/`overallProgressPercent: Int`/`nextQuestionId: String?`/
   `sets: [ProjectSetSummaryDTO]` 필드를 가진 `Codable` 구조체를 구현한다
-- [ ] T051 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectSetSummaryDTO.swift`에
+- [X] T051 [P] [S2] `sources/Projects/Data/DataLearningProject/DTOs/ProjectSetSummaryDTO.swift`에
   `setId`/`label`/`title`/`problemCount: Int`/`completedCount: Int` 필드를 가진 `Codable`
   구조체를 구현한다
-- [ ] T052 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Errors/DataExternalRepositoryError.swift`에
+- [X] T052 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Errors/DataExternalRepositoryError.swift`에
   `offline`/`other` 2개 케이스를 가진 `CaseIterable, Equatable, Error, Sendable` enum을
   구현한다(`invalidURLFormat`에 대응하는 케이스는 없음 — research.md 결정 4)
-- [ ] T053 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Errors/DataLearningProjectError.swift`에
+- [X] T053 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Errors/DataLearningProjectError.swift`에
   `invalidRequest`(`COMMON-001`)/`unauthorized`(`COMMON-002`)/`notFound`(`PROJECT-001`)/
   `serverError`(`COMMON-005`)/`unexpected` 5개 케이스를 가진
   `CaseIterable, Equatable, Error, Sendable` enum을 구현한다
-- [ ] T054 [P] [S1] `sources/Projects/Data/DataLearningProject/Contracts/ExternalRepositoryRemote.swift`에
+- [X] T054 [P] [S1] `sources/Projects/Data/DataLearningProject/Contracts/ExternalRepositoryRemote.swift`에
   `func repository(owner: String, name: String) async throws ->
   GitHubRepositoryResponseDTO`를 가진 `Sendable` 프로토콜을 구현한다(`GET
   https://api.github.com/repos/{owner}/{name}`에 대응, FR-002)
-- [ ] T055 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Contracts/LearningProjectRemote.swift`에
+- [X] T055 [P] [S1] [S2] [S3] `sources/Projects/Data/DataLearningProject/Contracts/LearningProjectRemote.swift`에
   `registerProject(_:)`/`fetchProjects(page:size:)`/`fetchProjectDetail(projectId:)`/
   `deleteProject(projectId:)` 4개 메서드를 가진 `Sendable` 프로토콜을 구현한다(`/api/v1/projects`
   Bearer 인증 엔드포인트에 대응, FR-005·FR-011·FR-016·FR-020)
 
 ### 정리와 패키지 검증
 
-- [ ] T056 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
+- [X] T056 [no-write] `xcodebuild test -workspace GitIt.xcworkspace -scheme
   DataLearningProject -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`로 패키지를
   검증한다(실패 0건, T036~T044의 디코딩·오류 케이스 전부 통과 확인)
 
@@ -317,9 +317,9 @@ Composition Adapter가 위임할 Data 계약(`ExternalRepositoryRemote`,
 
 **선행 조건**: `DataLearningProject` 패키지의 구현·검증·결과 보고가 완료되어야 한다.
 
-- [ ] T057 [no-write] `DomainLearningProject`·`DataLearningProject` 두 스킴의
+- [X] T057 [no-write] `DomainLearningProject`·`DataLearningProject` 두 스킴의
   `xcodebuild test`를 순서대로 재실행하고 결과를 기록한다(quickstart.md "전체 재확인")
-- [ ] T058 [no-write] spec.md 시나리오 1·2·3의 수용 시나리오 8+4+2개 전체를 T010~T015,
+- [X] T058 [no-write] spec.md 시나리오 1·2·3의 수용 시나리오 8+4+2개 전체를 T010~T015,
   T012~T013 테스트 결과와 대조해 SC-001~SC-004가 Domain·Data 범위 안에서 충족되었는지
   확인한다(Composition 배선과 실제 네트워크 왕복 검증은 후속 스펙 범위)
 
