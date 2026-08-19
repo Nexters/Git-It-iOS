@@ -44,6 +44,9 @@ public struct LayoutReviewCatalogList: View {
     }
 
     public struct ViewModel: Sendable, Equatable {
+
+        // MARK: Lifecycle
+
         public init(
             version: String,
             buildNumber: String,
@@ -60,12 +63,15 @@ public struct LayoutReviewCatalogList: View {
             self.sections = sections
         }
 
+        // MARK: Public
+
         public let version: String
         public let buildNumber: String
         public let purpose: String
         public let changeSummary: String
         public let limitations: [String]
         public let sections: [Section]
+
     }
 
     public var body: some View {

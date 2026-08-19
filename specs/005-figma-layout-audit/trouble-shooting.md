@@ -289,3 +289,46 @@ TS-20260819-003과 동일하게 Xcode에 등록된 이름 기반 `iPhone 17 Pro`
 ### 연결
 
 TS-20260819-003
+
+## TS-20260819-008: PR CI 전체 Swift lint에서 포맷 위반 탐지
+
+**기록일**: 2026-08-19
+**상태**: 해결
+**발생 단계**: PR #13 GitHub Actions lint
+**관련 항목**: T019, GitHub Actions job `95871669770`, `SavedQuestionCard.swift`, `LayoutReviewCatalogList.swift`, `LayoutReviewDetail.swift`
+
+### 증상
+
+PR #13의 build와 script tests는 성공했지만 lint job이 SwiftFormat 위반 3개 파일을 보고하고 종료 코드 1로 실패했다.
+
+### 영향
+
+기능 코드와 테스트가 통과해도 저장소 전체 스타일 검증을 충족하지 못해 PR의 CI 상태가 실패로 남았다.
+
+### 근거
+
+- `gh pr checks 13`: lint 실패, build와 script tests 성공.
+- GitHub Actions job `95871669770`: `SavedQuestionCard.swift`의 `spaceInsideParens`, `LayoutReviewCatalogList.swift`의 `organizeDeclarations`·`blankLinesAtEndOfScope`, `LayoutReviewDetail.swift`의 `wrapPropertyBodies` 위반을 보고했다.
+- 로컬 Git diff: CI가 요구한 세 파일의 formatter 결과가 커밋되지 않은 상태로 남아 있었다.
+
+### 원인
+
+PR 생성 시 세 파일의 포맷 변경을 기능 작업 범위 밖으로 판단해 커밋에서 제외했다. 그러나 CI lint는 변경 파일만이 아니라 `sources/Projects` 전체를 검사하므로 해당 변경을 제외하면 저장소 전체 스타일 검증이 실패한다.
+
+### 조치
+
+세 파일에 Swift-Style formatter의 fix 결과를 적용하고 PR 브랜치에 포함할 변경으로 확정했다.
+
+### 검증
+
+- `./tools/githooks/swift-format/bin/run.sh format <세 파일>`: 추가 위반 없이 각 파일의 SwiftFormat·SwiftLint 검사 성공.
+- `./tools/githooks/swift-format/bin/run.sh lint`: 저장소 전체 Swift 소스 검사 성공, 종료 코드 0.
+- 수정 커밋 push 후 GitHub Actions 재실행: 미실행.
+
+### 재발 방지
+
+PR 생성 전 staged 파일 검증과 별개로 CI와 동일한 전체 `swift-format` lint를 실행한다. formatter가 만든 범위 밖 변경을 제외하려면 먼저 해당 파일을 제외한 상태에서도 전체 lint가 통과하는지 확인한다.
+
+### 연결
+
+TS-20260819-006

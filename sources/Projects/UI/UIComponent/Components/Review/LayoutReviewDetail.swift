@@ -68,7 +68,9 @@ public struct LayoutReviewDetail<Content: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var revealPadding: CGFloat { 12 }
+        static var revealPadding: CGFloat {
+            12
+        }
     }
 
     private let viewModel: ViewModel

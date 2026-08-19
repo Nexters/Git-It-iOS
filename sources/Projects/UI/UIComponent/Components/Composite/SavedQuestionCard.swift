@@ -38,7 +38,7 @@ public struct SavedQuestionCard: View {
             StyledText.subtitle3(viewModel.prompt)
                 .padding(.top, 10)
             HStack {
-                Image( "ic-bookmark-filled", bundle: .module)
+                Image("ic-bookmark-filled", bundle: .module)
                     .designSystemForeground(.brandAccent)
                     .padding(.horizontal, 10)
                 Spacer()
