@@ -1,7 +1,7 @@
 import DomainLearningProject
 import Testing
 
-@testable import Composition
+@testable import CompositionAdepter
 
 // MARK: - SampleFetchLearningProjectsTests
 

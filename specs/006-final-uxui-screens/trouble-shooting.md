@@ -1208,3 +1208,318 @@ UI 패키지 경로를 문서화하거나 탐색하기 전에
 ### 연결
 
 선행·후속 문제 ID: 없음.
+
+## TS-20260820-003: Tuist 재생성 후 Xcode Unique Derived Data에서 외부 의존성 빌드 순환
+
+**기록일**: 2026-08-20
+**상태**: 미해결
+**발생 단계**: `006-final-uxui-screens` 작업 중 Tuist 재생성 후 Xcode `App` scheme 빌드
+**관련 항목**: T082, T091, `sources/Tuist/Package.swift`,
+`tools/githooks/project-build/core/xcodebuild.sh`
+
+### 증상
+
+Xcode 26.6에서 `App` scheme을 빌드하자 `UIKitNavigationShim` target의
+`Copy Module Map`과 `shim.m` 컴파일 사이에 dependency cycle이 발생했다. 오류의 cycle
+point는 제품 framework의 `Modules/module.modulemap`이었고, Xcode는 해당 파일을 생성하는
+script phase와 그 파일에 의존하는 Objective-C 컴파일을 하나의 순환으로 판정했다.
+
+같은 Xcode 전역 Derived Data에서는 순환 오류 직전 빌드에서
+`ComposableArchitectureMacros produced malformed response`도 발생했다. 두 오류 모두 앱의
+동작 코드가 아니라 Tuist가 생성한 외부 의존성 산출물을 가리켰다.
+
+### 영향
+
+`App` scheme 빌드가 제품 source 검증 전에 중단됐다. 이 실패만으로 현재 앱 source,
+AppIcon 변경 또는 `swift-navigation` source 결함을 확정할 수 없으며, T082와 T091의 빌드
+성공 근거로 사용할 수도 없다.
+
+### 근거
+
+- 첨부 Xcode 오류: `Cycle inside UIKitNavigationShim; building could produce unreliable
+  results.`와 `Copy Module Map` → `shim.m` → `module.modulemap` 순환을 보고했다.
+- `sources/Tuist/Package.resolved:203-208`: `swift-navigation`은 외부 의존성 버전
+  `2.10.3`이며 관련 lock file의 작업 트리 변경은 없었다.
+- `sources/Tuist/Package.swift:28-31`: `SwiftNavigation`, `SwiftUINavigation`,
+  `UIKitNavigation`, `UIKitNavigationShim`을 framework product로 생성한다.
+- 생성된 `swift-navigation.xcodeproj/project.pbxproj`: `UIKitNavigationShim`의 `Sources`
+  phase 뒤에 제품 `module.modulemap`을 출력하는 `Copy Module Map` phase가 있다.
+- 생성 프로젝트 시각은 2026-08-20 03:48:34, Xcode 전역 Derived Data의 `build.db` 갱신
+  시각은 03:49:06, 오류 기록 시각은 03:49:18이었다.
+- 같은 전역 Derived Data의 `shim.o`와 `UIKitNavigationShim.framework`은 프로젝트 재생성
+  전인 03:21에 정상 생성됐지만, 재생성 뒤에는 갱신되지 않았다.
+- Xcode 전역 `IDEBuildLocationStyle`은 `Unique`였다. 이 방식은 project별 경로를 선택하지만
+  같은 project의 매 빌드마다 새 경로를 만들지는 않는다.
+- `tools/repository-paths/repository-paths.json:7`과
+  `tools/githooks/project-build/core/xcodebuild.sh:45-60`: 저장소 runner는 Xcode 전역 경로와
+  별도인 `sources/DerivedData/PreCommit` 또는 `TestSchemes/<scheme>`을 명시적으로 사용한다.
+
+### 원인
+
+확정된 직접 원인은 Xcode가 현재 `UIKitNavigationShim` build task graph에서
+`module.modulemap` 생성과 `shim.m` 컴파일을 순환으로 판정한 것이다.
+
+프로젝트 재생성 뒤에도 Xcode `Unique` 경로의 이전 외부 의존성 산출물과 XCBuild 증분
+그래프가 재사용된 것이 유력한 유발 조건이다. `Unique`와 저장소의 명시적
+`-derivedDataPath`가 같은 파일을 사용해 충돌한 것은 아니다. 다만 새 Derived Data에서 같은
+빌드를 연속 실행하는 A/B 검증은 아직 수행하지 않았으므로 stale cache를 최종 원인으로
+확정하지 않는다.
+
+### 조치
+
+미실행. 다음 순서로 복구한다.
+
+1. 실행 중인 Xcode build와 `xcodebuild`가 없는지 확인하고 Xcode를 종료한다. 열린 상태에서
+   `build.db` 또는 제품 디렉터리를 이동하지 않는다.
+2. 오류 로그가 가리킨 정확한 전역 Derived Data
+   `~/Library/Developer/Xcode/DerivedData/GitIt-dlquessjgjqpujfavwufonmjoixv`만 대상으로
+   확인한다. `DerivedData` 상위 디렉터리 전체나 다른 project 경로는 대상에 포함하지 않는다.
+3. 즉시 삭제하지 않고 `/private/tmp/GitIt-dlquessjgjqpujfavwufonmjoixv-stale-20260820-001`
+   같은 비어 있는 명시 경로로 이동해 rollback 가능하게 보존한다. 원본 존재와 대상 부재를
+   먼저 확인하고, 검증 완료 전에는 격리본을 삭제하지 않는다.
+4. 전역 캐시와 독립된 새 경로에서 다음 clean build를 실행한다.
+
+   ```sh
+   xcodebuild build \
+     -workspace sources/GitIt.xcworkspace \
+     -scheme App \
+     -configuration Debug \
+     -destination 'generic/platform=iOS Simulator' \
+     -derivedDataPath /private/tmp/GitIt-006-App-UIKitNavigationShim-20260820 \
+     -disableAutomaticPackageResolution \
+     -jobs 1 \
+     CODE_SIGNING_ALLOWED=NO \
+     COMPILER_INDEX_STORE_ENABLE=NO
+   ```
+
+5. 첫 빌드가 성공하면 같은 명령을 같은 임시 Derived Data 경로로 한 번 더 실행해 증분
+   빌드에서도 cycle이 재발하지 않는지 확인한다.
+6. 두 번 모두 성공한 뒤 Xcode에서 `sources/GitIt.xcworkspace`를 열고 `App` scheme을 다시
+   빌드한다. Xcode `Unique`가 새 전역 Derived Data를 만들게 하며, 새 경로의
+   `UIKitNavigationShim` 산출물 시각이 현재 빌드와 일치하는지 확인한다.
+7. Xcode 빌드까지 성공한 뒤에만 격리해 둔 이전 Derived Data의 삭제 여부를 결정한다.
+
+새 임시 Derived Data의 첫 빌드에서도 같은 cycle이 발생하면 위 cache 가설은 기각한다. 이때
+생성된 `project.pbxproj`를 직접 수정하지 않고, 현재 Xcode·Tuist·`swift-navigation` 조합에서
+`UIKitNavigationShim`의 framework product와 `Copy Module Map` phase 순서를 별도 호환성
+문제로 조사한다.
+
+### 검증
+
+- 전역 Derived Data 격리 이동: 미실행.
+- 새 임시 Derived Data의 첫 clean build: 미실행.
+- 같은 임시 경로의 두 번째 incremental build: 미실행.
+- 새 Xcode `Unique` 경로의 `App` scheme build: 미실행.
+- 해결 판정 기준: 위 세 빌드가 모두 종료 코드 0과 `** BUILD SUCCEEDED **`를 반환하고,
+  `UIKitNavigationShim`의 `shim.o`, `module.modulemap`, framework가 각 사용 경로에서 현재
+  빌드 시각으로 생성돼야 한다.
+
+### 재발 방지
+
+`Unique`를 매 실행마다 깨끗한 Derived Data를 만드는 설정으로 해석하지 않는다. Tuist
+재생성 직후 외부 macro의 `malformed response`, module map cycle 또는 재생성 전 시각의
+산출물 재사용이 관찰되면 product source를 수정하기 전에 새 `-derivedDataPath`에서 clean과
+incremental 빌드를 차례로 비교한다. 같은 checkout의 `sources/DerivedData/PreCommit`을 쓰는
+`build`, `compile`, `test`와 별도 runner 실행은 병렬화하지 않는다.
+
+### 연결
+
+선행·후속 문제 ID: 없음.
+
+## TS-20260820-004: 수렴 코드 범위 경로 불일치와 Tuist 구성 충돌 표식 발견
+
+**기록일**: 2026-08-20
+**상태**: 미해결
+**발생 단계**: `$speckit-converge` 현재 코드 범위 탐색과 구현 대조
+**관련 항목**: T001, T002, T016~T020, T068,
+`sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`,
+`sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`,
+`sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`
+
+### 증상
+
+`plan.md`와 `tasks.md`에 기록된 Domain·Composition·Feature·App 구현 경로를 한 번에
+`rg --files`로 조회하자 여러 디렉터리가 존재하지 않아 명령이 실패했다. 상위 패키지
+디렉터리에서 다시 탐색하던 중 두 Tuist helper에 실제 merge marker가 남아 있고,
+`DataModuleName.sourceDirectory`가 추가 enum case를 처리하지 않으며, Composition 테스트의
+import 이름이 선언 target 이름과 다른 상태도 확인했다.
+
+### 영향
+
+현재 Tuist helper는 정상적인 프로젝트 생성·빌드 입력으로 사용할 수 없고, Composition
+테스트도 선언된 production module을 import하지 않는다. 따라서 T068의 Feature build·test와
+후속 App 작업을 신뢰성 있게 실행할 수 없다. `ProjectName.swift`의 충돌 블록은 Domain과
+Data 구획을 함께 감싸 Constitution 원칙 7의 단일 패키지 소유권을 즉시 결정할 수 없으므로,
+수렴 작업을 `tasks.md`에 추가하는 단계도 보류했다.
+
+### 근거
+
+- `rg --files sources/Projects/Domain/LearningProjectTests ...`: `Domain/LearningProjectTests`,
+  `Composition/Composition/LearningProject`, `Feature/FeatureTests/LearningProjectList`,
+  `App/ScreenLayoutHarness`, `App/ScreenLayoutUITests`가 없다는 오류로 실패했다.
+- `rg --files sources/Projects/Domain sources/Projects/Composition sources/Projects/Feature
+  sources/Projects/App`: 실제 테스트·Composition 역할 폴더는 `Tests/LearningProject`,
+  `Adepter`, `Tests/Adepter`, `Tests/LearningProjectList`이며 App harness는 아직 존재하지
+  않음을 확인했다.
+- `rg -n '^(<<<<<<<|=======|>>>>>>>)' sources/Tuist/ProjectDescriptionHelpers ...`:
+  `DomainModuleName.swift`와 `ProjectName.swift`에서 merge marker를 확인했다.
+- `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`: enum은
+  `DataLearningProject`·`DataLearningProjectTests`를 포함하지만 `sourceDirectory` switch는
+  두 case를 처리하지 않고, 해당 target 선언은 필수 `sourceDirectory`를 전달하지 않는다.
+- `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`와
+  `sources/Projects/Composition/Tests/Adepter/LearningProject/*.swift`: 선언 target은
+  `CompositionAdepter`인데 테스트 3개는 `Composition`을 import한다.
+
+### 원인
+
+경로 조회 실패의 직접 원인은 계획·작업 문서의 target 중심 경로와 현재 역할 폴더 경로가
+일부 패키지에서 일치하지 않는 것이다. Tuist helper의 merge marker, Data switch 누락과
+Composition module 불일치가 함께 존재하게 된 변경 과정은 확인하지 않았으며, Git 이력이나
+diff를 사용하는 것이 금지된 `$speckit-converge` 범위에서는 원인을 추정하지 않는다.
+
+### 조치
+
+상위 패키지 디렉터리에서 파일 목록을 다시 수집하고 현재 helper·source·test 내용을 직접
+대조했다. 기존 미완료 T068~T092로 추적되는 Feature 검증·App 구현·전체 검증은 중복 작업으로
+추가하지 않았다. 새 결함은 심각도별로 분류했지만 `ProjectName.swift`의 Domain·Data 소유
+경계를 임의로 정하지 않고 `tasks.md` append를 중단했다.
+
+### 검증
+
+- 상위 패키지 기준 `rg --files`: 실제 source·test 파일 목록 수집 성공.
+- Tuist helper merge marker 재검색: 2개 Swift 파일에 잔존, 미해결.
+- `DataModuleName` switch와 Composition import 정적 대조: 불일치 재확인, 미해결.
+- Tuist 생성·build·test: 미실행. 현재 정적 구성 결함과 패키지 소유권 결정이 선행돼야 한다.
+- `tasks.md` 수렴 단계 추가: 미실행.
+
+### 재발 방지
+
+수렴 코드 범위는 문서 경로를 그대로 한 번에 조회하기 전에 각 패키지의
+`*ModuleName.sourceDirectory`와 `Target.testModule` 경로 계산을 확인한다. 프로젝트 생성이나
+build 전에 Swift source의 merge marker, enum switch 완결성과 target 이름↔import 이름을
+정적으로 검사한다. 공용 helper의 충돌 블록이 여러 패키지 구획을 함께 감싸면 한 패키지에
+임의 배정하지 말고 사용자에게 소유 경계를 먼저 확인한다.
+
+### 연결
+
+선행: `TS-20260820-002`. 후속: 없음.
+
+## TS-20260820-005: Tuist 구성 수렴 작업의 패키지 소유권 확정
+
+**기록일**: 2026-08-20
+**상태**: 완화
+**발생 단계**: `$speckit-converge` F1~F3 후속 작업 배정
+**관련 항목**: `TS-20260820-004`, T093~T102,
+`specs/006-final-uxui-screens/tasks.md`
+
+### 증상
+
+`TS-20260820-004`에서 `ProjectName.swift`의 conflict block이 Domain과 Data 구획을 함께
+감싸 수렴 작업을 한 패키지에 임의 배정할 수 없어 `tasks.md` append가 중단됐다.
+
+### 영향
+
+Tuist helper와 Composition module 불일치의 수정 작업이 정의되지 않아 T068의 Feature
+검증과 후속 App 작업을 재개할 수 없었다.
+
+### 근거
+
+- 사용자 결정(2026-08-20): 현재 브랜치의 Tuist 형태를 적용한다.
+- `specs/006-final-uxui-screens/tasks.md`: 현재 브랜치의 명시적 `sourceDirectory`, 역할 중심
+  source·test 폴더와 `.package(...)` scheme을 수렴 기준으로 기록한 T093~T102가 존재한다.
+- 작업 ID 재검사: T001~T102 총 102개, 중복 0건, 기존 완료 67개를 보존했다.
+
+### 원인
+
+선행 기록의 직접 원인은 공용 helper의 패키지 소유 기준이 미확정이었던 것이다. 사용자가
+incoming 암시형 대신 현재 브랜치 Tuist 형태를 정본으로 선택해 작업 배정 기준이 확정됐다.
+
+### 조치
+
+기존 T001~T092를 수정하지 않고 `## 단계 6: 수렴`을 파일 끝에 추가했다. Domain은 conflict
+marker와 Domain scheme 복구, Data는 역할 폴더·완결된 `sourceDirectory`·Data scheme 정합,
+Composition은 target 이름과 test import 정합을 소유하도록 T093~T102를 패키지 순서와
+승인 게이트에 맞춰 배정했다.
+
+### 검증
+
+- 작업 ID·순서 검사: T001~T102 연속, 중복 0건.
+- 완료 표시 검사: 기존 완료 67개 유지, 새 미완료 10개 추가.
+- 수렴 패키지 순서: Domain → Data → Composition.
+- 실제 Tuist helper 수정·프로젝트 생성·build·test: 미실행. T093 이후 구현 책임이다.
+
+### 재발 방지
+
+공용 Tuist helper가 여러 패키지 구획을 함께 감싸면 현재 브랜치의 target/sourceDirectory/scheme
+형식을 먼저 확정하고, 패키지별 변경·검증·보고·승인 작업을 분리한다. 수렴 스킬은 소스에
+직접 적용하지 않고 append된 작업으로만 인계한다.
+
+### 연결
+
+선행: `TS-20260820-004`. 후속: 없음.
+
+## TS-20260820-006: Data 수렴 검증의 runner 범위와 Simulator 권한 제약
+
+**기록일**: 2026-08-20
+**상태**: 환경 제약
+**발생 단계**: `$speckit-implement` Data 수렴 T098
+**관련 항목**: T098, `tools/githooks/project-build/bin/run.sh`,
+`TS-20260819-012`, `TS-20260820-005`
+
+### 증상
+
+T098의 Domain·Data 단일 scheme 검증 방법을 확인하려고 project build runner에 `--help`를
+전달하자 `오류[common.invalid-input]: 지원하지 않는 ACTION=--help`로 종료됐다. 이어 sandbox
+안에서 `xcrun simctl list devices available`을 실행하자 CoreSimulatorService 연결이 끊기고
+사용자 Library의 Simulator 로그 경로 접근이 거부됐다.
+
+### 영향
+
+project build runner의 전체 공유 scheme 검증을 그대로 실행하면 Data 승인 단위 밖의 패키지까지
+검증하게 되고, sandbox 안에서는 테스트 destination UUID를 확인할 수 없었다. 두 제약 모두
+제품 코드나 Tuist graph의 실패와 혼동할 수 있지만 source 변경을 요구하지 않는다.
+
+### 근거
+
+- `./tools/githooks/project-build/bin/run.sh --help`: action은 `build`, `compile`, `test` 중
+  하나만 허용한다는 진단과 함께 종료 코드 2를 반환했다.
+- `tools/githooks/project-build/bin/run.sh`: 공개 인자 수를 1개로 제한하고 모든 공유 scheme을
+  관찰·실행하며 scheme 필터 인자를 제공하지 않는다.
+- sandbox 안 `xcrun simctl list devices available`: `CoreSimulatorService connection became
+  invalid`, `Operation not permitted`, `Connection refused`를 반환했다.
+- 승인된 외부 `xcrun simctl list devices available`: 부팅된 destination
+  `FF975095-E0FC-434D-89E9-E3EBA19EB913`를 확인했다.
+
+### 원인
+
+runner 오류의 확정 원인은 action 하나만 받는 공개 인터페이스에 지원하지 않는 `--help`를
+전달한 것이다. T098은 Domain·Data만 순서대로 요구하지만 현재 runner는 scheme 단위 필터를
+지원하지 않는다. Simulator 조회 실패의 확정 원인은 sandbox가 CoreSimulatorService와 사용자
+Library 로그 경로에 접근하지 못한 환경 권한 제약이다.
+
+### 조치
+
+runner 구현을 읽어 action-only 계약과 전체 scheme 범위를 확인했다. Data 승인 단위를 넘기지
+않도록 `Domain`, `Data` 각각에 격리된 `/private/tmp` Derived Data를 만들고 runner와 같은 핵심
+옵션의 직접 `xcodebuild`로 `build`, `build-for-testing`, `test-without-building`을 순서대로
+실행했다. Simulator 목록과 테스트 실행은 승인된 외부 환경에서 수행했다.
+
+### 검증
+
+- `make tuist`: 성공, 현재 source 기준 workspace 생성 완료.
+- `Domain` 직접 `xcodebuild`: build·build-for-testing·test-without-building 성공,
+  xcresult 기준 28/28 통과, 실패·건너뜀 0건.
+- `Data` 직접 `xcodebuild`: build·build-for-testing·test-without-building 성공,
+  xcresult 기준 23/23 통과, 실패·건너뜀 0건.
+- 전체 공유 scheme runner 검증: 미실행. 현재 Data 승인 단위 밖이며 T091이 별도로 소유한다.
+
+### 재발 방지
+
+단일 package scheme 검증 전 runner 소스의 공개 인자 계약을 확인하고 `--help` 지원을 가정하지
+않는다. scheme 필터가 없는 동안 package 승인 단계는 scheme별 격리 Derived Data와 직접
+`xcodebuild`를 사용한다. Simulator destination은 sandbox 실패 시 제품 오류로 분류하지 않고
+승인된 `simctl` 조회 결과의 UUID를 명시한다.
+
+### 연결
+
+선행: `TS-20260819-012`, `TS-20260820-005`. 후속: 없음.

@@ -1,6 +1,6 @@
 import Testing
 
-import Composition
+import CompositionAdepter
 import DomainLearningProject
 
 // MARK: - AppCompositionTests

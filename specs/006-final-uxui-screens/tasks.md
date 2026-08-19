@@ -384,3 +384,34 @@ Feature → App 승인 게이트를 모두 유지한다. S3·S4의 확정값 검
   기준으로 사용하지 않는다.
 - Figma `top dim`(`1216:16439`, 내부 `1216:16441`)과 `bottom dim`(`1216:16402`, 내부
   `1216:16399`)의 방향·정지점은 2026-08-19 읽기 전용 조회값을 정본으로 사용한다.
+
+## 단계 6: 수렴
+
+**수렴 기준**: 2026-08-20 사용자 결정에 따라 현재 브랜치의 Tuist 형식인 명시적
+`sourceDirectory`, 역할 중심 source·test 폴더와 `.package(...)` scheme 구성을 정본으로
+사용한다. 기존 T001~T092의 ID·순서·완료 표시는 변경하지 않는다.
+
+### 작업 패키지: Domain
+
+- [X] T093 [CRITICAL] `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`에서 merge marker와 incoming 암시적 `.module(name:)` 분기를 제거하고, `DomainLearningProject`와 `DomainLearningProjectTests`가 현재 브랜치 형식의 `sourceDirectory` 계산 및 명시적 `.module(name:sourceDirectory:)`·`.testModule(name:sourceDirectory:productionTarget:)` 선언만 사용하도록 복구한다 per Constitution 1·3, T001 (contradicts)
+- [X] T094 [CRITICAL] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Domain·Data를 함께 감싼 merge marker를 제거하고 Domain scheme을 현재 브랜치의 `.package(...)` 형식으로 확정하되 `DomainAuthentication`·`DomainLearningProject` production·test target을 모두 보존하고, Data 구획은 T097 전까지 현재 브랜치의 `DataAuthentication` 기준선을 유지한다 per Constitution 1·7, T002 (contradicts)
+- [X] T095 [no-write] `rg`로 `sources/Tuist/ProjectDescriptionHelpers/Projects/DomainModuleName.swift`와 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 merge marker 0건, Domain target의 source가 `sources/Projects/Domain/LearningProject/**`, test source가 `sources/Projects/Domain/Tests/LearningProject/**`로 해석되는지 정적으로 검증하고, 전체 Tuist 생성·build는 T097의 Data helper 복구 뒤 수행한다고 명시한다
+- [X] T096 [no-write] T093~T095의 Domain 변경 파일, 정적 검증 결과와 Data 선행 복구 전 미실행 범위를 보고한 뒤 중단하고 Data 수렴 작업 진행에 대한 명시적 사용자 승인을 기다린다
+
+**승인 게이트**: T096 승인 전에는 Data와 Composition 수렴 파일을 생성·수정·삭제하지 않는다.
+
+### 작업 패키지: Data
+
+- [X] T097 [CRITICAL] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`가 `DataAuthentication`·`DataAuthenticationTests`·`DataLearningProject`·`DataLearningProjectTests` 전 case의 `sourceDirectory`를 완결하고 현재 브랜치의 명시적 target helper를 사용하도록 수정하며, `sources/Projects/Data/DataLearningProject/**`를 `sources/Projects/Data/LearningProject/**`로, `sources/Projects/Data/DataLearningProjectTests/**`를 `sources/Projects/Data/Tests/LearningProject/**`로 역할 폴더화하고 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Data `.package(...)` scheme에 두 production·test target을 빠짐없이 연결한다 per Constitution 1·7, plan: Data 제외 결정 (unrequested)
+- [X] T098 [no-write] `make tuist` 후 project build runner로 Domain과 Data를 순서대로 build·test하고 Tuist helper merge marker·비완결 switch·누락 source 경로가 각각 0건이며 기존 Authentication target과 신규 LearningProject target이 현재 브랜치의 역할 폴더에서 함께 해석되는지 확인한다
+- [X] T099 [no-write] T097~T098의 Data 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 Composition 수렴 작업 진행에 대한 명시적 사용자 승인을 기다린다
+
+**승인 게이트**: T099 승인 전에는 Composition 수렴 파일을 생성·수정·삭제하지 않는다.
+
+### 작업 패키지: Composition
+
+- [X] T100 `sources/Projects/Composition/Tests/Adepter/LearningProject/AppCompositionTests.swift`, `sources/Projects/Composition/Tests/Adepter/LearningProject/SampleFetchLearningProjectsTests.swift`, `sources/Projects/Composition/Tests/Adepter/LearningProject/SampleDeleteLearningProjectTests.swift`의 `Composition` import를 현재 브랜치에 선언된 production target `CompositionAdepter`와 일치시키고 `AppComposition`·표본 Use Case가 같은 module 경계에서 검증되도록 정합화한다 per FR-024, SC-018, plan: Composition 조립 경계 (partial)
+- [X] T101 [no-write] `make tuist` 후 `Composition` scheme을 build·test하고 세 테스트 파일의 production module import 불일치 0건, `AppComposition.live()`의 구현 선택 지점 1곳, FeatureTests·Mock target 의존성 0건을 확인한다
+- [X] T102 [no-write] T100~T101의 Composition 변경 파일과 실제 검증 결과를 보고한 뒤 중단하고 기존 Feature 검증 T068 재개에 대한 명시적 사용자 승인을 기다린다
+
+**승인 게이트**: T102 승인 전에는 기존 T068 이후 Feature·App·전체 완료 검증을 재개하지 않는다.

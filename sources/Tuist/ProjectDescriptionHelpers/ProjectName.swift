@@ -90,10 +90,12 @@ extension ProjectName {
                 [.package(
                     name: self,
                     buildTargets: [
-                        DataModuleName.DataAuthentication.rawValue
+                        DataModuleName.DataAuthentication.rawValue,
+                        DataModuleName.DataLearningProject.rawValue,
                     ],
                     testTargets: [
-                        DataModuleName.DataAuthenticationTests.rawValue
+                        DataModuleName.DataAuthenticationTests.rawValue,
+                        DataModuleName.DataLearningProjectTests.rawValue,
                     ],
                 )]
 
