@@ -13,7 +13,7 @@
   "GIT_IT_AGENT_SKILLS_ROOT": ".agents",
   "GIT_IT_CLAUDE_INSTRUCTIONS_LINK_PATH": "CLAUDE.md",
   "GIT_IT_CLAUDE_SKILLS_LINK_PATH": ".claude",
-  "GIT_IT_VSCODE_WORKSPACE_PATH": "Git-It-iOS.code-workspace",
+  "GIT_IT_VSCODE_WORKSPACE_PATH": "Documents-Workspace.code-workspace",
   "GIT_IT_SPECS_ROOT": "specs",
   "GIT_IT_DOCS_ROOT": "docs",
   "GIT_IT_SWIFT_FORMAT_RUNNER": "tools/githooks/swift-format/bin/run.sh",
