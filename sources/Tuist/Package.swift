@@ -28,7 +28,7 @@ let packageSettings = PackageSettings(
         "SwiftNavigation": .framework,
         "SwiftUINavigation": .framework,
         "UIKitNavigation": .framework,
-        "UIKitNavigationShim": .framework,
+        "UIKitNavigationShim": .staticFramework,
         "XCTestDynamicOverlay": .framework,
     ]
 )
