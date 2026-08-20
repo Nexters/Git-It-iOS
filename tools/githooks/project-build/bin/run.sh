@@ -5,7 +5,7 @@ set -eu
 
 project_build_main() (
 	if [ "$#" -ne 1 ]; then
-		printf '오류[common.invalid-input]: ACTION 한 개가 필요합니다\n조치: build, compile, test 공개 명령을 사용하세요\n' >&2
+		printf '오류[common.invalid-input]: ACTION 한 개가 필요합니다\n조치: build, build-app, compile, test, compile-unit, test-unit, compile-ui, test-ui 공개 명령을 사용하세요\n' >&2
 		return 2
 	fi
 
@@ -36,7 +36,7 @@ project_build_main() (
 	. "$project_build_xcode_adapter"
 
 	project_build_action=$(scheme_policy_xcode_action "$project_build_operation") || {
-		printf '오류[common.invalid-input]: 지원하지 않는 ACTION=%s\n조치: build, compile, test 중 하나를 사용하세요\n' "$project_build_operation" >&2
+		printf '오류[common.invalid-input]: 지원하지 않는 ACTION=%s\n조치: 공개 build 또는 test 명령을 사용하세요\n' "$project_build_operation" >&2
 		return 2
 	}
 	case "$project_build_operation" in
@@ -44,15 +44,27 @@ project_build_main() (
 		project_build_scope=all
 		project_build_destination='generic/platform=iOS Simulator'
 		;;
+	build-app)
+		project_build_scope=app
+		project_build_destination='generic/platform=iOS Simulator'
+		;;
 	compile | test)
 		project_build_scope=testable
 		project_build_destination=${GIT_IT_TEST_DESTINATION:-'platform=iOS Simulator,name=iPhone 17 Pro'}
-		[ -n "$project_build_destination" ] || {
-			printf '오류[common.invalid-input]: GIT_IT_TEST_DESTINATION이 비어 있습니다\n조치: 유효한 iOS Simulator destination을 지정하세요\n' >&2
-			return 2
-		}
+		;;
+	compile-unit | test-unit)
+		project_build_scope=unit
+		project_build_destination=${GIT_IT_TEST_DESTINATION:-'platform=iOS Simulator,name=iPhone 17 Pro'}
+		;;
+	compile-ui | test-ui)
+		project_build_scope=ui
+		project_build_destination=${GIT_IT_TEST_DESTINATION:-'platform=iOS Simulator,name=iPhone 17 Pro'}
 		;;
 	esac
+	[ -n "$project_build_destination" ] || {
+		printf '오류[common.invalid-input]: destination이 비어 있습니다\n조치: 유효한 iOS Simulator destination을 지정하세요\n' >&2
+		return 2
+	}
 
 	[ -d "$project_build_workspace" ] || {
 		printf '오류[project-build.missing-workspace]: %s 누락\n조치: tuist generate를 실행하세요\n' "$project_build_workspace" >&2
@@ -91,7 +103,7 @@ project_build_main() (
 	fi
 
 	if [ ! -s "$project_build_targets" ]; then
-		if [ "$project_build_scope" = testable ] && [ -s "$project_build_observed" ]; then
+		if { [ "$project_build_scope" = testable ] || [ "$project_build_scope" = unit ] || [ "$project_build_scope" = ui ]; } && [ -s "$project_build_observed" ]; then
 			printf '건너뜀[project-build.no-test-schemes]: 테스트가 연결된 공유 scheme이 없습니다\n'
 			return 0
 		fi

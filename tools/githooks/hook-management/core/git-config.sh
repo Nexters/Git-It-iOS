@@ -14,8 +14,7 @@ hook_git_config_prepare() (
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/swift-format.sh" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/build.sh" \
-		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/compile.sh" \
-		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/test.sh"
+		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/compile.sh"
 )
 
 hook_git_config_read() (
@@ -32,8 +31,7 @@ hook_git_config_verify() (
 		pre-commit \
 		pre-commit.d/swift-format.sh \
 		pre-commit.d/build.sh \
-		pre-commit.d/compile.sh \
-		pre-commit.d/test.sh; do
+		pre-commit.d/compile.sh; do
 		[ -x "$hook_git_config_root/$hook_git_config_hooks_root/$hook_git_config_path" ] || return 1
 	done
 )

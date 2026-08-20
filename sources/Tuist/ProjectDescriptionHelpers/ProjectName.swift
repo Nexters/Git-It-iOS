@@ -40,7 +40,7 @@ extension ProjectName {
             switch self {
             case .App:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         AppModuleName.GitIt.rawValue
                     ],
@@ -53,7 +53,7 @@ extension ProjectName {
 
             case .Composition:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         CompositionModuleName.CompositionAdepter.rawValue
                     ],
@@ -64,7 +64,7 @@ extension ProjectName {
 
             case .Feature:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         FeatureModuleName.Feature.rawValue
                     ],
@@ -75,7 +75,7 @@ extension ProjectName {
 
             case .Domain:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         DomainModuleName.DomainAuthentication.rawValue,
                         DomainModuleName.DomainLearningProject.rawValue,
@@ -88,7 +88,7 @@ extension ProjectName {
 
             case .Data:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
                         DataModuleName.DataLearningProject.rawValue,
@@ -101,7 +101,7 @@ extension ProjectName {
 
             case .Infrastructure:
                 [.package(
-                    name: self,
+                    name: rawValue,
                     buildTargets: [
                         InfrastructureModuleName.InfrastructureAuthentication.rawValue,
                         InfrastructureModuleName.InfrastructureNetworkClient.rawValue,
@@ -115,20 +115,29 @@ extension ProjectName {
                 )]
 
             case .UI:
-                [.package(
-                    name: self,
-                    buildTargets: [
-                        UIModuleName.DesignSystem.rawValue,
-                        UIModuleName.UIComponent.rawValue,
-                        UIModuleName.UIComponentLayoutHarness.rawValue,
-                    ],
-                    testTargets: [
-                        UIModuleName.DesignSystemTests.rawValue,
-                        UIModuleName.UIComponentTests.rawValue,
-                        UIModuleName.UIComponentUITests.rawValue,
-                    ],
-                    runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
-                )]
+                [
+                    .package(
+                        name: rawValue,
+                        buildTargets: [
+                            UIModuleName.DesignSystem.rawValue,
+                            UIModuleName.UIComponent.rawValue,
+                            UIModuleName.UIComponentLayoutHarness.rawValue,
+                        ],
+                        testTargets: [
+                            UIModuleName.DesignSystemTests.rawValue,
+                            UIModuleName.UIComponentTests.rawValue,
+                        ],
+                        runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
+                    ),
+                    .package(
+                        name: "UIUITests",
+                        buildTargets: [UIModuleName.UIComponentLayoutHarness.rawValue],
+                        testTargets: [
+                            UIModuleName.UIComponentUITests.rawValue
+                        ],
+                        runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
+                    ),
+                ]
             }
 
         return Project(
@@ -143,14 +152,14 @@ extension ProjectName {
 
 extension Scheme {
     fileprivate static func package(
-        name: ProjectName,
+        name: String,
         buildTargets: [String],
         testTargets: [String],
         runTarget: String? = nil,
         supportsDistribution: Bool = false,
     ) -> Self {
         .scheme(
-            name: name.rawValue,
+            name: name,
             shared: true,
             buildAction: .buildAction(targets: buildTargets.map {
                 .target($0)
@@ -164,9 +173,11 @@ extension Scheme {
             archiveAction: supportsDistribution
                 ? .archiveAction(configuration: .release)
                 : nil,
-            profileAction: supportsDistribution ? runTarget.map {
-                .profileAction(executable: .executable(.target($0)))
-            } : nil,
+            profileAction: supportsDistribution
+                ? runTarget.map {
+                    .profileAction(executable: .executable(.target($0)))
+                }
+                : nil,
             analyzeAction: supportsDistribution
                 ? .analyzeAction(configuration: .debug)
                 : nil,
