@@ -62,7 +62,8 @@ extension UIModuleName {
             name: UIModuleName.UIComponent.rawValue,
             resources: Self.uiComponentImageResources,
             dependencies: [
-                .target(name: UIModuleName.DesignSystem.rawValue)
+                .target(name: UIModuleName.DesignSystem.rawValue),
+                .external(.Lottie),
             ],
         ),
         .module(
