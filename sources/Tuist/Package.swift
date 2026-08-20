@@ -48,5 +48,9 @@ let package = Package(
             url: "https://github.com/firebase/firebase-ios-sdk.git",
             from: "12.16.0",
         ),
+        .package(
+            url: "https://github.com/airbnb/lottie-ios.git",
+            from: "4.6.1",
+        ),
     ],
 )

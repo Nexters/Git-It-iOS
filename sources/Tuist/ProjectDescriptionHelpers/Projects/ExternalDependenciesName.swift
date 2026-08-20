@@ -6,6 +6,7 @@ enum ExternalDependenciesName: String {
     case ComposableArchitecture
     case FirebaseAnalytics
     case FirebaseCrashlytics
+    case Lottie
 }
 
 extension TargetDependency {

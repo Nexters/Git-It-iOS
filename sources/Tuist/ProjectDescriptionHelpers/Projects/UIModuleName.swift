@@ -79,7 +79,8 @@ extension UIModuleName {
             sourceDirectory: UIModuleName.UIComponent.sourceDirectory,
             resources: Self.uiComponentImageResources,
             dependencies: [
-                .target(name: UIModuleName.DesignSystem.rawValue)
+                .target(name: UIModuleName.DesignSystem.rawValue),
+                .external(.Lottie),
             ],
         ),
         .module(
