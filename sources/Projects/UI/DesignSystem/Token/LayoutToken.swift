@@ -22,6 +22,10 @@ extension LayoutToken {
         name: "Gutter",
         value: 12,
     )
+    public static let compactSpacing = LayoutToken(
+        name: "CompactSpacing",
+        value: 8,
+    )
 
-    public static let all: [LayoutToken] = [margin, gutter]
+    public static let all: [LayoutToken] = [margin, gutter, compactSpacing]
 }

@@ -105,12 +105,16 @@
 Tuist target 이름은 빌드 그래프에서 소속 패키지를 식별해야 하므로 필요한 패키지 문맥을
 포함할 수 있습니다. 반면 `sources/Projects/<패키지>/` 아래의 source·test 폴더는 이미
 패키지 문맥 안에 있으므로 target 이름의 패키지 접두어를 반복하지 않고 역할만 사용합니다.
-예를 들어 `InfrastructureAuthentication` target의 source·test 폴더는 각각
-`Authentication/`, `AuthenticationTests/`로 둡니다.
+예를 들어 `InfrastructureAuthentication`과 `InfrastructureAuthenticationTests` target의
+source·test 폴더는 각각 `Authentication/`, `Tests/Authentication/`으로 둡니다. 테스트
+폴더의 세부 규칙은 [테스트 작성 컨벤션](./test-conventions.md#7-파일과-target-구성)을
+따릅니다.
 
-새 target을 추가할 때는 `Target.module` 또는 `Target.testModule`의
-`sourceDirectory`를 명시해 이 경로를 설정합니다. target 이름을 source glob의 기본값으로
-그대로 사용하지 않습니다.
+새 target을 추가할 때는 각 `ModuleName` enum의 `sourceDirectory` 연산 프로퍼티에서
+target 이름 앞의 패키지명을 제거해 역할 경로를 계산합니다. 테스트 target은 계산한 역할을
+`Tests/<역할>/` 아래에 배치하고, `Target.module` 또는 `Target.testModule`의 필수
+`sourceDirectory` 인자에 전달합니다. 공통 Tuist helper는 전달받은 경로에 `/**`만 붙이며,
+target 이름을 source glob의 기본값으로 사용하거나 별도 폴더명을 덧붙이지 않습니다.
 
 ## 5. 접두어와 접미어
 

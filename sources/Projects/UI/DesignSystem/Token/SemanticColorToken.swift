@@ -52,6 +52,14 @@ extension SemanticColorToken {
         name: "BrandAccent",
         colorToken: .blue100,
     )
+    public static let progressTrack = SemanticColorToken(
+        name: "ProgressTrack",
+        colorToken: .grey500,
+    )
+    public static let progressFill = SemanticColorToken(
+        name: "ProgressFill",
+        colorToken: .blue200,
+    )
 
     public static let all: [SemanticColorToken] = [
         screenBackground,
@@ -63,5 +71,7 @@ extension SemanticColorToken {
         secondaryText,
         mutedText,
         brandAccent,
+        progressTrack,
+        progressFill,
     ]
 }

@@ -10,7 +10,7 @@ WORKSPACE_NAME := $(notdir $(WORKSPACE_PATH))
 
 .DEFAULT_GOAL := help
 
-.PHONY: help init tuist hooks format verify-tools
+.PHONY: help init tuist clean hooks format verify-tools
 
 help: ## 사용 가능한 명령을 표시합니다
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  make %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -21,6 +21,9 @@ tuist: ## iOS 프로젝트의 Tuist package를 설치·생성하고 루트에 �
 	cd $(IOS_ROOT) && tuist install && tuist generate
 	rm -rf $(WORKSPACE_NAME)
 	ln -s $(WORKSPACE_PATH) $(WORKSPACE_NAME)
+
+clean: ## Tuist의 로컬 캐시와 아티팩트를 정리합니다
+	cd $(IOS_ROOT) && tuist clean
 
 hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh

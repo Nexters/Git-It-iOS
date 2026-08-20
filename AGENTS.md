@@ -8,8 +8,9 @@
 
 1. [Constitution](.specify/memory/constitution.md) — 모든 문서보다 우선하는 상위 원칙
 2. [아키텍처 문서](sources/docs/architecture.md),
-   [네이밍 가이드](sources/docs/naming.md)와
-   [패키지별 규칙](sources/docs/package-rules/) — 모듈 책임, 의존성과 공개 이름 규칙
+   [네이밍 가이드](sources/docs/naming.md),
+   [테스트 작성 컨벤션](sources/docs/test-conventions.md)과
+   [패키지별 규칙](sources/docs/package-rules/) — 모듈 책임, 의존성, 테스트와 공개 이름 규칙
 3. [`.github/COMMIT_CONVENTION.md`](.github/COMMIT_CONVENTION.md) — 커밋 메시지 규칙
 4. [README](README.md) — 초기화·빌드·훅 설치 절차
 5. 이 문서
@@ -74,6 +75,9 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 - **Target과 폴더 이름을 구분합니다.** target은 패키지 문맥을 포함할 수 있지만,
   `sources/Projects/<패키지>/` 안의 source·test 폴더는 역할만 사용합니다. 새 target은
   `sourceDirectory`를 명시해 target 이름의 패키지 접두어를 폴더에 반복하지 않습니다.
+- **테스트 함수 이름은 한국어 동작 문장으로 작성하고 Swift Testing을 기본으로
+  사용합니다.** XCTest는 UI 자동화처럼 필요한 플랫폼 기능으로 제한하며, 세부 기준은
+  [테스트 작성 컨벤션](sources/docs/test-conventions.md)을 따릅니다.
 - 패키지별 세부 규칙은 수정 전에 해당 문서를 확인합니다:
   [App](sources/docs/package-rules/app.md) ·
   [Composition](sources/docs/package-rules/composition.md) ·

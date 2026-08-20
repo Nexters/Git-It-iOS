@@ -39,78 +39,96 @@ extension ProjectName {
         let schemes: [Scheme] =
             switch self {
             case .App:
-                AppModuleName.schemes
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        AppModuleName.GitIt.rawValue
+                    ],
+                    testTargets: [
+                        AppModuleName.GitItTests.rawValue
+                    ],
+                    runTarget: AppModuleName.GitIt.rawValue,
+                    supportsDistribution: true,
+                )]
 
             case .Composition:
-                [.module(name: "Composition", testTarget: "CompositionTests")]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        CompositionModuleName.CompositionAdepter.rawValue
+                    ],
+                    testTargets: [
+                        CompositionModuleName.CompositionAdepterTests.rawValue
+                    ],
+                )]
 
             case .Feature:
-                [.module(name: "Feature")]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        FeatureModuleName.Feature.rawValue
+                    ],
+                    testTargets: [
+                        FeatureModuleName.FeatureTests.rawValue
+                    ],
+                )]
 
             case .Domain:
-                [
-                    .module(
-                        name: "DomainAuthentication",
-                        testTarget: "DomainAuthenticationTests",
-                    ),
-                    .module(
-                        name: "DomainLearningProject",
-                        testTarget: "DomainLearningProjectTests",
-                    ),
-                ]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        DomainModuleName.DomainAuthentication.rawValue,
+                        DomainModuleName.DomainLearningProject.rawValue,
+                    ],
+                    testTargets: [
+                        DomainModuleName.DomainAuthenticationTests.rawValue,
+                        DomainModuleName.DomainLearningProjectTests.rawValue,
+                    ],
+                )]
 
             case .Data:
-                [
-                    .module(
-                        name: "DataAuthentication",
-                        testTarget: "DataAuthenticationTests",
-                    ),
-                    .module(
-                        name: "DataLearningProject",
-                        testTarget: "DataLearningProjectTests",
-                    ),
-                ]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        DataModuleName.DataAuthentication.rawValue,
+                        DataModuleName.DataLearningProject.rawValue,
+                    ],
+                    testTargets: [
+                        DataModuleName.DataAuthenticationTests.rawValue,
+                        DataModuleName.DataLearningProjectTests.rawValue,
+                    ],
+                )]
 
             case .Infrastructure:
-                [
-                    .module(
-                        name: "InfrastructureAuthentication",
-                        testTarget: "InfrastructureAuthenticationTests",
-                    ),
-                    .module(
-                        name: "InfrastructureNetworkClient",
-                        testTarget: "InfrastructureNetworkClientTests",
-                    ),
-                    .module(
-                        name: "InfrastructureCache",
-                        testTarget: "InfrastructureCacheTests",
-                    ),
-                ]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        InfrastructureModuleName.InfrastructureAuthentication.rawValue,
+                        InfrastructureModuleName.InfrastructureNetworkClient.rawValue,
+                        InfrastructureModuleName.InfrastructureCache.rawValue,
+                    ],
+                    testTargets: [
+                        InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,
+                        InfrastructureModuleName.InfrastructureNetworkClientTests.rawValue,
+                        InfrastructureModuleName.InfrastructureCacheTests.rawValue,
+                    ],
+                )]
 
             case .UI:
-                [
-                    .module(
-                        name: "DesignSystem",
-                        testTarget: "DesignSystemTests",
-                    ),
-                    .module(
-                        name: "UIComponent",
-                        testTarget: "UIComponentTests",
-                    ),
-                    .scheme(
-                        name: "UIComponentLayout",
-                        shared: true,
-                        buildAction: .buildAction(
-                            targets: [.target("UIComponentLayoutHarness")]
-                        ),
-                        testAction: .targets([
-                            .testableTarget(target: .target("UIComponentUITests"))
-                        ]),
-                        runAction: .runAction(
-                            executable: .executable(.target("UIComponentLayoutHarness"))
-                        ),
-                    ),
-                ]
+                [.package(
+                    name: self,
+                    buildTargets: [
+                        UIModuleName.DesignSystem.rawValue,
+                        UIModuleName.UIComponent.rawValue,
+                        UIModuleName.UIComponentLayoutHarness.rawValue,
+                    ],
+                    testTargets: [
+                        UIModuleName.DesignSystemTests.rawValue,
+                        UIModuleName.UIComponentTests.rawValue,
+                        UIModuleName.UIComponentUITests.rawValue,
+                    ],
+                    runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
+                )]
             }
 
         return Project(
@@ -124,17 +142,34 @@ extension ProjectName {
 }
 
 extension Scheme {
-    fileprivate static func module(
-        name: String,
-        testTarget: String? = nil,
+    fileprivate static func package(
+        name: ProjectName,
+        buildTargets: [String],
+        testTargets: [String],
+        runTarget: String? = nil,
+        supportsDistribution: Bool = false,
     ) -> Self {
         .scheme(
-            name: name,
+            name: name.rawValue,
             shared: true,
-            buildAction: .buildAction(targets: [.target(name)]),
-            testAction: testTarget.map {
-                .targets([.testableTarget(target: .target($0))])
+            buildAction: .buildAction(targets: buildTargets.map {
+                .target($0)
+            }),
+            testAction: .targets(testTargets.map {
+                .testableTarget(target: .target($0))
+            }),
+            runAction: runTarget.map {
+                .runAction(executable: .executable(.target($0)))
             },
+            archiveAction: supportsDistribution
+                ? .archiveAction(configuration: .release)
+                : nil,
+            profileAction: supportsDistribution ? runTarget.map {
+                .profileAction(executable: .executable(.target($0)))
+            } : nil,
+            analyzeAction: supportsDistribution
+                ? .analyzeAction(configuration: .debug)
+                : nil,
         )
     }
 }

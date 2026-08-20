@@ -3,9 +3,10 @@ import ProjectDescription
 extension Target {
     static func module(
         name: String,
-        sourceDirectory: String? = nil,
+        sourceDirectory: String,
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
+        buildLibraryForDistribution: Bool = true,
     ) -> Self {
         .target(
             name: name,
@@ -14,12 +15,12 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(sourceDirectory ?? name)/**"],
+            sources: ["\(sourceDirectory)/**"],
             resources: resources,
             dependencies: dependencies,
             settings: .settings(
                 base: [
-                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": buildLibraryForDistribution ? "YES" : "NO",
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
@@ -32,7 +33,7 @@ extension Target {
 
     static func internalStaticModule(
         name: String,
-        sourceDirectory: String? = nil,
+        sourceDirectory: String,
         dependencies: [TargetDependency] = [],
     ) -> Self {
         .target(
@@ -42,7 +43,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(sourceDirectory ?? name)/**"],
+            sources: ["\(sourceDirectory)/**"],
             dependencies: dependencies,
             settings: .settings(
                 base: [
@@ -59,18 +60,21 @@ extension Target {
 
     static func testModule(
         name: String,
-        sourceDirectory: String? = nil,
+        sourceDirectory: String,
         productionTarget: TargetDependency,
         additionalDependencies: [TargetDependency] = [],
     ) -> Self {
-        .target(
+        let testSourceDirectory = sourceDirectory.isEmpty
+            ? "Tests"
+            : "Tests/\(sourceDirectory)"
+        return .target(
             name: name,
             destinations: .iOS,
             product: .unitTests,
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(sourceDirectory ?? name)/**"],
+            sources: ["\(testSourceDirectory)/**"],
             dependencies: [productionTarget] + additionalDependencies,
             settings: .settings(
                 base: [
@@ -107,7 +111,7 @@ extension Target {
 
     static func testModule(
         name: String,
-        sourceDirectory: String? = nil,
+        sourceDirectory: String,
         dependencies: [TargetDependency] = [],
     ) -> Self {
         .target(
@@ -117,7 +121,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(sourceDirectory ?? name)/**"],
+            sources: ["\(sourceDirectory)/**"],
             dependencies: dependencies,
             settings: .settings(
                 base: [

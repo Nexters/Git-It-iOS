@@ -37,13 +37,16 @@ extension GradientToken {
         public init(
             position: Double,
             hex: String,
+            opacity: Double = 1,
         ) {
             self.position = position
             self.hex = hex
+            self.opacity = opacity
         }
 
         public let position: Double
         public let hex: String
+        public let opacity: Double
     }
 }
 
@@ -99,7 +102,49 @@ extension GradientToken {
         ],
     )
 
-    public static let all: [GradientToken] = [gradient1, gradient2, gradient3]
+    public static let topEdgeScrim = GradientToken(
+        name: "TopEdgeScrim",
+        start: topToBottomEnd,
+        end: topToBottomStart,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 0.25,
+                hex: "#141414",
+                opacity: 0.5,
+            ),
+        ],
+    )
+
+    public static let bottomEdgeScrim = GradientToken(
+        name: "BottomEdgeScrim",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0.7,
+                hex: "#141414",
+                opacity: 0.6,
+            ),
+            Stop(
+                position: 1,
+                hex: "#141414",
+                opacity: 0,
+            ),
+        ],
+    )
+
+    public static let all: [GradientToken] = [
+        gradient1,
+        gradient2,
+        gradient3,
+        topEdgeScrim,
+        bottomEdgeScrim,
+    ]
 
     // MARK: Private
 
