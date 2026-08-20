@@ -1,17 +1,24 @@
 #!/bin/sh
 # 초기화 동작별 사전 검사와 파일 변경 순서를 조합합니다.
 
-project_setup_workspace_link() (
+project_setup_workspace_links() (
 	project_setup_root=$1
 	project_setup_target=$2
 	project_setup_link=$3
-	project_setup_preflight_port=$4
-	project_setup_replace_port=$5
+	project_setup_edit_target=$4
+	project_setup_edit_link=$5
+	project_setup_preflight_port=$6
+	project_setup_replace_port=$7
 
+	# 두 위치의 충돌을 모두 확인한 뒤 workspace 링크를 함께 갱신합니다.
 	"$project_setup_preflight_port" "$project_setup_root" \
 		"$project_setup_target" "$project_setup_link" || return $?
+	"$project_setup_preflight_port" "$project_setup_root" \
+		"$project_setup_edit_target" "$project_setup_edit_link" || return $?
 	"$project_setup_replace_port" "$project_setup_root" \
-		"$project_setup_target" "$project_setup_link"
+		"$project_setup_target" "$project_setup_link" || return $?
+	"$project_setup_replace_port" "$project_setup_root" \
+		"$project_setup_edit_target" "$project_setup_edit_link"
 )
 
 project_setup_developer_tools() (

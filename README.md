@@ -14,16 +14,18 @@ Git It의 iOS 애플리케이션 저장소입니다.
 
 | 명령어 | 설명 |
 | --- | --- |
-| `make init` | **저장소 초기화** (Tuist, Git 훅, Claude 링크, VS Code workspace 설정) |
+| `make init` | **저장소 초기화** (Tuist 앱·편집 workspace, Git 훅, Claude 링크, VS Code workspace 설정) |
 | `make tuist` | Tuist 패키지 해결·생성 및 심볼릭 링크 갱신 |
 | `make clean` | Tuist 로컬 캐시 및 아티팩트 정리 |
 | `make hooks` | Git Hook 경로(`tools/githooks`) 지정 및 권한 설정 |
 | `make format` | 프로젝트 내 모든 Swift 소스 파일 포매팅 |
 | `make verify-tools` | 셸 스크립트 검증 도구(ShellCheck, shfmt) 다운로드 및 준비 |
 
-`make init`은 `tools/repository-paths/repository-paths.json`에 정의된 경로를 사용해
-`GitIt.xcworkspace`, `CLAUDE.md`, `.claude` 심볼릭 링크를 갱신합니다. 또한 `specs/`와
-`docs/`를 폴더로 등록한 `Documents-Workspace.code-workspace`를 저장소 루트에 생성합니다.
+`make init`은 Tuist package를 설치하고 앱용 `sources/GitIt.xcworkspace`와 manifest 편집용
+`sources/Manifests.xcworkspace`를 생성합니다. 이어서 저장소 루트에 각각
+`GitIt.xcworkspace`와 `Edit-Tuist.xcworkspace` 심볼릭 링크를 만들고, `CLAUDE.md`,
+`.claude` 링크도 갱신합니다. `specs/`와 `docs/`를 폴더로 등록한
+`Documents-Workspace.code-workspace`도 저장소 루트에 생성합니다.
 링크 위치에 일반 파일이나 디렉터리가 있으면 자동으로 삭제하지 않고 초기화를 중단합니다.
 
 ## 저장소 구조

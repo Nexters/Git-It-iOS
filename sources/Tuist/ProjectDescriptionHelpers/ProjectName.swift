@@ -68,9 +68,7 @@ extension ProjectName {
                     buildTargets: [
                         FeatureModuleName.Feature.rawValue
                     ],
-                    testTargets: [
-                        FeatureModuleName.FeatureTests.rawValue
-                    ],
+                    testTargets: [],
                 )]
 
             case .Domain:

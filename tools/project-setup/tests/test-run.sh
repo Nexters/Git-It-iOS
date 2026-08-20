@@ -27,6 +27,8 @@ paths="$repository/$paths_relative"
 
 workspace_target=$("$paths" GIT_IT_WORKSPACE_PATH)
 workspace_link=$("$paths" GIT_IT_WORKSPACE_LINK_PATH)
+edit_workspace_target=$("$paths" GIT_IT_EDIT_WORKSPACE_PATH)
+edit_workspace_link=$("$paths" GIT_IT_EDIT_WORKSPACE_LINK_PATH)
 agent_instructions=$("$paths" GIT_IT_AGENT_INSTRUCTIONS_PATH)
 agent_skills=$("$paths" GIT_IT_AGENT_SKILLS_ROOT)
 claude_instructions=$("$paths" GIT_IT_CLAUDE_INSTRUCTIONS_LINK_PATH)
@@ -38,6 +40,7 @@ docs_root=$("$paths" GIT_IT_DOCS_ROOT)
 # 링크의 대상과 위치는 구현에 하드코딩하지 않고 중앙 JSON만 소유합니다.
 for key in \
 	GIT_IT_WORKSPACE_PATH GIT_IT_WORKSPACE_LINK_PATH \
+	GIT_IT_EDIT_WORKSPACE_PATH GIT_IT_EDIT_WORKSPACE_LINK_PATH \
 	GIT_IT_AGENT_INSTRUCTIONS_PATH GIT_IT_CLAUDE_INSTRUCTIONS_LINK_PATH \
 	GIT_IT_AGENT_SKILLS_ROOT GIT_IT_CLAUDE_SKILLS_LINK_PATH; do
 	value=$("$paths" "$key")
@@ -52,15 +55,19 @@ for key in \
 	fi
 done
 
-mkdir -p "$repository/$workspace_target" "$repository/$agent_skills" \
+mkdir -p "$repository/$workspace_target" "$repository/$edit_workspace_target" \
+	"$repository/$agent_skills" \
 	"$repository/$specs_root" "$repository/$docs_root"
 printf '# Agent instructions\n' >"$repository/$agent_instructions"
 
 # 기존의 끊어진 workspace 링크도 제거한 뒤 올바른 대상으로 다시 만듭니다.
 ln -s '이전/Workspace.xcworkspace' "$repository/$workspace_link"
+ln -s '이전/Edit-Workspace.xcworkspace' "$repository/$edit_workspace_link"
 "$runner" workspace-link
 [ -L "$repository/$workspace_link" ]
 [ "$(readlink "$repository/$workspace_link")" = "$workspace_target" ]
+[ -L "$repository/$edit_workspace_link" ]
+[ "$(readlink "$repository/$edit_workspace_link")" = "$edit_workspace_target" ]
 
 # 일반 파일은 삭제하지 않고 안정 진단과 함께 실패해야 합니다.
 rm -f "$repository/$workspace_link"
@@ -75,6 +82,22 @@ fi
 [ "$(cat "$repository/$workspace_link")" = '보존할 파일' ]
 rg -q 'project-setup.path-conflict' "$work/err"
 rm -f "$repository/$workspace_link"
+
+# 편집 workspace 위치가 충돌하면 앞선 앱 workspace 링크도 교체하지 않습니다.
+ln -s '이전/Workspace.xcworkspace' "$repository/$workspace_link"
+rm -f "$repository/$edit_workspace_link"
+printf '보존할 편집 workspace 파일\n' >"$repository/$edit_workspace_link"
+if "$runner" workspace-link >"$work/out" 2>"$work/err"; then
+	printf 'FAIL: 편집 workspace 파일 충돌을 성공으로 반환\n' >&2
+	exit 1
+else
+	result=$?
+fi
+[ "$result" -eq 2 ]
+[ "$(readlink "$repository/$workspace_link")" = '이전/Workspace.xcworkspace' ]
+[ "$(cat "$repository/$edit_workspace_link")" = '보존할 편집 workspace 파일' ]
+rg -q 'project-setup.path-conflict' "$work/err"
+rm -f "$repository/$workspace_link" "$repository/$edit_workspace_link"
 
 # Claude 호환 링크와 두 문서 루트를 포함한 VS Code workspace를 생성합니다.
 "$runner" developer-tools

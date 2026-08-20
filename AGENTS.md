@@ -32,9 +32,11 @@ Constitution과 하위 문서가 충돌하면 하위 문서를 Constitution에 �
 make init
 ```
 
-`tuist install && tuist generate`로 workspace를 만들고 Git 훅을 설치합니다. 이미
+`tuist install && tuist generate && tuist edit --permanent`로 앱 workspace와 manifest
+편집 workspace를 만들고 Git 훅을 설치합니다. 이미
 설치되어 있으면 `make tuist` 또는 `make hooks`로 개별 실행할 수 있습니다.
-루트의 Xcode workspace 링크, `CLAUDE.md`와 `.claude` 링크, `specs/`와
+루트의 `GitIt.xcworkspace`와 `Edit-Tuist.xcworkspace` 링크, `CLAUDE.md`와 `.claude`
+링크, `specs/`와
 `docs/`를 포함하는 VS Code workspace도 함께 생성합니다. `make help`로 전체
 명령을 확인합니다.
 

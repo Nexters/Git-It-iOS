@@ -40,6 +40,8 @@ project_setup_main() (
 	# 모든 링크 경로와 대상을 중앙 JSON 판독기를 통해 읽습니다.
 	project_setup_workspace_target=$("$project_setup_paths" GIT_IT_WORKSPACE_PATH) || return $?
 	project_setup_workspace_link=$("$project_setup_paths" GIT_IT_WORKSPACE_LINK_PATH) || return $?
+	project_setup_edit_workspace_target=$("$project_setup_paths" GIT_IT_EDIT_WORKSPACE_PATH) || return $?
+	project_setup_edit_workspace_link=$("$project_setup_paths" GIT_IT_EDIT_WORKSPACE_LINK_PATH) || return $?
 	project_setup_instructions_target=$("$project_setup_paths" GIT_IT_AGENT_INSTRUCTIONS_PATH) || return $?
 	project_setup_instructions_link=$("$project_setup_paths" GIT_IT_CLAUDE_INSTRUCTIONS_LINK_PATH) || return $?
 	project_setup_skills_target=$("$project_setup_paths" GIT_IT_AGENT_SKILLS_ROOT) || return $?
@@ -49,6 +51,7 @@ project_setup_main() (
 	project_setup_docs_root=$("$project_setup_paths" GIT_IT_DOCS_ROOT) || return $?
 	for project_setup_path in \
 		"$project_setup_workspace_target" "$project_setup_workspace_link" \
+		"$project_setup_edit_workspace_target" "$project_setup_edit_workspace_link" \
 		"$project_setup_instructions_target" "$project_setup_instructions_link" \
 		"$project_setup_skills_target" "$project_setup_skills_link" \
 		"$project_setup_vscode_workspace" "$project_setup_specs_root" \
@@ -65,8 +68,9 @@ project_setup_main() (
 
 	case "$project_setup_operation" in
 	workspace-link)
-		project_setup_workspace_link "$project_setup_root" \
+		project_setup_workspace_links "$project_setup_root" \
 			"$project_setup_workspace_target" "$project_setup_workspace_link" \
+			"$project_setup_edit_workspace_target" "$project_setup_edit_workspace_link" \
 			project_setup_link_preflight project_setup_link_replace
 		;;
 	developer-tools)

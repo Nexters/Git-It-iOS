@@ -1,6 +1,6 @@
 # 프로젝트 스크립트 아키텍처
 
-저장소 자동화는 사용자 목적에 따라 `ci`, `project-build`, `project-setup`, `swift-format`, `hook-management`, `script-tests` 여섯 기능 모듈로 나눈다. 기술 종류가 아니라 함께 변경되는 정책과 실패 복구 계약이 기능 경계를 결정한다. `project-setup`은 중앙 JSON에 정의된 Xcode workspace·Claude 심볼릭 링크와 VS Code workspace 초기화를 소유한다. `ci`는 PR 변경 분류와 차단 job 결과 집계를 소유한다. 커밋 컨벤션은 Git이 직접 실행하는 `tools/githooks/commit-msg` 하나가 소유하며 일반 자동화 모듈과 분리한다. `tools/githooks/pre-commit`은 셸 회귀, 포매팅, 일반 빌드와 테스트 컴파일 공개 명령을 순서대로 조합한다. 테스트 실행은 CI나 명시적인 수동 검증에서 수행한다. 정적 검증은 `tools/script-verification` 모듈이 소유한다.
+저장소 자동화는 사용자 목적에 따라 `ci`, `project-build`, `project-setup`, `swift-format`, `hook-management`, `script-tests` 여섯 기능 모듈로 나눈다. 기술 종류가 아니라 함께 변경되는 정책과 실패 복구 계약이 기능 경계를 결정한다. `project-setup`은 중앙 JSON에 정의된 앱·manifest 편집 Xcode workspace 링크, Claude 심볼릭 링크와 VS Code workspace 초기화를 소유한다. `ci`는 PR 변경 분류와 차단 job 결과 집계를 소유한다. 커밋 컨벤션은 Git이 직접 실행하는 `tools/githooks/commit-msg` 하나가 소유하며 일반 자동화 모듈과 분리한다. `tools/githooks/pre-commit`은 셸 회귀, 포매팅, 일반 빌드와 테스트 컴파일 공개 명령을 순서대로 조합한다. 테스트 실행은 CI나 명시적인 수동 검증에서 수행한다. 정적 검증은 `tools/script-verification` 모듈이 소유한다.
 
 ## 계층과 의존 방향
 

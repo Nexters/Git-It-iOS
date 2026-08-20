@@ -5,6 +5,8 @@
   "GIT_IT_TUIST_ROOT": "sources/Tuist",
   "GIT_IT_WORKSPACE_PATH": "sources/GitIt.xcworkspace",
   "GIT_IT_WORKSPACE_LINK_PATH": "GitIt.xcworkspace",
+  "GIT_IT_EDIT_WORKSPACE_PATH": "sources/Manifests.xcworkspace",
+  "GIT_IT_EDIT_WORKSPACE_LINK_PATH": "Edit-Tuist.xcworkspace",
   "GIT_IT_DERIVED_DATA_PATH": "sources/DerivedData/PreCommit",
   "GIT_IT_SWIFT_STYLE_ROOT": "tools/swift-style",
   "GIT_IT_HOOKS_ROOT": "tools/githooks",

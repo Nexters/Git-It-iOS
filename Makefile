@@ -14,15 +14,15 @@ PROJECT_SETUP_RUNNER := $(shell $(PATHS_SH) GIT_IT_PROJECT_SETUP_RUNNER)
 help: ## 사용 가능한 명령을 표시합니다
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  make %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-init: tuist hooks ## Tuist·Git 훅·에이전트 링크·VS Code workspace를 초기화합니다
+init: tuist hooks ## Tuist 앱·편집 workspace, Git 훅과 개발 도구를 초기화합니다
 	$(PROJECT_SETUP_RUNNER) developer-tools
 
-tuist: ## iOS 프로젝트의 Tuist package를 설치·생성하고 루트에 워크스페이스 심볼릭 링크를 만듭니다
-	cd $(IOS_ROOT) && tuist install && tuist generate
+tuist: ## Tuist package와 앱·manifest 편집 workspace를 생성합니다
+	cd "$(IOS_ROOT)" && tuist install && tuist generate && tuist edit --permanent
 	$(PROJECT_SETUP_RUNNER) workspace-link
 
 clean: ## Tuist의 로컬 캐시와 아티팩트를 정리합니다
-	cd $(IOS_ROOT) && tuist clean
+	cd "$(IOS_ROOT)" && tuist clean
 
 hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh
