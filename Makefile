@@ -5,8 +5,7 @@ PATHS_SH := ./tools/repository-paths/bin/repository-paths.sh
 IOS_ROOT := $(shell $(PATHS_SH) GIT_IT_IOS_ROOT)
 HOOKS_ROOT := $(shell $(PATHS_SH) GIT_IT_HOOKS_ROOT)
 SWIFT_FORMAT_RUNNER := $(shell $(PATHS_SH) GIT_IT_SWIFT_FORMAT_RUNNER)
-WORKSPACE_PATH := $(shell $(PATHS_SH) GIT_IT_WORKSPACE_PATH)
-WORKSPACE_NAME := $(notdir $(WORKSPACE_PATH))
+PROJECT_SETUP_RUNNER := $(shell $(PATHS_SH) GIT_IT_PROJECT_SETUP_RUNNER)
 
 .DEFAULT_GOAL := help
 
@@ -15,12 +14,12 @@ WORKSPACE_NAME := $(notdir $(WORKSPACE_PATH))
 help: ## 사용 가능한 명령을 표시합니다
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  make %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-init: tuist hooks ## Tuist 프로젝트 생성과 Git 훅 설치를 함께 실행합니다
+init: tuist hooks ## Tuist·Git 훅·에이전트 링크·VS Code workspace를 초기화합니다
+	$(PROJECT_SETUP_RUNNER) developer-tools
 
 tuist: ## iOS 프로젝트의 Tuist package를 설치·생성하고 루트에 워크스페이스 심볼릭 링크를 만듭니다
 	cd $(IOS_ROOT) && tuist install && tuist generate
-	rm -rf $(WORKSPACE_NAME)
-	ln -s $(WORKSPACE_PATH) $(WORKSPACE_NAME)
+	$(PROJECT_SETUP_RUNNER) workspace-link
 
 clean: ## Tuist의 로컬 캐시와 아티팩트를 정리합니다
 	cd $(IOS_ROOT) && tuist clean
