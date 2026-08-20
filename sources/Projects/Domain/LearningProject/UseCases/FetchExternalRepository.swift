@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FetchExternalRepository: Sendable {
+public struct FetchExternalRepository: FetchExternalRepositoryUseCase {
 
     // MARK: Lifecycle
 

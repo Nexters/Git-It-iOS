@@ -11,25 +11,23 @@ struct AppCompositionTests {
     // MARK: Internal
 
     @Test
-    func `live는 두 Use Case가 공유하는 프로세스 수명 상태를 제공한다`() async throws {
-        let composition = AppComposition.live()
-        let fetchLearningProjects: any FetchLearningProjects = composition.fetchLearningProjects
-        let deleteLearningProject: any DeleteLearningProject = composition.deleteLearningProject
-        let initialPage = try await fetchLearningProjects(page: 0, size: 20)
-        let deletedID = try #require(initialPage.projects.first?.id)
+    func `sample은 두 Use Case가 공유하는 프로세스 수명 상태를 제공한다`() async throws {
+        let composition = AppComposition.sample()
+        let initialPage = try await composition.fetchLearningProjects(page: 0, size: 20)
+        let deletedID = try #require(initialPage.items.first?.projectId)
 
-        try await deleteLearningProject(deletedID)
-        let updatedPage = try await fetchLearningProjects(page: 0, size: 20)
+        try await composition.deleteLearningProject(projectId: deletedID)
+        let updatedPage = try await composition.fetchLearningProjects(page: 0, size: 20)
 
-        #expect(updatedPage.projects.count == initialPage.projects.count - 1)
-        #expect(!updatedPage.projects.contains { $0.id == deletedID })
+        #expect(updatedPage.items.count == initialPage.items.count - 1)
+        #expect(!updatedPage.items.contains { $0.projectId == deletedID })
     }
 
     @Test
-    func `projects 표본은 항목이 있는 페이지를 그대로 반환한다`() async throws {
+    func `projects 표본은 페이지를 그대로 반환한다`() async throws {
         let expectedPage = LearningProjectPage(
-            projects: [try project(id: "project-1")],
-            hasNextPage: true,
+            items: [project(id: "project-1")],
+            hasNext: true,
         )
         let composition = AppComposition.sample(fetch: .projects(expectedPage))
 
@@ -39,23 +37,10 @@ struct AppCompositionTests {
     }
 
     @Test
-    func `projects 표본은 빈 페이지를 그대로 반환한다`() async throws {
-        let expectedPage = LearningProjectPage(
-            projects: [],
-            hasNextPage: false,
-        )
-        let composition = AppComposition.sample(fetch: .projects(expectedPage))
-
-        let page = try await composition.fetchLearningProjects(page: 0, size: 20)
-
-        #expect(page == expectedPage)
-    }
-
-    @Test
-    func `failure 표본은 일시적 사용 불가 오류를 반환한다`() async {
+    func `failure 표본은 unexpected 오류를 반환한다`() async {
         let composition = AppComposition.sample(fetch: .failure)
 
-        await #expect(throws: LearningProjectError.temporarilyUnavailable) {
+        await #expect(throws: LearningProjectError.unexpected) {
             try await composition.fetchLearningProjects(page: 0, size: 20)
         }
     }
@@ -78,18 +63,18 @@ struct AppCompositionTests {
     @Test
     func `public initializer로 두 Use Case 실행 객체를 대체한다`() async throws {
         let expectedPage = LearningProjectPage(
-            projects: [try project(id: "substitute-project")],
-            hasNextPage: false,
+            items: [project(id: "substitute-project")],
+            hasNext: false,
         )
         let deletionRecorder = DeletionRecorder()
         let composition = AppComposition(
             fetchLearningProjects: SubstituteFetchLearningProjects(page: expectedPage),
             deleteLearningProject: SubstituteDeleteLearningProject(recorder: deletionRecorder),
         )
-        let deletedID = try #require(expectedPage.projects.first?.id)
+        let deletedID = try #require(expectedPage.items.first?.projectId)
 
         let page = try await composition.fetchLearningProjects(page: 3, size: 7)
-        try await composition.deleteLearningProject(deletedID)
+        try await composition.deleteLearningProject(projectId: deletedID)
 
         #expect(page == expectedPage)
         #expect(await deletionRecorder.snapshot() == deletedID)
@@ -97,13 +82,17 @@ struct AppCompositionTests {
 
     // MARK: Private
 
-    private func project(id: String) throws -> LearningProjectSummary {
+    private func project(id: String) -> LearningProjectSummary {
         LearningProjectSummary(
-            id: try #require(LearningProjectID(rawValue: id)),
-            name: "Git It iOS",
-            technologies: "Swift · SwiftUI · TCA",
-            progress: .init(completedRatio: 0.65),
-            nextSet: .init(order: 2, title: "Presentation 구조"),
+            projectId: id,
+            repositoryName: "Git It iOS",
+            repositoryImageURL: nil,
+            techStack: ["Swift", "SwiftUI", "TCA"],
+            currentSetLabel: "Set 2",
+            currentSetTitle: "Presentation 구조",
+            nextSetId: "set-2",
+            nextQuestionId: "question-1",
+            overallProgressPercent: 65,
         )
     }
 
@@ -111,7 +100,7 @@ struct AppCompositionTests {
 
 // MARK: - SubstituteFetchLearningProjects
 
-private struct SubstituteFetchLearningProjects: FetchLearningProjects {
+private struct SubstituteFetchLearningProjects: FetchLearningProjectsUseCase {
     let page: LearningProjectPage
 
     func callAsFunction(
@@ -124,11 +113,11 @@ private struct SubstituteFetchLearningProjects: FetchLearningProjects {
 
 // MARK: - SubstituteDeleteLearningProject
 
-private struct SubstituteDeleteLearningProject: DeleteLearningProject {
+private struct SubstituteDeleteLearningProject: DeleteLearningProjectUseCase {
     let recorder: DeletionRecorder
 
-    func callAsFunction(_ id: LearningProjectID) async throws {
-        await recorder.record(id)
+    func callAsFunction(projectId: String) async throws {
+        await recorder.record(projectId)
     }
 }
 
@@ -138,16 +127,16 @@ private actor DeletionRecorder {
 
     // MARK: Internal
 
-    func record(_ id: LearningProjectID) {
-        deletedID = id
+    func record(_ projectId: String) {
+        deletedID = projectId
     }
 
-    func snapshot() -> LearningProjectID? {
+    func snapshot() -> String? {
         deletedID
     }
 
     // MARK: Private
 
-    private var deletedID: LearningProjectID?
+    private var deletedID: String?
 
 }

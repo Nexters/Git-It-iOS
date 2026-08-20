@@ -1,4 +1,3 @@
-import DataAuthentication
 import DataLearningProject
 import InfrastructureNetworkClient
 
@@ -8,17 +7,17 @@ public struct LearningProjectRemoteAdapter: LearningProjectRemote {
 
     public init(
         httpClient: HTTPClient,
-        sessionStorage: LoginSessionStorage,
+        accessToken: @escaping @Sendable () async -> String?,
     ) {
         self.httpClient = httpClient
-        self.sessionStorage = sessionStorage
+        self.accessToken = accessToken
     }
 
     // MARK: Public
 
     public func registerProject(_ request: RegisterProjectRequestDTO) async throws -> RegisterProjectResponseDTO {
         try await send(
-            HTTPRequest(method: .post, path: "/api/v1/projects", headers: try await authorizationHeaders()),
+            HTTPRequest(method: .post, path: "/api/v1/projects", headers: await authorizationHeaders()),
             body: request,
             expecting: RegisterProjectResponseDTO.self,
         )
@@ -36,7 +35,7 @@ public struct LearningProjectRemoteAdapter: LearningProjectRemote {
                     HTTPRequest.QueryItem(name: "page", value: String(page)),
                     HTTPRequest.QueryItem(name: "size", value: String(size)),
                 ],
-                headers: try await authorizationHeaders(),
+                headers: await authorizationHeaders(),
             ),
             expecting: ProjectListResponseDTO.self,
         )
@@ -47,7 +46,7 @@ public struct LearningProjectRemoteAdapter: LearningProjectRemote {
             HTTPRequest(
                 method: .get,
                 path: "/api/v1/projects/\(projectId)",
-                headers: try await authorizationHeaders(),
+                headers: await authorizationHeaders(),
             ),
             expecting: ProjectDetailResponseDTO.self,
         )
@@ -57,7 +56,7 @@ public struct LearningProjectRemoteAdapter: LearningProjectRemote {
         let request = HTTPRequest(
             method: .delete,
             path: "/api/v1/projects/\(projectId)",
-            headers: try await authorizationHeaders(),
+            headers: await authorizationHeaders(),
         )
         let response: HTTPResponse<APIEnvelope<EmptyPayload>>
 
@@ -85,10 +84,10 @@ public struct LearningProjectRemoteAdapter: LearningProjectRemote {
     private struct EmptyPayload: Decodable, Sendable { }
 
     private let httpClient: HTTPClient
-    private let sessionStorage: LoginSessionStorage
+    private let accessToken: @Sendable () async -> String?
 
-    private func authorizationHeaders() async throws -> HTTPHeaders {
-        guard let accessToken = try? await sessionStorage.load()?.accessToken
+    private func authorizationHeaders() async -> HTTPHeaders {
+        guard let accessToken = await accessToken()
         else {
             return [:]
         }

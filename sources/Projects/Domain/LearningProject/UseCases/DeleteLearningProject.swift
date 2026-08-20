@@ -1,3 +1,19 @@
-public protocol DeleteLearningProject: Sendable {
-    func callAsFunction(_ id: LearningProjectID) async throws
+public struct DeleteLearningProject: DeleteLearningProjectUseCase {
+
+    // MARK: Lifecycle
+
+    public init(repository: LearningProjectRepository) {
+        self.repository = repository
+    }
+
+    // MARK: Public
+
+    public func callAsFunction(projectId: String) async throws {
+        try await repository.deleteProject(projectId: projectId)
+    }
+
+    // MARK: Private
+
+    private let repository: LearningProjectRepository
+
 }

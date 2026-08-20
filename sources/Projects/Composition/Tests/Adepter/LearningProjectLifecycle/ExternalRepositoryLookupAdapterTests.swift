@@ -1,6 +1,6 @@
 import Testing
 
-@testable import Composition
+@testable import CompositionAdepter
 @testable import DataLearningProject
 @testable import DomainLearningProject
 

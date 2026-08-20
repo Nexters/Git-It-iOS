@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-struct SampleFetchLearningProjects: FetchLearningProjects {
+struct SampleFetchLearningProjects: FetchLearningProjectsUseCase {
     init(store: SampleLearningProjectStore) {
         self.store = store
     }

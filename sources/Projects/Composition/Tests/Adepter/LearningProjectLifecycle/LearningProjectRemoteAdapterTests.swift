@@ -1,8 +1,7 @@
-import DataAuthentication
 import Foundation
 import Testing
 
-@testable import Composition
+@testable import CompositionAdepter
 @testable import DataLearningProject
 @testable import InfrastructureNetworkClient
 
@@ -17,7 +16,7 @@ struct LearningProjectRemoteAdapterTests {
             """
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.response(makeResponse(200, json))),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         let dto = try await adapter.registerProject(
@@ -35,7 +34,7 @@ struct LearningProjectRemoteAdapterTests {
             """
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.response(makeResponse(200, json))),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         let dto = try await adapter.fetchProjects(page: 0, size: 10)
@@ -51,7 +50,7 @@ struct LearningProjectRemoteAdapterTests {
             """
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.response(makeResponse(200, json))),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         let dto = try await adapter.fetchProjectDetail(projectId: "project-1")
@@ -67,7 +66,7 @@ struct LearningProjectRemoteAdapterTests {
             """
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.response(makeResponse(200, json))),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         try await adapter.deleteProject(projectId: "project-1")
@@ -85,7 +84,7 @@ struct LearningProjectRemoteAdapterTests {
             """
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.response(makeResponse(statusCode, json))),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         await #expect(throws: expected) {
@@ -97,7 +96,7 @@ struct LearningProjectRemoteAdapterTests {
     func `HTTPClientError는 unexpected로 매핑된다`() async throws {
         let adapter = makeAdapter(
             transport: FakeHTTPTransport(.failure(.connectionFailed)),
-            sessionStorage: FakeLoginSessionStorage(.noSession),
+            accessToken: nil,
         )
 
         await #expect(throws: DataLearningProjectError.unexpected) {
@@ -110,13 +109,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(200, """
             {"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}
             """)))
-        let session = StoredLoginSession(
-            accessToken: "access-token-123",
-            refreshToken: "refresh-token",
-            accessExpiresAt: Date(timeIntervalSince1970: 100),
-            user: LoginSessionResponseDTO.User(id: "user-1", availability: .available, displayName: nil),
-        )
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.hasSession(session)))
+        let adapter = makeAdapter(transport: transport, accessToken: "access-token-123")
 
         _ = try await adapter.fetchProjects(page: 0, size: 10)
 
@@ -129,7 +122,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(401, """
             {"success":false,"data":null,"code":"COMMON-002","message":"인증이 필요합니다","errors":null}
             """)))
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.noSession))
+        let adapter = makeAdapter(transport: transport, accessToken: nil)
 
         await #expect(throws: DataLearningProjectError.unauthorized) {
             try await adapter.fetchProjects(page: 0, size: 10)
@@ -144,7 +137,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(200, """
             {"success":true,"data":{"projectId":"project-1","status":"READY"},"code":null,"message":null,"errors":null}
             """)))
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.noSession))
+        let adapter = makeAdapter(transport: transport, accessToken: nil)
         let request = RegisterProjectRequestDTO(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l2)
 
         _ = try await adapter.registerProject(request)
@@ -161,7 +154,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(200, """
             {"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}
             """)))
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.noSession))
+        let adapter = makeAdapter(transport: transport, accessToken: nil)
 
         _ = try await adapter.fetchProjects(page: 2, size: 20)
 
@@ -175,7 +168,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(200, """
             {"success":true,"data":{"projectId":"project-1","repositoryUrl":"u","repositoryName":"n","repositoryImageUrl":null,"starCount":0,"techStack":[],"overallProgressPercent":0,"nextQuestionId":null,"sets":[]},"code":null,"message":null,"errors":null}
             """)))
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.noSession))
+        let adapter = makeAdapter(transport: transport, accessToken: nil)
 
         _ = try await adapter.fetchProjectDetail(projectId: "project-1")
 
@@ -189,7 +182,7 @@ struct LearningProjectRemoteAdapterTests {
         let transport = FakeHTTPTransport(.response(makeResponse(200, """
             {"success":true,"data":null,"code":null,"message":null,"errors":null}
             """)))
-        let adapter = makeAdapter(transport: transport, sessionStorage: FakeLoginSessionStorage(.noSession))
+        let adapter = makeAdapter(transport: transport, accessToken: nil)
 
         try await adapter.deleteProject(projectId: "project-1")
 
@@ -202,7 +195,7 @@ struct LearningProjectRemoteAdapterTests {
 extension LearningProjectRemoteAdapterTests {
     private func makeAdapter(
         transport: FakeHTTPTransport,
-        sessionStorage: FakeLoginSessionStorage,
+        accessToken: String?,
     ) -> LearningProjectRemoteAdapter {
         LearningProjectRemoteAdapter(
             httpClient: HTTPClient(
@@ -210,7 +203,7 @@ extension LearningProjectRemoteAdapterTests {
                 bodyCoding: JSONHTTPBodyCoding(),
                 transport: transport,
             ),
-            sessionStorage: sessionStorage,
+            accessToken: { accessToken },
         )
     }
 
@@ -220,41 +213,4 @@ extension LearningProjectRemoteAdapterTests {
     ) -> HTTPTransportResponse {
         HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(json.utf8))
     }
-}
-
-// MARK: - FakeLoginSessionStorage
-
-actor FakeLoginSessionStorage: LoginSessionStorage {
-
-    // MARK: Lifecycle
-
-    init(_ behavior: Behavior) {
-        self.behavior = behavior
-    }
-
-    // MARK: Internal
-
-    enum Behavior: Sendable {
-        case hasSession(StoredLoginSession)
-        case noSession
-    }
-
-    func save(_: StoredLoginSession) async throws { }
-
-    func load() async throws -> StoredLoginSession? {
-        switch behavior {
-        case .hasSession(let session):
-            session
-
-        case .noSession:
-            nil
-        }
-    }
-
-    func delete() async throws { }
-
-    // MARK: Private
-
-    private let behavior: Behavior
-
 }

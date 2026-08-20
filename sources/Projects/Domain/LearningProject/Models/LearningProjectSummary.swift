@@ -1,21 +1,39 @@
-public struct LearningProjectSummary: Identifiable, Sendable, Equatable {
+public struct LearningProjectSummary: Equatable, Sendable {
+
+    // MARK: Lifecycle
+
     public init(
-        id: LearningProjectID,
-        name: String,
-        technologies: String,
-        progress: LearningProgress,
-        nextSet: LearningSetMark,
+        projectId: String,
+        repositoryName: String,
+        repositoryImageURL: String?,
+        techStack: [String],
+        currentSetLabel: String,
+        currentSetTitle: String,
+        nextSetId: String,
+        nextQuestionId: String,
+        overallProgressPercent: Int,
     ) {
-        self.id = id
-        self.name = name
-        self.technologies = technologies
-        self.progress = progress
-        self.nextSet = nextSet
+        self.projectId = projectId
+        self.repositoryName = repositoryName
+        self.repositoryImageURL = repositoryImageURL
+        self.techStack = techStack
+        self.currentSetLabel = currentSetLabel
+        self.currentSetTitle = currentSetTitle
+        self.nextSetId = nextSetId
+        self.nextQuestionId = nextQuestionId
+        self.overallProgressPercent = overallProgressPercent
     }
 
-    public let id: LearningProjectID
-    public let name: String
-    public let technologies: String
-    public let progress: LearningProgress
-    public let nextSet: LearningSetMark
+    // MARK: Public
+
+    public let projectId: String
+    public let repositoryName: String
+    public let repositoryImageURL: String?
+    public let techStack: [String]
+    public let currentSetLabel: String
+    public let currentSetTitle: String
+    public let nextSetId: String
+    public let nextQuestionId: String
+    public let overallProgressPercent: Int
+
 }

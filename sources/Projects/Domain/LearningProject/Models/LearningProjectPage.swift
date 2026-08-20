@@ -1,12 +1,12 @@
-public struct LearningProjectPage: Sendable, Equatable {
+public struct LearningProjectPage: Equatable, Sendable {
     public init(
-        projects: [LearningProjectSummary],
-        hasNextPage: Bool,
+        items: [LearningProjectSummary],
+        hasNext: Bool,
     ) {
-        self.projects = projects
-        self.hasNextPage = hasNextPage
+        self.items = items
+        self.hasNext = hasNext
     }
 
-    public let projects: [LearningProjectSummary]
-    public let hasNextPage: Bool
+    public let items: [LearningProjectSummary]
+    public let hasNext: Bool
 }

@@ -16,16 +16,16 @@ actor SampleLearningProjectStore {
         currentPage
     }
 
-    func delete(_ id: LearningProjectID) throws {
-        guard let index = currentPage.projects.firstIndex(where: { $0.id == id }) else {
-            throw LearningProjectError.projectUnavailable
+    func delete(projectId: String) throws {
+        guard let index = currentPage.items.firstIndex(where: { $0.projectId == projectId }) else {
+            throw LearningProjectError.notFound
         }
 
-        var projects = currentPage.projects
-        projects.remove(at: index)
+        var items = currentPage.items
+        items.remove(at: index)
         currentPage = LearningProjectPage(
-            projects: projects,
-            hasNextPage: currentPage.hasNextPage,
+            items: items,
+            hasNext: currentPage.hasNext,
         )
     }
 

@@ -1,4 +1,6 @@
 import DomainLearningProject
+import Foundation
+import InfrastructureNetworkClient
 
 // MARK: - AppComposition
 
@@ -7,8 +9,8 @@ public struct AppComposition: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjects: any FetchLearningProjects,
-        deleteLearningProject: any DeleteLearningProject,
+        fetchLearningProjects: any FetchLearningProjectsUseCase,
+        deleteLearningProject: any DeleteLearningProjectUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -22,16 +24,29 @@ public struct AppComposition: Sendable {
         case pending
     }
 
-    public let fetchLearningProjects: any FetchLearningProjects
-    public let deleteLearningProject: any DeleteLearningProject
+    public let fetchLearningProjects: any FetchLearningProjectsUseCase
+    public let deleteLearningProject: any DeleteLearningProjectUseCase
 
-    public static func live() -> Self {
-        let store = SampleLearningProjectStore(initialPage: livePage())
+    public static func live(
+        serverBaseURL: URL,
+        accessToken: @escaping @Sendable () async -> String?,
+    ) -> Self {
+        let bodyCoding = JSONBodyCodingAdapter()
+        let serverClient = HTTPClient(baseURL: serverBaseURL, bodyCoding: bodyCoding)
+        let remote = LearningProjectRemoteAdapter(
+            httpClient: serverClient,
+            accessToken: accessToken,
+        )
+        let repository = LearningProjectRepositoryAdapter(remote: remote)
 
         return Self(
-            fetchLearningProjects: SampleFetchLearningProjects(store: store),
-            deleteLearningProject: SampleDeleteLearningProject(store: store),
+            fetchLearningProjects: FetchLearningProjects(repository: repository),
+            deleteLearningProject: DeleteLearningProject(repository: repository),
         )
+    }
+
+    public static func sample() -> Self {
+        sample(fetch: .projects(samplePage()))
     }
 
     public static func sample(fetch behavior: SampleFetchBehavior) -> Self {
@@ -61,29 +76,29 @@ public struct AppComposition: Sendable {
 
     // MARK: Private
 
-    private static func livePage() -> LearningProjectPage {
-        guard let projectID = LearningProjectID(rawValue: "git-it-ios") else {
-            preconditionFailure("기본 학습 프로젝트 식별자는 비어 있지 않아야 합니다.")
-        }
-
-        return LearningProjectPage(
-            projects: [
+    private static func samplePage() -> LearningProjectPage {
+        LearningProjectPage(
+            items: [
                 LearningProjectSummary(
-                    id: projectID,
-                    name: "Git It iOS",
-                    technologies: "Swift · SwiftUI · TCA",
-                    progress: .init(completedRatio: 0.65),
-                    nextSet: .init(order: 2, title: "Presentation 구조"),
+                    projectId: "git-it-ios",
+                    repositoryName: "Git It iOS",
+                    repositoryImageURL: nil,
+                    techStack: ["Swift", "SwiftUI", "TCA"],
+                    currentSetLabel: "Set 2",
+                    currentSetTitle: "Presentation 구조",
+                    nextSetId: "set-2",
+                    nextQuestionId: "question-1",
+                    overallProgressPercent: 65,
                 )
             ],
-            hasNextPage: false,
+            hasNext: false,
         )
     }
 
     private static func emptyPage() -> LearningProjectPage {
         LearningProjectPage(
-            projects: [],
-            hasNextPage: false,
+            items: [],
+            hasNext: false,
         )
     }
 
@@ -91,18 +106,18 @@ public struct AppComposition: Sendable {
 
 // MARK: - FailingFetchLearningProjects
 
-private struct FailingFetchLearningProjects: FetchLearningProjects {
+private struct FailingFetchLearningProjects: FetchLearningProjectsUseCase {
     func callAsFunction(
         page _: Int,
         size _: Int,
     ) async throws -> LearningProjectPage {
-        throw LearningProjectError.temporarilyUnavailable
+        throw LearningProjectError.unexpected
     }
 }
 
 // MARK: - PendingFetchLearningProjects
 
-private struct PendingFetchLearningProjects: FetchLearningProjects {
+private struct PendingFetchLearningProjects: FetchLearningProjectsUseCase {
     func callAsFunction(
         page _: Int,
         size _: Int,

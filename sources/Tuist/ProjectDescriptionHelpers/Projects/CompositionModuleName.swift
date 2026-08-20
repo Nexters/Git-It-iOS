@@ -25,10 +25,6 @@ extension CompositionModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainLearningProject),
-                    .fromData(.DataAuthentication),
-                    .fromInfrastructure(.InfrastructureAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataLearningProject),
                     .fromInfrastructure(.InfrastructureNetworkClient),
@@ -43,10 +39,6 @@ extension CompositionModuleName {
                     name: CompositionModuleName.CompositionAdepter.rawValue
                 ),
                 additionalDependencies: [
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainLearningProject),
-                    .fromData(.DataAuthentication),
-                    .fromInfrastructure(.InfrastructureAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataLearningProject),
                     .fromInfrastructure(.InfrastructureNetworkClient),

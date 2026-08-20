@@ -1,4 +1,4 @@
-public struct FetchLearningProjectDetail: Sendable {
+public struct FetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
 
     // MARK: Lifecycle
 

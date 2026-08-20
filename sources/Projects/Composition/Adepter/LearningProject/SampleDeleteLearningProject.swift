@@ -1,12 +1,12 @@
 import DomainLearningProject
 
-struct SampleDeleteLearningProject: DeleteLearningProject {
+struct SampleDeleteLearningProject: DeleteLearningProjectUseCase {
     init(store: SampleLearningProjectStore) {
         self.store = store
     }
 
-    func callAsFunction(_ id: LearningProjectID) async throws {
-        try await store.delete(id)
+    func callAsFunction(projectId: String) async throws {
+        try await store.delete(projectId: projectId)
     }
 
     private let store: SampleLearningProjectStore
