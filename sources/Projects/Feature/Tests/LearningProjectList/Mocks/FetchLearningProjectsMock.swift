@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor FetchLearningProjectsMock: FetchLearningProjects {
+actor FetchLearningProjectsMock: FetchLearningProjectsUseCase {
 
     // MARK: Lifecycle
 

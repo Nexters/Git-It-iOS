@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor DeleteLearningProjectMock: DeleteLearningProject {
+actor DeleteLearningProjectMock: DeleteLearningProjectUseCase {
 
     // MARK: Lifecycle
 
@@ -24,8 +24,8 @@ actor DeleteLearningProjectMock: DeleteLearningProject {
         case pending
     }
 
-    func callAsFunction(_ id: LearningProjectID) async throws {
-        projectIDs.append(id)
+    func callAsFunction(projectId: String) async throws {
+        projectIDs.append(projectId)
 
         switch behavior {
         case .result(.success):
@@ -59,14 +59,14 @@ actor DeleteLearningProjectMock: DeleteLearningProject {
         }
     }
 
-    func snapshot() -> [LearningProjectID] {
+    func snapshot() -> [String] {
         projectIDs
     }
 
     // MARK: Private
 
     private var behavior: Behavior
-    private var projectIDs = [LearningProjectID]()
+    private var projectIDs = [String]()
     private let pendingStream: AsyncThrowingStream<Void, Error>?
     private let pendingContinuation: AsyncThrowingStream<Void, Error>.Continuation?
 

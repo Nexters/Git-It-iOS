@@ -13,11 +13,11 @@ struct LearningProjectListDependencyIsolationTests {
     // MARK: Internal
 
     @Test
-    func `다른 Protocol 구현을 주입해도 조회 상태 전이와 입력 검증이 유지된다`() async throws {
-        let project = try makeProject(id: "alternate-project")
+    func `다른 Protocol 구현을 주입해도 조회 상태 전이와 입력 검증이 유지된다`() async {
+        let project = makeProject(id: "alternate-project")
         let page = LearningProjectPage(
-            projects: [project],
-            hasNextPage: true,
+            items: [project],
+            hasNext: true,
         )
         let fetchProjects = AlternateFetchLearningProjects(page: page)
         let store = TestStore(initialState: LearningProjectListFeature.State()) {
@@ -31,7 +31,7 @@ struct LearningProjectListDependencyIsolationTests {
             $0.loadState = .loading
         }
         await store.receive(\.projectsResponse) {
-            $0.projects = .init(uniqueElements: [project])
+            $0.projects = [project]
             $0.loadState = .loaded
         }
 
@@ -39,20 +39,20 @@ struct LearningProjectListDependencyIsolationTests {
     }
 
     @Test
-    func `다른 Protocol 구현을 주입해도 삭제 상태 전이와 식별자 검증이 유지된다`() async throws {
-        let project = try makeProject(id: "alternate-project")
+    func `다른 Protocol 구현을 주입해도 삭제 상태 전이와 식별자 검증이 유지된다`() async {
+        let project = makeProject(id: "alternate-project")
         let deleteProjects = AlternateDeleteLearningProject()
         let store = TestStore(
             initialState: LearningProjectListFeature.State(
-                projects: .init(uniqueElements: [project]),
+                projects: [project],
                 loadState: .loaded,
                 isDeleteMode: true,
-                pendingDeletion: project.id,
+                pendingDeletion: project.projectId,
             )
         ) {
             LearningProjectListFeature(
                 fetchLearningProjects: AlternateFetchLearningProjects(
-                    page: .init(projects: [project], hasNextPage: false)
+                    page: .init(items: [project], hasNext: false)
                 ),
                 deleteLearningProject: deleteProjects,
             )
@@ -60,23 +60,27 @@ struct LearningProjectListDependencyIsolationTests {
 
         await store.send(.deletionConfirmed)
         await store.receive(\.deletionResponse) {
-            $0.projects.remove(id: project.id)
+            $0.projects.removeAll { $0.projectId == project.projectId }
             $0.pendingDeletion = nil
             $0.isDeleteMode = false
         }
 
-        #expect(await deleteProjects.snapshot() == [project.id])
+        #expect(await deleteProjects.snapshot() == [project.projectId])
     }
 
     // MARK: Private
 
-    private func makeProject(id: String) throws -> LearningProjectSummary {
+    private func makeProject(id: String) -> LearningProjectSummary {
         LearningProjectSummary(
-            id: try #require(LearningProjectID(rawValue: id)),
-            name: "대체 구현 프로젝트",
-            technologies: "Swift",
-            progress: .init(completedRatio: 0.5),
-            nextSet: .init(order: 1, title: "의존성 격리"),
+            projectId: id,
+            repositoryName: "대체 구현 프로젝트",
+            repositoryImageURL: nil,
+            techStack: ["Swift"],
+            currentSetLabel: "Set 1",
+            currentSetTitle: "의존성 격리",
+            nextSetId: "set-1",
+            nextQuestionId: "question-1",
+            overallProgressPercent: 50,
         )
     }
 
@@ -84,7 +88,7 @@ struct LearningProjectListDependencyIsolationTests {
 
 // MARK: - AlternateFetchLearningProjects
 
-private actor AlternateFetchLearningProjects: FetchLearningProjects {
+private actor AlternateFetchLearningProjects: FetchLearningProjectsUseCase {
 
     // MARK: Lifecycle
 
@@ -120,20 +124,20 @@ private actor AlternateFetchLearningProjects: FetchLearningProjects {
 
 // MARK: - AlternateDeleteLearningProject
 
-private actor AlternateDeleteLearningProject: DeleteLearningProject {
+private actor AlternateDeleteLearningProject: DeleteLearningProjectUseCase {
 
     // MARK: Internal
 
-    func callAsFunction(_ id: LearningProjectID) async throws {
-        projectIDs.append(id)
+    func callAsFunction(projectId: String) async throws {
+        projectIDs.append(projectId)
     }
 
-    func snapshot() -> [LearningProjectID] {
+    func snapshot() -> [String] {
         projectIDs
     }
 
     // MARK: Private
 
-    private var projectIDs = [LearningProjectID]()
+    private var projectIDs = [String]()
 
 }

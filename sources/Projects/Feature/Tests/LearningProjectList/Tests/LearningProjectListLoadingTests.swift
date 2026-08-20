@@ -11,11 +11,11 @@ struct LearningProjectListLoadingTests {
     // MARK: Internal
 
     @Test
-    func `최초 화면 진입은 목록을 한 번만 조회해 loaded로 전이한다`() async throws {
-        let project = try makeProject(id: "project-1")
+    func `최초 화면 진입은 목록을 한 번만 조회해 loaded로 전이한다`() async {
+        let project = makeProject(id: "project-1")
         let page = LearningProjectPage(
-            projects: [project],
-            hasNextPage: false,
+            items: [project],
+            hasNext: false,
         )
         let fetchProjects = FetchLearningProjectsMock(
             behavior: .result(.success(page))
@@ -31,7 +31,7 @@ struct LearningProjectListLoadingTests {
             $0.loadState = .loading
         }
         await store.receive(\.projectsResponse) {
-            $0.projects = .init(uniqueElements: [project])
+            $0.projects = [project]
             $0.loadState = .loaded
         }
         await store.send(.onAppear)
@@ -61,8 +61,8 @@ struct LearningProjectListLoadingTests {
     @Test
     func `빈 페이지는 loaded와 빈 상태를 함께 표현한다`() async {
         let page = LearningProjectPage(
-            projects: [],
-            hasNextPage: false,
+            items: [],
+            hasNext: false,
         )
         let fetchProjects = FetchLearningProjectsMock(
             behavior: .result(.success(page))
@@ -85,14 +85,14 @@ struct LearningProjectListLoadingTests {
     }
 
     @Test
-    func `조회 실패 뒤 재시도는 loading으로 돌아가 같은 입력으로 다시 조회한다`() async throws {
-        let project = try makeProject(id: "retry-project")
+    func `조회 실패 뒤 재시도는 loading으로 돌아가 같은 입력으로 다시 조회한다`() async {
+        let project = makeProject(id: "retry-project")
         let recoveredPage = LearningProjectPage(
-            projects: [project],
-            hasNextPage: false,
+            items: [project],
+            hasNext: false,
         )
         let fetchProjects = FetchLearningProjectsMock(
-            behavior: .result(.failure(.temporarilyUnavailable))
+            behavior: .result(.failure(.unexpected))
         )
         let store = TestStore(initialState: LearningProjectListFeature.State()) {
             LearningProjectListFeature(
@@ -113,7 +113,7 @@ struct LearningProjectListLoadingTests {
             $0.loadState = .loading
         }
         await store.receive(\.projectsResponse) {
-            $0.projects = .init(uniqueElements: [project])
+            $0.projects = [project]
             $0.loadState = .loaded
         }
 
@@ -129,13 +129,17 @@ struct LearningProjectListLoadingTests {
         DeleteLearningProjectMock(behavior: .result(.success(())))
     }
 
-    private func makeProject(id: String) throws -> LearningProjectSummary {
+    private func makeProject(id: String) -> LearningProjectSummary {
         LearningProjectSummary(
-            id: try #require(LearningProjectID(rawValue: id)),
-            name: "Git It iOS",
-            technologies: "Swift · SwiftUI · TCA",
-            progress: .init(completedRatio: 0.65),
-            nextSet: .init(order: 2, title: "Presentation 구조"),
+            projectId: id,
+            repositoryName: "Git It iOS",
+            repositoryImageURL: nil,
+            techStack: ["Swift", "SwiftUI", "TCA"],
+            currentSetLabel: "Set 2",
+            currentSetTitle: "Presentation 구조",
+            nextSetId: "set-2",
+            nextQuestionId: "question-1",
+            overallProgressPercent: 65,
         )
     }
 

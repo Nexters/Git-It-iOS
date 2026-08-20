@@ -129,14 +129,14 @@ public struct LearningProjectListView: View {
     private var projectList: some View {
         ScrollView {
             LazyVStack(spacing: Constant.rowSpacing) {
-                ForEach(store.projects) { project in
+                ForEach(store.projects, id: \.projectId) { project in
                     ProjectRow(
                         viewModel: projectRowViewModel(project),
                         onAccessoryTap: {
                             if store.isDeleteMode {
-                                store.send(.deleteButtonTapped(project.id))
+                                store.send(.deleteButtonTapped(project.projectId))
                             } else {
-                                store.send(.learningStartButtonTapped(project.id))
+                                store.send(.learningStartButtonTapped(project.projectId))
                             }
                         },
                     ) {
@@ -147,7 +147,7 @@ public struct LearningProjectListView: View {
                             )
                         )
                     }
-                    .accessibilityIdentifier("project.row.\(project.id.rawValue)")
+                    .accessibilityIdentifier("project.row.\(project.projectId)")
                 }
             }
             .padding(.top, Constant.contentTopInset)
@@ -258,50 +258,61 @@ public struct LearningProjectListView: View {
         _ project: LearningProjectSummary
     ) -> ProjectRow<ResourceImage>.ViewModel {
         .init(
-            name: project.name,
-            supportingText: project.technologies,
-            progress: project.progress.completedRatio,
-            currentSet: project.nextSet.order,
-            setTitle: project.nextSet.title,
+            name: project.repositoryName,
+            supportingText: project.techStack.joined(separator: " · "),
+            progress: Double(max(0, min(100, project.overallProgressPercent))) / 100,
+            currentSet: currentSet(from: project.currentSetLabel),
+            setTitle: project.currentSetTitle,
             isDeleting: store.isDeleteMode,
         )
+    }
+
+    private func currentSet(from label: String) -> Int {
+        label
+            .split(separator: " ")
+            .last
+            .flatMap { Int($0) } ?? 1
     }
 
 }
 
 #if DEBUG
 private enum LearningProjectListPreview {
-    struct FetchProjects: FetchLearningProjects {
+    struct FetchProjects: FetchLearningProjectsUseCase {
         func callAsFunction(
             page _: Int,
             size _: Int,
         ) async throws -> LearningProjectPage {
-            .init(projects: [], hasNextPage: false)
+            .init(items: [], hasNext: false)
         }
     }
 
-    struct DeleteProject: DeleteLearningProject {
-        func callAsFunction(_: LearningProjectID) async throws { }
+    struct DeleteProject: DeleteLearningProjectUseCase {
+        func callAsFunction(projectId _: String) async throws { }
     }
 
-    static let projectID = LearningProjectID(rawValue: "preview-project")!
-    static let projects: IdentifiedArrayOf<LearningProjectSummary> = [
+    static let projectID = "preview-project"
+    static let projects: [LearningProjectSummary] = [
         .init(
-            id: projectID,
-            name: "Git It iOS",
-            technologies: "Swift · SwiftUI · TCA",
-            progress: .init(completedRatio: 0.65),
-            nextSet: .init(order: 2, title: "Presentation 구조"),
+            projectId: projectID,
+            repositoryName: "Git It iOS",
+            repositoryImageURL: nil,
+            techStack: ["Swift", "SwiftUI", "TCA"],
+            currentSetLabel: "Set 2",
+            currentSetTitle: "Presentation 구조",
+            nextSetId: "set-2",
+            nextQuestionId: "question-1",
+            overallProgressPercent: 65,
         )
     ]
 
     @MainActor
     static func view(
         loadState: LearningProjectListFeature.LoadState,
-        projects: IdentifiedArrayOf<LearningProjectSummary> = [],
+        projects: [LearningProjectSummary] = [],
         isMenuPresented: Bool = false,
         isDeleteMode: Bool = false,
-        pendingDeletion: LearningProjectID? = nil,
+        pendingDeletion: String? = nil,
     ) -> some View {
         LearningProjectListView(
             store: Store(

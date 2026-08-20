@@ -7,8 +7,8 @@ public struct LearningProjectListFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjects: any FetchLearningProjects,
-        deleteLearningProject: any DeleteLearningProject,
+        fetchLearningProjects: any FetchLearningProjectsUseCase,
+        deleteLearningProject: any DeleteLearningProjectUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -22,11 +22,11 @@ public struct LearningProjectListFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            projects: IdentifiedArrayOf<LearningProjectSummary> = [],
+            projects: [LearningProjectSummary] = [],
             loadState: LoadState = .idle,
             isMenuPresented: Bool = false,
             isDeleteMode: Bool = false,
-            pendingDeletion: LearningProjectID? = nil,
+            pendingDeletion: String? = nil,
         ) {
             self.projects = projects
             self.loadState = loadState
@@ -37,11 +37,11 @@ public struct LearningProjectListFeature: Sendable {
 
         // MARK: Public
 
-        public var projects: IdentifiedArrayOf<LearningProjectSummary>
+        public var projects: [LearningProjectSummary]
         public var loadState: LoadState
         public var isMenuPresented: Bool
         public var isDeleteMode: Bool
-        public var pendingDeletion: LearningProjectID?
+        public var pendingDeletion: String?
 
         public var isEmpty: Bool {
             loadState == .loaded && projects.isEmpty
@@ -64,16 +64,16 @@ public struct LearningProjectListFeature: Sendable {
         case menuDismissed
         case deleteModeEntered
         case deleteModeExited
-        case deleteButtonTapped(LearningProjectID)
+        case deleteButtonTapped(String)
         case deletionConfirmed
         case deletionCancelled
-        case deletionResponse(Result<LearningProjectID, LearningProjectError>)
-        case learningStartButtonTapped(LearningProjectID)
+        case deletionResponse(Result<String, LearningProjectError>)
+        case learningStartButtonTapped(String)
         case delegate(Delegate)
     }
 
     public enum Delegate: Sendable, Equatable {
-        case learningStarted(LearningProjectID)
+        case learningStarted(String)
     }
 
     public var body: some ReducerOf<Self> {
@@ -91,7 +91,7 @@ public struct LearningProjectListFeature: Sendable {
 
             case .projectsResponse(.success(let page)):
                 guard state.loadState == .loading else { return .none }
-                state.projects = .init(uniqueElements: page.projects)
+                state.projects = page.items
                 state.loadState = .loaded
                 return .none
 
@@ -120,23 +120,26 @@ public struct LearningProjectListFeature: Sendable {
                 state.pendingDeletion = nil
                 return .cancel(id: CancelID.delete)
 
-            case .deleteButtonTapped(let id):
-                guard state.isDeleteMode, state.projects[id: id] != nil else {
+            case .deleteButtonTapped(let projectId):
+                guard
+                    state.isDeleteMode,
+                    state.projects.contains(where: { $0.projectId == projectId })
+                else {
                     return .none
                 }
-                state.pendingDeletion = id
+                state.pendingDeletion = projectId
                 return .none
 
             case .deletionConfirmed:
-                guard let id = state.pendingDeletion else { return .none }
-                return deleteEffect(id: id)
+                guard let projectId = state.pendingDeletion else { return .none }
+                return deleteEffect(projectId: projectId)
 
             case .deletionCancelled:
                 state.pendingDeletion = nil
                 return .none
 
-            case .deletionResponse(.success(let id)):
-                state.projects.remove(id: id)
+            case .deletionResponse(.success(let projectId)):
+                state.projects.removeAll { $0.projectId == projectId }
                 state.pendingDeletion = nil
                 if state.projects.isEmpty {
                     state.isDeleteMode = false
@@ -147,9 +150,9 @@ public struct LearningProjectListFeature: Sendable {
                 state.pendingDeletion = nil
                 return .none
 
-            case .learningStartButtonTapped(let id):
-                guard state.projects[id: id] != nil else { return .none }
-                return .send(.delegate(.learningStarted(id)))
+            case .learningStartButtonTapped(let projectId):
+                guard state.projects.contains(where: { $0.projectId == projectId }) else { return .none }
+                return .send(.delegate(.learningStarted(projectId)))
 
             case .delegate:
                 return .none
@@ -169,8 +172,8 @@ public struct LearningProjectListFeature: Sendable {
         static let pageSize = 20
     }
 
-    private let fetchLearningProjects: any FetchLearningProjects
-    private let deleteLearningProject: any DeleteLearningProject
+    private let fetchLearningProjects: any FetchLearningProjectsUseCase
+    private let deleteLearningProject: any DeleteLearningProjectUseCase
 
     private func fetchEffect() -> Effect<Action> {
         .run { [fetchLearningProjects] send in
@@ -185,23 +188,23 @@ public struct LearningProjectListFeature: Sendable {
             } catch let error as LearningProjectError {
                 await send(.projectsResponse(.failure(error)))
             } catch {
-                await send(.projectsResponse(.failure(.temporarilyUnavailable)))
+                await send(.projectsResponse(.failure(.unexpected)))
             }
         }
         .cancellable(id: CancelID.fetch, cancelInFlight: true)
     }
 
-    private func deleteEffect(id: LearningProjectID) -> Effect<Action> {
+    private func deleteEffect(projectId: String) -> Effect<Action> {
         .run { [deleteLearningProject] send in
             do {
-                try await deleteLearningProject(id)
-                await send(.deletionResponse(.success(id)))
+                try await deleteLearningProject(projectId: projectId)
+                await send(.deletionResponse(.success(projectId)))
             } catch is CancellationError {
                 return
             } catch let error as LearningProjectError {
                 await send(.deletionResponse(.failure(error)))
             } catch {
-                await send(.deletionResponse(.failure(.temporarilyUnavailable)))
+                await send(.deletionResponse(.failure(.unexpected)))
             }
         }
         .cancellable(id: CancelID.delete, cancelInFlight: true)
