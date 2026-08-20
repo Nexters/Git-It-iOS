@@ -1,14 +1,14 @@
 installed:
-  - swift-format
-
+- swift-format
 settings:
   auto_execute_hooks: true
-
 hooks:
   after_implement:
-    - extension: swift-format
-      command: speckit.swift-format
-      enabled: true
-      optional: false
-      priority: 10
-      description: "구현 완료 후 전체 Swift 소스를 포맷합니다."
+  - extension: swift-format
+    command: speckit.swift-format.run
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: 허용된 변경 Swift 파일을 포맷할까요?
+    description: 모든 구현 패키지 완료 후 허용된 변경 Swift 파일을 포맷합니다.
+    condition: null

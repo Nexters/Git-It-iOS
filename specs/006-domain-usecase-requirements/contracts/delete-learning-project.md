@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-020~022 |
 **데이터 모델**: [data-model.md](../data-model.md) `LearningProject` |
-**도메인 문서**: [delete-learning-project.md](../../../sources/docs/git-it-domain-usecases/delete-learning-project.md)
 
 더 이상 학습하지 않을 프로젝트를 삭제한다.
 

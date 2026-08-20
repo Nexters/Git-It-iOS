@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-023~027 |
 **데이터 모델**: [data-model.md](../data-model.md) `LearningSet`, `Question`, `MyAnswer` |
-**도메인 문서**: [fetch-learning-set.md](../../../sources/docs/git-it-domain-usecases/fetch-learning-set.md)
 
 특정 학습 세트의 문제와 현재 풀이 상태를 조회한다.
 

@@ -93,7 +93,7 @@ Git index, 작업 파일 또는 공유 formatter cache를 사용하는 변경 �
 최소 문맥을 드러내야 한다. 표면적인 통일만을 위한 공통 접두어·접미어·축약은 적용하지 않고,
 저장·전달되는 값은 독립적으로 목적을 식별할 수 있게 계획한다. 외부 계약의 고정 이름은
 보존하고 공급자 중립 경계에는 특정 공급자나 저장 기술의 용어를 노출하지 않는다. 네이밍과
-설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `sources/docs/naming.md`가 없으면
+설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `docs/conventions/naming.md`가 없으면
 Constitution 원칙 10을 직접 적용하고, 문서가 작성된 뒤에는 세부 기준과 예외를 함께 참조한다.
 
 **패키지 진행**: 현재 명세가 변경하는 패키지를 식별하고 `Domain → Data → Infrastructure →
@@ -140,9 +140,7 @@ specs/006-final-uxui-screens/
 │   ├── component-correction.md
 │   ├── reference-screen-layout.md
 │   └── use-case-contracts.md
-├── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
-├── trouble-shooting.md  # 문제 발생 시 /speckit-troubleshooting이 생성·추가
-└── tacit-knowledge.md   # 암묵지 해석 시 /speckit-tacit-knowledge가 생성·추가
+└── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
 ```
 
 ### 소스 코드(저장소 루트)
@@ -216,7 +214,7 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
   전담한다.
 - 참조 화면에 필요한 `ActionMenu`, edge scrim 표현을 UIComponent가 소유한다. `top dim`은
   아래→위, `bottom dim`은 위→아래 방향과 실측 정지점을 자동 일치 판정에 포함한다.
-- `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응 정정은 UI 단계가 소유한다.
+- `docs/ui-component-checklist.md`의 `ProjectRow` 대응 정정은 UI 단계가 소유한다.
 - 이 기능은 기존 DesignSystem·UIComponent·UIComponentLayout target과 scheme을 재사용하므로
   `UIModuleName.swift`를 변경하지 않는다. 새 UI target 선언이 필요해지면 현재 계획을 먼저
   갱신하고 UI 패키지 작업으로 배정한다.
@@ -257,6 +255,6 @@ Feature와 Composition을 합법적으로 조립할 수 있는 App 프로젝트�
 구획만 변경한다. `sources/Tuist/Package.swift`는 TCA가 이미 선언되어 있어 변경하지 않으며,
 `UIModuleName.swift`도 기존 UI target을 재사용하므로 변경하지 않는다.
 
-패키지 밖 문서 `sources/docs/ui-component-checklist.md`는 잘못된 UI 컴포넌트 대응을 처음
+패키지 밖 문서 `docs/ui-component-checklist.md`는 잘못된 UI 컴포넌트 대응을 처음
 교정하는 UI 단계에 배정한다. 이 밖에 어느 패키지에도 배정할 수 없는 구현 파일이 발견되면
 계획을 중단하고 책임 경계를 다시 확정한다.

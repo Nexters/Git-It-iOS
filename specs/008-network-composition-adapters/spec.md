@@ -19,7 +19,7 @@
 
 ## 변경 시나리오와 테스트 *(필수)*
 
-이 기능의 실제 이해관계자는 007이 정의한 5개 UseCase 위에 화면(Feature)을 구현할 후속 개발자와, 이 기능이 배포된 뒤 실제 트래픽을 관찰할 운영자다. 007은 Domain·Data 패키지의 계약과 Test Double 기반 계약 테스트까지만 다루기로 스스로 범위를 한정했고([spec.md](../007-learning-project-lifecycle/spec.md) "범위 밖"), 그 결과 007이 끝나도 GitHub 공개 API·Git-It 서버로 나가는 실제 HTTP 요청은 이 저장소 어디에도 존재하지 않았다. 이 기능은 `sources/docs/package-rules/composition.md`가 정의한 Domain↔Data Adapter와 Data↔Infrastructure Adapter를 실제로 구현해 그 공백을 메운다.
+이 기능의 실제 이해관계자는 007이 정의한 5개 UseCase 위에 화면(Feature)을 구현할 후속 개발자와, 이 기능이 배포된 뒤 실제 트래픽을 관찰할 운영자다. 007은 Domain·Data 패키지의 계약과 Test Double 기반 계약 테스트까지만 다루기로 스스로 범위를 한정했고([spec.md](../007-learning-project-lifecycle/spec.md) "범위 밖"), 그 결과 007이 끝나도 GitHub 공개 API·Git-It 서버로 나가는 실제 HTTP 요청은 이 저장소 어디에도 존재하지 않았다. 이 기능은 `docs/package-rules/composition.md`가 정의한 Domain↔Data Adapter와 Data↔Infrastructure Adapter를 실제로 구현해 그 공백을 메운다.
 
 ### 시나리오 1 - GitHub 공개 API 확인이 실제 네트워크 호출로 동작한다 (우선순위: P1)
 
@@ -90,7 +90,7 @@
 
 - **FR-010**: `HTTPClientError`(연결 실패·타임아웃·취소·요청 인코딩 실패·응답 디코딩 실패)는 두 Adapter 모두 대응하는 Domain 오류의 미분류 케이스로 매핑해야 한다(`MUST`) — GitHub Adapter는 연결 실패를 `offline`으로, 그 밖의 `HTTPClientError`는 `other`로 구분한다. Git-It 서버 Adapter는 모든 `HTTPClientError`를 `unexpected`로 매핑한다.
 - **FR-011**: 시스템은 GitHub API·Git-It 서버 각각에 대해 서로 다른 base URL로 `HTTPClient`를 구성할 수 있어야 한다(`MUST`).
-- **FR-012**: 두 Adapter 모두 재등록 판단·다음 세트 계산 등 007이 이미 UseCase나 Domain 모델에 배치한 비즈니스 규칙을 다시 구현하지 않아야 한다(`MUST NOT`) — 요청·응답 변환과 오류 매핑만 수행한다(`sources/docs/package-rules/composition.md` 제약조건).
+- **FR-012**: 두 Adapter 모두 재등록 판단·다음 세트 계산 등 007이 이미 UseCase나 Domain 모델에 배치한 비즈니스 규칙을 다시 구현하지 않아야 한다(`MUST NOT`) — 요청·응답 변환과 오류 매핑만 수행한다(`docs/package-rules/composition.md` 제약조건).
 - **FR-013**: 시스템은 로그인 시작·세션 복원·액세스 토큰 갱신·폐기를 수행하는 Composition Adapter를 구현하지 않아야 한다(`MUST NOT`) — `refreshSession`/`revokeRefreshToken`에 대응하는 서버 엔드포인트가 `Git-It-server-scheme.json`에서 확인되지 않아 범위 밖이다.
 - **FR-014**: 두 Adapter는 각각 성공 경로 1개 이상과 예외·경계 사례 절이 식별한 모든 오류 경로를 검증하는 자동화된 테스트를 가져야 한다(`MUST`) — 실제 네트워크 호출 대신 `HTTPTransport`를 대체한 테스트 대역을 주입해 `HTTPClient`의 실제 요청 구성·응답 해석·오류 전파 경로를 그대로 실행하는 방식으로 검증한다.
 - **FR-015**: 두 Adapter 모두 일시적 네트워크 장애(타임아웃·연결 실패 등)에서 자동 재시도를 수행하지 않고 즉시 대응하는 Domain 오류로 매핑해야 한다(`MUST NOT` 자동 재시도) — 재시도 여부 결정은 UseCase를 소비하는 후속 Feature의 책임이다.

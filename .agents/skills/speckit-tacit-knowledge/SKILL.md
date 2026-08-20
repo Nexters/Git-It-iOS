@@ -1,6 +1,6 @@
 ---
 name: speckit-tacit-knowledge
-description: 여러 Spec Kit 세션과 저장소 근거를 종합해 문서에 명시되지 않은 규칙, 책임 경계, 의사결정 기준 또는 반복 패턴을 해석했을 때 근거, 확신도와 적용 범위를 활성 기능의 tacit-knowledge.md에 append-only로 기록한다. 단일 추측이나 이미 명시된 사실을 복사할 때는 사용하지 않는다.
+description: 여러 Spec Kit 세션과 저장소 근거를 종합해 문서에 명시되지 않은 규칙, 책임 경계, 의사결정 기준 또는 반복 패턴을 해석했을 때 근거, 확신도와 적용 범위를 docs/spec-kit 아래 기능별 tacit-knowledge.md에 append-only로 기록한다. 단일 추측이나 이미 명시된 사실을 복사할 때는 사용하지 않는다.
 ---
 
 # Spec Kit 암묵지 기록
@@ -28,9 +28,10 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 
 ## 허용 수정 경로
 
-이 스킬은 활성 기능의 `specs/<feature>/tacit-knowledge.md`만 생성하거나 파일 끝에 새
-항목을 추가할 수 있다. 현재 활성 기능이 `001-apple-social-login`이면 대상은 정확히
-`specs/001-apple-social-login/tacit-knowledge.md`다.
+이 스킬은 `GIT_IT_DOCS_ROOT` 아래 활성 기능의
+`spec-kit/<feature>/tacit-knowledge.md`만 생성하거나 파일 끝에 새 항목을 추가할 수 있다.
+현재 활성 기능이 `001-apple-social-login`이고 문서 루트가 `docs`이면 대상은 정확히
+`docs/spec-kit/001-apple-social-login/tacit-knowledge.md`다.
 
 - 기존 제목, 항목, 표, 순서와 문장을 수정하거나 삭제하지 않는다.
 - 기존 해석의 보강, 반증 또는 폐기가 필요하면 원래 항목을 참조하는 새 후속 항목을
@@ -66,11 +67,13 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 
 ## 실행 절차
 
-1. 저장소 루트에서 `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`를 한
-   번 실행해 `REPO_ROOT`와 `FEATURE_DIR`을 구한다. 사용자가 `specs/<feature>` 또는 정확한
-   대상 파일을 명시했다면 저장소의 `specs/` 아래에 있고 파일명이
-   `tacit-knowledge.md`인지 검증한 뒤 사용한다. 기능 디렉터리가 없으면 새 기능을 만들지
-   말고 중단한다.
+1. `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`로 `REPO_ROOT`와
+   `FEATURE_DIR`을 구하고, 활성 `specs/<feature>` 디렉터리인지 확인한다.
+   `tools/repository-paths/bin/repository-paths.sh GIT_IT_DOCS_ROOT`의 판독 결과가
+   저장소 안의 실제 디렉터리인지 검증한 뒤
+   `<docs-root>/spec-kit/<feature>/tacit-knowledge.md`를 대상으로 삼는다.
+   사용자가 기능이나 파일을 지정했다면 이 결과와 일치해야 하며, 기능 디렉터리가
+   없으면 중단한다.
 2. 대상 파일, Constitution, 관련 기능 산출물, 현재 코드·테스트와 사용 가능한 세션·Git
    근거를 읽는다. 최소 두 근거가 서로 독립적인지와 현재 상태에서 다시 확인 가능한지를
    평가한다.
@@ -143,7 +146,7 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 ## 완료 조건
 
 - [ ] 독립적인 근거를 둘 이상 확인했다.
-- [ ] 대상이 활성 기능의 정확한 `tacit-knowledge.md`인지 확인했다.
+- [ ] 대상이 활성 기능의 정확한 `docs/spec-kit/<feature>/tacit-knowledge.md`인지 확인했다.
 - [ ] 기존 기록을 보존하고 새 항목만 추가했다.
 - [ ] 사실, 해석, 적용 범위, 반례와 검증 조건을 분리했다.
 - [ ] 암묵지를 상위 규칙이나 확정 사실로 과장하지 않았다.

@@ -88,10 +88,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Allowed Write Paths
 
 This skill may modify only the newly resolved `specs/<feature>/**` directory and
-`.specify/feature.json`, except that `trouble-shooting.md` and `tacit-knowledge.md`
-remain exclusively owned by their dedicated recording skills. It MUST NOT create,
-modify, or delete those two records, application code, project configuration, or any
-other feature directory.
+`.specify/feature.json`. It MUST NOT create `trouble-shooting.md` or
+`tacit-knowledge.md` inside the feature directory, nor create, modify, or delete their
+canonical `docs/spec-kit/<feature>/` records. Those two records remain exclusively
+owned by their dedicated recording skills. It also MUST NOT modify application code,
+project configuration, or any other feature directory.
 
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 

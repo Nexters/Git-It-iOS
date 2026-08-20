@@ -10,13 +10,13 @@
 
 ## 요약
 
-spec 006이 확정한 `Git-It-server-scheme.json` 계약과 `sources/docs/git-it-domain-usecases/`
-문서를 바탕으로, 학습 프로젝트 생명주기의 5개 UseCase(`FetchExternalRepository`,
+spec 006이 확정한 `Git-It-server-scheme.json` 계약과 `contracts/` 문서를 바탕으로,
+학습 프로젝트 생명주기의 5개 UseCase(`FetchExternalRepository`,
 `CreateLearningProject`, `FetchLearningProjects`, `FetchLearningProjectDetail`,
 `DeleteLearningProject`)를 `DomainAuthentication`/`DataAuthentication`과 동일한 레이어
 경계로 실제 Swift 코드로 구현한다. 새 Domain 패키지 `DomainLearningProject`(Contracts·
 Models·UseCases)와 새 Data 패키지 `DataLearningProject`(Contracts·DTOs·Errors)를
-Tuist 모듈로 추가한다. `sources/docs/architecture.md`의 패키지 의존성 제약(Domain·Data는
+Tuist 모듈로 추가한다. `docs/architecture.md`의 패키지 의존성 제약(Domain·Data는
 서로 참조 불가, Data→Infrastructure 불가)에 따라 실제 HTTP 호출과 DTO↔Domain 모델 변환을
 수행하는 Composition Adapter는 이 계획의 범위 밖이며, 각 계층은 Test Double로 대체 가능한
 계약과 계약 테스트로 "실제로 동작함"을 검증한다(FR-025). Composition 배선과 Feature/UI
@@ -28,7 +28,7 @@ Tuist 모듈로 추가한다. `sources/docs/architecture.md`의 패키지 의존
 `deploymentTargets: .iOS("26.0")`)
 
 **주요 의존성**: 프로젝트 내부 의존성만 사용한다 — Domain·Data 신규 target은 Swift 표준
-라이브러리 외 의존성을 추가하지 않는다(`sources/docs/architecture.md` §6 외부 패키지
+라이브러리 외 의존성을 추가하지 않는다(`docs/architecture.md` §6 외부 패키지
 의존성 정책, Domain/Data 행: `Swift Standard Library`). 외부 서버·GitHub API 호출은 이
 계획이 아닌 후속 Composition 구현이 `003-http-client`의 `InfrastructureNetworkClient`
 (`HTTPClient`)를 재사용한다(가정, spec.md `가정` 절).
@@ -46,9 +46,9 @@ spec.md `범위 밖`).
 
 **성능 목표**: N/A — 도메인 로직·계약 정의 수준으로, 명시적 성능 목표가 없다.
 
-**제약 조건**: `sources/docs/architecture.md` §3.1 패키지 의존성 표(Domain: `—`, Data:
+**제약 조건**: `docs/architecture.md` §3.1 패키지 의존성 표(Domain: `—`, Data:
 `—`)와 §7.1 금지 의존성 목록(`Data → Infrastructure`, `Domain → Data`, `Data → Domain`
-포함)을 위반할 수 없다. `sources/docs/package-rules/domain.md`·`data.md`의 제약조건
+포함)을 위반할 수 없다. `docs/package-rules/domain.md`·`data.md`의 제약조건
 (Domain은 Data 모델·DTO·서버 API 형식 참조 금지, Data는 Domain 타입 참조·Domain
 Repository 구현 금지)도 동일하게 적용된다.
 
@@ -61,7 +61,7 @@ Data 계약 2개, Domain 모델 8종, Data DTO 7종, Domain/Data 오류 타입 �
 *게이트: 0단계 조사 전에 통과해야 하며 1단계 설계 후 다시 점검한다.*
 
 - **명시적인 경계(원칙 1)**: 신규 `DomainLearningProject`/`DataLearningProject`는
-  `sources/docs/architecture.md` §3.1 의존성 표를 그대로 따른다 — 두 패키지 모두 프로젝트
+  `docs/architecture.md` §3.1 의존성 표를 그대로 따른다 — 두 패키지 모두 프로젝트
   내부의 다른 패키지에 의존하지 않는다(Tuist에 의존성을 선언하지 않음). **통과**(설계로
   보장, 아래 "설계 후 재점검" 참고).
 - **상태와 데이터 안전성(원칙 2)**: UseCase는 `async throws` 비동기 함수로 오류 경로를

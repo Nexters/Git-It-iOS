@@ -365,7 +365,7 @@ UI 개발자가 색 토큰 집합을 Figma 색 변수와 정합시키고, 참조
 
 ### 일러스트 (SVG, 7종)
 
-모두 `viewBox="0 0 52 52"`로 동일한 기준 크기를 가진다. `sources/docs/ui-component-checklist.md`의 미구현 항목 "리스트 썸네일 `Illust_Levels_*`·`Illust_Knowledge_*`"에 대응한다.
+모두 `viewBox="0 0 52 52"`로 동일한 기준 크기를 가진다. `docs/ui-component-checklist.md`의 미구현 항목 "리스트 썸네일 `Illust_Levels_*`·`Illust_Knowledge_*`"에 대응한다.
 
 - 레벨 4단계: `Illust_Levels_Beginner.svg`, `Illust_Levels_Junior.svg`, `Illust_Levels_Mid.svg`, `Illust_Levels_Senior.svg`
 - 지식 3단계: `Illust_Knowledge_Basic.svg`, `Illust_Knowledge_Intermediate.svg`, `Illust_Knowledge_Advanced.svg`

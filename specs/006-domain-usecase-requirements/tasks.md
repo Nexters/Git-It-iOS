@@ -21,9 +21,8 @@ Domain → Data → Infrastructure → Composition → UI → Feature → App �
 (`data-model.md`, `contracts/`, `quickstart.md`)이 근거 자료와 어긋나지 않는지
 확인하는 **읽기 전용 검증 작업만** 남아 있다.
 
-**유즈케이스별 태스크 분리**: `contracts/` 10개 파일 각각을 원본 도메인 문서
-(`sources/docs/git-it-domain-usecases/`) 및 서버 스키마
-(`sources/docs/Git-It-server-scheme.json`)와 대조하는 작업을, 문서 전체를 한 번에
+**유즈케이스별 태스크 분리**: `contracts/` 10개 파일 각각을 spec.md 및 서버 스키마
+(`docs/Git-It-server-scheme.json`)와 대조하는 작업을, 문서 전체를 한 번에
 묶어 검증하지 않고 UseCase 10개 각각 별도 작업(T002~T011)으로 분리했다(사용자 요청).
 
 ## 형식: `[ID] [P?] [시나리오?] 설명`
@@ -49,54 +48,44 @@ Domain → Data → Infrastructure → Composition → UI → Feature → App �
 
 ### 시나리오 A — UseCase ↔ 계약 파일 1:1 대응 확인 (SC-001)
 
-- [ ] T001 [no-write] `sources/docs/git-it-domain-usecases/`의 파일 10개와
+- [ ] T001 [no-write] spec.md가 정의한 UseCase 10개와
   `specs/006-domain-usecase-requirements/contracts/`의 파일 10개 이름(확장자 제외)이
   정확히 1:1로 대응하는지 확인한다(quickstart.md 시나리오 A). 누락·불일치 0건을 기대한다.
 
 ### 시나리오 B+C — UseCase별 계약 ↔ 서버 스키마 ↔ FR 대조 (SC-002, SC-003, SC-004)
 
 - [ ] T002 [P] [S1] `specs/006-domain-usecase-requirements/contracts/fetch-external-repository.md`를
-  `sources/docs/git-it-domain-usecases/fetch-external-repository.md`, spec.md FR-001~004와
-  대조한다. `Git-It-server-scheme.json`의 `paths`에는 대응 엔드포인트가 없는 것이
+  spec.md FR-001~004와 대조한다. `Git-It-server-scheme.json`의 `paths`에는 대응 엔드포인트가 없는 것이
   정상임을 확인한다(GitHub 공개 API 직접 호출).
 - [ ] T003 [P] [S1] `specs/006-domain-usecase-requirements/contracts/create-learning-project.md`를
-  `sources/docs/git-it-domain-usecases/create-learning-project.md`, `sources/docs/Git-It-server-scheme.json`의
-  `POST /api/v1/projects`, spec.md FR-005~010과 대조한다. 재등록 멱등성(FR-007)과
+  `docs/Git-It-server-scheme.json`의 `POST /api/v1/projects`, spec.md FR-005~010과 대조한다. 재등록 멱등성(FR-007)과
   삭제 후 재등록 복원(FR-008) 규칙이 계약에 반영됐는지 확인한다.
 - [ ] T004 [P] [S1] `specs/006-domain-usecase-requirements/contracts/fetch-learning-projects.md`를
-  `sources/docs/git-it-domain-usecases/fetch-learning-projects.md`, `sources/docs/Git-It-server-scheme.json`의
-  `GET /api/v1/projects`, spec.md FR-011~015와 대조한다. `nextSetId`/`nextQuestionId`
+  `docs/Git-It-server-scheme.json`의 `GET /api/v1/projects`, spec.md FR-011~015와 대조한다. `nextSetId`/`nextQuestionId`
   동시 반환(FR-012)이 반영됐는지 확인한다.
 - [ ] T005 [P] [S1] `specs/006-domain-usecase-requirements/contracts/fetch-learning-project-detail.md`를
-  `sources/docs/git-it-domain-usecases/fetch-learning-project-detail.md`, `sources/docs/Git-It-server-scheme.json`의
-  `GET /api/v1/projects/{projectId}`, spec.md FR-016~019와 대조한다. `sets[]`
+  `docs/Git-It-server-scheme.json`의 `GET /api/v1/projects/{projectId}`, spec.md FR-016~019와 대조한다. `sets[]`
   기반 다음 세트 판단 규칙(FR-019)이 반영됐는지 확인한다.
 - [ ] T006 [P] [S1] `specs/006-domain-usecase-requirements/contracts/delete-learning-project.md`를
-  `sources/docs/git-it-domain-usecases/delete-learning-project.md`, `sources/docs/Git-It-server-scheme.json`의
-  `DELETE /api/v1/projects/{projectId}`, spec.md FR-020~022와 대조한다. 소유권 비노출
+  `docs/Git-It-server-scheme.json`의 `DELETE /api/v1/projects/{projectId}`, spec.md FR-020~022와 대조한다. 소유권 비노출
   404(`PROJECT-001`) 통일 처리(FR-022)가 반영됐는지 확인한다.
 - [ ] T007 [P] [S2] `specs/006-domain-usecase-requirements/contracts/fetch-learning-set.md`를
-  `sources/docs/git-it-domain-usecases/fetch-learning-set.md`, `sources/docs/Git-It-server-scheme.json`의
-  `GET /api/v1/projects/{projectId}/sets/{setId}`, spec.md FR-023~027과 대조한다.
+  `docs/Git-It-server-scheme.json`의 `GET /api/v1/projects/{projectId}/sets/{setId}`, spec.md FR-023~027과 대조한다.
   `myAnswer` 기반 이어 풀기/재풀이 판단(FR-025)이 반영됐는지 확인한다.
 - [ ] T008 [P] [S2] `specs/006-domain-usecase-requirements/contracts/submit-choice-answer.md`를
-  `sources/docs/git-it-domain-usecases/submit-choice-answer.md`, `sources/docs/Git-It-server-scheme.json`의
-  `POST /api/v1/projects/{projectId}/questions/{questionId}/answers/choice`,
+  `docs/Git-It-server-scheme.json`의 `POST /api/v1/projects/{projectId}/questions/{questionId}/answers/choice`,
   spec.md FR-028~031과 대조한다. 덮어쓰기 제출(FR-030)과 형식 불일치 400(FR-031)이
   반영됐는지 확인한다.
 - [ ] T009 [P] [S2] `specs/006-domain-usecase-requirements/contracts/submit-essay-answer.md`를
-  `sources/docs/git-it-domain-usecases/submit-essay-answer.md`, `sources/docs/Git-It-server-scheme.json`의
-  `POST /api/v1/projects/{projectId}/questions/{questionId}/answers/essay`,
+  `docs/Git-It-server-scheme.json`의 `POST /api/v1/projects/{projectId}/questions/{questionId}/answers/essay`,
   spec.md FR-032~036과 대조한다. 서버 미채점·`rubric` 반환(FR-033~034)이 반영됐는지
   확인한다.
 - [ ] T010 [P] [S3] `specs/006-domain-usecase-requirements/contracts/set-question-bookmark.md`를
-  `sources/docs/git-it-domain-usecases/set-question-bookmark.md`, `sources/docs/Git-It-server-scheme.json`의
-  `POST /api/v1/projects/{projectId}/questions/{questionId}/bookmark`,
+  `docs/Git-It-server-scheme.json`의 `POST /api/v1/projects/{projectId}/questions/{questionId}/bookmark`,
   spec.md FR-037~039와 대조한다. toggle 미추론·명시적 상태 전달(FR-038)이 반영됐는지
   확인한다.
 - [ ] T011 [P] [S3] `specs/006-domain-usecase-requirements/contracts/fetch-bookmarked-questions.md`를
-  `sources/docs/git-it-domain-usecases/fetch-bookmarked-questions.md`, `sources/docs/Git-It-server-scheme.json`의
-  `GET /api/v1/projects/bookmarks`, spec.md FR-040~042와 대조한다. `setId` 필수
+  `docs/Git-It-server-scheme.json`의 `GET /api/v1/projects/bookmarks`, spec.md FR-040~042와 대조한다. `setId` 필수
   포함(FR-041)과 `availableProjects` 전체 반환(FR-042)이 반영됐는지 확인한다.
 
 ### 시나리오 D — 명확화 이력 반영 확인

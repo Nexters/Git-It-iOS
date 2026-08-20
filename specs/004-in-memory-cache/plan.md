@@ -94,10 +94,10 @@ Git index, 작업 파일 또는 공유 formatter cache를 사용하는 변경 �
 최소 문맥을 드러내야 한다. 표면적인 통일만을 위한 공통 접두어·접미어·축약은 적용하지 않고,
 저장·전달되는 값은 독립적으로 목적을 식별할 수 있게 계획한다. 외부 계약의 고정 이름은
 보존하고 공급자 중립 경계에는 특정 공급자나 저장 기술의 용어를 노출하지 않는다. 네이밍과
-설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `sources/docs/naming.md`가 없으면
+설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `docs/conventions/naming.md`가 없으면
 Constitution 원칙 10을 직접 적용하고, 문서가 작성된 뒤에는 세부 기준과 예외를 함께 참조한다.
 
-이 기능에 적용한 판단은 다음과 같다([네이밍 가이드](../../sources/docs/naming.md) 기준).
+이 기능에 적용한 판단은 다음과 같다([네이밍 컨벤션](../../docs/conventions/naming.md) 기준).
 
 | 결정 | 근거 |
 | --- | --- |
@@ -149,7 +149,7 @@ Phase 1 산출물(data-model.md, contracts/in-memory-cache-api.md, quickstart.md
 
 - 설계가 추가한 target은 `InfrastructureCache`와 `InfrastructureCacheTests` 둘뿐이며 모두
   `Infrastructure` 패키지 내부 산출물이다. 패키지 경계와 의존 방향이 바뀌지 않으므로
-  `sources/docs/architecture.md`를 수정할 필요가 없다(원칙 3: 아키텍처 문서는 구조 결정이
+  `docs/architecture.md`를 수정할 필요가 없다(원칙 3: 아키텍처 문서는 구조 결정이
   바뀔 때만 갱신).
 - 공개 타입은 `InMemoryCache<Key, Value>` 하나, 공개 연산은 4개뿐이다. 별도 오류 타입,
   설정 타입, 프로토콜 추상화를 추가하지 않아 "최대한 심플하게"라는 사용자 요청과 원칙 3의

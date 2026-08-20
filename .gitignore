@@ -142,11 +142,13 @@ htmlcov/
 
 # Agent tool symlink to .agents
 .claude
+CLAUDE.md
 
 # Spec Kit working feature state
 .specify/feature.json
+.specify/extensions/.cache/
+.specify/extensions/*/.specify-dev/
 
 # Machine-specific configuration
 *.xcconfig
-sources/docs/git-it-domain-usecases/**
-sources/docs/Git-It-server-scheme.json
+docs/Git-It-server-scheme.json

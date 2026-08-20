@@ -96,8 +96,9 @@ of the code relative to the feature's artifacts — no git, no branch comparison
   Convergence phase);
 - modify, create, or delete any application code — completing the appended tasks is the
   job of `/speckit-implement`;
-- append tasks that create or update `trouble-shooting.md` or `tacit-knowledge.md` — those
-  event-driven records belong only to their dedicated skills.
+- append tasks that create or update `docs/spec-kit/<feature>/trouble-shooting.md` or
+  `docs/spec-kit/<feature>/tacit-knowledge.md` — those event-driven records belong only
+  to their dedicated skills.
 
 When the codebase already satisfies everything, the command MUST leave `tasks.md`
 **byte-for-byte unchanged** (no empty Convergence header) and report a clean result.

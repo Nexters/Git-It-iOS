@@ -50,7 +50,7 @@ target을 만들지 않는다).
 
 **제약 조건**: `architecture.md` §3.1 패키지 의존성 표(Composition: Domain·Data·
 Infrastructure 참조 가능)와 §7.1 금지 의존성 목록을 위반할 수 없다.
-`sources/docs/package-rules/composition.md`의 제약조건(비즈니스 규칙·캐시 정책·화면
+`docs/package-rules/composition.md`의 제약조건(비즈니스 규칙·캐시 정책·화면
 상태를 Adapter에 두지 않음, 외부 라이브러리 직접 사용 금지)도 동일하게 적용된다.
 
 **규모/범위**: 신규 Composition Adapter 4종(`ExternalRepositoryRemoteAdapter`,

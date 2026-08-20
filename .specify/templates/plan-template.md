@@ -69,7 +69,7 @@ Git index, 작업 파일 또는 공유 formatter cache를 사용하는 변경 �
 최소 문맥을 드러내야 한다. 표면적인 통일만을 위한 공통 접두어·접미어·축약은 적용하지 않고,
 저장·전달되는 값은 독립적으로 목적을 식별할 수 있게 계획한다. 외부 계약의 고정 이름은
 보존하고 공급자 중립 경계에는 특정 공급자나 저장 기술의 용어를 노출하지 않는다. 네이밍과
-설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `sources/docs/naming.md`가 없으면
+설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다. `docs/conventions/naming.md`가 없으면
 Constitution 원칙 10을 직접 적용하고, 문서가 작성된 뒤에는 세부 기준과 예외를 함께 참조한다.
 
 **패키지 진행**: 현재 명세가 변경하는 패키지를 식별하고 `Domain → Data → Infrastructure →
@@ -91,9 +91,7 @@ specs/[###-feature]/
 ├── data-model.md        # 1단계 산출물(/speckit-plan)
 ├── quickstart.md        # 1단계 산출물(/speckit-plan)
 ├── contracts/           # 1단계 산출물(/speckit-plan)
-├── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
-├── trouble-shooting.md  # 문제 발생 시 /speckit-troubleshooting이 생성·추가
-└── tacit-knowledge.md   # 암묵지 해석 시 /speckit-tacit-knowledge가 생성·추가
+└── tasks.md             # 2단계 산출물(/speckit-tasks, /speckit-plan이 생성하지 않음)
 ```
 
 ### 소스 코드(저장소 루트)

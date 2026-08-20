@@ -3,8 +3,8 @@
 **날짜**: 2026-08-19 | **명세**: [spec.md](./spec.md) | **계획**: [plan.md](./plan.md)
 
 이 기능은 실행 가능한 코드를 만들지 않는다(spec.md `범위 밖`). 아래 절차는 이 계획이
-산출한 `data-model.md`·`contracts/`가 근거 자료(`git-it-domain-usecases`,
-`Git-It-server-scheme.json`, `spec.md`)와 어긋나지 않는지 사람이 대조 확인하는
+산출한 `data-model.md`·`contracts/`가 근거 자료(`Git-It-server-scheme.json`,
+`spec.md`)와 어긋나지 않는지 사람이 대조 확인하는
 검증 가이드다. 자동화 스크립트는 이 계획의 허용 수정 경로 밖이라 포함하지 않는다
 (research.md §3).
 
@@ -13,12 +13,11 @@
 - [spec.md](./spec.md) — 기능 요구사항(FR-001~042)과 명확화 이력
 - [data-model.md](./data-model.md) — 엔터티 정의
 - [contracts/](./contracts/) — UseCase별 계약 10개
-- `sources/docs/git-it-domain-usecases/` — 원본 도메인 UseCase 문서 10개
-- `sources/docs/Git-It-server-scheme.json` — Git-It 서버 OpenAPI 스키마
+- `docs/Git-It-server-scheme.json` — Git-It 서버 OpenAPI 스키마
 
 ## 시나리오 A — UseCase ↔ 계약 파일 1:1 대응 확인 (SC-001)
 
-1. `git-it-domain-usecases/` 아래 파일 10개의 이름을 나열한다.
+1. spec.md가 정의한 UseCase 10개의 이름을 나열한다.
 2. `contracts/` 아래 파일 10개의 이름을 나열한다.
 3. 두 목록이 파일명 기준(확장자 제외) 정확히 1:1로 대응하는지 확인한다.
 

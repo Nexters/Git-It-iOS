@@ -3,7 +3,7 @@
 **대상 기능**: `006-final-uxui-screens` · **작성일**: 2026-08-19
 
 **원천**: Figma `mCRt0ejmzI4EFW3UnC9Bzb` › 페이지 `📌 서비스 설계`(`86:761`), 저장소
-`sources/docs/**`, `sources/Projects/**`, `.specify/memory/constitution.md`
+`docs/**`, `sources/Projects/**`, `.specify/memory/constitution.md`
 
 이 문서는 명세가 계획 단계로 넘긴 미확정 항목을 해소한다. 각 항목은 결정, 근거, 검토한
 대안 순으로 기록하며 Figma에서 직접 조회하지 못한 값은 확정값으로 기록하지 않는다.
@@ -32,7 +32,7 @@
 - 명세가 요구하는 상호작용 종류(선택, 펼침·접힘, 모드 전환, 확인)를 한 화면에서 모두
   실증할 수 있다. 메뉴 펼침 → 삭제 모드 진입 → 항목 삭제 → 모달 확인이 하나의 흐름이다.
 - 화면이 의존하는 Use Case가 이미 문서로 정의되어 있다.
-  `sources/docs/git-it-domain-usecases/fetch-learning-projects.md`와
+  `specs/006-domain-usecase-requirements/contracts/fetch-learning-projects.md`와
   `delete-learning-project.md`가 입력·출력·제외 책임을 확정한다. Use Case 계약을 새로
   발명하지 않고 문서 근거 위에서 정의할 수 있다.
 - 빈 상태가 별도 프레임으로 정의되어 있어 시나리오 2 수용 2를 검증할 수 있다.
@@ -169,7 +169,7 @@ COLOR 변수 25개, FLOAT 변수 0개다. 25개의 이름·hex·alpha는
 
 ## R-07. `ProjectRow`는 `ProjectList`에 대응하며 `학습세트 List-item`은 별도 컴포넌트다
 
-**결정**: `sources/docs/ui-component-checklist.md`가 `학습세트 List-item` → `ProjectRow`로
+**결정**: `docs/ui-component-checklist.md`가 `학습세트 List-item` → `ProjectRow`로
 적은 대응을 정정한다. `ProjectRow`의 실제 대응은 Figma `ProjectList`(`1621:23606`)이고,
 `학습세트 List-item`(`997:18550`)은 아직 구현이 없는 별도 컴포넌트다. 체크리스트 문서
 수정은 이 기능의 허용 수정 경로 밖이므로 계약에 정정 근거만 남기고 문서 갱신은
@@ -240,8 +240,8 @@ public protocol DeleteLearningProject: Sendable {
 - `DomainAuthentication`에 넣지 않는 이유는 학습 프로젝트가 인증과 다른 비즈니스 경계를
   가지기 때문이다. Domain 패키지 규칙의 "모든 내부 target은 도메인 모델·규칙·Use Case
   또는 외부 기능 계약을 소유해야 한다"를 새 target이 그대로 만족한다.
-- 이름은 `sources/docs/git-it-domain-usecases/`의 문서 제목과 일치시켜 문서와 계약이
-  같은 어휘를 쓰게 한다.
+- 이름은 `specs/006-domain-usecase-requirements/contracts/`의 계약 제목과 일치시켜
+  문서와 계약이 같은 어휘를 쓰게 한다.
 
 **검토한 대안**: `DomainLearning`처럼 더 넓은 이름은 학습 세트·문제 풀이 Use Case까지
 한 target에 몰아넣게 되어 후속 기능의 경계를 미리 흐린다. 필요해지면 그때 target을

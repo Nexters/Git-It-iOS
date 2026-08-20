@@ -28,8 +28,9 @@ You **MUST** consider the user input before proceeding (if not empty).
   최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
 - 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
   `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
-  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+- 이 스킬이 `docs/spec-kit/<feature>/` 아래 두 기록 파일을 직접 수정해서는 안 된다.
+  가설적 위험, 단일 추측, 이미 명시된 사실에는 기록 스킬을 적용하지 않으며 조건이 없으면
+  파일을 만들지 않는다.
 
 ## Scope Guard
 
@@ -126,7 +127,7 @@ Follow this execution flow:
    - Read `.specify/templates/spec-template.md` for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
    - Read `.specify/templates/tasks-template.md` and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
    - Read each installed Spec Kit command file for your agent (including this one) — named `speckit.*` or `speckit-*` (dot or hyphen depending on the agent), or laid out as `speckit-<name>/SKILL.md` for skills-based integrations, e.g. in `.github/agents/`, `.github/skills/`, `.claude/skills/`, or your agent's equivalent commands directory — to verify no outdated references (CLAUDE-only or other agent-specific names) remain when generic guidance is required.
-   - Read any runtime guidance docs (e.g., `README.md`, `docs/quickstart.md`, or agent-specific guidance files if present). Update references to principles changed.
+   - Read any runtime guidance docs (e.g., `README.md`, files under the resolved `GIT_IT_DOCS_ROOT`, or agent-specific guidance files if present). When they are outside Allowed Write Paths, inspect them and record required changes as pending instead of modifying them.
 
 5. Produce a Sync Impact Report (prepend as an HTML comment at top of the constitution file after update):
    - Version change: old → new

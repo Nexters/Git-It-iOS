@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-037~039 |
 **데이터 모델**: [data-model.md](../data-model.md) `Question` |
-**도메인 문서**: [set-question-bookmark.md](../../../sources/docs/git-it-domain-usecases/set-question-bookmark.md)
 
 문제의 북마크 상태를 사용자가 원하는 최종 상태로 설정한다.
 

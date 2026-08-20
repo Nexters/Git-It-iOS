@@ -26,7 +26,7 @@ spec.md에 `[NEEDS CLARIFICATION]` 표식은 없다(`/speckit-clarify` 세션 20
   · `ExternalRepositoryRemoteAdapter`(Data↔Infrastructure, `ExternalRepositoryRemote` 구현)
   · `LearningProjectRepositoryAdapter`(Domain↔Data, `LearningProjectRepository` 구현)
   · `LearningProjectRemoteAdapter`(Data↔Infrastructure, `LearningProjectRemote` 구현)로 나눈다.
-- **근거**: `sources/docs/package-rules/composition.md`가 "Data 모델·DTO·오류와 Domain
+- **근거**: `docs/package-rules/composition.md`가 "Data 모델·DTO·오류와 Domain
   모델·오류 사이의 변환은 Domain↔Data Adapter가", "Data 계약의 요청·응답과 Infrastructure
   API 사이의 변환은 Data↔Infrastructure Adapter가" 담당해야 한다고 명시적으로 분리한다.
   하나의 Adapter에 두 책임을 합치면 이 정책을 위반한다.
@@ -77,7 +77,7 @@ spec.md에 `[NEEDS CLARIFICATION]` 표식은 없다(`/speckit-clarify` 세션 20
   변환 코드만 추가한다.
 - **검토한 대안**: Data↔Infrastructure Adapter가 곧바로 Domain 오류를 던지게 해 한 단계로
   줄이는 안 — 결정 1의 책임 분리(Data 계층은 Domain 타입을 참조하지 않는다,
-  `sources/docs/package-rules/data.md`)를 Adapter 내부에서 위반하게 되어 기각한다.
+  `docs/package-rules/data.md`)를 Adapter 내부에서 위반하게 되어 기각한다.
 
 ## 결정 5: `HTTPClientError`의 typed throws를 표준 `throws`로 브리지하는 지점
 

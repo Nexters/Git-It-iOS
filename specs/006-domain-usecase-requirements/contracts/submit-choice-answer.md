@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-028~031, FR-036 |
 **데이터 모델**: [data-model.md](../data-model.md) `Question`, `MyAnswer` |
-**도메인 문서**: [submit-choice-answer.md](../../../sources/docs/git-it-domain-usecases/submit-choice-answer.md)
 
 객관식 문제에 대한 답변을 제출하고 채점 결과를 받는다.
 

@@ -1,6 +1,6 @@
 # 조사 노트: 디자인 토큰 시스템
 
-**입력**: [spec.md](./spec.md), [architecture.md](../../sources/docs/architecture.md), [package-rules/ui.md](../../sources/docs/package-rules/ui.md)
+**입력**: [spec.md](./spec.md), [architecture.md](../../docs/architecture.md), [package-rules/ui.md](../../docs/package-rules/ui.md)
 
 이 문서는 Technical Context를 채우기 위해 확인한 사실과, 명세가 "적용 수단에 위임"하기로
 결정한 항목의 구체적 구현 방식을 다룹니다. 명세 자체의 모호성은 `/speckit-clarify`에서

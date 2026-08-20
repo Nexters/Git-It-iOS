@@ -42,7 +42,7 @@
 
 `ProjectRow`는 Figma `ProjectList`에 대응한다. `학습세트 List-item`은 320×130pt,
 세그먼트 진행 표시, Grey700 배경을 갖는 별도 계약이므로 `ProjectRow`의 변형으로 합치지
-않는다. 구현 단계에서 `sources/docs/ui-component-checklist.md`의 잘못된 대응을 고치되,
+않는다. 구현 단계에서 `docs/ui-component-checklist.md`의 잘못된 대응을 고치되,
 새 컴포넌트 구현은 G4 후속 기능이 소유한다.
 
 ## 보류 항목
