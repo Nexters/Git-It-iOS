@@ -68,14 +68,15 @@ public struct ResourceAnimation: View {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
         ResourceAnimation(viewModel: .init(asset: .generalLoading))
             .frame(width: 128, height: 128)
+        
         ResourceAnimation(viewModel: .init(asset: .notification, isLooping: false))
             .frame(width: 128, height: 128)
+        
         ResourceAnimation(viewModel: .init(asset: .projectEmpty, isLooping: false))
             .frame(width: 128, height: 128)
         
         ResourceAnimation(viewModel: .init(asset: .storageEmpty, isLooping: false))
             .frame(width: 128, height: 128)
-
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin.cgFloatValue)
