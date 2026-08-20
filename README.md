@@ -23,20 +23,18 @@ Git It의 iOS 애플리케이션 저장소입니다.
 
 `make init`은 `tools/repository-paths/repository-paths.json`에 정의된 경로를 사용해
 `GitIt.xcworkspace`, `CLAUDE.md`, `.claude` 심볼릭 링크를 갱신합니다. 또한 `specs/`와
-`docs/`를 폴더로 등록한 `Git-It-iOS.code-workspace`를 저장소 루트에 생성합니다.
+`docs/`를 폴더로 등록한 `Documents-Workspace.code-workspace`를 저장소 루트에 생성합니다.
 링크 위치에 일반 파일이나 디렉터리가 있으면 자동으로 삭제하지 않고 초기화를 중단합니다.
 
 ## 저장소 구조
 
 ```text
 .
-├── sources/            # 실제 iOS 앱 소스와 Tuist 패키지
-├── docs/               # 아키텍처·컨벤션·패키지 규칙과 spec-kit/<feature>/ 세션 기록
+├── sources/            # iOS 앱 소스와 Tuist 패키지
+├── docs/               # 아키텍처·컨벤션·패키지 규칙 및 세션 기록
 ├── specs/              # 기능 명세 및 계획 산출물 (Spec Kit)
 ├── .specify/           # Spec Kit 설정과 상위 원칙(Constitution)
 ├── .agents/            # 프로젝트 전용 에이전트 스킬 (커스텀 툴)
 ├── .github/            # GitHub CI/CD 및 커밋·PR 규칙
-└── tools/
-    ├── project-setup/  # 에이전트 링크와 개발 workspace 초기화
-    └── ...             # 나머지 저장소 자동화 도구
+└── tools/              # 저장소 자동화 도구
 ```

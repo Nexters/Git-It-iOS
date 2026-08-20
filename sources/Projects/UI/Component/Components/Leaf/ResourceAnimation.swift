@@ -68,13 +68,13 @@ public struct ResourceAnimation: View {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
         ResourceAnimation(viewModel: .init(asset: .generalLoading))
             .frame(width: 128, height: 128)
-        
+
         ResourceAnimation(viewModel: .init(asset: .notification, isLooping: false))
             .frame(width: 128, height: 128)
-        
+
         ResourceAnimation(viewModel: .init(asset: .projectEmpty, isLooping: false))
             .frame(width: 128, height: 128)
-        
+
         ResourceAnimation(viewModel: .init(asset: .storageEmpty, isLooping: false))
             .frame(width: 128, height: 128)
     }
@@ -83,13 +83,11 @@ public struct ResourceAnimation: View {
     .designSystemBackground(.grey700)
 }
 
-
 #Preview("Resource Animation 2") {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-        ResourceAnimation(viewModel: .init(asset: .setCreationLoading,speed: 1.5))
+        ResourceAnimation(viewModel: .init(asset: .setCreationLoading, speed: 1.5))
             .frame(width: 250, height: 250)
-        
-        
+
         ResourceAnimation(viewModel: .init(asset: .complete, isLooping: false))
             .frame(width: 200, height: 200)
     }
