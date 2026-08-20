@@ -39,34 +39,26 @@ rg -q 'ci.gate-evaluate.unknown-result' "$work/err"
 # workflow가 변경 분류기 결과를 evaluator에 전달하는지 함께 고정합니다.
 rg -q 'needs\.changes\.result' "$workflow"
 
-# lint 병렬화와 아키텍처 의존성 단계별 build/compile 선행 관계를 고정합니다.
+# 단일 build → compile → test job과 컴파일 산출물 전달 계약을 고정합니다.
 rg -q "needs\.changes\.outputs\.build_required == 'true'" "$workflow"
-rg -Fq '    name: lint (${{ matrix.project }})' "$workflow"
-rg -Fq 'lint "$GIT_IT_PROJECTS_ROOT/$GIT_IT_LINT_PROJECT"' "$workflow"
-[ "$(rg -o '"project":"[A-Za-z]+"' "$workflow" | wc -l | tr -d ' ')" -eq 7 ]
-rg -q '^  foundation-build:$' "$workflow"
-rg -q '^  composition-feature-build:$' "$workflow"
+rg -q "needs\.changes\.outputs\.tests_required == 'true'" "$workflow"
 rg -q '^  app-build:$' "$workflow"
-rg -q '^  foundation-unit-compile:$' "$workflow"
-rg -q '^  composition-feature-unit-compile:$' "$workflow"
-rg -q '^  app-unit-compile:$' "$workflow"
-rg -q '^  ui-compile:$' "$workflow"
-rg -Fq 'foundation_build_matrix={"include":[{"scheme":"Domain"},{"scheme":"Data"},{"scheme":"Infrastructure"},{"scheme":"UI"}]}' "$workflow"
-rg -Fq 'composition_feature_build_matrix={"include":[{"scheme":"Composition"},{"scheme":"Feature"}]}' "$workflow"
-rg -Fq 'foundation_unit_test_matrix={"include":[{"scheme":"Domain","target":"DomainAuthenticationTests"}' "$workflow"
-rg -Fq 'composition_feature_unit_test_matrix={"include":[{"scheme":"Composition","target":"CompositionAdepterTests"},{"scheme":"Feature","target":"FeatureTests"}]}' "$workflow"
-rg -A 5 '^  composition-feature-build:$' "$workflow" | rg -q '^      - foundation-build$'
-rg -A 5 '^  app-build:$' "$workflow" | rg -q '^      - composition-feature-build$'
-rg -A 5 '^  foundation-unit-compile:$' "$workflow" | rg -q '^      - app-build$'
-rg -A 6 '^  composition-feature-unit-compile:$' "$workflow" | rg -q '^      - foundation-unit-compile$'
-rg -A 6 '^  composition-feature-unit-compile:$' "$workflow" | rg -q '^      - ui-compile$'
-rg -A 5 '^  app-unit-compile:$' "$workflow" | rg -q '^      - composition-feature-unit-compile$'
-rg -A 5 '^  unit-tests:$' "$workflow" | rg -q '^      - app-unit-compile$'
-rg -A 6 '^  ui-tests:$' "$workflow" | rg -q '^      - ui-compile$'
-rg -A 6 '^  ui-tests:$' "$workflow" | rg -q '^      - app-unit-compile$'
-[ "$(rg -c '^      max-parallel: 5$' "$workflow")" -eq 6 ]
+rg -q '^  test-compile:$' "$workflow"
+rg -q '^  tests:$' "$workflow"
+rg -A 5 '^  test-compile:$' "$workflow" | rg -q '^      - app-build$'
+rg -A 5 '^  tests:$' "$workflow" | rg -q '^      - test-compile$'
+if rg -q 'matrix\.|max-parallel:|GIT_IT_PROJECT_SCHEME:|GIT_IT_TEST_TARGET:' "$workflow"; then
+	printf 'FAIL: job 단위 분할 설정이 남아 있음\n' >&2
+	exit 1
+fi
+rg -Fq '"$GIT_IT_PROJECT_BUILD_RUNNER" build' "$workflow"
+rg -Fq '"$GIT_IT_PROJECT_BUILD_RUNNER" compile' "$workflow"
+rg -Fq '"$GIT_IT_PROJECT_BUILD_RUNNER" test' "$workflow"
 rg -q 'actions/upload-artifact@v4' "$workflow"
 rg -q 'actions/download-artifact@v4' "$workflow"
-rg -q 'GIT_IT_TEST_TARGET:' "$workflow"
+rg -q 'name: compiled-test-products' "$workflow"
+rg -Fq 'GIT_IT_DERIVED_DATA_PATH/TestSchemes' "$workflow"
+rg -Fq 'cd "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"' "$workflow"
+rg -Fq './*/Build/Products' "$workflow"
 
 printf 'PASS: CI gate evaluator\n'

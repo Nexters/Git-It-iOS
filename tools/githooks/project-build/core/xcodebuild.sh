@@ -7,10 +7,9 @@ project_xcodebuild_all() (
 	project_xcodebuild_destination=$3
 	project_xcodebuild_operation=$4
 	project_xcodebuild_action=$5
-	project_xcodebuild_test_target=$6
-	project_xcodebuild_targets=$7
-	project_xcodebuild_results=$8
-	project_xcodebuild_helper=$9
+	project_xcodebuild_targets=$6
+	project_xcodebuild_results=$7
+	project_xcodebuild_helper=$8
 
 	: >"$project_xcodebuild_results"
 	# NUL 경계를 보존한 채 각 scheme을 helper의 마지막 argv로 전달합니다.
@@ -20,7 +19,6 @@ project_xcodebuild_all() (
 		"$project_xcodebuild_destination" \
 		"$project_xcodebuild_operation" \
 		"$project_xcodebuild_action" \
-		"$project_xcodebuild_test_target" \
 		"$project_xcodebuild_results" <"$project_xcodebuild_targets"
 )
 
@@ -30,9 +28,8 @@ project_xcodebuild_one() {
 	project_xcodebuild_destination=$3
 	project_xcodebuild_operation=$4
 	project_xcodebuild_action=$5
-	project_xcodebuild_test_target=$6
-	project_xcodebuild_results=$7
-	project_xcodebuild_scheme_file=$8
+	project_xcodebuild_results=$6
+	project_xcodebuild_scheme_file=$7
 	project_xcodebuild_scheme=$(basename -- "$project_xcodebuild_scheme_file" .xcscheme)
 	project_xcodebuild_arch=$(uname -m)
 
@@ -54,12 +51,6 @@ project_xcodebuild_one() {
 		project_xcodebuild_derived=$project_xcodebuild_derived_root
 	fi
 	printf '%s 시작: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
-	# target 선택자는 compile과 test가 동일한 최소 테스트 단위를 공유하게 합니다.
-	if [ -n "$project_xcodebuild_test_target" ]; then
-		set -- "-only-testing:$project_xcodebuild_test_target"
-	else
-		set --
-	fi
 	if xcodebuild \
 		-quiet \
 		-workspace "$project_xcodebuild_workspace" \
@@ -69,7 +60,6 @@ project_xcodebuild_one() {
 		-derivedDataPath "$project_xcodebuild_derived" \
 		-disableAutomaticPackageResolution \
 		-jobs 1 \
-		"$@" \
 		"$project_xcodebuild_action" \
 		CODE_SIGNING_ALLOWED=NO \
 		COMPILER_INDEX_STORE_ENABLE=NO \

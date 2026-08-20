@@ -47,12 +47,10 @@ printf '%s\n' '#!/bin/sh' \
 	'action=' \
 	'derived_data=' \
 	'index_store=false' \
-	'test_target=' \
 	'for argument do' \
 	'  case "$argument" in' \
 	'    -sdk) exit 90 ;;' \
 	'    build | build-for-testing | test-without-building) action=$argument ;;' \
-	'    -only-testing:*) test_target=${argument#-only-testing:} ;;' \
 	'    COMPILER_INDEX_STORE_ENABLE=NO) index_store=true ;;' \
 	'  esac' \
 	'done' \
@@ -65,11 +63,7 @@ printf '%s\n' '#!/bin/sh' \
 	'[ "$index_store" = true ] || exit 92' \
 	'case "$scheme" in Tests) expected_derived="$EXPECTED_DERIVED_ROOT/TestSchemes/$scheme" ;; *) expected_derived=$EXPECTED_DERIVED_ROOT ;; esac' \
 	'[ "$derived_data" = "$expected_derived" ] || exit 93' \
-	'if [ -n "$test_target" ]; then' \
-	'  printf "%s\t%s\t%s\n" "$action" "$scheme" "$test_target" >> "$PROJECT_ACTION_LOG"' \
-	'else' \
-	'  printf "%s\t%s\n" "$action" "$scheme" >> "$PROJECT_ACTION_LOG"' \
-	'fi' \
+	'printf "%s\t%s\n" "$action" "$scheme" >> "$PROJECT_ACTION_LOG"' \
 	'[ "$scheme" != Fail ]' >"$work/bin/xcodebuild"
 chmod +x "$work/bin/xcodebuild"
 
@@ -113,45 +107,18 @@ rg -q 'project-build.scheme-failed' "$work/err"
 
 rm "$projects/Fail/xcshareddata/xcschemes/Fail.xcscheme"
 : >"$PROJECT_ACTION_LOG"
-GIT_IT_PROJECT_SCHEME=Tests GIT_IT_TEST_TARGET=TestsTarget \
-	run_stage compile >"$work/out" 2>"$work/err"
-[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'build-for-testing\tTests\tTestsTarget')" ]
+run_stage compile >"$work/out" 2>"$work/err"
+[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'build-for-testing\tTests')" ]
 rg -q '작업=compile 시도=1 성공=1 실패=0' "$work/out"
 
 : >"$PROJECT_ACTION_LOG"
-GIT_IT_PROJECT_SCHEME=Tests GIT_IT_TEST_TARGET=TestsTarget \
-	run_stage test >"$work/out" 2>"$work/err"
-[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests\tTestsTarget')" ]
+run_stage test >"$work/out" 2>"$work/err"
+[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests')" ]
 rg -q '작업=test 시도=1 성공=1 실패=0' "$work/out"
-
-: >"$PROJECT_ACTION_LOG"
-GIT_IT_PROJECT_SCHEME=App GIT_IT_TEST_TARGET='' \
-	run_stage build >"$work/out" 2>"$work/err"
-[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'build\tApp')" ]
-rg -q '작업=build 시도=1 성공=1 실패=0' "$work/out"
-
-if GIT_IT_PROJECT_SCHEME='invalid/name' GIT_IT_TEST_TARGET='' \
-	run_project compile >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: 유효하지 않은 scheme 선택자가 성공함\n' >&2
-	exit 1
-else
-	result=$?
-fi
-[ "$result" -eq 2 ] && rg -q 'common.invalid-input' "$work/err"
-
-if GIT_IT_PROJECT_SCHEME='' GIT_IT_TEST_TARGET=TestsTarget \
-	run_project build >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: build가 테스트 target 선택자를 허용함\n' >&2
-	exit 1
-else
-	result=$?
-fi
-[ "$result" -eq 2 ] && rg -q 'common.invalid-input' "$work/err"
 
 rm "$projects/Tests/xcshareddata/xcschemes/Tests.xcscheme"
 : >"$PROJECT_ACTION_LOG"
-GIT_IT_PROJECT_SCHEME=Tests GIT_IT_TEST_TARGET='' \
-	run_stage compile >"$work/out" 2>"$work/err"
+run_stage compile >"$work/out" 2>"$work/err"
 [ ! -s "$PROJECT_ACTION_LOG" ]
 rg -q 'project-build.no-test-schemes' "$work/out"
 

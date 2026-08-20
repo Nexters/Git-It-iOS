@@ -27,14 +27,7 @@ jobs:
       workflow_changed: ${{ steps.classify.outputs.workflow_changed }}
       tests_changed: ${{ steps.classify.outputs.tests_changed }}
       build_required: ${{ steps.classify.outputs.build_required }}
-      unit_tests_required: ${{ steps.classify.outputs.unit_tests_required }}
-      ui_tests_required: ${{ steps.classify.outputs.ui_tests_required }}
-      foundation_build_matrix: ${{ steps.plan.outputs.foundation_build_matrix }}
-      composition_feature_build_matrix: ${{ steps.plan.outputs.composition_feature_build_matrix }}
-      lint_matrix: ${{ steps.plan.outputs.lint_matrix }}
-      foundation_unit_test_matrix: ${{ steps.plan.outputs.foundation_unit_test_matrix }}
-      composition_feature_unit_test_matrix: ${{ steps.plan.outputs.composition_feature_unit_test_matrix }}
-      unit_test_matrix: ${{ steps.plan.outputs.unit_test_matrix }}
+      tests_required: ${{ steps.classify.outputs.tests_required }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -44,17 +37,6 @@ jobs:
       - name: Classify changes
         id: classify
         run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
-
-      - name: Define build, lint, and test matrix
-        id: plan
-        run: |
-          # 프로젝트 아키텍처의 provider → consumer 위상 순서를 유지합니다.
-          echo 'foundation_build_matrix={"include":[{"scheme":"Domain"},{"scheme":"Data"},{"scheme":"Infrastructure"},{"scheme":"UI"}]}' >> "$GITHUB_OUTPUT"
-          echo 'composition_feature_build_matrix={"include":[{"scheme":"Composition"},{"scheme":"Feature"}]}' >> "$GITHUB_OUTPUT"
-          echo 'lint_matrix={"include":[{"project":"App"},{"project":"Composition"},{"project":"Feature"},{"project":"Domain"},{"project":"Data"},{"project":"Infrastructure"},{"project":"UI"}]}' >> "$GITHUB_OUTPUT"
-          echo 'foundation_unit_test_matrix={"include":[{"scheme":"Domain","target":"DomainAuthenticationTests"},{"scheme":"Domain","target":"DomainLearningProjectTests"},{"scheme":"Data","target":"DataAuthenticationTests"},{"scheme":"Data","target":"DataLearningProjectTests"},{"scheme":"Infrastructure","target":"InfrastructureAuthenticationTests"},{"scheme":"Infrastructure","target":"InfrastructureNetworkClientTests"},{"scheme":"Infrastructure","target":"InfrastructureCacheTests"},{"scheme":"UI","target":"DesignSystemTests"},{"scheme":"UI","target":"UIComponentTests"}]}' >> "$GITHUB_OUTPUT"
-          echo 'composition_feature_unit_test_matrix={"include":[{"scheme":"Composition","target":"CompositionAdepterTests"},{"scheme":"Feature","target":"FeatureTests"}]}' >> "$GITHUB_OUTPUT"
-          echo 'unit_test_matrix={"include":[{"scheme":"Domain","target":"DomainAuthenticationTests"},{"scheme":"Domain","target":"DomainLearningProjectTests"},{"scheme":"Data","target":"DataAuthenticationTests"},{"scheme":"Data","target":"DataLearningProjectTests"},{"scheme":"Infrastructure","target":"InfrastructureAuthenticationTests"},{"scheme":"Infrastructure","target":"InfrastructureNetworkClientTests"},{"scheme":"Infrastructure","target":"InfrastructureCacheTests"},{"scheme":"UI","target":"DesignSystemTests"},{"scheme":"UI","target":"UIComponentTests"},{"scheme":"Composition","target":"CompositionAdepterTests"},{"scheme":"Feature","target":"FeatureTests"},{"scheme":"App","target":"GitItTests"}]}' >> "$GITHUB_OUTPUT"
 
   script-quality:
     name: script quality
@@ -78,19 +60,14 @@ jobs:
         run: "$GIT_IT_SCRIPT_TEST_RUNNER"
 
   swift-lint:
-    name: lint (${{ matrix.project }})
+    name: lint
     needs: changes
     if: ${{ needs.changes.outputs.swift_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 15
     continue-on-error: true
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.lint_matrix) }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_LINT_PROJECT: ${{ matrix.project }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -110,21 +87,16 @@ jobs:
 
       - name: Lint Swift style
         run: |
-          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint "$GIT_IT_PROJECTS_ROOT/$GIT_IT_LINT_PROJECT"
+          "$GIT_IT_SWIFT_FORMAT_RUNNER" lint
 
-  foundation-build:
-    name: build foundation (${{ matrix.scheme }})
+  app-build:
+    name: build
     needs: changes
     if: ${{ needs.changes.outputs.build_required == 'true' }}
     runs-on: macos-26
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.foundation_build_matrix) }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: ${{ matrix.scheme }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -161,132 +133,20 @@ jobs:
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
-      - name: Build production scheme
+      - name: Build shared schemes
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" build
 
-  composition-feature-build:
-    name: build composition/feature (${{ matrix.scheme }})
-    needs:
-      - changes
-      - foundation-build
-    if: ${{ needs.changes.outputs.build_required == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.composition_feature_build_matrix) }}
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: ${{ matrix.scheme }}
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Build production scheme
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" build
-
-  app-build:
-    name: build app
-    needs:
-      - changes
-      - composition-feature-build
-    if: ${{ needs.changes.outputs.build_required == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: App
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Build production scheme
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" build
-
-  foundation-unit-compile:
-    name: compile foundation (${{ matrix.target }})
+  test-compile:
+    name: compile tests
     needs:
       - changes
       - app-build
-    if: ${{ needs.changes.outputs.unit_tests_required == 'true' }}
+    if: ${{ needs.changes.outputs.tests_required == 'true' }}
     runs-on: macos-26
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.foundation_unit_test_matrix) }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: ${{ matrix.scheme }}
-      GIT_IT_TEST_TARGET: ${{ matrix.target }}
       GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
     steps:
       - name: Check out repository
@@ -324,37 +184,37 @@ jobs:
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
-      - name: Compile unit test target
+      - name: Compile tests
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" compile
 
-      - name: Archive compiled test product
+      - name: Archive compiled test products
         run: |
-          tar -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes" \
-            -cf "$RUNNER_TEMP/$GIT_IT_TEST_TARGET.tar" \
-            "$GIT_IT_PROJECT_SCHEME/Build/Products"
+          (
+            cd "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
+            tar -cf "$RUNNER_TEMP/compiled-test-products.tar" \
+              ./*/Build/Products
+          )
 
-      - name: Upload compiled test product
+      - name: Upload compiled test products
         uses: actions/upload-artifact@v4
         with:
-          name: compiled-${{ matrix.target }}
-          path: ${{ runner.temp }}/${{ matrix.target }}.tar
+          name: compiled-test-products
+          path: ${{ runner.temp }}/compiled-test-products.tar
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
 
-  ui-compile:
-    name: compile (UIComponentUITests)
+  tests:
+    name: tests
     needs:
       - changes
-      - app-build
-    if: ${{ needs.changes.outputs.ui_tests_required == 'true' }}
+      - test-compile
+    if: ${{ needs.changes.outputs.tests_required == 'true' }}
     runs-on: macos-26
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: UI
-      GIT_IT_TEST_TARGET: UIComponentUITests
       GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
     steps:
       - name: Check out repository
@@ -392,298 +252,19 @@ jobs:
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
-      - name: Compile UI test target
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
-
-      - name: Archive compiled test product
-        run: |
-          tar -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes" \
-            -cf "$RUNNER_TEMP/$GIT_IT_TEST_TARGET.tar" \
-            "$GIT_IT_PROJECT_SCHEME/Build/Products"
-
-      - name: Upload compiled test product
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-UIComponentUITests
-          path: ${{ runner.temp }}/UIComponentUITests.tar
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 0
-
-  composition-feature-unit-compile:
-    name: compile composition/feature (${{ matrix.target }})
-    needs:
-      - changes
-      - foundation-unit-compile
-      - ui-compile
-    if: ${{ always() && needs.changes.outputs.unit_tests_required == 'true' && needs.foundation-unit-compile.result == 'success' && (needs.ui-compile.result == 'success' || needs.ui-compile.result == 'skipped') }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.composition_feature_unit_test_matrix) }}
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: ${{ matrix.scheme }}
-      GIT_IT_TEST_TARGET: ${{ matrix.target }}
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Compile unit test target
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
-
-      - name: Archive compiled test product
-        run: |
-          tar -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes" \
-            -cf "$RUNNER_TEMP/$GIT_IT_TEST_TARGET.tar" \
-            "$GIT_IT_PROJECT_SCHEME/Build/Products"
-
-      - name: Upload compiled test product
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-${{ matrix.target }}
-          path: ${{ runner.temp }}/${{ matrix.target }}.tar
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 0
-
-  app-unit-compile:
-    name: compile app (GitItTests)
-    needs:
-      - changes
-      - composition-feature-unit-compile
-    if: ${{ needs.changes.outputs.unit_tests_required == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: App
-      GIT_IT_TEST_TARGET: GitItTests
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Compile unit test target
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
-
-      - name: Archive compiled test product
-        run: |
-          tar -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes" \
-            -cf "$RUNNER_TEMP/$GIT_IT_TEST_TARGET.tar" \
-            "$GIT_IT_PROJECT_SCHEME/Build/Products"
-
-      - name: Upload compiled test product
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-GitItTests
-          path: ${{ runner.temp }}/GitItTests.tar
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 0
-
-  unit-tests:
-    name: test (${{ matrix.target }})
-    needs:
-      - changes
-      - app-unit-compile
-    if: ${{ needs.changes.outputs.unit_tests_required == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix: ${{ fromJSON(needs.changes.outputs.unit_test_matrix) }}
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_PROJECT_SCHEME: ${{ matrix.scheme }}
-      GIT_IT_TEST_TARGET: ${{ matrix.target }}
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Download compiled test product
+      - name: Download compiled test products
         uses: actions/download-artifact@v4
         with:
-          name: compiled-${{ matrix.target }}
-          path: ${{ runner.temp }}/compiled-tests
+          name: compiled-test-products
+          path: ${{ runner.temp }}/compiled-test-products
 
-      - name: Restore compiled test product
+      - name: Restore compiled test products
         run: |
           mkdir -p "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
-          tar -xf "$RUNNER_TEMP/compiled-tests/$GIT_IT_TEST_TARGET.tar" \
+          tar -xf "$RUNNER_TEMP/compiled-test-products/compiled-test-products.tar" \
             -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
 
-      - name: Run unit test target
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" test
-
-  ui-tests:
-    name: test (UIComponentUITests)
-    needs:
-      - changes
-      - ui-compile
-      - app-unit-compile
-    if: ${{ needs.changes.outputs.ui_tests_required == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-      GIT_IT_PROJECT_SCHEME: UI
-      GIT_IT_TEST_TARGET: UIComponentUITests
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.tuist/Cache
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Download compiled test product
-        uses: actions/download-artifact@v4
-        with:
-          name: compiled-UIComponentUITests
-          path: ${{ runner.temp }}/compiled-tests
-
-      - name: Restore compiled test product
-        run: |
-          mkdir -p "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
-          tar -xf "$RUNNER_TEMP/compiled-tests/$GIT_IT_TEST_TARGET.tar" \
-            -C "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
-
-      - name: Run UI test target
+      - name: Run tests without building
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" test
 
@@ -692,15 +273,9 @@ jobs:
     needs:
       - changes
       - script-quality
-      - foundation-build
-      - composition-feature-build
       - app-build
-      - foundation-unit-compile
-      - ui-compile
-      - composition-feature-unit-compile
-      - app-unit-compile
-      - unit-tests
-      - ui-tests
+      - test-compile
+      - tests
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -712,12 +287,6 @@ jobs:
           ./tools/ci/bin/gate-evaluate.sh \
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
-            "${{ needs.foundation-build.result }}" \
-            "${{ needs.composition-feature-build.result }}" \
             "${{ needs.app-build.result }}" \
-            "${{ needs.foundation-unit-compile.result }}" \
-            "${{ needs.ui-compile.result }}" \
-            "${{ needs.composition-feature-unit-compile.result }}" \
-            "${{ needs.app-unit-compile.result }}" \
-            "${{ needs.unit-tests.result }}" \
-            "${{ needs.ui-tests.result }}"
+            "${{ needs.test-compile.result }}" \
+            "${{ needs.tests.result }}"

@@ -88,17 +88,13 @@ classify_changes_main() (
 		classify_docs_only=true
 	fi
 
-	# 선행 build 플래그는 모든 후행 compile/test 플래그를 포함합니다.
-	classify_unit_tests_required=false
+	# 선행 build 플래그는 후행 compile/test 플래그를 포함합니다.
+	classify_tests_required=false
 	if [ "$classify_swift" = true ] || [ "$classify_tests" = true ] ||
 		[ "$classify_project_config" = true ]; then
-		classify_unit_tests_required=true
+		classify_tests_required=true
 	fi
-	classify_ui_tests_required=$classify_ui
-	classify_build_required=false
-	if [ "$classify_unit_tests_required" = true ] || [ "$classify_ui_tests_required" = true ]; then
-		classify_build_required=true
-	fi
+	classify_build_required=$classify_tests_required
 
 	# GitHub output과 로그가 같은 분류 결과를 공유하도록 한 번씩 렌더링합니다.
 	if [ -n "${GITHUB_OUTPUT:-}" ]; then
@@ -111,8 +107,7 @@ classify_changes_main() (
 			printf 'workflow_changed=%s\n' "$classify_workflow"
 			printf 'tests_changed=%s\n' "$classify_tests"
 			printf 'build_required=%s\n' "$classify_build_required"
-			printf 'unit_tests_required=%s\n' "$classify_unit_tests_required"
-			printf 'ui_tests_required=%s\n' "$classify_ui_tests_required"
+			printf 'tests_required=%s\n' "$classify_tests_required"
 		} >>"$GITHUB_OUTPUT"
 	fi
 	printf 'docs_only=%s\n' "$classify_docs_only"
@@ -123,8 +118,7 @@ classify_changes_main() (
 	printf 'workflow_changed=%s\n' "$classify_workflow"
 	printf 'tests_changed=%s\n' "$classify_tests"
 	printf 'build_required=%s\n' "$classify_build_required"
-	printf 'unit_tests_required=%s\n' "$classify_unit_tests_required"
-	printf 'ui_tests_required=%s\n' "$classify_ui_tests_required"
+	printf 'tests_required=%s\n' "$classify_tests_required"
 
 	if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
 		{
@@ -139,8 +133,7 @@ classify_changes_main() (
 			printf '| workflow_changed | %s |\n' "$classify_workflow"
 			printf '| tests_changed | %s |\n' "$classify_tests"
 			printf '| build_required | %s |\n' "$classify_build_required"
-			printf '| unit_tests_required | %s |\n' "$classify_unit_tests_required"
-			printf '| ui_tests_required | %s |\n' "$classify_ui_tests_required"
+			printf '| tests_required | %s |\n' "$classify_tests_required"
 			printf '\n**변경 파일 수**: %s\n' "$classify_file_count"
 		} >>"$GITHUB_STEP_SUMMARY"
 	fi
