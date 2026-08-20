@@ -30,6 +30,7 @@ extension FeatureModuleName {
                     .fromUI(.DesignSystem),
                     .fromUI(.UIComponent),
                 ],
+                buildLibraryForDistribution: false,
             )
 
         case .FeatureTests:
@@ -52,7 +53,7 @@ extension TargetDependency {
     static func fromFeature(_ name: FeatureModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../Feature"
+            path: "../Feature",
         )
     }
 }

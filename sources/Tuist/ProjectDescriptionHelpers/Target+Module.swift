@@ -6,6 +6,7 @@ extension Target {
         sourceDirectory: String,
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
+        buildLibraryForDistribution: Bool = true,
     ) -> Self {
         .target(
             name: name,
@@ -19,7 +20,7 @@ extension Target {
             dependencies: dependencies,
             settings: .settings(
                 base: [
-                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": buildLibraryForDistribution ? "YES" : "NO",
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
