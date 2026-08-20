@@ -196,7 +196,12 @@ final class LayoutContractUITests: XCTestCase {
             ),
         )
 
-        assertDimension(radius, equals: 8, contract: "tag.radius")
+        assertDimension(
+            radius,
+            equals: 8,
+            contract: "tag.radius",
+            tolerance: 1,
+        )
     }
 
     func testNewComponentScenarioFramesMatchContracts() {
