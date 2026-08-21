@@ -50,7 +50,7 @@ extension AppModuleName {
                 resources: ["Resources/**"],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
-                    .fromComposition(.CompositionAdepter),
+                    .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
                     .external(.FirebaseAnalytics),

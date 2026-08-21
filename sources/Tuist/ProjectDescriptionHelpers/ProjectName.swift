@@ -64,10 +64,10 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        CompositionModuleName.CompositionAdepter.rawValue
+                        CompositionModuleName.CompositionAdapter.rawValue
                     ],
                     testTargets: [
-                        CompositionModuleName.CompositionAdepterTests.rawValue
+                        CompositionModuleName.CompositionAdapterTests.rawValue
                     ],
                 )]
 
