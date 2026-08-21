@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Git-It-iOS}/tools/swift-style",
+            "name": "Debug SwiftStyleFormatTool (tools/swift-style)",
+            "target": "SwiftStyleFormatTool",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug SwiftStyleFormatTool (tools/swift-style)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Git-It-iOS}/tools/swift-style",
+            "name": "Release SwiftStyleFormatTool (tools/swift-style)",
+            "target": "SwiftStyleFormatTool",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release SwiftStyleFormatTool (tools/swift-style)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Git-It-iOS}/tools/swift-style",
+            "name": "Debug ParameterFormatter (tools/swift-style)",
+            "target": "ParameterFormatter",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug ParameterFormatter (tools/swift-style)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Git-It-iOS}/tools/swift-style",
+            "name": "Release ParameterFormatter (tools/swift-style)",
+            "target": "ParameterFormatter",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release ParameterFormatter (tools/swift-style)"
+        }
+    ]
+}
