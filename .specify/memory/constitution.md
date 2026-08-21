@@ -1,22 +1,29 @@
 <!--
 Sync Impact Report
-- Version change: 2.3.1 → 3.0.0
-- Modified principles: 5. Spec-Kit 범위 — Swift 포맷 대상을 활성 tasks.md 경로로 제한하는
-  규칙 제거; 7. 패키지 단위 구현 진행 — 완료 후 포맷 대상을 현재 변경 Swift 파일 전체로 확대
+- Version change: 3.0.0 → 4.0.0
+- Modified principles: 7. 패키지 단위 구현 진행 — 고정된 패키지 이름 순서 목록을 제거하고
+  아키텍처 문서의 의존성 표에서 도출하는 위상 순서 규칙으로 대체; 독립 패키지의 상대 순서는
+  tasks.md가 근거와 함께 결정; 의존성 표와 계획 순서 불일치 시 구현 시작 금지 규칙 추가
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ 검토 후 변경 불필요
-- Commands requiring updates: ✅ .agents/skills/speckit-swift-format-run/SKILL.md
-- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ .specify/extensions/swift-format/**;
-  ✅ .specify/extensions.yml
+- Templates requiring updates: ✅ .specify/templates/plan-template.md;
+  ✅ .specify/templates/tasks-template.md; ✅ .specify/templates/spec-template.md (변경 불필요)
+- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md;
+  ✅ .agents/skills/speckit-tasks/SKILL.md; ✅ .agents/skills/speckit-converge/SKILL.md;
+  ✅ .agents/skills/speckit-implement/SKILL.md
+- Runtime guidance requiring updates: ⚠ docs/architecture.md 3.1과 7.1 — Data → Infrastructure
+  의존 허용 여부(ARCH-DI-001 / D-ARCH-003)가 미결이며 현재는 금지로 기재돼 있음. 이 스킬의
+  수정 허용 경로 밖이므로 pending. specs/013-feature-usecase-app-di의 FR-055~058 문서 동기화
+  단계에서 처리해야 함
 - Evidence records: 없음
-- Follow-up TODO: 없음
+- Follow-up TODO: docs/architecture.md의 패키지 의존성 표가 확정되기 전에는 013 명세의 구현
+  순서를 tasks.md에 고정하지 않습니다
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 3.0.0<br>
+**버전**: 4.0.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-21
 
@@ -115,9 +122,16 @@ Sync Impact Report
 ### 7. 패키지 단위 구현 진행
 
 - 현재 명세가 변경하는 패키지 중 한 번에 하나의 패키지만 구현합니다.
-- 적용 대상 패키지는 `Domain → Data → Infrastructure → Composition → UI → Feature → App`
-  순서로 구현합니다. 현재 명세가 변경하지 않는 패키지는 건너뛰되, 나머지 적용 대상
-  패키지의 상대적 순서는 바꾸지 않습니다.
+- 적용 대상 패키지는 의존성 위상 순서로 구현합니다. A가 B를 빌드 의존성으로 참조하면 B를
+  먼저 구현합니다. 순서의 근거는 [아키텍처 문서](../../docs/architecture.md)의 프로젝트 내부
+  패키지 의존성 표이며, 고정된 패키지 이름 목록을 이 문서나 하위 산출물에 정본으로 두지
+  않습니다.
+- 서로 의존하지 않는 패키지의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
+  한 번 정한 순서는 해당 명세의 구현이 끝날 때까지 바꾸지 않습니다.
+- 현재 명세가 변경하지 않는 패키지는 건너뛰되, 남은 적용 대상 패키지 사이의 위상 순서는
+  깨지 않습니다.
+- 의존성 표와 계획된 구현 순서가 어긋나면 구현을 시작하지 않습니다. 아키텍처 문서와
+  `tasks.md`를 먼저 일치시키고, 어느 쪽이 옳은지 불분명하면 사용자에게 확인합니다.
 - 현재 패키지의 모든 구현 작업과 검증을 완료하고, 변경 파일과 검증 결과를 사용자에게
   보고한 뒤 다음 적용 대상 패키지로 진행해도 된다는 명시적 승인을 받아야 합니다.
 - 다음 적용 대상 패키지의 영향 분석은 승인 전에 수행하고 보고할 수 있지만, 그 패키지에
@@ -132,8 +146,8 @@ Sync Impact Report
   파일을 수정합니다. 활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않습니다.
   저장소의 `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지
   않습니다.
-- 패키지 순서가 개정되면 이미 완료된 작업과 기존 변경은 이력으로 보존하되 더 수정하지
-  않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
+- 의존 관계 변경으로 패키지 구현 순서가 달라지면 이미 완료된 작업과 기존 변경은 이력으로
+  보존하되 더 수정하지 않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
   패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
 
 ### 8. Git-flow 브랜치 네임스페이스

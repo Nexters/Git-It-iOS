@@ -105,8 +105,9 @@ allowlist로 만들 수 없다. 문서를 읽기만 하는 검증은 `[no-write]
    - 현재 패키지 내부에서만 허용되는 병렬 실행 예시 생성
    - Validate task completeness (each change scenario has all needed tasks and is independently testable)
    - 모든 파일 변경 작업을 정확히 하나의 패키지 단계에 명시적으로 배정하고, 명세가 변경하지 않는 패키지는
-     제외한 `Domain → Data → Infrastructure → Composition → UI → Feature → App` 순서로 패키지 단계를
-     최상위 실행 순서로 구성
+     제외한 의존성 위상 순서로 패키지 단계를 최상위 실행 순서로 구성. 순서 근거는 아키텍처
+     문서의 패키지 의존성 표이며, 서로 의존하지 않는 패키지의 상대적 순서는 tasks.md가 근거와
+     함께 확정
    - 각 적용 대상 패키지 단계 끝에 패키지 검증, 결과 보고와 다음 적용 대상 패키지 진행에
      대한 명시적 사용자 승인 게이트를 두고, 패키지 단계 안에서 변경 시나리오 추적성을 유지
 
@@ -216,8 +217,8 @@ Every task MUST strictly follow this format:
 ### Task Organization
 
 1. **패키지 소유권 — PRIMARY ORGANIZATION**:
-   - 명세가 변경하는 패키지만 `Domain → Data → Infrastructure → Composition → UI → Feature → App`
-     순서의 최상위 단계로 생성
+   - 명세가 변경하는 패키지만 의존성 위상 순서의 최상위 단계로 생성. 피의존 패키지를 먼저
+     두고, 채택한 순서와 근거를 tasks.md에 남긴다
    - 모든 파일 변경 작업은 정확히 하나의 패키지 단계에 배치
    - 공용 파일이 여러 패키지 선언을 바꾸면 패키지별 작업으로 분리하고 해당 단계에서 필요한
      선언만 변경하도록 설명
