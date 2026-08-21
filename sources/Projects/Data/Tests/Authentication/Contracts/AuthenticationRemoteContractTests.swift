@@ -2,6 +2,8 @@ import Testing
 
 @testable import DataAuthentication
 
+// MARK: - AuthenticationRemoteContractTests
+
 @Suite("AuthenticationRemote 계약")
 struct AuthenticationRemoteContractTests {
 

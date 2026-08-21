@@ -11,7 +11,10 @@ public struct APIResponseDTO<Payload: Decodable & Sendable>: Decodable, Sendable
 // MARK: - FieldErrorDTO
 
 public struct FieldErrorDTO: Decodable, Equatable, Sendable {
-    public init(field: String, message: String?) {
+    public init(
+        field: String,
+        message: String?,
+    ) {
         self.field = field
         self.message = message
     }

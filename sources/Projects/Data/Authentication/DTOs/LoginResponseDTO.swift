@@ -1,9 +1,18 @@
 public struct LoginResponseDTO: CustomDebugStringConvertible, CustomStringConvertible, Decodable, Equatable, Sendable {
-    public init(accessToken: String, refreshToken: String, needsCuration: Bool) {
+
+    // MARK: Lifecycle
+
+    public init(
+        accessToken: String,
+        refreshToken: String,
+        needsCuration: Bool,
+    ) {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.needsCuration = needsCuration
     }
+
+    // MARK: Public
 
     public let accessToken: String
     public let refreshToken: String
@@ -16,4 +25,5 @@ public struct LoginResponseDTO: CustomDebugStringConvertible, CustomStringConver
     public var debugDescription: String {
         description
     }
+
 }

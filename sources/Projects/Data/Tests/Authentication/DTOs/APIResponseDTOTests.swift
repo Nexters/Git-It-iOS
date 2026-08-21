@@ -3,6 +3,8 @@ import Testing
 
 @testable import DataAuthentication
 
+// MARK: - APIResponseDTOTests
+
 @Suite("공통 응답 Envelope 디코딩")
 struct APIResponseDTOTests {
 
@@ -39,8 +41,8 @@ struct APIResponseDTOTests {
     @Test
     func `code와 message, errors를 디코딩한다`() throws {
         let json = Data(#"""
-        {"success":false,"data":null,"code":"COMMON-001","message":"invalid","errors":[{"field":"idToken","message":"required"}]}
-        """#.utf8)
+            {"success":false,"data":null,"code":"COMMON-001","message":"invalid","errors":[{"field":"idToken","message":"required"}]}
+            """#.utf8)
 
         let response = try JSONDecoder().decode(APIResponseDTO<Payload>.self, from: json)
 

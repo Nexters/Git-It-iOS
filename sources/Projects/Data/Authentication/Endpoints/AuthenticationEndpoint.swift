@@ -1,20 +1,16 @@
 public struct AuthenticationEndpoint: Equatable, Sendable {
 
-    // MARK: Public
-
     public enum Method: String, Equatable, Sendable {
         case get = "GET"
         case post = "POST"
     }
 
-    /// 참조 문서 SPEC-DATA-API-001 AUTH-01.
     public static let appleLogin = Self(
         method: .post,
         path: "/api/v1/auth/login/apple",
         requiresBearerAuthentication: false,
     )
 
-    /// 참조 문서 SPEC-DATA-API-001 AUTH-02.
     public static let verifyAccessToken = Self(
         method: .get,
         path: "/api/v1/auth/token",
