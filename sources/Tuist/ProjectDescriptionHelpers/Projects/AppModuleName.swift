@@ -88,7 +88,9 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
                 sources: ["\(sourceDirectory)/**"],
-                dependencies: [],
+                dependencies: [
+                    .target(name: AppModuleName.GitIt.rawValue)
+                ],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",
