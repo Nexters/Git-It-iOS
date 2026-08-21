@@ -62,7 +62,7 @@ expected=$(printf 'script-tests\nswift-format\ncompile')
 	exit 1
 }
 
-# 4. 한 단계가 실패하면 즉시 중단하고 종료 코드를 그대로 전파한다.
+# 4. 한 단계가 실패하면 즉시 중단하고 종료 코드를 그대로 전파하며 리포트를 작성한다.
 : >"$PRE_COMMIT_LOG"
 printf '%s\n' 'script-tests' 'swift-format' 'build' 'compile' >"$enabled"
 printf '%s\n' '#!/bin/sh' \
@@ -78,6 +78,8 @@ fi
 expected=$(printf 'script-tests\nswift-format\nbuild\ncompile')
 [ "$(cat "$PRE_COMMIT_LOG")" = "$expected" ]
 rg -q 'pre-commit.step-failed' "$work/err"
+rg -Fq 'pre-commit 리포트' "$work/err"
+rg -Fq '| compile | failure:17 |' "$work/err"
 
 # 5. 알 수 없는 단계 이름은 조용히 무시하지 않고 실패한다.
 printf '%s\n' 'swift-formt' >"$enabled"

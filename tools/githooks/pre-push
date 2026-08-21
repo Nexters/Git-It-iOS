@@ -1,0 +1,23 @@
+#!/bin/sh
+# Push 직전에 origin/develop 기준의 로컬 CI 동등 검증을 실행합니다.
+
+set -eu
+
+pre_push_main() (
+	pre_push_hook=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+	pre_push_root=$(git -C "$pre_push_hook" rev-parse --show-toplevel 2>/dev/null) || {
+		printf '오류[pre-push.repository-not-found]: Git 저장소를 찾을 수 없습니다\n' >&2
+		return 2
+	}
+	pre_push_runner="$pre_push_root/tools/ci/bin/pre-push.sh"
+	[ -x "$pre_push_runner" ] || {
+		printf '오류[pre-push.missing-runner]: %s를 실행할 수 없습니다\n조치: CI pre-push runner를 복원하세요\n' "$pre_push_runner" >&2
+		return 2
+	}
+
+	# Git이 전달한 ref 목록은 이 정책에서 사용하지 않습니다. base는 항상 origin/develop입니다.
+	cat >/dev/null
+	"$pre_push_runner"
+)
+
+pre_push_main "$@"

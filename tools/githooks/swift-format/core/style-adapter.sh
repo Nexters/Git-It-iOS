@@ -33,6 +33,20 @@ style_adapter_collect_one() {
 	esac
 }
 
+# 수집된 Swift 파일 가운데 작업 트리 또는 index에서 추가·수정된 파일만 NUL 경계로 남깁니다.
+# 삭제 파일은 수집 단계에서 실제 파일이 아니므로 자연스럽게 제외됩니다.
+style_adapter_collect_changed_one() {
+	style_adapter_root=$1
+	style_adapter_output=$2
+	style_adapter_item=$3
+	if ! git -C "$style_adapter_root" diff --quiet -- "$style_adapter_item" ||
+		! git -C "$style_adapter_root" diff --cached --quiet -- "$style_adapter_item" ||
+		git -C "$style_adapter_root" ls-files --others --exclude-standard --error-unmatch -- \
+			"$style_adapter_item" >/dev/null 2>&1; then
+		printf '%s\0' "$style_adapter_item" >>"$style_adapter_output"
+	fi
+}
+
 # xargs -0 -n 1 dispatch 대상: 대상 하나를 절대경로로 바꿔 포맷/린트 도구를 실행합니다.
 style_adapter_format_one() {
 	style_adapter_tool=$1
@@ -84,6 +98,9 @@ if [ "${1:-}" = --format-one ]; then
 elif [ "${1:-}" = --collect-one ]; then
 	shift
 	style_adapter_collect_one "$@"
+elif [ "${1:-}" = --collect-changed-one ]; then
+	shift
+	style_adapter_collect_changed_one "$@"
 elif [ "${1:-}" = --backup-one ]; then
 	shift
 	style_adapter_backup_one "$@"

@@ -13,9 +13,11 @@ extension DataModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Data.rawValue)
         return switch self {
-        case .DataAuthentication, .DataExternalRepository:
+        case .DataAuthentication,
+             .DataExternalRepository:
             directoryName
-        case .DataAuthenticationTests, .DataExternalRepositoryTests:
+        case .DataAuthenticationTests,
+             .DataExternalRepositoryTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -37,6 +39,12 @@ extension DataModuleName {
                 ),
             )
 
+        case .DataLearningProject:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+            )
+
         case .DataExternalRepository:
             .module(
                 name: rawValue,
@@ -49,6 +57,30 @@ extension DataModuleName {
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
                     name: DataModuleName.DataExternalRepository.rawValue
+                ),
+            )
+
+        case .DataLearningProjectTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataLearningProject.rawValue
+                ),
+            )
+
+        case .DataMember:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+            )
+
+        case .DataMemberTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataMember.rawValue
                 ),
             )
         }

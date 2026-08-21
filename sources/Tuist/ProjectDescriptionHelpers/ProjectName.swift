@@ -39,17 +39,26 @@ extension ProjectName {
         let schemes: [Scheme] =
             switch self {
             case .App:
-                [.package(
-                    name: rawValue,
-                    buildTargets: [
-                        AppModuleName.GitIt.rawValue
-                    ],
-                    testTargets: [
-                        AppModuleName.GitItTests.rawValue
-                    ],
-                    runTarget: AppModuleName.GitIt.rawValue,
-                    supportsDistribution: true,
-                )]
+                [
+                    .package(
+                        name: rawValue,
+                        buildTargets: [
+                            AppModuleName.GitIt.rawValue
+                        ],
+                        testTargets: [],
+                        runTarget: AppModuleName.GitIt.rawValue,
+                        supportsDistribution: true,
+                    ),
+                    .package(
+                        name: "AppTests",
+                        buildTargets: [
+                            AppModuleName.GitItTests.rawValue
+                        ],
+                        testTargets: [
+                            AppModuleName.GitItTests.rawValue
+                        ],
+                    ),
+                ]
 
             case .Composition:
                 [.package(
@@ -89,10 +98,14 @@ extension ProjectName {
                     name: rawValue,
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
+                        DataModuleName.DataLearningProject.rawValue,
+                        DataModuleName.DataMember.rawValue,
                         DataModuleName.DataExternalRepository.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
+                        DataModuleName.DataLearningProjectTests.rawValue,
+                        DataModuleName.DataMemberTests.rawValue,
                         DataModuleName.DataExternalRepositoryTests.rawValue,
                     ],
                 )]

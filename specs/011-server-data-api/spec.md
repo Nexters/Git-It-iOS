@@ -2,7 +2,7 @@
 
 **Git-flow 유형**: `feature`
 
-**기능 브랜치**: `미생성 (예정: feature/server-data-api)`
+**기능 브랜치**: `feature/server-data-api`
 
 **생성일**: 2026-08-21
 
