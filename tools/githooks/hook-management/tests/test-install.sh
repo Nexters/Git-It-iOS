@@ -25,6 +25,7 @@ export GIT_CONFIG_GLOBAL
 [ "$(git -C "$repository" config --local --get core.hooksPath)" = "$fixture_hooks_root" ]
 [ -x "$repository/$fixture_hooks_root/commit-msg" ]
 [ -x "$repository/$fixture_hooks_root/pre-commit" ]
+[ -x "$repository/$fixture_hooks_root/pre-push" ]
 for step in swift-format build compile; do
 	[ -x "$repository/$fixture_hooks_root/pre-commit.d/$step.sh" ]
 done

@@ -38,12 +38,13 @@ rg -q 'ci.gate-evaluate.unknown-result' "$work/err"
 
 # workflow가 변경 분류기 결과를 evaluator에 전달하는지 함께 고정합니다.
 rg -q 'needs\.changes\.result' "$workflow"
-if rg -n 'continue-on-error: true' "$workflow" | rg -v '^[0-9]+:    continue-on-error: true$' >/dev/null; then
-	printf 'FAIL: 허용되지 않은 continue-on-error 설정\n' >&2
+if rg -n 'continue-on-error: true' "$workflow" >/dev/null; then
+	printf 'FAIL: CI job이 오류를 성공으로 처리합니다\n' >&2
 	exit 1
 fi
-[ "$(rg -c 'continue-on-error: true' "$workflow")" -eq 1 ]
+rg -q 'continue-on-error: false' "$workflow"
 rg -q 'lint-changed-swift\.sh' "$workflow"
+rg -q 'needs\.swift-lint\.result' "$workflow"
 rg -q 'GIT_IT_SCRIPT_VERIFICATION_RUNNER' "$workflow"
 rg -q 'PROJECT_BUILD_RUNNER.*compile-unit' "$workflow"
 rg -q 'PROJECT_BUILD_RUNNER.*compile-ui' "$workflow"
