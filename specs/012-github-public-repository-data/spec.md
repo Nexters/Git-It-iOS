@@ -2,7 +2,7 @@
 
 **Git-flow 유형**: `feature`
 
-**기능 브랜치**: `미생성 (예정: feature/github-public-repository-data)`
+**기능 브랜치**: `feature/github-public-repository-data`
 
 **생성일**: 2026-08-21
 
@@ -20,6 +20,8 @@
 - 질문: 이번 Data 기능이 HTTP 상태와 기술 오류를 Data 오류로 매핑하는 구현까지 포함하는가? → 답변: 포함하지 않는다. Data는 요청·DTO·오류 계약만 구현하고 실제 매핑과 상태별 매핑 테스트는 후속 Composition 범위로 둔다.
 - 질문: 이번 Data 기능은 Repository 조회 실패를 몇 가지 오류로 구분하는가? → 답변: 네트워크 연결 실패만 `offline`으로 구분하고, GitHub 404를 포함한 나머지 실패는 모두 `other`로 통일한다. `owner`/`repo` 추출 실패는 upstream Domain의 `invalidURLFormat`으로 유지한다.
 - 질문: method·path·header 요청 계약은 어느 경계가 소유하는가? → 답변: Data가 구체 HTTP 클라이언트 타입에 의존하지 않는 기술 중립적 요청 명세로 소유하고, Composition이 이를 실제 HTTP 요청으로 변환한다.
+- 질문: GitHub base URL은 어느 경계가 소유하는가? → 답변: Data 요청 계약이 `https` scheme과 `api.github.com` host를 method·path·headers와 함께 소유하고, Composition은 이를 구체 HTTP 요청으로 변환만 한다.
+- 질문: `owner` 객체가 누락되거나 `null`이면 어떻게 처리하는가? → 답변: `owner` 객체는 필수이며 누락되거나 `null`이면 디코딩에 실패한다. 객체 내부의 `avatar_url`만 선택값으로 처리한다.
 
 ## 변경 시나리오와 테스트 *(필수)*
 
@@ -54,22 +56,24 @@ Data 패키지를 소비하는 Composition 개발자는 조회 가능한 GitHub 
 ### 시나리오 2 - GitHub 요청과 인증 경계를 분리한다 (우선순위: P1)
 
 Data 패키지를 소비하는 연동 개발자는 파싱이 끝난 `owner`와 `repo`로 Data가 제공하는 기술
-중립적 GitHub Public Repository 요청 명세를 얻을 수 있어야 하며, 이 명세에는 Git-It 또는
-Apple 인증 정보가 포함되지 않아야 한다. 구체 HTTP 요청 생성과 전송은 Composition이 맡는다.
+중립적 GitHub Public Repository 요청 명세를 얻을 수 있어야 하며, 이 명세는 `https` scheme과
+`api.github.com` host를 포함하고 Git-It 또는 Apple 인증 정보는 포함하지 않아야 한다. 구체
+HTTP 요청 생성과 전송은 Composition이 맡는다.
 
 **주요 행위자**: Data↔Infrastructure Adapter를 구현하거나 검토하는 개발자
 
 **우선순위 이유**: 서로 다른 서비스의 credential이 GitHub로 전송되면 보안 경계를 위반하며,
 요청 계약이 불명확하면 실제 endpoint와 다른 요청을 만들 수 있다.
 
-**독립 테스트**: 대표 `owner`/`repo` 입력으로 생성되는 기술 중립적 요청 명세의 method, path,
-필수 헤더와 `Authorization` 부재를 확인하면 구체 HTTP 클라이언트나 실제 네트워크 없이 전체
-경계를 검증할 수 있다.
+**독립 테스트**: 대표 `owner`/`repo` 입력으로 생성되는 기술 중립적 요청 명세의 scheme, host,
+method, path, 필수 헤더와 `Authorization` 부재를 확인하면 구체 HTTP 클라이언트나 실제
+네트워크 없이 전체 경계를 검증할 수 있다.
 
 **수용 시나리오**:
 
 1. **전제** `owner = "facebook"`, `repo = "react"`, **실행** Repository 조회 요청 계약을
-   확인, **결과** method는 `GET`이고 path는 `/repos/facebook/react`이다.
+   확인, **결과** scheme은 `https`, host는 `api.github.com`, method는 `GET`이고 path는
+   `/repos/facebook/react`이다.
 2. **전제** GitHub Public Repository 조회 요청, **실행** 헤더 확인, **결과**
    `Accept: application/vnd.github+json`과 `X-GitHub-Api-Version: 2022-11-28`가 존재한다.
 3. **전제** Git-It access token, refresh token 또는 Apple identity token이 존재하는 실행
@@ -107,6 +111,8 @@ HTTP 상태와 기술 오류의 실제 매핑은 후속 Composition 테스트에
 - `topics`가 누락되거나 `null`이면 빈 배열로 처리하고 Repository 조회는 성공해야 한다.
 - `owner.avatar_url`이 누락되거나 `null`이면 이미지 값만 없음으로 처리하고 나머지 응답은
   보존해야 한다.
+- `owner` 객체 자체가 누락되거나 `null`이면 성공 DTO를 만들지 않고 디코딩 실패로 처리해야
+  한다.
 - `stargazers_count`가 0이면 유효한 값 0으로 보존해야 하며 누락과 혼동하지 않아야 한다.
 - `html_url` 또는 `stargazers_count`가 누락되거나 타입이 계약과 다르면 성공 DTO를 만들지
   않고 디코딩 실패로 처리해야 한다.
@@ -123,63 +129,71 @@ HTTP 상태와 기술 오류의 실제 매핑은 후속 Composition 테스트에
 - **FR-001**: `DataLearningProject`는 upstream에서 파싱된 `owner`와 `repo`를 입력받아
   GitHub Public Repository 메타데이터 조회를 표현하는 Data 소유 계약을 제공해야 한다.
 - **FR-002**: 조회 요청 계약은 구체 HTTP 클라이언트 타입에 의존하지 않는 기술 중립적 명세로
-  `GET https://api.github.com/repos/{owner}/{repo}`와 `Accept: application/vnd.github+json`,
-  `X-GitHub-Api-Version: 2022-11-28`를 정확히 표현해야 한다.
+  `https` scheme, `api.github.com` host, `GET` method, `/repos/{owner}/{repo}` path와
+  `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`를 정확히
+  표현해야 한다.
 - **FR-003**: GitHub 조회 요청에는 `Authorization` 헤더, Git-It access token, Git-It
   refresh token, Apple identity token을 포함하지 않아야 한다.
 - **FR-004**: `GitHubRepositoryResponseDTO`의 서비스 소비 데이터는 `htmlURL: String`,
   `ownerAvatarURL: String?`, `starCount: Int`, `topics: [String]` 네 필드로 제한해야 한다.
 - **FR-005**: 응답 계약은 `html_url → htmlURL`, `owner.avatar_url → ownerAvatarURL`,
   `stargazers_count → starCount`, `topics → topics`를 손실 없이 보존해야 한다.
-- **FR-006**: `owner.avatar_url`이 누락되거나 `null`이어도 응답 디코딩이 성공하고
-  `ownerAvatarURL`은 `nil`이어야 한다.
+- **FR-006**: 필수 `owner` 객체가 존재하는 상태에서 `owner.avatar_url`이 누락되거나
+  `null`이어도 응답 디코딩이 성공하고 `ownerAvatarURL`은 `nil`이어야 한다. `owner` 객체
+  자체가 누락되거나 `null`이면 성공 DTO를 생성하지 않아야 한다.
 - **FR-007**: `topics`가 누락되거나 `null`이면 빈 배열로 처리하고, 값이 있으면 반환 순서를
   유지해야 한다.
-- **FR-008**: 필수 데이터인 `html_url` 또는 `stargazers_count`가 누락되거나 호환되지 않는
-  타입이면 성공 DTO를 생성하지 않아야 한다.
+- **FR-008**: 필수 데이터인 `html_url`, `owner` 객체 또는 `stargazers_count`가 누락되거나
+  `null`을 허용하지 않는 값이 `null`이거나 호환되지 않는 타입이면 성공 DTO를 생성하지
+  않아야 한다.
 - **FR-009**: 응답에 서비스가 소비하지 않는 추가 JSON 필드가 존재해도 디코딩은 성공해야 하며,
   그 필드를 Data 공개 모델에 전달하지 않아야 한다.
 - **FR-010**: `full_name`과 `language`는 현재 서비스에서 소비하지 않으므로
   `GitHubRepositoryResponseDTO`의 공개 저장 데이터에 포함하지 않아야 한다.
 - **FR-011**: Repository 조회 실패는 Data 경계에서 `offline`과 `other`로 구분할 수 있어야
   하며, URL 형식 오류는 이 오류 계약에 포함하지 않아야 한다.
-- **FR-012**: Data 오류 계약에서 `offline`은 네트워크 연결 실패만 의미하고, `other`는
-  GitHub HTTP 404·403·5xx와 필수 응답 디코딩 실패를 포함한 나머지 모든 실패를 의미해야
-  한다. HTTP 상태와 기술 오류를 이 값으로 실제 변환하는 책임은 포함하지 않아야 한다.
+- **FR-012**: `DataExternalRepositoryError`는 네트워크 연결 실패를 표현하는 `offline`과
+  그 밖의 실패를 표현하는 `other` 두 의미 계약을 제공해야 한다. GitHub HTTP
+  404·403·5xx와 필수 응답 디코딩 실패를 각 오류로 실제 변환하는 책임과 상태별 매핑 검증은
+  후속 Composition 범위로 두어야 한다.
 - **FR-013**: 실패 경로에서는 등록 가능한 성공 DTO를 생성하거나 반환하지 않아야 한다.
 - **FR-014**: Data 구현은 Domain 모델을 참조하거나 `ExternalRepository`로 변환하지 않아야
   하며, 기술 중립적 요청 명세를 구체 HTTP 요청으로 변환하거나 전송하는 구현 및
   Data↔Infrastructure Adapter를 소유하지 않아야 한다.
 - **FR-015**: Data target은 프로젝트 내부 패키지나 외부 라이브러리의 구체 API에 의존하지
   않고 독립적으로 빌드·테스트할 수 있어야 한다.
-- **FR-016**: 성공, optional 데이터, 추가 필드, 필수 필드 누락, 요청 method/path/header,
-  credential 미포함과 두 Data 오류 케이스의 구분을 자동화된 계약 테스트로 검증해야 한다.
+- **FR-016**: 성공, optional 데이터, 추가 필드, 필수 필드와 `owner` 객체 누락·`null`, 요청
+  scheme/host/method/path/header, credential 미포함과 두 Data 오류 케이스의 구분을 자동화된
+  계약 테스트로 검증해야 한다.
   연결 실패, HTTP 404·403·5xx와 기술적 디코딩 실패의 실제 매핑 테스트는 이 기능에 포함하지
   않아야 한다.
 
 ### 핵심 엔터티
 
 - **GitHub Public Repository 조회 계약**: 파싱된 `owner`와 `repo`를 받아 GitHub Public
-  Repository endpoint의 method·path·header를 기술 중립적 요청 명세로 제공하고 응답 결과를
-  Data 경계의 언어로 표현한다.
+  Repository endpoint의 scheme·host·method·path·header를 기술 중립적 요청 명세로 제공하고
+  응답 결과를 Data 경계의 언어로 표현한다.
 - **GitHubRepositoryResponseDTO**: canonical Repository URL, optional 소유자 이미지 URL,
   Star 수, 순서가 보존된 topics만 담는 최소 응답 데이터다.
-- **DataExternalRepositoryError**: 네트워크 연결 실패를 `offline`, GitHub 404를 포함한
-  나머지 실패를 `other`로 구분하는 Data 오류다.
+- **DataExternalRepositoryError**: 네트워크 연결 실패를 표현하는 `offline`과 그 밖의 실패를
+  표현하는 `other`를 제공하며, 실제 기술 오류 매핑은 후속 Composition이 담당하는 Data 오류다.
 
 ## 성공 기준 *(필수)*
 
 ### 측정 가능한 결과
 
 - **SC-001**: 정상, 이미지 없음, topics 누락·`null`·빈 배열, 추가 필드 포함 fixture의
-  디코딩 테스트가 100% 통과하고 네 개의 서비스 필요 필드 값 손실이 0건이다.
-- **SC-002**: 구체 HTTP 클라이언트 없이 실행하는 요청 계약 테스트에서 method, path, 두 필수
-  헤더가 모두 일치하고 `Authorization` 및 세 종류의 금지 credential이 포함되는 경우가 0건이다.
+  성공 테스트와 `owner` 객체 누락·`null` fixture의 실패 테스트가 100% 통과하고 네 개의
+  서비스 필요 필드 값 손실이 0건이다.
+- **SC-002**: 구체 HTTP 클라이언트 없이 실행하는 요청 계약 테스트에서 scheme, host, method,
+  path와 두 필수 헤더가 모두 일치하고 `Authorization` 및 세 종류의 금지 credential이
+  포함되는 경우가 0건이다.
 - **SC-003**: `GitHubRepositoryResponseDTO`의 서비스 소비 데이터가 네 필드로 제한되고,
   `full_name`, `language` 및 기타 미사용 GitHub 필드가 공개 데이터로 노출되는 경우가
   0건이다.
 - **SC-004**: Data 오류 계약 테스트에서 `offline`과 `other` 두 케이스를 100% 구분하고,
-  각 오류를 던지는 Remote 테스트 대역이 성공 DTO를 반환하는 사례가 0건이다.
+  Remote 테스트 대역이 지정된 오류를 손실 없이 전달하며 성공 DTO를 반환하는 사례가 0건이다.
+  기술 오류의 실제 분류는 이 성공 기준의 측정 대상에서 제외한다.
 - **SC-005**: `DataLearningProject` production target과 test target이 독립적으로 빌드·테스트
   대상에 포함되고, 이 기능의 자동화된 계약 테스트가 모두 통과한다.
 - **SC-006**: 새 Data production 코드에서 프로젝트 내부 패키지 import, Domain 모델 참조,
