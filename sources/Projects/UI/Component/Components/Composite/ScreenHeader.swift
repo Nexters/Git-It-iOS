@@ -6,11 +6,21 @@ public struct ScreenHeader: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel = .init(),
+        title: String? = nil,
+        subtitle: String? = nil,
+        style: Style = .default,
+        user: User? = nil,
+        leading: Control? = .back,
+        trailing: Control? = nil,
         onLeadingTap: @escaping () -> Void = { },
         onTrailingTap: @escaping () -> Void = { },
     ) {
-        self.viewModel = viewModel
+        self.title = title
+        self.subtitle = subtitle
+        self.style = style
+        self.user = user
+        self.leading = leading
+        self.trailing = trailing
         self.onLeadingTap = onLeadingTap
         self.onTrailingTap = onTrailingTap
         avatar = nil
@@ -18,12 +28,22 @@ public struct ScreenHeader: View {
 
     /// 아바타 슬롯을 `AnyView`로 지워 비제네릭을 유지하고 보조 타입을 계속 중첩합니다.
     public init(
-        viewModel: ViewModel = .init(),
+        title: String? = nil,
+        subtitle: String? = nil,
+        style: Style = .default,
+        user: User? = nil,
+        leading: Control? = .back,
+        trailing: Control? = nil,
         onLeadingTap: @escaping () -> Void = { },
         onTrailingTap: @escaping () -> Void = { },
         @ViewBuilder avatar: () -> some View,
     ) {
-        self.viewModel = viewModel
+        self.title = title
+        self.subtitle = subtitle
+        self.style = style
+        self.user = user
+        self.leading = leading
+        self.trailing = trailing
         self.onLeadingTap = onLeadingTap
         self.onTrailingTap = onTrailingTap
         self.avatar = AnyView(avatar())
@@ -122,43 +142,12 @@ public struct ScreenHeader: View {
         public let role: String
     }
 
-    public struct ViewModel: Sendable, Equatable {
-
-        // MARK: Lifecycle
-
-        public init(
-            title: String? = nil,
-            subtitle: String? = nil,
-            style: Style = .default,
-            user: User? = nil,
-            leading: Control? = .back,
-            trailing: Control? = nil,
-        ) {
-            self.title = title
-            self.subtitle = subtitle
-            self.style = style
-            self.user = user
-            self.leading = leading
-            self.trailing = trailing
-        }
-
-        // MARK: Public
-
-        public let title: String?
-        public let subtitle: String?
-        public let style: Style
-        public let user: User?
-        public let leading: Control?
-        public let trailing: Control?
-
-    }
-
     public var body: some View {
-        VStack(alignment: .leading, spacing: viewModel.style.titleSpacing) {
+        VStack(alignment: .leading, spacing: style.titleSpacing) {
             HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
-                if viewModel.style.showsUserProfile {
+                if style.showsUserProfile {
                     userProfile
-                } else if let leading = viewModel.leading {
+                } else if let leading {
                     IconGlassButton.neutral(
                         symbol: leading.symbol,
                         label: leading.label,
@@ -167,13 +156,13 @@ public struct ScreenHeader: View {
                     )
                 }
 
-                if viewModel.style.showsInlineTitle {
+                if style.showsInlineTitle {
                     titleAndSubtitle
                 }
 
                 Spacer(minLength: 0)
 
-                if let trailing = viewModel.trailing {
+                if let trailing {
                     IconGlassButton.neutral(
                         symbol: trailing.symbol,
                         label: trailing.label,
@@ -182,13 +171,13 @@ public struct ScreenHeader: View {
                     )
                 }
             }
-            .frame(height: viewModel.style.controlRowHeight, alignment: .top)
+            .frame(height: style.controlRowHeight, alignment: .top)
 
-            if viewModel.style.showsStackedTitle {
+            if style.showsStackedTitle {
                 titleAndSubtitle
             }
         }
-        .padding(.top, viewModel.style.topPadding)
+        .padding(.top, style.topPadding)
         .padding(.bottom, Constant.bottomPadding)
     }
 
@@ -200,14 +189,19 @@ public struct ScreenHeader: View {
         static let avatarSize: CGFloat = 40
     }
 
-    private let viewModel: ViewModel
+    private let title: String?
+    private let subtitle: String?
+    private let style: Style
+    private let user: User?
+    private let leading: Control?
+    private let trailing: Control?
     private let onLeadingTap: () -> Void
     private let onTrailingTap: () -> Void
     private let avatar: AnyView?
 
     @ViewBuilder
     private var userProfile: some View {
-        if let user = viewModel.user {
+        if let user {
             HStack(spacing: Constant.userProfileSpacing) {
                 avatar
                     .frame(width: Constant.avatarSize, height: Constant.avatarSize)
@@ -224,13 +218,13 @@ public struct ScreenHeader: View {
 
     @ViewBuilder
     private var titleAndSubtitle: some View {
-        if viewModel.title != nil || viewModel.subtitle != nil {
+        if title != nil || subtitle != nil {
             VStack(alignment: .leading, spacing: 0) {
-                if let title = viewModel.title {
+                if let title {
                     StyledText.subtitle1(title)
                 }
 
-                if let subtitle = viewModel.subtitle {
+                if let subtitle {
                     StyledText.body2(subtitle, color: .white30)
                 }
             }
@@ -242,36 +236,28 @@ public struct ScreenHeader: View {
 #Preview("Screen Header") {
     VStack(spacing: LayoutToken.margin.cgFloatValue) {
         ScreenHeader(
-            viewModel: .init(
-                title: "기본 헤더",
-                trailing: .init(symbol: "ellipsis", label: "더 보기"),
-            )
+            title: "기본 헤더",
+            trailing: .init(symbol: "ellipsis", label: "더 보기"),
         )
         ScreenHeader(
-            viewModel: .init(
-                title: "인라인 헤더",
-                subtitle: "보조 설명",
-                style: .inlineTitle,
-                trailing: .init(symbol: "bookmark", label: "저장하기"),
-            )
+            title: "인라인 헤더",
+            subtitle: "보조 설명",
+            style: .inlineTitle,
+            trailing: .init(symbol: "bookmark", label: "저장하기"),
         )
         ScreenHeader(
-            viewModel: .init(
-                style: .inlineUser,
-                user: .init(name: "김이박", role: "Junior Developer"),
-                leading: nil,
-                trailing: .init(symbol: "gearshape", label: "설정 열기"),
-            )
+            style: .inlineUser,
+            user: .init(name: "김이박", role: "Junior Developer"),
+            leading: nil,
+            trailing: .init(symbol: "gearshape", label: "설정 열기"),
         ) {
-            ResourceImage(viewModel: .init(asset: .profile, contentMode: .fill))
+            ResourceImage(asset: .profile, contentMode: .fill)
         }
         ScreenHeader(
-            viewModel: .init(
-                title: "큰 제목 헤더",
-                subtitle: "화면의 주요 목적을 설명합니다.",
-                style: .largeTitle,
-                leading: nil,
-            )
+            title: "큰 제목 헤더",
+            subtitle: "화면의 주요 목적을 설명합니다.",
+            style: .largeTitle,
+            leading: nil,
         )
     }
     .designSystemScreenMargin()

@@ -7,7 +7,7 @@ enum UIModuleName: String {
     case UIComponent
     case DesignSystemTests
     case UIComponentTests
-    case UIComponentLayoutHarness
+    case UIComponentPreview
     case UIComponentUITests
 }
 
@@ -17,7 +17,7 @@ extension UIModuleName {
         return switch self {
         case .DesignSystem,
              .UIComponent,
-             .UIComponentLayoutHarness:
+             .UIComponentPreview:
             directoryName
         case .DesignSystemTests:
             "\(directoryName.droppingSuffix("Tests"))"
@@ -102,10 +102,10 @@ extension UIModuleName {
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
         ),
         .target(
-            name: UIModuleName.UIComponentLayoutHarness.rawValue,
+            name: UIModuleName.UIComponentPreview.rawValue,
             destinations: .iOS,
             product: .app,
-            bundleId: "com.nexters.hytime.gitit.uicomponentlayoutharness",
+            bundleId: "com.nexters.hytime.gitit.uicomponentpreview",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(with: [
                 "UIApplicationSceneManifest": [
@@ -113,7 +113,7 @@ extension UIModuleName {
                 ],
                 "UILaunchScreen": [:],
             ]),
-            sources: ["\(UIModuleName.UIComponentLayoutHarness.sourceDirectory)/**"],
+            sources: ["\(UIModuleName.UIComponentPreview.sourceDirectory)/**"],
             dependencies: [
                 .target(name: UIModuleName.UIComponent.rawValue),
                 .target(name: UIModuleName.DesignSystem.rawValue),
@@ -135,7 +135,7 @@ extension UIModuleName {
             infoPlist: .default,
             sources: ["Tests/\(UIModuleName.UIComponentUITests.sourceDirectory)/**"],
             dependencies: [
-                .target(name: UIModuleName.UIComponentLayoutHarness.rawValue)
+                .target(name: UIModuleName.UIComponentPreview.rawValue)
             ],
             settings: .settings(base: [
                 "CODE_SIGN_STYLE": "Automatic",

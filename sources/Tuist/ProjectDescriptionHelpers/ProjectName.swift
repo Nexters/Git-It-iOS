@@ -132,21 +132,21 @@ extension ProjectName {
                         buildTargets: [
                             UIModuleName.DesignSystem.rawValue,
                             UIModuleName.UIComponent.rawValue,
-                            UIModuleName.UIComponentLayoutHarness.rawValue,
+                            UIModuleName.UIComponentPreview.rawValue,
                         ],
                         testTargets: [
                             UIModuleName.DesignSystemTests.rawValue,
                             UIModuleName.UIComponentTests.rawValue,
                         ],
-                        runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
+                        runTarget: UIModuleName.UIComponentPreview.rawValue,
                     ),
                     .package(
                         name: "UIUITests",
-                        buildTargets: [UIModuleName.UIComponentLayoutHarness.rawValue],
+                        buildTargets: [UIModuleName.UIComponentPreview.rawValue],
                         testTargets: [
                             UIModuleName.UIComponentUITests.rawValue
                         ],
-                        runTarget: UIModuleName.UIComponentLayoutHarness.rawValue,
+                        runTarget: UIModuleName.UIComponentPreview.rawValue,
                     ),
                 ]
             }

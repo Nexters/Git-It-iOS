@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-21
 
-**최종 수정일**: 2026-08-21
+**최종 수정일**: 2026-08-22
 
 ## 목적
 
@@ -17,9 +17,9 @@
 
 - `sources/Projects/UI/Component/Components/Leaf/**`의 말단 컴포넌트
 - `sources/Projects/UI/Component/Components/Composite/**`의 조합 컴포넌트
-- `sources/Projects/UI/Component/Components/Review/**`의 검토·디버그 전용 컴포넌트
 - `sources/Projects/UI/Component/Resources/**`의 이미지·애니메이션·일러스트레이션 자산
-- `UIComponentLayoutHarness`와 UI 자동화 target의 컴포넌트 레이아웃 검증
+- `sources/Projects/UI/ComponentPreview/**`의 catalog·fixture·환경 source
+- `UIComponentPreview`와 UI 자동화 target의 컴포넌트 탐색·계약 검증
 
 DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문서의 범위가 아닙니다.
 
@@ -62,11 +62,12 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 표현 계약을 제공합니다. 조합 자체가 Feature 상태를 해석하거나 화면 목적지를 결정하지
 않습니다.
 
-### 3.3 검토·디버그 전용 컴포넌트
+### 3.3 Preview 전용 컴포넌트
 
-레이아웃 카탈로그나 TestFlight 검토 제어처럼 제품 화면에서 사용하지 않는 컴포넌트는
-`Components/Review/`에 둡니다. 제품 컴포넌트가 Review 컴포넌트에 의존해서는 안 되며,
-세부 기준은 [View 컨벤션](./view.md#21-검토디버그-전용-컴포넌트)을 따릅니다.
+catalog 탐색, 결정적 fixture와 환경 선택처럼 제품 화면에서 사용하지 않는 구현은
+`ComponentPreview/`에 둡니다. Preview target은 `UIComponent`와 `DesignSystem`에만
+의존하며 production target에 포함되지 않습니다. Preview 화면은 환경 적용 상태를
+표시할 수 있지만 계약의 pass/fail을 계산하지 않습니다.
 
 ## 4. 재사용 판단
 
@@ -76,8 +77,7 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 1. 각 초기화 인자와 `Binding`은 같은 사용자 인지 역할을 표현하는가?
 2. 같은 상태 값은 모든 사용처에서 같은 상태와 표현 규칙을 의미하는가?
 3. nil, 빈 값과 범위 밖 값 같은 경계값을 같은 방식으로 해석하는가?
-4. VoiceOver 라벨과 trait를 포함한 접근성 의미가 같은가?
-5. 특정 Feature 모델을 다른 의미로 치환하거나 범용 이름 뒤에 숨기지 않는가?
+4. 특정 Feature 모델을 다른 의미로 치환하거나 범용 이름 뒤에 숨기지 않는가?
 
 현재 사용처가 하나라는 사실만으로 재사용 가능성을 인정하거나 부정하지 않습니다.
 화면 문맥이 달라도 입력과 상태 의미가 같으면 같은 계약을 사용할 수 있고, 외형이 같아도
@@ -88,12 +88,12 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 ### 5.1 파일과 폴더
 
 - 말단 컴포넌트는 `Components/Leaf/`, 조합 컴포넌트는
-  `Components/Composite/`, 검토 전용 컴포넌트는 `Components/Review/`에 둡니다.
+  `Components/Composite/`에 두고 Preview 전용 source는 `ComponentPreview/`에 둡니다.
 - 각 폴더에는 컴포넌트마다 하위 폴더를 만들지 않고 Swift 파일을 바로 둡니다.
 - 각 Swift 파일은 주된 최상위 `struct`, `enum`, `class`, `actor` 또는 `protocol`을
   하나만 정의하며 파일 이름은 타입 이름과 일치시킵니다.
-- 프리뷰 전용 타입이나 중첩할 수 없는 보조 타입은 같은 폴더에 소유 컴포넌트 이름을
-  앞에 붙인 파일로 둡니다.
+- 프리뷰 전용 타입은 `ComponentPreview/Fixtures/`에 두고, production 보조 타입 중
+  중첩할 수 없는 타입만 같은 production 폴더에 소유 컴포넌트 이름을 붙여 둡니다.
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.
 
 ### 5.2 중첩 선언
@@ -143,20 +143,22 @@ public struct SelectionToggle: View {
 ## 7. 분리 절차
 
 1. 화면과 사용처에서 독립적으로 이름 붙일 수 있는 표현 책임을 찾습니다.
-2. 후보들의 외형이 아니라 입력 필드, 상태, 경계값과 접근성 의미를 비교합니다.
+2. 후보들의 외형이 아니라 입력 필드, 상태와 경계값을 비교합니다.
 3. 의미가 모두 일치할 때만 하나의 초기화 인자·`Binding`·콜백 계약을 정의합니다.
 4. Feature의 State, Action 또는 업무 모델 없이 계약을 정의합니다.
 5. 다른 프로젝트 UI 컴포넌트를 렌더링하지 않는 후보만 말단으로 분류합니다.
 6. 보조 타입은 컴포넌트 내부에 중첩하고 표시 상태 wrapper는 추가하지 않습니다.
-7. 분리 전후의 표시 상태, 사용자 입력 전달과 접근성 의미가 보존되는지 검증합니다.
+7. 분리 전후의 표시 상태와 사용자 입력 전달이 보존되는지 검증합니다.
 
 ## 8. 검증
 
 - 공개 입력·`Binding`, 상태별 표현과 레이아웃 계약을 단위 테스트 또는
-  `UIComponentLayoutHarness`의 UI 자동화 테스트로 검증합니다.
+  `UIComponentPreview`를 host로 사용하는 UI 자동화 테스트로 검증합니다.
+- Preview catalog는 public component 전체를 stable `componentID`로 등록하고 local
+  fixture만 사용하며, 환경·fallback 결과의 자동 판정은 UI test가 소유합니다.
 - UI production target의 Tuist dependency와 Swift import에
   `ComposableArchitecture`가 없는지 확인합니다.
-- 컴포넌트 분리 전후의 표시 상태, 사용자 입력 전달과 접근성 의미를 확인합니다.
+- 컴포넌트 분리 전후의 표시 상태와 사용자 입력 전달을 확인합니다.
 - 테스트 이름, Test Double, 파일과 target 구성은 [테스트 컨벤션](./test.md)을 따릅니다.
 
 ## 9. 검토 체크리스트
@@ -164,8 +166,8 @@ public struct SelectionToggle: View {
 - [ ] 화면과 Feature 상태에서 독립적으로 설명할 수 있는 표현 계약인가?
 - [ ] 읽기 값·변경 값·일회성 입력이 초기화 값·Binding·콜백으로 구분되는가?
 - [ ] Feature, Domain 또는 TCA 타입이 공개 API와 구현에 없는가?
-- [ ] 외형이 아니라 입력·상태·경계값·접근성 의미로 재사용을 판단했는가?
-- [ ] 말단·조합·Review 폴더가 실제 의존 구조와 일치하는가?
+- [ ] 외형이 아니라 입력·상태·경계값의 의미로 재사용을 판단했는가?
+- [ ] 말단·조합·Preview source 분리가 실제 target 의존 구조와 일치하는가?
 - [ ] 보조 선언이 View에 중첩되고 표시 상태 wrapper가 없는가?
 - [ ] 자산과 DesignSystem 토큰의 소유 경계가 분리되는가?
 - [ ] 레이아웃과 사용자 입력 전달을 독립적으로 검증했는가?

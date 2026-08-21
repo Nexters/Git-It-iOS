@@ -5,35 +5,26 @@ public struct ProgressSegments: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(
+        completed: Int,
+        total: Int,
+    ) {
+        self.completed = completed
+        self.total = total
     }
 
     // MARK: Public
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            completed: Int,
-            total: Int,
-        ) {
-            self.completed = completed
-            self.total = total
-        }
-
-        public let completed: Int
-        public let total: Int
-    }
-
     public var body: some View {
         HStack(spacing: Constant.segmentSpacing) {
-            ForEach(0..<viewModel.total, id: \.self) { index in
+            ForEach(0..<total, id: \.self) { index in
                 RoundedRectangle(designSystem: .micro)
-                    .fill(Color(designSystem: index < viewModel.completed ? .blue100 : .grey500))
+                    .fill(Color(designSystem: index < completed ? .blue100 : .grey500))
                     .frame(height: Constant.segmentHeight)
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("전체 \(viewModel.total)문항 중 \(viewModel.completed)문항 완료")
+        .accessibilityLabel("전체 \(total)문항 중 \(completed)문항 완료")
     }
 
     // MARK: Private
@@ -43,15 +34,16 @@ public struct ProgressSegments: View {
         static let segmentHeight: CGFloat = 10
     }
 
-    private let viewModel: ViewModel
+    private let completed: Int
+    private let total: Int
 
 }
 
 #Preview("Progress Segments") {
     VStack(spacing: LayoutToken.margin.cgFloatValue) {
-        ProgressSegments(viewModel: .init(completed: 0, total: 5))
-        ProgressSegments(viewModel: .init(completed: 2, total: 5))
-        ProgressSegments(viewModel: .init(completed: 5, total: 5))
+        ProgressSegments(completed: 0, total: 5)
+        ProgressSegments(completed: 2, total: 5)
+        ProgressSegments(completed: 5, total: 5)
     }
     .frame(width: 320)
     .designSystemScreenMargin()

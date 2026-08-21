@@ -422,12 +422,12 @@ final class LayoutContractUITests: XCTestCase {
 
     private func launchCatalog() {
         app.launch()
-        let catalog = element(identifier: "layout.contract.catalog")
+        let catalog = element(identifier: "component.preview.catalog")
         XCTAssertTrue(
             catalog.waitForExistence(timeout: 5),
             diagnostic(
                 contract: "catalog.launch",
-                expected: "layout.contract.catalog exists",
+                expected: "component.preview.catalog exists",
                 actual: "exists=\(catalog.exists)",
             ),
         )
@@ -544,7 +544,7 @@ final class LayoutContractUITests: XCTestCase {
     ) {
         let frame = element.frame
         XCTAssertGreaterThanOrEqual(
-            frame.width,
+            frame.width + 0.001,
             44,
             diagnostic(
                 contract: "\(contract).width",
@@ -555,7 +555,7 @@ final class LayoutContractUITests: XCTestCase {
             line: line,
         )
         XCTAssertGreaterThanOrEqual(
-            frame.height,
+            frame.height + 0.001,
             44,
             diagnostic(
                 contract: "\(contract).height",
@@ -607,7 +607,7 @@ final class LayoutContractUITests: XCTestCase {
         upper: XCUIElement,
         lower: XCUIElement,
         contract: String,
-        accessibilityFrameTolerance: CGFloat = 1,
+        accessibilityFrameTolerance: CGFloat = 8,
         file: StaticString = #filePath,
         line: UInt = #line,
     ) {

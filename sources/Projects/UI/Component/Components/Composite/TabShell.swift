@@ -6,28 +6,22 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        selected: Item,
+        onSelect: @escaping (Item) -> Void,
         @ViewBuilder content: () -> Content,
     ) {
-        self.viewModel = viewModel
+        self.selected = selected
+        self.onSelect = onSelect
         self.content = content()
     }
 
     // MARK: Public
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(selected: Item) {
-            self.selected = selected
-        }
-
-        public let selected: Item
-    }
-
     public var body: some View {
-        TabView(selection: .constant(viewModel.selected)) {
+        TabView(selection: Binding(get: { selected }, set: onSelect)) {
             ForEach(Item.allCases) { item in
                 Group {
-                    if viewModel.selected == item {
+                    if selected == item {
                         content
                     } else {
                         Color(designSystem: .screenBackground)
@@ -46,15 +40,8 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let selected: Item
+    private let onSelect: (Item) -> Void
     private let content: Content
 
-}
-
-#Preview("Tab Shell") {
-    TabShell(viewModel: .init(selected: TabShellPreviewItem.home)) {
-        ScreenContainer {
-            StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
-        }
-    }
 }

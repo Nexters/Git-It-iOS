@@ -20,7 +20,7 @@ SwiftUI 구현 방식은 [View 컨벤션](../conventions/view.md)을 따릅니�
 
 - `DesignSystem`: 토큰, Typography, 색상·효과·레이아웃 적용 API와 폰트 등록
 - `UIComponent`: 화면에서 독립적으로 해석 가능한 말단·조합 컴포넌트와 해당 자산
-- `UIComponentLayoutHarness`와 UI 자동화 target: 제품 API가 아닌 레이아웃 계약 검토
+- `UIComponentPreview`와 UI 자동화 target: production source에서 분리된 catalog와 자동 계약 검증
 
 Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가 아닙니다.
 
@@ -54,8 +54,9 @@ Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가
 
 ### 검토·테스트 Target
 
-`UIComponentLayoutHarness`와 UI 자동화 target은 제품 화면이 아니라 컴포넌트 레이아웃
-계약을 독립적으로 검토·검증하는 실행 환경입니다. 제품 API를 제공하거나 production
+`UIComponentPreview`는 모든 public component의 variant·size·state와 환경 fixture를
+local data로 탐색하는 실행 환경입니다. UI 자동화 target은 Preview route, 레이아웃,
+상호작용과 접근성 계약을 판정합니다. 두 target 모두 제품 API를 제공하거나 production
 target의 의존 대상이 되어서는 안 됩니다.
 
 표현 API의 사용 방향은 `Feature → UIComponent → DesignSystem`입니다. 컴파일 의존성은
@@ -83,5 +84,5 @@ target의 의존 대상이 되어서는 안 됩니다.
 - 표시 상태를 묶는 ViewModel, State 또는 동등한 wrapper 타입을 정의해서는 안 됩니다.
 - DesignSystem 밖에 공통 시각 어휘를 정의해서는 안 됩니다.
 - 제품 컴포넌트가 Review 컴포넌트에 의존해서는 안 됩니다.
-- production target이 UIComponentLayoutHarness 또는 UI 자동화 target에 의존해서는 안
+- production target이 UIComponentPreview 또는 UI 자동화 target에 의존해서는 안
   됩니다.

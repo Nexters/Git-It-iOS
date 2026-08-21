@@ -5,21 +5,11 @@ public struct ContinuousProgressBar: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(progress: Double) {
+        self.progress = Self.clampedProgress(progress)
     }
 
     // MARK: Public
-
-    public struct ViewModel: Sendable, Equatable {
-        public init(progress: Double) {
-            self.progress = progress.isNaN
-                ? 0
-                : min(max(progress, 0), 1)
-        }
-
-        public let progress: Double
-    }
 
     public var body: some View {
         GeometryReader { proxy in
@@ -29,13 +19,13 @@ public struct ContinuousProgressBar: View {
 
                 Capsule()
                     .fill(Color(designSystem: Constant.fillColorToken))
-                    .frame(width: proxy.size.width * viewModel.progress)
+                    .frame(width: proxy.size.width * progress)
             }
         }
         .frame(height: Constant.surfaceHeight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("학습 진행률")
-        .accessibilityValue("\(Int((viewModel.progress * 100).rounded()))퍼센트")
+        .accessibilityValue("\(Int((progress * 100).rounded()))퍼센트")
     }
 
     // MARK: Internal
@@ -52,6 +42,10 @@ public struct ContinuousProgressBar: View {
         Constant.fillColorToken
     }
 
+    static func clampedProgress(_ progress: Double) -> Double {
+        progress.isNaN ? 0 : min(max(progress, 0), 1)
+    }
+
     // MARK: Private
 
     private enum Constant {
@@ -60,15 +54,15 @@ public struct ContinuousProgressBar: View {
         static let fillColorToken = SemanticColorToken.progressFill
     }
 
-    private let viewModel: ViewModel
+    private let progress: Double
 
 }
 
 #Preview("Continuous Progress Bar") {
     VStack(spacing: LayoutToken.margin.cgFloatValue) {
-        ContinuousProgressBar(viewModel: .init(progress: 0))
-        ContinuousProgressBar(viewModel: .init(progress: 0.45))
-        ContinuousProgressBar(viewModel: .init(progress: 1))
+        ContinuousProgressBar(progress: 0)
+        ContinuousProgressBar(progress: 0.45)
+        ContinuousProgressBar(progress: 1)
     }
     .frame(width: 320)
     .designSystemScreenMargin()

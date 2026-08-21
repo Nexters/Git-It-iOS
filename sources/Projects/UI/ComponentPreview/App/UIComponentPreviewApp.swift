@@ -1,10 +1,10 @@
 import SwiftUI
 
 @main
-struct UIComponentLayoutHarnessApp: App {
+struct UIComponentPreviewApp: App {
     var body: some Scene {
         WindowGroup {
-            LayoutContractCatalog()
+            ComponentPreviewCatalog()
         }
     }
 }

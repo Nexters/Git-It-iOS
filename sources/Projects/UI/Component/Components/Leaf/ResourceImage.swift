@@ -5,8 +5,12 @@ public struct ResourceImage: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(
+        asset: Asset,
+        contentMode: ContentMode = .fit,
+    ) {
+        self.asset = asset
+        self.contentMode = contentMode
     }
 
     // MARK: Public
@@ -31,42 +35,30 @@ public struct ResourceImage: View {
         }
     }
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            asset: Asset,
-            contentMode: ContentMode = .fit,
-        ) {
-            self.asset = asset
-            self.contentMode = contentMode
-        }
-
-        public let asset: Asset
-        public let contentMode: ContentMode
-    }
-
     public var body: some View {
-        viewModel.asset.image
+        asset.image
             .resizable()
-            .aspectRatio(contentMode: viewModel.contentMode)
+            .aspectRatio(contentMode: contentMode)
     }
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let asset: Asset
+    private let contentMode: ContentMode
 
 }
 
 #Preview("Resource Image") {
     HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-        ResourceImage(viewModel: .init(asset: .selectionCardThumbnail, contentMode: .fill))
+        ResourceImage(asset: .selectionCardThumbnail, contentMode: .fill)
             .frame(width: 96, height: 96)
             .designSystemCornerRadius(.extraLarge)
 
-        ResourceImage(viewModel: .init(asset: .profile, contentMode: .fill))
+        ResourceImage(asset: .profile, contentMode: .fill)
             .frame(width: 96, height: 96)
             .clipShape(Circle())
 
-        ResourceImage(viewModel: .init(asset: .emptyState))
+        ResourceImage(asset: .emptyState)
             .frame(width: 96, height: 96)
     }
     .designSystemScreenMargin()

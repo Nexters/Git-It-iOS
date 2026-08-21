@@ -5,8 +5,14 @@ public struct SelectionCardList: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(
+        items: [Item],
+        selectedID: Item.ID? = nil,
+        onSelect: @escaping (Item.ID) -> Void = { _ in },
+    ) {
+        self.items = items
+        self.selectedID = selectedID
+        self.onSelect = onSelect
     }
 
     // MARK: Public
@@ -27,25 +33,21 @@ public struct SelectionCardList: View {
         public let supportingText: String
     }
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(items: [Item]) {
-            self.items = items
-        }
-
-        public let items: [Item]
-    }
-
     public var body: some View {
         VStack(spacing: Constant.itemSpacing) {
-            ForEach(viewModel.items) { item in
-                SelectionCard(
-                    viewModel: .init(
+            ForEach(items) { item in
+                Button {
+                    onSelect(item.id)
+                } label: {
+                    SelectionCard(
                         title: item.title,
                         supportingText: item.supportingText,
-                    )
-                ) {
-                    thumbnail
+                        isSelected: selectedID == item.id,
+                    ) {
+                        thumbnail
+                    }
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -57,7 +59,9 @@ public struct SelectionCardList: View {
         static let thumbnailOverlayOpacity = 0.2
     }
 
-    private let viewModel: ViewModel
+    private let items: [Item]
+    private let selectedID: Item.ID?
+    private let onSelect: (Item.ID) -> Void
 
     private var thumbnail: some View {
         ResourceImage.Asset.selectionCardThumbnail.image
@@ -72,7 +76,7 @@ public struct SelectionCardList: View {
 }
 
 #Preview("Selection Card List") {
-    SelectionCardList(viewModel: .init(items: [
+    SelectionCardList(items: [
         .init(
             id: "concept",
             title: "기술 개념은 알아요",
@@ -88,7 +92,7 @@ public struct SelectionCardList: View {
             title: "유사 프로젝트 경험이 있어요",
             supportingText: "심화 문제와 서술형 비중 확대",
         ),
-    ]))
+    ])
     .frame(width: 320)
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin.cgFloatValue)

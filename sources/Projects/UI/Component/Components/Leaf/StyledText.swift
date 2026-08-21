@@ -5,36 +5,25 @@ public struct StyledText: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(
+        text: String,
+        style: TextStyleToken,
+        color: ColorToken = .grey100,
+        alignment: TextAlignment = .leading,
+    ) {
+        self.text = text
+        self.style = style
+        self.color = color
+        self.alignment = alignment
     }
 
     // MARK: Public
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            text: String,
-            style: TextStyleToken,
-            color: ColorToken = .grey100,
-            alignment: TextAlignment = .leading,
-        ) {
-            self.text = text
-            self.style = style
-            self.color = color
-            self.alignment = alignment
-        }
-
-        public let text: String
-        public let style: TextStyleToken
-        public let color: ColorToken
-        public let alignment: TextAlignment
-    }
-
     public var body: some View {
-        Text.designSystemStyled(viewModel.text, style: viewModel.style)
-            .designSystemLineSpacing(viewModel.style)
-            .designSystemForeground(viewModel.color)
-            .multilineTextAlignment(viewModel.alignment)
+        Text.designSystemStyled(text, style: style)
+            .designSystemLineSpacing(style)
+            .designSystemForeground(color)
+            .multilineTextAlignment(alignment)
             .fixedSize(horizontal: false, vertical: true)
     }
 
@@ -120,7 +109,10 @@ public struct StyledText: View {
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let text: String
+    private let style: TextStyleToken
+    private let color: ColorToken
+    private let alignment: TextAlignment
 
     private static func styled(
         _ text: String,
@@ -128,7 +120,7 @@ public struct StyledText: View {
         color: ColorToken,
         alignment: TextAlignment,
     ) -> Self {
-        Self(viewModel: .init(text: text, style: style, color: color, alignment: alignment))
+        Self(text: text, style: style, color: color, alignment: alignment)
     }
 
 }

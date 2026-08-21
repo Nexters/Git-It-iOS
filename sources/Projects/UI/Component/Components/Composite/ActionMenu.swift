@@ -6,10 +6,10 @@ public struct ActionMenu: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        items: [Item],
         onSelect: @escaping (Item.ID) -> Void = { _ in },
     ) {
-        self.viewModel = viewModel
+        self.items = items
         self.onSelect = onSelect
     }
 
@@ -31,17 +31,9 @@ public struct ActionMenu: View {
         public let accessibilityLabel: String
     }
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(items: [Item]) {
-            self.items = items
-        }
-
-        public let items: [Item]
-    }
-
     public var body: some View {
         VStack(spacing: 0) {
-            ForEach(viewModel.items) { item in
+            ForEach(items) { item in
                 Button {
                     onSelect(item.id)
                 } label: {
@@ -49,7 +41,7 @@ public struct ActionMenu: View {
                         .frame(
                             maxWidth: .infinity,
                             minHeight: Self.itemMinimumHeight(
-                                itemCount: viewModel.items.count
+                                itemCount: items.count
                             ),
                             alignment: .leading,
                         )
@@ -61,7 +53,7 @@ public struct ActionMenu: View {
         }
         .frame(
             minHeight: Self.contentMinimumHeight(
-                itemCount: viewModel.items.count
+                itemCount: items.count
             )
         )
         .padding(.top, Constant.topPadding)
@@ -137,14 +129,14 @@ public struct ActionMenu: View {
         static let backgroundColor = SemanticColorToken.cardBackground
     }
 
-    private let viewModel: ViewModel
+    private let items: [Item]
     private let onSelect: (Item.ID) -> Void
 
 }
 
 #Preview("Action Menu") {
     ActionMenu(
-        viewModel: .init(items: [
+        items: [
             .init(
                 id: "delete",
                 title: "프로젝트 삭제",
@@ -155,7 +147,7 @@ public struct ActionMenu: View {
                 title: "메뉴 닫기",
                 accessibilityLabel: "프로젝트 메뉴 닫기",
             ),
-        ])
+        ]
     )
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin.cgFloatValue)

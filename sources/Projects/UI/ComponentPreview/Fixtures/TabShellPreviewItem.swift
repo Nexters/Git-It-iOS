@@ -1,5 +1,6 @@
-/// 프리뷰 전용 타입은 컴포넌트의 공개 계약이 아니므로 중첩하지 않고 독립 파일에 둡니다.
-enum TabShellPreviewItem: String, TabShellItem {
+import UIComponent
+
+enum TabShellPreviewItem: String, CaseIterable, TabShellItem {
     case home
     case project
     case saved

@@ -58,7 +58,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 
@@ -67,7 +67,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 
