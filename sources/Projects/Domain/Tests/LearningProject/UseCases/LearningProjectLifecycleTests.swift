@@ -17,7 +17,7 @@ struct LearningProjectLifecycleTests {
             techStack: ["Swift"],
         )
         let registration = LearningProjectRegistration(
-            projectId: "project-1",
+            projectID: "project-1",
             status: .ready,
             quizLevel: .l1,
         )
@@ -30,28 +30,28 @@ struct LearningProjectLifecycleTests {
 
         let fetchedRepository = try await fetchExternalRepository(url: "https://github.com/owner/repo")
         let result = try await createLearningProject(
-            githubRepoUrl: fetchedRepository.canonicalURL,
+            githubRepoURL: fetchedRepository.canonicalURL,
             quizLevel: .l1,
         )
 
-        #expect(result.projectId == registration.projectId)
+        #expect(result.projectID == registration.projectID)
         #expect(result.status == registration.status)
     }
 
     @Test
     func `삭제 후 같은 Repository로 상세 조회하면 미존재로 처리된다`() async throws {
         let repository = LifecycleLearningProjectRepository(registration: LearningProjectRegistration(
-            projectId: "project-1",
+            projectID: "project-1",
             status: .ready,
             quizLevel: .l1,
         ))
         let deleteLearningProject = DeleteLearningProject(repository: repository)
         let fetchLearningProjectDetail = FetchLearningProjectDetail(repository: repository)
 
-        try await deleteLearningProject(projectId: "project-1")
+        try await deleteLearningProject(projectID: "project-1")
 
         await #expect(throws: LearningProjectError.notFound) {
-            try await fetchLearningProjectDetail(projectId: "project-1")
+            try await fetchLearningProjectDetail(projectID: "project-1")
         }
     }
 }
@@ -94,7 +94,7 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
     // MARK: Internal
 
     func register(
-        githubRepoUrl _: String,
+        githubRepoURL _: String,
         quizLevel _: QuizLevel,
     ) async throws -> LearningProjectRegistration {
         registration
@@ -107,26 +107,26 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
         LearningProjectPage(items: [], hasNext: false)
     }
 
-    func fetchProjectDetail(projectId _: String) async throws -> LearningProjectDetail {
+    func fetchProjectDetail(projectID _: String) async throws -> LearningProjectDetail {
         guard !deleted
         else {
             throw LearningProjectError.notFound
         }
 
         return LearningProjectDetail(
-            projectId: registration.projectId,
+            projectID: registration.projectID,
             repositoryURL: "https://github.com/owner/repo",
             repositoryName: "repo",
             repositoryImageURL: nil,
             starCount: 0,
             techStack: [],
             overallProgressPercent: 0,
-            nextQuestionId: nil,
+            nextQuestionID: nil,
             sets: [],
         )
     }
 
-    func deleteProject(projectId _: String) async throws {
+    func deleteProject(projectID _: String) async throws {
         deleted = true
     }
 

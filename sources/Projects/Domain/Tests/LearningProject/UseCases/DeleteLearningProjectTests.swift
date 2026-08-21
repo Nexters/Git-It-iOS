@@ -12,7 +12,7 @@ struct DeleteLearningProjectTests {
             repository: DeleteLearningProjectRepository(behavior: .succeed)
         )
 
-        try await deleteLearningProject(projectId: "project-1")
+        try await deleteLearningProject(projectID: "project-1")
     }
 
     @Test
@@ -22,7 +22,7 @@ struct DeleteLearningProjectTests {
         )
 
         await #expect(throws: LearningProjectError.notFound) {
-            try await deleteLearningProject(projectId: "project-1")
+            try await deleteLearningProject(projectID: "project-1")
         }
     }
 }
@@ -45,7 +45,7 @@ private actor DeleteLearningProjectRepository: LearningProjectRepository {
     }
 
     func register(
-        githubRepoUrl _: String,
+        githubRepoURL _: String,
         quizLevel _: QuizLevel,
     ) async throws -> LearningProjectRegistration {
         throw LearningProjectError.unexpected
@@ -58,11 +58,11 @@ private actor DeleteLearningProjectRepository: LearningProjectRepository {
         throw LearningProjectError.unexpected
     }
 
-    func fetchProjectDetail(projectId _: String) async throws -> LearningProjectDetail {
+    func fetchProjectDetail(projectID _: String) async throws -> LearningProjectDetail {
         throw LearningProjectError.unexpected
     }
 
-    func deleteProject(projectId _: String) async throws {
+    func deleteProject(projectID _: String) async throws {
         switch behavior {
         case .succeed:
             return

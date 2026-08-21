@@ -8,8 +8,8 @@ public struct FetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
 
     // MARK: Public
 
-    public func callAsFunction(projectId: String) async throws -> LearningProjectDetail {
-        try await repository.fetchProjectDetail(projectId: projectId)
+    public func callAsFunction(projectID: String) async throws -> LearningProjectDetail {
+        try await repository.fetchProjectDetail(projectID: projectID)
     }
 
     // MARK: Private

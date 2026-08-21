@@ -9,14 +9,14 @@ struct FetchLearningProjectsTests {
     @Test
     func `진행률과 다음 세트 및 다음 질문 정보를 그대로 반환한다`() async throws {
         let summary = LearningProjectSummary(
-            projectId: "project-1",
+            projectID: "project-1",
             repositoryName: "repo",
             repositoryImageURL: nil,
             techStack: ["Swift"],
             currentSetLabel: "Set 2",
             currentSetTitle: "Concurrency",
-            nextSetId: "set-2",
-            nextQuestionId: "question-5",
+            nextSetID: "set-2",
+            nextQuestionID: "question-5",
             overallProgressPercent: 40,
         )
         let page = LearningProjectPage(items: [summary], hasNext: true)
@@ -33,25 +33,25 @@ struct FetchLearningProjectsTests {
     func `서버가 반환한 항목 수를 그대로 유지하고 재필터링하지 않는다`() async throws {
         let items = [
             LearningProjectSummary(
-                projectId: "project-1",
+                projectID: "project-1",
                 repositoryName: "repo-1",
                 repositoryImageURL: nil,
                 techStack: [],
                 currentSetLabel: "Set 1",
                 currentSetTitle: "title",
-                nextSetId: "set-1",
-                nextQuestionId: "question-1",
+                nextSetID: "set-1",
+                nextQuestionID: "question-1",
                 overallProgressPercent: 10,
             ),
             LearningProjectSummary(
-                projectId: "project-2",
+                projectID: "project-2",
                 repositoryName: "repo-2",
                 repositoryImageURL: nil,
                 techStack: [],
                 currentSetLabel: "Set 1",
                 currentSetTitle: "title",
-                nextSetId: "set-1",
-                nextQuestionId: "question-1",
+                nextSetID: "set-1",
+                nextQuestionID: "question-1",
                 overallProgressPercent: 90,
             ),
         ]
@@ -95,7 +95,7 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
     }
 
     func register(
-        githubRepoUrl _: String,
+        githubRepoURL _: String,
         quizLevel _: QuizLevel,
     ) async throws -> LearningProjectRegistration {
         throw LearningProjectError.unexpected
@@ -114,11 +114,11 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
         }
     }
 
-    func fetchProjectDetail(projectId _: String) async throws -> LearningProjectDetail {
+    func fetchProjectDetail(projectID _: String) async throws -> LearningProjectDetail {
         throw LearningProjectError.unexpected
     }
 
-    func deleteProject(projectId _: String) async throws {
+    func deleteProject(projectID _: String) async throws {
         throw LearningProjectError.unexpected
     }
 

@@ -153,3 +153,5 @@ CLAUDE.md
 *.xcconfig
 docs/Git-It-server-scheme.json
 requirement-docs/**
+private/**
+

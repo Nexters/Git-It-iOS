@@ -72,16 +72,36 @@ public final class AppleAuthorizationProvider: NSObject, Sendable {
         throw AppleAuthorizationError.cancelled
     }
 
+    public func authorize(expiresIn: TimeInterval = 300) async throws -> AppleCredential {
+        let attempt = try startAuthorization(expiresIn: expiresIn)
+        return try await withCheckedThrowingContinuation { continuation in
+            state.withLock { $0.pendingContinuation = (attempt.id, continuation) }
+        }
+    }
+
     // MARK: Private
 
     private struct State {
         var authorizationController: ASAuthorizationController?
         var currentAttempt: AppleAuthorizationAttempt?
+        var pendingContinuation: (attemptID: String, continuation: CheckedContinuation<AppleCredential, Error>)?
     }
 
     private let randomValue: @Sendable (Int) throws -> String
     private let now: @Sendable () -> Date
     private let state = Mutex(State())
+
+    private func resumePendingContinuation(
+        attemptID: String,
+        with result: Result<AppleCredential, Error>,
+    ) {
+        let continuation = state.withLock { protectedState -> CheckedContinuation<AppleCredential, Error>? in
+            guard protectedState.pendingContinuation?.attemptID == attemptID else { return nil }
+            defer { protectedState.pendingContinuation = nil }
+            return protectedState.pendingContinuation?.continuation
+        }
+        continuation?.resume(with: result)
+    }
 
 }
 
@@ -101,11 +121,16 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
             fullName: credential.fullName?.formatted(),
         )
         guard let attempt = state.withLock({ $0.currentAttempt }) else { return }
-        _ = try? complete(
-            credential: coreCredential,
-            state: attempt.state,
-            attemptID: attempt.id,
-        )
+        do {
+            let result = try complete(
+                credential: coreCredential,
+                state: attempt.state,
+                attemptID: attempt.id,
+            )
+            resumePendingContinuation(attemptID: attempt.id, with: .success(result))
+        } catch {
+            resumePendingContinuation(attemptID: attempt.id, with: .failure(error))
+        }
     }
 
     public func authorizationController(
@@ -115,12 +140,14 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
         guard let attempt = state.withLock({ $0.currentAttempt }) else { return }
         if (error as? ASAuthorizationError)?.code == .canceled {
             try? cancel(attemptID: attempt.id)
+            resumePendingContinuation(attemptID: attempt.id, with: .failure(AppleAuthorizationError.cancelled))
         } else {
             state.withLock { protectedState in
                 if protectedState.currentAttempt?.id == attempt.id {
                     protectedState.currentAttempt = nil
                 }
             }
+            resumePendingContinuation(attemptID: attempt.id, with: .failure(AppleAuthorizationError.unavailable))
         }
     }
 }

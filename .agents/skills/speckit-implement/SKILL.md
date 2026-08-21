@@ -184,8 +184,8 @@ even if a task names them; use the dedicated recording skill instead.
    패키지에 걸친 작업, 별도 준비·기반·마무리 구현 단계가 있으면 파일을 수정하지 말고
    `/speckit-tasks`로 작업 목록을 갱신하도록 요청한 뒤 중단한다.
 
-   `Domain → Data → Infrastructure → Composition → UI → Feature → App` 순서에서 완료되지 않은 작업이
-   있는 첫 패키지만 선택한다. 완료되지 않은 작업이 없는 패키지는 건너뛴다. 이번 실행에서는
+   활성 tasks.md가 확정한 패키지 위상 순서에서 완료되지 않은 작업이 있는 첫 패키지만 선택한다.
+   tasks.md에 패키지 순서와 근거가 없으면 구현을 시작하지 말고 `/speckit-tasks`로 갱신을 요청한다. 완료되지 않은 작업이 없는 패키지는 건너뛴다. 이번 실행에서는
    이후 적용 대상 패키지가 소유한 파일을 수정해서는 안 된다.
 
 6. 선택한 패키지에 대해서만 작업 계획에 따라 구현한다:

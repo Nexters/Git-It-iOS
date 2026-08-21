@@ -53,7 +53,7 @@
 - refresh가 일시적으로 실패하면 저장 상태를 유지하고 복구 가능한 실패를 반환합니다.
 - refresh가 거부되거나 만료되면 세션과 인증 참조를 순서대로 정리합니다.
 
-### ObserveAuthorizationChanges
+### ObserveAuthenticationOutcomes
 
 - authorization 변경을 인증 결과 stream으로 변환합니다.
 - 인증됨 상태에서는 저장된 사용자를 복원합니다.

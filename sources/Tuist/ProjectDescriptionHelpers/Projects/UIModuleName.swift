@@ -15,7 +15,9 @@ extension UIModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.UI.rawValue)
         return switch self {
-        case .DesignSystem, .UIComponent, .UIComponentLayoutHarness:
+        case .DesignSystem,
+             .UIComponent,
+             .UIComponentLayoutHarness:
             directoryName
         case .DesignSystemTests:
             "\(directoryName.droppingSuffix("Tests"))"
@@ -27,15 +29,13 @@ extension UIModuleName {
     }
 }
 
+// MARK: - DesignSystemFontFamily
+
 private enum DesignSystemFontFamily: CaseIterable {
     case notoSansKR
     case plusJakartaSans
 
-    private enum Weight: String, CaseIterable {
-        case regular = "Regular"
-        case medium = "Medium"
-        case bold = "Bold"
-    }
+    // MARK: Internal
 
     var directoryName: String {
         switch self {
@@ -58,20 +58,23 @@ private enum DesignSystemFontFamily: CaseIterable {
     var resourceFileElements: [ResourceFileElement] {
         Weight.allCases.map {
             .glob(
-                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf",
+                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf"
             )
         }
+    }
+
+    // MARK: Private
+
+    private enum Weight: String, CaseIterable {
+        case regular = "Regular"
+        case medium = "Medium"
+        case bold = "Bold"
     }
 }
 
 extension UIModuleName {
-    private static let designSystemFontResources: ResourceFileElements = .resources(
-        DesignSystemFontFamily.allCases.flatMap(\.resourceFileElements),
-    )
 
-    private static let uiComponentImageResources: ResourceFileElements = .resources(
-        [.glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Resources/**")],
-    )
+    // MARK: Internal
 
     static let targets: [Target] = [
         .module(
@@ -142,13 +145,24 @@ extension UIModuleName {
             ]),
         ),
     ]
+
+    // MARK: Private
+
+    private static let designSystemFontResources = ResourceFileElements.resources(
+        DesignSystemFontFamily.allCases.flatMap(\.resourceFileElements)
+    )
+
+    private static let uiComponentImageResources = ResourceFileElements.resources(
+        [.glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Resources/**")]
+    )
+
 }
 
 extension TargetDependency {
     static func fromUI(_ name: UIModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../UI"
+            path: "../UI",
         )
     }
 }

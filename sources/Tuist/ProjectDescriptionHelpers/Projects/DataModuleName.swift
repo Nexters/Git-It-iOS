@@ -18,16 +18,16 @@ extension DataModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.Data.rawValue)
         return switch self {
         case
-                .DataAuthentication,
-                .DataExternalRepository,
-                .DataLearningProject,
-                .DataMember:
+            .DataAuthentication,
+            .DataExternalRepository,
+            .DataLearningProject,
+            .DataMember:
             directoryName
         case
-                .DataAuthenticationTests,
-                .DataExternalRepositoryTests,
-                .DataLearningProjectTests,
-                .DataMemberTests:
+            .DataAuthenticationTests,
+            .DataExternalRepositoryTests,
+            .DataLearningProjectTests,
+            .DataMemberTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -35,64 +35,74 @@ extension DataModuleName {
     var target: Target {
         switch self {
         case .DataAuthentication:
-                .module(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                )
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                ],
+            )
 
         case .DataAuthenticationTests:
-                .testModule(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                    productionTarget: .target(
-                        name: DataModuleName.DataAuthentication.rawValue
-                    ),
-                )
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataAuthentication.rawValue
+                ),
+            )
 
         case .DataLearningProject:
-                .module(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                )
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient)
+                ],
+            )
 
         case .DataExternalRepository:
-                .module(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                )
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient)
+                ],
+            )
 
         case .DataExternalRepositoryTests:
-                .testModule(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                    productionTarget: .target(
-                        name: DataModuleName.DataExternalRepository.rawValue
-                    ),
-                )
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataExternalRepository.rawValue
+                ),
+            )
 
         case .DataLearningProjectTests:
-                .testModule(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                    productionTarget: .target(
-                        name: DataModuleName.DataLearningProject.rawValue
-                    ),
-                )
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataLearningProject.rawValue
+                ),
+            )
 
         case .DataMember:
-                .module(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                )
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+            )
 
         case .DataMemberTests:
-                .testModule(
-                    name: rawValue,
-                    sourceDirectory: sourceDirectory,
-                    productionTarget: .target(
-                        name: DataModuleName.DataMember.rawValue
-                    ),
-                )
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataMember.rawValue
+                ),
+            )
         }
     }
 }

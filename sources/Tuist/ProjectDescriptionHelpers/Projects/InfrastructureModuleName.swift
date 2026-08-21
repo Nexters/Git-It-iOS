@@ -12,20 +12,6 @@ enum InfrastructureModuleName: String {
 }
 
 extension InfrastructureModuleName {
-    var sourceDirectory: String {
-        let directoryName = rawValue.droppingPrefix(ProjectName.Infrastructure.rawValue)
-        return switch self {
-        case .InfrastructureAuthentication,
-             .InfrastructureNetworkClient,
-             .InfrastructureCache:
-            directoryName
-        case .InfrastructureAuthenticationTests,
-             .InfrastructureNetworkClientTests,
-             .InfrastructureCacheTests:
-            "\(directoryName.droppingSuffix("Tests"))"
-        }
-    }
-
     static let targets: [Target] = [
         .module(
             name: InfrastructureModuleName.InfrastructureAuthentication.rawValue,
@@ -67,13 +53,27 @@ extension InfrastructureModuleName {
             ),
         ),
     ]
+
+    var sourceDirectory: String {
+        let directoryName = rawValue.droppingPrefix(ProjectName.Infrastructure.rawValue)
+        return switch self {
+        case .InfrastructureAuthentication,
+             .InfrastructureNetworkClient,
+             .InfrastructureCache:
+            directoryName
+        case .InfrastructureAuthenticationTests,
+             .InfrastructureNetworkClientTests,
+             .InfrastructureCacheTests:
+            "\(directoryName.droppingSuffix("Tests"))"
+        }
+    }
 }
 
 extension TargetDependency {
     static func fromInfrastructure(_ name: InfrastructureModuleName) -> Self {
         .project(
             target: name.rawValue,
-            path: "../Infrastructure"
+            path: "../Infrastructure",
         )
     }
 }
