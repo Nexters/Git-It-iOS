@@ -11,6 +11,7 @@ struct LoginSessionErrorTests {
                 .temporarilyUnavailable,
                 .refreshRejectedOrExpired,
                 .accountUnavailable,
+                .unauthorized,
             ]
         )
     }

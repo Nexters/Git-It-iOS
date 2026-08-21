@@ -11,7 +11,7 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
     public func callAsFunction(
         githubRepoURL: String,
         quizLevel: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         try await repository.register(githubRepoURL: githubRepoURL, quizLevel: quizLevel)
     }
 

@@ -47,7 +47,7 @@ private actor DeleteLearningProjectRepository: LearningProjectRepository {
     func register(
         githubRepoURL _: String,
         quizLevel _: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         throw LearningProjectError.unexpected
     }
 

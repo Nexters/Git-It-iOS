@@ -86,10 +86,12 @@ extension ProjectName {
                     buildTargets: [
                         DomainModuleName.DomainAuthentication.rawValue,
                         DomainModuleName.DomainLearningProject.rawValue,
+                        DomainModuleName.DomainMember.rawValue,
                     ],
                     testTargets: [
                         DomainModuleName.DomainAuthenticationTests.rawValue,
                         DomainModuleName.DomainLearningProjectTests.rawValue,
+                        DomainModuleName.DomainMemberTests.rawValue,
                     ],
                 )]
 

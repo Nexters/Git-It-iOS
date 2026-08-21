@@ -62,7 +62,8 @@ public struct RestoreSession: RestoreSessionUseCase, Sendable {
             return .recoverableFailure
 
         case .refreshRejectedOrExpired,
-             .accountUnavailable:
+             .accountUnavailable,
+             .unauthorized:
             await clearInvalidSession()
             return .unauthenticated
         }

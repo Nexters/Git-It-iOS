@@ -24,7 +24,7 @@ struct FetchLearningProjectsTests {
             repository: FetchLearningProjectsRepository(behavior: .succeed(page))
         )
 
-        let result = try await fetchLearningProjects(page: 0, size: 10)
+        let result = try await fetchLearningProjects()
 
         #expect(result == page)
     }
@@ -60,7 +60,7 @@ struct FetchLearningProjectsTests {
             repository: FetchLearningProjectsRepository(behavior: .succeed(page))
         )
 
-        let result = try await fetchLearningProjects(page: 0, size: 10)
+        let result = try await fetchLearningProjects()
 
         #expect(result.items.count == items.count)
     }
@@ -72,7 +72,7 @@ struct FetchLearningProjectsTests {
         )
 
         await #expect(throws: LearningProjectError.unauthorized) {
-            try await fetchLearningProjects(page: 0, size: 10)
+            try await fetchLearningProjects()
         }
     }
 }
@@ -97,7 +97,7 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
     func register(
         githubRepoURL _: String,
         quizLevel _: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         throw LearningProjectError.unexpected
     }
 

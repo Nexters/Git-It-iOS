@@ -18,11 +18,19 @@ struct LearningProjectDetailTests {
     }
 
     @Test
-    func `모든 세트를 완료했으면 다음 세트가 없다`() {
+    func `모든 세트를 완료했으면 replay를 위해 첫 세트로 되돌아간다`() {
+        let firstSet = makeSet(id: "set-1", problemCount: 5, completedCount: 5)
         let detail = makeDetail(sets: [
-            makeSet(id: "set-1", problemCount: 5, completedCount: 5),
+            firstSet,
             makeSet(id: "set-2", problemCount: 3, completedCount: 3),
         ])
+
+        #expect(detail.nextSet?.setID == firstSet.setID)
+    }
+
+    @Test
+    func `세트가 비어 있으면 다음 세트가 없다`() {
+        let detail = makeDetail(sets: [])
 
         #expect(detail.nextSet == nil)
     }

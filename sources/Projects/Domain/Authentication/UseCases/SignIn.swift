@@ -34,7 +34,8 @@ public struct SignIn: SignInUseCase, Sendable {
                 return .recoverableFailure
 
             case .refreshRejectedOrExpired,
-                 .accountUnavailable:
+                 .accountUnavailable,
+                 .unauthorized:
                 return .unauthenticated
             }
         } catch {

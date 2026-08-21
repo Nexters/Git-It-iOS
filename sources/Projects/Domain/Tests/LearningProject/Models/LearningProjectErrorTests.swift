@@ -11,6 +11,9 @@ struct LearningProjectErrorTests {
                 .invalidRequest,
                 .unauthorized,
                 .notFound,
+                .learningSetUnavailable,
+                .questionUnavailable,
+                .temporarilyUnavailable,
                 .unexpected,
             ]
         )

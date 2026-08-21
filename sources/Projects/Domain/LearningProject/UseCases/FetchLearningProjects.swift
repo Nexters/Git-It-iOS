@@ -8,14 +8,15 @@ public struct FetchLearningProjects: FetchLearningProjectsUseCase {
 
     // MARK: Public
 
-    public func callAsFunction(
-        page: Int = 0,
-        size: Int = 10,
-    ) async throws -> LearningProjectPage {
-        try await repository.fetchProjects(page: page, size: size)
+    public func callAsFunction() async throws -> LearningProjectPage {
+        try await repository.fetchProjects(page: Self.compatibilityPage, size: Self.compatibilitySize)
     }
 
     // MARK: Private
+
+    /// Data compatibility 호출 값이며 pagination 상태로 승격하지 않는다.
+    private static let compatibilityPage = 0
+    private static let compatibilitySize = 20
 
     private let repository: LearningProjectRepository
 

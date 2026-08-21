@@ -7,6 +7,8 @@ enum DomainModuleName: String, CaseIterable {
     case DomainAuthenticationTests
     case DomainLearningProject
     case DomainLearningProjectTests
+    case DomainMember
+    case DomainMemberTests
 }
 
 extension DomainModuleName {
@@ -14,11 +16,13 @@ extension DomainModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.Domain.rawValue)
         return switch self {
         case .DomainAuthentication,
-             .DomainLearningProject:
+             .DomainLearningProject,
+             .DomainMember:
             directoryName
 
         case .DomainAuthenticationTests,
-             .DomainLearningProjectTests:
+             .DomainLearningProjectTests,
+             .DomainMemberTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -52,6 +56,21 @@ extension DomainModuleName {
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
                     name: DomainModuleName.DomainLearningProject.rawValue
+                ),
+            )
+
+        case .DomainMember:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+            )
+
+        case .DomainMemberTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainMember.rawValue
                 ),
             )
         }

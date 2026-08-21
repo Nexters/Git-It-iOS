@@ -8,9 +8,9 @@ import Testing
 struct CreateLearningProjectTests {
     @Test
     func `신규 등록 결과를 그대로 반환한다`() async throws {
-        let registration = LearningProjectRegistration(
+        let registration = ProjectRegistrationReceipt(
             projectID: "project-1",
-            status: .ready,
+            requestStatus: "READY",
             quizLevel: .l1,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(registration))
@@ -22,9 +22,9 @@ struct CreateLearningProjectTests {
 
     @Test
     func `재등록 응답도 신규 등록과 구분 없이 그대로 반환한다`() async throws {
-        let existingRegistration = LearningProjectRegistration(
+        let existingRegistration = ProjectRegistrationReceipt(
             projectID: "existing-project",
-            status: .analyzed,
+            requestStatus: "ANALYZED",
             quizLevel: .l2,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(existingRegistration))
@@ -36,9 +36,9 @@ struct CreateLearningProjectTests {
 
     @Test
     func `삭제 후 복원 응답도 그대로 반환한다`() async throws {
-        let restoredRegistration = LearningProjectRegistration(
+        let restoredRegistration = ProjectRegistrationReceipt(
             projectID: "restored-project",
-            status: .completed,
+            requestStatus: "COMPLETED",
             quizLevel: .l3,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(restoredRegistration))
@@ -88,14 +88,14 @@ private actor CreateLearningProjectRepository: LearningProjectRepository {
     // MARK: Internal
 
     enum Behavior: Sendable {
-        case succeed(LearningProjectRegistration)
+        case succeed(ProjectRegistrationReceipt)
         case fail(LearningProjectError)
     }
 
     func register(
         githubRepoURL _: String,
         quizLevel _: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         switch behavior {
         case .succeed(let registration):
             return registration

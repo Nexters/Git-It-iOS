@@ -16,9 +16,9 @@ struct LearningProjectLifecycleTests {
             starCount: 7,
             techStack: ["Swift"],
         )
-        let registration = LearningProjectRegistration(
+        let registration = ProjectRegistrationReceipt(
             projectID: "project-1",
-            status: .ready,
+            requestStatus: "READY",
             quizLevel: .l1,
         )
         let fetchExternalRepository = FetchExternalRepository(
@@ -35,14 +35,14 @@ struct LearningProjectLifecycleTests {
         )
 
         #expect(result.projectID == registration.projectID)
-        #expect(result.status == registration.status)
+        #expect(result.requestStatus == registration.requestStatus)
     }
 
     @Test
     func `삭제 후 같은 Repository로 상세 조회하면 미존재로 처리된다`() async throws {
-        let repository = LifecycleLearningProjectRepository(registration: LearningProjectRegistration(
+        let repository = LifecycleLearningProjectRepository(registration: ProjectRegistrationReceipt(
             projectID: "project-1",
-            status: .ready,
+            requestStatus: "READY",
             quizLevel: .l1,
         ))
         let deleteLearningProject = DeleteLearningProject(repository: repository)
@@ -87,7 +87,7 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
 
     // MARK: Lifecycle
 
-    init(registration: LearningProjectRegistration) {
+    init(registration: ProjectRegistrationReceipt) {
         self.registration = registration
     }
 
@@ -96,7 +96,7 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
     func register(
         githubRepoURL _: String,
         quizLevel _: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         registration
     }
 
@@ -132,7 +132,7 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
 
     // MARK: Private
 
-    private let registration: LearningProjectRegistration
+    private let registration: ProjectRegistrationReceipt
     private var deleted = false
 
 }

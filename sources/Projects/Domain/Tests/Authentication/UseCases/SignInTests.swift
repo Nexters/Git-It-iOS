@@ -235,6 +235,18 @@ private actor SignInLoginSessionRepository: LoginSessionRepository {
 
     func signOut() async throws { }
 
+    func currentSession() async -> SessionRecord? {
+        nil
+    }
+
+    func replaceTokens(_: SessionTokens) async throws { }
+    func updateOnboarding(_: LocalOnboardingState) async throws { }
+    func refresh() async throws -> SessionTokens {
+        throw LoginSessionError.temporarilyUnavailable
+    }
+
+    func verifyAccessToken() async throws { }
+
     // MARK: Private
 
     private let behavior: Behavior

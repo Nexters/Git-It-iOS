@@ -2,7 +2,7 @@ public protocol LearningProjectRepository: Sendable {
     func register(
         githubRepoURL: String,
         quizLevel: QuizLevel,
-    ) async throws -> LearningProjectRegistration
+    ) async throws -> ProjectRegistrationReceipt
     func fetchProjects(
         page: Int,
         size: Int,

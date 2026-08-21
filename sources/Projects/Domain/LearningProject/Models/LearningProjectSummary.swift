@@ -9,8 +9,8 @@ public struct LearningProjectSummary: Equatable, Sendable {
         techStack: [String],
         currentSetLabel: String,
         currentSetTitle: String,
-        nextSetID: String,
-        nextQuestionID: String,
+        nextSetID: String?,
+        nextQuestionID: String?,
         overallProgressPercent: Int,
     ) {
         self.projectID = projectID
@@ -32,8 +32,8 @@ public struct LearningProjectSummary: Equatable, Sendable {
     public let techStack: [String]
     public let currentSetLabel: String
     public let currentSetTitle: String
-    public let nextSetID: String
-    public let nextQuestionID: String
+    public let nextSetID: String?
+    public let nextQuestionID: String?
     public let overallProgressPercent: Int
 
 }

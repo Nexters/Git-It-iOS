@@ -72,7 +72,8 @@ public struct ObserveAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCas
                 return .recoverableFailure
 
             case .refreshRejectedOrExpired,
-                 .accountUnavailable:
+                 .accountUnavailable,
+                 .unauthorized:
                 await clearInvalidSession()
                 return .unauthenticated
             }
