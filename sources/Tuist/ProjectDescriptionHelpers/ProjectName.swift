@@ -90,10 +90,12 @@ extension ProjectName {
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
                         DataModuleName.DataLearningProject.rawValue,
+                        DataModuleName.DataMember.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
                         DataModuleName.DataLearningProjectTests.rawValue,
+                        DataModuleName.DataMemberTests.rawValue,
                     ],
                 )]
 
