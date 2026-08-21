@@ -218,6 +218,128 @@ delimiter와 literal token만 대상으로 한다.
 
 TS-20260821-001, TS-20260821-002
 
+## TS-20260821-006: 임시 상태 파일 정리 명령이 실행 정책에서 거부됨
+
+**기록일**: 2026-08-21
+**상태**: 완화
+**발생 단계**: `speckit-implement` T006 포맷 전후 상태 비교
+**관련 항목**: `specs/012-github-public-repository-data/tasks.md` T006
+
+### 증상
+
+포맷 전후 `git status`를 임시 파일에 저장하고 끝에서 `rm -f`로 정리하는 검증 명령이 실행 정책에서 거부되어 포맷과 상태 비교가 시작되지 않았다.
+
+### 영향
+
+T006이 한 차례 중단됐으며, 테스트 파일 포맷과 Git 상태 비교 결과는 아직 확인되지 않았다. source와 test 파일은 이 거부로 변경되지 않았다.
+
+### 근거
+
+- `exec_command`: `rm -f style commands are not permitted. Use a safer approach`를 반환했다.
+- 거부된 명령: `GIT_IT_SWIFT_FORMAT_RUNNER` 실행 전에 명령 전체가 거부됐다.
+
+### 원인
+
+확정 원인은 검증용 임시 파일을 정리하는 `rm -f` 구문이 현재 실행 정책의 허용 범위를 벗어난 것이다.
+
+### 조치
+
+임시 파일을 만들거나 삭제하지 않고, 포맷 대상과 허용된 변경 경로를 `git status` 및 `git diff --name-only`로 직접 비교하는 방식으로 검증 절차를 변경한다.
+
+### 검증
+
+- 교정된 T006 명령: 미실행.
+
+### 재발 방지
+
+검증 명령은 명시적인 파일 삭제 없이 실행할 수 있는 비교 방식을 우선 사용한다.
+
+### 연결
+
+없음
+
+## TS-20260821-007: Red 검증 시작 전 GitIt.xcworkspace 부재
+
+**기록일**: 2026-08-21
+**상태**: 환경 제약
+**발생 단계**: `speckit-implement` T007 Red 확인
+**관련 항목**: `specs/012-github-public-repository-data/tasks.md` T007
+
+### 증상
+
+T007의 `xcodebuild build-for-testing -workspace GitIt.xcworkspace`가 production 선언 부재를 컴파일하기 전에 `GitIt.xcworkspace does not exist`로 종료됐다.
+
+### 영향
+
+테스트 Red 상태가 production 선언 부재만으로 발생하는지는 아직 확인하지 못했다. source와 test 파일은 이 실행으로 변경되지 않았다.
+
+### 근거
+
+- `xcodebuild build-for-testing -workspace GitIt.xcworkspace -scheme Data ...`: `xcodebuild: error: 'GitIt.xcworkspace' does not exist.`를 반환했다.
+
+### 원인
+
+확정 원인은 현재 checkout에 Tuist가 생성하는 루트 workspace가 아직 없다는 것이다.
+
+### 조치
+
+저장소 셋업 지침에 따라 `make tuist`로 workspace를 생성한 뒤 같은 T007 명령을 재실행한다.
+
+### 검증
+
+- `make tuist`: 미실행.
+- T007 재실행: 미실행.
+
+### 재발 방지
+
+xcodebuild 기반 검증 전에 루트 `GitIt.xcworkspace` 존재 여부를 먼저 확인하고, 없으면 Tuist 생성을 선행한다.
+
+### 연결
+
+없음
+
+## TS-20260821-008: placeholder 삭제 후 생성 workspace의 입력 목록 불일치
+
+**기록일**: 2026-08-21
+**상태**: 환경 제약
+**발생 단계**: `speckit-implement` T016 Data build-for-testing
+**관련 항목**: `specs/012-github-public-repository-data/tasks.md` T012, T016
+
+### 증상
+
+`DataLearningProjectPlaceholder.swift`를 T012에서 삭제한 뒤 T016을 실행하자, 생성된 Data project가 삭제 전 입력 목록을 유지해 해당 파일을 찾지 못했다.
+
+### 영향
+
+production 계약과 테스트의 컴파일 결과를 아직 판정할 수 없다. 실패 원인은 Swift 코드 진단이 아니라 stale generated workspace 입력 경로다.
+
+### 근거
+
+- `xcodebuild build-for-testing -workspace GitIt.xcworkspace -scheme Data ...`: `Build input file cannot be found: .../DataLearningProjectPlaceholder.swift`를 반환했다.
+- `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`: T012에 따라 삭제되어 존재하지 않는다.
+
+### 원인
+
+확정 원인은 소스 파일 추가·삭제 후 `tuist generate`를 다시 실행하지 않아 생성 Xcode project가 이전 파일 목록을 참조한 것이다.
+
+### 조치
+
+`sources`에서 `tuist generate`로 workspace를 재생성한 뒤 T016과 T017을 같은 DerivedData 경로에서 순서대로 재실행한다.
+
+### 검증
+
+- `tuist generate`: 미실행.
+- T016 재실행: 미실행.
+- T017 재실행: 미실행.
+
+### 재발 방지
+
+target source root 안의 파일을 추가하거나 삭제한 뒤 Xcode build 전에 `tuist generate`를 실행해 생성 project의 입력 목록을 최신화한다.
+
+### 연결
+
+TS-20260821-007
+
 ## TS-20260821-004: tasks 재생성 patch의 동일 경로 다중 작업 재발
 
 **기록일**: 2026-08-21

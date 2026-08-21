@@ -3,7 +3,7 @@
 **날짜**: 2026-08-21 | **명세**: [spec.md](./spec.md) | **조사**:
 [research.md](./research.md)
 
-이 기능은 `DataLearningProject`가 소유할 요청·응답·오류·Remote 계약만 정의한다. 모든 공개
+이 기능은 `DataExternalRepository`가 소유할 요청·응답·오류·Remote 계약만 정의한다. 모든 공개
 값 타입은 불변이며 `Sendable`이다. Domain 모델과 Infrastructure 타입은 포함하지 않는다.
 
 ## 1. `GitHubRepositoryRequest`

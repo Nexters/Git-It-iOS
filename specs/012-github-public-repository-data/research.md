@@ -80,16 +80,16 @@
   `GitHubRepositoryError` — 오류 의미를 공급자 wire 상태에 과도하게 결합하고 명세의 Data
   경계명을 변경하므로 기각한다.
 
-## 결정 7: 기존 Data target·scheme을 재사용하고 placeholder만 교체한다
+## 결정 7: `DataExternalRepository` 전용 target으로 계약을 분리한다
 
-- **결정**: production은 `sources/Projects/Data/LearningProject/`, 테스트는
-  `sources/Projects/Data/Tests/LearningProject/`에 둔다. 기존 placeholder 두 파일을 제거하고
-  `DataModuleName`, `ProjectName.Data` scheme과 `Project.swift`는 수정하지 않는다.
-- **근거**: 현재 manifest가 `DataLearningProject`와 `DataLearningProjectTests`를 각각 위
-  source root에 연결하고 Data 공유 scheme의 build/test action에도 포함한다. 새 target이나
-  공용 구성 변경 없이 독립 빌드·테스트 조건을 이미 충족한다.
-- **검토한 대안**: 새 target 또는 target 이름을 반복한 폴더 생성 — 기존 sourceDirectory
-  규칙과 테스트 컨벤션을 위반하고 중복 구성을 만든다.
+- **결정**: production은 `sources/Projects/Data/ExternalRepository/`, 테스트는
+  `sources/Projects/Data/Tests/ExternalRepository/`에 둔다. `DataModuleName`에
+  `DataExternalRepository`와 `DataExternalRepositoryTests`를 두고 `ProjectName.Data` 공유 scheme의
+  build/test target으로 연결한다. 기존 LearningProject placeholder와 target 선언은 제거한다.
+- **근거**: External Repository 조회는 학습 프로젝트와 다른 Data 책임이다. target과 source root를
+  분리하면 공개 계약의 소유자가 명확해지고, Data 공유 scheme에서도 독립적으로 빌드·테스트한다.
+- **검토한 대안**: `DataLearningProject` target 안에 계약을 유지 — 사용자 요구의 책임 분리와
+  맞지 않는다. target 이름을 source root에도 반복 — target 식별 문맥을 물리 폴더에 중복한다.
 
 ## 결정 8: 테스트는 네 계약 묶음으로 분리하고 실제 네트워크를 호출하지 않는다
 

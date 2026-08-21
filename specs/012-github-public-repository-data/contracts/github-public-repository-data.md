@@ -4,7 +4,7 @@
 
 ## 공개 Swift 계약
 
-다음 선언 형태를 `DataLearningProject`가 제공한다. 이는 구현 방향을 고정하는 공개 계약이며
+다음 선언 형태를 `DataExternalRepository`가 제공한다. 이는 구현 방향을 고정하는 공개 계약이며
 구체 HTTP 요청 변환·전송 구현은 포함하지 않는다.
 
 ```swift

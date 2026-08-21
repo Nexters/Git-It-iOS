@@ -10,8 +10,8 @@
 
 ## 요약
 
-기존 `DataLearningProject` target의 placeholder를 GitHub Public Repository 조회에 필요한
-Data 소유 계약으로 교체한다. `owner`와 `repo`로 고정 요청 값을 만드는
+GitHub Public Repository 조회 계약을 기존 `DataLearningProject`에서 분리한
+`DataExternalRepository` target으로 제공한다. `owner`와 `repo`로 고정 요청 값을 만드는
 `GitHubRepositoryRequest`, 네 필드만 디코딩하는 `GitHubRepositoryResponseDTO`, 조회 능력을
 표현하는 `ExternalRepositoryRemote`, `offline`과 `other`를 구분하는
 `DataExternalRepositoryError`를 추가한다. 실제 HTTP 요청 변환·전송과 기술 오류 매핑은
@@ -27,7 +27,7 @@ Apple `Foundation.JSONDecoder`와 Swift Testing을 사용한다.
 **저장소**: N/A — 캐시·영속화 없음
 
 **테스트**: Swift Testing(`@Suite`, `@Test`, `#expect`, `#require`), Data 공유 scheme의
-`DataLearningProjectTests`
+`DataExternalRepositoryTests`
 
 **대상 플랫폼**: iOS 26.0 이상
 
@@ -39,7 +39,7 @@ Apple `Foundation.JSONDecoder`와 Swift Testing을 사용한다.
 참조 금지, 외부 라이브러리 구체 API 금지, 실제 HTTP 오류 매핑·재시도·로깅 제외
 
 **규모/범위**: production target 1개, production 계약 타입 4개, 대응 계약 테스트 4개 묶음,
-기존 production/test placeholder 제거
+기존 `DataLearningProject` production/test placeholder 제거와 전용 target 구성 교체
 
 ## 헌법 점검
 
@@ -83,7 +83,7 @@ specs/012-github-public-repository-data/
 
 ```text
 sources/Projects/Data/
-├── LearningProject/
+├── ExternalRepository/
 │   ├── Contracts/
 │   │   └── ExternalRepositoryRemote.swift
 │   ├── DTOs/
@@ -92,7 +92,7 @@ sources/Projects/Data/
 │   │   └── DataExternalRepositoryError.swift
 │   └── Requests/
 │       └── GitHubRepositoryRequest.swift
-└── Tests/LearningProject/
+└── Tests/ExternalRepository/
     ├── Contracts/
     │   └── ExternalRepositoryRemoteContractTests.swift
     ├── DTOs/
@@ -104,13 +104,14 @@ sources/Projects/Data/
 ```
 
 현재 `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`와
-`sources/Projects/Data/Tests/LearningProject/DataLearningProjectCompilationTests.swift`는 실제
-계약과 테스트로 대체되므로 구현 단계에서 제거한다. `DataModuleName`과 Data 공유 scheme은 이미
-`DataLearningProject`/`DataLearningProjectTests`를 연결하므로 Tuist 구성 파일은 변경하지 않는다.
+`sources/Projects/Data/Tests/LearningProject/DataLearningProjectCompilationTests.swift`는
+`DataExternalRepository`와 `DataExternalRepositoryTests`로 대체되므로 구현 단계에서 제거한다.
+`DataModuleName`과 `ProjectName.Data`는 새 production/test target을 Data 공유 scheme에 연결하도록
+변경한다.
 
-**구조 결정**: 패키지 문맥을 폴더명에 반복하지 않고 기존 `LearningProject` source root 아래를
-역할별로 나눈다. production과 test target의 경로는 현재 `DataModuleName.sourceDirectory`와
-테스트 컨벤션을 그대로 따른다.
+**구조 결정**: `ExternalRepository`는 GitHub 요청·응답·Remote 계약의 실제 책임을 나타내는
+source root다. target의 `Data` 접두어는 Tuist 식별에만 두고, production과 test source root는
+각각 `ExternalRepository`로 유지한다.
 
 ## 0단계: 조사 결과
 
@@ -121,7 +122,8 @@ sources/Projects/Data/
 3. 응답 DTO는 `Decodable` 전용 부분 모델이며 필수 `owner` 컨테이너와 선택
    `owner.avatar_url`, 기본값 `[]`인 `topics`를 구분한다.
 4. Remote는 표준 `throws`를 유지하고 계약상 `DataExternalRepositoryError`만 전달한다.
-5. 기존 target·scheme을 재사용하고 source/test placeholder만 실제 계약으로 교체한다.
+5. 전용 `DataExternalRepository`/`DataExternalRepositoryTests` target을 Data 공유 scheme에 연결하고
+   source/test placeholder를 실제 계약으로 교체한다.
 
 미해결 기술 항목은 없다.
 
@@ -134,7 +136,7 @@ sources/Projects/Data/
 
 ## 구현 경계와 순서
 
-적용 대상은 `Data(DataLearningProject)` 하나다.
+적용 대상은 `Data(DataExternalRepository)` 하나다.
 
 1. 요청·DTO·오류·Remote 계약 테스트를 추가하고 구현 전에 대상 선언 부재로 실패하는 Red
    상태를 확인해 명세의 성공·실패 조건을 고정한다.
@@ -151,12 +153,14 @@ sources/Projects/Data/
 
 ## 설계 후 헌법 재점검
 
-- 변경 경로는 `sources/Projects/Data/LearningProject/**`와
-  `sources/Projects/Data/Tests/LearningProject/**`의 Data 단일 패키지로 배정 가능하다.
+- 변경 경로는 `sources/Projects/Data/ExternalRepository/**`,
+  `sources/Projects/Data/Tests/ExternalRepository/**`,
+  `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`,
+  `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Data 단일 패키지로 배정 가능하다.
 - 프로젝트 내부 패키지·외부 라이브러리 의존성을 추가하지 않는다.
 - Domain 변환, HTTPClient 변환·전송, 오류 매핑과 App DI를 설계에 포함하지 않았다.
 - 요청 값과 DTO는 불변·`Sendable`이고 테스트는 별도 Data test target에 위치한다.
-- 공용 Tuist 구성 파일 변경이 없어 다중 패키지 작업 또는 승인 게이트가 추가되지 않는다.
+- Tuist 구성은 Data target의 구성만 변경하며 다른 패키지 파일은 수정하지 않는다.
 - 허용된 Swift 파일을 전체 검증 전에 공개 formatter로 정리하고, 전체 검증 전후 작업 트리
   상태가 같아야만 읽기 전용 gate를 통과한 것으로 판정한다.
 

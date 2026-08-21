@@ -21,19 +21,19 @@ Data 검증에서는 수행하지 않는다.
 production과 테스트 변경은 다음 두 root 안에 있어야 한다.
 
 ```text
-sources/Projects/Data/LearningProject/
-sources/Projects/Data/Tests/LearningProject/
+sources/Projects/Data/ExternalRepository/
+sources/Projects/Data/Tests/ExternalRepository/
 ```
 
-`DataLearningProjectPlaceholder.swift`와 `DataLearningProjectCompilationTests.swift`는 실제
-계약과 테스트로 교체되어 없어야 한다. `DataModuleName.swift`와 `ProjectName.swift`는 기존
-target·scheme 구성이 충분하므로 변경하지 않는다.
+`DataLearningProjectPlaceholder.swift`와 `DataLearningProjectCompilationTests.swift`는 제거되어야
+한다. `DataModuleName.swift`와 `ProjectName.swift`는 `DataExternalRepository`와
+`DataExternalRepositoryTests` target을 Data 공유 scheme에 연결해야 한다.
 
 ## 3. 금지 의존성 확인
 
 ```sh
 if rg -n '^import (Domain|Infrastructure|Composition|Feature|UI)' \
-  sources/Projects/Data/LearningProject; then
+  sources/Projects/Data/ExternalRepository; then
   echo 'Data 금지 의존성이 발견되었습니다' >&2
   exit 1
 fi
@@ -48,14 +48,14 @@ swift_format_runner=$(
   ./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_SWIFT_FORMAT_RUNNER
 )
 "$swift_format_runner" format \
-  sources/Projects/Data/LearningProject/Contracts/ExternalRepositoryRemote.swift \
-  sources/Projects/Data/LearningProject/DTOs/GitHubRepositoryResponseDTO.swift \
-  sources/Projects/Data/LearningProject/Errors/DataExternalRepositoryError.swift \
-  sources/Projects/Data/LearningProject/Requests/GitHubRepositoryRequest.swift \
-  sources/Projects/Data/Tests/LearningProject/Contracts/ExternalRepositoryRemoteContractTests.swift \
-  sources/Projects/Data/Tests/LearningProject/DTOs/GitHubRepositoryResponseDTOTests.swift \
-  sources/Projects/Data/Tests/LearningProject/Errors/DataExternalRepositoryErrorTests.swift \
-  sources/Projects/Data/Tests/LearningProject/Requests/GitHubRepositoryRequestTests.swift
+  sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift \
+  sources/Projects/Data/ExternalRepository/DTOs/GitHubRepositoryResponseDTO.swift \
+  sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift \
+  sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift \
+  sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift \
+  sources/Projects/Data/Tests/ExternalRepository/DTOs/GitHubRepositoryResponseDTOTests.swift \
+  sources/Projects/Data/Tests/ExternalRepository/Errors/DataExternalRepositoryErrorTests.swift \
+  sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift
 ```
 
 예상 결과: 위 allowlist의 현재 변경 Swift 파일만 포맷되고 Git index와 대상 밖 파일은 변경되지
@@ -72,7 +72,7 @@ xcodebuild build-for-testing \
   -derivedDataPath sources/DerivedData/Feature012
 ```
 
-예상 결과: Data 공유 scheme의 `DataLearningProject`와 `DataLearningProjectTests` target이
+예상 결과: Data 공유 scheme의 `DataExternalRepository`와 `DataExternalRepositoryTests` target이
 build-for-testing에 성공한다.
 
 ## 6. Data 집중 테스트 실행

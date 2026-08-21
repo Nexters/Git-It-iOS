@@ -5,17 +5,17 @@ import ProjectDescription
 enum DataModuleName: String, CaseIterable {
     case DataAuthentication
     case DataAuthenticationTests
-    case DataLearningProject
-    case DataLearningProjectTests
+    case DataExternalRepository
+    case DataExternalRepositoryTests
 }
 
 extension DataModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Data.rawValue)
         return switch self {
-        case .DataAuthentication, .DataLearningProject:
+        case .DataAuthentication, .DataExternalRepository:
             directoryName
-        case .DataAuthenticationTests, .DataLearningProjectTests:
+        case .DataAuthenticationTests, .DataExternalRepositoryTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -37,18 +37,18 @@ extension DataModuleName {
                 ),
             )
 
-        case .DataLearningProject:
+        case .DataExternalRepository:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
             )
 
-        case .DataLearningProjectTests:
+        case .DataExternalRepositoryTests:
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
-                    name: DataModuleName.DataLearningProject.rawValue
+                    name: DataModuleName.DataExternalRepository.rawValue
                 ),
             )
         }

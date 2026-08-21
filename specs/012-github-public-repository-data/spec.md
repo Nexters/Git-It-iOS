@@ -22,6 +22,7 @@
 - 질문: method·path·header 요청 계약은 어느 경계가 소유하는가? → 답변: Data가 구체 HTTP 클라이언트 타입에 의존하지 않는 기술 중립적 요청 명세로 소유하고, Composition이 이를 실제 HTTP 요청으로 변환한다.
 - 질문: GitHub base URL은 어느 경계가 소유하는가? → 답변: Data 요청 계약이 `https` scheme과 `api.github.com` host를 method·path·headers와 함께 소유하고, Composition은 이를 구체 HTTP 요청으로 변환만 한다.
 - 질문: `owner` 객체가 누락되거나 `null`이면 어떻게 처리하는가? → 답변: `owner` 객체는 필수이며 누락되거나 `null`이면 디코딩에 실패한다. 객체 내부의 `avatar_url`만 선택값으로 처리한다.
+- 질문: 이 GitHub Public Repository Data 계약은 어느 Data target이 소유하는가? → 답변: `DataExternalRepository` production target과 `DataExternalRepositoryTests` test target으로 분리하며, 기존 `DataLearningProject` target에는 두지 않는다.
 
 ## 변경 시나리오와 테스트 *(필수)*
 
@@ -126,7 +127,7 @@ HTTP 상태와 기술 오류의 실제 매핑은 후속 Composition 테스트에
 
 ### 기능 요구사항
 
-- **FR-001**: `DataLearningProject`는 upstream에서 파싱된 `owner`와 `repo`를 입력받아
+- **FR-001**: `DataExternalRepository`는 upstream에서 파싱된 `owner`와 `repo`를 입력받아
   GitHub Public Repository 메타데이터 조회를 표현하는 Data 소유 계약을 제공해야 한다.
 - **FR-002**: 조회 요청 계약은 구체 HTTP 클라이언트 타입에 의존하지 않는 기술 중립적 명세로
   `https` scheme, `api.github.com` host, `GET` method, `/repos/{owner}/{repo}` path와
@@ -194,7 +195,7 @@ HTTP 상태와 기술 오류의 실제 매핑은 후속 Composition 테스트에
 - **SC-004**: Data 오류 계약 테스트에서 `offline`과 `other` 두 케이스를 100% 구분하고,
   Remote 테스트 대역이 지정된 오류를 손실 없이 전달하며 성공 DTO를 반환하는 사례가 0건이다.
   기술 오류의 실제 분류는 이 성공 기준의 측정 대상에서 제외한다.
-- **SC-005**: `DataLearningProject` production target과 test target이 독립적으로 빌드·테스트
+- **SC-005**: `DataExternalRepository` production target과 `DataExternalRepositoryTests` test target이 독립적으로 빌드·테스트
   대상에 포함되고, 이 기능의 자동화된 계약 테스트가 모두 통과한다.
 - **SC-006**: 새 Data production 코드에서 프로젝트 내부 패키지 import, Domain 모델 참조,
   외부 라이브러리 구체 API 참조가 각각 0건이다.

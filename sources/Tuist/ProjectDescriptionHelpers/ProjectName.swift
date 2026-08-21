@@ -89,11 +89,11 @@ extension ProjectName {
                     name: rawValue,
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
-                        DataModuleName.DataLearningProject.rawValue,
+                        DataModuleName.DataExternalRepository.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
-                        DataModuleName.DataLearningProjectTests.rawValue,
+                        DataModuleName.DataExternalRepositoryTests.rawValue,
                     ],
                 )]
 
