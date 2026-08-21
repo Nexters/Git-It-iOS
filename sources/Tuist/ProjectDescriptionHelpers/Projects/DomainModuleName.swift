@@ -13,9 +13,12 @@ extension DomainModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Domain.rawValue)
         return switch self {
-        case .DomainAuthentication, .DomainLearningProject:
+        case .DomainAuthentication,
+             .DomainLearningProject:
             directoryName
-        case .DomainAuthenticationTests, .DomainLearningProjectTests:
+
+        case .DomainAuthenticationTests,
+             .DomainLearningProjectTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
