@@ -12,6 +12,7 @@ hook_git_config_prepare() (
 	chmod +x \
 		"$hook_git_config_root/$hook_git_config_hooks_root/commit-msg" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit" \
+		"$hook_git_config_root/$hook_git_config_hooks_root/pre-push" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/swift-format.sh" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/build.sh" \
 		"$hook_git_config_root/$hook_git_config_hooks_root/pre-commit.d/compile.sh"
@@ -29,6 +30,7 @@ hook_git_config_verify() (
 	for hook_git_config_path in \
 		commit-msg \
 		pre-commit \
+		pre-push \
 		pre-commit.d/swift-format.sh \
 		pre-commit.d/build.sh \
 		pre-commit.d/compile.sh; do

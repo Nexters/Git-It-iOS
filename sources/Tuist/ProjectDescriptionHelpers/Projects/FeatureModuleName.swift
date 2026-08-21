@@ -28,6 +28,7 @@ extension FeatureModuleName {
                     .fromUI(.UIComponent),
                 ],
                 buildLibraryForDistribution: false,
+                definesModule: false,
             )
         }
     }

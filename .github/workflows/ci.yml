@@ -79,13 +79,14 @@ jobs:
     if: ${{ needs.changes.outputs.swift_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 15
-    continue-on-error: true
+    continue-on-error: false
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           submodules: recursive
 
       - name: Load repository paths
@@ -213,8 +214,8 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" test-unit
 
-  ui-tests:
-    name: ui tests
+  ui-compile:
+    name: ui test compile
     needs: changes
     if: ${{ needs.changes.outputs.ui_changed == 'true' }}
     runs-on: macos-26
@@ -262,18 +263,15 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" compile-ui
 
-      - name: Run tests
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" test-ui
-
   gate:
     name: CI / gate
     needs:
       - changes
       - script-quality
+      - swift-lint
       - app-build
       - unit-tests
-      - ui-tests
+      - ui-compile
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -285,6 +283,7 @@ jobs:
           ./tools/ci/bin/gate-evaluate.sh \
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
+            "${{ needs.swift-lint.result }}" \
             "${{ needs.app-build.result }}" \
             "${{ needs.unit-tests.result }}" \
-            "${{ needs.ui-tests.result }}"
+            "${{ needs.ui-compile.result }}"

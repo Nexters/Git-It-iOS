@@ -64,7 +64,8 @@ project_xcodebuild_one() {
 		project_xcodebuild_derived=$project_xcodebuild_derived_root
 	fi
 	printf '%s 시작: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
-	if xcodebuild \
+	# 호출자가 결과 경로를 제공하면 test action마다 충돌 없는 xcresult를 남깁니다.
+	set -- \
 		-quiet \
 		-workspace "$project_xcodebuild_workspace" \
 		-scheme "$project_xcodebuild_scheme" \
@@ -72,7 +73,19 @@ project_xcodebuild_one() {
 		-destination "$project_xcodebuild_destination" \
 		-derivedDataPath "$project_xcodebuild_derived" \
 		-disableAutomaticPackageResolution \
-		-jobs "$project_xcodebuild_jobs" \
+		-jobs "$project_xcodebuild_jobs"
+	project_xcodebuild_result_root=${GIT_IT_XCRESULTS_PATH:-}
+	if [ -n "$project_xcodebuild_result_root" ]; then
+		case "$project_xcodebuild_action" in
+		test | test-without-building)
+			mkdir -p "$project_xcodebuild_result_root" || return 2
+			project_xcodebuild_result="$project_xcodebuild_result_root/$project_xcodebuild_scheme-$$.xcresult"
+			set -- "$@" -resultBundlePath "$project_xcodebuild_result"
+			printf '테스트 결과 경로: %s\n' "$project_xcodebuild_result"
+			;;
+		esac
+	fi
+	if xcodebuild "$@" \
 		"$project_xcodebuild_action" \
 		CODE_SIGNING_ALLOWED=NO \
 		COMPILER_INDEX_STORE_ENABLE=NO \

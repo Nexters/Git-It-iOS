@@ -29,6 +29,11 @@ mkdir -p "$repository/$projects_relative/App/Derived" \
 	"$repository/$projects_relative/App/.build"
 : >"$repository/$projects_relative/App/Derived/Generated.swift"
 : >"$repository/$projects_relative/App/.build/Package.swift"
+git -C "$repository" config user.email 'swift-format-test@example.com'
+git -C "$repository" config user.name 'Swift Format Test'
+git -C "$repository" add -- "$projects_relative/App/App.swift" \
+	"$projects_relative/App/Derived/Generated.swift" "$projects_relative/App/.build/Package.swift"
+git -C "$repository" commit -qm '기준 Swift 파일 추가'
 
 printf '%s\n' '#!/bin/sh' \
 	'printf "%s\n" "$1" >> "$SWIFT_STYLE_LOG"' \
@@ -52,6 +57,30 @@ export SWIFT_STYLE_LOG
 "$repository/$swift_runner_relative" lint "$projects_relative/App/Derived" >"$work/out" 2>"$work/err"
 [ ! -s "$SWIFT_STYLE_LOG" ]
 rg -q 'swift-format.no-targets' "$work/out"
+
+# format 기본 동작은 현재 변경된 Swift 파일만 포맷하고, 추적 중이지만 변경되지 않은 파일은 제외합니다.
+changed_relative="$projects_relative/App/App.swift"
+untracked_relative="$projects_relative/App/추가 파일.swift"
+unchanged_relative="$projects_relative/App/변경 없음.swift"
+printf 'changed\n' >"$repository/$changed_relative"
+: >"$repository/$untracked_relative"
+: >"$repository/$unchanged_relative"
+git -C "$repository" add -- "$unchanged_relative"
+git -C "$repository" commit -qm '변경 없는 Swift 파일 추가'
+printf 'changed again\n' >"$repository/$changed_relative"
+
+printf '%s\n' '#!/bin/sh' \
+	'printf "%s\\n" "$1" >> "$SWIFT_STYLE_LOG"' \
+	>"$repository/$style_relative/scripts/format.sh"
+chmod +x "$repository/$style_relative/scripts/format.sh"
+: >"$SWIFT_STYLE_LOG"
+"$repository/$swift_runner_relative" format
+expected_format_targets=$(printf '%s\n%s' "$repository/$changed_relative" "$repository/$untracked_relative" | sort)
+actual_format_targets=$(sort "$SWIFT_STYLE_LOG")
+[ "$actual_format_targets" = "$expected_format_targets" ] || {
+	printf 'FAIL: format 기본 대상이 현재 변경 Swift 파일과 일치하지 않음\n' >&2
+	exit 1
+}
 
 # staged 포매터가 일부 파일을 바꾼 뒤 실패하면 전체 원본과 metadata를 복원합니다.
 first_relative="$projects_relative/App/첫 파일.swift"

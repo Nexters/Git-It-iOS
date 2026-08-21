@@ -39,17 +39,26 @@ extension ProjectName {
         let schemes: [Scheme] =
             switch self {
             case .App:
-                [.package(
-                    name: rawValue,
-                    buildTargets: [
-                        AppModuleName.GitIt.rawValue
-                    ],
-                    testTargets: [
-                        AppModuleName.GitItTests.rawValue
-                    ],
-                    runTarget: AppModuleName.GitIt.rawValue,
-                    supportsDistribution: true,
-                )]
+                [
+                    .package(
+                        name: rawValue,
+                        buildTargets: [
+                            AppModuleName.GitIt.rawValue
+                        ],
+                        testTargets: [],
+                        runTarget: AppModuleName.GitIt.rawValue,
+                        supportsDistribution: true,
+                    ),
+                    .package(
+                        name: "AppTests",
+                        buildTargets: [
+                            AppModuleName.GitItTests.rawValue
+                        ],
+                        testTargets: [
+                            AppModuleName.GitItTests.rawValue
+                        ],
+                    ),
+                ]
 
             case .Composition:
                 [.package(
