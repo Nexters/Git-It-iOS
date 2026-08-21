@@ -43,6 +43,7 @@ if rg -n 'continue-on-error: true' "$workflow" >/dev/null; then
 	exit 1
 fi
 rg -q 'continue-on-error: false' "$workflow"
+rg -q "vars.GIT_IT_CI_VALIDATION_ENABLED == 'true'" "$workflow"
 rg -q 'lint-changed-swift\.sh' "$workflow"
 rg -q 'needs\.swift-lint\.result' "$workflow"
 rg -q 'GIT_IT_SCRIPT_VERIFICATION_RUNNER' "$workflow"
