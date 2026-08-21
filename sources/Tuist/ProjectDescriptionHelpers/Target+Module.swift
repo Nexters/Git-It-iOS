@@ -6,7 +6,7 @@ extension Target {
         sourceDirectory: String,
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
-        buildLibraryForDistribution: Bool = true
+        buildLibraryForDistribution: Bool = true,
     ) -> Self {
         .target(
             name: name,
