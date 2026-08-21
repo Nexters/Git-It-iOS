@@ -229,7 +229,7 @@ API를 Infrastructure 테스트로 검증한다.
 
 ### 준비와 기반 — Tuist 의존성 선언
 
-- [ ] T030 [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서
+- [X] T030 [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서
   `.DataAuthentication` target에 `.fromInfrastructure(.InfrastructureNetworkClient)`,
   `.fromInfrastructure(.InfrastructureAuthentication)`를, `.DataLearningProject`와
   `.DataExternalRepository` target에 각각
@@ -238,18 +238,18 @@ API를 Infrastructure 테스트로 검증한다.
 
 ### 구현 — concrete Remote
 
-- [ ] T031 [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPProjectRemote.swift`를 신설해
+- [X] T031 [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPProjectRemote.swift`를 신설해
   `ProjectRemote`를 conform하는 `HTTPProjectRemote`를 구현한다. `HTTPClient`를 생성자로 주입받고,
   `ProjectEndpoint`의 `LearningProjectRequest`를 `HTTPRequest`로 변환해 `HTTPClient.send`를
   호출하며, 응답 DTO(`ProjectListResponseDTO`, `ProjectDetailResponseDTO`,
   `RegisterProjectResponseDTO`)로 디코딩하고, `HTTPClientError`를 `DataLearningProjectError`로
   변환한다(R-003, R-004, R-015).
-- [ ] T032 [S2] `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`를
+- [X] T032 [S2] `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`를
   신설해 `AuthenticationRemote`를 conform하는 `HTTPAuthenticationRemote`를 구현한다.
   `AuthenticationEndpoint.appleLogin`/`verifyAccessToken`을 `HTTPRequest`로 변환해
   `HTTPClient.send`를 호출하고, `LoginResponseDTO`로 디코딩하며, `HTTPClientError`를
   `DataAuthenticationError`로 변환한다.
-- [ ] T033 [S2] `sources/Projects/Data/ExternalRepository/Remotes/HTTPExternalRepositoryRemote.swift`를
+- [X] T033 [S2] `sources/Projects/Data/ExternalRepository/Remotes/HTTPExternalRepositoryRemote.swift`를
   신설해 `ExternalRepositoryRemote`를 conform하는 `HTTPExternalRepositoryRemote`를 구현한다.
   `GitHubRepositoryRequest`를 `HTTPRequest`로 변환해 `HTTPClient.send`를 호출하고,
   `GitHubRepositoryResponseDTO`로 디코딩하며, `HTTPClientError`를 `DataExternalRepositoryError`로
@@ -257,17 +257,17 @@ API를 Infrastructure 테스트로 검증한다.
 
 ### 테스트
 
-- [ ] T034 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPProjectRemoteTests.swift`를
+- [X] T034 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPProjectRemoteTests.swift`를
   신설해 `HTTPProjectRemote`의 요청 구성(`LearningProjectRequest`→`HTTPRequest` 변환), 응답
   변환(DTO 디코딩), 오류 변환(`HTTPClientError`→`DataLearningProjectError`)을 검증한다(FR-020).
-- [ ] T035 [P] [S2] `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift`를
+- [X] T035 [P] [S2] `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift`를
   신설해 `HTTPAuthenticationRemote`의 요청 구성·응답 변환·오류 변환을 검증한다.
-- [ ] T036 [P] [S2] `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift`를
+- [X] T036 [P] [S2] `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift`를
   신설해 `HTTPExternalRepositoryRemote`의 요청 구성·응답 변환·오류 변환을 검증한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T037 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
+- [X] T037 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
   순차 실행해 Data 테스트가 전부 통과하는지 확인한다. Data가 Domain·Composition·Feature·App·UI를
   import하지 않는지 소스를 검토하고(FR-019), `DataMember`가 변경되지 않았는지 확인한다.
 
