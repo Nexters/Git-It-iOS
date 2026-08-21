@@ -61,6 +61,56 @@
 
 없음
 
+## TS-20260821-010: PyYAML 부재 시 수동 스킬 검증 완료
+
+**기록일**: 2026-08-21
+**상태**: 완화
+**발생 단계**: `skill-creator` 포맷 스킬 변경 검증
+**관련 항목**: TS-20260821-009, `.agents/skills/speckit-swift-format-run/SKILL.md`
+
+### 증상
+
+TS-20260821-009의 공식 `quick_validate.py`는 계속 실행할 수 없었지만, 저장소에 이미 있는
+도구로 스킬과 확장 문서의 구조·연결을 검증할 수 있었다.
+
+### 영향
+
+공식 검증기의 frontmatter·이름 검사는 미실행 상태로 남았다. YAML 구문, 확장 manifest와
+registry 연결, Spec Kit 포맷 훅 회귀는 대체 검증으로 확인했다.
+
+### 근거
+
+- Ruby YAML parser가 스킬, 확장 명령, 확장 manifest와 `.specify/extensions.yml`을 모두
+  오류 없이 읽었다.
+- 확장 manifest SHA-256과 `.specify/extensions/.registry`의 `manifest_hash`가 일치했다.
+- `tools/githooks/swift-format/tests/test-speckit-hook.sh`가 성공했다.
+
+### 원인
+
+TS-20260821-009의 PyYAML 부재는 유지된다. 추가 제품 코드 또는 프로젝트 스크립트 결함은
+관찰되지 않았다.
+
+### 조치
+
+YAML parsing, registry hash 비교, 남은 구문 검색, `git diff --check`와 전용 회귀 테스트를
+공식 검증기의 대체 검증으로 실행했다.
+
+### 검증
+
+- Ruby YAML parsing: 성공했다.
+- registry manifest hash 비교: `REGISTRY_HASH_OK`를 확인했다.
+- `test-speckit-hook.sh`: `PASS: speckit swift-format hook`을 확인했다.
+- `git diff --check`: 성공했다.
+
+### 재발 방지
+
+공식 스킬 검증기 실행 환경에 PyYAML이 없을 때는 검증기 미실행을 명시하고 YAML 구문,
+manifest hash와 저장소 전용 회귀를 독립적으로 확인한다.
+
+### 연결
+
+TS-20260821-009
+
 ## TS-20260821-002: zsh 파일 목록 검증의 잘못된 누락 판정
 
 **기록일**: 2026-08-21
@@ -435,3 +485,96 @@ append-only 기록은 `tail`로 마지막 항목의 고유 문맥을 확인하�
 ### 연결
 
 TS-20260821-005
+
+## TS-20260821-009: 스킬 검증기의 PyYAML 의존성 부재
+
+**기록일**: 2026-08-21
+**상태**: 환경 제약
+**발생 단계**: `skill-creator` 포맷 스킬 변경 검증
+**관련 항목**: `.agents/skills/speckit-swift-format-run/SKILL.md`
+
+### 증상
+
+`skill-creator`의 `quick_validate.py`를 시스템 Python과 Codex 번들 Python으로 각각 실행했지만
+두 실행 모두 `yaml` 모듈을 import하지 못해 검증기가 시작되지 않았다.
+
+### 영향
+
+스킬 frontmatter와 이름을 공식 검증기로 확인할 수 없었다. 포맷 대상 필터 제거 문서 변경과
+애플리케이션 소스에는 이 실패로 인한 추가 변경이 발생하지 않았다.
+
+### 근거
+
+- `python3 .../skill-creator/scripts/quick_validate.py .../speckit-swift-format-run`:
+  `ModuleNotFoundError: No module named 'yaml'`을 반환했다.
+- Codex 번들 `python3`로 실행한 동일 명령도 같은 오류를 반환했다.
+
+### 원인
+
+확정 원인은 두 Python 실행 환경에 `quick_validate.py`가 요구하는 PyYAML 패키지가 설치되어
+있지 않은 것이다.
+
+### 조치
+
+외부 패키지를 설치해 환경을 변경하지 않고 YAML frontmatter 필수 필드, 남은 구문 참조,
+Constitution 버전·날짜와 변경 diff를 저장소 명령으로 직접 검사했다.
+
+### 검증
+
+- `quick_validate.py`: 환경 의존성 부재로 실패했다.
+- 수동 구조·일관성 검사: 성공 여부를 후속 검증에서 확인한다.
+
+### 재발 방지
+
+스킬 검증 전에 실행할 Python 환경에서 `import yaml` 성공 여부를 확인한다. 의존성이 없으면
+환경 변경 권한을 확인한 뒤 설치하거나, 공식 검증 미실행 범위와 수동 검증 근거를 구분해
+보고한다.
+
+### 연결
+
+없음
+
+## TS-20260821-011: TS-010 후속 기록의 append 위치 위반
+
+**기록일**: 2026-08-21
+**상태**: 완화
+**발생 단계**: `speckit-troubleshooting` TS-010 기록
+**관련 항목**: TS-20260821-006, TS-20260821-009, TS-20260821-010
+
+### 증상
+
+TS-010을 추가한 Update patch가 파일 끝의 TS-009가 아니라 먼저 발견된 `### 연결`과 `없음`
+문맥에 적용되어 TS-001과 TS-002 사이에 항목을 삽입했다.
+
+### 영향
+
+기존 문장은 삭제되거나 수정되지 않았지만 TS-010이 파일 끝에 추가되어야 한다는 append-only
+순서 규칙을 위반했다. TS-010의 수동 검증 결과 자체는 유효하다.
+
+### 근거
+
+- `rg -n '^## TS-20260821-'`: TS-010이 64행, TS-009가 489행에 있음을 확인했다.
+- TS-010 추가 patch는 문서 안에서 반복되는 `### 연결`과 `없음`만 anchor로 사용했다.
+
+### 원인
+
+확정 원인은 TS-20260821-006에 이미 기록된 비고유 append 문맥 사용을 다시 반복한 것이다.
+
+### 조치
+
+기존 기록과 TS-010의 위치를 변경하지 않고, TS-009의 고유한 재발 방지 문장과 연결 문맥을
+anchor로 사용해 이 후속 항목을 실제 파일 끝에 추가했다.
+
+### 검증
+
+- `rg -n '^## TS-20260821-'`: TS-011이 마지막 항목인지 확인한다.
+- 변경 대상 파일에 한정한 `git diff --check`: 확인한다.
+
+### 재발 방지
+
+append-only patch는 직전 마지막 항목의 제목 또는 고유 본문을 반드시 anchor에 포함하고,
+반복 가능한 소제목과 값만으로 위치를 지정하지 않는다.
+
+### 연결
+
+TS-20260821-006, TS-20260821-010

@@ -41,21 +41,21 @@
 ### 준비와 target 분리
 
 - [ ] T001 [no-write] `git status --porcelain=v1 --untracked-files=all`의 기준 상태를 보존하고 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`와 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`에서 기존 `DataLearningProject`/`DataLearningProjectTests` 선언과 Data 공유 scheme 연결을 확인한다
-- [ ] T002 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataLearningProject`와 `DataLearningProjectTests`를 `DataExternalRepository`와 `DataExternalRepositoryTests`로 교체하고 sourceDirectory가 `ExternalRepository` root를 가리키도록 구현한다
-- [ ] T003 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`에서 Data 공유 scheme의 buildTargets와 testTargets를 `DataExternalRepository`와 `DataExternalRepositoryTests`로 교체한다
+- [x] T002 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataExternalRepository`와 `DataExternalRepositoryTests`를 추가하고 sourceDirectory가 `ExternalRepository` root를 가리키도록 구현한다. 기존 `DataLearningProject` target은 별도 기능의 계약을 위해 유지한다
+- [x] T003 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Data 공유 scheme buildTargets와 testTargets에 `DataExternalRepository`와 `DataExternalRepositoryTests`를 추가한다
 
 ### 테스트: S1 Public Repository 최소 데이터
 
-- [ ] T004 [P] [S1] `sources/Projects/Data/Tests/ExternalRepository/DTOs/GitHubRepositoryResponseDTOTests.swift`에 정상 최소 JSON, 추가 필드, avatar key 누락·`null`, topics 누락·`null`·빈 배열, star 0, 필수 owner 누락·`null`, 필수 필드 누락·잘못된 타입과 공개 저장 필드 네 개를 검증하는 Swift Testing 테스트를 작성한다
+- [x] T004 [P] [S1] `sources/Projects/Data/Tests/ExternalRepository/DTOs/GitHubRepositoryResponseDTOTests.swift`에 정상 최소 JSON, 추가 필드, avatar key 누락·`null`, topics 누락·`null`·빈 배열, star 0, 필수 owner 누락·`null`, 필수 필드 누락·잘못된 타입과 공개 저장 필드 네 개를 검증하는 Swift Testing 테스트를 작성한다
 
 ### 테스트: S2 요청과 인증 경계
 
-- [ ] T005 [P] [S2] `sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift`에 대표 owner/repository의 `https`, `api.github.com`, `GET`, `/repos/{owner}/{repo}`, 두 필수 header와 `Authorization`·Git-It access/refresh token·Apple identity token 부재를 검증하는 Swift Testing 테스트를 작성한다
+- [x] T005 [P] [S2] `sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift`에 대표 owner/repository의 `https`, `api.github.com`, `GET`, `/repos/{owner}/{repo}`, 두 필수 header와 `Authorization`·Git-It access/refresh token·Apple identity token 부재를 검증하는 Swift Testing 테스트를 작성한다
 
 ### 테스트: S3 오류와 Remote 계약
 
-- [ ] T006 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Errors/DataExternalRepositoryErrorTests.swift`에 `allCases == [.offline, .other]`, 두 케이스의 구분과 `Equatable`·`Error` 계약을 검증하는 Swift Testing 테스트를 작성한다
-- [ ] T007 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift`에 actor Probe가 `GitHubRepositoryRequest`를 한 번 기록해 DTO를 그대로 반환하고 지정된 `.offline`·`.other` 실패를 손실 없이 전달하며 성공 DTO를 반환하지 않는 계약 테스트를 작성한다
+- [x] T006 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Errors/DataExternalRepositoryErrorTests.swift`에 `allCases == [.offline, .other]`, 두 케이스의 구분과 `Equatable`·`Error` 계약을 검증하는 Swift Testing 테스트를 작성한다
+- [x] T007 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift`에 actor Probe가 `GitHubRepositoryRequest`를 한 번 기록해 DTO를 그대로 반환하고 지정된 `.offline`·`.other` 실패를 손실 없이 전달하며 성공 DTO를 반환하지 않는 계약 테스트를 작성한다
 
 ### 테스트 Red 확인
 
@@ -64,28 +64,28 @@
 
 ### 구현: S1 Public Repository 최소 데이터
 
-- [ ] T010 [P] [S1] `sources/Projects/Data/ExternalRepository/DTOs/GitHubRepositoryResponseDTO.swift`에 네 공개 필드와 public initializer를 가진 `Decodable`·`Equatable`·`Sendable` DTO를 구현하고, 필수 owner nested container, optional `avatar_url`, 기본 빈 배열 `topics`, 필수 `html_url`·`stargazers_count` 규칙을 custom decoding으로 적용한다
+- [x] T010 [P] [S1] `sources/Projects/Data/ExternalRepository/DTOs/GitHubRepositoryResponseDTO.swift`에 네 공개 필드와 public initializer를 가진 `Decodable`·`Equatable`·`Sendable` DTO를 구현하고, 필수 owner nested container, optional `avatar_url`, 기본 빈 배열 `topics`, 필수 `html_url`·`stargazers_count` 규칙을 custom decoding으로 적용한다
 
 ### 구현: S2 요청과 인증 경계
 
-- [ ] T011 [P] [S2] `sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift`에 `owner`·`repository`만 받는 public initializer와 고정 scheme·host·method·path·두 header를 가진 불변 `Equatable`·`Sendable` 요청 값을 구현하고 arbitrary header·credential 주입 경로를 두지 않는다
+- [x] T011 [P] [S2] `sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift`에 `owner`·`repository`만 받는 public initializer와 고정 scheme·host·method·path·두 header를 가진 불변 `Equatable`·`Sendable` 요청 값을 구현하고 arbitrary header·credential 주입 경로를 두지 않는다
 
 ### 구현: S3 오류와 Remote 계약
 
-- [ ] T012 [P] [S3] `sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift`에 연관값 없는 `offline`, `other`와 `CaseIterable`·`Equatable`·`Error`·`Sendable` 채택을 구현하고 두 case의 의미와 실제 기술 오류 매핑이 Composition 책임임을 공개 문서 주석으로 명시한다
-- [ ] T013 [S3] `sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift`에 `Sendable` 프로토콜과 `repository(_ request: GitHubRepositoryRequest) async throws -> GitHubRepositoryResponseDTO` 단일 연산을 구현하고 실제 HTTP 변환·전송·오류 매핑은 포함하지 않는다
+- [x] T012 [P] [S3] `sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift`에 연관값 없는 `offline`, `other`와 `CaseIterable`·`Equatable`·`Error`·`Sendable` 채택을 구현하고 두 case의 의미와 실제 기술 오류 매핑이 Composition 책임임을 공개 문서 주석으로 명시한다
+- [x] T013 [S3] `sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift`에 `Sendable` 프로토콜과 `repository(_ request: GitHubRepositoryRequest) async throws -> GitHubRepositoryResponseDTO` 단일 연산을 구현하고 실제 HTTP 변환·전송·오류 매핑은 포함하지 않는다
 
 ### 정리와 포맷
 
-- [ ] T014 [P] `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`를 전용 ExternalRepository 계약으로 대체했으므로 삭제한다
-- [ ] T015 [P] `sources/Projects/Data/Tests/LearningProject/DataLearningProjectCompilationTests.swift`를 전용 ExternalRepository 계약 테스트로 대체했으므로 삭제한다
-- [ ] T016 [P] `sources/Projects/Data/LearningProject/DTOs/GitHubRepositoryResponseDTO.swift`, `sources/Projects/Data/LearningProject/Requests/GitHubRepositoryRequest.swift`, `sources/Projects/Data/LearningProject/Errors/DataExternalRepositoryError.swift`, `sources/Projects/Data/LearningProject/Contracts/ExternalRepositoryRemote.swift`의 전용 target 분리 전 미추적 계약 파일을 삭제한다
-- [ ] T017 [P] `sources/Projects/Data/Tests/LearningProject/DTOs/GitHubRepositoryResponseDTOTests.swift`, `sources/Projects/Data/Tests/LearningProject/Requests/GitHubRepositoryRequestTests.swift`, `sources/Projects/Data/Tests/LearningProject/Errors/DataExternalRepositoryErrorTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/ExternalRepositoryRemoteContractTests.swift`의 전용 target 분리 전 미추적 테스트 파일을 삭제한다
+- [x] T014 [P] `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`를 전용 ExternalRepository 계약으로 대체했으므로 삭제한다
+- [x] T015 [P] `sources/Projects/Data/Tests/LearningProject/DataLearningProjectCompilationTests.swift`를 전용 ExternalRepository 계약 테스트로 대체했으므로 삭제한다
+- [x] T016 [P] `sources/Projects/Data/LearningProject/DTOs/GitHubRepositoryResponseDTO.swift`, `sources/Projects/Data/LearningProject/Requests/GitHubRepositoryRequest.swift`, `sources/Projects/Data/LearningProject/Errors/DataExternalRepositoryError.swift`, `sources/Projects/Data/LearningProject/Contracts/ExternalRepositoryRemote.swift`의 전용 target 분리 전 미추적 계약 파일을 삭제한다
+- [x] T017 [P] `sources/Projects/Data/Tests/LearningProject/DTOs/GitHubRepositoryResponseDTOTests.swift`, `sources/Projects/Data/Tests/LearningProject/Requests/GitHubRepositoryRequestTests.swift`, `sources/Projects/Data/Tests/LearningProject/Errors/DataExternalRepositoryErrorTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/ExternalRepositoryRemoteContractTests.swift`의 전용 target 분리 전 미추적 테스트 파일을 삭제한다
 - [ ] T018 `sources/Projects/Data/ExternalRepository/DTOs/GitHubRepositoryResponseDTO.swift`, `sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift`, `sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift`, `sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift`, `sources/Projects/Data/Tests/ExternalRepository/DTOs/GitHubRepositoryResponseDTOTests.swift`, `sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift`, `sources/Projects/Data/Tests/ExternalRepository/Errors/DataExternalRepositoryErrorTests.swift`, `sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift`만 `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점으로 포맷한다
 
 ### Data 패키지 검증과 결과 보고
 
-- [ ] T019 [no-write] 변경 파일이 T002~T018에 명시된 경로뿐이고 기존 사용자 변경을 보존했는지 확인하며, `sources/Projects/Data/ExternalRepository/`에서 Domain·Infrastructure·Composition·Feature·UI import, `fullName`·`language` 공개 저장 필드, `Authorization`과 credential 저장값이 없음을 `rg`로 확인한다
+- [x] T019 [no-write] 변경 파일이 T002~T018에 명시된 경로뿐이고 기존 사용자 변경을 보존했는지 확인하며, `sources/Projects/Data/ExternalRepository/`에서 Domain·Infrastructure·Composition·Feature·UI import, `fullName`·`language` 공개 저장 필드, `Authorization`과 credential 저장값이 없음을 `rg`로 확인한다
 - [ ] T020 [no-write] `sources`에서 `tuist generate`를 실행한 뒤 `test_destination=${GIT_IT_TEST_DESTINATION:-'platform=iOS Simulator,name=iPhone 17 Pro'}`를 사용해 `xcodebuild build-for-testing -workspace GitIt.xcworkspace -scheme Data -destination "$test_destination" -derivedDataPath sources/DerivedData/Feature012`를 실행하고 전용 production/test target 성공과 Git 추적 파일 무변경을 확인한다
 - [ ] T021 [no-write] T020의 destination과 `sources/DerivedData/Feature012`를 사용해 `xcodebuild test-without-building -workspace GitIt.xcworkspace -scheme Data -destination "$test_destination" -derivedDataPath sources/DerivedData/Feature012`를 실행하고 S1~S3 계약 테스트 통과와 Git 추적 파일 무변경을 확인한다
 - [ ] T022 [no-write] Data target 분리, 변경 파일, T019~T021의 실제 결과와 미검증 범위를 사용자에게 보고하고 Data 패키지 변경을 종료한다
