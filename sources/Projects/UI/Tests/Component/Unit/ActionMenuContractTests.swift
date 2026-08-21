@@ -25,20 +25,16 @@ struct ActionMenuContractTests {
     }
 
     @Test
-    func `ViewModel은 불변 항목만 소유하고 선택 콜백은 별도 초기화 인자로 받는다`() {
+    func `불변 항목과 선택 콜백을 직접 초기화 인자로 받는다`() {
         let item = ActionMenu.Item(
             id: "delete",
             title: "프로젝트 삭제",
             accessibilityLabel: "학습 프로젝트 삭제 모드 열기",
         )
-        let viewModel = ActionMenu.ViewModel(items: [item])
-
         _ = ActionMenu(
-            viewModel: viewModel,
+            items: [item],
             onSelect: { _ in },
         )
-
-        #expect(viewModel.items == [item])
     }
 
     @Test

@@ -8,27 +8,16 @@ public struct EmptyState<Illustration: View>: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        title: String,
+        message: String,
         @ViewBuilder illustration: () -> Illustration,
     ) {
-        self.viewModel = viewModel
+        self.title = title
+        self.message = message
         self.illustration = illustration()
     }
 
     // MARK: Public
-
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            title: String,
-            message: String,
-        ) {
-            self.title = title
-            self.message = message
-        }
-
-        public let title: String
-        public let message: String
-    }
 
     public var body: some View {
         VStack(spacing: LayoutToken.margin.cgFloatValue) {
@@ -41,12 +30,12 @@ public struct EmptyState<Illustration: View>: View {
             VStack(spacing: Constant.textSpacing) {
                 StyledText
                     .subtitle1(
-                        viewModel.title,
+                        title,
                         alignment: .center,
                     )
                 StyledText
                     .body2(
-                        viewModel.message,
+                        message,
                         color: .grey400,
                         alignment: .center,
                     )
@@ -73,23 +62,22 @@ public struct EmptyState<Illustration: View>: View {
         }
     }
 
-    private let viewModel: ViewModel
+    private let title: String
+    private let message: String
     private let illustration: Illustration
 
 }
 
 #Preview("Empty State") {
     EmptyState(
-        viewModel: .init(
-            title: "projects = []",
-            message:
-            """
-            아직 저장한 항목이 없습니다.
-            다시 확인할 내용을 저장해 보세요.
-            """,
-        )
+        title: "projects = []",
+        message:
+        """
+        아직 저장한 항목이 없습니다.
+        다시 확인할 내용을 저장해 보세요.
+        """,
     ) {
-        ResourceImage(viewModel: .init(asset: .emptyState))
+        ResourceAnimation(asset: .projectEmpty, isLooping: false)
     }
     .frame(width: 390, height: 420)
     .designSystemBackground(.grey700)

@@ -7,11 +7,11 @@ import Testing
 struct ContinuousProgressBarContractTests {
     @Test
     func `진행률은 0부터 1 사이로 제한한다`() {
-        #expect(ContinuousProgressBar.ViewModel(progress: -0.1).progress == 0)
-        #expect(ContinuousProgressBar.ViewModel(progress: 0).progress == 0)
-        #expect(ContinuousProgressBar.ViewModel(progress: 0.45).progress == 0.45)
-        #expect(ContinuousProgressBar.ViewModel(progress: 1).progress == 1)
-        #expect(ContinuousProgressBar.ViewModel(progress: 1.1).progress == 1)
+        #expect(ContinuousProgressBar.clampedProgress(-0.1) == 0)
+        #expect(ContinuousProgressBar.clampedProgress(0) == 0)
+        #expect(ContinuousProgressBar.clampedProgress(0.45) == 0.45)
+        #expect(ContinuousProgressBar.clampedProgress(1) == 1)
+        #expect(ContinuousProgressBar.clampedProgress(1.1) == 1)
     }
 
     @Test
@@ -22,10 +22,7 @@ struct ContinuousProgressBarContractTests {
     }
 
     @Test
-    func `불변 ViewModel로 생성한다`() {
-        let viewModel = ContinuousProgressBar.ViewModel(progress: 0.25)
-
-        _ = ContinuousProgressBar(viewModel: viewModel)
-        #expect(viewModel.progress == 0.25)
+    func `진행률을 직접 입력으로 생성한다`() {
+        _ = ContinuousProgressBar(progress: 0.25)
     }
 }

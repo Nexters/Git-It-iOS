@@ -6,10 +6,30 @@ public struct ActionButton: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        title: String,
+        style: Style = .primary,
+        size: Size = .large,
+        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
-        self.viewModel = viewModel
+        label = .title(title)
+        self.style = style
+        self.size = size
+        self.isEnabled = isEnabled
+        self.action = action
+    }
+
+    public init(
+        styledText: StyledText,
+        style: Style = .primary,
+        size: Size = .large,
+        isEnabled: Bool = true,
+        action: @escaping () -> Void = { },
+    ) {
+        label = .styled(AnyView(styledText))
+        self.style = style
+        self.size = size
+        self.isEnabled = isEnabled
         self.action = action
     }
 
@@ -83,64 +103,21 @@ public struct ActionButton: View {
         }
     }
 
-    /// 기본 문구는 `title`, 서식이 필요한 문구는 `styled`로 전달합니다.
-    public enum Label: Sendable, Equatable {
-        case title(String)
-        case styled(StyledText.ViewModel)
-    }
-
-    public struct ViewModel: Sendable, Equatable {
-
-        // MARK: Lifecycle
-
-        public init(
-            title: String,
-            style: Style = .primary,
-            size: Size = .large,
-            isEnabled: Bool = true,
-        ) {
-            label = .title(title)
-            self.style = style
-            self.size = size
-            self.isEnabled = isEnabled
-        }
-
-        public init(
-            styledText: StyledText.ViewModel,
-            style: Style = .primary,
-            size: Size = .large,
-            isEnabled: Bool = true,
-        ) {
-            label = .styled(styledText)
-            self.style = style
-            self.size = size
-            self.isEnabled = isEnabled
-        }
-
-        // MARK: Public
-
-        public let label: Label
-        public let style: Style
-        public let size: Size
-        public let isEnabled: Bool
-
-    }
-
     public var body: some View {
         Button(action: action) {
             ZStack {
                 content
                     .frame(maxWidth: .infinity)
-                    .frame(height: viewModel.size.surfaceHeight)
+                    .frame(height: size.surfaceHeight)
                     .background(
-                        viewModel.style.backgroundColor(isEnabled: viewModel.isEnabled),
+                        style.backgroundColor(isEnabled: isEnabled),
                         in: RoundedRectangle(designSystem: .large),
                     )
             }
-            .frame(minHeight: viewModel.size.touchHeight)
+            .frame(minHeight: size.touchHeight)
             .contentShape(Rectangle())
         }
-        .disabled(!viewModel.isEnabled)
+        .disabled(!isEnabled)
     }
 
     public static func primary(
@@ -150,19 +127,10 @@ public struct ActionButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .primary, size: size, isEnabled: isEnabled),
-            action: action,
-        )
-    }
-
-    public static func primary(
-        styledText: StyledText.ViewModel,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            viewModel: .init(styledText: styledText, style: .primary, size: size, isEnabled: isEnabled),
+            title: title,
+            style: .primary,
+            size: size,
+            isEnabled: isEnabled,
             action: action,
         )
     }
@@ -174,19 +142,10 @@ public struct ActionButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .secondary, size: size, isEnabled: isEnabled),
-            action: action,
-        )
-    }
-
-    public static func secondary(
-        styledText: StyledText.ViewModel,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            viewModel: .init(styledText: styledText, style: .secondary, size: size, isEnabled: isEnabled),
+            title: title,
+            style: .secondary,
+            size: size,
+            isEnabled: isEnabled,
             action: action,
         )
     }
@@ -198,19 +157,10 @@ public struct ActionButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .destructive, size: size, isEnabled: isEnabled),
-            action: action,
-        )
-    }
-
-    public static func destructive(
-        styledText: StyledText.ViewModel,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            viewModel: .init(styledText: styledText, style: .destructive, size: size, isEnabled: isEnabled),
+            title: title,
+            style: .destructive,
+            size: size,
+            isEnabled: isEnabled,
             action: action,
         )
     }
@@ -222,41 +172,40 @@ public struct ActionButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(title: title, style: .text, size: size, isEnabled: isEnabled),
-            action: action,
-        )
-    }
-
-    public static func text(
-        styledText: StyledText.ViewModel,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            viewModel: .init(styledText: styledText, style: .text, size: size, isEnabled: isEnabled),
+            title: title,
+            style: .text,
+            size: size,
+            isEnabled: isEnabled,
             action: action,
         )
     }
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private enum Label {
+        case title(String)
+        case styled(AnyView)
+    }
+
+    private let label: Label
+    private let style: Style
+    private let size: Size
+    private let isEnabled: Bool
     private let action: () -> Void
 
     /// `title`은 버튼 스타일이 정한 색을 입히고, `styled`는 전달된 서식을 그대로 사용합니다.
     @ViewBuilder
     private var content: some View {
-        switch viewModel.label {
+        switch label {
         case .title(let title):
             Text.designSystemStyled(title, style: .body1)
                 .designSystemLineSpacing(.body1)
-                .designSystemForeground(viewModel.style.titleColor(isEnabled: viewModel.isEnabled))
+                .designSystemForeground(style.titleColor(isEnabled: isEnabled))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
         case .styled(let styledText):
-            StyledText(viewModel: styledText)
+            styledText
         }
     }
 

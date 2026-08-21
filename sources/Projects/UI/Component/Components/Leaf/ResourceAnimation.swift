@@ -7,10 +7,16 @@ public struct ResourceAnimation: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        asset: Asset,
+        isLooping: Bool = true,
+        speed: Double = 1,
+        contentMode: ContentMode = .fit,
         onCompletion: ((Bool) -> Void)? = nil,
     ) {
-        self.viewModel = viewModel
+        self.asset = asset
+        self.isLooping = isLooping
+        self.speed = speed
+        self.contentMode = contentMode
         self.onCompletion = onCompletion
     }
 
@@ -29,53 +35,37 @@ public struct ResourceAnimation: View {
         }
     }
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            asset: Asset,
-            isLooping: Bool = true,
-            speed: Double = 1,
-            contentMode: ContentMode = .fit,
-        ) {
-            self.asset = asset
-            self.isLooping = isLooping
-            self.speed = speed
-            self.contentMode = contentMode
-        }
-
-        public let asset: Asset
-        public let isLooping: Bool
-        public let speed: Double
-        public let contentMode: ContentMode
-    }
-
     public var body: some View {
-        LottieView(animation: viewModel.asset.animation)
-            .playing(loopMode: viewModel.isLooping ? .loop : .playOnce)
-            .animationSpeed(viewModel.speed)
+        LottieView(animation: asset.animation)
+            .playing(loopMode: isLooping ? .loop : .playOnce)
+            .animationSpeed(speed)
             .animationDidFinish { onCompletion?($0) }
             .resizable()
-            .aspectRatio(contentMode: viewModel.contentMode)
+            .aspectRatio(contentMode: contentMode)
     }
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let asset: Asset
+    private let isLooping: Bool
+    private let speed: Double
+    private let contentMode: ContentMode
     private let onCompletion: ((Bool) -> Void)?
 
 }
 
 #Preview("Resource Animation") {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-        ResourceAnimation(viewModel: .init(asset: .generalLoading))
+        ResourceAnimation(asset: .generalLoading)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(viewModel: .init(asset: .notification, isLooping: false))
+        ResourceAnimation(asset: .notification, isLooping: false)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(viewModel: .init(asset: .projectEmpty, isLooping: false))
+        ResourceAnimation(asset: .projectEmpty, isLooping: false)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(viewModel: .init(asset: .storageEmpty, isLooping: false))
+        ResourceAnimation(asset: .storageEmpty, isLooping: false)
             .frame(width: 128, height: 128)
     }
     .designSystemScreenMargin()
@@ -85,10 +75,10 @@ public struct ResourceAnimation: View {
 
 #Preview("Resource Animation 2") {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-        ResourceAnimation(viewModel: .init(asset: .setCreationLoading, speed: 1.5))
+        ResourceAnimation(asset: .setCreationLoading, speed: 1.5)
             .frame(width: 250, height: 250)
 
-        ResourceAnimation(viewModel: .init(asset: .complete, isLooping: false))
+        ResourceAnimation(asset: .complete, isLooping: true)
             .frame(width: 200, height: 200)
     }
     .designSystemScreenMargin()

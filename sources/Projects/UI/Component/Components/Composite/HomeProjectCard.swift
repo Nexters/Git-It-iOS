@@ -6,10 +6,20 @@ public struct HomeProjectCard: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        title: String,
+        technologies: String,
+        progress: Double,
+        currentSet: Int = 1,
+        setTitle: String = "",
+        variant: Variant = .purple,
         onStart: @escaping () -> Void = { },
     ) {
-        self.viewModel = viewModel
+        self.title = title
+        self.technologies = technologies
+        self.progress = progress
+        self.currentSet = currentSet
+        self.setTitle = setTitle
+        self.variant = variant
         self.onStart = onStart
     }
 
@@ -86,50 +96,19 @@ public struct HomeProjectCard: View {
         }
     }
 
-    public struct ViewModel: Sendable, Equatable {
-
-        // MARK: Lifecycle
-
-        public init(
-            title: String,
-            technologies: String,
-            progress: Double,
-            currentSet: Int,
-            setTitle: String,
-            variant: Variant,
-        ) {
-            self.title = title
-            self.technologies = technologies
-            self.progress = progress
-            self.currentSet = currentSet
-            self.setTitle = setTitle
-            self.variant = variant
-        }
-
-        // MARK: Public
-
-        public let title: String
-        public let technologies: String
-        public let progress: Double
-        public let currentSet: Int
-        public let setTitle: String
-        public let variant: Variant
-
-    }
-
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                     StyledText.subtitle2(
-                        viewModel.title,
-                        color: viewModel.variant.titleColor,
+                        title,
+                        color: variant.titleColor,
                     )
                     .lineLimit(2)
 
                     StyledText.caption2(
-                        viewModel.technologies,
-                        color: viewModel.variant.technologyColor,
+                        technologies,
+                        color: variant.technologyColor,
                     )
                     .lineLimit(3)
                 }
@@ -151,19 +130,19 @@ public struct HomeProjectCard: View {
 
             VStack(alignment: .leading, spacing: Constant.footerSpacing) {
                 StyledText.caption2(
-                    "Set \(viewModel.currentSet)",
+                    "Set \(currentSet)",
                     color: .grey100,
                 )
                 .padding(.horizontal, Constant.setBadgeHorizontalPadding)
                 .frame(height: Constant.setBadgeHeight)
                 .background(
-                    Color(designSystem: viewModel.variant.progressColor),
+                    Color(designSystem: variant.progressColor),
                     in: Capsule(),
                 )
 
                 StyledText.caption1(
-                    viewModel.setTitle,
-                    color: viewModel.variant.setTitleColor,
+                    setTitle,
+                    color: variant.setTitleColor,
                 )
                 .lineLimit(1)
             }
@@ -172,9 +151,9 @@ public struct HomeProjectCard: View {
             .padding(.bottom, Constant.footerBottomPadding)
         }
         .frame(width: Constant.cardWidth, height: Constant.cardHeight)
-        .background(Color(designSystem: viewModel.variant.cardColor))
+        .background(Color(designSystem: variant.cardColor))
         .designSystemCornerRadius(.large)
-        .rotationEffect(.degrees(viewModel.variant.rotationDegrees))
+        .rotationEffect(.degrees(variant.rotationDegrees))
         .accessibilityElement(children: .combine)
     }
 
@@ -199,7 +178,12 @@ public struct HomeProjectCard: View {
         static let startTouchSize: CGFloat = 44
     }
 
-    private let viewModel: ViewModel
+    private let title: String
+    private let technologies: String
+    private let progress: Double
+    private let currentSet: Int
+    private let setTitle: String
+    private let variant: Variant
     private let onStart: () -> Void
 
     /// 시각 표면은 32pt지만 44pt 프레임으로 감싸 최소 터치 대상을 확보합니다.
@@ -207,24 +191,24 @@ public struct HomeProjectCard: View {
         Button(action: onStart) {
             Image(systemName: "play.fill")
                 .font(.system(size: Constant.startSymbolSize, weight: .bold))
-                .designSystemForeground(viewModel.variant.cardColor)
+                .designSystemForeground(variant.cardColor)
                 .frame(width: Constant.startSurfaceSize, height: Constant.startSurfaceSize)
                 .background(Color(designSystem: .grey100), in: Circle())
                 .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(viewModel.title) 학습 시작")
+        .accessibilityLabel("\(title) 학습 시작")
     }
 
     private var progressBar: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color(designSystem: viewModel.variant.trackColor))
+                    .fill(Color(designSystem: variant.trackColor))
 
                 Capsule()
-                    .fill(Color(designSystem: viewModel.variant.progressColor))
+                    .fill(Color(designSystem: variant.progressColor))
                     .frame(width: proxy.size.width * clampedProgress)
             }
         }
@@ -232,7 +216,7 @@ public struct HomeProjectCard: View {
     }
 
     private var clampedProgress: Double {
-        min(max(viewModel.progress, 0), 1)
+        min(max(progress, 0), 1)
     }
 
 }
@@ -240,34 +224,28 @@ public struct HomeProjectCard: View {
 #Preview("Home Project Card") {
     HStack(spacing: LayoutToken.margin.cgFloatValue) {
         HomeProjectCard(
-            viewModel: .init(
-                title: "Nexters",
-                technologies: "Kotlin · Compose · Coroutines",
-                progress: 0.4,
-                currentSet: 1,
-                setTitle: "Compose 핵심 개념",
-                variant: .purple,
-            )
+            title: "Nexters",
+            technologies: "Kotlin · Compose · Coroutines",
+            progress: 0.4,
+            currentSet: 1,
+            setTitle: "Compose 핵심 개념",
+            variant: .purple,
         )
         HomeProjectCard(
-            viewModel: .init(
-                title: "Now in Android",
-                technologies: "Kotlin · Compose · Coroutines",
-                progress: 0.4,
-                currentSet: 1,
-                setTitle: "Compose 핵심 개념",
-                variant: .lightBlue,
-            )
+            title: "Now in Android",
+            technologies: "Kotlin · Compose · Coroutines",
+            progress: 0.4,
+            currentSet: 1,
+            setTitle: "Compose 핵심 개념",
+            variant: .lightBlue,
         )
         HomeProjectCard(
-            viewModel: .init(
-                title: "Git It iOS",
-                technologies: "Swift · SwiftUI · TCA",
-                progress: 0.4,
-                currentSet: 1,
-                setTitle: "Presentation 구조",
-                variant: .darkBlue,
-            )
+            title: "Git It iOS",
+            technologies: "Swift · SwiftUI · TCA",
+            progress: 0.4,
+            currentSet: 1,
+            setTitle: "Presentation 구조",
+            variant: .darkBlue,
         )
     }
     .padding(.vertical, LayoutToken.margin.cgFloatValue)

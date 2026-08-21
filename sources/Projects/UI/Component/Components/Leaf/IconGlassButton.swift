@@ -6,10 +6,16 @@ public struct IconGlassButton: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        symbol: String,
+        label: String,
+        style: Style = .neutral,
+        size: Size = .small,
         action: @escaping () -> Void = { },
     ) {
-        self.viewModel = viewModel
+        self.symbol = symbol
+        self.label = label
+        self.style = style
+        self.size = size
         self.action = action
     }
 
@@ -66,51 +72,24 @@ public struct IconGlassButton: View {
         }
     }
 
-    public struct ViewModel: Sendable, Equatable {
-
-        // MARK: Lifecycle
-
-        public init(
-            symbol: String,
-            label: String,
-            style: Style = .neutral,
-            size: Size = .small,
-        ) {
-            self.symbol = symbol
-            self.label = label
-            self.style = style
-            self.size = size
-        }
-
-        // MARK: Public
-
-        /// SF Symbol 이름입니다. 심볼 이름은 렌더링 정보이므로 `label`이 사용자가
-        /// 인지하는 이름을 따로 소유합니다.
-        public let symbol: String
-        public let label: String
-        public let style: Style
-        public let size: Size
-
-    }
-
     public var body: some View {
         Button(action: action) {
-            Image(systemName: viewModel.symbol)
-                .font(.system(size: viewModel.size.iconSize))
-                .designSystemForeground(viewModel.style.tintColor)
+            Image(systemName: symbol)
+                .font(.system(size: size.iconSize))
+                .designSystemForeground(style.tintColor)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .frame(width: viewModel.size.surfaceSize, height: viewModel.size.surfaceSize)
+                .frame(width: size.surfaceSize, height: size.surfaceSize)
                 .glassEffect(
                     .regular
-                        .tint(Color(designSystem: viewModel.style.backgroundColor))
+                        .tint(Color(designSystem: style.backgroundColor))
                         .interactive(),
                     in: .circle,
                 )
-                .frame(width: viewModel.size.touchSize, height: viewModel.size.touchSize)
+                .frame(width: size.touchSize, height: size.touchSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(viewModel.label)
+        .accessibilityLabel(label)
     }
 
     public static func neutral(
@@ -120,7 +99,10 @@ public struct IconGlassButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .neutral, size: size),
+            symbol: symbol,
+            label: label,
+            style: .neutral,
+            size: size,
             action: action,
         )
     }
@@ -132,7 +114,10 @@ public struct IconGlassButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .accent, size: size),
+            symbol: symbol,
+            label: label,
+            style: .accent,
+            size: size,
             action: action,
         )
     }
@@ -144,14 +129,20 @@ public struct IconGlassButton: View {
         action: @escaping () -> Void = { },
     ) -> Self {
         Self(
-            viewModel: .init(symbol: symbol, label: label, style: .destructive, size: size),
+            symbol: symbol,
+            label: label,
+            style: .destructive,
+            size: size,
             action: action,
         )
     }
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let symbol: String
+    private let label: String
+    private let style: Style
+    private let size: Size
     private let action: () -> Void
 
 }

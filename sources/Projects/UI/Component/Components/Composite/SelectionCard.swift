@@ -8,33 +8,35 @@ public struct SelectionCard<Thumbnail: View>: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel,
+        title: String,
+        supportingText: String? = nil,
+        badgeText: String? = nil,
+        isSelected: Bool = false,
         @ViewBuilder thumbnail: () -> Thumbnail,
     ) {
-        self.viewModel = viewModel
+        self.title = title
+        self.supportingText = supportingText
+        self.badgeText = badgeText
+        self.isSelected = isSelected
         self.thumbnail = thumbnail()
     }
 
-    // MARK: Public
-
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            title: String,
-            supportingText: String? = nil,
-            badgeText: String? = nil,
-            isSelected: Bool = false,
-        ) {
-            self.title = title
-            self.supportingText = supportingText
-            self.badgeText = badgeText
-            self.isSelected = isSelected
-        }
-
-        public let title: String
-        public let supportingText: String?
-        public let badgeText: String?
-        public var isSelected: Bool
+    public init(
+        title: String,
+        supportingText: String? = nil,
+        badgeText: String? = nil,
+        isSelected: Bool = false,
+    ) where Thumbnail == EmptyView {
+        self.init(
+            title: title,
+            supportingText: supportingText,
+            badgeText: badgeText,
+            isSelected: isSelected,
+            thumbnail: EmptyView.init,
+        )
     }
+
+    // MARK: Public
 
     public var body: some View {
         HStack(spacing: Constant.thumbnailSpacing) {
@@ -44,12 +46,12 @@ public struct SelectionCard<Thumbnail: View>: View {
 
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                 HStack(spacing: Constant.badgeSpacing) {
-                    StyledText.subtitle3(viewModel.title)
-                    if let badgeText = viewModel.badgeText {
+                    StyledText.subtitle3(title)
+                    if let badgeText {
                         TagBadge.selected(badgeText)
                     }
                 }
-                if let supportingText = viewModel.supportingText {
+                if let supportingText {
                     StyledText.caption1(supportingText, color: .grey300)
                 }
             }
@@ -62,12 +64,12 @@ public struct SelectionCard<Thumbnail: View>: View {
         .overlay {
             RoundedRectangle(designSystem: .large)
                 .stroke(
-                    viewModel.isSelected ? Color(designSystem: .blue200) : .clear,
+                    isSelected ? Color(designSystem: .blue200) : .clear,
                     lineWidth: Constant.borderWidth,
                 )
         }
         .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(viewModel.isSelected ? .isSelected : [])
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Private
@@ -102,7 +104,10 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
     }
 
-    private let viewModel: ViewModel
+    private let title: String
+    private let supportingText: String?
+    private let badgeText: String?
+    private let isSelected: Bool
     private let thumbnail: Thumbnail
 
 }
@@ -110,21 +115,17 @@ public struct SelectionCard<Thumbnail: View>: View {
 #Preview("Selection Card") {
     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
         SelectionCard(
-            viewModel: .init(
-                title: "기술 개념은 알아요",
-                supportingText: "실제 코드 흐름을 중심으로 학습",
-            )
+            title: "기술 개념은 알아요",
+            supportingText: "실제 코드 흐름을 중심으로 학습",
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .purple300))
         }
 
         SelectionCard(
-            viewModel: .init(
-                title: "프로젝트 경험이 있어요",
-                supportingText: "심화 문제와 서술형 비중 확대",
-                isSelected: true,
-            )
+            title: "프로젝트 경험이 있어요",
+            supportingText: "심화 문제와 서술형 비중 확대",
+            isSelected: true,
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .blue400))

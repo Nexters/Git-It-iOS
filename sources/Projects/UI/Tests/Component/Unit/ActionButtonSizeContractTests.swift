@@ -20,28 +20,17 @@ struct ActionButtonSizeContractTests {
     }
 
     @Test
-    func `String과 StyledText 생성 경로를 모두 보존한다`() {
-        let styledText = StyledText.ViewModel(
-            text: "서식 라벨",
-            style: .subtitle2,
-            color: .grey100,
-            alignment: .center,
-        )
-        let titleViewModel = ActionButton.ViewModel(
-            title: "문자열 라벨",
-            style: .primary,
-            size: .medium,
-        )
-        let styledViewModel = ActionButton.ViewModel(
-            styledText: styledText,
+    func `String과 StyledText 직접 생성 경로를 모두 보존한다`() {
+        _ = ActionButton(title: "문자열 라벨", style: .primary, size: .medium)
+        _ = ActionButton(
+            styledText: StyledText(text: "서식 라벨", style: .subtitle2, alignment: .center),
             style: .secondary,
             size: .small,
         )
 
-        #expect(titleViewModel.label == .title("문자열 라벨"))
-        #expect(styledViewModel.label == .styled(styledText))
-
         _ = ActionButton.primary("문자열 라벨", size: .medium)
-        _ = ActionButton.primary(styledText: styledText, size: .small)
+        _ = ActionButton.secondary("보조 버튼", isEnabled: false)
+        _ = ActionButton.destructive("삭제", size: .small)
+        _ = ActionButton.text("더 보기")
     }
 }

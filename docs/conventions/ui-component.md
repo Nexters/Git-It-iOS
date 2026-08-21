@@ -17,9 +17,9 @@
 
 - `sources/Projects/UI/Component/Components/Leaf/**`의 말단 컴포넌트
 - `sources/Projects/UI/Component/Components/Composite/**`의 조합 컴포넌트
-- `sources/Projects/UI/Component/Components/Review/**`의 검토·디버그 전용 컴포넌트
 - `sources/Projects/UI/Component/Resources/**`의 이미지·애니메이션·일러스트레이션 자산
-- `UIComponentLayoutHarness`와 UI 자동화 target의 컴포넌트 레이아웃 검증
+- `sources/Projects/UI/ComponentPreview/**`의 catalog·fixture·환경 source
+- `UIComponentPreview`와 UI 자동화 target의 컴포넌트 탐색·계약 검증
 
 DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문서의 범위가 아닙니다.
 
@@ -62,11 +62,12 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 표현 계약을 제공합니다. 조합 자체가 Feature 상태를 해석하거나 화면 목적지를 결정하지
 않습니다.
 
-### 3.3 검토·디버그 전용 컴포넌트
+### 3.3 Preview 전용 컴포넌트
 
-레이아웃 카탈로그나 TestFlight 검토 제어처럼 제품 화면에서 사용하지 않는 컴포넌트는
-`Components/Review/`에 둡니다. 제품 컴포넌트가 Review 컴포넌트에 의존해서는 안 되며,
-세부 기준은 [View 컨벤션](./view.md#21-검토디버그-전용-컴포넌트)을 따릅니다.
+catalog 탐색, 결정적 fixture와 환경 선택처럼 제품 화면에서 사용하지 않는 구현은
+`ComponentPreview/`에 둡니다. Preview target은 `UIComponent`와 `DesignSystem`에만
+의존하며 production target에 포함되지 않습니다. Preview 화면은 환경 적용 상태를
+표시할 수 있지만 계약의 pass/fail을 계산하지 않습니다.
 
 ## 4. 재사용 판단
 
@@ -87,12 +88,12 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 ### 5.1 파일과 폴더
 
 - 말단 컴포넌트는 `Components/Leaf/`, 조합 컴포넌트는
-  `Components/Composite/`, 검토 전용 컴포넌트는 `Components/Review/`에 둡니다.
+  `Components/Composite/`에 두고 Preview 전용 source는 `ComponentPreview/`에 둡니다.
 - 각 폴더에는 컴포넌트마다 하위 폴더를 만들지 않고 Swift 파일을 바로 둡니다.
 - 각 Swift 파일은 주된 최상위 `struct`, `enum`, `class`, `actor` 또는 `protocol`을
   하나만 정의하며 파일 이름은 타입 이름과 일치시킵니다.
-- 프리뷰 전용 타입이나 중첩할 수 없는 보조 타입은 같은 폴더에 소유 컴포넌트 이름을
-  앞에 붙인 파일로 둡니다.
+- 프리뷰 전용 타입은 `ComponentPreview/Fixtures/`에 두고, production 보조 타입 중
+  중첩할 수 없는 타입만 같은 production 폴더에 소유 컴포넌트 이름을 붙여 둡니다.
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.
 
 ### 5.2 중첩 선언
@@ -152,7 +153,9 @@ public struct SelectionToggle: View {
 ## 8. 검증
 
 - 공개 입력·`Binding`, 상태별 표현과 레이아웃 계약을 단위 테스트 또는
-  `UIComponentLayoutHarness`의 UI 자동화 테스트로 검증합니다.
+  `UIComponentPreview`를 host로 사용하는 UI 자동화 테스트로 검증합니다.
+- Preview catalog는 public component 전체를 stable `componentID`로 등록하고 local
+  fixture만 사용하며, 환경·fallback 결과의 자동 판정은 UI test가 소유합니다.
 - UI production target의 Tuist dependency와 Swift import에
   `ComposableArchitecture`가 없는지 확인합니다.
 - 컴포넌트 분리 전후의 표시 상태와 사용자 입력 전달을 확인합니다.
@@ -164,7 +167,7 @@ public struct SelectionToggle: View {
 - [ ] 읽기 값·변경 값·일회성 입력이 초기화 값·Binding·콜백으로 구분되는가?
 - [ ] Feature, Domain 또는 TCA 타입이 공개 API와 구현에 없는가?
 - [ ] 외형이 아니라 입력·상태·경계값의 의미로 재사용을 판단했는가?
-- [ ] 말단·조합·Review 폴더가 실제 의존 구조와 일치하는가?
+- [ ] 말단·조합·Preview source 분리가 실제 target 의존 구조와 일치하는가?
 - [ ] 보조 선언이 View에 중첩되고 표시 상태 wrapper가 없는가?
 - [ ] 자산과 DesignSystem 토큰의 소유 경계가 분리되는가?
 - [ ] 레이아웃과 사용자 입력 전달을 독립적으로 검증했는가?

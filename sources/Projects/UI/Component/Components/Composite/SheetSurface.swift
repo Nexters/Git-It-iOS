@@ -8,17 +8,12 @@ public struct SheetSurface<Content: View>: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel _: ViewModel = .init(),
-        @ViewBuilder content: () -> Content,
+        @ViewBuilder content: () -> Content
     ) {
         self.content = content()
     }
 
     // MARK: Public
-
-    public struct ViewModel: Sendable, Equatable {
-        public init() { }
-    }
 
     public var body: some View {
         VStack(spacing: 0) {

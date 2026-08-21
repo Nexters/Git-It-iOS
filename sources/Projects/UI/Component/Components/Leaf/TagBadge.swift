@@ -5,8 +5,12 @@ public struct TagBadge: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    public init(
+        text: String,
+        style: Style = .neutral,
+    ) {
+        self.text = text
+        self.style = style
     }
 
     // MARK: Public
@@ -36,42 +40,29 @@ public struct TagBadge: View {
         }
     }
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(
-            text: String,
-            style: Style = .neutral,
-        ) {
-            self.text = text
-            self.style = style
-        }
-
-        public let text: String
-        public let style: Style
-    }
-
     public var body: some View {
-        Text.designSystemStyled(viewModel.text, style: .body2)
+        Text.designSystemStyled(text, style: .body2)
             .designSystemLineSpacing(.body2)
-            .designSystemForeground(viewModel.style.textColor)
+            .designSystemForeground(style.textColor)
             .padding(.horizontal, Constant.horizontalPadding)
             .padding(.top, Constant.topPadding)
             .padding(.bottom, Constant.bottomPadding)
             .background(
-                Color(designSystem: viewModel.style.backgroundColor),
+                Color(designSystem: style.backgroundColor),
                 in: RoundedRectangle(designSystem: .small),
             )
     }
 
     public static func neutral(_ text: String) -> Self {
-        Self(viewModel: .init(text: text, style: .neutral))
+        Self(text: text, style: .neutral)
     }
 
     public static func accent(_ text: String) -> Self {
-        Self(viewModel: .init(text: text, style: .accent))
+        Self(text: text, style: .accent)
     }
 
     public static func selected(_ text: String) -> Self {
-        Self(viewModel: .init(text: text, style: .selected))
+        Self(text: text, style: .selected)
     }
 
     // MARK: Private
@@ -82,7 +73,8 @@ public struct TagBadge: View {
         static let bottomPadding: CGFloat = 4
     }
 
-    private let viewModel: ViewModel
+    private let text: String
+    private let style: Style
 
 }
 

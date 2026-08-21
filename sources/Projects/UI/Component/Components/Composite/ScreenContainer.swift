@@ -6,33 +6,25 @@ public struct ScreenContainer<Content: View>: View {
     // MARK: Lifecycle
 
     public init(
-        viewModel: ViewModel = .init(),
+        background: SemanticColorToken = .screenBackground,
         @ViewBuilder content: () -> Content,
     ) {
-        self.viewModel = viewModel
+        self.background = background
         self.content = content()
     }
 
     // MARK: Public
 
-    public struct ViewModel: Sendable, Equatable {
-        public init(background: SemanticColorToken = .screenBackground) {
-            self.background = background
-        }
-
-        public let background: SemanticColorToken
-    }
-
     public var body: some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(designSystem: viewModel.background))
+            .background(Color(designSystem: background))
             .preferredColorScheme(.dark)
     }
 
     // MARK: Private
 
-    private let viewModel: ViewModel
+    private let background: SemanticColorToken
     private let content: Content
 
 }
