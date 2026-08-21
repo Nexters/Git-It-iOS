@@ -135,9 +135,15 @@ swift_format_main() (
 		trap 'swift_format_rollback || :; swift_format_cleanup; exit 143' TERM
 	fi
 
-	# 3. 대상마다 절대경로로 변환해 Swift-Style 도구를 실행합니다.
-	if xargs -0 -n 1 "$swift_format_adapter" --format-one "$swift_format_tool" "$swift_format_root" \
-		<"$swift_format_targets"; then
+	# 3. 대상 전체를 절대경로로 변환한 뒤 Swift-Style 도구를 한 번만 실행합니다.
+	# 대상마다 도구를 재기동하면 프로세스 기동 비용이 대상 수만큼 반복되므로,
+	# 절대경로 변환만 대상별로 수행하고 포맷/린트 실행 자체는 배치로 묶습니다.
+	swift_format_absolute_targets="$swift_format_work/absolute-targets.nul"
+	: >"$swift_format_absolute_targets"
+	xargs -0 -n 1 "$swift_format_adapter" --to-absolute-one "$swift_format_root" \
+		<"$swift_format_targets" >"$swift_format_absolute_targets" || return 2
+
+	if xargs -0 "$swift_format_tool" <"$swift_format_absolute_targets"; then
 		:
 	else
 		[ "$swift_format_action" != staged ] || swift_format_rollback || return 2

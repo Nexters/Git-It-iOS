@@ -70,7 +70,9 @@ git -C "$repository" commit -qm '변경 없는 Swift 파일 추가'
 printf 'changed again\n' >"$repository/$changed_relative"
 
 printf '%s\n' '#!/bin/sh' \
-	'printf "%s\\n" "$1" >> "$SWIFT_STYLE_LOG"' \
+	'for target in "$@"; do' \
+	'	printf "%s\\n" "$target" >> "$SWIFT_STYLE_LOG"' \
+	'done' \
 	>"$repository/$style_relative/scripts/format.sh"
 chmod +x "$repository/$style_relative/scripts/format.sh"
 : >"$SWIFT_STYLE_LOG"
@@ -103,10 +105,12 @@ ROLLBACK_FAIL_TARGET=$second
 SWIFT_FORMAT_CALLS="$work/format-calls"
 export ROLLBACK_FAIL_TARGET SWIFT_FORMAT_CALLS
 printf '%s\n' '#!/bin/sh' \
-	'printf "%s\n" "$1" >> "$SWIFT_FORMAT_CALLS"' \
-	'printf "formatted\n" >"$1"' \
-	'chmod 600 "$1"' \
-	'[ "$1" != "$ROLLBACK_FAIL_TARGET" ] || exit 7' \
+	'for target in "$@"; do' \
+	'	printf "%s\n" "$target" >> "$SWIFT_FORMAT_CALLS"' \
+	'	printf "formatted\n" >"$target"' \
+	'	chmod 600 "$target"' \
+	'	[ "$target" != "$ROLLBACK_FAIL_TARGET" ] || exit 7' \
+	'done' \
 	>"$repository/$style_relative/scripts/format.sh"
 chmod +x "$repository/$style_relative/scripts/format.sh"
 
