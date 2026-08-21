@@ -4,6 +4,7 @@ import Testing
 @testable import CompositionAdapter
 @testable import DataAuthentication
 @testable import DomainAuthentication
+@testable import DomainMember
 @testable import InfrastructureAuthentication
 
 // MARK: - AuthenticationAssemblyTests
@@ -19,6 +20,9 @@ struct AuthenticationAssemblyTests {
         _ = assembly.signOut as any SignOutUseCase
         _ = assembly.restoreSession as any RestoreSessionUseCase
         _ = assembly.observeAuthenticationOutcomes as any ObserveAuthenticationOutcomesUseCase
+        _ = assembly.refreshSession as any RefreshSessionUseCase
+        _ = assembly.verifyAccessToken as any VerifyAccessTokenUseCase
+        _ = assembly.completeCuration as any CompleteCurationUseCase
     }
 
 }
@@ -29,8 +33,14 @@ struct AuthenticationAssemblyTests {
 struct LoginSessionRepositoryAdapterTests {
 
     @Test
-    func `로그인 응답을 저장하고 idToken 기반 사용자를 반환한다`() async throws {
+    func `로그인 응답을 저장하고 Apple 안정 식별자 기반 사용자를 반환한다`() async throws {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        // AuthenticationRepositoryAdapter.authenticate()가 먼저 저장하는 Apple userID를 흉내낸다.
+        try keychainStore.save(
+            Data("apple-user-1".utf8),
+            for: AppleIdentityKeychainLayout.Key.appleUserID.rawValue,
+            in: AppleIdentityKeychainLayout.namespace,
+        )
         let remote = StubAuthenticationRemote(appleLoginResult: .success(
             LoginResponseDTO(accessToken: "access-1", refreshToken: "refresh-1", needsCuration: false)
         ))
@@ -39,11 +49,11 @@ struct LoginSessionRepositoryAdapterTests {
         let grant = AuthenticationGrant(id: .init(rawValue: "id-token-1"), method: .apple)
         let user = try await adapter.start(with: grant)
 
-        #expect(user.id == "id-token-1")
+        #expect(user.id == "apple-user-1")
         #expect(user.availability == .available)
 
         let restored = try await adapter.restore()
-        #expect(restored?.id == "id-token-1")
+        #expect(restored?.id == "apple-user-1")
 
         try await adapter.signOut()
     }

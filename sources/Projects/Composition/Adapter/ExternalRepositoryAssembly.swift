@@ -11,13 +11,10 @@ public struct ExternalRepositoryAssembly: Sendable {
 
     public init(
         baseURL: URL,
+        transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
-        let client = HTTPClient(
-            baseURL: baseURL,
-            bodyCoding: StandardJSONBodyCoding(),
-            responseTimeout: responseTimeout,
-        )
+        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let lookup = ExternalRepositoryLookupAdapter(remote: HTTPExternalRepositoryRemote(client: client))
 
         fetchExternalRepository = FetchExternalRepository(lookup: lookup)

@@ -16,14 +16,14 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
     func register(
         githubRepoURL: String,
         quizLevel: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         do {
             let response = try await remote.registerProject(
                 RegisterProjectRequestDTO(githubRepoURL: githubRepoURL, quizLevel: dtoQuizLevel(quizLevel))
             )
-            return LearningProjectRegistration(
+            return ProjectRegistrationReceipt(
                 projectID: response.projectID,
-                status: domainStatus(response.status),
+                requestStatus: response.requestStatus,
                 quizLevel: quizLevel,
             )
         } catch let error as DataLearningProjectError {
@@ -59,6 +59,9 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                 overallProgressPercent: response.overallProgressPercent,
                 nextQuestionID: response.nextQuestionID,
                 sets: response.sets.map {
+                    // ProjectSetSummaryDTO는 problemCount/completedCount를 내려주지 않는다
+                    // (서버 OpenAPI 미확정). 값이 없어 0으로 둔다 — 재계산이 아니라 없는 값의
+                    // 보존이다. 서버 계약이 확정되면 이 매핑을 갱신해야 한다.
                     LearningProjectSetProgress(
                         setID: $0.setID,
                         label: $0.label,
@@ -93,10 +96,8 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
             techStack: dto.techStack,
             currentSetLabel: dto.currentSetLabel,
             currentSetTitle: dto.currentSetTitle,
-            // 서버는 완료된 프로젝트에서 다음 세트·질문을 생략할 수 있다. Domain 모델은 항상
-            // 값을 요구하므로 생략된 경우 빈 문자열로 정규화한다.
-            nextSetID: dto.nextSetID ?? "",
-            nextQuestionID: dto.nextQuestionID ?? "",
+            nextSetID: dto.nextSetID,
+            nextQuestionID: dto.nextQuestionID,
             overallProgressPercent: dto.overallProgressPercent,
         )
     }
@@ -110,18 +111,6 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
         }
     }
 
-    private func domainStatus(_ status: String) -> QuizGenerationStatus {
-        switch status {
-        case "ready": .ready
-        case "analyzed": .analyzed
-        case "anchored": .anchored
-        case "rejected": .rejected
-        case "failed": .failed
-        case "completed": .completed
-        default: .failed
-        }
-    }
-
     private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
         switch error {
         case .invalidRequest:
@@ -130,14 +119,20 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
         case .unauthorized:
             .unauthorized
 
-        case .projectUnavailable,
-             .questionUnavailable,
-             .learningSetUnavailable:
+        case .projectUnavailable:
             .notFound
 
+        case .questionUnavailable:
+            .questionUnavailable
+
+        case .learningSetUnavailable:
+            .learningSetUnavailable
+
         case .temporarilyUnavailable,
-             .transport,
-             .decoding,
+             .transport:
+            .temporarilyUnavailable
+
+        case .decoding,
              .unexpectedStatus,
              .generationRetryUnavailable:
             .unexpected

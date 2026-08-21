@@ -71,14 +71,12 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     // MARK: Private
 
-    private enum Key: String {
-        case appleUserID
-    }
+    private typealias Key = AppleIdentityKeychainLayout.Key
 
     private let authorizationProvider: AppleAuthorizationProvider
     private let credentialStateProvider: AppleCredentialStateProvider
     private let keychainStore: KeychainStore
-    private let namespace = KeychainNamespace("com.nexters.hytime.gitit.authentication")
+    private let namespace = AppleIdentityKeychainLayout.namespace
 
     private func persistUserID(_ userID: String) throws {
         try keychainStore.save(Data(userID.utf8), for: Key.appleUserID.rawValue, in: namespace)

@@ -1,5 +1,7 @@
 import DataAuthentication
+import DataMember
 import DomainAuthentication
+import DomainMember
 import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
@@ -12,25 +14,17 @@ public struct AuthenticationAssembly: Sendable {
 
     public init(
         baseURL: URL,
+        keychainStore: KeychainStore = KeychainStore(),
+        transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
-        let client = HTTPClient(
-            baseURL: baseURL,
-            bodyCoding: StandardJSONBodyCoding(),
-            responseTimeout: responseTimeout,
-        )
-        let keychainStore = KeychainStore()
+        let accessTokenProvider: @Sendable () async -> String? = {
+            (try? SessionRecordKeychainCoding(keychainStore: keychainStore).load())?.tokens.accessToken
+        }
+        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let authenticationRemote = HTTPAuthenticationRemote(
             client: client,
-            accessTokenProvider: {
-                guard
-                    let data = try? keychainStore.load(
-                        for: SessionKeychainLayout.Key.accessToken.rawValue,
-                        in: SessionKeychainLayout.namespace,
-                    )
-                else { return nil }
-                return String(data: data, encoding: .utf8)
-            },
+            accessTokenProvider: accessTokenProvider,
         )
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
@@ -40,6 +34,12 @@ public struct AuthenticationAssembly: Sendable {
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: authenticationRemote,
             keychainStore: keychainStore,
+        )
+        let curationRepository = CurationRepositoryAdapter(
+            remote: MemberRepositoryAdapter(
+                remote: HTTPMemberRemote(client: client, accessTokenProvider: accessTokenProvider)
+            ),
+            loginSessionRepository: loginSessionRepository,
         )
 
         signIn = SignIn(
@@ -58,6 +58,11 @@ public struct AuthenticationAssembly: Sendable {
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
+        // UC12(refresh)·UC14(revoke)는 서버 capability 미확보(INT-API-001)로 구조만 조립한다.
+        refreshSession = RefreshSession(loginSessionRepository: loginSessionRepository)
+        verifyAccessToken = VerifyAccessToken(loginSessionRepository: loginSessionRepository)
+        completeCuration = CompleteCuration(repository: curationRepository)
+        self.loginSessionRepository = loginSessionRepository
     }
 
     // MARK: Public
@@ -66,5 +71,15 @@ public struct AuthenticationAssembly: Sendable {
     public let signOut: any SignOutUseCase
     public let restoreSession: any RestoreSessionUseCase
     public let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
+    public let refreshSession: any RefreshSessionUseCase
+    public let verifyAccessToken: any VerifyAccessTokenUseCase
+    public let completeCuration: any CompleteCurationUseCase
+
+    // MARK: Internal
+
+    /// `AppComposition`이 다른 조립체(예: `MemberAssembly`의 curation 조정)와 세션 상태를
+    /// 공유하기 위해 사용하는 non-public 참조입니다. public API 표면(any XxxUseCase)에는
+    /// 포함되지 않습니다.
+    let loginSessionRepository: any LoginSessionRepository
 
 }

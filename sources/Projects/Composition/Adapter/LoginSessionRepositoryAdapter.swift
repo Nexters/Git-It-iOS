@@ -15,6 +15,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     ) {
         self.remote = remote
         self.keychainStore = keychainStore
+        sessionCoding = SessionRecordKeychainCoding(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -22,16 +23,25 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     func start(with grant: AuthenticationGrant) async throws -> AuthenticatedUser {
         do {
             let response = try await remote.appleLogin(idToken: grant.id.rawValue)
-            try persist(response: response, userID: grant.id.rawValue)
-            // 서버가 반환하는 사용자 식별자·표시 이름 필드가 없어 grant의 idToken을 임시
-            // 식별자로 사용한다. 실제 사용자 프로필 조회가 추가되면 갱신해야 한다.
-            return AuthenticatedUser(
-                id: grant.id.rawValue,
-                availability: .available,
-                displayName: nil,
-            )
+            try sessionCoding.save(SessionRecord(
+                tokens: SessionTokens(
+                    accessToken: response.accessToken,
+                    refreshToken: response.refreshToken,
+                    accessTokenExpiresAt: nil,
+                    refreshTokenExpiresAt: nil,
+                ),
+                onboarding: LocalOnboardingState(
+                    needsCuration: response.needsCuration,
+                    acceptedLegalVersions: [],
+                    acceptedAt: nil,
+                ),
+            ))
+            // 사용자 ID는 idToken(JWT, 로그인마다 값이 바뀔 수 있음)이 아니라
+            // `AuthenticationRepositoryAdapter`가 저장한 Apple 안정 식별자를 사용한다(GAP-014-007).
+            guard let userID = try loadAppleUserID() else { throw LoginSessionError.temporarilyUnavailable }
+            return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
         } catch let error as DataAuthenticationError {
-            throw domainError(for: error)
+            throw domainLoginError(for: error)
         } catch is KeychainStoreError {
             throw LoginSessionError.temporarilyUnavailable
         }
@@ -39,8 +49,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     func restore() async throws -> AuthenticatedUser? {
         do {
-            guard let accessToken = try loadString(.accessToken), !accessToken.isEmpty else { return nil }
-            let userID = (try? loadString(.userID)) ?? accessToken
+            guard try sessionCoding.load() != nil, let userID = try loadAppleUserID() else { return nil }
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
         } catch is KeychainStoreError {
             throw LoginSessionError.temporarilyUnavailable
@@ -49,37 +58,68 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     func signOut() async throws {
         do {
-            try keychainStore.delete(for: Key.accessToken.rawValue, in: namespace)
-            try keychainStore.delete(for: Key.refreshToken.rawValue, in: namespace)
-            try keychainStore.delete(for: Key.userID.rawValue, in: namespace)
+            try sessionCoding.delete()
         } catch is KeychainStoreError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
 
+    func currentSession() async -> SessionRecord? {
+        try? sessionCoding.load()
+    }
+
+    func replaceTokens(_ tokens: SessionTokens) async throws {
+        do {
+            let onboarding = try sessionCoding.load()?.onboarding
+                ?? LocalOnboardingState(needsCuration: false, acceptedLegalVersions: [], acceptedAt: nil)
+            try sessionCoding.save(SessionRecord(tokens: tokens, onboarding: onboarding))
+        } catch is KeychainStoreError {
+            throw LoginSessionError.temporarilyUnavailable
+        }
+    }
+
+    func updateOnboarding(_ onboarding: LocalOnboardingState) async throws {
+        do {
+            guard let existing = try sessionCoding.load() else { throw LoginSessionError.temporarilyUnavailable }
+            try sessionCoding.save(SessionRecord(tokens: existing.tokens, onboarding: onboarding))
+        } catch is KeychainStoreError {
+            throw LoginSessionError.temporarilyUnavailable
+        }
+    }
+
+    func refresh() async throws -> SessionTokens {
+        // UC12: 서버 refresh endpoint 미확보(INT-API-001). 임의 성공을 만들지 않고 capability
+        // 부재를 그대로 던진다.
+        throw LoginSessionError.temporarilyUnavailable
+    }
+
+    func verifyAccessToken() async throws {
+        do {
+            try await remote.verifyAccessToken()
+        } catch let error as DataAuthenticationError {
+            throw domainVerifyError(for: error)
+        }
+    }
+
     // MARK: Private
 
-    private typealias Key = SessionKeychainLayout.Key
+    private typealias AppleIdentityKey = AppleIdentityKeychainLayout.Key
 
     private let remote: AuthenticationRemote
     private let keychainStore: KeychainStore
-    private let namespace = SessionKeychainLayout.namespace
+    private let sessionCoding: SessionRecordKeychainCoding
 
-    private func persist(
-        response: LoginResponseDTO,
-        userID: String,
-    ) throws {
-        try keychainStore.save(Data(response.accessToken.utf8), for: Key.accessToken.rawValue, in: namespace)
-        try keychainStore.save(Data(response.refreshToken.utf8), for: Key.refreshToken.rawValue, in: namespace)
-        try keychainStore.save(Data(userID.utf8), for: Key.userID.rawValue, in: namespace)
-    }
-
-    private func loadString(_ key: Key) throws -> String? {
-        guard let data = try keychainStore.load(for: key.rawValue, in: namespace) else { return nil }
+    private func loadAppleUserID() throws -> String? {
+        guard
+            let data = try keychainStore.load(
+                for: AppleIdentityKey.appleUserID.rawValue,
+                in: AppleIdentityKeychainLayout.namespace,
+            )
+        else { return nil }
         return String(data: data, encoding: .utf8)
     }
 
-    private func domainError(for error: DataAuthenticationError) -> LoginSessionError {
+    private func domainLoginError(for error: DataAuthenticationError) -> LoginSessionError {
         switch error {
         case .unauthorized:
             .refreshRejectedOrExpired
@@ -88,6 +128,23 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
             .accountUnavailable
 
         case .temporarilyUnavailable,
+             .transport,
+             .decoding,
+             .unexpectedStatus:
+            .temporarilyUnavailable
+
+        @unknown default:
+            .temporarilyUnavailable
+        }
+    }
+
+    private func domainVerifyError(for error: DataAuthenticationError) -> LoginSessionError {
+        switch error {
+        case .unauthorized:
+            .unauthorized
+
+        case .invalidRequest,
+             .temporarilyUnavailable,
              .transport,
              .decoding,
              .unexpectedStatus:

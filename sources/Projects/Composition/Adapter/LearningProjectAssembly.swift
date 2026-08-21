@@ -11,19 +11,33 @@ public struct LearningProjectAssembly: Sendable {
 
     public init(
         baseURL: URL,
+        accessTokenProvider: @escaping @Sendable () async -> String?,
+        transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
-        let client = HTTPClient(
-            baseURL: baseURL,
-            bodyCoding: StandardJSONBodyCoding(),
-            responseTimeout: responseTimeout,
+        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
+        let projectRepository = LearningProjectRepositoryAdapter(
+            remote: HTTPProjectRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
-        let repository = LearningProjectRepositoryAdapter(remote: HTTPProjectRemote(client: client))
+        let learningSetRepository = LearningSetRepositoryAdapter(
+            remote: HTTPLearningSetRemote(client: client, accessTokenProvider: accessTokenProvider)
+        )
+        let answerRepository = AnswerRepositoryAdapter(
+            remote: HTTPAnswerRemote(client: client, accessTokenProvider: accessTokenProvider)
+        )
+        let bookmarkRepository = BookmarkRepositoryAdapter(
+            remote: HTTPBookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
+        )
 
-        fetchLearningProjects = FetchLearningProjects(repository: repository)
-        fetchLearningProjectDetail = FetchLearningProjectDetail(repository: repository)
-        createLearningProject = CreateLearningProject(repository: repository)
-        deleteLearningProject = DeleteLearningProject(repository: repository)
+        fetchLearningProjects = FetchLearningProjects(repository: projectRepository)
+        fetchLearningProjectDetail = FetchLearningProjectDetail(repository: projectRepository)
+        createLearningProject = CreateLearningProject(repository: projectRepository)
+        deleteLearningProject = DeleteLearningProject(repository: projectRepository)
+        fetchLearningSet = FetchLearningSet(repository: learningSetRepository)
+        submitChoiceAnswer = SubmitChoiceAnswer(repository: answerRepository)
+        submitEssayAnswer = SubmitEssayAnswer(repository: answerRepository)
+        setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
+        fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
     }
 
     // MARK: Public
@@ -32,5 +46,10 @@ public struct LearningProjectAssembly: Sendable {
     public let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
     public let createLearningProject: any CreateLearningProjectUseCase
     public let deleteLearningProject: any DeleteLearningProjectUseCase
+    public let fetchLearningSet: any FetchLearningSetUseCase
+    public let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
+    public let submitEssayAnswer: any SubmitEssayAnswerUseCase
+    public let setQuestionBookmark: any SetQuestionBookmarkUseCase
+    public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
 
 }

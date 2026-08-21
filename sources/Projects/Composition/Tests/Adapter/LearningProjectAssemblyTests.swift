@@ -12,12 +12,20 @@ struct LearningProjectAssemblyTests {
 
     @Test
     func `live 그래프 생성이 성공하고 노출 property가 모두 UseCase Protocol 타입이다`() throws {
-        let assembly = LearningProjectAssembly(baseURL: try #require(URL(string: "https://api.git-it.example.com")))
+        let assembly = LearningProjectAssembly(
+            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
+            accessTokenProvider: { nil },
+        )
 
         _ = assembly.fetchLearningProjects as any FetchLearningProjectsUseCase
         _ = assembly.fetchLearningProjectDetail as any FetchLearningProjectDetailUseCase
         _ = assembly.createLearningProject as any CreateLearningProjectUseCase
         _ = assembly.deleteLearningProject as any DeleteLearningProjectUseCase
+        _ = assembly.fetchLearningSet as any FetchLearningSetUseCase
+        _ = assembly.submitChoiceAnswer as any SubmitChoiceAnswerUseCase
+        _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
+        _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
+        _ = assembly.fetchBookmarkedQuestions as any FetchBookmarkedQuestionsUseCase
     }
 
 }
@@ -79,14 +87,15 @@ struct LearningProjectRepositoryAdapterTests {
     func `등록 요청을 Data DTO로 위임하고 응답을 Domain 등록 결과로 변환한다`() async throws {
         let remote = StubProjectRemote(registerProjectResult: .success(RegisterProjectResponseDTO(
             projectID: "project-1",
-            status: "ready",
+            requestStatus: "ready",
         )))
         let adapter = LearningProjectRepositoryAdapter(remote: remote)
 
         let registration = try await adapter.register(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
 
         #expect(registration.projectID == "project-1")
-        #expect(registration.status == .ready)
+        #expect(registration.requestStatus == "ready")
+        #expect(registration.quizLevel == .l1)
         #expect(await remote.recordedRequests() == [.registerProject(githubRepoURL: "https://github.com/owner/repo")])
     }
 
