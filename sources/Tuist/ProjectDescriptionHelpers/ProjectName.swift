@@ -52,8 +52,7 @@ extension ProjectName {
                     .package(
                         name: "AppTests",
                         buildTargets: [
-                            AppModuleName.GitIt.rawValue,
-                            AppModuleName.GitItTests.rawValue,
+                            AppModuleName.GitItTests.rawValue
                         ],
                         testTargets: [
                             AppModuleName.GitItTests.rawValue

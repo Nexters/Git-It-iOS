@@ -88,13 +88,9 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
                 sources: ["\(sourceDirectory)/**"],
-                dependencies: [
-                    .target(name: AppModuleName.GitIt.rawValue)
-                ],
+                dependencies: [],
                 settings: .settings(
                     base: [
-                        "BUNDLE_LOADER": "$(TEST_HOST)",
-                        "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/GitIt.app/GitIt",
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
