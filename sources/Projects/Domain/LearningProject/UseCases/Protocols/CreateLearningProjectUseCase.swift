@@ -1,6 +1,6 @@
 public protocol CreateLearningProjectUseCase: Sendable {
     func callAsFunction(
-        githubRepoUrl: String,
+        githubRepoURL: String,
         quizLevel: QuizLevel,
     ) async throws -> LearningProjectRegistration
 }

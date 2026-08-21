@@ -64,7 +64,7 @@ Protocol 시그니처에 Domain 외부 타입이 없는지 확인한다. rename 
 
 ### 준비와 기반 — 아키텍처 문서 개정 (S5, 어떤 패키지 구현보다 선행)
 
-- [ ] T001 [S5] `docs/architecture.md`의 3.1 프로젝트 내부 패키지 의존성 표에서 Data의 허용
+- [X] T001 [S5] `docs/architecture.md`의 3.1 프로젝트 내부 패키지 의존성 표에서 Data의 허용
   의존성에 Infrastructure를 추가하고, 3.3 Adapter 경계의 `Data ↔ Infrastructure` 절을 "Data의
   concrete 구현이 직접 변환을 소유"하는 서술로 정정하고, 4장 패키지 제어 흐름을 개정된 흐름에
   맞게 수정하고, 7.1 금지 의존성 목록에서 `Data → Infrastructure` 항목을 제거하고, 새 `## 9.
@@ -73,84 +73,84 @@ Protocol 시그니처에 Domain 외부 타입이 없는지 확인한다. rename 
   주입을 수행, FeatureTests는 Domain UseCase Protocol의 local Test Double만 사용)을 기록한다.
   상위 문서 `ARCH-DI-001`의 Composition 정의를 이 결정이 대체하는 범위를 명시하고, FR-032~FR-054
   후속 Feature·App 구현 규범을 옮겨 적는다(FR-055~FR-061).
-- [ ] T002 [S5] `docs/package-rules/data.md`에서 "프로젝트 내부의 다른 패키지에 의존해서는 안
+- [X] T002 [S5] `docs/package-rules/data.md`에서 "프로젝트 내부의 다른 패키지에 의존해서는 안
   됩니다", "Infrastructure 타입 또는 외부 라이브러리의 구체 API를 직접 참조해서는 안 됩니다",
   "Data↔Infrastructure Adapter를 Data 내부에 구현해서는 안 됩니다" 세 제약을 Data가
   Infrastructure에 의존하고 그 위에서 concrete 구현을 소유하도록 개정한다.
-- [ ] T003 [S5] `docs/package-rules/composition.md`에서 "Data가 정의한 기술 계약은 Core가
+- [X] T003 [S5] `docs/package-rules/composition.md`에서 "Data가 정의한 기술 계약은 Core가
   제공하는 내부 API를 이용한 Adapter로 충족" 정책과 "Data 계약의 요청·응답과 Infrastructure
   API 사이의 변환은 Data↔Infrastructure Adapter가 담당" 서술을 제거하고, Composition은
   Domain↔Data Adapter만 소유한다는 개정된 책임으로 수정한다.
-- [ ] T004 [no-write] [S5] T001~T003에서 개정한 세 문서와
+- [X] T004 [no-write] [S5] T001~T003에서 개정한 세 문서와
   `contracts/package-dependency-rules.md`를 대조해 모순 서술이 0건인지, `D-ARCH-003` 결정
   기록이 Feature 의존 대상·Composition 책임·App 주입 위치·FeatureTests 정책을 포함하는지
   확인한다(SC-015~SC-017).
 
 ### 구현 — 표준 약어 표기 rename (`DomainLearningProject`, S6)
 
-- [ ] T005 [P] [S6] `sources/Projects/Domain/LearningProject/Contracts/LearningProjectRepository.swift`의
+- [X] T005 [P] [S6] `sources/Projects/Domain/LearningProject/Contracts/LearningProjectRepository.swift`의
   `projectId`→`projectID`, `githubRepoUrl`→`githubRepoURL`를 rename한다. 연산 집합과 시그니처의
   나머지 부분은 바꾸지 않는다.
-- [ ] T006 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjectDetailUseCase.swift`,
+- [X] T006 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjectDetailUseCase.swift`,
   `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjectDetail.swift`의
   `projectId`→`projectID`를 rename한다.
-- [ ] T007 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProjectUseCase.swift`,
+- [X] T007 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProjectUseCase.swift`,
   `sources/Projects/Domain/LearningProject/UseCases/DeleteLearningProject.swift`의
   `projectId`→`projectID`를 rename한다.
-- [ ] T008 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProjectUseCase.swift`,
+- [X] T008 [P] [S6] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProjectUseCase.swift`,
   `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProject.swift`의
   `githubRepoUrl`→`githubRepoURL`을 rename한다.
-- [ ] T009 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectSummary.swift`의
+- [X] T009 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectSummary.swift`의
   `projectId`→`projectID`, `nextSetId`→`nextSetID`, `nextQuestionId`→`nextQuestionID`를
   rename한다.
-- [ ] T010 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectDetail.swift`의
+- [X] T010 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectDetail.swift`의
   `projectId`→`projectID`, `nextQuestionId`→`nextQuestionID`를 rename한다.
-- [ ] T011 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectRegistration.swift`의
+- [X] T011 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectRegistration.swift`의
   `projectId`→`projectID`를 rename한다.
-- [ ] T012 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectSetProgress.swift`의
+- [X] T012 [P] [S6] `sources/Projects/Domain/LearningProject/Models/LearningProjectSetProgress.swift`의
   `setId`→`setID`를 rename한다.
-- [ ] T013 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/Contracts/LearningProjectRepositoryContractTests.swift`의
+- [X] T013 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/Contracts/LearningProjectRepositoryContractTests.swift`의
   호출부와 Test Double 레이블을 T005 rename에 맞게 갱신한다.
-- [ ] T014 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProjectDetailTests.swift`의
+- [X] T014 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProjectDetailTests.swift`의
   레이블을 T010 rename에 맞게 갱신한다.
-- [ ] T015 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`의
+- [X] T015 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`의
   레이블을 T008 rename에 맞게 갱신한다.
-- [ ] T016 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/DeleteLearningProjectTests.swift`의
+- [X] T016 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/DeleteLearningProjectTests.swift`의
   레이블을 T007 rename에 맞게 갱신한다.
-- [ ] T017 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectDetailTests.swift`의
+- [X] T017 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectDetailTests.swift`의
   레이블을 T006 rename에 맞게 갱신한다.
-- [ ] T018 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`의
+- [X] T018 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`의
   레이블을 T009 rename에 맞게 갱신한다.
-- [ ] T019 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/LearningProjectLifecycleTests.swift`의
+- [X] T019 [P] [S6] `sources/Projects/Domain/Tests/LearningProject/UseCases/LearningProjectLifecycleTests.swift`의
   레이블을 T005~T012 rename에 맞게 갱신한다.
 
 ### 구현 — `ObserveAuthenticationOutcomes` rename과 Authentication UseCase Protocol 신설 (S1, S6)
 
-- [ ] T020 [S6] `sources/Projects/Domain/Authentication/UseCases/ObserveAuthorizationChanges.swift`를
+- [X] T020 [S6] `sources/Projects/Domain/Authentication/UseCases/ObserveAuthorizationChanges.swift`를
   `sources/Projects/Domain/Authentication/UseCases/ObserveAuthenticationOutcomes.swift`로
   rename한다. 파일명과 타입명(`ObserveAuthorizationChanges`→`ObserveAuthenticationOutcomes`)만
   바꾸고 구현 본문과 동작은 그대로 둔다. 책임 분리(관찰과 세션 복원의 분리)는 수행하지 않는다
   (R-013).
-- [ ] T021 [S6] `sources/Projects/Domain/Authentication/README.md`의
+- [X] T021 [S6] `sources/Projects/Domain/Authentication/README.md`의
   `ObserveAuthorizationChanges` 언급을 `ObserveAuthenticationOutcomes`로 갱신한다.
-- [ ] T022 [S6] `sources/Projects/Domain/Tests/Authentication/UseCases/ObserveAuthorizationChangesTests.swift`를
+- [X] T022 [S6] `sources/Projects/Domain/Tests/Authentication/UseCases/ObserveAuthorizationChangesTests.swift`를
   `sources/Projects/Domain/Tests/Authentication/UseCases/ObserveAuthenticationOutcomesTests.swift`로
   rename하고 파일 내부의 타입 참조를 갱신한다. 테스트 케이스의 검증 내용은 바꾸지 않는다.
-- [ ] T023 [S1] `sources/Projects/Domain/Authentication/UseCases/SignInUseCase.swift`를 신설해
+- [X] T023 [S1] `sources/Projects/Domain/Authentication/UseCases/SignInUseCase.swift`를 신설해
   `public protocol SignInUseCase: Sendable { func callAsFunction(_ method: AuthenticationMethod) async -> AuthenticationOutcome }`을
   선언하고, `sources/Projects/Domain/Authentication/UseCases/SignIn.swift`의 `SignIn`이
   `SignInUseCase`를 conform하도록 선언을 추가한다. 시그니처는 현재 구현과 문자 그대로 일치시킨다
   (R-012, contracts/domain-usecase-protocols.md).
-- [ ] T024 [S1] `sources/Projects/Domain/Authentication/UseCases/SignOutUseCase.swift`를 신설해
+- [X] T024 [S1] `sources/Projects/Domain/Authentication/UseCases/SignOutUseCase.swift`를 신설해
   `public protocol SignOutUseCase: Sendable { func callAsFunction() async -> AuthenticationOutcome }`을
   선언하고, `sources/Projects/Domain/Authentication/UseCases/SignOut.swift`의 `SignOut`이
   `SignOutUseCase`를 conform하도록 선언을 추가한다.
-- [ ] T025 [S1] `sources/Projects/Domain/Authentication/UseCases/RestoreSessionUseCase.swift`를
+- [X] T025 [S1] `sources/Projects/Domain/Authentication/UseCases/RestoreSessionUseCase.swift`를
   신설해
   `public protocol RestoreSessionUseCase: Sendable { func callAsFunction() async -> AuthenticationOutcome }`을
   선언하고, `sources/Projects/Domain/Authentication/UseCases/RestoreSession.swift`의
   `RestoreSession`이 `RestoreSessionUseCase`를 conform하도록 선언을 추가한다.
-- [ ] T026 [S1] `sources/Projects/Domain/Authentication/UseCases/ObserveAuthenticationOutcomesUseCase.swift`를
+- [X] T026 [S1] `sources/Projects/Domain/Authentication/UseCases/ObserveAuthenticationOutcomesUseCase.swift`를
   신설해
   `public protocol ObserveAuthenticationOutcomesUseCase: Sendable { func callAsFunction() async -> AsyncStream<AuthenticationOutcome> }`을
   선언하고, T020에서 rename한 `ObserveAuthenticationOutcomes`가 이 Protocol을 conform하도록
@@ -158,7 +158,7 @@ Protocol 시그니처에 Domain 외부 타입이 없는지 확인한다. rename 
 
 ### 정리와 패키지 검증
 
-- [ ] T027 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
+- [X] T027 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
   순차 실행해 Domain 테스트가 전부 통과하는지 확인한다. rename 전후로 동일한 테스트 집합이
   통과했는지(FR-067, SC-020), `projectId`·`githubRepoUrl`·`nextSetId`·`nextQuestionId`·`setId`·
   `ObserveAuthorizationChanges` 표기가 0건 남았는지(SC-018) 확인한다. T023~T026에서 신설한
@@ -185,7 +185,7 @@ API를 Infrastructure 테스트로 검증한다.
 
 ### 준비와 대조
 
-- [ ] T028 [no-write] [S3] Data의 concrete Remote 구현(다음 Data 단계에서 만들 `HTTPProjectRemote`,
+- [X] T028 [no-write] [S3] Data의 concrete Remote 구현(다음 Data 단계에서 만들 `HTTPProjectRemote`,
   `HTTPAuthenticationRemote`, `HTTPExternalRepositoryRemote`)이 요구하는 기술 API를
   `sources/Projects/Infrastructure/NetworkClient/Client/HTTPClient.swift`,
   `sources/Projects/Infrastructure/NetworkClient/HTTP/HTTPRequest.swift`,
@@ -204,7 +204,7 @@ API를 Infrastructure 테스트로 검증한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T029 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
+- [X] T029 [no-write] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
   순차 실행해 Infrastructure 테스트가 전부 통과하는지 확인한다. Infrastructure가 Data·Domain·
   Composition·Feature·App·UI를 import하지 않는지 소스를 검토한다(FR-013).
 

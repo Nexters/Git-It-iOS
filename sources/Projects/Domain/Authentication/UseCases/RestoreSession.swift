@@ -1,4 +1,4 @@
-public struct RestoreSession: Sendable {
+public struct RestoreSession: RestoreSessionUseCase, Sendable {
 
     // MARK: Lifecycle
 

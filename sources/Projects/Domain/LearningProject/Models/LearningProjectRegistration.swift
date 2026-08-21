@@ -1,15 +1,15 @@
 public struct LearningProjectRegistration: Equatable, Sendable {
     public init(
-        projectId: String,
+        projectID: String,
         status: QuizGenerationStatus,
         quizLevel: QuizLevel,
     ) {
-        self.projectId = projectId
+        self.projectID = projectID
         self.status = status
         self.quizLevel = quizLevel
     }
 
-    public let projectId: String
+    public let projectID: String
     public let status: QuizGenerationStatus
     public let quizLevel: QuizLevel
 }

@@ -19,7 +19,7 @@ Feature는 TCA를 이용해 사용자 기능의 상태와 상호작용을 표현
 | 패키지 | 책임 |
 |---|---|
 | App | Feature와 Composition의 연결, 애플리케이션 전체 Navigation과 화면 흐름 조정 |
-| Composition | Domain↔Data, Data↔Infrastructure Adapter 구현, 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
+| Composition | Domain↔Data Adapter 구현, 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
 | Feature | TCA 기반 상태 관리, 사용자 상호작용, 화면 구성과 Presentation 흐름 |
 | Domain | 비즈니스 모델, 정책, 비즈니스 로직과 외부 기능에 대한 Domain 계약 |
 | Data | 데이터 획득·저장·캐시·동기화와 Data 소유 모델·DTO, 외부 기술 기능에 대한 Data 계약 |
@@ -32,7 +32,7 @@ App은 **Coordination Layer**로서 Feature가 표현하는 사용자 흐름과 
 
 ### Composition
 
-Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data, Data와 Infrastructure 사이의 Adapter를 구현하고 실행 환경에 맞는 구체 구현, 객체 생성 순서와 수명을 결정합니다.
+Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data 사이의 Adapter를 구현하고, Data가 Infrastructure 기술 API 위에서 소유하는 concrete 구현을 실행 환경에 맞게 선택해 객체 생성 순서와 수명을 결정합니다.
 
 ### Feature
 
@@ -70,7 +70,7 @@ UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구
 | Composition | Domain, Data, Infrastructure |
 | Feature | Domain, UI |
 | Domain | — |
-| Data | — |
+| Data | Infrastructure |
 | Infrastructure | — |
 | UI | — |
 
@@ -152,27 +152,38 @@ Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
 
 #### Data ↔ Infrastructure
 
-Data는 네트워크, 저장소와 같은 외부 기술 기능에 필요한 계약을 Data의 언어로 정의합니다.
+Data는 네트워크, 저장소와 같은 외부 기술 기능에 필요한 계약을 Data의 언어로 정의하고, 그 계약의 concrete 구현을 Infrastructure 기술 API 위에서 직접 소유합니다. 이 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당합니다.
 
 ```swift
 public protocol UserRemote: Sendable {
     func user(id: String) async throws -> UserResponseDTO
 }
-```
 
-Composition의 Data↔Infrastructure Adapter는 Data 계약을 구현하고 Infrastructure API에 작업을 위임합니다.
+public struct HTTPUserRemote: UserRemote {
+    private let client: HTTPClient
+
+    public init(client: HTTPClient) {
+        self.client = client
+    }
+
+    public func user(id: String) async throws -> UserResponseDTO {
+        // Data 소유 요청 값을 HTTPRequest로 변환해 client.send를 호출하고,
+        // 응답을 UserResponseDTO로 디코딩하며 기술 오류를 Data 오류로 변환한다.
+    }
+}
+```
 
 ```text
 Data UserRemote
       ↑
       │ implements
-Composition DataInfrastructureAdapter
+Data HTTPUserRemote
       │ delegates
       ↓
 Infrastructure HTTPClient
 ```
 
-Adapter는 Data 계약의 요청·응답과 Infrastructure의 기술 API 사이를 변환합니다.
+`HTTPUserRemote`는 Data 계약의 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
 
 ### 3.4 Navigation과 화면 흐름
 
@@ -209,8 +220,6 @@ Composition · DomainDataAdapter
  ↓
 Data
  ↓
-Composition · DataInfrastructureAdapter
- ↓
 Infrastructure
  ↓
 External System
@@ -222,8 +231,6 @@ External System
 External System
  ↓
 Infrastructure result
- ↓
-Composition · DataInfrastructureAdapter
  ↓
 Data model / DTO
  ↓
@@ -249,13 +256,13 @@ App은 Feature가 출력한 애플리케이션 수준의 navigation intent를 �
 ### Data
 
 - 데이터 획득, 캐시, 저장, 동기화, DTO와 오류 처리 정책을 테스트합니다.
+- Data 계약과 Infrastructure API 사이의 요청 구성, 응답 변환과 오류 변환을 테스트합니다.
 - 외부 기술 기능은 Data 계약을 구현한 Test Double로 주입합니다.
 - Data target은 독립적인 테스트 실행 단위를 구성합니다.
 
 ### Composition Adapter
 
 - Data 모델과 Domain 모델 사이의 변환을 테스트합니다.
-- Data 계약과 Infrastructure API 사이의 요청·응답 변환을 테스트합니다.
 - Adapter 테스트는 경계 변환과 위임 관계를 중심으로 구성합니다.
 
 ### Feature
@@ -289,7 +296,6 @@ Domain → Feature
 Domain → UI
 
 Data → Domain
-Data → Infrastructure
 Data → Feature
 Data → UI
 
@@ -334,6 +340,71 @@ App이 Feature와 Composition을 직접 연결하는 것은 이 아키텍처의 
 - [UI 패키지 규칙](./package-rules/ui.md)
 - [Domain 패키지 규칙](./package-rules/domain.md)
 - [Infrastructure 패키지 규칙](./package-rules/infrastructure.md)
+
+## 9. 아키텍처 결정 기록
+
+### D-ARCH-003 — Feature → Domain UseCase 의존과 App 소유 의존성 주입
+
+**배경**: 상위 결정 `ARCH-DI-001`은 이 저장소에 파일로 존재하지 않는다. 이 결정은
+`specs/013-feature-usecase-app-di/spec.md`가 확정한 범위에서 `ARCH-DI-001`의 Composition
+정의를 대체한다. 대체 범위는 아래 "Composition 책임"과 "적용 범위" 항목으로 한정하며, 이
+범위를 넘는 `ARCH-DI-001`의 다른 결정에는 영향을 주지 않는다.
+
+**결정**:
+
+- **Feature 의존 대상**: Feature는 Domain이 소유한 UseCase Protocol에만 의존한다. Feature는
+  Domain Repository Protocol, Data의 Remote·Storage·DTO·Adapter, Infrastructure의 client·보안
+  저장소·transport·외부 SDK, Composition 또는 App의 타입을 직접 참조하지 않는다.
+- **Composition 책임**: Composition은 Infrastructure 객체, Data concrete 구현, Domain↔Data
+  Adapter와 Domain UseCase 구현을 조립해 Domain UseCase Protocol 타입으로만 노출한다.
+  Composition은 Feature reducer, Feature dependency 묶음, Store 또는 View를 생성하지 않으며
+  Feature·App·UI를 의존성으로 선언하지 않는다.
+- **App 주입 위치**: App이 production 실행 객체 그래프를 생성하는 유일한 최종 진입점이며,
+  production Composition을 정확히 1회 생성한다. App은 Composition이 제공한 실행 객체를 Domain
+  UseCase Protocol 타입으로 각 Feature가 실제로 사용하는 최소 범위만 전달한다.
+- **FeatureTests 정책**: FeatureTests는 Domain UseCase Protocol을 구현하는 local Mock·Stub·Spy
+  Test Double만 소유하며, 그 Test Double은 production Feature target에 포함되지 않는다.
+  FeatureTests target은 Data, Infrastructure, Composition을 의존성으로 선언하지 않는다.
+- **`Data → Infrastructure` 의존 허용**: Data가 소유한 Remote·Storage 계약의 concrete 구현을
+  Infrastructure 기술 API 위에서 Data가 직접 소유한다. Data↔Infrastructure 변환은 Composition
+  Adapter가 아니라 Data 내부 구현이 담당한다. 3.1과 7.1의 의존성 표·금지 목록, 3.3의
+  Adapter 경계, 4장의 제어 흐름과 5장의 Data 테스트 정책이 이 결정을 반영한다.
+
+**적용 범위**: 이 결정은 즉시 `Domain`, `Data`, `Infrastructure`, `Composition`의 의존 방향과
+책임 서술에 적용된다. `Feature`·`App`의 소스 구현은
+`specs/013-feature-usecase-app-di`의 범위 밖이며, 위 "Feature 의존 대상"·"App 주입
+위치"·"FeatureTests 정책" 항목은 후속 Feature·App 구현이 따라야 하는 규범으로 남긴다.
+
+### 후속 Feature 구현 규범
+
+- Feature는 필요한 UseCase Protocol을 initializer 또는 명시적 immutable dependency 값으로
+  전달받는다. Feature가 저장·요구하는 production dependency 타입은 Domain UseCase Protocol이며
+  concrete 구현 타입이 아니다.
+- Feature 내부에서 UseCase의 production 구현을 생성하지 않으며, Service Locator, singleton,
+  전역 mutable container 또는 ambient dependency로 UseCase를 resolve하지 않는다.
+- 필수 UseCase에 기본 live 값을 제공하는 initializer로 App 주입을 우회하지 않는다. Feature
+  dependency 누락은 런타임 fallback이 아니라 컴파일 오류로 드러나야 한다.
+- App이 주입한 UseCase interface를 parent Feature가 child Feature에 전달하는 것은 허용하되,
+  전달 과정에서 구현을 교체하거나 새로 생성하지 않는다. child Feature에는 자신이 사용하는
+  최소 UseCase subset만 전달하며 전역 dependency 묶음을 무조건 전달하지 않는다.
+- Feature production 소스가 추가되는 시점에 대응하는 테스트 target을 Tuist 테스트 대상으로
+  선언한다.
+- Feature reducer 테스트는 UseCase 호출 횟수, 입력값, 취소 처리와 결과 상태를 검증하며, 입력
+  으로 HTTP 상태 코드나 DTO fixture가 아니라 Domain 결과와 Domain 오류를 사용한다.
+
+### 후속 App 구현 규범
+
+- App은 production 실행 객체 그래프를 생성하는 유일한 최종 진입점이며 production Composition을
+  정확히 1회 생성한다. Composition이 제공한 실행 객체를 Domain UseCase Protocol 타입으로
+  Feature에 전달한다.
+- App은 root Feature와 root Store를 생성하고, 세션·온보딩 판정 결과에 따라 root 경로를
+  선택한다.
+- App은 각 Feature에 그 Feature가 실제로 사용하는 UseCase만 전달하며 Composition 컨테이너
+  전체를 전달하지 않는다.
+- App은 DTO 변환, Repository 정책 또는 HTTP 요청 로직을 구현하지 않는다.
+- production App은 sample, preview 또는 test 구현을 주입하지 않는다.
+- App wiring에 필요한 Domain target 의존성은 Tuist에 명시적으로 선언하며 transitive 접근에
+  의존하지 않는다.
 
 ## 문서 변경 기준
 

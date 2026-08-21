@@ -2,10 +2,10 @@ import Testing
 
 @testable import DomainAuthentication
 
-// MARK: - ObserveAuthorizationChangesTests
+// MARK: - ObserveAuthenticationOutcomesTests
 
-@Suite("ObserveAuthorizationChanges")
-struct ObserveAuthorizationChangesTests {
+@Suite("ObserveAuthenticationOutcomes")
+struct ObserveAuthenticationOutcomesTests {
     @Test
     func `authorization 변경을 저장 정리와 인증 결과로 수렴한다`() async {
         let recorder = AuthorizationChangesCallRecorder()
@@ -22,13 +22,13 @@ struct ObserveAuthorizationChangesTests {
             restoredUser: user,
             recorder: recorder,
         )
-        let observeAuthorizationChanges = ObserveAuthorizationChanges(
+        let observeAuthenticationOutcomes = ObserveAuthenticationOutcomes(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
 
         var outcomes = [AuthenticationOutcome]()
-        for await outcome in await observeAuthorizationChanges() {
+        for await outcome in await observeAuthenticationOutcomes() {
             outcomes.append(outcome)
         }
 

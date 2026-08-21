@@ -9,10 +9,10 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
     // MARK: Public
 
     public func callAsFunction(
-        githubRepoUrl: String,
+        githubRepoURL: String,
         quizLevel: QuizLevel,
     ) async throws -> LearningProjectRegistration {
-        try await repository.register(githubRepoUrl: githubRepoUrl, quizLevel: quizLevel)
+        try await repository.register(githubRepoURL: githubRepoURL, quizLevel: quizLevel)
     }
 
     // MARK: Private

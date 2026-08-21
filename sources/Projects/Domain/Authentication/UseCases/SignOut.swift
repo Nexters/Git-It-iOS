@@ -1,5 +1,4 @@
-
-public struct SignOut: Sendable {
+public struct SignOut: SignOutUseCase, Sendable {
 
     // MARK: Lifecycle
 

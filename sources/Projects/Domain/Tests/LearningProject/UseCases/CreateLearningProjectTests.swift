@@ -9,13 +9,13 @@ struct CreateLearningProjectTests {
     @Test
     func `신규 등록 결과를 그대로 반환한다`() async throws {
         let registration = LearningProjectRegistration(
-            projectId: "project-1",
+            projectID: "project-1",
             status: .ready,
             quizLevel: .l1,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(registration))
 
-        let result = try await createLearningProject(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l1)
+        let result = try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
 
         #expect(result == registration)
     }
@@ -23,13 +23,13 @@ struct CreateLearningProjectTests {
     @Test
     func `재등록 응답도 신규 등록과 구분 없이 그대로 반환한다`() async throws {
         let existingRegistration = LearningProjectRegistration(
-            projectId: "existing-project",
+            projectID: "existing-project",
             status: .analyzed,
             quizLevel: .l2,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(existingRegistration))
 
-        let result = try await createLearningProject(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l2)
+        let result = try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l2)
 
         #expect(result == existingRegistration)
     }
@@ -37,13 +37,13 @@ struct CreateLearningProjectTests {
     @Test
     func `삭제 후 복원 응답도 그대로 반환한다`() async throws {
         let restoredRegistration = LearningProjectRegistration(
-            projectId: "restored-project",
+            projectID: "restored-project",
             status: .completed,
             quizLevel: .l3,
         )
         let createLearningProject = makeCreateLearningProject(behavior: .succeed(restoredRegistration))
 
-        let result = try await createLearningProject(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l3)
+        let result = try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l3)
 
         #expect(result == restoredRegistration)
     }
@@ -53,7 +53,7 @@ struct CreateLearningProjectTests {
         let createLearningProject = makeCreateLearningProject(behavior: .fail(.invalidRequest))
 
         await #expect(throws: LearningProjectError.invalidRequest) {
-            try await createLearningProject(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l1)
+            try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
         }
     }
 
@@ -62,7 +62,7 @@ struct CreateLearningProjectTests {
         let createLearningProject = makeCreateLearningProject(behavior: .fail(.unauthorized))
 
         await #expect(throws: LearningProjectError.unauthorized) {
-            try await createLearningProject(githubRepoUrl: "https://github.com/owner/repo", quizLevel: .l1)
+            try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
         }
     }
 }
@@ -93,7 +93,7 @@ private actor CreateLearningProjectRepository: LearningProjectRepository {
     }
 
     func register(
-        githubRepoUrl _: String,
+        githubRepoURL _: String,
         quizLevel _: QuizLevel,
     ) async throws -> LearningProjectRegistration {
         switch behavior {
@@ -112,11 +112,11 @@ private actor CreateLearningProjectRepository: LearningProjectRepository {
         throw LearningProjectError.unexpected
     }
 
-    func fetchProjectDetail(projectId _: String) async throws -> LearningProjectDetail {
+    func fetchProjectDetail(projectID _: String) async throws -> LearningProjectDetail {
         throw LearningProjectError.unexpected
     }
 
-    func deleteProject(projectId _: String) async throws {
+    func deleteProject(projectID _: String) async throws {
         throw LearningProjectError.unexpected
     }
 

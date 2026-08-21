@@ -9,21 +9,21 @@ struct FetchLearningProjectDetailTests {
     @Test
     func `진행 중 세트가 있으면 다음 세트가 일치한다`() async throws {
         let inProgressSet = LearningProjectSetProgress(
-            setId: "set-2",
+            setID: "set-2",
             label: "Set 2",
             title: "title",
             problemCount: 5,
             completedCount: 1,
         )
         let detail = makeDetail(sets: [
-            LearningProjectSetProgress(setId: "set-1", label: "Set 1", title: "title", problemCount: 5, completedCount: 5),
+            LearningProjectSetProgress(setID: "set-1", label: "Set 1", title: "title", problemCount: 5, completedCount: 5),
             inProgressSet,
         ])
         let fetchLearningProjectDetail = FetchLearningProjectDetail(
             repository: FetchLearningProjectDetailRepository(behavior: .succeed(detail))
         )
 
-        let result = try await fetchLearningProjectDetail(projectId: "project-1")
+        let result = try await fetchLearningProjectDetail(projectID: "project-1")
 
         #expect(result.nextSet == inProgressSet)
     }
@@ -31,13 +31,13 @@ struct FetchLearningProjectDetailTests {
     @Test
     func `모두 완료했으면 다음 세트가 없다`() async throws {
         let detail = makeDetail(sets: [
-            LearningProjectSetProgress(setId: "set-1", label: "Set 1", title: "title", problemCount: 5, completedCount: 5)
+            LearningProjectSetProgress(setID: "set-1", label: "Set 1", title: "title", problemCount: 5, completedCount: 5)
         ])
         let fetchLearningProjectDetail = FetchLearningProjectDetail(
             repository: FetchLearningProjectDetailRepository(behavior: .succeed(detail))
         )
 
-        let result = try await fetchLearningProjectDetail(projectId: "project-1")
+        let result = try await fetchLearningProjectDetail(projectID: "project-1")
 
         #expect(result.nextSet == nil)
     }
@@ -49,7 +49,7 @@ struct FetchLearningProjectDetailTests {
         )
 
         await #expect(throws: LearningProjectError.notFound) {
-            try await fetchLearningProjectDetail(projectId: "project-1")
+            try await fetchLearningProjectDetail(projectID: "project-1")
         }
     }
 }
@@ -57,14 +57,14 @@ struct FetchLearningProjectDetailTests {
 extension FetchLearningProjectDetailTests {
     private func makeDetail(sets: [LearningProjectSetProgress]) -> LearningProjectDetail {
         LearningProjectDetail(
-            projectId: "project-1",
+            projectID: "project-1",
             repositoryURL: "https://github.com/owner/repo",
             repositoryName: "repo",
             repositoryImageURL: nil,
             starCount: 0,
             techStack: [],
             overallProgressPercent: 0,
-            nextQuestionId: nil,
+            nextQuestionID: nil,
             sets: sets,
         )
     }
@@ -88,7 +88,7 @@ private actor FetchLearningProjectDetailRepository: LearningProjectRepository {
     }
 
     func register(
-        githubRepoUrl _: String,
+        githubRepoURL _: String,
         quizLevel _: QuizLevel,
     ) async throws -> LearningProjectRegistration {
         throw LearningProjectError.unexpected
@@ -101,7 +101,7 @@ private actor FetchLearningProjectDetailRepository: LearningProjectRepository {
         throw LearningProjectError.unexpected
     }
 
-    func fetchProjectDetail(projectId _: String) async throws -> LearningProjectDetail {
+    func fetchProjectDetail(projectID _: String) async throws -> LearningProjectDetail {
         switch behavior {
         case .succeed(let detail):
             return detail
@@ -111,7 +111,7 @@ private actor FetchLearningProjectDetailRepository: LearningProjectRepository {
         }
     }
 
-    func deleteProject(projectId _: String) async throws {
+    func deleteProject(projectID _: String) async throws {
         throw LearningProjectError.unexpected
     }
 

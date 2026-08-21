@@ -3,37 +3,37 @@ public struct LearningProjectDetail: Equatable, Sendable {
     // MARK: Lifecycle
 
     public init(
-        projectId: String,
+        projectID: String,
         repositoryURL: String,
         repositoryName: String,
         repositoryImageURL: String?,
         starCount: Int,
         techStack: [String],
         overallProgressPercent: Int,
-        nextQuestionId: String?,
+        nextQuestionID: String?,
         sets: [LearningProjectSetProgress],
     ) {
-        self.projectId = projectId
+        self.projectID = projectID
         self.repositoryURL = repositoryURL
         self.repositoryName = repositoryName
         self.repositoryImageURL = repositoryImageURL
         self.starCount = starCount
         self.techStack = techStack
         self.overallProgressPercent = overallProgressPercent
-        self.nextQuestionId = nextQuestionId
+        self.nextQuestionID = nextQuestionID
         self.sets = sets
     }
 
     // MARK: Public
 
-    public let projectId: String
+    public let projectID: String
     public let repositoryURL: String
     public let repositoryName: String
     public let repositoryImageURL: String?
     public let starCount: Int
     public let techStack: [String]
     public let overallProgressPercent: Int
-    public let nextQuestionId: String?
+    public let nextQuestionID: String?
     public let sets: [LearningProjectSetProgress]
 
     public var nextSet: LearningProjectSetProgress? {

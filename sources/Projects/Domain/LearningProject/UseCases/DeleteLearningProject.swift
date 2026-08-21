@@ -8,8 +8,8 @@ public struct DeleteLearningProject: DeleteLearningProjectUseCase {
 
     // MARK: Public
 
-    public func callAsFunction(projectId: String) async throws {
-        try await repository.deleteProject(projectId: projectId)
+    public func callAsFunction(projectID: String) async throws {
+        try await repository.deleteProject(projectID: projectID)
     }
 
     // MARK: Private
