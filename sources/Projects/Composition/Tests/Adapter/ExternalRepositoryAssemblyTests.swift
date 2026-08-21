@@ -1,0 +1,65 @@
+import Foundation
+import Testing
+
+@testable import CompositionAdapter
+@testable import DataExternalRepository
+@testable import DomainLearningProject
+
+// MARK: - ExternalRepositoryAssemblyTests
+
+@Suite("ExternalRepositoryAssembly")
+struct ExternalRepositoryAssemblyTests {
+
+    @Test
+    func `live 그래프 생성이 성공하고 노출 property가 UseCase Protocol 타입이다`() throws {
+        let assembly = ExternalRepositoryAssembly(baseURL: try #require(URL(string: "https://api.github.com")))
+
+        _ = assembly.fetchExternalRepository as any FetchExternalRepositoryUseCase
+    }
+
+}
+
+// MARK: - ExternalRepositoryLookupAdapterTests
+
+@Suite("ExternalRepositoryLookupAdapter")
+struct ExternalRepositoryLookupAdapterTests {
+
+    @Test
+    func `GitHub 응답 DTO를 Domain 모델로 변환한다`() async throws {
+        let remote = StubExternalRepositoryRemote(result: .success(GitHubRepositoryResponseDTO(
+            htmlURL: "https://github.com/facebook/react",
+            ownerAvatarURL: "https://avatar",
+            starCount: 10,
+            topics: ["swift"],
+        )))
+        let adapter = ExternalRepositoryLookupAdapter(remote: remote)
+
+        let repository = try await adapter.repository(owner: "facebook", name: "react")
+
+        #expect(repository.canonicalURL == "https://github.com/facebook/react")
+        #expect(repository.ownerName == "facebook")
+        #expect(repository.repositoryName == "react")
+        #expect(repository.starCount == 10)
+    }
+
+    @Test
+    func `Data 오류를 Domain 오류로 변환한다`() async throws {
+        let remote = StubExternalRepositoryRemote(result: .failure(.offline))
+        let adapter = ExternalRepositoryLookupAdapter(remote: remote)
+
+        await #expect(throws: ExternalRepositoryError.offline) {
+            try await adapter.repository(owner: "facebook", name: "react")
+        }
+    }
+
+}
+
+// MARK: - StubExternalRepositoryRemote
+
+private struct StubExternalRepositoryRemote: ExternalRepositoryRemote {
+    let result: Result<GitHubRepositoryResponseDTO, DataExternalRepositoryError>
+
+    func repository(_: GitHubRepositoryRequest) async throws -> GitHubRepositoryResponseDTO {
+        try result.get()
+    }
+}

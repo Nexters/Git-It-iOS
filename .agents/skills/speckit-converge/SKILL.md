@@ -244,7 +244,8 @@ Append to the **end** of `tasks.md`, per the append contract:
    Constitution-violation tasks MUST be emitted first and described as
    `CRITICAL`.
    추가하는 모든 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 적용되지 않는 패키지를
-   제외한 `Domain → Data → Infrastructure → Composition → UI → Feature → App` 순서로 작업을 묶는다.
+   제외한 의존성 위상 순서로 작업을 묶는다. 활성 tasks.md가 이미 확정한 패키지 순서가 있으면
+   그 순서를 따른다.
    추가한 각 패키지 그룹 끝에 검증, 결과 보고와 명시적 사용자 승인 게이트를 둔다. 여러
    패키지를 하나의 구현 단위로 합치지 않는다.
    `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 헌법 순서로

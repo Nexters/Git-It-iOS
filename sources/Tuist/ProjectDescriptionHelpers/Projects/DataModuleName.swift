@@ -38,6 +38,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                ],
             )
 
         case .DataAuthenticationTests:
@@ -53,12 +57,18 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                ],
             )
 
         case .DataExternalRepository:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                ],
             )
 
         case .DataExternalRepositoryTests:

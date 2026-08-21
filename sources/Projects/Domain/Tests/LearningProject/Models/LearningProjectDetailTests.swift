@@ -14,7 +14,7 @@ struct LearningProjectDetailTests {
             makeSet(id: "set-3", problemCount: 5, completedCount: 0),
         ])
 
-        #expect(detail.nextSet?.setId == "set-2")
+        #expect(detail.nextSet?.setID == "set-2")
     }
 
     @Test
@@ -31,14 +31,14 @@ struct LearningProjectDetailTests {
 extension LearningProjectDetailTests {
     private func makeDetail(sets: [LearningProjectSetProgress]) -> LearningProjectDetail {
         LearningProjectDetail(
-            projectId: "project-1",
+            projectID: "project-1",
             repositoryURL: "https://github.com/owner/repo",
             repositoryName: "repo",
             repositoryImageURL: nil,
             starCount: 0,
             techStack: [],
             overallProgressPercent: 0,
-            nextQuestionId: nil,
+            nextQuestionID: nil,
             sets: sets,
         )
     }
@@ -49,7 +49,7 @@ extension LearningProjectDetailTests {
         completedCount: Int,
     ) -> LearningProjectSetProgress {
         LearningProjectSetProgress(
-            setId: id,
+            setID: id,
             label: id,
             title: id,
             problemCount: problemCount,

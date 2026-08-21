@@ -47,13 +47,14 @@ style_adapter_collect_changed_one() {
 	fi
 }
 
-# xargs -0 -n 1 dispatch 대상: 대상 하나를 절대경로로 바꿔 포맷/린트 도구를 실행합니다.
-style_adapter_format_one() {
-	style_adapter_tool=$1
-	style_adapter_root=$2
-	style_adapter_item=$3
+# xargs -0 -n 1 dispatch 대상: 대상 하나를 절대경로로 바꿔 NUL 경계로 출력합니다.
+# 호출자가 전체 대상을 모은 뒤 도구를 한 번만 실행해 프로세스 기동 비용을 대상 수만큼
+# 반복하지 않게 합니다.
+style_adapter_to_absolute_one() {
+	style_adapter_root=$1
+	style_adapter_item=$2
 	style_adapter_absolute_item=$(style_adapter_absolute "$style_adapter_root" "$style_adapter_item")
-	"$style_adapter_tool" "$style_adapter_absolute_item"
+	printf '%s\0' "$style_adapter_absolute_item"
 }
 
 # xargs -0 -n 1 dispatch 대상: staged 포맷팅 후 작업 트리가 여전히 깨끗한지 확인합니다.
@@ -92,9 +93,9 @@ style_adapter_verify_one() {
 	}
 }
 
-if [ "${1:-}" = --format-one ]; then
+if [ "${1:-}" = --to-absolute-one ]; then
 	shift
-	style_adapter_format_one "$@"
+	style_adapter_to_absolute_one "$@"
 elif [ "${1:-}" = --collect-one ]; then
 	shift
 	style_adapter_collect_one "$@"
