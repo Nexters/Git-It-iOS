@@ -98,4 +98,17 @@ struct AppleAuthorizationProviderTests {
             )
         }
     }
+
+    @Test
+    func `attempt 생성이 실패하면 authorize가 컨트롤러를 만들지 않고 오류를 던진다`() async throws {
+        struct RandomFailure: Error, Equatable { }
+        let provider = AppleAuthorizationProvider(
+            randomValue: { _ in throw RandomFailure() },
+            now: { Date(timeIntervalSince1970: 10) },
+        )
+
+        await #expect(throws: RandomFailure.self) {
+            _ = try await provider.authorize()
+        }
+    }
 }
