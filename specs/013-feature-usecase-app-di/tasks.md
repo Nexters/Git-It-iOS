@@ -294,29 +294,29 @@ Feature·Store·View 생성 코드 유무를 검토한다.
 
 ### 준비와 기반 — `CompositionAdapter` target rename (S6)
 
-- [ ] T038 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
+- [X] T038 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
   enum case `CompositionAdepter`→`CompositionAdapter`, `CompositionAdepterTests`→
   `CompositionAdapterTests`로 rename하고 내부 참조를 갱신한다.
-- [ ] T039 [S6] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.Composition`
+- [X] T039 [S6] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.Composition`
   스킴 정의에서 `CompositionModuleName.CompositionAdepter.rawValue`,
   `CompositionModuleName.CompositionAdepterTests.rawValue` 참조 2건을 rename 후 이름으로
   갱신한다.
-- [ ] T040 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의
+- [X] T040 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의
   `.fromComposition(.CompositionAdepter)` 1건을 `.fromComposition(.CompositionAdapter)`로
   갱신한다. 이는 App target의 의존성 선언에서 target 이름 참조만 바꾸는 변경이며, App 소스
   파일과 실행 동작은 바꾸지 않는다(FR-064a).
-- [ ] T041 [S6] `sources/Projects/Composition/Adepter/` 폴더를
+- [X] T041 [S6] `sources/Projects/Composition/Adepter/` 폴더를
   `sources/Projects/Composition/Adapter/`로 rename하고,
   `CompositionAdepterPlaceholder.swift`를 `CompositionAdapterPlaceholder.swift`로 rename해
   타입명 `CompositionAdepterPlaceholder`→`CompositionAdapterPlaceholder`를 갱신한다.
-- [ ] T042 [S6] `sources/Projects/Composition/Tests/Adepter/` 폴더를
+- [X] T042 [S6] `sources/Projects/Composition/Tests/Adepter/` 폴더를
   `sources/Projects/Composition/Tests/Adapter/`로 rename하고,
   `CompositionAdepterCompilationTests.swift`를 `CompositionAdapterCompilationTests.swift`로
   rename해 파일 내부의 타입명·`@testable import`·`@Suite` 문자열을 갱신한다.
 
 ### 준비와 기반 — Tuist 의존성 선언
 
-- [ ] T043 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
+- [X] T043 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의
   `CompositionAdapter` target에 `.fromDomain(.DomainAuthentication)`,
   `.fromDomain(.DomainLearningProject)`, `.fromData(.DataAuthentication)`,
   `.fromData(.DataLearningProject)`, `.fromData(.DataExternalRepository)`,
@@ -326,7 +326,7 @@ Feature·Store·View 생성 코드 유무를 검토한다.
 
 ### 구현 — Domain↔Data Adapter
 
-- [ ] T044 [S4] `sources/Projects/Composition/Adapter/LearningProjectRepositoryAdapter.swift`를
+- [X] T044 [S4] `sources/Projects/Composition/Adapter/LearningProjectRepositoryAdapter.swift`를
   신설해 `LearningProjectRepository`를 conform하는 `LearningProjectRepositoryAdapter`를
   구현한다. `HTTPProjectRemote`를 생성자로 주입받고, `ProjectListResponseDTO`·
   `ProjectDetailResponseDTO`·`RegisterProjectResponseDTO`를 `LearningProjectPage`·
@@ -334,16 +334,16 @@ Feature·Store·View 생성 코드 유무를 검토한다.
   `LearningProjectError`로 변환한다. Domain은 rename 후 `projectID`·`githubRepoURL` 표기를
   사용하고 Data도 이미 같은 표기이므로 식별자·URL 필드의 표기를 뒤집는 변환은 0건이어야
   한다(SC-022).
-- [ ] T045 [S4] `sources/Projects/Composition/Adapter/ExternalRepositoryLookupAdapter.swift`를
+- [X] T045 [S4] `sources/Projects/Composition/Adapter/ExternalRepositoryLookupAdapter.swift`를
   신설해 `ExternalRepositoryLookup`을 conform하는 `ExternalRepositoryLookupAdapter`를
   구현한다. `HTTPExternalRepositoryRemote`를 생성자로 주입받고, `GitHubRepositoryResponseDTO`를
   `ExternalRepository`로, `DataExternalRepositoryError`를 `ExternalRepositoryError`로
   변환한다.
-- [ ] T046 [S4] `sources/Projects/Composition/Adapter/AuthenticationRepositoryAdapter.swift`를
+- [X] T046 [S4] `sources/Projects/Composition/Adapter/AuthenticationRepositoryAdapter.swift`를
   신설해 `AuthenticationRepository`를 conform하는 `AuthenticationRepositoryAdapter`를
   구현한다. Infrastructure의 `AppleAuthorizationProvider`, `AppleCredentialStateProvider`를
   생성자로 주입받고, `AppleAuthorizationError`를 `AuthenticationError`로 변환한다.
-- [ ] T047 [S4] `sources/Projects/Composition/Adapter/LoginSessionRepositoryAdapter.swift`를
+- [X] T047 [S4] `sources/Projects/Composition/Adapter/LoginSessionRepositoryAdapter.swift`를
   신설해 `LoginSessionRepository`를 conform하는 `LoginSessionRepositoryAdapter`를 구현한다.
   `HTTPAuthenticationRemote`와 `KeychainStore`를 생성자로 주입받고, `LoginResponseDTO`를
   `AuthenticatedUser`로, `DataAuthenticationError`·`KeychainStoreError`를 `LoginSessionError`로
@@ -351,17 +351,17 @@ Feature·Store·View 생성 코드 유무를 검토한다.
 
 ### 구현 — 조립 진입점
 
-- [ ] T048 [S4] `sources/Projects/Composition/Adapter/LearningProjectAssembly.swift`를 신설한다.
+- [X] T048 [S4] `sources/Projects/Composition/Adapter/LearningProjectAssembly.swift`를 신설한다.
   실행 환경 설정(baseURL, 타임아웃)을 입력값으로 받아 `HTTPClient`를 1회 생성하고,
   `HTTPProjectRemote`와 `LearningProjectRepositoryAdapter`를 조립해
   `FetchLearningProjectsUseCase`, `FetchLearningProjectDetailUseCase`,
   `CreateLearningProjectUseCase`, `DeleteLearningProjectUseCase` 타입의 property만 노출한다
   (FR-022, FR-027, R-009, R-016).
-- [ ] T049 [S4] `sources/Projects/Composition/Adapter/ExternalRepositoryAssembly.swift`를
+- [X] T049 [S4] `sources/Projects/Composition/Adapter/ExternalRepositoryAssembly.swift`를
   신설한다. `HTTPClient`를 1회 생성하고 `HTTPExternalRepositoryRemote`와
   `ExternalRepositoryLookupAdapter`를 조립해 `FetchExternalRepositoryUseCase` 타입의 property만
   노출한다.
-- [ ] T050 [S4] `sources/Projects/Composition/Adapter/AuthenticationAssembly.swift`를 신설한다.
+- [X] T050 [S4] `sources/Projects/Composition/Adapter/AuthenticationAssembly.swift`를 신설한다.
   `HTTPClient`, `KeychainStore`, `AppleAuthorizationProvider`를 각각 1회 생성해
   `AuthenticationRepositoryAdapter`와 `LoginSessionRepositoryAdapter`에 공유 주입하고, `SignIn`,
   `SignOut`, `RestoreSession`, `ObserveAuthenticationOutcomes`를 조립해 `SignInUseCase`,
@@ -370,20 +370,20 @@ Feature·Store·View 생성 코드 유무를 검토한다.
 
 ### 테스트
 
-- [ ] T051 [P] [S4] `sources/Projects/Composition/Tests/Adapter/LearningProjectAssemblyTests.swift`를
+- [X] T051 [P] [S4] `sources/Projects/Composition/Tests/Adapter/LearningProjectAssemblyTests.swift`를
   신설해 live 그래프 생성 성공, 노출 property가 모두 Domain UseCase Protocol 타입인지,
   `LearningProjectRepositoryAdapter`의 DTO→Domain 모델·오류 변환을 검증한다(FR-031).
-- [ ] T052 [P] [S4] `sources/Projects/Composition/Tests/Adapter/ExternalRepositoryAssemblyTests.swift`를
+- [X] T052 [P] [S4] `sources/Projects/Composition/Tests/Adapter/ExternalRepositoryAssemblyTests.swift`를
   신설해 같은 항목을 `ExternalRepositoryAssembly`에 대해 검증한다.
-- [ ] T053 [P] [S4] `sources/Projects/Composition/Tests/Adapter/AuthenticationAssemblyTests.swift`를
+- [X] T053 [P] [S4] `sources/Projects/Composition/Tests/Adapter/AuthenticationAssemblyTests.swift`를
   신설해 같은 항목을 `AuthenticationAssembly`에 대해 검증한다.
-- [ ] T054 [P] [S4] `sources/Projects/Composition/Tests/Adapter/SharedLifetimeTests.swift`를
+- [X] T054 [P] [S4] `sources/Projects/Composition/Tests/Adapter/SharedLifetimeTests.swift`를
   신설해 각 조립 진입점 안에서 `HTTPClient`·`KeychainStore`가 중복 생성되지 않는지 검증한다
   (FR-027, SC-010).
 
 ### 정리와 패키지 검증
 
-- [ ] T055 [no-write] `tuist generate`와 `"$project_build_runner" build`,
+- [X] T055 [no-write] `tuist generate`와 `"$project_build_runner" build`,
   `"$project_build_runner" compile`, `"$project_build_runner" test`를 순차 실행한다.
   `Adepter` 표기가 manifest·폴더·target 이름·의존성 선언에 0건 남았는지(`docs/spec-kit/**`의
   append-only 기록 제외, SC-021), App의 변경이 T040의 target 이름 참조 1건뿐이고 App 소스
@@ -401,16 +401,16 @@ Feature·Store·View 생성 코드 유무를 검토한다.
 
 **선행 조건**: Composition 패키지의 구현·검증·결과 보고와 사용자 승인이 완료되어야 한다.
 
-- [ ] T056 [no-write] `cd sources && tuist generate && cd ..`를 실행한 뒤
+- [X] T056 [no-write] `cd sources && tuist generate && cd ..`를 실행한 뒤
   `"$project_build_runner" build`, `"$project_build_runner" compile`,
   `"$project_build_runner" test`를 순차 실행하고 결과를 기록한다. 의존성 순환이 0건이고 전체
   공유 scheme Debug 빌드가 성공하는지(SC-012), Domain·Data·Infrastructure·Composition
   테스트가 모두 통과하는지(SC-013) 확인한다.
-- [ ] T057 [no-write] `Feature`와 `App`의 소스가 변경되지 않았는지(App은 T040의 target 이름
+- [X] T057 [no-write] `Feature`와 `App`의 소스가 변경되지 않았는지(App은 T040의 target 이름
   참조 1건만 예외, SC-014, SC-021), 저장소 Swift 선언에 `Url`·`Id`·`Http` 절충 표기가 0건인지
   (Data `CodingKeys`의 서버 원문 키와 테스트 JSON fixture는 제외, SC-019) `git diff`와
   전수 검토로 확인한다.
-- [ ] T058 [no-write] 시나리오 1~6의 독립 수용 기준을 각각 재확인하고, SC-001~SC-022 전체를
+- [X] T058 [no-write] 시나리오 1~6의 독립 수용 기준을 각각 재확인하고, SC-001~SC-022 전체를
   이 기능의 성공 기준과 대조해 미달 항목이 없는지 보고한다.
 
 ## 의존성과 실행 순서
