@@ -4,7 +4,8 @@
 # Swift-Style 서브모듈 포매터/린터의 공개 진입점입니다.
 #
 #   staged           : 커밋에 staged된 *.swift 파일만 포맷하고 재검증합니다.
-#   format [paths..] : 지정 경로(기본 GIT_IT_PROJECTS_ROOT)를 포맷합니다.
+#   format [paths..] : 현재 변경된 Swift 파일만 포맷합니다. 경로를 지정하면 그 범위로
+#                      대상을 더 좁힙니다(기본 GIT_IT_PROJECTS_ROOT).
 #   lint   [paths..] : 지정 경로(기본 GIT_IT_PROJECTS_ROOT)를 수정 없이 검사만 합니다.
 #                     두 동작 모두 Derived/와 .build/ 하위 생성물은 제외합니다.
 #
@@ -103,6 +104,16 @@ swift_format_main() (
 	if [ -s "$swift_format_requested" ]; then
 		xargs -0 -n 1 "$swift_format_adapter" --collect-one "$swift_format_root" \
 			"$swift_format_targets" <"$swift_format_requested" || return 2
+	fi
+
+	# 일반 포맷은 수집한 후보 중 현재 작업 트리에서 추가·수정된 파일만 남깁니다.
+	# staged는 index 기준 대상과 backup/rollback 계약을 그대로 유지합니다.
+	if [ "$swift_format_action" = format ] && [ -s "$swift_format_targets" ]; then
+		swift_format_changed_targets="$swift_format_work/changed-targets.nul"
+		: >"$swift_format_changed_targets"
+		xargs -0 -n 1 "$swift_format_adapter" --collect-changed-one "$swift_format_root" \
+			"$swift_format_changed_targets" <"$swift_format_targets" || return 2
+		mv "$swift_format_changed_targets" "$swift_format_targets" || return 2
 	fi
 
 	if [ ! -s "$swift_format_targets" ]; then

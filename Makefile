@@ -27,7 +27,7 @@ clean: ## Tuist의 로컬 캐시와 아티팩트를 정리합니다
 hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh
 
-format: ## 프로젝트 전체 Swift 소스를 포맷합니다
+format: ## 현재 변경된 Swift 소스만 포맷합니다
 	$(SWIFT_FORMAT_RUNNER) format
 
 verify-tools: ## 셸 스크립트 검증에 필요한 ShellCheck·shfmt를 준비합니다
