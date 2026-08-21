@@ -57,7 +57,7 @@ struct HTTPProjectRemoteTests {
         let transport = StubHTTPTransport(results: [
             .response(jsonResponse(
                 statusCode: 200,
-                envelope: #"{"success":true,"data":{"projectId":"project-1","status":"ready"},"code":null,"message":null,"errors":null}"#,
+                envelope: #"{"success":true,"data":{"projectId":"project-1","requestStatus":"ready"},"code":null,"message":null,"errors":null}"#,
             ))
         ])
         let remote = makeRemote(transport: transport)
@@ -135,7 +135,7 @@ extension HTTPProjectRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return HTTPProjectRemote(client: client)
+        return HTTPProjectRemote(client: client, accessTokenProvider: { "test-access-token" })
     }
 
     private func jsonResponse(

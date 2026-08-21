@@ -93,6 +93,9 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient)
+                ],
             )
 
         case .DataMemberTests:

@@ -22,7 +22,7 @@ actor LearningProjectRemoteProbe: ProjectRemote, QuizGenerationRemote, LearningS
 
     func registerProject(_: RegisterProjectRequestDTO) async throws -> RegisterProjectResponseDTO {
         calls.append(.registerProject)
-        return RegisterProjectResponseDTO(projectID: "project-1", status: "IN_PROGRESS")
+        return RegisterProjectResponseDTO(projectID: "project-1", requestStatus: "IN_PROGRESS")
     }
 
     func fetchProjects(
