@@ -9,7 +9,7 @@ enum AppModuleName: String, CaseIterable {
 
 extension AppModuleName {
     var sourceDirectory: String {
-        return switch self {
+        switch self {
         case .GitIt:
             "Sources"
         case .GitItTests:
@@ -93,6 +93,8 @@ extension AppModuleName {
                 ],
                 settings: .settings(
                     base: [
+                        "BUNDLE_LOADER": "$(TEST_HOST)",
+                        "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/GitIt.app/GitIt",
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",

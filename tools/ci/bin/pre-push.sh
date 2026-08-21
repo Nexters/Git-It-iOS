@@ -80,6 +80,8 @@ ci_pre_push_main() (
 		ci_pre_push_run workspace ci_pre_push_prepare_workspace "$ci_pre_push_ios_root"
 		if [ "$ci_pre_push_project" = true ]; then ci_pre_push_run app-build "$ci_pre_push_build" build; else ci_pre_push_run app-build "$ci_pre_push_build" build-app; fi
 	fi
+	# pre-push에서만 보존되는 테스트 결과를 DerivedData 아래에 남깁니다.
+	export GIT_IT_XCRESULTS_PATH="$ci_pre_push_ios_root/DerivedData/PrePushTestResults"
 	if [ "$ci_pre_push_swift" = true ] || [ "$ci_pre_push_tests" = true ] || [ "$ci_pre_push_project" = true ]; then
 		ci_pre_push_run unit-compile "$ci_pre_push_build" compile-unit
 		ci_pre_push_run unit-tests "$ci_pre_push_build" test-unit

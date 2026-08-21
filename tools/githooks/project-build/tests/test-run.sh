@@ -48,6 +48,7 @@ printf '%s\n' '#!/bin/sh' \
 	'jobs=' \
 	'action=' \
 	'derived_data=' \
+	'result_bundle=' \
 	'index_store=false' \
 	'for argument do' \
 	'  case "$argument" in' \
@@ -59,12 +60,20 @@ printf '%s\n' '#!/bin/sh' \
 	'while [ "$#" -gt 0 ]; do' \
 	'  if [ "$1" = -jobs ]; then jobs=$2; shift 2; continue; fi' \
 	'  if [ "$1" = -derivedDataPath ]; then derived_data=$2; shift 2; continue; fi' \
+	'  if [ "$1" = -resultBundlePath ]; then result_bundle=$2; shift 2; continue; fi' \
 	'  if [ "$1" = -scheme ]; then scheme=$2; shift 2; else shift; fi' \
 	'done' \
 	'[ "$jobs" = "${EXPECTED_JOBS:-1}" ] || exit 91' \
 	'[ "$index_store" = true ] || exit 92' \
 	'case "$scheme" in Tests | UIUITests) expected_derived="$EXPECTED_DERIVED_ROOT/TestSchemes/$scheme" ;; *) expected_derived=$EXPECTED_DERIVED_ROOT ;; esac' \
 	'[ "$derived_data" = "$expected_derived" ] || exit 93' \
+	'if [ -n "${EXPECTED_XCRESULTS_ROOT:-}" ] && [ "$action" = test-without-building ]; then' \
+	'  [ "$(dirname -- "$result_bundle")" = "$EXPECTED_XCRESULTS_ROOT" ] || exit 94' \
+	'  case "$(basename -- "$result_bundle")" in "$scheme"-*.xcresult) ;; *) exit 95 ;; esac' \
+	'  mkdir -p "$result_bundle"' \
+	'else' \
+	'  [ -z "$result_bundle" ] || exit 96' \
+	'fi' \
 	'printf "%s\t%s\n" "$action" "$scheme" >> "$PROJECT_ACTION_LOG"' \
 	'[ "$scheme" != Fail ]' >"$work/bin/xcodebuild"
 chmod +x "$work/bin/xcodebuild"
@@ -124,8 +133,17 @@ rg -q '^test-without-building[[:space:]]+UIUITests$' "$PROJECT_ACTION_LOG"
 rg -q '작업=test 시도=2 성공=2 실패=0' "$work/out"
 
 : >"$PROJECT_ACTION_LOG"
-EXPECTED_JOBS=4 GIT_IT_XCODE_JOBS=4 run_project test-unit >"$work/out" 2>"$work/err"
+EXPECTED_XCRESULTS_ROOT="$work/xcresults"
+export EXPECTED_XCRESULTS_ROOT
+EXPECTED_JOBS=4 GIT_IT_XCODE_JOBS=4 GIT_IT_XCRESULTS_PATH="$EXPECTED_XCRESULTS_ROOT" \
+	run_project test-unit >"$work/out" 2>"$work/err"
 [ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests')" ]
+result_bundle_found=false
+for result_bundle in "$EXPECTED_XCRESULTS_ROOT"/Tests-*.xcresult; do
+	[ -d "$result_bundle" ] && result_bundle_found=true
+done
+[ "$result_bundle_found" = true ]
+unset EXPECTED_XCRESULTS_ROOT GIT_IT_XCRESULTS_PATH
 
 : >"$PROJECT_ACTION_LOG"
 run_project test-ui >"$work/out" 2>"$work/err"

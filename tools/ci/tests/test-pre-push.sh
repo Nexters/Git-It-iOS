@@ -36,6 +36,7 @@ for runner in format build script-tests script-quality tuist; do
 	# shellcheck disable=SC2016
 	printf '%s\n' '#!/bin/sh' 'set -eu' \
 		'printf "%s:%s\n" "$(basename -- "$0")" "$*" >>"$CALL_LOG"' \
+		'if [ -n "${GIT_IT_XCRESULTS_PATH:-}" ]; then printf "xcresults:%s\n" "$GIT_IT_XCRESULTS_PATH" >>"$CALL_LOG"; fi' \
 		'if [ "$(basename -- "$0")" = format ]; then printf "\n" >>"$2"; fi' \
 		'if [ "$(basename -- "$0")" = build ] && [ "$1" = test-ui ]; then exit 1; fi' \
 		>"$repository/tools/runners/$runner"
@@ -68,6 +69,7 @@ rg -q '^lint:origin/develop:' "$CALL_LOG"
 for action in build-app compile-unit test-unit compile-ui test-ui; do
 	rg -qx "build:$action" "$CALL_LOG"
 done
+rg -Fqx "xcresults:$repository/$ios_relative/DerivedData/PrePushTestResults" "$CALL_LOG"
 rg -qx 'tuist:install' "$CALL_LOG"
 rg -qx 'tuist:generate --no-open' "$CALL_LOG"
 rg -Fq '| ui-tests | failure:1 |' "$work/out"
