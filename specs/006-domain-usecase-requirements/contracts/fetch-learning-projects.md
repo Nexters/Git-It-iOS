@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-011~015 |
 **데이터 모델**: [data-model.md](../data-model.md) `LearningProject` |
-**도메인 문서**: [fetch-learning-projects.md](../../../sources/docs/git-it-domain-usecases/fetch-learning-projects.md)
 
 내가 학습 중인 프로젝트 목록을 페이지 단위로 조회한다.
 

@@ -1,6 +1,6 @@
 # 프로젝트 스크립트 아키텍처
 
-저장소 자동화는 사용자 목적에 따라 `ci`, `project-build`, `swift-format`, `hook-management`, `script-tests` 다섯 기능 모듈로 나눈다. 기술 종류가 아니라 함께 변경되는 정책과 실패 복구 계약이 기능 경계를 결정한다. `ci`는 PR 변경 분류와 차단 job 결과 집계를 소유한다. 커밋 컨벤션은 Git이 직접 실행하는 `tools/githooks/commit-msg` 하나가 소유하며 일반 자동화 모듈과 분리한다. `tools/githooks/pre-commit`은 셸 회귀, 포매팅, 일반 빌드, 테스트 컴파일과 테스트 실행 공개 명령을 순서대로 조합한다. 정적 검증은 `tools/script-verification` 모듈이 소유한다.
+저장소 자동화는 사용자 목적에 따라 `ci`, `project-build`, `project-setup`, `swift-format`, `hook-management`, `script-tests` 여섯 기능 모듈로 나눈다. 기술 종류가 아니라 함께 변경되는 정책과 실패 복구 계약이 기능 경계를 결정한다. `project-setup`은 중앙 JSON에 정의된 앱·manifest 편집 Xcode workspace 링크, Claude 심볼릭 링크와 VS Code workspace 초기화를 소유한다. `ci`는 PR 변경 분류와 차단 job 결과 집계를 소유한다. 커밋 컨벤션은 Git이 직접 실행하는 `tools/githooks/commit-msg` 하나가 소유하며 일반 자동화 모듈과 분리한다. `tools/githooks/pre-commit`은 셸 회귀, 포매팅, 일반 빌드와 테스트 컴파일 공개 명령을 순서대로 조합한다. 테스트 실행은 CI나 명시적인 수동 검증에서 수행한다. 정적 검증은 `tools/script-verification` 모듈이 소유한다.
 
 ## 계층과 의존 방향
 
@@ -22,4 +22,4 @@
 
 ## 공개 계약
 
-사용자와 저장소 연동점은 각 기능의 `bin/`, 저장소 경로를 제공하는 `tools/repository-paths/bin/repository-paths.sh`, Git이 직접 호출하는 `tools/githooks/commit-msg`와 `tools/githooks/pre-commit`, 스킬이 제공하는 검증 명령뿐이다. CI workflow는 `tools/ci/bin/classify-changes.sh`와 `tools/ci/bin/gate-evaluate.sh`만 호출하고 내부 정책을 직접 사용하지 않는다. 내부 파일 경로와 함수명은 공개 API가 아니다. `commit-msg`는 커밋 메시지 파일 외의 프로젝트 스크립트나 기능 모듈에 의존하지 않는다. `pre-commit`은 `script-tests/bin/run.sh`, `swift-format/bin/run.sh staged`, `project-build/bin/run.sh build`, `project-build/bin/run.sh compile`, `project-build/bin/run.sh test`를 fail-fast 순서로 실행한다. `compile`은 테스트가 연결된 공유 scheme을 `build-for-testing`하고 `test`는 같은 Derived Data로 `test-without-building`한다. 새 공개 경로로 전환할 때 `tools/githooks`, Tuist, README와 스킬 참조 문서를 함께 갱신하고 이전 wrapper나 symlink를 남기지 않는다.
+사용자와 저장소 연동점은 각 기능의 `bin/`, 저장소 경로를 제공하는 `tools/repository-paths/bin/repository-paths.sh`, Git이 직접 호출하는 `tools/githooks/commit-msg`와 `tools/githooks/pre-commit`, 스킬이 제공하는 검증 명령뿐이다. `make init`과 `make tuist`는 `tools/project-setup/bin/run.sh`만 호출하며 링크 경로와 대상을 직접 정의하지 않는다. CI workflow는 `tools/ci/bin/classify-changes.sh`, `tools/ci/bin/lint-changed-swift.sh`와 `tools/ci/bin/gate-evaluate.sh`만 호출하고 내부 정책을 직접 사용하지 않는다. 내부 파일 경로와 함수명은 공개 API가 아니다. `commit-msg`는 커밋 메시지 파일 외의 프로젝트 스크립트나 기능 모듈에 의존하지 않는다. `pre-commit`은 `script-tests/bin/run.sh`, `swift-format/bin/run.sh staged`, `project-build/bin/run.sh build`, `project-build/bin/run.sh compile`을 fail-fast 순서로 실행한다. `compile`은 테스트가 연결된 공유 scheme을 `build-for-testing`하지만 테스트 본문은 실행하지 않는다. 새 공개 경로로 전환할 때 `tools/githooks`, Tuist, README와 스킬 참조 문서를 함께 갱신하고 이전 wrapper나 symlink를 남기지 않는다.

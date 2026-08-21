@@ -24,11 +24,6 @@ extension CompositionModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
-                dependencies: [
-                    .fromDomain(.DomainLearningProject),
-                    .fromData(.DataLearningProject),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                ],
             )
 
         case .CompositionAdepterTests:
@@ -38,11 +33,6 @@ extension CompositionModuleName {
                 productionTarget: .target(
                     name: CompositionModuleName.CompositionAdepter.rawValue
                 ),
-                additionalDependencies: [
-                    .fromDomain(.DomainLearningProject),
-                    .fromData(.DataLearningProject),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                ],
             )
         }
     }

@@ -9,8 +9,8 @@
 ## 1. `contracts/` 형식 — UseCase별 Markdown 계약 문서 (10개)
 
 **결정**: `Git-It-server-scheme.json`(OpenAPI 3.x) 전체를 그대로 노출하지 않고,
-`sources/docs/git-it-domain-usecases/`의 UseCase 이름과 1:1 대응하는 Markdown 계약 파일을
-10개 작성한다. 각 파일은 HTTP 메서드·경로, 요청(경로·쿼리·바디), 성공 응답 필드, 오류
+spec.md가 정의한 UseCase 이름과 1:1 대응하는 Markdown 계약 파일을 10개 작성한다. 각
+파일은 HTTP 메서드·경로, 요청(경로·쿼리·바디), 성공 응답 필드, 오류
 응답(HTTP 상태·서버 오류 코드·조건), spec.md의 관련 `FR-XXX`를 포함한다.
 
 **근거**:
@@ -39,7 +39,7 @@ enum)으로 확정하지 않고 "표현하는 의미 + 필드 + 출처(서버 �
 **근거**: 이 기능은 어떤 패키지도 구현하지 않으므로(헌법 점검 참고), Swift 타입을 미리
 확정하면 후속 구현자의 설계 자유를 제한하고 이 문서가 실제로 구현되지 않을 세부사항(예:
 struct 이름, 접근 제어자)까지 떠안게 된다. 서버 필드명과 의미만 정본으로 남기는 편이
-`sources/docs/naming.md`의 책임 기반 네이밍 원칙과도 맞다 — 실제 이름은 그 타입을 소유할
+`docs/conventions/naming.md`의 책임 기반 네이밍 원칙과도 맞다 — 실제 이름은 그 타입을 소유할
 패키지가 문맥에 맞게 정한다.
 
 **검토한 대안**: Swift `struct`/`enum` 초안을 미리 작성하는 방안 — 004-in-memory-cache처럼

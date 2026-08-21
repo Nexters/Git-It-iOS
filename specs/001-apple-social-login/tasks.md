@@ -71,7 +71,7 @@ project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_P
 
 ## 패키지 구현 순서
 
-`sources/docs/assets/package-dependency-graph.dot`에서 `A → B`이면 `A`가 `B`를 컴파일
+`docs/assets/package-dependency-graph.dot`에서 `A → B`이면 `A`가 `B`를 컴파일
 의존성으로 참조한다. 이 관계로 각 소비 패키지의 선행 조건을 검증하고, 프로젝트 내부
 의존성이 없는 패키지 사이의 상대적 순서를 포함한 전체 실행 순서는 헌법의
 `Domain → Data → Core → Composition → UI → Feature → App`을 그대로 따른다.

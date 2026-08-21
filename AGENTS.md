@@ -7,10 +7,9 @@
 ## 우선순위
 
 1. [Constitution](.specify/memory/constitution.md) — 모든 문서보다 우선하는 상위 원칙
-2. [아키텍처 문서](sources/docs/architecture.md),
-   [네이밍 가이드](sources/docs/naming.md),
-   [테스트 작성 컨벤션](sources/docs/test-conventions.md)과
-   [패키지별 규칙](sources/docs/package-rules/) — 모듈 책임, 의존성, 테스트와 공개 이름 규칙
+2. [아키텍처 문서](docs/architecture.md),
+   [공통 컨벤션](docs/conventions/README.md)과
+   [패키지별 규칙](docs/package-rules/) — 모듈 책임, 의존성, 테스트와 공개 이름 규칙
 3. [`.github/COMMIT_CONVENTION.md`](.github/COMMIT_CONVENTION.md) — 커밋 메시지 규칙
 4. [README](README.md) — 초기화·빌드·훅 설치 절차
 5. 이 문서
@@ -24,7 +23,7 @@ Constitution과 하위 문서가 충돌하면 하위 문서를 Constitution에 �
 - 실제 소스는 `sources/` 아래에만 있습니다. 저장소 루트의 `GitIt.xcworkspace`는
   `sources/GitIt.xcworkspace`를 가리키는 심볼릭 링크입니다.
 - 패키지: `App`, `Composition`, `Feature`, `Domain`, `Data`, `Infrastructure`, `UI`.
-  각 패키지의 책임과 허용 의존 방향은 [아키텍처 문서](sources/docs/architecture.md)의
+  각 패키지의 책임과 허용 의존 방향은 [아키텍처 문서](docs/architecture.md)의
   표를 따릅니다. Domain/Data/Core는 프로젝트 내부 패키지에 의존하지 않습니다.
 
 ## 셋업
@@ -33,9 +32,13 @@ Constitution과 하위 문서가 충돌하면 하위 문서를 Constitution에 �
 make init
 ```
 
-`tuist install && tuist generate`로 workspace를 만들고 Git 훅을 설치합니다. 이미
+`tuist install && tuist generate && tuist edit --permanent`로 앱 workspace와 manifest
+편집 workspace를 만들고 Git 훅을 설치합니다. 이미
 설치되어 있으면 `make tuist` 또는 `make hooks`로 개별 실행할 수 있습니다.
-`make help`로 전체 명령을 확인합니다.
+루트의 `GitIt.xcworkspace`와 `Edit-Tuist.xcworkspace` 링크, `CLAUDE.md`와 `.claude`
+링크, `specs/`와
+`docs/`를 포함하는 VS Code workspace도 함께 생성합니다. `make help`로 전체
+명령을 확인합니다.
 
 ## 빌드·테스트
 
@@ -66,26 +69,30 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 
 - **의존성 방향을 지킵니다.** 특히 Domain/Data/Core는 서로 및 App/Feature/UI에
   의존하지 않습니다. 금지된 의존성 목록은
-  [아키텍처 문서 7.1](sources/docs/architecture.md)을 참고합니다.
+  [아키텍처 문서 7.1](docs/architecture.md)을 참고합니다.
 - **의존성은 생성자 주입**으로 전달합니다. `@Dependency` 키, Service Locator, 전역
   mutable container를 production 의존성 전달 수단으로 쓰지 않습니다.
 - **공개 이름은 책임과 필요한 최소 문맥을 드러냅니다.** 일괄 접두어·접미어·축약을
   적용하지 않고 외부 고정 명칭과 공급자 중립 경계를 구분하며, 세부 기준은
-  [네이밍 가이드](sources/docs/naming.md)를 따릅니다.
+  [네이밍 컨벤션](docs/conventions/naming.md)을 따릅니다.
 - **Target과 폴더 이름을 구분합니다.** target은 패키지 문맥을 포함할 수 있지만,
   `sources/Projects/<패키지>/` 안의 source·test 폴더는 역할만 사용합니다. 새 target은
   `sourceDirectory`를 명시해 target 이름의 패키지 접두어를 폴더에 반복하지 않습니다.
 - **테스트 함수 이름은 한국어 동작 문장으로 작성하고 Swift Testing을 기본으로
   사용합니다.** XCTest는 UI 자동화처럼 필요한 플랫폼 기능으로 제한하며, 세부 기준은
-  [테스트 작성 컨벤션](sources/docs/test-conventions.md)을 따릅니다.
+  [테스트 컨벤션](docs/conventions/test.md)을 따릅니다.
+- **SwiftUI·UIComponent·TCA 구현은 공통 컨벤션을 따릅니다.** View 생성 경로와 내부
+  선언은 [View](docs/conventions/view.md), 컴포넌트 경계는
+  [UIComponent](docs/conventions/ui-component.md), Feature 상태와 Effect는
+  [TCA](docs/conventions/tca.md) 컨벤션을 따릅니다.
 - 패키지별 세부 규칙은 수정 전에 해당 문서를 확인합니다:
-  [App](sources/docs/package-rules/app.md) ·
-  [Composition](sources/docs/package-rules/composition.md) ·
-  [Feature](sources/docs/package-rules/feature.md) ·
-  [Domain](sources/docs/package-rules/domain.md) ·
-  [Data](sources/docs/package-rules/data.md) ·
-  [Infrastructure](sources/docs/package-rules/infrastructure.md) ·
-  [UI](sources/docs/package-rules/ui.md)
+  [App](docs/package-rules/app.md) ·
+  [Composition](docs/package-rules/composition.md) ·
+  [Feature](docs/package-rules/feature.md) ·
+  [Domain](docs/package-rules/domain.md) ·
+  [Data](docs/package-rules/data.md) ·
+  [Infrastructure](docs/package-rules/infrastructure.md) ·
+  [UI](docs/package-rules/ui.md)
 - Swift 포맷팅은 빌드 시 Swift Style의 `FormatSwift` 플러그인이 자동 적용합니다.
   별도로 포맷 도구를 수동 실행할 필요는 없지만, staged 파일과 포맷 결과가 다르면
   pre-commit이 커밋을 막습니다 — 변경 파일을 다시 stage하세요.
@@ -109,7 +116,7 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 
 | 스킬 | 허용 수정 경로 |
 | --- | --- |
-| `speckit-specify` | `specs/<feature>/**`, `.specify/feature.json` |
+| `speckit-specify` | 기록 파일 이름을 제외한 `specs/<feature>/**`, `.specify/feature.json` |
 | `speckit-clarify` | `specs/<feature>/spec.md`, `specs/<feature>/checklists/requirements.md` |
 | `speckit-plan` | `specs/<feature>/plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/**` |
 | `speckit-tasks` | `specs/<feature>/tasks.md` |
@@ -119,6 +126,9 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 | `speckit-implement` | 활성 `tasks.md`에 명시된 파일, `tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈만 생성 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
+| `speckit-swift-format-run` | 활성 `tasks.md`에 정확히 적혀 있고 현재 작업 트리에서 변경된 Swift 파일만 포맷 |
+| `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
+| `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 
 기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질·구조·운영·개발 경험,
 리팩터링·스타일·의존성 갱신에도 작성할 수 있습니다. 작성 여부는 변경의 위험·범위·협업
@@ -147,13 +157,15 @@ PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 
 ```text
 .
-├── sources/            # iOS 앱, Tuist workspace, 아키텍처 문서
+├── sources/            # iOS 앱과 Tuist workspace
+├── docs/               # 공용 문서와 기능별 Spec Kit 세션 기록
 ├── .specify/           # Spec Kit 설정과 Constitution
 ├── .agents/skills/     # 프로젝트 전용 에이전트 스킬 (Spec-Kit, 셸 스크립트)
 ├── specs/              # 기능 명세 (speckit-specify 산출물)
 ├── .github/            # CI, 커밋 컨벤션, PR 템플릿
 └── tools/
     ├── githooks/            # Git Hook 및 저장소 자동화
+    ├── project-setup/       # 에이전트 링크와 개발 workspace 초기화
     ├── repository-paths/    # 저장소 공용 경로 관리
     ├── script-tests/        # 프로젝트 셸 회귀 테스트 실행
     ├── script-verification/ # POSIX 셸 정적·회귀 검증

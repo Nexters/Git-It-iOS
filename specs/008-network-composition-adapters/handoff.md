@@ -64,13 +64,13 @@ xcodebuild test -workspace GitIt.xcworkspace -scheme Composition \
   유지한다. 실패 관찰은 타입화된 Domain 오류(FR-004, FR-009)로만 한다.
 - **토큰 조회는 `LoginSessionStorage` 재사용**: 001-apple-social-login이 이미 정의한
   `LoginSessionStorage.load()?.accessToken`을 그대로 소비한다. 새 프로토콜을 만들지
-  않았다(근거: [tacit-knowledge.md](./tacit-knowledge.md) TK-20260820-002). 토큰이 없으면
+  않았다(근거: [tacit-knowledge.md](../../docs/spec-kit/008-network-composition-adapters/tacit-knowledge.md) TK-20260820-002). 토큰이 없으면
   헤더 없이 요청을 보내고, 서버의 401 응답이 자연스럽게 `LearningProjectError.unauthorized`로
   이어지도록 둔다(수용 시나리오 2-6).
 - **Composition은 새 target을 만들지 않음**: 앱 전체가 공유하는 기존 `Composition`
   target 안에 `LearningProjectLifecycle/` 하위 폴더를 새로 도입했다. 후속 Composition
   Adapter(예: 인증)도 같은 방식으로 자기 기능 이름의 하위 폴더를 쓰는 것이 이 저장소의
-  전례가 됐다(근거: [tacit-knowledge.md](./tacit-knowledge.md) TK-20260820-001).
+  전례가 됐다(근거: [tacit-knowledge.md](../../docs/spec-kit/008-network-composition-adapters/tacit-knowledge.md) TK-20260820-001).
 
 ## 다음에 무엇이 필요한가 (이 기능의 범위 밖)
 
@@ -89,7 +89,7 @@ xcodebuild test -workspace GitIt.xcworkspace -scheme Composition \
 
 - `CompositionTests` 스킴에 Test Action이 아예 없던 기존 Tuist 구성 gap을 이번에 함께
   고쳤다(`ProjectName.swift`에 `testTarget: "CompositionTests"` 추가). 자세한 경위는
-  [trouble-shooting.md](./trouble-shooting.md) TS-20260820-001 참고 — 008의 코드 결함이
+  [trouble-shooting.md](../../docs/spec-kit/008-network-composition-adapters/trouble-shooting.md) TS-20260820-001 참고 — 008의 코드 결함이
   아니라 `CompositionTests`가 그동안 placeholder뿐이라 드러나지 않았던 기존 gap이었다.
 - `Git-It-server-scheme.json`은 구현 시점에 아직 커밋되지 않은 작업본이었다(spec.md
   가정). 실제 서버 스키마가 바뀌었다면 `LearningProjectRemoteAdapter`의 엔드포인트·오류

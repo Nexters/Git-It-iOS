@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "Logo_Appicon_Android@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "Logo_Appicon_Android@2x 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "Logo_Appicon_Android@2x 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

@@ -74,10 +74,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 This skill may modify only (1) files named by an incomplete task in the active
 `tasks.md`, and (2) checkbox states for completed tasks in that same `tasks.md`.
 Each implementation task MUST name an exact repository-relative path. A directory
-such as `sources/**` is not a blanket allowance. If a needed file is absent from the
-task list, stop and request an updated task instead of modifying it. Do not create or
+such as `sources/**` or `docs/**` is not a blanket allowance. If a needed file is absent from the
+task list, stop and request an updated task instead of modifying it. A `docs/**` file may be
+modified only when an incomplete task names that exact current path and assigns it to one
+responsible package. Resolve the document root through `GIT_IT_DOCS_ROOT`; reject stale
+`sources/docs/**` task paths and request `/speckit-tasks` correction. Do not create or
 amend ignore files unless an active task explicitly names that exact ignore file.
-`trouble-shooting.md` and `tacit-knowledge.md` are never implementation-owned paths,
+`docs/spec-kit/<feature>/trouble-shooting.md` and
+`docs/spec-kit/<feature>/tacit-knowledge.md` are never implementation-owned paths,
 even if a task names them; use the dedicated recording skill instead.
 
 1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -127,22 +131,22 @@ even if a task names them; use the dedicated recording skill instead.
      active task explicitly names that exact file.
 
    **Detection & Creation Logic**:
-   - Check if the following command succeeds to determine if the repository is a git repo (create/verify .gitignore if so):
+   - Check if the following command succeeds to determine if the repository is a git repo. Inspect
+     `.gitignore` if so, but create or amend it only when an incomplete task names `.gitignore` exactly:
 
      ```sh
      git rev-parse --git-dir 2>/dev/null
      ```
 
-   - Check if Dockerfile* exists or Docker in plan.md → create/verify .dockerignore
-   - Check if .eslintrc* exists → create/verify .eslintignore
-   - Check if eslint.config.* exists → ensure the config's `ignores` entries cover required patterns
-   - Check if .prettierrc* exists → create/verify .prettierignore
-   - Check if .npmrc or package.json exists → create/verify .npmignore (if publishing)
-   - Check if terraform files (*.tf) exist → create/verify .terraformignore
-   - Check if .helmignore needed (helm charts present) → create/verify .helmignore
+   - Apply the following detection only to an ignore file named exactly by an incomplete task:
+     Dockerfile* or Docker in plan.md → .dockerignore; .eslintrc* → .eslintignore;
+     eslint.config.* → its `ignores`; .prettierrc* → .prettierignore; .npmrc or package.json
+     when publishing → .npmignore; terraform files → .terraformignore; Helm charts → .helmignore.
 
-   **If ignore file already exists**: Verify it contains essential patterns, append missing critical patterns only
-   **If ignore file missing**: Create with full pattern set for detected technology
+   **If ignore file already exists**: Verify it contains essential patterns. Append missing critical
+   patterns only when an incomplete task names that exact file.
+   **If ignore file missing**: Create it only when an incomplete task names that exact file; otherwise
+   report the gap and request a `/speckit-tasks` update.
 
    **Common Patterns by Technology** (from plan.md tech stack):
    - **Node.js/JavaScript/TypeScript**: `node_modules/`, `dist/`, `build/`, `*.log`, `.env*`

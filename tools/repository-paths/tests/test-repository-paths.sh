@@ -20,22 +20,38 @@ repository=$(CDPATH='' cd -- "$repository" && pwd -P)
 paths="$repository/$reader_relative"
 ios_fixture='제품 작업 공간'
 workspace_fixture="$ios_fixture/Fixture.xcworkspace"
+workspace_link_fixture='Fixture.xcworkspace'
+edit_workspace_fixture="$ios_fixture/Manifest-Fixture.xcworkspace"
+edit_workspace_link_fixture='Edit-Fixture.xcworkspace'
 style_fixture='검증 도구/스타일'
 hooks_fixture='검증 도구/훅'
+project_setup_fixture='검증 도구/프로젝트 설정/bin/run.sh'
 script_tests_fixture='검증 도구/스크립트 테스트'
 /usr/bin/plutil -replace GIT_IT_IOS_ROOT -string "$ios_fixture" \
 	"$repository/$config_relative"
 /usr/bin/plutil -replace GIT_IT_WORKSPACE_PATH -string "$workspace_fixture" \
 	"$repository/$config_relative"
+/usr/bin/plutil -replace GIT_IT_WORKSPACE_LINK_PATH -string "$workspace_link_fixture" \
+	"$repository/$config_relative"
+/usr/bin/plutil -replace GIT_IT_EDIT_WORKSPACE_PATH -string "$edit_workspace_fixture" \
+	"$repository/$config_relative"
+/usr/bin/plutil -replace GIT_IT_EDIT_WORKSPACE_LINK_PATH -string "$edit_workspace_link_fixture" \
+	"$repository/$config_relative"
 /usr/bin/plutil -replace GIT_IT_SWIFT_STYLE_ROOT -string "$style_fixture" \
 	"$repository/$config_relative"
 /usr/bin/plutil -replace GIT_IT_HOOKS_ROOT -string "$hooks_fixture" \
+	"$repository/$config_relative"
+/usr/bin/plutil -replace GIT_IT_PROJECT_SETUP_RUNNER -string "$project_setup_fixture" \
 	"$repository/$config_relative"
 /usr/bin/plutil -replace GIT_IT_SCRIPT_TEST_RUNNER -string "$script_tests_fixture/bin/run.sh" \
 	"$repository/$config_relative"
 [ "$("$paths" GIT_IT_IOS_ROOT)" = "$ios_fixture" ]
 [ "$("$paths" GIT_IT_WORKSPACE_PATH)" = "$workspace_fixture" ]
+[ "$("$paths" GIT_IT_WORKSPACE_LINK_PATH)" = "$workspace_link_fixture" ]
+[ "$("$paths" GIT_IT_EDIT_WORKSPACE_PATH)" = "$edit_workspace_fixture" ]
+[ "$("$paths" GIT_IT_EDIT_WORKSPACE_LINK_PATH)" = "$edit_workspace_link_fixture" ]
 [ "$("$paths" GIT_IT_HOOKS_ROOT)" = "$hooks_fixture" ]
+[ "$("$paths" GIT_IT_PROJECT_SETUP_RUNNER)" = "$project_setup_fixture" ]
 [ "$("$paths" GIT_IT_SCRIPT_TEST_RUNNER)" = "$script_tests_fixture/bin/run.sh" ]
 [ "$("$paths" --absolute GIT_IT_IOS_ROOT)" = "$repository/$ios_fixture" ]
 [ "$(GIT_IT_IOS_ROOT='대체 작업 공간' "$paths" GIT_IT_IOS_ROOT)" = '대체 작업 공간' ]
@@ -43,8 +59,12 @@ script_tests_fixture='검증 도구/스크립트 테스트'
 	"$work/외부 작업 공간" ]
 "$paths" >"$work/environment"
 rg -Fq "GIT_IT_WORKSPACE_PATH=$workspace_fixture" "$work/environment"
+rg -Fq "GIT_IT_WORKSPACE_LINK_PATH=$workspace_link_fixture" "$work/environment"
+rg -Fq "GIT_IT_EDIT_WORKSPACE_PATH=$edit_workspace_fixture" "$work/environment"
+rg -Fq "GIT_IT_EDIT_WORKSPACE_LINK_PATH=$edit_workspace_link_fixture" "$work/environment"
 rg -Fq "GIT_IT_SWIFT_STYLE_ROOT=$style_fixture" "$work/environment"
 rg -Fq "GIT_IT_HOOKS_ROOT=$hooks_fixture" "$work/environment"
+rg -Fq "GIT_IT_PROJECT_SETUP_RUNNER=$project_setup_fixture" "$work/environment"
 rg -Fq "GIT_IT_SCRIPT_TEST_RUNNER=$script_tests_fixture/bin/run.sh" "$work/environment"
 
 if "$paths" UNKNOWN_PATH >"$work/out" 2>"$work/err"; then

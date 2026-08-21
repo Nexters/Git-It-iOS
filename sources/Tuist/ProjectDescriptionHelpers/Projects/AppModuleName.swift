@@ -9,7 +9,7 @@ enum AppModuleName: String, CaseIterable {
 
 extension AppModuleName {
     var sourceDirectory: String {
-        return switch self {
+        switch self {
         case .GitIt:
             "Sources"
         case .GitItTests:

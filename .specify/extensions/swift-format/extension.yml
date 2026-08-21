@@ -1,0 +1,31 @@
+schema_version: "1.0"
+
+extension:
+  id: swift-format
+  name: "Git-It Swift Format"
+  version: "1.0.0"
+  description: "활성 Spec Kit 작업에서 허용된 변경 Swift 파일만 프로젝트 공개 포맷 명령으로 정리합니다."
+  author: Git-It
+  license: MIT
+
+requires:
+  speckit_version: ">=0.14.1"
+
+provides:
+  commands:
+    - name: speckit.swift-format.run
+      file: commands/speckit.swift-format.md
+      description: "활성 tasks.md에 명시된 현재 변경 Swift 파일만 포맷합니다."
+
+hooks:
+  after_implement:
+    command: speckit.swift-format.run
+    optional: false
+    priority: 10
+    prompt: "허용된 변경 Swift 파일을 포맷할까요?"
+    description: "모든 구현 패키지 완료 후 허용된 변경 Swift 파일을 포맷합니다."
+
+tags:
+  - swift
+  - format
+  - validation

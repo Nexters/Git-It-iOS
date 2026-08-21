@@ -24,7 +24,7 @@
 
 ## 변경 시나리오와 테스트 *(필수)*
 
-이 기능의 실제 이해관계자는 `sources/docs/git-it-domain-usecases/`에 정의된 10개 도메인 UseCase를 이후 별도의 `/speckit-specify` · `/speckit-plan` 호출로 하나씩 구현할 iOS 개발자입니다. 이 명세 자체는 화면이나 Swift 코드를 만들지 않으며, 각 UseCase의 책임(도메인 문서 기준)과 Git-It 서버 API 계약(`Git-It-server-scheme.json` 기준)을 하나로 대조·통합한 요구사항 문서를 산출물로 합니다. 최종 앱 사용자는 이 문서를 직접 인지하지 않으며, 후속 구현 스펙이 API를 재조사하지 않고 정확하게 진행되는 방식으로 간접적인 혜택을 받습니다.
+이 기능의 실제 이해관계자는 이 명세가 정의한 10개 도메인 UseCase를 이후 별도의 `/speckit-specify` · `/speckit-plan` 호출로 하나씩 구현할 iOS 개발자입니다. 이 명세 자체는 화면이나 Swift 코드를 만들지 않으며, 각 UseCase의 책임(spec.md와 `contracts/` 기준)과 Git-It 서버 API 계약(`Git-It-server-scheme.json` 기준)을 하나로 대조·통합한 요구사항 문서를 산출물로 합니다. 최종 앱 사용자는 이 문서를 직접 인지하지 않으며, 후속 구현 스펙이 API를 재조사하지 않고 정확하게 진행되는 방식으로 간접적인 혜택을 받습니다.
 
 ### 시나리오 1 - 학습 프로젝트 생명주기 요구사항 확인 (우선순위: P1)
 

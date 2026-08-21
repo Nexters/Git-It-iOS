@@ -132,7 +132,7 @@
 **소유 경로**: `sources/Projects/UI/DesignSystem/**`,
 `sources/Projects/UI/Tests/DesignSystem/**`, `sources/Projects/UI/Component/**`,
 `sources/Projects/UI/Tests/Component/Unit/**`, `sources/Projects/UI/ComponentLayoutHarness/**`,
-`sources/Projects/UI/Tests/Component/UI/**`, `sources/docs/ui-component-checklist.md`
+`sources/Projects/UI/Tests/Component/UI/**`, `docs/ui-component-checklist.md`
 
 **관련 변경 시나리오**: S1, S2, S3, S4, S5
 
@@ -173,7 +173,7 @@
 - [x] T049 [P] [S3] `sources/Projects/UI/Component/Components/Leaf/ActionButton.swift`의 `Size`를 LG 54·MD 40·SM 36pt 표면과 최소 44pt 터치 영역으로 교정하고 기존 생성 경로를 보존한다
 - [x] T050 [P] [S3] `sources/Projects/UI/Component/Components/Composite/SheetSurface.swift`의 grabber를 58×4pt, 위 5pt, grabber 영역 총 16pt로 교정하고 Figma 미확정값은 기존 근거 수준으로 유지한다
 - [x] T051 [S2] `sources/Projects/UI/Component/Components/Composite/ProjectRow.swift`가 위 16·좌우 18·아래 18pt inset, 기본 150pt·삭제 94pt 최소 높이, 8pt 세부 간격과 `ContinuousProgressBar`를 사용하도록 교정한다
-- [x] T052 [S1] `sources/docs/ui-component-checklist.md`의 `ProjectRow` 대응을 Figma `ProjectList`로 정정하고 `학습세트 List-item`은 별도 미구현 컴포넌트로 유지하며 신규 컴포넌트 상태를 반영한다
+- [x] T052 [S1] `docs/ui-component-checklist.md`의 `ProjectRow` 대응을 Figma `ProjectList`로 정정하고 `학습세트 List-item`은 별도 미구현 컴포넌트로 유지하며 신규 컴포넌트 상태를 반영한다
 - [x] T053 `sources/Projects/UI/Tests/Component/Unit/Placeholder.swift`를 실제 UIComponent 테스트가 추가된 뒤 삭제한다
 
 ### 패키지 검증과 승인

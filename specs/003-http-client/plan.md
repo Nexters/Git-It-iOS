@@ -141,7 +141,7 @@ Git index, 작업 파일 또는 공유 formatter cache를 사용하는 변경 �
 보존하고 공급자 중립 경계에는 특정 공급자나 저장 기술의 용어를 노출하지 않는다. 네이밍과
 설계·동작 변경이 함께 필요하면 범위와 검증을 분리한다.
 
-이 기능에 적용한 판단은 다음과 같다([네이밍 가이드](../../sources/docs/naming.md) 기준).
+이 기능에 적용한 판단은 다음과 같다([네이밍 컨벤션](../../docs/conventions/naming.md) 기준).
 
 | 결정 | 근거 |
 | --- | --- |
@@ -216,7 +216,7 @@ Phase 1 산출물(data-model.md, contracts/http-client-api.md, quickstart.md)을
 게이트는 모두 그대로 통과한다. 설계에서 새로 확인한 사항은 다음과 같다.
 
 - 설계가 추가한 target은 `CoreHTTP`와 `CoreHTTPTests` 둘뿐이며 모두 `Core` 패키지 내부
-  산출물이다. 패키지 경계와 의존 방향이 바뀌지 않으므로 `sources/docs/architecture.md`를
+  산출물이다. 패키지 경계와 의존 방향이 바뀌지 않으므로 `docs/architecture.md`를
   수정할 필요가 없다(원칙 3: 아키텍처 문서는 구조 결정이 바뀔 때만 갱신).
 - 테스트 전용 전송 수단 구현을 `CoreHTTPTests`가 소유하도록 해 프로덕션 target에 테스트
   코드가 들어가지 않는다(research.md §12).

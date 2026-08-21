@@ -78,7 +78,7 @@
 
 | 카테고리 | 경로 패턴 |
 |----------|-----------|
-| docs | `**/*.md`, `sources/docs/**`, `specs/**`, `**/*.png` (docs 전용), `**/*.svg`, `LICENSE` |
+| docs | `**/*.md`, `docs/**`, `specs/**`, `**/*.png` (docs 전용), `**/*.svg`, `LICENSE` |
 | scripts | `tools/**`, `**/*.sh`, `tools/githooks/**` |
 | swift | `sources/**/*.swift`, `sources/Tuist/ProjectDescriptionHelpers/**/*.swift` |
 | ui | `sources/Projects/UI/**`, UI 관련 Tuist helper |

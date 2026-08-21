@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-001~004 |
 **데이터 모델**: [data-model.md](../data-model.md) `ExternalRepository` |
-**도메인 문서**: [fetch-external-repository.md](../../../sources/docs/git-it-domain-usecases/fetch-external-repository.md)
 
 사용자가 입력한 GitHub Repository URL이 등록 가능한 Public Repository인지 확인한다.
 

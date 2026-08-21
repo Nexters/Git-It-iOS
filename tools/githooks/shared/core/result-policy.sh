@@ -30,6 +30,8 @@ result_policy_is_known_code() (
 		swift-format.no-targets | swift-format.formatter-failed | \
 		swift-format.restage-required | commit-convention.message-invalid | \
 		hook-management.install-failed | \
+		project-setup.missing-target | project-setup.path-conflict | \
+		project-setup.write-failed | \
 		pre-commit.step-failed | \
 		script-tests.no-tests | script-tests.failed | \
 		script-verification.static-failed | \

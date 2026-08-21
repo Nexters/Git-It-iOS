@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-032~036 |
 **데이터 모델**: [data-model.md](../data-model.md) `Question`, `Rubric`, `MyAnswer` |
-**도메인 문서**: [submit-essay-answer.md](../../../sources/docs/git-it-domain-usecases/submit-essay-answer.md)
 
 서술형 문제에 대한 답변을 제출하고 자가채점용 해설·기준을 받는다.
 

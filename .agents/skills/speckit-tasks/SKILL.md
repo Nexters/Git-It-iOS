@@ -75,7 +75,13 @@ This skill may modify only `specs/<feature>/tasks.md`. Every generated task that
 changes a file MUST include its exact repository-relative path; this is the write
 allowlist that `/speckit-implement` will use.
 
-`trouble-shooting.md`와 `tacit-knowledge.md`는 구현 작업으로 생성하지 않는다. 실제 문제나
+공용 문서 경로는 공개 경로 판독기의 `GIT_IT_DOCS_ROOT`로 확인하고 현재 `docs/**`
+상대경로만 작업에 사용한다. `sources/docs/**` 구 경로를 전파하지 않는다. 문서 변경은
+정확한 파일 경로 하나와 책임 패키지를 명시해야 하며 `docs/` 디렉터리나 glob을 구현
+allowlist로 만들 수 없다. 문서를 읽기만 하는 검증은 `[no-write]`로 표시한다.
+
+`docs/spec-kit/<feature>/trouble-shooting.md`와
+`docs/spec-kit/<feature>/tacit-knowledge.md`는 구현 작업으로 생성하지 않는다. 실제 문제나
 복수 세션 기반 암묵지 해석이 발생한 세션에서 각 전용 기록 스킬이 별도로 처리한다.
 
 1. **Setup**: Run `.specify/scripts/bash/setup-tasks.sh --json` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md` or `contracts/`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -170,8 +176,8 @@ The tasks.md should be immediately executable - each task must be specific enoug
 **CRITICAL**: 작업은 패키지를 최상위 실행 단위로 구성한다. 변경 시나리오는 각 패키지
 단계 안에서 추적하고 독립 검증 기준을 유지한다.
 
-**SESSION RECORDS ARE NOT TASKS**: `trouble-shooting.md`와 `tacit-knowledge.md`의 생성·추가를
-작업 ID, 패키지 작업 또는 전체 완료 검증으로 만들지 않는다.
+**SESSION RECORDS ARE NOT TASKS**: `trouble-shooting.md`와 `tacit-knowledge.md`의
+생성·추가를 작업 ID, 패키지 작업 또는 전체 완료 검증으로 만들지 않는다.
 
 **Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
 
@@ -198,7 +204,7 @@ Every task MUST strictly follow this format:
 
 **Examples**:
 
-- ✅ CORRECT: `- [ ] T001 Create Domain structure in sources/Projects/Domain/FeatureName/`
+- ✅ CORRECT: `- [ ] T001 Create Domain model in sources/Projects/Domain/FeatureName/FeatureName.swift`
 - ✅ CORRECT: `- [ ] T005 [P] Implement Domain model in sources/Projects/Domain/FeatureName/Model.swift`
 - ✅ CORRECT: `- [ ] T012 [P] [S1] Create User model in src/models/user.py`
 - ✅ CORRECT: `- [ ] T014 [S1] Implement UserService in src/services/user_service.py`

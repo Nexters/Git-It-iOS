@@ -4,7 +4,7 @@
 
 spec.md에 `[NEEDS CLARIFICATION]` 표식은 남아 있지 않다(checklists/requirements.md 검증
 결과: 전체 통과). 이 문서는 계획 단계에서 실제로 필요했던 설계 결정을 기록한다 — 요구사항
-자체의 모호성이 아니라, `sources/docs/architecture.md`·`package-rules/*.md`·
+자체의 모호성이 아니라, `docs/architecture.md`·`package-rules/*.md`·
 `Git-It-server-scheme.json`을 대조하며 확정해야 했던 구현 경계와 표현 방식이다.
 
 ## 결정 1: 패키지 경계는 `DomainLearningProject`/`DataLearningProject` 단일 쌍으로 한다

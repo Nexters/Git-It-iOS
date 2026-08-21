@@ -1,28 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 1.6.1 → 2.0.0
-- Modified principles: 4. 스킬별 수정 경로 — 사용자에게 관찰되는 동작 변경으로 한정하던
-  Spec 작성 대상을 내부 품질·구조·운영·개발 경험 변경까지 허용하도록 재정의
+- Version change: 2.2.0 → 2.3.1
+- Modified principles: 4. 스킬별 수정 경로 — Spec Kit 세션 기록의 중앙 문서 경로와 전용
+  쓰기 예외 추가; 5. Spec-Kit 범위 — 두 기록 스킬의 허용 경로를 docs/spec-kit으로 이전;
+  9. Spec Kit 세션 지식 기록 — 기능별 중앙 기록 위치 명시
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/spec-template.md,
-  .specify/templates/tasks-template.md; ✅ 검토 후 변경 불필요
-  .specify/templates/plan-template.md, checklist-template.md, constitution-template.md
-- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md,
-  .agents/skills/speckit-analyze/SKILL.md, .agents/skills/speckit-clarify/SKILL.md,
-  .agents/skills/speckit-converge/SKILL.md, .agents/skills/speckit-tasks/SKILL.md,
-  .agents/skills/speckit-taskstoissues/SKILL.md; ✅ 검토 후 변경 불필요 나머지 speckit 스킬
-- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ 변경 불필요 README.md, sources/docs/**
-- Evidence records: 없음
+- Templates requiring updates: ✅ .specify/templates/plan-template.md;
+  ✅ .specify/templates/tasks-template.md; ✅ 검토 후 변경 불필요 나머지 템플릿
+- Commands requiring updates: ✅ 관련 .agents/skills/speckit-*/SKILL.md 경로·권한 동기화
+- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ README.md; ✅ 기존 세션 기록 이전
+- Evidence records: ✅ docs/spec-kit/010-verify-learning-api/trouble-shooting.md
 - Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 2.0.0<br>
+**버전**: 2.3.1<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-17
+**최종 수정일**: 2026-08-21
 
 ## 원칙
 
@@ -30,7 +27,7 @@ Sync Impact Report
 
 - 모듈은 책임과 공개 API를 명확히 구분합니다.
 - 의존성은 Tuist에 명시하고 순환 의존을 허용하지 않습니다.
-- 모듈 설계와 의존 관계는 [아키텍처 문서](../../sources/docs/architecture.md)를 기준으로 합니다.
+- 모듈 설계와 의존 관계는 [아키텍처 문서](../../docs/architecture.md)를 기준으로 합니다.
 
 ### 2. 상태와 데이터 안전성
 
@@ -60,12 +57,20 @@ Sync Impact Report
   결정합니다. 허용 목록 밖의 파일은 읽을 수만 있으며 수정하려면 해당 책임을 가진
   스킬 또는 별도 사용자 지시가 필요합니다.
 - `/speckit-implement`는 활성 `tasks.md`에 정확히 명시된 파일과 `tasks.md`의 완료
-  표시만 수정할 수 있습니다. `sources/**`는 구현 대상의 기본 위치일 뿐, 유일한
-  허용 경로가 아닙니다. `trouble-shooting.md`와 `tacit-knowledge.md`는 작업 목록에
-  적혀 있어도 구현 스킬이 수정할 수 없으며 각 전용 기록 스킬만 소유합니다.
+  표시만 수정할 수 있습니다. `sources/**`와 `docs/**`는 디렉터리 단위 허용 경로가
+  아닙니다. `docs/**` 파일은 미완료 구현 작업이 정확한 저장소 상대경로로 파일 하나를
+  명시하고 그 작업이 책임 패키지에 배정된 경우에만 수정할 수 있습니다.
+- 프로젝트 공용 문서는 `GIT_IT_DOCS_ROOT`의 판독 결과인 `docs/**`를 사용하며,
+  `sources/docs/**`는 새 산출물이나 작업 경로로 전파하지 않습니다.
+- 공용 문서는 읽기 근거일 뿐 스킬의 쓰기 권한을 넓히지 않습니다. 예외로
+  `docs/spec-kit/<feature>/trouble-shooting.md`와 `tacit-knowledge.md`는 각 전용
+  기록 스킬만 생성하거나 끝에 추가할 수 있습니다.
 - 하나의 변경은 한 스킬의 허용 경로 안에서 완료합니다. 다른 스킬의 산출물 또는
   허용되지 않은 경로가 필요하면 중단하고 적절한 스킬을 실행하거나 사용자 승인을
   받습니다.
+- Spec Kit 훅이 명령을 자동 실행하려면 해당 명령을 제공하는 설치된 확장과 독립 스킬이
+  모두 존재해야 합니다. 훅 스킬은 호출한 스킬의 권한을 넓힐 수 없으며 자신의 허용 경로와
+  공개 실행 진입점을 명시해야 합니다.
 - 기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질, 구조, 운영성, 개발 경험,
   스타일과 의존성 변경에도 작성할 수 있습니다. 외부 동작이 없다는 이유만으로 명세 작성을
   금지하지 않습니다.
@@ -79,18 +84,19 @@ Sync Impact Report
 
 | 스킬 | 허용 수정 경로 |
 | --- | --- |
-| `speckit-specify` | `trouble-shooting.md`, `tacit-knowledge.md`를 제외한 `specs/<feature>/**`, `.specify/feature.json` |
+| `speckit-specify` | 기록 파일 이름을 제외한 `specs/<feature>/**`, `.specify/feature.json` |
 | `speckit-clarify` | `specs/<feature>/spec.md`, `specs/<feature>/checklists/requirements.md` |
 | `speckit-plan` | `specs/<feature>/plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/**` |
 | `speckit-tasks` | `specs/<feature>/tasks.md` |
 | `speckit-checklist` | `specs/<feature>/checklists/**` |
 | `speckit-analyze` | 없음(읽기 전용) |
 | `speckit-converge` | `specs/<feature>/tasks.md` 끝에 새 Convergence 단계 추가만 |
-| `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일, `specs/<feature>/tasks.md`의 완료 표시 |
+| `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일(`docs/**`도 파일 단위만), `specs/<feature>/tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈 생성만 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
-| `speckit-troubleshooting` | `specs/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
-| `speckit-tacit-knowledge` | `specs/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
+| `speckit-swift-format-run` | 활성 `tasks.md`에 정확히 적혀 있고 현재 작업 트리에서 변경된 Swift 파일만 포맷 |
+| `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
+| `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
   넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
 
@@ -123,6 +129,9 @@ Sync Impact Report
   파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
   파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
   마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
+- 모든 적용 대상 패키지가 완료된 뒤의 포맷 훅은 활성 `tasks.md`에 정확히 명시된 경로와
+  현재 작업 트리에서 변경된 Swift 파일의 교집합만 수정합니다. 저장소의
+  `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지 않습니다.
 - 패키지 순서가 개정되면 이미 완료된 작업과 기존 변경은 이력으로 보존하되 더 수정하지
   않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
   패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
@@ -150,13 +159,15 @@ Sync Impact Report
 ### 9. Spec Kit 세션 지식 기록
 
 - Spec Kit 세션에서 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면
-  `$speckit-troubleshooting`으로 활성 기능의 `trouble-shooting.md`에 증상, 영향, 근거,
-  원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. 발생하지 않은 위험이나 근거 없는
-  가능성은 기록하지 않습니다.
+  `$speckit-troubleshooting`으로 `docs/spec-kit/<feature>/trouble-shooting.md`에 증상,
+  영향, 근거, 원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. `<feature>`는 활성 기능
+  디렉터리의 이름과 같아야 하며, 발생하지 않은 위험이나 근거 없는 가능성은 기록하지
+  않습니다.
 - 여러 세션과 저장소 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
   의사결정 기준 또는 반복 패턴을 해석하면 `$speckit-tacit-knowledge`로 활성 기능의
-  `tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도, 적용·제외 범위, 반례와 검증
-  조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의 복사는 기록하지 않습니다.
+  `docs/spec-kit/<feature>/tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도,
+  적용·제외 범위, 반례와 검증 조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의
+  복사는 기록하지 않습니다.
 - 두 기록은 append-only입니다. 기존 항목을 수정·삭제하지 않으며 교정, 재발, 반증과 상태
   변화는 선행 ID를 참조하는 새 항목으로 남깁니다. 기록 조건을 충족하지 않으면 빈 파일이나
   placeholder를 만들지 않습니다.
@@ -189,8 +200,8 @@ Sync Impact Report
 - 네이밍만 변경하는 작업은 동작, 상태 수명, 책임, 의존 방향 또는 외부 계약을 함께 바꾸지
   않습니다. 함께 바꿔야 한다면 네이밍 변경과 설계·동작 변경을 분리하고 각 변경의 명세,
   계획, 작업과 검증 범위를 별도로 정의해야 합니다.
-- 세부 적용 사례, 패키지별 어휘와 예외는 `sources/docs/naming.md`에 기록합니다. 해당 문서가
-  작성되기 전에는 이 원칙을 직접 적용합니다. 네이밍 가이드는 Constitution보다 우선할 수
+- 세부 적용 사례, 패키지별 어휘와 예외는 `docs/conventions/naming.md`에 기록합니다. 해당 문서가
+  작성되기 전에는 이 원칙을 직접 적용합니다. 네이밍 컨벤션은 Constitution보다 우선할 수
   없으며 특정 기능의 이름을 다른 기능에 일괄 적용하는 근거로 사용할 수 없습니다.
 
 ## 적용

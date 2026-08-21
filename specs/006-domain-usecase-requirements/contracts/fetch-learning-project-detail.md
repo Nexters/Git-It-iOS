@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-016~019 |
 **데이터 모델**: [data-model.md](../data-model.md) `LearningProject`, `LearningSet` 요약 |
-**도메인 문서**: [fetch-learning-project-detail.md](../../../sources/docs/git-it-domain-usecases/fetch-learning-project-detail.md)
 
 특정 학습 프로젝트의 상세 정보를 조회한다.
 

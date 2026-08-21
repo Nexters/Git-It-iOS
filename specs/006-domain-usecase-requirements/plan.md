@@ -10,8 +10,8 @@
 
 ## 요약
 
-`sources/docs/git-it-domain-usecases/`의 10개 도메인 UseCase 문서와
-`Git-It-server-scheme.json`(Git-It 서버 OpenAPI 스키마)을 대조해 확정한 요구사항
+spec.md가 정의한 10개 도메인 UseCase와 `Git-It-server-scheme.json`(Git-It 서버 OpenAPI
+스키마)을 대조해 확정한 요구사항
 (FR-001~042, `/speckit-clarify` 3회 세션으로 7건 명확화)을, 후속 UseCase별 구현
 스펙이 API를 재조사하지 않고 바로 쓸 수 있는 참고 자료로 formalize한다. **이 계획은
 어떤 소스 패키지도 변경하지 않는다** — spec.md `범위 밖`에 명시된 대로 실제 Swift
@@ -25,8 +25,8 @@
 **언어/버전**: N/A — 이 계획은 코드를 작성하지 않는다. 계약 문서는 기존 프로젝트와
 동일한 Swift 5 모드·iOS 26.0+ 컨텍스트(후속 구현 기준)를 전제로만 서술한다.
 
-**주요 의존성**: 없음(코드 의존성 없음). 참고 자료는 `Git-It-server-scheme.json`
-(OpenAPI 3.x)과 `sources/docs/git-it-domain-usecases/`.
+**주요 의존성**: 없음(코드 의존성 없음). 참고 자료는 spec.md와
+`Git-It-server-scheme.json`(OpenAPI 3.x)이다.
 
 **저장소**: N/A — 영속 데이터 변경 없음.
 
@@ -107,8 +107,7 @@ specs/006-domain-usecase-requirements/
 │   ├── set-question-bookmark.md
 │   └── fetch-bookmarked-questions.md
 ├── checklists/requirements.md
-├── trouble-shooting.md  # /speckit-troubleshooting 기록 2건
-└── tacit-knowledge.md   # /speckit-tacit-knowledge 기록 2건
+└── tasks.md
 ```
 
 ### 소스 코드(저장소 루트)
@@ -129,7 +128,7 @@ sources/Projects/
 
 **구조 결정**: 이 계획은 위 트리를 만들지 않는다 — Tuist 기반 iOS 멀티 패키지 구조
 (`sources/Projects/{Domain,Data,Infrastructure,Composition,UI,Feature,App}`)는
-`sources/docs/architecture.md`에 이미 정의돼 있으며, 후속 UseCase별 스펙이 각자
+`docs/architecture.md`에 이미 정의돼 있으며, 후속 UseCase별 스펙이 각자
 필요한 범위만 골라 구현한다.
 
 ## 복잡성 추적

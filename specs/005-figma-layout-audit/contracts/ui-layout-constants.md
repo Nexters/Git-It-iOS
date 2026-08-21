@@ -20,7 +20,7 @@
 | [ ] | `corner.medium` | 10pt | B | 같은 경로 |
 | [ ] | `corner.large` | 12pt | B | 같은 경로 |
 | [ ] | `corner.extraLarge` | 16pt | B | 같은 경로 |
-| [ ] | `touch.minimum` | 44pt × 44pt 이상 | 프로젝트 접근성 규칙 | `sources/docs/view-conventions.md` |
+| [ ] | `touch.minimum` | 44pt × 44pt 이상 | 프로젝트 접근성 규칙 | `docs/conventions/view.md` |
 
 ## 컨트롤
 

@@ -1,6 +1,6 @@
 ---
 name: speckit-troubleshooting
-description: Spec Kit 작업 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생했을 때 원인, 조치와 검증 근거를 활성 기능의 trouble-shooting.md에 append-only로 기록한다. 가설적 위험만 논의하거나 문제가 발생하지 않은 경우에는 사용하지 않는다.
+description: Spec Kit 작업 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생했을 때 원인, 조치와 검증 근거를 docs/spec-kit 아래 기능별 trouble-shooting.md에 append-only로 기록한다. 가설적 위험만 논의하거나 문제가 발생하지 않은 경우에는 사용하지 않는다.
 ---
 
 # Spec Kit 문제 해결 기록
@@ -27,9 +27,10 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 
 ## 허용 수정 경로
 
-이 스킬은 활성 기능의 `specs/<feature>/trouble-shooting.md`만 생성하거나 파일 끝에 새
-항목을 추가할 수 있다. 현재 활성 기능이 `001-apple-social-login`이면 대상은 정확히
-`specs/001-apple-social-login/trouble-shooting.md`다.
+이 스킬은 `GIT_IT_DOCS_ROOT` 아래 활성 기능의
+`spec-kit/<feature>/trouble-shooting.md`만 생성하거나 파일 끝에 새 항목을 추가할 수 있다.
+현재 활성 기능이 `001-apple-social-login`이고 문서 루트가 `docs`이면 대상은 정확히
+`docs/spec-kit/001-apple-social-login/trouble-shooting.md`다.
 
 - 기존 제목, 항목, 표, 순서와 문장을 수정하거나 삭제하지 않는다.
 - 기존 내용의 교정이 필요하면 원래 항목을 참조하는 새 후속 항목을 추가한다.
@@ -51,11 +52,13 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 
 ## 실행 절차
 
-1. 저장소 루트에서 `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`를 한
-   번 실행해 `REPO_ROOT`와 `FEATURE_DIR`을 구한다. 사용자가 `specs/<feature>` 또는 정확한
-   대상 파일을 명시했다면 저장소의 `specs/` 아래에 있고 파일명이
-   `trouble-shooting.md`인지 검증한 뒤 사용한다. 기능 디렉터리가 없으면 새 기능을 만들지
-   말고 중단한다.
+1. `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`로 `REPO_ROOT`와
+   `FEATURE_DIR`을 구하고, 활성 `specs/<feature>` 디렉터리인지 확인한다.
+   `tools/repository-paths/bin/repository-paths.sh GIT_IT_DOCS_ROOT`의 판독 결과가
+   저장소 안의 실제 디렉터리인지 검증한 뒤
+   `<docs-root>/spec-kit/<feature>/trouble-shooting.md`를 대상으로 삼는다.
+   사용자가 기능이나 파일을 지정했다면 이 결과와 일치해야 하며, 기능 디렉터리가
+   없으면 중단한다.
 2. 대상 파일과 문제와 직접 관련된 현재 산출물, Git diff·이력, 명령 출력 또는 테스트
    결과를 읽는다. 관찰한 사실, 해석, 아직 확인하지 못한 내용을 분리한다.
 3. 문제 상태를 `미해결`, `완화`, `해결`, `환경 제약` 중 하나로 정한다. `해결`은 원인을
@@ -129,7 +132,7 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 ## 완료 조건
 
 - [ ] 실제로 관찰된 문제인지 확인했다.
-- [ ] 대상이 활성 기능의 정확한 `trouble-shooting.md`인지 확인했다.
+- [ ] 대상이 활성 기능의 정확한 `docs/spec-kit/<feature>/trouble-shooting.md`인지 확인했다.
 - [ ] 기존 기록을 보존하고 새 항목만 추가했다.
 - [ ] 증거, 원인, 조치, 검증과 상태가 서로 모순되지 않는다.
 - [ ] 민감 값과 확인되지 않은 성공 주장을 남기지 않았다.

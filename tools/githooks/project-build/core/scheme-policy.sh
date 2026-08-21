@@ -6,6 +6,7 @@ scheme_policy_decide() (
 	scheme_policy_path=$3
 	scheme_policy_scope=$4
 	scheme_policy_has_tests=$5
+	scheme_policy_name=$(basename -- "$scheme_policy_path" .xcscheme)
 
 	case "$scheme_policy_path/" in
 	"$scheme_policy_projects_root/"*/xcshareddata/xcschemes/*.xcscheme/ | \
@@ -16,18 +17,26 @@ scheme_policy_decide() (
 		;;
 	esac
 
-	case "$scheme_policy_scope:$scheme_policy_has_tests" in
-	all:true | all:false | testable:true) printf 'eligible\n' ;;
-	testable:false) printf 'ineligible\n' ;;
+	case "$scheme_policy_scope:$scheme_policy_has_tests:$scheme_policy_name" in
+	all:true:* | all:false:*) printf 'eligible\n' ;;
+	app:*:App) printf 'eligible\n' ;;
+	app:*:*) printf 'ineligible\n' ;;
+	testable:true:*) printf 'eligible\n' ;;
+	testable:false:*) printf 'ineligible\n' ;;
+	unit:true:UIUITests) printf 'ineligible\n' ;;
+	unit:true:*) printf 'eligible\n' ;;
+	unit:false:*) printf 'ineligible\n' ;;
+	ui:true:UIUITests) printf 'eligible\n' ;;
+	ui:*:*) printf 'ineligible\n' ;;
 	*) return 2 ;;
 	esac
 )
 
 scheme_policy_xcode_action() (
 	case "$1" in
-	build) printf 'build\n' ;;
-	compile) printf 'build-for-testing\n' ;;
-	test) printf 'test-without-building\n' ;;
+	build | build-app) printf 'build\n' ;;
+	compile | compile-unit | compile-ui) printf 'build-for-testing\n' ;;
+	test | test-unit | test-ui) printf 'test-without-building\n' ;;
 	*) return 2 ;;
 	esac
 )

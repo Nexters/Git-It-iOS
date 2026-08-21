@@ -27,14 +27,14 @@
 **결정**: `Core` 패키지에 신규 target `CoreHTTP`와 검증 target `CoreHTTPTests`를 만든다.
 기존 `CoreAuthentication`에는 넣지 않는다.
 
-**근거**: [Core 패키지 규칙](../../sources/docs/package-rules/core.md)은 "모든 내부 target은
+**근거**: [Infrastructure 패키지 규칙](../../docs/package-rules/infrastructure.md)은 "모든 내부 target은
 하나의 범용 기술 기능을 프로젝트 내부 API로 제공해야 한다"고 정한다. HTTP 요청-응답 통신은
 인증과 다른 기술 기능이다. 기존 `CoreAuthentication`/`CoreAuthenticationTests` 쌍이 이미
 `Core<기술 기능>` + `<동명>Tests` 구조를 쓰므로 같은 구조를 따른다.
 
 **이름 선택**: `CoreNetwork`·`CoreNetworking` 대신 `CoreHTTP`를 쓴다. 명세의 범위 제외
 항목이 지속 연결, 스트리밍, 업로드·다운로드 진행률, 캐시를 명시적으로 배제하므로 이 target이
-실제로 소유하는 책임은 HTTP 요청-응답 하나다. [네이밍 가이드](../../sources/docs/naming.md)
+실제로 소유하는 책임은 HTTP 요청-응답 하나다. [네이밍 컨벤션](../../docs/conventions/naming.md)
 §2.1은 선언이 맡지 않는 미래 책임을 이름에 넣지 않도록 요구하고, §6은 `HTTP`를 의미 그대로
 쓸 때 유지할 수 있는 고정 약어로 인정한다.
 

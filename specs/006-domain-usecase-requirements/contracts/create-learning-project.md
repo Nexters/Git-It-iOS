@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-005~010 |
 **데이터 모델**: [data-model.md](../data-model.md) `LearningProject`, `QuizGenerationStatus`, `QuizLevel` |
-**도메인 문서**: [create-learning-project.md](../../../sources/docs/git-it-domain-usecases/create-learning-project.md)
 
 확인된 외부 Repository를 학습 프로젝트로 등록한다.
 

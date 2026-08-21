@@ -2,7 +2,6 @@
 
 **날짜**: 2026-08-19 | **명세**: [spec.md](../spec.md) FR-040~042 |
 **데이터 모델**: [data-model.md](../data-model.md) `BookmarkedQuestion` |
-**도메인 문서**: [fetch-bookmarked-questions.md](../../../sources/docs/git-it-domain-usecases/fetch-bookmarked-questions.md)
 
 사용자가 북마크한 문제 목록을 조회한다.
 
