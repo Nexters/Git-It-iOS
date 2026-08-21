@@ -186,44 +186,44 @@ raw value 보존 테스트가 통과함을 확인한다.
 
 ### 준비
 
-- [ ] T022 [S1] `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`를
+- [X] T022 [S1] `sources/Projects/Data/LearningProject/DataLearningProjectPlaceholder.swift`를
   삭제한다(구현으로 대체되어 더 이상 필요하지 않음).
 
 ### 테스트
 
-- [ ] T023 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/APIResponseDTOTests.swift`에
+- [X] T023 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/APIResponseDTOTests.swift`에
   `APIResponseDTO<Payload>`의 `data` key 부재·`null` Unit 응답 decode 성공, `FieldErrorDTO`
   decode 테스트를 작성한다(FR-005).
-- [ ] T024 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Errors/ServerAPIErrorTests.swift`에
+- [X] T024 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Errors/ServerAPIErrorTests.swift`에
   `ServerAPIError` decode 테스트를 작성한다.
-- [ ] T025 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Endpoints/LearningProjectEndpointTests.swift`에
+- [X] T025 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Endpoints/LearningProjectEndpointTests.swift`에
   PROJECT-01~11 각 operation의 method/path/query/body 조립과 Bearer 인증 헤더 적용
   테스트를 작성한다(FR-003, FR-004).
-- [ ] T026 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectRemoteContractTests.swift`에
+- [X] T026 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectRemoteContractTests.swift`에
   PROJECT-01(프로젝트 등록)·PROJECT-02(프로젝트 목록)·PROJECT-03(프로젝트 상세)·
   PROJECT-04(프로젝트 삭제) contract test를 작성한다(spec.md 14절 항목 3~5).
-- [ ] T027 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectGenerationContractTests.swift`에
+- [X] T027 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectGenerationContractTests.swift`에
   PROJECT-05(생성 상태 조회, 알려지지 않은 raw value 포함)·PROJECT-06(생성 재시도, 409
   `QUIZ-007`) contract test를 작성한다(spec.md 14절 항목 6~7, FR-011).
-- [ ] T028 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectLearningSetContractTests.swift`에
+- [X] T028 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectLearningSetContractTests.swift`에
   PROJECT-07(학습 세트) contract test를 작성하며, 객관식/서술형 질문과 `myAnswer` nil
   fixture를 모두 포함한다(spec.md 14절 항목 8~10).
-- [ ] T029 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectAnswerContractTests.swift`에
+- [X] T029 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectAnswerContractTests.swift`에
   PROJECT-08(객관식 답변)·PROJECT-09(서술형 답변, 응답에 `correct` 없음 검증) contract
   test를 작성한다(spec.md 14절 항목 11~12, FR-010).
-- [ ] T030 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectBookmarkContractTests.swift`에
+- [X] T030 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Contracts/LearningProjectBookmarkContractTests.swift`에
   PROJECT-10(북마크 설정, toggle이 아닌 최종 상태 전달)·PROJECT-11(북마크 목록,
   `projectId`/`setId`/`questionId` 보존) contract test를 작성한다(spec.md 14절 항목
   13~14, FR-008).
-- [ ] T031 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/ProjectListItemDTOTests.swift`에
+- [X] T031 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/ProjectListItemDTOTests.swift`에
   `repositoryImageUrl`/`nextSetId`/`nextQuestionId` nil fixture decoding 테스트를
   작성한다(FR-007, SC-004).
-- [ ] T032 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/ArrayOrderPreservationTests.swift`에
+- [X] T032 [P] [S1] `sources/Projects/Data/Tests/LearningProject/DTOs/ArrayOrderPreservationTests.swift`에
   `ProjectDetailResponseDTO.sets`, `LearningSetResponseDTO.questions`,
   `QuestionResponseDTO.choices`가 서버 응답 배열 순서를 그대로 보존함을 검증하는 fixture
   테스트를 작성한다(FR-009 — 서버가 반환한 순서와 다르게 정렬된 fixture를 입력해 정렬되지
   않았음을 확인).
-- [ ] T033 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Errors/DataLearningProjectErrorTests.swift`에
+- [X] T033 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Errors/DataLearningProjectErrorTests.swift`에
   `DataLearningProjectError.init(from:)` 매핑 함수의 대표 오류 매핑(404 `PROJECT-001`→
   `projectUnavailable`, 404 `QUIZ-005`→`questionUnavailable`, 404 `QUIZ-006`→
   `learningSetUnavailable`, 409 `QUIZ-007`→`generationRetryUnavailable`) fixture 테스트를
@@ -231,45 +231,45 @@ raw value 보존 테스트가 통과함을 확인한다.
 
 ### 구현
 
-- [ ] T034 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/APIResponseDTO.swift`에
+- [X] T034 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/APIResponseDTO.swift`에
   `APIResponseDTO<Payload>`와 `FieldErrorDTO`를 구현한다(FR-005, research.md 결정 4 —
   Authentication과 동일한 형태를 이 target에 독립적으로 선언).
-- [ ] T035 [P] [S2] `sources/Projects/Data/LearningProject/Errors/ServerAPIError.swift`에
+- [X] T035 [P] [S2] `sources/Projects/Data/LearningProject/Errors/ServerAPIError.swift`에
   `ServerAPIError`를 구현한다.
-- [ ] T036 [S1] `sources/Projects/Data/LearningProject/Endpoints/LearningProjectEndpoint.swift`에
+- [X] T036 [S1] `sources/Projects/Data/LearningProject/Endpoints/LearningProjectEndpoint.swift`에
   PROJECT-01~11의 method/path/query/body 조립과 Bearer 인증 헤더 적용 규칙을 구현한다
   (FR-003, FR-004).
-- [ ] T037 [S1] `sources/Projects/Data/LearningProject/Contracts/LearningProjectRemote.swift`에
+- [X] T037 [S1] `sources/Projects/Data/LearningProject/Contracts/LearningProjectRemote.swift`에
   11개 메서드(`registerProject`, `fetchProjects`, `fetchProjectDetail`, `deleteProject`,
   `fetchGenerationStatus`, `retryQuizGeneration`, `fetchLearningSet`,
   `submitChoiceAnswer`, `submitEssayAnswer`, `setBookmark`, `fetchBookmarks`)를
   선언한다(contracts/learning-project-remote.md 근거).
-- [ ] T038 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/RegisterProjectDTOs.swift`에
+- [X] T038 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/RegisterProjectDTOs.swift`에
   `RegisterProjectRequestDTO`, `QuizLevelDTO`, `RegisterProjectResponseDTO`를 구현한다
   (PROJECT-01).
-- [ ] T039 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/ProjectListDTOs.swift`에
+- [X] T039 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/ProjectListDTOs.swift`에
   `ProjectListResponseDTO`, `ProjectListItemDTO`를 구현하며 `repositoryImageUrl`/
   `nextSetId`/`nextQuestionId`를 optional로 선언한다(PROJECT-02, FR-007).
-- [ ] T040 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/ProjectDetailDTOs.swift`에
+- [X] T040 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/ProjectDetailDTOs.swift`에
   `ProjectDetailResponseDTO`, `ProjectSetSummaryDTO`를 구현하며 `sets` 배열을 서버 응답
   순서 그대로 저장한다(PROJECT-03, FR-009).
-- [ ] T041 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/QuizGenerationStatusResponseDTO.swift`에
+- [X] T041 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/QuizGenerationStatusResponseDTO.swift`에
   `status: String` raw value를 그대로 보존하는 응답 DTO를 구현한다(PROJECT-05, FR-011).
-- [ ] T042 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/LearningSetDTOs.swift`에
+- [X] T042 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/LearningSetDTOs.swift`에
   `LearningSetResponseDTO`, `QuestionResponseDTO`, `SourceResponseDTO`,
   `MyAnswerResponseDTO`(ISO-8601 `answeredAt: Date`)를 구현하며 `questions`/`choices`
   배열을 서버 응답 순서 그대로 저장한다(PROJECT-07, research.md 결정 5, FR-009).
-- [ ] T043 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/AnswerDTOs.swift`에
+- [X] T043 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/AnswerDTOs.swift`에
   `SubmitChoiceAnswerRequestDTO`, `SubmitChoiceAnswerResponseDTO`,
   `SubmitEssayAnswerRequestDTO`, `SubmitEssayAnswerResponseDTO`, `RubricResponseDTO`를
   구현하며 `SubmitEssayAnswerResponseDTO`에 `correct` 필드를 추가하지 않는다(PROJECT-08,
   PROJECT-09, FR-010).
-- [ ] T044 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/BookmarkDTOs.swift`에
+- [X] T044 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/BookmarkDTOs.swift`에
   `BookmarkQuestionRequestDTO`(최종 `bookmarked` 상태), `BookmarkQuestionResponseDTO`,
   `BookmarkedQuestionListResponseDTO`, `AvailableProjectResponseDTO`,
   `BookmarkedQuestionResponseDTO`(`projectId`/`setId`/`questionId` 보존)를 구현한다
   (PROJECT-10, PROJECT-11, FR-008).
-- [ ] T045 [S2] `sources/Projects/Data/LearningProject/Errors/DataLearningProjectError.swift`에
+- [X] T045 [S2] `sources/Projects/Data/LearningProject/Errors/DataLearningProjectError.swift`에
   공통 6개 케이스(`invalidRequest`, `unauthorized`, `temporarilyUnavailable`, `transport`,
   `decoding`, `unexpectedStatus`) + 도메인 4개 케이스(`projectUnavailable`,
   `questionUnavailable`, `learningSetUnavailable`, `generationRetryUnavailable`)와
@@ -278,10 +278,10 @@ raw value 보존 테스트가 통과함을 확인한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T046 [no-write] `"$project_build_runner" compile`과
+- [X] T046 [no-write] `"$project_build_runner" compile`과
   `"$project_build_runner" test`를 `DataLearningProjectTests` 대상으로 실행해
   T023~T045를 검증한다.
-- [ ] T047 [no-write] 저장소 전체에서
+- [X] T047 [no-write] 저장소 전체에서
   `grep -rn "googleLogin(\|GoogleLoginRequestDTO\|GoogleLoginEndpoint\|refreshSession\|revokeRefreshToken" sources/Projects/Data/LearningProject sources/Projects/Data/Tests/LearningProject`
   결과가 0건임을 확인한다.
 
@@ -308,70 +308,70 @@ target에 포함됨을 확인한다(SC-007).
 
 ### 준비 — target 선언
 
-- [ ] T048 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에
+- [X] T048 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에
   `DataMember`, `DataMemberTests` case와 `sourceDirectory`/`target` 분기를 추가한다
   (`DataAuthentication`/`DataLearningProject` 기존 선언은 변경하지 않는다).
-- [ ] T049 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.Data` scheme
+- [X] T049 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.Data` scheme
   `buildTargets`에 `DataModuleName.DataMember.rawValue`,
   `testTargets`에 `DataModuleName.DataMemberTests.rawValue`를 추가한다(기존
   Authentication/LearningProject 항목은 유지).
 
 ### 테스트
 
-- [ ] T050 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/APIResponseDTOTests.swift`에
+- [X] T050 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/APIResponseDTOTests.swift`에
   `APIResponseDTO<Payload>`의 `data` key 부재·`null` Unit 응답 decode 성공, `FieldErrorDTO`
   decode 테스트를 작성한다(FR-005).
-- [ ] T051 [P] [S2] `sources/Projects/Data/Tests/Member/Errors/ServerAPIErrorTests.swift`에
+- [X] T051 [P] [S2] `sources/Projects/Data/Tests/Member/Errors/ServerAPIErrorTests.swift`에
   `ServerAPIError` decode 테스트를 작성한다.
-- [ ] T052 [P] [S1] `sources/Projects/Data/Tests/Member/Endpoints/MemberEndpointTests.swift`에
+- [X] T052 [P] [S1] `sources/Projects/Data/Tests/Member/Endpoints/MemberEndpointTests.swift`에
   MEMBER-01~06 각 operation의 method/path/query/body 조립과 Bearer 인증 헤더 적용 테스트를
   작성한다(FR-003, FR-004).
-- [ ] T053 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberRemoteContractTests.swift`에
+- [X] T053 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberRemoteContractTests.swift`에
   MEMBER-01(프로필)·MEMBER-06(회원 탈퇴) contract test를 작성한다(spec.md 14절 항목
   15, 20).
-- [ ] T054 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberDeviceContractTests.swift`에
+- [X] T054 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberDeviceContractTests.swift`에
   MEMBER-02(기기 정보 등록, `deviceType == "ios"` 고정) contract test를 작성한다
   (spec.md 14절 항목 16).
-- [ ] T055 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberPreferenceContractTests.swift`에
+- [X] T055 [P] [S1] `sources/Projects/Data/Tests/Member/Contracts/MemberPreferenceContractTests.swift`에
   MEMBER-03(큐레이션)·MEMBER-04(분야 변경)·MEMBER-05(수준 변경) contract test를
   작성한다(spec.md 14절 항목 17~19).
-- [ ] T056 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/MemberProfileResponseDTOTests.swift`에
+- [X] T056 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/MemberProfileResponseDTOTests.swift`에
   `weeklyChart` 배열 순서 보존 fixture 테스트를 작성한다(FR-009).
-- [ ] T057 [P] [S2] `sources/Projects/Data/Tests/Member/Errors/DataMemberErrorTests.swift`에
+- [X] T057 [P] [S2] `sources/Projects/Data/Tests/Member/Errors/DataMemberErrorTests.swift`에
   `DataMemberError.init(from:)` 매핑 함수의 대표 오류 매핑(404 `MEMBER-001`→
   `memberUnavailable`) fixture 테스트를 작성한다.
 
 ### 구현
 
-- [ ] T058 [P] [S1] `sources/Projects/Data/Member/DTOs/APIResponseDTO.swift`에
+- [X] T058 [P] [S1] `sources/Projects/Data/Member/DTOs/APIResponseDTO.swift`에
   `APIResponseDTO<Payload>`와 `FieldErrorDTO`를 구현한다(FR-005).
-- [ ] T059 [P] [S2] `sources/Projects/Data/Member/Errors/ServerAPIError.swift`에
+- [X] T059 [P] [S2] `sources/Projects/Data/Member/Errors/ServerAPIError.swift`에
   `ServerAPIError`를 구현한다.
-- [ ] T060 [S1] `sources/Projects/Data/Member/Endpoints/MemberEndpoint.swift`에
+- [X] T060 [S1] `sources/Projects/Data/Member/Endpoints/MemberEndpoint.swift`에
   MEMBER-01~06의 method/path/query/body 조립과 Bearer 인증 헤더 적용 규칙을 구현한다
   (FR-003, FR-004).
-- [ ] T061 [S1] `sources/Projects/Data/Member/Contracts/MemberRemote.swift`에 6개
+- [X] T061 [S1] `sources/Projects/Data/Member/Contracts/MemberRemote.swift`에 6개
   메서드(`fetchProfile`, `registerDeviceInfo`, `curateMember`, `updatePosition`,
   `updateCareerLevel`, `withdrawMember`)를 선언한다(contracts/member-remote.md 근거).
-- [ ] T062 [P] [S1] `sources/Projects/Data/Member/DTOs/MemberProfileResponseDTO.swift`에
+- [X] T062 [P] [S1] `sources/Projects/Data/Member/DTOs/MemberProfileResponseDTO.swift`에
   `name`/`email`/`position`/`careerLevel`/`thisWeekSolvedCount`/`thisMonthSolvedCount`/
   `streakDays`/`weeklyChart: [WeeklyChartItemDTO]`를 구현하며 `weeklyChart`를 서버 응답
   순서 그대로 저장한다(MEMBER-01, FR-009).
-- [ ] T063 [P] [S1] `sources/Projects/Data/Member/DTOs/DeviceInfoRequestDTO.swift`에
+- [X] T063 [P] [S1] `sources/Projects/Data/Member/DTOs/DeviceInfoRequestDTO.swift`에
   `deviceId`/`deviceType`/`appVersion`/`osVersion`/`deviceToken: String?`를 구현한다
   (MEMBER-02).
-- [ ] T064 [P] [S1] `sources/Projects/Data/Member/DTOs/PreferenceDTOs.swift`에
+- [X] T064 [P] [S1] `sources/Projects/Data/Member/DTOs/PreferenceDTOs.swift`에
   `PositionDTO`, `CareerLevelDTO`, `CurationRequestDTO`, `PositionRequestDTO`,
   `CareerLevelRequestDTO`를 구현한다(MEMBER-03~05).
-- [ ] T065 [S2] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에 공통 6개
+- [X] T065 [S2] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에 공통 6개
   케이스 + `memberUnavailable`과 `init(from serverError: ServerAPIError)` 매핑 함수를
   구현한다(data-model.md `DataMember target` 근거).
 
 ### 정리와 패키지 검증
 
-- [ ] T066 [no-write] `"$project_build_runner" build`로 `DataMember` target이 Data
+- [X] T066 [no-write] `"$project_build_runner" build`로 `DataMember` target이 Data
   scheme build에 포함됨을 확인한다.
-- [ ] T067 [no-write] `"$project_build_runner" compile`과
+- [X] T067 [no-write] `"$project_build_runner" compile`과
   `"$project_build_runner" test`를 `DataMemberTests` 대상으로 실행해 T050~T065를
   검증한다.
 
@@ -384,19 +384,19 @@ target에 포함됨을 확인한다(SC-007).
 
 **선행 조건**: 작업 패키지 3(Member)의 구현·검증·결과 보고가 완료되어야 한다.
 
-- [ ] T068 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`,
+- [X] T068 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`,
   `"$project_build_runner" test`를 전체 Data scheme 대상으로 순차 실행하고 결과를
   기록한다(SC-003, SC-007).
-- [ ] T069 [no-write] `AuthenticationRemote`(2) + `LearningProjectRemote`(11) +
+- [X] T069 [no-write] `AuthenticationRemote`(2) + `LearningProjectRemote`(11) +
   `MemberRemote`(6) = 19개 operation을 열거해 Auth 2/Project 11/Member 6 합계가 19임을
   확인한다(SC-001, quickstart.md 3절).
-- [ ] T070 [no-write] 저장소 전체에서
+- [X] T070 [no-write] 저장소 전체에서
   `grep -rn "GoogleLoginRequestDTO\|googleLogin(\|GoogleLoginEndpoint" sources/Projects/Data`와
   `grep -rn "refreshSession\|revokeRefreshToken\|RefreshRequestDTO\|RefreshResponseDTO" sources/Projects/Data`
   결과가 각각 0건임을 확인한다(SC-002, SC-008).
-- [ ] T071 [no-write] `grep -rln "Mock\|Fixture" sources/Projects/Data/Authentication sources/Projects/Data/LearningProject sources/Projects/Data/Member`가
+- [X] T071 [no-write] `grep -rln "Mock\|Fixture" sources/Projects/Data/Authentication sources/Projects/Data/LearningProject sources/Projects/Data/Member`가
   `Tests/` 경로를 제외하고 결과 없음을 확인한다(FR-016).
-- [ ] T072 [no-write] spec.md 변경 시나리오 1~3의 수용 시나리오를 quickstart.md 절차에
+- [X] T072 [no-write] spec.md 변경 시나리오 1~3의 수용 시나리오를 quickstart.md 절차에
   따라 재확인하고 결과를 보고한다.
 
 ## 의존성과 실행 순서
