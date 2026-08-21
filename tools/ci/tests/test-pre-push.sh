@@ -12,7 +12,7 @@ mkdir -p "$repository/tools/ci/bin" "$repository/tools/repository-paths/bin" "$r
 	"$repository/$ios_relative"
 cp "$root/tools/ci/bin/pre-push.sh" "$repository/tools/ci/bin/pre-push.sh"
 
-# fixture 공개 명령은 호출 순서와 인자를 기록하고 UI test만 실패시켜 계속 실행을 검증합니다.
+# fixture 공개 명령은 호출 순서와 인자를 기록하고 포맷 교정 실패 뒤에도 검증을 계속합니다.
 printf '%s\n' '#!/bin/sh' \
 	'set -eu' \
 	'printf "scripts_changed=false\nswift_changed=true\nui_changed=true\nproject_config_changed=false\ntests_changed=true\n"' \
@@ -38,7 +38,6 @@ for runner in format build script-tests script-quality tuist; do
 		'printf "%s:%s\n" "$(basename -- "$0")" "$*" >>"$CALL_LOG"' \
 		'if [ -n "${GIT_IT_XCRESULTS_PATH:-}" ]; then printf "xcresults:%s\n" "$GIT_IT_XCRESULTS_PATH" >>"$CALL_LOG"; fi' \
 		'if [ "$(basename -- "$0")" = format ]; then printf "\n" >>"$2"; fi' \
-		'if [ "$(basename -- "$0")" = build ] && [ "$1" = test-ui ]; then exit 1; fi' \
 		>"$repository/tools/runners/$runner"
 done
 chmod +x "$repository/tools/ci/bin/pre-push.sh" "$repository/tools/ci/bin/classify-changes.sh" \
@@ -61,18 +60,25 @@ FIXTURE_ROOT="$repository"
 FIXTURE_IOS_RELATIVE="$ios_relative"
 export CALL_LOG FIXTURE_ROOT FIXTURE_IOS_RELATIVE
 if (cd "$repository" && PATH="$repository/tools/runners:$PATH" ./tools/ci/bin/pre-push.sh >"$work/out" 2>"$work/err"); then
-	printf 'FAIL: UI test 실패를 pre-push 성공으로 반환\n' >&2
+	printf 'FAIL: 포맷 교정 필요 상태를 pre-push 성공으로 반환\n' >&2
 	exit 1
 fi
 rg -Fqx "format:format $ios_relative/Changed.swift" "$CALL_LOG"
 rg -q '^lint:origin/develop:' "$CALL_LOG"
-for action in build-app compile-unit test-unit compile-ui test-ui; do
+for action in build-app compile-unit test-unit compile-ui; do
 	rg -qx "build:$action" "$CALL_LOG"
 done
+if rg -qx 'build:test-ui' "$CALL_LOG"; then
+	printf 'FAIL: pre-push가 UI 테스트를 실행합니다\n' >&2
+	exit 1
+fi
 rg -Fqx "xcresults:$repository/$ios_relative/DerivedData/PrePushTestResults" "$CALL_LOG"
 rg -qx 'tuist:install' "$CALL_LOG"
 rg -qx 'tuist:generate --no-open' "$CALL_LOG"
-rg -Fq '| ui-tests | failure:1 |' "$work/out"
+if rg -Fq '| ui-tests |' "$work/out"; then
+	printf 'FAIL: pre-push 리포트에 제거된 UI 테스트 단계가 남아 있습니다\n' >&2
+	exit 1
+fi
 rg -Fq '| swift-format | failure:3 |' "$work/out"
 rg -q 'format-corrected' "$work/err"
 rg -q 'ci.pre-push.failed' "$work/err"

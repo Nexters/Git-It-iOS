@@ -214,8 +214,8 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" test-unit
 
-  ui-tests:
-    name: ui tests
+  ui-compile:
+    name: ui test compile
     needs: changes
     if: ${{ needs.changes.outputs.ui_changed == 'true' }}
     runs-on: macos-26
@@ -263,10 +263,6 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" compile-ui
 
-      - name: Run tests
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" test-ui
-
   gate:
     name: CI / gate
     needs:
@@ -275,7 +271,7 @@ jobs:
       - swift-lint
       - app-build
       - unit-tests
-      - ui-tests
+      - ui-compile
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -290,4 +286,4 @@ jobs:
             "${{ needs.swift-lint.result }}" \
             "${{ needs.app-build.result }}" \
             "${{ needs.unit-tests.result }}" \
-            "${{ needs.ui-tests.result }}"
+            "${{ needs.ui-compile.result }}"

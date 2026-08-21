@@ -26,8 +26,8 @@ Git It의 iOS 애플리케이션 저장소입니다.
 `origin/develop`부터 `HEAD`까지의 변경을 CI와 같은 조건으로 분류하고, Swift 변경은 먼저
 포맷을 교정합니다. 한 단계가 실패해도 선택된 검증을 모두 수행한 뒤 리포트를 출력하며,
 포맷으로 파일이 바뀐 경우에는 검토·stage·commit을 요구하고 push를 중단합니다.
-테스트가 선택되면 로컬 `sources/DerivedData/PrePushTestResults/`에 `.xcresult`를 남겨
-실패 리포트의 원인을 확인할 수 있습니다.
+단위 테스트가 선택되면 로컬 `sources/DerivedData/PrePushTestResults/`에 `.xcresult`를 남기고,
+UI 관련 변경은 UI test target을 컴파일하되 UI 테스트 본문은 실행하지 않습니다.
 
 `make init`은 Tuist package를 설치하고 앱용 `sources/GitIt.xcworkspace`와 manifest 편집용
 `sources/Manifests.xcworkspace`를 생성합니다. 이어서 저장소 루트에 각각

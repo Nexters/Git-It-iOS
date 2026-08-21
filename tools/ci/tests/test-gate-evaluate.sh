@@ -48,5 +48,10 @@ rg -q 'needs\.swift-lint\.result' "$workflow"
 rg -q 'GIT_IT_SCRIPT_VERIFICATION_RUNNER' "$workflow"
 rg -q 'PROJECT_BUILD_RUNNER.*compile-unit' "$workflow"
 rg -q 'PROJECT_BUILD_RUNNER.*compile-ui' "$workflow"
+rg -q 'needs\.ui-compile\.result' "$workflow"
+if rg -n 'test-ui|^[[:space:]]+ui-tests:' "$workflow" >/dev/null; then
+	printf 'FAIL: CI workflow에 제거된 UI 테스트 실행이 남아 있습니다\n' >&2
+	exit 1
+fi
 
 printf 'PASS: CI gate evaluator\n'

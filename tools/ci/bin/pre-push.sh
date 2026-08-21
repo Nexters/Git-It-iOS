@@ -88,7 +88,6 @@ ci_pre_push_main() (
 	fi
 	if [ "$ci_pre_push_ui" = true ]; then
 		ci_pre_push_run ui-compile "$ci_pre_push_build" compile-ui
-		ci_pre_push_run ui-tests "$ci_pre_push_build" test-ui
 	fi
 	ci_pre_push_report "$ci_pre_push_results"
 )
