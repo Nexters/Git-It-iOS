@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "extensions": {
     "swift-format": {
-      "version": "1.0.0",
+      "version": "2.0.0",
       "source": "local",
-      "manifest_hash": "sha256:4b0e0a759cde5572c501b4ccdb593958d0c4234c760b437e3a10cd7dc10375a0",
+      "manifest_hash": "sha256:4975acd3fa5283f2662b31c0e86bd5789dc4fffbc7604161ce62cb44c04646a0",
       "enabled": true,
       "priority": 10,
       "registered_commands": {

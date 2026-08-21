@@ -9,6 +9,6 @@ hooks:
     enabled: true
     optional: false
     priority: 10
-    prompt: 허용된 변경 Swift 파일을 포맷할까요?
-    description: 모든 구현 패키지 완료 후 허용된 변경 Swift 파일을 포맷합니다.
+    prompt: 현재 변경된 Swift 파일을 포맷할까요?
+    description: 모든 구현 패키지 완료 후 현재 변경된 Swift 파일을 포맷합니다.
     condition: null
