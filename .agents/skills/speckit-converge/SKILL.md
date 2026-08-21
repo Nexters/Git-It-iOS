@@ -241,6 +241,11 @@ Append to the **end** of `tasks.md`, per the append contract:
 
    `<gap-type>` is one of `missing`, `partial`, `contradicts`, `unrequested`.
 
+   각 파일 변경 task는 부분 완료 없이 검증할 수 있는 하나의 원자적 목적과 정확한 저장소
+   상대경로 하나를 포함해야 한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
+   `<source-ref>`와 `<gap-type>`을 유지한 별도 task로 분리한다. Commit 제목이나 그룹은
+   append하지 않으며 `/speckit-implement`가 선택 패키지 안에서 실행 시점에 단위를 설계한다.
+
    Constitution-violation tasks MUST be emitted first and described as
    `CRITICAL`.
    추가하는 모든 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 적용되지 않는 패키지를
@@ -248,9 +253,15 @@ Append to the **end** of `tasks.md`, per the append contract:
    그 순서를 따른다.
    추가한 각 패키지 그룹 끝에 검증, 결과 보고와 명시적 사용자 승인 게이트를 둔다. 여러
    패키지를 하나의 구현 단위로 합치지 않는다.
-   `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 헌법 순서로
-   만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다. 공용 파일 변경은 패키지별
-   작업으로 분리하며 소유권을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.
+   `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 활성 tasks.md가
+   확정한 의존성 위상 순서로 만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다.
+   공용 파일 변경은 패키지별 작업으로 분리하며 소유권을 결정할 수 없으면 append하지 않고
+   사용자에게 경계 결정을 요청한다.
+   마지막 package subsection 뒤에는 `### 전체 수렴 완료 검증`을 append하고 새 ID의
+   `[no-write]` tasks로 (1) 활성 plan/tasks가 요구하는 전체 build·compile·test와 (2) 영향받은
+   변경 시나리오 수용 기준을 다시 검증하도록 한다. 기존 완료된 전체 검증 checkbox를 재사용하지
+   않는다. 이 global tasks는 `/speckit-implement`가 마지막 적용 패키지의
+   `FINALIZATION_TASKS`로 매핑해 필수 after hook과 함께 최종 commit 전에 실행한다.
 4. Never reuse or renumber existing IDs. If a prior Convergence phase exists, add a new,
    separately-numbered one below it — do not touch the old one.
 
@@ -263,8 +274,10 @@ Append to the **end** of `tasks.md`, per the append contract:
 ### 8. 다음 작업 제시(인계)
 
 - On `tasks_appended`: state how many tasks were appended under which phase, and recommend
-  running `/speckit-implement` to complete them; note that a follow-up converge
-  run will find fewer or no remaining items.
+  committing the appended tasks.md wording/structure as a separate baseline before running
+  `/speckit-implement` to complete them; note that this skill does not create that commit and a
+  follow-up converge run will find fewer or no remaining items. Include the newly appended whole
+  convergence-validation task count in the handoff.
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
   is needed for this feature's specified scope.
 
