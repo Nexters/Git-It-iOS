@@ -126,7 +126,7 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 | `speckit-implement` | 활성 `tasks.md`에 명시된 파일, `tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈만 생성 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
-| `speckit-swift-format-run` | 활성 `tasks.md`에 정확히 적혀 있고 현재 작업 트리에서 변경된 Swift 파일만 포맷 |
+| `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
 | `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
 | `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 

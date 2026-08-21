@@ -100,11 +100,13 @@ extension ProjectName {
                         DataModuleName.DataAuthentication.rawValue,
                         DataModuleName.DataLearningProject.rawValue,
                         DataModuleName.DataMember.rawValue,
+                        DataModuleName.DataExternalRepository.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
                         DataModuleName.DataLearningProjectTests.rawValue,
                         DataModuleName.DataMemberTests.rawValue,
+                        DataModuleName.DataExternalRepositoryTests.rawValue,
                     ],
                 )]
 

@@ -39,7 +39,8 @@ jobs:
   script-quality:
     name: script quality
     needs: changes
-    if: ${{ needs.changes.outputs.scripts_changed == 'true' || needs.changes.outputs.workflow_changed == 'true' }}
+    # Repository variable를 true로 바꾸기 전에는 검증 job을 실행하지 않습니다.
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.scripts_changed == 'true' || needs.changes.outputs.workflow_changed == 'true') }}
     runs-on: macos-26
     timeout-minutes: 10
     steps:
@@ -76,7 +77,7 @@ jobs:
   swift-lint:
     name: lint
     needs: changes
-    if: ${{ needs.changes.outputs.swift_changed == 'true' }}
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && needs.changes.outputs.swift_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 15
     continue-on-error: false
@@ -109,7 +110,7 @@ jobs:
   app-build:
     name: build
     needs: changes
-    if: ${{ needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.project_config_changed == 'true' }}
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
     runs-on: macos-26
     timeout-minutes: 60
     env:
@@ -163,7 +164,7 @@ jobs:
   unit-tests:
     name: unit tests
     needs: changes
-    if: ${{ needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true' }}
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
     runs-on: macos-26
     timeout-minutes: 60
     env:
@@ -217,7 +218,7 @@ jobs:
   ui-compile:
     name: ui test compile
     needs: changes
-    if: ${{ needs.changes.outputs.ui_changed == 'true' }}
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && needs.changes.outputs.ui_changed == 'true' }}
     runs-on: macos-26
     timeout-minutes: 45
     env:

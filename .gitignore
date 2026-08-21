@@ -152,4 +152,4 @@ CLAUDE.md
 # Machine-specific configuration
 *.xcconfig
 docs/Git-It-server-scheme.json
-Git-It Server API 전체 Data 패키지 구현 명세 — SPEC-DATA-API-001.md
+requirement-docs/**

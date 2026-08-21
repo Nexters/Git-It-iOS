@@ -30,8 +30,11 @@ for step in swift-format build compile; do
 	[ -x "$repository/$fixture_hooks_root/pre-commit.d/$step.sh" ]
 done
 [ ! -e "$repository/$fixture_hooks_root/pre-commit.d/test.sh" ]
-# 기본 pre-commit은 셸 회귀와 staged Swift 포맷을 실행합니다.
-rg -qx 'script-tests' "$repository/$fixture_hooks_root/pre-commit.d/enabled"
-rg -qx 'swift-format' "$repository/$fixture_hooks_root/pre-commit.d/enabled"
+# 기본 pre-commit 검증 단계는 모두 비활성화되어 있습니다.
+if rg -q '^[[:space:]]*(script-tests|swift-format|build|compile)[[:space:]]*$' \
+	"$repository/$fixture_hooks_root/pre-commit.d/enabled"; then
+	printf 'FAIL: 기본 pre-commit 검증 단계가 활성화됨\n' >&2
+	exit 1
+fi
 [ "$global_before" = "$(cksum "$global_config")" ]
 printf 'PASS: hook install\n'

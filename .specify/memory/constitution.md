@@ -1,23 +1,22 @@
 <!--
 Sync Impact Report
-- Version change: 2.2.0 → 2.3.1
-- Modified principles: 4. 스킬별 수정 경로 — Spec Kit 세션 기록의 중앙 문서 경로와 전용
-  쓰기 예외 추가; 5. Spec-Kit 범위 — 두 기록 스킬의 허용 경로를 docs/spec-kit으로 이전;
-  9. Spec Kit 세션 지식 기록 — 기능별 중앙 기록 위치 명시
+- Version change: 2.3.1 → 3.0.0
+- Modified principles: 5. Spec-Kit 범위 — Swift 포맷 대상을 활성 tasks.md 경로로 제한하는
+  규칙 제거; 7. 패키지 단위 구현 진행 — 완료 후 포맷 대상을 현재 변경 Swift 파일 전체로 확대
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md;
-  ✅ .specify/templates/tasks-template.md; ✅ 검토 후 변경 불필요 나머지 템플릿
-- Commands requiring updates: ✅ 관련 .agents/skills/speckit-*/SKILL.md 경로·권한 동기화
-- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ README.md; ✅ 기존 세션 기록 이전
-- Evidence records: ✅ docs/spec-kit/010-verify-learning-api/trouble-shooting.md
+- Templates requiring updates: ✅ 검토 후 변경 불필요
+- Commands requiring updates: ✅ .agents/skills/speckit-swift-format-run/SKILL.md
+- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ .specify/extensions/swift-format/**;
+  ✅ .specify/extensions.yml
+- Evidence records: 없음
 - Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 2.3.1<br>
+**버전**: 3.0.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-21
 
@@ -94,7 +93,7 @@ Sync Impact Report
 | `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일(`docs/**`도 파일 단위만), `specs/<feature>/tasks.md`의 완료 표시 |
 | `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈 생성만 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
-| `speckit-swift-format-run` | 활성 `tasks.md`에 정확히 적혀 있고 현재 작업 트리에서 변경된 Swift 파일만 포맷 |
+| `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
 | `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
 | `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
 - 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
@@ -129,9 +128,10 @@ Sync Impact Report
   파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
   파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
   마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
-- 모든 적용 대상 패키지가 완료된 뒤의 포맷 훅은 활성 `tasks.md`에 정확히 명시된 경로와
-  현재 작업 트리에서 변경된 Swift 파일의 교집합만 수정합니다. 저장소의
-  `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지 않습니다.
+- 모든 적용 대상 패키지가 완료된 뒤의 포맷 훅은 현재 작업 트리에서 추가 또는 수정된 Swift
+  파일을 수정합니다. 활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않습니다.
+  저장소의 `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지
+  않습니다.
 - 패키지 순서가 개정되면 이미 완료된 작업과 기존 변경은 이력으로 보존하되 더 수정하지
   않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
   패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.

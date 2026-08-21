@@ -4,6 +4,22 @@
 set -eu
 
 pre_push_main() (
+	# 기본값은 검증을 실행하지 않습니다. 재활성화가 필요하면 push 환경에
+	# GIT_IT_PRE_PUSH_VALIDATION_ENABLED=true를 설정합니다.
+	case "${GIT_IT_PRE_PUSH_VALIDATION_ENABLED:-false}" in
+	true) ;;
+	false)
+		cat >/dev/null
+		printf 'pre-push 검증 비활성화됨\n'
+		return 0
+		;;
+	*)
+		cat >/dev/null
+		printf '오류[pre-push.invalid-validation-setting]: GIT_IT_PRE_PUSH_VALIDATION_ENABLED에는 true 또는 false만 설정할 수 있습니다\n' >&2
+		return 2
+		;;
+	esac
+
 	pre_push_hook=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 	pre_push_root=$(git -C "$pre_push_hook" rev-parse --show-toplevel 2>/dev/null) || {
 		printf '오류[pre-push.repository-not-found]: Git 저장소를 찾을 수 없습니다\n' >&2

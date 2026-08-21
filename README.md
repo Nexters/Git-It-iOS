@@ -21,13 +21,11 @@ Git It의 iOS 애플리케이션 저장소입니다.
 | `make format` | 현재 변경된 Swift 소스 파일만 포매팅 |
 | `make verify-tools` | 셸 스크립트 검증 도구(ShellCheck, shfmt) 다운로드 및 준비 |
 
-`make hooks`는 커밋 전 셸 회귀 검증·staged Swift 포맷과 push 전 CI 동등 검증을 설치합니다.
-`pre-commit` 단계가 실패하면 완료된 단계와 실패 지점을 리포트로 출력합니다. `pre-push`는
-`origin/develop`부터 `HEAD`까지의 변경을 CI와 같은 조건으로 분류하고, Swift 변경은 먼저
-포맷을 교정합니다. 한 단계가 실패해도 선택된 검증을 모두 수행한 뒤 리포트를 출력하며,
-포맷으로 파일이 바뀐 경우에는 검토·stage·commit을 요구하고 push를 중단합니다.
-단위 테스트가 선택되면 로컬 `sources/DerivedData/PrePushTestResults/`에 `.xcresult`를 남기고,
-UI 관련 변경은 UI test target을 컴파일하되 UI 테스트 본문은 실행하지 않습니다.
+`make hooks`는 커밋 메시지 형식 검사와 검증 훅을 설치합니다. 현재는 빌드·컴파일·테스트·린트·포맷 검증을 기본 비활성화했습니다.
+커밋 전 검증은 `tools/githooks/pre-commit.d/enabled`에서 필요한 단계의 주석을 풀어 다시 켭니다.
+push 전 검증은 `GIT_IT_PRE_PUSH_VALIDATION_ENABLED=true git push`로 다시 켤 수 있습니다.
+CI 검증 job은 GitHub Actions repository variable `GIT_IT_CI_VALIDATION_ENABLED`가 정확히 `true`일 때만 실행됩니다.
+이 변수를 삭제하거나 다른 값으로 바꾸면 다시 비활성화되며, 변경 분류와 최종 gate job은 검증 job이 생략된 상태로 성공합니다.
 
 `make init`은 Tuist package를 설치하고 앱용 `sources/GitIt.xcworkspace`와 manifest 편집용
 `sources/Manifests.xcworkspace`를 생성합니다. 이어서 저장소 루트에 각각
