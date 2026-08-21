@@ -7,8 +7,8 @@ enum UIModuleName: String {
     case UIComponent
     case DesignSystemTests
     case UIComponentTests
-    case UIComponentLayoutHarness
-    case UIComponentUITests
+    case UIComponentPreviewApp
+    case UIComponentPreviewAppUITests
 }
 
 extension UIModuleName {
@@ -17,14 +17,14 @@ extension UIModuleName {
         return switch self {
         case .DesignSystem,
              .UIComponent,
-             .UIComponentLayoutHarness:
+             .UIComponentPreviewApp:
             directoryName
         case .DesignSystemTests:
             "\(directoryName.droppingSuffix("Tests"))"
         case .UIComponentTests:
             "\(directoryName.droppingSuffix("Tests"))/Unit"
-        case .UIComponentUITests:
-            "\(directoryName.droppingSuffix("UITests"))/UI"
+        case .UIComponentPreviewAppUITests:
+            "Component/UI"
         }
     }
 }
@@ -102,7 +102,7 @@ extension UIModuleName {
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
         ),
         .target(
-            name: UIModuleName.UIComponentLayoutHarness.rawValue,
+            name: UIModuleName.UIComponentPreviewApp.rawValue,
             destinations: .iOS,
             product: .app,
             bundleId: "com.nexters.hytime.gitit.uicomponentlayoutharness",
@@ -113,7 +113,7 @@ extension UIModuleName {
                 ],
                 "UILaunchScreen": [:],
             ]),
-            sources: ["\(UIModuleName.UIComponentLayoutHarness.sourceDirectory)/**"],
+            sources: ["\(UIModuleName.UIComponentPreviewApp.sourceDirectory)/**"],
             dependencies: [
                 .target(name: UIModuleName.UIComponent.rawValue),
                 .target(name: UIModuleName.DesignSystem.rawValue),
@@ -127,15 +127,15 @@ extension UIModuleName {
             ]),
         ),
         .target(
-            name: UIModuleName.UIComponentUITests.rawValue,
+            name: UIModuleName.UIComponentPreviewAppUITests.rawValue,
             destinations: .iOS,
             product: .uiTests,
             bundleId: "com.nexters.hytime.gitit.uicomponentuitests",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Tests/\(UIModuleName.UIComponentUITests.sourceDirectory)/**"],
+            sources: ["Tests/\(UIModuleName.UIComponentPreviewAppUITests.sourceDirectory)/**"],
             dependencies: [
-                .target(name: UIModuleName.UIComponentLayoutHarness.rawValue)
+                .target(name: UIModuleName.UIComponentPreviewApp.rawValue)
             ],
             settings: .settings(base: [
                 "CODE_SIGN_STYLE": "Automatic",
