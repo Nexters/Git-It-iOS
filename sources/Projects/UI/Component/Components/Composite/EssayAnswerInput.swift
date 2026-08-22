@@ -44,11 +44,13 @@ public struct EssayAnswerInput: View {
 
                 TextEditor(text: $text)
                     .scrollContentBackground(.hidden)
+                    .scrollDisabled(true)
                     .designSystemForeground(.grey100)
                     .padding(.horizontal, Constant.editorHorizontalInset)
                     .disabled(viewModel.isDisabled)
+                    .frame(maxHeight: Constant.maximumHeight)
             }
-            .frame(minHeight: Constant.minimumHeight)
+            .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight)
             .designSystemBackground(.cardBackground)
             .designSystemCornerRadius(.small)
 
@@ -63,6 +65,7 @@ public struct EssayAnswerInput: View {
 
     private enum Constant {
         static let minimumHeight: CGFloat = 160
+        static let maximumHeight: CGFloat = 240
         static let textInset: CGFloat = 16
         static let editorHorizontalInset: CGFloat = 12
     }

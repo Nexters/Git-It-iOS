@@ -268,21 +268,23 @@ struct LayoutContractCatalog: View {
     }
 
     private var learningSetRowContracts: some View {
-        HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-            LearningSetRow(
-                viewModel: .init(title: "Presentation 구조", questionCount: 12, progress: 0.4)
-            )
-            .accessibilityIdentifier("learningSetRow.default")
-
-            LearningSetRow(
-                viewModel: .init(
-                    title: "State 관리",
-                    questionCount: 8,
-                    progress: 1,
-                    isCompleted: true,
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                LearningSetRow(
+                    viewModel: .init(title: "Presentation 구조", questionCount: 12, progress: 0.4)
                 )
-            )
-            .accessibilityIdentifier("learningSetRow.completed")
+                .accessibilityIdentifier("learningSetRow.default")
+
+                LearningSetRow(
+                    viewModel: .init(
+                        title: "State 관리",
+                        questionCount: 8,
+                        progress: 1,
+                        isCompleted: true,
+                    )
+                )
+                .accessibilityIdentifier("learningSetRow.completed")
+            }
         }
     }
 
@@ -350,4 +352,8 @@ struct LayoutContractCatalog: View {
             .accessibilityIdentifier(identifier)
     }
 
+}
+
+#Preview {
+    LayoutContractCatalog()
 }
