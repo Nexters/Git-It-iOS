@@ -110,6 +110,9 @@ allowlist로 만들 수 없다. 문서를 읽기만 하는 검증은 `[no-write]
      함께 확정
    - 각 적용 대상 패키지 단계 끝에 패키지 검증, 결과 보고와 다음 적용 대상 패키지 진행에
      대한 명시적 사용자 승인 게이트를 두고, 패키지 단계 안에서 변경 시나리오 추적성을 유지
+   - 작업은 정확한 경로와 의존성을 가진 원자적 실행 항목으로 유지하고 커밋 단위를 tasks.md에
+     미리 고정하지 않음. `/speckit-implement`가 선택 패키지의 미완료 작업을 실행 시점에
+     논리적 커밋 단위로 설계할 수 있을 만큼 각 작업 경계가 명확한지 검증
 
 4. **Generate tasks.md**: Read the tasks template from TASKS_TEMPLATE (from the JSON output above) and use it as structure. If TASKS_TEMPLATE is empty, fall back to `.specify/templates/tasks-template.md`. Fill with:
    - Correct feature name from plan.md
@@ -167,10 +170,13 @@ Output path to generated tasks.md and summary:
 - Independent test criteria for each change scenario
 - Suggested minimum valuable scope (보통 Scenario 1이지만 패키지 순서와 승인 게이트는 모두 유지)
 - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
+- Git handoff: 이 스킬은 commit하지 않으므로 생성·수정된 tasks.md의 wording/structure를 별도
+  기준선 commit으로 확정한 뒤 `/speckit-implement`를 실행해야 함을 명시
 
 Context for task generation: $ARGUMENTS
 
-The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
+After its baseline commit, tasks.md should be immediately executable: each task must be specific enough
+that an LLM can complete it without additional context.
 
 ## Task Generation Rules
 
@@ -181,6 +187,10 @@ The tasks.md should be immediately executable - each task must be specific enoug
 생성·추가를 작업 ID, 패키지 작업 또는 전체 완료 검증으로 만들지 않는다.
 
 **Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
+
+**COMMIT UNITS ARE IMPLEMENT-TIME PLANS**: tasks.md에는 커밋 제목, 커밋 그룹 또는 commit
+checkbox를 생성하지 않는다. 한 작업 ID는 부분 완료로 나눌 필요가 없는 원자적 변경이어야
+하며, `/speckit-implement`가 같은 패키지 안에서 하나 이상의 작업을 논리적 커밋 단위로 묶는다.
 
 ### Checklist Format (REQUIRED)
 
@@ -250,7 +260,7 @@ Every task MUST strictly follow this format:
 
 ### Phase Structure
 
-- **패키지 단계**: 적용 대상만 헌법 순서로 생성
+- **패키지 단계**: 적용 대상만 아키텍처 의존성 표와 tasks.md가 확정한 위상 순서로 생성
   - 각 단계 내부: 준비 → 테스트(요청된 경우) → 구현 → 정리 → 패키지 검증
   - 각 단계 끝: 변경 파일과 검증 결과 보고 → 다음 적용 대상 패키지 명시적 승인 게이트
 - **전체 완료 검증**: 마지막 적용 대상 패키지 뒤에 읽기 전용 검증만 배치
@@ -258,7 +268,9 @@ Every task MUST strictly follow this format:
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
-- [ ] 적용 대상 패키지가 헌법 순서로 배치되고 모든 파일 변경 작업의 단일 패키지 소유권 확인
+- [ ] 적용 대상 패키지가 근거 있는 의존성 위상 순서로 배치되고 모든 파일 변경 작업의 단일 패키지 소유권 확인
+- [ ] 각 작업이 부분 완료 없이 implement 시점의 논리적 커밋 단위에 배정 가능한 원자성 확인
 - [ ] 각 패키지 검증·결과 보고·승인 게이트와 마지막 읽기 전용 전체 검증 확인
+- [ ] Completion Report에서 tasks.md 기준선 commit 후 implement 실행 순서 안내
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, scenario breakdown, and minimum valuable scope

@@ -2,7 +2,9 @@
 
 **Git-flow 유형**: `[feature | hotfix | release]`
 
-**기능 브랜치**: `[실제 생성된 브랜치 또는 "미생성 (예정: type/short-name)"]`
+**기능 브랜치**: `[speckit-specify가 직접 생성 또는 재사용을 확인한 type/short-name]`
+
+**브랜치 상태**: `[생성 | 재사용]`
 
 **생성일**: [DATE]
 
