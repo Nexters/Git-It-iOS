@@ -343,34 +343,40 @@ description: "기능 구현 작업 목록: UC01~UC20 전체 UseCase end-to-end �
 
 ### Preview app 명칭 교정
 
-- [ ] T131 [S4] `sources/Projects/UI/ComponentLayoutHarness/` 디렉터리를 `sources/Projects/UI/ComponentPreviewApp/`로 이동한다(파일: `LayoutContractCatalog.swift`, `UIComponentLayoutHarnessApp.swift`→`UIComponentPreviewAppApp.swift`)
-- [ ] T132 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`의 `UIComponentLayoutHarness`/`UIComponentUITests` case를 `UIComponentPreviewApp`/`UIComponentPreviewAppUITests`로 rename하고 `sourceDirectory`를 T131 경로로 갱신한다(NFR-014-008)
-- [ ] T133 [S4] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.UI` case에서 `buildTargets`/`testTargets`의 harness 이름을 갱신한다
+- [X] T131 [S4] `sources/Projects/UI/ComponentLayoutHarness/` 디렉터리를 `sources/Projects/UI/ComponentPreviewApp/`로 이동한다(파일: `LayoutContractCatalog.swift`, `UIComponentLayoutHarnessApp.swift`→`UIComponentPreviewAppApp.swift`)
+- [X] T132 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`의 `UIComponentLayoutHarness`/`UIComponentUITests` case를 `UIComponentPreviewApp`/`UIComponentPreviewAppUITests`로 rename하고 `sourceDirectory`를 T131 경로로 갱신한다(NFR-014-008)
+- [X] T133 [S4] `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.UI` case에서 `buildTargets`/`testTargets`의 harness 이름을 갱신한다
 
 ### 신규 component
 
-- [ ] T134 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/TextField.swift`를 새로 만들어 Default/Active/Filled/Error 상태를 scalar/Binding/callback으로 표현한다(U02)
-- [ ] T135 [P] [S4] `sources/Projects/UI/Component/Components/Composite/SettingRow.swift`를 새로 만든다(U06)
-- [ ] T136 [P] [S4] `sources/Projects/UI/Component/Components/Composite/SelectableSettingRow.swift`를 새로 만든다(U06)
-- [ ] T137 [P] [S4] `sources/Projects/UI/Component/Components/Composite/AccountActionRow.swift`를 새로 만든다(U06)
-- [ ] T138 [P] [S4] `sources/Projects/UI/Component/Components/Composite/LearningSetRow.swift`를 새로 만들어 320×130pt 의미 계약을 구현한다(U07)
-- [ ] T139 [P] [S4] `sources/Projects/UI/Component/Components/Composite/QuestionPrompt.swift`를 새로 만든다(U08)
-- [ ] T140 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/ChoiceAnswerOption.swift`를 새로 만들어 correct/incorrect를 token+텍스트/아이콘/접근성으로 표현한다(U08)
-- [ ] T141 [P] [S4] `sources/Projects/UI/Component/Components/Composite/EssayAnswerInput.swift`를 새로 만든다(U08)
-- [ ] T142 [P] [S4] `sources/Projects/UI/Component/Components/Composite/RubricView.swift`를 새로 만든다(U08)
-- [ ] T143 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/LabeledProgressBar.swift`를 새로 만든다(U08)
-- [ ] T144 [S4] `sources/Projects/UI/ComponentPreviewApp/LayoutContractCatalog.swift`에 T134~T143 component를 카탈로그 항목으로 등록한다
+- [X] T134 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/TextField.swift`를 새로 만들어 Default/Active/Filled/Error 상태를 scalar/Binding/callback으로 표현한다(U02)
+- [X] T135 [P] [S4] `sources/Projects/UI/Component/Components/Composite/SettingRow.swift`를 새로 만든다(U06)
+- [X] T136 [P] [S4] `sources/Projects/UI/Component/Components/Composite/SelectableSettingRow.swift`를 새로 만든다(U06)
+- [X] T137 [P] [S4] `sources/Projects/UI/Component/Components/Composite/AccountActionRow.swift`를 새로 만든다(U06)
+- [X] T138 [P] [S4] `sources/Projects/UI/Component/Components/Composite/LearningSetRow.swift`를 새로 만들어 320×130pt 의미 계약을 구현한다(U07)
+- [X] T139 [P] [S4] `sources/Projects/UI/Component/Components/Composite/QuestionPrompt.swift`를 새로 만든다(U08)
+- [X] T140 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/ChoiceAnswerOption.swift`를 새로 만들어 correct/incorrect를 token+텍스트/아이콘/접근성으로 표현한다(U08)
+- [X] T141 [P] [S4] `sources/Projects/UI/Component/Components/Composite/EssayAnswerInput.swift`를 새로 만든다(U08)
+- [X] T142 [P] [S4] `sources/Projects/UI/Component/Components/Composite/RubricView.swift`를 새로 만든다(U08)
+- [X] T143 [P] [S4] `sources/Projects/UI/Component/Components/Leaf/LabeledProgressBar.swift`를 새로 만든다(U08)
+- [X] T144 [S4] `sources/Projects/UI/ComponentPreviewApp/LayoutContractCatalog.swift`에 T134~T143 component를 카탈로그 항목으로 등록한다
 
 ### 테스트
 
-- [ ] T145 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/TextFieldTests.swift`에 상태별 렌더링·콜백 테스트를 작성한다(T134)
-- [ ] T146 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/LearningSetRowTests.swift`에 크기·Dynamic Type 테스트를 작성한다(T138)
-- [ ] T147 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/ChoiceAnswerOptionTests.swift`에 correct/incorrect 접근성 semantics 테스트를 작성한다(T140)
-- [ ] T148 [S4] `sources/Projects/UI/Tests/Component/UI/UIComponentPreviewAppLaunchTests.swift`(구 `UIComponentUITests`)를 rename·수정해 새 target 이름으로 카탈로그 도달성을 검증한다(T131, T132)
+- [X] T145 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/TextFieldTests.swift`에 상태별 렌더링·콜백 테스트를 작성한다(T134)
+- [X] T146 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/LearningSetRowTests.swift`에 크기·Dynamic Type 테스트를 작성한다(T138)
+- [X] T147 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/ChoiceAnswerOptionTests.swift`에 correct/incorrect 접근성 semantics 테스트를 작성한다(T140)
+- [X] T148 [S4] `sources/Projects/UI/Tests/Component/UI/UIComponentPreviewAppLaunchTests.swift`(구 `UIComponentUITests`)를 rename·수정해 새 target 이름으로 카탈로그 도달성을 검증한다(T131, T132)
 
 ### 정리와 패키지 검증
 
-- [ ] T149 [no-write] `tuist generate` 재실행 후 UI shared scheme으로 `build`·`compile`·`test`를 실행하고 결과를 기록한다
+- [X] T149 [no-write] `tuist generate` 재실행 후 UI shared scheme으로 `build`·`compile`·`test`를 실행하고 결과를 기록한다
+
+**구현 중 확인된 편차**(계획 대비 실제):
+
+- T131~T148: 이번 세션 시작 시점에 이미 이전 세션에서 구현이 완료되어 있었다(커밋 `2995d4b`). 이번 세션에서는 `EssayAnswerInput`의 `TextEditor`가 외부 `ScrollView` 안에서 높이가 무제한으로 확장되는 문제를 발견해 `.scrollDisabled(true)`와 `maxHeight` 상한(240pt)을 추가했고, `LayoutContractCatalog`의 `learningSetRowContracts`가 두 `LearningSetRow`(각 320pt, 합 652pt)를 화면 폭(402pt)보다 넓은 일반 `HStack`에 배치해 `ScrollView`가 전체 콘텐츠를 중앙 정렬·클리핑하던 실제 레이아웃 결함을 시뮬레이터로 재현·이진 탐색해 원인을 확정하고, 해당 섹션을 가로 `ScrollView`로 감싸 수정했다(범위 내 필수 수정, T144 소유 파일).
+
+**검증 결과**: `tuist install`·`tuist generate` 성공. `xcodebuild -workspace GitIt.xcworkspace -scheme UI -destination 'platform=iOS Simulator,id=<default-1>' build test` 실행 결과 **BUILD SUCCEEDED / TEST SUCCEEDED**, 8개 Suite 31개 테스트(신규 `ChoiceAnswerOption 계약`·`LearningSetRow 계약`·`TextField 계약` 포함) 전부 통과. 시뮬레이터에 `UIComponentPreviewApp`을 직접 설치·실행해 `LayoutContractCatalog` 전체(제목부터 `questionContracts`/`EssayAnswerInput`까지)가 화면 폭 안에서 정상 렌더링되는지 스크린샷으로 확인했다.
 
 **승인 게이트**: T131~T149의 변경 파일과 검증 결과를 보고한 뒤 중단한다. 사용자가 Feature 패키지를 명시적으로 승인하기 전에는 Feature 파일을 변경하지 않는다.
 

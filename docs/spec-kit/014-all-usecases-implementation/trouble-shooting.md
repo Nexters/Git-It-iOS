@@ -143,3 +143,94 @@ Swift Testing의 `#require`는 매크로이며, 인자 표현식 안에 또 다�
 ### 연결
 
 없음
+
+## TS-20260822-003: `ScrollView` 안의 고정 폭 `HStack`이 화면 폭을 넘으면 전체 콘텐츠가 중앙 정렬·클리핑된다
+
+**기록일**: 2026-08-22
+**상태**: 해결
+**발생 단계**: `/speckit-implement` — UI 패키지(T144) 완료 뒤 사용자의 시뮬레이터 UI 확인 중 발견
+**관련 항목**: `specs/014-all-usecases-implementation/tasks.md`의 T144,
+`sources/Projects/UI/ComponentPreviewApp/LayoutContractCatalog.swift`,
+`sources/Projects/UI/Component/Components/Composite/LearningSetRow.swift`,
+`sources/Projects/UI/Component/Components/Composite/EssayAnswerInput.swift`
+
+### 증상
+
+시뮬레이터에서 `UIComponentPreviewApp`(`LayoutContractCatalog`)을 실행하면 제목
+"Figma 레이아웃 계약"을 포함한 화면 전체 콘텐츠가 좌우로 잘려 보였다(예: "Figma 레이아웃
+계약"이 "웃 계약"으로, "Large"가 "ge"로 보임). `EssayAnswerInput`을 최근에 수정했다는
+정황 때문에 처음에는 그 컴포넌트의 `TextEditor` 높이 문제로 추정했다.
+
+### 영향
+
+`EssayAnswerInput`의 `TextEditor`에 `.scrollDisabled(true)`·`maxHeight` 상한을
+추가하고, `LayoutContractCatalog`의 최상위 `VStack`/`ScrollView`에
+`.frame(maxWidth: .infinity, alignment: .leading)`를 추가하고,
+`.dynamicTypeSize(.large)`로 강제 고정하는 등 여러 차례 수정을 시도했으나 스크린샷상
+증상이 전혀 변하지 않아 원인 진단이 상당히 지연되었다. 잘못된 가설(TextEditor 높이,
+ScrollView 폭 제약 없음, Dynamic Type)로 여러 차례 재빌드·재설치·재스크린샷을 반복했다.
+
+### 근거
+
+- `NSLog`로 `GeometryReader`의 `proxy.frame(in: .global)`을 로깅한 결과, 제목
+  `Text`의 global x-origin이 iPhone 17 Pro 시뮬레이터(폭 402pt)에서 `-125.0`,
+  iPhone 17 Pro Max 시뮬레이터(폭 440pt)에서 `-106.0`으로 측정되었다. 두 값 모두
+  `(availableWidth - 652) / 2`와 정확히 일치해, 콘텐츠의 실제 intrinsic 폭이
+  652pt로 고정돼 있고 `ScrollView`가 이를 가운데 정렬하고 있음을 확인했다.
+- `LayoutContractCatalog.swift`의 `learningSetRowContracts`(당시 `private var
+  learningSetRowContracts: some View`)가 `LearningSetRow`(각 320pt,
+  `LearningSetRow.swift`의 `Constant.width`) 두 개를 `HStack(spacing:
+  LayoutToken.gutter.cgFloatValue)`(12pt)에 배치해 320+320+12=652pt였다.
+- `body`를 이진 탐색(제목만 남기고 전부 제거 → 정상 렌더링 확인 → 절반씩 복원)한 결과,
+  `learningSetRowContracts`를 추가하는 시점에만 증상이 재현되고 그 전 모든 섹션(action
+  button, project row, sheet surface, glass container, text field, setting row,
+  question contracts 포함)은 단독으로 정상 렌더링되었다(스크린샷으로 확인).
+- `xcrun simctl` 직접 빌드·설치·스크린샷으로 재현했으며, `.frame(maxWidth: .infinity,
+  alignment: .leading)`·`.dynamicTypeSize(.large)` 강제 적용 뒤에도 title의 global
+  x-origin이 동일하게 `-125.0`으로 남아 있어 이 두 수정이 근본 원인을 해결하지 못했음을
+  직접 확인했다.
+
+### 원인
+
+`ScrollView`(세로)는 자신의 콘텐츠가 자신의 폭보다 넓을 때 내부 `VStack(alignment:
+.leading)`의 정렬을 따르지 않고 콘텐츠 전체를 가로로 가운데 정렬한다. 화면 폭
+402~440pt보다 넓은 652pt 콘텐츠(두 `LearningSetRow`를 감싼 일반 `HStack`)가 최상위
+`VStack`에 포함되면서, 최상위 `VStack`의 intrinsic 폭이 652pt가 되어 `ScrollView`
+전체가 가운데 정렬됐고, 그 결과 제목을 포함한 모든 형제 섹션이 좌우로 잘려 보였다.
+`EssayAnswerInput`은 이 증상과 무관했다.
+
+### 조치
+
+`learningSetRowContracts`를 `ScrollView(.horizontal, showsIndicators: false)`로
+감싸 두 `LearningSetRow`가 자체적으로 가로 스크롤되도록 하여, 최상위 `VStack`의
+intrinsic 폭 계산에 더 이상 영향을 주지 않게 했다(`LayoutContractCatalog.swift`).
+`EssayAnswerInput`의 `.scrollDisabled(true)`·`maxHeight` 상한(240pt)은 근본 원인은
+아니었지만 `TextEditor`가 콘텐츠 크기에 맞춰 자동 조정되고 무한 확장을 방지하는
+정당한 개선이라 되돌리지 않고 유지했다.
+
+### 검증
+
+- `xcrun simctl` 직접 빌드·설치 후 스크린샷: 수정 전에는 제목부터 모든 섹션이 좌우로
+  잘려 보였고, `learningSetRowContracts`를 가로 `ScrollView`로 감싼 뒤에는 제목부터
+  `questionContracts`(`EssayAnswerInput` 포함)까지 화면 폭 안에서 정상 렌더링됨을
+  확인했다.
+- `xcodebuild -workspace GitIt.xcworkspace -scheme UI -destination 'platform=iOS
+  Simulator,id=<UDID>' build test`: **BUILD SUCCEEDED / TEST SUCCEEDED**(8개 Suite
+  31개 테스트 통과, `LearningSetRow 계약` 포함).
+
+### 재발 방지
+
+- 이후 세션에서 SwiftUI 레이아웃이 예상과 다르게 잘리거나 밀리는 증상을 진단할 때는,
+  최근에 수정한 컴포넌트를 먼저 의심하기 전에 `body`를 이진 탐색(섹션을 절반씩
+  제거·복원)해 증상이 재현되는 최소 범위를 먼저 좁힌다.
+- 세로 `ScrollView` 안에 고정 폭 자식들을 담은 `HStack`을 배치할 때는, 그 자식들의
+  합산 폭이 대상 화면 폭을 넘을 수 있는지(특히 고정 `frame(width:)`를 가진 컴포넌트
+  두 개 이상을 나란히 배치하는 경우) 미리 계산하고, 넘을 수 있으면 처음부터
+  `ScrollView(.horizontal)`로 감싼다.
+- `GeometryReader`의 `proxy.frame(in: .global)`을 `NSLog`로 로깅하는 방법이 시뮬레이터
+  환경에서 SwiftUI 레이아웃 오프셋의 실제 수치 원인(중앙 정렬 폭 불일치 등)을 확인하는
+  데 유효했다.
+
+### 연결
+
+없음
