@@ -234,3 +234,145 @@ intrinsic 폭 계산에 더 이상 영향을 주지 않게 했다(`LayoutContrac
 ### 연결
 
 없음
+
+## TS-20260823-001: Feature scheme의 `test-without-building`이 시뮬레이터에서 테스트 진입 전 SIGSEGV로 크래시한다
+
+**기록일**: 2026-08-23
+**상태**: 환경 제약
+**발생 단계**: `/speckit-implement` — Feature 패키지(T154~T186) 구현·검증 중 T186(`build`·`compile`·`test`)에서 발견
+**관련 항목**: `specs/014-all-usecases-implementation/tasks.md`의 T186,
+`sources/Projects/Feature/**`(U01~U08 8개 TCA Feature 전체)
+
+### 증상
+
+Feature shared scheme으로 `xcodebuild ... -scheme Feature ... test`(test-without-building)를
+실행하면 실제 테스트 코드가 실행되기 전에 `xctest` 프로세스가
+`EXC_BAD_ACCESS(SIGSEGV)`로 크래시한다. 크래시 스택은 `realizeAllClasses →
+swift_getSingletonMetadata` 프레임을 포함하며 시스템 프레임워크 `LocalStatusKit`이
+관여한다.
+
+### 영향
+
+T186의 "build·compile·test 실행하고 결과를 기록한다" 중 `test` 항목이 완전히
+검증되지 않은 채로 남는다. Feature 패키지의 실제 프로덕션 코드·테스트 코드 자체의
+결함인지, 로컬 빌드 환경의 문제인지 이 세션 안에서는 확정하지 못했다. `build`와
+`build-for-testing`(compile)은 Feature scheme을 포함해 8개 scheme 전부 성공했고,
+Feature를 제외한 나머지 7개 scheme(Domain/Infrastructure/Data/Composition/UI/
+UIUITests/AppTests)은 `test`까지 전부 정상 통과해, 이 크래시가 Feature 패키지 범위에만
+재현된다.
+
+### 근거
+
+- `xcodebuild -workspace GitIt.xcworkspace -scheme Feature -destination 'platform=iOS
+  Simulator,...' test`: 반복 실행 시 매번 `EXC_BAD_ACCESS(SIGSEGV)`,
+  `realizeAllClasses → swift_getSingletonMetadata` 프레임, `LocalStatusKit` 관여를
+  동일하게 재현.
+- `project_build_runner test`(8개 scheme 전체 실행): `성공=7 실패=1`(Feature만 실패,
+  나머지 7개는 전부 성공).
+- Xcode 26.5.2 / iOS 26.5 시뮬레이터 환경에서 관찰.
+
+### 원인
+
+확정하지 못함. Feature target이 이 저장소에서 `ComposableArchitecture` 매크로
+확장이 가장 많고(`@Reducer`/`@ObservableState`/`@CasePathable`/`@ViewAction`을 U01~U08
+8개 Feature 전체에 적용) `UIComponent`·Lottie를 통째로 링크하는 target이라는 점이
+관련 있을 것으로 추정하나, 매크로 확장 규모·링크 그래프 크기·`LocalStatusKit`(시스템
+프레임워크) 중 무엇이 실제 트리거인지는 확인하지 못했다. 제품 코드(Reducer/View/Test
+자체의 논리 결함)가 원인이라는 근거는 발견하지 못했다.
+
+### 조치
+
+다음을 시도했으나 모두 동일하게 재현되어 크래시를 해소하지 못했다.
+
+- DerivedData 삭제 후 재빌드
+- 단일 `@Suite`만 선택해 실행(테스트 범위 축소)
+- 시뮬레이터 erase 후 재생성
+- `CoreSimulatorService` 재시작
+- 동일 조건 5회 재시도
+
+사용자 승인 하에 이 문제를 환경 제약으로 기록하고, Feature 패키지의 `build`·
+`build-for-testing` 성공과 코드 리뷰 가능한 상태를 근거로 T186 승인 게이트를 통과해
+App 패키지(작업 패키지 7) 착수를 진행했다.
+
+### 검증
+
+- `xcodebuild ... -scheme Feature ... build`: **BUILD SUCCEEDED**
+- `xcodebuild ... -scheme Feature ... build-for-testing`(compile): **성공**
+- `xcodebuild ... -scheme Feature ... test`: **미해결** — 반복 재현되는 SIGSEGV로 실행 불가
+- `project_build_runner test`(8개 scheme 전체): 성공=7 실패=1(Feature만 실패)
+
+### 재발 방지
+
+- 이후 세션(App 패키지 이후 전체 완료 검증 T201 등)에서 Feature scheme의 `test`를
+  다시 시도할 때는, 먼저 Xcode를 재설치하거나 다른 macOS/Xcode 버전 환경에서
+  재현 여부를 확인해 이 문제가 로컬 환경 고유 문제인지 이 저장소의 구성 문제인지
+  구분한다.
+- 재현되지 않는 환경을 찾으면 그 환경의 Xcode/iOS 시뮬레이터 버전을 이 항목에 후속
+  기록으로 남겨 원인 범위를 좁힌다.
+- 재현되면 Feature target만 별도로 `@Reducer` 매크로 적용 범위를 줄인 최소 재현
+  target을 만들어 이분 탐색하는 방법을 다음 시도로 고려한다.
+
+### 연결
+
+없음
+
+## TS-20260823-002: `SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor` target에서 `@Reducer` 타입과 `StoreOf<>` 프로퍼티가 다른 파일에 있으면 circular reference 컴파일 오류가 난다
+
+**기록일**: 2026-08-23
+**상태**: 해결
+**발생 단계**: `/speckit-implement` — App 패키지(T190~T192) 구현 중 `RootFeature`/`RootView` 빌드에서 발견
+**관련 항목**: `specs/014-all-usecases-implementation/tasks.md`의 T190, T191,
+`sources/Projects/App/Sources/RootFeature.swift`, `sources/Projects/App/Sources/RootView.swift`
+
+### 증상
+
+App target은 `SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor`로 설정돼 있다. `@Reducer`
+매크로가 적용된 `RootFeature` 타입 선언은 `RootFeature.swift`에 있고, 이를 사용하는
+`StoreOf<RootFeature>` 프로퍼티는 `RootView.swift`(다른 파일)에 선언했는데,
+`xcodebuild -scheme App build` 시 circular reference 컴파일 오류가 발생했다.
+
+### 영향
+
+`RootFeature`/`RootView`를 계획대로 분리된 두 파일(T190, T191)에 작성한 상태로는
+App target이 빌드되지 않아 진행이 중단됐다.
+
+### 근거
+
+- `xcodebuild -workspace GitIt.xcworkspace -scheme App -destination 'platform=iOS
+  Simulator,...' build`: `RootFeature`와 `StoreOf<RootFeature>` 선언이 서로 다른
+  파일에 있는 상태에서 circular reference 오류로 최초 빌드 실패.
+- 같은 조건에서 `RootFeature` 타입 선언에 `nonisolated`를 추가한 뒤 재빌드하면 **BUILD
+  SUCCEEDED**로 통과함을 확인.
+
+### 원인
+
+`SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor`가 target 전역 기본 격리를 `MainActor`로
+만든 상태에서, `@Reducer` 매크로가 생성하는 확장 코드와 `StoreOf<RootFeature>` 프로퍼티
+선언이 서로 다른 파일에 위치하면 두 선언 사이의 격리 추론이 순환 참조로 해석되는
+것으로 보인다(Swift 매크로 확장과 MainActor 기본 격리 상호작용에 대한 정확한 컴파일러
+내부 동작까지는 확인하지 못함, 증상과 해결 조치만 확정).
+
+### 조치
+
+`RootFeature` `@Reducer` 타입 선언 자체에 `nonisolated`를 직접 붙였다
+(`sources/Projects/App/Sources/RootFeature.swift`). 이후 `RootView.swift`의
+`StoreOf<RootFeature>` 프로퍼티 선언과의 circular reference가 해소됐다.
+
+### 검증
+
+- `xcodebuild -workspace GitIt.xcworkspace -scheme App -destination 'platform=iOS
+  Simulator,...' build`: 수정 전 circular reference 오류로 실패 → `nonisolated` 추가
+  뒤 **BUILD SUCCEEDED**로 통과.
+
+### 재발 방지
+
+- 이 저장소처럼 target에 `SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor`가 설정된 상태에서
+  `@Reducer` 타입과 그 타입을 사용하는 `StoreOf<>` 프로퍼티를 서로 다른 파일에 나눠
+  작성할 때 circular reference 오류가 나면, 우선 해당 `@Reducer` 타입 선언에
+  `nonisolated`를 붙여 재현 여부를 확인한다.
+- 근본적인 컴파일러 동작 원인은 아직 확정하지 못했으므로, 동일 증상이 다른 Feature나
+  App 파일에서 재발하면 이 항목을 참조하는 후속 항목으로 원인 조사를 이어간다.
+
+### 연결
+
+없음
