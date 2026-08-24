@@ -23,12 +23,13 @@ extension FeatureModuleName {
                 sourceDirectory: sourceDirectory,
                 dependencies: [
                     .external(.ComposableArchitecture),
+                    .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainMember),
                     .fromUI(.DesignSystem),
                     .fromUI(.UIComponent),
                 ],
                 buildLibraryForDistribution: false,
-                definesModule: false,
             )
         }
     }

@@ -7,7 +7,6 @@ extension Target {
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
         buildLibraryForDistribution: Bool = true,
-        definesModule: Bool = true,
     ) -> Self {
         .target(
             name: name,
@@ -24,7 +23,6 @@ extension Target {
                     "BUILD_LIBRARY_FOR_DISTRIBUTION": buildLibraryForDistribution ? "YES" : "NO",
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
-                    "DEFINES_MODULE": definesModule ? "YES" : "NO",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "SKIP_INSTALL": "YES",
                     "SWIFT_VERSION": "5.0",

@@ -67,7 +67,7 @@ public struct OnboardingFeature: Sendable {
         public enum EffectEvent: Sendable, Equatable {
             case restoreSessionFinished(AuthenticationOutcome)
             case signInFinished(AuthenticationOutcome)
-            case curationFinished(Result<FeatureUnit, MemberError>)
+            case curationFinished(MemberError?)
         }
 
         @CasePathable
@@ -119,10 +119,10 @@ public struct OnboardingFeature: Sendable {
                 return .run { send in
                     do {
                         try await completeCuration(position: position, careerLevel: careerLevel)
-                        await send(.effect(.curationFinished(.success(FeatureUnit()))))
+                        await send(.effect(.curationFinished(nil)))
                     } catch {
                         let mapped = error as? MemberError ?? .temporarilyUnavailable
-                        await send(.effect(.curationFinished(.failure(mapped))))
+                        await send(.effect(.curationFinished(mapped)))
                     }
                 }
                 .cancellable(id: CancelID.curation)
@@ -154,11 +154,11 @@ public struct OnboardingFeature: Sendable {
                     return .none
                 }
 
-            case .effect(.curationFinished(.success)):
+            case .effect(.curationFinished(nil)):
                 state.curationStatus = .idle
                 return .send(.delegate(.curationCompleted))
 
-            case .effect(.curationFinished(.failure(let error))):
+            case .effect(.curationFinished(.some(let error))):
                 state.curationStatus = .failed(error)
                 return .none
 

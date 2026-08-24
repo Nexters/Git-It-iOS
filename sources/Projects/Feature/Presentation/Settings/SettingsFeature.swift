@@ -80,10 +80,10 @@ public struct SettingsFeature: Sendable {
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case profileLoadFinished(Result<MemberProfile, MemberError>)
-            case positionUpdateFinished(MemberPosition, Result<FeatureUnit, MemberError>)
-            case careerLevelUpdateFinished(CareerLevel, Result<FeatureUnit, MemberError>)
+            case positionUpdateFinished(MemberPosition, MemberError?)
+            case careerLevelUpdateFinished(CareerLevel, MemberError?)
             case signOutFinished(AuthenticationOutcome)
-            case deleteAccountFinished(Result<FeatureUnit, MemberError>)
+            case deleteAccountFinished(MemberError?)
         }
 
         @CasePathable
@@ -114,10 +114,10 @@ public struct SettingsFeature: Sendable {
                 return .run { send in
                     do {
                         try await updateMemberPosition(position)
-                        await send(.effect(.positionUpdateFinished(position, .success(FeatureUnit()))))
+                        await send(.effect(.positionUpdateFinished(position, nil)))
                     } catch {
                         let mapped = error as? MemberError ?? .temporarilyUnavailable
-                        await send(.effect(.positionUpdateFinished(position, .failure(mapped))))
+                        await send(.effect(.positionUpdateFinished(position, mapped)))
                     }
                 }
                 .cancellable(id: CancelID.positionMutation)
@@ -128,10 +128,10 @@ public struct SettingsFeature: Sendable {
                 return .run { send in
                     do {
                         try await updateMemberCareerLevel(careerLevel)
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, .success(FeatureUnit()))))
+                        await send(.effect(.careerLevelUpdateFinished(careerLevel, nil)))
                     } catch {
                         let mapped = error as? MemberError ?? .temporarilyUnavailable
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, .failure(mapped))))
+                        await send(.effect(.careerLevelUpdateFinished(careerLevel, mapped)))
                     }
                 }
                 .cancellable(id: CancelID.careerLevelMutation)
@@ -162,10 +162,10 @@ public struct SettingsFeature: Sendable {
                 return .run { send in
                     do {
                         try await deleteMemberAccount()
-                        await send(.effect(.deleteAccountFinished(.success(FeatureUnit()))))
+                        await send(.effect(.deleteAccountFinished(nil)))
                     } catch {
                         let mapped = error as? MemberError ?? .temporarilyUnavailable
-                        await send(.effect(.deleteAccountFinished(.failure(mapped))))
+                        await send(.effect(.deleteAccountFinished(mapped)))
                     }
                 }
                 .cancellable(id: CancelID.accountAction)
@@ -181,25 +181,25 @@ public struct SettingsFeature: Sendable {
                 }
                 return .none
 
-            case .effect(.positionUpdateFinished(let position, .success)):
+            case .effect(.positionUpdateFinished(let position, nil)):
                 state.positionMutation = .idle
                 if state.profile != nil {
                     state.profile?.replacePosition(position)
                 }
                 return .none
 
-            case .effect(.positionUpdateFinished(_, .failure(let error))):
+            case .effect(.positionUpdateFinished(_, .some(let error))):
                 state.positionMutation = .failed(error)
                 return .none
 
-            case .effect(.careerLevelUpdateFinished(let careerLevel, .success)):
+            case .effect(.careerLevelUpdateFinished(let careerLevel, nil)):
                 state.careerLevelMutation = .idle
                 if state.profile != nil {
                     state.profile?.replaceCareerLevel(careerLevel)
                 }
                 return .none
 
-            case .effect(.careerLevelUpdateFinished(_, .failure(let error))):
+            case .effect(.careerLevelUpdateFinished(_, .some(let error))):
                 state.careerLevelMutation = .failed(error)
                 return .none
 
@@ -214,11 +214,11 @@ public struct SettingsFeature: Sendable {
                     return .none
                 }
 
-            case .effect(.deleteAccountFinished(.success)):
+            case .effect(.deleteAccountFinished(nil)):
                 state.accountAction = .idle
                 return .send(.delegate(.accountDeleted))
 
-            case .effect(.deleteAccountFinished(.failure(let error))):
+            case .effect(.deleteAccountFinished(.some(let error))):
                 state.accountAction = .failed(error)
                 return .none
 

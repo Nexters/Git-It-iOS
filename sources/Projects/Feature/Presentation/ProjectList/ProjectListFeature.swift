@@ -63,7 +63,7 @@ public struct ProjectListFeature: Sendable {
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case projectsLoadFinished(requestID: Int, result: Result<LearningProjectPage, LearningProjectError>)
-            case deletionFinished(projectID: String, result: Result<FeatureUnit, LearningProjectError>)
+            case deletionFinished(projectID: String, error: LearningProjectError?)
         }
 
         @CasePathable
@@ -110,10 +110,10 @@ public struct ProjectListFeature: Sendable {
                 return .run { send in
                     do {
                         try await deleteLearningProject(projectID: projectID)
-                        await send(.effect(.deletionFinished(projectID: projectID, result: .success(FeatureUnit()))))
+                        await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
                     } catch {
                         let mapped = error as? LearningProjectError ?? .unexpected
-                        await send(.effect(.deletionFinished(projectID: projectID, result: .failure(mapped))))
+                        await send(.effect(.deletionFinished(projectID: projectID, error: mapped)))
                     }
                 }
                 .cancellable(id: CancelID.deletion)
@@ -130,18 +130,18 @@ public struct ProjectListFeature: Sendable {
                 }
                 return .none
 
-            case .effect(.deletionFinished(let projectID, .success)):
+            case .effect(.deletionFinished(let projectID, nil)):
                 state.projects.removeAll { $0.projectID == projectID }
                 state.deletion = .idle
                 return .none
 
-            case .effect(.deletionFinished(let projectID, .failure(.notFound))):
+            case .effect(.deletionFinished(let projectID, .some(.notFound))):
                 // 이미 서버에서 삭제된 항목이므로 로컬 목록과 재조정한다.
                 state.projects.removeAll { $0.projectID == projectID }
                 state.deletion = .idle
                 return .none
 
-            case .effect(.deletionFinished(let projectID, .failure(let error))):
+            case .effect(.deletionFinished(let projectID, .some(let error))):
                 state.deletion = .failed(projectID: projectID, error: error)
                 return .none
 
