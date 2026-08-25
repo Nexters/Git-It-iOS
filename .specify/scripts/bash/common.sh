@@ -152,12 +152,17 @@ _persist_feature_json() {
     # Ensure .specify/ directory exists
     mkdir -p "$repo_root/.specify"
 
-    # Write feature.json — prefer jq for safe JSON, fall back to printf
+    # Render beside the destination and rename only after a complete JSON value exists.
+    local feature_json_temp
+    feature_json_temp=$(mktemp "$repo_root/.specify/.feature.json.XXXXXX") || return 1
+    trap 'rm -f "$feature_json_temp"' RETURN
     if command -v jq >/dev/null 2>&1; then
-        jq -cn --arg fd "$feature_dir_value" '{feature_directory:$fd}' > "$fj"
+        jq -cn --arg fd "$feature_dir_value" '{feature_directory:$fd}' > "$feature_json_temp" || return 1
     else
-        printf '{"feature_directory":"%s"}\n' "$(json_escape "$feature_dir_value")" > "$fj"
+        printf '{"feature_directory":"%s"}\n' "$(json_escape "$feature_dir_value")" > "$feature_json_temp" || return 1
     fi
+    mv "$feature_json_temp" "$fj"
+    trap - RETURN
 }
 
 get_feature_paths() {
@@ -175,7 +180,27 @@ get_feature_paths() {
     local repo_root
     repo_root=$(get_repo_root) || return 1
     local current_branch
-    current_branch=$(get_current_branch)
+    current_branch=$(git -C "$repo_root" symbolic-ref --quiet --short HEAD 2>/dev/null) || {
+        echo "ERROR: Canonical feature identity requires a symbolic Git branch." >&2
+        return 1
+    }
+
+    # Canonical identity is the checked-out Git-flow branch. The shared resolver
+    # uses spec metadata and treats feature.json only as a disposable hint.
+    local resolver="$repo_root/tools/spec-kit/bin/resolve-feature.sh"
+    [[ -x "$resolver" ]] || {
+        echo "ERROR: Spec-Kit feature resolver not found: $resolver" >&2
+        return 1
+    }
+    local resolution
+    resolution=$("$resolver" "$current_branch") || return 1
+    local resolved_relative
+    resolved_relative=$(printf '%s\n' "$resolution" | sed -n 's/^SPEC_DIR=//p')
+    [[ -n "$resolved_relative" ]] || {
+        echo "ERROR: Feature resolver did not return SPEC_DIR." >&2
+        return 1
+    }
+    local resolved_dir="$repo_root/$resolved_relative"
 
     # Resolve feature directory.  Priority:
     #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override)
@@ -186,34 +211,28 @@ get_feature_paths() {
         feature_dir="$SPECIFY_FEATURE_DIRECTORY"
         # Normalize relative paths to absolute under repo root
         [[ "$feature_dir" != /* ]] && feature_dir="$repo_root/$feature_dir"
-        # Persist to feature.json so future sessions without the env var still
-        # work — unless the caller opted out for read-only resolution (#3025).
-        if [[ "$no_persist" != true ]]; then
-            _persist_feature_json "$repo_root" "$SPECIFY_FEATURE_DIRECTORY"
-        fi
+        [[ "$feature_dir" == "$resolved_dir" ]] || {
+            echo "ERROR: SPECIFY_FEATURE_DIRECTORY conflicts with branch metadata: $feature_dir != $resolved_dir" >&2
+            return 1
+        }
     elif [[ -f "$repo_root/.specify/feature.json" ]]; then
         local _fd
         _fd=$(read_feature_json_feature_directory "$repo_root")
         if [[ -n "$_fd" ]]; then
             feature_dir="$_fd"
-            # Normalize relative paths to absolute under repo root
+            # Normalize relative paths to absolute under repo root, then reject
+            # stale pointers instead of using them as canonical identity.
             [[ "$feature_dir" != /* ]] && feature_dir="$repo_root/$feature_dir"
+            [[ "$feature_dir" == "$resolved_dir" ]] || {
+                echo "ERROR: .specify/feature.json is stale for branch $current_branch" >&2
+                return 1
+            }
         else
             echo "ERROR: Feature directory not found. Set SPECIFY_FEATURE_DIRECTORY or ensure .specify/feature.json contains feature_directory." >&2
             return 1
         fi
     else
-        echo "ERROR: Feature directory not found. Set SPECIFY_FEATURE_DIRECTORY or run the specify command to create .specify/feature.json." >&2
-        return 1
-    fi
-
-    # When no branch context exists (no SPECIFY_FEATURE, feature resolved via
-    # SPECIFY_FEATURE_DIRECTORY or feature.json), fall back to the feature
-    # directory basename so CURRENT_BRANCH is a usable identifier rather than
-    # an empty, misleading value (issue #3026).
-    if [[ -z "$current_branch" ]]; then
-        local feature_dir_trimmed="${feature_dir%/}"
-        current_branch="${feature_dir_trimmed##*/}"
+        feature_dir="$resolved_dir"
     fi
 
     # Use printf '%q' to safely quote values, preventing shell injection

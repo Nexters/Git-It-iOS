@@ -1,5 +1,7 @@
 # 기능 명세: 디자인 토큰 시스템
 
+**기능 브랜치**: `미연결 (legacy artifact; branch metadata 미기록)`
+
 **기능 디렉터리**: `specs/002-design-token-system`
 
 **작성일**: 2026-08-12

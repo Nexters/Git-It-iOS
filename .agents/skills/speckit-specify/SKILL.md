@@ -175,9 +175,9 @@ Given that feature description, do this:
    planned-but-uncreated branch. If a hook reports a different branch or switches HEAD, treat that as
    an error and stop before creating/updating specification artifacts.
 
-   Do not invoke `.specify/scripts/bash/create-new-feature.sh`. The installed legacy script derives an
-   `NNN-short-name` branch value and couples it to the spec directory, which is incompatible with the
-   required slash namespace and independent spec-directory resolution.
+   `.specify/scripts/bash/create-new-feature.sh`를 사용할 때도 출력의 `BRANCH_NAME`은 현재
+   canonical Git-flow branch, `FEATURE_NUM`은 artifact sequence로 해석합니다. 스크립트가
+   branch를 생성하거나 전환하는 대신 Pre-Execution Checks가 이 상태를 먼저 확정합니다.
 
 3. **Create the spec feature directory**:
 

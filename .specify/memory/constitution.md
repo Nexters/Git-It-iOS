@@ -1,11 +1,8 @@
 <!--
 Sync Impact Report
-- Version change: 4.0.0 → 5.0.0
-- Modified principles: 4. 스킬별 수정 경로 — 브랜치, Git index와 로컬 커밋 변경이 파일
-  수정 허용 범위를 넓히지 않는다는 경계 추가; 7. 패키지 단위 구현 진행 — 선택 패키지의
-  작업을 논리적 커밋 단위로 설계하고 단위별 검증·커밋·성공 확인 후 진행하도록 변경;
-  8. Git-flow 브랜치 네임스페이스 — 훅 선택 실행 대신 /speckit-specify가 명세 산출물 생성
-  전에 브랜치를 직접 생성하도록 변경
+- Version change: 5.0.0 → 6.0.0
+- Modified principles: 8. Git-flow 브랜치 네임스페이스 — canonical identity, artifact
+  sequence, ephemeral pointer와 collision failure를 명시
 - Added sections: 없음
 - Removed sections: 없음
 - Templates requiring updates: ✅ .specify/templates/plan-template.md;
@@ -15,8 +12,8 @@ Sync Impact Report
   ✅ .agents/skills/speckit-implement/SKILL.md; ✅ .agents/skills/speckit-tasks/SKILL.md;
   ✅ .agents/skills/speckit-converge/SKILL.md; ✅ 나머지 설치된 Spec Kit 스킬 검토 완료
   (변경 불필요)
-- Runtime guidance requiring updates: ✅ AGENTS.md, README.md, docs/architecture.md,
-  .github/COMMIT_CONVENTION.md 검토 완료(변경 불필요)
+- Runtime guidance requiring updates: ✅ AGENTS.md, README.md;
+  ✅ docs/architecture.md, .github/COMMIT_CONVENTION.md 검토 완료(변경 불필요)
 - Evidence records: 없음
 - Follow-up TODO: 없음
 -->
@@ -24,9 +21,9 @@ Sync Impact Report
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 5.0.0<br>
+**버전**: 6.0.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-22
+**최종 수정일**: 2026-08-25
 
 ## 원칙
 
@@ -203,6 +200,24 @@ Sync Impact Report
   패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
 
 ### 8. Git-flow 브랜치 네임스페이스
+
+- 기능의 canonical identity는 검증된 현재 Git-flow branch 이름입니다. `NNN` prefix,
+  spec 디렉터리 basename, checkout 경로와 `.specify/feature.json`은 identity가 아닙니다.
+- 이 개정 전에 실제 branch로 사용한 `NNN-slug`는 history 보존을 위한 legacy canonical
+  identity로 계속 판독합니다. 신규 artifact와 branch에는 이 형식을 생성하지 않습니다.
+- `specs/<sequence>-<slug>`는 branch metadata에 연결된 artifact container입니다. sequence는
+  사람이 읽는 생성 순서이며 lookup key나 고유 ID가 아닙니다. 신규 sequential 번호는 기존
+  숫자 prefix 최댓값의 다음 번호를 no-clobber 방식으로 선택하며 과거 중복 번호는 소급
+  rename하지 않습니다.
+- `.specify/feature.json`은 삭제·재생성 가능한 ephemeral pointer입니다. 현재 branch와
+  `spec.md` metadata가 우선하며 pointer가 안전한 경로여도 현재 branch와 metadata가 다르면
+  stale로 실패하고 자동 선택하지 않습니다. 누락·malformed·지원하지 않는 metadata도 검증
+  성공에서 제외하지 않고 명시적으로 실패합니다.
+- 하나의 canonical branch가 둘 이상의 spec에 연결되면 identity collision으로 실패합니다.
+  기존 `미생성 (예정: <branch>)` metadata는 정확히 같은 branch를 lazy migration할 때만
+  읽으며 새 artifact에는 실제 branch association을 기록합니다.
+- feature directory는 저장소 `specs/`의 실제 비-symlink 직계 하위여야 합니다. 절대 외부
+  경로, `..`, 중첩 경로와 symlink escape는 읽기·쓰기 후보에서 제외합니다.
 
 - `/speckit-specify`는 기능 설명과 브랜치 유형을 검증한 직후, extension hook이나 명세
   디렉터리·파일을 처리하기 전에 현재 HEAD에서 로컬 기능 브랜치를 직접 생성하고 그 브랜치로
