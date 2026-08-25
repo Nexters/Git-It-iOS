@@ -24,12 +24,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## 세션 지식 기록 위임
 
-- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
-  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
-- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
-  `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
-  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+- 기록 적용 여부와 문턱은 Constitution 원칙 9를 단일 정본으로 따른다.
+- 이 스킬은 두 기록 파일을 직접 수정하지 않는다. 조건을 충족하면 전용
+  `$speckit-troubleshooting` 또는 `$speckit-tacit-knowledge`를 별도로 적용한다.
 
 ## Pre-Execution Checks
 
@@ -244,24 +241,24 @@ Append to the **end** of `tasks.md`, per the append contract:
    각 파일 변경 task는 부분 완료 없이 검증할 수 있는 하나의 원자적 목적과 정확한 저장소
    상대경로 하나를 포함해야 한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
    `<source-ref>`와 `<gap-type>`을 유지한 별도 task로 분리한다. Commit 제목이나 그룹은
-   append하지 않으며 `/speckit-implement`가 선택 패키지 안에서 실행 시점에 단위를 설계한다.
+   append하지 않으며 `/speckit-implement`가 실행 시점에 논리적 단위를 설계한다.
 
    Constitution-violation tasks MUST be emitted first and described as
    `CRITICAL`.
-   추가하는 모든 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 적용되지 않는 패키지를
-   제외한 의존성 위상 순서로 작업을 묶는다. 활성 tasks.md가 이미 확정한 패키지 순서가 있으면
-   그 순서를 따른다.
-   추가한 각 패키지 그룹 끝에 검증, 결과 보고와 명시적 사용자 승인 게이트를 둔다. 여러
-   패키지를 하나의 구현 단위로 합치지 않는다.
+   추가하는 파일 변경 작업을 책임 패키지에 배정하고 의존성 위상 순서로 작업을 묶는다. 분리하면
+   compile되지 않는 공개 API 이전·공용 manifest·migration은 불가분한 다중 패키지 integration
+   unit으로 배정하고 분리 불가 근거, 정확한 경로와 통합 검증을 기록한다.
+   각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위 또는 읽기 전용 전체
+   검증을 위한 승인 게이트는 추가하지 않는다. 새 권한이 필요한 경우에만 승인 작업을 append한다.
    `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 활성 tasks.md가
    확정한 의존성 위상 순서로 만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다.
-   공용 파일 변경은 패키지별 작업으로 분리하며 소유권을 결정할 수 없으면 append하지 않고
-   사용자에게 경계 결정을 요청한다.
+   공용 파일 변경은 분리 가능한 경우 패키지별 작업으로 나누고, 불가분하면 integration unit에
+   배치한다. 책임 단위나 검증을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.
    마지막 package subsection 뒤에는 `### 전체 수렴 완료 검증`을 append하고 새 ID의
    `[no-write]` tasks로 (1) 활성 plan/tasks가 요구하는 전체 build·compile·test와 (2) 영향받은
    변경 시나리오 수용 기준을 다시 검증하도록 한다. 기존 완료된 전체 검증 checkbox를 재사용하지
-   않는다. 이 global tasks는 `/speckit-implement`가 마지막 적용 패키지의
-   `FINALIZATION_TASKS`로 매핑해 필수 after hook과 함께 최종 commit 전에 실행한다.
+   않는다. 이 global tasks는 `/speckit-implement`가 마지막 실행 단위의 `FINALIZATION_TASKS`로
+   매핑해 반복 승인 없이 필수 after hook과 함께 최종 commit 전에 실행한다.
 4. Never reuse or renumber existing IDs. If a prior Convergence phase exists, add a new,
    separately-numbered one below it — do not touch the old one.
 
@@ -273,11 +270,9 @@ Append to the **end** of `tasks.md`, per the append contract:
 
 ### 8. 다음 작업 제시(인계)
 
-- On `tasks_appended`: state how many tasks were appended under which phase, and recommend
-  committing the appended tasks.md wording/structure as a separate baseline before running
-  `/speckit-implement` to complete them; note that this skill does not create that commit and a
-  follow-up converge run will find fewer or no remaining items. Include the newly appended whole
-  convergence-validation task count in the handoff.
+- On `tasks_appended`: state how many tasks were appended under which phase. Explain that
+  `/speckit-implement` captures the tasks.md blob hash and full diff as its baseline; a separate
+  baseline commit is optional. Include the newly appended whole convergence-validation task count.
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
   is needed for this feature's specified scope.
 

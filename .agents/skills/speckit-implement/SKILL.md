@@ -1,6 +1,6 @@
 ---
 name: "speckit-implement"
-description: "Execute tasks.md one package at a time by designing logical commit units, validating and committing each unit before continuing."
+description: "Execute tasks.md as ordered logical units, including justified multi-package integration units, validating and committing each unit before continuing."
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
@@ -24,12 +24,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## 세션 지식 기록 위임
 
-- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
-  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
-- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
-  `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
-  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+- 기록 적용 여부와 문턱은 Constitution 원칙 9를 단일 정본으로 따른다.
+- 이 스킬은 두 기록 파일을 직접 수정하지 않는다. 조건을 충족하면 전용
+  `$speckit-troubleshooting` 또는 `$speckit-tacit-knowledge`를 별도로 적용한다.
 
 ## Pre-Execution Checks
 
@@ -98,8 +95,9 @@ Each file-changing implementation task MUST name an exact repository-relative pa
 such as `sources/**` or `docs/**` is not a blanket allowance. If a needed file is absent from the
 task list, stop and request an updated task instead of modifying it. A `docs/**` file may be
 modified only when an incomplete task, a proven interrupted `[X]` resume task, or the active frozen
-unit names that exact current path and assigns it to one responsible package. Resolve the document root through
-`GIT_IT_DOCS_ROOT`; reject stale
+unit names that exact current path and assigns it to one responsible execution unit. A unit defaults
+to one package, but may be an explicitly justified multi-package integration unit. Resolve the
+document root through `GIT_IT_DOCS_ROOT`; reject stale
 `sources/docs/**` task paths and request `/speckit-tasks` correction. Do not create or
 amend ignore files unless an incomplete task, a proven interrupted `[X]` resume task, or the active
 frozen unit explicitly names that exact ignore file.
@@ -216,78 +214,71 @@ permission does not expand the file write allowlist above.
 5. Parse tasks.md structure and establish the execution boundary:
    - **활성 브랜치**: Require the current symbolic branch to equal the actual feature branch recorded
      in spec.md. Do not create or switch branches from this skill.
-   - **패키지 단계**: Derive applicable packages and their topological order from the architecture
-     dependency table and the order explicitly fixed by tasks.md. Do not use a hard-coded package list
-     or infer a new order during implementation.
+   - **실행 단위 단계**: Derive package units and explicit integration units from tasks.md. Preserve
+     package dependency order and do not invent a new unit during implementation.
    - **전체 최종화 작업**: Before package selection, map global `[no-write]` tasks under the whole
      completion-validation section, including an appended convergence phase's `전체 수렴 완료 검증`,
-     to the last applicable package as `FINALIZATION_TASKS`. This is an execution mapping only and MUST
-     NOT restructure tasks.md. It lets the last package be selected for finalization even when every
-     file-changing package task is already complete.
+     to the last execution unit as `FINALIZATION_TASKS`. This is an execution mapping only and MUST
+     NOT restructure tasks.md.
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, exact file paths, `[no-write]`, and parallel markers [P]
-   - **Execution flow**: Order, dependency, and explicit approval-gate requirements
-   - **패키지 소유권**: Every incomplete file-changing task and every resume task must be assigned to
-     exactly one applicable package in tasks.md, except global `FINALIZATION_TASKS`, whose sole allowed
-     ownership is the explicit execution mapping to the last applicable package above.
+   - **Execution flow**: Order, dependency, and risk-based approval requirements
+   - **실행 단위 소유권**: Every incomplete file-changing task and resume task must be assigned to one
+     package unit or one explicitly declared integration unit, except global `FINALIZATION_TASKS`, which
+     map to the last execution unit.
 
-   Do not infer or invent package ownership from a path or description. If ownership is absent,
-   spans packages, or creates a separate preparation/foundation/cleanup implementation phase, stop
-   before file changes and request a `/speckit-tasks` correction.
+   Do not infer ownership from a path alone. If the responsible unit, exact paths, non-separability
+   rationale, or validation is missing, stop before file changes and request `/speckit-tasks` correction.
 
-   **Classify the complete active tasks.md diff before selecting a package**:
-   - Inspect HEAD, index, and worktree versions of the entire active tasks.md. Classify every checkbox
-     and every diff hunk as one of: already committed, one current interrupted unit, or invalid.
+   **Capture and classify the active tasks.md baseline before selecting an execution unit**:
+   - Inspect HEAD, index, and worktree versions of the entire active tasks.md. Record its blob hash when
+     tracked and hash the complete worktree content plus its staged/unstaged diff as `TASKS_BASELINE`.
+     A separate baseline commit is optional and MUST NOT be required unless the user requested it or a
+     durable collaboration boundary is necessary.
    - A HEAD-relative `[X]` file-changing task is a resume task only when its exact task-file diff exists.
      A HEAD-relative `[X]` `[no-write]` task may form a tasks-only resume unit without a source diff;
      this applies to package validation and finalization tasks, not only the final task in the file.
-   - All uncommitted `[X]` transitions must belong to exactly one logical unit and one package (or that
-     package's `FINALIZATION_TASKS`). A checkbox reversal, an `[X]` file task without its exact file
-     diff, changes from multiple units/packages, wording or structure edits, or any other tasks.md hunk
-     is invalid and blocks implementation.
-   - Because the transaction stages tasks.md as one exact file, any pre-existing tasks.md change not
-     owned by that single resume unit would be consumed by the commit. Stop before modifying or staging
-     when such a hunk exists; require it to be committed, reverted by its owner, or otherwise resolved.
+   - Uncommitted `[X]` transitions must belong to one proven interrupted unit. Checkbox reversals or an
+     `[X]` file task without its exact file diff are invalid. Wording or structure edits are baseline
+     content when their ownership is established by the current request; do not require a separate commit.
+   - Because staging tasks.md consumes the whole file, freeze every baseline hunk. At commit time require
+     the staged tasks.md to equal `TASKS_BASELINE` plus only the current unit's checkbox transitions.
+     If another change appears, preserve it and stop before staging.
    - Existing exact file changes for still-incomplete tasks may be treated as an interrupted unmarked
      unit only when session evidence or an explicit user statement proves their ownership and all such
-     paths form one logical unit in one package. Otherwise preserve them and stop.
+     paths form one logical execution unit. Otherwise preserve them and stop.
 
    **Classify the remaining Git state**:
-   - Existing staged changes block a new unit. They may be resumed only when every staged path is the
-     active tasks.md or an exact path of the one proven interrupted unit, and the staged plus unstaged
-     diff contains nothing outside that unit.
+   - Existing staged changes block a new unit unless they are (a) only the active tasks.md baseline with
+     ownership established by the current request, or (b) exact paths of one proven interrupted unit.
+     Freeze an accepted staged tasks.md baseline and never add unrelated staged paths to the unit.
    - Changes on a selected-unit path whose ownership cannot be proven block the run. Matching an exact
      path is insufficient: every diff hunk in that file must belong to the one unit, because exact-file
      staging would otherwise consume a user's same-file change. Unrelated unstaged changes elsewhere
      remain baseline: preserve them and never stage or modify them.
 
-   **Select and authorize one package boundary**:
+   **Select and authorize one execution-unit boundary**:
    - A proven interrupted unit takes precedence, but it must be at the earliest incomplete/resume
-     boundary after all predecessor packages; otherwise stop for an inconsistent execution order.
-   - With no interrupted unit, select the first package in the fixed topological order that has an
-     incomplete task. If only incomplete `FINALIZATION_TASKS` remain, select the last applicable
-     package in finalization state. Skip only packages with neither incomplete, resume, nor mapped
-     finalization work. If tasks.md lacks its package order and rationale, request `/speckit-tasks`.
-   - Starting the first package, resuming a proven unit, or continuing a package that already has
-     committed progress needs no new cross-package approval. Starting a later untouched package
-     requires the current user-triggered input to explicitly approve `next` or that selected package
-     after the preceding package's results were reported. An automatic continuation or older generic
-     approval is insufficient; if unclear, stop and ask for approval without changing files.
-   - If tasks.md places an explicit approval gate between last-package work and whole-feature
-     validation, honor it. Commit and report the ordinary last-package units first, then run the
-     mapped tasks-only finalization unit only after the user's subsequent explicit approval. Do not
-     silently fold validation or hooks across that gate.
-   - During this run, do not modify files owned by any later package.
+     boundary after all predecessor units; otherwise stop for an inconsistent execution order.
+   - With no interrupted unit, select the first incomplete package or integration unit in the fixed
+     dependency order. If only `FINALIZATION_TASKS` remain, select the last unit in finalization state.
+   - The user's implementation request authorizes all ordinary units and read-only final validation in
+     the fixed tasks.md scope. Report progress after each unit, but do not stop for package transitions.
+   - Stop and request explicit approval only when the next action expands scope, is destructive or hard
+     to recover, changes remote/external state, consumes user-owned changes, or introduces a new security,
+     cost, or product decision. A package boundary alone is not an approval boundary.
+   - During the current unit, do not modify files owned by a later unit.
 
 6. **파일을 수정하기 전에 커밋 단위를 설계하고 인세션 계획으로 보고한다**:
-   - 선택 패키지의 각 미완료 작업 ID와 위에서 식별한 미커밋 `[X]` 재개 작업을 정확히 하나의
+   - 선택 실행 단위의 각 미완료 작업 ID와 위에서 식별한 미커밋 `[X]` 재개 작업을 정확히 하나의
      순서화된 커밋 단위에 배정한다. 작업 하나가 너무 넓어 논리적으로 분리해야 하지만
      checkbox 하나로 부분 완료를 표현할 수 없으면 구현하지 말고 `/speckit-tasks` 갱신을
      요청한다.
    - 각 단위에 `단위 ID`, 하나의 논리적 `목적`, 포함 `작업 ID`, 정확한 `파일 경로`, 실행할
      `검증`, `.github/COMMIT_CONVENTION.md`를 따르는 `[Tag] Message`를 명시한다.
-   - 하나의 단위는 선택 패키지만 포함하고 독립적으로 리뷰하고 되돌릴 수 있어야 한다. 직접
-     관련된 production 코드와 테스트는 함께 둘 수 있지만 독립적인 기능, refactor, rename,
+   - 하나의 단위는 독립적으로 리뷰하고 되돌릴 수 있어야 한다. 단일 패키지가 기본이지만,
+     tasks.md가 분리 불가 근거와 통합 검증을 명시한 integration unit은 여러 패키지를 포함할
+     수 있다. 직접 관련된 production 코드와 테스트는 함께 둘 수 있지만 독립적인 기능, refactor, rename,
      현재 목적과 무관하거나 독립적으로 되돌릴 수 있는 build 설정, 대규모 포맷 변경은
      분리한다. 코드와 함께 있어야 compile되는 target/source 연결은 같은 목적의 단위에 둘 수
      있다.
@@ -297,11 +288,11 @@ permission does not expand the file write allowlist above.
      대규모 포맷 변경에 적용한다.
    - `[P]` 작업은 같은 커밋 단위 안에서 서로 다른 파일을 다룰 때만 병렬 실행할 수 있다.
      서로 다른 커밋 단위와 모든 Git index/commit 작업은 직렬로 실행한다.
-   - 패키지 검증 `[no-write]` 작업은 해당 패키지의 마지막 ordinary unit에 배정한다. 명시적
-     승인 게이트가 가로막지 않으면 마지막 적용 패키지의 `FINALIZATION_TASKS`와 필수 post hook도
-     마지막 ordinary unit에 배정해 `FINAL_UNIT`으로 표시한다. 명시적 게이트가 있으면 후속 승인
-     뒤 tasks.md 완료 표시만 담는 tasks-only `FINAL_UNIT`을 둔다. 파일 변경 단위만 이미 commit된
-     단순 재개이고 게이트가 없으면 현재 실행에서 추가 승인 없이 tasks-only `FINAL_UNIT`을 둔다.
+   - 패키지 검증 `[no-write]` 작업은 관련 ordinary unit에 배정한다. 마지막 실행 단위의
+     `FINALIZATION_TASKS`와 필수 post hook은 마지막 ordinary unit에 배정해 `FINAL_UNIT`으로
+     표시한다. 기존 tasks.md의 패키지 승인 게이트 문구만으로는 새 권한이 생기지 않으므로,
+     Constitution 원칙 7의 위험 기준에 해당하지 않으면 반복 승인 없이 finalization을 진행한다.
+     파일 변경 단위만 이미 commit된 단순 재개이면 tasks-only `FINAL_UNIT`을 둔다.
      입증된 중단 상태에서는 비최종 `[no-write]` tasks-only unit도 첫 재개 단위가 될 수 있다.
    - 각 단위를 시작하기 직전에 계획한 작업 ID와 경로를 `UNIT_TASK_IDS`와 `UNIT_PATHS`로
      snapshot한다. 이후 formatter나 hook이 허용 경로를 바꾸지 못하며 commit 성공 또는 중단
@@ -309,8 +300,8 @@ permission does not expand the file write allowlist above.
    - 이 계획은 tasks.md 구조를 수정하지 않는다. tasks.md에서는 검증을 마친 기존 checkbox의
      상태만 바꾼다.
 
-7. 선택한 패키지의 커밋 단위를 계획 순서대로 하나씩 구현한다:
-   - **패키지 내부 실행**: 선택한 패키지 단계의 준비, 테스트, 구현, 정리, 검증 순서 준수
+7. 선택한 실행 단위의 커밋 단위를 계획 순서대로 하나씩 구현한다:
+   - **실행 단위 내부 실행**: 선택한 단계의 준비, 테스트, 구현, 정리, 검증 순서 준수
    - **Respect dependencies**: Run sequential tasks in order; parallel tasks [P] can run together
      only inside the current commit unit
    - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
@@ -319,12 +310,12 @@ permission does not expand the file write allowlist above.
      전에는 다음 단위 파일을 수정하지 않음
 
 8. Implementation execution rules:
-   - **패키지 준비 우선**: 선택한 패키지에 명시적으로 배정된 구조·의존성·구성 작업만 수행
+   - **실행 단위 준비 우선**: 선택한 단위에 명시적으로 배정된 구조·의존성·구성 작업만 수행
    - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
    - **Infrastructure development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
-   - **정리와 검증**: 선택한 패키지 소유 작업만 수행하고 전체 읽기 전용 검증은 마지막 적용
-     대상 패키지 완료 뒤에만 수행
+   - **정리와 검증**: 선택한 단위의 작업만 수행하고 전체 읽기 전용 검증은 마지막 구현 단위
+     완료 뒤 같은 실행에서 수행
 
 9. 각 커밋 단위를 다음 트랜잭션으로 완료한다:
    1. 예상 HEAD, 현재 브랜치, `UNIT_TASK_IDS`, `UNIT_PATHS`와 Git 상태를 다시 확인하고 baseline
@@ -338,12 +329,15 @@ permission does not expand the file write allowlist above.
       전에 실행한다. Hook 대상이 될 수 있는 무관한 기존 Swift 변경이 있으면 실행하지 않고
       중단한다. Hook이 `UNIT_PATHS`를 바꾸면 변경 경로를 검사하고 영향받은 검증을 다시 실행해
       그 결과를 같은 최종 단위에 포함한다. snapshot 범위 밖 파일을 바꾸면 commit하지 않는다.
-   5. staging 직전에 HEAD 대비 전체 tasks.md diff가 `UNIT_TASK_IDS`의 checkbox 전이만 포함하고
-      다른 hunk가 없음을 다시 확인한다. 그다음 `UNIT_PATHS`와 활성 `tasks.md`만
+   5. staging 직전에 전체 tasks.md가 `TASKS_BASELINE`과 현재 `UNIT_TASK_IDS`의 checkbox 전이만
+      포함하고 새 hunk가 없음을 다시 확인한다. 기준선 wording·structure가 현재 요청에 속한다면
+      같은 파일 staging에 포함될 수 있으며 cached diff에서 별도로 식별한다. 그다음
+      `UNIT_PATHS`와 활성 `tasks.md`만
       `git add -- <exact-unit-path>... <active-tasks.md>`로 stage한다. Tasks-only unit이면 빈 경로
       인수를 만들지 말고 활성 `tasks.md`만 명시한다.
    6. `git diff --cached --name-status`, 전체 cached diff와 `git diff --cached --check`를
-      확인한다. 계획한 경로와 checkbox만 포함되는지, 임시·디버그 파일이 없는지, 실제 diff와
+      확인한다. 계획한 경로, 허용된 tasks.md baseline hunk와 checkbox만 포함되는지,
+      임시·디버그 파일이 없는지, 실제 diff와
       예정 Tag/message가 일치하는지 검증한다. 범위 밖 staged 파일이 있으면 commit하지 않는다.
    7. 훅을 우회하지 않고 계획한 메시지로 `git commit`을 한 번 실행한다. 같은 checkout의
       다른 commit, pre-commit 또는 staged formatter 체인과 병렬 실행하지 않는다.
@@ -368,17 +362,18 @@ permission does not expand the file write allowlist above.
      committed.
 
 11. Completion validation:
-   - 선택한 실행 경계의 모든 필수 작업이 완료되었는지 확인. 명시적 최종화 승인 게이트가
-     남았다면 ordinary package work만 완료로 보고하고 `FINALIZATION_TASKS`는 완료로 표시하지 않음
-   - 선택한 패키지 구현이 원래 명세와 일치하는지 확인
-   - 선택한 패키지의 필수 테스트 통과와 커버리지 요구사항 충족 여부 검증
+   - 선택한 실행 단위의 모든 필수 작업이 완료되었는지 확인하고, 같은 범위의 다음 단위 또는
+     `FINALIZATION_TASKS`가 있으면 반복 승인 없이 계속함
+   - 선택한 실행 단위 구현이 원래 명세와 일치하는지 확인
+   - 선택한 실행 단위의 필수 테스트 통과와 커버리지 요구사항 충족 여부 검증
    - Confirm the implementation follows the technical plan
-   - 선택한 패키지의 각 커밋 SHA, 메시지, 작업 ID, 변경 파일과 정확한 검증 결과 보고
-   - 선택 패키지에서 이번 실행이 소유한 staged/unstaged 변경이 남지 않았고, 무관한 baseline
+   - 선택한 실행 단위의 각 커밋 SHA, 메시지, 작업 ID, 변경 파일과 정확한 검증 결과 보고
+   - 선택 단위에서 이번 실행이 소유한 staged/unstaged 변경이 남지 않았고, 무관한 baseline
      변경이 그대로 보존됐는지 확인
-   - 이후 적용 대상 패키지 또는 승인 대기 중인 finalization boundary가 남아 있으면 명시적
-     사용자 승인을 요청하고 중단. 기능 구현이 완료되지 않았으므로 이 시점에는 필수 사후 훅을
-     실행하지 않음
+   - 새 범위, 파괴적 작업, remote·외부 상태 변경, 사용자 소유 변경 소비 또는 새 제품 결정이
+     필요하면 그 작업 전에 중단하고 명시적 승인을 요청함
+   - 미완료 실행 단위가 남으면 5단계로 돌아가 다음 단위를 선택하고, 모두 끝난 경우에만
+     Mandatory Post-Execution Hooks와 Completion Report로 진행
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 
@@ -386,11 +381,10 @@ Note: This command assumes a complete task breakdown exists in tasks.md. If task
 
 **You MUST complete this section before reporting completion to the user.**
 
-모든 적용 대상 패키지와 전체 읽기 전용 검증이 완료된 뒤에만 이 훅을 실행한다. 마지막 적용
-패키지의 마지막 commit 단위에서는 위 9단계 트랜잭션의 staging 전에 이 섹션을 실행하고,
+모든 실행 단위와 전체 읽기 전용 검증이 완료된 뒤에만 이 훅을 실행한다. 마지막
+commit 단위에서는 위 9단계 트랜잭션의 staging 전에 이 섹션을 실행하고,
 hook 결과와 완료된 `tasks.md`를 그 최종 commit에 포함한다. 최종 commit 성공 뒤 이 섹션을
-다시 실행하지 않는다. 이후 적용 대상 패키지가 남아 있으면 훅을 실행하지 않고 11단계의
-패키지 승인 게이트에서 중단한다.
+다시 실행하지 않는다. 이후 실행 단위가 남아 있으면 훅을 실행하지 않고 다음 단위로 진행한다.
 
 이 섹션을 9단계의 최종 commit 전 절차로 실행한 경우, hook 실행 또는 생략 처리가 끝나면
 Completion Report로 건너뛰지 말고 9단계 5번의 정확한 staging으로 돌아간다. 최종 commit
@@ -437,17 +431,17 @@ the final commit. Otherwise continue to the Completion Report.
 
 ## Completion Report
 
-Report final status with the selected package, commit-unit plan, verified commit SHA/message/path
-for every completed unit, exact validation results, preserved baseline changes, and whether the next
-package requires approval.
+Report final status with the selected execution units, commit-unit plan, verified commit
+SHA/message/path for every completed unit, exact validation results, preserved baseline changes, and
+any boundary that required new authority.
 
 ## Done When
 
-- [ ] 선택한 실행 경계의 작업만 완료하고 `[X]`로 표시하며 승인 대기 작업은 미완료로 보존
+- [ ] 선택한 실행 단위의 작업을 완료하고 `[X]`로 표시하며 새 권한이 필요한 작업은 미완료로 보존
 - [ ] Implementation validated against specification, plan, and test coverage
-- [ ] 파일 수정 전에 선택 패키지의 커밋 단위 계획을 인세션에서 확정하고 보고
-- [ ] tasks.md의 모든 기존 diff hunk와 checkbox를 단일 재개 단위 또는 오류로 분류
+- [ ] 파일 수정 전에 선택 실행 단위의 커밋 계획을 인세션에서 확정하고 보고
+- [ ] tasks.md의 blob hash와 전체 diff를 기준선으로 고정하고 기존 hunk의 소유권을 분류
 - [ ] 각 단위를 정확한 파일과 checkbox만으로 검증·commit하고 SHA와 범위 확인
-- [ ] 선택 패키지 소유 변경은 남지 않고 무관한 baseline 변경은 그대로 보존
+- [ ] 선택 실행 단위 소유 변경은 남지 않고 무관한 baseline 변경은 그대로 보존
 - [ ] 모든 적용 대상 패키지가 완료된 경우에만 최종 commit 전에 확장 훅 실행 또는 생략 처리
-- [ ] 패키지, 커밋, 변경 파일과 검증 결과를 보고하고 다음 적용 대상 패키지 전에 명시적 승인 요청
+- [ ] 실행 단위, 커밋, 변경 파일과 검증 결과를 보고하고 새 권한이 필요한 경우에만 승인 요청

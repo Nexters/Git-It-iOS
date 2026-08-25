@@ -24,13 +24,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## 세션 지식 기록 위임
 
-- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
-  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
-- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
-  `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 `docs/spec-kit/<feature>/` 아래 두 기록 파일을 직접 수정해서는 안 된다.
-  가설적 위험, 단일 추측, 이미 명시된 사실에는 기록 스킬을 적용하지 않으며 조건이 없으면
-  파일을 만들지 않는다.
+- 기록 적용 여부와 문턱은 Constitution 원칙 9를 단일 정본으로 따른다.
+- 이 스킬은 `docs/spec-kit/<feature>/` 아래 두 기록 파일을 직접 수정하지 않는다. 조건을
+  충족하면 전용 `$speckit-troubleshooting` 또는 `$speckit-tacit-knowledge`를 별도로 적용한다.
 
 ## Scope Guard
 

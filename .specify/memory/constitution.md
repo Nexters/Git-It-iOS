@@ -1,27 +1,28 @@
 <!--
 Sync Impact Report
-- Version change: 5.0.0 → 6.0.0
-- Modified principles: 8. Git-flow 브랜치 네임스페이스 — canonical identity, artifact
-  sequence, ephemeral pointer와 collision failure를 명시
+- Version change: 6.0.0 → 7.0.0
+- Modified principles: 4. 스킬별 수정 경로 — 수정 경로 표를 단일 정본으로 지정;
+  7. 패키지 단위 구현 진행 → 위험 기반 실행 단위 — 반복 승인과 단일 패키지 강제를 제거하고
+  불가분한 다중 패키지 단위 및 선택적 기준선을 허용; 9. Spec Kit 세션 지식 기록 —
+  반복되거나 재사용 가능한 사건만 영구 기록하도록 문턱 강화
 - Added sections: 없음
 - Removed sections: 없음
 - Templates requiring updates: ✅ .specify/templates/plan-template.md;
-  ✅ .specify/templates/spec-template.md; ✅ .specify/templates/tasks-template.md;
+  ✅ .specify/templates/tasks-template.md; ✅ .specify/templates/spec-template.md (변경 불필요);
   ✅ .specify/templates/constitution-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md;
-  ✅ .agents/skills/speckit-implement/SKILL.md; ✅ .agents/skills/speckit-tasks/SKILL.md;
-  ✅ .agents/skills/speckit-converge/SKILL.md; ✅ 나머지 설치된 Spec Kit 스킬 검토 완료
-  (변경 불필요)
-- Runtime guidance requiring updates: ✅ AGENTS.md, README.md;
+- Commands requiring updates: ✅ 설치된 모든 `.agents/skills/speckit-*/SKILL.md`의 기록 조건;
+  ✅ speckit-plan, speckit-tasks, speckit-converge, speckit-implement의 실행 경계
+- Runtime guidance requiring updates: ⚠ AGENTS.md의 중복 수정 경로 표는 이 Skill의 허용
+  경로 밖이므로 후속 동기화 필요; ✅ README.md 검토 완료(변경 불필요);
   ✅ docs/architecture.md, .github/COMMIT_CONVENTION.md 검토 완료(변경 불필요)
 - Evidence records: 없음
-- Follow-up TODO: 없음
+- Follow-up TODO: AGENTS.md가 Constitution의 정본 표를 참조하도록 별도 사용자 지시로 동기화
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 6.0.0<br>
+**버전**: 7.0.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-25
 
@@ -111,8 +112,9 @@ Sync Impact Report
 | `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
 | `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
 | `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
-- 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
-  넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
+- 이 표가 Spec-Kit 수정 경로의 단일 정본입니다. 각 스킬 문서는 자신의 행을 참조하고 실행에
+  필요한 구체적인 제한만 덧붙이며, 전체 표나 다른 스킬의 범위를 복제하지 않습니다. 경로를
+  와일드카드로 넓히거나 새 경로를 추가하려면 Constitution 개정이 필요합니다.
 
 ### 6. 한국어 Spec-Kit 산출물
 
@@ -127,48 +129,49 @@ Sync Impact Report
 - 산출물을 완료로 보고하기 전에 새로 작성한 자연어 본문과 고정 문구가 이 원칙을 따르는지
   검토합니다.
 
-### 7. 패키지 단위 구현 진행
+### 7. 위험 기반 실행 단위
 
-- 현재 명세가 변경하는 패키지 중 한 번에 하나의 패키지만 구현합니다.
+- 구현의 기본 실행 경계는 하나의 목적과 검증 가능한 결과를 가진 논리적 단위입니다. 단일
+  패키지 단위가 기본이지만 공개 API 이전, 공용 manifest·구성 변경, 양쪽 변경이 함께 있어야
+  compile되는 migration처럼 분리하면 중간 상태가 깨지는 경우에는 불가분한 다중 패키지
+  integration unit을 허용합니다.
 - 적용 대상 패키지는 의존성 위상 순서로 구현합니다. A가 B를 빌드 의존성으로 참조하면 B를
   먼저 구현합니다. 순서의 근거는 [아키텍처 문서](../../docs/architecture.md)의 프로젝트 내부
   패키지 의존성 표이며, 고정된 패키지 이름 목록을 이 문서나 하위 산출물에 정본으로 두지
   않습니다.
-- 서로 의존하지 않는 패키지의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
-  한 번 정한 순서는 해당 명세의 구현이 끝날 때까지 바꾸지 않습니다.
+- 서로 의존하지 않는 단위의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
 - 현재 명세가 변경하지 않는 패키지는 건너뛰되, 남은 적용 대상 패키지 사이의 위상 순서는
   깨지 않습니다.
 - 의존성 표와 계획된 구현 순서가 어긋나면 구현을 시작하지 않습니다. 아키텍처 문서와
   `tasks.md`를 먼저 일치시키고, 어느 쪽이 옳은지 불분명하면 사용자에게 확인합니다.
-- 현재 패키지의 모든 구현 작업과 검증을 완료하고, 변경 파일과 검증 결과를 사용자에게
-  보고한 뒤 다음 적용 대상 패키지로 진행해도 된다는 명시적 승인을 받아야 합니다. 후속
-  패키지를 처음 시작하는 실행은 현재 사용자 입력에서 `다음` 또는 그 패키지를 승인했는지
-  확인해야 하며 자동 continuation이나 오래된 포괄 승인을 재사용하지 않습니다.
-- 다음 적용 대상 패키지의 영향 분석은 승인 전에 수행하고 보고할 수 있지만, 그 패키지에
-  속한 파일은 승인 전에 생성, 수정 또는 삭제할 수 없습니다.
-- `tasks.md`는 각 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 위 순서에 따른
-  패키지별 단계와 각 단계 끝의 검증 및 승인 게이트를 명시해야 합니다.
-- `/speckit-implement`는 선택한 패키지의 파일을 수정하기 전에 미완료 작업을 순서가 있는
+- 다중 패키지 단위는 포함 이유, 관련 작업 ID, 정확한 파일 경로, 의존 순서와 집중·통합 검증을
+  명시해야 합니다. 편의상 여러 목적을 묶거나 독립적으로 되돌릴 수 있는 변경을 포함하는
+  근거로 사용할 수 없습니다.
+- 패키지 또는 실행 단위 완료 뒤 변경 파일과 검증 결과를 진행 상황으로 보고하되, 다음 단위나
+  읽기 전용 전체 검증을 시작하기 위한 반복 승인을 요구하지 않습니다. 사용자의 최초 구현
+  요청은 확정된 `tasks.md` 범위의 일반적인 후속 단위와 읽기 전용 검증을 포함합니다.
+- 명시적 승인은 범위 확대, 파괴적 또는 복구 곤란한 작업, remote·외부 시스템 변경, 사용자
+  소유 변경의 소비, 새로운 보안·비용·제품 결정을 포함하는 등 현재 요청에 없는 권한이 필요할
+  때만 요청합니다. 승인 필요 여부는 패키지 경계가 아니라 위험과 권한 변화로 판단합니다.
+- `tasks.md`는 파일 변경 작업을 책임 패키지에 배정합니다. 불가분한 다중 패키지 단위는 별도
+  integration unit으로 표시하고 단일 패키지로 나눌 수 없는 이유를 기록합니다.
+- `/speckit-implement`는 파일을 수정하기 전에 미완료 작업을 순서가 있는
   논리적 커밋 단위로 설계해야 합니다. 각 단위는 하나의 목적, 포함 작업 ID, 정확한 파일
   경로, 실행할 검증과 `.github/COMMIT_CONVENTION.md`를 따르는 커밋 메시지를 명시하며,
-  하나의 패키지만 포함하고 독립적으로 되돌릴 수 있어야 합니다. 이 설계는 사용자에게
-  보고하는 인세션 실행 계획이며 `tasks.md`에는 기존 작업의 checkbox 상태 외에 커밋 계획
-  구조를 추가하지 않습니다.
-- 계획 전에 HEAD, index와 worktree의 활성 `tasks.md` 전체 diff를 검사합니다. 미커밋 `[X]`
-  전이는 정확한 파일 diff가 있는 단일 파일 단위 또는 파일 경로가 없는 단일 `[no-write]`
-  단위로 입증해야 합니다. 여러 단위·패키지의 완료 표시, checkbox 역전, wording·구조 변경과
-  소유할 수 없는 hunk가 있으면 파일 전체 staging이 이를 함께 소비하므로 구현 전에 중단합니다.
-- `/speckit-tasks`가 생성하거나 `/speckit-converge`가 append한 wording·structure 변경은 두
-  스킬이 commit하지 않으므로 `/speckit-implement` 전에 별도 기준선 commit으로 확정합니다.
-  Implement가 소비할 수 있는 미커밋 tasks.md 변경은 입증된 단일 중단 단위의 checkbox 전이뿐입니다.
+  독립적으로 리뷰하고 되돌릴 수 있어야 합니다. 이 설계는 인세션 실행 계획이며 `tasks.md`에는
+  기존 작업의 checkbox 상태 외에 커밋 계획 구조를 추가하지 않습니다.
+- 계획 전에 HEAD, index와 worktree의 활성 `tasks.md` 전체 diff를 검사합니다. 생성·일반 편집
+  상태의 `tasks.md`는 별도 commit을 강제하지 않고 현재 blob hash와 전체 diff를 실행 기준선으로
+  고정할 수 있습니다. Commit은 사용자가 요청했거나 협업상 영속 기준선이 필요한 경우에만
+  먼저 만듭니다.
+- 구현 중 `[X]` 전이와 wording·structure 변경을 구분합니다. 현재 단위가 소유하지 않은 hunk를
+  정확한 파일 staging이 함께 소비할 가능성이 있으면 변경을 보존하고 중단합니다. 기준선의
+  일반 편집을 구현 커밋에 포함하려면 그 범위와 소유권이 현재 요청으로 입증되어야 합니다.
 - 각 단위를 시작할 때 작업 ID와 정확한 파일 경로를 snapshot하며, 이 허용 범위는 checkbox를
   `[X]`로 바꾼 뒤에도 commit 성공 또는 중단까지 유지됩니다. Formatter와 hook은 snapshot을
   넓힐 수 없고 다음 단위 경로를 미리 활성화할 수 없습니다.
-- 구현과 직접 관련된 테스트는 같은 커밋 단위에 포함할 수 있지만 기능 구현, 구조 정리,
-  rename과 현재 단위와 무관한 대규모·전역 포맷처럼 독립적으로 되돌려야 하는 목적은
-  분리합니다. 현재 단위의 정확한 파일에 commit hook 또는 필수 formatter가 적용한 포맷
-  결과는 같은 단위에 포함합니다. 미완성 작업, `WIP`, 서로 다른 패키지 또는 현재 단위와
-  무관한 기존 변경은 커밋 단위에 포함하지 않습니다.
+- 구현과 직접 관련된 테스트와 불가분한 target·manifest 연결은 같은 커밋 단위에 포함할 수
+  있습니다. 독립적인 기능, 구조 정리, rename, 대규모 포맷과 무관한 기존 변경은 분리합니다.
 - 각 커밋 단위는 작업 수행, 단위 검증, 해당 작업의 `[X]` 표시, 정확한 단위 파일과 활성
   `tasks.md`만 stage, staged 범위 검사, 훅을 우회하지 않는 커밋, 생성된 커밋 확인 순서로
   완료합니다. 커밋 성공과 함께 단위 파일 및 tasks.md에 staged·unstaged·untracked 잔여가
@@ -177,27 +180,23 @@ Sync Impact Report
   검증이 실패하면 변경을 보존하고 중단합니다. 같은 Git 변경 체인을 병렬 실행하거나 원인을
   확인하지 않은 채 재시도하지 않으며, `/speckit-implement`는 commit을 amend, rebase, push하지
   않습니다.
-- 준비, 기반, 마무리와 횡단 관심사는 별도의 다중 패키지 구현 단계가 될 수 없습니다.
-  파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
-  파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
-  마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
-- 패키지 밖의 전체 읽기 전용 검증 작업은 실행 시 마지막 적용 패키지의 최종화 작업으로
-  매핑합니다. 파일 단위가 이미 commit됐으면 tasks.md 완료 표시만 담는 최종화 단위를 둘 수
-  있습니다. 활성 tasks.md가 마지막 패키지 작업과 전체 검증 사이에 명시적 승인 게이트를
-  두었다면 ordinary unit을 먼저 commit·보고하고 후속 승인 뒤에만 최종화 단위를 실행합니다.
+- 준비, 기반, 마무리와 횡단 관심사는 책임 패키지 단위 또는 불가분한 integration unit에
+  배치합니다. 공용 파일을 억지로 패키지별 변경으로 나눠 중간 상태를 깨뜨리지 않습니다.
+- 전체 읽기 전용 검증은 필요한 구현 단위가 끝난 같은 실행에서 이어서 수행합니다. 별도의
+  승인 게이트를 만들지 않으며, 새 권한이나 범위 확대가 발견된 경우에만 중단합니다.
 - `/speckit-converge`가 새 파일 작업을 append하면 같은 수렴 단계 끝에 새 전체 `[no-write]`
   검증 작업도 append합니다. 이전에 완료된 전체 검증 checkbox를 재사용하지 않으며 새 검증과
   필수 after hook은 수렴 작업의 마지막 최종화 단위에서 다시 실행합니다.
-- 모든 적용 대상 패키지와 전체 읽기 전용 검증이 완료되면 마지막 커밋 단위를 commit하기
+- 모든 실행 단위와 전체 읽기 전용 검증이 완료되면 마지막 커밋 단위를 commit하기
   전에 포맷 훅을 실행합니다. 훅은 현재 작업 트리에서 추가 또는 수정된 Swift 파일을
   `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점으로 수정하고 Git index는 변경하지 않습니다.
   활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않지만, 현재 단위 밖의 기존 Swift
   변경이 있으면 사용자 소유 변경을 침범할 수 있으므로 훅을 실행하지 않고 중단합니다. 훅의
   허용된 결과와 완료 표시를 같은 마지막 커밋 단위에 포함하고 commit 뒤 다시 실행하지
   않습니다. 필수 훅이 실패하면 마지막 단위를 stage 또는 commit하지 않습니다.
-- 의존 관계 변경으로 패키지 구현 순서가 달라지면 이미 완료된 작업과 기존 변경은 이력으로
-  보존하되 더 수정하지 않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
-  패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
+- 의존 관계 변경으로 실행 순서가 달라지면 이미 완료된 작업과 기존 변경은 이력으로 보존하고
+  남은 작업을 새 순서 또는 integration unit으로 이관한 뒤 계속합니다. 어느 쪽이 옳은지
+  불분명하거나 새 범위가 필요하면 중단하고 `tasks.md`를 먼저 갱신합니다.
 
 ### 8. Git-flow 브랜치 네임스페이스
 
@@ -265,22 +264,22 @@ Sync Impact Report
 
 ### 9. Spec Kit 세션 지식 기록
 
-- Spec Kit 세션에서 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면
-  `$speckit-troubleshooting`으로 `docs/spec-kit/<feature>/trouble-shooting.md`에 증상,
-  영향, 근거, 원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. `<feature>`는 활성 기능
-  디렉터리의 이름과 같아야 하며, 발생하지 않은 위험이나 근거 없는 가능성은 기록하지
-  않습니다.
-- 여러 세션과 저장소 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
-  의사결정 기준 또는 반복 패턴을 해석하면 `$speckit-tacit-knowledge`로 활성 기능의
-  `docs/spec-kit/<feature>/tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도,
-  적용·제외 범위, 반례와 검증 조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의
-  복사는 기록하지 않습니다.
+- 일시적 실패나 한 번의 환경 오류만으로 영구 기록을 만들지 않습니다. 세션 안에서 해결된
+  일반적인 명령 오타, Simulator·network 일시 장애와 재시도 가능한 도구 오류는 실제 결과와
+  미검증 범위를 사용자 보고에만 남깁니다.
+- `$speckit-troubleshooting`은 같은 원인이 합리적인 재시도 뒤에도 반복되거나, 원인과 복구
+  절차가 다른 세션에서 재사용 가능하거나, 해결되지 않은 상태가 후속 세션에 영향을 주거나,
+  사용자가 영구 기록을 명시적으로 요청한 경우에만 적용합니다. 기록에는 증상, 영향, 근거,
+  원인, 조치, 검증 상태와 재발 방지를 포함합니다.
+- 여러 세션과 저장소의 독립 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
+  의사결정 기준 또는 반복 패턴을 해석한 경우에만 `$speckit-tacit-knowledge`를 적용합니다.
+  단일 사건, 단일 추측이나 이미 명시된 사실은 암묵지로 기록하지 않습니다.
 - 두 기록은 append-only입니다. 기존 항목을 수정·삭제하지 않으며 교정, 재발, 반증과 상태
   변화는 선행 ID를 참조하는 새 항목으로 남깁니다. 기록 조건을 충족하지 않으면 빈 파일이나
   placeholder를 만들지 않습니다.
-- 문제 자체와 그 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단 기준은
-  `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록 ID를
-  연결합니다.
+- 문제 자체와 재사용 가능한 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단
+  기준은 `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록
+  ID를 연결합니다.
 - 기록은 Constitution, 명세, 계획, 작업 목록과 현재 소스보다 우선하지 않습니다. 암묵지를
   규범, 요구사항, 설계 결정 또는 구현 작업으로 승격하려면 해당 산출물을 소유한 Spec Kit
   스킬을 별도로 실행해야 합니다.
