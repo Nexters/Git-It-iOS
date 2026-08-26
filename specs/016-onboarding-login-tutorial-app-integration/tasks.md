@@ -17,7 +17,21 @@ description: "온보딩·로그인·튜토리얼 App 통합 구현 작업 목록
 
 **부분 갱신 사유 1(같은 세션, needsCuration)**: 같은 `/speckit-analyze` 세션에서 research.md §10·data-model.md("LoginResponse")·contracts/onboarding-flow.md(Phase 계약, 로그인 직후 curation 판정)가 이미 `LoginResponse.needsCuration`으로 로그인 직후 curation 필요 여부를 판정하도록 결정했지만, 이 결정이 Domain·Feature 작업에 반영되지 않은 공백이 확인됐다. 저장소의 현재 미커밋 상태(`LoginResponseDTO.needsCuration`, `LocalOnboardingState.needsCuration`, `LoginSessionRepositoryAdapter.start(with:)`가 로그인 성공 시 `needsCuration`을 세션 record에 저장하는 동작)는 이미 이 값을 세션 정본에 보존하고 있어 Data·Composition 작업은 추가 변경이 필요하지 않다. Domain(SignInResult·SignIn.swift)과 Feature(reducer) 작업을 이 값이 `SignInResult.success`를 통해 Feature까지 손실 없이 전달되도록 갱신했다.
 
-**부분 갱신 사유 2(저장 기술, `/speckit-plan` 재실행)**: 같은 `/speckit-analyze` 세션에서 정책 동의 로컬 저장 기술이 plan.md의 "먼저 검증하고 선택" 요구에도 research.md에 구체 기술명 없이 남아 있는 공백(F2)이 확인됐다. `/speckit-plan`을 다시 실행해 기존 `KeychainStore`(앱 삭제 후에도 유지될 수 있음)와 `InMemoryCache`(프로세스 재시작 시 소실)가 각각 FR-041의 "앱 데이터 삭제 시 무효화"·"로그아웃 후 유지" 요건을 만족하지 못함을 확인했고, Infrastructure에 `UserDefaultsStore` 범용 기술 API를 신설하기로 결정했다([research.md §3.1](./research.md), [plan.md](./plan.md)). 이 문서는 그 결정에 따라 **작업 패키지 2: Infrastructure**를 새로 추가하고, Data 이후 모든 작업 ID를 4개씩 뒤로 밀어 재번호를 매겼다(T028부터 T100까지).
+**부분 갱신 사유 2(저장 기술, `/speckit-plan` 재실행)**: 같은 `/speckit-analyze` 세션에서 정책 동의 로컬 저장 기술이 plan.md의 "먼저 검증하고 선택" 요구에도 research.md에 구체 기술명 없이 남아 있는 공백(F2)이 확인됐다. `/speckit-plan`을 다시 실행해 기존 `KeychainStore`(앱 삭제 후에도 유지될 수 있음)와 `InMemoryCache`(프로세스 재시작 시 소실)가 각각 FR-041의 "앱 데이터 삭제 시 무효화"·"로그아웃 후 유지" 요건을 만족하지 못함을 확인했고, Infrastructure에 `UserDefaultsStore` 범용 기술 API를 신설하기로 결정했다([research.md §3.1](./research.md), [plan.md](./plan.md)). 이 문서는 그 결정에 따라 **작업 패키지 2: Infrastructure**를 새로 추가하고, Data 이후 모든 작업 ID를 4개씩 뒤로 밀어 재번호를 매겼다(T028부터 T101까지).
+
+**부분 갱신 사유 3(Composition Tuist 의존성 공백, `/speckit-implement` 세션 2026-08-26)**: 같은
+`016-onboarding-login-tutorial-app-integration` 기능의 `/speckit-implement` 세션에서 Composition
+패키지 T045(구 번호, `PolicyConsentRepositoryAdapterTests.swift`)·T051(구 번호,
+`PolicyConsentRepositoryAdapter.swift`)를 구현하려면 `CompositionAdapter` target이
+`DataLegalConsent`(Data 패키지 T039~T041에서 신설)와 `InfrastructureCache`(Infrastructure
+패키지 T030~T031에서 신설)를 새로 의존해야 하는데, 이 선언이 가능한
+`sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`가 Composition
+패키지 소유 경로에 없고 어떤 작업도 이 파일을 명시하지 않는 공백이 확인됐다(Infrastructure
+T031, Data T042와 달리 대응 작업 누락, `docs/spec-kit/016-onboarding-login-tutorial-app-integration/trouble-shooting.md`의
+TS-20260826-006). 이 문서는 그 공백을 반영해 Composition 패키지 "준비와 테스트" 절 앞에
+Tuist 의존성 선언 작업을 새 T044로 추가하고, Composition 이후 모든 작업 ID를 1개씩 뒤로 밀어
+재번호를 매겼다(T045부터 T102까지). Domain·Infrastructure·Data 패키지의 작업 ID(T001~T043)는
+바꾸지 않았다.
 
 ## 형식: `[ID] [P?] [시나리오?] 설명`
 
@@ -95,17 +109,17 @@ description: "온보딩·로그인·튜토리얼 App 통합 구현 작업 목록
 
 ### 테스트
 
-- [ ] T028 [P] [S2] `sources/Projects/Infrastructure/Tests/Storage/UserDefaultsStoreTests.swift`에 Codable 값의 저장 후 조회 round-trip, 같은 키 재저장 시 값 교체, 서로 다른 namespace/키 간 격리 테스트를 작성한다
-- [ ] T029 [P] [S2] `sources/Projects/Infrastructure/Tests/Storage/UserDefaultsStoreTests.swift`(같은 파일, 별도 테스트)에 `removeValue`·`removeAll` 후 조회가 `nil`을 반환하는 테스트와, 저장되지 않은 키 조회·손상된 raw 값 디코딩 실패가 오류 없이 `nil`을 반환하는 테스트를 추가한다
+- [X] T028 [P] [S2] `sources/Projects/Infrastructure/Tests/Storage/UserDefaultsStoreTests.swift`에 Codable 값의 저장 후 조회 round-trip, 같은 키 재저장 시 값 교체, 서로 다른 namespace/키 간 격리 테스트를 작성한다
+- [X] T029 [P] [S2] `sources/Projects/Infrastructure/Tests/Storage/UserDefaultsStoreTests.swift`(같은 파일, 별도 테스트)에 `removeValue`·`removeAll` 후 조회가 `nil`을 반환하는 테스트와, 저장되지 않은 키 조회·손상된 raw 값 디코딩 실패가 오류 없이 `nil`을 반환하는 테스트를 추가한다
 
 ### 구현
 
-- [ ] T030 [S2] `sources/Projects/Infrastructure/Storage/UserDefaultsStore.swift`에 `InMemoryCache`와 같은 스타일의 제네릭 key-value 범용 기술 API(`store(_:forKey:)`, `value(forKey:)`, `removeValue(forKey:)`, `removeAll()`)를 `UserDefaults` 위에 구현한다. Domain·Data 의미를 노출하지 않고 Codable 값만 다룬다([research.md §3.1](../../../specs/016-onboarding-login-tutorial-app-integration/research.md))
-- [ ] T031 [S2] `sources/Projects/Infrastructure/Project.swift`에 `UserDefaultsStore`를 포함하는 기존 `InfrastructureCache`(또는 대응 target) source 선언만 갱신한다. 새 외부 라이브러리 의존성은 추가하지 않는다
+- [X] T030 [S2] `sources/Projects/Infrastructure/Storage/UserDefaultsStore.swift`에 `InMemoryCache`와 같은 스타일의 제네릭 key-value 범용 기술 API(`store(_:forKey:)`, `value(forKey:)`, `removeValue(forKey:)`, `removeAll()`)를 `UserDefaults` 위에 구현한다. Domain·Data 의미를 노출하지 않고 Codable 값만 다룬다([research.md §3.1](../../../specs/016-onboarding-login-tutorial-app-integration/research.md))
+- [X] T031 [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift`에 `UserDefaultsStore`를 포함하는 기존 `InfrastructureCache`(또는 대응 target) source 선언만 갱신한다(`sources/Projects/Infrastructure/Project.swift`는 `ProjectName.Infrastructure.project`만 참조하는 1줄 포인터라 target source 선언을 담지 못함을 확인함). 새 외부 라이브러리 의존성은 추가하지 않는다
 
 ### 정리와 패키지 검증
 
-- [ ] T032 [no-write] `sources/Projects/Infrastructure/`를 대상으로 Infrastructure 전용 test scheme을 실행하고 `UserDefaultsStore`의 저장·조회·삭제·격리 계약 결과를 보고한다
+- [X] T032 [no-write] `sources/Projects/Infrastructure/`를 대상으로 Infrastructure 전용 test scheme을 실행하고 `UserDefaultsStore`의 저장·조회·삭제·격리 계약 결과를 보고한다
 
 **승인 게이트**: T028~T032의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 Data 진행을 명시적으로 승인하기 전에는 Data 파일을 변경하지 않는다.
 
@@ -124,23 +138,23 @@ description: "온보딩·로그인·튜토리얼 App 통합 구현 작업 목록
 
 ### 테스트
 
-- [ ] T033 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/MemberProfileResponseDTOTests.swift`에 두 필드의 null 조합과 미지원 non-null raw value decoding 실패 테스트를 추가한다
-- [ ] T034 [P] [S1] `sources/Projects/Data/Tests/Member/Errors/DataMemberErrorTests.swift`에 `(404, MEMBER-001)`과 일반 404·transport·5xx·decoding 오류 분류 테스트를 추가한다
-- [ ] T035 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/PolicyConsentRecordDTOTests.swift`에 문서별 record 직렬화와 회원·Apple 계정 식별자 부재 테스트를 작성한다
-- [ ] T036 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/LocalPolicyConsentStoreTests.swift`에 `UserDefaultsStore` 기반 구현이 logout과 무관하게 설치 단위로 유지되고, 문서별 교체와 앱 데이터 초기화(새 `UserDefaultsStore` 인스턴스 시뮬레이션) 후 부재를 만족하는 테스트를 작성한다
+- [X] T033 [P] [S1] `sources/Projects/Data/Tests/Member/DTOs/MemberProfileResponseDTOTests.swift`에 두 필드의 null 조합과 미지원 non-null raw value decoding 실패 테스트를 추가한다
+- [X] T034 [P] [S1] `sources/Projects/Data/Tests/Member/Errors/DataMemberErrorTests.swift`에 `(404, MEMBER-001)`과 일반 404·transport·5xx·decoding 오류 분류 테스트를 추가한다
+- [X] T035 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/PolicyConsentRecordDTOTests.swift`에 문서별 record 직렬화와 회원·Apple 계정 식별자 부재 테스트를 작성한다
+- [X] T036 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/LocalPolicyConsentStoreTests.swift`에 `UserDefaultsStore` 기반 구현이 logout과 무관하게 설치 단위로 유지되고, 문서별 교체와 앱 데이터 초기화(새 `UserDefaultsStore` 인스턴스 시뮬레이션) 후 부재를 만족하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T037 [S1] `sources/Projects/Data/Member/DTOs/MemberProfileResponseDTO.swift`에서 `position`·`careerLevel`을 `String?`으로 선언해 JSON null을 그대로 보존하고 unknown 문자열을 null로 치환하지 않는다
-- [ ] T038 [S1] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에 계약된 미가입 응답과 retryable transport·server·decoding 오류를 구분하는 의미를 추가한다
-- [ ] T039 [S2] `sources/Projects/Data/LegalConsent/Models/PolicyConsentRecordDTO.swift`에 계정 식별자가 없는 Codable 저장 모델을 구현한다
-- [ ] T040 [S2] `sources/Projects/Data/LegalConsent/Contracts/PolicyConsentStore.swift`에 설치 단위 record 조회·저장·초기화 계약을 정의한다
-- [ ] T041 [S2] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`에 Infrastructure `UserDefaultsStore`를 사용하는 document ID별 저장 구현을 추가한다(더 이상 "기존 범용 저장 API"로 미확정 상태를 두지 않고 T030에서 신설한 구체 API를 직접 참조한다)
-- [ ] T042 [S2] `sources/Projects/Data/Project.swift`에 `DataLegalConsent` source/test target과 `InfrastructureCache`(또는 T031에서 확정한 target명) 의존성만 선언한다
+- [X] T037 [S1] `sources/Projects/Data/Member/DTOs/MemberProfileResponseDTO.swift`에서 `position`·`careerLevel`을 `String?`으로 선언해 JSON null을 그대로 보존하고 unknown 문자열을 null로 치환하지 않는다
+- [X] T038 [S1] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에 계약된 미가입 응답과 retryable transport·server·decoding 오류를 구분하는 의미를 추가한다
+- [X] T039 [S2] `sources/Projects/Data/LegalConsent/Models/PolicyConsentRecordDTO.swift`에 계정 식별자가 없는 Codable 저장 모델을 구현한다
+- [X] T040 [S2] `sources/Projects/Data/LegalConsent/Contracts/PolicyConsentStore.swift`에 설치 단위 record 조회·저장·초기화 계약을 정의한다
+- [X] T041 [S2] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`에 Infrastructure `UserDefaultsStore`를 사용하는 document ID별 저장 구현을 추가한다(더 이상 "기존 범용 저장 API"로 미확정 상태를 두지 않고 T030에서 신설한 구체 API를 직접 참조한다)
+- [X] T042 [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataLegalConsent` source/test target과 `InfrastructureCache`(또는 T031에서 확정한 target명) 의존성만 선언한다(`sources/Projects/Data/Project.swift`는 `ProjectName.Data.project`만 참조하는 1줄 포인터라 target source 선언을 담지 못함을 확인함). 새 target rawValue를 `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 Data shared scheme 대상 목록에도 함께 반영한다
 
 ### 정리와 패키지 검증
 
-- [ ] T043 [no-write] `sources/Projects/Data/`를 대상으로 Data 전용 test scheme을 실행하고 S1·S2 계약 테스트 및 기존 미커밋 DTO 변경 보존 여부를 보고한다
+- [X] T043 [no-write] `sources/Projects/Data/`를 대상으로 Data 전용 test scheme을 실행하고 S1·S2 계약 테스트 및 기존 미커밋 DTO 변경 보존 여부를 보고한다
 
 **승인 게이트**: T033~T043의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 Composition 진행을 명시적으로 승인하기 전에는 Composition 파일을 변경하지 않는다.
 
@@ -157,28 +171,29 @@ Member graph를 하나의 production composition으로 조립한다.
 
 **독립 검증**: adapter 테스트에서 null·404·오류 변환, `SignInResult`·`SignOutResult`·`RestoreSessionResult` 전달, consent 수명, `CompleteCurationUseCase` 단일 정본 노출을 검증한다.
 
-### 테스트
+### 준비와 테스트
 
-- [ ] T044 [P] [S1] `sources/Projects/Composition/Tests/Adapter/MemberRepositoryAdapterTests.swift`에 nullable profile, 계약된 404, transport·5xx·decoding 변환 테스트를 추가한다
-- [ ] T045 [P] [S2] `sources/Projects/Composition/Tests/Adapter/PolicyConsentRepositoryAdapterTests.swift`에 manifest 문서와 저장 record의 version 유효성 및 logout 후 유지 테스트를 작성한다
-- [ ] T046 [P] [S1] `sources/Projects/Composition/Tests/Adapter/AuthenticationRepositoryAdapterTests.swift`에 `SignInResult`의 `cancelled`/`retryableFailure` 구분, `RestoreSessionResult`의 3케이스 전달, `SignOutResult`의 로컬 정리 실패 노출이 손실 없이 유지되는 테스트를 작성한다
-- [ ] T047 [P] [S1] `sources/Projects/Composition/Tests/Adapter/AuthenticationAssemblyTests.swift`를 갱신해 `SignInUseCase`·`SignOutUseCase`·`RestoreSessionUseCase`가 신규 결과 타입을 반환하는 조립 계약 테스트로 대체한다
-- [ ] T048 [P] [S3] `sources/Projects/Composition/Tests/Adapter/AppCompositionTests.swift`에 Member graph의 `CompleteCurationUseCase` 단일 정본과 Domain protocol 전용 공개 테스트를 작성한다
+- [X] T044 [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 `CompositionAdapter` target `dependencies`에 `.fromData(.DataLegalConsent)`와 `.fromInfrastructure(.InfrastructureCache)`만 추가한다(`docs/package-rules/composition.md`에 따라 Composition은 Infrastructure `UserDefaultsStore`를 직접 참조하지 않고 Data `DataLegalConsent`의 concrete 구현을 거쳐야 하므로 두 target 모두 필요함을 확인함). 새 target 선언이나 다른 패키지 의존성은 추가하지 않는다. T045이 `DataLegalConsent` 타입을 import하려면 이 target 선언이 먼저 있어야 한다
+- [X] T045 [P] [S1] `sources/Projects/Composition/Tests/Adapter/MemberRepositoryAdapterTests.swift`에 nullable profile, 계약된 404, transport·5xx·decoding 변환 테스트를 추가한다
+- [X] T046 [P] [S2] `sources/Projects/Composition/Tests/Adapter/PolicyConsentRepositoryAdapterTests.swift`에 manifest 문서와 저장 record의 version 유효성 및 logout 후 유지 테스트를 작성한다
+- [X] T047 [P] [S1] `sources/Projects/Composition/Tests/Adapter/AuthenticationRepositoryAdapterTests.swift`에 `SignInResult`의 `cancelled`/`retryableFailure` 구분, `RestoreSessionResult`의 3케이스 전달, `SignOutResult`의 로컬 정리 실패 노출이 손실 없이 유지되는 테스트를 작성한다
+- [X] T048 [P] [S1] `sources/Projects/Composition/Tests/Adapter/AuthenticationAssemblyTests.swift`를 갱신해 `SignInUseCase`·`SignOutUseCase`·`RestoreSessionUseCase`가 신규 결과 타입을 반환하는 조립 계약 테스트로 대체한다
+- [X] T049 [P] [S3] `sources/Projects/Composition/Tests/Adapter/AppCompositionTests.swift`에 Member graph의 `CompleteCurationUseCase` 단일 정본과 Domain protocol 전용 공개 테스트를 작성한다
 
 ### 구현
 
-- [ ] T049 [S1] `sources/Projects/Composition/Adapter/MemberRepositoryAdapter.swift`에서 Data null을 Domain optional `MemberProfile.position`/`careerLevel`로 보존하고 계약된 404만 `unregistered`로 변환한다
-- [ ] T050 [S1] `sources/Projects/Composition/Adapter/AuthenticationRepositoryAdapter.swift`에서 로컬 인증 정리 오류를 `SignOutResult.retryableFailure`로, Apple 인증 취소를 `SignInResult.cancelled`로, 세션 복구 실패를 `RestoreSessionResult.recoverableFailure`로 손실 없이 변환한다
-- [ ] T051 [S2] `sources/Projects/Composition/Adapter/PolicyConsentRepositoryAdapter.swift`에 Domain 정책 계약과 Data 설치 단위 store 사이의 record 변환을 구현한다
-- [ ] T052 [S2] `sources/Projects/Composition/Adapter/AuthenticationAssembly.swift`에 정책 동의 adapter와 명시적 local cleanup use case를 같은 session 수명으로 조립하고 `SignIn`·`SignOut`·`RestoreSession`이 신규 결과 타입을 반환하도록 조립을 갱신한다
-- [ ] T053 [S3] `sources/Projects/Composition/Adapter/MemberAssembly.swift`가 `CompleteCurationUseCase`의 유일한 production 조립 지점이 되도록 정리한다
-- [ ] T054 [S1] `sources/Projects/Composition/Adapter/AppComposition.swift`에 profile·curation·policy·cleanup Domain protocol을 노출하고 중복 curation assembly를 제거한다
+- [X] T050 [S1] `sources/Projects/Composition/Adapter/MemberRepositoryAdapter.swift`에서 Data null을 Domain optional `MemberProfile.position`/`careerLevel`로 보존하고 계약된 404만 `unregistered`로 변환한다
+- [X] T051 [S1] `sources/Projects/Composition/Adapter/AuthenticationRepositoryAdapter.swift`에서 로컬 인증 정리 오류를 `SignOutResult.retryableFailure`로, Apple 인증 취소를 `SignInResult.cancelled`로, 세션 복구 실패를 `RestoreSessionResult.recoverableFailure`로 손실 없이 변환한다
+- [X] T052 [S2] `sources/Projects/Composition/Adapter/PolicyConsentRepositoryAdapter.swift`에 Domain 정책 계약과 Data 설치 단위 store 사이의 record 변환을 구현한다
+- [X] T053 [S2] `sources/Projects/Composition/Adapter/AuthenticationAssembly.swift`에 정책 동의 adapter와 명시적 local cleanup use case를 같은 session 수명으로 조립하고 `SignIn`·`SignOut`·`RestoreSession`이 신규 결과 타입을 반환하도록 조립을 갱신한다
+- [X] T054 [S3] `sources/Projects/Composition/Adapter/MemberAssembly.swift`가 `CompleteCurationUseCase`의 유일한 production 조립 지점이 되도록 정리한다
+- [X] T055 [S1] `sources/Projects/Composition/Adapter/AppComposition.swift`에 profile·curation·policy·cleanup Domain protocol을 노출하고 중복 curation assembly를 제거한다
 
 ### 정리와 패키지 검증
 
-- [ ] T055 [no-write] `sources/Projects/Composition/`을 대상으로 Composition 전용 test scheme을 실행하고 S1~S3 경계 변환, 신규 결과 타입 전파, 직접 Data 타입 비노출을 보고한다
+- [X] T056 [no-write] `sources/Projects/Composition/`을 대상으로 Composition 전용 test scheme을 실행하고 S1~S3 경계 변환, 신규 결과 타입 전파, 직접 Data 타입 비노출을 보고한다
 
-**승인 게이트**: T044~T055의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 UI 진행을 명시적으로 승인하기 전에는 UI 파일을 변경하지 않는다.
+**승인 게이트**: T044~T056의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 UI 진행을 명시적으로 승인하기 전에는 UI 파일을 변경하지 않는다.
 
 ---
 
@@ -194,23 +209,23 @@ Member graph를 하나의 production composition으로 조립한다.
 
 ### 테스트
 
-- [ ] T056 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/SelectionCardListTests.swift`에 단일 선택 callback, 선택 trait와 비선택 상태 계약 테스트를 작성한다
-- [ ] T057 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/PolicyAgreementRowTests.swift`에 필수 표시, 선택, 외부 브라우저 열기 요청 실패·retry callback 및 44×44pt hit area 테스트를 작성한다
-- [ ] T058 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/PageIndicatorTests.swift`에 현재 페이지 label/value와 Reduce Motion 독립성 테스트를 작성한다
+- [X] T057 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/SelectionCardListTests.swift`에 단일 선택 callback, 선택 trait와 비선택 상태 계약 테스트를 작성한다
+- [X] T058 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/PolicyAgreementRowTests.swift`에 필수 표시, 선택, 외부 브라우저 열기 요청 실패·retry callback 및 44×44pt hit area 테스트를 작성한다
+- [X] T059 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/PageIndicatorTests.swift`에 현재 페이지 label/value와 Reduce Motion 독립성 테스트를 작성한다
 
 ### 구현
 
-- [ ] T059 [S3] `sources/Projects/UI/Component/Components/Composite/SelectionCardList.swift`에 Domain 타입을 노출하지 않는 generic 단일 선택 값과 callback API를 추가한다
-- [ ] T060 [S2] `sources/Projects/UI/Component/Components/Composite/PolicyAgreementRow.swift`에 필수 선택, 승인 링크, 외부 브라우저 열기 요청 실패와 retry를 분리한 공용 표현을 구현하고 page load 상태는 API에 포함하지 않는다
-- [ ] T061 [S4] `sources/Projects/UI/Component/Components/Leaf/PageIndicator.swift`에 현재/전체 페이지를 색상 외 label·value로 전달하는 표현을 구현한다
-- [ ] T062 [S2] `sources/Projects/UI/Component/Components/Composite/SheetSurface.swift`가 Dynamic Type과 작은 화면에서 정책 목록과 CTA에 스크롤 접근을 보장하도록 확장한다
-- [ ] T063 [S4] `sources/Projects/UI/Component/Components/Composite/OnboardingMockup.swift`를 실제 Domain action 없이 교체 가능한 tutorial presentation으로 유지하며 접근성 장식 요소를 정리한다
+- [X] T060 [S3] `sources/Projects/UI/Component/Components/Composite/SelectionCardList.swift`에 Domain 타입을 노출하지 않는 generic 단일 선택 값과 callback API를 추가한다
+- [X] T061 [S2] `sources/Projects/UI/Component/Components/Composite/PolicyAgreementRow.swift`에 필수 선택, 승인 링크, 외부 브라우저 열기 요청 실패와 retry를 분리한 공용 표현을 구현하고 page load 상태는 API에 포함하지 않는다
+- [X] T062 [S4] `sources/Projects/UI/Component/Components/Leaf/PageIndicator.swift`에 현재/전체 페이지를 색상 외 label·value로 전달하는 표현을 구현한다
+- [X] T063 [S2] `sources/Projects/UI/Component/Components/Composite/SheetSurface.swift`가 Dynamic Type과 작은 화면에서 정책 목록과 CTA에 스크롤 접근을 보장하도록 확장한다
+- [X] T064 [S4] `sources/Projects/UI/Component/Components/Composite/OnboardingMockup.swift`를 실제 Domain action 없이 교체 가능한 tutorial presentation으로 유지하며 접근성 장식 요소를 정리한다
 
 ### 정리와 패키지 검증
 
-- [ ] T064 [no-write] `sources/Projects/UI/`를 대상으로 UIComponent unit/UI test scheme을 실행하고 S2~S4 공용 표현 계약과 기존 컴포넌트 중복 부재를 보고한다
+- [X] T065 [no-write] `sources/Projects/UI/`를 대상으로 UIComponent unit/UI test scheme을 실행하고 S2~S4 공용 표현 계약과 기존 컴포넌트 중복 부재를 보고한다
 
-**승인 게이트**: T056~T064의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 Feature 진행을 명시적으로 승인하기 전에는 Feature 또는 Feature Tuist helper 파일을 변경하지 않는다.
+**승인 게이트**: T057~T065의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 Feature 진행을 명시적으로 승인하기 전에는 Feature 또는 Feature Tuist helper 파일을 변경하지 않는다.
 
 ---
 
@@ -228,33 +243,33 @@ screen-local Preview를 제공한다.
 
 ### 준비와 테스트
 
-- [ ] T065 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 `FeatureTests` target과 shared scheme Test Action 연결에 필요한 Feature 패키지 선언만 추가한다
-- [ ] T066 [P] [S1] `sources/Projects/Feature/Tests/Onboarding/OnboardingRestoreTests.swift`에 미인증·`RestoreSessionResult.recoverableFailure`/retry·member 404/cleanup 실패·partial null·complete profile·stale 응답 전이와 호출 횟수를 작성한다
-- [ ] T067 [P] [S2] `sources/Projects/Feature/Tests/Onboarding/OnboardingLegalAndSignInTests.swift`에 tutorial paging, consent 유효/불일치, sheet 취소, 외부 브라우저 열기 요청 실패, sign-in 중복, `SignInResult`의 `success`·`cancelled`·`retryableFailure`와 단계 이탈 뒤 stale 응답 무시 테스트를 작성한다. `success`는 `needsCuration: true`이면 position 단계로, `false`이면 profile을 재조회하지 않고 즉시 completing/MainShell delegate로 전이하는 두 경로를 각각 검증한다
-- [ ] T068 [P] [S3] `sources/Projects/Feature/Tests/Onboarding/OnboardingCurationTests.swift`에 지원 값 매핑, CTA 상태, career back 보존, position back의 `SignOutResult` 처리(성공 시 tutorial 3페이지, 실패 시 오류 유지), 중복 제출, 실패 retry와 성공 delegate 테스트를 작성한다
-- [ ] T069 [P] [S4] `sources/Projects/Feature/Tests/Onboarding/OnboardingAccessibilityTests.swift`에 페이지·선택·오류의 접근성 값과 Reduce Motion 상태 계약 테스트를 작성한다
+- [ ] T066 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`에 `FeatureTests` target과 shared scheme Test Action 연결에 필요한 Feature 패키지 선언만 추가한다
+- [ ] T067 [P] [S1] `sources/Projects/Feature/Tests/Onboarding/OnboardingRestoreTests.swift`에 미인증·`RestoreSessionResult.recoverableFailure`/retry·member 404/cleanup 실패·partial null·complete profile·stale 응답 전이와 호출 횟수를 작성한다
+- [ ] T068 [P] [S2] `sources/Projects/Feature/Tests/Onboarding/OnboardingLegalAndSignInTests.swift`에 tutorial paging, consent 유효/불일치, sheet 취소, 외부 브라우저 열기 요청 실패, sign-in 중복, `SignInResult`의 `success`·`cancelled`·`retryableFailure`와 단계 이탈 뒤 stale 응답 무시 테스트를 작성한다. `success`는 `needsCuration: true`이면 position 단계로, `false`이면 profile을 재조회하지 않고 즉시 completing/MainShell delegate로 전이하는 두 경로를 각각 검증한다
+- [ ] T069 [P] [S3] `sources/Projects/Feature/Tests/Onboarding/OnboardingCurationTests.swift`에 지원 값 매핑, CTA 상태, career back 보존, position back의 `SignOutResult` 처리(성공 시 tutorial 3페이지, 실패 시 오류 유지), 중복 제출, 실패 retry와 성공 delegate 테스트를 작성한다
+- [ ] T070 [P] [S4] `sources/Projects/Feature/Tests/Onboarding/OnboardingAccessibilityTests.swift`에 페이지·선택·오류의 접근성 값과 Reduce Motion 상태 계약 테스트를 작성한다
 
 ### reducer 구현
 
-- [ ] T070 [S1] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 `splash`, `restoreError`, `tutorial`, `legalAgreement`, `position`, `career`, `completing` 단일 phase와 initializer 주입 Domain protocol(`RestoreSessionUseCase`·`SignInUseCase`·`SignOutUseCase`·`FetchMemberProfileUseCase`·`CompleteCurationUseCase`·정책 조회/저장 UseCase)을 구현한다
-- [ ] T071 [S1] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 launch 자동 restore 1회, 명시적 retry, `RestoreSessionResult`의 `authenticated`/`unauthenticated`/`recoverableFailure` 분기, 인증 후 profile/404 분기와 request identity 기반 stale response 무시를 구현한다
-- [ ] T072 [S2] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 정책 version 유효성, sheet 선택·취소, 문서별 외부 브라우저 열기 요청 실패 상태, sign-in 중복 방지, `SignInResult`의 `success`·`cancelled`·`retryableFailure` 분기와 request identity 기반 stale 응답 무시를 구현한다. `success`의 `needsCuration`이 `true`면 position 단계로 전이하고, `false`면 `FetchMemberProfileUseCase`를 호출하지 않고 곧바로 completing을 거쳐 MainShell delegate를 실행한다(세션 복구 경로의 profile null 기반 판정은 T071 그대로 유지하고 이 분기와 공유하지 않는다)
-- [ ] T073 [S3] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 position/career 매핑, `SignOutResult` 처리를 포함한 position back 동작, career back 선택값 보존, 전체 curation 단일 제출, 실패 보존과 완료 delegate를 구현한다
+- [ ] T071 [S1] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 `splash`, `restoreError`, `tutorial`, `legalAgreement`, `position`, `career`, `completing` 단일 phase와 initializer 주입 Domain protocol(`RestoreSessionUseCase`·`SignInUseCase`·`SignOutUseCase`·`FetchMemberProfileUseCase`·`CompleteCurationUseCase`·정책 조회/저장 UseCase)을 구현한다
+- [ ] T072 [S1] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 launch 자동 restore 1회, 명시적 retry, `RestoreSessionResult`의 `authenticated`/`unauthenticated`/`recoverableFailure` 분기, 인증 후 profile/404 분기와 request identity 기반 stale response 무시를 구현한다
+- [ ] T073 [S2] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 정책 version 유효성, sheet 선택·취소, 문서별 외부 브라우저 열기 요청 실패 상태, sign-in 중복 방지, `SignInResult`의 `success`·`cancelled`·`retryableFailure` 분기와 request identity 기반 stale 응답 무시를 구현한다. `success`의 `needsCuration`이 `true`면 position 단계로 전이하고, `false`면 `FetchMemberProfileUseCase`를 호출하지 않고 곧바로 completing을 거쳐 MainShell delegate를 실행한다(세션 복구 경로의 profile null 기반 판정은 T072 그대로 유지하고 이 분기와 공유하지 않는다)
+- [ ] T074 [S3] `sources/Projects/Feature/Presentation/Onboarding/OnboardingFeature.swift`에 position/career 매핑, `SignOutResult` 처리를 포함한 position back 동작, career back 선택값 보존, 전체 curation 단일 제출, 실패 보존과 완료 delegate를 구현한다
 
 ### 화면과 Preview
 
-- [ ] T074 [P] [S1] `sources/Projects/Feature/Presentation/Onboarding/SplashScreen.swift`에 restore loading/error/retry UI, Reduce Motion 동작과 파일 하단 `iPhone 17 Pro Max` deterministic Preview를 구현한다
-- [ ] T075 [P] [S2] `sources/Projects/Feature/Presentation/Onboarding/TutorialScreen.swift`에 3페이지 swipe, 동기화 indicator, 3페이지 tooltip·실제 bundle version 표시 및 Figma `779:33450`·`779:33529`·`779:33564` Preview를 구현하되 Google 로그인 표현은 Apple 로그인으로 정합화한다
-- [ ] T076 [P] [S2] `sources/Projects/Feature/Presentation/Onboarding/LegalAgreementScreen.swift`에 두 필수 정책, 선택, `openURL` 외부 브라우저 열기 결과 action, 문서별 열기 요청 실패/retry, 계속하기 상태 및 Figma `786:38332`·idle/error Preview를 구현하고 브라우저 page load는 추적하지 않는다
-- [ ] T077 [P] [S3] `sources/Projects/Feature/Presentation/Onboarding/PositionSelectionScreen.swift`에 네 position의 1:1 매핑, back 시 `SignOutUseCase` 호출, Figma `737:10367`·idle/loading Preview를 구현한다
-- [ ] T078 [P] [S3] `sources/Projects/Feature/Presentation/Onboarding/CareerSelectionScreen.swift`에 `entry`·`junior`·`midLevel`·`senior` 순서와 문구, back 보존, Figma node `737:10358`·`737:10349` Preview를 구현한다
-- [ ] T079 [S4] `sources/Projects/Feature/Presentation/Onboarding/OnboardingScreen.swift`에 phase별 화면을 하나만 렌더링하고 작은 화면·Dynamic Type·VoiceOver에서 핵심 CTA 접근을 보장하는 container와 Preview를 구현한다
+- [ ] T075 [P] [S1] `sources/Projects/Feature/Presentation/Onboarding/SplashScreen.swift`에 restore loading/error/retry UI, Reduce Motion 동작과 파일 하단 `iPhone 17 Pro Max` deterministic Preview를 구현한다
+- [ ] T076 [P] [S2] `sources/Projects/Feature/Presentation/Onboarding/TutorialScreen.swift`에 3페이지 swipe, 동기화 indicator, 3페이지 tooltip·실제 bundle version 표시 및 Figma `779:33450`·`779:33529`·`779:33564` Preview를 구현하되 Google 로그인 표현은 Apple 로그인으로 정합화한다
+- [ ] T077 [P] [S2] `sources/Projects/Feature/Presentation/Onboarding/LegalAgreementScreen.swift`에 두 필수 정책, 선택, `openURL` 외부 브라우저 열기 결과 action, 문서별 열기 요청 실패/retry, 계속하기 상태 및 Figma `786:38332`·idle/error Preview를 구현하고 브라우저 page load는 추적하지 않는다
+- [ ] T078 [P] [S3] `sources/Projects/Feature/Presentation/Onboarding/PositionSelectionScreen.swift`에 네 position의 1:1 매핑, back 시 `SignOutUseCase` 호출, Figma `737:10367`·idle/loading Preview를 구현한다
+- [ ] T079 [P] [S3] `sources/Projects/Feature/Presentation/Onboarding/CareerSelectionScreen.swift`에 `entry`·`junior`·`midLevel`·`senior` 순서와 문구, back 보존, Figma node `737:10358`·`737:10349` Preview를 구현한다
+- [ ] T080 [S4] `sources/Projects/Feature/Presentation/Onboarding/OnboardingScreen.swift`에 phase별 화면을 하나만 렌더링하고 작은 화면·Dynamic Type·VoiceOver에서 핵심 CTA 접근을 보장하는 container와 Preview를 구현한다
 
 ### 정리와 패키지 검증
 
-- [ ] T080 [no-write] `sources/Projects/Feature/`와 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`를 대상으로 `make tuist` 후 Feature build/test를 실행하고 S1~S4 reducer·Preview 진입점 및 금지 import 0건을 보고한다
+- [ ] T081 [no-write] `sources/Projects/Feature/`와 `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`를 대상으로 `make tuist` 후 Feature build/test를 실행하고 S1~S4 reducer·Preview 진입점 및 금지 import 0건을 보고한다
 
-**승인 게이트**: T065~T080의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 App 진행을 명시적으로 승인하기 전에는 App 또는 App Tuist helper 파일을 변경하지 않는다.
+**승인 게이트**: T066~T081의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 App 진행을 명시적으로 승인하기 전에는 App 또는 App Tuist helper 파일을 변경하지 않는다.
 
 ---
 
@@ -270,27 +285,27 @@ screen-local Preview를 제공한다.
 
 ### 준비와 테스트
 
-- [ ] T081 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitItTests`에 App·Feature·Composition·필요 Domain test dependency와 shared scheme Test Action 연결을 추가한다
-- [ ] T082 [P] [S2] `sources/Projects/App/Tests/GitIt/PolicyManifestTests.swift`에 개인정보 처리방침 `privacy-policy`/`1`, 서비스 이용 약관 `terms-of-service`/`1`, 승인 HTTPS URL·표시 이름·필수 여부 계약 테스트를 작성한다
-- [ ] T083 [P] [S1] `sources/Projects/App/Tests/GitIt/AppRootFeatureTests.swift`에 restoring/onboarding/mainShell, logout/session invalidation(`SignOutResult` 처리 포함)의 tutorial 3페이지 복귀 및 retry 차단 테스트를 작성한다
-- [ ] T084 [P] [S1] `sources/Projects/App/Tests/GitIt/GitItCompositionLifetimeTests.swift`에 production graph 앱 수명당 1회 생성과 Domain protocol 주입 테스트를 작성한다
-- [ ] T085 [P] [S4] `sources/Projects/App/Tests/GitIt/GitItCompilationTests.swift`에 `Hello, world!`·sample root 부재와 production root 연결 검증을 추가한다
+- [ ] T082 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitItTests`에 App·Feature·Composition·필요 Domain test dependency와 shared scheme Test Action 연결을 추가한다
+- [ ] T083 [P] [S2] `sources/Projects/App/Tests/GitIt/PolicyManifestTests.swift`에 개인정보 처리방침 `privacy-policy`/`1`, 서비스 이용 약관 `terms-of-service`/`1`, 승인 HTTPS URL·표시 이름·필수 여부 계약 테스트를 작성한다
+- [ ] T084 [P] [S1] `sources/Projects/App/Tests/GitIt/AppRootFeatureTests.swift`에 restoring/onboarding/mainShell, logout/session invalidation(`SignOutResult` 처리 포함)의 tutorial 3페이지 복귀 및 retry 차단 테스트를 작성한다
+- [ ] T085 [P] [S1] `sources/Projects/App/Tests/GitIt/GitItCompositionLifetimeTests.swift`에 production graph 앱 수명당 1회 생성과 Domain protocol 주입 테스트를 작성한다
+- [ ] T086 [P] [S4] `sources/Projects/App/Tests/GitIt/GitItCompilationTests.swift`에 `Hello, world!`·sample root 부재와 production root 연결 검증을 추가한다
 
 ### 구현
 
-- [ ] T086 [S2] `sources/Projects/App/Resources/Policies/policy-manifest.json`에 개인정보 처리방침 `privacy-policy`/`1`과 서비스 이용 약관 `terms-of-service`/`1`의 승인된 표시 이름·URL·필수 여부를 추가한다
-- [ ] T087 [S2] `sources/Projects/App/Sources/PolicyManifestLoader.swift`에 번들 manifest를 Domain `PolicyDocument`로 검증해 읽는 loader를 구현한다
-- [ ] T088 [S1] `sources/Projects/App/Sources/AppRootFeature.swift`에 restoring/onboarding/mainShell root와 onboarding delegate, logout/session invalidation 복귀 coordination을 구현한다
-- [ ] T089 [S1] `sources/Projects/App/Sources/AppRootView.swift`에 root 상태별 onboarding 또는 MainShell을 정확히 하나만 표시하는 production View와 deterministic Preview를 구현한다
-- [ ] T090 [S1] `sources/Projects/App/Sources/GitItApp.swift`에서 `AppComposition.live`를 앱 수명당 한 번 생성하고 policy manifest·bundle version과 Domain UseCase를 root store에 initializer 주입한다
-- [ ] T091 [S1] `sources/Projects/App/Sources/ContentView.swift`의 `Hello, world!`와 sample root를 제거하고 `AppRootView` 진입점으로 교체한다
-- [ ] T092 [S4] `sources/Projects/App/Project.swift`에 policy manifest resource와 App 테스트 실행에 필요한 현재 패키지 선언만 반영한다
+- [ ] T087 [S2] `sources/Projects/App/Resources/Policies/policy-manifest.json`에 개인정보 처리방침 `privacy-policy`/`1`과 서비스 이용 약관 `terms-of-service`/`1`의 승인된 표시 이름·URL·필수 여부를 추가한다
+- [ ] T088 [S2] `sources/Projects/App/Sources/PolicyManifestLoader.swift`에 번들 manifest를 Domain `PolicyDocument`로 검증해 읽는 loader를 구현한다
+- [ ] T089 [S1] `sources/Projects/App/Sources/AppRootFeature.swift`에 restoring/onboarding/mainShell root와 onboarding delegate, logout/session invalidation 복귀 coordination을 구현한다
+- [ ] T090 [S1] `sources/Projects/App/Sources/AppRootView.swift`에 root 상태별 onboarding 또는 MainShell을 정확히 하나만 표시하는 production View와 deterministic Preview를 구현한다
+- [ ] T091 [S1] `sources/Projects/App/Sources/GitItApp.swift`에서 `AppComposition.live`를 앱 수명당 한 번 생성하고 policy manifest·bundle version과 Domain UseCase를 root store에 initializer 주입한다
+- [ ] T092 [S1] `sources/Projects/App/Sources/ContentView.swift`의 `Hello, world!`와 sample root를 제거하고 `AppRootView` 진입점으로 교체한다
+- [ ] T093 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`에 policy manifest resource와 App 테스트 실행에 필요한 현재 패키지 선언만 반영한다(`sources/Projects/App/Project.swift`는 `ProjectName.App.project`만 참조하는 1줄 포인터라 target resource·dependency 선언을 담지 못함을 확인함; `GitIt` target은 이미 `resources: ["Resources/**"]`로 `Resources/Policies/` 하위 파일을 포함하므로 신규 glob 추가가 필요 없다면 실제 변경 없음을 보고한다)
 
 ### 정리와 패키지 검증
 
-- [ ] T093 [no-write] `sources/Projects/App/`와 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`를 대상으로 `make tuist` 후 App build/test를 실행하고 S1~S4 root·manifest·composition 수명 계약을 보고한다
+- [ ] T094 [no-write] `sources/Projects/App/`와 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`를 대상으로 `make tuist` 후 App build/test를 실행하고 S1~S4 root·manifest·composition 수명 계약을 보고한다
 
-**승인 게이트**: T081~T093의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 전체 완료 검증을 명시적으로 승인한 뒤에만 아래 `[no-write]` 검증을 실행한다.
+**승인 게이트**: T082~T094의 변경 파일과 실제 검증 결과를 보고한 뒤 중단한다. 사용자가 전체 완료 검증을 명시적으로 승인한 뒤에만 아래 `[no-write]` 검증을 실행한다.
 
 ---
 
@@ -298,14 +313,14 @@ screen-local Preview를 제공한다.
 
 **선행 조건**: App 패키지까지 구현·검증·결과 보고가 완료되고 사용자가 전체 검증을 승인해야 한다.
 
-- [ ] T094 [no-write] `sources/`에 대해 `make tuist` 후 project build runner의 `build → compile → test`를 `iPhone 17 Pro Max` destination에서 순서대로 실행하고 실제 exit status를 기록한다
-- [ ] T095 [no-write] `sources/Projects/`의 production import와 source를 검색해 Feature의 Data·Infrastructure·Composition 직접 import, production `@Dependency`, `Hello, world!`, sample root가 0건인지 검증한다
-- [ ] T096 [no-write] `sources/Projects/Feature/Presentation/Onboarding/`의 모든 기능 View 파일 하단 Preview를 `iPhone 17 Pro Max`에서 렌더링하고 tutorial `779:33450`·`779:33529`·`779:33564`, 약관 전체 선택 `786:38332`, 분야 선택 `737:10367`, Career `737:10358`·`737:10349`를 비교해 일치·수정 완료·승인된 차이로 기록하며 Google 로그인 표현·개인정보 관련 명칭·분야 화면 닫기 표현·360×800 frame 차이는 명세 우선의 승인된 차이로 이유와 영향을 남긴다
-- [ ] T097 [no-write] `sources/Projects/Feature/Presentation/Onboarding/`을 작은 지원 iPhone, 최대 Dynamic Type, VoiceOver, Reduce Motion에서 수동 검증하고 CTA 접근 불가와 색상 단독 정보 전달이 0건인지 기록한다
-- [ ] T098 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S1 수용 조건을 fake composition launch 결과와 호출 횟수로 독립 검증한다
-- [ ] T099 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S2 수용 조건을 tutorial·legal·sign-in reducer, 외부 브라우저 열기 요청 실패와 sign-in stale 응답 결과 및 `UserDefaultsStore` 기반 정책 동의 저장 수명(로그아웃 후 유지)으로 독립 검증한다
-- [ ] T100 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S3 수용 조건을 curation 선택·back·submit·retry·MainShell 결과로 독립 검증한다
-- [ ] T101 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S4 수용 조건을 Preview·Figma·접근성 결과로 독립 검증한다
+- [ ] T095 [no-write] `sources/`에 대해 `make tuist` 후 project build runner의 `build → compile → test`를 `iPhone 17 Pro Max` destination에서 순서대로 실행하고 실제 exit status를 기록한다
+- [ ] T096 [no-write] `sources/Projects/`의 production import와 source를 검색해 Feature의 Data·Infrastructure·Composition 직접 import, production `@Dependency`, `Hello, world!`, sample root가 0건인지 검증한다
+- [ ] T097 [no-write] `sources/Projects/Feature/Presentation/Onboarding/`의 모든 기능 View 파일 하단 Preview를 `iPhone 17 Pro Max`에서 렌더링하고 tutorial `779:33450`·`779:33529`·`779:33564`, 약관 전체 선택 `786:38332`, 분야 선택 `737:10367`, Career `737:10358`·`737:10349`를 비교해 일치·수정 완료·승인된 차이로 기록하며 Google 로그인 표현·개인정보 관련 명칭·분야 화면 닫기 표현·360×800 frame 차이는 명세 우선의 승인된 차이로 이유와 영향을 남긴다
+- [ ] T098 [no-write] `sources/Projects/Feature/Presentation/Onboarding/`을 작은 지원 iPhone, 최대 Dynamic Type, VoiceOver, Reduce Motion에서 수동 검증하고 CTA 접근 불가와 색상 단독 정보 전달이 0건인지 기록한다
+- [ ] T099 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S1 수용 조건을 fake composition launch 결과와 호출 횟수로 독립 검증한다
+- [ ] T100 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S2 수용 조건을 tutorial·legal·sign-in reducer, 외부 브라우저 열기 요청 실패와 sign-in stale 응답 결과 및 `UserDefaultsStore` 기반 정책 동의 저장 수명(로그아웃 후 유지)으로 독립 검증한다
+- [ ] T101 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S3 수용 조건을 curation 선택·back·submit·retry·MainShell 결과로 독립 검증한다
+- [ ] T102 [no-write] `specs/016-onboarding-login-tutorial-app-integration/spec.md`의 S4 수용 조건을 Preview·Figma·접근성 결과로 독립 검증한다
 
 ## 의존성과 실행 순서
 
@@ -330,10 +345,10 @@ screen-local Preview를 제공한다.
 
 ### 변경 시나리오 완료 순서
 
-- **S1**: Domain T001~T002·T004·T006~T007·T009·T013~T014·T017~T025 → Data T033~T034·T037~T038 → Composition T044·T046~T047·T049~T050·T054 → Feature T066·T070~T071·T074 → App T083~T084·T088~T091 → T098
-- **S2**: Domain T003·T005·T008·T015~T016·T026 → Infrastructure T028~T032 → Data T035~T036·T039~T042 → Composition T045·T051~T052·T054 → UI T057·T060·T062 → Feature T067·T072·T075~T076 → App T082·T086~T087 → T099
-- **S3**: Domain T010~T012 → Composition T048·T053 → UI T056·T059 → Feature T068·T073·T077~T078 → App root 연결 → T100
-- **S4**: UI T058·T061·T063 → Feature T069·T074~T079 → App T085·T089·T092 → T096~T097·T101
+- **S1**: Domain T001~T002·T004·T006~T007·T009·T013~T014·T017~T025 → Data T033~T034·T037~T038 → Composition T045·T047~T048·T050~T051·T055 → Feature T067·T071~T072·T075 → App T084~T085·T089~T092 → T099
+- **S2**: Domain T003·T005·T008·T015~T016·T026 → Infrastructure T028~T032 → Data T035~T036·T039~T042 → Composition T044·T046·T052~T053·T055 → UI T058·T061·T063 → Feature T068·T073·T076~T077 → App T083·T087~T088 → T100
+- **S3**: Domain T010~T012 → Composition T049·T054 → UI T057·T060 → Feature T069·T074·T078~T079 → App root 연결 → T101
+- **S4**: UI T059·T062·T064 → Feature T070·T075~T080 → App T086·T090·T093 → T097~T098·T102
 - S1~S4는 관련된 모든 패키지와 승인 게이트가 끝난 뒤에만 독립 수용 완료로 판정한다.
 
 ### 현재 패키지 내부 병렬 실행 예시
@@ -341,10 +356,10 @@ screen-local Preview를 제공한다.
 - Domain 승인 후 T001~T010은 서로 다른 테스트 파일이므로 병렬 작성할 수 있다.
 - Infrastructure 승인 후 T028~T029는 같은 파일의 서로 다른 테스트 케이스이므로 순차 작성하되, 두 테스트 모두 T030 구현보다 먼저 작성한다.
 - Data 승인 후 T033~T036은 서로 다른 계약 테스트 파일이므로 병렬 작성할 수 있다.
-- Composition 승인 후 T044~T048은 서로 다른 adapter 테스트 파일이므로 병렬 작성할 수 있다.
-- UI 승인 후 T056~T058은 서로 다른 공용 컴포넌트 테스트 파일이므로 병렬 작성할 수 있다.
-- Feature 승인 후 T066~T069 및 reducer 기반이 확정된 뒤 T074~T078은 각각 서로 다른 파일 범위에서 병렬 작업할 수 있다.
-- App 승인 후 T082~T085는 서로 다른 테스트 파일이므로 병렬 작성할 수 있다.
+- Composition 승인 후 T044(Tuist 의존성 선언)를 먼저 실행한다. T045~T049은 서로 다른 adapter 테스트 파일이므로 병렬 작성할 수 있다.
+- UI 승인 후 T057~T059은 서로 다른 공용 컴포넌트 테스트 파일이므로 병렬 작성할 수 있다.
+- Feature 승인 후 T067~T070 및 reducer 기반이 확정된 뒤 T075~T079은 각각 서로 다른 파일 범위에서 병렬 작업할 수 있다.
+- App 승인 후 T083~T086는 서로 다른 테스트 파일이므로 병렬 작성할 수 있다.
 - 서로 다른 패키지는 같은 의존 깊이여도 승인 게이트를 넘어 병렬 실행하지 않는다.
 
 ## 구현 전략
@@ -358,12 +373,12 @@ screen-local Preview를 제공한다.
 
 ## 참고
 
-- 작업 ID는 실행 순서대로 T001~T101을 사용한다.
+- 작업 ID는 실행 순서대로 T001~T102을 사용한다.
 - 기존 미커밋 Domain/Data/Composition 변경(`CareerLevel.swift`, `MemberPosition.swift`,
   `MemberRepositoryAdapter.swift`, `AnswerDTOs.swift` 등)은 각 패키지 진입 시 diff를 다시
   확인하고 되돌리거나 덮어쓰지 않는다. `MemberRepositoryAdapter.swift`의 현재 미커밋 상태는
   optional 반환을 `MemberProfile`의 non-optional 필드에 대입해 컴파일이 깨지므로, T013(Domain)
-  완료 뒤 T049(Composition)에서 정합화한다.
+  완료 뒤 T050(Composition)에서 정합화한다.
 - `LoginResponseDTO.swift`(Data), `LocalOnboardingState.swift`(Domain),
   `LoginSessionRepositoryAdapter.swift`(Composition)의 현재 미커밋 상태는 이미 로그인 응답의
   `needsCuration`을 세션 record에 저장한다. T017·T023(Domain)은 이 기존 배관을 되돌리지 않고
