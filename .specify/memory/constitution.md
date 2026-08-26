@@ -1,31 +1,27 @@
 <!--
 Sync Impact Report
-- Version change: 3.0.0 → 4.0.0
-- Modified principles: 7. 패키지 단위 구현 진행 — 고정된 패키지 이름 순서 목록을 제거하고
-  아키텍처 문서의 의존성 표에서 도출하는 위상 순서 규칙으로 대체; 독립 패키지의 상대 순서는
-  tasks.md가 근거와 함께 결정; 의존성 표와 계획 순서 불일치 시 구현 시작 금지 규칙 추가
+- Version change: 4.0.0 → 4.1.0
+- Modified principles: 7. 패키지 단위 구현 진행 — `[no-write]` 검증이 추적 대상 소스·문서와
+  Git index를 직접 변경하지 않는다는 기준을 명시하고, `make tuist`의 파생 workspace·project·
+  cache 갱신을 허용하는 예외와 실행 전후 추적 파일 확인 의무를 추가
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md;
-  ✅ .specify/templates/tasks-template.md; ✅ .specify/templates/spec-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md;
-  ✅ .agents/skills/speckit-tasks/SKILL.md; ✅ .agents/skills/speckit-converge/SKILL.md;
-  ✅ .agents/skills/speckit-implement/SKILL.md
-- Runtime guidance requiring updates: ⚠ docs/architecture.md 3.1과 7.1 — Data → Infrastructure
-  의존 허용 여부(ARCH-DI-001 / D-ARCH-003)가 미결이며 현재는 금지로 기재돼 있음. 이 스킬의
-  수정 허용 경로 밖이므로 pending. specs/013-feature-usecase-app-di의 FR-055~058 문서 동기화
-  단계에서 처리해야 함
+- Templates requiring updates: ✅ .specify/templates/tasks-template.md;
+  ✅ .specify/templates/plan-template.md (변경 불필요);
+  ✅ .specify/templates/spec-template.md (변경 불필요)
+- Commands requiring updates: ✅ .agents/skills/speckit-tasks/SKILL.md;
+  ✅ .agents/skills/speckit-implement/SKILL.md; 그 밖의 speckit 스킬은 변경 불필요
+- Runtime guidance requiring updates: 없음
 - Evidence records: 없음
-- Follow-up TODO: docs/architecture.md의 패키지 의존성 표가 확정되기 전에는 013 명세의 구현
-  순서를 tasks.md에 고정하지 않습니다
+- Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 4.0.0<br>
+**버전**: 4.1.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-21
+**최종 수정일**: 2026-08-26
 
 ## 원칙
 
@@ -142,6 +138,11 @@ Sync Impact Report
   파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
   파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
   마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
+- `[no-write]` 검증은 저장소가 추적하는 소스·문서와 Git index를 작업의 결과로 직접
+  변경하지 않아야 합니다. `make tuist`는 현재 소스에서 파생되는 workspace, project, 심볼릭
+  링크와 도구 cache를 생성·갱신하는 명령이므로 `[no-write]` 검증에서 실행할 수 있습니다.
+  실행 전후 Git 상태를 비교해야 하며, `make tuist`가 기존의 추적 파일 diff를 바꾸거나 새
+  추적 대상 변경을 만들면 해당 검증을 완료로 처리하지 않고 변경 경로와 영향을 보고합니다.
 - 모든 적용 대상 패키지가 완료된 뒤의 포맷 훅은 현재 작업 트리에서 추가 또는 수정된 Swift
   파일을 수정합니다. 활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않습니다.
   저장소의 `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지
