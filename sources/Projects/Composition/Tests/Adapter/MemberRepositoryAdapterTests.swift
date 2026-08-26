@@ -50,6 +50,79 @@ struct MemberRepositoryAdapterTests {
         }
     }
 
+    @Test
+    func `position과 careerLevel이 모두 null이면 nil로 보존한다`() async throws {
+        let remote = StubMemberRemote(profileResult: .success(MemberProfileResponseDTO(
+            name: "홍길동",
+            email: "a@b.com",
+            position: nil,
+            careerLevel: nil,
+            thisWeekSolvedCount: 0,
+            thisMonthSolvedCount: 0,
+            streakDays: 0,
+            weeklyChart: [],
+        )))
+        let adapter = MemberRepositoryAdapter(remote: remote)
+
+        let profile = try await adapter.fetchProfile()
+
+        #expect(profile.position == nil)
+        #expect(profile.careerLevel == nil)
+    }
+
+    @Test
+    func `한 필드만 null이면 다른 필드는 그대로 매핑된다`() async throws {
+        let remote = StubMemberRemote(profileResult: .success(MemberProfileResponseDTO(
+            name: "홍길동",
+            email: "a@b.com",
+            position: "IOS",
+            careerLevel: nil,
+            thisWeekSolvedCount: 0,
+            thisMonthSolvedCount: 0,
+            streakDays: 0,
+            weeklyChart: [],
+        )))
+        let adapter = MemberRepositoryAdapter(remote: remote)
+
+        let profile = try await adapter.fetchProfile()
+
+        #expect(profile.position == .ios)
+        #expect(profile.careerLevel == nil)
+    }
+
+    @Test
+    func `지원하지 않는 non-null raw value는 nil로 치환하지 않고 decoding 오류로 처리한다`() async throws {
+        let remote = StubMemberRemote(profileResult: .success(MemberProfileResponseDTO(
+            name: "홍길동",
+            email: "a@b.com",
+            position: "WEB",
+            careerLevel: "JUNIOR",
+            thisWeekSolvedCount: 0,
+            thisMonthSolvedCount: 0,
+            streakDays: 0,
+            weeklyChart: [],
+        )))
+        let adapter = MemberRepositoryAdapter(remote: remote)
+
+        await #expect(throws: MemberError.temporarilyUnavailable) {
+            try await adapter.fetchProfile()
+        }
+    }
+
+    @Test(arguments: [
+        DataMemberError.transport,
+        DataMemberError.temporarilyUnavailable,
+        DataMemberError.decoding,
+    ])
+    func `transport·5xx·decoding 오류를 재시도 가능한 Domain 오류로 변환한다`(dataError: DataMemberError) async throws {
+        let remote = StubMemberRemote(profileResult: .failure(dataError))
+        let adapter = MemberRepositoryAdapter(remote: remote)
+
+        await #expect(throws: MemberError.temporarilyUnavailable) {
+            try await adapter.fetchProfile()
+        }
+    }
+
 }
 
 // MARK: - StubMemberRemote

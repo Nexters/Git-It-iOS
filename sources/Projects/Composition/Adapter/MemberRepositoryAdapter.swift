@@ -40,8 +40,8 @@ struct MemberRepositoryAdapter: MemberRepository {
             return MemberProfile(
                 name: response.name,
                 email: response.email,
-                position: domainPosition(response.position),
-                careerLevel: domainCareerLevel(response.careerLevel),
+                position: try domainPosition(response.position),
+                careerLevel: try domainCareerLevel(response.careerLevel),
                 statistics: LearningStatistics(
                     totalAnsweredCount: response.thisMonthSolvedCount,
                     totalCorrectCount: 0,
@@ -114,41 +114,43 @@ struct MemberRepositoryAdapter: MemberRepository {
         case .android: PositionDTO(rawValue: "ANDROID")
         case .backend: PositionDTO(rawValue: "BACKEND")
         case .frontend: PositionDTO(rawValue: "FRONTEND")
-        case .web: PositionDTO(rawValue: "WEB")
-        case .unknown: PositionDTO(rawValue: "UNKNOWN")
         @unknown default: PositionDTO(rawValue: "UNKNOWN")
         }
     }
 
-    private func domainPosition(_ dto: String) -> MemberPosition {
+    /// 서버 null은 그대로 nil로 보존한다. non-null이지만 지원하지 않는 raw value는 nil로
+    /// 치환하지 않고 계약/decoding 오류(`MemberError.temporarilyUnavailable`)로 처리한다.
+    private func domainPosition(_ dto: String?) throws -> MemberPosition? {
+        guard let dto else { return nil }
         switch dto.uppercased() {
-        case "IOS": .ios
-        case "ANDROID": .android
-        case "BACKEND": .backend
-        case "FRONTEND": .frontend
-        case "WEB": .web
-        default: .unknown
+        case "IOS": return .ios
+        case "ANDROID": return .android
+        case "BACKEND": return .backend
+        case "FRONTEND": return .frontend
+        default: throw MemberError.temporarilyUnavailable
         }
     }
 
     private func dtoCareerLevel(_ level: CareerLevel) -> CareerLevelDTO {
         switch level {
-        case .student: CareerLevelDTO(rawValue: "STUDENT")
+        case .entry: CareerLevelDTO(rawValue: "ENTRY")
         case .junior: CareerLevelDTO(rawValue: "JUNIOR")
-        case .midLevel: CareerLevelDTO(rawValue: "MID_LEVEL")
+        case .midLevel: CareerLevelDTO(rawValue: "MIDDLE")
         case .senior: CareerLevelDTO(rawValue: "SENIOR")
-        case .unknown: CareerLevelDTO(rawValue: "UNKNOWN")
         @unknown default: CareerLevelDTO(rawValue: "UNKNOWN")
         }
     }
 
-    private func domainCareerLevel(_ dto: String) -> CareerLevel {
+    /// 서버 null은 그대로 nil로 보존한다. non-null이지만 지원하지 않는 raw value는 nil로
+    /// 치환하지 않고 계약/decoding 오류(`MemberError.temporarilyUnavailable`)로 처리한다.
+    private func domainCareerLevel(_ dto: String?) throws -> CareerLevel? {
+        guard let dto else { return nil }
         switch dto.uppercased() {
-        case "STUDENT": .student
-        case "JUNIOR": .junior
-        case "MID_LEVEL": .midLevel
-        case "SENIOR": .senior
-        default: .unknown
+        case "ENTRY": return .entry
+        case "JUNIOR": return .junior
+        case "MIDDLE": return .midLevel
+        case "SENIOR": return .senior
+        default: throw MemberError.temporarilyUnavailable
         }
     }
 
