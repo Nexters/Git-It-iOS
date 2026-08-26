@@ -228,7 +228,7 @@ fi
 # Determine branch prefix
 if [ "$USE_TIMESTAMP" = true ]; then
     FEATURE_NUM=$(date +%Y%m%d-%H%M%S)
-    BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    DIRECTORY_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
 else
     if [ -n "$BRANCH_NUMBER" ] && [[ ! "$BRANCH_NUMBER" =~ ^[0-9]+$ ]]; then
         echo "Error: --number must be an unsigned integer, got '$BRANCH_NUMBER'" >&2
@@ -253,13 +253,25 @@ else
 
     # Force base-10 interpretation to prevent octal conversion (e.g., 010 → 8 in octal, but should be 10 in decimal)
     FEATURE_NUM=$(printf "%03d" "$((10#$BRANCH_NUMBER))")
-    BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
+    DIRECTORY_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
 fi
+
+# Sequence belongs only to the artifact directory. The checked-out Git-flow
+# branch is the canonical feature identity and never receives the NNN prefix.
+BRANCH_NAME=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+IDENTITY_POLICY="$REPO_ROOT/tools/spec-kit/core/identity.sh"
+[ -f "$IDENTITY_POLICY" ] || { echo "Error: Spec-Kit identity policy not found: $IDENTITY_POLICY" >&2; exit 1; }
+# shellcheck disable=SC1090
+source "$IDENTITY_POLICY"
+spec_kit_validate_branch "$BRANCH_NAME" || {
+    echo "Error: current branch is not a supported canonical identity: $BRANCH_NAME" >&2
+    exit 1
+}
 
 # GitHub enforces a 244-byte limit on branch names
 # Validate and truncate if necessary
 MAX_BRANCH_LENGTH=244
-if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
+if [ ${#DIRECTORY_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     # Calculate how much we need to trim from suffix
     # Account for prefix length: timestamp (15) + hyphen (1) = 16, or sequential (3) + hyphen (1) = 4
     PREFIX_LENGTH=$(( ${#FEATURE_NUM} + 1 ))
@@ -270,15 +282,15 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     # Remove trailing hyphen if truncation created one
     TRUNCATED_SUFFIX=$(echo "$TRUNCATED_SUFFIX" | sed 's/-$//')
 
-    ORIGINAL_BRANCH_NAME="$BRANCH_NAME"
-    BRANCH_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
+    ORIGINAL_BRANCH_NAME="$DIRECTORY_NAME"
+    DIRECTORY_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
 
     >&2 echo "[specify] Warning: Branch name exceeded GitHub's 244-byte limit"
     >&2 echo "[specify] Original: $ORIGINAL_BRANCH_NAME (${#ORIGINAL_BRANCH_NAME} bytes)"
-    >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
+    >&2 echo "[specify] Truncated to: $DIRECTORY_NAME (${#DIRECTORY_NAME} bytes)"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
+FEATURE_DIR="$SPECS_DIR/$DIRECTORY_NAME"
 SPEC_FILE="$FEATURE_DIR/spec.md"
 
 if [ "$DRY_RUN" != true ]; then
@@ -291,20 +303,54 @@ if [ "$DRY_RUN" != true ]; then
         exit 1
     fi
 
-    mkdir -p "$FEATURE_DIR"
-
-    if [ ! -f "$SPEC_FILE" ]; then
-        TEMPLATE=$(resolve_template "spec-template" "$REPO_ROOT") || true
-        if [ -n "$TEMPLATE" ] && [ -f "$TEMPLATE" ]; then
-            cp "$TEMPLATE" "$SPEC_FILE"
-        else
-            echo "Warning: Spec template not found; created empty spec file" >&2
-            touch "$SPEC_FILE"
-        fi
+    if [ -d "$FEATURE_DIR" ]; then
+        [ "$ALLOW_EXISTING" = true ] || exit 1
+        [ -f "$SPEC_FILE" ] && [ ! -L "$SPEC_FILE" ] && grep -F "**기능 브랜치**: \`$BRANCH_NAME\`" "$SPEC_FILE" >/dev/null || {
+            echo "Error: Existing feature directory is not associated with current branch: $FEATURE_DIR" >&2
+            exit 1
+        }
+    else
+        # Resolve and render the associated spec before exposing the target path.
+        TEMPLATE=$(resolve_template "spec-template" "$REPO_ROOT") || {
+            echo "Error: Spec template could not be resolved" >&2
+            exit 1
+        }
+        [ -f "$TEMPLATE" ] || {
+            echo "Error: Spec template not found: $TEMPLATE" >&2
+            exit 1
+        }
+        TRANSACTION_DIR=$(mktemp -d "$SPECS_DIR/.spec-kit-create.XXXXXX") || exit 1
+        CREATED_FEATURE_DIR=false
+        rollback_feature_creation() {
+            rm -rf "$TRANSACTION_DIR"
+            if [ "$CREATED_FEATURE_DIR" = true ]; then
+                rm -f "$SPEC_FILE"
+                rmdir "$FEATURE_DIR" 2>/dev/null || true
+            fi
+        }
+        trap rollback_feature_creation EXIT HUP INT TERM
+        sed \
+            -e "s#\[speckit-specify가 직접 생성 또는 재사용을 확인한 type/short-name\]#$BRANCH_NAME#" \
+            -e "s#\[feature | hotfix | release\]#${BRANCH_NAME%%/*}#" \
+            -e "s#\[DATE\]#$(date +%Y-%m-%d)#" \
+            "$TEMPLATE" >"$TRANSACTION_DIR/spec.md"
+        grep -F "**기능 브랜치**: \`$BRANCH_NAME\`" "$TRANSACTION_DIR/spec.md" >/dev/null || {
+            echo "Error: Rendered spec is not associated with current branch" >&2
+            exit 1
+        }
+        mkdir "$FEATURE_DIR" || {
+            echo "Error: Feature directory was created concurrently: $FEATURE_DIR" >&2
+            exit 1
+        }
+        CREATED_FEATURE_DIR=true
+        mv "$TRANSACTION_DIR/spec.md" "$SPEC_FILE"
+        rmdir "$TRANSACTION_DIR"
+        CREATED_FEATURE_DIR=false
+        trap - EXIT HUP INT TERM
     fi
 
-    # Persist to .specify/feature.json so downstream commands can find the feature
-    _persist_feature_json "$REPO_ROOT" "$FEATURE_DIR"
+    # The specify workflow publishes feature.json only after the spec body and
+    # requirements checklist pass validation; artifact setup preserves it.
 
     # Inform the user how to set feature state in their own shell
     printf '# To persist: export SPECIFY_FEATURE=%s\n' "$(shell_quote "$BRANCH_NAME")" >&2

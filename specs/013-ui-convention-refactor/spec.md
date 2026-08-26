@@ -2,7 +2,7 @@
 
 **Git-flow 유형**: `feature`
 
-**기능 브랜치**: `feature/ui-convention-refactor`
+**기능 브랜치**: `미연결 (legacy artifact; specs/014-ui-convention-refactor로 대체)`
 
 **생성일**: 2026-08-21
 
