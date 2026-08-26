@@ -1,3 +1,3 @@
 public protocol SignOutUseCase: Sendable {
-    func callAsFunction() async -> AuthenticationOutcome
+    func callAsFunction() async -> SignOutResult
 }

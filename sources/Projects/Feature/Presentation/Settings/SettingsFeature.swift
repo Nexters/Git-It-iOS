@@ -82,7 +82,7 @@ public struct SettingsFeature: Sendable {
             case profileLoadFinished(Result<MemberProfile, MemberError>)
             case positionUpdateFinished(MemberPosition, MemberError?)
             case careerLevelUpdateFinished(CareerLevel, MemberError?)
-            case signOutFinished(AuthenticationOutcome)
+            case signOutFinished(SignOutResult)
             case deleteAccountFinished(MemberError?)
         }
 
@@ -140,8 +140,8 @@ public struct SettingsFeature: Sendable {
                 guard state.accountAction == .idle else { return .none }
                 state.accountAction = .signingOut
                 return .run { send in
-                    let outcome = await signOut()
-                    await send(.effect(.signOutFinished(outcome)))
+                    let result = await signOut()
+                    await send(.effect(.signOutFinished(result)))
                 }
                 .cancellable(id: CancelID.accountAction)
 
@@ -203,13 +203,13 @@ public struct SettingsFeature: Sendable {
                 state.careerLevelMutation = .failed(error)
                 return .none
 
-            case .effect(.signOutFinished(let outcome)):
-                switch outcome {
-                case .unauthenticated:
+            case .effect(.signOutFinished(let result)):
+                switch result {
+                case .success:
                     state.accountAction = .idle
                     return .send(.delegate(.signedOut))
 
-                case .authenticated, .recoverableFailure:
+                case .retryableFailure:
                     state.accountAction = .failed(.temporarilyUnavailable)
                     return .none
                 }

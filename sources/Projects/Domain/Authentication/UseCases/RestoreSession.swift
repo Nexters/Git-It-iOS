@@ -12,7 +12,7 @@ public struct RestoreSession: RestoreSessionUseCase, Sendable {
 
     // MARK: Public
 
-    public func callAsFunction() async -> AuthenticationOutcome {
+    public func callAsFunction() async -> RestoreSessionResult {
         let user: AuthenticatedUser
 
         do {
@@ -56,7 +56,7 @@ public struct RestoreSession: RestoreSessionUseCase, Sendable {
     private let authenticationRepository: any AuthenticationRepository
     private let loginSessionRepository: any LoginSessionRepository
 
-    private func outcome(for error: LoginSessionError) async -> AuthenticationOutcome {
+    private func outcome(for error: LoginSessionError) async -> RestoreSessionResult {
         switch error {
         case .temporarilyUnavailable:
             return .recoverableFailure

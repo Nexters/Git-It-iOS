@@ -1,3 +1,3 @@
 public protocol SignInUseCase: Sendable {
-    func callAsFunction(_ method: AuthenticationMethod) async -> AuthenticationOutcome
+    func callAsFunction(_ method: AuthenticationMethod) async -> SignInResult
 }

@@ -12,16 +12,20 @@ public struct SignOut: SignOutUseCase, Sendable {
 
     // MARK: Public
 
-    public func callAsFunction() async -> AuthenticationOutcome {
+    public func callAsFunction() async -> SignOutResult {
         do {
             try await loginSessionRepository.signOut()
-        } catch { }
+        } catch {
+            return .retryableFailure
+        }
 
         do {
             try await authenticationRepository.clearAuthentication()
-        } catch { }
+        } catch {
+            return .retryableFailure
+        }
 
-        return .unauthenticated
+        return .success
     }
 
     // MARK: Private

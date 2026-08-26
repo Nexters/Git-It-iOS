@@ -12,35 +12,24 @@ public struct SignIn: SignInUseCase, Sendable {
 
     // MARK: Public
 
-    public func callAsFunction(_ method: AuthenticationMethod) async -> AuthenticationOutcome {
+    public func callAsFunction(_ method: AuthenticationMethod) async -> SignInResult {
         let grant: AuthenticationGrant
 
         do {
             grant = try await authenticationRepository.authenticate(using: method)
         } catch AuthenticationError.cancelled {
-            return .unauthenticated
+            return .cancelled
         } catch {
-            return .recoverableFailure
+            return .retryableFailure
         }
 
         do {
             let user = try await loginSessionRepository.start(with: grant)
-            return .authenticated(user)
-        } catch let error as LoginSessionError {
-            await clearAuthentication()
-
-            switch error {
-            case .temporarilyUnavailable:
-                return .recoverableFailure
-
-            case .refreshRejectedOrExpired,
-                 .accountUnavailable,
-                 .unauthorized:
-                return .unauthenticated
-            }
+            let needsCuration = await loginSessionRepository.currentSession()?.onboarding.needsCuration ?? false
+            return .success(user, needsCuration: needsCuration)
         } catch {
             await clearAuthentication()
-            return .recoverableFailure
+            return .retryableFailure
         }
     }
 
