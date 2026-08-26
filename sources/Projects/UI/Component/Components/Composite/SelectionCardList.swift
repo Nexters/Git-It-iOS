@@ -5,26 +5,36 @@ public struct SelectionCardList: View {
 
     // MARK: Lifecycle
 
-    public init(viewModel: ViewModel) {
+    public init(
+        viewModel: ViewModel,
+        onSelect: @escaping (String) -> Void = { _ in },
+    ) {
         self.viewModel = viewModel
+        self.onSelect = onSelect
     }
 
     // MARK: Public
 
+    /// Domain 타입을 노출하지 않는 generic 단일 선택 값입니다. 여러 `Item`이 동시에
+    /// `isSelected == true`여도 이 컴포넌트는 강제하지 않으며, 단일 선택 규칙은 호출자가
+    /// `onSelect`로 전달받은 `id`로 `items`를 다시 구성해 유지합니다.
     public struct Item: Identifiable, Sendable, Equatable {
         public init(
             id: String,
             title: String,
             supportingText: String,
+            isSelected: Bool = false,
         ) {
             self.id = id
             self.title = title
             self.supportingText = supportingText
+            self.isSelected = isSelected
         }
 
         public let id: String
         public let title: String
         public let supportingText: String
+        public let isSelected: Bool
     }
 
     public struct ViewModel: Sendable, Equatable {
@@ -38,14 +48,20 @@ public struct SelectionCardList: View {
     public var body: some View {
         VStack(spacing: Constant.itemSpacing) {
             ForEach(viewModel.items) { item in
-                SelectionCard(
-                    viewModel: .init(
-                        title: item.title,
-                        supportingText: item.supportingText,
-                    )
-                ) {
-                    thumbnail
+                Button {
+                    onSelect(item.id)
+                } label: {
+                    SelectionCard(
+                        viewModel: .init(
+                            title: item.title,
+                            supportingText: item.supportingText,
+                            isSelected: item.isSelected,
+                        )
+                    ) {
+                        thumbnail
+                    }
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -58,6 +74,7 @@ public struct SelectionCardList: View {
     }
 
     private let viewModel: ViewModel
+    private let onSelect: (String) -> Void
 
     private var thumbnail: some View {
         ResourceImage.Asset.selectionCardThumbnail.image
@@ -82,6 +99,7 @@ public struct SelectionCardList: View {
             id: "code",
             title: "일부 코드를 봤어요",
             supportingText: "구현 의도와 연결 영향까지 포함",
+            isSelected: true,
         ),
         .init(
             id: "project",

@@ -36,8 +36,9 @@ public struct OnboardingMockup: View {
                 RoundedRectangle(designSystem: .extraLarge)
                     .stroke(Color(designSystem: .raisedBackground), lineWidth: Constant.bezelWidth)
             }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("앱 화면 미리보기")
+            // 실제 Domain action이 없는 장식용 illustration이라 페이지마다 동일한
+            // 일반 문구를 반복해서 읽는 대신 VoiceOver에서 완전히 건너뜁니다.
+            .accessibilityHidden(true)
     }
 
     // MARK: Private
