@@ -101,12 +101,14 @@ extension ProjectName {
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
                         DataModuleName.DataLearningProject.rawValue,
+                        DataModuleName.DataLegalConsent.rawValue,
                         DataModuleName.DataMember.rawValue,
                         DataModuleName.DataExternalRepository.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
                         DataModuleName.DataLearningProjectTests.rawValue,
+                        DataModuleName.DataLegalConsentTests.rawValue,
                         DataModuleName.DataMemberTests.rawValue,
                         DataModuleName.DataExternalRepositoryTests.rawValue,
                     ],

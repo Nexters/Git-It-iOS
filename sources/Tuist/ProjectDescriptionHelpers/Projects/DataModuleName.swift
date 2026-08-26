@@ -9,6 +9,8 @@ enum DataModuleName: String, CaseIterable {
     case DataExternalRepositoryTests
     case DataLearningProject
     case DataLearningProjectTests
+    case DataLegalConsent
+    case DataLegalConsentTests
     case DataMember
     case DataMemberTests
 }
@@ -21,12 +23,14 @@ extension DataModuleName {
             .DataAuthentication,
             .DataExternalRepository,
             .DataLearningProject,
+            .DataLegalConsent,
             .DataMember:
             directoryName
         case
             .DataAuthenticationTests,
             .DataExternalRepositoryTests,
             .DataLearningProjectTests,
+            .DataLegalConsentTests,
             .DataMemberTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
@@ -87,6 +91,27 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
+            )
+
+        case .DataLegalConsent:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureCache)
+                ],
+            )
+
+        case .DataLegalConsentTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataLegalConsent.rawValue
+                ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureCache)
+                ],
             )
 
         case .DataMember:
