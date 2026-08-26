@@ -7,8 +7,8 @@ public struct MemberProfileResponseDTO: Decodable, Equatable, Sendable {
     public init(
         name: String,
         email: String,
-        position: String,
-        careerLevel: String,
+        position: String?,
+        careerLevel: String?,
         thisWeekSolvedCount: Int,
         thisMonthSolvedCount: Int,
         streakDays: Int,
@@ -28,8 +28,10 @@ public struct MemberProfileResponseDTO: Decodable, Equatable, Sendable {
 
     public let name: String
     public let email: String
-    public let position: String
-    public let careerLevel: String
+    /// 서버 null을 그대로 보존한다. 지원하지 않는 raw value를 nil로 치환하지 않는다.
+    public let position: String?
+    /// 서버 null을 그대로 보존한다. 지원하지 않는 raw value를 nil로 치환하지 않는다.
+    public let careerLevel: String?
     public let thisWeekSolvedCount: Int
     public let thisMonthSolvedCount: Int
     public let streakDays: Int
@@ -44,10 +46,20 @@ public struct WeeklyChartItemDTO: Decodable, Equatable, Sendable {
         date: String,
         solvedCount: Int,
     ) {
-        self.date = date
-        self.solvedCount = solvedCount
+        self.init(dayLabel: date, count: solvedCount)
     }
 
-    public let date: String
-    public let solvedCount: Int
+    public init(
+        dayLabel: String,
+        count: Int,
+    ) {
+        self.dayLabel = dayLabel
+        self.count = count
+    }
+
+    public let dayLabel: String
+    public let count: Int
+
+    public var date: String { dayLabel }
+    public var solvedCount: Int { count }
 }
