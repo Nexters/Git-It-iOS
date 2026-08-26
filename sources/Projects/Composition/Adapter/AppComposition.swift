@@ -22,15 +22,18 @@ public struct AppComposition: Sendable {
         public init(
             apiBaseURL: URL,
             externalRepositoryBaseURL: URL,
+            policyDocuments: [PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
             self.externalRepositoryBaseURL = externalRepositoryBaseURL
+            self.policyDocuments = policyDocuments
         }
 
         // MARK: Public
 
         public let apiBaseURL: URL
         public let externalRepositoryBaseURL: URL
+        public let policyDocuments: [PolicyDocument]
 
     }
 
@@ -41,6 +44,7 @@ public struct AppComposition: Sendable {
     ) -> AppComposition {
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,
+            policyDocuments: environment.policyDocuments,
             keychainStore: keychainStore,
             transport: transport,
         )
@@ -78,6 +82,7 @@ public struct AppComposition: Sendable {
     public let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
+    public let policyConsent: any PolicyConsentUseCase
     public let completeCuration: any CompleteCurationUseCase
 
     public let fetchLearningProjects: any FetchLearningProjectsUseCase
@@ -112,7 +117,8 @@ public struct AppComposition: Sendable {
         observeAuthenticationOutcomes = authentication.observeAuthenticationOutcomes
         refreshSession = authentication.refreshSession
         verifyAccessToken = authentication.verifyAccessToken
-        completeCuration = authentication.completeCuration
+        policyConsent = authentication.policyConsent
+        completeCuration = member.completeCuration
 
         fetchLearningProjects = learningProject.fetchLearningProjects
         fetchLearningProjectDetail = learningProject.fetchLearningProjectDetail

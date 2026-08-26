@@ -1,9 +1,9 @@
 import DataAuthentication
-import DataMember
+import DataLegalConsent
 import DomainAuthentication
-import DomainMember
 import Foundation
 import InfrastructureAuthentication
+import InfrastructureCache
 import InfrastructureNetworkClient
 
 // MARK: - AuthenticationAssembly
@@ -14,7 +14,11 @@ public struct AuthenticationAssembly: Sendable {
 
     public init(
         baseURL: URL,
+        policyDocuments: [PolicyDocument] = [],
         keychainStore: KeychainStore = KeychainStore(),
+        policyConsentStore: any PolicyConsentStore = LocalPolicyConsentStore(
+            store: UserDefaultsStore(namespace: "com.nexters.hytime.gitit.legalConsent")
+        ),
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
@@ -34,12 +38,6 @@ public struct AuthenticationAssembly: Sendable {
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: authenticationRemote,
             keychainStore: keychainStore,
-        )
-        let curationRepository = CurationRepositoryAdapter(
-            remote: MemberRepositoryAdapter(
-                remote: HTTPMemberRemote(client: client, accessTokenProvider: accessTokenProvider)
-            ),
-            loginSessionRepository: loginSessionRepository,
         )
 
         signIn = SignIn(
@@ -61,7 +59,12 @@ public struct AuthenticationAssembly: Sendable {
         // UC12(refresh)·UC14(revoke)는 서버 capability 미확보(INT-API-001)로 구조만 조립한다.
         refreshSession = RefreshSession(loginSessionRepository: loginSessionRepository)
         verifyAccessToken = VerifyAccessToken(loginSessionRepository: loginSessionRepository)
-        completeCuration = CompleteCuration(repository: curationRepository)
+        // `signOut`은 멤버 404 뒤 명시적 local cleanup에도 그대로 재사용된다(신규 UseCase를
+        // 따로 두지 않음, spec.md 외부 의존성 "기존 SignOutUseCase와 로컬 인증 세션 정리 계약").
+        policyConsent = PolicyConsentRepositoryAdapter(
+            manifestDocuments: policyDocuments,
+            store: policyConsentStore,
+        )
         self.loginSessionRepository = loginSessionRepository
     }
 
@@ -73,7 +76,7 @@ public struct AuthenticationAssembly: Sendable {
     public let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
-    public let completeCuration: any CompleteCurationUseCase
+    public let policyConsent: any PolicyConsentUseCase
 
     // MARK: Internal
 

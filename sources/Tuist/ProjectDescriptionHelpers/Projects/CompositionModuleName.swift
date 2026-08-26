@@ -31,9 +31,11 @@ extension CompositionModuleName {
                     .fromData(.DataAuthentication),
                     .fromData(.DataLearningProject),
                     .fromData(.DataExternalRepository),
+                    .fromData(.DataLegalConsent),
                     .fromData(.DataMember),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureCache),
                 ],
             )
 

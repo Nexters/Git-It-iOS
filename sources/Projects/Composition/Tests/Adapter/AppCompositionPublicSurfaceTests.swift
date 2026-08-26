@@ -23,7 +23,7 @@ struct AppCompositionPublicSurfaceTests {
 
         let expected: Set<String> = [
             "signIn", "signOut", "restoreSession", "observeAuthenticationOutcomes",
-            "refreshSession", "verifyAccessToken", "completeCuration",
+            "refreshSession", "verifyAccessToken", "policyConsent", "completeCuration",
             "fetchLearningProjects", "fetchLearningProjectDetail", "createLearningProject",
             "deleteLearningProject", "fetchLearningSet", "submitChoiceAnswer",
             "submitEssayAnswer", "setQuestionBookmark", "fetchBookmarkedQuestions",

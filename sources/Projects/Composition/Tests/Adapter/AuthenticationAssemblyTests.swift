@@ -4,12 +4,11 @@ import Testing
 @testable import CompositionAdapter
 @testable import DataAuthentication
 @testable import DomainAuthentication
-@testable import DomainMember
 @testable import InfrastructureAuthentication
 
 // MARK: - AuthenticationAssemblyTests
 
-@Suite("AuthenticationAssembly")
+@Suite("AuthenticationAssembly", .serialized)
 struct AuthenticationAssemblyTests {
 
     @Test
@@ -22,7 +21,30 @@ struct AuthenticationAssemblyTests {
         _ = assembly.observeAuthenticationOutcomes as any ObserveAuthenticationOutcomesUseCase
         _ = assembly.refreshSession as any RefreshSessionUseCase
         _ = assembly.verifyAccessToken as any VerifyAccessTokenUseCase
-        _ = assembly.completeCuration as any CompleteCurationUseCase
+    }
+
+    @Test
+    func `저장된 세션이 없으면 restoreSession이 RestoreSessionResult unauthenticated를 반환한다`() async throws {
+        let assembly = AuthenticationAssembly(
+            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
+            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+        )
+
+        let result = await assembly.restoreSession()
+
+        #expect(result == .unauthenticated)
+    }
+
+    @Test
+    func `저장된 세션이 없어도 signOut은 SignOutResult success를 반환한다`() async throws {
+        let assembly = AuthenticationAssembly(
+            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
+            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+        )
+
+        let result = await assembly.signOut()
+
+        #expect(result == .success)
     }
 
 }
@@ -78,28 +100,6 @@ struct LoginSessionRepositoryAdapterTests {
         await #expect(throws: LoginSessionError.refreshRejectedOrExpired) {
             _ = try await adapter.start(with: AuthenticationGrant(id: .init(rawValue: "id-token-2"), method: .apple))
         }
-    }
-
-}
-
-// MARK: - AuthenticationRepositoryAdapterTests
-
-@Suite("AuthenticationRepositoryAdapter", .serialized)
-struct AuthenticationRepositoryAdapterTests {
-
-    @Test
-    func `저장된 사용자가 없으면 재인증이 필요하다고 판정한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        let adapter = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: keychainStore,
-        )
-        try await adapter.clearAuthentication()
-
-        let status = try await adapter.authorizationStatus()
-
-        #expect(status == .reauthenticationRequired)
     }
 
 }
