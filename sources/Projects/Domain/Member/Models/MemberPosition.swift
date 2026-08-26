@@ -3,6 +3,4 @@ public enum MemberPosition: CaseIterable, Equatable, Sendable {
     case android
     case backend
     case frontend
-    case web
-    case unknown
 }
