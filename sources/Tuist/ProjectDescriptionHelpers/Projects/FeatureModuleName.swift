@@ -4,6 +4,7 @@ import ProjectDescription
 
 enum FeatureModuleName: String, CaseIterable {
     case Feature
+    case FeatureTests
 }
 
 extension FeatureModuleName {
@@ -12,6 +13,8 @@ extension FeatureModuleName {
         return switch self {
         case .Feature:
             directoryName.isEmpty ? "Presentation" : directoryName
+        case .FeatureTests:
+            directoryName.droppingSuffix("Tests")
         }
     }
 
@@ -30,6 +33,18 @@ extension FeatureModuleName {
                     .fromUI(.UIComponent),
                 ],
                 buildLibraryForDistribution: false,
+            )
+
+        case .FeatureTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: FeatureModuleName.Feature.rawValue
+                ),
+                additionalDependencies: [
+                    .external(.ComposableArchitecture)
+                ],
             )
         }
     }
