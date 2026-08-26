@@ -40,16 +40,44 @@ extension InfrastructureModuleName {
                 name: InfrastructureModuleName.InfrastructureNetworkClient.rawValue
             ),
         ),
-        .module(
+        .target(
             name: InfrastructureModuleName.InfrastructureCache.rawValue,
-            sourceDirectory: InfrastructureModuleName.InfrastructureCache.sourceDirectory,
+            destinations: .iOS,
+            product: .framework,
+            bundleId: "com.nexters.hytime.gitit.\(InfrastructureModuleName.InfrastructureCache.rawValue.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["Cache/**", "Storage/**"],
             dependencies: [],
+            settings: .settings(
+                base: [
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SKIP_INSTALL": "YES",
+                    "SWIFT_VERSION": "5.0",
+                ]
+            ),
         ),
-        .testModule(
+        .target(
             name: InfrastructureModuleName.InfrastructureCacheTests.rawValue,
-            sourceDirectory: InfrastructureModuleName.InfrastructureCacheTests.sourceDirectory,
-            productionTarget: .target(
-                name: InfrastructureModuleName.InfrastructureCache.rawValue
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.nexters.hytime.gitit.\(InfrastructureModuleName.InfrastructureCacheTests.rawValue.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["Tests/Cache/**", "Tests/Storage/**"],
+            dependencies: [
+                .target(name: InfrastructureModuleName.InfrastructureCache.rawValue)
+            ],
+            settings: .settings(
+                base: [
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SWIFT_VERSION": "5.0",
+                ]
             ),
         ),
     ]
@@ -58,13 +86,14 @@ extension InfrastructureModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.Infrastructure.rawValue)
         return switch self {
         case .InfrastructureAuthentication,
-             .InfrastructureNetworkClient,
-             .InfrastructureCache:
+             .InfrastructureNetworkClient:
             directoryName
         case .InfrastructureAuthenticationTests,
-             .InfrastructureNetworkClientTests,
-             .InfrastructureCacheTests:
+             .InfrastructureNetworkClientTests:
             "\(directoryName.droppingSuffix("Tests"))"
+        case .InfrastructureCache,
+             .InfrastructureCacheTests:
+            ""
         }
     }
 }
