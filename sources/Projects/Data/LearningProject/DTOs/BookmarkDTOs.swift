@@ -52,7 +52,7 @@ public struct AvailableProjectResponseDTO: Decodable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case projectID = "projectId"
-        case repositoryName
+        case repositoryName = "projectName"
     }
 }
 
@@ -61,21 +61,37 @@ public struct AvailableProjectResponseDTO: Decodable, Equatable, Sendable {
 public struct BookmarkedQuestionResponseDTO: Decodable, Equatable, Sendable {
     public init(
         projectID: String,
+        projectName: String = "",
         setID: String,
+        setLabel: String = "",
+        problemNumber: Int = 0,
         questionID: String,
+        question: String = "",
     ) {
         self.projectID = projectID
+        self.projectName = projectName
         self.setID = setID
+        self.setLabel = setLabel
+        self.problemNumber = problemNumber
         self.questionID = questionID
+        self.question = question
     }
 
     public let projectID: String
+    public let projectName: String
     public let setID: String
+    public let setLabel: String
+    public let problemNumber: Int
     public let questionID: String
+    public let question: String
 
     private enum CodingKeys: String, CodingKey {
         case projectID = "projectId"
+        case projectName
         case setID = "setId"
+        case setLabel
+        case problemNumber
         case questionID = "questionId"
+        case question
     }
 }

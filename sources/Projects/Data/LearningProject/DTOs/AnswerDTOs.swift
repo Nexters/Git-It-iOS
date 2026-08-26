@@ -85,10 +85,51 @@ public struct RubricResponseDTO: Decodable, Equatable, Sendable {
         score: Int,
         feedback: String,
     ) {
-        self.score = score
-        self.feedback = feedback
+        self.init(
+            criteria: [RubricCriterionResponseDTO(text: feedback, points: score)],
+            keyPoints: [],
+            fullMarkExample: "",
+            partialExample: "",
+            zeroExample: "",
+        )
     }
 
-    public let score: Int
-    public let feedback: String
+    public init(
+        criteria: [RubricCriterionResponseDTO],
+        keyPoints: [String],
+        fullMarkExample: String,
+        partialExample: String,
+        zeroExample: String,
+    ) {
+        self.criteria = criteria
+        self.keyPoints = keyPoints
+        self.fullMarkExample = fullMarkExample
+        self.partialExample = partialExample
+        self.zeroExample = zeroExample
+    }
+
+    public let criteria: [RubricCriterionResponseDTO]
+    public let keyPoints: [String]
+    public let fullMarkExample: String
+    public let partialExample: String
+    public let zeroExample: String
+
+    public var feedback: String {
+        criteria.map(\.text).joined(separator: "\n")
+    }
+}
+
+// MARK: - RubricCriterionResponseDTO
+
+public struct RubricCriterionResponseDTO: Decodable, Equatable, Sendable {
+    public init(
+        text: String,
+        points: Int,
+    ) {
+        self.text = text
+        self.points = points
+    }
+
+    public let text: String
+    public let points: Int
 }

@@ -42,6 +42,6 @@ public struct RegisterProjectResponseDTO: Decodable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case projectID = "projectId"
-        case requestStatus
+        case requestStatus = "status"
     }
 }
