@@ -98,7 +98,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureCache)
+                    .fromInfrastructure(.InfrastructureStorage)
                 ],
             )
 
@@ -110,7 +110,7 @@ extension DataModuleName {
                     name: DataModuleName.DataLegalConsent.rawValue
                 ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureCache)
+                    .fromInfrastructure(.InfrastructureStorage)
                 ],
             )
 

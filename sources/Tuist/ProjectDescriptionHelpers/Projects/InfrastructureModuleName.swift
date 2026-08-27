@@ -9,6 +9,8 @@ enum InfrastructureModuleName: String {
     case InfrastructureNetworkClientTests
     case InfrastructureCache
     case InfrastructureCacheTests
+    case InfrastructureStorage
+    case InfrastructureStorageTests
 }
 
 extension InfrastructureModuleName {
@@ -40,44 +42,28 @@ extension InfrastructureModuleName {
                 name: InfrastructureModuleName.InfrastructureNetworkClient.rawValue
             ),
         ),
-        .target(
+        .module(
             name: InfrastructureModuleName.InfrastructureCache.rawValue,
-            destinations: .iOS,
-            product: .framework,
-            bundleId: "com.nexters.hytime.gitit.\(InfrastructureModuleName.InfrastructureCache.rawValue.lowercased())",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .default,
-            sources: ["Cache/**", "Storage/**"],
+            sourceDirectory: InfrastructureModuleName.InfrastructureCache.sourceDirectory,
             dependencies: [],
-            settings: .settings(
-                base: [
-                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
-                    "CODE_SIGN_STYLE": "Automatic",
-                    "DEVELOPMENT_TEAM": "6924CABL23",
-                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                    "SKIP_INSTALL": "YES",
-                    "SWIFT_VERSION": "5.0",
-                ]
+        ),
+        .testModule(
+            name: InfrastructureModuleName.InfrastructureCacheTests.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructureCacheTests.sourceDirectory,
+            productionTarget: .target(
+                name: InfrastructureModuleName.InfrastructureCache.rawValue
             ),
         ),
-        .target(
-            name: InfrastructureModuleName.InfrastructureCacheTests.rawValue,
-            destinations: .iOS,
-            product: .unitTests,
-            bundleId: "com.nexters.hytime.gitit.\(InfrastructureModuleName.InfrastructureCacheTests.rawValue.lowercased())",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .default,
-            sources: ["Tests/Cache/**", "Tests/Storage/**"],
-            dependencies: [
-                .target(name: InfrastructureModuleName.InfrastructureCache.rawValue)
-            ],
-            settings: .settings(
-                base: [
-                    "CODE_SIGN_STYLE": "Automatic",
-                    "DEVELOPMENT_TEAM": "6924CABL23",
-                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                    "SWIFT_VERSION": "5.0",
-                ]
+        .module(
+            name: InfrastructureModuleName.InfrastructureStorage.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructureStorage.sourceDirectory,
+            dependencies: [],
+        ),
+        .testModule(
+            name: InfrastructureModuleName.InfrastructureStorageTests.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructureStorageTests.sourceDirectory,
+            productionTarget: .target(
+                name: InfrastructureModuleName.InfrastructureStorage.rawValue
             ),
         ),
     ]
@@ -86,14 +72,15 @@ extension InfrastructureModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.Infrastructure.rawValue)
         return switch self {
         case .InfrastructureAuthentication,
-             .InfrastructureNetworkClient:
+             .InfrastructureNetworkClient,
+             .InfrastructureCache,
+             .InfrastructureStorage:
             directoryName
         case .InfrastructureAuthenticationTests,
-             .InfrastructureNetworkClientTests:
+             .InfrastructureNetworkClientTests,
+             .InfrastructureCacheTests,
+             .InfrastructureStorageTests:
             "\(directoryName.droppingSuffix("Tests"))"
-        case .InfrastructureCache,
-             .InfrastructureCacheTests:
-            ""
         }
     }
 }

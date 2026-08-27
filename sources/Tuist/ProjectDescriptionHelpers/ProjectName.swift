@@ -123,11 +123,13 @@ extension ProjectName {
                         InfrastructureModuleName.InfrastructureAuthentication.rawValue,
                         InfrastructureModuleName.InfrastructureNetworkClient.rawValue,
                         InfrastructureModuleName.InfrastructureCache.rawValue,
+                        InfrastructureModuleName.InfrastructureStorage.rawValue,
                     ],
                     testTargets: [
                         InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,
                         InfrastructureModuleName.InfrastructureNetworkClientTests.rawValue,
                         InfrastructureModuleName.InfrastructureCacheTests.rawValue,
+                        InfrastructureModuleName.InfrastructureStorageTests.rawValue,
                     ],
                 )]
 
