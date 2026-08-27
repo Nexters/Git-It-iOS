@@ -135,7 +135,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.tuist/Cache
+            ~/.cache/tuist
             ${{ env.GIT_IT_TUIST_ROOT }}/.build
             .build
             ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
@@ -191,7 +191,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.tuist/Cache
+            ~/.cache/tuist
             ${{ env.GIT_IT_TUIST_ROOT }}/.build
             .build
             ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
@@ -244,7 +244,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.tuist/Cache
+            ~/.cache/tuist
             ${{ env.GIT_IT_TUIST_ROOT }}/.build
             .build
             ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
