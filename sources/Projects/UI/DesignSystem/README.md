@@ -5,7 +5,7 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 
 ## 토큰 카테고리
 
-`Token/`은 SwiftUI를 import하지 않는 순수 Swift 값 타입입니다.
+`Tokens/`는 SwiftUI를 import하지 않는 순수 Swift 값 타입입니다.
 
 | 카테고리 | 파일 | 원천 |
 | --- | --- | --- |
@@ -36,8 +36,8 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 
 ## 적용 계층
 
-`Application/`은 SwiftUI 뷰 모디파이어로 토큰을 화면에 연결합니다. 값 모델(`Token/`)은
-이 계층을 참조하지 않으며, 의존 방향은 항상 `Token/ ← Application/ ← UIComponent`입니다.
+`Extensions/`는 SwiftUI 뷰 모디파이어로 토큰을 화면에 연결합니다. 값 모델(`Tokens/`)은
+이 계층을 참조하지 않으며, 의존 방향은 항상 `Tokens/ ← Extensions/ ← UIComponent`입니다.
 
 | 모디파이어 | 대상 |
 | --- | --- |
@@ -54,7 +54,7 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 `in:` 인자로 도형을 넘기는 위치는 `RoundedRectangle(designSystem:)`을 사용해
 `clipShape` 경로와 같은 토큰을 참조합니다.
 
-`Font/`에 번들된 Noto Sans KR·Plus Jakarta Sans 정적 TTF(Regular/Medium/Bold)는
+`Resources/Fonts/`에 번들된 Noto Sans KR·Plus Jakarta Sans 정적 TTF(Regular/Medium/Bold)는
 `FontRegistration.registerBundledFonts`가 프로세스 스코프에 1회 등록하며,
 `Text.designSystemStyled(_:style:)`가 렌더링 전 이를 트리거합니다.
 

@@ -846,8 +846,6 @@ private struct GeometryMarkerColor {
 
     // MARK: Private
 
-    /// Rasterization tolerance is only for locating deterministic geometry markers.
-    /// These comparisons are not evidence of design-token color fidelity.
     private static let rasterizationChannelTolerance: UInt8 = 6
 
 }
@@ -991,8 +989,6 @@ private struct PixelImage {
         static let minimumCornerRadius: CGFloat = 4
         static let maximumCornerRadius: CGFloat = 12
         static let cornerRadiusStep: CGFloat = 0.1
-        /// The interpolated 50% coverage contour represents the vector edge without
-        /// biasing the radius toward either the antialiased fringe or the solid core.
         static let antialiasedEdgeCoverage = 0.5
     }
 

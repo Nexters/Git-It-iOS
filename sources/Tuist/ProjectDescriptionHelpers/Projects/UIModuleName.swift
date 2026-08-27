@@ -58,7 +58,7 @@ private enum DesignSystemFontFamily: CaseIterable {
     var resourceFileElements: [ResourceFileElement] {
         Weight.allCases.map {
             .glob(
-                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf"
+                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Resources/Fonts/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf"
             )
         }
     }
