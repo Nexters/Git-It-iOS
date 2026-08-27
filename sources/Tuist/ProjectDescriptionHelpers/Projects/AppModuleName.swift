@@ -75,7 +75,11 @@ extension AppModuleName {
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
                         "TARGETED_DEVICE_FAMILY": "1,2",
-                    ]
+                    ],
+                    configurations: [
+                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
+                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                    ],
                 ),
             )
 
