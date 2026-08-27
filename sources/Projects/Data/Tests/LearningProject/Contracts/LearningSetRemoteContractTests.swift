@@ -4,7 +4,7 @@ import Testing
 @testable import DataLearningProject
 
 @Suite("LearningSetRemote 계약")
-struct LearningProjectLearningSetContractTests {
+struct LearningSetRemoteContractTests {
 
     @Test
     func `학습 세트를 조회한다`() async throws {

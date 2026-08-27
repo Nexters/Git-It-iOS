@@ -3,7 +3,7 @@ import Testing
 @testable import DataLearningProject
 
 @Suite("BookmarkRemote 계약")
-struct LearningProjectBookmarkContractTests {
+struct BookmarkRemoteContractTests {
 
     @Test
     func `북마크 설정은 toggle이 아니라 최종 상태를 전달한다`() async throws {

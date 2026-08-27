@@ -3,6 +3,8 @@ import Testing
 
 @testable import DataMember
 
+// MARK: - MemberProfileResponseDTOTests
+
 @Suite("MemberProfileResponseDTO 디코딩")
 struct MemberProfileResponseDTOTests {
 
@@ -18,16 +20,16 @@ struct MemberProfileResponseDTOTests {
               "thisMonthSolvedCount": 12,
               "streakDays": 5,
               "weeklyChart": [
-                {"date": "2026-08-19", "solvedCount": 2},
-                {"date": "2026-08-17", "solvedCount": 1},
-                {"date": "2026-08-18", "solvedCount": 0}
+                {"dayLabel": "2026-08-19", "count": 2},
+                {"dayLabel": "2026-08-17", "count": 1},
+                {"dayLabel": "2026-08-18", "count": 0}
               ]
             }
             """#.utf8)
 
         let profile = try JSONDecoder().decode(MemberProfileResponseDTO.self, from: json)
 
-        #expect(profile.weeklyChart.map(\.date) == ["2026-08-19", "2026-08-17", "2026-08-18"])
+        #expect(profile.weeklyChart.map(\.dayLabel) == ["2026-08-19", "2026-08-17", "2026-08-18"])
     }
 
     @Test

@@ -42,7 +42,7 @@ struct HTTPAnswerRemoteTests {
             .response(jsonResponse(
                 statusCode: 200,
                 envelope: #"""
-                    {"success":true,"data":{"questionId":"question-1","explanation":"설명","rubric":{"score":80,"feedback":"good"}},"code":null,"message":null,"errors":null}
+                    {"success":true,"data":{"questionId":"question-1","explanation":"설명","rubric":{"criteria":[{"text":"good","points":80}],"keyPoints":["핵심 포인트"],"fullMarkExample":"만점 예시","partialExample":"부분 점수 예시","zeroExample":"0점 예시"}},"code":null,"message":null,"errors":null}
                     """#,
             ))
         ])
@@ -54,7 +54,8 @@ struct HTTPAnswerRemoteTests {
             request: SubmitEssayAnswerRequestDTO(text: "내 답"),
         )
 
-        #expect(result.rubric.score == 80)
+        #expect(result.rubric.criteria == [RubricCriterionResponseDTO(text: "good", points: 80)])
+        #expect(result.rubric.keyPoints == ["핵심 포인트"])
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/essay")
     }

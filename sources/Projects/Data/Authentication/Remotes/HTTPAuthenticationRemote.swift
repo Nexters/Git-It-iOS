@@ -143,7 +143,3 @@ public struct HTTPAuthenticationRemote: AuthenticationRemote {
     }
 
 }
-
-// MARK: - EmptyResponseData
-
-struct EmptyResponseData: Decodable, Sendable { }

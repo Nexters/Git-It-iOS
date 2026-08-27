@@ -37,7 +37,7 @@ struct HTTPProjectRemoteTests {
             .response(jsonResponse(
                 statusCode: 200,
                 envelope: #"""
-                    {"success":true,"data":{"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":["Swift"],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[{"setId":"set-1","label":"Set 1","title":"title"}]},"code":null,"message":null,"errors":null}
+                    {"success":true,"data":{"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":["Swift"],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[{"setId":"set-1","label":"Set 1","title":"title","problemCount":3,"completedCount":0}]},"code":null,"message":null,"errors":null}
                     """#,
             ))
         ])
@@ -57,7 +57,7 @@ struct HTTPProjectRemoteTests {
         let transport = StubHTTPTransport(results: [
             .response(jsonResponse(
                 statusCode: 200,
-                envelope: #"{"success":true,"data":{"projectId":"project-1","requestStatus":"ready"},"code":null,"message":null,"errors":null}"#,
+                envelope: #"{"success":true,"data":{"projectId":"project-1","status":"READY"},"code":null,"message":null,"errors":null}"#,
             ))
         ])
         let remote = makeRemote(transport: transport)

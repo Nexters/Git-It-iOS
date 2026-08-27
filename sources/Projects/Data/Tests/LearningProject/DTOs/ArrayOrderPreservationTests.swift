@@ -19,9 +19,9 @@ struct ArrayOrderPreservationTests {
               "overallProgressPercent": 0,
               "nextQuestionId": null,
               "sets": [
-                {"setId": "set-3", "label": "3", "title": "Third"},
-                {"setId": "set-1", "label": "1", "title": "First"},
-                {"setId": "set-2", "label": "2", "title": "Second"}
+                {"setId": "set-3", "label": "3", "title": "Third", "problemCount": 3, "completedCount": 0},
+                {"setId": "set-1", "label": "1", "title": "First", "problemCount": 3, "completedCount": 0},
+                {"setId": "set-2", "label": "2", "title": "Second", "problemCount": 3, "completedCount": 0}
               ]
             }
             """#.utf8)

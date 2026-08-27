@@ -148,7 +148,3 @@ public struct HTTPMemberRemote: MemberRemote {
     }
 
 }
-
-// MARK: - EmptyResponseData
-
-struct EmptyResponseData: Decodable, Sendable { }

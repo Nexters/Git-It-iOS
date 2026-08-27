@@ -3,7 +3,7 @@ import Testing
 @testable import DataLearningProject
 
 @Suite("AnswerRemote 계약")
-struct LearningProjectAnswerContractTests {
+struct AnswerRemoteContractTests {
 
     @Test
     func `객관식 답변을 제출한다`() async throws {

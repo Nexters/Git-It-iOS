@@ -1,11 +1,3 @@
-// MARK: - HTTPMethod
-
-public enum HTTPMethod: String, Equatable, Sendable {
-    case get = "GET"
-    case post = "POST"
-    case delete = "DELETE"
-}
-
 // MARK: - LearningProjectRequest
 
 public struct LearningProjectRequest: Equatable, Sendable {

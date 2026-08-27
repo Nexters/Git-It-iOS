@@ -2,10 +2,10 @@ import Testing
 
 @testable import DataLearningProject
 
-// MARK: - LearningProjectRemoteContractTests
+// MARK: - ProjectRemoteContractTests
 
 @Suite("ProjectRemote 계약")
-struct LearningProjectRemoteContractTests {
+struct ProjectRemoteContractTests {
 
     @Test
     func `프로젝트를 등록한다`() async throws {

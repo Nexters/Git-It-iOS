@@ -3,8 +3,6 @@ import InfrastructureNetworkClient
 
 // MARK: - LearningProjectHTTPExecutor
 
-/// `DataLearningProject`의 concrete Remote가 공유하는 요청 조립·오류 변환 로직이다.
-/// 매 호출 시점에 `accessTokenProvider`로 최신 access token을 읽어 Authorization 헤더를 구성한다(GAP-014-010).
 struct LearningProjectHTTPExecutor: Sendable {
 
     // MARK: Internal
@@ -124,7 +122,3 @@ struct LearningProjectHTTPExecutor: Sendable {
     }
 
 }
-
-// MARK: - EmptyResponseData
-
-struct EmptyResponseData: Decodable, Sendable { }
