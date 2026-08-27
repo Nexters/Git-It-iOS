@@ -4,6 +4,8 @@ import Testing
 @testable import DataMember
 @testable import DomainMember
 
+// MARK: - MemberRepositoryAdapterTests
+
 @Suite("MemberRepositoryAdapter")
 struct MemberRepositoryAdapterTests {
 

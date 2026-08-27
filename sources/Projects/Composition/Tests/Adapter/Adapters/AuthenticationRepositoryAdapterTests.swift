@@ -8,14 +8,6 @@ import Testing
 
 // MARK: - AuthenticationRepositoryAdapterTests
 
-/// `AuthenticationRepositoryAdapter`·`LoginSessionRepositoryAdapter`가 `SignIn`·`SignOut`·
-/// `RestoreSession`(Domain)과 조합됐을 때 신규 액션 결과 타입을 손실 없이 전달하는지 검증한다.
-/// `authenticate()`·실제 `authorizationStatus()` 승인 경로는 `AppleAuthorizationProvider`·
-/// `AppleCredentialStateProvider`가 실기기 Apple ID 상태에 결합돼 있어 이 계층에서 결정적으로
-/// 재현할 수 없다(`SignInResult.cancelled`/`.retryableFailure`와 `RestoreSessionResult`의
-/// `.authenticated`/`.recoverableFailure` 분기는 Domain `SignInTests`·`RestoreSessionTests`가
-/// 완전히 mock된 `AuthenticationRepository`로 이미 검증한다). 이 파일은 keychain만으로 결정적으로
-/// 재현 가능한 `.unauthenticated`·`.success` 경로를 다룬다.
 @Suite("AuthenticationRepositoryAdapter", .serialized)
 struct AuthenticationRepositoryAdapterTests {
 
@@ -35,7 +27,7 @@ struct AuthenticationRepositoryAdapterTests {
     }
 
     @Test
-    func `저장된 세션이 없으면 RestoreSessionResult가 unauthenticated다`() async throws {
+    func `저장된 세션이 없으면 RestoreSessionResult가 unauthenticated다`() async {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),

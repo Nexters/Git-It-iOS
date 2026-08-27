@@ -4,12 +4,6 @@ import Foundation
 
 // MARK: - MemberRepositoryAdapter
 
-/// `MemberProfileResponseDTO`(thisWeekSolvedCount/thisMonthSolvedCount/streakDays/weeklyChart)와
-/// Domain `LearningStatistics`(totalAnsweredCount/totalCorrectCount/weeklyCounts) 사이에는
-/// 서버 OpenAPI 확정 전이라 1:1 대응이 없다. `totalAnsweredCount`는 `thisMonthSolvedCount`로
-/// 추정 매핑하고, 서버가 정답 수를 별도로 내려주지 않아 `totalCorrectCount`는 0으로 두며
-/// (재계산 아님, 값 없음을 보존), `streakDays`는 대응 필드가 없어 보존하지 않는다. 실제
-/// 서버 계약이 확정되면 이 매핑을 갱신해야 한다(추정 매핑, 사용자 승인 하에 진행).
 struct MemberRepositoryAdapter: MemberRepository {
 
     // MARK: Lifecycle
@@ -118,8 +112,6 @@ struct MemberRepositoryAdapter: MemberRepository {
         }
     }
 
-    /// 서버 null은 그대로 nil로 보존한다. non-null이지만 지원하지 않는 raw value는 nil로
-    /// 치환하지 않고 계약/decoding 오류(`MemberError.temporarilyUnavailable`)로 처리한다.
     private func domainPosition(_ dto: String?) throws -> MemberPosition? {
         guard let dto else { return nil }
         switch dto.uppercased() {
@@ -135,20 +127,18 @@ struct MemberRepositoryAdapter: MemberRepository {
         switch level {
         case .entry: CareerLevelDTO(rawValue: "ENTRY")
         case .junior: CareerLevelDTO(rawValue: "JUNIOR")
-        case .midLevel: CareerLevelDTO(rawValue: "MIDDLE")
+        case .middle: CareerLevelDTO(rawValue: "MIDDLE")
         case .senior: CareerLevelDTO(rawValue: "SENIOR")
         @unknown default: CareerLevelDTO(rawValue: "UNKNOWN")
         }
     }
 
-    /// 서버 null은 그대로 nil로 보존한다. non-null이지만 지원하지 않는 raw value는 nil로
-    /// 치환하지 않고 계약/decoding 오류(`MemberError.temporarilyUnavailable`)로 처리한다.
     private func domainCareerLevel(_ dto: String?) throws -> CareerLevel? {
         guard let dto else { return nil }
         switch dto.uppercased() {
         case "ENTRY": return .entry
         case "JUNIOR": return .junior
-        case "MIDDLE": return .midLevel
+        case "MIDDLE": return .middle
         case "SENIOR": return .senior
         default: throw MemberError.temporarilyUnavailable
         }

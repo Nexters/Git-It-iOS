@@ -1,7 +1,6 @@
 import Foundation
 import InfrastructureNetworkClient
 
-/// `AppComposition.live`에 주입해 실제 네트워크 없이 요청을 관찰하는 stub transport입니다.
 actor RecordingHTTPTransport: HTTPTransport {
 
     // MARK: Lifecycle

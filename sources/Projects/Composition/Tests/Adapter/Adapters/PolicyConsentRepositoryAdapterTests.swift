@@ -10,6 +10,8 @@ import Testing
 @Suite("PolicyConsentRepositoryAdapter")
 struct PolicyConsentRepositoryAdapterTests {
 
+    // MARK: Internal
+
     @Test
     func `requiredDocuments가 주입된 manifest 문서를 그대로 반환한다`() async throws {
         let documents = try makeDocuments()
@@ -21,7 +23,7 @@ struct PolicyConsentRepositoryAdapterTests {
     }
 
     @Test
-    func `필수 문서 ID와 version이 모두 일치하는 저장 기록만 유효로 판정한다`() async throws {
+    func `필수 문서 ID와 version이 모두 일치하는 저장 기록만 유효로 판정한다`() throws {
         let documents = try makeDocuments()
         let adapter = PolicyConsentRepositoryAdapter(manifestDocuments: documents, store: FakePolicyConsentStore())
         let validRecords = documents.map {
@@ -32,7 +34,7 @@ struct PolicyConsentRepositoryAdapterTests {
     }
 
     @Test
-    func `한 문서만 version이 바뀌면 그 문서 기록만 무효화된다`() async throws {
+    func `한 문서만 version이 바뀌면 그 문서 기록만 무효화된다`() throws {
         let documents = try makeDocuments()
         let adapter = PolicyConsentRepositoryAdapter(manifestDocuments: documents, store: FakePolicyConsentStore())
         let staleRecords = [
@@ -69,7 +71,6 @@ struct PolicyConsentRepositoryAdapterTests {
             PolicyConsentRecord(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
         ])
 
-        // logout 흐름은 이 adapter를 거치지 않으므로 store.removeAll()을 호출하지 않는다.
         let stillStored = try await adapter.storedConsentRecords()
 
         #expect(stillStored.contains { $0.documentIdentifier == "privacy-policy" })
@@ -119,6 +120,6 @@ private actor FakePolicyConsentStore: PolicyConsentStore {
 
     // MARK: Private
 
-    private var storage: [PolicyConsentRecordDTO] = []
+    private var storage = [PolicyConsentRecordDTO]()
 
 }

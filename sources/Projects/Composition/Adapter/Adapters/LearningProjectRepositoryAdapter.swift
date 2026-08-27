@@ -59,9 +59,6 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                 overallProgressPercent: response.overallProgressPercent,
                 nextQuestionID: response.nextQuestionID,
                 sets: response.sets.map {
-                    // ProjectSetSummaryDTO는 problemCount/completedCount를 내려주지 않는다
-                    // (서버 OpenAPI 미확정). 값이 없어 0으로 둔다 — 재계산이 아니라 없는 값의
-                    // 보존이다. 서버 계약이 확정되면 이 매핑을 갱신해야 한다.
                     LearningProjectSetProgress(
                         setID: $0.setID,
                         label: $0.label,

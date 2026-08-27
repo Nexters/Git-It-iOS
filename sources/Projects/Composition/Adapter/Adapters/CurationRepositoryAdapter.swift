@@ -3,9 +3,6 @@ import DomainMember
 
 // MARK: - CurationRepositoryAdapter
 
-/// `MemberRepositoryAdapter`를 감싸 UC15(초기 curation 완료)의 server mutation과 local
-/// onboarding state(`needsCuration`) 갱신을 원자적 순서로 조정한다: server 성공 전에는
-/// local state를 절대 앞서 변경하지 않는다.
 struct CurationRepositoryAdapter: MemberRepository {
 
     // MARK: Lifecycle

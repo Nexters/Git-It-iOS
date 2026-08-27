@@ -7,9 +7,6 @@ import Testing
 @testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
 
-/// `AppComposition.completeCuration`이 Member graph(`MemberAssembly`)가 조립한 단일
-/// production 지점에서만 나오는지, 그리고 공개 표면이 Domain UseCase Protocol 타입으로만
-/// 이뤄지는지 검증한다.
 @Suite("AppComposition")
 struct AppCompositionTests {
 

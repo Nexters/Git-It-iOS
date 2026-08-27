@@ -4,9 +4,6 @@ import Foundation
 
 // MARK: - PolicyConsentRepositoryAdapter
 
-/// 앱 번들 정책 manifest(주입된 `manifestDocuments`)와 설치 단위 `PolicyConsentStore` 사이에서
-/// Domain `PolicyConsentRecord`를 변환한다. 계정 식별자는 다루지 않으며 logout으로 저장 기록을
-/// 지우지 않는다(FR-041).
 struct PolicyConsentRepositoryAdapter: PolicyConsentUseCase {
 
     // MARK: Lifecycle

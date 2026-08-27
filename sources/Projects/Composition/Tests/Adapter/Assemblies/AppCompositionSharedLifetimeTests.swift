@@ -6,8 +6,6 @@ import Testing
 @testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
 
-/// 여러 보호 Remote(LearningProject, Member)가 `AppComposition`이 조립한 동일한 session
-/// 정본(공유 `KeychainStore`)을 읽어 같은 access token으로 요청하는지 검증한다.
 @Suite("AppComposition 공유 세션 수명")
 struct AppCompositionSharedLifetimeTests {
 
@@ -28,7 +26,8 @@ struct AppCompositionSharedLifetimeTests {
             HTTPTransportResponse(
                 statusCode: 200,
                 headers: [:],
-                body: Data(#"{"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}"#.utf8),
+                body: Data(#"{"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}"#
+                    .utf8),
             ),
             HTTPTransportResponse(
                 statusCode: 200,

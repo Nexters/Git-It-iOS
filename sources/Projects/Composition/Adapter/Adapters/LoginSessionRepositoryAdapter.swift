@@ -36,8 +36,6 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
                     acceptedAt: nil,
                 ),
             ))
-            // 사용자 ID는 idToken(JWT, 로그인마다 값이 바뀔 수 있음)이 아니라
-            // `AuthenticationRepositoryAdapter`가 저장한 Apple 안정 식별자를 사용한다(GAP-014-007).
             guard let userID = try loadAppleUserID() else { throw LoginSessionError.temporarilyUnavailable }
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
         } catch let error as DataAuthenticationError {
@@ -88,8 +86,6 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     }
 
     func refresh() async throws -> SessionTokens {
-        // UC12: 서버 refresh endpoint 미확보(INT-API-001). 임의 성공을 만들지 않고 capability
-        // 부재를 그대로 던진다.
         throw LoginSessionError.temporarilyUnavailable
     }
 

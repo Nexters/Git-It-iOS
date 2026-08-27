@@ -2,9 +2,6 @@ import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
 
-/// `SessionRecord`를 단일 key 아래 JSON blob으로 원자적으로 저장·조회한다. token pair와
-/// onboarding state를 분리된 key로 나누면 하나만 갱신되다 실패하는 부분 상태가 생길 수 있어
-/// 이를 막는다(GAP-014-008, GAP-014-009).
 struct SessionRecordKeychainCoding: Sendable {
 
     // MARK: Lifecycle

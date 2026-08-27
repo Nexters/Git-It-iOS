@@ -4,6 +4,8 @@ import Testing
 @testable import DataLearningProject
 @testable import DomainLearningProject
 
+// MARK: - BookmarkRepositoryAdapterTests
+
 @Suite("BookmarkRepositoryAdapter")
 struct BookmarkRepositoryAdapterTests {
 
@@ -52,8 +54,8 @@ struct BookmarkRepositoryAdapterTests {
 // MARK: - StubBookmarkRemote
 
 private struct StubBookmarkRemote: BookmarkRemote {
-    var setResult: Result<BookmarkQuestionResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus)
-    var listResult: Result<BookmarkedQuestionListResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus)
+    var setResult = Result<BookmarkQuestionResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
+    var listResult = Result<BookmarkedQuestionListResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
 
     func setBookmark(
         projectID _: String,

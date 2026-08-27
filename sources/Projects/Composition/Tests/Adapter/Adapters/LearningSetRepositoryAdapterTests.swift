@@ -4,6 +4,8 @@ import Testing
 @testable import DataLearningProject
 @testable import DomainLearningProject
 
+// MARK: - LearningSetRepositoryAdapterTests
+
 @Suite("LearningSetRepositoryAdapter")
 struct LearningSetRepositoryAdapterTests {
 
@@ -21,7 +23,14 @@ struct LearningSetRepositoryAdapterTests {
                     format: "multiple_choice",
                     text: "질문",
                     choices: ["A", "B"],
-                    sources: [SourceResponseDTO(file: "a.swift", startLine: 1, endLine: 2, symbol: "foo", summary: nil, url: "https://example.com")],
+                    sources: [SourceResponseDTO(
+                        file: "a.swift",
+                        startLine: 1,
+                        endLine: 2,
+                        symbol: "foo",
+                        summary: nil,
+                        url: "https://example.com",
+                    )],
                     myAnswer: nil,
                 ),
                 QuestionResponseDTO(
@@ -63,7 +72,10 @@ struct LearningSetRepositoryAdapterTests {
 private struct StubLearningSetRemote: LearningSetRemote {
     let result: Result<LearningSetResponseDTO, DataLearningProjectError>
 
-    func fetchLearningSet(projectID _: String, setID _: String) async throws -> LearningSetResponseDTO {
+    func fetchLearningSet(
+        projectID _: String,
+        setID _: String,
+    ) async throws -> LearningSetResponseDTO {
         try result.get()
     }
 }

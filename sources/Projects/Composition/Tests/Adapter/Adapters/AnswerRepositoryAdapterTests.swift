@@ -4,6 +4,8 @@ import Testing
 @testable import DataLearningProject
 @testable import DomainLearningProject
 
+// MARK: - AnswerRepositoryAdapterTests
+
 @Suite("AnswerRepositoryAdapter")
 struct AnswerRepositoryAdapterTests {
 
@@ -52,8 +54,8 @@ struct AnswerRepositoryAdapterTests {
 // MARK: - StubAnswerRemote
 
 private struct StubAnswerRemote: AnswerRemote {
-    var choiceResult: Result<SubmitChoiceAnswerResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus)
-    var essayResult: Result<SubmitEssayAnswerResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus)
+    var choiceResult = Result<SubmitChoiceAnswerResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
+    var essayResult = Result<SubmitEssayAnswerResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
 
     func submitChoiceAnswer(
         projectID _: String,
