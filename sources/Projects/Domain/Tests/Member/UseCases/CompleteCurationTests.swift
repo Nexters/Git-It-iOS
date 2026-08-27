@@ -30,7 +30,7 @@ struct CompleteCurationTests {
     @Test
     func `CareerLevel은 entry junior midLevel senior 4개뿐이다`() {
         #expect(CareerLevel.allCases.count == 4)
-        #expect(Set(CareerLevel.allCases) == [.entry, .junior, .midLevel, .senior])
+        #expect(Set(CareerLevel.allCases) == [.entry, .junior, .middle, .senior])
     }
 
     @Test

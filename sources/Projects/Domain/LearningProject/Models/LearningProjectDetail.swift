@@ -36,8 +36,6 @@ public struct LearningProjectDetail: Equatable, Sendable {
     public let nextQuestionID: String?
     public let sets: [LearningProjectSetProgress]
 
-    /// 미완료 세트가 있으면 첫 미완료 세트, 모두 완료했으면 replay를 위해 `sets.first`로
-    /// fallback한다. `sets`가 비어 있으면 nil이다(GAP-014-006).
     public var nextSet: LearningProjectSetProgress? {
         sets.first { $0.completedCount < $0.problemCount } ?? sets.first
     }

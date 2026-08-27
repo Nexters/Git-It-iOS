@@ -1,5 +1,3 @@
-/// UC10 응답. `availableProjects`는 filter와 무관하게 항상 전체 목록을 유지한다
-/// (filter 결과로 재계산하지 않는다).
 public struct BookmarkedQuestionCollection: Equatable, Sendable {
 
     // MARK: Lifecycle

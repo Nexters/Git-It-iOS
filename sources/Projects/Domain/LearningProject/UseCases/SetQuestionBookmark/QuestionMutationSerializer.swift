@@ -1,6 +1,6 @@
 import Foundation
 
-public actor MemberMutationSerializer {
+public actor QuestionMutationSerializer {
 
     // MARK: Lifecycle
 
@@ -8,16 +8,16 @@ public actor MemberMutationSerializer {
 
     // MARK: Public
 
-    public func run(
+    public func run<Value: Sendable>(
         key: String,
-        _ operation: @escaping @Sendable () async throws -> Void,
-    ) async throws {
+        _ operation: @escaping @Sendable () async throws -> Value,
+    ) async throws -> Value {
         let token = UUID()
         let previous = inFlight[key]
 
-        let task = Task<Void, Error> {
+        let task = Task<Value, Error> {
             _ = await previous?.awaitCompletion()
-            try await operation()
+            return try await operation()
         }
         inFlight[key] = PendingMutation(token: token, awaitCompletion: { _ = try? await task.value })
 
@@ -27,7 +27,7 @@ public actor MemberMutationSerializer {
             }
         }
 
-        try await task.value
+        return try await task.value
     }
 
     // MARK: Private

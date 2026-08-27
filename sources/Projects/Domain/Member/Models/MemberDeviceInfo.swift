@@ -26,7 +26,6 @@ public struct MemberDeviceInfo: Equatable, Sendable {
     public let deviceType: DeviceType
     public let appVersion: String
     public let osVersion: String
-    /// 알림 권한이 없으면 nil을 허용한다.
     public let deviceToken: String?
 
 }

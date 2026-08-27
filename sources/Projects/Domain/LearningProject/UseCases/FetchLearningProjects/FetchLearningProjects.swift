@@ -14,7 +14,6 @@ public struct FetchLearningProjects: FetchLearningProjectsUseCase {
 
     // MARK: Private
 
-    /// Data compatibility 호출 값이며 pagination 상태로 승격하지 않는다.
     private static let compatibilityPage = 0
     private static let compatibilitySize = 20
 
