@@ -38,4 +38,31 @@ cmp "$work/expected.nul" "$work/targets.nul"
 style_adapter_collect_one "$work" "$work/excluded.nul" "$work/Sources/Derived"
 [ ! -s "$work/excluded.nul" ]
 
+# 최초 실행: .build가 없으면 조용히 marker만 남기고 기존 내용은 건드리지 않습니다.
+cache_dir=$(mktemp -d "${TMPDIR:-/tmp}/swift-format-cache-test.XXXXXX")
+trap 'rm -rf "$work" "$cache_dir"' EXIT HUP INT TERM
+style_dir="$cache_dir/style"
+mkdir -p "$style_dir"
+style_adapter_ensure_fresh_build_cache "$style_dir"
+assert_equal "$style_dir" "$(cat "$style_dir/.build/.git-it-build-root")" \
+	'최초 실행은 현재 경로를 marker에 기록'
+
+# marker가 현재 경로와 같으면 기존 .build 내용을 보존합니다.
+: >"$style_dir/.build/kept-artifact"
+style_adapter_ensure_fresh_build_cache "$style_dir"
+[ -f "$style_dir/.build/kept-artifact" ] || {
+	printf 'FAIL: marker가 일치하면 기존 .build를 보존해야 합니다\n' >&2
+	exit 1
+}
+
+# marker가 다른 경로를 가리키면(저장소 이동/재클론) .build를 통째로 지우고 새로 만듭니다.
+printf '%s' "$style_dir-old-location" >"$style_dir/.build/.git-it-build-root"
+style_adapter_ensure_fresh_build_cache "$style_dir"
+[ -f "$style_dir/.build/kept-artifact" ] && {
+	printf 'FAIL: marker가 다르면 .build를 초기화해야 합니다\n' >&2
+	exit 1
+}
+assert_equal "$style_dir" "$(cat "$style_dir/.build/.git-it-build-root")" \
+	'경로 불일치 초기화 후 새 경로를 marker에 기록'
+
 printf 'PASS: swift-format style-adapter\n'
