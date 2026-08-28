@@ -4,6 +4,7 @@ extension Target {
     static func module(
         name: String,
         sourceDirectory: String,
+        sourceExcludes: [Path] = [],
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
         buildLibraryForDistribution: Bool = true,
@@ -15,7 +16,7 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["\(sourceDirectory)/**"],
+            sources: [.glob("\(sourceDirectory)/**", excluding: sourceExcludes)],
             resources: resources,
             dependencies: dependencies,
             settings: .settings(

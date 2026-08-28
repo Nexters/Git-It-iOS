@@ -9,11 +9,12 @@ enum AppModuleName: String, CaseIterable {
 
 extension AppModuleName {
     var sourceDirectory: String {
-        switch self {
+        let directoryName = rawValue.droppingPrefix(ProjectName.App.rawValue)
+        return switch self {
         case .GitIt:
-            "Sources"
+            directoryName
         case .GitItTests:
-            "Tests/GitIt"
+            "Tests/\(directoryName.droppingSuffix("Tests"))"
         }
     }
 
@@ -28,10 +29,13 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .extendingDefault(
                     with: [
+                        "CFBundleShortVersionString": "$(MARKETING_VERSION)",
                         "UIApplicationSceneManifest": [
                             "UIApplicationSupportsMultipleScenes": false
                         ],
                         "UIApplicationSupportsIndirectInputEvents": true,
+                        "GIT_IT_API_HOST": "$(GIT_IT_API_HOST)",
+                        "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
                             "UIInterfaceOrientationPortrait",
@@ -47,7 +51,7 @@ extension AppModuleName {
                     ]
                 ),
                 sources: ["\(sourceDirectory)/**"],
-                resources: ["Resources/**"],
+                resources: ["\(sourceDirectory)/Resources/**"],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
                     .fromComposition(.CompositionAdapter),
@@ -65,7 +69,7 @@ extension AppModuleName {
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_PREVIEWS": "YES",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        "MARKETING_VERSION": "1.0",
+                        "MARKETING_VERSION": "1.0.0",
                         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                         "SUPPORTS_MACCATALYST": "NO",
                         "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
@@ -92,7 +96,15 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
                 sources: ["\(sourceDirectory)/**"],
-                dependencies: [],
+                dependencies: [
+                    .target(name: AppModuleName.GitIt.rawValue),
+                    .external(.ComposableArchitecture),
+                    .fromFeature(.Feature),
+                    .fromComposition(.CompositionAdapter),
+                    .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainMember),
+                ],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",

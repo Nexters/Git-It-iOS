@@ -12,7 +12,7 @@ extension FeatureModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.Feature.rawValue)
         return switch self {
         case .Feature:
-            directoryName.isEmpty ? "Presentation" : directoryName
+            "."
         case .FeatureTests:
             directoryName.droppingSuffix("Tests")
         }
@@ -24,6 +24,12 @@ extension FeatureModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                sourceExcludes: [
+                    "Tests/**",
+                    "Derived/**",
+                    "Feature.xcodeproj/**",
+                    "Project.swift",
+                ],
                 dependencies: [
                     .external(.ComposableArchitecture),
                     .fromDomain(.DomainAuthentication),

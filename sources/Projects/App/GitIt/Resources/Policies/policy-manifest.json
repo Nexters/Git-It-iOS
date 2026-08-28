@@ -1,0 +1,18 @@
+{
+    "documents": [
+        {
+            "identifier": "privacy-policy",
+            "displayName": "개인정보 처리방침",
+            "version": "1",
+            "approvedURL": "https://git-it-service-policy.notion.site/Git-it-3bb7221e5fe780fd8431d3147acdaf47",
+            "isRequired": true
+        },
+        {
+            "identifier": "terms-of-service",
+            "displayName": "서비스 이용 약관",
+            "version": "1",
+            "approvedURL": "https://git-it-service-policy.notion.site/Git-it-3bb7221e5fe780089c08ea2d2a2cd264",
+            "isRequired": true
+        }
+    ]
+}
