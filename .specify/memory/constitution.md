@@ -1,25 +1,30 @@
 <!--
 Sync Impact Report
-- Version change: 4.0.0 → 4.1.0
-- Modified principles: 7. 패키지 단위 구현 진행 — `[no-write]` 검증이 추적 대상 소스·문서와
-  Git index를 직접 변경하지 않는다는 기준을 명시하고, `make tuist`의 파생 workspace·project·
-  cache 갱신을 허용하는 예외와 실행 전후 추적 파일 확인 의무를 추가
+- Version change: 6.0.0 → 7.0.0
+- Modified principles: 4. 스킬별 수정 경로 — 수정 경로 표를 단일 정본으로 지정;
+  7. 패키지 단위 구현 진행 → 위험 기반 실행 단위 — 반복 승인과 단일 패키지 강제를 제거하고
+  불가분한 다중 패키지 단위 및 선택적 기준선을 허용하되, `[no-write]` 검증이 추적 대상
+  소스·문서와 Git index를 직접 변경하지 않는다는 기준과 `make tuist`의 파생 workspace·
+  project·cache 갱신을 허용하는 예외 및 실행 전후 추적 파일 확인 의무를 유지;
+  9. Spec Kit 세션 지식 기록 — 반복되거나 재사용 가능한 사건만 영구 기록하도록 문턱 강화
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/tasks-template.md;
-  ✅ .specify/templates/plan-template.md (변경 불필요);
-  ✅ .specify/templates/spec-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-tasks/SKILL.md;
-  ✅ .agents/skills/speckit-implement/SKILL.md; 그 밖의 speckit 스킬은 변경 불필요
-- Runtime guidance requiring updates: 없음
+- Templates requiring updates: ✅ .specify/templates/plan-template.md;
+  ✅ .specify/templates/tasks-template.md; ✅ .specify/templates/spec-template.md (변경 불필요);
+  ✅ .specify/templates/constitution-template.md (변경 불필요)
+- Commands requiring updates: ✅ 설치된 모든 `.agents/skills/speckit-*/SKILL.md`의 기록 조건;
+  ✅ speckit-plan, speckit-tasks, speckit-converge, speckit-implement의 실행 경계
+- Runtime guidance requiring updates: ⚠ AGENTS.md의 중복 수정 경로 표는 이 Skill의 허용
+  경로 밖이므로 후속 동기화 필요; ✅ README.md 검토 완료(변경 불필요);
+  ✅ docs/architecture.md, .github/COMMIT_CONVENTION.md 검토 완료(변경 불필요)
 - Evidence records: 없음
-- Follow-up TODO: 없음
+- Follow-up TODO: AGENTS.md가 Constitution의 정본 표를 참조하도록 별도 사용자 지시로 동기화
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 4.1.0<br>
+**버전**: 7.0.0<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-08-26
 
@@ -60,8 +65,9 @@ Sync Impact Report
   스킬 또는 별도 사용자 지시가 필요합니다.
 - `/speckit-implement`는 활성 `tasks.md`에 정확히 명시된 파일과 `tasks.md`의 완료
   표시만 수정할 수 있습니다. `sources/**`와 `docs/**`는 디렉터리 단위 허용 경로가
-  아닙니다. `docs/**` 파일은 미완료 구현 작업이 정확한 저장소 상대경로로 파일 하나를
-  명시하고 그 작업이 책임 패키지에 배정된 경우에만 수정할 수 있습니다.
+  아닙니다. `docs/**` 파일은 미완료 구현 작업 또는 HEAD 대비 미커밋 `[X]`로 입증된 중단
+  커밋 단위의 작업이 정확한 저장소 상대경로로 파일 하나를 명시하고 그 작업이 책임 패키지에
+  배정된 경우에만 수정할 수 있습니다.
 - 프로젝트 공용 문서는 `GIT_IT_DOCS_ROOT`의 판독 결과인 `docs/**`를 사용하며,
   `sources/docs/**`는 새 산출물이나 작업 경로로 전파하지 않습니다.
 - 공용 문서는 읽기 근거일 뿐 스킬의 쓰기 권한을 넓히지 않습니다. 예외로
@@ -70,9 +76,18 @@ Sync Impact Report
 - 하나의 변경은 한 스킬의 허용 경로 안에서 완료합니다. 다른 스킬의 산출물 또는
   허용되지 않은 경로가 필요하면 중단하고 적절한 스킬을 실행하거나 사용자 승인을
   받습니다.
+- `/speckit-specify`가 검증된 로컬 브랜치를 생성하거나 정확한 기존 브랜치를 명시적으로
+  재사용하고 HEAD를 그 브랜치로 전환하는 것과
+  `/speckit-implement`가 허용된 구현 파일 및 활성 `tasks.md`만 Git index에 추가해 로컬
+  커밋을 만드는 것은 각 워크플로에 필요한 Git 상태 변경입니다. 이 권한은 파일 수정 허용
+  경로를 넓히거나 기존 사용자 변경, 다른 브랜치, remote와 push를 변경할 권한을 부여하지
+  않습니다.
 - Spec Kit 훅이 명령을 자동 실행하려면 해당 명령을 제공하는 설치된 확장과 독립 스킬이
   모두 존재해야 합니다. 훅 스킬은 호출한 스킬의 권한을 넓힐 수 없으며 자신의 허용 경로와
   공개 실행 진입점을 명시해야 합니다.
+- `/speckit-implement`의 mandatory pre-hook은 읽기 전용 worktree·feature branch·HEAD·기존
+  Git 변경 체인 guard를 통과한 뒤에만 실행합니다. Hook 실패, branch/HEAD 변경 또는 종료되지
+  않은 변경 체인은 본문 구현을 시작하지 않는 fail-closed 조건입니다.
 - 기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질, 구조, 운영성, 개발 경험,
   스타일과 의존성 변경에도 작성할 수 있습니다. 외부 동작이 없다는 이유만으로 명세 작성을
   금지하지 않습니다.
@@ -99,8 +114,9 @@ Sync Impact Report
 | `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
 | `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
 | `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
-- 각 스킬 문서는 위 표와 같은 범위를 자체적으로 명시해야 합니다. 경로를 와일드카드로
-  넓히거나 새 경로를 추가하려면 constitution 개정이 필요합니다.
+- 이 표가 Spec-Kit 수정 경로의 단일 정본입니다. 각 스킬 문서는 자신의 행을 참조하고 실행에
+  필요한 구체적인 제한만 덧붙이며, 전체 표나 다른 스킬의 범위를 복제하지 않습니다. 경로를
+  와일드카드로 넓히거나 새 경로를 추가하려면 Constitution 개정이 필요합니다.
 
 ### 6. 한국어 Spec-Kit 산출물
 
@@ -115,48 +131,111 @@ Sync Impact Report
 - 산출물을 완료로 보고하기 전에 새로 작성한 자연어 본문과 고정 문구가 이 원칙을 따르는지
   검토합니다.
 
-### 7. 패키지 단위 구현 진행
+### 7. 위험 기반 실행 단위
 
-- 현재 명세가 변경하는 패키지 중 한 번에 하나의 패키지만 구현합니다.
+- 구현의 기본 실행 경계는 하나의 목적과 검증 가능한 결과를 가진 논리적 단위입니다. 단일
+  패키지 단위가 기본이지만 공개 API 이전, 공용 manifest·구성 변경, 양쪽 변경이 함께 있어야
+  compile되는 migration처럼 분리하면 중간 상태가 깨지는 경우에는 불가분한 다중 패키지
+  integration unit을 허용합니다.
 - 적용 대상 패키지는 의존성 위상 순서로 구현합니다. A가 B를 빌드 의존성으로 참조하면 B를
   먼저 구현합니다. 순서의 근거는 [아키텍처 문서](../../docs/architecture.md)의 프로젝트 내부
   패키지 의존성 표이며, 고정된 패키지 이름 목록을 이 문서나 하위 산출물에 정본으로 두지
   않습니다.
-- 서로 의존하지 않는 패키지의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
-  한 번 정한 순서는 해당 명세의 구현이 끝날 때까지 바꾸지 않습니다.
+- 서로 의존하지 않는 단위의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
 - 현재 명세가 변경하지 않는 패키지는 건너뛰되, 남은 적용 대상 패키지 사이의 위상 순서는
   깨지 않습니다.
 - 의존성 표와 계획된 구현 순서가 어긋나면 구현을 시작하지 않습니다. 아키텍처 문서와
   `tasks.md`를 먼저 일치시키고, 어느 쪽이 옳은지 불분명하면 사용자에게 확인합니다.
-- 현재 패키지의 모든 구현 작업과 검증을 완료하고, 변경 파일과 검증 결과를 사용자에게
-  보고한 뒤 다음 적용 대상 패키지로 진행해도 된다는 명시적 승인을 받아야 합니다.
-- 다음 적용 대상 패키지의 영향 분석은 승인 전에 수행하고 보고할 수 있지만, 그 패키지에
-  속한 파일은 승인 전에 생성, 수정 또는 삭제할 수 없습니다.
-- `tasks.md`는 각 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 위 순서에 따른
-  패키지별 단계와 각 단계 끝의 검증 및 승인 게이트를 명시해야 합니다.
-- 준비, 기반, 마무리와 횡단 관심사는 별도의 다중 패키지 구현 단계가 될 수 없습니다.
-  파일을 변경하는 작업은 책임 패키지 단계 안에 배치하고, 여러 패키지의 선언을 바꾸는 공용
-  파일 작업은 패키지별 변경으로 분리합니다. 전체 기능을 대상으로 하는 읽기 전용 검증은
-  마지막 적용 대상 패키지 완료 뒤에만 실행합니다.
+- 다중 패키지 단위는 포함 이유, 관련 작업 ID, 정확한 파일 경로, 의존 순서와 집중·통합 검증을
+  명시해야 합니다. 편의상 여러 목적을 묶거나 독립적으로 되돌릴 수 있는 변경을 포함하는
+  근거로 사용할 수 없습니다.
+- 패키지 또는 실행 단위 완료 뒤 변경 파일과 검증 결과를 진행 상황으로 보고하되, 다음 단위나
+  읽기 전용 전체 검증을 시작하기 위한 반복 승인을 요구하지 않습니다. 사용자의 최초 구현
+  요청은 확정된 `tasks.md` 범위의 일반적인 후속 단위와 읽기 전용 검증을 포함합니다.
+- 명시적 승인은 범위 확대, 파괴적 또는 복구 곤란한 작업, remote·외부 시스템 변경, 사용자
+  소유 변경의 소비, 새로운 보안·비용·제품 결정을 포함하는 등 현재 요청에 없는 권한이 필요할
+  때만 요청합니다. 승인 필요 여부는 패키지 경계가 아니라 위험과 권한 변화로 판단합니다.
+- `tasks.md`는 파일 변경 작업을 책임 패키지에 배정합니다. 불가분한 다중 패키지 단위는 별도
+  integration unit으로 표시하고 단일 패키지로 나눌 수 없는 이유를 기록합니다.
+- `/speckit-implement`는 파일을 수정하기 전에 미완료 작업을 순서가 있는
+  논리적 커밋 단위로 설계해야 합니다. 각 단위는 하나의 목적, 포함 작업 ID, 정확한 파일
+  경로, 실행할 검증과 `.github/COMMIT_CONVENTION.md`를 따르는 커밋 메시지를 명시하며,
+  독립적으로 리뷰하고 되돌릴 수 있어야 합니다. 이 설계는 인세션 실행 계획이며 `tasks.md`에는
+  기존 작업의 checkbox 상태 외에 커밋 계획 구조를 추가하지 않습니다.
+- 계획 전에 HEAD, index와 worktree의 활성 `tasks.md` 전체 diff를 검사합니다. 생성·일반 편집
+  상태의 `tasks.md`는 별도 commit을 강제하지 않고 현재 blob hash와 전체 diff를 실행 기준선으로
+  고정할 수 있습니다. Commit은 사용자가 요청했거나 협업상 영속 기준선이 필요한 경우에만
+  먼저 만듭니다.
+- 구현 중 `[X]` 전이와 wording·structure 변경을 구분합니다. 현재 단위가 소유하지 않은 hunk를
+  정확한 파일 staging이 함께 소비할 가능성이 있으면 변경을 보존하고 중단합니다. 기준선의
+  일반 편집을 구현 커밋에 포함하려면 그 범위와 소유권이 현재 요청으로 입증되어야 합니다.
+- 각 단위를 시작할 때 작업 ID와 정확한 파일 경로를 snapshot하며, 이 허용 범위는 checkbox를
+  `[X]`로 바꾼 뒤에도 commit 성공 또는 중단까지 유지됩니다. Formatter와 hook은 snapshot을
+  넓힐 수 없고 다음 단위 경로를 미리 활성화할 수 없습니다.
+- 구현과 직접 관련된 테스트와 불가분한 target·manifest 연결은 같은 커밋 단위에 포함할 수
+  있습니다. 독립적인 기능, 구조 정리, rename, 대규모 포맷과 무관한 기존 변경은 분리합니다.
+- 각 커밋 단위는 작업 수행, 단위 검증, 해당 작업의 `[X]` 표시, 정확한 단위 파일과 활성
+  `tasks.md`만 stage, staged 범위 검사, 훅을 우회하지 않는 커밋, 생성된 커밋 확인 순서로
+  완료합니다. 커밋 성공과 함께 단위 파일 및 tasks.md에 staged·unstaged·untracked 잔여가
+  없음을 확인하기 전에는 다음 단위를 시작하지 않습니다.
 - `[no-write]` 검증은 저장소가 추적하는 소스·문서와 Git index를 작업의 결과로 직접
   변경하지 않아야 합니다. `make tuist`는 현재 소스에서 파생되는 workspace, project, 심볼릭
   링크와 도구 cache를 생성·갱신하는 명령이므로 `[no-write]` 검증에서 실행할 수 있습니다.
   실행 전후 Git 상태를 비교해야 하며, `make tuist`가 기존의 추적 파일 diff를 바꾸거나 새
   추적 대상 변경을 만들면 해당 검증을 완료로 처리하지 않고 변경 경로와 영향을 보고합니다.
-- 모든 적용 대상 패키지가 완료된 뒤의 포맷 훅은 현재 작업 트리에서 추가 또는 수정된 Swift
-  파일을 수정합니다. 활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않습니다.
-  저장소의 `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점을 사용하고 Git index는 변경하지
+- 기존 staged·unstaged 변경의 소유권이 현재 단위에 속하는지 확인할 수 없거나 커밋 또는
+  검증이 실패하면 변경을 보존하고 중단합니다. 같은 Git 변경 체인을 병렬 실행하거나 원인을
+  확인하지 않은 채 재시도하지 않으며, `/speckit-implement`는 commit을 amend, rebase, push하지
   않습니다.
-- 의존 관계 변경으로 패키지 구현 순서가 달라지면 이미 완료된 작업과 기존 변경은 이력으로
-  보존하되 더 수정하지 않습니다. 다음 구현 전에 미완료 작업을 새 순서로 이관하고, 패키지 소유권이 없거나 여러
-  패키지에 걸친 작업이 남아 있으면 구현을 중단하고 `tasks.md`를 먼저 갱신합니다.
+- 준비, 기반, 마무리와 횡단 관심사는 책임 패키지 단위 또는 불가분한 integration unit에
+  배치합니다. 공용 파일을 억지로 패키지별 변경으로 나눠 중간 상태를 깨뜨리지 않습니다.
+- 전체 읽기 전용 검증은 필요한 구현 단위가 끝난 같은 실행에서 이어서 수행합니다. 별도의
+  승인 게이트를 만들지 않으며, 새 권한이나 범위 확대가 발견된 경우에만 중단합니다.
+- `/speckit-converge`가 새 파일 작업을 append하면 같은 수렴 단계 끝에 새 전체 `[no-write]`
+  검증 작업도 append합니다. 이전에 완료된 전체 검증 checkbox를 재사용하지 않으며 새 검증과
+  필수 after hook은 수렴 작업의 마지막 최종화 단위에서 다시 실행합니다.
+- 모든 실행 단위와 전체 읽기 전용 검증이 완료되면 마지막 커밋 단위를 commit하기
+  전에 포맷 훅을 실행합니다. 훅은 현재 작업 트리에서 추가 또는 수정된 Swift 파일을
+  `GIT_IT_SWIFT_FORMAT_RUNNER` 공개 진입점으로 수정하고 Git index는 변경하지 않습니다.
+  활성 `tasks.md`의 파일 경로는 포맷 대상 제한에 사용하지 않지만, 현재 단위 밖의 기존 Swift
+  변경이 있으면 사용자 소유 변경을 침범할 수 있으므로 훅을 실행하지 않고 중단합니다. 훅의
+  허용된 결과와 완료 표시를 같은 마지막 커밋 단위에 포함하고 commit 뒤 다시 실행하지
+  않습니다. 필수 훅이 실패하면 마지막 단위를 stage 또는 commit하지 않습니다.
+- 의존 관계 변경으로 실행 순서가 달라지면 이미 완료된 작업과 기존 변경은 이력으로 보존하고
+  남은 작업을 새 순서 또는 integration unit으로 이관한 뒤 계속합니다. 어느 쪽이 옳은지
+  불분명하거나 새 범위가 필요하면 중단하고 `tasks.md`를 먼저 갱신합니다.
 
 ### 8. Git-flow 브랜치 네임스페이스
 
-- `/speckit-specify`가 새 Git 브랜치를 생성할 때 브랜치 이름은 정확히 하나의 Git-flow
-  네임스페이스로 시작해야 합니다. 일반 기능은 `feature/<short-name>`, 운영 중인 배포본의
-  긴급 수정은 `hotfix/<short-name>`, 배포 준비와 안정화는
-  `release/<version-or-short-name>`을 사용합니다.
+- 기능의 canonical identity는 검증된 현재 Git-flow branch 이름입니다. `NNN` prefix,
+  spec 디렉터리 basename, checkout 경로와 `.specify/feature.json`은 identity가 아닙니다.
+- 이 개정 전에 실제 branch로 사용한 `NNN-slug`는 history 보존을 위한 legacy canonical
+  identity로 계속 판독합니다. 신규 artifact와 branch에는 이 형식을 생성하지 않습니다.
+- `specs/<sequence>-<slug>`는 branch metadata에 연결된 artifact container입니다. sequence는
+  사람이 읽는 생성 순서이며 lookup key나 고유 ID가 아닙니다. 신규 sequential 번호는 기존
+  숫자 prefix 최댓값의 다음 번호를 no-clobber 방식으로 선택하며 과거 중복 번호는 소급
+  rename하지 않습니다.
+- `.specify/feature.json`은 삭제·재생성 가능한 ephemeral pointer입니다. 현재 branch와
+  `spec.md` metadata가 우선하며 pointer가 안전한 경로여도 현재 branch와 metadata가 다르면
+  stale로 실패하고 자동 선택하지 않습니다. 누락·malformed·지원하지 않는 metadata도 검증
+  성공에서 제외하지 않고 명시적으로 실패합니다.
+- 하나의 canonical branch가 둘 이상의 spec에 연결되면 identity collision으로 실패합니다.
+  기존 `미생성 (예정: <branch>)` metadata는 정확히 같은 branch를 lazy migration할 때만
+  읽으며 새 artifact에는 실제 branch association을 기록합니다.
+- feature directory는 저장소 `specs/`의 실제 비-symlink 직계 하위여야 합니다. 절대 외부
+  경로, `..`, 중첩 경로와 symlink escape는 읽기·쓰기 후보에서 제외합니다.
+
+- `/speckit-specify`는 기능 설명과 브랜치 유형을 검증한 직후, extension hook이나 명세
+  디렉터리·파일을 처리하기 전에 현재 HEAD에서 로컬 기능 브랜치를 직접 생성하고 그 브랜치로
+  전환해야 합니다. 브랜치 생성 또는 전환에 실패하면 어떤 명세 산출물도 생성하거나 수정하지
+  않습니다.
+- 성공한 브랜치 상태는 symbolic branch 이름이 검증된 이름과 같고 해당 local ref가 실제
+  commit으로 해석되는 경우만 인정합니다. Unborn·dangling ref는 생성, 재사용 또는 hook 이후
+  검증을 통과하지 못합니다. 최초 검증한 commit을 기준으로 저장하고 이후 hook과 명세 처리
+  동안 HEAD 또는 대상 ref가 이동하면 완료하지 않습니다.
+- 새 브랜치 이름은 정확히 하나의 Git-flow 네임스페이스로 시작해야 합니다. 일반 기능은
+  `feature/<short-name>`, 운영 중인 배포본의 긴급 수정은 `hotfix/<short-name>`, 배포 준비와
+  안정화는 `release/<version-or-short-name>`을 사용합니다.
 - 사용자가 유형을 명시하면 그 값을 사용합니다. 명시하지 않은 경우 배포본의 긴급 수정은
   `hotfix`, 배포 준비와 안정화는 `release`, 그 밖의 변경은 `feature`를 기본값으로
   결정합니다. 서로 충돌하는 유형이 입력되면 브랜치를 생성하지 않고 충돌을 먼저 해소합니다.
@@ -165,30 +244,49 @@ Sync Impact Report
   비어 있거나 추가 `/`를 포함할 수 없으며 네임스페이스를 중복해서 붙일 수 없습니다.
 - 사용자가 `GIT_BRANCH_NAME`을 직접 제공해도 위 네임스페이스와 접미사 규칙을 검증해야
   합니다. 명시값은 정책 검사를 우회하는 수단이 될 수 없습니다.
+- 현재 브랜치가 검증된 대상 브랜치와 같으면 재실행으로 간주해 계속할 수 있습니다. 대상
+  로컬 브랜치가 존재하지만 현재 브랜치가 아니면 현재 입력에 그 정확한 브랜치를 재사용하라는
+  명시적 결정이 있을 때만 전환하고 검증합니다. 결정이 없으면 중단하며 기존 브랜치를 재생성,
+  삭제 또는 덮어쓰지 않습니다. 전환 전에 index 또는 worktree 변경이 있으면 정확한 변경 목록을
+  그 브랜치로 운반한다는 별도 명시적 승인도 필요합니다.
+- 같은 이름의 로컬 브랜치가 없더라도 일치하는 remote-tracking ref가 있으면 현재 HEAD에서
+  무관한 동명 브랜치를 만들지 않습니다. 사용자가 정확한 remote ref의 추적 재사용을 명시한
+  경우에만 local tracking branch를 만들고, 그 밖에는 후보를 보고한 뒤 중단합니다. 이 검사는
+  fetch나 remote 변경을 허용하지 않습니다.
+- `before_specify` hook은 이미 생성·전환된 브랜치를 입력으로 받을 수 있지만 브랜치 생성이나
+  전환을 대신 소유할 수 없습니다. 훅의 유무와 성공 여부가 핵심 브랜치 생성 조건을 바꾸지
+  않습니다.
 - Spec 디렉터리 이름은 브랜치 이름과 독립적으로 유지하며 `/` 네임스페이스를 포함하지
-  않습니다. 명세에는 브랜치 유형과 실제 생성된 이름을 기록하고, 생성 훅이 없거나 실행되지
-  않았다면 생성된 것처럼 기록하지 않고 예정 이름과 미생성 상태를 구분합니다.
+  않습니다. 모든 명시·저장·탐색 경로는 canonical `specs/<feature>` 직계 하위로 제한하고
+  절대 외부 경로, `..`와 symlink 탈출을 허용하지 않습니다. 명세에는 브랜치 유형과 실제 생성
+  또는 재사용이 확인된 브랜치 이름만 기록합니다. 기존 `미생성 (예정: ...)` 값이 정확히 같은
+  브랜치를 가리키면 기존 명세를 보존 병합하면서 실제 브랜치 메타데이터로 이관할 수 있습니다.
+- 새 spec의 template 준비와 브랜치 metadata 연결은 placeholder나 부분 연결 파일을 최종
+  경로에 노출하지 않는 원자적 setup transaction으로 수행합니다. 실패·중단 후 재실행은 같은
+  transaction artifact를 먼저 복구하거나 정리하며 새 자동 번호로 중복 디렉터리를 만들지 않습니다.
+- `.specify/feature.json`은 현재 명세 본문과 품질 체크리스트의 검증 상태를 기록한 뒤에만
+  canonical 저장소 상대경로로 갱신합니다. 갱신 전 실패는 기존 활성 포인터를 보존합니다.
 - 이 원칙의 시행 전에 생성된 브랜치는 이력 보존을 위해 소급해 이름을 바꾸지 않습니다.
   시행 후 새 브랜치를 생성하거나 기존 명세용 브랜치를 새로 만들 때부터 이 원칙을 적용합니다.
 
 ### 9. Spec Kit 세션 지식 기록
 
-- Spec Kit 세션에서 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면
-  `$speckit-troubleshooting`으로 `docs/spec-kit/<feature>/trouble-shooting.md`에 증상,
-  영향, 근거, 원인, 조치, 검증 상태와 재발 방지를 기록해야 합니다. `<feature>`는 활성 기능
-  디렉터리의 이름과 같아야 하며, 발생하지 않은 위험이나 근거 없는 가능성은 기록하지
-  않습니다.
-- 여러 세션과 저장소 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
-  의사결정 기준 또는 반복 패턴을 해석하면 `$speckit-tacit-knowledge`로 활성 기능의
-  `docs/spec-kit/<feature>/tacit-knowledge.md`에 사실과 해석, 독립 근거, 확신도,
-  적용·제외 범위, 반례와 검증 조건을 기록해야 합니다. 단일 추측이나 이미 명시된 사실의
-  복사는 기록하지 않습니다.
+- 일시적 실패나 한 번의 환경 오류만으로 영구 기록을 만들지 않습니다. 세션 안에서 해결된
+  일반적인 명령 오타, Simulator·network 일시 장애와 재시도 가능한 도구 오류는 실제 결과와
+  미검증 범위를 사용자 보고에만 남깁니다.
+- `$speckit-troubleshooting`은 같은 원인이 합리적인 재시도 뒤에도 반복되거나, 원인과 복구
+  절차가 다른 세션에서 재사용 가능하거나, 해결되지 않은 상태가 후속 세션에 영향을 주거나,
+  사용자가 영구 기록을 명시적으로 요청한 경우에만 적용합니다. 기록에는 증상, 영향, 근거,
+  원인, 조치, 검증 상태와 재발 방지를 포함합니다.
+- 여러 세션과 저장소의 독립 근거를 종합해 기존 문서에 직접 적혀 있지 않은 규칙, 책임 경계,
+  의사결정 기준 또는 반복 패턴을 해석한 경우에만 `$speckit-tacit-knowledge`를 적용합니다.
+  단일 사건, 단일 추측이나 이미 명시된 사실은 암묵지로 기록하지 않습니다.
 - 두 기록은 append-only입니다. 기존 항목을 수정·삭제하지 않으며 교정, 재발, 반증과 상태
   변화는 선행 ID를 참조하는 새 항목으로 남깁니다. 기록 조건을 충족하지 않으면 빈 파일이나
   placeholder를 만들지 않습니다.
-- 문제 자체와 그 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단 기준은
-  `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록 ID를
-  연결합니다.
+- 문제 자체와 재사용 가능한 해결 과정은 `trouble-shooting.md`, 여러 사건에서 일반화한 판단
+  기준은 `tacit-knowledge.md`에 분리합니다. 한 사건이 두 조건을 모두 충족하면 서로의 기록
+  ID를 연결합니다.
 - 기록은 Constitution, 명세, 계획, 작업 목록과 현재 소스보다 우선하지 않습니다. 암묵지를
   규범, 요구사항, 설계 결정 또는 구현 작업으로 승격하려면 해당 산출물을 소유한 Spec Kit
   스킬을 별도로 실행해야 합니다.

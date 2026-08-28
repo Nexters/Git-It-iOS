@@ -122,6 +122,11 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 **각 스킬은 정해진 경로만 수정할 수 있습니다** — 범위 밖 파일은 읽기만 하고, 수정이
 필요하면 해당 스킬을 실행하거나 사용자에게 직접 확인받습니다.
 
+기능의 canonical identity는 Git-flow branch이고 `specs/<NNN>-<slug>`의 숫자는 생성 순서일
+뿐입니다. `.specify/feature.json`은 삭제 가능한 활성 pointer이며 branch metadata와 충돌하면
+신뢰하지 않습니다. 공용 판독·검증은 `tools/spec-kit/bin/resolve-feature.sh`와
+`tools/spec-kit/bin/validate.sh`를 사용합니다.
+
 | 스킬 | 허용 수정 경로 |
 | --- | --- |
 | `speckit-specify` | 기록 파일 이름을 제외한 `specs/<feature>/**`, `.specify/feature.json` |

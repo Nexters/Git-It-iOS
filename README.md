@@ -21,6 +21,11 @@ Git It의 iOS 애플리케이션 저장소입니다.
 | `make format` | 현재 변경된 Swift 소스 파일만 포매팅 |
 | `make verify-tools` | 셸 스크립트 검증 도구(ShellCheck, shfmt) 다운로드 및 준비 |
 
+Spec-Kit 기능은 `feature/`, `hotfix/`, `release/` Git-flow branch 이름으로 식별합니다.
+`specs/<NNN>-<slug>`의 `NNN`은 정렬용 생성 순서이고 `.specify/feature.json`은 삭제 가능한
+활성 pointer입니다. 현재 branch의 artifact는 `tools/spec-kit/bin/resolve-feature.sh`, 전체
+identity 충돌과 pointer 안전성은 `tools/spec-kit/bin/validate.sh`로 읽기 전용 검증합니다.
+
 `make hooks`는 커밋 메시지 형식 검사와 검증 훅을 설치합니다. 현재는 빌드·컴파일·테스트·린트·포맷 검증을 기본 비활성화했습니다.
 커밋 전 검증은 `tools/githooks/pre-commit.d/enabled`에서 필요한 단계의 주석을 풀어 다시 켭니다.
 push 전 검증은 `GIT_IT_PRE_PUSH_VALIDATION_ENABLED=true git push`로 다시 켤 수 있습니다.

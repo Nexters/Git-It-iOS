@@ -55,8 +55,9 @@ Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가
 
 ### 검토·테스트 Target
 
-`UIComponentLayoutHarness`와 UI 자동화 target은 제품 화면이 아니라 컴포넌트 레이아웃
-계약을 독립적으로 검토·검증하는 실행 환경입니다. 제품 API를 제공하거나 production
+`UIComponentPreview`는 모든 public component의 variant·size·state와 환경 fixture를
+local data로 탐색하는 실행 환경입니다. UI 자동화 target은 Preview route, 레이아웃,
+상호작용과 접근성 계약을 판정합니다. 두 target 모두 제품 API를 제공하거나 production
 target의 의존 대상이 되어서는 안 됩니다.
 
 표현 API의 사용 방향은 `Feature → UIComponent → DesignSystem`입니다. 컴파일 의존성은

@@ -7,16 +7,18 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     public init(
         selected: Item,
+        onSelect: @escaping (Item) -> Void,
         @ViewBuilder content: () -> Content,
     ) {
         self.selected = selected
+        self.onSelect = onSelect
         self.content = content()
     }
 
     // MARK: Public
 
     public var body: some View {
-        TabView(selection: .constant(selected)) {
+        TabView(selection: Binding(get: { selected }, set: onSelect)) {
             ForEach(Item.allCases) { item in
                 Group {
                     if selected == item {
@@ -39,12 +41,13 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
     // MARK: Private
 
     private let selected: Item
+    private let onSelect: (Item) -> Void
     private let content: Content
 
 }
 
 #Preview("Tab Shell") {
-    TabShell(selected: TabShellPreviewItem.home) {
+    TabShell(selected: TabShellPreviewItem.home, onSelect: { _ in }) {
         ScreenContainer {
             StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
         }

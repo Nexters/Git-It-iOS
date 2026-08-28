@@ -16,61 +16,15 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## 산출물 언어
+## 공통 규칙
 
-이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
-코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
-원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
-
-## 세션 지식 기록 위임
-
-- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
-  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
-- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
-  `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
-  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+이 스킬은 [Spec Kit 스킬 공통 규칙](../../../.specify/memory/speckit-common-rules.md)의
+산출물 언어, 세션 지식 기록 위임, 인자 이스케이프 규칙을 그대로 따른다.
 
 ## Pre-Execution Checks
 
-**Check for extension hooks (before convergence)**:
-
-- Check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.before_converge` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-
-    ```text
-    ## Extension Hooks
-
-    **Optional Pre-Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-
-  - **Mandatory hook** (`optional: false`):
-
-    ```text
-    ## Extension Hooks
-
-    **Automatic Pre-Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-
-    Wait for the result of the hook command before proceeding to the Goal.
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+**Check for extension hooks (before convergence)**: [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)을
+따르되 훅 키는 `hooks.before_converge`, 필수 훅의 "Wait for..." 대상 섹션은 "the Goal"이다.
 
 ## Goal
 
@@ -241,16 +195,27 @@ Append to the **end** of `tasks.md`, per the append contract:
 
    `<gap-type>` is one of `missing`, `partial`, `contradicts`, `unrequested`.
 
+   각 파일 변경 task는 부분 완료 없이 검증할 수 있는 하나의 원자적 목적과 정확한 저장소
+   상대경로 하나를 포함해야 한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
+   `<source-ref>`와 `<gap-type>`을 유지한 별도 task로 분리한다. Commit 제목이나 그룹은
+   append하지 않으며 `/speckit-implement`가 실행 시점에 논리적 단위를 설계한다.
+
    Constitution-violation tasks MUST be emitted first and described as
    `CRITICAL`.
-   추가하는 모든 파일 변경 작업을 정확히 하나의 패키지에 배정하고, 적용되지 않는 패키지를
-   제외한 의존성 위상 순서로 작업을 묶는다. 활성 tasks.md가 이미 확정한 패키지 순서가 있으면
-   그 순서를 따른다.
-   추가한 각 패키지 그룹 끝에 검증, 결과 보고와 명시적 사용자 승인 게이트를 둔다. 여러
-   패키지를 하나의 구현 단위로 합치지 않는다.
-   `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 헌법 순서로
-   만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다. 공용 파일 변경은 패키지별
-   작업으로 분리하며 소유권을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.
+   추가하는 파일 변경 작업을 책임 패키지에 배정하고 의존성 위상 순서로 작업을 묶는다. 분리하면
+   compile되지 않는 공개 API 이전·공용 manifest·migration은 불가분한 다중 패키지 integration
+   unit으로 배정하고 분리 불가 근거, 정확한 경로와 통합 검증을 기록한다.
+   각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위 또는 읽기 전용 전체
+   검증을 위한 승인 게이트는 추가하지 않는다. 새 권한이 필요한 경우에만 승인 작업을 append한다.
+   `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 활성 tasks.md가
+   확정한 의존성 위상 순서로 만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다.
+   공용 파일 변경은 분리 가능한 경우 패키지별 작업으로 나누고, 불가분하면 integration unit에
+   배치한다. 책임 단위나 검증을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.
+   마지막 package subsection 뒤에는 `### 전체 수렴 완료 검증`을 append하고 새 ID의
+   `[no-write]` tasks로 (1) 활성 plan/tasks가 요구하는 전체 build·compile·test와 (2) 영향받은
+   변경 시나리오 수용 기준을 다시 검증하도록 한다. 기존 완료된 전체 검증 checkbox를 재사용하지
+   않는다. 이 global tasks는 `/speckit-implement`가 마지막 실행 단위의 `FINALIZATION_TASKS`로
+   매핑해 반복 승인 없이 필수 after hook과 함께 최종 commit 전에 실행한다.
 4. Never reuse or renumber existing IDs. If a prior Convergence phase exists, add a new,
    separately-numbered one below it — do not touch the old one.
 
@@ -262,48 +227,15 @@ Append to the **end** of `tasks.md`, per the append contract:
 
 ### 8. 다음 작업 제시(인계)
 
-- On `tasks_appended`: state how many tasks were appended under which phase, and recommend
-  running `/speckit-implement` to complete them; note that a follow-up converge
-  run will find fewer or no remaining items.
+- On `tasks_appended`: state how many tasks were appended under which phase. Explain that
+  `/speckit-implement` captures the tasks.md blob hash and full diff as its baseline; a separate
+  baseline commit is optional. Include the newly appended whole convergence-validation task count.
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
   is needed for this feature's specified scope.
 
 ### 9. Check for extension hooks
 
-After producing the result, check if `.specify/extensions.yml` exists in the project root.
-
-- If it exists, read it and look for entries under the `hooks.after_converge` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- Report the convergence outcome (`converged` or `tasks_appended`) in-session before listing
-  any hooks, so users can decide whether to run optional follow-up commands.
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-
-    ```text
-    ## Extension Hooks
-
-    **Optional Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-
-  - **Mandatory hook** (`optional: false`):
-
-    ```text
-    ## Extension Hooks
-
-    **Automatic Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+After producing the result, report the convergence outcome (`converged` or `tasks_appended`)
+in-session before listing any hooks, so users can decide whether to run optional follow-up
+commands. Then apply the [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)
+with hook key `hooks.after_converge`.

@@ -1,6 +1,6 @@
 ---
 name: "speckit-specify"
-description: "Create or update the feature specification from a natural language feature description."
+description: "Create a validated Git-flow branch immediately, then create or update the feature specification from a natural language feature description."
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
@@ -16,24 +16,16 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## 산출물 언어
+## 공통 규칙
 
-이 스킬이 생성·수정하거나 사용자에게 보고하는 모든 자연어 문장은 한국어로 작성한다.
-코드 식별자, 명령어, 파일 경로, 환경 변수, 라이브러리·API 고유 명칭, BDD 키워드는
-원문을 유지한다. 이 규칙은 이 문서의 영어 예시와 기본 템플릿의 고정 문구보다 우선한다.
-
-## 세션 지식 기록 위임
-
-- 실행 중 실제 오류, 실패, 잘못된 판단, 복구 또는 환경 제약이 발생하면 근거를 보존한 뒤
-  최종 보고 전에 `$speckit-troubleshooting`을 별도로 적용한다.
-- 여러 세션과 저장소의 독립 근거에서 문서에 없는 판단 기준이나 책임 경계를 해석하면
-  `$speckit-tacit-knowledge`를 별도로 적용한다.
-- 이 스킬이 두 기록 파일을 직접 수정해서는 안 된다. 가설적 위험, 단일 추측, 이미 명시된
-  사실에는 기록 스킬을 적용하지 않으며 조건이 없으면 파일을 만들지 않는다.
+이 스킬은 [Spec Kit 스킬 공통 규칙](../../../.specify/memory/speckit-common-rules.md)의
+산출물 언어, 세션 지식 기록 위임, 인자 이스케이프 규칙을 그대로 따른다.
 
 ## Pre-Execution Checks
 
-**Prepare a Git-flow branch name before dispatching `before_specify` hooks**:
+**Create the Git-flow branch before dispatching `before_specify` hooks**:
+- Require a non-empty feature description before deriving a name or changing Git state. If it is
+  empty, stop with `기능 설명이 제공되지 않았습니다` and do not create a branch.
 - Derive `SHORT_NAME` from the feature description using the short-name rules in step 1 below.
 - Determine `BRANCH_NAMESPACE` before branch creation:
   - Use the user's explicit `feature`, `hotfix`, or `release` type when provided.
@@ -47,41 +39,57 @@ You **MUST** consider the user input before proceeding (if not empty).
   NOT contain another `/` or a repeated namespace.
 - If the user explicitly provided `GIT_BRANCH_NAME`, do not rewrite it. Validate that it has exactly
   one allowed namespace and a valid suffix. An invalid explicit name is an error, not a policy bypass.
-- Pass the validated `GIT_BRANCH_NAME` to every executable `before_specify` hook.
+- Run `git check-ref-format --branch "$GIT_BRANCH_NAME"` after the policy validation. Both checks
+  MUST pass before the branch can be created or reused.
+- Verify that the repository is a Git worktree and resolve the current symbolic branch. A detached
+  HEAD or a Git lookup failure is an error.
+- Define the branch invariant as both (a) the current symbolic name equals `GIT_BRANCH_NAME`, and
+  (b) `refs/heads/$GIT_BRANCH_NAME^{commit}` resolves to a commit. An unborn or dangling symbolic
+  branch never satisfies reuse, creation, or a hook checkpoint.
+- Create or resume the branch before any hook or specification file operation:
+  - If the current branch already equals `GIT_BRANCH_NAME`, treat this as a resumed invocation and set
+    `BRANCH_STATUS` to `재사용` without creating another branch, but only after the full branch
+    invariant passes.
+  - Use `git show-ref --verify --quiet "refs/heads/$GIT_BRANCH_NAME"` to check the local target. If it
+    exists while another branch is current, reuse it only when the current invocation contains an
+    explicit user decision to reuse that exact branch. Before switching, inspect staged, unstaged, and
+    untracked paths. If any exist, require a separate explicit decision to carry that exact listed
+    worktree/index state; branch reuse approval alone is insufficient. Then run
+    `git switch "$GIT_BRANCH_NAME"` and set
+    `BRANCH_STATUS` to `재사용`. Without that decision, stop and report both branch names plus the two
+    safe continuations: switch to the target branch manually, or rerun with explicit reuse approval.
+    Do not recreate, delete, or overwrite the existing branch.
+  - If no local target exists, inspect local remote-tracking refs for the exact
+    `*/$GIT_BRANCH_NAME` name before creating anything. If any exist, do not create an unrelated local
+    branch from the current HEAD. With an explicit decision naming exactly one remote ref, run
+    the same staged/unstaged/untracked carry-over check above, then
+    `git switch --track -c "$GIT_BRANCH_NAME" "<remote>/$GIT_BRANCH_NAME"` and set `BRANCH_STATUS` to
+    `재사용`; otherwise stop and report the candidate refs so the user can choose or switch manually.
+    This check does not fetch or mutate a remote.
+  - Only when neither a local target nor a matching remote-tracking ref exists, run
+    `git switch -c "$GIT_BRANCH_NAME"` from the current HEAD and set `BRANCH_STATUS` to `생성`.
+  - Recheck the full branch invariant. After an existing-branch switch, also require the previously
+    listed carry-over paths and index state to remain exactly accounted for. If creation, switching, or
+    verification fails, stop before dispatching hooks or creating/updating specification artifacts.
+- After this first successful invariant, capture `SPECIFY_HEAD`. Every later branch-invariant checkpoint
+  also requires both HEAD and `refs/heads/$GIT_BRANCH_NAME` to remain at `SPECIFY_HEAD`; this skill and
+  its hooks do not own commit, reset, or ref movement.
+- If a later hook or specification step fails after successful branch creation, preserve the branch
+  and report the partial state. Do not delete it or switch back automatically; a retry reuses it.
+- Do not stash, reset, clean, stage, commit, amend, rebase, or push existing changes as part of branch
+  creation. Record pre-existing changes only to preserve ownership and report them separately.
+- Pass the verified active `GIT_BRANCH_NAME` and `BRANCH_STATUS` to every executable
+  `before_specify` hook. A hook may inspect the active branch but MUST NOT create or switch it.
 
-**Check for extension hooks (before specification)**:
-- Check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.before_specify` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Pre-Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-  - **Mandatory hook** (`optional: false`):
-    ```
-    ## Extension Hooks
-
-    **Automatic Pre-Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-
-    Wait for the result of the hook command before proceeding to the Outline.
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+**Check for extension hooks (before specification)**: [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)을
+따르되 훅 키는 `hooks.before_specify`, 필수 훅의 "Wait for..." 대상 섹션은 "the Outline"이다.
+- Immediately after every invoked mandatory hook returns, whether it succeeded or failed, recheck the
+  full branch invariant. If it fails, stop before the Outline, do not switch automatically, and report
+  the expected branch/ref, actual state, hook result, and partial state.
+- If an invoked mandatory hook fails while the branch still matches, stop before the Outline, preserve
+  the branch, and report the partial state. Do not treat emitting `EXECUTE_COMMAND:` as hook success.
+- After all executable `before_specify` hooks finish, require the full branch invariant again before
+  entering the Outline.
 
 ## Outline
 
@@ -92,7 +100,10 @@ This skill may modify only the newly resolved `specs/<feature>/**` directory and
 `tacit-knowledge.md` inside the feature directory, nor create, modify, or delete their
 canonical `docs/spec-kit/<feature>/` records. Those two records remain exclusively
 owned by their dedicated recording skills. It also MUST NOT modify application code,
-project configuration, or any other feature directory.
+project configuration, or any other feature directory. Before those file writes, this skill may
+create the validated local `GIT_BRANCH_NAME`, or explicitly reuse its exact local/remote-tracking
+branch, and switch HEAD to it as described above. That Git permission does not authorize deleting or
+overwriting another branch, changing the Git index or existing commits, fetching, or pushing.
 
 The text the user typed after `/speckit-specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
@@ -116,28 +127,44 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Git-flow branch creation** (optional, via hook):
+2. **Use the verified Git-flow branch** (required, core behavior):
 
-   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have
-   created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`.
-   Verify that `BRANCH_NAME` exactly matches the validated `GIT_BRANCH_NAME`. A mismatched or
-   non-compliant result is an error and MUST NOT be reported as a successfully created branch.
+   Require the Pre-Execution Checks to have created or resumed `GIT_BRANCH_NAME` and verified that it
+   is the current symbolic branch. Do not defer branch creation to a hook, and do not continue with a
+   planned-but-uncreated branch. If a hook reports a different branch or switches HEAD, treat that as
+   an error and stop before creating/updating specification artifacts.
 
-   If no executable `before_specify` hook exists or the hook did not run, do not create or switch
-   branches in this core command. Retain `GIT_BRANCH_NAME` only as the planned name and record branch
-   status as `미생성` in the specification.
-
-   Do not invoke `.specify/scripts/bash/create-new-feature.sh` as a fallback. The installed legacy
-   script derives an `NNN-short-name` branch value and couples it to the spec directory, which is
-   incompatible with the required slash namespace and independent spec-directory resolution.
+   `.specify/scripts/bash/create-new-feature.sh`를 사용할 때도 출력의 `BRANCH_NAME`은 현재
+   canonical Git-flow branch, `FEATURE_NUM`은 artifact sequence로 해석합니다. 스크립트가
+   branch를 생성하거나 전환하는 대신 Pre-Execution Checks가 이 상태를 먼저 확정합니다.
 
 3. **Create the spec feature directory**:
 
-   Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
+   Resolve the repository root and canonical `SPECS_ROOT` (`<repo>/specs`) before inspecting a feature
+   path. Every explicit, persisted, discovered, or generated feature directory MUST normalize to
+   exactly one direct child `SPECS_ROOT/<feature>` and MUST NOT escape through an absolute external
+   path, `..`, or a symlink. Reject an explicit or generated unsafe path before any read or write.
+   Treat an unsafe `.specify/feature.json` pointer as invalid without reading through it, and report it
+   as stale. Existing feature directories and `spec.md`, `checklists/`, or `requirements.md` artifacts
+   that are symlinks are not valid read or write targets. `.specify/feature.json` itself must be absent
+   or a regular non-symlink file.
 
    **Resolution order for `SPECIFY_FEATURE_DIRECTORY`**:
-   1. If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY` (e.g., via environment variable, argument, or configuration), use it as-is
-   2. Otherwise, auto-generate it under `specs/`:
+   1. Regardless of `BRANCH_STATUS`, collect canonical existing candidates from a safe
+      `.specify/feature.json` pointer and every direct-child `specs/*/spec.md`. A candidate matches when
+      its metadata records either the actual `GIT_BRANCH_NAME` or the exact legacy value
+      `미생성 (예정: <GIT_BRANCH_NAME>)`. The legacy form is a migration candidate, not permission to
+      match a different planned branch. Deduplicate candidates by canonical directory. A safe pointer
+      whose spec records another branch is stale for this invocation and is not a candidate.
+   2. If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY` (via environment variable, argument,
+      or configuration), canonicalize it first. If any matching candidate resolves to another
+      directory, stop instead of creating a duplicate. Reuse the explicit directory only when its
+      existing `spec.md` matches the actual or exact legacy branch value above. A nonexistent or empty
+      direct-child directory is allowed only when no matching candidate exists. A non-empty directory
+      without a matching `spec.md`, or a spec associated with another branch, is an error.
+   3. Without an explicit directory, reuse a candidate only when the deduplicated set contains exactly
+      one directory. If multiple candidates exist, stop and report all of them instead of choosing. If
+      none exists, auto-generate under `SPECS_ROOT`:
       - Check `.specify/init-options.json` for `feature_numbering` (preferred) or `branch_numbering` (deprecated, migration only — will be removed in a future release)
       - If `"timestamp"`: prefix is `YYYYMMDD-HHMMSS` (current timestamp)
       - If `"sequential"` or absent: prefix is `NNN` (next available 3-digit number after scanning existing directories in `specs/`)
@@ -146,18 +173,22 @@ Given that feature description, do this:
       - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
 
    **Create the directory and spec file**:
-   - `mkdir -p SPECIFY_FEATURE_DIRECTORY`
+   - Immediately before the first artifact write, revalidate the canonical direct-child path and
+     require the full branch invariant.
    - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
-   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
+     before creating a new directory, so template-resolution failure leaves no orphan directory.
+   - Record whether the target directory and spec existed. For a new spec, treat target setup, template
+     rendering, verified Git-flow type/branch/status association, and final installation as one atomic
+     transaction: build and validate the associated spec at a unique temporary path, then expose it as
+     `SPECIFY_FEATURE_DIRECTORY/spec.md` only by an atomic no-clobber install. Never expose a placeholder
+     or partially associated spec at the final path.
+   - On any ordinary failure before the atomic install, remove only the exact temporary artifact and
+     newly created empty directory owned by this invocation. On interruption, a retry must recognize,
+     validate, and clean or resume the exact transaction artifact before choosing another automatic
+     feature number; it MUST NOT create a second directory. Never remove or overwrite a pre-existing
+     artifact. If the spec exists through the verified reuse path, load and update it without replacing
+     it with the template.
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
-   - Persist the resolved path to `.specify/feature.json`:
-     ```json
-     {
-       "feature_directory": "<resolved feature dir>"
-     }
-     ```
-     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit-specify` invocation
@@ -171,7 +202,7 @@ Given that feature description, do this:
 
 6. Follow this execution flow:
     1. Parse user description from arguments
-       If empty: ERROR "No feature description provided"
+       If empty: ERROR "기능 설명이 제공되지 않았습니다"
     2. Extract key concepts from description
        Identify: stakeholders/actors, actions or system conditions, data, constraints
     3. For unclear aspects:
@@ -200,13 +231,24 @@ Given that feature description, do this:
 
 7. Write the specification to SPEC_FILE using the template structure, replacing placeholders with
    concrete details derived from the feature description (arguments) while preserving section order
-   and headings. Fill `Git-flow 유형` with `BRANCH_NAMESPACE`. Fill `기능 브랜치` with the verified
-   `BRANCH_NAME` only when the hook actually created/switched it; otherwise write
-   `미생성 (예정: GIT_BRANCH_NAME)`.
+   and headings. Fill `Git-flow 유형` with `BRANCH_NAMESPACE` and `기능 브랜치` with the verified
+   active `GIT_BRANCH_NAME`. Record `BRANCH_STATUS` separately as `생성` or `재사용`; never write a
+   planned or uncreated branch as the feature branch.
+   - For a reused spec, treat its current contents as the merge baseline instead of regenerating the
+     file. Apply only the requested delta and necessary validation corrections. Preserve requirement
+     IDs, prior clarification answers, manual notes, unknown sections, and content not contradicted by
+     the current request. Do not truncate the file or remove established scope unless the user
+     explicitly requested that removal.
+   - When reusing an exact legacy planned-branch candidate, replace that metadata with the verified
+     active branch and `BRANCH_STATUS`; preserve the rest under the same merge rules.
 
 8. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
-   a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
+   a. **Create or reuse Spec Quality Checklist**: If absent, generate a checklist file at
+      `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure
+      with these validation items. If it exists, use it as the baseline and update only validation
+      states, issue notes, and missing standard items required by the current spec; preserve manual
+      notes and unrelated existing checklist content instead of replacing or truncating the file:
 
       ```markdown
       # 명세 품질 체크리스트: [기능 이름]
@@ -296,40 +338,35 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
+9. **Persist the active feature pointer after a reportable spec exists**:
+   - Do not replace `.specify/feature.json` while the spec is still a template or before its current
+     validation state has been recorded in `checklists/requirements.md`.
+   - Revalidate the full branch invariant and canonical feature directory, then atomically replace
+     `.specify/feature.json` with the canonical repository-relative direct-child path:
+     ```json
+     {
+       "feature_directory": "specs/<resolved-feature-directory>"
+     }
+     ```
+   - If branch/path validation or the atomic pointer update fails, preserve the previous pointer, keep
+     the new spec artifacts for diagnosis, and stop before post-execution hooks. This pointer lets
+     downstream commands locate the feature independently of branch naming.
+
 ## Mandatory Post-Execution Hooks
 
 **You MUST complete this section before reporting completion to the user.**
 
-Check if `.specify/extensions.yml` exists in the project root.
-- If it does not exist, or no hooks are registered under `hooks.after_specify`, skip to the Completion Report.
-- If it exists, read it and look for entries under the `hooks.after_specify` key.
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue to the Completion Report.
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Mandatory hook** (`optional: false`) — **You MUST emit `EXECUTE_COMMAND:` for each mandatory hook**:
-    ```
-    ## Extension Hooks
+If no hooks are registered under `hooks.after_specify`, mark hook handling as skipped and continue to
+the final branch invariant below. Otherwise apply the [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)
+with hook key `hooks.after_specify`. For a mandatory hook you MUST emit `EXECUTE_COMMAND:` and
+actually invoke it; immediately after it returns, whether it succeeded or failed, recheck the full
+branch invariant. If the invariant fails, do not switch automatically; stop and report the expected
+branch/ref, actual state, hook result, completed artifacts, and partial state. If the invariant passes
+but the mandatory hook failed, stop and report the partial state before completion.
 
-    **Automatic Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
+After all executable hooks finish or hook handling is skipped, require the full branch invariant one
+final time. A failure blocks the Completion Report and must be reported as partial completion without
+an automatic branch switch.
 
 ## Completion Report
 
@@ -337,12 +374,12 @@ Report completion to the user with:
 - `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
 - `SPEC_FILE` — the spec file path
 - `BRANCH_NAMESPACE` and `GIT_BRANCH_NAME` — the selected Git-flow type and validated branch name
-- Branch status — whether the hook actually created/switched the branch or it remains planned
+- Branch status — whether this invocation created the branch or explicitly reused an existing branch
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
-**NOTE:** Branch creation is handled only by the `before_specify` hook (git extension). Spec directory
-and file creation are always handled by this core command. Never claim that a planned branch was created.
+**NOTE:** Branch creation is mandatory core behavior and completes before `before_specify` hooks.
+Spec directory and file creation are also handled by this core command, after branch verification.
 
 ## Quick Guidelines
 
@@ -411,6 +448,9 @@ Success criteria must be:
 ## Done When
 
 - [ ] Specification written to `SPEC_FILE` and validated against quality checklist
-- [ ] Git-flow namespace and branch status recorded without treating a planned branch as created
+- [ ] Git-flow branch created or resumed directly and verified before any specification artifact write
+- [ ] Git-flow namespace, active branch, and `생성`/`재사용` status recorded accurately
+- [ ] Feature directory is a canonical direct child of `specs/` and feature.json was updated only after validation state was recorded
+- [ ] Reused spec and checklist content merged without unintended truncation
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with feature directory, spec file path, and checklist results
