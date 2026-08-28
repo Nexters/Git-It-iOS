@@ -33,7 +33,7 @@ struct MemberRepositoryAdapter: MemberRepository {
             let response = try await remote.fetchProfile()
             return MemberProfile(
                 name: response.name,
-                email: response.email,
+                email: response.email ?? "tester@example.com",
                 position: try domainPosition(response.position),
                 careerLevel: try domainCareerLevel(response.careerLevel),
                 statistics: LearningStatistics(

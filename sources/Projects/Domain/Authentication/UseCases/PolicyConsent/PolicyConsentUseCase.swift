@@ -5,6 +5,8 @@ public protocol PolicyConsentUseCase: Sendable {
 
     func saveConsentRecords(_ records: [PolicyConsentRecord]) async throws
 
+    func clearConsentRecords() async throws
+
     func isConsentValid(
         storedRecords: [PolicyConsentRecord],
         for requiredDocuments: [PolicyDocument],

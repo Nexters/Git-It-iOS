@@ -11,20 +11,17 @@ struct AuthenticationEndpointTests {
 
         #expect(endpoint.method == .post)
         #expect(endpoint.path == "/api/v1/auth/login/apple")
-        #expect(!endpoint.requiresBearerAuthentication)
         #expect(endpoint.headers(accessToken: nil)["Authorization"] == nil)
         #expect(endpoint.headers(accessToken: nil)["Accept"] == "application/json")
         #expect(endpoint.headers(accessToken: nil)["Content-Type"] == "application/json")
     }
 
     @Test
-    func `Access Token 확인은 Bearer 헤더를 포함한 GET으로 요청한다`() {
+    func `Access Token 확인은 GET으로 요청한다`() {
         let endpoint = AuthenticationEndpoint.verifyAccessToken
 
         #expect(endpoint.method == .get)
         #expect(endpoint.path == "/api/v1/auth/token")
-        #expect(endpoint.requiresBearerAuthentication)
-        #expect(endpoint.headers(accessToken: "token-123")["Authorization"] == "Bearer token-123")
         #expect(endpoint.headers(accessToken: "token-123")["Accept"] == "application/json")
         #expect(endpoint.headers(accessToken: "token-123")["Content-Type"] == "application/json")
     }

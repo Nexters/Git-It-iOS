@@ -98,8 +98,13 @@ public struct HTTPMemberRemote: MemberRemote {
     ) throws -> Payload {
         switch response.body {
         case .decoded(let envelope):
-            guard let payload = envelope.data else { throw DataMemberError.unexpectedStatus }
-            return payload
+            if let payload = envelope.data {
+                return payload
+            }
+            if let empty = EmptyResponseData() as? Payload {
+                return empty
+            }
+            throw DataMemberError.unexpectedStatus
 
         case .raw(let data):
             throw DataMemberError(from: try serverError(statusCode: response.statusCode, data: data))

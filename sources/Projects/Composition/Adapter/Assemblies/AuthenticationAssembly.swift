@@ -58,9 +58,9 @@ public struct AuthenticationAssembly: Sendable {
         )
         refreshSession = RefreshSession(loginSessionRepository: loginSessionRepository)
         verifyAccessToken = VerifyAccessToken(loginSessionRepository: loginSessionRepository)
-        policyConsent = PolicyConsentRepositoryAdapter(
+        policyConsent = PolicyConsent(
             manifestDocuments: policyDocuments,
-            store: policyConsentStore,
+            policyConsentRepository: PolicyConsentRepositoryAdapter(store: policyConsentStore),
         )
         self.loginSessionRepository = loginSessionRepository
     }

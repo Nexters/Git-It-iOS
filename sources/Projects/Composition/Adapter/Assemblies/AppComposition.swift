@@ -102,6 +102,10 @@ public struct AppComposition: Sendable {
         keychainStore: KeychainStore = KeychainStore(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
+        #if DEBUG
+        try? keychainStore.removeAll()
+        #endif
+
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,
             policyDocuments: environment.policyDocuments,

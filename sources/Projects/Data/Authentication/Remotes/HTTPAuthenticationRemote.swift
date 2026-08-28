@@ -93,8 +93,13 @@ public struct HTTPAuthenticationRemote: AuthenticationRemote {
     ) throws -> Payload {
         switch response.body {
         case .decoded(let envelope):
-            guard let payload = envelope.data else { throw DataAuthenticationError.unexpectedStatus }
-            return payload
+            if let payload = envelope.data {
+                return payload
+            }
+            if let empty = EmptyResponseData() as? Payload {
+                return empty
+            }
+            throw DataAuthenticationError.unexpectedStatus
 
         case .raw(let data):
             throw DataAuthenticationError(from: try serverError(statusCode: response.statusCode, data: data))

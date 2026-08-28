@@ -53,6 +53,10 @@ public final class KeychainStore: Sendable {
             _ = state.withLock { $0.values.removeValue(forKey: "\(namespace.rawValue).\(key)") }
         }
 
+        fileprivate func removeAll() {
+            state.withLock { $0.values.removeAll() }
+        }
+
         // MARK: Private
 
         private struct State {
@@ -144,6 +148,15 @@ public final class KeychainStore: Sendable {
             key: key,
             namespace: namespace,
         ) as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else { throw KeychainStoreError.unavailable }
+    }
+
+    public func removeAll() throws {
+        if let backend {
+            backend.removeAll()
+            return
+        }
+        let status = SecItemDelete([kSecClass: kSecClassGenericPassword] as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else { throw KeychainStoreError.unavailable }
     }
 

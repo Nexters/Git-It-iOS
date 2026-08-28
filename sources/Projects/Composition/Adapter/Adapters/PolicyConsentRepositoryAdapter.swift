@@ -4,23 +4,15 @@ import Foundation
 
 // MARK: - PolicyConsentRepositoryAdapter
 
-struct PolicyConsentRepositoryAdapter: PolicyConsentUseCase {
+struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
 
     // MARK: Lifecycle
 
-    init(
-        manifestDocuments: [PolicyDocument],
-        store: any PolicyConsentStore,
-    ) {
-        self.manifestDocuments = manifestDocuments
+    init(store: any PolicyConsentStore) {
         self.store = store
     }
 
     // MARK: Internal
-
-    func requiredDocuments() async throws -> [PolicyDocument] {
-        manifestDocuments
-    }
 
     func storedConsentRecords() async throws -> [PolicyConsentRecord] {
         await store.records().map(domainRecord(from:))
@@ -32,16 +24,12 @@ struct PolicyConsentRepositoryAdapter: PolicyConsentUseCase {
         }
     }
 
-    func isConsentValid(
-        storedRecords: [PolicyConsentRecord],
-        for requiredDocuments: [PolicyDocument],
-    ) -> Bool {
-        PolicyConsentRecord.isConsentValid(storedRecords: storedRecords, for: requiredDocuments)
+    func clearConsentRecords() async throws {
+        await store.removeAll()
     }
 
     // MARK: Private
 
-    private let manifestDocuments: [PolicyDocument]
     private let store: any PolicyConsentStore
 
     private func domainRecord(from dto: PolicyConsentRecordDTO) -> PolicyConsentRecord {

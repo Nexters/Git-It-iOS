@@ -72,8 +72,13 @@ struct LearningProjectHTTPExecutor: Sendable {
     ) throws -> Payload {
         switch response.body {
         case .decoded(let envelope):
-            guard let payload = envelope.data else { throw DataLearningProjectError.unexpectedStatus }
-            return payload
+            if let payload = envelope.data {
+                return payload
+            }
+            if let empty = EmptyResponseData() as? Payload {
+                return empty
+            }
+            throw DataLearningProjectError.unexpectedStatus
 
         case .raw(let data):
             throw DataLearningProjectError(from: try serverError(statusCode: response.statusCode, data: data))

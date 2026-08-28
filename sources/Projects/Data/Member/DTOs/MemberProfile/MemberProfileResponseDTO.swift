@@ -4,7 +4,7 @@ public struct MemberProfileResponseDTO: Decodable, Equatable, Sendable {
 
     public init(
         name: String,
-        email: String,
+        email: String?,
         position: String?,
         careerLevel: String?,
         thisWeekSolvedCount: Int,
@@ -25,7 +25,7 @@ public struct MemberProfileResponseDTO: Decodable, Equatable, Sendable {
     // MARK: Public
 
     public let name: String
-    public let email: String
+    public let email: String?
     public let position: String?
     public let careerLevel: String?
     public let thisWeekSolvedCount: Int
