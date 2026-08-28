@@ -206,8 +206,9 @@ sources/Projects/Domain/
 
 - 테스트 파일은 검증 대상 또는 동작 범위에 따라 묶고 파일 이름은
   `<Subject>Tests.swift` 형식을 사용합니다.
-- 반복 사용하는 Test Double은 대상 테스트 가까이의 `Mocks/` 또는 역할이 드러나는
-  테스트 지원 폴더에 둡니다. 한 파일에서만 사용하는 작은 Double은 `private`로 둡니다.
+- 둘 이상의 파일에서 쓰는 Test Double은 test 소스 루트의 `TestDoubles/`에 둡니다
+  ([디렉터리·파일 컨벤션 §7](./directory-file.md#7-패키지별-형태-어휘)). 한 파일에서만
+  사용하는 작은 Double은 같은 파일에 `private`로 둡니다.
 - Tuist test target과 공유 scheme에는 실제 `@Test` 함수 또는 `XCTestCase` 테스트가
   있는 target만 연결합니다. 빈 test target을 scheme에 등록하지 않습니다.
 

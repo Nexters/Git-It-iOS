@@ -4,22 +4,21 @@
 
 **작성일**: 2026-08-21
 
-**최종 수정일**: 2026-08-21
+**최종 수정일**: 2026-08-27 (컴포넌트 분류를 역할 기준으로 재정의)
 
 ## 목적
 
-이 문서는 `UIComponent`의 재사용 가능한 표현 계약을 정의하고 컴포넌트의 분류, 공개
-입력, 파일·선언·자산 구성과 검증 방식을 통일합니다. UI 패키지의 책임과 의존 방향은
-[UI 패키지 규칙](../package-rules/ui.md)이 소유하고, 컴포넌트 구현 방식은 이 문서가
-소유합니다.
+이 문서는 `UIComponent`의 재사용 가능한 표현 계약을 정의하고 컴포넌트의 역할 분류, 공개
+입력, 선언·자산 구성과 검증 방식을 통일합니다. UI 패키지의 책임과 의존 방향은
+[UI 패키지 규칙](../package-rules/ui.md)이, 폴더 뎁스와 파일 분할의 공통 규칙은
+[디렉터리·파일 컨벤션](./directory-file.md)이 소유하고, 컴포넌트 구현 방식과 역할
+폴더의 목록은 이 문서가 소유합니다.
 
 ## 1. 적용 범위
 
-- `sources/Projects/UI/Component/Components/Leaf/**`의 말단 컴포넌트
-- `sources/Projects/UI/Component/Components/Composite/**`의 조합 컴포넌트
-- `sources/Projects/UI/Component/Components/Review/**`의 검토·디버그 전용 컴포넌트
-- `sources/Projects/UI/Component/Resources/**`의 이미지·애니메이션·일러스트레이션 자산
-- `UIComponentLayoutHarness`와 UI 자동화 target의 컴포넌트 레이아웃 검증
+- `sources/Projects/UI/Component/` 아래의 모든 컴포넌트와 역할 폴더
+- `sources/Projects/UI/Component/Resources/`의 이미지·애니메이션·일러스트레이션 자산
+- `UIComponentPreviewApp`과 UI 자동화 target의 컴포넌트 레이아웃 검증
 
 DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문서의 범위가 아닙니다.
 
@@ -37,36 +36,86 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 - 컴포넌트의 공개 이름은 [네이밍 컨벤션](./naming.md)을 따르며 시각 의미와 재사용
   책임을 드러냅니다.
 
-## 3. 컴포넌트 경계
+## 3. 컴포넌트 역할 분류
 
-### 3.1 말단 컴포넌트
+### 3.1 분류 축은 역할입니다
 
-말단 컴포넌트는 렌더링 트리에 프로젝트가 소유한 다른 `View` 컴포넌트를 포함하지 않는
-최하위 단위입니다. 크기나 구현 라인 수가 아니라 의존 구조로 판단합니다.
+컴포넌트는 **화면에서 맡는 역할**로 분류하고, 역할 이름의 폴더에 둡니다. 역할은
+컴포넌트의 **공개 계약**으로 판정합니다. 구현이 다른 컴포넌트를 렌더링하는지, 파일이
+몇 개인지, 어느 화면에서 처음 만들어졌는지는 판정 근거가 아닙니다.
 
-말단 컴포넌트는 다음 요소를 사용할 수 있습니다.
+이전 `Leaf`·`Composite` 분류는 "렌더링 트리에 프로젝트가 소유한 다른 View를 포함하는가"
+라는 구현 의존 구조를 기준으로 했고, 다음 문제가 있었습니다.
 
-- 플랫폼이 제공하는 기본 `View`, `Shape`와 modifier
-- DesignSystem이 제공하는 토큰과 토큰 적용 API
-- 같은 컴포넌트의 `body`, private 연산 프로퍼티 또는 private 메서드로 분해한 렌더링 조각
+- 내부 구현을 바꾸면 공개 계약이 그대로인데도 분류가 바뀝니다.
+- 호출부는 컴포넌트가 말단인지 조합인지 알 필요가 없어 분류가 사용에 도움을 주지
+  않습니다.
+- 분류를 유지하려고 구현이 왜곡됩니다. 말단 자격을 잃지 않으려고 `StyledText` 대신
+  `Text.designSystemStyled(_:style:)`를 쓰는 규칙이 그 예입니다.
+- 실제로 24개 중 대부분이 `Composite`에 몰려 분류가 정보를 주지 못했습니다.
 
-다음 조건 중 하나라도 해당하면 말단 컴포넌트가 아닙니다.
+### 3.2 판정 순서
 
-- 프로젝트가 소유한 다른 컴포넌트 타입을 생성해 렌더링합니다.
-- 제네릭 `Content` 또는 `@ViewBuilder`로 임의의 자식 View를 입력받습니다.
-- 같은 파일의 별도 View 타입에 렌더링 책임을 위임합니다.
+위에서부터 순서대로 확인하고 **처음 만족하는 역할**을 사용합니다. 순서가 곧 우선순위
+이므로 두 역할에 모두 해당하는 컴포넌트도 하나의 폴더로 결정됩니다.
 
-### 3.2 조합 컴포넌트
+| 순서 | 폴더 | 판정 질문 |
+| --- | --- | --- |
+| 1 | `Scaffolds/` | 화면 전체 또는 화면의 고정 영역을 정의하고 그 안에 임의의 콘텐츠를 담는가? |
+| 2 | `Overlays/` | 기존 화면 위에 겹쳐 떠서 표시되거나 화면 콘텐츠를 덮는가? |
+| 3 | `Controls/` | 표시하는 정보를 모두 제거해도 조작 단위로 남는가? |
+| 4 | `CollectionItems/` | 목록·그리드에서 하나의 항목으로 반복 배치되는가? |
+| 5 | `Indicators/` | 진행·완료·부재처럼 시간에 따라 변하는 상태를 알리는가? |
+| 6 | `Displays/` | 위에 해당하지 않는 읽기 전용 표시인가? |
 
-조합 컴포넌트는 말단 컴포넌트 또는 `@ViewBuilder`로 받은 자식을 조립해 하나의 독립된
-표현 계약을 제공합니다. 조합 자체가 Feature 상태를 해석하거나 화면 목적지를 결정하지
-않습니다.
+`Controls/`의 판정 질문은 "표시 값을 모두 지웠을 때 무엇이 남는가"로 읽습니다.
+`AccountActionRow`는 title을 지우면 동작을 실행하는 행이 남으므로 `Controls/`이고,
+`SettingRow`는 title과 value를 지우면 남는 것이 없으므로 `CollectionItems/`입니다.
+같은 목록에 놓이는 두 행이 서로 다른 폴더에 있는 이유는 **정보 표시가 계약의
+중심인지, 조작이 계약의 중심인지**가 다르기 때문입니다.
 
-### 3.3 검토·디버그 전용 컴포넌트
+컬렉션 전체를 그리면서 선택을 소유하는 컴포넌트는 항목이 아니라 조작 단위이므로
+`Controls/`에 둡니다(`SelectionCardList`).
 
-레이아웃 카탈로그나 TestFlight 검토 제어처럼 제품 화면에서 사용하지 않는 컴포넌트는
-`Components/Review/`에 둡니다. 제품 컴포넌트가 Review 컴포넌트에 의존해서는 안 되며,
-세부 기준은 [View 컨벤션](./view.md#21-검토디버그-전용-컴포넌트)을 따릅니다.
+**UIComponent에는 제품 컴포넌트만 둡니다.** 레이아웃 카탈로그나 TestFlight 검토
+제어처럼 제품 화면에서 쓰지 않는 UI는 역할 폴더를 갖지 않고 `UIComponentPreviewApp`
+target이 소유합니다.
+
+### 3.3 역할별 소유 범위
+
+| 폴더 | 소유하는 책임 | 소유하지 않는 것 |
+| --- | --- | --- |
+| `Scaffolds/` | 화면 배경·안전 영역·상하단 고정 영역·탭 구조 | 담기는 콘텐츠의 의미 |
+| `Overlays/` | 겹쳐 뜨는 표면의 배치·표시 전환·닫기 신호 | 표면 안에 놓이는 화면 흐름 |
+| `Controls/` | 사용자 입력 수집과 조작 결과 전달 | 입력값의 업무적 해석 |
+| `CollectionItems/` | 한 항목의 요약 표시와 항목 단위 동작 | 목록의 정렬·페이지네이션 |
+| `Indicators/` | 진행·완료·부재 상태의 시각 표현 | 상태를 만들어 내는 로직 |
+| `Displays/` | 텍스트·이미지·본문의 토큰 기반 렌더링 | 표시할 값의 결정 |
+
+검토 전용 UI의 표현 예외는 [View 컨벤션 §2.1](./view.md#21-검토디버그-전용-컴포넌트)이
+소유하며, 그 UI는 `UIComponentPreviewApp` target에 둡니다.
+
+### 3.4 현재 컴포넌트 배치
+
+이 표가 배치의 정본입니다. 컴포넌트를 추가하거나 역할을 바꾸면 같은 PR에서 갱신합니다.
+
+| 폴더 | 컴포넌트 |
+| --- | --- |
+| `Scaffolds/` | `BottomActionBar`, `ScreenContainer`, `ScreenHeader`, `TabShell` |
+| `Overlays/` | `ActionMenu`, `ModalOverlay`, `ScreenEdgeScrim`, `SheetSurface`, `WebSheet` |
+| `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `ChoiceAnswerOption`, `EssayAnswerInput`, `IconGlassButton`, `IconPlainButton`, `PolicyAgreementRow`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
+| `CollectionItems/` | `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `SelectionCard`, `SettingRow` |
+| `Indicators/` | `ContinuousProgressBar`, `EmptyState`, `LabeledProgressBar`, `PageIndicator`, `ProgressSegments` |
+| `Displays/` | `LaunchLogo`, `OnboardingMockup`, `QuestionPrompt`, `ResourceAnimation`, `ResourceImage`, `RubricView`, `SplashView`, `StyledText`, `TagBadge`, `WebContentView` |
+
+### 3.5 재분류 기준
+
+**폴더는 공개 계약이 바뀔 때만 옮깁니다.** 내부 구현에서 다른 컴포넌트를 쓰기
+시작하거나 파일을 나누는 변경으로는 폴더가 바뀌지 않습니다.
+
+계약 변경으로 역할이 바뀌면 이동을 rename과 함께 하나의 변경으로 처리하지 않고,
+[네이밍 컨벤션 §8](./naming.md#8-rename과-설계동작-변경-분리)에 따라 계약 변경과 이동을
+구분해 기록합니다.
 
 ## 4. 재사용 판단
 
@@ -83,28 +132,46 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 화면 문맥이 달라도 입력과 상태 의미가 같으면 같은 계약을 사용할 수 있고, 외형이 같아도
 의미가 다르면 별도 컴포넌트로 유지합니다.
 
+역할이 다르면 재사용하지 않습니다. 같은 외형이라도 조작이 계약의 중심인 컴포넌트와
+정보 표시가 중심인 컴포넌트는 §3.2에 따라 다른 폴더의 다른 컴포넌트입니다.
+
 ## 5. 파일·선언·자산 구성
 
-### 5.1 파일과 폴더
+### 5.1 폴더와 파일
 
-- 말단 컴포넌트는 `Components/Leaf/`, 조합 컴포넌트는
-  `Components/Composite/`, 검토 전용 컴포넌트는 `Components/Review/`에 둡니다.
-- 각 폴더에는 컴포넌트마다 하위 폴더를 만들지 않고 Swift 파일을 바로 둡니다.
-- 각 Swift 파일은 주된 최상위 `struct`, `enum`, `class`, `actor` 또는 `protocol`을
-  하나만 정의하며 파일 이름은 타입 이름과 일치시킵니다.
-- 프리뷰 전용 타입이나 중첩할 수 없는 보조 타입은 같은 폴더에 소유 컴포넌트 이름을
-  앞에 붙인 파일로 둡니다.
+- 폴더 뎁스, 파일당 타입 개수, 파일 이름 규칙은
+  [디렉터리·파일 컨벤션](./directory-file.md)을 따릅니다.
+- `UI/Component/`의 1뎁스는 §3.2의 역할 폴더와 `Resources/`뿐입니다. `Components/`
+  같은 target 이름을 반복하는 중간 폴더를 두지 않습니다.
+- 한 컴포넌트의 파일이 둘 이상이면 컴포넌트 이름의 2뎁스 폴더로 묶습니다. 파일이
+  하나면 역할 폴더에 직접 둡니다.
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.
+
+```text
+UI/Component/
+├── Controls/
+│   ├── ActionButton.swift
+│   └── TextField/
+│       ├── TextField.swift
+│       └── TextField+Style.swift
+└── Scaffolds/
+    └── ScreenHeader/
+        ├── ScreenHeader.swift
+        ├── ScreenHeader+Constant.swift
+        ├── ScreenHeader+Control.swift
+        └── ScreenHeader+Style.swift
+```
 
 ### 5.2 중첩 선언
 
-- `Style`, `Constant`, `Item`, `Control`처럼 컴포넌트가 소유하는 보조 타입은 원칙적으로
-  컴포넌트 View 내부에 중첩하고 같은 파일에 둡니다.
+- `Style`, `Constant`, `Item`, `Control`처럼 컴포넌트가 소유하는 보조 타입은
+  `extension`에서 중첩 선언하고, `{상위타입}+{보조타입}.swift` 파일로 분리합니다.
 - 소유 컴포넌트가 문맥을 제공하므로 `ActionButtonStyle` 대신
   `ActionButton.Style`, `SelectionCardListItem` 대신 `SelectionCardList.Item`을
   사용합니다.
 - 변형에 따라 갈리는 표현 값은 `Style`이 소유하고 컴포넌트는 결과만 읽습니다.
-- 중첩할 수 없는 경우는 [View 컨벤션](./view.md#54-중첩할-수-없는-경우)을 따릅니다.
+- 중첩할 수 없는 경우는 [View 컨벤션](./view.md#54-중첩할-수-없는-경우)을 따르고,
+  파일은 소유 컴포넌트의 2뎁스 폴더에 둡니다.
 
 ### 5.3 자산
 
@@ -146,14 +213,15 @@ public struct SelectionToggle: View {
 2. 후보들의 외형이 아니라 입력 필드, 상태, 경계값과 접근성 의미를 비교합니다.
 3. 의미가 모두 일치할 때만 하나의 초기화 인자·`Binding`·콜백 계약을 정의합니다.
 4. Feature의 State, Action 또는 업무 모델 없이 계약을 정의합니다.
-5. 다른 프로젝트 UI 컴포넌트를 렌더링하지 않는 후보만 말단으로 분류합니다.
+5. 정의한 공개 계약에 §3.2의 판정 질문을 순서대로 적용해 역할 폴더를 정합니다.
 6. 보조 타입은 컴포넌트 내부에 중첩하고 표시 상태 wrapper는 추가하지 않습니다.
 7. 분리 전후의 표시 상태, 사용자 입력 전달과 접근성 의미가 보존되는지 검증합니다.
+8. §3.4의 배치 표에 새 컴포넌트를 추가합니다.
 
 ## 8. 검증
 
 - 공개 입력·`Binding`, 상태별 표현과 레이아웃 계약을 단위 테스트 또는
-  `UIComponentLayoutHarness`의 UI 자동화 테스트로 검증합니다.
+  UI 자동화 테스트로 검증합니다.
 - UI production target의 Tuist dependency와 Swift import에
   `ComposableArchitecture`가 없는지 확인합니다.
 - 컴포넌트 분리 전후의 표시 상태, 사용자 입력 전달과 접근성 의미를 확인합니다.
@@ -165,7 +233,10 @@ public struct SelectionToggle: View {
 - [ ] 읽기 값·변경 값·일회성 입력이 초기화 값·Binding·콜백으로 구분되는가?
 - [ ] Feature, Domain 또는 TCA 타입이 공개 API와 구현에 없는가?
 - [ ] 외형이 아니라 입력·상태·경계값·접근성 의미로 재사용을 판단했는가?
-- [ ] 말단·조합·Review 폴더가 실제 의존 구조와 일치하는가?
+- [ ] §3.2의 판정 질문을 순서대로 적용해 역할 폴더를 정했는가?
+- [ ] 역할 판정 근거가 구현 의존 구조가 아니라 공개 계약인가?
+- [ ] §3.4의 배치 표가 실제 폴더와 일치하는가?
+- [ ] 폴더 뎁스와 파일 이름이 [디렉터리·파일 컨벤션](./directory-file.md)을 따르는가?
 - [ ] 보조 선언이 View에 중첩되고 표시 상태 wrapper가 없는가?
 - [ ] 자산과 DesignSystem 토큰의 소유 경계가 분리되는가?
 - [ ] 레이아웃과 사용자 입력 전달을 독립적으로 검증했는가?
@@ -174,13 +245,17 @@ public struct SelectionToggle: View {
 
 - [아키텍처](../architecture.md)
 - [UI 패키지 규칙](../package-rules/ui.md)
+- [디렉터리·파일 컨벤션](./directory-file.md)
 - [View 컨벤션](./view.md)
 - [네이밍 컨벤션](./naming.md)
 - [테스트 컨벤션](./test.md)
-- [UI 컴포넌트 체크리스트](../ui-component-checklist.md)
+- [컴포넌트 인덱스](../../.agents/skills/implement-figma-ui/references/component-index.md)
 
 ## 문서 변경 기준
 
-UIComponent의 공개 입력 형태, 말단·조합 분류, 파일·선언·자산 배치 또는 레이아웃 검증
-방식이 바뀔 때 수정합니다. Figma 항목과 구현 현황만 바뀌면 이 문서가 아니라
-[UI 컴포넌트 체크리스트](../ui-component-checklist.md)를 수정합니다.
+UIComponent의 공개 입력 형태, 역할 폴더의 목록과 판정 순서, 컴포넌트 배치 또는 레이아웃
+검증 방식이 바뀔 때 수정합니다. 폴더 뎁스와 파일 분할의 공통 규칙이 바뀌면 이 문서보다
+[디렉터리·파일 컨벤션](./directory-file.md)을 먼저 갱신합니다. Figma 노드와 코드
+컴포넌트의 대응만 바뀌면 이 문서가 아니라
+[컴포넌트 인덱스](../../.agents/skills/implement-figma-ui/references/component-index.md)를
+수정합니다.

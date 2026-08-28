@@ -78,13 +78,21 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 - **Target과 폴더 이름을 구분합니다.** target은 패키지 문맥을 포함할 수 있지만,
   `sources/Projects/<패키지>/` 안의 source·test 폴더는 역할만 사용합니다. 새 target은
   `sourceDirectory`를 명시해 target 이름의 패키지 접두어를 폴더에 반복하지 않습니다.
+- **파일 하나에 타입 하나, 폴더는 형태 1뎁스·관심사 2뎁스로 둡니다.** 소스 루트 계산,
+  형태 폴더 어휘와 `{상위타입}+{중첩타입}.swift` 분할 규칙은
+  [디렉터리·파일 컨벤션](docs/conventions/directory-file.md)을 따릅니다.
 - **테스트 함수 이름은 한국어 동작 문장으로 작성하고 Swift Testing을 기본으로
   사용합니다.** XCTest는 UI 자동화처럼 필요한 플랫폼 기능으로 제한하며, 세부 기준은
   [테스트 컨벤션](docs/conventions/test.md)을 따릅니다.
 - **SwiftUI·UIComponent·TCA 구현은 공통 컨벤션을 따릅니다.** View 생성 경로와 내부
-  선언은 [View](docs/conventions/view.md), 컴포넌트 경계는
+  선언은 [View](docs/conventions/view.md), 컴포넌트 역할 분류는
   [UIComponent](docs/conventions/ui-component.md), Feature 상태와 Effect는
   [TCA](docs/conventions/tca.md) 컨벤션을 따릅니다.
+- **Figma 디자인을 화면·컴포넌트로 옮길 때는 `.agents/skills/implement-figma-ui`를 사용합니다.**
+  [Figma 노드 인덱스](.agents/skills/implement-figma-ui/references/figma-index.md)로 대상 노드를
+  확정하고, [컴포넌트 인덱스](.agents/skills/implement-figma-ui/references/component-index.md)와
+  [토큰 인덱스](.agents/skills/implement-figma-ui/references/token-index.md)로 기존 구현을
+  재사용합니다. 노드 근거 없이 레이아웃 값을 추정해 구현하지 않습니다.
 - 패키지별 세부 규칙은 수정 전에 해당 문서를 확인합니다:
   [App](docs/package-rules/app.md) ·
   [Composition](docs/package-rules/composition.md) ·
