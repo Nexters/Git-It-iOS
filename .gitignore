@@ -157,3 +157,5 @@ private/**
 sources/graph.png
 .derived-data-log-*
 *.xcconfig
+sources/Projects/App/Config/debug.xcconfig
+sources/Projects/App/Config/release.xcconfig
