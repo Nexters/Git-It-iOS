@@ -691,3 +691,64 @@ scheme)만 실패하고 개별 `Domain` scheme은 통과했다면 원인 파악�
 ### 연결
 
 [[TS-20260829-001]]
+
+## TS-20260829-003: TS-20260829-001의 "Infrastructure·Data만 성공" 근거가 부정확했음(실제로는 4개 scheme 성공)
+
+**기록일**: 2026-08-29
+**상태**: 해결
+**발생 단계**: 사용자 요청("기록된 트러블 슈팅들과 암묵지에 대해서 검토해주세요")에 따른
+직전 기록(TS-20260829-001) 재검토
+**관련 항목**: TS-20260829-001
+
+### 증상
+
+TS-20260829-001의 "근거" 절은 첫 번째 `project_build_runner build` 실행에서
+"`Infrastructure`·`Data`만 성공"했다고 기록했다. 그러나 같은 실행의 요약 줄은
+"시도=10 성공=4 실패=6"이었다 — 실패한 6개 scheme(App·AppTests·Composition·
+Feature·Domain·AllTests)을 10개에서 빼면 성공한 scheme은 4개여야 하는데, 기록은
+2개(Infrastructure·Data)만 언급해 서로 모순됐다.
+
+### 영향
+
+이 기록만 읽으면 `UIUITests`·`UI` scheme도 실패했다고 잘못 추정할 위험이 있었다.
+근본 원인·조치·검증 결론 자체는 바뀌지 않지만, "어떤 scheme까지 영향을 받았는지"를
+판단하는 세부 근거가 부정확했다.
+
+### 근거
+
+- TS-20260829-001 "영향"·"근거" 절: "시도=10 성공=4 실패=6"과 "Infrastructure·Data만
+  성공"이 같은 항목 안에서 산술적으로 모순된다(6개 실패 + 2개 성공 = 8 ≠ 10).
+- 그 build 실행 로그의 가시적인 부분은 `build 시작: UIUITests`, `build 시작: UI` 뒤에
+  바로 `build 시작: App`으로 이어져 `UIUITests`·`UI`의 `build 완료:` 줄이 보이지
+  않았다(`tail -100`으로 앞부분이 잘렸을 가능성이 높음). 실패로 명시된 6개 scheme을
+  10개에서 제외하면 남는 4개는 정확히 `UIUITests`·`UI`·`Infrastructure`·`Data`이며,
+  이는 요약 줄의 "성공=4"와 정확히 일치한다.
+
+### 원인
+
+첫 build 로그를 `tail -100`으로 잘라본 뒤, 눈에 보이는 `build 완료:` 줄(Infrastructure·
+Data)만으로 "성공한 scheme"을 판단하고 요약 줄의 성공 개수(4)와 대조하지 않았다.
+
+### 조치
+
+TS-20260829-001의 본문은 append-only 원칙에 따라 그대로 두고, 이 후속 항목으로
+정정한다. 정확한 근거는 "실패 6개(App·AppTests·Composition·Feature·Domain·AllTests)를
+제외한 나머지 4개 scheme(UIUITests·UI·Infrastructure·Data)이 성공했다"이다.
+
+### 검증
+
+- 산술 재확인: 실패 6개 + 성공 4개 = 시도 10개, 요약 줄과 일치 — 성공.
+- `UIUITests`·`UI`가 실제로 `PolicyConsentUseCase`를 참조하지 않는 scheme임을 감안하면
+  (UI 계층은 Domain의 이 타입에 의존하지 않음) 두 scheme이 이 stale 참조 문제의 영향을
+  받지 않고 성공한 것은 원인 설명과 일관적이다 — 성공(정성적 확인).
+
+### 재발 방지
+
+여러 scheme의 build 로그를 요약할 때는 로그에 보이는 개별 `build 완료:` 줄의 개수와
+요약 줄의 `성공=N`이 일치하는지 항상 대조한다. `tail`로 앞부분이 잘린 로그에서 "보이지
+않음"을 "실패"나 "확인 불가"로 취급하지 않고, 성공/실패 스키마 목록과 총 시도 수의
+산술로 나머지를 역산해 확인한다.
+
+### 연결
+
+[[TS-20260829-001]]
