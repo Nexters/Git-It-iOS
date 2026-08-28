@@ -29,6 +29,10 @@ printf '%s\n' \
 	'case .App:' \
 	'    [.package(' \
 	'        name: .App,' \
+	'        testTargets: [],' \
+	'    )]' \
+	'    [.package(' \
+	'        name: .AppTests,' \
 	'        testTargets: [' \
 	'            AppModuleName.GitItTests.rawValue,' \
 	'        ],' \
@@ -67,6 +71,7 @@ printf '%s\n' \
 	'        testTargets: [' \
 	'            UIModuleName.UIComponentTests.rawValue,' \
 	'            UIModuleName.UIComponentUITests.rawValue,' \
+	'            UIModuleName.UIComponentPreviewAppUITests.rawValue,' \
 	'        ],' \
 	'    )]' >"$scheme_source"
 printf '%s\n' \
@@ -88,8 +93,17 @@ printf '%s\n' \
 	'    sourceDirectory: InfrastructureModuleName.InfrastructureAuthenticationTests.sourceDirectory,' \
 	')' >"$infrastructure_module_source"
 printf '%s\n' \
+	'var sourceDirectory: String {' \
+	'    switch self {' \
+	'    case .UIComponentPreviewAppUITests:' \
+	'        "Component/UI"' \
+	'    default:' \
+	'        ""' \
+	'    }' \
+	'}' \
 	'case .UIComponentTests:' \
 	'case .UIComponentUITests:' \
+	'case .UIComponentPreviewAppUITests:' \
 	'.testModule(' \
 	'    name: UIModuleName.UIComponentTests.rawValue,' \
 	'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
@@ -97,8 +111,20 @@ printf '%s\n' \
 	'.testModule(' \
 	'    name: UIModuleName.UIComponentUITests.rawValue,' \
 	'    sourceDirectory: UIModuleName.UIComponentUITests.sourceDirectory,' \
+	')' \
+	'.target(' \
+	'    name: UIModuleName.UIComponentPreviewAppUITests.rawValue,' \
+	'    sour''ces: ["Tests/\\(UIModuleName.UIComponentPreviewAppUITests.sourceDirectory)/**"],' \
 	')' >"$ui_module_source"
 printf '%s\n' \
+	'var sourceDirectory: String {' \
+	'    switch self {' \
+	'    case .GitItTests:' \
+	'        "Tests/GitIt"' \
+	'    default:' \
+	'        ""' \
+	'    }' \
+	'}' \
 	'case .GitItTests:' \
 	'    .target(' \
 	'        name: rawValue,' \
@@ -106,6 +132,10 @@ printf '%s\n' \
 	'    )' >"$app_module_source"
 printf '%s\n' 'import Testing' '@Test func appSample() {}' \
 	>"$projects/App/Tests/GitIt/GitItTests.swift"
+if script_tests_list_scheme_test_targets "$scheme_source" | rg -q '^GitIt\|App$'; then
+	printf 'FAIL: 빈 testTargets 배열 다음의 build target을 test target으로 읽었습니다\n' >&2
+	exit 1
+fi
 printf '%s\n' 'import Testing' '@Test func sample() {}' \
 	>"$projects/ReadyTests/ReadyTests.swift"
 printf '%s\n' '// placeholder' >"$projects/EmptyTests/Placeholder.swift"
@@ -145,5 +175,7 @@ rg -q 'script-tests.empty-test-target.*UIComponentUITests' "$work/err"
 
 printf '%s\n' 'import XCTest' 'final class ComponentUITests: XCTestCase {}' \
 	>"$projects/UI/Tests/Component/UI/ComponentUITests.swift"
+printf '%s\n' 'import XCTest' 'final class PreviewAppUITests: XCTestCase {}' \
+	>"$projects/UI/Tests/Component/UI/PreviewAppUITests.swift"
 script_tests_validate_testable_schemes "$projects" "$scheme_source"
 printf 'PASS: testable schemes\n'
