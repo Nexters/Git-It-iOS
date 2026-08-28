@@ -587,7 +587,7 @@ final class LayoutContractUITests: XCTestCase {
     ) {
         let frame = element.frame
         XCTAssertGreaterThanOrEqual(
-            frame.width + 0.001,
+            frame.width,
             44,
             diagnostic(
                 contract: "\(contract).width",
@@ -598,7 +598,7 @@ final class LayoutContractUITests: XCTestCase {
             line: line,
         )
         XCTAssertGreaterThanOrEqual(
-            frame.height + 0.001,
+            frame.height,
             44,
             diagnostic(
                 contract: "\(contract).height",
@@ -650,7 +650,7 @@ final class LayoutContractUITests: XCTestCase {
         upper: XCUIElement,
         lower: XCUIElement,
         contract: String,
-        accessibilityFrameTolerance: CGFloat = 8,
+        accessibilityFrameTolerance: CGFloat = 1,
         file: StaticString = #filePath,
         line: UInt = #line,
     ) {

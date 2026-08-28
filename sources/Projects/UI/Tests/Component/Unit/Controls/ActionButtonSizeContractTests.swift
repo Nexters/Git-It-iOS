@@ -31,8 +31,6 @@ struct ActionButtonSizeContractTests {
         _ = ActionButton(title: "문자열 라벨", style: .primary, size: .medium)
         _ = ActionButton(styledText: styledText, style: .secondary, size: .small)
         _ = ActionButton.primary("문자열 라벨", size: .medium)
-        _ = ActionButton.secondary("보조 버튼", isEnabled: false)
-        _ = ActionButton.destructive("삭제", size: .small)
-        _ = ActionButton.text("더 보기")
+        _ = ActionButton.primary(styledText: styledText, size: .small)
     }
 }

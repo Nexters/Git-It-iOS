@@ -105,7 +105,7 @@ extension UIModuleName {
             name: UIModuleName.UIComponentPreviewApp.rawValue,
             destinations: .iOS,
             product: .app,
-            bundleId: "com.nexters.hytime.gitit.uicomponentpreview",
+            bundleId: "com.nexters.hytime.gitit.uicomponentlayoutharness",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(with: [
                 "UIApplicationSceneManifest": [
