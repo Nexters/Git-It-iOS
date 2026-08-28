@@ -18,6 +18,7 @@ init: tuist hooks ## Tuist 앱·편집 workspace, Git 훅과 개발 도구를 �
 	$(PROJECT_SETUP_RUNNER) developer-tools
 
 tuist: ## Tuist package와 앱·manifest 편집 workspace를 생성합니다
+	$(PROJECT_SETUP_RUNNER) ensure-app-xcconfigs
 	cd "$(IOS_ROOT)" && tuist install && tuist generate && tuist edit --permanent
 	$(PROJECT_SETUP_RUNNER) workspace-link
 

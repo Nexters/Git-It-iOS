@@ -54,3 +54,18 @@ project_setup_developer_tools() (
 		"$project_setup_vscode_workspace" "$project_setup_specs_root" \
 		"$project_setup_docs_root" "$project_setup_work"
 )
+
+# Tuist가 참조하는 로컬 xcconfig 템플릿을 생성하되, 기존 사용자 설정은 보존합니다.
+project_setup_app_xcconfigs() (
+	project_setup_root=$1
+	project_setup_debug_xcconfig_relative=$2
+	project_setup_release_xcconfig_relative=$3
+	project_setup_preflight_port=$4
+	project_setup_ensure_port=$5
+
+	# 두 경로의 충돌을 먼저 확인해 한 파일만 생성되는 경우를 줄입니다.
+	"$project_setup_preflight_port" "$project_setup_root/$project_setup_debug_xcconfig_relative" || return $?
+	"$project_setup_preflight_port" "$project_setup_root/$project_setup_release_xcconfig_relative" || return $?
+	"$project_setup_ensure_port" "$project_setup_root/$project_setup_debug_xcconfig_relative" || return $?
+	"$project_setup_ensure_port" "$project_setup_root/$project_setup_release_xcconfig_relative"
+)

@@ -36,6 +36,8 @@ claude_skills=$("$paths" GIT_IT_CLAUDE_SKILLS_LINK_PATH)
 vscode_workspace=$("$paths" GIT_IT_VSCODE_WORKSPACE_PATH)
 specs_root=$("$paths" GIT_IT_SPECS_ROOT)
 docs_root=$("$paths" GIT_IT_DOCS_ROOT)
+debug_xcconfig=$("$paths" GIT_IT_APP_DEBUG_XCCONFIG_PATH)
+release_xcconfig=$("$paths" GIT_IT_APP_RELEASE_XCCONFIG_PATH)
 
 # 링크의 대상과 위치는 구현에 하드코딩하지 않고 중앙 JSON만 소유합니다.
 for key in \
@@ -59,6 +61,30 @@ mkdir -p "$repository/$workspace_target" "$repository/$edit_workspace_target" \
 	"$repository/$agent_skills" \
 	"$repository/$specs_root" "$repository/$docs_root"
 printf '# Agent instructions\n' >"$repository/$agent_instructions"
+
+# 누락된 로컬 xcconfig는 Tuist 실행 전에 만들고, 이후 실행에서 사용자 설정을 보존합니다.
+"$runner" ensure-app-xcconfigs
+[ -f "$repository/$debug_xcconfig" ]
+[ -f "$repository/$release_xcconfig" ]
+printf 'API_HOST = example.test\n' >"$repository/$debug_xcconfig"
+"$runner" ensure-app-xcconfigs
+[ "$(cat "$repository/$debug_xcconfig")" = 'API_HOST = example.test' ]
+
+# 디렉터리 충돌은 덮어쓰지 않고 안정 진단과 함께 실패해야 합니다.
+rm -f "$repository/$debug_xcconfig"
+rm -f "$repository/$release_xcconfig"
+mkdir -p "$repository/$release_xcconfig"
+if "$runner" ensure-app-xcconfigs >"$work/out" 2>"$work/err"; then
+	printf 'FAIL: xcconfig 디렉터리 충돌을 성공으로 반환\n' >&2
+	exit 1
+else
+	result=$?
+fi
+[ "$result" -eq 2 ]
+[ ! -e "$repository/$debug_xcconfig" ]
+[ -d "$repository/$release_xcconfig" ]
+rg -q 'project-setup.path-conflict' "$work/err"
+rmdir "$repository/$release_xcconfig"
 
 # 기존의 끊어진 workspace 링크도 제거한 뒤 올바른 대상으로 다시 만듭니다.
 ln -s '이전/Workspace.xcworkspace' "$repository/$workspace_link"

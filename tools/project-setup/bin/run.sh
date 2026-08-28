@@ -14,13 +14,13 @@ project_setup_require_relative_path() (
 
 project_setup_main() (
 	[ "$#" -eq 1 ] || {
-		printf '오류[common.invalid-input]: workspace-link 또는 developer-tools 동작이 필요합니다\n조치: 지원하는 동작 하나를 지정하세요\n' >&2
+		printf '오류[common.invalid-input]: workspace-link, developer-tools 또는 ensure-app-xcconfigs 동작이 필요합니다\n조치: 지원하는 동작 하나를 지정하세요\n' >&2
 		return 2
 	}
 	case "$1" in
-	workspace-link | developer-tools) project_setup_operation=$1 ;;
+	workspace-link | developer-tools | ensure-app-xcconfigs) project_setup_operation=$1 ;;
 	*)
-		printf '오류[common.invalid-input]: 알 수 없는 프로젝트 설정 동작 %s\n조치: workspace-link 또는 developer-tools를 사용하세요\n' \
+		printf '오류[common.invalid-input]: 알 수 없는 프로젝트 설정 동작 %s\n조치: workspace-link, developer-tools 또는 ensure-app-xcconfigs를 사용하세요\n' \
 			"$1" >&2
 		return 2
 		;;
@@ -49,13 +49,16 @@ project_setup_main() (
 	project_setup_vscode_workspace=$("$project_setup_paths" GIT_IT_VSCODE_WORKSPACE_PATH) || return $?
 	project_setup_specs_root=$("$project_setup_paths" GIT_IT_SPECS_ROOT) || return $?
 	project_setup_docs_root=$("$project_setup_paths" GIT_IT_DOCS_ROOT) || return $?
+	project_setup_debug_xcconfig=$("$project_setup_paths" GIT_IT_APP_DEBUG_XCCONFIG_PATH) || return $?
+	project_setup_release_xcconfig=$("$project_setup_paths" GIT_IT_APP_RELEASE_XCCONFIG_PATH) || return $?
 	for project_setup_path in \
 		"$project_setup_workspace_target" "$project_setup_workspace_link" \
 		"$project_setup_edit_workspace_target" "$project_setup_edit_workspace_link" \
 		"$project_setup_instructions_target" "$project_setup_instructions_link" \
 		"$project_setup_skills_target" "$project_setup_skills_link" \
 		"$project_setup_vscode_workspace" "$project_setup_specs_root" \
-		"$project_setup_docs_root"; do
+		"$project_setup_docs_root" "$project_setup_debug_xcconfig" \
+		"$project_setup_release_xcconfig"; do
 		project_setup_require_relative_path "$project_setup_path" || return $?
 	done
 
@@ -81,6 +84,11 @@ project_setup_main() (
 			"$project_setup_docs_root" "$project_setup_work" \
 			project_setup_link_preflight project_setup_link_replace \
 			project_setup_vscode_workspace_preflight project_setup_vscode_workspace_write
+		;;
+	ensure-app-xcconfigs)
+		project_setup_app_xcconfigs "$project_setup_root" \
+			"$project_setup_debug_xcconfig" "$project_setup_release_xcconfig" \
+			project_setup_xcconfig_preflight project_setup_xcconfig_ensure
 		;;
 	esac
 )
