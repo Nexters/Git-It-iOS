@@ -404,6 +404,49 @@ final class LayoutContractUITests: XCTestCase {
         )
     }
 
+    func testPolicyAgreementRowCombinesTitleAndRequirementIntoSingleAccessibilityElement() {
+        let unselected = reveal(identifier: "policyAgreementRow.unselected")
+
+        XCTAssertTrue(
+            unselected.label.hasPrefix("필수, 서비스 이용 약관"),
+            diagnostic(
+                contract: "policyAgreementRow.unselected.label",
+                expected: "label starting with \"필수, 서비스 이용 약관\"",
+                actual: unselected.label,
+            ),
+        )
+    }
+
+    func testPolicyAgreementRowExposesIsSelectedTraitSeparatelyFromColor() {
+        let selected = reveal(identifier: "policyAgreementRow.selected")
+        let unselected = reveal(identifier: "policyAgreementRow.unselected")
+
+        XCTAssertTrue(
+            selected.isSelected,
+            diagnostic(
+                contract: "policyAgreementRow.selected.isSelected",
+                expected: "isSelected=true",
+                actual: "isSelected=\(selected.isSelected)",
+            ),
+        )
+        XCTAssertFalse(
+            unselected.isSelected,
+            diagnostic(
+                contract: "policyAgreementRow.unselected.isSelected",
+                expected: "isSelected=false",
+                actual: "isSelected=\(unselected.isSelected)",
+            ),
+        )
+    }
+
+    func testPolicyAgreementRowOpenLinkButtonHasOwnAccessibilityLabel() {
+        _ = reveal(identifier: "policyAgreementRow.unselected")
+        let openLinkButton = app.buttons["서비스 이용 약관 전문 보기"]
+
+        assertExists(openLinkButton, contract: "policyAgreementRow.unselected.openLink")
+        assertButtonTrait(openLinkButton, contract: "policyAgreementRow.unselected.openLink.trait")
+    }
+
     func testContractDiagnosticContainsIdentifierExpectedAndActual() {
         let message = diagnostic(
             contract: "diagnostic.contract",

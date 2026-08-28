@@ -28,9 +28,19 @@ public struct SheetSurface<Content: View>: View {
             if isScrollable {
                 ScrollView {
                     content
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear.preference(
+                                    key: ContentHeightPreferenceKey.self,
+                                    value: proxy.size.height,
+                                )
+                            }
+                        )
                 }
+                .frame(maxHeight: contentHeight)
                 .contentMargins(.all, 0, for: .scrollContent)
                 .scrollBounceBehavior(.basedOnSize)
+                .onPreferenceChange(ContentHeightPreferenceKey.self) { contentHeight = $0 }
             } else {
                 content
             }
@@ -45,9 +55,24 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Private
 
+    @State private var contentHeight: CGFloat?
+
     private let isScrollable: Bool
     private let content: Content
 
+}
+
+// MARK: - ContentHeightPreferenceKey
+
+private struct ContentHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat? = nil
+
+    static func reduce(
+        value: inout CGFloat?,
+        nextValue: () -> CGFloat?,
+    ) {
+        value = nextValue() ?? value
+    }
 }
 
 #Preview("Sheet Surface") {

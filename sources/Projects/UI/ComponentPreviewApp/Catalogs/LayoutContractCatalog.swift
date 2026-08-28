@@ -50,6 +50,7 @@ struct LayoutContractCatalog: View {
                 settingRowContracts
                 learningSetRowContracts
                 questionContracts
+                policyAgreementRowContracts
             }
             .designSystemScreenMargin()
             .padding(.vertical, LayoutToken.margin.cgFloatValue)
@@ -302,6 +303,27 @@ struct LayoutContractCatalog: View {
 
             LabeledProgressBar(label: "학습 진행률", progress: 0.6, valueText: "6 / 10")
                 .accessibilityIdentifier("labeledProgressBar.default")
+        }
+        .frame(width: Constant.componentWidth)
+    }
+
+    private var policyAgreementRowContracts: some View {
+        VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+            PolicyAgreementRow(
+                title: "서비스 이용 약관",
+                isRequired: true,
+                isSelected: false,
+                onOpenLink: { },
+            )
+            .accessibilityIdentifier("policyAgreementRow.unselected")
+
+            PolicyAgreementRow(
+                title: "개인정보 처리방침",
+                isRequired: true,
+                isSelected: true,
+                onOpenLink: { },
+            )
+            .accessibilityIdentifier("policyAgreementRow.selected")
         }
         .frame(width: Constant.componentWidth)
     }

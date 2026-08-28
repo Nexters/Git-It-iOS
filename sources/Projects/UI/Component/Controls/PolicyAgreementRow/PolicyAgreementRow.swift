@@ -24,26 +24,37 @@ public struct PolicyAgreementRow: View {
     // MARK: Public
 
     public var body: some View {
-        Button(action: onToggle) {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+        HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            Button(action: onToggle) {
                 HStack(spacing: 12) {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                     StyledText.body1(title)
                 }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
 
-                Spacer(minLength: 0)
+            Spacer(minLength: 0)
 
-                Button(action: onOpenLink) {
-                    Image(systemName: "chevron.right")
-                        .designSystemForeground(.grey300)
-                        .frame(width: Constant.minimumTouchSize,
-                               height: Constant.minimumTouchSize)
-                        .contentShape(Rectangle())
-                }.buttonStyle(.plain)
-            }.buttonStyle(.plain)
+            Button(action: onOpenLink) {
+                Image(systemName: "chevron.right")
+                    .designSystemForeground(.grey300)
+                    .frame(width: Constant.minimumTouchSize,
+                           height: Constant.minimumTouchSize)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(openLinkAccessibilityLabel)
+            .accessibilityIdentifier("policyAgreementRow.openLink.\(title)")
         }
         .frame(height: 54)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Internal
@@ -61,6 +72,10 @@ public struct PolicyAgreementRow: View {
     private var accessibilityLabel: String {
         let requiredText = isRequired ? "필수" : "선택"
         return "\(requiredText), \(title)"
+    }
+
+    private var openLinkAccessibilityLabel: String {
+        "\(title) 전문 보기"
     }
 
 }

@@ -20,9 +20,14 @@ public struct ResourceImage: View {
     public enum Asset: Sendable, Equatable {
         case icon(Icon)
         case illust(Illust)
+        case logo(Logo)
         case onboarding(Onboarding)
 
         // MARK: Public
+
+        public enum Logo: String, Sendable, Equatable, CaseIterable {
+            case app = "app-logo-image"
+        }
 
         public enum Icon: String, Sendable, Equatable, CaseIterable {
             case bookmark = "ic-bookmark"
@@ -81,6 +86,7 @@ public struct ResourceImage: View {
             switch self {
             case .icon(let asset): asset.rawValue
             case .illust(let asset): asset.rawValue
+            case .logo(let asset): asset.rawValue
             case .onboarding(let asset): asset.rawValue
             }
         }
