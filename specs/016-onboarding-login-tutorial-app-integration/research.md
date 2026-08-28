@@ -35,10 +35,10 @@
 - **검증 대상과 결과**: FR-041은 정책 동의 기록이 "로그아웃 또는 session invalidation 후에도
   유지"되고 "앱 데이터 삭제 시 무효화"되는 두 수명 요건을 동시에 만족해야 한다. 현재
   Infrastructure가 제공하는 범용 저장 API 두 종류를 직접 확인했다.
-  - `KeychainStore`(`sources/Projects/Infrastructure/Authentication/Keychain/KeychainStore.swift`):
+  - `KeychainStore`(`sources/Projects/Infrastructure/Authentication/Keychain/Stores/KeychainStore.swift`):
     Keychain 항목은 iOS 기본 동작상 앱 삭제 후에도 유지되는 경우가 있어(재설치 시 이전 값이
     남을 수 있음) "앱 데이터 삭제 시 무효화" 요건을 만족한다고 확정할 수 없다.
-  - `InMemoryCache`(`sources/Projects/Infrastructure/Cache/InMemoryCache.swift`): 프로세스 메모리
+  - `InMemoryCache`(`sources/Projects/Infrastructure/Cache/Stores/InMemoryCache.swift`): 프로세스 메모리
     범위만 보관하며 앱 재실행마다 소실되므로 "로그아웃 후에도 유지" 요건을 만족하지 못한다.
   - 두 API 모두 두 요건을 동시에 만족하지 못해 FR-041을 위한 새 범용 기술 API가 필요하다.
 - **결정**: Infrastructure에 `UserDefaultsStore` API를 신설한다. `UserDefaults`(앱 sandbox의
@@ -96,12 +96,12 @@
 - **검토한 대안**: View body마다 live 생성, 전역 locator, 이중 assembly 유지. 각각 중복 생성,
   주입 원칙 위반, 책임과 수명 불명확성을 남긴다.
 
-## 7. UI 재사용과 접근성
+## 7. UI 재사용
 
 - **결정**: 기존 UIComponent를 기본으로 쓰고 `SelectionCard/List`의 단일 선택 callback·selected
   trait 등 공용 표현 계약만 UI에서 보강한다. 화면의 업무 매핑과 TCA action은 Feature에 둔다.
-- **근거**: ActionButton은 44pt hit area를 이미 보장하고 SelectionCard는 selected trait를 제공하지만
-  SelectionCardList는 선택/callback을 받지 않는다. 화면-local 중복 컴포넌트는 금지된다.
+- **근거**: ActionButton과 SelectionCard는 이미 존재하지만 SelectionCardList는 선택/callback을
+  받지 않는다. 화면-local 중복 컴포넌트는 금지된다.
 - **검토한 대안**: Feature-local 카드·버튼 구현, UI API에 Domain enum 또는 Feature State 노출.
   각각 재사용 책임과 패키지 경계를 위반한다.
 

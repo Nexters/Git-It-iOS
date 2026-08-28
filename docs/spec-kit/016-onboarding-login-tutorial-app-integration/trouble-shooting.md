@@ -935,3 +935,898 @@ Domain의 UseCase 반환·인자 타입 계약을 바꾸는 작업을 설계할 
 ### 연결
 
 TS-20260826-006, TS-20260826-009
+
+## TS-20260826-011: App target에서 커스텀 init을 가진 @Reducer 타입이 circular reference로 컴파일 실패
+
+**기록일**: 2026-08-26
+**상태**: 완화
+**발생 단계**: speckit-implement, App 패키지(T082~T094) 구현, T089
+**관련 항목**: T089, `sources/Projects/App/Sources/AppRootFeature.swift`,
+`sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`
+
+### 증상
+
+`sources/Projects/App/Sources/AppRootFeature.swift`에 `@Reducer struct AppRootFeature:
+Sendable { ... }`을 선언하면(커스텀 `init`과 `private let` 저장 프로퍼티가 있는 형태)
+App(GitIt) target에서만 다음 컴파일 오류가 발생했다.
+
+```text
+@__swiftmacro_5GitIt14AppRootFeature7ReducerfMe_.swift:1:1: error: circular reference
+extension AppRootFeature: ComposableArchitecture.Reducer {
+```
+
+Feature 패키지의 `MainShellFeature`·`OnboardingFeature`처럼 동일한 `@Reducer` + 커스텀
+`init` + 여러 `private let any Protocol` 저장 프로퍼티 패턴을 쓰는 기존 Reducer는 문제없이
+컴파일된다.
+
+### 영향
+
+App root 연결(T089)의 최초 구현이 App target에서 전혀 컴파일되지 않아 T090~T094 어느
+것도 진행할 수 없는 상태였다.
+
+### 근거
+
+- `xcodebuild -scheme App -destination 'generic/platform=iOS Simulator'
+  -derivedDataPath /tmp/gitit-isolated-dd2 build`: 최소 재현 코드
+  (`@Reducer struct AppRootFeature: Sendable { init(count: Int) { self.count = count };
+  private let count: Int; ... var body: some ReducerOf<Self> { Reduce { _, _ in .none } } }`)
+  로도 동일한 circular reference가 재현됨을 확인했다.
+- 같은 파일에서 저장 프로퍼티와 커스텀 `init`을 모두 제거한 버전(`State`에 `var route:
+  Int = 0`만 있고 `Action`도 `case task` 하나뿐인 버전)은 circular reference 없이
+  컴파일됨을 확인했다 — 즉 타입 이름이나 `Scope`/`switch` 본문 복잡도가 아니라 "커스텀
+  init + 저장 프로퍼티 존재"가 재현 조건이었다.
+- 타입 이름을 `AppRootFeature` → `RenamedRootFeature` → `RootFeature`로 바꿔가며 같은
+  최소 재현 코드를 반복 실행해, 처음에는 이름 문제로 오인했으나 이후 전체 필드가 있는
+  버전을 `RootFeature`라는 이름으로 다시 컴파일하자 동일하게 circular reference가
+  재현되어 이름은 원인이 아님을 재확인했다.
+- `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 GitIt target
+  `settings`에만 `"SWIFT_APPROACHABLE_CONCURRENCY": "YES"`,
+  `"SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor"`가 있고 Feature/Composition 등 다른
+  패키지에는 없음을 `grep`으로 확인했다. 이 두 설정을 GitIt target에서만 제거하고 같은
+  최소 재현 코드를 다시 컴파일했으나 circular reference가 계속 재현되어, 이 두 설정
+  단독이 원인이라는 가설은 이 세션에서 확정하지 못했다(다른 세팅과의 조합이거나 App
+  target 특유의 다른 요인일 수 있다).
+- `struct AppRootFeature: Sendable { ... }`를 `nonisolated struct AppRootFeature: Sendable
+  { ... }`로 바꾼 뒤 전체 필드가 있는 원래 코드(Scope 2개, 13개 UseCase 저장 프로퍼티,
+  전체 switch 분기 포함)를 다시 컴파일: circular reference 없이 성공.
+
+### 원인
+
+App target에서만 재현되고 `nonisolated`로 타입 전체의 격리를 명시하면 사라지는 것으로
+보아 App target의 actor-isolation 관련 컴파일러 설정과 `@Reducer` 매크로가 합성하는
+`Reducer` 준수부(커스텀 init이 있는 타입 한정)가 상호작용해 발생하는 것으로 추정하지만,
+`SWIFT_DEFAULT_ACTOR_ISOLATION`/`SWIFT_APPROACHABLE_CONCURRENCY` 제거만으로는 재현이
+계속돼 정확한 단일 원인은 확인하지 못했다.
+
+### 조치
+
+`sources/Projects/App/Sources/AppRootFeature.swift`의 타입 선언을 `@Reducer nonisolated
+struct AppRootFeature: Sendable { ... }`로 바꿔 우회했다. Tuist 설정
+(`AppModuleName.swift`의 actor-isolation 관련 설정, Firebase 의존성)은 진단 목적으로
+일시적으로 제거해봤을 뿐 최종적으로 원래대로 복원했고, 실제로 유지한 변경은
+`nonisolated` 키워드 추가뿐이다.
+
+### 검증
+
+- `xcodebuild -workspace sources/GitIt.xcworkspace -scheme App -configuration Debug
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/gitit-final-dd
+  build`: `** BUILD SUCCEEDED **`.
+- `project_build_runner build`(전체 9개 공유 scheme, `iPhone 17 Pro` destination):
+  `프로젝트 요약: 작업=build 시도=9 성공=9 실패=0`.
+
+### 재발 방지
+
+이 저장소에서 App(GitIt) target에 새 `@Reducer` 타입을 추가할 때 커스텀 `init`과 저장
+프로퍼티가 하나라도 있으면 `circular reference` 컴파일 오류가 날 수 있음을 먼저 가정하고,
+`@Reducer` 다음 줄의 타입 선언에 `nonisolated`를 붙인 뒤 컴파일해본다. 근본 원인이
+확인되지 않았으므로, Swift/Xcode 도구 버전이 바뀌면 이 우회가 여전히 필요한지 다시
+확인한다.
+
+### 연결
+
+[[TS-20260826-012]]
+
+## TS-20260826-012: GitItTests가 GitIt.app을 처음 host로 사용하며 xctest 부트스트랩 SIGSEGV로 test 단계 차단
+
+**기록일**: 2026-08-26
+**상태**: 미해결
+**발생 단계**: speckit-implement, App 패키지(T082~T094) 구현, T094
+**관련 항목**: T082, T094, `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`,
+AppTests xcodebuild test scheme, [[TS-20260826-007]], [[TS-20260826-011]]
+
+### 증상
+
+T082에서 `GitItTests`(unit test target)의 `dependencies`에
+`.target(name: AppModuleName.GitIt.rawValue)`를 처음 추가해 `GitIt.app`을 host
+application으로 쓰게 됐다. 이후 `xcodebuild test -scheme AppTests`(또는
+`project_build_runner test`가 실행하는 동일 scheme)를 실행하면 특정 테스트가 실패하는
+것이 아니라 host 앱 자체가 테스트 준비 단계에서 크래시해 다음과 같이 실패한다.
+
+```text
+Testing failed:
+	GitIt (nnnnn) encountered an error (Early unexpected exit, operation never finished
+	bootstrapping - no restart will be attempted. (Underlying Error: Test crashed with
+	signal segv while preparing to run tests.))
+```
+
+### 영향
+
+T094(App build/test 검증)의 `build`·`compile`(build-for-testing)은 성공하지만 `test`
+단계에서 `AppTests`만 실행이 막혀, 이 세션에서 `AppRootFeatureTests`·`PolicyManifestTests`·
+`GitItCompositionLifetimeTests`·`GitItCompilationTests`가 실제로 통과하는지 확정 검증하지
+못했다.
+
+### 근거
+
+- `~/Library/Logs/DiagnosticReports/GitIt-2026-08-26-193338.ips`(및 이후 재현마다 생성된
+  동일 패턴 `.ips`): crashed thread가 `+[XCTestCase(RuntimeUtilities) allSubclasses]` →
+  `objc_copyClassList` → `realizeAllClasses()` → `swift_getSingletonMetadata` →
+  `_swift_relocateClassMetadata` → `computeMetadataBoundsFromSuperclass`이고 exception은
+  `EXC_BAD_ACCESS`/`SIGSEGV`, `KERN_INVALID_ADDRESS at 0x0000000000bad4007`다. 즉 특정
+  테스트 코드 실행 전, XCTest가 프로세스 내 모든 Objective-C 클래스를 강제로 realize하는
+  시점에 크래시한다.
+- `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 GitIt target
+  `dependencies`에서 `.external(.FirebaseAnalytics)`·`.external(.FirebaseCrashlytics)`를
+  일시 제거하고 `tuist generate` 후 재실행: 동일한 crashed thread로 재현됨(Firebase가
+  원인이 아님을 확인).
+- 같은 파일에서 GitIt target의 `"SWIFT_APPROACHABLE_CONCURRENCY"`·
+  `"SWIFT_DEFAULT_ACTOR_ISOLATION"` 설정도 함께 제거하고 재실행: 동일하게 재현됨.
+- `xcrun simctl erase 580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F` 후 재실행: 동일하게
+  재현됨(시뮬레이터 상태 손상 문제가 아님).
+- `rm -rf sources/DerivedData/PreCommit ~/Library/Developer/Xcode/DerivedData/GitIt-*` 후
+  `-derivedDataPath sources/DerivedData/PreCommit`로 재실행: 동일하게 재현됨 —
+  [[TS-20260826-007]]이 유사한 크래시 시그니처를 DerivedData 삭제로 완화했던 사례와 달리
+  이번에는 DerivedData 삭제가 효과가 없었다.
+- `project_build_runner test`(9개 공유 scheme 순차 실행) 실행 중 App과 무관한 기존
+  `Feature` scheme도 한 번은 `xctest (68984) encountered an error ... crashed while
+  preparing to run tests`로 동일 패턴에 실패했다(같은 세션의 개별 재시도들에서는
+  Feature가 통과한 이력도 있다) — App 관련 코드 변경과 무관하게 이 실행 환경에서
+  산발적으로 나타나는 문제일 가능성을 시사한다.
+- 같은 세션에서 `UIUITests`(다른 host app인 `UIComponentPreviewApp` 사용)는
+  `Executed 16 tests, with 0 failures`로 정상 통과했다.
+- `project_build_runner build`(9/9)와 `project_build_runner compile`(8/8, AppTests
+  build-for-testing 포함)은 모두 성공해, 프로덕션·테스트 컴파일 자체는 정상이다.
+
+### 원인
+
+XCTest가 host 프로세스의 Objective-C 클래스를 전부 realize하는 시점에 Swift 런타임의
+제네릭 클래스 metadata 계산(`computeMetadataBoundsFromSuperclass` 등)이 SIGSEGV로
+죽는다. Firebase 의존성, App target의 actor-isolation 설정, 시뮬레이터 상태,
+DerivedData 캐시를 각각 제거·초기화해도 재현이 계속돼 이 세션에서는 확정 원인을 좁히지
+못했다. `Feature` scheme도 한 번 동일 패턴으로 실패한 사실은 GitIt.app host 자체의
+결함이 아니라 이 Xcode 26 / iOS 26.5 Simulator 실행 환경의 산발적(flaky) 문제일 가능성을
+시사하지만, 확정하지는 못했다.
+
+### 조치
+
+미해결. `GitItTests`가 `GitIt.app`을 host로 쓰는 구조(T082의 요구사항이며
+`@testable import GitIt`로 App 내부 타입에 접근하려면 필수)는 그대로 유지했다. 이
+크래시를 우회하는 프로젝트 설정 변경은 적용하지 않았다(Firebase·actor-isolation 제거는
+진단 목적으로 임시 적용했다가 모두 원상 복구했다).
+
+### 검증
+
+- `project_build_runner build`: 성공(9/9).
+- `project_build_runner compile`: 성공(8/8, AppTests build-for-testing 포함).
+- `project_build_runner test`: 실패(AppTests가 이 크래시로 차단, 그 밖에 Data scheme은
+  이 기능과 무관한 기존 실패 4건이 별도로 있었다).
+- `AppRootFeatureTests`·`PolicyManifestTests`·`GitItCompositionLifetimeTests`·
+  `GitItCompilationTests`의 실제 실행 결과: 미검증(이 크래시로 차단됨).
+
+### 재발 방지
+
+다음 세션에서 AppTests를 다시 시도할 때는 (1) 이 항목과 [[TS-20260826-007]]을 먼저
+참조하고, (2) `Feature` 등 App과 무관한 scheme도 같은 세션에서 함께 여러 번 재시도해
+산발성 여부를 다시 확인하고, (3) 여전히 재현되면 별도의 macOS/Xcode 환경이나 물리
+기기에서 같은 scheme을 실행해 이 환경 특유의 문제인지 좁힌다. `test` 단계 실패만으로
+`AppRootFeature`·`PolicyManifestLoader`의 로직 결함을 단정하지 않는다.
+
+### 연결
+
+[[TS-20260826-007]], [[TS-20260826-011]]
+
+## TS-20260827-001: Feature scheme test 실행도 TS-20260826-012와 동일한 xctest 부트스트랩 SIGSEGV로 재현됨
+
+**기록일**: 2026-08-27
+**상태**: 환경 제약
+**발생 단계**: speckit-implement, Feature 패키지(T081~T082) 구현, T082
+**관련 항목**: T082, T070(`OnboardingAccessibilityTests.swift`, 이 세션에서 `.midLevel`→`.middle` 오타 수정 완료), [[TS-20260826-010]], [[TS-20260826-012]]
+
+### 증상
+
+T081 검증(`SettingsFeature.swift`가 이미 `SignOutResult` 계약과 정합함을 확인) 완료 후
+T082(Feature build/test)를 위해 격리된 DerivedData에서 `xcodebuild -workspace
+sources/GitIt.xcworkspace -scheme Feature -destination 'platform=iOS
+Simulator,name=iPhone 17 Pro' test`를 실행했다. 빌드와 테스트 컴파일은 모두 성공했지만
+테스트 실행 직전 host 프로세스가 죽어 다음과 같이 실패했다.
+
+```text
+Testing failed:
+	xctest (28638) encountered an error (Early unexpected exit, operation never finished
+	bootstrapping - no restart will be attempted. (Underlying Error: The test runner
+	crashed while preparing to run tests: xctest at <external symbol>))
+```
+
+`test-without-building`으로 재시도해도 동일하게 재현됐다(`xctest (28727)`).
+
+### 영향
+
+T082(Feature 패키지 `[no-write]` build/test 검증)의 `build`는 성공했지만 `test` 단계가
+차단되어, `OnboardingRestoreTests`·`OnboardingLegalAndSignInTests`·
+`OnboardingCurationTests`·`OnboardingAccessibilityTests`의 실제 통과 여부를 이 세션에서
+확정하지 못했다. Feature 패키지 승인 게이트를 위한 검증 결과 보고가 이 부분만
+"미실행/환경 차단"으로 남는다.
+
+### 근거
+
+- `xcodebuild ... -scheme Feature ... build`: `** BUILD SUCCEEDED **`(프로덕션 코드
+  컴파일 성공, 이 세션에서 T081 확인과 T070의 `.midLevel`→`.middle` 오타 수정 이후).
+- `xcodebuild ... -scheme Feature ... test`: 테스트 대상 4개 파일(`OnboardingAccessibilityTests.swift`,
+  `OnboardingRestoreTests.swift`, `OnboardingCurationTests.swift`,
+  `OnboardingLegalAndSignInTests.swift`) 모두 컴파일 성공(`Ld ... FeatureTests` 성공) 후
+  `xctest` 프로세스가 부트스트랩 중 종료됨을 확인.
+- `xcodebuild ... -scheme Feature ... test-without-building`: 동일한 오류로 재현
+  확인(`xctest (28727)`).
+- `~/Library/Logs/DiagnosticReports/xctest-2026-08-27-172502.ips`를 파싱한 결과,
+  crashed thread가 `+[XCTestCase(RuntimeUtilities) allSubclasses]` →
+  `objc_copyClassList` → `realizeAllClasses()` → `swift_getSingletonMetadata` →
+  `_swift_relocateClassMetadata` → `computeMetadataBoundsFromSuperclass`이고 exception은
+  `EXC_BAD_ACCESS`/`SIGSEGV`, `KERN_INVALID_ADDRESS at 0x0000000000bad4007`다. 이는
+  [[TS-20260826-012]]가 기록한 crash signature와 프레임 단위로 동일하다.
+- `xcrun simctl list devices`: 대상 시뮬레이터 `iPhone 17 Pro
+  (580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F)`가 `Booted` 상태였음을 확인(TS-012가 이미
+  `simctl erase` 시도로도 재현이 계속됐다고 기록한 것과 같은 시뮬레이터).
+- [[TS-20260826-012]]는 "같은 세션에서 App과 무관한 기존 `Feature` scheme도 한 번은
+  동일 패턴으로 실패했다"고 이미 기록했다. 이번 관찰은 그 재발 방지 절차가 요청한
+  "Feature 등 App과 무관한 scheme도 재시도해 산발성 여부를 확인"을 다른 세션에서 수행한
+  결과이며, `GitIt.app`을 host로 쓰는 `GitItTests`뿐 아니라 `FeatureTests`(별도의 경량
+  host)에서도 같은 crash가 재현되어, 원인이 `GitIt.app` host 구조([[TS-20260826-012]]가
+  검토했던 가설)가 아니라 이 Xcode 26.5 / iOS 26.5 Simulator 실행 환경 자체의 문제일
+  가능성을 강화한다.
+
+### 원인
+
+[[TS-20260826-012]]와 동일하게 XCTest가 host 프로세스의 Objective-C 클래스를 전부
+realize하는 시점에 Swift 런타임의 제네릭 클래스 metadata 계산이 SIGSEGV로 죽는다.
+`FeatureTests`는 `GitIt.app`을 host로 쓰지 않는 별도의 경량 xctest bundle인데도 동일한
+crash가 발생해, 원인이 특정 target 구성이 아니라 이 세션의 Xcode/Simulator 실행 환경
+자체에 있을 가능성이 더 커졌다. 확정 원인은 여전히 미확인이다.
+
+### 조치
+
+미실행. 이 crash를 우회하는 프로젝트 설정 변경은 시도하지 않았다. T070의
+`.midLevel`→`.middle` 오타는 이 crash와 무관한 별개의 실제 컴파일 결함이었으며 이미
+수정했다(별도 커밋 대상, 이 기록과 별개로 tasks.md T070 범위 안에서 처리).
+
+### 검증
+
+- `xcodebuild -scheme Feature build`: 성공.
+- `xcodebuild -scheme Feature test`: 컴파일 성공, 실행 단계에서 SIGSEGV로 차단.
+- `xcodebuild -scheme Feature test-without-building`: 동일하게 차단.
+- `OnboardingRestoreTests`·`OnboardingLegalAndSignInTests`·`OnboardingCurationTests`·
+  `OnboardingAccessibilityTests`의 실제 실행 결과: 미검증(이 crash로 차단됨).
+
+### 재발 방지
+
+다음 세션에서 Feature 또는 App 패키지 test 검증을 재시도할 때는 (1) 이 항목과
+[[TS-20260826-012]]를 먼저 참조하고, (2) 별도의 macOS/Xcode 환경이나 물리 기기에서 같은
+scheme을 실행해 이 세션 환경 특유의 문제인지 좁히며, (3) `test` 단계 실패만으로
+`OnboardingFeature`·`SettingsFeature` 등 production reducer의 로직 결함을 단정하지
+않는다. 두 scheme(App, Feature) 모두에서 동일 signature가 재현된 이상, 세 번째 무관
+scheme(예: `Domain`, `UI`)에서도 재현되는지 확인하면 "GitIt.app host 특유" 가설을 완전히
+배제하고 "이 환경 전역" 결론으로 좁힐 수 있다.
+
+### 연결
+
+[[TS-20260826-010]], [[TS-20260826-012]]
+
+## TS-20260827-002: SIGSEGV는 전체 환경이 아니라 ComposableArchitecture를 import하는 scheme(Feature·App)에서만 재현됨
+
+**기록일**: 2026-08-27
+**상태**: 환경 제약
+**발생 단계**: speckit-implement, Feature 패키지(T082) 검증 중 사용자 요청에 따른 교차 확인
+**관련 항목**: T082, [[TS-20260826-012]], [[TS-20260827-001]]
+
+### 증상
+
+[[TS-20260827-001]]이 기록한 "이 환경 전역 문제일 가능성" 가설을 좁히기 위해 사용자
+요청으로 App·Feature와 무관한 scheme에서 같은 crash가 재현되는지 확인했다. 같은
+격리된 DerivedData 방식(`xcodebuild -workspace sources/GitIt.xcworkspace -scheme
+<S> -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`)으로 `Domain`,
+`UI`, `Composition` 세 scheme을 순서대로 실행한 결과 셋 다 SIGSEGV 없이 정상
+종료됐다. 같은 시뮬레이터(`iPhone 17 Pro`,
+`580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F`, 세 실행 내내 재부팅 없이 `Booted` 유지)에서
+Feature·App만 크래시가 재현되므로, 이 문제는 "이 세션의 Xcode/Simulator 환경 전역"이
+아니라 특정 scheme 집합에 국한된다.
+
+### 영향
+
+[[TS-20260827-001]]의 "환경 전역 문제일 가능성" 결론을 좁힌다. Feature·App
+패키지의 `[no-write]` test 검증(T082, T095)이 이 crash로 계속 차단될 가능성이 높은
+반면, Domain·Infrastructure·Data·Composition·UI 패키지의 test 검증은 이 crash의
+영향을 받지 않을 것으로 예상할 수 있는 근거가 생겼다(단, Infrastructure·Data는 이
+세션에서 직접 재실행하지 않아 확인 중).
+
+### 근거
+
+- `xcodebuild -scheme Domain ... test`: `Test run with 16 tests in 8 suites passed`,
+  `** TEST SUCCEEDED **`.
+- `xcodebuild -scheme UI ... test`: `Test run with 32 tests in 11 suites passed`,
+  `** TEST SUCCEEDED **`.
+- `xcodebuild -scheme Composition ... test`: `Test run with 44 tests in 17 suites
+  passed`, `** TEST SUCCEEDED **`.
+- `xcodebuild -scheme Feature ... test`, `xcodebuild -scheme App ...`([[TS-20260826-012]]):
+  둘 다 `xctest` 프로세스가 부트스트랩 중 SIGSEGV로 종료([[TS-20260827-001]],
+  [[TS-20260826-012]]).
+- `grep -rl "import ComposableArchitecture" sources/Projects/<패키지> --include="*.swift"
+  | wc -l`: `Domain`=0, `UI`=0, `Composition`=0, `Feature`=23, `App`=5. crash가
+  재현된 두 scheme만 `ComposableArchitecture`를 import하는 파일을 갖고 있고, 재현되지
+  않은 세 scheme은 0건이다.
+- `xcrun simctl list devices`: 세 scheme 실행 내내 같은 시뮬레이터
+  (`580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F`)가 `Booted` 상태로 유지됨을 확인해, 시뮬레이터
+  재부팅이나 상태 변화가 이 차이를 설명하지 않음을 배제했다.
+
+### 원인
+
+확정되지 않았다. `ComposableArchitecture` import 여부와의 상관관계는 이 세션에서 직접
+관찰한 사실이지만, `Composition`도 `ComposableArchitecture`에 간접 의존하는
+`AuthenticationAssembly` 등을 가질 수 있어(미검증) import 여부만으로 인과관계를
+단정하지 않는다. [[TS-20260826-012]]가 기록한 crash 지점(`realizeAllClasses` →
+`swift_getSingletonMetadata` → `computeMetadataBoundsFromSuperclass`)은
+`@Reducer`·`@ObservableState`·`@CasePathable` 등 `ComposableArchitecture`/`CasePaths`
+매크로가 생성하는 제네릭 클래스 metadata 처리와 관련이 있을 가능성이 있는 가설이며,
+이 세션에서 Swift 컴파일러나 런타임 소스로 직접 검증하지는 못했다.
+
+### 조치
+
+미실행. 이 crash를 우회하는 프로젝트 설정 변경은 시도하지 않았다.
+
+### 검증
+
+- `xcodebuild -scheme Domain test`: 성공(16/16).
+- `xcodebuild -scheme UI test`: 성공(32/32).
+- `xcodebuild -scheme Composition test`: 성공(44/44).
+- `xcodebuild -scheme Feature test`, `AppTests`: 실패(SIGSEGV, [[TS-20260827-001]],
+  [[TS-20260826-012]]).
+- Infrastructure, Data scheme: 이 세션에서 재실행하지 않음(미실행).
+
+### 재발 방지
+
+다음 세션에서 이 가설을 더 좁히려면 (1) Infrastructure·Data scheme도 같은 방식으로
+실행해 `ComposableArchitecture` 미의존 scheme 전체가 일관되게 통과하는지 확인하고,
+(2) Feature 또는 App에서 `ComposableArchitecture` 매크로 사용을 최소화한 별도의 진단용
+target으로 재현 여부를 좁히거나, (3) Xcode/Swift 버전을 변경할 수 있는 환경에서 같은
+scheme을 재시도해 툴체인 버전 문제인지 확인한다. 이 상관관계가 재현되지 않는 반례가
+나오면 이 항목을 참조하는 후속 항목으로 뒤집는다.
+
+### 연결
+
+[[TS-20260826-012]], [[TS-20260827-001]]
+
+## TS-20260827-003: T095(App `[no-write]` build/test) 재시도에서도 TS-20260826-012 SIGSEGV 재발
+
+**기록일**: 2026-08-27
+**상태**: 환경 제약
+**발생 단계**: speckit-implement, App 패키지(T083~T095) 검증, T095
+**관련 항목**: T095, [[TS-20260826-012]], [[TS-20260827-001]], [[TS-20260827-002]]
+
+### 증상
+
+사용자가 T082(Feature `[no-write]` test)를 [[TS-20260827-001]]의 환경 제약으로 보류하고
+App 패키지 진행을 명시적으로 승인해, App 패키지 구현(T083~T094, 이미 이전 세션에서
+전부 완료)의 `[no-write]` 검증(T095)을 다시 시도했다. `xcodebuild -scheme App build`와
+`xcodebuild -scheme AppTests build-for-testing`은 모두 성공했으나 `test-without-building`
+실행 중 host 앱 `GitIt`이 다음과 같이 부트스트랩 단계에서 죽었다.
+
+```text
+Testing failed:
+	GitIt (35742) encountered an error (Early unexpected exit, operation never finished
+	bootstrapping - no restart will be attempted. (Underlying Error: The test runner
+	crashed while preparing to run tests: GitIt at <external symbol>))
+```
+
+### 영향
+
+T095가 다시 미완료로 남는다. `AppRootFeatureTests`·`PolicyManifestTests`·
+`GitItCompositionLifetimeTests`·`GitItCompilationTests`의 실제 실행 결과는 이번
+세션에서도 확정하지 못했다. 다만 production·테스트 컴파일 자체는 정상임을 재확인했다.
+
+### 근거
+
+- `xcodebuild -scheme App -destination 'generic/platform=iOS Simulator' build`:
+  `** BUILD SUCCEEDED **`.
+- `xcodebuild -scheme AppTests -derivedDataPath /tmp/gitit-app-verify-dd
+  build-for-testing`: `** TEST BUILD SUCCEEDED **`.
+- `xcodebuild -scheme AppTests -derivedDataPath /tmp/gitit-app-verify-dd
+  test-without-building`: `** TEST EXECUTE FAILED **`, host `GitIt (35742)`.
+- `~/Library/Logs/DiagnosticReports/GitIt-2026-08-27-174259.ips`: crashed thread가
+  [[TS-20260826-012]]·[[TS-20260827-001]]과 프레임 단위로 동일
+  (`+[XCTestCase(RuntimeUtilities) allSubclasses]` → `objc_copyClassList` →
+  `realizeAllClasses()` → `swift_getSingletonMetadata` → `_swift_relocateClassMetadata`
+  → `computeMetadataBoundsFromSuperclass`, `EXC_BAD_ACCESS`/`SIGSEGV`,
+  `KERN_INVALID_ADDRESS at 0x0000000000bad4007`).
+- `git status --porcelain=v1`을 build/test 실행 전후로 비교: 추적 파일 변경 없음
+  (`[no-write]` 조건 충족).
+
+### 원인
+
+[[TS-20260826-012]]·[[TS-20260827-002]]와 동일. 새로운 원인 정보는 없다.
+
+### 조치
+
+미실행.
+
+### 검증
+
+- `xcodebuild -scheme App build`: 성공.
+- `xcodebuild -scheme AppTests build-for-testing`: 성공.
+- `xcodebuild -scheme AppTests test-without-building`: 실패(SIGSEGV).
+- `git status` 전후 비교: 추적 파일 변경 없음.
+
+### 재발 방지
+
+[[TS-20260826-012]]·[[TS-20260827-002]]의 재발 방지 절차를 그대로 따른다. 이 재발은 그
+절차의 우선순위를 바꾸지 않는다.
+
+### 연결
+
+[[TS-20260826-012]], [[TS-20260827-001]], [[TS-20260827-002]]
+
+## TS-20260827-004: PolicyAgreementRow가 view.md §7.2 접근성 규칙 3가지를 위반함(라벨 미적용·combine 누락·isSelected trait 누락)
+
+**기록일**: 2026-08-27
+**상태**: 미해결
+**발생 단계**: speckit-implement, "전체 완료 검증" T099(접근성 계약 검증) 수행 중
+**관련 항목**: T099, T061, T058, `docs/conventions/view.md` §7.2
+
+### 증상
+
+`sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`가
+`docs/conventions/view.md` §7.2의 접근성 규칙 중 3가지를 위반한다.
+
+1. `private var accessibilityLabel`(line 61-64, `"필수/선택, {title}"` 형식 계산
+   문자열)이 정의만 되어 있고 `body`의 어떤 View에도 `.accessibilityLabel(...)`로
+   적용되지 않는 죽은 코드다.
+2. 카드형 행 컴포넌트인데 `accessibilityElement(children: .combine)`이 없다 — 체크
+   아이콘과 제목 `StyledText`가 결합되지 않은 채 각각 별도 접근성 요소로 남는다.
+3. `isSelected` 상태가 아이콘 색상(`designSystemForeground(isSelected ? .blue100 :
+   .grey400)`)과 SF Symbol 이름(`checkmark.circle.fill` vs `circle`) 전환으로만
+   표현되고 `.accessibilityAddTraits(.isSelected)`가 없다 — 색상·심볼만으로 선택
+   상태를 전달한다.
+4. 내부 독립 동작 버튼(`onOpenLink`, `chevron.right` 심볼 전용)에 별도
+   accessibilityLabel이 없다 — "심볼만 표시하는 컨트롤은 의미 라벨을 필수 초기화
+   인자로 받는다"와 "묶인 요소 안 독립 동작 버튼은 별도 라벨로 분리한다" 규칙을 함께
+   위반한다.
+
+### 영향
+
+`LegalAgreementScreen.swift:27-33`이 `PolicyAgreementRow`를 그대로 사용하므로, 약관
+동의 화면의 각 정책 행이 VoiceOver 사용자에게 "필수 여부 + 문서명"을 하나의 의미
+단위로 전달하지 못하고, 체크 여부(선택 상태)를 trait로 인지시키지 못하며, 열기
+버튼이 무엇을 여는지 알려주지 않는다. `tasks.md`의 T099(전체 완료 검증, no-write)가
+요구하는 "선택 상태가 색상 단독으로 전달되는 사례 0건" 기준을 이 컴포넌트가
+충족하지 못한다. T061·T058은 이미 완료 표시된 상태이고 이 세션(전체 완료 검증
+단계)에는 UI 패키지 파일을 수정할 수 있는 task 배정이 없어 결함만 기록하고
+수정하지 않았다.
+
+### 근거
+
+- `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift:26-47`:
+  `body` 전체에 accessibility modifier가 전혀 없음.
+- 같은 파일 `:61-64`: 정의만 되고 적용되지 않는 `accessibilityLabel` 계산 프로퍼티.
+- 대조군 `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift:60-61`:
+  같은 UI 패키지의 다른 선택형 컴포넌트는 `.accessibilityElement(children: .combine)`과
+  `.accessibilityAddTraits(isSelected ? .isSelected : [])`를 올바르게 적용하고
+  있어, `PolicyAgreementRow`만 예외적으로 누락됐음을 확인.
+- 대조군 `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader.swift:117`과
+  `ScreenHeader+Control.swift`: 같은 패키지의 다른 심볼 버튼은
+  `accessibilityElement(children: .combine)`과 심볼 전용 컨트롤의 필수 `label` 초기화
+  인자 규칙을 지킨다.
+- `sources/Projects/UI/Tests/Component/Unit/Controls/PolicyAgreementRowTests.swift`
+  전체: `onToggle`/`onOpenLink` 콜백 호출과 `minimumHitArea` 상수만 검증하고, 실제
+  뷰를 렌더링해 accessibilityLabel 적용 여부·combine 여부·`isSelected` trait 여부를
+  검사하는 테스트가 하나도 없어 이 결함이 T058(테스트 작성)·T061(구현) 완료 표시
+  이후에도 발견되지 않은 채 남아 있었다.
+- `docs/conventions/view.md` §7.2(472-482행)의 규칙 텍스트와 컴포넌트 코드를 직접
+  대조해 확인.
+
+### 원인
+
+T058 테스트가 콜백 전달과 44pt 상수만 검증하도록 작성되어 실제 SwiftUI 접근성
+트리(라벨 적용·trait·combine 여부)를 검사하지 않았다. 이 때문에 T061 구현에서
+`accessibilityLabel` 계산 프로퍼티를 만들어 두고 실제로 뷰에 붙이는 것을 빠뜨린
+실수가 테스트로 걸러지지 않고 UI 패키지 승인 게이트(T065)를 통과했다.
+
+### 조치
+
+미실행. 이 세션은 "전체 완료 검증" 단계의 no-write 작업만 수행하도록 제한되어 있어
+UI 패키지 파일을 수정할 권한이 없다. 결함을 기록하고 T099 결과에 실패 항목으로
+반영한 뒤 사용자에게 보고했다.
+
+### 검증
+
+- 코드 읽기로 위 4가지 위반을 확인함(성공).
+- Accessibility Inspector, VoiceOver 등 실행 기반 검증: 미실행.
+
+### 재발 방지
+
+후속 세션에서 `PolicyAgreementRow.swift`의 `body`에
+`.accessibilityElement(children: .combine)`, `.accessibilityLabel(accessibilityLabel)`,
+선택 시 `.accessibilityAddTraits(.isSelected)`, `onOpenLink` 버튼에 별도
+accessibilityLabel(예: `"\(title) 전문 보기"`)을 추가하고,
+`PolicyAgreementRowTests.swift`에 렌더링된 뷰의 접근성 트리를 실제로 검사하는
+테스트를 추가해야 한다. 이 결함은 `/speckit-tasks`로 UI 패키지에 새 수정 작업을
+추가한 뒤에만 고칠 수 있다.
+
+### 연결
+
+없음
+
+## TS-20260827-005: Onboarding 화면 6개가 view.md §8의 "#Preview는 Screens 파일에 두지 않는다" 규칙을 위반하도록 tasks.md T075~T080이 지시함
+
+**기록일**: 2026-08-27
+**상태**: 미해결
+**발생 단계**: speckit-implement, "전체 완료 검증" T103(S4 Preview·Figma 비교) 수행 중
+**관련 항목**: T103, T075~T080, `docs/conventions/view.md` §8
+
+### 증상
+
+`docs/conventions/view.md` §8(현재 커밋된 상태 포함, 이번 세션의 미커밋 diff는 표의
+경로 표기만 `Screens/Previews/`→`Previews/`로 바꿨을 뿐 규칙 자체는 이전부터
+존재했다)은 "화면 파일 안에 `#Preview`를 두지 않습니다. 화면 프리뷰는 상태 조합마다
+늘어나므로 화면 구현과 분리해 목록으로 관리합니다"라고 명시하며, Feature 화면의
+Preview는 `Previews/<영역>Previews.swift`(구 표기 `Screens/Previews/`)에 있어야
+한다고 규정한다. 그러나 `tasks.md`의 T075("···SplashScreen.swift에 ... 파일 하단
+`iPhone 17 Pro Max` deterministic Preview를 구현한다")부터 T080까지 6개 작업이 모두
+"화면 파일 하단에 Preview를 구현한다"고 명시적으로 지시했고, 실제 구현도 그 지시를
+그대로 따라 `SplashScreen.swift`·`TutorialScreen.swift`·`LegalAgreementScreen.swift`·
+`PositionSelectionScreen.swift`·`CareerSelectionScreen.swift`·`OnboardingScreen.swift`
+6개 파일 모두 자기 파일 하단에 `#Preview`를 직접 선언했다.
+`sources/Projects/Feature/Onboarding/Previews/`에는 `OnboardingPreviewSupport/`
+(mock UseCase 등 지원 타입)만 있고 실제 `#Preview`를 담은 `*Previews.swift` 파일은
+하나도 없다.
+
+### 영향
+
+이 세션(전체 완료 검증)은 소스 파일을 수정할 task 배정이 없어 이 불일치를 고칠 수
+없다. `tasks.md`를 실행 계약으로 삼아 구현했으므로 T075~T080·T103 자체를 실패로
+판정하지는 않았지만, `docs/conventions/view.md` §9 검토 체크리스트의 "화면 프리뷰가
+`Previews/`에 있는가?" 항목 기준으로는 Onboarding 화면 6개 전부가 미충족 상태다.
+다음에 이 컨벤션을 기준으로 리뷰하면 재작업(Preview를 별도 파일로 옮기는 리팩터링)이
+필요하다.
+
+### 근거
+
+- `grep -rln "^#Preview" sources/Projects/Feature/Onboarding/Screens/`: 6개 파일
+  전부에서 `#Preview` 발견(`OnboardingScreen.swift`, `LegalAgreementScreen.swift`,
+  `PositionSelectionScreen.swift`, `CareerSelectionScreen.swift`,
+  `TutorialScreen.swift`, `SplashScreen.swift`).
+- `find sources/Projects/Feature/Onboarding/Previews -type f`: `OnboardingPreviewSupport/`
+  하위 지원 타입 파일 7개만 있고 `*Previews.swift`는 없음.
+- `git diff docs/conventions/view.md`: 이번 세션 시작 시점에 이미 uncommitted였던
+  diff가 `Screens/Previews/<영역>Previews.swift` → `Previews/<영역>Previews.swift`로
+  경로 표기만 바꿨을 뿐, "화면 파일 안에 `#Preview`를 두지 않는다"는 규칙 자체는 이
+  diff 이전(즉 커밋된 버전)부터 존재했음을 확인 — 이 세션의 문서 개정이 만든 새 규칙이
+  아니다.
+- `specs/016-onboarding-login-tutorial-app-integration/tasks.md`의 T075~T080 6개
+  작업 설명이 모두 "파일 하단 ... Preview를 구현한다"는 표현을 명시적으로 포함함을
+  확인.
+
+### 원인
+
+확정 원인은 확인하지 못했다. `tasks.md`가 처음 작성될 때 view.md §8의 "화면 파일 안에
+Preview를 두지 않는다" 규칙을 반영하지 못한 것으로 보이는 가설과, view.md §8이 이
+기능의 작업 목록 확정 이후 추가된 규칙이라 tasks.md가 그 시점 기준으로는 정합했을
+가설을 구분하지 못했다 — 두 문서의 변경 이력을 이 세션에서 직접 대조하지 않았다.
+
+### 조치
+
+미실행. 이 세션은 no-write 검증 단계라 `tasks.md`나 Screens 소스를 수정할 권한이 없다.
+
+### 검증
+
+- `grep`으로 6개 파일 전부에서 위반을 확인함(성공).
+- `docs/conventions/view.md`의 커밋 이력(`git log -p`)으로 §8 규칙이 언제 추가됐는지
+  확인: 미실행.
+
+### 재발 방지
+
+후속 세션에서 (1) `git log -p -- docs/conventions/view.md`로 §8 규칙의 도입 시점을
+확인하고, (2) `/speckit-tasks`로 Onboarding 화면 6개의 `#Preview`를
+`Feature/Onboarding/Previews/OnboardingScreensPreviews.swift`(또는 화면별 파일)로
+옮기는 리팩터링 작업을 추가하거나, view.md §8이 이 기능에는 적용되지 않는다고
+명시적으로 예외 처리할지 결정해야 한다.
+
+### 연결
+
+없음
+
+## TS-20260827-006: UIUITests scheme도 동일한 xctest 부트스트랩 SIGSEGV로 재현되어 TS-20260827-002의 "ComposableArchitecture import 여부" 판별 기준이 반례에 부딪힘
+
+**기록일**: 2026-08-27
+**상태**: 미해결
+**발생 단계**: speckit-implement, 작업 패키지 8(UI 후속 수정) T104(테스트 우선 작성) 수행 중
+**관련 항목**: T104, T106, [[TS-20260826-012]], [[TS-20260827-001]], [[TS-20260827-002]]
+
+### 증상
+
+`UIUITests` scheme(`sources/Projects/UI/Tests/Component/UI/LayoutContractUITests.swift`가
+속한 XCUITest scheme, `UIComponentPreviewApp`을 실제 구동)이
+`xcodebuild -workspace sources/GitIt.xcworkspace -scheme UIUITests -destination
+'platform=iOS Simulator,name=iPhone 17 Pro' test`로 재현 가능하게 3회 연속 SIGSEGV로
+실패했다. 실패 메시지는 "UIComponentPreviewAppUITests-Runner encountered an error
+(Early unexpected exit, operation never finished bootstrapping - no restart will be
+attempted. (Underlying Error: The test runner crashed while preparing to run tests:
+UIComponentPreviewAppUITests-Runner at _XCTRunnerRunTests))"이다.
+
+이 crash signature는 [[TS-20260826-012]]·[[TS-20260827-001]]·[[TS-20260827-002]]가
+기록한 것과 프레임 단위로 동일하다(`computeMetadataBoundsFromSuperclass` →
+`_swift_relocateClassMetadata` → `swift_getSingletonMetadata` → `realizeAllClasses` →
+`+[XCTestCase(RuntimeUtilities) _allSubclasses]`). 그런데 [[TS-20260827-002]]는
+"SIGSEGV는 ComposableArchitecture를 import하는 scheme(Feature·App)에서만 재현되고,
+재현되지 않은 Domain·UI·Composition 세 scheme은 ComposableArchitecture import가
+0건"이라는 상관관계를 근거로 결론지었다. `UIUITests`는 `ComposableArchitecture`를
+import하지 않는데도(같은 UI 패키지의 Swift Testing 유닛 테스트 scheme인 `UI`는 여전히
+정상 통과) 동일한 crash가 재현되어, 이 상관관계 가설이 반례에 부딪혔다.
+
+또한 같은 세션 안에서 이 crash가 결정적이지 않았다: 세션 시작 직후 실행한 project
+build runner의 전체 `test` 단계에서는 `UIUITests`가 정상 통과("test 완료:
+UIUITests")했고, 그로부터 약 1~2시간 뒤 iOS Simulator MCP 도구로 같은 시뮬레이터
+(580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F)에 `GitIt.app`을 별도로 빌드·설치·실행(Apple
+로그인 화면까지 조작)한 뒤부터는 같은 scheme이 시뮬레이터 재부팅 후에도 3회 연속
+재현 가능하게 실패했다.
+
+### 영향
+
+T104가 요구하는 "테스트 우선 작성 뒤 실패를 실제로 확인"을 이 환경에서 실행 기반으로
+검증하지 못했다. `LayoutContractCatalog.swift`(카탈로그에 `PolicyAgreementRow` 2개
+추가)와 `LayoutContractUITests.swift`(신규 UI 테스트 3개 추가)의 코드는 작성해
+컴파일까지 확인했지만, 실제 xctest 실행으로 "결함이 있는 현재 구현에서 실패 → T105
+수정 후 통과"를 증명하지 못한 채 코드 검토로 대체해야 했다. 더 근본적으로,
+[[TS-20260827-002]]의 "ComposableArchitecture import 여부가 이 crash의 판별 기준"이라는
+결론은 이 반례로 더 이상 유지할 수 없다.
+
+### 근거
+
+- `sources/DerivedData/PreCommit/Logs/Test/Test-UIUITests-2026.08.27_19-19-51-+0900.xcresult`,
+  `19-21-09`, `19-23-13` 3개 xcresult 모두 동일한 `_XCTRunnerRunTests` 부트스트랩 실패
+  메시지를 기록.
+- `~/Library/Logs/DiagnosticReports/UIComponentPreviewAppUITests-Runner-2026-08-27-192119.ips`
+  (및 `192017`): `exception.type=EXC_BAD_ACCESS`, `signal=SIGSEGV`, `faultingThread`
+  프레임이 `computeMetadataBoundsFromSuperclass`(imageOffset 156792) →
+  `_swift_relocateClassMetadata` → `swift_getSingletonMetadata` → `realizeAllClasses()`
+  → `objc_copyClassList` → `+[XCTestCase(RuntimeUtilities) _allSubclasses]` → ... →
+  `_XCTestMain`으로 [[TS-20260826-012]]와 동일.
+- `grep -rl "import ComposableArchitecture" sources/Projects/UI --include="*.swift"`:
+  0건(UI 패키지 전체가 ComposableArchitecture를 import하지 않음에도 UIUITests에서 crash
+  재현).
+- `xcrun simctl shutdown 580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F && xcrun simctl boot
+  580DF63E-93A7-4E5A-AC70-3EE2F2B07B6F` 뒤 재시도해도 동일하게 실패(3회차 로그에 추가로
+  `objc[65886]: Class UIAccessibilityLoaderWebShared is implemented in both ...
+  WebKit.axbundle ... and ... WebCore.axbundle ...` 중복 클래스 경고가 새로 관찰됨 — 이
+  경고 자체가 crash 원인인지는 미확인).
+- `project_build_runner compile`로 `UI` scheme을 포함한 8개 scheme build-for-testing이
+  전부 성공(0 errors)해, 이번 세션에서 추가한 `LayoutContractCatalog.swift`·
+  `LayoutContractUITests.swift` 코드 자체의 컴파일 문제가 아님을 확인.
+- 세션 앞부분(T082/T095 검증 시점)의 project build runner 전체 `test` 실행 로그에서는
+  "test 시작: UIUITests" 뒤 "test 완료: UIUITests"로 성공했음(같은 세션, 같은
+  시뮬레이터).
+
+### 원인
+
+확정하지 못했다. crash signature 자체는 [[TS-20260826-012]]와 동일해 Swift 매크로가
+생성하는 제네릭 클래스 metadata 처리(`realizeAllClasses`)와 관련된 이 macOS/Xcode 환경
+고유 문제라는 기존 가설은 유지되지만, "ComposableArchitecture import 여부" 판별
+기준은 반례로 기각한다. 세션 중 iOS Simulator MCP 도구로 같은 디바이스에 다른 앱을
+설치·구동한 것이 실패 재현성을 바꾼 것처럼 보이는 시간적 상관관계가 있으나(재부팅
+후에도 실패가 유지됐으므로 단순 앱 잔존 상태만으로는 설명되지 않음), 인과관계는
+확인하지 못했다.
+
+### 조치
+
+미실행. 이 crash를 우회하는 프로젝트 설정 변경은 시도하지 않았다. T105(구현)는 이
+테스트 실행 결과와 무관하게 코드 검토 기준으로 진행하고, T106에서 이 환경 제약을 다시
+보고한다.
+
+### 검증
+
+- `xcodebuild -scheme UIUITests test`(3회, 시뮬레이터 재부팅 1회 포함): 모두 실패
+  (SIGSEGV, 동일 시그니처).
+- `project_build_runner compile`(UI 포함 8개 scheme): 성공.
+- Domain·Data·Infrastructure·Composition·Feature(unit)·App(unit) scheme 재실행: 미실행
+  (이 항목의 범위 밖).
+
+### 재발 방지
+
+후속 세션에서 (1) [[TS-20260827-002]]의 "ComposableArchitecture import" 판별 기준을
+폐기하고 대신 "XCUITest(실제 앱 host를 실행하는 scheme)인지 여부"를 다음 가설로
+검증한다(UIUITests·Feature·App은 모두 실제 host app을 실행하는 반면 Domain·UI(unit)·
+Composition·Data·Infrastructure는 host 없이 라이브러리만 로드함 — 이 시점까지 관찰된
+성공/실패 사례 전부와 일치하는지 대조), (2) 동일 시뮬레이터에 다른 앱을 설치·구동한
+이력이 이후 XCUITest 재현성에 영향을 주는지 별도로 재현 실험한다(새 시뮬레이터
+디바이스를 만들어 다른 앱 설치 없이 UIUITests만 먼저 실행), (3) 새 가설이 맞다면
+[[TS-20260827-002]]를 뒤집는 후속 항목을 추가한다.
+
+### 연결
+
+TS-20260826-012, TS-20260827-001, TS-20260827-002
+
+## TS-20260827-007: UIUITests가 실제 실행됐고 PolicyAgreementRow 접근성 identifier 조회가 진짜로 실패함(중복 accessibilityIdentifier)
+
+**기록일**: 2026-08-27
+**상태**: 미해결
+**발생 단계**: `/speckit-implement` T109(작업 패키지 9: Feature 후속 수정, no-write 패키지 검증)
+**관련 항목**: T104~T106(작업 패키지 8), T105 구현 파일 `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`, `sources/Projects/UI/ComponentPreviewApp/Catalogs/LayoutContractCatalog.swift`
+
+### 증상
+
+T107~T108 완료 뒤 `make tuist` → project build runner `test` 실행에서 `UIUITests` scheme이
+TS-20260827-006이 기록한 xctest 부트스트랩 SIGSEGV 없이 실제로 실행됐다(이번 세션에서는
+재현되지 않음). 그러나 `LayoutContractUITests`의 다음 3개 테스트가 진짜로 실패했다:
+`testPolicyAgreementRowCombinesTitleAndRequirementIntoSingleAccessibilityElement`,
+`testPolicyAgreementRowExposesIsSelectedTraitSeparatelyFromColor`,
+`testPolicyAgreementRowOpenLinkButtonHasOwnAccessibilityLabel`. 세 테스트 모두 같은 오류로
+실패했다: `LayoutContractUITests.swift:501: Failed to get matching snapshot: Find single
+matching element. Multiple matching elements found`.
+
+### 영향
+
+`policyAgreementRow.unselected`/`policyAgreementRow.selected` identifier로 조회하면 버튼
+2개(토글 버튼과 열기 버튼)가 동시에 매칭되어 T104가 의도한 단일 요소 조회, `.isSelected`
+trait 검증, 열기 버튼 단독 라벨 검증을 어느 것도 수행할 수 없다. TS-20260827-004가 "코드
+검토로 규칙 4가지를 반영했다고 판단했으나 실행 검증이 남아 있다"고 미확정으로 남긴 부분이
+실제 실행에서 실패로 확인됐다.
+
+### 근거
+
+- `sources/DerivedData/PreCommit/TestSchemes/UIUITests/Logs/Test/Test-UIUITests-2026.08.27_19-42-35-+0900.xcresult`:
+  `xcrun xcresulttool get test-results tests`로 추출한 실패 노드 3건이 모두
+  `LayoutContractUITests.swift:501`에서 "Multiple matching elements found"를 보고하며,
+  실패 로그의 sparse tree가 `Button, identifier: 'policyAgreementRow.unselected', label:
+  '필수, 서비스 이용 약관'`과 `Button, identifier: 'policyAgreementRow.unselected', label:
+  '서비스 이용 약관 전문 보기'` 두 버튼이 같은 identifier를 가짐을 보여준다(선택됨 케이스도
+  동일 패턴).
+- `sources/Projects/UI/ComponentPreviewApp/Catalogs/LayoutContractCatalog.swift:312-326`:
+  `PolicyAgreementRow(...)` 인스턴스 전체에 `.accessibilityIdentifier("policyAgreementRow.
+  unselected")`/`"policyAgreementRow.selected"`를 걸고 있다.
+- `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`(T105
+  구현): `onToggle` 버튼에는 `.accessibilityElement(children: .combine)` +
+  `.accessibilityLabel` + 선택 시 `.isSelected` trait가 있고, `onOpenLink` 버튼은 형제
+  요소로 분리되어 자체 `.accessibilityLabel`만 있고 `.accessibilityIdentifier`는 없다.
+
+### 원인
+
+SwiftUI는 컨테이너(또는 그 하위 View)에 건 `.accessibilityIdentifier`를, 자체
+`.accessibilityIdentifier`가 없는 모든 하위 접근성 요소로 전파한다. `PolicyAgreementRow`가
+`onToggle`·`onOpenLink` 두 개의 독립 접근성 요소(형제)를 노출하는데 `onOpenLink`에 고유
+identifier가 없으므로, `LayoutContractCatalog`가 View 전체에 건 identifier를 두 버튼이
+모두 상속해 같은 값을 공유하게 된다. 확정 원인이며 가설이 아니다(xcresult 로그의 sparse
+tree가 두 버튼의 동일 identifier를 직접 보여준다).
+
+### 조치
+
+원인에 맞는 최소 수정(`onOpenLink` 버튼에 `title` 기반 고유 `.accessibilityIdentifier`를
+추가해 외부에서 건 identifier가 그 버튼으로 전파되지 않도록 함)을 시도했으나, 이 파일은
+이미 승인 게이트를 통과한 작업 패키지 8(UI)의 소유 경로이고 현재 활성 작업은 작업 패키지
+9(Feature 후속 수정)의 T109(no-write 검증)이다. `/speckit-implement`의 패키지 소유권
+규칙(9번: "후속 패키지에서 선행 패키지 수정이 필요하면 구현을 중단하고 이 작업 목록의
+소유권과 순서를 재생성한다")에 따라 이 세션은 시도한 수정을 되돌리고 `PolicyAgreementRow.
+swift`를 원래 상태로 유지했다. 실제 코드 수정은 미실행이며, `/speckit-tasks` 재실행으로
+새 UI 후속 작업(승인 게이트 포함)을 추가해야 한다.
+
+### 검증
+
+- `project_build_runner test`(2026-08-27 19:46~19:48, `iPhone 17 Pro`): `UIUITests` scheme
+  자체는 SIGSEGV 없이 실행 완료. `LayoutContractUITests`의 PolicyAgreementRow 관련 3개
+  테스트는 실패로 확정. 나머지 `UIComponentPreviewAppUITests`의 다른 테스트는 이 세션에서
+  개별 통과 여부를 별도 확인하지 않음(scheme 결과는 3건 실패로 인해 "Failed"로 집계).
+- 되돌린 수정 자체의 재검증(수정 후 재실행)은 미실행 — 소유권 규칙에 따라 수정을
+  보류했기 때문.
+
+### 재발 방지
+
+다음 세션(또는 `/speckit-tasks` 재실행으로 추가될 UI 후속 작업)에서 `onOpenLink` 버튼에
+`onToggle`과 값이 겹치지 않는 고유 `.accessibilityIdentifier`(예: `title` 기반)를 부여하고,
+`LayoutContractUITests`의 3개 실패 테스트를 다시 실행해 "Multiple matching elements
+found"가 재현되지 않는지, `.isSelected` trait와 열기 버튼 단독 라벨 조회가 의도대로
+동작하는지 확인한다.
+
+### 연결
+
+TS-20260827-004(선행, 실행 검증 미실시 상태로 열어 둠), TS-20260827-006(같은 세션에서
+SIGSEGV가 재현되지 않음을 함께 확인)
+
+## TS-20260827-008: T110의 "onOpenLink에 고유 identifier만 추가" 처방이 TS-20260827-007을 해소하지 못함(전파 방향 오판)
+
+**기록일**: 2026-08-27
+**상태**: 해결
+**발생 단계**: `/speckit-implement` 작업 패키지 10(UI 후속 수정 2) T110~T111
+**관련 항목**: T110, T111, `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`, TS-20260827-007
+
+### 증상
+
+T110은 "`onOpenLink` 버튼에 `title` 기반 고유 `.accessibilityIdentifier`를 추가하면
+TS-20260827-007이 해소된다"고 명시했다. 지시대로 `onOpenLink` Button에만
+`.accessibilityIdentifier("policyAgreementRow.openLink.\(title)")`를 추가하고 `UIUITests`
+scheme을 `xcodebuild test-without-building`으로 iPhone 17 Pro 시뮬레이터에서 실행한 결과,
+`LayoutContractUITests`의 PolicyAgreementRow 관련 3개 테스트가 TS-20260827-007과 동일한
+"Failed to get matching snapshot: Find single matching element. Multiple matching elements
+found"로 재현됐다. sparse tree는 여전히 `onToggle`·`onOpenLink` 두 버튼이 동일한 identifier
+`policyAgreementRow.unselected`를 갖는다고 보여줬다(`onOpenLink`에 새로 추가한
+`policyAgreementRow.openLink.*` identifier는 무시됨). derived data(`sources/DerivedData/
+PreCommit/TestSchemes/UIUITests`, `.../UI`)를 완전히 삭제하고 clean build 후 재실행해도
+동일하게 재현되어 캐시 문제가 아님을 확인했다.
+
+### 영향
+
+T110의 처방을 그대로 신뢰했다면 구현 완료로 잘못 보고할 뻔했다. 실제 xctest 실행 없이
+코드 검토만으로 "해결"을 판정했던 T106(TS-20260827-004)과 같은 유형의 오판이 재발할
+위험이 있었다.
+
+### 근거
+
+- `xcodebuild test-without-building -scheme UIUITests -only-testing:...testPolicyAgreementRow*`
+  (2026-08-27 20:20 무렵, `iPhone 17 Pro`, derived data 완전 삭제 후 clean build): 3개
+  테스트 모두 실패, sparse tree에 두 버튼이 동일 identifier `policyAgreementRow.unselected`를
+  가짐을 직접 확인.
+- 동일 조건에서 `onOpenLink`에 `.accessibilityElement(children: .ignore)` + 고유 identifier를
+  추가한 변형도 동일하게 재현(collision 지속, 엘리먼트 타입만 Button→Other로 바뀜).
+- 동일 조건에서 `onOpenLink`에만 로컬 `.accessibilityElement(children: .contain)`을 적용한
+  변형도 동일하게 재현.
+- `PolicyAgreementRow`의 `body` 최상위 `HStack` 전체에 `.accessibilityElement(children:
+  .contain)`을 적용한 변형은 `onOpenLink` collision을 해소했으나(고유 label로 독립 조회
+  성공), 대신 identifier `policyAgreementRow.unselected`가 새로 생긴 컨테이너 노드에
+  바인딩되어 `onToggle`의 label 검증이 빈 문자열로 실패하고 `isSelected` trait 검증도
+  실패함을 확인.
+
+### 원인
+
+T110은 "SwiftUI가 컨테이너에 건 identifier를 자체 identifier가 없는 하위 요소에만
+전파한다"는 전제로 작성됐으나, 실기기 실행으로 반증됐다. 실제 동작은: `HStack`처럼 그
+자체가 명시적 accessibility element/container(`.combine`/`.contain`/`.ignore`)로 등록되지
+않은 컨테이너에 외부에서 `.accessibilityIdentifier`를 걸면, SwiftUI는 그 identifier를
+"어디에 바인딩할지" 결정하지 못해 하위에서 발견되는 모든 접근성 leaf에 무조건 동일하게
+복제·전파한다 — 하위 leaf가 자체 identifier를 이미 갖고 있는지 여부와 무관하다. 이
+전파를 막으려면 identifier가 바인딩될 명시적 컨테이너 경계(`.contain`)가 필요하며, 그
+경계가 없으면 하위 요소에 아무리 고유 identifier를 추가해도 덮어써진다. 확정 원인이며
+가설이 아니다(3가지 변형 모두 clean build 후 실기기 실행으로 직접 재현·반증함).
+
+### 조치
+
+`PolicyAgreementRow.swift`의 `body` 최상위 `HStack`에 `.accessibilityElement(children:
+.contain)`을 적용해 외부(Catalog)에서 건 identifier가 컨테이너 경계에서 멈추도록 하고,
+동일 컨테이너에 `onToggle`이 이미 갖고 있던 것과 같은 값의 `.accessibilityLabel
+(accessibilityLabel)`·`.accessibilityAddTraits(isSelected ? .isSelected : [])`를 중복
+적용해, 외부 identifier가 이 컨테이너 노드에 바인딩되더라도 `reveal(identifier:)` 조회가
+올바른 label·trait를 반환하도록 했다. `onOpenLink` 버튼의 `title` 기반 고유
+`.accessibilityIdentifier`(T110 원안)는 유지했다. `onToggle` 버튼 자체의 기존
+`.accessibilityElement(children: .combine)`·`.accessibilityLabel`·`.isSelected` trait와
+시각 레이아웃(54pt 행 높이, leading 아이콘+제목, trailing chevron)은 변경하지 않았다.
+
+### 검증
+
+- `xcodebuild test-without-building -scheme UIUITests` 전체(2026-08-27 20:22~20:26,
+  `iPhone 17 Pro`, clean build 반영): `LayoutContractUITests`를 포함한
+  `UIComponentPreviewAppUITests` 19개 테스트 전부 통과("Executed 19 tests, with 0
+  failures"), TS-20260827-007 재현 없음.
+- `project_build_runner build`(2026-08-27 20:31 무렵): 9/9 성공.
+- `project_build_runner compile`(2026-08-27 20:31 무렵): 8/8 성공.
+- `project_build_runner test`(2026-08-27 20:33~20:37, `iPhone 17 Pro`): 8개 scheme 중 6개
+  성공(`UIUITests` 포함, 신규로 통과). 실패 2건(`AppTests`·`Feature`)은 TS-20260826-012·
+  TS-20260827-001~003·006과 동일한 시그니처의 xctest 부트스트랩 SIGSEGV이며 이번 변경과
+  무관함을 로그로 확인.
+
+### 재발 방지
+
+SwiftUI 접근성 identifier가 여러 형제 요소를 가진 커스텀 컴포넌트에 외부에서 걸리는
+구조라면, "하위 요소에 고유 identifier만 추가하면 충분하다"는 가정을 코드 검토만으로
+확정하지 말고 반드시 실기기(UI test) 실행으로 먼저 반증 가능성을 확인한다. 컨테이너가
+명시적 accessibility element/container로 등록되어 있지 않은 상태에서 외부 identifier가
+걸리는 패턴이 있으면, 그 컨테이너를 `.contain`으로 경계 짓고 기존에 그 identifier로
+조회되길 기대하는 특정 자식의 label·trait를 컨테이너에도 동일하게 재적용해야 하는지
+함께 점검한다.
+
+### 연결
+
+TS-20260827-007(선행, 이 문제의 원인 처방이 T110에 기록됨), TS-20260827-004(같은
+`PolicyAgreementRow` 접근성 결함 계열의 최초 발견)

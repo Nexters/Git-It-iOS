@@ -69,15 +69,9 @@ PR에 남긴다. Figma의 Google 로그인 표현, 개인정보 관련 명칭, �
 frame은 각각 명세의 Apple 로그인, `개인정보 처리방침`, sign-out 복귀 동작, `iPhone 17 Pro Max`
 기준을 우선하는 승인된 차이로 기록한다.
 
-## 수동 접근성 검증
+## 수동 검증
 
-1. 작은 지원 iPhone과 가장 큰 접근성 Dynamic Type에서 tutorial·legal·curation의 문구와 CTA에
-   스크롤로 접근 가능한지 확인한다.
-2. VoiceOver로 page indicator의 현재 페이지, 카드의 선택 상태, link 오류와 retry action이 색상
-   없이 전달되는지 확인한다.
-3. Reduce Motion을 켜고 splash 및 page 전환에서 장식 motion만 축소되고 순서와 기능이 유지되는지
-   확인한다.
-4. link 미열람 및 외부 브라우저 열기 요청 실패 상태에서도 필수 선택 후 continue와 Apple sign-in이
+1. link 미열람 및 외부 브라우저 열기 요청 실패 상태에서도 필수 선택 후 continue와 Apple sign-in이
    가능한지 확인한다. 브라우저가 열린 뒤의 page load 결과는 앱 검증 항목에 포함하지 않는다.
 
 수동 결과에는 기기/OS, 설정, Preview 또는 화면 상태, 결과와 증거 경로를 기록한다.

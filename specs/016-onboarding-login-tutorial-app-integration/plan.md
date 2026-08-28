@@ -31,7 +31,7 @@
 
 **테스트**: Swift Testing 기반 Domain/Data/Composition/Feature/App 단위·계약 테스트,
 UIComponent 계약 및 UI 테스트, Tuist shared scheme, project build runner, SwiftUI Preview와
-Simulator 수동 접근성·Figma 비교
+Simulator 수동 Figma 비교
 
 **대상 플랫폼**: iPhone/iPad, iOS 26.0 이상. 시각 기준은 `iPhone 17 Pro Max`.
 
@@ -40,9 +40,8 @@ Simulator 수동 접근성·Figma 비교
 **성능 목표**: launch 자동 복구 1회, 사용자 재시도당 네트워크·mutation 최대 1회, 앱 수명당
 production composition graph 생성 1회, route 전환 중 stale 응답 반영 0회
 
-**제약 조건**: 생성자 주입, Feature의 Domain protocol 전용 소비, 44×44pt 최소 hit area,
-Dynamic Type·VoiceOver·Reduce Motion 지원, 정책 링크 열기 요청과 동의/로그인 조건의 분리, nullable과
-unknown raw value의 비혼합, 기존 미커밋 작업 보존
+**제약 조건**: 생성자 주입, Feature의 Domain protocol 전용 소비, 정책 링크 열기 요청과
+동의/로그인 조건의 분리, nullable과 unknown raw value의 비혼합, 기존 미커밋 작업 보존
 
 정책 링크는 외부 브라우저로 열고 시스템의 열기 요청 성공·실패만 Feature에 전달한다. 브라우저가
 열린 뒤의 페이지 load 결과는 앱 상태나 동의 유효성으로 추적하지 않는다. 정책 manifest는
@@ -110,27 +109,28 @@ sources/Projects/
 │   ├── Member/{Models,Errors}/
 │   └── Tests/{Authentication,Member}/
 ├── Infrastructure/
-│   ├── Storage/UserDefaultsStore.swift
-│   └── Tests/Storage/
+│   ├── Storage/Stores/UserDefaultsStore.swift
+│   └── Tests/Storage/Stores/
 ├── Data/
 │   ├── Member/{DTOs,Errors,Remotes}/
-│   ├── LegalConsent/{Contracts,Models,Stores}/
+│   ├── LegalConsent/{Contracts,DTOs,Stores}/
 │   └── Tests/{Member,LegalConsent}/
 ├── Composition/
-│   ├── Adapter/{AppComposition,AuthenticationAssembly,MemberAssembly,...}.swift
-│   └── Tests/Adapter/
+│   ├── Adapter/{Adapters,Assemblies,Codings,Factories,Layouts}/
+│   └── Tests/Adapter/{Adapters,Assemblies,TestDoubles}/
 ├── UI/
-│   ├── Component/Components/{Leaf,Composite}/
+│   ├── Component/{CollectionItems,Controls,Displays,Indicators,Overlays,Scaffolds}/
 │   ├── Component/Resources/
-│   └── Tests/Component/
+│   ├── DesignSystem/{Extensions,Resources,Tokens}/
+│   └── Tests/{Component,DesignSystem}/
 ├── Feature/
-│   ├── Presentation/Onboarding/{OnboardingFeature,*Screen}.swift
-│   ├── Presentation/MainShell/
-│   └── Tests/Onboarding/
+│   ├── Onboarding/{Reducers,Screens,Previews}/
+│   ├── MainShell/{Models,Reducers}/
+│   └── Tests/Onboarding/{Reducers,TestDoubles}/
 └── App/
-    ├── Sources/{GitItApp,ContentView,AppRootFeature,AppRootView}.swift
-    ├── Resources/Policies/
-    └── Tests/GitIt/
+    ├── Config/policy-manifest.json
+    ├── GitIt/{Configurations,Reducers,Screens,Resources}/
+    └── Tests/GitIt/{Loaders,Reducers,TestDoubles}/
 
 sources/Tuist/ProjectDescriptionHelpers/Projects/
 ├── FeatureModuleName.swift
@@ -169,16 +169,16 @@ Infrastructure가 먼저 완료돼야 하므로 Data 직전에 배치했고, 이
 4. **Composition**: Domain↔Data adapter, 정책 동의 저장 수명, 404 후 명시적 세션 정리, member
    graph의 `CompleteCurationUseCase` 단일 정본을 조립해 Domain protocol만 공개한다.
 5. **UI**: 기존 `ActionButton`, `SelectionCard`, `SelectionCardList`, `SheetSurface`,
-   `ProgressSegments`, `OnboardingMockup`을 우선 재사용하고 단일 선택 callback·접근성, 정책 행,
+   `ProgressSegments`, `OnboardingMockup`을 우선 재사용하고 단일 선택 callback, 정책 행,
    page indicator/tooltip 중 여러 Feature에 재사용 가능한 표현만 확장한다.
-6. **Feature**: 단일 onboarding phase와 request identity를 가진 reducer, 화면별 `*Screen.swift`,
+6. **Feature**: 단일 onboarding phase와 request identity를 가진 `Onboarding/Reducers/`의 reducer, `Onboarding/Screens/`의 화면별 `*Screen.swift`,
    파일 하단 deterministic Preview, reducer tests를 구현한다. `FeatureModuleName.swift`의 FeatureTests
    선언과 scheme 연결은 Feature 패키지 단계에 배정한다.
-7. **App**: 번들 정책 manifest, production graph 1회 생성, onboarding/MainShell root coordination,
+7. **App**: `Config/`의 번들 정책 manifest, `GitIt/Reducers/`의 root coordination, production graph 1회 생성,
    logout/session invalidation 복귀, App tests를 구현한다. `AppModuleName.swift`의 AppTests dependency는
    App 단계에 배정한다.
 
-전체 저장소 build/compile/test와 수동 시각·접근성 검증은 App 단계 승인 후 `[no-write]` 최종
+전체 저장소 build/compile/test와 수동 시각 검증은 App 단계 승인 후 `[no-write]` 최종
 검증으로 실행한다. `[no-write]`에서 `make tuist`의 파생 workspace·project·심볼릭 링크·cache
 갱신은 허용하되 실행 전후 Git 상태를 비교하고 추적 대상 소스·문서나 Git index 변경이 생기면
 완료로 처리하지 않는다. Tuist 공용 helper 변경은 각 파일을 최초로 필요로 하는 Feature 또는 App

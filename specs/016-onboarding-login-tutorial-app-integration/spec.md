@@ -104,22 +104,19 @@
 
 ---
 
-### 시나리오 4 - 디자인 근거와 접근성을 갖춘 화면을 검증한다 (우선순위: P2)
+### 시나리오 4 - 디자인 근거를 갖춘 화면을 검증한다 (우선순위: P2)
 
-개발자와 리뷰어는 각 화면의 독립 Preview를 Figma 개별 node와 비교하고, 작은 화면·Dynamic Type·VoiceOver·Reduce Motion 환경에서도 핵심 흐름이 유지됨을 확인한다.
+개발자와 리뷰어는 각 화면의 독립 Preview를 Figma 개별 node와 비교해 디자인 정합성을 확인한다.
 
-**주요 행위자**: 앱 사용자, 개발자, 리뷰어
+**주요 행위자**: 개발자, 리뷰어
 
-**우선순위 이유**: 실제 사용자 경험과 디자인 정합성을 재현 가능한 근거로 검증하고 접근성 회귀를 방지한다.
+**우선순위 이유**: 실제 디자인 정합성을 재현 가능한 근거로 검증한다.
 
-**독립 테스트**: 각 SwiftUI View의 Preview를 `iPhone 17 Pro Max` 기준으로 렌더링해 Figma node와 비교하고 접근성 속성 및 환경별 동작을 확인한다.
+**독립 테스트**: 각 SwiftUI View의 Preview를 `iPhone 17 Pro Max` 기준으로 렌더링해 Figma node와 비교한다.
 
 **수용 시나리오**:
 
 1. **전제** Figma 대응 화면을 검토한다, **실행** 해당 View 파일의 Preview를 연다, **결과** node ID 또는 상태가 표시된 독립 상태를 즉시 비교할 수 있다.
-2. **전제** Dynamic Type 또는 작은 화면을 사용한다, **실행** 튜토리얼과 큐레이션을 진행한다, **결과** 필수 문구와 CTA가 잘리거나 접근 불가능해지지 않는다.
-3. **전제** VoiceOver를 사용한다, **실행** 페이지 표시기와 선택 카드를 탐색한다, **결과** 현재 페이지와 선택 상태가 색상 외의 의미로 전달된다.
-4. **전제** Reduce Motion이 활성화되었다, **실행** splash에서 다음 단계로 전환한다, **결과** 장식 동작은 축소되지만 정보와 기능 순서는 유지된다.
 
 ### 예외·경계 사례
 
@@ -171,9 +168,7 @@
 - **FR-023**: 화면 구현은 UI 패키지가 소유한 기존 컴포넌트 사용을 기본으로 해야 하며, 필요한 표현이 없으면 UI 패키지 책임과 재사용 가능성을 검토해 컴포넌트를 확장하거나 추가해야 한다. Feature View는 raw 색상·폰트·간격 또는 동일 책임의 화면 전용 컴포넌트를 중복 정의하지 않아야 한다.
 - **FR-024**: 모든 기능 대상 SwiftUI View 파일은 파일 최하단에 `iPhone 17 Pro Max`를 기준으로 한 deterministic Preview를 제공하고, Figma 대응 Preview 이름에는 node ID 또는 상태 식별자를 포함해야 한다.
 - **FR-025**: 주요 idle, selected, loading, error 상태는 서로 독립적으로 재현 가능한 Preview 또는 동등한 시각 검증 진입점을 제공해야 한다.
-- **FR-026**: 모든 interactive control은 최소 44×44pt hit area를 제공하고, 선택 상태·오류·현재 페이지를 색상만으로 전달하지 않아야 한다.
-- **FR-027**: 화면은 작은 지원 기기와 Dynamic Type에서 핵심 콘텐츠가 잘리지 않도록 접근 가능한 탐색 또는 스크롤 수단을 제공해야 한다.
-- **FR-028**: Figma 비교는 section 전체가 아니라 tutorial `779:33450`·`779:33529`·`779:33564`, 약관 전체 선택 `786:38332`, 분야 선택 `737:10367`, Career 미선택·선택 `737:10358`·`737:10349`의 7개 개별 node를 기준으로 수행해야 한다. node의 인증 제공자·정책 이름·뒤로 가기 동작·360×800 frame이 명세와 다르면 명세를 우선하고 이유와 영향을 승인된 차이로 기록해야 한다.
+- **FR-028**: Figma 비교는 section 전체가 아니라 tutorial `779:33450`·`779:33529`·`779:33564`, 약관 전체 선택 `786:38332`, 분야 선택 `737:10367`, Career 미선택·선택 `737:10358`·`737:10349`의 7개 개별 node를 기준으로 수행해야 한다. node의 인증 제공자·정책 이름·뒤로 가기 동작·360×800 frame·tutorial 힌트("3초만에 가입하기") tooltip 배경·포인터 생략이 명세와 다르면 명세를 우선하고 이유와 영향을 승인된 차이로 기록해야 한다.
 - **FR-029**: tutorial 내부 설명용 미니 화면은 교체 가능한 presentation 요소로 격리되고 실제 제품 Domain 동작을 수행하지 않아야 한다.
 - **FR-030**: 멤버 프로필 계약은 `position`과 `careerLevel`의 nullability를 손실 없이 Domain 경계까지 보존해야 하며, null을 `.unknown`, 빈 문자열 또는 임의 기본값으로 치환하지 않아야 한다.
 - **FR-031**: 시스템은 멤버 조회 404와 transport·5xx·decoding·예상하지 못한 응답 오류를 구분하고, 후자의 오류를 가입 또는 큐레이션 상태로 변환하지 않아야 한다.
@@ -214,9 +209,8 @@
 - **SC-006**: 큐레이션 성공 시 MainShell 도달률은 정의된 자동화 시나리오에서 100%다.
 - **SC-007**: Feature production source에서 Data, Infrastructure, Composition 직접 import 및 production `@Dependency` 기반 UseCase 조회는 0건이다.
 - **SC-008**: 기능에 포함된 SwiftUI View 파일의 100%가 파일 하단 Preview를 제공하고 모든 Figma 대응 Preview가 node ID 또는 상태 식별자를 포함한다.
-- **SC-009**: `iPhone 17 Pro Max` 기준으로 FR-028의 Figma 개별 node 7종을 모두 비교하고, node의 Google 로그인 표현, 개인정보 관련 명칭, 분야 화면 닫기 표현과 360×800 frame 차이는 명세 우선의 승인된 차이로 이유·영향이 기록되며 그 밖의 차이는 수정 또는 별도 승인 상태로 분류된다.
+- **SC-009**: `iPhone 17 Pro Max` 기준으로 FR-028의 Figma 개별 node 7종을 모두 비교하고, node의 Google 로그인 표현, 개인정보 관련 명칭, 분야 화면 닫기 표현, 360×800 frame과 tutorial 힌트 tooltip 배경·포인터 생략 차이는 명세 우선의 승인된 차이로 이유·영향이 기록되며 그 밖의 차이는 수정 또는 별도 승인 상태로 분류된다.
 - **SC-010**: Feature와 App의 명시된 launch, legal, sign-in, curation, root 전환 자동화 시나리오가 100% 통과한다.
-- **SC-011**: VoiceOver, Dynamic Type, Reduce Motion 검증에서 핵심 정보 또는 진행 CTA에 접근할 수 없는 상태는 0건이다.
 - **SC-012**: App source와 실행 화면에서 `Hello, world!` 및 샘플 root 노출은 0건이고 production composition graph 생성은 앱 수명당 1회다.
 - **SC-013**: 기능 화면에서 UI 패키지에 이미 존재하는 컴포넌트와 의미가 중복되는 Feature-local 컴포넌트는 0건이며, 신규 공통 표현은 UI 패키지에서 검증된다.
 - **SC-014**: 프로필 응답의 `position`·`careerLevel` null 보존, 멤버 404, transport, 5xx, decoding 실패에 대한 계약 테스트가 각각 존재하며 상태 오분류는 0건이다.
@@ -250,7 +244,7 @@
 - 분야 및 코드 이해 수준 큐레이션과 완료 제출
 - Onboarding Feature의 화면·상태·action·effect·delegate 확장
 - production composition graph와 App root 연결
-- screen-local Preview, 접근성, reducer/App 테스트와 Figma 개별 node 비교
+- screen-local Preview, reducer/App 테스트와 Figma 개별 node 비교
 
 ### 제외
 

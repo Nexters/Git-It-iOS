@@ -69,7 +69,7 @@ career ── back ─> position (selection preserved)
 | `midLevel` | 미들 | 프로젝트 구조와 흐름을 함께 살펴봐요. |
 | `senior` | 시니어 | 설계 의도와 변경 영향을 분석할 수 있어요. |
 
-현재 미커밋 tree의 `beginner`는 Domain 단계에서 최종 공개 이름 `entry`로 변경한다.
+현재 Domain은 최종 공개 이름 `entry`를 제공한다.
 `CareerLevel.unknown`은 정의하거나 지원하지 않는다.
 
 ## 정책 계약
@@ -96,13 +96,10 @@ career ── back ─> position (selection preserved)
 - 404 cleanup 실패는 신규 가입이나 Apple sign-in으로 진행하지 않고 retryable error를 표시한다.
 - policy 외부 브라우저 열기 요청 실패는 인증 failure로 변환하지 않는다.
 
-## Preview·접근성 계약
+## Preview 계약
 
 - 각 기능 대상 View 파일 하단 Preview는 `iPhone 17 Pro Max` frame과 deterministic dependency를 쓴다.
 - Figma 대응 이름에는 node ID, 그 외에는 idle/selected/loading/error 상태 ID를 포함한다.
-- interactive control은 최소 44×44pt이고 selection/page/error는 label/value/trait로도 전달한다.
-- 작은 화면과 Dynamic Type에는 ScrollView 등 접근 가능한 탐색을 제공한다.
-- Reduce Motion에서는 장식 transition만 축소하고 정보·action 순서를 유지한다.
 - 필수 Figma 비교는 tutorial `779:33450`·`779:33529`·`779:33564`, 약관 전체 선택 `786:38332`,
   분야 선택 `737:10367`, Career `737:10358`·`737:10349`를 사용한다. Figma의 Google 로그인 표현,
   개인정보 관련 명칭, 분야 화면 닫기 표현과 360×800 frame은 명세 우선의 승인된 차이다.
