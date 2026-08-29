@@ -26,6 +26,7 @@ jobs:
       project_config_changed: ${{ steps.classify.outputs.project_config_changed }}
       workflow_changed: ${{ steps.classify.outputs.workflow_changed }}
       tests_changed: ${{ steps.classify.outputs.tests_changed }}
+      testable_schemes: ${{ steps.discover.outputs.schemes }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -35,6 +36,21 @@ jobs:
       - name: Classify changes
         id: classify
         run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      # test job의 matrix를 패키지 scheme 목록에 맞춰 동적으로 채웁니다.
+      - name: Discover testable schemes
+        id: discover
+        run: |
+          schemes=$(
+            find "$GIT_IT_PROJECTS_ROOT" -path '*/xcshareddata/xcschemes/*.xcscheme' \
+              -exec sh -c 'grep -q "<TestableReference" "$1" && basename "$1" .xcscheme' _ {} \; \
+              | sort -u
+          )
+          printf '%s\n' "$schemes" | jq -R -s -c 'split("\n") | map(select(length > 0))' \
+            | { read -r json; echo "schemes=$json" >> "$GITHUB_OUTPUT"; }
 
   script-quality:
     name: script quality
@@ -107,16 +123,14 @@ jobs:
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}"
 
-  project-validation:
-    name: build, compile and test
+  build:
+    name: build
     needs: changes
     if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
     runs-on: macos-26
-    timeout-minutes: 90
+    timeout-minutes: 30
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-      GIT_IT_XCODE_JOBS: 4
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -162,14 +176,139 @@ jobs:
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" build
 
-      # AllTests aggregate는 공통 의존성을 한 번만 컴파일하고 같은 DerivedData로 바로 실행합니다.
-      - name: Compile aggregate unit tests
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" compile-unit
+  compile:
+    name: compile
+    needs:
+      - changes
+      - build
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
+      GIT_IT_XCODE_JOBS: 4
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
-      - name: Run aggregate unit tests without rebuilding
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            tuist = "4.202.2"
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/tuist
+            ${{ env.GIT_IT_TUIST_ROOT }}/.build
+            .build
+            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-
+
+      - name: Ensure app xcconfigs
         run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" test-unit
+          "$GIT_IT_PROJECT_SETUP_RUNNER" ensure-app-xcconfigs
+
+      - name: Install dependencies
+        run: tuist install
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Generate workspace
+        run: tuist generate --no-open
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      # 패키지별 test target을 각자 격리된 DerivedData(TestSchemes/<scheme>)로 빌드합니다.
+      - name: Compile package test targets
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" compile
+
+      # test job이 패키지별로 병렬 실행되며 재사용할 수 있도록 빌드 산출물을 넘깁니다.
+      - name: Upload package test builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-derived-data
+          path: ${{ env.GIT_IT_DERIVED_DATA_PATH }}/TestSchemes
+          retention-days: 1
+          if-no-files-found: error
+
+  test:
+    name: test
+    needs:
+      - changes
+      - compile
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
+    runs-on: macos-26
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        scheme: ${{ fromJson(needs.changes.outputs.testable_schemes) }}
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
+      GIT_IT_XCODE_JOBS: 4
+      GIT_IT_ONLY_SCHEME: ${{ matrix.scheme }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            tuist = "4.202.2"
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/tuist
+            ${{ env.GIT_IT_TUIST_ROOT }}/.build
+            .build
+            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
+          key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-
+
+      - name: Ensure app xcconfigs
+        run: |
+          "$GIT_IT_PROJECT_SETUP_RUNNER" ensure-app-xcconfigs
+
+      - name: Install dependencies
+        run: tuist install
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Generate workspace
+        run: tuist generate --no-open
+        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
+
+      - name: Download package test builds
+        uses: actions/download-artifact@v4
+        with:
+          name: test-derived-data
+          path: ${{ env.GIT_IT_DERIVED_DATA_PATH }}/TestSchemes
+
+      # GIT_IT_ONLY_SCHEME이 matrix가 맡은 패키지 scheme 하나로만 실행 범위를 좁힙니다.
+      - name: Run package tests without rebuilding
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" test
 
   gate:
     name: CI / gate
@@ -177,7 +316,9 @@ jobs:
       - changes
       - script-quality
       - swift-lint
-      - project-validation
+      - build
+      - compile
+      - test
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -190,4 +331,6 @@ jobs:
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
             "${{ needs.swift-lint.result }}" \
-            "${{ needs.project-validation.result }}"
+            "${{ needs.build.result }}" \
+            "${{ needs.compile.result }}" \
+            "${{ needs.test.result }}"
