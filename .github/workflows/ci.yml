@@ -305,6 +305,13 @@ jobs:
           name: test-derived-data
           path: ${{ env.GIT_IT_DERIVED_DATA_PATH }}/TestSchemes
 
+      # actions/download-artifact가 내려받은 파일에 com.apple.quarantine을 남겨
+      # Gatekeeper가 서명되지 않은 xctest 번들과 내장 프레임워크 로드를 막고
+      # "Test crashed with signal segv while preparing to run tests"로 실패하게
+      # 만듭니다. test-without-building 전에 격리 속성을 제거합니다.
+      - name: Clear quarantine on downloaded test builds
+        run: xattr -cr "$GIT_IT_DERIVED_DATA_PATH/TestSchemes"
+
       # GIT_IT_ONLY_SCHEME이 matrix가 맡은 패키지 scheme 하나로만 실행 범위를 좁힙니다.
       - name: Run package tests without rebuilding
         run: |
