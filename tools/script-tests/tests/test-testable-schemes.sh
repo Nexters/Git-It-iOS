@@ -18,11 +18,10 @@ app_module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/AppModul
 mkdir -p "$(dirname -- "$scheme_source")" \
 	"$projects/ReadyTests" \
 	"$projects/EmptyTests" \
-	"$projects/Infrastructure/Tests/Authentication" \
-	"$projects/Domain/Tests/LearningProject" \
-	"$projects/UI/Tests/Component/Unit" \
-	"$projects/UI/Tests/Component/UI" \
-	"$projects/App/Tests/GitIt" \
+		"$projects/Infrastructure/Tests/Authentication" \
+		"$projects/Domain/Tests/LearningProject" \
+		"$projects/UI/Tests/Component/Unit" \
+		"$projects/App/Tests/GitIt" \
 	"$(dirname -- "$module_source")"
 
 printf '%s\n' \
@@ -68,11 +67,9 @@ printf '%s\n' \
 	'case .UI:' \
 	'    [.package(' \
 	'        name: .UI,' \
-	'        testTargets: [' \
-	'            UIModuleName.UIComponentTests.rawValue,' \
-	'            UIModuleName.UIComponentUITests.rawValue,' \
-	'            UIModuleName.UIComponentPreviewAppUITests.rawValue,' \
-	'        ],' \
+		'        testTargets: [' \
+		'            UIModuleName.UIComponentTests.rawValue,' \
+		'        ],' \
 	'    )]' >"$scheme_source"
 printf '%s\n' \
 	'var sourceDirectory: String {' \
@@ -93,29 +90,14 @@ printf '%s\n' \
 	'    sourceDirectory: InfrastructureModuleName.InfrastructureAuthenticationTests.sourceDirectory,' \
 	')' >"$infrastructure_module_source"
 printf '%s\n' \
-	'var sourceDirectory: String {' \
-	'    switch self {' \
-	'    case .UIComponentPreviewAppUITests:' \
-	'        "Component/UI"' \
-	'    default:' \
-	'        ""' \
-	'    }' \
-	'}' \
-	'case .UIComponentTests:' \
-	'case .UIComponentUITests:' \
-	'case .UIComponentPreviewAppUITests:' \
-	'.testModule(' \
-	'    name: UIModuleName.UIComponentTests.rawValue,' \
-	'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
-	')' \
-	'.testModule(' \
-	'    name: UIModuleName.UIComponentUITests.rawValue,' \
-	'    sourceDirectory: UIModuleName.UIComponentUITests.sourceDirectory,' \
-	')' \
-	'.target(' \
-	'    name: UIModuleName.UIComponentPreviewAppUITests.rawValue,' \
-	'    sour''ces: ["Tests/\\(UIModuleName.UIComponentPreviewAppUITests.sourceDirectory)/**"],' \
-	')' >"$ui_module_source"
+		'var sourceDirectory: String {' \
+		'    "Component/Unit"' \
+		'}' \
+		'case .UIComponentTests:' \
+		'.testModule(' \
+		'    name: UIModuleName.UIComponentTests.rawValue,' \
+		'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
+		')' >"$ui_module_source"
 printf '%s\n' \
 	'var sourceDirectory: String {' \
 	'    switch self {' \
@@ -160,22 +142,12 @@ printf '%s\n' 'import Testing' '@Test func authenticationSample() {}' \
 printf '%s\n' 'import Testing' '@Test func domainLearningProjectSample() {}' \
 	>"$projects/Domain/Tests/LearningProject/LearningProjectTests.swift"
 if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: Unit과 UI test target의 역할 폴더를 구분하지 못했습니다\n' >&2
+	printf 'FAIL: UIComponent test target의 역할 폴더를 찾지 못했습니다\n' >&2
 	exit 1
 fi
 rg -q 'script-tests.empty-test-target.*UIComponentTests' "$work/err"
 
 printf '%s\n' 'import Testing' '@Test func componentSample() {}' \
-	>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
-if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: 패키지 scheme의 두 번째 test target을 검증하지 않았습니다\n' >&2
-	exit 1
-fi
-rg -q 'script-tests.empty-test-target.*UIComponentUITests' "$work/err"
-
-printf '%s\n' 'import XCTest' 'final class ComponentUITests: XCTestCase {}' \
-	>"$projects/UI/Tests/Component/UI/ComponentUITests.swift"
-printf '%s\n' 'import XCTest' 'final class PreviewAppUITests: XCTestCase {}' \
-	>"$projects/UI/Tests/Component/UI/PreviewAppUITests.swift"
+		>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
 script_tests_validate_testable_schemes "$projects" "$scheme_source"
 printf 'PASS: testable schemes\n'

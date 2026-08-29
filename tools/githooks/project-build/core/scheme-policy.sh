@@ -24,11 +24,9 @@ scheme_policy_decide() (
 	testable:true:AllTests) printf 'ineligible\n' ;;
 	testable:true:*) printf 'eligible\n' ;;
 	testable:false:*) printf 'ineligible\n' ;;
-	unit:true:UIUITests) printf 'ineligible\n' ;;
 	unit:true:AllTests) printf 'ineligible\n' ;;
 	unit:true:*) printf 'eligible\n' ;;
 	unit:false:*) printf 'ineligible\n' ;;
-	ui:true:UIUITests) printf 'eligible\n' ;;
 	ui:*:*) printf 'ineligible\n' ;;
 	*) return 2 ;;
 	esac

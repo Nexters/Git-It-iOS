@@ -140,21 +140,10 @@ extension ProjectName {
                         buildTargets: [
                             UIModuleName.DesignSystem.rawValue,
                             UIModuleName.UIComponent.rawValue,
-                            UIModuleName.UIComponentPreviewApp.rawValue,
                         ],
                         testTargets: [
-                            UIModuleName.DesignSystemTests.rawValue,
                             UIModuleName.UIComponentTests.rawValue,
                         ],
-                        runTarget: UIModuleName.UIComponentPreviewApp.rawValue,
-                    ),
-                    .package(
-                        name: "UIUITests",
-                        buildTargets: [UIModuleName.UIComponentPreviewApp.rawValue],
-                        testTargets: [
-                            UIModuleName.UIComponentPreviewAppUITests.rawValue
-                        ],
-                        runTarget: UIModuleName.UIComponentPreviewApp.rawValue,
                     ),
                 ]
             }
