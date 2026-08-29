@@ -51,7 +51,6 @@ nonisolated struct AppRootFeature: Sendable {
     enum Route: Equatable, Sendable {
         case restoring
         case onboarding
-        case curationSplash
         case mainShell
     }
 
@@ -78,7 +77,6 @@ nonisolated struct AppRootFeature: Sendable {
         @CasePathable
         enum View: Sendable, Equatable {
             case task
-            case curationSplashFinished
             case resetAllTapped
         }
 
@@ -158,15 +156,6 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .onboarding(.delegate(.mainShellRequested)):
-                state.route = .mainShell
-                return .none
-
-            case .onboarding(.delegate(.curationCompleted)):
-                state.route = .curationSplash
-                return .none
-
-            case .view(.curationSplashFinished):
-                guard state.route == .curationSplash else { return .none }
                 state.route = .mainShell
                 return .none
 

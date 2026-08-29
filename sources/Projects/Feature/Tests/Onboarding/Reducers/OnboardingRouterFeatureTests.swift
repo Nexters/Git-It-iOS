@@ -8,7 +8,7 @@ import Testing
 struct OnboardingRouterFeatureTests {
 
     @Test
-    func `정상 완료 여정은 guide에서 curation을 거쳐 curationCompleted를 위임하고 전환마다 이동 이벤트를 남긴다`() async {
+    func `정상 완료 여정은 guide와 curation 및 splash를 거쳐 mainShell 전환을 위임하고 이동 이벤트를 남긴다`() async {
         let signIn = SignInUseCaseMock(results: [.success(OnboardingTestFixture.authenticatedUser, needsCuration: true)])
         let completeCuration = CompleteCurationUseCaseMock(results: [.success(())])
         let store = makeOnboardingRouterStore(signIn: signIn, completeCuration: completeCuration)
@@ -49,11 +49,20 @@ struct OnboardingRouterFeatureTests {
         await store.receive(.curation(.effect(.curationFinished(success: true))))
         await store.receive(.curation(.delegate(.curationSucceeded)))
         await store.receive(.exit(.input(.curationSucceeded)))
-        await store.receive(.exit(.delegate(.shouldExit)))
-        await store.receive(.delegate(.curationCompleted))
+        await store.receive(.exit(.delegate(.shouldExit))) {
+            $0.activeScreen = .curationSplash
+            $0.transitionLog.append(.init(
+                from: .curation(.career),
+                to: .curationSplash,
+                trigger: String(describing: OnboardingRouterFeature.Action.exit(.delegate(.shouldExit))),
+            ))
+        }
 
-        #expect(store.state.activeScreen == .curation(.career))
-        #expect(store.state.transitionLog.count == 3)
+        #expect(store.state.activeScreen == .curationSplash)
+        #expect(store.state.transitionLog.count == 4)
+
+        await store.send(.view(.curationSplashFinished))
+        await store.receive(.delegate(.mainShellRequested))
 
         #expect(await completeCuration.snapshot() == [.init(position: .ios, careerLevel: .junior)])
     }

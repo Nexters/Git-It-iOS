@@ -111,6 +111,21 @@ extension TextStyleToken {
         size: 10,
         lineHeightPercent: 150,
     )
+    public static let splashTitle = TextStyleToken(
+        name: "Splash Title",
+        weight: .bold,
+        size: 44,
+        lineHeightPercent: 140,
+        letterSpacing: -0.98,
+    )
+    
+    public static let splashSubtitle = TextStyleToken(
+        name: "Splash Subtitle",
+        weight: .bold,
+        size: 22,
+        lineHeightPercent: 140,
+    )
+    
 
     public static let all: [TextStyleToken] = [
         headline1,
@@ -124,5 +139,7 @@ extension TextStyleToken {
         caption1,
         caption2,
         tabItem,
+        splashTitle,
+        splashSubtitle
     ]
 }

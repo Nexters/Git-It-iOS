@@ -38,6 +38,7 @@ public struct OnboardingRouterFeature: Sendable {
     public enum ActiveScreen: Equatable, Sendable {
         case guide(OnboardingGuideFeature.Screen)
         case curation(CurationFeature.Screen)
+        case curationSplash
     }
 
     /// Router가 관리하는 화면이 실제로 전환될 때 남는 기록(FR-006).
@@ -80,7 +81,8 @@ public struct OnboardingRouterFeature: Sendable {
 
     }
 
-    public enum Action: Sendable, Equatable {
+    public enum Action: ViewAction, Sendable, Equatable {
+        case view(View)
         case guide(OnboardingGuideFeature.Action)
         case curation(CurationFeature.Action)
         case exit(OnboardingExitFeature.Action)
@@ -89,9 +91,13 @@ public struct OnboardingRouterFeature: Sendable {
         // MARK: Public
 
         @CasePathable
+        public enum View: Sendable, Equatable {
+            case curationSplashFinished
+        }
+
+        @CasePathable
         public enum Delegate: Sendable, Equatable {
             case mainShellRequested
-            case curationCompleted
         }
     }
 
@@ -132,7 +138,11 @@ public struct OnboardingRouterFeature: Sendable {
                 effect = .send(.exit(.input(.curationSucceeded)))
 
             case .exit(.delegate(.shouldExit)):
-                effect = .send(.delegate(.curationCompleted))
+                state.activeScreen = .curationSplash
+
+            case .view(.curationSplashFinished):
+                guard state.activeScreen == .curationSplash else { break }
+                effect = .send(.delegate(.mainShellRequested))
 
             case .guide:
                 if case .guide = state.activeScreen {
@@ -144,7 +154,8 @@ public struct OnboardingRouterFeature: Sendable {
                     state.activeScreen = .curation(state.curation.screen)
                 }
 
-            case .exit,
+            case .view,
+                 .exit,
                  .delegate:
                 break
             }

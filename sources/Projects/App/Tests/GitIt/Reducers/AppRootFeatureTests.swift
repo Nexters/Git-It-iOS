@@ -139,42 +139,6 @@ struct AppRootFeatureTests {
     }
 
     @Test
-    func `onboarding delegate curationCompleted는 route를 curationSplash로 전환한다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .onboarding
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.onboarding(.delegate(.curationCompleted))) {
-            $0.route = .curationSplash
-        }
-    }
-
-    @Test
-    func `curationSplash 완료는 route를 mainShell로 전환한다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .curationSplash
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.curationSplashFinished)) {
-            $0.route = .mainShell
-        }
-    }
-
-    @Test
-    func `curationSplash가 아닐 때 완료 신호는 route를 바꾸지 않는다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.curationSplashFinished))
-
-        #expect(store.state.route == .mainShell)
-    }
-
-    @Test
     func `resetAll 탭은 주입된 초기화 동작을 실행한 뒤 onboarding 안내부터 다시 시작한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell

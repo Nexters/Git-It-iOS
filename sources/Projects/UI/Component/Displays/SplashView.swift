@@ -16,20 +16,20 @@ public struct SplashView: View {
     public var body: some View {
         VStack(alignment: .center, spacing: Constant.lineSpacing) {
             HStack(spacing: 0) {
-                Text.designSystemStyled(hello, style: Constant.line1Style)
+                Text.designSystemStyled(hello, style: Constant.subtitleText)
                     .foregroundStyle(Color(designSystem: .grey400))
-                cursorBar(style: Constant.line1Style, color: .grey400, state: cursor1)
+                cursorBar(style: Constant.subtitleText, color: .grey400, state: cursor1)
             }
-            .frame(minHeight: Constant.line1Style.lineHeight, alignment: .leading)
+            .frame(minHeight: Constant.subtitleText.lineHeight, alignment: .leading)
 
             HStack(spacing: 0) {
-                Text.designSystemStyled(lets, style: Constant.line2Style)
+                Text.designSystemStyled(lets, style: Constant.titleText)
                     .foregroundStyle(Color(designSystem: .grey100))
-                Text.designSystemStyled(git, style: Constant.line2Style)
+                Text.designSystemStyled(git, style: Constant.titleText)
                     .foregroundStyle(Color(designSystem: .blue100))
-                cursorBar(style: Constant.line2Style, color: .blue100, state: cursor2)
+                cursorBar(style: Constant.titleText, color: .blue100, state: cursor2)
             }
-            .frame(minHeight: Constant.line2Style.lineHeight, alignment: .leading)
+            .frame(minHeight: Constant.titleText.lineHeight, alignment: .leading)
         }
         .accessibilityHidden(true)
         .task { await runIntroSequence() }
@@ -59,20 +59,10 @@ public struct SplashView: View {
         static let cursorHandoffBlinkDuration = Duration.milliseconds(500)
         static let blinkHalfInterval = Duration.milliseconds(700)
         static let fadeInterval = Duration.milliseconds(2100)
+        
+        static let titleText = TextStyleToken.splashTitle
+        static let subtitleText = TextStyleToken.splashSubtitle
 
-        static let line1Style = TextStyleToken(
-            name: "Splash Line 1",
-            weight: .medium,
-            size: 22,
-            lineHeightPercent: 140,
-        )
-        static let line2Style = TextStyleToken(
-            name: "Splash Line 2",
-            weight: .bold,
-            size: 48,
-            lineHeightPercent: 140,
-            letterSpacing: -0.96,
-        )
     }
 
     @State private var hello = ""

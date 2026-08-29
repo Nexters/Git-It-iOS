@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - OnboardingScreen
 
+@ViewAction(for: OnboardingRouterFeature.self)
 public struct OnboardingScreen: View {
 
     // MARK: Lifecycle
@@ -20,7 +21,7 @@ public struct OnboardingScreen: View {
 
     // MARK: Private
 
-    @Bindable private var store: StoreOf<OnboardingRouterFeature>
+    @Bindable public var store: StoreOf<OnboardingRouterFeature>
 
     @ViewBuilder
     private var content: some View {
@@ -30,6 +31,9 @@ public struct OnboardingScreen: View {
 
         case .curation:
             CurationScreen(store: store.scope(state: \.curation, action: \.curation))
+
+        case .curationSplash:
+            CurationSplashScreen(onCompletion: { send(.curationSplashFinished) })
         }
     }
 

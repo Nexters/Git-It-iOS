@@ -1,11 +1,13 @@
 import ComposableArchitecture
-import DesignSystem
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Feature
 import SwiftUI
-import UIComponent
+
+#if DEBUG
+import AppDebug
+#endif
 
 // MARK: - AppRootView
 
@@ -32,30 +34,13 @@ struct AppRootView: View {
         case .onboarding:
             OnboardingScreen(store: store.scope(state: \.onboarding, action: \.onboarding))
 
-        case .curationSplash:
-            ScreenContainer {
-                SplashView(onCompletion: { send(.curationSplashFinished) })
-                    .designSystemScreenMargin()
-            }
-
         case .mainShell:
-            mainShellPlaceholder
-        }
-    }
-
-    private var mainShellPlaceholder: some View {
-        ScreenContainer {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                Text("MainShell")
-
+            MainShellScreen(store: store.scope(state: \.mainShell, action: \.mainShell))
                 #if DEBUG
-                ActionButton.destructive(
-                    "설정 초기화 (회원탈퇴·로그아웃·약관 동의 삭제)",
-                    action: { send(.resetAllTapped) },
-                )
+                .safeAreaInset(edge: .bottom) {
+                    ResetAllButton(action: { send(.resetAllTapped) })
+                }
                 #endif
-            }
-            .designSystemScreenMargin()
         }
     }
 
@@ -67,10 +52,6 @@ struct AppRootView: View {
 
 #Preview("AppRoot - onboarding") {
     AppRootView(store: AppRootPreviewSupport.store(route: .onboarding))
-}
-
-#Preview("AppRoot - curationSplash") {
-    AppRootView(store: AppRootPreviewSupport.store(route: .curationSplash))
 }
 
 #Preview("AppRoot - mainShell") {
