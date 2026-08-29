@@ -46,6 +46,10 @@ project_workspace_select_one() {
 		"$project_workspace_scheme_file" \
 		"$project_workspace_scope" "$project_workspace_has_tests") || return 2
 	[ "$project_workspace_decision" = eligible ] || return 0
+	# CI test job이 패키지별로 병렬 실행될 때 자신이 맡은 scheme만 선택하도록 좁힙니다.
+	if [ -n "${GIT_IT_ONLY_SCHEME:-}" ]; then
+		[ "$(basename -- "$project_workspace_scheme_file" .xcscheme)" = "$GIT_IT_ONLY_SCHEME" ] || return 0
+	fi
 	printf '%s\0' "$project_workspace_scheme_file" >>"$project_workspace_targets"
 }
 

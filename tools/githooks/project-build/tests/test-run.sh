@@ -132,6 +132,19 @@ rg -q '^test-without-building[[:space:]]+Tests$' "$PROJECT_ACTION_LOG"
 rg -q '작업=test 시도=1 성공=1 실패=0' "$work/out"
 rg -q '경과=[0-9][0-9]*s' "$work/out"
 
+mkdir -p "$projects/Other/xcshareddata/xcschemes"
+printf '<Scheme><Testables><TestableReference/></Testables></Scheme>\n' \
+	>"$projects/Other/xcshareddata/xcschemes/Other.xcscheme"
+: >"$PROJECT_ACTION_LOG"
+GIT_IT_ONLY_SCHEME=Tests run_project test >"$work/out" 2>"$work/err"
+[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests')" ] || {
+	printf 'FAIL: GIT_IT_ONLY_SCHEME이 다른 scheme을 걸러내지 않음\n' >&2
+	exit 1
+}
+rg -q '작업=test 시도=1 성공=1 실패=0' "$work/out"
+unset GIT_IT_ONLY_SCHEME
+rm -rf "$projects/Other"
+
 : >"$PROJECT_ACTION_LOG"
 EXPECTED_XCRESULTS_ROOT="$work/xcresults"
 export EXPECTED_XCRESULTS_ROOT
