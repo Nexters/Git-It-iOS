@@ -18,11 +18,15 @@ public struct AuthenticationEndpoint: Equatable, Sendable {
     public let method: Method
     public let path: String
 
-    public func headers(accessToken _: String?) -> [String: String] {
-        [
+    public func headers(accessToken: String?) -> [String: String] {
+        var headers = [
             "Accept": "application/json",
             "Content-Type": "application/json",
         ]
+        if let accessToken {
+            headers["Authorization"] = "Bearer \(accessToken)"
+        }
+        return headers
     }
 
 }

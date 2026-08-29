@@ -22,6 +22,7 @@ struct AuthenticationEndpointTests {
 
         #expect(endpoint.method == .get)
         #expect(endpoint.path == "/api/v1/auth/token")
+        #expect(endpoint.headers(accessToken: "token-123")["Authorization"] == "Bearer token-123")
         #expect(endpoint.headers(accessToken: "token-123")["Accept"] == "application/json")
         #expect(endpoint.headers(accessToken: "token-123")["Content-Type"] == "application/json")
     }
