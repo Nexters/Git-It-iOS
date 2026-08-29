@@ -26,7 +26,6 @@ jobs:
       project_config_changed: ${{ steps.classify.outputs.project_config_changed }}
       workflow_changed: ${{ steps.classify.outputs.workflow_changed }}
       tests_changed: ${{ steps.classify.outputs.tests_changed }}
-      testable_schemes: ${{ steps.discover.outputs.schemes }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -36,20 +35,6 @@ jobs:
       - name: Classify changes
         id: classify
         run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
-
-      # 이 job은 ubuntu-latest에서 실행되어 macOS 전용(plutil) repository-paths.sh를
-      # 쓸 수 없으므로, repository-paths.sh 자체의 기본 config 경로에서 jq로 직접 읽습니다.
-      - name: Discover testable schemes
-        id: discover
-        run: |
-          projects_root=$(jq -r '.GIT_IT_PROJECTS_ROOT' tools/repository-paths/repository-paths.json)
-          schemes=$(
-            find "$projects_root" -path '*/xcshareddata/xcschemes/*.xcscheme' \
-              -exec sh -c 'grep -q "<TestableReference" "$1" && basename "$1" .xcscheme' _ {} \; \
-              | sort -u
-          )
-          printf '%s\n' "$schemes" | jq -R -s -c 'split("\n") | map(select(length > 0))' \
-            | { read -r json; echo "schemes=$json" >> "$GITHUB_OUTPUT"; }
 
   script-quality:
     name: script quality
@@ -183,6 +168,8 @@ jobs:
     if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
     runs-on: macos-26
     timeout-minutes: 60
+    outputs:
+      testable_schemes: ${{ steps.discover.outputs.schemes }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
@@ -227,6 +214,20 @@ jobs:
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
+      # xcscheme은 tuist generate가 만든 .xcodeproj 안에만 존재하고 .xcodeproj는
+      # gitignore 대상이라, workspace를 생성한 이 job에서 test job의 matrix로 쓸
+      # scheme 목록을 찾습니다.
+      - name: Discover testable schemes
+        id: discover
+        run: |
+          schemes=$(
+            find "$GIT_IT_PROJECTS_ROOT" -path '*/xcshareddata/xcschemes/*.xcscheme' \
+              -exec sh -c 'grep -q "<TestableReference" "$1" && basename "$1" .xcscheme' _ {} \; \
+              | sort -u
+          )
+          printf '%s\n' "$schemes" | jq -R -s -c 'split("\n") | map(select(length > 0))' \
+            | { read -r json; echo "schemes=$json" >> "$GITHUB_OUTPUT"; }
+
       # 패키지별 test target을 각자 격리된 DerivedData(TestSchemes/<scheme>)로 빌드합니다.
       - name: Compile package test targets
         run: |
@@ -252,7 +253,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scheme: ${{ fromJson(needs.changes.outputs.testable_schemes) }}
+        scheme: ${{ fromJson(needs.compile.outputs.testable_schemes) }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
