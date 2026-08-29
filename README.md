@@ -31,6 +31,10 @@ identity 충돌과 pointer 안전성은 `tools/spec-kit/bin/validate.sh`로 읽�
 push 전 검증은 `GIT_IT_PRE_PUSH_VALIDATION_ENABLED=true git push`로 다시 켤 수 있습니다.
 CI 검증 job은 GitHub Actions repository variable `GIT_IT_CI_VALIDATION_ENABLED`가 정확히 `true`일 때만 실행됩니다.
 이 변수를 삭제하거나 다른 값으로 바꾸면 다시 비활성화되며, 변경 분류와 최종 gate job은 검증 job이 생략된 상태로 성공합니다.
+Swift·테스트·Tuist 입력 변경은 `project-validation` job 하나에서 환경을 한 번만 구성합니다.
+Tuist 설정 변경일 때만 모든 공유 scheme을 먼저 빌드하고, 이후 `AllTests` aggregate를
+`build-for-testing` 한 뒤 같은 DerivedData로 `test-without-building`을 실행합니다. project-build
+로그의 scheme별·전체 `경과=<seconds>s`로 병목 시간을 확인할 수 있습니다.
 
 `make init`은 Tuist package를 설치하고 앱용 `sources/GitIt.xcworkspace`와 manifest 편집용
 `sources/Manifests.xcworkspace`를 생성합니다. 이어서 저장소 루트에 각각

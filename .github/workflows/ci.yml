@@ -107,66 +107,12 @@ jobs:
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}"
 
-  app-build:
-    name: build
-    needs: changes
-    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/tuist
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Build representative app scheme
-        if: ${{ needs.changes.outputs.project_config_changed != 'true' }}
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" build-app
-
-      - name: Build all shared schemes
-        if: ${{ needs.changes.outputs.project_config_changed == 'true' }}
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" build
-
-  unit-tests:
-    name: unit tests
+  project-validation:
+    name: build, compile and test
     needs: changes
     if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && (needs.changes.outputs.swift_changed == 'true' || needs.changes.outputs.tests_changed == 'true' || needs.changes.outputs.project_config_changed == 'true') }}
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
@@ -199,6 +145,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-
 
+      - name: Ensure app xcconfigs
+        run: |
+          "$GIT_IT_PROJECT_SETUP_RUNNER" ensure-app-xcconfigs
+
       - name: Install dependencies
         run: tuist install
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
@@ -207,62 +157,19 @@ jobs:
         run: tuist generate --no-open
         working-directory: ${{ env.GIT_IT_IOS_ROOT }}
 
-      - name: Compile tests
+      - name: Build all shared schemes
+        if: ${{ needs.changes.outputs.project_config_changed == 'true' }}
+        run: |
+          "$GIT_IT_PROJECT_BUILD_RUNNER" build
+
+      # AllTests aggregate는 공통 의존성을 한 번만 컴파일하고 같은 DerivedData로 바로 실행합니다.
+      - name: Compile aggregate unit tests
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" compile-unit
 
-      - name: Run tests
+      - name: Run aggregate unit tests without rebuilding
         run: |
           "$GIT_IT_PROJECT_BUILD_RUNNER" test-unit
-
-  ui-compile:
-    name: ui test compile
-    needs: changes
-    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' && needs.changes.outputs.ui_changed == 'true' }}
-    runs-on: macos-26
-    timeout-minutes: 45
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      GIT_IT_TEST_DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 17
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      - name: Install Tuist
-        uses: jdx/mise-action@v3
-        with:
-          mise_toml: |
-            [tools]
-            tuist = "4.202.2"
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/tuist
-            ${{ env.GIT_IT_TUIST_ROOT }}/.build
-            .build
-            ${{ env.GIT_IT_SWIFT_STYLE_ROOT }}/.build
-          key: ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-${{ hashFiles(env.GIT_IT_PATHS_FILE, format('{0}/Package.resolved', env.GIT_IT_TUIST_ROOT), format('{0}/Package.swift', env.GIT_IT_TUIST_ROOT), format('{0}/Workspace.swift', env.GIT_IT_IOS_ROOT), format('{0}/*/Project.swift', env.GIT_IT_PROJECTS_ROOT), format('{0}/ProjectDescriptionHelpers/**/*.swift', env.GIT_IT_TUIST_ROOT)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-xcode-26.6-tuist-4.202.2-dependencies-
-
-      - name: Install dependencies
-        run: tuist install
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Generate workspace
-        run: tuist generate --no-open
-        working-directory: ${{ env.GIT_IT_IOS_ROOT }}
-
-      - name: Compile tests
-        run: |
-          "$GIT_IT_PROJECT_BUILD_RUNNER" compile-ui
 
   gate:
     name: CI / gate
@@ -270,9 +177,7 @@ jobs:
       - changes
       - script-quality
       - swift-lint
-      - app-build
-      - unit-tests
-      - ui-compile
+      - project-validation
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -285,6 +190,4 @@ jobs:
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
             "${{ needs.swift-lint.result }}" \
-            "${{ needs.app-build.result }}" \
-            "${{ needs.unit-tests.result }}" \
-            "${{ needs.ui-compile.result }}"
+            "${{ needs.project-validation.result }}"

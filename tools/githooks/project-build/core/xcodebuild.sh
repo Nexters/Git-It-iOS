@@ -64,6 +64,7 @@ project_xcodebuild_one() {
 		project_xcodebuild_derived=$project_xcodebuild_derived_root
 	fi
 	printf '%s 시작: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
+	project_xcodebuild_started_at=$(date +%s) || return 2
 	# 호출자가 결과 경로를 제공하면 test action마다 충돌 없는 xcresult를 남깁니다.
 	set -- \
 		-quiet \
@@ -91,12 +92,18 @@ project_xcodebuild_one() {
 		COMPILER_INDEX_STORE_ENABLE=NO \
 		ONLY_ACTIVE_ARCH=YES \
 		"ARCHS=$project_xcodebuild_arch"; then
+		project_xcodebuild_finished_at=$(date +%s) || return 2
+		project_xcodebuild_elapsed=$((project_xcodebuild_finished_at - project_xcodebuild_started_at))
 		printf 'succeeded\t%s\n' "$project_xcodebuild_scheme" >>"$project_xcodebuild_results"
-		printf '%s 완료: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
+		printf '%s 완료: %s 경과=%ss\n' \
+			"$project_xcodebuild_operation" "$project_xcodebuild_scheme" "$project_xcodebuild_elapsed"
 	else
+		project_xcodebuild_finished_at=$(date +%s) || return 2
+		project_xcodebuild_elapsed=$((project_xcodebuild_finished_at - project_xcodebuild_started_at))
 		printf 'failed\t%s\n' "$project_xcodebuild_scheme" >>"$project_xcodebuild_results"
-		printf '오류[project-build.scheme-failed]: 작업=%s scheme=%s action=%s 실패\n' \
-			"$project_xcodebuild_operation" "$project_xcodebuild_scheme" "$project_xcodebuild_action" >&2
+		printf '오류[project-build.scheme-failed]: 작업=%s scheme=%s action=%s 경과=%ss 실패\n' \
+			"$project_xcodebuild_operation" "$project_xcodebuild_scheme" \
+			"$project_xcodebuild_action" "$project_xcodebuild_elapsed" >&2
 		return 1
 	fi
 }

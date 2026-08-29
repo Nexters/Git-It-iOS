@@ -47,11 +47,25 @@ rg -q "vars.GIT_IT_CI_VALIDATION_ENABLED == 'true'" "$workflow"
 rg -q 'lint-changed-swift\.sh' "$workflow"
 rg -q 'needs\.swift-lint\.result' "$workflow"
 rg -q 'GIT_IT_SCRIPT_VERIFICATION_RUNNER' "$workflow"
-rg -q 'PROJECT_BUILD_RUNNER.*compile-unit' "$workflow"
-rg -q 'PROJECT_BUILD_RUNNER.*compile-ui' "$workflow"
-rg -q 'needs\.ui-compile\.result' "$workflow"
-if rg -n 'test-ui|^[[:space:]]+ui-tests:' "$workflow" >/dev/null; then
-	printf 'FAIL: CI workflow에 제거된 UI 테스트 실행이 남아 있습니다\n' >&2
+rg -q '^  project-validation:' "$workflow"
+validation_job=$(sed -n '/^  project-validation:/,/^  gate:/p' "$workflow")
+printf '%s\n' "$validation_job" | rg -q 'PROJECT_BUILD_RUNNER.*build'
+printf '%s\n' "$validation_job" | rg -q 'PROJECT_BUILD_RUNNER.*compile-unit'
+printf '%s\n' "$validation_job" | rg -q 'PROJECT_BUILD_RUNNER.*test-unit'
+compile_line=$(printf '%s\n' "$validation_job" | rg -n 'PROJECT_BUILD_RUNNER.*compile-unit' | cut -d: -f1)
+test_line=$(printf '%s\n' "$validation_job" | rg -n 'PROJECT_BUILD_RUNNER.*test-unit' | cut -d: -f1)
+[ "$compile_line" -lt "$test_line" ] || {
+	printf 'FAIL: unit test가 컴파일보다 먼저 실행됩니다\n' >&2
+	exit 1
+}
+printf '%s\n' "$validation_job" | rg -q "project_config_changed == 'true'"
+if printf '%s\n' "$validation_job" | rg -q 'actions/cache/(save|restore)@v4|TestSchemes/\*/Build/Products'; then
+	printf 'FAIL: 통합 job이 컴파일 산출물을 불필요하게 전송합니다\n' >&2
+	exit 1
+fi
+rg -q 'needs\.project-validation\.result' "$workflow"
+if rg -n '^[[:space:]]+(app-build|unit-compile|unit-tests|ui-compile|ui-tests):|test-ui|compile-ui' "$workflow" >/dev/null; then
+	printf 'FAIL: CI workflow에 중복 project job이 남아 있습니다\n' >&2
 	exit 1
 fi
 
