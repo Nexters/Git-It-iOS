@@ -37,15 +37,14 @@ jobs:
         id: classify
         run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
 
-      - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
-
-      # test job의 matrix를 패키지 scheme 목록에 맞춰 동적으로 채웁니다.
+      # 이 job은 ubuntu-latest에서 실행되어 macOS 전용(plutil) repository-paths.sh를
+      # 쓸 수 없으므로, repository-paths.sh 자체의 기본 config 경로에서 jq로 직접 읽습니다.
       - name: Discover testable schemes
         id: discover
         run: |
+          projects_root=$(jq -r '.GIT_IT_PROJECTS_ROOT' tools/repository-paths/repository-paths.json)
           schemes=$(
-            find "$GIT_IT_PROJECTS_ROOT" -path '*/xcshareddata/xcschemes/*.xcscheme' \
+            find "$projects_root" -path '*/xcshareddata/xcschemes/*.xcscheme' \
               -exec sh -c 'grep -q "<TestableReference" "$1" && basename "$1" .xcscheme' _ {} \; \
               | sort -u
           )
