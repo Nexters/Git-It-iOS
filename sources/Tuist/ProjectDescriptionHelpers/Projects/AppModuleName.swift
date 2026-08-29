@@ -3,6 +3,7 @@ import ProjectDescription
 // MARK: - AppModuleName
 
 enum AppModuleName: String, CaseIterable {
+    case AppDebug
     case GitIt
     case GitItTests
 }
@@ -11,6 +12,8 @@ extension AppModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.App.rawValue)
         return switch self {
+        case .AppDebug:
+            directoryName
         case .GitIt:
             directoryName
         case .GitItTests:
@@ -20,6 +23,17 @@ extension AppModuleName {
 
     var target: Target {
         switch self {
+        case .AppDebug:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainMember),
+                ],
+                buildLibraryForDistribution: false,
+            )
+
         case .GitIt:
             .target(
                 name: rawValue,
@@ -54,6 +68,7 @@ extension AppModuleName {
                 resources: ["\(sourceDirectory)/Resources/**"],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
+                    .target(name: AppModuleName.AppDebug.rawValue),
                     .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),

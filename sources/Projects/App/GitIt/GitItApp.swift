@@ -5,6 +5,10 @@ import DomainMember
 import Foundation
 import SwiftUI
 
+#if DEBUG
+import AppDebug
+#endif
+
 // MARK: - GitItApp
 
 @main
