@@ -9,7 +9,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
         selected: Binding<Item>,
         @ViewBuilder content: @escaping (Item) -> Content,
     ) {
-        self._selected = selected
+        _selected = selected
         self.content = content
     }
 
@@ -19,12 +19,12 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
         TabView(selection: $selected) {
             ForEach(Item.allCases) { item in
                 content(item)
-                .tabItem {
-                    Image(item.tabSystemImage, bundle: .module)
-                        .padding(.bottom, 4)
-                    Text.designSystemStyled(item.tabTitle, style: .tabItem)
-                }
-                .tag(item)
+                    .tabItem {
+                        Image(item.tabSystemImage, bundle: .module)
+                            .padding(.bottom, 4)
+                        Text.designSystemStyled(item.tabTitle, style: .tabItem)
+                    }
+                    .tag(item)
             }
         }
         .tint(Color(designSystem: .brandAccent))
@@ -33,6 +33,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
     // MARK: Private
 
     @Binding private var selected: Item
+
     private let content: (Item) -> Content
 
 }

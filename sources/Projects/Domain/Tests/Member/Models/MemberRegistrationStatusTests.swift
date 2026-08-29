@@ -14,9 +14,9 @@ struct MemberRegistrationStatusTests {
             careerLevel: .entry,
             statistics: statistics,
         )
-        let registered: MemberRegistrationStatus = .registered(profile: profile)
-        let unregistered: MemberRegistrationStatus = .unregistered
-        let retryableFailure: MemberRegistrationStatus = .retryableFailure
+        let registered = MemberRegistrationStatus.registered(profile: profile)
+        let unregistered = MemberRegistrationStatus.unregistered
+        let retryableFailure = MemberRegistrationStatus.retryableFailure
 
         #expect(registered != unregistered)
         #expect(unregistered != retryableFailure)

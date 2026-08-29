@@ -59,10 +59,9 @@ public struct SplashView: View {
         static let cursorHandoffBlinkDuration = Duration.milliseconds(500)
         static let blinkHalfInterval = Duration.milliseconds(700)
         static let fadeInterval = Duration.milliseconds(2100)
-        
+
         static let titleText = TextStyleToken.splashTitle
         static let subtitleText = TextStyleToken.splashSubtitle
-
     }
 
     @State private var hello = ""

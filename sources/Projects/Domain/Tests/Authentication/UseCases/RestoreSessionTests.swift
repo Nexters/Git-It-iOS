@@ -2,6 +2,8 @@ import Testing
 
 @testable import DomainAuthentication
 
+// MARK: - RestoreSessionTests
+
 @Suite("RestoreSession")
 struct RestoreSessionTests {
     @Test

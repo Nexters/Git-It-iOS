@@ -18,10 +18,10 @@ app_module_source="$repository/tuist/ProjectDescriptionHelpers/Projects/AppModul
 mkdir -p "$(dirname -- "$scheme_source")" \
 	"$projects/ReadyTests" \
 	"$projects/EmptyTests" \
-		"$projects/Infrastructure/Tests/Authentication" \
-		"$projects/Domain/Tests/LearningProject" \
-		"$projects/UI/Tests/Component/Unit" \
-		"$projects/App/Tests/GitIt" \
+	"$projects/Infrastructure/Tests/Authentication" \
+	"$projects/Domain/Tests/LearningProject" \
+	"$projects/UI/Tests/Component/Unit" \
+	"$projects/App/Tests/GitIt" \
 	"$(dirname -- "$module_source")"
 
 printf '%s\n' \
@@ -67,9 +67,9 @@ printf '%s\n' \
 	'case .UI:' \
 	'    [.package(' \
 	'        name: .UI,' \
-		'        testTargets: [' \
-		'            UIModuleName.UIComponentTests.rawValue,' \
-		'        ],' \
+	'        testTargets: [' \
+	'            UIModuleName.UIComponentTests.rawValue,' \
+	'        ],' \
 	'    )]' >"$scheme_source"
 printf '%s\n' \
 	'var sourceDirectory: String {' \
@@ -90,14 +90,14 @@ printf '%s\n' \
 	'    sourceDirectory: InfrastructureModuleName.InfrastructureAuthenticationTests.sourceDirectory,' \
 	')' >"$infrastructure_module_source"
 printf '%s\n' \
-		'var sourceDirectory: String {' \
-		'    "Component/Unit"' \
-		'}' \
-		'case .UIComponentTests:' \
-		'.testModule(' \
-		'    name: UIModuleName.UIComponentTests.rawValue,' \
-		'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
-		')' >"$ui_module_source"
+	'var sourceDirectory: String {' \
+	'    "Component/Unit"' \
+	'}' \
+	'case .UIComponentTests:' \
+	'.testModule(' \
+	'    name: UIModuleName.UIComponentTests.rawValue,' \
+	'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
+	')' >"$ui_module_source"
 printf '%s\n' \
 	'var sourceDirectory: String {' \
 	'    switch self {' \
@@ -148,6 +148,6 @@ fi
 rg -q 'script-tests.empty-test-target.*UIComponentTests' "$work/err"
 
 printf '%s\n' 'import Testing' '@Test func componentSample() {}' \
-		>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
+	>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
 script_tests_validate_testable_schemes "$projects" "$scheme_source"
 printf 'PASS: testable schemes\n'

@@ -36,11 +36,11 @@ struct AppRootView: View {
 
         case .mainShell:
             MainShellScreen(store: store.scope(state: \.mainShell, action: \.mainShell))
-                #if DEBUG
+            #if DEBUG
                 .safeAreaInset(edge: .bottom) {
                     ResetAllButton(action: { send(.resetAllTapped) })
                 }
-                #endif
+            #endif
         }
     }
 

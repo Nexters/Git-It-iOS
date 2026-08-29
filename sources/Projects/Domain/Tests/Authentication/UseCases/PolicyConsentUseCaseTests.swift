@@ -3,7 +3,7 @@ import Testing
 
 @testable import DomainAuthentication
 
-// MARK: - PolicyConsentTests
+// MARK: - PolicyConsentUseCaseTests
 
 @Suite("PolicyConsent")
 struct PolicyConsentUseCaseTests {

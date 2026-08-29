@@ -142,9 +142,9 @@ extension ProjectName {
                             UIModuleName.UIComponent.rawValue,
                         ],
                         testTargets: [
-                            UIModuleName.UIComponentTests.rawValue,
+                            UIModuleName.UIComponentTests.rawValue
                         ],
-                    ),
+                    )
                 ]
             }
 

@@ -10,8 +10,6 @@ import Testing
 @Suite("PolicyConsentRepositoryAdapter")
 struct PolicyConsentRepositoryAdapterTests {
 
-    // MARK: Internal
-
     @Test
     func `저장한 동의 기록을 Domain 타입으로 손실 없이 다시 조회한다`() async throws {
         let store = FakePolicyConsentStore()

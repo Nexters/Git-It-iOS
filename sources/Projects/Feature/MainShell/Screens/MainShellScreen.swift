@@ -15,6 +15,8 @@ public struct MainShellScreen: View {
 
     // MARK: Public
 
+    @Bindable public var store: StoreOf<MainShellFeature>
+
     public var body: some View {
         TabShell(selected: selectedTab) { tab in
             ScreenContainer {
@@ -24,8 +26,6 @@ public struct MainShellScreen: View {
     }
 
     // MARK: Private
-
-    @Bindable public var store: StoreOf<MainShellFeature>
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(

@@ -6,19 +6,19 @@ import Testing
 @Suite("정책 동의 유효성")
 struct PolicyConsentTests {
     @Test
-    func `필수 문서마다 ID와 version이 모두 일치해야 유효하다`() {
+    func `필수 문서마다 ID와 version이 모두 일치해야 유효하다`() throws {
         let privacy = PolicyDocument(
             identifier: "privacy-policy",
             displayName: "개인정보 처리방침",
             version: "1",
-            approvedURL: URL(string: "https://example.com/privacy")!,
+            approvedURL: try #require(URL(string: "https://example.com/privacy")),
             isRequired: true,
         )
         let terms = PolicyDocument(
             identifier: "terms-of-service",
             displayName: "서비스 이용 약관",
             version: "1",
-            approvedURL: URL(string: "https://example.com/terms")!,
+            approvedURL: try #require(URL(string: "https://example.com/terms")),
             isRequired: true,
         )
         let matchingRecords = [
@@ -30,19 +30,19 @@ struct PolicyConsentTests {
     }
 
     @Test
-    func `한 문서의 version이 바뀌면 그 문서 기록만 무효화된다`() {
+    func `한 문서의 version이 바뀌면 그 문서 기록만 무효화된다`() throws {
         let privacy = PolicyDocument(
             identifier: "privacy-policy",
             displayName: "개인정보 처리방침",
             version: "2",
-            approvedURL: URL(string: "https://example.com/privacy")!,
+            approvedURL: try #require(URL(string: "https://example.com/privacy")),
             isRequired: true,
         )
         let terms = PolicyDocument(
             identifier: "terms-of-service",
             displayName: "서비스 이용 약관",
             version: "1",
-            approvedURL: URL(string: "https://example.com/terms")!,
+            approvedURL: try #require(URL(string: "https://example.com/terms")),
             isRequired: true,
         )
         let staleRecords = [

@@ -10,6 +10,8 @@ public enum MainShellTab: String, CaseIterable, Hashable, Identifiable, Sendable
     case saved
     case settings
 
+    // MARK: Public
+
     public var id: String {
         rawValue
     }
