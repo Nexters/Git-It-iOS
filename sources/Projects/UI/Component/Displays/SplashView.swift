@@ -20,7 +20,7 @@ public struct SplashView: View {
                     .foregroundStyle(Color(designSystem: .grey400))
                 cursorBar(style: Constant.subtitleText, color: .grey400, state: cursor1)
             }
-            .frame(minHeight: Constant.subtitleText.lineHeight, alignment: .leading)
+            .frame(alignment: .leading)
 
             HStack(spacing: 0) {
                 Text.designSystemStyled(lets, style: Constant.titleText)
@@ -29,7 +29,7 @@ public struct SplashView: View {
                     .foregroundStyle(Color(designSystem: .blue100))
                 cursorBar(style: Constant.titleText, color: .blue100, state: cursor2)
             }
-            .frame(minHeight: Constant.titleText.lineHeight, alignment: .leading)
+            .frame(alignment: .leading)
         }
         .accessibilityHidden(true)
         .task { await runIntroSequence() }
@@ -52,13 +52,13 @@ public struct SplashView: View {
     }
 
     private enum Constant {
-        static let lineSpacing: CGFloat = 28
+        static let lineSpacing: CGFloat = 4
         static let typingInterval1 = Duration.milliseconds(72)
         static let typingInterval2 = Duration.milliseconds(62)
         static let initialDelay = Duration.milliseconds(200)
         static let cursorHandoffBlinkDuration = Duration.milliseconds(500)
         static let blinkHalfInterval = Duration.milliseconds(700)
-        static let fadeInterval = Duration.milliseconds(2100)
+        static let fadeInterval = Duration.milliseconds(700)
 
         static let titleText = TextStyleToken.splashTitle
         static let subtitleText = TextStyleToken.splashSubtitle
@@ -135,16 +135,9 @@ public struct SplashView: View {
 
 }
 
-extension TextStyleToken {
-    fileprivate var lineHeight: CGFloat {
-        size * lineHeightPercent / 100
-    }
-}
-
 #Preview("Splash") {
     ScreenContainer {
         SplashView()
             .designSystemScreenMargin()
     }
-    .frame(width: 390, height: 700)
 }
