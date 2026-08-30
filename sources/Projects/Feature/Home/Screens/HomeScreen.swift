@@ -202,7 +202,6 @@ public struct HomeScreen: View {
         }
         .padding(EdgeInsets(top: 13, leading: 16, bottom: 12, trailing: 12))
         .frame(minHeight: 133, alignment: .topLeading)
-        .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
     }
 
     private var projectSection: some View {
@@ -262,8 +261,14 @@ public struct HomeScreen: View {
 
     private var emptyProjectCards: some View {
         let cardSize = CGSize(width: 154, height: 192)
+        let cardSpacing: CGFloat = 2.5
         let angles = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172).initialAngles(cardCount: 3)
-        let centers = angles.indices.map { CGPoint(x: cardSize.width / 2 + CGFloat($0) * 172, y: cardSize.height / 2) }
+        let centers = angles.indices.map {
+            CGPoint(
+                x: cardSize.width / 2 + CGFloat($0) * (cardSize.width + cardSpacing),
+                y: cardSize.height / 2,
+            )
+        }
         let bounds = Self.cardGroupBounds(centers: centers, size: cardSize, angles: angles)
 
         return ScrollView(.horizontal) {
@@ -273,7 +278,7 @@ public struct HomeScreen: View {
                     .frame(width: bounds.width, height: bounds.height)
                     .position(x: bounds.midX, y: bounds.midY)
 
-                HStack(spacing: 18) {
+                HStack(spacing: cardSpacing) {
                     ForEach(angles.indices, id: \.self) { index in
                         emptyProjectCard(size: cardSize)
                             .rotationEffect(.degrees(angles[index]))
@@ -333,7 +338,7 @@ public struct HomeScreen: View {
         let layout = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172)
 
         return ScrollView(.horizontal) {
-            LazyHStack(spacing: 18) {
+            LazyHStack(spacing: 2.5) {
                 ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
                     HomeProjectCard(
                         title: project.title,
