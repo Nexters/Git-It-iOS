@@ -252,11 +252,11 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjects: some View {
-        VStack(spacing: 12) {
+        ZStack {
             emptyProjectCards
             StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200, alignment: .center)
+                .allowsHitTesting(false)
         }
-        .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine)
     }
 
