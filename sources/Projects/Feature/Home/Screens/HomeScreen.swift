@@ -194,16 +194,26 @@ public struct HomeScreen: View {
 
             HStack {
                 Spacer()
-                ActionButton.primary("지금 불러오기", size: .small) {
-                    send(.projectRegistrationTapped)
-                }
-                .frame(width: 104)
-                .accessibilityLabel(Display.registrationLabel)
+                registrationButton
             }
         }
         .padding(EdgeInsets(top: 13, leading: 16, bottom: 12, trailing: 12))
         .frame(minHeight: 133, alignment: .topLeading)
         .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+    }
+
+    private var registrationButton: some View {
+        Button {
+            send(.projectRegistrationTapped)
+        } label: {
+            StyledText.body2("지금 불러오기", color: .grey700)
+                .frame(width: 104, height: 37)
+                .background(Color(designSystem: .blue100), in: RoundedRectangle(designSystem: .medium))
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Display.registrationLabel)
     }
 
     private var projectSection: some View {
