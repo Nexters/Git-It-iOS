@@ -9,46 +9,97 @@ public struct HomeProjectCard: View {
         title: String,
         technologies: String,
         progress: Double,
-        currentSet: Int,
+        currentSetLabel: String,
         setTitle: String,
         variant: Variant,
+        isLearningEnabled: Bool = true,
+        onSelect: @escaping () -> Void = { },
         onStart: @escaping () -> Void = { },
     ) {
         self.title = title
         self.technologies = technologies
         self.progress = progress
-        self.currentSet = currentSet
+        self.currentSetLabel = currentSetLabel
         self.setTitle = setTitle
         self.variant = variant
+        self.isLearningEnabled = isLearningEnabled
+        self.onSelect = onSelect
         self.onStart = onStart
     }
 
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top, spacing: 0) {
-                VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText.subtitle2(
-                        title,
-                        color: variant.titleColor,
-                    )
-                    .lineLimit(2)
-
-                    StyledText.caption2(
-                        technologies,
-                        color: variant.technologyColor,
-                    )
-                    .lineLimit(3)
-                }
-                .frame(width: Constant.titleWidth, alignment: .leading)
-
-                Spacer(minLength: 0)
-
-                startButton
+        ZStack(alignment: .topTrailing) {
+            Button(action: select) {
+                cardContent
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(title), \(currentSetLabel), 프로젝트 상세 보기")
+
+            startButton
+                .padding(.trailing, Constant.headerTrailingPadding)
+                .padding(.top, Constant.headerTopPadding)
+        }
+        .frame(width: Constant.cardWidth, height: Constant.cardHeight)
+        .background(Color(designSystem: variant.cardColor))
+        .designSystemCornerRadius(.large)
+        .accessibilityElement(children: .contain)
+    }
+
+    // MARK: Internal
+
+    static let minimumTouchArea = Constant.startTouchSize
+
+    var displayedCurrentSetLabel: String {
+        currentSetLabel
+    }
+
+    static func clampedProgress(_ progress: Double) -> Double {
+        min(max(progress, 0), 1)
+    }
+
+    func select() {
+        onSelect()
+    }
+
+    func start() {
+        guard isLearningEnabled else { return }
+        onStart()
+    }
+
+    // MARK: Private
+
+    private let title: String
+    private let technologies: String
+    private let progress: Double
+    private let currentSetLabel: String
+    private let setTitle: String
+    private let variant: Variant
+    private let isLearningEnabled: Bool
+    private let onSelect: () -> Void
+    private let onStart: () -> Void
+
+    private var cardContent: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+                StyledText.subtitle2(
+                    title,
+                    color: variant.titleColor,
+                )
+                .lineLimit(2)
+
+                StyledText.caption2(
+                    technologies,
+                    color: variant.technologyColor,
+                )
+                .lineLimit(3)
+            }
+            .frame(width: Constant.titleWidth, alignment: .leading)
             .padding(.leading, Constant.headerLeadingPadding)
-            .padding(.trailing, Constant.headerTrailingPadding)
+            .padding(.trailing, Constant.headerTrailingPadding + Constant.startTouchSize)
             .padding(.top, Constant.headerTopPadding)
 
             progressBar
@@ -59,7 +110,7 @@ public struct HomeProjectCard: View {
 
             VStack(alignment: .leading, spacing: Constant.footerSpacing) {
                 StyledText.caption2(
-                    "Set \(currentSet)",
+                    currentSetLabel,
                     color: .grey100,
                 )
                 .padding(.horizontal, Constant.setBadgeHorizontalPadding)
@@ -80,24 +131,10 @@ public struct HomeProjectCard: View {
             .padding(.bottom, Constant.footerBottomPadding)
         }
         .frame(width: Constant.cardWidth, height: Constant.cardHeight)
-        .background(Color(designSystem: variant.cardColor))
-        .designSystemCornerRadius(.large)
-        .rotationEffect(.degrees(variant.rotationDegrees))
-        .accessibilityElement(children: .combine)
     }
 
-    // MARK: Private
-
-    private let title: String
-    private let technologies: String
-    private let progress: Double
-    private let currentSet: Int
-    private let setTitle: String
-    private let variant: Variant
-    private let onStart: () -> Void
-
     private var startButton: some View {
-        Button(action: onStart) {
+        Button(action: start) {
             Image(systemName: "play.fill")
                 .font(.system(size: Constant.startSymbolSize, weight: .bold))
                 .designSystemForeground(variant.cardColor)
@@ -107,7 +144,9 @@ public struct HomeProjectCard: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(!isLearningEnabled)
         .accessibilityLabel("\(title) 학습 시작")
+        .accessibilityHint(isLearningEnabled ? "다음 학습을 시작합니다" : "다음 학습 위치가 없습니다")
     }
 
     private var progressBar: some View {
@@ -118,14 +157,10 @@ public struct HomeProjectCard: View {
 
                 Capsule()
                     .fill(Color(designSystem: variant.progressColor))
-                    .frame(width: proxy.size.width * clampedProgress)
+                    .frame(width: proxy.size.width * Self.clampedProgress(progress))
             }
         }
         .frame(height: Constant.progressBarHeight)
-    }
-
-    private var clampedProgress: Double {
-        min(max(progress, 0), 1)
     }
 
 }
@@ -136,7 +171,7 @@ public struct HomeProjectCard: View {
             title: "Nexters",
             technologies: "Kotlin · Compose · Coroutines",
             progress: 0.4,
-            currentSet: 1,
+            currentSetLabel: "Set 1",
             setTitle: "Compose 핵심 개념",
             variant: .purple,
         )
@@ -144,7 +179,7 @@ public struct HomeProjectCard: View {
             title: "Now in Android",
             technologies: "Kotlin · Compose · Coroutines",
             progress: 0.4,
-            currentSet: 1,
+            currentSetLabel: "Set 1",
             setTitle: "Compose 핵심 개념",
             variant: .lightBlue,
         )
@@ -152,7 +187,7 @@ public struct HomeProjectCard: View {
             title: "Git It iOS",
             technologies: "Swift · SwiftUI · TCA",
             progress: 0.4,
-            currentSet: 1,
+            currentSetLabel: "Set 1",
             setTitle: "Presentation 구조",
             variant: .darkBlue,
         )
