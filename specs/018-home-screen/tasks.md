@@ -157,7 +157,7 @@ MainShell이 Home 기본인지 검증한다.
 
 ### 패키지 검증과 결과 보고
 
-- [ ] T033 [no-write] `Makefile`의 `make tuist`를 실행한 뒤 `sources/GitIt.xcworkspace`의 AppTests scheme을 build-for-testing·test-without-building하고, 실행 전후 `git status --short`를 비교해 추적 파일·index 변경이 없을 때만 T030~T032의 변경 파일과 결과를 보고한다
+- [X] T033 [no-write] `Makefile`의 `make tuist`를 실행한 뒤 `sources/GitIt.xcworkspace`의 AppTests scheme을 build-for-testing·test-without-building하고, 실행 전후 `git status --short`를 비교해 추적 파일·index 변경이 없을 때만 T030~T032의 변경 파일과 결과를 보고한다
 
 **진행 점검**: T030~T033의 변경 파일과 검증 결과를 보고하고 전체 완료
 검증으로 연속 진행한다. 새 범위·권한이 필요할 때만 중단하고 명시적 승인을 요청한다.
