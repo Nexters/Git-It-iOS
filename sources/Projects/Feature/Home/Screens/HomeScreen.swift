@@ -252,37 +252,35 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjects: some View {
-        ZStack(alignment: .topLeading) {
+        VStack(spacing: 12) {
             emptyProjectCards
-                .frame(width: 300, height: 142)
-                .accessibilityHidden(true)
-            StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
-                .padding(.leading, 42)
-                .padding(.top, 67)
+            StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200, alignment: .center)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine)
     }
 
     private var emptyProjectCards: some View {
-        ZStack {
-            emptyProjectCard
-                .rotationEffect(.degrees(-9))
-                .position(x: 66, y: 71)
-            emptyProjectCard
-                .rotationEffect(.degrees(3))
-                .position(x: 150, y: 71)
-            emptyProjectCard
-                .rotationEffect(.degrees(10))
-                .position(x: 234, y: 71)
+        let angles = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172).initialAngles(cardCount: 3)
+
+        return ScrollView(.horizontal) {
+            HStack(spacing: 18) {
+                ForEach(angles.indices, id: \.self) { index in
+                    emptyProjectCard
+                        .rotationEffect(.degrees(angles[index]))
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 24)
         }
+        .scrollIndicators(.hidden)
+        .accessibilityHidden(true)
     }
 
     private var emptyProjectCard: some View {
         RoundedRectangle(designSystem: .large)
             .fill(Color(designSystem: .blue500).opacity(0.3))
-            .frame(width: 96, height: 130)
+            .frame(width: 154, height: 192)
             .overlay {
                 RoundedRectangle(designSystem: .large)
                     .stroke(Color(designSystem: .purple300), lineWidth: 1)
