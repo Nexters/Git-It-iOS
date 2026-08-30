@@ -252,13 +252,15 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjects: some View {
-        VStack(spacing: 4) {
+        ZStack(alignment: .topLeading) {
             ResourceImage(asset: .illust(.projectEmpty))
-                .frame(width: 280, height: 132)
+                .frame(width: 300, height: 142)
                 .accessibilityHidden(true)
-            StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200, alignment: .center)
+            StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
+                .padding(.leading, 42)
+                .padding(.top, 67)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
         .accessibilityElement(children: .combine)
     }
