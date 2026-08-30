@@ -245,12 +245,12 @@ reducer 테스트로 각 시나리오의 State 전이·delegate 출력을 독립
 ### 트랙 A: ProjectRegistration — 구현
 
 - [X] T030 [S1] [S2] [S3] [S4] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`를 수정해 `contracts/feature-app-contracts.md` 1절의 계약(신규 init 매개변수 `observeLearningProjectGenerationOutcomes`, `SubmissionStatus.awaitingGeneration` 케이스, `View.waitAtHomeTapped`/`notificationOptionAccepted`/`notificationOptionDeclined`/`retryTapped`, `EffectEvent.generationOutcomeReceived`, `Delegate.notificationOptionSelected`, `isNotificationOptionSheetPresented` State, 관찰 Effect의 `projectID` 필터링·멱등 처리)를 구현한다.
-- [ ] T031 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`에 링크 입력 화면(Figma node `986:13739`/`986:13646` 계열)을 구현한다. 레이아웃·색·타이포는 `.agents/skills/implement-figma-ui` 스킬로 해당 node를 직접 조회해 근거를 확보하고 기존 UIComponent/DesignSystem 토큰을 우선 재사용한다(FR-018/021).
-- [ ] T032 [S1] 같은 target에 레포지토리 확인 화면(Figma node `737:10890`, Task2_04)을 구현한다. 근거 확보 방식은 T031과 동일하다.
-- [ ] T033 [S2] 같은 target에 기술 이해도 선택 화면(Figma node `737:10882`/`737:10874`, Task2_05/06)과 생성 시작 확정 화면(Figma node `737:10830`, Task2_09)을 구현한다. 근거 확보 방식은 T031과 동일하다.
-- [ ] T034 [S3] 같은 target에 생성 진행 화면(Figma node `737:10800`, 5단계 정적 체크리스트 + `홈에서 기다리기` CTA)을 구현한다. 근거 확보 방식은 T031과 동일하며, 진행률(%) 폴링을 유발하는 어떤 네트워크 호출도 추가하지 않는다(SC-010).
-- [ ] T035 [S4] 같은 target에 완료 알림 옵션 시트(Figma node `824:12149`)를 구현한다. 근거 확보 방식은 T031과 동일하다.
-- [ ] T036 [P] [S5] `sources/Projects/Feature/ProjectRegistration/Previews/ProjectRegistrationScreenPreviews.swift`에 T031~T035 각 화면의 deterministic Preview를 `360×800` 기준으로 작성해 지정된 Figma node와 대조 가능하게 한다(S5 시나리오 1).
+- [X] T031 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`에 링크 입력 화면(Figma node `986:13739`/`986:13646` 계열)을 구현한다. 레이아웃·색·타이포는 `.agents/skills/implement-figma-ui` 스킬로 해당 node를 직접 조회해 근거를 확보하고 기존 UIComponent/DesignSystem 토큰을 우선 재사용한다(FR-018/021).
+- [X] T032 [S1] 같은 target에 레포지토리 확인 화면(Figma node `737:10890`, Task2_04)을 구현한다. 근거 확보 방식은 T031과 동일하다.
+- [X] T033 [S2] 같은 target에 기술 이해도 선택 화면(Figma node `737:10882`/`737:10874`, Task2_05/06)과 생성 시작 확정 화면(Figma node `737:10830`, Task2_09)을 구현한다. 근거 확보 방식은 T031과 동일하다.
+- [X] T034 [S3] 같은 target에 생성 진행 화면(Figma node `737:10800`, 5단계 정적 체크리스트 + `홈에서 기다리기` CTA)을 구현한다. 근거 확보 방식은 T031과 동일하며, 진행률(%) 폴링을 유발하는 어떤 네트워크 호출도 추가하지 않는다(SC-010).
+- [X] T035 [S4] 같은 target에 완료 알림 옵션 시트(Figma node `824:12149`)를 구현한다. 근거 확보 방식은 T031과 동일하다.
+- [X] T036 [P] [S5] `sources/Projects/Feature/ProjectRegistration/Previews/ProjectRegistrationScreenPreviews.swift`에 T031~T035 각 화면의 deterministic Preview를 `360×800` 기준으로 작성해 지정된 Figma node와 대조 가능하게 한다(S5 시나리오 1).
 
 ### 트랙 B: Home/MainShell — 테스트
 
