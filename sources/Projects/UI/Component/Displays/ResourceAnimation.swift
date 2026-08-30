@@ -26,7 +26,6 @@ public struct ResourceAnimation: View {
         case complete
         case generalLoading = "general-loading"
         case notification
-        case projectEmpty = "project-empty"
         case setCreationLoading = "set-creation-loading"
         case storageEmpty = "storage-empty"
 
@@ -60,9 +59,6 @@ public struct ResourceAnimation: View {
             .frame(width: 128, height: 128)
 
         ResourceAnimation(asset: .notification, isLooping: false)
-            .frame(width: 128, height: 128)
-
-        ResourceAnimation(asset: .projectEmpty, isLooping: false)
             .frame(width: 128, height: 128)
 
         ResourceAnimation(asset: .storageEmpty, isLooping: false)

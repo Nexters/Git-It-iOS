@@ -72,6 +72,7 @@ public struct ResourceImage: View {
             case levelJunior = "illust_level_junior"
             case levelMiddle = "illust_level_middle"
             case levelSenior = "illust_level_senior"
+            case projectEmpty = "illust_project_empty"
         }
 
         public enum Onboarding: String, Sendable, Equatable, CaseIterable {
