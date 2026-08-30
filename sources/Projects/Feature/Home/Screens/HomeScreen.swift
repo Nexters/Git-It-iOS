@@ -213,7 +213,11 @@ public struct HomeScreen: View {
                 Button {
                     send(.showAllProjectsTapped)
                 } label: {
-                    StyledText.body2("전체 보기", color: .blue100)
+                    HStack(spacing: 3) {
+                        StyledText.caption1("전체 보기", color: .blue100)
+                        ResourceImage(asset: .icon(.chevronRight))
+                            .frame(width: 6, height: 10)
+                    }
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Display.showAllLabel)
