@@ -96,7 +96,7 @@ diff를 snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 
 - [X] T010 [P] [S3] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureLoadTests.swift`에 최초 profile/project 각 1회 조회, 복귀 시 추가 조회 0회, 독립 성공·실패, profile만 재시도, stale 응답 무시를 `TestStore`로 검증한다
 - [X] T011 [P] [S4] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureNavigationTests.swift`에 있음·없음 CTA의 동일 등록 delegate, 전체 보기 Action, ProjectDetail delegate와 실제 destination 생성 0건을 검증한다
 - [X] T012 [P] [S5] `sources/Projects/Feature/Tests/Home/Screens/HomeAccessibilityTests.swift`에 profile 보조 문구 4종, 기본 avatar, CTA·전체 보기·카드·학습의 접근성 label·disabled 의미와 긴 표시 값 변환을 검증한다
-- [ ] T013 [P] [S1] `sources/Projects/Feature/Tests/MainShell/Reducers/MainShellFeatureTests.swift`에 Home 기본·네 탭 순서, 탭 전환 시 child State 보존, Home 복귀 시 추가 조회 0회, 로그아웃·계정 삭제 초기화를 검증한다
+- [X] T013 [P] [S1] `sources/Projects/Feature/Tests/MainShell/Reducers/MainShellFeatureTests.swift`에 Home 기본·네 탭 순서, 탭 전환 시 child State 보존, Home 복귀 시 추가 조회 0회, 로그아웃·계정 삭제 초기화를 검증한다
 
 ### Home 구현
 
@@ -117,10 +117,10 @@ diff를 snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 
 
 ### MainShell 통합
 
-- [ ] T025 [P] [S1] `sources/Projects/Feature/MainShell/Models/MainShellTab.swift`에 `.home`을 선행 case로 추가하고 `home`·`projects`·`saved`·`settings`의 제목·icon·순서 계약을 구현한다
-- [ ] T026 [S1] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`에 `HomeFeature.State`·Action·Scope와 두 기존 Use Case의 initializer 주입을 추가하고 기본 탭과 sign-out·account deletion 후 네 child를 새 `MainShellFeature.State()`로 초기화한다
-- [ ] T027 [S1] `sources/Projects/Feature/MainShell/Screens/MainShellScreen.swift`에 Home 탭의 scoped `HomeScreen`과 projects·saved·settings의 기존 제목 placeholder를 분기하고 `TabShell` 선택 상태를 유지한다
-- [ ] T028 [S4] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`에 Home의 `showAllProjectsTapped`을 `selectedTab = .projects`로 해석하고 등록·ProjectDetail·학습 delegate payload를 App 경계로 손실 없이 중계한다
+- [X] T025 [P] [S1] `sources/Projects/Feature/MainShell/Models/MainShellTab.swift`에 `.home`을 선행 case로 추가하고 `home`·`projects`·`saved`·`settings`의 제목·icon·순서 계약을 구현한다
+- [X] T026 [S1] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`에 `HomeFeature.State`·Action·Scope와 두 기존 Use Case의 initializer 주입을 추가하고 기본 탭과 sign-out·account deletion 후 네 child를 새 `MainShellFeature.State()`로 초기화한다
+- [X] T027 [S1] `sources/Projects/Feature/MainShell/Screens/MainShellScreen.swift`에 Home 탭의 scoped `HomeScreen`과 projects·saved·settings의 기존 제목 placeholder를 분기하고 `TabShell` 선택 상태를 유지한다
+- [X] T028 [S4] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`에 Home의 `showAllProjectsTapped`을 `selectedTab = .projects`로 해석하고 등록·ProjectDetail·학습 delegate payload를 App 경계로 손실 없이 중계한다
 
 ### 패키지 검증과 결과 보고
 

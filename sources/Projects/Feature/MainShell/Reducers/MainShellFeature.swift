@@ -35,7 +35,8 @@ public struct MainShellFeature: Sendable {
     public struct State: Equatable, Sendable {
         public init() { }
 
-        public var selectedTab = MainShellTab.projects
+        public var selectedTab = MainShellTab.home
+        public var home = HomeFeature.State()
         public var projectList = ProjectListFeature.State()
         public var saved = SavedFeature.State()
         public var settings = SettingsFeature.State()
@@ -44,6 +45,7 @@ public struct MainShellFeature: Sendable {
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case delegate(Delegate)
+        case home(HomeFeature.Action)
         case projectList(ProjectListFeature.Action)
         case saved(SavedFeature.Action)
         case settings(SettingsFeature.Action)
@@ -55,6 +57,9 @@ public struct MainShellFeature: Sendable {
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
+            case projectRegistrationRequested
+            case projectDetailRequested(projectID: String)
+            case learningRequested(projectID: String, nextSetID: String, nextQuestionID: String)
             case projectSelected(projectID: String)
             case questionSelected(BookmarkedQuestion)
             case loggedOut
@@ -62,6 +67,12 @@ public struct MainShellFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.home, action: \.home) {
+            HomeFeature(
+                fetchLearningProjects: fetchLearningProjects,
+                fetchMemberProfile: fetchMemberProfile,
+            )
+        }
         Scope(state: \.projectList, action: \.projectList) {
             ProjectListFeature(
                 fetchLearningProjects: fetchLearningProjects,
@@ -86,6 +97,27 @@ public struct MainShellFeature: Sendable {
                 state.selectedTab = tab
                 return .none
 
+            case .home(.view(.showAllProjectsTapped)):
+                state.selectedTab = .projects
+                return .none
+
+            case .home(.delegate(.projectRegistrationRequested)):
+                return .send(.delegate(.projectRegistrationRequested))
+
+            case .home(.delegate(.projectDetailRequested(let projectID))):
+                return .send(.delegate(.projectDetailRequested(projectID: projectID)))
+
+            case .home(.delegate(.learningRequested(let projectID, let nextSetID, let nextQuestionID))):
+                return .send(
+                    .delegate(
+                        .learningRequested(
+                            projectID: projectID,
+                            nextSetID: nextSetID,
+                            nextQuestionID: nextQuestionID,
+                        )
+                    )
+                )
+
             case .projectList(.delegate(.projectSelected(let projectID))):
                 return .send(.delegate(.projectSelected(projectID: projectID)))
 
@@ -94,12 +126,11 @@ public struct MainShellFeature: Sendable {
 
             case .settings(.delegate(.signedOut)),
                  .settings(.delegate(.accountDeleted)):
-                state.projectList = ProjectListFeature.State()
-                state.saved = SavedFeature.State()
-                state.settings = SettingsFeature.State()
+                state = MainShellFeature.State()
                 return .send(.delegate(.loggedOut))
 
-            case .projectList,
+            case .home,
+                 .projectList,
                  .saved,
                  .settings,
                  .delegate:
