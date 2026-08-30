@@ -148,12 +148,12 @@ MainShell이 Home 기본인지 검증한다.
 
 ### 테스트
 
-- [ ] T030 [S4] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 MainShell의 등록·ProjectDetail·학습 delegate가 payload를 보존하면서 AppRoot route·MainShell State·destination을 변경하지 않는 테스트를 작성한다
-- [ ] T031 [S1] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 sign-out·session invalidation·reset으로 `MainShellFeature.State()`가 재생성된 뒤 다음 MainShell 진입이 Home으로 시작하는 테스트를 추가한다
+- [X] T030 [S4] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 MainShell의 등록·ProjectDetail·학습 delegate가 payload를 보존하면서 AppRoot route·MainShell State·destination을 변경하지 않는 테스트를 작성한다
+- [X] T031 [S1] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 sign-out·session invalidation·reset으로 `MainShellFeature.State()`가 재생성된 뒤 다음 MainShell 진입이 Home으로 시작하는 테스트를 추가한다
 
 ### 구현
 
-- [ ] T032 [S4] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 MainShell의 Home 등록·ProjectDetail·학습 delegate case를 명시적 no-op으로 처리해 실제 ProjectRegistration·ProjectDetail·Quiz destination을 생성하지 않는다
+- [X] T032 [S4] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 MainShell의 Home 등록·ProjectDetail·학습 delegate case를 명시적 no-op으로 처리해 실제 ProjectRegistration·ProjectDetail·Quiz destination을 생성하지 않는다
 
 ### 패키지 검증과 결과 보고
 
