@@ -197,6 +197,7 @@ public struct HomeScreen: View {
                 ActionButton.primary("지금 불러오기", size: .small) {
                     send(.projectRegistrationTapped)
                 }
+                .frame(width: 104)
                 .accessibilityLabel(Display.registrationLabel)
             }
         }
@@ -274,11 +275,6 @@ public struct HomeScreen: View {
 
         return ScrollView(.horizontal) {
             ZStack {
-                RoundedRectangle(designSystem: .large)
-                    .stroke(Color(designSystem: .purple300).opacity(0.3), lineWidth: 1)
-                    .frame(width: bounds.width, height: bounds.height)
-                    .position(x: bounds.midX, y: bounds.midY)
-
                 HStack(spacing: cardSpacing) {
                     ForEach(angles.indices, id: \.self) { index in
                         emptyProjectCard(size: cardSize)
