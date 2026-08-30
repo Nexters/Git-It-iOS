@@ -268,11 +268,14 @@ public struct HomeScreen: View {
     private var emptyProjectCards: some View {
         ZStack {
             emptyProjectCard
-                .rotationEffect(.degrees(-7))
-                .position(x: 96, y: 71)
+                .rotationEffect(.degrees(-9))
+                .position(x: 66, y: 71)
             emptyProjectCard
-                .rotationEffect(.degrees(9))
-                .position(x: 196, y: 71)
+                .rotationEffect(.degrees(3))
+                .position(x: 150, y: 71)
+            emptyProjectCard
+                .rotationEffect(.degrees(10))
+                .position(x: 234, y: 71)
         }
     }
 
