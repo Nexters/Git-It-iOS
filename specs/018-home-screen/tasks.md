@@ -85,35 +85,35 @@ diff를 snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 
 
 ### 테스트 기반
 
-- [ ] T005 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeLearningProjectsUseCaseMock.swift`에 순서가 있는 `Result<LearningProjectPage, LearningProjectError>` 응답, 호출 횟수와 지연 완료를 관찰할 수 있는 actor Test Double을 작성한다
-- [ ] T006 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeMemberProfileUseCaseMock.swift`에 순서가 있는 `Result<MemberProfile, MemberError>` 응답, 호출 횟수와 지연 완료를 관찰할 수 있는 actor Test Double을 작성한다
-- [ ] T007 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에 nullable profile 4종, 0·1·3개 이상 project page, 학습 ID 유효·무효 표본을 Domain 원문 기반으로 정의한다
+- [X] T005 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeLearningProjectsUseCaseMock.swift`에 순서가 있는 `Result<LearningProjectPage, LearningProjectError>` 응답, 호출 횟수와 지연 완료를 관찰할 수 있는 actor Test Double을 작성한다
+- [X] T006 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeMemberProfileUseCaseMock.swift`에 순서가 있는 `Result<MemberProfile, MemberError>` 응답, 호출 횟수와 지연 완료를 관찰할 수 있는 actor Test Double을 작성한다
+- [X] T007 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에 nullable profile 4종, 0·1·3개 이상 project page, 학습 ID 유효·무효 표본을 Domain 원문 기반으로 정의한다
 
 ### 테스트
 
-- [ ] T008 [P] [S2] `sources/Projects/Feature/Tests/Home/Models/HomeCardScrollLayoutTests.swift`에 `P0/P1/P2` 각도, 두 중간점의 선형 보간, 양쪽 clamp, 1·2개 카드 포즈가 `±0.5°` 오차 이내인지 검증하는 테스트를 작성한다
-- [ ] T009 [P] [S2] `sources/Projects/Feature/Tests/Home/Screens/HomeProjectPresentationTests.swift`에 `LearningProjectSummary`의 표시 값·Domain 순서 variant·percent-to-ratio 변환·학습 ID 활성 변환과 카드 본문·학습 intent payload를 검증한다
-- [ ] T010 [P] [S3] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureLoadTests.swift`에 최초 profile/project 각 1회 조회, 복귀 시 추가 조회 0회, 독립 성공·실패, profile만 재시도, stale 응답 무시를 `TestStore`로 검증한다
-- [ ] T011 [P] [S4] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureNavigationTests.swift`에 있음·없음 CTA의 동일 등록 delegate, 전체 보기 Action, ProjectDetail delegate와 실제 destination 생성 0건을 검증한다
-- [ ] T012 [P] [S5] `sources/Projects/Feature/Tests/Home/Screens/HomeAccessibilityTests.swift`에 profile 보조 문구 4종, 기본 avatar, CTA·전체 보기·카드·학습의 접근성 label·disabled 의미와 긴 표시 값 변환을 검증한다
+- [X] T008 [P] [S2] `sources/Projects/Feature/Tests/Home/Models/HomeCardScrollLayoutTests.swift`에 `P0/P1/P2` 각도, 두 중간점의 선형 보간, 양쪽 clamp, 1·2개 카드 포즈가 `±0.5°` 오차 이내인지 검증하는 테스트를 작성한다
+- [X] T009 [P] [S2] `sources/Projects/Feature/Tests/Home/Screens/HomeProjectPresentationTests.swift`에 `LearningProjectSummary`의 표시 값·Domain 순서 variant·percent-to-ratio 변환·학습 ID 활성 변환과 카드 본문·학습 intent payload를 검증한다
+- [X] T010 [P] [S3] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureLoadTests.swift`에 최초 profile/project 각 1회 조회, 복귀 시 추가 조회 0회, 독립 성공·실패, profile만 재시도, stale 응답 무시를 `TestStore`로 검증한다
+- [X] T011 [P] [S4] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureNavigationTests.swift`에 있음·없음 CTA의 동일 등록 delegate, 전체 보기 Action, ProjectDetail delegate와 실제 destination 생성 0건을 검증한다
+- [X] T012 [P] [S5] `sources/Projects/Feature/Tests/Home/Screens/HomeAccessibilityTests.swift`에 profile 보조 문구 4종, 기본 avatar, CTA·전체 보기·카드·학습의 접근성 label·disabled 의미와 긴 표시 값 변환을 검증한다
 - [ ] T013 [P] [S1] `sources/Projects/Feature/Tests/MainShell/Reducers/MainShellFeatureTests.swift`에 Home 기본·네 탭 순서, 탭 전환 시 child State 보존, Home 복귀 시 추가 조회 0회, 로그아웃·계정 삭제 초기화를 검증한다
 
 ### Home 구현
 
-- [ ] T014 [P] [S2] `sources/Projects/Feature/Home/Models/HomeCardScrollLayout.swift`에 현재 layout의 `P0/P1/P2` 중심 좌표를 산출하고 `0° ↔ +16° ↔ -12°`를 연속 선형 보간·clamp하는 index·variant 독립 순수 함수를 구현한다
-- [ ] T015 [P] [S3] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 initializer로 주입된 두 Use Case, 독립 `ProfileLoad`·`ProjectLoad`, 각 request ID·CancelID, 최초 1회 조회, profile 전용 재시도와 stale 응답 거부를 구현한다
-- [ ] T016 [S2] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 카드 본문의 `projectID` 상세 intent와 세 ID가 모두 존재할 때만 생성되는 학습 intent를 추가하고 무효 ID에서 임의 값을 재구성하지 않는다
-- [ ] T017 [S4] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 프로젝트 있음·없음이 공유하는 등록 intent와 MainShell이 해석할 `showAllProjectsTapped` Action을 추가하되 실제 destination은 만들지 않는다
-- [ ] T018 [S2] `.agents/skills/implement-figma-ui/SKILL.md`의 직접 노드 대조 절차를 적용해 `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 `ScreenContainer`·`ScreenHeader`·`HomeProjectCard`·DesignSystem token을 재사용하고, Domain 표시 값·고정 variant·`scrollTargetLayout`·`viewAligned`·`visualEffect`로 모든 `items`의 스크롤·좌표 회전을 구현하며 SwiftUI `ScrollView`가 scroll로 인식한 접촉에서 카드·학습 intent를 억제한다
-- [ ] T019 [S3] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 idle·loading이 빈 상태로 보이지 않는 분기, 성공 0개·프로젝트 실패의 동일 illustration·문구·CTA, profile 실패의 헤더 내 error·전용 retry와 독립 영역 보존을 구현한다
-- [ ] T020 [S5] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 profile·CTA·전체 보기·카드·학습 control의 중복 없는 접근성 label·trait·disabled 의미와 iOS 26 `DynamicTypeSize` 전체 12단계·긴 표시 값에서 핵심 동작을 보존하는 layout을 추가한다
+- [X] T014 [P] [S2] `sources/Projects/Feature/Home/Models/HomeCardScrollLayout.swift`에 현재 layout의 `P0/P1/P2` 중심 좌표를 산출하고 `0° ↔ +16° ↔ -12°`를 연속 선형 보간·clamp하는 index·variant 독립 순수 함수를 구현한다
+- [X] T015 [P] [S3] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 initializer로 주입된 두 Use Case, 독립 `ProfileLoad`·`ProjectLoad`, 각 request ID·CancelID, 최초 1회 조회, profile 전용 재시도와 stale 응답 거부를 구현한다
+- [X] T016 [S2] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 카드 본문의 `projectID` 상세 intent와 세 ID가 모두 존재할 때만 생성되는 학습 intent를 추가하고 무효 ID에서 임의 값을 재구성하지 않는다
+- [X] T017 [S4] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에 프로젝트 있음·없음이 공유하는 등록 intent와 MainShell이 해석할 `showAllProjectsTapped` Action을 추가하되 실제 destination은 만들지 않는다
+- [X] T018 [S2] `.agents/skills/implement-figma-ui/SKILL.md`의 직접 노드 대조 절차를 적용해 `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 `ScreenContainer`·`ScreenHeader`·`HomeProjectCard`·DesignSystem token을 재사용하고, Domain 표시 값·고정 variant·`scrollTargetLayout`·`viewAligned`·`visualEffect`로 모든 `items`의 스크롤·좌표 회전을 구현하며 SwiftUI `ScrollView`가 scroll로 인식한 접촉에서 카드·학습 intent를 억제한다
+- [X] T019 [S3] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 idle·loading이 빈 상태로 보이지 않는 분기, 성공 0개·프로젝트 실패의 동일 illustration·문구·CTA, profile 실패의 헤더 내 error·전용 retry와 독립 영역 보존을 구현한다
+- [X] T020 [S5] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`에 profile·CTA·전체 보기·카드·학습 control의 중복 없는 접근성 label·trait·disabled 의미와 iOS 26 `DynamicTypeSize` 전체 12단계·긴 표시 값에서 핵심 동작을 보존하는 layout을 추가한다
 
 ### Preview 구현
 
-- [ ] T021 [P] [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewFetchLearningProjects.swift`에 loading·성공 0개·성공 1개 이상·실패를 결정론적으로 반환하는 Preview Use Case를 작성한다
-- [ ] T022 [P] [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewFetchMemberProfile.swift`에 nullable 표시 조합의 성공과 헤더 실패를 결정론적으로 반환하는 Preview Use Case를 작성한다
-- [ ] T023 [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewSupport.swift`에 두 Preview Use Case를 initializer로 주입해 project present·absent·loading·project failure-as-empty·profile failure Store를 만드는 표본을 구성한다
-- [ ] T024 [S5] `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`에 `Project Present - 1465:19015`, `Project Absent - 1542:19610`, `Loading`, `Project Failure as Empty - 1542:19610`, `Profile Failure` 상태를 `360×800` 비교용 진입점으로 추가한다
+- [X] T021 [P] [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewFetchLearningProjects.swift`에 loading·성공 0개·성공 1개 이상·실패를 결정론적으로 반환하는 Preview Use Case를 작성한다
+- [X] T022 [P] [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewFetchMemberProfile.swift`에 nullable 표시 조합의 성공과 헤더 실패를 결정론적으로 반환하는 Preview Use Case를 작성한다
+- [X] T023 [S5] `sources/Projects/Feature/Home/Previews/HomePreviewSupport/HomePreviewSupport.swift`에 두 Preview Use Case를 initializer로 주입해 project present·absent·loading·project failure-as-empty·profile failure Store를 만드는 표본을 구성한다
+- [X] T024 [S5] `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`에 `Project Present - 1465:19015`, `Project Absent - 1542:19610`, `Loading`, `Project Failure as Empty - 1542:19610`, `Profile Failure` 상태를 `360×800` 비교용 진입점으로 추가한다
 
 ### MainShell 통합
 
