@@ -248,9 +248,9 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjects: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             ResourceAnimation(asset: .projectEmpty, isLooping: false)
-                .frame(width: 180, height: 140)
+                .frame(width: 240, height: 240)
                 .accessibilityHidden(true)
             StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200, alignment: .center)
         }
