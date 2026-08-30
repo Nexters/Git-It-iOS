@@ -124,6 +124,7 @@ extension ProjectName {
                         InfrastructureModuleName.InfrastructureNetworkClient.rawValue,
                         InfrastructureModuleName.InfrastructureCache.rawValue,
                         InfrastructureModuleName.InfrastructureStorage.rawValue,
+                        InfrastructureModuleName.InfrastructurePushMessaging.rawValue,
                     ],
                     testTargets: [
                         InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,

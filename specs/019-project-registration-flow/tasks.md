@@ -92,24 +92,34 @@ Onboarding, AppEntry 패키지는 건너뛴다).
 기술 API(`PushMessagingClient`)로 감싼다.
 
 **소유 경로**: `sources/Projects/Infrastructure/PushMessaging/**`,
-`sources/Projects/Infrastructure/Project.swift`
+`sources/Tuist/ProjectDescriptionHelpers/Projects/ExternalDependenciesName.swift`,
+`sources/Tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift`,
+`sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`
 
 **관련 변경 시나리오**: S3(기반 기술, 사용자 관찰 가능 동작 없음)
 
 **독립 검증**: Infrastructure target만으로 build하며 Domain·Data를 참조하지 않는다.
 
+**경로 정정**: `sources/Projects/Infrastructure/Project.swift`는 `ProjectName.Infrastructure.project`만
+참조하는 1줄짜리 위임 파일이라 여기에 target 의존성을 직접 추가할 수 없다. 이 프로젝트의 Tuist
+설정에서 실제 target·의존성 선언은 `sources/Tuist/ProjectDescriptionHelpers/` 아래 manifest
+helper 파일에 있으므로(`ExternalDependenciesName`이 외부 SPM product 이름을,
+`InfrastructureModuleName`이 Infrastructure의 각 하위 모듈 target과 그 의존성을,
+`ProjectName`이 패키지별 `buildTargets`/`testTargets` 목록을 선언), T007을 이 세 파일 기준으로
+재작성했다.
+
 ### 준비
 
-- [ ] T007 `sources/Projects/Infrastructure/Project.swift`의 Infrastructure target 의존성에 `FirebaseMessaging` product를 추가한다(워크스페이스 `sources/Tuist/Package.swift`에는 이미 `firebase-ios-sdk` 12.16+가 선언되어 있으므로 새 workspace dependency는 추가하지 않는다).
+- [X] T007 세 파일을 함께 수정해 새 `InfrastructurePushMessaging` target을 추가한다: (a) `sources/Tuist/ProjectDescriptionHelpers/Projects/ExternalDependenciesName.swift`의 `ExternalDependenciesName` enum에 `case FirebaseMessaging`을 추가한다(워크스페이스 `sources/Tuist/Package.swift`에는 이미 `firebase-ios-sdk` 12.16+가 선언되어 있으므로 새 workspace dependency는 추가하지 않는다). (b) `sources/Tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift`의 `InfrastructureModuleName` enum에 `case InfrastructurePushMessaging`을 추가하고(테스트 target은 생성하지 않는다 — T010이 컴파일만 검증), `targets` 배열에 `.module(name: InfrastructureModuleName.InfrastructurePushMessaging.rawValue, sourceDirectory: ..., dependencies: [.external(.FirebaseMessaging)])`를 `InfrastructureAuthentication` 항목과 같은 형태로 추가하며, `sourceDirectory` 계산의 `switch self` 두 분기 모두에 새 case를 추가한다. (c) `sources/Tuist/ProjectDescriptionHelpers/ProjectName.swift`의 `.Infrastructure` 케이스 `buildTargets` 배열에 `InfrastructureModuleName.InfrastructurePushMessaging.rawValue`를 추가한다(`testTargets`는 변경하지 않는다).
 
 ### 구현
 
-- [ ] T008 [S3] `sources/Projects/Infrastructure/PushMessaging/Clients/PushMessagingClient.swift`에 `PushMessagingClient` 프로토콜(`func registrationToken() async throws -> String`, `func setAPNsToken(_ token: Data)`)을 `contracts/domain-data-contracts.md` 4절에 따라 구현한다.
-- [ ] T009 [S3] `sources/Projects/Infrastructure/PushMessaging/Clients/FirebaseMessagingPushClient.swift`에 T008을 구현하는 `FirebaseMessagingPushClient`를 작성한다. 자기 초기화 시점에 `Messaging.messaging().delegate = self`를 등록해 `MessagingDelegate` 채택 자체를 이 타입 안에 완전히 가두고, `messaging(_:didReceiveRegistrationToken:)` 콜백을 `CheckedContinuation`으로 감싸 `registrationToken()`을 비동기 API로 노출하며, `setAPNsToken(_:)`은 `Messaging.messaging().apnsToken`에 대입한다(`contracts/domain-data-contracts.md` 4절).
+- [X] T008 [S3] `sources/Projects/Infrastructure/PushMessaging/Clients/PushMessagingClient.swift`에 `PushMessagingClient` 프로토콜(`func registrationToken() async throws -> String`, `func setAPNsToken(_ token: Data)`)을 `contracts/domain-data-contracts.md` 4절에 따라 구현한다.
+- [X] T009 [S3] `sources/Projects/Infrastructure/PushMessaging/Clients/FirebaseMessagingPushClient.swift`에 T008을 구현하는 `FirebaseMessagingPushClient`를 작성한다. 자기 초기화 시점에 `Messaging.messaging().delegate = self`를 등록해 `MessagingDelegate` 채택 자체를 이 타입 안에 완전히 가두고, `messaging(_:didReceiveRegistrationToken:)` 콜백을 `CheckedContinuation`으로 감싸 `registrationToken()`을 비동기 API로 노출하며, `setAPNsToken(_:)`은 `Messaging.messaging().apnsToken`에 대입한다(`contracts/domain-data-contracts.md` 4절).
 
 ### 정리와 패키지 검증
 
-- [ ] T010 [no-write] Infrastructure target이 `FirebaseMessaging` 의존성과 함께 컴파일되는지 `"$project_build_runner" compile`로 확인한다(Firebase SDK 콜백 동작 자체는 자동화 테스트로 재현하기 어려우므로 quickstart.md의 수동 시나리오로 후속 검증한다).
+- [X] T010 [no-write] Infrastructure target이 `FirebaseMessaging` 의존성과 함께 컴파일되는지 `"$project_build_runner" compile`로 확인한다(Firebase SDK 콜백 동작 자체는 자동화 테스트로 재현하기 어려우므로 quickstart.md의 수동 시나리오로 후속 검증한다).
 
 **진행 점검**: T007~T010의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위(Data)로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.
