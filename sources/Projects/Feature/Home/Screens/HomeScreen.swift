@@ -253,7 +253,7 @@ public struct HomeScreen: View {
 
     private var emptyProjects: some View {
         ZStack(alignment: .topLeading) {
-            ResourceImage(asset: .illust(.projectEmpty))
+            emptyProjectCards
                 .frame(width: 300, height: 142)
                 .accessibilityHidden(true)
             StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
@@ -263,6 +263,27 @@ public struct HomeScreen: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
         .accessibilityElement(children: .combine)
+    }
+
+    private var emptyProjectCards: some View {
+        ZStack {
+            emptyProjectCard
+                .rotationEffect(.degrees(-7))
+                .position(x: 96, y: 71)
+            emptyProjectCard
+                .rotationEffect(.degrees(9))
+                .position(x: 196, y: 71)
+        }
+    }
+
+    private var emptyProjectCard: some View {
+        RoundedRectangle(designSystem: .large)
+            .fill(Color(designSystem: .blue500).opacity(0.3))
+            .frame(width: 96, height: 130)
+            .overlay {
+                RoundedRectangle(designSystem: .large)
+                    .stroke(Color(designSystem: .purple300), lineWidth: 1)
+            }
     }
 
     private func projectCards(_ projects: [Display.Project]) -> some View {
