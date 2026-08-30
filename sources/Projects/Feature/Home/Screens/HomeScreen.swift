@@ -19,7 +19,7 @@ public struct HomeScreen: View {
     @Bindable public var store: StoreOf<HomeFeature>
 
     public var body: some View {
-        ScreenContainer(background: SemanticColorToken(name: "HomeScreenBackground", colorToken: .grey100)) {
+        ScreenContainer {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     profileHeader
