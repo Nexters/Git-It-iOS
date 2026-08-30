@@ -22,6 +22,23 @@ struct LearningProjectAssemblyTests {
         _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
         _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
         _ = assembly.fetchBookmarkedQuestions as any FetchBookmarkedQuestionsUseCase
+        _ = assembly.observeLearningProjectGenerationOutcomes as any ObserveLearningProjectGenerationOutcomesUseCase
+    }
+
+    @Test
+    func `push 진입점으로 수신한 payload가 관찰 Use Case의 스트림으로 전달된다`() async throws {
+        let assembly = LearningProjectAssembly(
+            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
+            accessTokenProvider: { nil },
+        )
+
+        let stream = await assembly.observeLearningProjectGenerationOutcomes()
+        var iterator = stream.makeAsyncIterator()
+
+        await assembly.ingestGenerationOutcomePayload(["projectId": "project-1", "status": "completed"])
+
+        let outcome = await iterator.next()
+        #expect(outcome == LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
     }
 
 }

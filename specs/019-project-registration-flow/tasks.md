@@ -27,6 +27,11 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 맞춰 작업 패키지 4·6을 재작성했다. Domain/Infrastructure/Data 패키지와 Feature 트랙 A/B는
 이번 개정에서 변경하지 않았다.
 
+`/speckit-analyze`가 지적한 추가 발견(E1 중요·E2·E3·U1)을 반영해 T049(`FirebaseApp.configure()`
+호출 명시), T022(`MemberDeviceInfo` 나머지 필드 소싱 명시), T054(SC-015 수동 검증 범위 인정)를
+수정하고 T056(SC-010 grep 확인)을 추가했다. `contracts/domain-data-contracts.md` 6절은 이
+갱신을 아직 반영하지 않았으며 `speckit-plan` 책임으로 남아 있다.
+
 ## 형식: `[ID] [P?] [시나리오?] 설명`
 
 - **[P]**: 현재 실행 단위 안에서만 병렬 실행 가능(서로 다른 파일, 미완료 의존성 없음)
@@ -187,19 +192,19 @@ Use Case와 두 closure(`forwardAPNsToken`, `ingestPushPayload`)를 노출하며
 
 ### 테스트
 
-- [ ] T017 [P] [S3] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningProjectGenerationOutcomeRepositoryAdapterTests.swift`에 `ProjectGenerationOutcomeDTO`(completed/failed) → `LearningProjectGenerationOutcome` 변환과, 알 수 없는 `RawStatus`가 Domain으로 전달되지 않고 폐기되는지 검증하는 테스트를 Test Double `ProjectGenerationOutcomeRemote`로 작성한다.
-- [ ] T018 [S3] `sources/Projects/Composition/Tests/Adapter/Assemblies/LearningProjectAssemblyTests.swift`(기존 파일 수정)에 `LearningProjectAssembly.observeLearningProjectGenerationOutcomes`가 `any ObserveLearningProjectGenerationOutcomesUseCase` 타입으로 노출되는지, 그리고 push 허브의 `ingest(rawPayload:)`에 위임하는 closure(향후 `AppComposition.ingestPushPayload`가 되는 진입점)가 공개 프로퍼티로 노출되는지 검증하는 케이스를 추가한다.
-- [ ] T019 [S3] `sources/Projects/Composition/Tests/Adapter/Assemblies/AppCompositionPublicSurfaceTests.swift`(기존 파일 수정)에 `AppComposition.observeLearningProjectGenerationOutcomes`, `AppComposition.forwardAPNsToken`(`@Sendable (Data) -> Void`), `AppComposition.ingestPushPayload`(`@Sendable ([String: String]) async -> Void`) 세 공개 표면을 `contracts/domain-data-contracts.md` 5절에 따라 검증하는 케이스를 추가한다.
+- [X] T017 [P] [S3] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningProjectGenerationOutcomeRepositoryAdapterTests.swift`에 `ProjectGenerationOutcomeDTO`(completed/failed) → `LearningProjectGenerationOutcome` 변환과, 알 수 없는 `RawStatus`가 Domain으로 전달되지 않고 폐기되는지 검증하는 테스트를 Test Double `ProjectGenerationOutcomeRemote`로 작성한다.
+- [X] T018 [S3] `sources/Projects/Composition/Tests/Adapter/Assemblies/LearningProjectAssemblyTests.swift`(기존 파일 수정)에 `LearningProjectAssembly.observeLearningProjectGenerationOutcomes`가 `any ObserveLearningProjectGenerationOutcomesUseCase` 타입으로 노출되는지, 그리고 push 허브의 `ingest(rawPayload:)`에 위임하는 closure(향후 `AppComposition.ingestPushPayload`가 되는 진입점)가 공개 프로퍼티로 노출되는지 검증하는 케이스를 추가한다.
+- [X] T019 [S3] `sources/Projects/Composition/Tests/Adapter/Assemblies/AppCompositionPublicSurfaceTests.swift`(기존 파일 수정)에 `AppComposition.observeLearningProjectGenerationOutcomes`, `AppComposition.forwardAPNsToken`(`@Sendable (Data) -> Void`), `AppComposition.ingestPushPayload`(`@Sendable ([String: String]) async -> Void`) 세 공개 표면을 `contracts/domain-data-contracts.md` 5절에 따라 검증하는 케이스를 추가한다.
 
 ### 구현
 
-- [ ] T020 [S3] `sources/Projects/Composition/Adapter/Adapters/LearningProjectGenerationOutcomeRepositoryAdapter.swift`에 `LearningProjectGenerationOutcomeRepository`를 구현하는 Adapter를 `contracts/domain-data-contracts.md` 5절에 따라 작성한다(생성자로 `ProjectGenerationOutcomeRemote` 주입).
-- [ ] T021 [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`를 수정해 `PushProjectGenerationOutcomeRemote` 인스턴스를 소유하고, `observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase`와 허브의 `ingest(rawPayload:)`에 위임하는 `ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void` closure를 공개 프로퍼티로 노출한다.
-- [ ] T022 [S3] `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`를 수정해 `contracts/domain-data-contracts.md` 5절의 세 공개 표면을 추가한다: (a) `observeLearningProjectGenerationOutcomes`를 `LearningProjectAssembly`로부터 배선, (b) `PushMessagingClient` 인스턴스(`FirebaseMessagingPushClient()`)를 소유하고 그 `setAPNsToken(_:)`에 위임하는 `forwardAPNsToken: @Sendable (Data) -> Void` 노출, (c) `LearningProjectAssembly.ingestGenerationOutcomePayload`에 위임하는 `ingestPushPayload: @Sendable ([String: String]) async -> Void` 노출. 이어서 `AppComposition.live(...)`가 인스턴스를 구성하는 시점에 `Task { let token = try await pushClient.registrationToken(); await registerMemberDevice(MemberDeviceInfo(deviceToken: token, ...)) }`를 직접 시작한다(`registerMemberDevice`는 이미 노출되어 있으므로 그 자체는 변경하지 않는다). Composition은 이 과정에서 `UIApplicationDelegate`, `MessagingDelegate`, `UNUserNotificationCenterDelegate` 어느 것도 채택하지 않는다.
+- [X] T020 [S3] `sources/Projects/Composition/Adapter/Adapters/LearningProjectGenerationOutcomeRepositoryAdapter.swift`에 `LearningProjectGenerationOutcomeRepository`를 구현하는 Adapter를 `contracts/domain-data-contracts.md` 5절에 따라 작성한다(생성자로 `ProjectGenerationOutcomeRemote` 주입).
+- [X] T021 [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`를 수정해 `PushProjectGenerationOutcomeRemote` 인스턴스를 소유하고, `observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase`와 허브의 `ingest(rawPayload:)`에 위임하는 `ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void` closure를 공개 프로퍼티로 노출한다.
+- [X] T022 [S3] `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`를 수정해 `contracts/domain-data-contracts.md` 5절의 세 공개 표면을 추가한다: (a) `observeLearningProjectGenerationOutcomes`를 `LearningProjectAssembly`로부터 배선, (b) `PushMessagingClient` 인스턴스(`FirebaseMessagingPushClient()`)를 소유하고 그 `setAPNsToken(_:)`에 위임하는 `forwardAPNsToken: @Sendable (Data) -> Void` 노출, (c) `LearningProjectAssembly.ingestGenerationOutcomePayload`에 위임하는 `ingestPushPayload: @Sendable ([String: String]) async -> Void` 노출. 이어서 `AppComposition.live(...)`가 인스턴스를 구성하는 시점에 `Task { let token = try await pushClient.registrationToken(); await registerMemberDevice(MemberDeviceInfo(deviceToken: token, ...)) }`를 직접 시작한다(`registerMemberDevice`는 이미 노출되어 있으므로 그 자체는 변경하지 않는다). Composition은 이 과정에서 `UIApplicationDelegate`, `MessagingDelegate`, `UNUserNotificationCenterDelegate` 어느 것도 채택하지 않는다. **`MemberDeviceInfo`의 나머지 필드는 다음과 같이 채운다**(`/speckit-analyze` U1 발견 반영, Composition은 외부 기술을 Infrastructure API로만 사용하므로 `UIDevice` 등 UIKit에 직접 접근하지 않는다): `deviceID`는 `live(...)`가 이미 받는 `keychainStore: KeychainStore`로 고정 `KeychainNamespace`에서 기존 UUID 문자열을 조회하고 없으면 새 `UUID().uuidString`을 생성해 저장한 뒤 재사용한다(Keychain은 이미 Infrastructure API를 통해 사용 중). `deviceType`은 `.ios`, `appVersion`은 `Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String`(Foundation, UIKit 아님), `osVersion`은 `ProcessInfo.processInfo.operatingSystemVersionString`(Foundation, UIKit 아님)으로 채운다.
 
 ### 정리와 패키지 검증
 
-- [ ] T023 [no-write] Composition target 테스트를 실행해 T017~T019가 통과하는지 확인한다.
+- [X] T023 [no-write] Composition target 테스트를 실행해 T017~T019가 통과하는지 확인한다.
 
 **진행 점검**: T017~T023의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위(Feature)로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을
@@ -300,7 +305,7 @@ quickstart.md의 수동 시나리오로 검증한다(contracts/feature-app-contr
 
 - [ ] T047 [S1] [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`를 수정해 `contracts/feature-app-contracts.md` 4절의 계약(`@Presents var projectRegistration`, `Action.projectRegistration(PresentationAction<…>)`, `ifLet`, 신규 init 매개변수 `fetchExternalRepository`/`createLearningProject`/`observeLearningProjectGenerationOutcomes`, `projectRegistrationRequested`/`projectRegistered`/`notificationOptionSelected` 처리)를 구현한다.
 - [ ] T048 [S1] `sources/Projects/App/GitIt/Screens/AppRootView.swift`를 수정해 `mainShell` 분기에 `contracts/feature-app-contracts.md` 5절의 `fullScreenCover(item:)`로 `ProjectRegistrationScreen`을 연결한다.
-- [ ] T049 [S1] [S3] `sources/Projects/App/GitIt/AppDelegates/GitItAppDelegate.swift`에 `contracts/domain-data-contracts.md` 6절의 `GitItAppDelegate`(`NSObject`, `UIApplicationDelegate`, `UNUserNotificationCenterDelegate`만 채택 — `MessagingDelegate`는 채택하지 않고 FirebaseMessaging SDK를 import하지 않음)를 구현한다. `static func configure(forwardAPNsToken:ingestPushPayload:)`로 설정 전 delegate 콜백은 no-op 처리(로그만 남김)하고, `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`은 `forwardAPNsToken(deviceToken)`을, `application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`(silent push)는 raw payload를 `[String: String]`으로 정규화해 `ingestPushPayload(...)`를 호출한 뒤 `fetchCompletionHandler(.newData)`를 호출한다. 디바이스 등록(`registerMemberDevice`)은 이 타입의 책임이 아니다(작업 패키지 4의 T022가 이미 처리).
+- [ ] T049 [S1] [S3] `sources/Projects/App/GitIt/AppDelegates/GitItAppDelegate.swift`에 `contracts/domain-data-contracts.md` 6절의 `GitItAppDelegate`(`NSObject`, `UIApplicationDelegate`, `UNUserNotificationCenterDelegate`만 채택 — `MessagingDelegate`는 채택하지 않고 FirebaseMessaging SDK를 import하지 않음)를 구현한다. `static func configure(forwardAPNsToken:ingestPushPayload:)`로 설정 전 delegate 콜백은 no-op 처리(로그만 남김)하고, `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`은 `forwardAPNsToken(deviceToken)`을, `application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`(silent push)는 raw payload를 `[String: String]`으로 정규화해 `ingestPushPayload(...)`를 호출한 뒤 `fetchCompletionHandler(.newData)`를 호출한다. 디바이스 등록(`registerMemberDevice`)은 이 타입의 책임이 아니다(작업 패키지 4의 T022가 이미 처리). **`application(_:didFinishLaunchingWithOptions:)`을 구현해 `import FirebaseCore`한 뒤 가장 먼저 `FirebaseApp.configure()`를 호출하고 `true`를 반환한다** — 저장소 전체에 이 호출이 어디에도 없어 `AppComposition.live(...)`(작업 패키지 4의 T022)가 내부적으로 생성하는 `FirebaseMessagingPushClient`의 `Messaging.messaging()` 접근이 이 호출 없이는 fatal error를 낸다. `@UIApplicationDelegateAdaptor`는 SwiftUI `App`의 `body`/`init()`보다 먼저 이 콜백을 실행하므로, T050이 `GitItApp.init()`에서 `AppComposition.live(...)`를 호출하는 시점에는 이미 `FirebaseApp.configure()`가 끝나 있다(`/speckit-analyze` E1 발견 반영, `contracts/domain-data-contracts.md` 6절과 함께 갱신 필요 — `speckit-plan` 책임).
 - [ ] T050 [S1] [S3] `sources/Projects/App/GitIt/GitItApp.swift`를 수정해 `@UIApplicationDelegateAdaptor(GitItAppDelegate.self) var appDelegate`를 선언하고, `AppComposition.live(...)` 직후 `rootStore`를 생성하기 전에 `GitItAppDelegate.configure(forwardAPNsToken: appComposition.forwardAPNsToken, ingestPushPayload: appComposition.ingestPushPayload)`를 호출한다(`contracts/domain-data-contracts.md` 7절, `research.md` 5절 근거).
 - [ ] T051 `docs/conventions/directory-file.md`의 §7 App 패키지 형태 폴더 표에 이번 기능이 추가하는 새 형태 `AppDelegates/`(플랫폼 생명주기 delegate 타입 전용)를 한 행으로 추가한다(plan.md "구조 결정" 절이 명시한 갱신 대상, 책임 패키지: App). 이 명세가 실제로 만드는 T049의 폴더 배치만 반영하며 다른 패키지의 표 내용은 바꾸지 않는다.
 
@@ -322,8 +327,9 @@ quickstart.md의 수동 시나리오로 검증한다(contracts/feature-app-contr
 검증과 필수 `after_implement` hook(swift-format)을 마친 뒤 그 단위를 최종 commit한다.
 
 - [ ] T053 [no-write] `"$project_build_runner" build`, `compile`, `test`를 순서대로 실행하고 전체 결과를 기록한다.
-- [ ] T054 [no-write] `quickstart.md`의 수동 검증 시나리오 1~11(Simulator)을 실행해 S1~S4 수용 기준과 SC-006/SC-007/SC-009/SC-010/SC-014/SC-015/SC-016을 확인한다.
+- [ ] T054 [no-write] `quickstart.md`의 수동 검증 시나리오 1~11(Simulator)을 실행해 S1~S4 수용 기준과 SC-006/SC-007/SC-009/SC-014/SC-016을 확인한다. **SC-015(탭 전환 차단)는 `fullScreenCover`의 SwiftUI 기본 동작에 의존해 reducer/Effect 테스트로 자동화하지 않으며, 시나리오 1의 수동 확인만으로 검증 범위를 인정한다**(`/speckit-analyze` E3 발견 반영). SC-010은 T056에서 별도로 확인한다.
 - [ ] T055 [no-write] [S5] `implement-figma-ui` 스킬로 T031~T035의 5개 화면을 지정 Figma node와 다시 대조하고(SC-011), VoiceOver로 입력·검증/제출/재시도 버튼·이해도 선택 카드·진행 체크리스트를 탐색해 의미 식별 가능 여부와 44×44pt 터치 영역을 확인하며(SC-012), `xSmall`~`accessibility5` 12단계 Dynamic Type에서 핵심 입력·동작이 가려지지 않는지 확인한다(SC-013).
+- [ ] T056 [no-write] SC-010을 확인한다: `grep -rn "@Dependency" sources/Projects/Feature/ProjectRegistration`(진행률 폴링 API·production `@Dependency` 조회 0건)과 `grep -rn "^import Data\|^import Infrastructure\|^import Composition" sources/Projects/Feature/ProjectRegistration`(Data·Infrastructure·Composition 직접 import 0건, `DomainLearningProject`의 `ObserveLearningProjectGenerationOutcomesUseCase` import는 예외로 허용)를 실행해 각각 결과가 없는지 확인한다(`/speckit-analyze` E2 발견 반영).
 
 ## 의존성과 실행 순서
 
@@ -348,6 +354,7 @@ quickstart.md의 수동 시나리오로 검증한다(contracts/feature-app-contr
   T037~T041, T046~T047, T050, T054
 - S4: T028, T035
 - S5: T036, T055
+- (시나리오 라벨 없음, SC-010 전용): T056
 
 ### 최소 가치 범위
 
@@ -383,7 +390,7 @@ FCM 판정 없이도 제출 자체는 가능하나, `awaitingGeneration` 이후 
    범위의 다음 단위로 이어간다.
 5. `GoogleService-Info.plist` 등 세션이 보유하지 않은 자격 증명이 필요한 경계가
    나타나면 변경을 시작하기 전에 중단하고 명시적 승인을 요청한다.
-6. App 패키지에서는 전체 읽기 전용 검증(T053~T055)과 필수 `after_implement` hook을
+6. App 패키지에서는 전체 읽기 전용 검증(T053~T056)과 필수 `after_implement` hook을
    실행하고 결과를 재검증한 뒤 마지막 단위를 최종 commit한다.
 
 ## 참고

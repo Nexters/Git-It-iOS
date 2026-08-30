@@ -1,8 +1,9 @@
 import Foundation
+import Synchronization
 
 // MARK: - PushProjectGenerationOutcomeRemote
 
-public actor PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeRemote {
+public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeRemote, Sendable {
 
     // MARK: Lifecycle
 
@@ -13,26 +14,27 @@ public actor PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeRemote 
     public func outcomes() -> AsyncStream<ProjectGenerationOutcomeDTO> {
         let id = UUID()
         return AsyncStream { continuation in
-            continuations[id] = continuation
+            state.withLock { $0.continuations[id] = continuation }
             continuation.onTermination = { [weak self] _ in
-                Task { await self?.removeContinuation(id: id) }
+                self?.state.withLock { _ = $0.continuations.removeValue(forKey: id) }
             }
         }
     }
 
     public func ingest(rawPayload: [String: String]) async {
         guard let outcome = ProjectGenerationOutcomeDTO(rawPayload: rawPayload) else { return }
-        for continuation in continuations.values {
+        let continuations = state.withLock { Array($0.continuations.values) }
+        for continuation in continuations {
             continuation.yield(outcome)
         }
     }
 
     // MARK: Private
 
-    private var continuations: [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation] = [:]
-
-    private func removeContinuation(id: UUID) {
-        continuations.removeValue(forKey: id)
+    private struct State {
+        var continuations: [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation] = [:]
     }
+
+    private let state = Mutex(State())
 
 }

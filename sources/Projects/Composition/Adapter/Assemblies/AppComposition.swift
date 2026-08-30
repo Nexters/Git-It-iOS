@@ -5,6 +5,7 @@ import DomainMember
 import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
+import InfrastructurePushMessaging
 
 // MARK: - AppComposition
 
@@ -17,6 +18,7 @@ public struct AppComposition: Sendable {
         learningProject: LearningProjectAssembly,
         member: MemberAssembly,
         externalRepository: ExternalRepositoryAssembly,
+        keychainStore: KeychainStore,
     ) {
         signIn = authentication.signIn
         signOut = authentication.signOut
@@ -36,6 +38,7 @@ public struct AppComposition: Sendable {
         submitEssayAnswer = learningProject.submitEssayAnswer
         setQuestionBookmark = learningProject.setQuestionBookmark
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
+        observeLearningProjectGenerationOutcomes = learningProject.observeLearningProjectGenerationOutcomes
 
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
@@ -44,6 +47,27 @@ public struct AppComposition: Sendable {
         deleteMemberAccount = member.deleteMemberAccount
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
+
+        let pushClient = FirebaseMessagingPushClient()
+        forwardAPNsToken = { token in
+            pushClient.setAPNsToken(token)
+        }
+        ingestPushPayload = { rawPayload in
+            await learningProject.ingestGenerationOutcomePayload(rawPayload)
+        }
+
+        let registerMemberDevice = member.registerMemberDevice
+        let deviceID = AppComposition.deviceID(keychainStore: keychainStore)
+        Task {
+            guard let token = try? await pushClient.registrationToken() else { return }
+            try? await registerMemberDevice(MemberDeviceInfo(
+                deviceID: deviceID,
+                deviceType: .ios,
+                appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
+                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                deviceToken: token,
+            ))
+        }
     }
 
     // MARK: Public
@@ -97,6 +121,10 @@ public struct AppComposition: Sendable {
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
+    public let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    public let forwardAPNsToken: @Sendable (Data) -> Void
+    public let ingestPushPayload: @Sendable ([String: String]) async -> Void
+
     public static func live(
         _ environment: Environment,
         keychainStore: KeychainStore = KeychainStore(),
@@ -133,7 +161,27 @@ public struct AppComposition: Sendable {
             learningProject: learningProject,
             member: member,
             externalRepository: externalRepository,
+            keychainStore: keychainStore,
         )
+    }
+
+    // MARK: Private
+
+    private static let deviceKeychainNamespace = KeychainNamespace("com.nexters.hytime.gitit.device")
+    private static let deviceKeychainKey = "deviceID"
+
+    private static func deviceID(keychainStore: KeychainStore) -> String {
+        if
+            let data = try? keychainStore.load(for: deviceKeychainKey, in: deviceKeychainNamespace),
+            let existing = String(data: data, encoding: .utf8)
+        {
+            return existing
+        }
+        let newDeviceID = UUID().uuidString
+        if let data = newDeviceID.data(using: .utf8) {
+            try? keychainStore.save(data, for: deviceKeychainKey, in: deviceKeychainNamespace)
+        }
+        return newDeviceID
     }
 
 }

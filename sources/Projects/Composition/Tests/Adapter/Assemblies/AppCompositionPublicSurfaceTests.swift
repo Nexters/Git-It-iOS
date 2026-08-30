@@ -1,3 +1,4 @@
+import DomainLearningProject
 import Foundation
 import Testing
 
@@ -41,9 +42,26 @@ struct AppCompositionPublicSurfaceTests {
             "registerMemberDevice",
             "deleteMemberAccount",
             "fetchExternalRepository",
+            "observeLearningProjectGenerationOutcomes",
+            "forwardAPNsToken",
+            "ingestPushPayload",
         ]
 
         #expect(labels == expected)
+    }
+
+    @Test
+    func `push 관련 공개 표면이 계약된 타입으로 노출된다`() throws {
+        let composition = AppComposition.live(
+            AppComposition.Environment(
+                apiBaseURL: try #require(URL(string: "https://api.git-it.example.com")),
+                externalRepositoryBaseURL: try #require(URL(string: "https://api.github.com")),
+            )
+        )
+
+        _ = composition.observeLearningProjectGenerationOutcomes as any ObserveLearningProjectGenerationOutcomesUseCase
+        _ = composition.forwardAPNsToken as @Sendable (Data) -> Void
+        _ = composition.ingestPushPayload as @Sendable ([String: String]) async -> Void
     }
 
 }

@@ -38,6 +38,14 @@ public struct LearningProjectAssembly: Sendable {
         submitEssayAnswer = SubmitEssayAnswer(repository: answerRepository)
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
         fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
+
+        let generationOutcomeRemote = PushProjectGenerationOutcomeRemote()
+        observeLearningProjectGenerationOutcomes = ObserveLearningProjectGenerationOutcomes(
+            repository: LearningProjectGenerationOutcomeRepositoryAdapter(remote: generationOutcomeRemote)
+        )
+        ingestGenerationOutcomePayload = { rawPayload in
+            await generationOutcomeRemote.ingest(rawPayload: rawPayload)
+        }
     }
 
     // MARK: Public
@@ -51,5 +59,7 @@ public struct LearningProjectAssembly: Sendable {
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    public let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
 }
