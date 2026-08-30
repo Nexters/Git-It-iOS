@@ -7,7 +7,7 @@ import Testing
 @Suite("SignIn")
 struct SignInTests {
     @Test
-    func `선택한 인증 방식으로 인증한 뒤 grant로 세션을 시작한다`() async {
+    func `선택한 인증 방식으로 인증한 뒤 grant로 세션을 시작하고 needsCuration을 전달한다`() async {
         let recorder = SignInCallRecorder()
         let grant = AuthenticationGrant(
             id: .init(rawValue: "grant-1"),
@@ -25,20 +25,52 @@ struct SignInTests {
         let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .succeed(user),
             recorder: recorder,
+            needsCuration: true,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
 
-        let outcome = await signIn(.apple)
+        let result = await signIn(.apple)
 
-        #expect(outcome == .authenticated(user))
-        #expect(await recorder.snapshot() == [.authenticate(.apple), .start(grant)])
+        #expect(result == .success(user, needsCuration: true))
+        #expect(await recorder.snapshot() == [.authenticate(.apple), .start(grant), .currentSession])
     }
 
     @Test
-    func `인증 실패 시 세션을 시작하지 않는다`() async {
+    func `needsCuration이 false면 그대로 전달한다`() async {
+        let recorder = SignInCallRecorder()
+        let grant = AuthenticationGrant(
+            id: .init(rawValue: "grant-1"),
+            method: .apple,
+        )
+        let user = AuthenticatedUser(
+            id: "user-1",
+            availability: .available,
+            displayName: nil,
+        )
+        let authenticationRepository = SignInAuthenticationRepository(
+            behavior: .succeed(grant),
+            recorder: recorder,
+        )
+        let loginSessionRepository = SignInLoginSessionRepository(
+            behavior: .succeed(user),
+            recorder: recorder,
+            needsCuration: false,
+        )
+        let signIn = SignIn(
+            authenticationRepository: authenticationRepository,
+            loginSessionRepository: loginSessionRepository,
+        )
+
+        let result = await signIn(.apple)
+
+        #expect(result == .success(user, needsCuration: false))
+    }
+
+    @Test
+    func `인증 일시 실패 시 세션을 시작하지 않고 retryableFailure를 반환한다`() async {
         let recorder = SignInCallRecorder()
         let authenticationRepository = SignInAuthenticationRepository(
             behavior: .fail,
@@ -47,20 +79,21 @@ struct SignInTests {
         let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
+            needsCuration: false,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
 
-        let outcome = await signIn(.apple)
+        let result = await signIn(.apple)
 
-        #expect(outcome == .recoverableFailure)
+        #expect(result == .retryableFailure)
         #expect(await recorder.snapshot() == [.authenticate(.apple)])
     }
 
     @Test
-    func `사용자 취소 시 경고 가능한 오류 대신 비인증으로 수렴한다`() async {
+    func `사용자 취소 시 cancelled를 retryableFailure와 구분해 반환한다`() async {
         let recorder = SignInCallRecorder()
         let authenticationRepository = SignInAuthenticationRepository(
             behavior: .cancel,
@@ -69,20 +102,22 @@ struct SignInTests {
         let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
+            needsCuration: false,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
 
-        let outcome = await signIn(.apple)
+        let result = await signIn(.apple)
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .cancelled)
+        #expect(result != .retryableFailure)
         #expect(await recorder.snapshot() == [.authenticate(.apple)])
     }
 
     @Test
-    func `세션 시작 실패 시 인증 참조를 정리한다`() async {
+    func `세션 시작 실패 시 인증 참조를 정리하고 retryableFailure를 반환한다`() async {
         let recorder = SignInCallRecorder()
         let grant = AuthenticationGrant(
             id: .init(rawValue: "grant-1"),
@@ -95,15 +130,16 @@ struct SignInTests {
         let loginSessionRepository = SignInLoginSessionRepository(
             behavior: .fail,
             recorder: recorder,
+            needsCuration: false,
         )
         let signIn = SignIn(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
 
-        let outcome = await signIn(.apple)
+        let result = await signIn(.apple)
 
-        #expect(outcome == .recoverableFailure)
+        #expect(result == .retryableFailure)
         #expect(
             await recorder.snapshot() == [
                 .authenticate(.apple),
@@ -123,6 +159,7 @@ private actor SignInCallRecorder {
     enum Call: Equatable, Sendable {
         case authenticate(AuthenticationMethod)
         case start(AuthenticationGrant)
+        case currentSession
         case clearAuthentication
     }
 
@@ -205,9 +242,11 @@ private actor SignInLoginSessionRepository: LoginSessionRepository {
     init(
         behavior: Behavior,
         recorder: SignInCallRecorder,
+        needsCuration: Bool,
     ) {
         self.behavior = behavior
         self.recorder = recorder
+        self.needsCuration = needsCuration
     }
 
     // MARK: Internal
@@ -235,9 +274,35 @@ private actor SignInLoginSessionRepository: LoginSessionRepository {
 
     func signOut() async throws { }
 
+    func currentSession() async -> SessionRecord? {
+        await recorder.append(.currentSession)
+        return SessionRecord(
+            tokens: SessionTokens(
+                accessToken: "access-token",
+                refreshToken: "refresh-token",
+                accessTokenExpiresAt: nil,
+                refreshTokenExpiresAt: nil,
+            ),
+            onboarding: LocalOnboardingState(
+                needsCuration: needsCuration,
+                acceptedLegalVersions: [],
+                acceptedAt: nil,
+            ),
+        )
+    }
+
+    func replaceTokens(_: SessionTokens) async throws { }
+    func updateOnboarding(_: LocalOnboardingState) async throws { }
+    func refresh() async throws -> SessionTokens {
+        throw LoginSessionError.temporarilyUnavailable
+    }
+
+    func verifyAccessToken() async throws { }
+
     // MARK: Private
 
     private let behavior: Behavior
     private let recorder: SignInCallRecorder
+    private let needsCuration: Bool
 
 }

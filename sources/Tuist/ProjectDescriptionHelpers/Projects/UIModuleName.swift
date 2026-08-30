@@ -5,10 +5,7 @@ import ProjectDescription
 enum UIModuleName: String {
     case DesignSystem
     case UIComponent
-    case DesignSystemTests
     case UIComponentTests
-    case UIComponentPreview
-    case UIComponentUITests
 }
 
 extension UIModuleName {
@@ -16,15 +13,10 @@ extension UIModuleName {
         let directoryName = rawValue.droppingPrefix(ProjectName.UI.rawValue)
         return switch self {
         case .DesignSystem,
-             .UIComponent,
-             .UIComponentPreview:
+             .UIComponent:
             directoryName
-        case .DesignSystemTests:
-            "\(directoryName.droppingSuffix("Tests"))"
         case .UIComponentTests:
             "\(directoryName.droppingSuffix("Tests"))/Unit"
-        case .UIComponentUITests:
-            "\(directoryName.droppingSuffix("UITests"))/UI"
         }
     }
 }
@@ -58,7 +50,7 @@ private enum DesignSystemFontFamily: CaseIterable {
     var resourceFileElements: [ResourceFileElement] {
         Weight.allCases.map {
             .glob(
-                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Font/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf"
+                pattern: "\(UIModuleName.DesignSystem.sourceDirectory)/Resources/Fonts/\(directoryName)/static/\(postScriptNamePrefix)-\($0.rawValue).ttf"
             )
         }
     }
@@ -92,57 +84,9 @@ extension UIModuleName {
             resources: Self.designSystemFontResources,
         ),
         .testModule(
-            name: UIModuleName.DesignSystemTests.rawValue,
-            sourceDirectory: UIModuleName.DesignSystemTests.sourceDirectory,
-            productionTarget: .target(name: UIModuleName.DesignSystem.rawValue),
-        ),
-        .testModule(
             name: UIModuleName.UIComponentTests.rawValue,
             sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
-        ),
-        .target(
-            name: UIModuleName.UIComponentPreview.rawValue,
-            destinations: .iOS,
-            product: .app,
-            bundleId: "com.nexters.hytime.gitit.uicomponentpreview",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .extendingDefault(with: [
-                "UIApplicationSceneManifest": [
-                    "UIApplicationSupportsMultipleScenes": false
-                ],
-                "UILaunchScreen": [:],
-            ]),
-            sources: ["\(UIModuleName.UIComponentPreview.sourceDirectory)/**"],
-            dependencies: [
-                .target(name: UIModuleName.UIComponent.rawValue),
-                .target(name: UIModuleName.DesignSystem.rawValue),
-            ],
-            settings: .settings(base: [
-                "CODE_SIGN_STYLE": "Automatic",
-                "DEVELOPMENT_TEAM": "6924CABL23",
-                "ENABLE_PREVIEWS": "YES",
-                "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                "SWIFT_VERSION": "5.0",
-            ]),
-        ),
-        .target(
-            name: UIModuleName.UIComponentUITests.rawValue,
-            destinations: .iOS,
-            product: .uiTests,
-            bundleId: "com.nexters.hytime.gitit.uicomponentuitests",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .default,
-            sources: ["Tests/\(UIModuleName.UIComponentUITests.sourceDirectory)/**"],
-            dependencies: [
-                .target(name: UIModuleName.UIComponentPreview.rawValue)
-            ],
-            settings: .settings(base: [
-                "CODE_SIGN_STYLE": "Automatic",
-                "DEVELOPMENT_TEAM": "6924CABL23",
-                "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                "SWIFT_VERSION": "5.0",
-            ]),
         ),
     ]
 

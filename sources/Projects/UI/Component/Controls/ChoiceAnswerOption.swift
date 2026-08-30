@@ -1,0 +1,127 @@
+import DesignSystem
+import SwiftUI
+
+// MARK: - ChoiceAnswerOption
+
+public struct ChoiceAnswerOption: View {
+
+    // MARK: Lifecycle
+
+    public init(
+        text: String,
+        state: State = .default,
+        onTap: @escaping () -> Void = { },
+    ) {
+        self.text = text
+        self.state = state
+        self.onTap = onTap
+    }
+
+    // MARK: Public
+
+    public enum State: Sendable, Equatable {
+        case `default`
+        case selected
+        case correct
+        case incorrect
+
+        // MARK: Internal
+
+        var borderColor: ColorToken {
+            switch self {
+            case .default: .grey500
+            case .selected: .blue100
+            case .correct: .correct
+            case .incorrect: .incorrect
+            }
+        }
+
+        var symbol: String? {
+            switch self {
+            case .default,
+                 .selected:
+                nil
+            case .correct:
+                "checkmark.circle.fill"
+            case .incorrect:
+                "xmark.circle.fill"
+            }
+        }
+
+        var accessibilitySuffix: String? {
+            switch self {
+            case .default,
+                 .selected:
+                nil
+            case .correct:
+                "정답"
+            case .incorrect:
+                "오답"
+            }
+        }
+    }
+
+    public var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                StyledText.body1(text)
+                    .lineLimit(2)
+
+                Spacer(minLength: 0)
+
+                if let symbol = state.symbol {
+                    Image(systemName: symbol)
+                        .designSystemForeground(state.borderColor)
+                }
+            }
+            .padding(.horizontal, Constant.horizontalPadding)
+            .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight, alignment: .leading)
+            .designSystemBackground(.cardBackground)
+            .designSystemCornerRadius(.large)
+            .overlay {
+                RoundedRectangle(designSystem: .large)
+                    .stroke(
+                        Color(designSystem: state.borderColor),
+                        lineWidth: Constant.borderWidth,
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(state == .selected ? .isSelected : [])
+    }
+
+    // MARK: Private
+
+    private enum Constant {
+        static let horizontalPadding: CGFloat = 16
+        static let minimumHeight: CGFloat = 52
+        static let borderWidth: CGFloat = 1
+    }
+
+    private let text: String
+    private let state: State
+    private let onTap: () -> Void
+
+    private var accessibilityLabel: String {
+        guard let suffix = state.accessibilitySuffix else {
+            return text
+        }
+        return "\(text), \(suffix)"
+    }
+
+}
+
+#Preview("Choice Answer Option") {
+    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+        ChoiceAnswerOption(text: "State", state: .default)
+        ChoiceAnswerOption(text: "Binding", state: .selected)
+        ChoiceAnswerOption(text: "ObservedObject", state: .correct)
+        ChoiceAnswerOption(text: "EnvironmentObject", state: .incorrect)
+    }
+    .frame(width: 320)
+    .designSystemScreenMargin()
+    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .designSystemBackground(.grey700)
+}

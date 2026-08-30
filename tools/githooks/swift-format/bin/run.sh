@@ -42,6 +42,10 @@ swift_format_main() (
 	swift_format_projects=$("$swift_format_paths" --absolute GIT_IT_PROJECTS_ROOT) || return $?
 	swift_format_style_dir=$("$swift_format_paths" --absolute GIT_IT_SWIFT_STYLE_ROOT) || return $?
 
+	# 저장소 이동/재클론으로 Swift-Style submodule의 빌드 캐시가 예전 경로를 가리키면
+	# 도구 실행 전에 초기화합니다.
+	"$swift_format_adapter" --ensure-fresh-cache "$swift_format_style_dir" || return 2
+
 	case "$swift_format_action" in
 	staged | format) swift_format_tool="$swift_format_style_dir/scripts/format.sh" ;;
 	lint) swift_format_tool="$swift_format_style_dir/scripts/lint.sh" ;;

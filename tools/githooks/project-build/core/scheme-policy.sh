@@ -21,12 +21,13 @@ scheme_policy_decide() (
 	all:true:* | all:false:*) printf 'eligible\n' ;;
 	app:*:App) printf 'eligible\n' ;;
 	app:*:*) printf 'ineligible\n' ;;
+	testable:true:AllTests) printf 'ineligible\n' ;;
 	testable:true:*) printf 'eligible\n' ;;
 	testable:false:*) printf 'ineligible\n' ;;
-	unit:true:UIUITests) printf 'ineligible\n' ;;
-	unit:true:*) printf 'eligible\n' ;;
+	# CI unit 검증은 workspace aggregate 한 번으로 공통 의존성을 재사용합니다.
+	unit:true:AllTests) printf 'eligible\n' ;;
+	unit:true:*) printf 'ineligible\n' ;;
 	unit:false:*) printf 'ineligible\n' ;;
-	ui:true:UIUITests) printf 'eligible\n' ;;
 	ui:*:*) printf 'ineligible\n' ;;
 	*) return 2 ;;
 	esac

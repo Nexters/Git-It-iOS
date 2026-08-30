@@ -27,11 +27,15 @@ extension CompositionModuleName {
                 dependencies: [
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainMember),
                     .fromData(.DataAuthentication),
                     .fromData(.DataLearningProject),
                     .fromData(.DataExternalRepository),
+                    .fromData(.DataLegalConsent),
+                    .fromData(.DataMember),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 

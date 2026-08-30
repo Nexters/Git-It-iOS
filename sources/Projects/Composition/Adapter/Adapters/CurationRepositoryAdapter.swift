@@ -1,0 +1,58 @@
+import DomainAuthentication
+import DomainMember
+
+// MARK: - CurationRepositoryAdapter
+
+struct CurationRepositoryAdapter: MemberRepository {
+
+    // MARK: Lifecycle
+
+    init(
+        remote: MemberRepository,
+        loginSessionRepository: any LoginSessionRepository,
+    ) {
+        self.remote = remote
+        self.loginSessionRepository = loginSessionRepository
+    }
+
+    // MARK: Internal
+
+    func completeCuration(
+        position: MemberPosition,
+        careerLevel: CareerLevel,
+    ) async throws {
+        try await remote.completeCuration(position: position, careerLevel: careerLevel)
+        guard let session = await loginSessionRepository.currentSession() else { return }
+        try? await loginSessionRepository.updateOnboarding(LocalOnboardingState(
+            needsCuration: false,
+            acceptedLegalVersions: session.onboarding.acceptedLegalVersions,
+            acceptedAt: session.onboarding.acceptedAt,
+        ))
+    }
+
+    func fetchProfile() async throws -> MemberProfile {
+        try await remote.fetchProfile()
+    }
+
+    func updatePosition(_ position: MemberPosition) async throws {
+        try await remote.updatePosition(position)
+    }
+
+    func updateCareerLevel(_ careerLevel: CareerLevel) async throws {
+        try await remote.updateCareerLevel(careerLevel)
+    }
+
+    func registerDevice(_ device: MemberDeviceInfo) async throws {
+        try await remote.registerDevice(device)
+    }
+
+    func deleteAccount() async throws {
+        try await remote.deleteAccount()
+    }
+
+    // MARK: Private
+
+    private let remote: MemberRepository
+    private let loginSessionRepository: any LoginSessionRepository
+
+}

@@ -8,9 +8,6 @@ import Testing
 
 // MARK: - SharedLifetimeTests
 
-/// `AuthenticationAssembly`는 `HTTPClient`·`KeychainStore`를 노출하지 않으므로(FR-028) 외부에서
-/// 인스턴스 동일성을 직접 검증할 수 없다. 대신 두 Adapter가 같은 `KeychainStore` 인스턴스를
-/// 공유해도 서로 다른 namespace·key로 충돌 없이 공존하는지 검증해 공유 가능성을 확인한다.
 @Suite("공유 수명 객체", .serialized)
 struct SharedLifetimeTests {
 

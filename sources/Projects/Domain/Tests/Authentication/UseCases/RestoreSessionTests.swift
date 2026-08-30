@@ -15,9 +15,9 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result: RestoreSessionResult = await restoreSession()
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .unauthenticated)
         #expect(await recorder.snapshot() == [.restore, .clearAuthentication])
     }
 
@@ -35,9 +35,9 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result = await restoreSession()
 
-        #expect(outcome == .authenticated(user))
+        #expect(result == .authenticated(user))
         #expect(await recorder.snapshot() == [.restore, .authorizationStatus])
     }
 
@@ -55,9 +55,9 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result = await restoreSession()
 
-        #expect(outcome == .recoverableFailure)
+        #expect(result == .recoverableFailure)
         #expect(await recorder.snapshot() == [.restore, .authorizationStatus])
     }
 
@@ -75,9 +75,9 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result = await restoreSession()
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .unauthenticated)
         #expect(
             await recorder.snapshot() == [
                 .restore,
@@ -97,9 +97,9 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result = await restoreSession()
 
-        #expect(outcome == .recoverableFailure)
+        #expect(result == .recoverableFailure)
         #expect(await recorder.snapshot() == [.restore])
     }
 
@@ -112,10 +112,24 @@ struct RestoreSessionTests {
             recorder: recorder,
         )
 
-        let outcome = await restoreSession()
+        let result = await restoreSession()
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .unauthenticated)
         #expect(await recorder.snapshot() == [.restore, .signOut, .clearAuthentication])
+    }
+
+    @Test
+    func `AuthenticationOutcome을 재사용하지 않는 별개 타입을 반환한다`() async {
+        let recorder = RestoreSessionCallRecorder()
+        let restoreSession = makeRestoreSession(
+            sessionBehavior: .missing,
+            authorizationStatus: .authorized,
+            recorder: recorder,
+        )
+
+        let result = await restoreSession()
+
+        #expect(type(of: result) == RestoreSessionResult.self)
     }
 }
 
@@ -249,6 +263,18 @@ private actor RestoreSessionLoginSessionRepository: LoginSessionRepository {
     func signOut() async throws {
         await recorder.append(.signOut)
     }
+
+    func currentSession() async -> SessionRecord? {
+        nil
+    }
+
+    func replaceTokens(_: SessionTokens) async throws { }
+    func updateOnboarding(_: LocalOnboardingState) async throws { }
+    func refresh() async throws -> SessionTokens {
+        throw LoginSessionError.temporarilyUnavailable
+    }
+
+    func verifyAccessToken() async throws { }
 
     // MARK: Private
 

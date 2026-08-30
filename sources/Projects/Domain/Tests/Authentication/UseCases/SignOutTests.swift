@@ -7,7 +7,7 @@ import Testing
 @Suite("SignOut")
 struct SignOutTests {
     @Test
-    func `서버 세션을 먼저 종료한 뒤 인증 참조를 정리한다`() async {
+    func `서버 세션과 인증 참조 정리가 모두 성공하면 success를 반환한다`() async {
         let recorder = SignOutCallRecorder()
         let signOut = SignOut(
             authenticationRepository: SignOutAuthenticationRepository(
@@ -20,18 +20,18 @@ struct SignOutTests {
             ),
         )
 
-        let outcome = await signOut()
+        let result = await signOut()
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .success)
         #expect(await recorder.snapshot() == [.signOut, .clearAuthentication])
     }
 
     @Test
-    func `원격 폐기 실패와 관계없이 인증 참조를 정리하고 로그아웃한다`() async {
+    func `로컬 세션 정리 실패는 삼키지 않고 retryableFailure로 반환한다`() async {
         let recorder = SignOutCallRecorder()
         let signOut = SignOut(
             authenticationRepository: SignOutAuthenticationRepository(
-                shouldFail: true,
+                shouldFail: false,
                 recorder: recorder,
             ),
             loginSessionRepository: SignOutLoginSessionRepository(
@@ -40,9 +40,29 @@ struct SignOutTests {
             ),
         )
 
-        let outcome = await signOut()
+        let result = await signOut()
 
-        #expect(outcome == .unauthenticated)
+        #expect(result == .retryableFailure)
+        #expect(await recorder.snapshot() == [.signOut])
+    }
+
+    @Test
+    func `인증 참조 정리 실패는 삼키지 않고 retryableFailure로 반환한다`() async {
+        let recorder = SignOutCallRecorder()
+        let signOut = SignOut(
+            authenticationRepository: SignOutAuthenticationRepository(
+                shouldFail: true,
+                recorder: recorder,
+            ),
+            loginSessionRepository: SignOutLoginSessionRepository(
+                shouldFail: false,
+                recorder: recorder,
+            ),
+        )
+
+        let result = await signOut()
+
+        #expect(result == .retryableFailure)
         #expect(await recorder.snapshot() == [.signOut, .clearAuthentication])
     }
 }
@@ -144,6 +164,18 @@ private actor SignOutLoginSessionRepository: LoginSessionRepository {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
+
+    func currentSession() async -> SessionRecord? {
+        nil
+    }
+
+    func replaceTokens(_: SessionTokens) async throws { }
+    func updateOnboarding(_: LocalOnboardingState) async throws { }
+    func refresh() async throws -> SessionTokens {
+        throw LoginSessionError.temporarilyUnavailable
+    }
+
+    func verifyAccessToken() async throws { }
 
     // MARK: Private
 

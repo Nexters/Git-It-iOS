@@ -95,12 +95,16 @@ project_build_main() (
 			"$1" "$2" "$project_build_xcode_adapter"
 	}
 
+	# 전체 소요 시간을 scheme별 시간과 함께 CI 로그에 남깁니다.
+	project_build_started_at=$(date +%s) || return 2
 	if project_run_all project_build_observe project_build_execute \
 		"$project_build_observed" "$project_build_targets" "$project_build_results"; then
 		project_build_exit=0
 	else
 		project_build_exit=$?
 	fi
+	project_build_finished_at=$(date +%s) || return 2
+	project_build_elapsed=$((project_build_finished_at - project_build_started_at))
 
 	if [ ! -s "$project_build_targets" ]; then
 		if { [ "$project_build_scope" = testable ] || [ "$project_build_scope" = unit ] || [ "$project_build_scope" = ui ]; } && [ -s "$project_build_observed" ]; then
@@ -114,9 +118,9 @@ project_build_main() (
 	project_build_attempted=$(wc -l <"$project_build_results" | tr -d ' ')
 	project_build_failed=$(grep -c '^failed' "$project_build_results" 2>/dev/null || true)
 	project_build_succeeded=$(grep -c '^succeeded' "$project_build_results" 2>/dev/null || true)
-	printf '프로젝트 요약: 작업=%s 시도=%s 성공=%s 실패=%s\n' \
+	printf '프로젝트 요약: 작업=%s 시도=%s 성공=%s 실패=%s 경과=%ss\n' \
 		"$project_build_operation" "$project_build_attempted" \
-		"$project_build_succeeded" "$project_build_failed"
+		"$project_build_succeeded" "$project_build_failed" "$project_build_elapsed"
 	[ "$project_build_exit" -eq 0 ] || {
 		printf '조치: 위 실패 scheme의 로그, simulator와 패키지 의존성을 확인하세요\n' >&2
 		return 1

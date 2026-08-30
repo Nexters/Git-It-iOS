@@ -37,7 +37,10 @@ allowlist that `/speckit-implement` will use.
 공용 문서 경로는 공개 경로 판독기의 `GIT_IT_DOCS_ROOT`로 확인하고 현재 `docs/**`
 상대경로만 작업에 사용한다. `sources/docs/**` 구 경로를 전파하지 않는다. 문서 변경은
 정확한 파일 경로 하나와 책임 패키지를 명시해야 하며 `docs/` 디렉터리나 glob을 구현
-allowlist로 만들 수 없다. 문서를 읽기만 하는 검증은 `[no-write]`로 표시한다.
+allowlist로 만들 수 없다. 추적 대상 소스·문서와 Git index를 직접 변경하지 않는 검증은
+`[no-write]`로 표시한다. `make tuist`가 생성·갱신하는 파생 workspace·project·심볼릭 링크·
+cache는 허용하되 실행 전후 Git 상태를 비교하고 추적 파일 변경이 생기면 완료로 처리하지
+않는 조건을 작업 설명이나 공통 형식에 명시한다.
 
 `docs/spec-kit/<feature>/trouble-shooting.md`와
 `docs/spec-kit/<feature>/tacit-knowledge.md`는 구현 작업으로 생성하지 않는다. 실제 문제나
@@ -78,7 +81,8 @@ allowlist로 만들 수 없다. 문서를 읽기만 하는 검증은 `[no-write]
    - 정해진 순서에 따른 실행 단위. 단일 패키지가 기본이며 허용된 integration unit에는
      관련 패키지, 분리 불가 근거, 정확한 경로와 통합 검증을 명시하고 변경 시나리오 라벨 유지
    - Each phase includes: scenario goal, independent test criteria, tests (if requested), implementation tasks
-   - 마지막 적용 대상 패키지 뒤에는 파일을 변경하지 않는 전체 기능 검증만 배치
+   - 마지막 적용 대상 패키지 뒤에는 추적 대상 소스·문서와 Git index를 직접 변경하지 않는
+     전체 기능 검증만 배치. `make tuist`의 파생 산출물 갱신은 허용
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
    - Dependencies section showing scenario completion order
@@ -143,7 +147,7 @@ Every task MUST strictly follow this format:
    - Legacy format: existing specs that already use [US1], [US2], [US3] keep those labels
    - 공통 패키지 기반 작업: 시나리오 라벨 없음
    - 변경 시나리오 관련 작업: 해당 `[S#]` 또는 기존 `[US#]` 라벨 필수
-   - 패키지 검증과 전체 읽기 전용 검증: 시나리오 라벨 선택
+   - 패키지 검증과 전체 `[no-write]` 검증: 시나리오 라벨 선택
 5. **Description**: Clear action with exact file path
 
 **Examples**:
@@ -188,23 +192,25 @@ Every task MUST strictly follow this format:
    - 별도의 Setup, Foundational, Polish 구현 단계를 만들지 않음
    - 준비·기반·정리 작업은 책임 패키지 단계에 배치
    - 패키지에 속하지 않는 파일은 최초로 필요로 하는 책임 패키지를 명시
-   - 여러 패키지에 걸친 공용 파일 변경은 분리 가능한 경우 패키지별로 나누고, 불가분하면
+   - 여러 패키지에 걸친 공용 파일 변경은 분리 가능한 경우 패키지별 작업으로 나누고, 불가분하면
      integration unit에 배치
-   - 전체 기능 검증은 마지막 패키지 뒤의 `[no-write]` 작업으로만 구성
+   - 전체 기능 검증은 마지막 패키지 뒤의 `[no-write]` 작업으로만 구성하며, `make tuist`의
+     파생 산출물 갱신을 제외한 추적 대상 소스·문서와 Git index의 직접 변경은 금지
 
 ### Phase Structure
 
 - **실행 단위 단계**: 적용 대상만 아키텍처 의존성 표와 tasks.md가 확정한 위상 순서로 생성
   - 각 단계 내부: 준비 → 테스트(요청된 경우) → 구현 → 정리 → 패키지 검증
-  - 각 단계 끝: 변경 파일과 검증 결과 보고 → 같은 범위의 다음 단위로 연속 진행
-- **전체 완료 검증**: 마지막 적용 대상 패키지 뒤에 읽기 전용 검증만 배치
+  - 각 단계 끝: 변경 파일과 검증 결과 보고 → 같은 범위의 다음 단위로 반복 승인 없이 연속 진행
+- **전체 완료 검증**: 마지막 적용 대상 패키지 뒤에 `[no-write]` 검증만 배치. 필요한
+  `make tuist` 파생 산출물 갱신은 허용하고 실행 전후 Git 상태를 비교
 
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
 - [ ] 실행 단위가 근거 있는 의존성 순서로 배치되고 integration unit의 분리 불가 근거 확인
 - [ ] 각 작업이 부분 완료 없이 implement 시점의 논리적 커밋 단위에 배정 가능한 원자성 확인
-- [ ] 각 실행 단위 검증·결과 보고와 위험 기반 승인 조건, 마지막 읽기 전용 전체 검증 확인
+- [ ] 각 실행 단위 검증·결과 보고와 위험 기반 승인 조건, 마지막 `[no-write]` 전체 검증 확인
 - [ ] Completion Report에서 tasks.md 기준선 snapshot 후 implement 실행 순서 안내
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, scenario breakdown, and minimum valuable scope

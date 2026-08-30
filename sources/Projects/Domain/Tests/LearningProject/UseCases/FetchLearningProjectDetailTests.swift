@@ -29,10 +29,27 @@ struct FetchLearningProjectDetailTests {
     }
 
     @Test
-    func `모두 완료했으면 다음 세트가 없다`() async throws {
-        let detail = makeDetail(sets: [
-            LearningProjectSetProgress(setID: "set-1", label: "Set 1", title: "title", problemCount: 5, completedCount: 5)
-        ])
+    func `모두 완료했으면 replay를 위해 첫 세트로 되돌아간다`() async throws {
+        let firstSet = LearningProjectSetProgress(
+            setID: "set-1",
+            label: "Set 1",
+            title: "title",
+            problemCount: 5,
+            completedCount: 5,
+        )
+        let detail = makeDetail(sets: [firstSet])
+        let fetchLearningProjectDetail = FetchLearningProjectDetail(
+            repository: FetchLearningProjectDetailRepository(behavior: .succeed(detail))
+        )
+
+        let result = try await fetchLearningProjectDetail(projectID: "project-1")
+
+        #expect(result.nextSet == firstSet)
+    }
+
+    @Test
+    func `세트가 비어 있으면 다음 세트가 없다`() async throws {
+        let detail = makeDetail(sets: [])
         let fetchLearningProjectDetail = FetchLearningProjectDetail(
             repository: FetchLearningProjectDetailRepository(behavior: .succeed(detail))
         )
@@ -90,7 +107,7 @@ private actor FetchLearningProjectDetailRepository: LearningProjectRepository {
     func register(
         githubRepoURL _: String,
         quizLevel _: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         throw LearningProjectError.unexpected
     }
 

@@ -12,15 +12,16 @@ UI는 시각 언어와 화면에서 독립된 재사용 UI 구성요소를 담�
 DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현 타입과 분리된 표시
 값·SwiftUI `Binding`·콜백 기반 컴포넌트를 제공합니다.
 
-이 문서는 UI 패키지가 소유하는 책임과 허용 의존성을 정의합니다. 컴포넌트의 분류, 공개
-입력과 파일·자산 구성은 [UIComponent 컨벤션](../conventions/ui-component.md), 공통
-SwiftUI 구현 방식은 [View 컨벤션](../conventions/view.md)을 따릅니다.
+이 문서는 UI 패키지가 소유하는 책임과 허용 의존성을 정의합니다. 컴포넌트의 역할 분류,
+공개 입력과 자산 구성은 [UIComponent 컨벤션](../conventions/ui-component.md), 폴더와
+파일 배치는 [디렉터리·파일 컨벤션](../conventions/directory-file.md), 공통 SwiftUI 구현
+방식은 [View 컨벤션](../conventions/view.md)을 따릅니다.
 
 ## 적용 범위
 
 - `DesignSystem`: 토큰, Typography, 색상·효과·레이아웃 적용 API와 폰트 등록
-- `UIComponent`: 화면에서 독립적으로 해석 가능한 말단·조합 컴포넌트와 해당 자산
-- `UIComponentPreview`와 UI 자동화 target: production source에서 분리된 catalog와 자동 계약 검증
+- `UIComponent`: 화면에서 독립적으로 해석 가능한 역할별 재사용 컴포넌트와 해당 자산
+- `UIComponentLayoutHarness`와 UI 자동화 target: 제품 API가 아닌 레이아웃 계약 검토
 
 Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가 아닙니다.
 
@@ -46,7 +47,7 @@ Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가
 
 ### UIComponent
 
-- DesignSystem을 사용해 말단·조합 컴포넌트와 컴포넌트 자산을 제공합니다.
+- DesignSystem을 사용해 역할별 재사용 컴포넌트와 컴포넌트 자산을 제공합니다.
 - Feature, Domain, Data, Infrastructure 또는 Composition 타입을 참조하지 않습니다.
 - 읽기 값은 초기화 인자, 변경 값은 Binding, 일회성 입력은 콜백으로 받습니다.
 - 컴포넌트의 상세 구현은 [UIComponent 컨벤션](../conventions/ui-component.md)을
@@ -64,14 +65,17 @@ target의 의존 대상이 되어서는 안 됩니다.
 
 ## 구현 컨벤션
 
-- 컴포넌트 경계, 재사용 판단, 파일·자산 구성과 검증은
+- 컴포넌트 역할 분류, 재사용 판단, 자산 구성과 검증은
   [UIComponent 컨벤션](../conventions/ui-component.md)을 따릅니다.
+- 소스 루트, 폴더 뎁스와 파일 분할은
+  [디렉터리·파일 컨벤션](../conventions/directory-file.md)을 따릅니다.
 - 공개 생성 경로, 디자인 토큰, 내부 선언, 접근성과 프리뷰는
   [View 컨벤션](../conventions/view.md)을 따릅니다.
 - 테스트 이름, Test Double, 파일과 target 구성은
   [테스트 컨벤션](../conventions/test.md)을 따릅니다.
-- 디자인 컴포넌트·자산과 구현 상태는
-  [UI 컴포넌트 체크리스트](../ui-component-checklist.md)에서 추적합니다.
+- Figma 노드와 코드 컴포넌트의 대응은
+  [컴포넌트 인덱스](../../.agents/skills/implement-figma-ui/references/component-index.md)에서
+  추적합니다.
 
 ## 제약조건
 
@@ -83,6 +87,7 @@ target의 의존 대상이 되어서는 안 됩니다.
 - 외형만 같고 공개 입력의 의미가 다른 UI를 하나의 컴포넌트로 통합해서는 안 됩니다.
 - 표시 상태를 묶는 ViewModel, State 또는 동등한 wrapper 타입을 정의해서는 안 됩니다.
 - DesignSystem 밖에 공통 시각 어휘를 정의해서는 안 됩니다.
-- 제품 컴포넌트가 Review 컴포넌트에 의존해서는 안 됩니다.
-- production target이 UIComponentPreview 또는 UI 자동화 target에 의존해서는 안
+- 검토 전용 UI를 `UIComponent`가 소유해서는 안 됩니다. `UIComponentPreviewApp`
+  target에 둡니다.
+- production target이 UIComponentLayoutHarness 또는 UI 자동화 target에 의존해서는 안
   됩니다.

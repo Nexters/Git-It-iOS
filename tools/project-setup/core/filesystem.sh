@@ -121,3 +121,30 @@ project_setup_vscode_workspace_write() (
 	}
 	printf 'VS Code workspace 생성: %s\n' "$project_setup_workspace_relative"
 )
+
+# 기존 로컬 설정을 보존하기 위해 생성 전에 파일 상태를 검증합니다.
+project_setup_xcconfig_preflight() (
+	project_setup_xcconfig_path=$1
+	if [ -L "$project_setup_xcconfig_path" ] || [ -e "$project_setup_xcconfig_path" ]; then
+		[ -f "$project_setup_xcconfig_path" ] || {
+			printf '오류[project-setup.path-conflict]: xcconfig 위치 %s에 일반 파일이 아닌 항목이 존재합니다\n조치: 해당 항목을 이동하거나 올바른 xcconfig 파일로 교체하세요\n' \
+				"$project_setup_xcconfig_path" >&2
+			return 2
+		}
+	fi
+)
+
+# 누락된 로컬 설정 파일만 만들고 기존 파일이나 디렉터리는 덮어쓰지 않습니다.
+project_setup_xcconfig_ensure() (
+	project_setup_xcconfig_path=$1
+	[ -e "$project_setup_xcconfig_path" ] && return 0
+
+	# 부모 디렉터리를 먼저 만든 뒤 제한된 권한의 빈 템플릿을 생성합니다.
+	mkdir -p -- "$(dirname -- "$project_setup_xcconfig_path")" || return 2
+	(umask 077 && : >"$project_setup_xcconfig_path") || {
+		printf '오류[project-setup.write-failed]: xcconfig 파일 %s 생성 실패\n조치: 경로 권한과 파일 시스템 상태를 확인하세요\n' \
+			"$project_setup_xcconfig_path" >&2
+		return 2
+	}
+	printf 'xcconfig 생성: %s\n' "$project_setup_xcconfig_path"
+)

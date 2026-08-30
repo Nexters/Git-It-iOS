@@ -24,14 +24,15 @@
 
 다음 선언에 적용합니다.
 
-- `sources/Projects/UI/Component/Components/**`의 모든 컴포넌트
+- `sources/Projects/UI/Component/**`의 모든 컴포넌트
 - `sources/Projects/UI/DesignSystem/**`의 토큰과 토큰 적용 API
-- `sources/Projects/Feature/Presentation/**`의 모든 화면과 화면 보조 선언
+- `sources/Projects/Feature/**`의 모든 화면과 화면 보조 선언
 
 다음은 이 문서가 다루지 않습니다.
 
 - 컴포넌트를 **분리할지 말지**의 판단 — [UIComponent 컨벤션](./ui-component.md#4-재사용-판단)
-- 말단·조합 컴포넌트의 **분류 기준** — [UIComponent 컨벤션](./ui-component.md#3-컴포넌트-경계)
+- 컴포넌트의 **역할 분류 기준** — [UIComponent 컨벤션](./ui-component.md#3-컴포넌트-역할-분류)
+- 폴더 뎁스와 파일 분할 — [디렉터리·파일 컨벤션](./directory-file.md)
 - 공개 **이름**의 어휘 선택 — [네이밍 컨벤션](./naming.md)
 - `// MARK:` 구획, 선언 순서, 들여쓰기 — Swift Style의 `organizeDeclarations`가
   빌드 시 자동 적용하므로 사람이 관리하지 않습니다.
@@ -43,7 +44,7 @@
 | 계층 | 소유 | 소유하지 않는 것 |
 |---|---|---|
 | DesignSystem | 원시 토큰, 의미 토큰, 토큰 적용 modifier | 컴포넌트, 화면 |
-| UIComponent | 화면에서 독립된 말단·조합 컴포넌트 | 화면 흐름, Feature 타입 |
+| UIComponent | 화면에서 독립된 역할별 재사용 컴포넌트 | 화면 흐름, Feature 타입 |
 | Feature 화면 | 화면 조립, 상태 분기, 화면 흐름 | 재사용 컴포넌트, 시각 어휘 정의 |
 
 **시각 어휘는 DesignSystem이 단독으로 소유합니다.** Feature나 UIComponent가
@@ -52,15 +53,15 @@
 
 ### 2.1 검토·디버그 전용 컴포넌트
 
-TestFlight 레이아웃 검토 도구처럼 제품 화면이 아닌 UI는 제품 컴포넌트와 같은
-디렉터리에 두지 않고 `Components/Review/`에 둡니다. 이 컴포넌트는 다음 예외를
-가집니다.
+TestFlight 레이아웃 검토 도구처럼 제품 화면이 아닌 UI는 `UIComponent`에 두지 않고
+`UIComponentPreviewApp` target이 소유합니다. 이 UI는 다음 예외를 가집니다.
 
 - 제품 시각 어휘 대신 플랫폼 기본 표현(`List`, `.ultraThinMaterial`)을 쓸 수 있습니다.
 - 디자인 토큰 적용 의무(§4)의 대상이 아닙니다.
 
 그 외 규칙 — 파일 구성, 공개 생성 경로, View 내부 선언 — 은 동일하게 적용합니다.
-제품 컴포넌트는 검토 전용 컴포넌트를 참조하지 않습니다.
+제품 컴포넌트는 검토 전용 UI를 참조하지 않으며, 검토 전용 UI를 `UIComponent`의 역할
+폴더로 옮기지 않습니다.
 
 ## 3. 공개 생성 경로
 
@@ -110,7 +111,7 @@ SelectionToggle(state: .init(isSelected: store.isSelected))
 하나뿐인 컴포넌트는 직접 초기화 메서드만 공개하고 `standard` 같은 무의미한 이름의
 팩토리를 만들지 않습니다.
 
-`@ViewBuilder`로 자식 View를 받는 조합 컴포넌트는 팩토리 대신
+`@ViewBuilder`로 자식 View를 받는 컴포넌트는 팩토리 대신
 `init(..., content:)`를 기본 생성 경로로 두고, 필요한 기본값은 §3.1에 따라 해당
 초기화 인자에 둡니다.
 
@@ -125,7 +126,7 @@ Feature 화면은 TCA `Store`를 화면 상태의 단일 정본으로 사용하�
 `ViewModel`, 시각 변형 팩토리 또는 `Style`을 정의하지 않습니다.
 
 ```swift
-// Screens/Home/HomeView.swift
+// Home/HomeView.swift
 public struct HomeView: View {
     public init(store: StoreOf<HomeFeature>) {
         self.store = store
@@ -148,7 +149,7 @@ public struct HomeView: View {
 화면은 `Store`의 상태를 UI 컴포넌트의 표시 값과 SwiftUI `Binding`으로 연결하고
 컴포넌트 콜백을 Feature `Action`으로 해석합니다. 여러 화면이 함께 쓰는 View가 아닌
 Presentation 보조 타입은
-어느 한 화면이 소유하지 않으므로 `Presentation/Shared/`의 독립 파일에 최상위 타입으로
+어느 한 화면이 소유하지 않으므로 `Shared/`의 형태 폴더에 최상위 타입으로
 둘 수 있습니다. 한 화면만 쓰는 보조 타입은 §5에 따라 그 화면에 중첩합니다.
 
 ### 3.5 접근 수준
@@ -231,9 +232,9 @@ Reducer의 `State`가 소유합니다.
 사용합니다. `TextStyleToken`은 자간·행간·언어별 폰트 선택을 함께 결정하므로
 `.font(.caption2)` 같은 플랫폼 API로 대체하면 표현이 갈라집니다.
 
-**말단 컴포넌트 예외**: `StyledText`를 렌더링하면 다른 프로젝트 컴포넌트를 포함하게
-되어 말단 자격([UIComponent 컨벤션](./ui-component.md#3-컴포넌트-경계))을 잃습니다.
-`ActionButton`, `TagBadge`처럼 자기 문자열을 직접 그리는 말단 컴포넌트는
+**`Text` 값이 필요한 경우 예외**: `StyledText`는 View이므로 `Button` label 안에서
+`Text` 값 수준의 구성이 필요한 위치에는 넣을 수 없습니다. `ActionButton`, `TagBadge`처럼
+자기 문자열을 직접 그리는 컴포넌트는
 DesignSystem의 토큰 적용 API인 `Text.designSystemStyled(_:style:)`과
 `designSystemLineSpacing(_:)`을 사용합니다. 이 경로도 `TextStyleToken`을 통과하므로
 표현이 갈라지지 않습니다.
@@ -340,7 +341,7 @@ public struct SheetSurface<Content: View>: View {
 늘어날 때 고쳐야 할 위치를 열거형 한 곳으로 모으기 위한 것입니다.
 
 ```swift
-// Components/Leaf/ActionButton.swift
+// Controls/ActionButton.swift
 public struct ActionButton: View {
     public init(
         title: String,
@@ -454,7 +455,7 @@ Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는
 ### 6.3 표시용 표본 데이터
 
 레이아웃 검토 단계의 화면이 참조하는 표본 데이터는 화면 파일에 하드코딩하지 않고
-`Presentation/Shared/Models/`의 `internal` 표본 타입에 모읍니다. 표본 타입은 컴포넌트
+`Shared/Models/`의 `internal` 표본 타입에 모읍니다. 표본 타입은 컴포넌트
 입력 타입이 아니며 UI 패키지로 넘기지 않습니다.
 
 화면이 실제 상태에 연결될 때 표본 참조는 Feature `State`에서 파생한 표시 값이나
@@ -466,7 +467,7 @@ SwiftUI `Binding`으로 대체하고, 표본 타입은 해당 화면의 참조�
 | 대상 | 위치 | 이름 |
 |---|---|---|
 | UIComponent | 컴포넌트 파일 하단 `#Preview` | 컴포넌트 이름 |
-| Feature 화면 | `Screens/Previews/<영역>Previews.swift` | 화면과 상태를 설명하는 한국어 이름 |
+| Feature 화면 | `Previews/<영역>Previews.swift` | 화면과 상태를 설명하는 한국어 이름 |
 
 - 컴포넌트 프리뷰는 모든 시각 변형을 한 프리뷰에 나열해 변형 간 차이를 함께 봅니다.
 - 컴포넌트 프리뷰의 배경은 `designSystemBackground(.grey700)`으로 실제 화면 배경 위의
@@ -514,12 +515,12 @@ SwiftUI `Binding`으로 대체하고, 표본 타입은 해당 화면의 참조�
 - [ ] 변형별 표현 값을 View가 아니라 `Style`이 소유하는가?
 - [ ] 화면 안에 별도 `View` 타입을 정의하지 않았는가?
 - [ ] 화면이 `preferredColorScheme`을 다시 지정하지 않는가?
-- [ ] 검토 전용 컴포넌트가 제품 컴포넌트 디렉터리 밖에 있는가?
+- [ ] 검토 전용 UI가 `UIComponentPreviewApp` target에 있는가?
 
 ### 프리뷰
 
 - [ ] 컴포넌트 프리뷰가 모든 시각 변형을 포함하는가?
-- [ ] 화면 프리뷰가 `Screens/Previews/`에 있는가?
+- [ ] 화면 프리뷰가 `Previews/`에 있는가?
 
 ## 관련 문서
 

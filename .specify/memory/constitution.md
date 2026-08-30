@@ -3,8 +3,10 @@ Sync Impact Report
 - Version change: 6.0.0 → 7.0.0
 - Modified principles: 4. 스킬별 수정 경로 — 수정 경로 표를 단일 정본으로 지정;
   7. 패키지 단위 구현 진행 → 위험 기반 실행 단위 — 반복 승인과 단일 패키지 강제를 제거하고
-  불가분한 다중 패키지 단위 및 선택적 기준선을 허용; 9. Spec Kit 세션 지식 기록 —
-  반복되거나 재사용 가능한 사건만 영구 기록하도록 문턱 강화
+  불가분한 다중 패키지 단위 및 선택적 기준선을 허용하되, `[no-write]` 검증이 추적 대상
+  소스·문서와 Git index를 직접 변경하지 않는다는 기준과 `make tuist`의 파생 workspace·
+  project·cache 갱신을 허용하는 예외 및 실행 전후 추적 파일 확인 의무를 유지;
+  9. Spec Kit 세션 지식 기록 — 반복되거나 재사용 가능한 사건만 영구 기록하도록 문턱 강화
 - Added sections: 없음
 - Removed sections: 없음
 - Templates requiring updates: ✅ .specify/templates/plan-template.md;
@@ -24,7 +26,7 @@ Sync Impact Report
 **상태**: Ratified<br>
 **버전**: 7.0.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-25
+**최종 수정일**: 2026-08-26
 
 ## 원칙
 
@@ -176,6 +178,11 @@ Sync Impact Report
   `tasks.md`만 stage, staged 범위 검사, 훅을 우회하지 않는 커밋, 생성된 커밋 확인 순서로
   완료합니다. 커밋 성공과 함께 단위 파일 및 tasks.md에 staged·unstaged·untracked 잔여가
   없음을 확인하기 전에는 다음 단위를 시작하지 않습니다.
+- `[no-write]` 검증은 저장소가 추적하는 소스·문서와 Git index를 작업의 결과로 직접
+  변경하지 않아야 합니다. `make tuist`는 현재 소스에서 파생되는 workspace, project, 심볼릭
+  링크와 도구 cache를 생성·갱신하는 명령이므로 `[no-write]` 검증에서 실행할 수 있습니다.
+  실행 전후 Git 상태를 비교해야 하며, `make tuist`가 기존의 추적 파일 diff를 바꾸거나 새
+  추적 대상 변경을 만들면 해당 검증을 완료로 처리하지 않고 변경 경로와 영향을 보고합니다.
 - 기존 staged·unstaged 변경의 소유권이 현재 단위에 속하는지 확인할 수 없거나 커밋 또는
   검증이 실패하면 변경을 보존하고 중단합니다. 같은 Git 변경 체인을 병렬 실행하거나 원인을
   확인하지 않은 채 재시도하지 않으며, `/speckit-implement`는 commit을 amend, rebase, push하지

@@ -45,6 +45,7 @@ repository=$(CDPATH='' cd -- "$repository" && pwd -P)
 TEST_CALL_LOG=$call_log PATH="$work/bin:$PATH" \
 	make -s -C "$repository" init
 printf '%s\n' \
+	'setup|ensure-app-xcconfigs' \
 	"tuist|$repository/$ios_root|install" \
 	"tuist|$repository/$ios_root|generate" \
 	"tuist|$repository/$ios_root|edit --permanent" \

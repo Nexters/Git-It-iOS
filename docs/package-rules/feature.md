@@ -67,7 +67,7 @@ UI 내부 자산을 공개 계약에 포함하지 않습니다.
 - Composition에 직접 접근해 dependency를 조회해서는 안 됩니다.
 - Repository 또는 production 구현체를 Feature 내부에서 생성해서는 안 됩니다.
 - Domain의 비즈니스 규칙을 Feature에 다시 구현해서는 안 됩니다.
-- 재사용 가능한 말단 또는 조합 UI 컴포넌트를 소유해서는 안 됩니다.
+- 재사용 가능한 UI 컴포넌트를 소유해서는 안 됩니다.
 - Feature State, Action 또는 업무 모델을 UIComponent 공개 API에 노출해서는 안 됩니다.
 - DesignSystem 밖에 시각 어휘를 정의해서는 안 됩니다.
 - 화면 파일 안에 별도 View 타입을 정의해서는 안 됩니다.

@@ -21,7 +21,6 @@ mkdir -p "$(dirname -- "$scheme_source")" \
 	"$projects/Infrastructure/Tests/Authentication" \
 	"$projects/Domain/Tests/LearningProject" \
 	"$projects/UI/Tests/Component/Unit" \
-	"$projects/UI/Tests/Component/UI" \
 	"$projects/App/Tests/GitIt" \
 	"$(dirname -- "$module_source")"
 
@@ -29,6 +28,10 @@ printf '%s\n' \
 	'case .App:' \
 	'    [.package(' \
 	'        name: .App,' \
+	'        testTargets: [],' \
+	'    )]' \
+	'    [.package(' \
+	'        name: .AppTests,' \
 	'        testTargets: [' \
 	'            AppModuleName.GitItTests.rawValue,' \
 	'        ],' \
@@ -66,7 +69,6 @@ printf '%s\n' \
 	'        name: .UI,' \
 	'        testTargets: [' \
 	'            UIModuleName.UIComponentTests.rawValue,' \
-	'            UIModuleName.UIComponentUITests.rawValue,' \
 	'        ],' \
 	'    )]' >"$scheme_source"
 printf '%s\n' \
@@ -88,17 +90,23 @@ printf '%s\n' \
 	'    sourceDirectory: InfrastructureModuleName.InfrastructureAuthenticationTests.sourceDirectory,' \
 	')' >"$infrastructure_module_source"
 printf '%s\n' \
+	'var sourceDirectory: String {' \
+	'    "Component/Unit"' \
+	'}' \
 	'case .UIComponentTests:' \
-	'case .UIComponentUITests:' \
 	'.testModule(' \
 	'    name: UIModuleName.UIComponentTests.rawValue,' \
 	'    sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,' \
-	')' \
-	'.testModule(' \
-	'    name: UIModuleName.UIComponentUITests.rawValue,' \
-	'    sourceDirectory: UIModuleName.UIComponentUITests.sourceDirectory,' \
 	')' >"$ui_module_source"
 printf '%s\n' \
+	'var sourceDirectory: String {' \
+	'    switch self {' \
+	'    case .GitItTests:' \
+	'        "Tests/GitIt"' \
+	'    default:' \
+	'        ""' \
+	'    }' \
+	'}' \
 	'case .GitItTests:' \
 	'    .target(' \
 	'        name: rawValue,' \
@@ -106,6 +114,10 @@ printf '%s\n' \
 	'    )' >"$app_module_source"
 printf '%s\n' 'import Testing' '@Test func appSample() {}' \
 	>"$projects/App/Tests/GitIt/GitItTests.swift"
+if script_tests_list_scheme_test_targets "$scheme_source" | rg -q '^GitIt\|App$'; then
+	printf 'FAIL: 빈 testTargets 배열 다음의 build target을 test target으로 읽었습니다\n' >&2
+	exit 1
+fi
 printf '%s\n' 'import Testing' '@Test func sample() {}' \
 	>"$projects/ReadyTests/ReadyTests.swift"
 printf '%s\n' '// placeholder' >"$projects/EmptyTests/Placeholder.swift"
@@ -130,20 +142,12 @@ printf '%s\n' 'import Testing' '@Test func authenticationSample() {}' \
 printf '%s\n' 'import Testing' '@Test func domainLearningProjectSample() {}' \
 	>"$projects/Domain/Tests/LearningProject/LearningProjectTests.swift"
 if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: Unit과 UI test target의 역할 폴더를 구분하지 못했습니다\n' >&2
+	printf 'FAIL: UIComponent test target의 역할 폴더를 찾지 못했습니다\n' >&2
 	exit 1
 fi
 rg -q 'script-tests.empty-test-target.*UIComponentTests' "$work/err"
 
 printf '%s\n' 'import Testing' '@Test func componentSample() {}' \
 	>"$projects/UI/Tests/Component/Unit/ComponentTests.swift"
-if script_tests_validate_testable_schemes "$projects" "$scheme_source" >"$work/out" 2>"$work/err"; then
-	printf 'FAIL: 패키지 scheme의 두 번째 test target을 검증하지 않았습니다\n' >&2
-	exit 1
-fi
-rg -q 'script-tests.empty-test-target.*UIComponentUITests' "$work/err"
-
-printf '%s\n' 'import XCTest' 'final class ComponentUITests: XCTestCase {}' \
-	>"$projects/UI/Tests/Component/UI/ComponentUITests.swift"
 script_tests_validate_testable_schemes "$projects" "$scheme_source"
 printf 'PASS: testable schemes\n'

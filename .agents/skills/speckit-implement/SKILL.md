@@ -276,8 +276,10 @@ permission does not expand the file write allowlist above.
    - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
    - **Infrastructure development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
-   - **정리와 검증**: 선택한 단위의 작업만 수행하고 전체 읽기 전용 검증은 마지막 구현 단위
-     완료 뒤 같은 실행에서 수행
+   - **정리와 검증**: 선택한 패키지 소유 작업만 수행하고 전체 `[no-write]` 검증은 마지막 적용
+     대상 패키지 완료 뒤에만 수행. `[no-write]`에서 `make tuist`의 파생 workspace·project·
+     심볼릭 링크·cache 갱신은 허용하되 실행 전후 Git 상태를 비교하고 추적 대상 소스·문서나
+     Git index의 직접 변경이 생기면 완료로 처리하지 않음
 
 9. 각 커밋 단위를 다음 트랜잭션으로 완료한다:
    1. 예상 HEAD, 현재 브랜치, `UNIT_TASK_IDS`, `UNIT_PATHS`와 Git 상태를 다시 확인하고 baseline

@@ -9,6 +9,8 @@ enum DataModuleName: String, CaseIterable {
     case DataExternalRepositoryTests
     case DataLearningProject
     case DataLearningProjectTests
+    case DataLegalConsent
+    case DataLegalConsentTests
     case DataMember
     case DataMemberTests
 }
@@ -21,12 +23,14 @@ extension DataModuleName {
             .DataAuthentication,
             .DataExternalRepository,
             .DataLearningProject,
+            .DataLegalConsent,
             .DataMember:
             directoryName
         case
             .DataAuthenticationTests,
             .DataExternalRepositoryTests,
             .DataLearningProjectTests,
+            .DataLegalConsentTests,
             .DataMemberTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
@@ -58,7 +62,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureNetworkClient)
                 ],
             )
 
@@ -67,7 +71,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureNetworkClient)
                 ],
             )
 
@@ -89,10 +93,34 @@ extension DataModuleName {
                 ),
             )
 
+        case .DataLegalConsent:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureStorage)
+                ],
+            )
+
+        case .DataLegalConsentTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataLegalConsent.rawValue
+                ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureStorage)
+                ],
+            )
+
         case .DataMember:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureNetworkClient)
+                ],
             )
 
         case .DataMemberTests:

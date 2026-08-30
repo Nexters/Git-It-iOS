@@ -18,6 +18,8 @@
   "GIT_IT_VSCODE_WORKSPACE_PATH": "Documents-Workspace.code-workspace",
   "GIT_IT_SPECS_ROOT": "specs",
   "GIT_IT_DOCS_ROOT": "docs",
+  "GIT_IT_APP_DEBUG_XCCONFIG_PATH": "sources/Projects/App/Config/debug.xcconfig",
+  "GIT_IT_APP_RELEASE_XCCONFIG_PATH": "sources/Projects/App/Config/release.xcconfig",
   "GIT_IT_SWIFT_FORMAT_RUNNER": "tools/githooks/swift-format/bin/run.sh",
   "GIT_IT_PROJECT_BUILD_RUNNER": "tools/githooks/project-build/bin/run.sh",
   "GIT_IT_PROJECT_SETUP_RUNNER": "tools/project-setup/bin/run.sh",

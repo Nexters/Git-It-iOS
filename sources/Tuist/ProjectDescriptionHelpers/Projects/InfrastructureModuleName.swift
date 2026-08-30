@@ -9,6 +9,8 @@ enum InfrastructureModuleName: String {
     case InfrastructureNetworkClientTests
     case InfrastructureCache
     case InfrastructureCacheTests
+    case InfrastructureStorage
+    case InfrastructureStorageTests
 }
 
 extension InfrastructureModuleName {
@@ -52,6 +54,18 @@ extension InfrastructureModuleName {
                 name: InfrastructureModuleName.InfrastructureCache.rawValue
             ),
         ),
+        .module(
+            name: InfrastructureModuleName.InfrastructureStorage.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructureStorage.sourceDirectory,
+            dependencies: [],
+        ),
+        .testModule(
+            name: InfrastructureModuleName.InfrastructureStorageTests.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructureStorageTests.sourceDirectory,
+            productionTarget: .target(
+                name: InfrastructureModuleName.InfrastructureStorage.rawValue
+            ),
+        ),
     ]
 
     var sourceDirectory: String {
@@ -59,11 +73,13 @@ extension InfrastructureModuleName {
         return switch self {
         case .InfrastructureAuthentication,
              .InfrastructureNetworkClient,
-             .InfrastructureCache:
+             .InfrastructureCache,
+             .InfrastructureStorage:
             directoryName
         case .InfrastructureAuthenticationTests,
              .InfrastructureNetworkClientTests,
-             .InfrastructureCacheTests:
+             .InfrastructureCacheTests,
+             .InfrastructureStorageTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }

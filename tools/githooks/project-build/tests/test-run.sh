@@ -28,9 +28,9 @@ cp "$root/$hooks_relative/pre-commit.d/build.sh" \
 	"$repository/$hooks_relative/pre-commit.d/"
 git -C "$repository" init -q
 mkdir -p "$workspace" \
+	"$workspace/xcshareddata/xcschemes" \
 	"$projects/App/xcshareddata/xcschemes" \
 	"$projects/Tests/xcshareddata/xcschemes" \
-	"$projects/UI/xcshareddata/xcschemes" \
 	"$projects/Fail/xcshareddata/xcschemes" \
 	"$projects/$newline_project/xcshareddata/xcschemes"
 printf '<Scheme><Testables></Testables></Scheme>\n' \
@@ -38,7 +38,7 @@ printf '<Scheme><Testables></Testables></Scheme>\n' \
 printf '<Scheme><Testables><TestableReference/></Testables></Scheme>\n' \
 	>"$projects/Tests/xcshareddata/xcschemes/Tests.xcscheme"
 printf '<Scheme><Testables><TestableReference/></Testables></Scheme>\n' \
-	>"$projects/UI/xcshareddata/xcschemes/UIUITests.xcscheme"
+	>"$workspace/xcshareddata/xcschemes/AllTests.xcscheme"
 printf '<Scheme><Testables></Testables></Scheme>\n' \
 	>"$projects/Fail/xcshareddata/xcschemes/Fail.xcscheme"
 printf '<Scheme><Testables></Testables></Scheme>\n' \
@@ -65,7 +65,7 @@ printf '%s\n' '#!/bin/sh' \
 	'done' \
 	'[ "$jobs" = "${EXPECTED_JOBS:-1}" ] || exit 91' \
 	'[ "$index_store" = true ] || exit 92' \
-	'case "$scheme" in Tests | UIUITests) expected_derived="$EXPECTED_DERIVED_ROOT/TestSchemes/$scheme" ;; *) expected_derived=$EXPECTED_DERIVED_ROOT ;; esac' \
+	'case "$scheme" in Tests | AllTests) expected_derived="$EXPECTED_DERIVED_ROOT/TestSchemes/$scheme" ;; *) expected_derived=$EXPECTED_DERIVED_ROOT ;; esac' \
 	'[ "$derived_data" = "$expected_derived" ] || exit 93' \
 	'if [ -n "${EXPECTED_XCRESULTS_ROOT:-}" ] && [ "$action" = test-without-building ]; then' \
 	'  [ "$(dirname -- "$result_bundle")" = "$EXPECTED_XCRESULTS_ROOT" ] || exit 94' \
@@ -113,33 +113,46 @@ rg -q '^build[[:space:]]+App$' "$PROJECT_ACTION_LOG"
 rg -q '^build[[:space:]]+Tests$' "$PROJECT_ACTION_LOG"
 rg -q '^build[[:space:]]+Fail$' "$PROJECT_ACTION_LOG"
 rg -q '^build[[:space:]]+Newline$' "$PROJECT_ACTION_LOG"
-rg -q '^build[[:space:]]+UIUITests$' "$PROJECT_ACTION_LOG"
+rg -q '^build[[:space:]]+AllTests$' "$PROJECT_ACTION_LOG"
 rg -q '작업=build 시도=5 성공=4 실패=1' "$work/out"
 rg -q 'project-build.scheme-failed' "$work/err"
 
 rm "$projects/Fail/xcshareddata/xcschemes/Fail.xcscheme"
 : >"$PROJECT_ACTION_LOG"
 run_stage compile >"$work/out" 2>"$work/err"
-[ "$(wc -l <"$PROJECT_ACTION_LOG" | tr -d ' ')" -eq 2 ]
+[ "$(wc -l <"$PROJECT_ACTION_LOG" | tr -d ' ')" -eq 1 ]
 rg -q '^build-for-testing[[:space:]]+Tests$' "$PROJECT_ACTION_LOG"
-rg -q '^build-for-testing[[:space:]]+UIUITests$' "$PROJECT_ACTION_LOG"
-rg -q '작업=compile 시도=2 성공=2 실패=0' "$work/out"
+rg -q '작업=compile 시도=1 성공=1 실패=0' "$work/out"
+rg -q '경과=[0-9][0-9]*s' "$work/out"
 
 : >"$PROJECT_ACTION_LOG"
 run_project test >"$work/out" 2>"$work/err"
-[ "$(wc -l <"$PROJECT_ACTION_LOG" | tr -d ' ')" -eq 2 ]
+[ "$(wc -l <"$PROJECT_ACTION_LOG" | tr -d ' ')" -eq 1 ]
 rg -q '^test-without-building[[:space:]]+Tests$' "$PROJECT_ACTION_LOG"
-rg -q '^test-without-building[[:space:]]+UIUITests$' "$PROJECT_ACTION_LOG"
-rg -q '작업=test 시도=2 성공=2 실패=0' "$work/out"
+rg -q '작업=test 시도=1 성공=1 실패=0' "$work/out"
+rg -q '경과=[0-9][0-9]*s' "$work/out"
+
+mkdir -p "$projects/Other/xcshareddata/xcschemes"
+printf '<Scheme><Testables><TestableReference/></Testables></Scheme>\n' \
+	>"$projects/Other/xcshareddata/xcschemes/Other.xcscheme"
+: >"$PROJECT_ACTION_LOG"
+GIT_IT_ONLY_SCHEME=Tests run_project test >"$work/out" 2>"$work/err"
+[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests')" ] || {
+	printf 'FAIL: GIT_IT_ONLY_SCHEME이 다른 scheme을 걸러내지 않음\n' >&2
+	exit 1
+}
+rg -q '작업=test 시도=1 성공=1 실패=0' "$work/out"
+unset GIT_IT_ONLY_SCHEME
+rm -rf "$projects/Other"
 
 : >"$PROJECT_ACTION_LOG"
 EXPECTED_XCRESULTS_ROOT="$work/xcresults"
 export EXPECTED_XCRESULTS_ROOT
 EXPECTED_JOBS=4 GIT_IT_XCODE_JOBS=4 GIT_IT_XCRESULTS_PATH="$EXPECTED_XCRESULTS_ROOT" \
 	run_project test-unit >"$work/out" 2>"$work/err"
-[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tTests')" ]
+[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tAllTests')" ]
 result_bundle_found=false
-for result_bundle in "$EXPECTED_XCRESULTS_ROOT"/Tests-*.xcresult; do
+for result_bundle in "$EXPECTED_XCRESULTS_ROOT"/AllTests-*.xcresult; do
 	[ -d "$result_bundle" ] && result_bundle_found=true
 done
 [ "$result_bundle_found" = true ]
@@ -147,17 +160,18 @@ unset EXPECTED_XCRESULTS_ROOT GIT_IT_XCRESULTS_PATH
 
 : >"$PROJECT_ACTION_LOG"
 run_project test-ui >"$work/out" 2>"$work/err"
-[ "$(cat "$PROJECT_ACTION_LOG")" = "$(printf 'test-without-building\tUIUITests')" ]
+[ ! -s "$PROJECT_ACTION_LOG" ]
+rg -q 'project-build.no-test-schemes' "$work/out"
 
-rm "$projects/Tests/xcshareddata/xcschemes/Tests.xcscheme" \
-	"$projects/UI/xcshareddata/xcschemes/UIUITests.xcscheme"
+rm "$projects/Tests/xcshareddata/xcschemes/Tests.xcscheme"
 : >"$PROJECT_ACTION_LOG"
 run_stage compile >"$work/out" 2>"$work/err"
 [ ! -s "$PROJECT_ACTION_LOG" ]
 rg -q 'project-build.no-test-schemes' "$work/out"
 
 rm "$projects/App/xcshareddata/xcschemes/App.xcscheme" \
-	"$projects/$newline_project/xcshareddata/xcschemes/Newline.xcscheme"
+	"$projects/$newline_project/xcshareddata/xcschemes/Newline.xcscheme" \
+	"$workspace/xcshareddata/xcschemes/AllTests.xcscheme"
 if run_stage build >"$work/out" 2>"$work/err"; then
 	printf 'FAIL: build 대상 없음이 성공함\n' >&2
 	exit 1

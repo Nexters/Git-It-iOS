@@ -8,9 +8,9 @@ import Testing
 struct LearningProjectRepositoryContractTests {
     @Test
     func `등록과 목록 및 상세 조회와 삭제만 제공한다`() async throws {
-        let registration = LearningProjectRegistration(
+        let registration = ProjectRegistrationReceipt(
             projectID: "project-1",
-            status: .ready,
+            requestStatus: "READY",
             quizLevel: .l1,
         )
         let page = LearningProjectPage(items: [], hasNext: false)
@@ -57,7 +57,7 @@ private actor LearningProjectRepositoryContractProbe: LearningProjectRepository 
     // MARK: Lifecycle
 
     init(
-        registration: LearningProjectRegistration,
+        registration: ProjectRegistrationReceipt,
         page: LearningProjectPage,
         detail: LearningProjectDetail,
     ) {
@@ -78,7 +78,7 @@ private actor LearningProjectRepositoryContractProbe: LearningProjectRepository 
     func register(
         githubRepoURL: String,
         quizLevel: QuizLevel,
-    ) async throws -> LearningProjectRegistration {
+    ) async throws -> ProjectRegistrationReceipt {
         calls.append(.register(githubRepoURL: githubRepoURL, quizLevel: quizLevel))
         return registration
     }
@@ -106,7 +106,7 @@ private actor LearningProjectRepositoryContractProbe: LearningProjectRepository 
 
     // MARK: Private
 
-    private let registration: LearningProjectRegistration
+    private let registration: ProjectRegistrationReceipt
     private let page: LearningProjectPage
     private let detail: LearningProjectDetail
     private var calls = [Call]()

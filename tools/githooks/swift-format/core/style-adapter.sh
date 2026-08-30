@@ -83,6 +83,42 @@ style_adapter_restore_one() {
 	cp -p "$style_adapter_backup" "$style_adapter_absolute_item"
 }
 
+# 저장소가 다른 경로로 이동/재클론되면 Swift-Style submodule의 .build 아래 Clang 모듈
+# 캐시(.pcm)가 예전 절대경로를 내부에 기록한 채 남아 "missing required module" 빌드
+# 실패로 이어집니다. 이전 실행 경로를 marker 파일에 남겨 현재 경로와 비교하고, 다르면
+# .build를 통째로 지워 다음 빌드가 새 경로로 캐시를 다시 만들게 합니다.
+style_adapter_ensure_fresh_build_cache() {
+	style_adapter_style_dir=$1
+	style_adapter_build_dir="$style_adapter_style_dir/.build"
+	style_adapter_marker="$style_adapter_build_dir/.git-it-build-root"
+
+	if [ -d "$style_adapter_build_dir" ]; then
+		style_adapter_recorded=""
+		if [ -f "$style_adapter_marker" ]; then
+			style_adapter_recorded=$(cat "$style_adapter_marker") || style_adapter_recorded=""
+		fi
+		if [ "$style_adapter_recorded" != "$style_adapter_style_dir" ]; then
+			printf '진단[swift-format.stale-build-cache]: 저장소 경로가 바뀌어 %s 캐시를 초기화합니다\n' \
+				"$style_adapter_build_dir" >&2
+			# macOS에서 Spotlight/Finder가 .DS_Store를 다시 만들며 rm -rf가 일시적으로
+			# "Directory not empty"를 내는 경우가 있어 짧게 재시도합니다.
+			style_adapter_remove_attempt=0
+			while [ -d "$style_adapter_build_dir" ] && [ "$style_adapter_remove_attempt" -lt 3 ]; do
+				rm -rf "$style_adapter_build_dir" 2>/dev/null || :
+				style_adapter_remove_attempt=$((style_adapter_remove_attempt + 1))
+			done
+			if [ -d "$style_adapter_build_dir" ]; then
+				printf '오류[swift-format.stale-build-cache-removal-failed]: %s를 지우지 못했습니다\n조치: 디렉터리 권한과 잠긴 프로세스를 확인한 뒤 수동으로 삭제하세요\n' \
+					"$style_adapter_build_dir" >&2
+				return 2
+			fi
+		fi
+	fi
+
+	mkdir -p "$style_adapter_build_dir" || return 2
+	printf '%s' "$style_adapter_style_dir" >"$style_adapter_marker"
+}
+
 style_adapter_verify_one() {
 	style_adapter_root=$1
 	style_adapter_item=$2
@@ -111,4 +147,7 @@ elif [ "${1:-}" = --restore-one ]; then
 elif [ "${1:-}" = --verify-one ]; then
 	shift
 	style_adapter_verify_one "$@"
+elif [ "${1:-}" = --ensure-fresh-cache ]; then
+	shift
+	style_adapter_ensure_fresh_build_cache "$@"
 fi

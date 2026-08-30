@@ -77,7 +77,9 @@ extension ProjectName {
                     buildTargets: [
                         FeatureModuleName.Feature.rawValue
                     ],
-                    testTargets: [],
+                    testTargets: [
+                        FeatureModuleName.FeatureTests.rawValue
+                    ],
                 )]
 
             case .Domain:
@@ -86,10 +88,12 @@ extension ProjectName {
                     buildTargets: [
                         DomainModuleName.DomainAuthentication.rawValue,
                         DomainModuleName.DomainLearningProject.rawValue,
+                        DomainModuleName.DomainMember.rawValue,
                     ],
                     testTargets: [
                         DomainModuleName.DomainAuthenticationTests.rawValue,
                         DomainModuleName.DomainLearningProjectTests.rawValue,
+                        DomainModuleName.DomainMemberTests.rawValue,
                     ],
                 )]
 
@@ -99,12 +103,14 @@ extension ProjectName {
                     buildTargets: [
                         DataModuleName.DataAuthentication.rawValue,
                         DataModuleName.DataLearningProject.rawValue,
+                        DataModuleName.DataLegalConsent.rawValue,
                         DataModuleName.DataMember.rawValue,
                         DataModuleName.DataExternalRepository.rawValue,
                     ],
                     testTargets: [
                         DataModuleName.DataAuthenticationTests.rawValue,
                         DataModuleName.DataLearningProjectTests.rawValue,
+                        DataModuleName.DataLegalConsentTests.rawValue,
                         DataModuleName.DataMemberTests.rawValue,
                         DataModuleName.DataExternalRepositoryTests.rawValue,
                     ],
@@ -117,11 +123,13 @@ extension ProjectName {
                         InfrastructureModuleName.InfrastructureAuthentication.rawValue,
                         InfrastructureModuleName.InfrastructureNetworkClient.rawValue,
                         InfrastructureModuleName.InfrastructureCache.rawValue,
+                        InfrastructureModuleName.InfrastructureStorage.rawValue,
                     ],
                     testTargets: [
                         InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,
                         InfrastructureModuleName.InfrastructureNetworkClientTests.rawValue,
                         InfrastructureModuleName.InfrastructureCacheTests.rawValue,
+                        InfrastructureModuleName.InfrastructureStorageTests.rawValue,
                     ],
                 )]
 
@@ -132,22 +140,11 @@ extension ProjectName {
                         buildTargets: [
                             UIModuleName.DesignSystem.rawValue,
                             UIModuleName.UIComponent.rawValue,
-                            UIModuleName.UIComponentPreview.rawValue,
                         ],
                         testTargets: [
-                            UIModuleName.DesignSystemTests.rawValue,
-                            UIModuleName.UIComponentTests.rawValue,
+                            UIModuleName.UIComponentTests.rawValue
                         ],
-                        runTarget: UIModuleName.UIComponentPreview.rawValue,
-                    ),
-                    .package(
-                        name: "UIUITests",
-                        buildTargets: [UIModuleName.UIComponentPreview.rawValue],
-                        testTargets: [
-                            UIModuleName.UIComponentUITests.rawValue
-                        ],
-                        runTarget: UIModuleName.UIComponentPreview.rawValue,
-                    ),
+                    )
                 ]
             }
 

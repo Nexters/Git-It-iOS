@@ -11,6 +11,8 @@ script_tests_list_scheme_test_targets() (
 		}
 		/testTargets:[[:space:]]*\[/ {
 			in_test_targets = 1
+			# 빈 배열은 같은 줄에서 끝나므로 다음 package의 build target을 읽으면 안 됩니다.
+			if ($0 ~ /\]/) in_test_targets = 0
 			next
 		}
 		in_test_targets && /ModuleName\.[[:alnum:]_]+\.rawValue/ {
@@ -49,8 +51,26 @@ script_tests_declared_source_directory() (
 	# ModuleName.sourceDirectory 연산 프로퍼티를 전달하면 target 이름의 패키지 접두어와
 	# 테스트 접미어를 제거해 테스트 컨벤션의 역할 경로로 해석합니다.
 	script_tests_source_declaration=$(awk -v expected_target="$script_tests_target" '
+		/var[[:space:]]+sourceDirectory[[:space:]]*:/ {
+			in_source_directory = 1
+			next
+		}
+		/var[[:space:]]+target[[:space:]]*:/ {
+			in_source_directory = 0
+		}
 		/case[[:space:]]+\.[[:alnum:]_]+:/ {
 			matches_target = index($0, "." expected_target) > 0
+			matches_source_directory_case = in_source_directory && matches_target
+			next
+		}
+		# sourceDirectory enum 분기의 문자열은 target 이름이 아닌 실제 역할 경로입니다.
+		matches_source_directory_case && /^[[:space:]]*"[^"]+"[[:space:]]*$/ {
+			source_directory = $0
+			sub(/^[[:space:]]*"/, "", source_directory)
+			sub(/"[[:space:]]*$/, "", source_directory)
+			print source_directory
+			found = 1
+			exit
 		}
 		/name:[[:space:]]*/ && index($0, "." expected_target ".rawValue") > 0 {
 			matches_target = 1
@@ -119,6 +139,11 @@ script_tests_target_has_test_case() (
 		'' | /* | .. | ../* | */../* | */..) return 2 ;;
 		esac
 		script_tests_declared_path="$script_tests_projects/$script_tests_package/$script_tests_source_directory"
+		# 일부 Tuist target은 테스트 역할 경로만 제공하고 소스 목록 선언에서 Tests 접두어를 붙입니다.
+		# 직접 경로가 없을 때만 테스트 루트 아래의 같은 역할 경로를 보조로 확인합니다.
+		if [ ! -d "$script_tests_declared_path" ] && [ -d "$script_tests_projects/$script_tests_package/Tests/$script_tests_source_directory" ]; then
+			script_tests_declared_path="$script_tests_projects/$script_tests_package/Tests/$script_tests_source_directory"
+		fi
 		[ -d "$script_tests_declared_path" ] || return 1
 		printf '%s\0' "$script_tests_declared_path" >"$script_tests_target_list"
 	else
