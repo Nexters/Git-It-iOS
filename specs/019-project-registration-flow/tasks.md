@@ -141,18 +141,18 @@ helper 파일에 있으므로(`ExternalDependenciesName`이 외부 SPM product �
 
 ### 테스트
 
-- [ ] T011 [P] [S3] `sources/Projects/Data/Tests/LearningProject/DTOs/ProjectGenerationOutcomeDTOTests.swift`에 `[String: String]` payload로부터 완료·실패 각각 디코딩 성공, 알 수 없는 상태값과 필수 키 누락 시 디코딩 실패(nil 또는 throw)를 검증하는 테스트를 작성한다.
-- [ ] T012 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Remotes/PushProjectGenerationOutcomeRemoteTests.swift`에 (a) `outcomes()`를 두 번 호출해 만든 두 스트림이 `ingest(rawPayload:)` 한 번 호출로 동일 이벤트를 각자 받는지(멀티캐스트), (b) 디코딩 실패 payload가 조용히 폐기되는지, (c) 한 스트림의 소비를 끝내도 다른 스트림이 계속 이벤트를 받는지 검증하는 테스트를 작성한다.
+- [X] T011 [P] [S3] `sources/Projects/Data/Tests/LearningProject/DTOs/ProjectGenerationOutcomeDTOTests.swift`에 `[String: String]` payload로부터 완료·실패 각각 디코딩 성공, 알 수 없는 상태값과 필수 키 누락 시 디코딩 실패(nil 또는 throw)를 검증하는 테스트를 작성한다.
+- [X] T012 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Remotes/PushProjectGenerationOutcomeRemoteTests.swift`에 (a) `outcomes()`를 두 번 호출해 만든 두 스트림이 `ingest(rawPayload:)` 한 번 호출로 동일 이벤트를 각자 받는지(멀티캐스트), (b) 디코딩 실패 payload가 조용히 폐기되는지, (c) 한 스트림의 소비를 끝내도 다른 스트림이 계속 이벤트를 받는지 검증하는 테스트를 작성한다.
 
 ### 구현
 
-- [ ] T013 [P] [S3] `sources/Projects/Data/LearningProject/DTOs/ProjectGenerationOutcomeDTO.swift`에 `ProjectGenerationOutcomeDTO`(projectID, status: RawStatus)와 `[String: String]` payload 디코딩 initializer를 `data-model.md` "신규 Data 계약·모델" 절에 따라 구현한다.
-- [ ] T014 [S3] `sources/Projects/Data/LearningProject/Contracts/ProjectGenerationOutcomeRemote.swift`에 `ProjectGenerationOutcomeRemote` 프로토콜(`func outcomes() -> AsyncStream<ProjectGenerationOutcomeDTO>`)을 구현한다.
-- [ ] T015 [S3] `sources/Projects/Data/LearningProject/Remotes/PushProjectGenerationOutcomeRemote.swift`에 T014를 구현하는 actor `PushProjectGenerationOutcomeRemote`(continuation 등록/해제, `ingest(rawPayload:)`)를 `contracts/domain-data-contracts.md` 3절에 따라 구현한다.
+- [X] T013 [P] [S3] `sources/Projects/Data/LearningProject/DTOs/ProjectGenerationOutcomeDTO.swift`에 `ProjectGenerationOutcomeDTO`(projectID, status: RawStatus)와 `[String: String]` payload 디코딩 initializer를 `data-model.md` "신규 Data 계약·모델" 절에 따라 구현한다.
+- [X] T014 [S3] `sources/Projects/Data/LearningProject/Contracts/ProjectGenerationOutcomeRemote.swift`에 `ProjectGenerationOutcomeRemote` 프로토콜(`func outcomes() -> AsyncStream<ProjectGenerationOutcomeDTO>`)을 구현한다.
+- [X] T015 [S3] `sources/Projects/Data/LearningProject/Remotes/PushProjectGenerationOutcomeRemote.swift`에 T014를 구현하는 actor `PushProjectGenerationOutcomeRemote`(continuation 등록/해제, `ingest(rawPayload:)`)를 `contracts/domain-data-contracts.md` 3절에 따라 구현한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T016 [no-write] Data target 테스트를 실행해 T011~T012가 통과하는지 확인한다.
+- [X] T016 [no-write] Data target 테스트를 실행해 T011~T012가 통과하는지 확인한다.
 
 **진행 점검**: T011~T016의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위(Composition)로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을
