@@ -202,6 +202,7 @@ public struct HomeScreen: View {
         }
         .padding(EdgeInsets(top: 13, leading: 16, bottom: 12, trailing: 12))
         .frame(minHeight: 133, alignment: .topLeading)
+        .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
     }
 
     private var projectSection: some View {
