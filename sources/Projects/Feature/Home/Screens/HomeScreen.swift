@@ -269,7 +269,7 @@ public struct HomeScreen: View {
         return ScrollView(.horizontal) {
             ZStack {
                 RoundedRectangle(designSystem: .large)
-                    .stroke(Color(designSystem: .purple300), lineWidth: 1)
+                    .stroke(Color(designSystem: .purple300).opacity(0.3), lineWidth: 1)
                     .frame(width: bounds.width, height: bounds.height)
                     .position(x: bounds.midX, y: bounds.midY)
 
