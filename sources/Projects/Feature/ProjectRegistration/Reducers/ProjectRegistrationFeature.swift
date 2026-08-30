@@ -12,9 +12,11 @@ public struct ProjectRegistrationFeature: Sendable {
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
+        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
+        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
     }
 
     // MARK: Public
@@ -28,6 +30,7 @@ public struct ProjectRegistrationFeature: Sendable {
         public var validation = ValidationStatus.idle
         public var submission = SubmissionStatus.idle
         public var validationRequestID = 0
+        public var isNotificationOptionSheetPresented = false
     }
 
     public enum ValidationStatus: Equatable, Sendable {
@@ -40,6 +43,7 @@ public struct ProjectRegistrationFeature: Sendable {
     public enum SubmissionStatus: Equatable, Sendable {
         case idle
         case committing
+        case awaitingGeneration(ProjectRegistrationReceipt)
         case failed(LearningProjectError)
     }
 
@@ -56,17 +60,23 @@ public struct ProjectRegistrationFeature: Sendable {
             case quizLevelSelected(QuizLevel)
             case validateTapped
             case submitTapped
+            case waitAtHomeTapped
+            case notificationOptionAccepted
+            case notificationOptionDeclined
+            case retryTapped
         }
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case validationFinished(requestID: Int, result: Result<ExternalRepository, ExternalRepositoryError>)
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
+            case generationOutcomeReceived(LearningProjectGenerationOutcome)
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectRegistered(ProjectRegistrationReceipt)
+            case notificationOptionSelected(accepted: Bool)
         }
     }
 
@@ -104,21 +114,29 @@ public struct ProjectRegistrationFeature: Sendable {
                     case .validated(let repository) = state.validation,
                     state.submission != .committing
                 else { return .none }
-                state.submission = .committing
-                let quizLevel = state.quizLevel
-                return .run { send in
-                    do {
-                        let receipt = try await createLearningProject(
-                            githubRepoURL: repository.canonicalURL,
-                            quizLevel: quizLevel,
-                        )
-                        await send(.effect(.submissionFinished(.success(receipt))))
-                    } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
-                        await send(.effect(.submissionFinished(.failure(mapped))))
-                    }
-                }
-                .cancellable(id: CancelID.submission)
+                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+
+            case .view(.retryTapped):
+                guard
+                    case .failed = state.submission,
+                    case .validated(let repository) = state.validation
+                else { return .none }
+                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+
+            case .view(.waitAtHomeTapped):
+                guard case .awaitingGeneration = state.submission else { return .none }
+                state.isNotificationOptionSheetPresented = true
+                return .none
+
+            case .view(.notificationOptionAccepted):
+                guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
+                state.isNotificationOptionSheetPresented = false
+                return finishWaiting(receipt: receipt, notifyAccepted: true)
+
+            case .view(.notificationOptionDeclined):
+                guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
+                state.isNotificationOptionSheetPresented = false
+                return finishWaiting(receipt: receipt, notifyAccepted: false)
 
             case .effect(.validationFinished(let requestID, let result)):
                 guard requestID == state.validationRequestID else { return .none }
@@ -132,12 +150,29 @@ public struct ProjectRegistrationFeature: Sendable {
                 return .none
 
             case .effect(.submissionFinished(.success(let receipt))):
-                state.submission = .idle
-                return .send(.delegate(.projectRegistered(receipt)))
+                state.submission = .awaitingGeneration(receipt)
+                return observeGenerationOutcomes(projectID: receipt.projectID)
 
             case .effect(.submissionFinished(.failure(let error))):
                 state.submission = .failed(error)
-                return .none
+                return .cancel(id: CancelID.generationOutcomeObservation)
+
+            case .effect(.generationOutcomeReceived(let outcome)):
+                guard
+                    case .awaitingGeneration(let receipt) = state.submission,
+                    outcome.projectID == receipt.projectID
+                else { return .none }
+                switch outcome.status {
+                case .completed:
+                    return finishWaiting(receipt: receipt, notifyAccepted: nil)
+
+                case .failed:
+                    state.submission = .failed(.unexpected)
+                    return .cancel(id: CancelID.generationOutcomeObservation)
+
+                @unknown default:
+                    return .none
+                }
 
             case .delegate:
                 return .none
@@ -150,9 +185,56 @@ public struct ProjectRegistrationFeature: Sendable {
     private enum CancelID: Hashable {
         case validation
         case submission
+        case generationOutcomeObservation
     }
 
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
+    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+
+    private func submit(
+        repository: ExternalRepository,
+        quizLevel: QuizLevel,
+        state: inout State,
+    ) -> Effect<Action> {
+        state.submission = .committing
+        return .run { send in
+            do {
+                let receipt = try await createLearningProject(
+                    githubRepoURL: repository.canonicalURL,
+                    quizLevel: quizLevel,
+                )
+                await send(.effect(.submissionFinished(.success(receipt))))
+            } catch {
+                let mapped = error as? LearningProjectError ?? .unexpected
+                await send(.effect(.submissionFinished(.failure(mapped))))
+            }
+        }
+        .cancellable(id: CancelID.submission)
+    }
+
+    private func observeGenerationOutcomes(projectID: String) -> Effect<Action> {
+        .run { send in
+            for await outcome in await observeLearningProjectGenerationOutcomes() where outcome.projectID == projectID {
+                await send(.effect(.generationOutcomeReceived(outcome)))
+            }
+        }
+        .cancellable(id: CancelID.generationOutcomeObservation)
+    }
+
+    private func finishWaiting(
+        receipt: ProjectRegistrationReceipt,
+        notifyAccepted: Bool?,
+    ) -> Effect<Action> {
+        .merge(
+            .cancel(id: CancelID.generationOutcomeObservation),
+            .run { send in
+                if let notifyAccepted {
+                    await send(.delegate(.notificationOptionSelected(accepted: notifyAccepted)))
+                }
+                await send(.delegate(.projectRegistered(receipt)))
+            }
+        )
+    }
 
 }
