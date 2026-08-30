@@ -41,6 +41,11 @@ struct AppRootView: View {
                     ResetAllButton(action: { send(.resetAllTapped) })
                 }
             #endif
+                .fullScreenCover(
+                    item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
+                ) { store in
+                    ProjectRegistrationScreen(store: store)
+                }
         }
     }
 
@@ -160,6 +165,27 @@ private enum AppRootPreviewSupport {
         }
     }
 
+    struct NoopFetchExternalRepository: FetchExternalRepositoryUseCase {
+        func callAsFunction(url _: String) async throws -> ExternalRepository {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopCreateLearningProject: CreateLearningProjectUseCase {
+        func callAsFunction(
+            githubRepoURL _: String,
+            quizLevel _: QuizLevel,
+        ) async throws -> ProjectRegistrationReceipt {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopObserveLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCase {
+        func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
+            AsyncStream { _ in }
+        }
+    }
+
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = route
@@ -178,6 +204,9 @@ private enum AppRootPreviewSupport {
                 updateMemberPosition: NoopUpdateMemberPosition(),
                 updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),
+                fetchExternalRepository: NoopFetchExternalRepository(),
+                createLearningProject: NoopCreateLearningProject(),
+                observeLearningProjectGenerationOutcomes: NoopObserveLearningProjectGenerationOutcomes(),
             )
         }
     }

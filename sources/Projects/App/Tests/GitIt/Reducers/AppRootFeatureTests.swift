@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DomainAuthentication
+import DomainLearningProject
 import Feature
 import Testing
 
@@ -266,6 +267,33 @@ struct AppRootFeatureTests {
         )
         #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell == MainShellFeature.State())
+    }
+
+    @Test
+    func `projectRegistrationRequested delegate는 등록 흐름 State를 채운다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.delegate(.projectRegistrationRequested))) {
+            $0.projectRegistration = ProjectRegistrationFeature.State()
+        }
+    }
+
+    @Test
+    func `등록 완료 delegate는 등록 흐름을 닫고 Home을 정확히 한 번 재조회한다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        let receipt = ProjectRegistrationReceipt(projectID: "project-1", requestStatus: "accepted", quizLevel: .l1)
+        await store.send(.projectRegistration(.presented(.delegate(.projectRegistered(receipt))))) {
+            $0.projectRegistration = nil
+        }
+        await store.receive(.mainShell(.home(.view(.reloadRequested))))
     }
 
     @Test

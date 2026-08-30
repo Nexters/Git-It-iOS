@@ -56,13 +56,23 @@ struct GitItApp: App {
                 updateMemberPosition: composition.updateMemberPosition,
                 updateMemberCareerLevel: composition.updateMemberCareerLevel,
                 deleteMemberAccount: composition.deleteMemberAccount,
+                fetchExternalRepository: composition.fetchExternalRepository,
+                createLearningProject: composition.createLearningProject,
+                observeLearningProjectGenerationOutcomes: composition.observeLearningProjectGenerationOutcomes,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
                 resetAllForTesting: resetAllForTesting,
             )
         }
+
+        GitItAppDelegate.configure(
+            forwardAPNsToken: composition.forwardAPNsToken,
+            ingestPushPayload: composition.ingestPushPayload,
+        )
     }
 
     // MARK: Internal
+
+    @UIApplicationDelegateAdaptor(GitItAppDelegate.self) var appDelegate
 
     let rootStore: StoreOf<AppRootFeature>
 

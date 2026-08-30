@@ -76,6 +76,8 @@ func makeAppRootStore(
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
     observeAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCaseMock = ObserveAuthenticationOutcomesUseCaseMock(),
     resetAllForTesting: (@Sendable () async -> Void)? = nil,
+    observeLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCaseMock =
+        ObserveLearningProjectGenerationOutcomesUseCaseMock(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -93,6 +95,9 @@ func makeAppRootStore(
             updateMemberPosition: NoopUpdateMemberPositionUseCase(),
             updateMemberCareerLevel: NoopUpdateMemberCareerLevelUseCase(),
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
+            fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
+            createLearningProject: NoopCreateLearningProjectUseCase(),
+            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
             resetAllForTesting: resetAllForTesting,
         )
     }

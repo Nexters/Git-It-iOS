@@ -312,6 +312,7 @@ Scaffolds/TabShell/
 | | `Configurations/` | 실행 환경과 번들 설정 |
 | | `Loaders/` | 번들 리소스 해석 |
 | | `Resources/` | 앱 자산과 정책 문서 |
+| | `AppDelegates/` | 플랫폼 생명주기 delegate 타입 |
 | `Tests/<역할>/` | production과 같은 형태 폴더 | 대상 형태를 그대로 사용 |
 | | `TestDoubles/` | 둘 이상의 파일에서 쓰는 Test Double |
 

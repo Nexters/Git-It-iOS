@@ -65,7 +65,10 @@ extension AppModuleName {
                     ]
                 ),
                 sources: ["\(sourceDirectory)/**"],
-                resources: ["\(sourceDirectory)/Resources/**"],
+                resources: [
+                    "\(sourceDirectory)/Resources/**",
+                    "Config/GoogleService-Info.plist",
+                ],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
                     .target(name: AppModuleName.AppDebug.rawValue),

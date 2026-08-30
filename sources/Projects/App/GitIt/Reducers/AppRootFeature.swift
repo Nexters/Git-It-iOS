@@ -26,6 +26,9 @@ nonisolated struct AppRootFeature: Sendable {
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
+        fetchExternalRepository: any FetchExternalRepositoryUseCase,
+        createLearningProject: any CreateLearningProjectUseCase,
+        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
         deletesCompletedAccountOnSignIn: Bool = false,
         resetAllForTesting: (@Sendable () async -> Void)? = nil,
     ) {
@@ -42,6 +45,9 @@ nonisolated struct AppRootFeature: Sendable {
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
+        self.fetchExternalRepository = fetchExternalRepository
+        self.createLearningProject = createLearningProject
+        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
         self.resetAllForTesting = resetAllForTesting
     }
@@ -65,6 +71,7 @@ nonisolated struct AppRootFeature: Sendable {
         var appEntry: AppEntryFeature.State
         var onboarding: OnboardingRouterFeature.State
         var mainShell = MainShellFeature.State()
+        @Presents var projectRegistration: ProjectRegistrationFeature.State?
     }
 
     enum Action: ViewAction, Sendable, Equatable {
@@ -73,6 +80,7 @@ nonisolated struct AppRootFeature: Sendable {
         case appEntry(AppEntryFeature.Action)
         case onboarding(OnboardingRouterFeature.Action)
         case mainShell(MainShellFeature.Action)
+        case projectRegistration(PresentationAction<ProjectRegistrationFeature.Action>)
 
         @CasePathable
         enum View: Sendable, Equatable {
@@ -115,6 +123,7 @@ nonisolated struct AppRootFeature: Sendable {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
+                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
             )
         }
         Reduce { state, action in
@@ -175,17 +184,37 @@ nonisolated struct AppRootFeature: Sendable {
                 returnToOnboarding(&state)
                 return .none
 
+            case .mainShell(.delegate(.projectRegistrationRequested)):
+                state.projectRegistration = ProjectRegistrationFeature.State()
+                return .none
+
             case .mainShell(.delegate(.projectSelected)),
                  .mainShell(.delegate(.questionSelected)),
-                 .mainShell(.delegate(.projectRegistrationRequested)),
                  .mainShell(.delegate(.projectDetailRequested)),
                  .mainShell(.delegate(.learningRequested)):
+                return .none
+
+            case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
+                state.projectRegistration = nil
+                return .send(.mainShell(.home(.view(.reloadRequested))))
+
+            case .projectRegistration(.presented(.delegate(.notificationOptionSelected(_)))):
+                return .none
+
+            case .projectRegistration:
                 return .none
 
             case .onboarding,
                  .mainShell:
                 return .none
             }
+        }
+        .ifLet(\.$projectRegistration, action: \.projectRegistration) {
+            ProjectRegistrationFeature(
+                fetchExternalRepository: fetchExternalRepository,
+                createLearningProject: createLearningProject,
+                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            )
         }
     }
 
@@ -209,6 +238,9 @@ nonisolated struct AppRootFeature: Sendable {
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
+    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
+    private let createLearningProject: any CreateLearningProjectUseCase
+    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
 
