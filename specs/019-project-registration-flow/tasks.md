@@ -254,14 +254,14 @@ reducer 테스트로 각 시나리오의 State 전이·delegate 출력을 독립
 
 ### 트랙 B: Home/MainShell — 테스트
 
-- [ ] T037 [P] [S3] `sources/Projects/Feature/Tests/Home/TestDoubles/StubObserveLearningProjectGenerationOutcomesUseCase.swift`에 여러 이벤트를 스크립트로 방출하는 Test Double을 작성한다.
-- [ ] T038 [S3] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureTests.swift`(기존 파일 확장)에 `view(.task)`가 `generationOutcomeObservation`이 `idle`일 때만 관찰 Effect를 시작하고 재호출 시 중복 구독하지 않는지, `generationOutcomeReceived`가 일치하는 `projectID`의 프로젝트 표시 상태를 갱신하는지, `reloadRequested`가 `projectLoad`가 `.loading`이 아닐 때만 새 조회를 시작하는지 검증하는 케이스를 추가한다(FR-013, FR-022).
+- [X] T037 [P] [S3] `sources/Projects/Feature/Tests/Home/TestDoubles/StubObserveLearningProjectGenerationOutcomesUseCase.swift`에 여러 이벤트를 스크립트로 방출하는 Test Double을 작성한다.
+- [X] T038 [S3] `sources/Projects/Feature/Tests/Home/Reducers/HomeFeatureTests.swift`(기존 파일 확장)에 `view(.task)`가 `generationOutcomeObservation`이 `idle`일 때만 관찰 Effect를 시작하고 재호출 시 중복 구독하지 않는지, `generationOutcomeReceived`가 일치하는 `projectID`의 프로젝트 표시 상태를 갱신하는지, `reloadRequested`가 `projectLoad`가 `.loading`이 아닐 때만 새 조회를 시작하는지 검증하는 케이스를 추가한다(FR-013, FR-022).
 
 ### 트랙 B: Home/MainShell — 구현
 
-- [ ] T039 [S3] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`를 수정해 `contracts/feature-app-contracts.md` 2절의 계약(신규 init 매개변수, `View.reloadRequested`, `EffectEvent.generationOutcomeReceived`, `generationOutcomeObservation` State, 장기 관찰 Effect)을 구현한다.
-- [ ] T040 [S3] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`를 수정해 `observeLearningProjectGenerationOutcomes`를 신규 init 매개변수로 받아 `HomeFeature`로 그대로 전달한다.
-- [ ] T041 [S3] `sources/Projects/Feature/Tests/MainShell/Reducers/MainShellFeatureTests.swift`(기존 파일 수정)의 `makeStore(...)` 헬퍼가 `MainShellFeature(...)` 생성자 호출에 `observeLearningProjectGenerationOutcomes` 인자를 추가하도록 갱신한다. T037의 Stub Test Double(또는 동등한 Mock)을 재사용해 인자를 채운다(T040이 추가하는 신규 init 매개변수로 인해 이 파일이 컴파일되지 않는 것을 방지).
+- [X] T039 [S3] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`를 수정해 `contracts/feature-app-contracts.md` 2절의 계약(신규 init 매개변수, `View.reloadRequested`, `EffectEvent.generationOutcomeReceived`, `generationOutcomeObservation` State, 장기 관찰 Effect)을 구현한다.
+- [X] T040 [S3] `sources/Projects/Feature/MainShell/Reducers/MainShellFeature.swift`를 수정해 `observeLearningProjectGenerationOutcomes`를 신규 init 매개변수로 받아 `HomeFeature`로 그대로 전달한다.
+- [X] T041 [S3] `sources/Projects/Feature/Tests/MainShell/Reducers/MainShellFeatureTests.swift`(기존 파일 수정)의 `makeStore(...)` 헬퍼가 `MainShellFeature(...)` 생성자 호출에 `observeLearningProjectGenerationOutcomes` 인자를 추가하도록 갱신한다. T037의 Stub Test Double(또는 동등한 Mock)을 재사용해 인자를 채운다(T040이 추가하는 신규 init 매개변수로 인해 이 파일이 컴파일되지 않는 것을 방지).
 
 ### 정리와 패키지 검증
 

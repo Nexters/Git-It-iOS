@@ -17,7 +17,11 @@ struct HomeFeatureLoadTests {
             suspendsRequests: true,
         )
         let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.task)) {
@@ -50,7 +54,11 @@ struct HomeFeatureLoadTests {
         state.profileLoad = .failed(.temporarilyUnavailable)
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = TestStore(initialState: state) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.profileRetryTapped)) {
@@ -74,6 +82,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
             )
         }
 
@@ -91,7 +100,11 @@ struct HomeFeatureLoadTests {
             suspendsRequests: true,
         )
         let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.task)) {

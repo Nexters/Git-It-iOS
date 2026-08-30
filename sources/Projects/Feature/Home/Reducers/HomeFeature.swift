@@ -7,9 +7,11 @@ public struct HomeFeature: Sendable {
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
+        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.fetchMemberProfile = fetchMemberProfile
+        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
     }
 
     @ObservableState
@@ -30,10 +32,16 @@ public struct HomeFeature: Sendable {
             case failed(LearningProjectError)
         }
 
+        public enum GenerationOutcomeObservation: Equatable, Sendable {
+            case idle
+            case observing
+        }
+
         public var profileLoad = ProfileLoad.idle
         public var projectLoad = ProjectLoad.idle
         public var profileRequestID = 0
         public var projectRequestID = 0
+        public var generationOutcomeObservation = GenerationOutcomeObservation.idle
     }
 
     public enum Action: ViewAction, Equatable, Sendable {
@@ -49,12 +57,14 @@ public struct HomeFeature: Sendable {
             case showAllProjectsTapped
             case projectCardTapped(projectID: String)
             case learningTapped(projectID: String)
+            case reloadRequested
         }
 
         @CasePathable
         public enum Effect: Equatable, Sendable {
             case profileLoadFinished(requestID: Int, result: Result<MemberProfile, MemberError>)
             case projectsLoadFinished(requestID: Int, result: Result<LearningProjectPage, LearningProjectError>)
+            case generationOutcomeReceived(LearningProjectGenerationOutcome)
         }
 
         @CasePathable
@@ -76,7 +86,15 @@ public struct HomeFeature: Sendable {
                 if state.projectLoad == .idle {
                     effects.append(startProjectLoad(state: &state))
                 }
+                if state.generationOutcomeObservation == .idle {
+                    state.generationOutcomeObservation = .observing
+                    effects.append(observeGenerationOutcomes())
+                }
                 return .merge(effects)
+
+            case .view(.reloadRequested):
+                guard state.projectLoad != .loading else { return .none }
+                return startProjectLoad(state: &state)
 
             case .view(.profileRetryTapped):
                 guard case .failed = state.profileLoad else { return .none }
@@ -124,6 +142,10 @@ public struct HomeFeature: Sendable {
                 }
                 return .none
 
+            case .effect(.generationOutcomeReceived):
+                guard state.projectLoad != .loading else { return .none }
+                return startProjectLoad(state: &state)
+
             case .delegate:
                 return .none
             }
@@ -137,6 +159,7 @@ public struct HomeFeature: Sendable {
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
+    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
@@ -172,5 +195,14 @@ public struct HomeFeature: Sendable {
             }
         }
         .cancellable(id: CancelID.projects, cancelInFlight: true)
+    }
+
+    private func observeGenerationOutcomes() -> ComposableArchitecture.Effect<Action> {
+        let observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        return .run { send in
+            for await outcome in await observeLearningProjectGenerationOutcomes() {
+                await send(.effect(.generationOutcomeReceived(outcome)))
+            }
+        }
     }
 }
