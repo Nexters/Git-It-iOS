@@ -261,13 +261,23 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjectCards: some View {
+        let cardSize = CGSize(width: 154, height: 192)
         let angles = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172).initialAngles(cardCount: 3)
+        let centers = angles.indices.map { CGPoint(x: cardSize.width / 2 + CGFloat($0) * 172, y: cardSize.height / 2) }
+        let bounds = Self.cardGroupBounds(centers: centers, size: cardSize, angles: angles)
 
         return ScrollView(.horizontal) {
-            HStack(spacing: 18) {
-                ForEach(angles.indices, id: \.self) { index in
-                    emptyProjectCard
-                        .rotationEffect(.degrees(angles[index]))
+            ZStack {
+                RoundedRectangle(designSystem: .large)
+                    .stroke(Color(designSystem: .purple300), lineWidth: 1)
+                    .frame(width: bounds.width, height: bounds.height)
+                    .position(x: bounds.midX, y: bounds.midY)
+
+                HStack(spacing: 18) {
+                    ForEach(angles.indices, id: \.self) { index in
+                        emptyProjectCard(size: cardSize)
+                            .rotationEffect(.degrees(angles[index]))
+                    }
                 }
             }
             .padding(.horizontal, 20)
@@ -277,14 +287,46 @@ public struct HomeScreen: View {
         .accessibilityHidden(true)
     }
 
-    private var emptyProjectCard: some View {
+    private static func cardGroupBounds(
+        centers: [CGPoint],
+        size: CGSize,
+        angles: [Double],
+    ) -> CGRect {
+        let halfWidth = size.width / 2
+        let halfHeight = size.height / 2
+        let corners: [(dx: CGFloat, dy: CGFloat)] = [
+            (-halfWidth, -halfHeight),
+            (halfWidth, -halfHeight),
+            (halfWidth, halfHeight),
+            (-halfWidth, halfHeight),
+        ]
+
+        let points = zip(centers, angles).flatMap { center, angle -> [CGPoint] in
+            let radians = angle * .pi / 180
+            return corners.map { corner in
+                CGPoint(
+                    x: center.x + corner.dx * cos(radians) - corner.dy * sin(radians),
+                    y: center.y + corner.dx * sin(radians) + corner.dy * cos(radians),
+                )
+            }
+        }
+
+        guard
+            let minX = points.map(\.x).min(),
+            let maxX = points.map(\.x).max(),
+            let minY = points.map(\.y).min(),
+            let maxY = points.map(\.y).max()
+        else {
+            return .zero
+        }
+
+        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+    }
+
+    private func emptyProjectCard(size: CGSize) -> some View {
         RoundedRectangle(designSystem: .large)
             .fill(Color(designSystem: .blue500).opacity(0.3))
-            .frame(width: 154, height: 192)
-            .overlay {
-                RoundedRectangle(designSystem: .large)
-                    .stroke(Color(designSystem: .purple300), lineWidth: 1)
-            }
+            .frame(width: size.width, height: size.height)
     }
 
     private func projectCards(_ projects: [Display.Project]) -> some View {
