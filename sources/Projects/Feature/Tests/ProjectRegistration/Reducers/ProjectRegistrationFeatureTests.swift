@@ -164,7 +164,8 @@ struct ProjectRegistrationFeatureTests {
             state: state,
         )
 
-        await store.send(.view(.waitAtHomeTapped)) {
+        await store.send(.view(.waitAtHomeTapped))
+        await store.receive(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: false))) {
             $0.isNotificationOptionSheetPresented = true
         }
         await store.send(.view(.notificationOptionDeclined)) {
@@ -172,6 +173,33 @@ struct ProjectRegistrationFeatureTests {
         }
         await store.receive(.delegate(.notificationOptionSelected(accepted: false)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        await learningProjectOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `waitAtHomeTapped는 알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록하고 projectRegistered를 출력한다`() async {
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let requestGenerationReminder = StubRequestGenerationReminderUseCase(
+            results: [.authorized],
+            isAuthorizedResult: true,
+        )
+        var state = ProjectRegistrationFeature.State()
+        state.submission = .awaitingGeneration(sampleReceipt)
+        let store = makeProjectRegistrationStore(
+            learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            state: state,
+        )
+
+        await store.send(.view(.waitAtHomeTapped))
+        await store.receive(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: true)))
+        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        #expect(store.state.isNotificationOptionSheetPresented == false)
+        #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
 
         await learningProjectOutcomes.finish()
         await store.finish()

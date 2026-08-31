@@ -75,6 +75,7 @@ public struct ProjectRegistrationFeature: Sendable {
             case validationFinished(requestID: Int, result: Result<ExternalRepository, ExternalRepositoryError>)
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
             case generationOutcomeReceived(LearningProjectGenerationOutcome)
+            case waitAtHomeAuthorizationChecked(isAuthorized: Bool)
         }
 
         @CasePathable
@@ -129,20 +130,23 @@ public struct ProjectRegistrationFeature: Sendable {
 
             case .view(.waitAtHomeTapped):
                 guard case .awaitingGeneration = state.submission else { return .none }
-                state.isNotificationOptionSheetPresented = true
-                return .none
+                return .run { [requestGenerationReminder] send in
+                    let isAuthorized = await requestGenerationReminder.isAuthorized()
+                    await send(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: isAuthorized)))
+                }
+
+            case .effect(.waitAtHomeAuthorizationChecked(let isAuthorized)):
+                guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
+                guard isAuthorized else {
+                    state.isNotificationOptionSheetPresented = true
+                    return .none
+                }
+                return acceptNotificationReminder(receipt: receipt)
 
             case .view(.notificationOptionAccepted):
                 guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
                 state.isNotificationOptionSheetPresented = false
-                return .merge(
-                    .run { [requestGenerationReminder, openNotificationSettings, projectID = receipt.projectID] _ in
-                        if await requestGenerationReminder(projectID: projectID) == .previouslyDenied {
-                            await openNotificationSettings()
-                        }
-                    },
-                    finishWaiting(receipt: receipt, notifyAccepted: true),
-                )
+                return acceptNotificationReminder(receipt: receipt)
 
             case .view(.notificationOptionDeclined):
                 guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
@@ -233,6 +237,17 @@ public struct ProjectRegistrationFeature: Sendable {
             }
         }
         .cancellable(id: CancelID.generationOutcomeObservation)
+    }
+
+    private func acceptNotificationReminder(receipt: ProjectRegistrationReceipt) -> Effect<Action> {
+        .merge(
+            .run { [requestGenerationReminder, openNotificationSettings, projectID = receipt.projectID] _ in
+                if await requestGenerationReminder(projectID: projectID) == .previouslyDenied {
+                    await openNotificationSettings()
+                }
+            },
+            finishWaiting(receipt: receipt, notifyAccepted: true),
+        )
     }
 
     private func finishWaiting(

@@ -81,6 +81,10 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
     func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
         .authorized
     }
+
+    func isAuthorized() async -> Bool {
+        true
+    }
 }
 
 #Preview("링크 입력 · 986:13739") {

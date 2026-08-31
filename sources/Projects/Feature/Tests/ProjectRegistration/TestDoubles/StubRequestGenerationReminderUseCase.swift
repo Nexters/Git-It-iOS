@@ -4,8 +4,9 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [NotificationAuthorizationOutcome] = [.authorized]) {
+    init(results: [NotificationAuthorizationOutcome] = [.authorized], isAuthorizedResult: Bool = false) {
         self.results = results
+        self.isAuthorizedResult = isAuthorizedResult
     }
 
     // MARK: Internal
@@ -16,6 +17,10 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
         return nextResult()
     }
 
+    func isAuthorized() async -> Bool {
+        isAuthorizedResult
+    }
+
     func snapshot() -> (callCount: Int, lastProjectID: String?) {
         (callCount, lastProjectID)
     }
@@ -23,6 +28,7 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
     // MARK: Private
 
     private var results: [NotificationAuthorizationOutcome]
+    private let isAuthorizedResult: Bool
     private var callCount = 0
     private var lastProjectID: String?
 
