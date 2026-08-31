@@ -12,11 +12,13 @@ public struct ProjectRegistrationFeature: Sendable {
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
-        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
+        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        openNotificationSettings: @escaping @Sendable () async -> Void = { },
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
-        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        self.learningProjectOutcomes = learningProjectOutcomes
+        self.openNotificationSettings = openNotificationSettings
     }
 
     // MARK: Public
@@ -131,7 +133,10 @@ public struct ProjectRegistrationFeature: Sendable {
             case .view(.notificationOptionAccepted):
                 guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
                 state.isNotificationOptionSheetPresented = false
-                return finishWaiting(receipt: receipt, notifyAccepted: true)
+                return .merge(
+                    .run { [openNotificationSettings] _ in await openNotificationSettings() },
+                    finishWaiting(receipt: receipt, notifyAccepted: true),
+                )
 
             case .view(.notificationOptionDeclined):
                 guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
@@ -190,7 +195,8 @@ public struct ProjectRegistrationFeature: Sendable {
 
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let openNotificationSettings: @Sendable () async -> Void
 
     private func submit(
         repository: ExternalRepository,
@@ -215,7 +221,7 @@ public struct ProjectRegistrationFeature: Sendable {
 
     private func observeGenerationOutcomes(projectID: String) -> Effect<Action> {
         .run { send in
-            for await outcome in await observeLearningProjectGenerationOutcomes() where outcome.projectID == projectID {
+            for await outcome in await learningProjectOutcomes() where outcome.projectID == projectID {
                 await send(.effect(.generationOutcomeReceived(outcome)))
             }
         }
@@ -233,7 +239,7 @@ public struct ProjectRegistrationFeature: Sendable {
                     await send(.delegate(.notificationOptionSelected(accepted: notifyAccepted)))
                 }
                 await send(.delegate(.projectRegistered(receipt)))
-            }
+            },
         )
     }
 

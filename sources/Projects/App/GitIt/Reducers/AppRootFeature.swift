@@ -16,7 +16,7 @@ nonisolated struct AppRootFeature: Sendable {
         restoreSession: any RestoreSessionUseCase,
         signIn: any SignInUseCase,
         signOut: any SignOutUseCase,
-        observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase,
+        authenticationOutcomes: any AuthenticationOutcomesUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
         completeCuration: any CompleteCurationUseCase,
         policyConsent: any PolicyConsentUseCase,
@@ -28,14 +28,15 @@ nonisolated struct AppRootFeature: Sendable {
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
-        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
+        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        openNotificationSettings: @escaping @Sendable () async -> Void = { },
         deletesCompletedAccountOnSignIn: Bool = false,
         resetAllForTesting: (@Sendable () async -> Void)? = nil,
     ) {
         self.restoreSession = restoreSession
         self.signIn = signIn
         self.signOut = signOut
-        self.observeAuthenticationOutcomes = observeAuthenticationOutcomes
+        self.authenticationOutcomes = authenticationOutcomes
         self.fetchMemberProfile = fetchMemberProfile
         self.completeCuration = completeCuration
         self.policyConsent = policyConsent
@@ -47,7 +48,8 @@ nonisolated struct AppRootFeature: Sendable {
         self.deleteMemberAccount = deleteMemberAccount
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
-        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        self.learningProjectOutcomes = learningProjectOutcomes
+        self.openNotificationSettings = openNotificationSettings
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
         self.resetAllForTesting = resetAllForTesting
     }
@@ -123,7 +125,7 @@ nonisolated struct AppRootFeature: Sendable {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
-                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: learningProjectOutcomes,
             )
         }
         Reduce { state, action in
@@ -133,7 +135,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return .merge(
                     .send(.appEntry(.view(.task))),
                     .run { send in
-                        let outcomes = await observeAuthenticationOutcomes()
+                        let outcomes = await authenticationOutcomes()
                         for await outcome in outcomes {
                             await send(.effect(.authenticationOutcomeReceived(outcome)))
                         }
@@ -213,7 +215,8 @@ nonisolated struct AppRootFeature: Sendable {
             ProjectRegistrationFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: createLearningProject,
-                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: learningProjectOutcomes,
+                openNotificationSettings: openNotificationSettings,
             )
         }
     }
@@ -228,7 +231,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let restoreSession: any RestoreSessionUseCase
     private let signIn: any SignInUseCase
     private let signOut: any SignOutUseCase
-    private let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
+    private let authenticationOutcomes: any AuthenticationOutcomesUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
     private let completeCuration: any CompleteCurationUseCase
     private let policyConsent: any PolicyConsentUseCase
@@ -240,7 +243,8 @@ nonisolated struct AppRootFeature: Sendable {
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let openNotificationSettings: @Sendable () async -> Void
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
 
