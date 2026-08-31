@@ -1,0 +1,4 @@
+interface:
+  display_name: "프로젝트 Swift 린트 교정"
+  short_description: "sources/Projects 전체 Swift 린트 오류를 안전하게 교정"
+  default_prompt: "Use $fix-project-swift-lint to lint all Swift files under sources/Projects and fix every reported style violation."
