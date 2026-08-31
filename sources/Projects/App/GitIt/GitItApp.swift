@@ -60,6 +60,7 @@ struct GitItApp: App {
                 fetchExternalRepository: composition.fetchExternalRepository,
                 createLearningProject: composition.createLearningProject,
                 learningProjectOutcomes: composition.learningProjectOutcomes,
+                requestGenerationReminder: composition.requestGenerationReminder,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)

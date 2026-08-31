@@ -36,11 +36,11 @@ struct AppRootView: View {
 
         case .mainShell:
             MainShellScreen(store: store.scope(state: \.mainShell, action: \.mainShell))
-            #if DEBUG
-                .safeAreaInset(edge: .bottom) {
-                    ResetAllButton(action: { send(.resetAllTapped) })
-                }
-            #endif
+//            #if DEBUG
+//                .safeAreaInset(edge: .bottom) {
+//                    ResetAllButton(action: { send(.resetAllTapped) })
+//                }
+//            #endif
                 .fullScreenCover(
                     item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
                 ) { store in
@@ -186,6 +186,16 @@ private enum AppRootPreviewSupport {
         }
     }
 
+    struct NoopRequestGenerationReminder: RequestGenerationReminderUseCase {
+        func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+            .authorized
+        }
+
+        func isAuthorized() async -> Bool {
+            true
+        }
+    }
+
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = route
@@ -207,6 +217,7 @@ private enum AppRootPreviewSupport {
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
                 learningProjectOutcomes: NoopLearningProjectOutcomes(),
+                requestGenerationReminder: NoopRequestGenerationReminder(),
             )
         }
     }

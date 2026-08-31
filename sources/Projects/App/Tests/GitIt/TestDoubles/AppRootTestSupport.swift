@@ -48,6 +48,18 @@ actor ResetAllForTestingSpy {
     }
 }
 
+// MARK: - NoopRequestGenerationReminderUseCase
+
+struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
+    func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+        .authorized
+    }
+
+    func isAuthorized() async -> Bool {
+        true
+    }
+}
+
 // MARK: - AppRootTestFixture
 
 enum AppRootTestFixture {
@@ -78,6 +90,7 @@ func makeAppRootStore(
     resetAllForTesting: (@Sendable () async -> Void)? = nil,
     learningProjectOutcomes: LearningProjectOutcomesUseCaseMock =
         LearningProjectOutcomesUseCaseMock(),
+    requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -98,6 +111,7 @@ func makeAppRootStore(
             fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
             createLearningProject: NoopCreateLearningProjectUseCase(),
             learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
             resetAllForTesting: resetAllForTesting,
         )
     }

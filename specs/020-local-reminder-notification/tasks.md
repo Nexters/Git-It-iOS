@@ -291,20 +291,20 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 구현
 
-- [ ] T023 [S1] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`를 수정한다:
+- [X] T023 [S1] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`를 수정한다:
       `init`에 `requestGenerationReminder: any RequestGenerationReminderUseCase`를(기본값
       없이) `learningProjectOutcomes` 다음, `openNotificationSettings` 앞에 추가하고
       `private let requestGenerationReminder: any RequestGenerationReminderUseCase`를 저장한다.
       `.ifLet(\.$projectRegistration, action: \.projectRegistration)`가 생성하는
       `ProjectRegistrationFeature(...)` 호출에 `requestGenerationReminder:
       requestGenerationReminder`를 전달한다.
-- [ ] T024 [S1] `sources/Projects/App/GitIt/GitItApp.swift`를 수정한다: `AppRootFeature(...)`
+- [X] T024 [S1] `sources/Projects/App/GitIt/GitItApp.swift`를 수정한다: `AppRootFeature(...)`
       생성 호출의 `openNotificationSettings` 인자 옆에 `requestGenerationReminder:
       composition.requestGenerationReminder`를 추가한다.
 
 ### 테스트
 
-- [ ] T025 [S1] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`를
+- [X] T025 [S1] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`를
       수정한다: `NoopRequestGenerationReminderUseCase`(`RequestGenerationReminderUseCase`
       채택, `.authorized` 반환)를 다른 `Noop*UseCase`와 같은 위치에 추가하고,
       `makeAppRootStore`에 `requestGenerationReminder: NoopRequestGenerationReminderUseCase =
@@ -313,7 +313,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 정리와 패키지 검증
 
-- [ ] T026 [no-write] `GitIt` App target build와 `GitIt` Tests target test를 실행해
+- [X] T026 [no-write] `GitIt` App target build와 `GitIt` Tests target test를 실행해
       T023~T025가 통과하는지, 기존 `notificationOptionSelected` delegate 관련 테스트가
       회귀 없이 통과하는지 확인한다.
 

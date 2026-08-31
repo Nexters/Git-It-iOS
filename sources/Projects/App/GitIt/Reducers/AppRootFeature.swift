@@ -29,6 +29,7 @@ nonisolated struct AppRootFeature: Sendable {
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
         learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @Sendable () async -> Void = { },
         deletesCompletedAccountOnSignIn: Bool = false,
         resetAllForTesting: (@Sendable () async -> Void)? = nil,
@@ -49,6 +50,7 @@ nonisolated struct AppRootFeature: Sendable {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
         self.learningProjectOutcomes = learningProjectOutcomes
+        self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
         self.resetAllForTesting = resetAllForTesting
@@ -216,6 +218,7 @@ nonisolated struct AppRootFeature: Sendable {
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: createLearningProject,
                 learningProjectOutcomes: learningProjectOutcomes,
+                requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
             )
         }
@@ -244,6 +247,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
     private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @Sendable () async -> Void
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
