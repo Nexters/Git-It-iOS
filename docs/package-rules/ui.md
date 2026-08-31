@@ -79,7 +79,7 @@ target의 의존 대상이 되어서는 안 됩니다.
 
 ## 제약조건
 
-- 프로젝트 내부의 다른 패키지에 의존해서는 안 됩니다.
+- 프로젝트 내부 패키지 의존성은 [아키텍처 문서 3.1](../architecture.md)이 정한 허용 목록(UI: 없음)을 벗어나서는 안 됩니다.
 - `ComposableArchitecture`에 의존하거나 UI target dependency로 선언해서는 안 됩니다.
 - 특정 Feature의 화면, Action, State 또는 화면 흐름을 소유해서는 안 됩니다.
 - Domain 모델이나 비즈니스 규칙을 참조해서는 안 됩니다.

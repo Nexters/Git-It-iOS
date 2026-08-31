@@ -7,11 +7,32 @@
 | 문서 | 소유하는 규칙 |
 | --- | --- |
 | [네이밍](./naming.md) | 공개 이름, 경계 값, 접두어·접미어와 외부 고정 명칭 |
-| [디렉터리·파일](./directory-file.md) | 소스 루트, 폴더 뎁스, 파일 분할과 패키지별 형태 어휘 |
+| [디렉터리·파일](./directory-file.md) | 소스 루트, 폴더 뎁스와 관심사 세그먼트, 자산·매니페스트 일치 |
+| [파일·형태 어휘](./file-vocabulary.md) | 파일당 타입 개수, 파일 이름 규칙, 패키지별 형태 폴더 어휘 |
 | [테스트](./test.md) | 프레임워크, 테스트 이름·구성, Test Double과 target 배치 |
-| [View](./view.md) | SwiftUI 생성 경로, 디자인 토큰, 내부 선언, 접근성과 프리뷰 |
+| [View](./view.md) | SwiftUI 공개 생성 경로, 화면 조립과 프리뷰 |
+| [View 토큰](./view-tokens.md) | 색상·레이아웃·Typography 토큰 사용 규칙 |
+| [View 내부 선언](./view-declarations.md) | `Constant`·`Style` 등 View 내부 선언과 중첩 규칙 |
 | [UIComponent](./ui-component.md) | 컴포넌트 경계, 공개 입력, 파일·자산 구성과 검증 |
-| [TCA](./tca.md) | Feature 상태·Action·Reducer·Effect와 화면 연결 |
+| [TCA](./tca/README.md) | TCA 핵심 용어, 제약조건과 하위 문서 안내 |
+
+TCA 세부 규칙은 [`tca/`](./tca/) 아래 문서로 나뉘어 있습니다 —
+[Feature](./tca/feature.md), [State](./tca/state.md), [Action](./tca/action.md),
+[Effect](./tca/effect.md), [Navigation](./tca/navigation.md). 진입점은
+[tca/README.md](./tca/README.md)입니다.
+
+## 상위 문서와 충돌 해소
+
+이 디렉터리의 모든 컨벤션에 공통으로 적용하는 규칙이며, 각 문서가 따로 반복하지
+않습니다.
+
+- 문서 우선순위는 [Constitution](../../.specify/memory/constitution.md) →
+  [아키텍처 문서](../architecture.md) · [패키지 규칙](../package-rules/) →
+  이 디렉터리의 컨벤션 순입니다.
+- 컨벤션이 상위 문서와 충돌하면 상위 문서를 따르고 **컨벤션 쪽을 수정합니다.**
+- 패키지 책임과 허용 의존 방향은 아키텍처 문서와 패키지 규칙이 소유합니다. 그 경계를
+  바꾸는 내용은 컨벤션에만 추가하지 않고 상위 문서를 먼저 갱신합니다.
+- 컨벤션은 상위 문서가 정한 경계 **안에서의 작성 방식**만 소유합니다.
 
 ## 문서 형식
 
@@ -26,6 +47,5 @@
 7. `문서 변경 기준`
 
 규칙은 책임의 소유자와 금지 경계를 함께 밝히고, 예시는 규칙을 이해하는 데 필요한
-최소 범위로 둡니다. 패키지 책임이나 의존 방향을 바꾸는 내용은 컨벤션에만 추가하지 않고
-[아키텍처 문서](../architecture.md)와 해당 [패키지 규칙](../package-rules/)을 먼저
-갱신합니다.
+최소 범위로 둡니다. 같은 규칙을 두 문서에 옮겨 적지 않고, 소유 문서를 정한 뒤 다른
+문서에서는 한 줄 요약과 링크만 둡니다.

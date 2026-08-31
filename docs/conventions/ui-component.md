@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-21
 
-**최종 수정일**: 2026-08-27 (컴포넌트 분류를 역할 기준으로 재정의)
+**최종 수정일**: 2026-08-31 (문서 간 중복 제거와 소유 문서 정리)
 
 ## 목적
 
@@ -12,7 +12,8 @@
 입력, 선언·자산 구성과 검증 방식을 통일합니다. UI 패키지의 책임과 의존 방향은
 [UI 패키지 규칙](../package-rules/ui.md)이, 폴더 뎁스와 파일 분할의 공통 규칙은
 [디렉터리·파일 컨벤션](./directory-file.md)이 소유하고, 컴포넌트 구현 방식과 역할
-폴더의 목록은 이 문서가 소유합니다.
+폴더의 목록은 이 문서가 소유합니다. 상위 문서와의 우선순위는
+[컨벤션 공통 규칙](./README.md#상위-문서와-충돌-해소)을 따릅니다.
 
 ## 1. 적용 범위
 
@@ -25,12 +26,10 @@ DesignSystem 토큰의 정의, Feature 화면 상태와 화면 흐름은 이 문
 ## 2. 공개 계약
 
 - 컴포넌트는 화면과 Feature 구현에서 독립적으로 해석 가능한 표현 계약이어야 합니다.
-- 읽기 전용 표시 값은 초기화 인자, 외부 변경을 관찰해야 하는 값은 SwiftUI `Binding`,
-  일회성 사용자 입력은 콜백으로 받습니다.
+- 표시 값·`Binding`·콜백으로 입력을 나누는 방식과 표시 상태 wrapper 금지는
+  [View 컨벤션 §3](./view.md#3-공개-생성-경로)이 소유합니다.
 - Feature의 `State`, `Action`, 업무 모델과 TCA의 `Store`, `Reducer`, `Effect`를 공개
-  API나 구현에 사용하지 않습니다.
-- 표시 상태를 묶기 위한 `ViewModel`, `State` 또는 동등한 wrapper 타입을 정의하지
-  않습니다.
+  API**와 구현 모두**에 사용하지 않습니다.
 - 외부 라이브러리가 필요하면 구현에 필요한 범위로 격리하고 외부 타입을 Feature에
   공개하지 않습니다.
 - 컴포넌트의 공개 이름은 [네이밍 컨벤션](./naming.md)을 따르며 시각 의미와 재사용
@@ -138,21 +137,16 @@ target이 소유합니다.
 
 ### 5.1 폴더와 파일
 
-- 폴더 뎁스, 파일당 타입 개수, 파일 이름 규칙은
-  [디렉터리·파일 컨벤션](./directory-file.md)을 따릅니다.
+- 폴더 뎁스와 타입 패밀리 폴더는
+  [디렉터리·파일 컨벤션 §5](./directory-file.md#5-2뎁스--타입-패밀리-폴더)를,
+  파일당 타입 개수와 파일 이름 규칙은
+  [파일·형태 어휘 컨벤션 §2](./file-vocabulary.md#2-파일-규칙)를 따릅니다.
 - `UI/Component/`의 1뎁스는 §3.2의 역할 폴더와 `Resources/`뿐입니다. `Components/`
   같은 target 이름을 반복하는 중간 폴더를 두지 않습니다.
-- 한 컴포넌트의 파일이 둘 이상이면 컴포넌트 이름의 2뎁스 폴더로 묶습니다. 파일이
-  하나면 역할 폴더에 직접 둡니다.
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.
 
 ```text
 UI/Component/
-├── Controls/
-│   ├── ActionButton.swift
-│   └── TextField/
-│       ├── TextField.swift
-│       └── TextField+Style.swift
 └── Scaffolds/
     └── ScreenHeader/
         ├── ScreenHeader.swift
@@ -163,13 +157,11 @@ UI/Component/
 
 ### 5.2 중첩 선언
 
-- `Style`, `Constant`, `Item`, `Control`처럼 컴포넌트가 소유하는 보조 타입은
-  `extension`에서 중첩 선언하고, `{상위타입}+{보조타입}.swift` 파일로 분리합니다.
-- 소유 컴포넌트가 문맥을 제공하므로 `ActionButtonStyle` 대신
-  `ActionButton.Style`, `SelectionCardListItem` 대신 `SelectionCardList.Item`을
-  사용합니다.
-- 변형에 따라 갈리는 표현 값은 `Style`이 소유하고 컴포넌트는 결과만 읽습니다.
-- 중첩할 수 없는 경우는 [View 컨벤션](./view.md#54-중첩할-수-없는-경우)을 따르고,
+- 어떤 보조 타입을 중첩하는지, `Style`이 무엇을 소유하는지, 중첩할 수 없는 경우를
+  어떻게 처리하는지는
+  [View 내부 선언 컨벤션 §2](./view-declarations.md#2-view-내부-선언)가 소유합니다.
+- 중첩 선언을 파일로 나눌 때의 이름과 위치는
+  [파일·형태 어휘 컨벤션 §2.2](./file-vocabulary.md#22-중첩-타입-분리)를 따르고, 나눈
   파일은 소유 컴포넌트의 2뎁스 폴더에 둡니다.
 
 ### 5.3 자산
@@ -182,29 +174,15 @@ UI/Component/
 
 ## 6. 상태와 생성 경로
 
-- 표시 값은 private 불변 저장 프로퍼티로, 변경 가능한 외부 상태는 `@Binding`으로
-  보존합니다.
-- 컴포넌트 입력을 `@State`나 별도 참조 타입에 복제하지 않습니다.
-- 상위 소유자에게 입력을 전달하는 콜백은 초기화 인자로 받고 private 저장 프로퍼티로
-  보존합니다.
-- 공개 생성 경로는 표시 값·`Binding`·콜백을 직접 받는 초기화 메서드와 시각 변형별
-  `public static func` 팩토리로 제한합니다.
-- 팩토리 기준, 접근 수준, `Constant`와 `Style`의 세부 구현은
-  [View 컨벤션](./view.md)을 따릅니다.
+컴포넌트의 공개 생성 경로는 표시 값·`Binding`·콜백을 직접 받는 초기화 메서드와 시각
+변형별 `public static func` 팩토리 둘뿐입니다. 두 경로의 정의 기준, 외부 상태를
+`@Binding`으로 보존하고 `@State`에 복제하지 않는 규칙, 접근 수준과 `Constant`·`Style`의
+세부 구현은 [View 컨벤션 §3](./view.md#3-공개-생성-경로)과
+[View 내부 선언 컨벤션 §2](./view-declarations.md#2-view-내부-선언)가 소유합니다.
 
-```swift
-public struct SelectionToggle: View {
-    public init(isSelected: Binding<Bool>) {
-        self._isSelected = isSelected
-    }
-
-    public var body: some View {
-        Toggle("선택", isOn: $isSelected)
-    }
-
-    @Binding private var isSelected: Bool
-}
-```
+컴포넌트는 그 위에 UI 패키지 고유의 제약을 하나 더 지킵니다. **표시 상태를 소유하지
+않습니다** — 컴포넌트는 전달받은 값을 렌더링할 뿐이고, 그 값의 정본은 언제나 호출부인
+Feature 화면의 `State`입니다.
 
 ## 7. 분리 절차
 
@@ -245,7 +223,9 @@ public struct SelectionToggle: View {
 - [아키텍처](../architecture.md)
 - [UI 패키지 규칙](../package-rules/ui.md)
 - [디렉터리·파일 컨벤션](./directory-file.md)
+- [파일·형태 어휘 컨벤션](./file-vocabulary.md)
 - [View 컨벤션](./view.md)
+- [View 내부 선언 컨벤션](./view-declarations.md)
 - [네이밍 컨벤션](./naming.md)
 - [테스트 컨벤션](./test.md)
 - [컴포넌트 인덱스](../../.agents/skills/implement-figma-ui/references/component-index.md)

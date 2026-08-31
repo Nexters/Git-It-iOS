@@ -31,7 +31,7 @@ Git-It의 프레임워크 비의존 디자인 토큰 값 모델과 SwiftUI 적�
 `ColorToken`은 팔레트 위치(`grey600`, `blue100`)를, `SemanticColorToken`은 화면에서의
 역할(`cardBackground`, `brandAccent`)을 표현합니다. 역할이 바뀌면 참조하는 원시 토큰만
 교체하면 되도록 두 계층을 분리했으며, 정의 기준은
-[View 컨벤션 §4.1](../../../../docs/conventions/view.md#41-의미-색상은-designsystem이-소유합니다)을
+[View 토큰 컨벤션 §2.1](../../../../docs/conventions/view-tokens.md#21-의미-색상은-designsystem이-소유합니다)을
 따릅니다. 적용 API는 두 타입의 오버로드를 모두 제공하므로 호출 형태는 같습니다.
 
 ## 적용 계층

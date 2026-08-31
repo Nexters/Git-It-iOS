@@ -4,13 +4,14 @@
 
 **작성일**: 2026-08-19
 
-**최종 수정일**: 2026-08-21
+**최종 수정일**: 2026-08-31 (문서 간 중복 제거와 소유 문서 정리)
 
 ## 목적
 
 이 문서는 Git It iOS의 테스트를 읽을 수 있는 동작 명세로 유지하기 위한 작성 기준입니다.
 패키지별 테스트 대상과 의존성 경계는 [아키텍처 문서](../architecture.md#5-테스트-정책)를
-함께 따릅니다. 이 문서가 Constitution과 충돌하면 Constitution이 우선합니다.
+함께 따릅니다. 상위 문서와의 우선순위는
+[컨벤션 공통 규칙](./README.md#상위-문서와-충돌-해소)을 따릅니다.
 
 ## 1. 적용 범위
 
@@ -161,32 +162,24 @@ func `삭제 확인 성공은 선택한 식별자를 한 번 전달한다`() asy
 
 ## 6. Feature와 TCA 테스트
 
-Feature 테스트는 Swift Testing 안에서 TCA의 `TestStore`를 사용합니다.
+Feature 테스트는 Swift Testing 안에서 TCA의 `TestStore`를 사용하고, 초기 State와
+initializer로 주입할 Domain Use Case를 테스트 본문에서 명시합니다. 외부 의존성의 입력과
+호출 횟수는 §5의 Test Double snapshot으로 별도 검증합니다.
 
-Feature 구성과 Effect 취소의 production 규칙은 [TCA 컨벤션](./tca.md)을 함께
+`TestStore`로 무엇을 검증해야 하는지 — 상태 전이, Effect event, 취소, 늦은 응답과
+delegate 출력 — 와 Effect 취소의 production 규칙은
+[TCA Effect 컨벤션 §3](./tca/effect.md#3-테스트)이 소유합니다.
+
+패키지별 테스트 초점은 [아키텍처 문서 §5](../architecture.md#5-테스트-정책)를
 따릅니다.
-
-- 초기 State와 initializer로 주입할 Domain Use Case를 명시합니다.
-- 사용자 입력은 `store.send`, Effect의 응답과 delegate 출력은 `store.receive`로
-  검증합니다.
-- State 변화는 가능한 한 `send`와 `receive`의 assertion closure에서 검증합니다.
-- 외부 의존성의 입력과 호출 횟수는 Test Double의 snapshot으로 별도 검증합니다.
-- 미완료 Effect는 테스트 종료 전에 취소하고 `finish()`로 정리합니다.
-- 화면 밖 흐름은 실제 navigation을 실행하지 않고 Feature가 출력한 delegate Action을
-  검증합니다.
-
-패키지별 테스트 초점은 아키텍처 문서의 테스트 정책을 따릅니다. Domain은 모델·정책·Use
-Case와 상태 전이, Data는 데이터 경계와 오류 처리, Composition은 변환과 위임, Feature는
-State·Effect·사용자 상호작용을 중심으로 검증합니다.
 
 ## 7. 파일과 Target 구성
 
 ### 7.1 물리 폴더와 test target을 분리합니다
 
-- 모든 테스트 소스는 `sources/Projects/<Package>/Tests/` 아래에 둡니다. 패키지 루트에
-  `<TargetName>Tests/` 또는 `<TargetName>UITests/` 폴더를 나란히 만들지 않습니다.
-- `Tests/`의 하위 폴더는 target 이름이 아니라 검증하는 production 모듈 또는 기능의
-  역할을 표현합니다. 패키지 이름과 `Tests` 접미어를 반복하지 않습니다.
+- 테스트 소스의 폴더 경로는 [디렉터리·파일 컨벤션 §3.3](./directory-file.md#33-test-소스-루트)이
+  소유합니다. 패키지 루트에 `<TargetName>Tests/` 또는 `<TargetName>UITests/` 폴더를
+  나란히 만들지 않습니다.
 - Tuist test target 이름은 빌드 그래프 식별을 위해 패키지 문맥과 `Tests` 또는
   `UITests` 접미어를 유지할 수 있습니다. 폴더 이름과 target 이름을 같게 만들 필요는
   없습니다.
@@ -197,18 +190,9 @@ State·Effect·사용자 상호작용을 중심으로 검증합니다.
   `Tests/<Module>/Unit/`, `Tests/<Module>/UI/`처럼 서로 겹치지 않는 역할 하위 폴더로
   분리합니다.
 
-```text
-sources/Projects/Domain/
-├── Authentication/
-└── Tests/
-    └── Authentication/  # DomainAuthenticationTests의 sourceDirectory
-```
-
-- 테스트 파일은 검증 대상 또는 동작 범위에 따라 묶고 파일 이름은
-  `<Subject>Tests.swift` 형식을 사용합니다.
-- 둘 이상의 파일에서 쓰는 Test Double은 test 소스 루트의 `TestDoubles/`에 둡니다
-  ([디렉터리·파일 컨벤션 §7](./directory-file.md#7-패키지별-형태-어휘)). 한 파일에서만
-  사용하는 작은 Double은 같은 파일에 `private`로 둡니다.
+- 테스트 파일 이름, 파일당 타입 개수와 `TestDoubles/` 배치는
+  [파일·형태 어휘 컨벤션 §2](./file-vocabulary.md#2-파일-규칙)·[§3](./file-vocabulary.md#3-패키지별-형태-어휘)을
+  따릅니다.
 - Tuist test target과 공유 scheme에는 실제 `@Test` 함수 또는 `XCTestCase` 테스트가
   있는 target만 연결합니다. 빈 test target을 scheme에 등록하지 않습니다.
 
@@ -264,7 +248,8 @@ project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_P
 
 - [아키텍처](../architecture.md)
 - [네이밍 컨벤션](./naming.md)
-- [TCA 컨벤션](./tca.md)
+- [파일·형태 어휘 컨벤션](./file-vocabulary.md)
+- [TCA 컨벤션](./tca/README.md)
 
 ## 문서 변경 기준
 
