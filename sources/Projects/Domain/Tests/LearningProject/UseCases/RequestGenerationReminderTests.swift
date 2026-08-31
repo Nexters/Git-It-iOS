@@ -50,6 +50,20 @@ struct RequestGenerationReminderTests {
         #expect(outcome == .previouslyDenied)
         #expect(await registry.registeredProjectIDs.isEmpty)
     }
+
+    @Test
+    func `isAuthorized는 gateway의 현재 권한 상태를 그대로 반환한다`() async {
+        let gateway = StubNotificationAuthorizationGateway(scriptedOutcome: .authorized, isAuthorizedResult: true)
+        let registry = StubGenerationReminderRegistry()
+        let requestGenerationReminder = RequestGenerationReminder(
+            authorizationGateway: gateway,
+            reminderRegistry: registry
+        )
+
+        let isAuthorized = await requestGenerationReminder.isAuthorized()
+
+        #expect(isAuthorized)
+    }
 }
 
 // MARK: - StubNotificationAuthorizationGateway
@@ -57,9 +71,14 @@ struct RequestGenerationReminderTests {
 private struct StubNotificationAuthorizationGateway: NotificationAuthorizationGateway {
 
     let scriptedOutcome: NotificationAuthorizationOutcome
+    var isAuthorizedResult = false
 
     func requestAuthorization() async -> NotificationAuthorizationOutcome {
         scriptedOutcome
+    }
+
+    func isAuthorized() async -> Bool {
+        isAuthorizedResult
     }
 
 }

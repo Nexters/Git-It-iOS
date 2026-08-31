@@ -20,6 +20,10 @@ public struct RequestGenerationReminder: RequestGenerationReminderUseCase, Senda
         return outcome
     }
 
+    public func isAuthorized() async -> Bool {
+        await authorizationGateway.isAuthorized()
+    }
+
     // MARK: Private
 
     private let authorizationGateway: any NotificationAuthorizationGateway
