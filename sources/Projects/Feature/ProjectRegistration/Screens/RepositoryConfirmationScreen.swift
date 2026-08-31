@@ -3,7 +3,11 @@ import DomainLearningProject
 import SwiftUI
 import UIComponent
 
-struct ProjectRegistrationRepositoryConfirmationScreen: View {
+// MARK: - RepositoryConfirmationScreen
+
+struct RepositoryConfirmationScreen: View {
+
+    // MARK: Internal
 
     let repository: ExternalRepository
     let onConfirm: () -> Void
@@ -44,7 +48,8 @@ struct ProjectRegistrationRepositoryConfirmationScreen: View {
         }
     }
 
-    @ViewBuilder
+    // MARK: Private
+
     private var thumbnail: some View {
         Group {
             if let imageURL = repository.imageURL, let url = URL(string: imageURL) {
@@ -75,7 +80,9 @@ struct ProjectRegistrationRepositoryConfirmationScreen: View {
 
 }
 
-extension ProjectRegistrationRepositoryConfirmationScreen {
+// MARK: RepositoryConfirmationScreen.Constant
+
+extension RepositoryConfirmationScreen {
     private enum Constant {
         static let textSetSpacing: CGFloat = 16
         static let thumbnailSpacing: CGFloat = 12

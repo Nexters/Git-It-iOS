@@ -4,6 +4,8 @@ import DomainLearningProject
 import SwiftUI
 import UIComponent
 
+// MARK: - ProjectRegistrationScreen
+
 @ViewAction(for: ProjectRegistrationFeature.self)
 public struct ProjectRegistrationScreen: View {
 
@@ -29,7 +31,7 @@ public struct ProjectRegistrationScreen: View {
             }
         }
         .sheet(isPresented: Binding(get: { store.isNotificationOptionSheetPresented }, set: { _ in })) {
-            ProjectRegistrationNotificationOptionSheet(
+            NotificationOptionSheet(
                 onAccept: { send(.notificationOptionAccepted) },
                 onDecline: { send(.notificationOptionDeclined) },
             )
@@ -53,8 +55,8 @@ public struct ProjectRegistrationScreen: View {
         switch store.submission {
         case .committing,
              .awaitingGeneration:
-            ProjectRegistrationGenerationProgressScreen(
-                onWaitAtHome: { send(.waitAtHomeTapped) },
+            GenerationProgressScreen(
+                onWaitAtHome: { send(.waitAtHomeTapped) }
             )
 
         case .failed:
@@ -63,21 +65,21 @@ public struct ProjectRegistrationScreen: View {
         case .idle:
             if case .validated(let repository) = store.validation {
                 if !hasConfirmedRepository {
-                    ProjectRegistrationRepositoryConfirmationScreen(
+                    RepositoryConfirmationScreen(
                         repository: repository,
                         onConfirm: { hasConfirmedRepository = true },
                         onReject: { send(.repositoryURLChanged(store.repositoryURLInput)) },
                         onBack: { send(.repositoryURLChanged(store.repositoryURLInput)) },
                     )
                 } else if !hasSelectedQuizLevel {
-                    ProjectRegistrationQuizLevelSelectionScreen(
+                    QuizLevelSelectionScreen(
                         selectedLevel: store.quizLevel,
                         onSelect: { send(.quizLevelSelected($0)) },
                         onNext: { hasSelectedQuizLevel = true },
                         onBack: { hasConfirmedRepository = false },
                     )
                 } else {
-                    ProjectRegistrationGenerationConfirmationScreen(
+                    GenerationConfirmationScreen(
                         onStart: { send(.submitTapped) },
                         onBack: { hasSelectedQuizLevel = false },
                     )
@@ -111,7 +113,6 @@ public struct ProjectRegistrationScreen: View {
             .padding(.top, Constant.headerContentSpacing)
 
             guideSection
-                .designSystemScreenMargin()
                 .padding(.top, Constant.fieldGuideSpacing)
 
             Spacer(minLength: 0)
@@ -162,7 +163,9 @@ public struct ProjectRegistrationScreen: View {
     }
 
     private var fieldUnderlineColor: ColorToken {
-        if case .failed = store.validation { return .error }
+        if case .failed = store.validation {
+            return .error
+        }
         return .blue100
     }
 
@@ -174,12 +177,12 @@ public struct ProjectRegistrationScreen: View {
                 HStack {
                     StyledText.body2("불러오기 방법", color: .blue100)
                     Spacer()
-                    ResourceImage(asset: .icon(isGuideExpanded ? .chevronUp : .chevronDown))
-                        .frame(width: 16, height: 16)
+                    ResourceImage(asset: .icon(isGuideExpanded ? .chevronUp : .chevronDown), contentMode: .fit)
+                        .frame(width: 12, height: 12)
                 }
                 .padding(.horizontal, LayoutToken.margin.cgFloatValue)
                 .padding(.vertical, LayoutToken.gutter.cgFloatValue)
-                .frame(minHeight: 44)
+                .frame(height: 54)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -229,6 +232,8 @@ public struct ProjectRegistrationScreen: View {
     }
 
 }
+
+// MARK: ProjectRegistrationScreen.Constant
 
 extension ProjectRegistrationScreen {
     private enum Constant {

@@ -2,7 +2,9 @@ import DesignSystem
 import SwiftUI
 import UIComponent
 
-struct ProjectRegistrationGenerationConfirmationScreen: View {
+// MARK: - GenerationConfirmationScreen
+
+struct GenerationConfirmationScreen: View {
 
     let onStart: () -> Void
     let onBack: () -> Void
@@ -30,7 +32,9 @@ struct ProjectRegistrationGenerationConfirmationScreen: View {
 
 }
 
-extension ProjectRegistrationGenerationConfirmationScreen {
+// MARK: GenerationConfirmationScreen.Constant
+
+extension GenerationConfirmationScreen {
     private enum Constant {
         static let textSetSpacing: CGFloat = 16
         static let bottomButtonPadding: CGFloat = 34

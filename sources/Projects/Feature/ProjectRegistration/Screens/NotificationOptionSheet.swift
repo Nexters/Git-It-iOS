@@ -2,7 +2,9 @@ import DesignSystem
 import SwiftUI
 import UIComponent
 
-struct ProjectRegistrationNotificationOptionSheet: View {
+// MARK: - NotificationOptionSheet
+
+struct NotificationOptionSheet: View {
 
     let onAccept: () -> Void
     let onDecline: () -> Void
@@ -13,9 +15,7 @@ struct ProjectRegistrationNotificationOptionSheet: View {
 
             SheetSurface {
                 VStack(spacing: Constant.contentSpacing) {
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: Constant.bellIconSize))
-                        .designSystemForeground(.blue200)
+                    ResourceAnimation(asset: .notification)
                         .frame(width: Constant.bellSize, height: Constant.bellSize)
 
                     VStack(spacing: Constant.textSetSpacing) {
@@ -37,7 +37,9 @@ struct ProjectRegistrationNotificationOptionSheet: View {
 
 }
 
-extension ProjectRegistrationNotificationOptionSheet {
+// MARK: NotificationOptionSheet.Constant
+
+extension NotificationOptionSheet {
     private enum Constant {
         static let contentSpacing: CGFloat = 24
         static let textSetSpacing: CGFloat = 8

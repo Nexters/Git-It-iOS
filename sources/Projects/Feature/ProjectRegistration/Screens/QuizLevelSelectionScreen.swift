@@ -3,7 +3,9 @@ import DomainLearningProject
 import SwiftUI
 import UIComponent
 
-struct ProjectRegistrationQuizLevelSelectionScreen: View {
+// MARK: - QuizLevelSelectionScreen
+
+struct QuizLevelSelectionScreen: View {
 
     let selectedLevel: QuizLevel?
     let onSelect: (QuizLevel) -> Void
@@ -58,7 +60,9 @@ extension QuizLevel {
     }
 }
 
-extension ProjectRegistrationQuizLevelSelectionScreen {
+// MARK: - QuizLevelSelectionScreen.Constant
+
+extension QuizLevelSelectionScreen {
     private enum Constant {
         static let titleTopPadding: CGFloat = 24
         static let listTopPadding: CGFloat = 32
