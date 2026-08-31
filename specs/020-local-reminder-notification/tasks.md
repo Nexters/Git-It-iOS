@@ -220,7 +220,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 구현
 
-- [ ] T016 [P] [S1] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`에
+- [X] T016 [P] [S1] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`에
       `GenerationCompletionReminderCoordinator` actor를 계약 3.1절에 따라 구현한다:
       `init(localNotificationClient: any LocalNotificationClient)`, `Set<String>`으로 등록된
       projectID를 관리하는 `register(projectID: String)`, 그리고
@@ -230,14 +230,14 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
       `presentGenerationCompletedNotification(projectID:)`를 호출하고, 등록 여부와 무관하게
       완료·실패(`.failed`) 이벤트 수신 시 해당 projectID를 집합에서 제거한다(S3: 실패는 발송
       없이 제거만).
-- [ ] T017 [P] [S1] `sources/Projects/Composition/Adapter/Adapters/NotificationAuthorizationGatewayAdapter.swift`에
+- [X] T017 [P] [S1] `sources/Projects/Composition/Adapter/Adapters/NotificationAuthorizationGatewayAdapter.swift`에
       `NotificationAuthorizationGatewayAdapter`(`NotificationAuthorizationGateway` 채택)를
       계약 3.2절 스니펫대로 구현해 `LocalNotificationAuthorizationOutcome` →
       `NotificationAuthorizationOutcome` 1:1 변환을 수행한다.
-- [ ] T018 [P] [S1] [S2] `sources/Projects/Composition/Adapter/Adapters/GenerationReminderRegistryAdapter.swift`에
+- [X] T018 [P] [S1] [S2] `sources/Projects/Composition/Adapter/Adapters/GenerationReminderRegistryAdapter.swift`에
       `GenerationReminderRegistryAdapter`(`GenerationReminderRegistry` 채택)를 계약 3.3절
       스니펫대로 구현해 `coordinator.register(projectID:)`로 위임한다.
-- [ ] T019 [S1] [S2] `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`를
+- [X] T019 [S1] [S2] `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`를
       수정한다: `public let requestGenerationReminder: any RequestGenerationReminderUseCase`를
       `learningProjectOutcomes` 선언 다음에 추가한다. `AppComposition.init` 안, 기존 FCM
       등록 토큰 `Task` 근처에서 (a) `UNUserNotificationCenterLocalNotificationClient()`를
@@ -250,7 +250,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 테스트
 
-- [ ] T020 [S1] [S2] [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`를
+- [X] T020 [S1] [S2] [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`를
       새로 만들어(`ExternalRepositoryLookupAdapterTests.swift`와 같은 스타일로 파일 하단에
       stub `LocalNotificationClient`와 스크립트 가능한 `LearningProjectOutcomesUseCase` 스텁을
       정의) 다음을 검증한다: (1) `register(projectID:)` 호출 후 같은 projectID의 `.completed`
@@ -260,13 +260,13 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
       `.completed` 이벤트는 무시된다(S1 경계), (4) 등록된 projectID의 `.failed` 이벤트는
       발송 없이 등록 집합에서 제거만 한다(S3), (5) 같은 projectID에 `.completed` 이벤트가
       두 번 도착해도 발송은 1회뿐이다(중복 방지, FR-010).
-- [ ] T021 [S1] `sources/Projects/Composition/Tests/Adapter/Assemblies/AppCompositionPublicSurfaceTests.swift`(기존
+- [X] T021 [S1] `sources/Projects/Composition/Tests/Adapter/Assemblies/AppCompositionPublicSurfaceTests.swift`(기존
       파일 수정)의 `expected` 집합에 `"requestGenerationReminder"`를 추가해 공개 표면 목록을
       갱신한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T022 [no-write] `Composition`과 `Composition` Tests target을 build·test해 T016~T021이
+- [X] T022 [no-write] `Composition`과 `Composition` Tests target을 build·test해 T016~T021이
       통과하는지 확인한다.
 
 **진행 점검**: T016~T022의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행

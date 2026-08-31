@@ -48,6 +48,16 @@ public struct AppComposition: Sendable {
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
 
+        let localNotificationClient = UNUserNotificationCenterLocalNotificationClient()
+        let reminderCoordinator = GenerationCompletionReminderCoordinator(
+            localNotificationClient: localNotificationClient,
+        )
+        Task { await reminderCoordinator.start(learningProjectOutcomes: learningProject.learningProjectOutcomes) }
+        requestGenerationReminder = RequestGenerationReminder(
+            authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
+            reminderRegistry: GenerationReminderRegistryAdapter(coordinator: reminderCoordinator),
+        )
+
         let pushClient = FirebaseMessagingPushClient()
         let forwardAPNsToken: @Sendable (Data) -> Void = { token in
             pushClient.setAPNsToken(token)
@@ -128,6 +138,7 @@ public struct AppComposition: Sendable {
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
     public let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    public let requestGenerationReminder: any RequestGenerationReminderUseCase
 
     public static func live(
         _ environment: Environment,

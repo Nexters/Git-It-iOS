@@ -42,6 +42,7 @@ struct AppCompositionPublicSurfaceTests {
             "deleteMemberAccount",
             "fetchExternalRepository",
             "learningProjectOutcomes",
+            "requestGenerationReminder",
         ]
 
         #expect(labels == expected)
