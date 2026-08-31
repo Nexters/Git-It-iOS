@@ -15,10 +15,11 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
     }
 
     public func application(
-        _: UIApplication,
+        _ application: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?,
     ) -> Bool {
         FirebaseApp.configure()
+        application.registerForRemoteNotifications()
         return true
     }
 

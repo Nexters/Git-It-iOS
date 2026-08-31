@@ -31,7 +31,7 @@ public final class FirebaseMessagingPushClient: NSObject, PushMessagingClient, S
     // MARK: Private
 
     private struct State {
-        var pendingContinuations: [CheckedContinuation<String, Never>] = []
+        var pendingContinuations = [CheckedContinuation<String, Never>]()
     }
 
     private let state = Mutex(State())
@@ -41,7 +41,10 @@ public final class FirebaseMessagingPushClient: NSObject, PushMessagingClient, S
 // MARK: MessagingDelegate
 
 extension FirebaseMessagingPushClient: MessagingDelegate {
-    public func messaging(_: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    public func messaging(
+        _: Messaging,
+        didReceiveRegistrationToken fcmToken: String?,
+    ) {
         guard let fcmToken else { return }
         let continuations = state.withLock { protectedState -> [CheckedContinuation<String, Never>] in
             defer { protectedState.pendingContinuations.removeAll() }
