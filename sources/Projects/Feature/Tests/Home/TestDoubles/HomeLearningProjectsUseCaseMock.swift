@@ -1,6 +1,9 @@
 import DomainLearningProject
 
 actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
+
+    // MARK: Lifecycle
+
     init(
         results: [Result<LearningProjectPage, LearningProjectError>] = [.failure(.unexpected)],
         suspendsRequests: Bool = false,
@@ -8,6 +11,8 @@ actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
         self.results = results
         self.suspendsRequests = suspendsRequests
     }
+
+    // MARK: Internal
 
     func callAsFunction() async throws -> LearningProjectPage {
         callCount += 1
@@ -29,13 +34,19 @@ actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
         continuation.resume(with: result)
     }
 
+    // MARK: Private
+
     private var results: [Result<LearningProjectPage, LearningProjectError>]
     private let suspendsRequests: Bool
     private var callCount = 0
-    private var continuations = [(CheckedContinuation<LearningProjectPage, any Error>, Result<LearningProjectPage, LearningProjectError>)]()
+    private var continuations = [(
+        CheckedContinuation<LearningProjectPage, any Error>,
+        Result<LearningProjectPage, LearningProjectError>,
+    )]()
 
     private func nextResult() -> Result<LearningProjectPage, LearningProjectError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }
+
 }

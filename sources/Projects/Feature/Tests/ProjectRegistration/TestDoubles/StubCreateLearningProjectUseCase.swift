@@ -47,7 +47,10 @@ actor StubCreateLearningProjectUseCase: CreateLearningProjectUseCase {
     private var results: [Result<ProjectRegistrationReceipt, LearningProjectError>]
     private let suspendsRequests: Bool
     private var calls = [Call]()
-    private var continuations = [(CheckedContinuation<ProjectRegistrationReceipt, any Error>, Result<ProjectRegistrationReceipt, LearningProjectError>)]()
+    private var continuations = [(
+        CheckedContinuation<ProjectRegistrationReceipt, any Error>,
+        Result<ProjectRegistrationReceipt, LearningProjectError>,
+    )]()
 
     private func nextResult() -> Result<ProjectRegistrationReceipt, LearningProjectError> {
         guard !results.isEmpty else { return .failure(.unexpected) }

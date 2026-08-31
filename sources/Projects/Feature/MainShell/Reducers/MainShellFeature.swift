@@ -52,6 +52,8 @@ public struct MainShellFeature: Sendable {
         case saved(SavedFeature.Action)
         case settings(SettingsFeature.Action)
 
+        // MARK: Public
+
         @CasePathable
         public enum View: Sendable, Equatable {
             case tabSelected(MainShellTab)

@@ -4,10 +4,10 @@ import Testing
 
 @testable import Feature
 
+// MARK: - ProjectRegistrationFeatureTests
+
 @Suite("ProjectRegistrationFeature")
 struct ProjectRegistrationFeatureTests {
-
-    // MARK: - S1: 레포지토리 검증
 
     @Test
     func `repositoryURLChanged는 validation을 idle로 되돌린다`() async {
@@ -90,8 +90,6 @@ struct ProjectRegistrationFeatureTests {
         #expect(store.state.validation == .validating)
     }
 
-    // MARK: - S2: 이해도 선택과 제출
-
     @Test
     func `quizLevelSelected는 선택한 값을 반영한다`() async {
         let store = makeProjectRegistrationStore()
@@ -155,8 +153,6 @@ struct ProjectRegistrationFeatureTests {
         await learningProjectOutcomes.finish()
         await store.finish()
     }
-
-    // MARK: - S3: 생성 진행과 FCM 판정
 
     @Test
     func `waitAtHomeTapped는 알림 옵션이 꺼져 있으면 시트를 거친 뒤 projectRegistered를 정확히 한 번 출력한다`() async {
@@ -310,8 +306,6 @@ struct ProjectRegistrationFeatureTests {
         await store.finish()
     }
 
-    // MARK: - S4: 알림 옵션
-
     @Test
     func `알림 수락은 notificationOptionSelected accepted true를 출력한 뒤 waitAtHomeTapped 동작을 이어간다`() async {
         let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
@@ -353,8 +347,6 @@ struct ProjectRegistrationFeatureTests {
         await learningProjectOutcomes.finish()
         await store.finish()
     }
-
-    // MARK: - FR-016 / SC-014: 흐름 중간 종료 시 취소
 
     @Test
     func `State가 폐기되면 진행 중이던 검증 Effect가 취소되고 이후 이벤트를 받지 않는다`() async {
@@ -443,8 +435,6 @@ private func makeProjectRegistrationStore(
 
 @Reducer
 private struct ProjectRegistrationHostFeature {
-
-    // MARK: Internal
 
     @ObservableState
     struct State: Equatable {

@@ -102,6 +102,22 @@ extension GradientToken {
         ],
     )
 
+    public static let gradient4 = GradientToken(
+        name: "Gradient 4",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#3B3749",
+            ),
+            Stop(
+                position: 1,
+                hex: "#56718A",
+            ),
+        ],
+    )
+
     public static let topEdgeScrim = GradientToken(
         name: "TopEdgeScrim",
         start: topToBottomEnd,

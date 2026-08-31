@@ -58,7 +58,11 @@ private struct PreviewCreateLearningProjectUseCase: CreateLearningProjectUseCase
         githubRepoURL _: String,
         quizLevel: QuizLevel,
     ) async throws -> ProjectRegistrationReceipt {
-        ProjectRegistrationReceipt(projectID: "preview-project", requestStatus: "accepted", quizLevel: quizLevel)
+        ProjectRegistrationReceipt(
+            projectID: "preview-project",
+            requestStatus: "accepted",
+            quizLevel: quizLevel,
+        )
     }
 }
 
@@ -70,66 +74,66 @@ private struct PreviewLearningProjectOutcomesUseCase: LearningProjectOutcomesUse
     }
 }
 
-// #Preview("링크 입력 · 986:13739") {
-//    ProjectRegistrationScreen(store: ProjectRegistrationPreviewSupport.store())
+#Preview("링크 입력 · 986:13739") {
+    ProjectRegistrationScreen(store: ProjectRegistrationPreviewSupport.store())
 //        .frame(width: 360, height: 800)
-// }
-//
-// #Preview("링크 입력 · 검증 실패") {
-//    ProjectRegistrationScreen(
-//        store: ProjectRegistrationPreviewSupport.store(
-//            repositoryURLInput: "https://github.com/invalid",
-//            validation: .failed,
-//        ),
-//    )
+}
+
+#Preview("링크 입력 · 검증 실패") {
+    ProjectRegistrationScreen(
+        store: ProjectRegistrationPreviewSupport.store(
+            repositoryURLInput: "https://github.com/invalid",
+            validation: .failed,
+        )
+    )
 //    .frame(width: 360, height: 800)
-// }
-//
-// #Preview("레포지토리 확인 · 737:10890") {
-//    ProjectRegistrationScreen(
-//        store: ProjectRegistrationPreviewSupport.store(
-//            repositoryURLInput: "https://github.com/seaweedfs/seaweedfs",
-//            validation: .validated(ProjectRegistrationPreviewSupport.repository),
-//        ),
-//    )
+}
+
+#Preview("레포지토리 확인 · 737:10890") {
+    ProjectRegistrationScreen(
+        store: ProjectRegistrationPreviewSupport.store(
+            repositoryURLInput: "https://github.com/seaweedfs/seaweedfs",
+            validation: .validated(ProjectRegistrationPreviewSupport.repository),
+        )
+    )
 //    .frame(width: 360, height: 800)
-// }
-//
-// #Preview("이해도 선택 · 737:10882") {
-//    QuizLevelSelectionScreen(
-//        selectedLevel: nil,
-//        onSelect: { _ in },
-//        onNext: { },
-//        onBack: { },
-//    )
+}
+
+#Preview("이해도 선택 · 737:10882") {
+    QuizLevelSelectionScreen(
+        selectedLevel: nil,
+        onSelect: { _ in },
+        onNext: { },
+        onBack: { },
+    )
 //    .designSystemBackgroundForPreview()
-// }
-//
-// #Preview("이해도 선택 · 선택됨 · 737:10874") {
-//    QuizLevelSelectionScreen(
-//        selectedLevel: .l1,
-//        onSelect: { _ in },
-//        onNext: { },
-//        onBack: { },
-//    )
+}
+
+#Preview("이해도 선택 · 선택됨 · 737:10874") {
+    QuizLevelSelectionScreen(
+        selectedLevel: .l1,
+        onSelect: { _ in },
+        onNext: { },
+        onBack: { },
+    )
 //    .designSystemBackgroundForPreview()
-// }
-//
-// #Preview("생성 시작 확정 · 737:10830") {
-//    GenerationConfirmationScreen(onStart: { }, onBack: { })
+}
+
+#Preview("생성 시작 확정 · 737:10830") {
+    GenerationConfirmationScreen(onStart: { }, onBack: { })
 //        .designSystemBackgroundForPreview()
-// }
-//
-// #Preview("생성 진행 · 737:10800") {
-//    ProjectRegistrationScreen(
-//        store: ProjectRegistrationPreviewSupport.store(
-//            submission: .awaitingGeneration(
-//                ProjectRegistrationReceipt(projectID: "preview-project", requestStatus: "accepted", quizLevel: .l1)
-//            ),
-//        ),
-//    )
+}
+
+#Preview("생성 진행 · 2026:29388") {
+    ProjectRegistrationScreen(
+        store: ProjectRegistrationPreviewSupport.store(
+            submission: .awaitingGeneration(
+                ProjectRegistrationReceipt(projectID: "preview-project", requestStatus: "accepted", quizLevel: .l1)
+            )
+        )
+    )
 //    .frame(width: 360, height: 800)
-// }
+}
 
 #Preview("알림 옵션 시트 · 824:12149") {
     NotificationOptionSheet(onAccept: { }, onDecline: { })
@@ -137,7 +141,7 @@ private struct PreviewLearningProjectOutcomesUseCase: LearningProjectOutcomesUse
 }
 
 extension View {
-    private func designSystemBackgroundForPreview() -> some View {
+    func designSystemBackgroundForPreview() -> some View {
         ScreenContainer { self }
             .frame(width: 360, height: 800)
     }

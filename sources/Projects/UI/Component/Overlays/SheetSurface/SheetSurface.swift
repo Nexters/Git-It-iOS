@@ -47,10 +47,11 @@ public struct SheetSurface<Content: View>: View {
         }
         .designSystemScreenMargin()
         .padding(.bottom, Constant.bottomPadding)
-        .background(
-            Color(designSystem: .cardBackground),
-            in: UnevenRoundedRectangle(designSystemTopCorners: .extraLarge),
-        )
+        .background {
+            UnevenRoundedRectangle(designSystemTopCorners: .extraLarge)
+                .fill(Color(designSystem: .cardBackground))
+                .ignoresSafeArea(edges: .bottom)
+        }
     }
 
     // MARK: Private

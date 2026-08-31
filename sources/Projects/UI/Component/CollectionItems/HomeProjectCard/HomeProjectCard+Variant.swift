@@ -18,6 +18,8 @@ extension HomeProjectCard {
                 }
         }
 
+        // MARK: Internal
+
         var cardColor: ColorToken {
             switch self {
             case .purple: .purple300

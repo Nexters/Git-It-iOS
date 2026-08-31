@@ -1,6 +1,9 @@
 import DomainMember
 
 actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
+
+    // MARK: Lifecycle
+
     init(
         results: [Result<MemberProfile, MemberError>] = [.failure(.temporarilyUnavailable)],
         suspendsRequests: Bool = false,
@@ -8,6 +11,8 @@ actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
         self.results = results
         self.suspendsRequests = suspendsRequests
     }
+
+    // MARK: Internal
 
     func callAsFunction() async throws -> MemberProfile {
         callCount += 1
@@ -29,6 +34,8 @@ actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
         continuation.resume(with: result)
     }
 
+    // MARK: Private
+
     private var results: [Result<MemberProfile, MemberError>]
     private let suspendsRequests: Bool
     private var callCount = 0
@@ -38,4 +45,5 @@ actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
         guard !results.isEmpty else { return .failure(.temporarilyUnavailable) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }
+
 }

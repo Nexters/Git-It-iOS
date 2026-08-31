@@ -4,6 +4,9 @@ import DomainMember
 
 @Reducer
 public struct HomeFeature: Sendable {
+
+    // MARK: Lifecycle
+
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
@@ -14,9 +17,16 @@ public struct HomeFeature: Sendable {
         self.learningProjectOutcomes = learningProjectOutcomes
     }
 
+    // MARK: Public
+
     @ObservableState
     public struct State: Equatable, Sendable {
+
+        // MARK: Lifecycle
+
         public init() { }
+
+        // MARK: Public
 
         public enum ProfileLoad: Equatable, Sendable {
             case idle
@@ -42,12 +52,15 @@ public struct HomeFeature: Sendable {
         public var profileRequestID = 0
         public var projectRequestID = 0
         public var generationOutcomeObservation = GenerationOutcomeObservation.idle
+
     }
 
     public enum Action: ViewAction, Equatable, Sendable {
         case view(View)
         case effect(Effect)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Equatable, Sendable {
@@ -79,7 +92,7 @@ public struct HomeFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .view(.task):
-                var effects: [ComposableArchitecture.Effect<Action>] = []
+                var effects = [ComposableArchitecture.Effect<Action>]()
                 if state.profileLoad == .idle {
                     effects.append(startProfileLoad(state: &state))
                 }
@@ -152,6 +165,8 @@ public struct HomeFeature: Sendable {
         }
     }
 
+    // MARK: Private
+
     private enum CancelID {
         case profile
         case projects
@@ -187,7 +202,10 @@ public struct HomeFeature: Sendable {
 
         return .run { send in
             do {
-                await send(.effect(.projectsLoadFinished(requestID: requestID, result: .success(try await fetchLearningProjects()))))
+                await send(.effect(.projectsLoadFinished(
+                    requestID: requestID,
+                    result: .success(try await fetchLearningProjects()),
+                )))
             } catch let error as LearningProjectError {
                 await send(.effect(.projectsLoadFinished(requestID: requestID, result: .failure(error))))
             } catch {
@@ -205,4 +223,5 @@ public struct HomeFeature: Sendable {
             }
         }
     }
+
 }

@@ -101,19 +101,27 @@ public struct ProjectRegistrationScreen: View {
             VStack(alignment: .leading, spacing: Constant.titleFieldSpacing) {
                 StyledText.subtitle1("GitHub 레포지토리\n링크를 붙여넣어 주세요")
 
-                VStack(alignment: .leading, spacing: Constant.fieldErrorSpacing) {
-                    linkField
-
-                    if case .failed = store.validation {
-                        StyledText.caption1("레포지토리를 확인할 수 없어요. 링크를 다시 확인해 주세요.", color: .error)
-                    }
-                }
+                LabeledTextField(
+                    label: "링크",
+                    placeholder: "https://github.com",
+                    text: Binding(
+                        get: { store.repositoryURLInput },
+                        set: { send(.repositoryURLChanged($0)) },
+                    ),
+                    supportingText: isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
+                    isError: isValidationFailed,
+                    keyboardType: .URL,
+                    textInputAutocapitalization: .never,
+                    autocorrectionDisabled: true,
+                    accessibilityLabel: "GitHub 레포지토리 링크",
+                )
             }
             .designSystemScreenMargin()
             .padding(.top, Constant.headerContentSpacing)
 
             guideSection
                 .padding(.top, Constant.fieldGuideSpacing)
+                .padding(.horizontal, 20)
 
             Spacer(minLength: 0)
 
@@ -135,38 +143,11 @@ public struct ProjectRegistrationScreen: View {
         store.validation == .validating ? "확인 중…" : "다음"
     }
 
-    private var linkField: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-                StyledText.body2("링크", color: .blue100)
-
-                TextField(
-                    "",
-                    text: Binding(
-                        get: { store.repositoryURLInput },
-                        set: { send(.repositoryURLChanged($0)) },
-                    ),
-                    prompt: Text("https://github.com").foregroundStyle(Color(designSystem: .white30)),
-                )
-                .keyboardType(.URL)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .designSystemForeground(.grey100)
-                .accessibilityLabel("GitHub 레포지토리 링크")
-            }
-            .frame(height: Constant.fieldHeight)
-
-            Rectangle()
-                .fill(Color(designSystem: fieldUnderlineColor))
-                .frame(height: 1)
-        }
-    }
-
-    private var fieldUnderlineColor: ColorToken {
+    private var isValidationFailed: Bool {
         if case .failed = store.validation {
-            return .error
+            return true
         }
-        return .blue100
+        return false
     }
 
     private var guideSection: some View {
@@ -198,9 +179,9 @@ public struct ProjectRegistrationScreen: View {
                                 Circle()
                                     .fill(Color(designSystem: .grey500))
                                     .frame(width: 16, height: 16)
-                                StyledText.caption1("\(index + 1)", color: .grey300)
+                                StyledText.caption2("\(index + 1)", color: .grey300)
                             }
-                            StyledText.caption1(text)
+                            StyledText.caption1(text, color: .grey100)
                         }
                     }
                 }
@@ -237,10 +218,8 @@ public struct ProjectRegistrationScreen: View {
 
 extension ProjectRegistrationScreen {
     private enum Constant {
-        static let fieldHeight: CGFloat = 56
         static let headerContentSpacing: CGFloat = 32
         static let titleFieldSpacing: CGFloat = 16
-        static let fieldErrorSpacing: CGFloat = 8
         static let fieldGuideSpacing: CGFloat = 32
         static let guideStepSpacing: CGFloat = 10
         static let bottomButtonPadding: CGFloat = 34

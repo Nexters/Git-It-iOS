@@ -4,6 +4,9 @@ import Testing
 
 @Suite("HomeProjectCard 계약")
 struct HomeProjectCardTests {
+
+    // MARK: Internal
+
     @Test
     func `currentSetLabel은 원문을 손실 없이 유지한다`() {
         let card = HomeProjectCard(
@@ -69,6 +72,8 @@ struct HomeProjectCardTests {
         #expect(HomeProjectCard.minimumTouchArea == 44)
     }
 
+    // MARK: Private
+
     private func makeCard(
         isLearningEnabled: Bool = true,
         onSelect: @escaping () -> Void = { },
@@ -86,4 +91,5 @@ struct HomeProjectCardTests {
             onStart: onStart,
         )
     }
+
 }

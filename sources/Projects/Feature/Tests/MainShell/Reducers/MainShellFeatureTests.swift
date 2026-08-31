@@ -5,9 +5,14 @@ import Testing
 
 @testable import Feature
 
+// MARK: - MainShellFeatureTests
+
 @MainActor
 @Suite("MainShell Home 통합")
 struct MainShellFeatureTests {
+
+    // MARK: Internal
+
     @Test
     func `Home이 기본이고 탭 순서는 Home 프로젝트 저장 마이다`() {
         #expect(MainShellFeature.State().selectedTab == .home)
@@ -72,6 +77,8 @@ struct MainShellFeatureTests {
         await store.receive(.delegate(.loggedOut))
     }
 
+    // MARK: Private
+
     private func makeStore(
         state: MainShellFeature.State = .init(),
         projects: HomeLearningProjectsUseCaseMock = .init(),
@@ -91,22 +98,31 @@ struct MainShellFeatureTests {
             )
         }
     }
+
 }
+
+// MARK: - MainShellDeleteProjectStub
 
 private struct MainShellDeleteProjectStub: DeleteLearningProjectUseCase {
-    func callAsFunction(projectID: String) async throws { }
+    func callAsFunction(projectID _: String) async throws { }
 }
 
+// MARK: - MainShellBookmarksStub
+
 private struct MainShellBookmarksStub: FetchBookmarkedQuestionsUseCase {
-    func callAsFunction(projectID: String?) async throws -> BookmarkedQuestionCollection {
+    func callAsFunction(projectID _: String?) async throws -> BookmarkedQuestionCollection {
         .init(totalCount: 0, availableProjects: [], bookmarks: [])
     }
 }
 
+// MARK: - MainShellUpdatePositionStub
+
 private struct MainShellUpdatePositionStub: UpdateMemberPositionUseCase {
-    func callAsFunction(_ position: MemberPosition) async throws { }
+    func callAsFunction(_: MemberPosition) async throws { }
 }
 
+// MARK: - MainShellUpdateCareerStub
+
 private struct MainShellUpdateCareerStub: UpdateMemberCareerLevelUseCase {
-    func callAsFunction(_ careerLevel: CareerLevel) async throws { }
+    func callAsFunction(_: CareerLevel) async throws { }
 }

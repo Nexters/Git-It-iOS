@@ -2,8 +2,13 @@ import ComposableArchitecture
 import DomainLearningProject
 import DomainMember
 
+// MARK: - HomePreviewSupport
+
 @MainActor
 enum HomePreviewSupport {
+
+    // MARK: Internal
+
     static let projectPresent = store(
         projects: .success(.init(items: [project(0), project(1), project(2)], hasNext: false)),
         profile: .success(profile),
@@ -20,6 +25,8 @@ enum HomePreviewSupport {
         projects: .success(.init(items: [project(0)], hasNext: false)),
         profile: .failure(.temporarilyUnavailable),
     )
+
+    // MARK: Private
 
     private static let profile = MemberProfile(
         name: "프로덕션에 푸시하는 고양이",
@@ -55,6 +62,7 @@ enum HomePreviewSupport {
             )
         }
     }
+
 }
 
 // MARK: - HomePreviewLearningProjectOutcomes

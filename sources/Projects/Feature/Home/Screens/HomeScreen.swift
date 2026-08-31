@@ -146,7 +146,7 @@ public struct HomeScreen: View {
                 user: .init(name: profile.name, role: Display.profileSubtitle(profile) ?? ""),
                 leading: nil,
             ) {
-                ResourceImage(asset: .icon(.user), contentMode: .fill)
+                ResourceImage(asset: .icon(.profile), contentMode: .fill)
             }
 
         case .failed:

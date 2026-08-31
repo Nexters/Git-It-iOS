@@ -62,7 +62,7 @@ struct LegalAgreementScreen: View {
     private var allAgreementRow: some View {
         Button(action: { send(.legalAllDocumentsToggled) }) {
             HStack(spacing: Constant.checkSpacing) {
-                Image(systemName: store.legal.isAllSelected ? "checkmark.circle.fill" : "circle")
+                ResourceImage(asset: store.legal.isAllSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                     .designSystemForeground(store.legal.isAllSelected ? .blue100 : .grey400)
                     .frame(width: Constant.checkSize, height: Constant.checkSize)
                 StyledText.body1("전체 동의")

@@ -58,7 +58,8 @@ struct HomeFeatureGenerationOutcomeTests {
     func `generationOutcomeReceived는 로딩 중이 아니면 프로젝트 목록을 다시 조회한다`() async {
         let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         let projects = HomeLearningProjectsUseCaseMock(results: [
-            .success(HomeTestFixture.oneProjectPage), .success(HomeTestFixture.manyProjectsPage),
+            .success(HomeTestFixture.oneProjectPage),
+            .success(HomeTestFixture.manyProjectsPage),
         ])
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)

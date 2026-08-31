@@ -45,7 +45,10 @@ actor StubFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
     private var results: [Result<ExternalRepository, ExternalRepositoryError>]
     private let suspendsRequests: Bool
     private var callCount = 0
-    private var continuations = [(CheckedContinuation<ExternalRepository, any Error>, Result<ExternalRepository, ExternalRepositoryError>)]()
+    private var continuations = [(
+        CheckedContinuation<ExternalRepository, any Error>,
+        Result<ExternalRepository, ExternalRepositoryError>,
+    )]()
 
     private func nextResult() -> Result<ExternalRepository, ExternalRepositoryError> {
         guard !results.isEmpty else { return .failure(.other) }
