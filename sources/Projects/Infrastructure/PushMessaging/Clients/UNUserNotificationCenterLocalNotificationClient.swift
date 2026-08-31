@@ -38,13 +38,13 @@ public final class UNUserNotificationCenterLocalNotificationClient: LocalNotific
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         switch settings.authorizationStatus {
         case .authorized, .provisional, .ephemeral:
-            true
+            return true
 
         case .notDetermined, .denied:
-            false
+            return false
 
         @unknown default:
-            false
+            return false
         }
     }
 
