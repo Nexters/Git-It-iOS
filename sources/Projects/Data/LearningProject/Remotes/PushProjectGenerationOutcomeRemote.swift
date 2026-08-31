@@ -7,7 +7,7 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
 
     // MARK: Lifecycle
 
-    public init() {}
+    public init() { }
 
     // MARK: Public
 
@@ -32,7 +32,7 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
     // MARK: Private
 
     private struct State {
-        var continuations: [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation] = [:]
+        var continuations = [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation]()
     }
 
     private let state = Mutex(State())

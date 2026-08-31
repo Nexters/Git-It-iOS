@@ -2,7 +2,10 @@ public struct ProjectGenerationOutcomeDTO: Equatable, Sendable {
 
     // MARK: Lifecycle
 
-    public init(projectID: String, status: RawStatus) {
+    public init(
+        projectID: String,
+        status: RawStatus,
+    ) {
         self.projectID = projectID
         self.status = status
     }

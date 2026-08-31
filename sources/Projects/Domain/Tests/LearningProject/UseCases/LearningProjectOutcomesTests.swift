@@ -14,7 +14,7 @@ struct LearningProjectOutcomesTests {
         ]
         let repository = ScriptedLearningProjectGenerationOutcomeRepository(scriptedOutcomes: outcomes)
         let learningProjectOutcomes = LearningProjectOutcomes(
-            repository: repository,
+            repository: repository
         )
 
         var received = [LearningProjectGenerationOutcome]()

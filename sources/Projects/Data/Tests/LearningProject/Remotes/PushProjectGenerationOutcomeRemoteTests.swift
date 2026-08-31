@@ -43,7 +43,7 @@ struct PushProjectGenerationOutcomeRemoteTests {
         let stream2 = await remote.outcomes()
 
         let task1 = Task {
-            for await _ in stream1 {}
+            for await _ in stream1 { }
         }
         task1.cancel()
         _ = await task1.value
