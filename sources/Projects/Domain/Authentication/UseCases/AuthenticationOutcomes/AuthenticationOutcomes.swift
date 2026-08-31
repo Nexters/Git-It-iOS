@@ -1,4 +1,4 @@
-public struct ObserveAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCase, Sendable {
+public struct AuthenticationOutcomes: AuthenticationOutcomesUseCase, Sendable {
 
     // MARK: Lifecycle
 

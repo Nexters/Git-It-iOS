@@ -1,4 +1,4 @@
-public struct ObserveLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCase, Sendable {
+public struct LearningProjectOutcomes: LearningProjectOutcomesUseCase, Sendable {
 
     // MARK: Lifecycle
 

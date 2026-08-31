@@ -10,7 +10,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `task는 generationOutcomeObservation이 idle일 때만 관찰 Effect를 시작하고 재호출 시 중복 구독하지 않는다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         let profile = HomeMemberProfileUseCaseMock(
             results: [.success(HomeTestFixture.profileWithBoth)],
             suspendsRequests: true,
@@ -23,7 +23,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: learningProjectOutcomes,
             )
         }
 
@@ -50,13 +50,13 @@ struct HomeFeatureGenerationOutcomeTests {
         #expect(await profile.snapshot().callCount == 1)
         #expect(await projects.snapshot().callCount == 1)
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `generationOutcomeReceived는 로딩 중이 아니면 프로젝트 목록을 다시 조회한다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         let projects = HomeLearningProjectsUseCaseMock(results: [
             .success(HomeTestFixture.oneProjectPage), .success(HomeTestFixture.manyProjectsPage),
         ])
@@ -67,11 +67,11 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: learningProjectOutcomes,
             )
         }
 
-        await observeLearningProjectGenerationOutcomes.emit(
+        await learningProjectOutcomes.emit(
             LearningProjectGenerationOutcome(projectID: "project-1", status: .completed)
         )
         await store.receive(
@@ -84,7 +84,7 @@ struct HomeFeatureGenerationOutcomeTests {
             $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
         }
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
@@ -97,7 +97,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
             )
         }
 

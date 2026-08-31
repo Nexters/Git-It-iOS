@@ -129,13 +129,13 @@ struct ProjectRegistrationFeatureTests {
     @Test
     func `submitTapped 성공 시 createLearningProject가 검증된 canonicalURL과 선택된 QuizLevel로 정확히 한 번 호출된다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         state.quizLevel = .l2
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
@@ -152,7 +152,7 @@ struct ProjectRegistrationFeatureTests {
             ]
         )
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
@@ -160,11 +160,11 @@ struct ProjectRegistrationFeatureTests {
 
     @Test
     func `waitAtHomeTapped는 알림 옵션이 꺼져 있으면 시트를 거친 뒤 projectRegistered를 정확히 한 번 출력한다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.submission = .awaitingGeneration(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
@@ -177,19 +177,19 @@ struct ProjectRegistrationFeatureTests {
         await store.receive(.delegate(.notificationOptionSelected(accepted: false)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `awaitingGeneration 중 일치하는 projectID의 completed 수신은 projectRegistered를 출력한다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
@@ -200,7 +200,7 @@ struct ProjectRegistrationFeatureTests {
             $0.submission = .awaitingGeneration(sampleReceipt)
         }
 
-        await observeLearningProjectGenerationOutcomes.emit(
+        await learningProjectOutcomes.emit(
             LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
         )
         await store.receive(
@@ -210,21 +210,21 @@ struct ProjectRegistrationFeatureTests {
         )
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `일치하지 않는 projectID의 이벤트는 무시된다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.submission = .awaitingGeneration(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
-        await observeLearningProjectGenerationOutcomes.emit(
+        await learningProjectOutcomes.emit(
             LearningProjectGenerationOutcome(projectID: "other-project", status: .completed)
         )
         await store.receive(
@@ -235,21 +235,21 @@ struct ProjectRegistrationFeatureTests {
 
         #expect(store.state.submission == .awaitingGeneration(sampleReceipt))
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `failed 이벤트 수신 시 submission이 failed로 전이한다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.submission = .awaitingGeneration(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
-        await observeLearningProjectGenerationOutcomes.emit(
+        await learningProjectOutcomes.emit(
             LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
         )
         await store.receive(
@@ -260,7 +260,7 @@ struct ProjectRegistrationFeatureTests {
             $0.submission = .failed(.unexpected)
         }
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
@@ -282,14 +282,14 @@ struct ProjectRegistrationFeatureTests {
     @Test
     func `retryTapped는 동일 입력으로 재제출한다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         state.quizLevel = .l3
         state.submission = .failed(.unexpected)
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
@@ -306,7 +306,7 @@ struct ProjectRegistrationFeatureTests {
             ]
         )
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
@@ -314,12 +314,12 @@ struct ProjectRegistrationFeatureTests {
 
     @Test
     func `알림 수락은 notificationOptionSelected accepted true를 출력한 뒤 waitAtHomeTapped 동작을 이어간다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.submission = .awaitingGeneration(sampleReceipt)
         state.isNotificationOptionSheetPresented = true
         let store = makeProjectRegistrationStore(
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
 
@@ -329,18 +329,18 @@ struct ProjectRegistrationFeatureTests {
         await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `알림 옵션 선택은 상태 전이 자체에 영향을 주지 않는다`() async {
-        let observeLearningProjectGenerationOutcomes = StubObserveLearningProjectGenerationOutcomesUseCase()
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.submission = .awaitingGeneration(sampleReceipt)
         state.isNotificationOptionSheetPresented = true
         let store = makeProjectRegistrationStore(
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             state: state,
         )
         store.exhaustivity = .off
@@ -350,7 +350,7 @@ struct ProjectRegistrationFeatureTests {
         #expect(store.state.repositoryURLInput.isEmpty)
         #expect(store.state.quizLevel == .l1)
 
-        await observeLearningProjectGenerationOutcomes.finish()
+        await learningProjectOutcomes.finish()
         await store.finish()
     }
 
@@ -365,7 +365,7 @@ struct ProjectRegistrationFeatureTests {
             ProjectRegistrationHostFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: StubCreateLearningProjectUseCase(),
-                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
             )
         }
 
@@ -390,7 +390,7 @@ struct ProjectRegistrationFeatureTests {
             ProjectRegistrationHostFeature(
                 fetchExternalRepository: StubFetchExternalRepositoryUseCase(),
                 createLearningProject: createLearningProject,
-                observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase(),
+                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
             )
         }
 
@@ -427,14 +427,14 @@ private let sampleReceipt = ProjectRegistrationReceipt(
 private func makeProjectRegistrationStore(
     fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
     createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    observeLearningProjectGenerationOutcomes: StubObserveLearningProjectGenerationOutcomesUseCase = StubObserveLearningProjectGenerationOutcomesUseCase(),
+    learningProjectOutcomes: StubLearningProjectOutcomesUseCase = StubLearningProjectOutcomesUseCase(),
     state: ProjectRegistrationFeature.State = ProjectRegistrationFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationFeature> {
     TestStore(initialState: state) {
         ProjectRegistrationFeature(
             fetchExternalRepository: fetchExternalRepository,
             createLearningProject: createLearningProject,
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
         )
     }
 }
@@ -457,7 +457,7 @@ private struct ProjectRegistrationHostFeature {
 
     let fetchExternalRepository: any FetchExternalRepositoryUseCase
     let createLearningProject: any CreateLearningProjectUseCase
-    let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    let learningProjectOutcomes: any LearningProjectOutcomesUseCase
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
@@ -465,7 +465,7 @@ private struct ProjectRegistrationHostFeature {
                 ProjectRegistrationFeature(
                     fetchExternalRepository: fetchExternalRepository,
                     createLearningProject: createLearningProject,
-                    observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                    learningProjectOutcomes: learningProjectOutcomes,
                 )
             }
     }

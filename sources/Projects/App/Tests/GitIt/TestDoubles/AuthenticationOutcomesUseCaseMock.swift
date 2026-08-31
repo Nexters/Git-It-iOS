@@ -3,7 +3,7 @@ import DomainLearningProject
 import DomainMember
 import Foundation
 
-actor ObserveAuthenticationOutcomesUseCaseMock: ObserveAuthenticationOutcomesUseCase {
+actor AuthenticationOutcomesUseCaseMock: AuthenticationOutcomesUseCase {
 
     // MARK: Internal
 

@@ -51,15 +51,15 @@ enum HomePreviewSupport {
             HomeFeature(
                 fetchLearningProjects: HomePreviewFetchLearningProjects(behavior: projects),
                 fetchMemberProfile: HomePreviewFetchMemberProfile(behavior: profile),
-                observeLearningProjectGenerationOutcomes: HomePreviewObserveLearningProjectGenerationOutcomes(),
+                learningProjectOutcomes: HomePreviewLearningProjectOutcomes(),
             )
         }
     }
 }
 
-// MARK: - HomePreviewObserveLearningProjectGenerationOutcomes
+// MARK: - HomePreviewLearningProjectOutcomes
 
-private struct HomePreviewObserveLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCase {
+private struct HomePreviewLearningProjectOutcomes: LearningProjectOutcomesUseCase {
     func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
         AsyncStream { _ in }
     }

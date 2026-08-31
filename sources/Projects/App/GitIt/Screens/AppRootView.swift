@@ -85,7 +85,7 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopObserveAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCase {
+    struct NoopAuthenticationOutcomes: AuthenticationOutcomesUseCase {
         func callAsFunction() async -> AsyncStream<AuthenticationOutcome> {
             AsyncStream { _ in }
         }
@@ -180,7 +180,7 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopObserveLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCase {
+    struct NoopLearningProjectOutcomes: LearningProjectOutcomesUseCase {
         func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
             AsyncStream { _ in }
         }
@@ -194,7 +194,7 @@ private enum AppRootPreviewSupport {
                 restoreSession: NoopRestoreSession(),
                 signIn: NoopSignIn(),
                 signOut: NoopSignOut(),
-                observeAuthenticationOutcomes: NoopObserveAuthenticationOutcomes(),
+                authenticationOutcomes: NoopAuthenticationOutcomes(),
                 fetchMemberProfile: NoopFetchMemberProfile(),
                 completeCuration: NoopCompleteCuration(),
                 policyConsent: NoopPolicyConsent(),
@@ -206,7 +206,7 @@ private enum AppRootPreviewSupport {
                 deleteMemberAccount: NoopDeleteMemberAccount(),
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
-                observeLearningProjectGenerationOutcomes: NoopObserveLearningProjectGenerationOutcomes(),
+                learningProjectOutcomes: NoopLearningProjectOutcomes(),
             )
         }
     }

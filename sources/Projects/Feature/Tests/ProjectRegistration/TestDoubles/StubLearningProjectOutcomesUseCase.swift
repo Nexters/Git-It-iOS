@@ -1,7 +1,6 @@
 import DomainLearningProject
-import Foundation
 
-actor ObserveLearningProjectGenerationOutcomesUseCaseMock: ObserveLearningProjectGenerationOutcomesUseCase {
+actor StubLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase {
 
     // MARK: Internal
 

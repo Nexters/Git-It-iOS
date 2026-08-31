@@ -18,7 +18,7 @@ public struct MainShellFeature: Sendable {
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
-        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
+        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -28,7 +28,7 @@ public struct MainShellFeature: Sendable {
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
-        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        self.learningProjectOutcomes = learningProjectOutcomes
     }
 
     // MARK: Public
@@ -73,7 +73,7 @@ public struct MainShellFeature: Sendable {
             HomeFeature(
                 fetchLearningProjects: fetchLearningProjects,
                 fetchMemberProfile: fetchMemberProfile,
-                observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: learningProjectOutcomes,
             )
         }
         Scope(state: \.projectList, action: \.projectList) {
@@ -152,6 +152,6 @@ public struct MainShellFeature: Sendable {
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
 
 }

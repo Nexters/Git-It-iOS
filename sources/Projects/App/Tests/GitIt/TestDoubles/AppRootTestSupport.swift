@@ -74,10 +74,10 @@ func makeAppRootStore(
     restoreSession: RestoreSessionUseCaseMock = RestoreSessionUseCaseMock(),
     fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    observeAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCaseMock = ObserveAuthenticationOutcomesUseCaseMock(),
+    authenticationOutcomes: AuthenticationOutcomesUseCaseMock = AuthenticationOutcomesUseCaseMock(),
     resetAllForTesting: (@Sendable () async -> Void)? = nil,
-    observeLearningProjectGenerationOutcomes: ObserveLearningProjectGenerationOutcomesUseCaseMock =
-        ObserveLearningProjectGenerationOutcomesUseCaseMock(),
+    learningProjectOutcomes: LearningProjectOutcomesUseCaseMock =
+        LearningProjectOutcomesUseCaseMock(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -85,7 +85,7 @@ func makeAppRootStore(
             restoreSession: restoreSession,
             signIn: NoopSignInUseCase(),
             signOut: signOut,
-            observeAuthenticationOutcomes: observeAuthenticationOutcomes,
+            authenticationOutcomes: authenticationOutcomes,
             fetchMemberProfile: fetchMemberProfile,
             completeCuration: NoopCompleteCurationUseCase(),
             policyConsent: NoopPolicyConsentUseCase(),
@@ -97,7 +97,7 @@ func makeAppRootStore(
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
             fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
             createLearningProject: NoopCreateLearningProjectUseCase(),
-            observeLearningProjectGenerationOutcomes: observeLearningProjectGenerationOutcomes,
+            learningProjectOutcomes: learningProjectOutcomes,
             resetAllForTesting: resetAllForTesting,
         )
     }

@@ -7,11 +7,11 @@ public struct HomeFeature: Sendable {
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
-        observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase,
+        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.fetchMemberProfile = fetchMemberProfile
-        self.observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        self.learningProjectOutcomes = learningProjectOutcomes
     }
 
     @ObservableState
@@ -159,7 +159,7 @@ public struct HomeFeature: Sendable {
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
+    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
@@ -198,9 +198,9 @@ public struct HomeFeature: Sendable {
     }
 
     private func observeGenerationOutcomes() -> ComposableArchitecture.Effect<Action> {
-        let observeLearningProjectGenerationOutcomes = observeLearningProjectGenerationOutcomes
+        let learningProjectOutcomes = learningProjectOutcomes
         return .run { send in
-            for await outcome in await observeLearningProjectGenerationOutcomes() {
+            for await outcome in await learningProjectOutcomes() {
                 await send(.effect(.generationOutcomeReceived(outcome)))
             }
         }

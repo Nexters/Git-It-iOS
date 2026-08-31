@@ -2,10 +2,10 @@ import Testing
 
 @testable import DomainLearningProject
 
-// MARK: - ObserveLearningProjectGenerationOutcomesTests
+// MARK: - LearningProjectOutcomesTests
 
-@Suite("ObserveLearningProjectGenerationOutcomes")
-struct ObserveLearningProjectGenerationOutcomesTests {
+@Suite("LearningProjectOutcomes")
+struct LearningProjectOutcomesTests {
     @Test
     func `repository의 outcomes 스트림을 그대로 위임한다`() async {
         let outcomes = [
@@ -13,12 +13,12 @@ struct ObserveLearningProjectGenerationOutcomesTests {
             LearningProjectGenerationOutcome(projectID: "project-2", status: .failed),
         ]
         let repository = ScriptedLearningProjectGenerationOutcomeRepository(scriptedOutcomes: outcomes)
-        let observeLearningProjectGenerationOutcomes = ObserveLearningProjectGenerationOutcomes(
+        let learningProjectOutcomes = LearningProjectOutcomes(
             repository: repository,
         )
 
         var received = [LearningProjectGenerationOutcome]()
-        for await outcome in await observeLearningProjectGenerationOutcomes() {
+        for await outcome in await learningProjectOutcomes() {
             received.append(outcome)
         }
 
