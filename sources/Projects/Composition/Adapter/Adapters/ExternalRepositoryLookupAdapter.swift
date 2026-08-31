@@ -21,8 +21,8 @@ struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
             let response = try await remote.repository(GitHubRepositoryRequest(owner: owner, repository: name))
             return ExternalRepository(
                 canonicalURL: response.htmlURL,
-                ownerName: owner,
-                repositoryName: name,
+                ownerName: response.ownerLogin,
+                repositoryName: response.repositoryName,
                 imageURL: response.ownerAvatarURL,
                 starCount: response.starCount,
                 techStack: response.topics,

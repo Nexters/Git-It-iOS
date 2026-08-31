@@ -25,6 +25,32 @@ struct FetchExternalRepositoryTests {
         #expect(await lookup.recordedOwnerAndName() == ["owner/repo"])
     }
 
+    @Test(arguments: [
+        "github.com/owner/repo",
+        "www.github.com/owner/repo",
+        "http://github.com/owner/repo",
+        "http://www.github.com/owner/repo",
+        "https://www.github.com/owner/repo",
+        "HTTPS://GitHub.com/owner/repo",
+    ])
+    func `scheme·www 조합이 달라도 같은 owner-repo로 조회한다`(_ url: String) async throws {
+        let expected = ExternalRepository(
+            canonicalURL: "https://github.com/owner/repo",
+            ownerName: "owner",
+            repositoryName: "repo",
+            imageURL: nil,
+            starCount: 3,
+            techStack: ["Swift"],
+        )
+        let lookup = FetchExternalRepositoryLookup(behavior: .succeed(expected))
+        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
+
+        let result = try await fetchExternalRepository(url: url)
+
+        #expect(result == expected)
+        #expect(await lookup.recordedOwnerAndName() == ["owner/repo"])
+    }
+
     @Test
     func `파싱할 수 없는 URL은 조회 없이 URL 형식 오류를 던진다`() async throws {
         let lookup = FetchExternalRepositoryLookup(behavior: .succeed(

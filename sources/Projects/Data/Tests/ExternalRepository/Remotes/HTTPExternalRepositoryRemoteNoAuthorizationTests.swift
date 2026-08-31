@@ -13,8 +13,10 @@ struct HTTPExternalRepositoryRemoteNoAuthorizationTests {
             .response(HTTPTransportResponse(
                 statusCode: 200,
                 headers: [:],
-                body: Data(#"{"html_url":"https://github.com/owner/repo","stargazers_count":0,"topics":[],"owner":{"avatar_url":"https://example.com/a.png"}}"#
-                    .utf8),
+                body: Data(
+                    #"{"html_url":"https://github.com/owner/repo","name":"repo","stargazers_count":0,"topics":[],"owner":{"login":"owner","avatar_url":"https://example.com/a.png"}}"#
+                        .utf8
+                ),
             ))
         ])
         let client = HTTPClient(

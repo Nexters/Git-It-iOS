@@ -28,7 +28,7 @@ public struct FetchExternalRepository: FetchExternalRepositoryUseCase {
 
         guard
             !trimmed.isEmpty,
-            let components = URLComponents(string: trimmed),
+            let components = URLComponents(string: normalizedURLString(from: trimmed)),
             let host = components.host?.lowercased(),
             host == "github.com" || host == "www.github.com"
         else {
@@ -55,6 +55,18 @@ public struct FetchExternalRepository: FetchExternalRepositoryUseCase {
         }
 
         return (owner, name)
+    }
+
+    /// scheme이 없는 입력(`github.com/owner/repo`, `www.github.com/owner/repo`)에
+    /// `https://`를 보충해 `http://`, `https://`, `www.` 조합 모두 host 판별이
+    /// 가능하도록 한다.
+    private static func normalizedURLString(from trimmed: String) -> String {
+        let lowercased = trimmed.lowercased()
+        guard lowercased.hasPrefix("http://") || lowercased.hasPrefix("https://")
+        else {
+            return "https://\(trimmed)"
+        }
+        return trimmed
     }
 
 }
