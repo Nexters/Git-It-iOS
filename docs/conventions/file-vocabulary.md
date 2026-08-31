@@ -135,6 +135,7 @@ Scaffolds/TabShell/
 | | `Providers/` | 플랫폼 API를 감싸는 제공자 |
 | | `Models/` | 요청·응답·설정 값 타입 |
 | | `Errors/` | 기술 오류 타입 |
+| | `AppDelegates/` | 플랫폼 생명주기 delegate 타입 |
 | `Composition/Adapter/` | `Adapters/` | Domain 계약을 구현하는 Adapter |
 | | `Assemblies/` | 조립 진입 타입과 객체 수명 선택 |
 | | `Codings/` | 경계 간 인코딩·디코딩 |

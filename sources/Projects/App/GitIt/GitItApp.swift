@@ -4,6 +4,7 @@ import DomainAuthentication
 import DomainMember
 import Foundation
 import SwiftUI
+import UIKit
 
 #if DEBUG
 import AppDebug
@@ -46,7 +47,7 @@ struct GitItApp: App {
                 restoreSession: restoreSession,
                 signIn: composition.signIn,
                 signOut: composition.signOut,
-                observeAuthenticationOutcomes: composition.observeAuthenticationOutcomes,
+                authenticationOutcomes: composition.authenticationOutcomes,
                 fetchMemberProfile: composition.fetchMemberProfile,
                 completeCuration: composition.completeCuration,
                 policyConsent: composition.policyConsent,
@@ -58,21 +59,20 @@ struct GitItApp: App {
                 deleteMemberAccount: composition.deleteMemberAccount,
                 fetchExternalRepository: composition.fetchExternalRepository,
                 createLearningProject: composition.createLearningProject,
-                observeLearningProjectGenerationOutcomes: composition.observeLearningProjectGenerationOutcomes,
+                learningProjectOutcomes: composition.learningProjectOutcomes,
+                openNotificationSettings: {
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    await UIApplication.shared.open(url)
+                },
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
                 resetAllForTesting: resetAllForTesting,
             )
         }
-
-        GitItAppDelegate.configure(
-            forwardAPNsToken: composition.forwardAPNsToken,
-            ingestPushPayload: composition.ingestPushPayload,
-        )
     }
 
     // MARK: Internal
 
-    @UIApplicationDelegateAdaptor(GitItAppDelegate.self) var appDelegate
+    @UIApplicationDelegateAdaptor(PushNotificationAppDelegate.self) var appDelegate
 
     let rootStore: StoreOf<AppRootFeature>
 

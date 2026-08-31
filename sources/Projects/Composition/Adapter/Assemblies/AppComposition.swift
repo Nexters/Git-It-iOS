@@ -23,7 +23,7 @@ public struct AppComposition: Sendable {
         signIn = authentication.signIn
         signOut = authentication.signOut
         restoreSession = authentication.restoreSession
-        observeAuthenticationOutcomes = authentication.observeAuthenticationOutcomes
+        authenticationOutcomes = authentication.authenticationOutcomes
         refreshSession = authentication.refreshSession
         verifyAccessToken = authentication.verifyAccessToken
         policyConsent = authentication.policyConsent
@@ -38,7 +38,7 @@ public struct AppComposition: Sendable {
         submitEssayAnswer = learningProject.submitEssayAnswer
         setQuestionBookmark = learningProject.setQuestionBookmark
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
-        observeLearningProjectGenerationOutcomes = learningProject.observeLearningProjectGenerationOutcomes
+        learningProjectOutcomes = learningProject.learningProjectOutcomes
 
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
@@ -49,12 +49,18 @@ public struct AppComposition: Sendable {
         fetchExternalRepository = externalRepository.fetchExternalRepository
 
         let pushClient = FirebaseMessagingPushClient()
-        forwardAPNsToken = { token in
+        let forwardAPNsToken: @Sendable (Data) -> Void = { token in
             pushClient.setAPNsToken(token)
         }
-        ingestPushPayload = { rawPayload in
+        let ingestPushPayload: @Sendable ([String: String]) async -> Void = { rawPayload in
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
         }
+        PushNotificationAppDelegate.configure(
+            PushNotificationHandlers(
+                forwardAPNsToken: forwardAPNsToken,
+                ingestPushPayload: ingestPushPayload,
+            )
+        )
 
         let registerMemberDevice = member.registerMemberDevice
         let deviceID = AppComposition.deviceID(keychainStore: keychainStore)
@@ -97,7 +103,7 @@ public struct AppComposition: Sendable {
     public let signIn: any SignInUseCase
     public let signOut: any SignOutUseCase
     public let restoreSession: any RestoreSessionUseCase
-    public let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
+    public let authenticationOutcomes: any AuthenticationOutcomesUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
@@ -121,9 +127,7 @@ public struct AppComposition: Sendable {
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
-    public let observeLearningProjectGenerationOutcomes: any ObserveLearningProjectGenerationOutcomesUseCase
-    public let forwardAPNsToken: @Sendable (Data) -> Void
-    public let ingestPushPayload: @Sendable ([String: String]) async -> Void
+    public let learningProjectOutcomes: any LearningProjectOutcomesUseCase
 
     public static func live(
         _ environment: Environment,

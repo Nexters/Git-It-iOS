@@ -71,7 +71,8 @@ extension InfrastructureModuleName {
             name: InfrastructureModuleName.InfrastructurePushMessaging.rawValue,
             sourceDirectory: InfrastructureModuleName.InfrastructurePushMessaging.sourceDirectory,
             dependencies: [
-                .external(.FirebaseMessaging)
+                .external(.FirebaseCore),
+                .external(.FirebaseMessaging),
             ],
         ),
     ]
