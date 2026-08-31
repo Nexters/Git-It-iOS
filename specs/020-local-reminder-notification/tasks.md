@@ -113,13 +113,13 @@ Infrastructure → Feature → Composition → App**.
 
 ### 구현
 
-- [ ] T008 [P] [S1] [S2] `sources/Projects/Infrastructure/PushMessaging/Clients/LocalNotificationClient.swift`에
+- [X] T008 [P] [S1] [S2] `sources/Projects/Infrastructure/PushMessaging/Clients/LocalNotificationClient.swift`에
       `LocalNotificationClient` 프로토콜(`requestAuthorization() async ->
       LocalNotificationAuthorizationOutcome`, `isAuthorized() async -> Bool`,
       `presentGenerationCompletedNotification(projectID: String)`)과
       `LocalNotificationAuthorizationOutcome`(`authorized`/`declined`/`previouslyDenied`) enum을
       계약 2.1절에 따라 정의한다.
-- [ ] T009 [S1] [S2] `sources/Projects/Infrastructure/PushMessaging/Clients/UNUserNotificationCenterLocalNotificationClient.swift`에
+- [X] T009 [S1] [S2] `sources/Projects/Infrastructure/PushMessaging/Clients/UNUserNotificationCenterLocalNotificationClient.swift`에
       T008을 구현하는 `UNUserNotificationCenterLocalNotificationClient`를 계약 2.2절에 따라
       작성한다: `requestAuthorization()`은 `UNUserNotificationCenter.current().notificationSettings()`로
       현재 상태를 조회해 `.notDetermined`일 때만 `requestAuthorization(options: [.alert, .badge,
@@ -132,7 +132,7 @@ Infrastructure → Feature → Composition → App**.
 
 ### 정리와 패키지 검증
 
-- [ ] T010 [no-write] `InfrastructurePushMessaging` target을 build해 T008~T009가
+- [X] T010 [no-write] `InfrastructurePushMessaging` target을 build해 T008~T009가
       `UserNotifications` 프레임워크와 함께 컴파일되는지 확인한다.
 
 **진행 점검**: T008~T010의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
