@@ -15,4 +15,8 @@ struct NotificationAuthorizationGatewayAdapter: NotificationAuthorizationGateway
         }
     }
 
+    func isAuthorized() async -> Bool {
+        await localNotificationClient.isAuthorized()
+    }
+
 }
