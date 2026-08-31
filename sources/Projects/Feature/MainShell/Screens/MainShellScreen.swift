@@ -19,8 +19,16 @@ public struct MainShellScreen: View {
 
     public var body: some View {
         TabShell(selected: selectedTab) { tab in
-            ScreenContainer {
-                StyledText.subtitle1(tab.tabTitle, alignment: .center)
+            switch tab {
+            case .home:
+                HomeScreen(store: store.scope(state: \.home, action: \.home))
+
+            case .projects,
+                 .saved,
+                 .settings:
+                ScreenContainer {
+                    StyledText.subtitle1(tab.tabTitle, alignment: .center)
+                }
             }
         }
     }

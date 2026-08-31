@@ -176,7 +176,10 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .mainShell(.delegate(.projectSelected)),
-                 .mainShell(.delegate(.questionSelected)):
+                 .mainShell(.delegate(.questionSelected)),
+                 .mainShell(.delegate(.projectRegistrationRequested)),
+                 .mainShell(.delegate(.projectDetailRequested)),
+                 .mainShell(.delegate(.learningRequested)):
                 return .none
 
             case .onboarding,

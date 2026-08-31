@@ -18,16 +18,6 @@ extension HomeProjectCard {
                 }
         }
 
-        // MARK: Internal
-
-        var rotationDegrees: Double {
-            switch self {
-            case .purple: 0
-            case .lightBlue: 16
-            case .darkBlue: -12
-            }
-        }
-
         var cardColor: ColorToken {
             switch self {
             case .purple: .purple300

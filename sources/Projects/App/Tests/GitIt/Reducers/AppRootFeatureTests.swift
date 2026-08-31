@@ -180,6 +180,95 @@ struct AppRootFeatureTests {
     }
 
     @Test
+    func `로그아웃·세션 무효화·초기화 뒤 재생성된 MainShell은 다음 진입에서 Home 기본으로 시작한다`() async {
+        var loggedOutState = AppRootFeature.State(bundleVersion: "1.0.0")
+        loggedOutState.route = .mainShell
+        loggedOutState.mainShell.selectedTab = .settings
+        let loggedOutStore = makeAppRootStore(state: loggedOutState)
+        loggedOutStore.exhaustivity = .off
+
+        await loggedOutStore.send(.mainShell(.delegate(.loggedOut))) {
+            $0.route = .onboarding
+            $0.mainShell = MainShellFeature.State()
+        }
+        await loggedOutStore.send(.onboarding(.delegate(.mainShellRequested))) {
+            $0.route = .mainShell
+        }
+        #expect(loggedOutStore.state.mainShell.selectedTab == .home)
+        #expect(loggedOutStore.state.mainShell.home == HomeFeature.State())
+
+        let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
+        let observeAuthenticationOutcomes = ObserveAuthenticationOutcomesUseCaseMock()
+        var sessionState = AppRootFeature.State(bundleVersion: "1.0.0")
+        sessionState.route = .mainShell
+        sessionState.mainShell.selectedTab = .projects
+        let sessionStore = makeAppRootStore(
+            restoreSession: restoreSession,
+            observeAuthenticationOutcomes: observeAuthenticationOutcomes,
+            state: sessionState,
+        )
+        sessionStore.exhaustivity = .off
+
+        await observeAuthenticationOutcomes.emit(.unauthenticated)
+        await sessionStore.receive(.effect(.authenticationOutcomeReceived(.unauthenticated))) {
+            $0.route = .onboarding
+            $0.mainShell = MainShellFeature.State()
+        }
+        await sessionStore.send(.onboarding(.delegate(.mainShellRequested))) {
+            $0.route = .mainShell
+        }
+        #expect(sessionStore.state.mainShell.selectedTab == .home)
+        #expect(sessionStore.state.mainShell.home == HomeFeature.State())
+
+        await observeAuthenticationOutcomes.finish()
+        await sessionStore.finish()
+
+        var resetState = AppRootFeature.State(bundleVersion: "1.0.0")
+        resetState.route = .mainShell
+        resetState.mainShell.selectedTab = .saved
+        let spy = ResetAllForTestingSpy()
+        let resetStore = makeAppRootStore(resetAllForTesting: { await spy() }, state: resetState)
+        resetStore.exhaustivity = .off
+
+        await resetStore.send(.view(.resetAllTapped))
+        await resetStore.receive(.effect(.resetAllFinished)) {
+            $0.route = .onboarding
+            $0.mainShell = MainShellFeature.State()
+        }
+        await resetStore.send(.onboarding(.delegate(.mainShellRequested))) {
+            $0.route = .mainShell
+        }
+        #expect(resetStore.state.mainShell.selectedTab == .home)
+        #expect(resetStore.state.mainShell.home == HomeFeature.State())
+    }
+
+    @Test
+    func `MainShell의 등록·ProjectDetail·학습 delegate는 payload를 보존하며 route와 MainShell 상태를 바꾸지 않는다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.delegate(.projectRegistrationRequested)))
+        #expect(store.state.route == .mainShell)
+        #expect(store.state.mainShell == MainShellFeature.State())
+
+        await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
+        #expect(store.state.route == .mainShell)
+        #expect(store.state.mainShell == MainShellFeature.State())
+
+        await store.send(
+            .mainShell(
+                .delegate(
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1")
+                )
+            )
+        )
+        #expect(store.state.route == .mainShell)
+        #expect(store.state.mainShell == MainShellFeature.State())
+    }
+
+    @Test
     func `mainShell 표시 중 session invalidation은 onboarding 안내부터 다시 시작한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
         let observeAuthenticationOutcomes = ObserveAuthenticationOutcomesUseCaseMock()
