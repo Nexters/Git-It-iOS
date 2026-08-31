@@ -38,6 +38,7 @@ private enum ProjectRegistrationPreviewSupport {
                 fetchExternalRepository: PreviewFetchExternalRepositoryUseCase(),
                 createLearningProject: PreviewCreateLearningProjectUseCase(),
                 learningProjectOutcomes: PreviewLearningProjectOutcomesUseCase(),
+                requestGenerationReminder: PreviewRequestGenerationReminderUseCase(),
             )
         }
     }
@@ -71,6 +72,14 @@ private struct PreviewCreateLearningProjectUseCase: CreateLearningProjectUseCase
 private struct PreviewLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase {
     func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
         AsyncStream { _ in }
+    }
+}
+
+// MARK: - PreviewRequestGenerationReminderUseCase
+
+private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
+    func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+        .authorized
     }
 }
 

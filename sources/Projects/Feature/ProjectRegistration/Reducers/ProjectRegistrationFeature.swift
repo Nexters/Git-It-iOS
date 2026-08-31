@@ -13,11 +13,13 @@ public struct ProjectRegistrationFeature: Sendable {
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
         learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @Sendable () async -> Void = { },
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
         self.learningProjectOutcomes = learningProjectOutcomes
+        self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
     }
 
@@ -134,7 +136,11 @@ public struct ProjectRegistrationFeature: Sendable {
                 guard case .awaitingGeneration(let receipt) = state.submission else { return .none }
                 state.isNotificationOptionSheetPresented = false
                 return .merge(
-                    .run { [openNotificationSettings] _ in await openNotificationSettings() },
+                    .run { [requestGenerationReminder, openNotificationSettings, projectID = receipt.projectID] _ in
+                        if await requestGenerationReminder(projectID: projectID) == .previouslyDenied {
+                            await openNotificationSettings()
+                        }
+                    },
                     finishWaiting(receipt: receipt, notifyAccepted: true),
                 )
 
@@ -196,6 +202,7 @@ public struct ProjectRegistrationFeature: Sendable {
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
     private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @Sendable () async -> Void
 
     private func submit(

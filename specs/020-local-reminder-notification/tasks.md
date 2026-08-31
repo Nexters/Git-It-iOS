@@ -158,12 +158,12 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 테스트
 
-- [ ] T011 [P] [S1] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/StubRequestGenerationReminderUseCase.swift`를
+- [X] T011 [P] [S1] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/StubRequestGenerationReminderUseCase.swift`를
       새로 만들어 `StubFetchExternalRepositoryUseCase.swift`와 같은 스타일의 actor로
       `RequestGenerationReminderUseCase`를 구현한다. 스크립트된
       `[NotificationAuthorizationOutcome]` 결과열과 `callCount`, 마지막으로 전달된
       `projectID`를 기록하는 `snapshot()`을 제공한다.
-- [ ] T012 [S1] `sources/Projects/Feature/Tests/ProjectRegistration/Reducers/ProjectRegistrationFeatureTests.swift`의
+- [X] T012 [S1] `sources/Projects/Feature/Tests/ProjectRegistration/Reducers/ProjectRegistrationFeatureTests.swift`의
       `makeProjectRegistrationStore` 헬퍼에 `requestGenerationReminder:
       StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(results:
       [.authorized])` 인자를 추가하고 `ProjectRegistrationFeature(...)` 생성 호출에 전달한다.
@@ -176,7 +176,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 구현
 
-- [ ] T013 [S1] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`를
+- [X] T013 [S1] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`를
       수정한다: `init`에 `requestGenerationReminder: any RequestGenerationReminderUseCase`를
       (기본값 없이) `learningProjectOutcomes` 다음, `openNotificationSettings` 앞에 추가하고
       `private let requestGenerationReminder: any RequestGenerationReminderUseCase`를
@@ -185,7 +185,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
       `.previouslyDenied`일 때만 `openNotificationSettings()`를 호출한다. 나머지
       로직(`finishWaiting`과의 `.merge`, `isNotificationOptionSheetPresented = false`)은
       유지한다.
-- [ ] T014 [S1] `sources/Projects/Feature/ProjectRegistration/Previews/ProjectRegistrationScreenPreviews.swift`를
+- [X] T014 [S1] `sources/Projects/Feature/ProjectRegistration/Previews/ProjectRegistrationScreenPreviews.swift`를
       수정한다: 기존 `PreviewFetchExternalRepositoryUseCase` 등과 같은 위치에
       `PreviewRequestGenerationReminderUseCase`(`RequestGenerationReminderUseCase` 채택,
       `.authorized`를 반환)를 추가하고, `ProjectRegistrationFeature(...)` 생성 호출에
@@ -193,7 +193,7 @@ Domain·UI에만 의존하고 Infrastructure를 참조하지 않는지 확인한
 
 ### 정리와 패키지 검증
 
-- [ ] T015 [no-write] `Feature`와 `FeatureTests`
+- [X] T015 [no-write] `Feature`와 `FeatureTests`
       target을 build·test해 T011~T014가 통과하는지 확인하고, `grep`으로 이 패키지 소스가
       `InfrastructurePushMessaging`을 import하지 않는지 확인한다.
 

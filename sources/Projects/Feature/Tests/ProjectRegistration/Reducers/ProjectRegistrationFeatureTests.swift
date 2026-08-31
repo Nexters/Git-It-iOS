@@ -328,6 +328,90 @@ struct ProjectRegistrationFeatureTests {
     }
 
     @Test
+    func `권한이 허용되면 설정 화면 안내 없이 기존 waitAtHome 동작이 유지된다`() async {
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.authorized])
+        let openNotificationSettings = OpenNotificationSettingsSpy()
+        var state = ProjectRegistrationFeature.State()
+        state.submission = .awaitingGeneration(sampleReceipt)
+        state.isNotificationOptionSheetPresented = true
+        let store = makeProjectRegistrationStore(
+            learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            openNotificationSettings: openNotificationSettings,
+            state: state,
+        )
+
+        await store.send(.view(.notificationOptionAccepted)) {
+            $0.isNotificationOptionSheetPresented = false
+        }
+        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
+        #expect(await openNotificationSettings.callCount == 0)
+
+        await learningProjectOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `권한을 방금 거부해도 설정 화면을 안내하지 않는다`() async {
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.declined])
+        let openNotificationSettings = OpenNotificationSettingsSpy()
+        var state = ProjectRegistrationFeature.State()
+        state.submission = .awaitingGeneration(sampleReceipt)
+        state.isNotificationOptionSheetPresented = true
+        let store = makeProjectRegistrationStore(
+            learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            openNotificationSettings: openNotificationSettings,
+            state: state,
+        )
+
+        await store.send(.view(.notificationOptionAccepted)) {
+            $0.isNotificationOptionSheetPresented = false
+        }
+        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
+        #expect(await openNotificationSettings.callCount == 0)
+
+        await learningProjectOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `권한이 이미 거부된 상태면 설정 화면을 정확히 한 번 안내한다`() async {
+        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.previouslyDenied])
+        let openNotificationSettings = OpenNotificationSettingsSpy()
+        var state = ProjectRegistrationFeature.State()
+        state.submission = .awaitingGeneration(sampleReceipt)
+        state.isNotificationOptionSheetPresented = true
+        let store = makeProjectRegistrationStore(
+            learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            openNotificationSettings: openNotificationSettings,
+            state: state,
+        )
+
+        await store.send(.view(.notificationOptionAccepted)) {
+            $0.isNotificationOptionSheetPresented = false
+        }
+        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
+        #expect(await openNotificationSettings.callCount == 1)
+
+        await learningProjectOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
     func `알림 옵션 선택은 상태 전이 자체에 영향을 주지 않는다`() async {
         let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
@@ -420,6 +504,8 @@ private func makeProjectRegistrationStore(
     fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
     createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
     learningProjectOutcomes: StubLearningProjectOutcomesUseCase = StubLearningProjectOutcomesUseCase(),
+    requestGenerationReminder: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(results: [.authorized]),
+    openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
     state: ProjectRegistrationFeature.State = ProjectRegistrationFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationFeature> {
     TestStore(initialState: state) {
@@ -427,7 +513,19 @@ private func makeProjectRegistrationStore(
             fetchExternalRepository: fetchExternalRepository,
             createLearningProject: createLearningProject,
             learningProjectOutcomes: learningProjectOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            openNotificationSettings: { await openNotificationSettings() },
         )
+    }
+}
+
+// MARK: - OpenNotificationSettingsSpy
+
+private actor OpenNotificationSettingsSpy {
+    private(set) var callCount = 0
+
+    func callAsFunction() {
+        callCount += 1
     }
 }
 
@@ -456,6 +554,7 @@ private struct ProjectRegistrationHostFeature {
                     fetchExternalRepository: fetchExternalRepository,
                     createLearningProject: createLearningProject,
                     learningProjectOutcomes: learningProjectOutcomes,
+                    requestGenerationReminder: StubRequestGenerationReminderUseCase(results: [.authorized]),
                 )
             }
     }
