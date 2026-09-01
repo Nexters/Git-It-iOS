@@ -367,21 +367,21 @@ scheme 테스트만으로 확인할 수 있다.
 
 ### 승인 필요
 
-- [ ] T041 App Group 식별자와 커스텀 URL 스킴 문자열을 확정받는다. 제안값은
+- [X] T041 App Group 식별자와 커스텀 URL 스킴 문자열을 확정받는다. 제안값은
       `group.com.nexters.hytime.gitit`과 `gitit`이다. 앱 서명 구성과 외부에 노출되는 식별자를
       새로 도입하는 결정이므로 확정 전에 T047 이후를 시작하지 않는다.
 
 ### S2 · S3 — 진행 상태 수명과 복원
 
-- [ ] T042 [S2] [S3] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에
+- [X] T042 [S2] [S3] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에
       제출 성공 시 추적 시작, 준비 완료 시각까지 진행 중 유지, 결과 확정 후 해제, 앱 시작 시
       복원, 상한 초과 시 만료, 복원된 `projectID`가 학습 프로젝트 목록에 있으면 해제하는
       테스트를 추가한다(FR-005, FR-008, SC-010).
-- [ ] T043 [S2] [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 진행 상태 수명을
+- [X] T043 [S2] [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 진행 상태 수명을
       구현한다. 등록 제출 성공 시 `trackGenerationProgress.begin`, 준비 완료 시각까지 대기,
       결과 확정 시 `end`, 상태 변화를 `mainShell.home(.input(.generationProgressChanged(...)))`로
       전달, 앱 시작 시 `current()`로 복원한다(R-009).
-- [ ] T044 [S2] [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`와
+- [X] T044 [S2] [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`와
       `sources/Projects/App/GitIt/GitItApp.swift`에 `trackGenerationProgress`,
       `GenerationWaitPolicy`, `now` 주입 배선을 추가한다.
 

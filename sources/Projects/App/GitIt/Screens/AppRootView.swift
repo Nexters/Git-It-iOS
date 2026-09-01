@@ -3,6 +3,7 @@ import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Feature
+import Foundation
 import SwiftUI
 
 #if DEBUG
@@ -196,6 +197,19 @@ private enum AppRootPreviewSupport {
         }
     }
 
+    struct NoopTrackGenerationProgress: TrackGenerationProgressUseCase {
+        func begin(
+            projectID _: String,
+            requestedAt _: Date,
+        ) async { }
+
+        func current() async -> GenerationProgress? {
+            nil
+        }
+
+        func end() async { }
+    }
+
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = route
@@ -218,6 +232,7 @@ private enum AppRootPreviewSupport {
                 createLearningProject: NoopCreateLearningProject(),
                 observeGenerationOutcomes: NoopObserveGenerationOutcomes(),
                 requestGenerationReminder: NoopRequestGenerationReminder(),
+                trackGenerationProgress: NoopTrackGenerationProgress(),
             )
         }
     }

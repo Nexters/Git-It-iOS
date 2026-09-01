@@ -61,6 +61,7 @@ struct GitItApp: App {
                 createLearningProject: composition.createLearningProject,
                 observeGenerationOutcomes: composition.observeGenerationOutcomes,
                 requestGenerationReminder: composition.requestGenerationReminder,
+                trackGenerationProgress: composition.trackGenerationProgress,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)

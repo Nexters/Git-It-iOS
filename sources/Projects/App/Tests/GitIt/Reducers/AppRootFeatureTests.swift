@@ -2,12 +2,15 @@ import ComposableArchitecture
 import DomainAuthentication
 import DomainLearningProject
 import Feature
+import Foundation
 import Testing
 
 @testable import GitIt
 
 @Suite("AppRootFeature root 전환")
 struct AppRootFeatureTests {
+
+    // MARK: Internal
 
     @Test
     func `launch task는 route를 즉시 바꾸지 않고 appEntry task를 전달한다`() async {
@@ -477,5 +480,190 @@ struct AppRootFeatureTests {
         await store.skipReceivedActions()
         await store.finish()
     }
+
+    @Test
+    func `등록 제출이 성공하면 추적을 시작하고 홈에 진행 중을 전달한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let trackGenerationProgress = TrackGenerationProgressSpy()
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        let store = makeAppRootStore(
+            trackGenerationProgress: trackGenerationProgress,
+            waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
+            now: { requestedAt },
+            state: state,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt)))))) {
+            $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+        }
+        await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))) {
+            $0.mainShell.home.isGenerationInProgress = true
+        }
+
+        #expect(await trackGenerationProgress.beganCount == 1)
+
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `결과가 확정되어도 준비 완료 시각까지는 진행 중을 유지한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        let store = makeAppRootStore(
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            waitPolicy: GenerationWaitPolicy(minimumWait: 60, retentionLimit: 3_600),
+            now: { requestedAt },
+            state: state,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+
+        // 최소 대기 시간이 남아 있으므로 해제되지 않는다.
+        #expect(store.state.generationProgress?.projectID == "project-1")
+
+        await store.send(.mainShell(.delegate(.loggedOut)))
+        await observeGenerationOutcomes.finish()
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `준비 완료 시각이 지난 뒤 결과가 도착하면 진행 상태를 해제한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let trackGenerationProgress = TrackGenerationProgressSpy()
+        let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        let store = makeAppRootStore(
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGenerationProgress: trackGenerationProgress,
+            waitPolicy: GenerationWaitPolicy(minimumWait: 0, retentionLimit: 3_600),
+            now: { requestedAt },
+            state: state,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+
+        await store.receive(.effect(.generationProgressReleased(projectID: "project-1")), timeout: .seconds(5)) {
+            $0.generationProgress = nil
+        }
+        #expect(await trackGenerationProgress.endedCount == 1)
+
+        await observeGenerationOutcomes.finish()
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `앱 시작 시 보존된 진행 상태를 복원해 홈에 진행 중을 전달한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+        let store = makeAppRootStore(
+            trackGenerationProgress: TrackGenerationProgressSpy(stored: restored),
+            waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
+            now: { requestedAt.addingTimeInterval(10) },
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(.effect(.generationProgressRestored(restored))) {
+            $0.generationProgress = restored
+            $0.isGenerationProgressRestored = true
+        }
+        await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))) {
+            $0.mainShell.home.isGenerationInProgress = true
+        }
+
+        await store.send(.mainShell(.delegate(.loggedOut)))
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `보존 상한을 넘긴 진행 상태는 복원하지 않고 해제한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+        let trackGenerationProgress = TrackGenerationProgressSpy(stored: restored)
+        let store = makeAppRootStore(
+            trackGenerationProgress: trackGenerationProgress,
+            waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
+            now: { requestedAt.addingTimeInterval(3_601) },
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(.effect(.generationProgressRestored(restored)))
+
+        #expect(store.state.generationProgress == nil)
+        #expect(store.state.mainShell.home.isGenerationInProgress == false)
+
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `복원된 projectID가 학습 프로젝트 목록에 있으면 진행 상태를 해제한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.generationProgress = restored
+        state.isGenerationProgressRestored = true
+        let store = makeAppRootStore(
+            waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
+            now: { requestedAt.addingTimeInterval(301) },
+            state: state,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.home(.effect(.projectsLoadFinished(
+            requestID: 1,
+            result: .success(Self.pageContainingProject),
+        )))))
+        await store.receive(.effect(.generationProgressReleased(projectID: "project-1"))) {
+            $0.generationProgress = nil
+            $0.isGenerationProgressRestored = false
+        }
+
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    // MARK: Private
+
+    private static let receipt = ProjectRegistrationReceipt(
+        projectID: "project-1",
+        requestStatus: "IN_PROGRESS",
+        quizLevel: .l1,
+    )
+
+    private static let pageContainingProject = LearningProjectPage(
+        items: [
+            LearningProjectSummary(
+                projectID: "project-1",
+                repositoryName: "repo",
+                repositoryImageURL: nil,
+                techStack: ["Swift"],
+                currentSetLabel: "Set 1",
+                currentSetTitle: "제목",
+                nextSetID: nil,
+                nextQuestionID: nil,
+                overallProgressPercent: 0,
+            )
+        ],
+        hasNext: false,
+    )
 
 }

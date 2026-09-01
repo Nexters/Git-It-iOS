@@ -92,6 +92,9 @@ func makeAppRootStore(
     observeGenerationOutcomes: ObserveGenerationOutcomesUseCaseMock =
         ObserveGenerationOutcomesUseCaseMock(),
     requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
+    trackGenerationProgress: TrackGenerationProgressSpy = TrackGenerationProgressSpy(),
+    waitPolicy: GenerationWaitPolicy = .standard,
+    now: @escaping @Sendable () -> Date = { Date() },
     registerCurrentDevice: RegisterCurrentDeviceSpy = RegisterCurrentDeviceSpy(),
     deviceTokenRefreshes: DeviceTokenRefreshStream = DeviceTokenRefreshStream(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
@@ -115,11 +118,54 @@ func makeAppRootStore(
             createLearningProject: NoopCreateLearningProjectUseCase(),
             observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
+            trackGenerationProgress: trackGenerationProgress,
+            waitPolicy: waitPolicy,
+            now: now,
             registerCurrentDevice: { try await registerCurrentDevice() },
             deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
             resetAllForTesting: resetAllForTesting,
         )
     }
+}
+
+// MARK: - TrackGenerationProgressSpy
+
+/// 진행 상태 저장·복원 호출을 관찰한다. 기기 저장소 없이 App의 수명 규칙만 검증하기 위한
+/// 대역이다.
+actor TrackGenerationProgressSpy: TrackGenerationProgressUseCase {
+
+    // MARK: Lifecycle
+
+    init(stored: GenerationProgress? = nil) {
+        self.stored = stored
+    }
+
+    // MARK: Internal
+
+    private(set) var beganCount = 0
+    private(set) var endedCount = 0
+
+    func begin(
+        projectID: String,
+        requestedAt: Date,
+    ) async {
+        beganCount += 1
+        stored = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
+    }
+
+    func current() async -> GenerationProgress? {
+        stored
+    }
+
+    func end() async {
+        endedCount += 1
+        stored = nil
+    }
+
+    // MARK: Private
+
+    private var stored: GenerationProgress?
+
 }
 
 // MARK: - RegisterCurrentDeviceSpy

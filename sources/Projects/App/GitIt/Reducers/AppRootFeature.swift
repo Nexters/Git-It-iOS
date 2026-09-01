@@ -30,6 +30,9 @@ nonisolated struct AppRootFeature: Sendable {
         createLearningProject: any CreateLearningProjectUseCase,
         observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
+        trackGenerationProgress: any TrackGenerationProgressUseCase,
+        waitPolicy: GenerationWaitPolicy = .standard,
+        now: @escaping @Sendable () -> Date = { Date() },
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
         registerCurrentDevice: @escaping @Sendable () async throws -> Void = { },
         deviceTokenRefreshes: @escaping @Sendable () -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
@@ -53,6 +56,9 @@ nonisolated struct AppRootFeature: Sendable {
         self.createLearningProject = createLearningProject
         self.observeGenerationOutcomes = observeGenerationOutcomes
         self.requestGenerationReminder = requestGenerationReminder
+        self.trackGenerationProgress = trackGenerationProgress
+        self.waitPolicy = waitPolicy
+        self.now = now
         self.openNotificationSettings = openNotificationSettings
         self.registerCurrentDevice = registerCurrentDevice
         self.deviceTokenRefreshes = deviceTokenRefreshes
@@ -88,6 +94,11 @@ nonisolated struct AppRootFeature: Sendable {
         var onboarding: OnboardingRouterFeature.State
         var mainShell = MainShellFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
+        /// 진행 중인 학습 세트 생성 1건이다. 요청 제출부터 해제 시점까지 App이 수명을 소유한다.
+        var generationProgress: GenerationProgress?
+        /// 앱 재실행으로 복원한 진행 상태인지 여부다. 복원 경로에서만 학습 프로젝트 목록을
+        /// 1차 해소 수단으로 사용한다.
+        var isGenerationProgressRestored = false
         @Presents var projectRegistration: ProjectRegistrationFeature.State?
     }
 
@@ -115,6 +126,8 @@ nonisolated struct AppRootFeature: Sendable {
             case deviceRegistrationSucceeded
             case deviceRegistrationFailed
             case deviceTokenRefreshed
+            case generationProgressRestored(GenerationProgress?)
+            case generationProgressReleased(projectID: String)
         }
     }
 
@@ -168,6 +181,9 @@ nonisolated struct AppRootFeature: Sendable {
                         }
                     }
                     .cancellable(id: CancelID.deviceTokenRefreshes),
+                    .run { [trackGenerationProgress] send in
+                        await send(.effect(.generationProgressRestored(trackGenerationProgress.current())))
+                    },
                 )
 
             case .appEntry(.delegate(.destinationDecided(let destination))):
@@ -238,6 +254,56 @@ nonisolated struct AppRootFeature: Sendable {
                  .mainShell(.delegate(.learningRequested)):
                 return .none
 
+            case .projectRegistration(.presented(.effect(.submissionFinished(.success(let receipt))))):
+                // 생성 진행 상태의 수명은 등록 화면이 닫힌 뒤에도 이어지므로 App이 소유한다.
+                let progress = GenerationProgress(projectID: receipt.projectID, requestedAt: now())
+                state.generationProgress = progress
+                state.isGenerationProgressRestored = false
+                return .merge(
+                    .run { [trackGenerationProgress] _ in
+                        await trackGenerationProgress.begin(
+                            projectID: progress.projectID,
+                            requestedAt: progress.requestedAt,
+                        )
+                    },
+                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))),
+                    releaseGenerationProgress(progress),
+                )
+
+            case .effect(.generationProgressRestored(let restored)):
+                guard let restored, state.generationProgress == nil else { return .none }
+                guard !waitPolicy.isExpired(restored, now: now()) else {
+                    // 보존 상한을 넘긴 상태는 결과와 무관하게 해제한다.
+                    return .run { [trackGenerationProgress] _ in await trackGenerationProgress.end() }
+                }
+                state.generationProgress = restored
+                state.isGenerationProgressRestored = true
+                return .merge(
+                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))),
+                    releaseGenerationProgress(restored),
+                )
+
+            case .effect(.generationProgressReleased(let projectID)):
+                guard state.generationProgress?.projectID == projectID else { return .none }
+                state.generationProgress = nil
+                state.isGenerationProgressRestored = false
+                return .merge(
+                    .cancel(id: CancelID.generationProgress),
+                    .run { [trackGenerationProgress] _ in await trackGenerationProgress.end() },
+                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: false))))),
+                )
+
+            case .mainShell(.home(.effect(.projectsLoadFinished(_, .success(let page))))):
+                // 복원된 상태는 결과가 도착하지 않을 수 있으므로, 최소 대기 시간이 지난 뒤
+                // 해당 프로젝트가 목록에 나타나면 1차 해소 수단으로 해제한다.
+                guard
+                    state.isGenerationProgressRestored,
+                    let progress = state.generationProgress,
+                    waitPolicy.readyDate(for: progress) <= now(),
+                    page.items.contains(where: { $0.projectID == progress.projectID })
+                else { return .none }
+                return .send(.effect(.generationProgressReleased(projectID: progress.projectID)))
+
             case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
                 state.projectRegistration = nil
                 return .send(.mainShell(.home(.input(.learningProjectsReloadRequested))))
@@ -271,6 +337,7 @@ nonisolated struct AppRootFeature: Sendable {
         case resetAll
         case deviceRegistration
         case deviceTokenRefreshes
+        case generationProgress
     }
 
     private let restoreSession: any RestoreSessionUseCase
@@ -290,6 +357,9 @@ nonisolated struct AppRootFeature: Sendable {
     private let createLearningProject: any CreateLearningProjectUseCase
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let trackGenerationProgress: any TrackGenerationProgressUseCase
+    private let waitPolicy: GenerationWaitPolicy
+    private let now: @Sendable () -> Date
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let registerCurrentDevice: @Sendable () async throws -> Void
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
@@ -311,6 +381,40 @@ nonisolated struct AppRootFeature: Sendable {
         .cancellable(id: CancelID.deviceRegistration)
     }
 
+    /// 진행 상태를 `max(요청 + 최소 대기 시간, 결과 확정)` 시점에 해제한다. 결과가 끝내
+    /// 도착하지 않으면 보존 상한에서 해제해 상태가 영구히 남지 않게 한다.
+    private func releaseGenerationProgress(_ progress: GenerationProgress) -> Effect<Action> {
+        .run { [observeGenerationOutcomes, waitPolicy, now] send in
+            let deadline = progress.requestedAt.addingTimeInterval(waitPolicy.retentionLimit)
+
+            // 결과 도착과 보존 상한 중 먼저 오는 쪽까지 기다린다.
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    for await outcome in await observeGenerationOutcomes()
+                        where outcome.projectID == progress.projectID
+                    {
+                        return
+                    }
+                }
+                group.addTask {
+                    let remaining = deadline.timeIntervalSince(now())
+                    guard remaining > 0 else { return }
+                    try? await Task.sleep(for: .seconds(remaining))
+                }
+                await group.next()
+                group.cancelAll()
+            }
+
+            // 결과가 먼저 도착했다면 남은 최소 대기 시간만큼 더 유지한다.
+            let remainingMinimum = waitPolicy.readyDate(for: progress).timeIntervalSince(now())
+            if remainingMinimum > 0 {
+                try? await Task.sleep(for: .seconds(remainingMinimum))
+            }
+            await send(.effect(.generationProgressReleased(projectID: progress.projectID)))
+        }
+        .cancellable(id: CancelID.generationProgress, cancelInFlight: true)
+    }
+
     /// 인증 종료 경로의 단일 통로다. 등록 흐름 child와 그 child가 시작한 생성 결과 관찰,
     /// 그리고 진행 중인 기기 등록 Effect를 함께 제거한다.
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
@@ -319,8 +423,13 @@ nonisolated struct AppRootFeature: Sendable {
         state.mainShell = MainShellFeature.State()
         state.projectRegistration = nil
         state.deviceRegistration = .idle
+        state.generationProgress = nil
+        state.isGenerationProgressRestored = false
         state.route = .onboarding
-        return .cancel(id: CancelID.deviceRegistration)
+        return .merge(
+            .cancel(id: CancelID.deviceRegistration),
+            .cancel(id: CancelID.generationProgress),
+        )
     }
 
 }
