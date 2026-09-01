@@ -70,7 +70,7 @@ private struct PreviewCreateLearningProjectUseCase: CreateLearningProjectUseCase
 // MARK: - PreviewLearningProjectOutcomesUseCase
 
 private struct PreviewLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase {
-    func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
+    func callAsFunction() async -> AsyncStream<GenerationOutcome> {
         AsyncStream { _ in }
     }
 }

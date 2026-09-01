@@ -225,11 +225,11 @@ struct ProjectRegistrationFeatureTests {
         }
 
         await learningProjectOutcomes.emit(
-            LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
+            GenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
         )
         await store.receive(
             .effect(.generationOutcomeReceived(
-                LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
+                GenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
             ))
         )
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
@@ -249,11 +249,11 @@ struct ProjectRegistrationFeatureTests {
         )
 
         await learningProjectOutcomes.emit(
-            LearningProjectGenerationOutcome(projectID: "other-project", status: .completed)
+            GenerationOutcome(projectID: "other-project", status: .completed)
         )
         await store.receive(
             .effect(.generationOutcomeReceived(
-                LearningProjectGenerationOutcome(projectID: "other-project", status: .completed)
+                GenerationOutcome(projectID: "other-project", status: .completed)
             ))
         )
 
@@ -274,11 +274,11 @@ struct ProjectRegistrationFeatureTests {
         )
 
         await learningProjectOutcomes.emit(
-            LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
+            GenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
         )
         await store.receive(
             .effect(.generationOutcomeReceived(
-                LearningProjectGenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
+                GenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
             ))
         ) {
             $0.submission = .failed(.unexpected)

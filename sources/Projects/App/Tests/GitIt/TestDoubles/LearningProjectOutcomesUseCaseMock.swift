@@ -5,13 +5,13 @@ actor LearningProjectOutcomesUseCaseMock: LearningProjectOutcomesUseCase {
 
     // MARK: Internal
 
-    func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
-        let (stream, continuation) = AsyncStream<LearningProjectGenerationOutcome>.makeStream()
+    func callAsFunction() async -> AsyncStream<GenerationOutcome> {
+        let (stream, continuation) = AsyncStream<GenerationOutcome>.makeStream()
         self.continuation = continuation
         return stream
     }
 
-    func emit(_ outcome: LearningProjectGenerationOutcome) {
+    func emit(_ outcome: GenerationOutcome) {
         continuation?.yield(outcome)
     }
 
@@ -21,6 +21,6 @@ actor LearningProjectOutcomesUseCaseMock: LearningProjectOutcomesUseCase {
 
     // MARK: Private
 
-    private var continuation: AsyncStream<LearningProjectGenerationOutcome>.Continuation?
+    private var continuation: AsyncStream<GenerationOutcome>.Continuation?
 
 }

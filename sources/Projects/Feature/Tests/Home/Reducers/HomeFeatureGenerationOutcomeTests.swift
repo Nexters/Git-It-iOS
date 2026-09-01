@@ -73,10 +73,10 @@ struct HomeFeatureGenerationOutcomeTests {
         }
 
         await learningProjectOutcomes.emit(
-            LearningProjectGenerationOutcome(projectID: "project-1", status: .completed)
+            GenerationOutcome(projectID: "project-1", status: .completed)
         )
         await store.receive(
-            .effect(.generationOutcomeReceived(LearningProjectGenerationOutcome(projectID: "project-1", status: .completed)))
+            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
         ) {
             $0.projectLoad = .loading
             $0.projectRequestID = 1

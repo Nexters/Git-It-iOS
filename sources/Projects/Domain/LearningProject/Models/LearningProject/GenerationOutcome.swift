@@ -1,4 +1,4 @@
-public struct LearningProjectGenerationOutcome: Equatable, Sendable {
+public struct GenerationOutcome: Equatable, Sendable {
 
     // MARK: Lifecycle
 

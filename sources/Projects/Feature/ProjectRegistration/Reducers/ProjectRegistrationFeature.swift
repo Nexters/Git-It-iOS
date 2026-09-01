@@ -74,7 +74,7 @@ public struct ProjectRegistrationFeature: Sendable {
         public enum EffectEvent: Sendable, Equatable {
             case validationFinished(requestID: Int, result: Result<ExternalRepository, ExternalRepositoryError>)
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
-            case generationOutcomeReceived(LearningProjectGenerationOutcome)
+            case generationOutcomeReceived(GenerationOutcome)
             case waitAtHomeAuthorizationChecked(isAuthorized: Bool)
         }
 
@@ -184,9 +184,6 @@ public struct ProjectRegistrationFeature: Sendable {
                 case .failed:
                     state.submission = .failed(.unexpected)
                     return .cancel(id: CancelID.generationOutcomeObservation)
-
-                @unknown default:
-                    return .none
                 }
 
             case .delegate:

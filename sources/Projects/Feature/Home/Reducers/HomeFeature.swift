@@ -77,7 +77,7 @@ public struct HomeFeature: Sendable {
         public enum Effect: Equatable, Sendable {
             case profileLoadFinished(requestID: Int, result: Result<MemberProfile, MemberError>)
             case projectsLoadFinished(requestID: Int, result: Result<LearningProjectPage, LearningProjectError>)
-            case generationOutcomeReceived(LearningProjectGenerationOutcome)
+            case generationOutcomeReceived(GenerationOutcome)
         }
 
         @CasePathable

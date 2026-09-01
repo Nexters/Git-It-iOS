@@ -137,6 +137,22 @@ public struct HomeScreen: View {
 
     // MARK: Private
 
+    private enum CardLayout {
+
+        // MARK: Internal
+
+        static let cardWidth: CGFloat = 154
+        static let cardSpacing: CGFloat = 2.5
+        static let screenMargin: CGFloat = 20
+        static let cardStride = cardWidth + cardSpacing
+        static let p0CenterX = screenMargin + cardWidth / 2
+
+        static var scrollLayout: HomeCardScrollLayout {
+            HomeCardScrollLayout(p0CenterX: p0CenterX, cardStride: cardStride)
+        }
+
+    }
+
     @ViewBuilder
     private var profileHeader: some View {
         switch store.profileLoad {
@@ -272,12 +288,11 @@ public struct HomeScreen: View {
     }
 
     private var emptyProjectCards: some View {
-        let cardSize = CGSize(width: 154, height: 192)
-        let cardSpacing: CGFloat = 2.5
-        let angles = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172).initialAngles(cardCount: 3)
+        let cardSize = CGSize(width: CardLayout.cardWidth, height: 192)
+        let angles = CardLayout.scrollLayout.initialAngles(cardCount: 3)
         let centers = angles.indices.map {
             CGPoint(
-                x: cardSize.width / 2 + CGFloat($0) * (cardSize.width + cardSpacing),
+                x: cardSize.width / 2 + CGFloat($0) * CardLayout.cardStride,
                 y: cardSize.height / 2,
             )
         }
@@ -285,14 +300,14 @@ public struct HomeScreen: View {
 
         return ScrollView(.horizontal) {
             ZStack {
-                HStack(spacing: cardSpacing) {
+                HStack(spacing: CardLayout.cardSpacing) {
                     ForEach(angles.indices, id: \.self) { index in
                         emptyProjectCard(size: cardSize)
                             .rotationEffect(.degrees(angles[index]))
                     }
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, CardLayout.screenMargin)
             .padding(.vertical, 24)
         }
         .scrollIndicators(.hidden)
@@ -342,10 +357,10 @@ public struct HomeScreen: View {
     }
 
     private func projectCards(_ projects: [Display.Project]) -> some View {
-        let layout = HomeCardScrollLayout(p0CenterX: 97, cardStride: 172)
+        let layout = CardLayout.scrollLayout
 
         return ScrollView(.horizontal) {
-            LazyHStack(spacing: 2.5) {
+            LazyHStack(spacing: CardLayout.cardSpacing) {
                 ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
                     HomeProjectCard(
                         title: project.title,
@@ -366,7 +381,7 @@ public struct HomeScreen: View {
                 }
             }
             .scrollTargetLayout()
-            .padding(.horizontal, 20)
+            .padding(.horizontal, CardLayout.screenMargin)
             .padding(.vertical, 24)
         }
         .scrollIndicators(.hidden)

@@ -68,7 +68,7 @@ enum HomePreviewSupport {
 // MARK: - HomePreviewLearningProjectOutcomes
 
 private struct HomePreviewLearningProjectOutcomes: LearningProjectOutcomesUseCase {
-    func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
+    func callAsFunction() async -> AsyncStream<GenerationOutcome> {
         AsyncStream { _ in }
     }
 }

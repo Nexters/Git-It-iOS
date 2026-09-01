@@ -9,15 +9,15 @@ struct LearningProjectOutcomesTests {
     @Test
     func `repository의 outcomes 스트림을 그대로 위임한다`() async {
         let outcomes = [
-            LearningProjectGenerationOutcome(projectID: "project-1", status: .completed),
-            LearningProjectGenerationOutcome(projectID: "project-2", status: .failed),
+            GenerationOutcome(projectID: "project-1", status: .completed),
+            GenerationOutcome(projectID: "project-2", status: .failed),
         ]
-        let repository = ScriptedLearningProjectGenerationOutcomeRepository(scriptedOutcomes: outcomes)
+        let repository = ScriptedGenerationOutcomeRepository(scriptedOutcomes: outcomes)
         let learningProjectOutcomes = LearningProjectOutcomes(
             repository: repository
         )
 
-        var received = [LearningProjectGenerationOutcome]()
+        var received = [GenerationOutcome]()
         for await outcome in await learningProjectOutcomes() {
             received.append(outcome)
         }
@@ -26,13 +26,13 @@ struct LearningProjectOutcomesTests {
     }
 }
 
-// MARK: - ScriptedLearningProjectGenerationOutcomeRepository
+// MARK: - ScriptedGenerationOutcomeRepository
 
-private struct ScriptedLearningProjectGenerationOutcomeRepository: LearningProjectGenerationOutcomeRepository {
+private struct ScriptedGenerationOutcomeRepository: GenerationOutcomeRepository {
 
-    let scriptedOutcomes: [LearningProjectGenerationOutcome]
+    let scriptedOutcomes: [GenerationOutcome]
 
-    func outcomes() async -> AsyncStream<LearningProjectGenerationOutcome> {
+    func outcomes() async -> AsyncStream<GenerationOutcome> {
         let scriptedOutcomes = scriptedOutcomes
         return AsyncStream { continuation in
             for outcome in scriptedOutcomes {

@@ -39,9 +39,9 @@ public struct LearningProjectAssembly: Sendable {
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
         fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
 
-        let generationOutcomeRemote = PushProjectGenerationOutcomeRemote()
+        let generationOutcomeRemote = PushGenerationOutcomeStream()
         learningProjectOutcomes = LearningProjectOutcomes(
-            repository: LearningProjectGenerationOutcomeRepositoryAdapter(remote: generationOutcomeRemote)
+            repository: GenerationOutcomeRepositoryAdapter(remote: generationOutcomeRemote)
         )
         ingestGenerationOutcomePayload = { rawPayload in
             await generationOutcomeRemote.ingest(rawPayload: rawPayload)

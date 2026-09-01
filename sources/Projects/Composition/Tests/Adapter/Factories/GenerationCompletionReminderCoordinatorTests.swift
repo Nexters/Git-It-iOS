@@ -17,7 +17,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
         await coordinator.register(projectID: "project-1")
         await coordinator.start(learningProjectOutcomes: learningProjectOutcomes)
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
@@ -32,7 +32,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
         await coordinator.register(projectID: "project-1")
         await coordinator.start(learningProjectOutcomes: learningProjectOutcomes)
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
@@ -46,7 +46,7 @@ struct GenerationCompletionReminderCoordinatorTests {
         let coordinator = GenerationCompletionReminderCoordinator(localNotificationClient: localNotificationClient)
 
         await coordinator.start(learningProjectOutcomes: learningProjectOutcomes)
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "unregistered", status: .completed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "unregistered", status: .completed))
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
@@ -61,7 +61,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
         await coordinator.register(projectID: "project-1")
         await coordinator.start(learningProjectOutcomes: learningProjectOutcomes)
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "project-1", status: .failed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .failed))
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
@@ -76,8 +76,8 @@ struct GenerationCompletionReminderCoordinatorTests {
 
         await coordinator.register(projectID: "project-1")
         await coordinator.start(learningProjectOutcomes: learningProjectOutcomes)
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
-        await learningProjectOutcomes.emit(LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await learningProjectOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
@@ -92,13 +92,13 @@ private actor StubLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase
 
     // MARK: Internal
 
-    func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
-        let (stream, continuation) = AsyncStream<LearningProjectGenerationOutcome>.makeStream()
+    func callAsFunction() async -> AsyncStream<GenerationOutcome> {
+        let (stream, continuation) = AsyncStream<GenerationOutcome>.makeStream()
         self.continuation = continuation
         return stream
     }
 
-    func emit(_ outcome: LearningProjectGenerationOutcome) {
+    func emit(_ outcome: GenerationOutcome) {
         continuation?.yield(outcome)
     }
 
@@ -108,7 +108,7 @@ private actor StubLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase
 
     // MARK: Private
 
-    private var continuation: AsyncStream<LearningProjectGenerationOutcome>.Continuation?
+    private var continuation: AsyncStream<GenerationOutcome>.Continuation?
 
 }
 

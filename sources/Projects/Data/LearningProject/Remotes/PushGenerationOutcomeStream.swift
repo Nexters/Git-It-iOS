@@ -2,9 +2,9 @@ import Foundation
 import os
 import Synchronization
 
-// MARK: - PushProjectGenerationOutcomeRemote
+// MARK: - PushGenerationOutcomeStream
 
-public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeRemote, Sendable {
+public final class PushGenerationOutcomeStream: GenerationOutcomeStream, Sendable {
 
     // MARK: Lifecycle
 
@@ -12,7 +12,7 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
 
     // MARK: Public
 
-    public func outcomes() -> AsyncStream<ProjectGenerationOutcomeDTO> {
+    public func outcomes() -> AsyncStream<GenerationOutcomeDTO> {
         let id = UUID()
         return AsyncStream { continuation in
             state.withLock { $0.continuations[id] = continuation }
@@ -23,7 +23,7 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
     }
 
     public func ingest(rawPayload: [String: String]) async {
-        guard let outcome = ProjectGenerationOutcomeDTO(rawPayload: rawPayload) else {
+        guard let outcome = GenerationOutcomeDTO(rawPayload: rawPayload) else {
             Self.logger.debug("생성 결과 payload 파싱 실패: rawPayload=\(rawPayload, privacy: .public)")
             return
         }
@@ -36,10 +36,10 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
 
     // MARK: Private
 
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "PushProjectGenerationOutcomeRemote")
+    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "PushGenerationOutcomeStream")
 
     private struct State {
-        var continuations = [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation]()
+        var continuations = [UUID: AsyncStream<GenerationOutcomeDTO>.Continuation]()
     }
 
     private let state = Mutex(State())

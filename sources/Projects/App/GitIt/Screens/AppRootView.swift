@@ -181,7 +181,7 @@ private enum AppRootPreviewSupport {
     }
 
     struct NoopLearningProjectOutcomes: LearningProjectOutcomesUseCase {
-        func callAsFunction() async -> AsyncStream<LearningProjectGenerationOutcome> {
+        func callAsFunction() async -> AsyncStream<GenerationOutcome> {
             AsyncStream { _ in }
         }
     }

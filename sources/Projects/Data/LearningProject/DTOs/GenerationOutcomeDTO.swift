@@ -1,4 +1,4 @@
-public struct ProjectGenerationOutcomeDTO: Equatable, Sendable {
+public struct GenerationOutcomeDTO: Equatable, Sendable {
 
     // MARK: Lifecycle
 

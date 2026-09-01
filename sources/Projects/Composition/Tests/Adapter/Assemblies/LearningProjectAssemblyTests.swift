@@ -38,7 +38,7 @@ struct LearningProjectAssemblyTests {
         await assembly.ingestGenerationOutcomePayload(["projectId": "project-1", "status": "completed"])
 
         let outcome = await iterator.next()
-        #expect(outcome == LearningProjectGenerationOutcome(projectID: "project-1", status: .completed))
+        #expect(outcome == GenerationOutcome(projectID: "project-1", status: .completed))
     }
 
 }

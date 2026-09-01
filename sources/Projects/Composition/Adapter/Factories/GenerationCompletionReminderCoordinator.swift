@@ -40,7 +40,7 @@ actor GenerationCompletionReminderCoordinator {
     private var registeredProjectIDs: Set<String> = []
     private var observationTask: Task<Void, Never>?
 
-    private func handle(_ outcome: LearningProjectGenerationOutcome) async {
+    private func handle(_ outcome: GenerationOutcome) async {
         Self.logger.debug("생성 결과 수신: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)")
 
         guard registeredProjectIDs.remove(outcome.projectID) != nil else {
