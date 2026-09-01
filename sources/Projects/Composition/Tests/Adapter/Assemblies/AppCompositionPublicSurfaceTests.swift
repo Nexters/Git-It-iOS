@@ -43,6 +43,7 @@ struct AppCompositionPublicSurfaceTests {
             "fetchExternalRepository",
             "observeGenerationOutcomes",
             "requestGenerationReminder",
+            "trackGenerationProgress",
             "bootstrap",
             "registerCurrentDevice",
             "deviceTokenRefreshes",
