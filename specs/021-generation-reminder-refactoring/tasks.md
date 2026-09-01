@@ -103,7 +103,7 @@ T003이 두 hunk를 함께 커밋하며, 이 예외와 이유를 PR에 기록한
       `sources/Projects/Composition/Adapter/Adapters/NotificationAuthorizationGatewayAdapter.swift`,
       `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`,
       `sources/Projects/Data/LearningProject/Remotes/PushProjectGenerationOutcomeRemote.swift`
-- [ ] T006 [P] DEBUG 전용 초기화 버튼 복구를 커밋한다. 주석 처리된 `ResetAllButton`
+- [X] T006 [P] DEBUG 전용 초기화 버튼 복구를 커밋한다. 주석 처리된 `ResetAllButton`
       `safeAreaInset`를 다시 활성화한다.
       `sources/Projects/App/GitIt/Screens/AppRootView.swift`
 - [ ] T007 [P] Home 카드 스크롤 레이아웃 상수 추출을 커밋한다. 화면에 흩어진 카드 폭·간격·여백
