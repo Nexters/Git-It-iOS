@@ -12,7 +12,7 @@ struct RequestGenerationReminderTests {
         let registry = StubGenerationReminderRegistry()
         let requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: gateway,
-            reminderRegistry: registry
+            reminderRegistry: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -27,7 +27,7 @@ struct RequestGenerationReminderTests {
         let registry = StubGenerationReminderRegistry()
         let requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: gateway,
-            reminderRegistry: registry
+            reminderRegistry: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -42,7 +42,7 @@ struct RequestGenerationReminderTests {
         let registry = StubGenerationReminderRegistry()
         let requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: gateway,
-            reminderRegistry: registry
+            reminderRegistry: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -57,7 +57,7 @@ struct RequestGenerationReminderTests {
         let registry = StubGenerationReminderRegistry()
         let requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: gateway,
-            reminderRegistry: registry
+            reminderRegistry: registry,
         )
 
         let isAuthorized = await requestGenerationReminder.isAuthorized()
@@ -87,7 +87,7 @@ private struct StubNotificationAuthorizationGateway: NotificationAuthorizationGa
 
 private actor StubGenerationReminderRegistry: GenerationReminderRegistry {
 
-    private(set) var registeredProjectIDs: [String] = []
+    private(set) var registeredProjectIDs = [String]()
 
     func register(projectID: String) async {
         registeredProjectIDs.append(projectID)

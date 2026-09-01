@@ -6,14 +6,17 @@ import os
 
 struct NotificationAuthorizationGatewayAdapter: NotificationAuthorizationGateway {
 
+    // MARK: Internal
+
     let localNotificationClient: any LocalNotificationClient
 
     func requestAuthorization() async -> NotificationAuthorizationOutcome {
-        let outcome: NotificationAuthorizationOutcome = switch await localNotificationClient.requestAuthorization() {
-        case .authorized: .authorized
-        case .declined: .declined
-        case .previouslyDenied: .previouslyDenied
-        }
+        let outcome: NotificationAuthorizationOutcome =
+            switch await localNotificationClient.requestAuthorization() {
+            case .authorized: .authorized
+            case .declined: .declined
+            case .previouslyDenied: .previouslyDenied
+            }
         Self.logger.debug("알림 권한 요청 결과: \(String(describing: outcome), privacy: .public)")
         return outcome
     }

@@ -7,7 +7,7 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
 
     // MARK: Lifecycle
 
-    public init() {}
+    public init() { }
 
     // MARK: Public
 
@@ -18,7 +18,7 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
         case .notDetermined:
             do {
                 let granted = try await UNUserNotificationCenter.current().requestAuthorization(
-                    options: [.alert, .badge, .sound],
+                    options: [.alert, .badge, .sound]
                 )
                 outcome = granted ? .authorized : .declined
             } catch {
@@ -29,7 +29,9 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
         case .denied:
             outcome = .previouslyDenied
 
-        case .authorized, .provisional, .ephemeral:
+        case .authorized,
+             .provisional,
+             .ephemeral:
             outcome = .authorized
 
         @unknown default:
@@ -42,10 +44,13 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
     public func isAuthorized() async -> Bool {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         switch settings.authorizationStatus {
-        case .authorized, .provisional, .ephemeral:
+        case .authorized,
+             .provisional,
+             .ephemeral:
             return true
 
-        case .notDetermined, .denied:
+        case .notDetermined,
+             .denied:
             return false
 
         @unknown default:
