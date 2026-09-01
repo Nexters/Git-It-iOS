@@ -71,6 +71,7 @@ public struct HomeFeature: Sendable {
         public enum View: Equatable, Sendable {
             case task
             case profileRetryTapped
+            case projectRetryTapped
             case projectRegistrationTapped
             case showAllProjectsTapped
             case projectCardTapped(projectID: String)
@@ -125,6 +126,10 @@ public struct HomeFeature: Sendable {
             case .view(.profileRetryTapped):
                 guard case .failed = state.profileLoad else { return .none }
                 return startProfileLoad(state: &state)
+
+            case .view(.projectRetryTapped):
+                guard case .failed = state.projectLoad else { return .none }
+                return startProjectLoad(state: &state)
 
             case .view(.projectRegistrationTapped):
                 return .send(.delegate(.projectRegistrationRequested))
