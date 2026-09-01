@@ -280,15 +280,15 @@ build로 확인한다.
 
 ### S3 — 등록 흐름 대기 게이트
 
-- [ ] T031 [S3] `sources/Projects/Feature/Tests/ProjectRegistration/Reducers/ProjectRegistrationFeatureTests.swift`에
+- [X] T031 [S3] `sources/Projects/Feature/Tests/ProjectRegistration/Reducers/ProjectRegistrationFeatureTests.swift`에
       준비 완료 시각 전 결과 도착 시 전이 보류, 준비 완료 시각 도달 시 전이, 이미 지난 뒤
       도착하면 즉시 전이, 실패도 같은 게이트를 따르는 테스트를 추가한다. 짧은
       `GenerationWaitPolicy`와 고정 `now`를 주입한다(FR-012, FR-013).
-- [ ] T032 [S3] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`에
+- [X] T032 [S3] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`에
       `waitPolicy: GenerationWaitPolicy`와 `now: @Sendable () -> Date` 생성자 인자를 추가하고,
       도착한 생성 결과를 상태에 보관했다가 준비 완료 시각에 완료 또는 실패로 전이하는 게이트를
       구현한다. 대기는 기존 `CancelID` 경계를 유지하는 취소 가능한 Effect로 둔다.
-- [ ] T033 [S3] `sources/Projects/Feature/ProjectRegistration/Screens/QuizGenerationProgressScreen.swift`가
+- [X] T033 [S3] `sources/Projects/Feature/ProjectRegistration/Screens/QuizGenerationProgressScreen.swift`가
       진행률 시뮬레이션 종료 후에도 마지막 단계를 진행 중 상태로 유지하고 완료 표시나 화면
       전환을 하지 않는지 확인하고, 필요한 경우에만 조정한다. 180~300초 무작위 구간 자체는
       변경하지 않는다(FR-013, 명확화 2).

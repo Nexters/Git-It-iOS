@@ -15,12 +15,16 @@ public struct ProjectRegistrationFeature: Sendable {
         observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
+        waitPolicy: GenerationWaitPolicy = .standard,
+        now: @escaping @Sendable () -> Date = { Date() },
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
         self.observeGenerationOutcomes = observeGenerationOutcomes
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
+        self.waitPolicy = waitPolicy
+        self.now = now
     }
 
     // MARK: Public
@@ -44,6 +48,10 @@ public struct ProjectRegistrationFeature: Sendable {
         public var step = RegistrationStep.repositoryConfirmation
         public var validationRequestID = 0
         public var isGenerationReminderSheetPresented = false
+        /// 생성 요청을 제출한 시각이다. 최소 대기 시간 계산의 기준이 된다.
+        public var requestedAt: Date?
+        /// 도착했지만 최소 대기 시간이 남아 아직 노출하지 않은 생성 결과다.
+        public var pendingOutcome: GenerationOutcome?
     }
 
     public enum ValidationStatus: Equatable, Sendable {
@@ -89,6 +97,7 @@ public struct ProjectRegistrationFeature: Sendable {
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
             case generationOutcomeReceived(GenerationOutcome)
             case waitAtHomeAuthorizationChecked(isAuthorized: Bool)
+            case minimumWaitElapsed
         }
 
         @CasePathable
@@ -215,13 +224,26 @@ public struct ProjectRegistrationFeature: Sendable {
                     case .awaitingOutcome(let receipt) = state.progress,
                     outcome.projectID == receipt.projectID
                 else { return .none }
-                switch outcome.status {
-                case .completed:
-                    return finishWaiting(receipt: receipt, isReminderEnabled: nil)
-
-                case .failed:
-                    return transitionToFailure(.unexpected, state: &state)
+                // 완료와 실패 모두 같은 게이트를 따른다. 최소 대기 시간이 남아 있으면 결과를
+                // 보관만 하고, 남은 시간이 지난 뒤에 한 번에 노출한다.
+                let remaining = remainingWait(requestedAt: state.requestedAt, projectID: receipt.projectID)
+                guard remaining > 0 else {
+                    // 이미 최소 대기 시간이 지났다면 추가 지연 없이 곧바로 노출한다.
+                    return applyOutcome(outcome, receipt: receipt, state: &state)
                 }
+                state.pendingOutcome = outcome
+                return .run { send in
+                    try await Task.sleep(for: .seconds(remaining))
+                    await send(.effect(.minimumWaitElapsed))
+                }
+                .cancellable(id: CancelID.minimumWait, cancelInFlight: true)
+
+            case .effect(.minimumWaitElapsed):
+                guard
+                    case .awaitingOutcome(let receipt) = state.progress,
+                    let outcome = state.pendingOutcome
+                else { return .none }
+                return applyOutcome(outcome, receipt: receipt, state: &state)
 
             case .delegate:
                 return .none
@@ -235,6 +257,8 @@ public struct ProjectRegistrationFeature: Sendable {
         case validation
         /// 구독 확립과 생성 요청, 결과 관찰이 하나의 실행 경로이므로 취소 단위도 하나다.
         case registrationPipeline
+        /// 도착한 결과를 최소 대기 시간까지 붙잡아 두는 대기다.
+        case minimumWait
     }
 
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
@@ -242,6 +266,8 @@ public struct ProjectRegistrationFeature: Sendable {
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+    private let waitPolicy: GenerationWaitPolicy
+    private let now: @Sendable () -> Date
 
     /// 생성 결과 구독을 먼저 확립한 뒤에 생성을 요청하고, 응답으로 받은 `projectID`로
     /// 이미 확립된 스트림을 필터링한다. 세 단계가 순서가 보장되는 단일 실행 경로에 있으므로
@@ -252,6 +278,8 @@ public struct ProjectRegistrationFeature: Sendable {
         state: inout State,
     ) -> Effect<Action> {
         state.progress = .submitting
+        state.requestedAt = now()
+        state.pendingOutcome = nil
         return .run { send in
             let outcomes = await observeGenerationOutcomes()
 
@@ -285,7 +313,37 @@ public struct ProjectRegistrationFeature: Sendable {
     ) -> Effect<Action> {
         state.progress = .failed(error)
         state.isGenerationReminderSheetPresented = false
-        return .cancel(id: CancelID.registrationPipeline)
+        state.pendingOutcome = nil
+        return .merge(
+            .cancel(id: CancelID.registrationPipeline),
+            .cancel(id: CancelID.minimumWait),
+        )
+    }
+
+    /// 요청 시각 기준으로 아직 남은 최소 대기 시간이다. 요청 시각을 모르면 대기하지 않는다.
+    private func remainingWait(
+        requestedAt: Date?,
+        projectID: String,
+    ) -> TimeInterval {
+        guard let requestedAt else { return 0 }
+        let progress = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
+        return waitPolicy.readyDate(for: progress).timeIntervalSince(now())
+    }
+
+    /// 보관 여부와 무관하게 생성 결과를 화면에 노출하는 단일 경로다.
+    private func applyOutcome(
+        _ outcome: GenerationOutcome,
+        receipt: ProjectRegistrationReceipt,
+        state: inout State,
+    ) -> Effect<Action> {
+        state.pendingOutcome = nil
+        switch outcome.status {
+        case .completed:
+            return finishWaiting(receipt: receipt, isReminderEnabled: nil)
+
+        case .failed:
+            return transitionToFailure(.unexpected, state: &state)
+        }
     }
 
     private func acceptGenerationReminder(receipt: ProjectRegistrationReceipt) -> Effect<Action> {
@@ -305,6 +363,7 @@ public struct ProjectRegistrationFeature: Sendable {
     ) -> Effect<Action> {
         .merge(
             .cancel(id: CancelID.registrationPipeline),
+            .cancel(id: CancelID.minimumWait),
             .run { send in
                 if let isReminderEnabled {
                     await send(.delegate(.generationReminderPreferenceSelected(isEnabled: isReminderEnabled)))

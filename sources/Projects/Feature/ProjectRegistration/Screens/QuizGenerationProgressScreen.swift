@@ -187,7 +187,9 @@ extension QuizGenerationProgressScreen {
         static let checklistIconSize: CGFloat = 24
         static let bottomButtonPadding: CGFloat = 58
         static let simulatedDurationRange: ClosedRange<Double> = 180...300
-        static let maxSimulatedProgress = 0.99
+        /// 진행률 시뮬레이션은 마지막 단계가 완료로 표시되기 직전에서 멈춘다. 실제 완료 전이는
+        /// 최소 대기 시간과 생성 결과가 결정하므로 화면이 스스로 완료를 표시하지 않는다(FR-013).
+        static let maxSimulatedProgress = 0.98
         static let simulatedProgressTickInterval = Duration.milliseconds(200)
     }
 }

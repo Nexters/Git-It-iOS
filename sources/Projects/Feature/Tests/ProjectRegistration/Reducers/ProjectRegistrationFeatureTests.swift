@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DomainLearningProject
+import Foundation
 import Testing
 
 @testable import Feature
@@ -233,6 +234,100 @@ struct ProjectRegistrationFeatureTests {
             ))
         )
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+
+        await observeGenerationOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `준비 완료 시각 전에 도착한 완료 결과는 보류되었다가 대기가 끝나면 전이한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let outcome = GenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
+        var state = ProjectRegistrationFeature.State()
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.requestedAt = requestedAt
+        let store = makeProjectRegistrationStore(
+            waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
+            now: { requestedAt },
+            state: state,
+        )
+
+        await store.send(.effect(.generationOutcomeReceived(outcome))) {
+            $0.pendingOutcome = outcome
+        }
+        #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
+
+        await store.receive(\.effect.minimumWaitElapsed, timeout: .seconds(5)) {
+            $0.pendingOutcome = nil
+        }
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+        await store.finish()
+    }
+
+    @Test
+    func `준비 완료 시각 전에 도착한 실패 결과도 같은 게이트를 따른다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let outcome = GenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
+        var state = ProjectRegistrationFeature.State()
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.requestedAt = requestedAt
+        let store = makeProjectRegistrationStore(
+            waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
+            now: { requestedAt },
+            state: state,
+        )
+
+        await store.send(.effect(.generationOutcomeReceived(outcome))) {
+            $0.pendingOutcome = outcome
+        }
+        #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
+
+        await store.receive(\.effect.minimumWaitElapsed, timeout: .seconds(5)) {
+            $0.pendingOutcome = nil
+            $0.progress = .failed(.unexpected)
+        }
+        await store.finish()
+    }
+
+    @Test
+    func `준비 완료 시각이 이미 지난 뒤 도착한 결과는 추가 지연 없이 전이한다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let outcome = GenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
+        var state = ProjectRegistrationFeature.State()
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.requestedAt = requestedAt
+        let store = makeProjectRegistrationStore(
+            waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
+            now: { requestedAt.addingTimeInterval(301) },
+            state: state,
+        )
+
+        await store.send(.effect(.generationOutcomeReceived(outcome)))
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+        await store.finish()
+    }
+
+    @Test
+    func `submitTapped는 요청 시각을 기록해 최소 대기 계산의 기준으로 남긴다`() async {
+        let requestedAt = Date(timeIntervalSince1970: 1_000)
+        let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        var state = ProjectRegistrationFeature.State()
+        state.validation = .validated(sampleRepository)
+        let store = makeProjectRegistrationStore(
+            createLearningProject: createLearningProject,
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            now: { requestedAt },
+            state: state,
+        )
+
+        await store.send(.view(.submitTapped)) {
+            $0.progress = .submitting
+            $0.requestedAt = requestedAt
+        }
+        await store.receive(.effect(.submissionFinished(.success(sampleReceipt)))) {
+            $0.progress = .awaitingOutcome(sampleReceipt)
+        }
 
         await observeGenerationOutcomes.finish()
         await store.finish()
@@ -675,6 +770,8 @@ private func makeProjectRegistrationStore(
     requestGenerationReminder: StubRequestGenerationReminderUseCase =
         StubRequestGenerationReminderUseCase(results: [.authorized]),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
+    waitPolicy: GenerationWaitPolicy = .standard,
+    now: @escaping @Sendable () -> Date = { Date() },
     state: ProjectRegistrationFeature.State = ProjectRegistrationFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationFeature> {
     TestStore(initialState: state) {
@@ -684,6 +781,8 @@ private func makeProjectRegistrationStore(
             observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: { await openNotificationSettings() },
+            waitPolicy: waitPolicy,
+            now: now,
         )
     }
 }
