@@ -17,6 +17,7 @@ public struct LabeledTextField: View {
         textInputAutocapitalization: TextInputAutocapitalization = .sentences,
         autocorrectionDisabled: Bool = false,
         accessibilityLabel: String? = nil,
+        focus: FocusState<Bool>.Binding? = nil,
     ) {
         self.label = label
         self.placeholder = placeholder
@@ -27,6 +28,7 @@ public struct LabeledTextField: View {
         self.textInputAutocapitalization = textInputAutocapitalization
         self.autocorrectionDisabled = autocorrectionDisabled
         self.accessibilityLabel = accessibilityLabel ?? label
+        self.focus = focus
     }
 
     // MARK: Public
@@ -47,6 +49,7 @@ public struct LabeledTextField: View {
                     .autocorrectionDisabled(autocorrectionDisabled)
                     .designSystemForeground(.grey100)
                     .accessibilityLabel(accessibilityLabel)
+                    .focused(focus ?? $unboundFocus)
                 }
 
                 if !text.isEmpty {
@@ -81,6 +84,9 @@ public struct LabeledTextField: View {
 
     // MARK: Private
 
+    /// 호출부가 포커스를 관찰하지 않을 때 `focused(_:)`에 넘길 내부 상태입니다.
+    @FocusState private var unboundFocus: Bool
+
     private let label: String
     private let placeholder: String
     private let supportingText: String?
@@ -89,6 +95,7 @@ public struct LabeledTextField: View {
     private let textInputAutocapitalization: TextInputAutocapitalization
     private let autocorrectionDisabled: Bool
     private let accessibilityLabel: String
+    private let focus: FocusState<Bool>.Binding?
 
     private var accentColor: ColorToken {
         isError ? .error : .blue100

@@ -169,13 +169,13 @@ build로 확인한다.
 
 ### 구현
 
-- [ ] T016 [S1] `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift`에
+- [X] T016 [S1] `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift`에
       기본값 `nil`인 `focus: FocusState<Bool>.Binding?` 인자를 추가하고 내부 `TextField`에
       연결한다. 기존 인자 순서와 표시·검증 동작은 바꾸지 않는다.
 
 ### 정리와 패키지 검증
 
-- [ ] T017 [no-write] UI scheme build로 기존 호출부가 변경 없이 컴파일되는지 확인한다.
+- [X] T017 [no-write] UI scheme build로 기존 호출부가 변경 없이 컴파일되는지 확인한다.
 
 **진행 점검**: T016~T017의 변경 파일과 검증 결과를 보고하고 패키지 4로 진행한다.
 
