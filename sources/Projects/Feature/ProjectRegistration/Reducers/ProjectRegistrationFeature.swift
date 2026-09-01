@@ -39,7 +39,12 @@ public struct ProjectRegistrationFeature: Sendable {
 
     @ObservableState
     public struct State: Equatable, Sendable {
-        public init() { }
+
+        /// 공유 시트로 전달받은 URL을 링크 입력 초기값으로 1회 소비하기 위한 진입점이다.
+        /// 검증되지 않은 외부 입력이므로 기존 검증 경로를 그대로 통과한다.
+        public init(initialRepositoryURL: String = "") {
+            repositoryURLInput = initialRepositoryURL
+        }
 
         public var repositoryURLInput = ""
         public var quizLevel = QuizLevel.l1
@@ -52,6 +57,7 @@ public struct ProjectRegistrationFeature: Sendable {
         public var requestedAt: Date?
         /// 도착했지만 최소 대기 시간이 남아 아직 노출하지 않은 생성 결과다.
         public var pendingOutcome: GenerationOutcome?
+
     }
 
     public enum ValidationStatus: Equatable, Sendable {

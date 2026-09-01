@@ -295,7 +295,7 @@ build로 확인한다.
 
 ### S6 — 공유 링크 초기값
 
-- [ ] T034 [S6] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`의
+- [X] T034 [S6] `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`의
       `State`에 `init(initialRepositoryURL: String = "")`을 추가한다. 값은 검증되지 않은 외부
       입력이므로 기존 검증 경로를 그대로 통과해야 한다(FR-025).
 
