@@ -41,6 +41,8 @@ public struct ProjectRegistrationScreen: View {
 
     @State private var isGuideExpanded = false
 
+    @FocusState private var isLinkFieldFocused: Bool
+
     @ViewBuilder
     private var content: some View {
         switch store.progress {
@@ -108,6 +110,7 @@ public struct ProjectRegistrationScreen: View {
                     textInputAutocapitalization: .never,
                     autocorrectionDisabled: true,
                     accessibilityLabel: "GitHub 레포지토리 링크",
+                    focus: $isLinkFieldFocused,
                 )
             }
             .designSystemScreenMargin()
@@ -127,6 +130,17 @@ public struct ProjectRegistrationScreen: View {
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)
         }
+        // 배경 레이어에만 해제 제스처를 두어 안내 패널·입력 지우기·액션 버튼의 히트 테스트를
+        // 가로채지 않는다.
+        .background(keyboardDismissLayer)
+        // 키보드가 오르내려도 하단 액션 버튼의 화면 내 위치를 고정한다.
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+    }
+
+    private var keyboardDismissLayer: some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .onTapGesture { isLinkFieldFocused = false }
     }
 
     private var canValidate: Bool {

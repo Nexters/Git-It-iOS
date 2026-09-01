@@ -238,10 +238,10 @@ build로 확인한다.
 
 ### S1 — 링크 입력 키보드
 
-- [ ] T023 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`의
+- [X] T023 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`의
       `linkInputContent`에 키보드 안전 영역 무시를 적용해, 키보드가 오르내려도 하단
       `ActionButton`의 화면 내 위치가 변하지 않게 한다(FR-001).
-- [ ] T024 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`에
+- [X] T024 [S1] `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`에
       `@FocusState`를 두고 T016의 포커스 인자로 `LabeledTextField`에 연결한 뒤, 배경 레이어
       터치로 포커스를 해제한다. 안내 패널 버튼·입력 지우기 버튼·액션
       버튼의 히트 테스트를 가로채지 않는다(FR-002~004).
