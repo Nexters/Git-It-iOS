@@ -48,6 +48,10 @@ extension AppModuleName {
                             "UIApplicationSupportsMultipleScenes": false
                         ],
                         "UIApplicationSupportsIndirectInputEvents": true,
+                        "UIBackgroundModes": [
+                            "remote-notification"
+                        ],
+                        "FirebaseAppDelegateProxyEnabled": false,
                         "GIT_IT_API_HOST": "$(GIT_IT_API_HOST)",
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
                         "UILaunchScreen": [:],
@@ -75,8 +79,6 @@ extension AppModuleName {
                     .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
-                    .external(.FirebaseAnalytics),
-                    .external(.FirebaseCrashlytics),
                 ],
                 settings: .settings(
                     base: [

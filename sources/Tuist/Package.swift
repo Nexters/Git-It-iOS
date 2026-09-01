@@ -30,6 +30,22 @@ let packageSettings = PackageSettings(
         "UIKitNavigation": .framework,
         "UIKitNavigationShim": .staticFramework,
         "XCTestDynamicOverlay": .framework,
+        "FBLPromises": .framework,
+        "Firebase": .framework,
+        "FirebaseAuthInterop": .framework,
+        "FirebaseCore": .framework,
+        "FirebaseCoreInternal": .framework,
+        "FirebaseInstallations": .framework,
+        "GoogleDataTransport": .framework,
+        "GoogleUtilities-AppDelegateSwizzler": .framework,
+        "GoogleUtilities-Environment": .framework,
+        "GoogleUtilities-Logger": .framework,
+        "GoogleUtilities-NSData": .framework,
+        "GoogleUtilities-Network": .framework,
+        "GoogleUtilities-Reachability": .framework,
+        "GoogleUtilities-UserDefaults": .framework,
+        "nanopb": .framework,
+        "third-party-IsAppEncrypted": .framework,
     ]
 )
 #endif
