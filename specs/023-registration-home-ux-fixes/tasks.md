@@ -347,7 +347,7 @@ scheme 테스트만으로 확인할 수 있다.
 
 ### 정리와 패키지 검증
 
-- [ ] T040 [no-write] Composition scheme 테스트로 T036 통과를 확인한다.
+- [X] T040 [no-write] Composition scheme 테스트로 T036 통과를 확인한다.
 
 **진행 점검**: T036~T040의 변경 파일과 검증 결과를 보고하고 패키지 7로 진행한다.
 
@@ -394,27 +394,27 @@ scheme 테스트만으로 확인할 수 있다.
 
 **의존 순서**: manifest·entitlements(T045~T047) → 확장 소스(T048) → 앱 소비 경로(T049~T051).
 
-- [ ] T045 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`에
+- [X] T045 [S6] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`에
       `product: .appExtension`인 공유 확장 target을 추가한다. enum case 이름은
       `ShareExtension`으로 두어 `sourceDirectory`가 `ShareExtension`으로 도출되게 하고,
       exhaustive switch인 `sourceDirectory`와 `target` 양쪽에 새 case 분기를 함께 추가한다.
       앱 target에는 확장 의존과 `CFBundleURLTypes`(T041의 스킴)를 등록한다.
-- [ ] T046 [S6] `sources/Projects/App/GitIt.entitlements`에 T041의 App Group을 추가한다.
-- [ ] T047 [S6] 확장용 entitlements 파일을 `sources/Projects/App/`에 추가하고 같은 App Group을
+- [X] T046 [S6] `sources/Projects/App/GitIt.entitlements`에 T041의 App Group을 추가한다.
+- [X] T047 [S6] 확장용 entitlements 파일을 `sources/Projects/App/`에 추가하고 같은 App Group을
       선언한다. 파일명은 T045의 target 이름과 일치시킨다.
-- [ ] T048 [S6] `sources/Projects/App/ShareExtension/` 아래에 확장 소스와 `Info.plist`를
+- [X] T048 [S6] `sources/Projects/App/ShareExtension/` 아래에 확장 소스와 `Info.plist`를
       추가한다. `NSExtensionActivationRule`을 URL 항목이 있는 공유로 한정하고(FR-024), 전달받은
       첫 번째 URL만 App Group 컨테이너에 기록한 뒤 커스텀 URL 스킴으로 컨테이너 앱을 연다.
       확장은 URL을 검증하지 않는다(FR-028, [contracts/share-entry.md](./contracts/share-entry.md)).
-- [ ] T049 [S6] `sources/Projects/App/GitIt/Models/SharedRepositoryLink.swift`에 공유 URL 1건을
+- [X] T049 [S6] `sources/Projects/App/GitIt/Models/SharedRepositoryLink.swift`에 공유 URL 1건을
       나타내는 값 타입을 추가한다.
-- [ ] T050 [S6] `sources/Projects/App/GitIt/GitItApp.swift`에 URL 스킴 수신 경로를 추가하고,
+- [X] T050 [S6] `sources/Projects/App/GitIt/GitItApp.swift`에 URL 스킴 수신 경로를 추가하고,
       App Group 컨테이너에서 값을 읽는 즉시 컨테이너에서 삭제한다(R-011).
-- [ ] T051 [S6] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 공유 링크 소비
+- [X] T051 [S6] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 공유 링크 소비
       규칙을 구현한다. 인증 완료 후 `ProjectRegistrationFeature.State(initialRepositoryURL:)`로
       전달, 미인증이면 진입 흐름 완료까지 메모리에 보관, 생성 진행 중이면 폐기하고 홈의 진행 중
       상태를 표시, 1회만 소비(FR-025~027).
-- [ ] T052 [S6] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 공유 링크
+- [X] T052 [S6] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 공유 링크
       소비 규칙 테스트를 추가한다. 인증 완료 후 전달, 진행 중 폐기, 1회 소비 후 재사용되지
       않음을 확인한다.
 
@@ -437,7 +437,7 @@ scheme 테스트만으로 확인할 수 있다.
 필수 `after_implement` hook을 마친 뒤 그 단위를 최종 commit한다. 읽기 전용 전체 검증은 반복
 승인 없이 같은 실행에서 이어서 수행한다.
 
-- [ ] T054 [no-write] `make tuist`로 파생 workspace·project를 갱신하고, 실행 전후 `git status`를
+- [X] T054 [no-write] `make tuist`로 파생 workspace·project를 갱신하고, 실행 전후 `git status`를
       비교해 추적 파일 변경이 없는지 확인한다. 추적 파일이 바뀌면 완료로 처리하지 않는다.
 - [ ] T055 [no-write] 아래를 순차 실행하고 결과를 기록한다. 세 명령은
       `sources/DerivedData/PreCommit`을 공유하므로 병렬 실행하지 않는다.
@@ -446,7 +446,7 @@ scheme 테스트만으로 확인할 수 있다.
 - [ ] T056 [no-write] [S1] [S2] [S3] [S4] [S5] [S6] [quickstart.md](./quickstart.md)의 수동 검증
       절차로 시나리오 1~6의 독립 수용 기준을 확인한다. 시간 의존 항목은 짧은
       `GenerationWaitPolicy`를 주입한 구성으로 확인한 뒤 기본값으로 1회 재확인한다.
-- [ ] T057 [no-write] 홈 프로필 영역이 프로필 데이터와 무관하게 기존 고정 기본 아바타를
+- [X] T057 [no-write] 홈 프로필 영역이 프로필 데이터와 무관하게 기존 고정 기본 아바타를
       유지하는지 확인한다(FR-030). 코드 변경 없이 회귀만 확인한다.
 
 ## 의존성과 실행 순서

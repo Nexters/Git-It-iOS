@@ -99,6 +99,8 @@ nonisolated struct AppRootFeature: Sendable {
         /// 앱 재실행으로 복원한 진행 상태인지 여부다. 복원 경로에서만 학습 프로젝트 목록을
         /// 1차 해소 수단으로 사용한다.
         var isGenerationProgressRestored = false
+        /// 아직 소비하지 못한 공유 링크다. 앱 실행 동안만 메모리에 유지한다.
+        var pendingSharedLink: SharedRepositoryLink?
         @Presents var projectRegistration: ProjectRegistrationFeature.State?
     }
 
@@ -128,6 +130,7 @@ nonisolated struct AppRootFeature: Sendable {
             case deviceTokenRefreshed
             case generationProgressRestored(GenerationProgress?)
             case generationProgressReleased(projectID: String)
+            case sharedRepositoryLinkReceived(SharedRepositoryLink)
         }
     }
 
@@ -190,7 +193,10 @@ nonisolated struct AppRootFeature: Sendable {
                 switch destination {
                 case .mainShell:
                     state.route = .mainShell
-                    return registerDeviceIfNeeded(&state)
+                    return .merge(
+                        registerDeviceIfNeeded(&state),
+                        consumePendingSharedLink(&state),
+                    )
 
                 case .onboarding(let entryPoint):
                     let bundleVersion = state.onboarding.guide.bundleVersion
@@ -211,7 +217,10 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .onboarding(.delegate(.mainShellRequested)):
                 state.route = .mainShell
-                return registerDeviceIfNeeded(&state)
+                return .merge(
+                    registerDeviceIfNeeded(&state),
+                    consumePendingSharedLink(&state),
+                )
 
             case .mainShell(.delegate(.loggedOut)):
                 return returnToOnboarding(&state)
@@ -282,6 +291,19 @@ nonisolated struct AppRootFeature: Sendable {
                     .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))),
                     releaseGenerationProgress(restored),
                 )
+
+            case .effect(.sharedRepositoryLinkReceived(let link)):
+                // 생성이 진행 중이면 등록 화면을 열지 않고 버린다. 홈의 진행 중 표기가
+                // 등록 화면이 열리지 않은 이유를 설명하는 피드백이 된다.
+                guard state.generationProgress == nil else { return .none }
+                guard state.route == .mainShell else {
+                    // 미인증이면 진입 흐름을 마칠 때까지 메모리에 보관한다.
+                    state.pendingSharedLink = link
+                    return .none
+                }
+                state.pendingSharedLink = nil
+                state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+                return .none
 
             case .effect(.generationProgressReleased(let projectID)):
                 guard state.generationProgress?.projectID == projectID else { return .none }
@@ -381,6 +403,16 @@ nonisolated struct AppRootFeature: Sendable {
         .cancellable(id: CancelID.deviceRegistration)
     }
 
+    /// 보관해 둔 공유 링크를 링크 입력 초기값으로 1회만 소비한다. 소비 여부와 무관하게
+    /// 보관을 해제해 같은 링크가 다시 쓰이지 않게 한다.
+    private func consumePendingSharedLink(_ state: inout State) -> Effect<Action> {
+        guard let link = state.pendingSharedLink else { return .none }
+        state.pendingSharedLink = nil
+        guard state.generationProgress == nil else { return .none }
+        state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+        return .none
+    }
+
     /// 진행 상태를 `max(요청 + 최소 대기 시간, 결과 확정)` 시점에 해제한다. 결과가 끝내
     /// 도착하지 않으면 보존 상한에서 해제해 상태가 영구히 남지 않게 한다.
     private func releaseGenerationProgress(_ progress: GenerationProgress) -> Effect<Action> {
@@ -425,6 +457,7 @@ nonisolated struct AppRootFeature: Sendable {
         state.deviceRegistration = .idle
         state.generationProgress = nil
         state.isGenerationProgressRestored = false
+        state.pendingSharedLink = nil
         state.route = .onboarding
         return .merge(
             .cancel(id: CancelID.deviceRegistration),
