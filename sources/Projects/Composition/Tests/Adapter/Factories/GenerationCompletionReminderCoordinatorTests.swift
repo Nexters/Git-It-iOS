@@ -21,7 +21,7 @@ struct GenerationCompletionReminderCoordinatorTests {
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
-        #expect(localNotificationClient.presentedProjectIDs() == ["project-1"])
+        #expect(localNotificationClient.presentedProjectIDs() == ["generation-completed-project-1"])
     }
 
     @Test
@@ -81,7 +81,7 @@ struct GenerationCompletionReminderCoordinatorTests {
         await learningProjectOutcomes.finish()
         await coordinator.waitUntilObservationFinished()
 
-        #expect(localNotificationClient.presentedProjectIDs() == ["project-1"])
+        #expect(localNotificationClient.presentedProjectIDs() == ["generation-completed-project-1"])
     }
 
 }
@@ -133,8 +133,8 @@ private final class StubLocalNotificationClient: LocalNotificationClient, Sendab
         isAuthorizedResult
     }
 
-    func presentGenerationCompletedNotification(projectID: String) {
-        state.withLock { $0.presented.append(projectID) }
+    func present(_ request: LocalNotificationRequest) {
+        state.withLock { $0.presented.append(request.identifier) }
     }
 
     func presentedProjectIDs() -> [String] {

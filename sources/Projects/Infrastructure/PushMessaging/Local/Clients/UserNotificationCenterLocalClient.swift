@@ -53,18 +53,18 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
         }
     }
 
-    public func presentGenerationCompletedNotification(projectID: String) {
-        Self.logger.debug("생성 완료 로컬 알림 발송: projectID=\(projectID, privacy: .public)")
+    public func present(_ request: LocalNotificationRequest) {
+        Self.logger.debug("로컬 알림 발송: identifier=\(request.identifier, privacy: .public)")
         let content = UNMutableNotificationContent()
-        content.title = "세트 생성 완료"
-        content.body = "학습 세트 생성이 완료됐어요. 지금 확인해보세요."
+        content.title = request.title
+        content.body = request.body
         content.sound = .default
-        let request = UNNotificationRequest(
-            identifier: "generation-completed-\(projectID)",
+        let notificationRequest = UNNotificationRequest(
+            identifier: request.identifier,
             content: content,
             trigger: nil,
         )
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(notificationRequest)
     }
 
     // MARK: Private

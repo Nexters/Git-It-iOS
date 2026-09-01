@@ -67,7 +67,7 @@ public struct AppComposition: Sendable {
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
         }
         PushNotificationAppDelegate.configure(
-            PushNotificationHandlers(
+            PushNotificationCallbacks(
                 forwardAPNsToken: forwardAPNsToken,
                 ingestPushPayload: ingestPushPayload,
             )

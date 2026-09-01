@@ -1,8 +1,8 @@
 import Foundation
 
-// MARK: - PushNotificationHandlers
+// MARK: - PushNotificationCallbacks
 
-public struct PushNotificationHandlers: Sendable {
+public struct PushNotificationCallbacks: Sendable {
 
     // MARK: Lifecycle
 

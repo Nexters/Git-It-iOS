@@ -12,7 +12,7 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 
     // MARK: Public
 
-    public static func configure(_ handlers: PushNotificationHandlers) {
+    public static func configure(_ handlers: PushNotificationCallbacks) {
         Self.state.withLock { $0 = handlers }
     }
 
@@ -53,17 +53,17 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         Messaging.messaging().appDidReceiveMessage(userInfo)
 
         let payload = RemoteNotificationPayload(userInfo: userInfo)
-        Self.logger.debug("didReceiveRemoteNotification 수신: \(payload.value, privacy: .public)")
+        Self.logger.debug("didReceiveRemoteNotification 수신: \(payload.userInfoStrings, privacy: .public)")
 
         Task {
-            await handlers.ingestPushPayload(payload.value)
+            await handlers.ingestPushPayload(payload.userInfoStrings)
             completionHandler(.newData)
         }
     }
 
     // MARK: Private
 
-    private static let state = Mutex<PushNotificationHandlers?>(nil)
+    private static let state = Mutex<PushNotificationCallbacks?>(nil)
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "FirebaseMessagingAppDelegate")
 
 }

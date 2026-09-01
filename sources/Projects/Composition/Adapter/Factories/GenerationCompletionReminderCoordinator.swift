@@ -56,7 +56,13 @@ actor GenerationCompletionReminderCoordinator {
             return
         }
         Self.logger.debug("로컬 알림 발송: projectID=\(outcome.projectID, privacy: .public)")
-        localNotificationClient.presentGenerationCompletedNotification(projectID: outcome.projectID)
+        localNotificationClient.present(
+            LocalNotificationRequest(
+                identifier: "generation-completed-\(outcome.projectID)",
+                title: "세트 생성 완료",
+                body: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
+            )
+        )
     }
 
 }

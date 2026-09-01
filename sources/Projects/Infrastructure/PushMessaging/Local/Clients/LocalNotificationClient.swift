@@ -8,14 +8,6 @@ public protocol LocalNotificationClient: Sendable {
     /// 로컬 알림을 실제로 보내기 직전에 현재 권한이 허용 상태인지 다시 확인한다.
     func isAuthorized() async -> Bool
 
-    /// 지정한 프로젝트의 생성 완료를 안내하는, 사용자에게 보이는 로컬 알림을 즉시 발송한다.
-    func presentGenerationCompletedNotification(projectID: String)
-}
-
-// MARK: - LocalNotificationAuthorizationOutcome
-
-public enum LocalNotificationAuthorizationOutcome: Sendable, Equatable {
-    case authorized
-    case declined
-    case previouslyDenied
+    /// 전달받은 값 그대로 로컬 알림을 즉시 발송한다.
+    func present(_ request: LocalNotificationRequest)
 }
