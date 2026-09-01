@@ -158,11 +158,9 @@ extension AppModuleName {
                 infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
                 sources: ["\(sourceDirectory)/**/*.swift"],
                 entitlements: .file(path: "ShareExtension.entitlements"),
-                // 공유 URL 판정을 앱의 링크 검증과 같은 규칙으로 맞추기 위해 Data의 parser를
-                // 직접 참조한다. 확장 target은 패키지 의존성 방향의 예외다.
-                dependencies: [
-                    .fromData(.DataExternalRepository)
-                ],
+                // 확장은 URL 형식을 판정하지 않고 그대로 앱에 넘기므로 프로젝트 내부 패키지에
+                // 의존하지 않는다.
+                dependencies: [],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",

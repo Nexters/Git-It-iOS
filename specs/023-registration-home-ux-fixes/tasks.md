@@ -623,11 +623,11 @@ Infrastructure·Data를 앞에 두었기 때문에 패키지 5에 도달해야 �
 **통합 검증**: `make tuist` 이후 App scheme 빌드. 전체 검증은 아래 「전체 수렴 완료 검증」에서
 한 번 수행한다.
 
-- [ ] T062 [S6] `firstRepositoryURL()`이 URL 항목의 첫 번째 값을 형식과 무관하게 반환하도록
+- [X] T062 [S6] `firstRepositoryURL()`이 URL 항목의 첫 번째 값을 형식과 무관하게 반환하도록
       바꾸고 `GitHubRepositoryURLParser` 사용과 `DataExternalRepository` import를 제거하도록
       `sources/Projects/App/ShareExtension/ShareViewController.swift`를 수정한다. per FR-028,
       FR-029, S6/AC6 (contradicts)
-- [ ] T063 [S6] `ShareExtension` target의 `dependencies`에서
+- [X] T063 [S6] `ShareExtension` target의 `dependencies`에서
       `.fromData(.DataExternalRepository)`와 관련 주석을 제거해 확장이 프로젝트 내부 패키지를
       참조하지 않도록
       `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`를 수정한다.
@@ -635,7 +635,7 @@ Infrastructure·Data를 앞에 두었기 때문에 패키지 5에 도달해야 �
 
 #### 정리와 패키지 검증
 
-- [ ] T064 [no-write] `make tuist`로 파생 workspace·project를 갱신하고, 실행 전후
+- [X] T064 [no-write] `make tuist`로 파생 workspace·project를 갱신하고, 실행 전후
       `git status`를 비교해 추적 파일 변경이 없는지 확인한 뒤 App scheme 빌드가 성공하는지
       확인하고 결과를 보고한다. 추적 파일이 바뀌면 완료로 처리하지 않는다.
 

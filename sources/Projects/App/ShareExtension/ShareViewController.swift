@@ -1,12 +1,11 @@
-import DataExternalRepository
 import UIKit
 import UniformTypeIdentifiers
 
 // MARK: - ShareViewController
 
-/// 공유 시트에서 전달받은 첫 번째 URL 중 저장소로 해석되는 것을 App Group 컨테이너에
-/// 기록하고 컨테이너 앱을 연다. 판정 규칙은 앱의 링크 검증과 같은
-/// `GitHubRepositoryURLParser`가 소유하므로 특정 앱의 공유 형태에 의존하지 않는다.
+/// 공유 시트에서 전달받은 첫 번째 URL을 App Group 컨테이너에 기록하고 컨테이너 앱을 연다.
+/// 저장소 링크인지는 판정하지 않는다. 유효성 판정과 실패 안내는 사용자가 직접 붙여넣었을
+/// 때와 동일하게 앱의 링크 입력 경로가 단독으로 담당한다.
 final class ShareViewController: UIViewController {
 
     // MARK: Internal
@@ -21,8 +20,6 @@ final class ShareViewController: UIViewController {
 
     // MARK: Private
 
-    private let urlParser = GitHubRepositoryURLParser()
-
     private func forwardSharedRepositoryURL() async {
         guard let url = await firstRepositoryURL() else { return }
         SharedRepositoryLinkContainer.store(url)
@@ -34,8 +31,8 @@ final class ShareViewController: UIViewController {
         _ = await extensionContext.open(containerAppURL)
     }
 
-    /// 공유 항목의 URL을 순서대로 훑어 저장소로 해석되는 첫 번째 것을 고른다. 해석되지
-    /// 않으면 아무것도 기록하지 않고 앱도 열지 않는다.
+    /// 공유 항목의 URL을 순서대로 훑어 형식과 무관하게 첫 번째 것을 고른다. URL 항목이
+    /// 하나도 없을 때만 아무것도 기록하지 않고 앱도 열지 않는다.
     private func firstRepositoryURL() async -> String? {
         let items = (extensionContext?.inputItems as? [NSExtensionItem]) ?? []
         let identifier = UTType.url.identifier
@@ -46,10 +43,7 @@ final class ShareViewController: UIViewController {
                 guard let url = try? await provider.loadItem(forTypeIdentifier: identifier) as? URL else {
                     continue
                 }
-                let candidate = url.absoluteString
-                if urlParser.location(from: candidate) != nil {
-                    return candidate
-                }
+                return url.absoluteString
             }
         }
         return nil
