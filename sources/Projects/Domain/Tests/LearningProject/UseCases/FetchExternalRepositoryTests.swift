@@ -1,3 +1,4 @@
+import Synchronization
 import Testing
 
 @testable import DomainLearningProject
@@ -6,8 +7,11 @@ import Testing
 
 @Suite("FetchExternalRepository")
 struct FetchExternalRepositoryTests {
+
+    // MARK: Internal
+
     @Test
-    func `파싱 가능한 URL은 조회 결과를 그대로 반환한다`() async throws {
+    func `해석된 위치로 조회하고 결과를 그대로 반환한다`() async throws {
         let expected = ExternalRepository(
             canonicalURL: "https://github.com/owner/repo",
             ownerName: "owner",
@@ -17,42 +21,20 @@ struct FetchExternalRepositoryTests {
             techStack: ["Swift"],
         )
         let lookup = FetchExternalRepositoryLookup(behavior: .succeed(expected))
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
+        let parser = StubExternalRepositoryURLParser(
+            location: ExternalRepositoryLocation(owner: "owner", name: "repo")
+        )
+        let fetchExternalRepository = FetchExternalRepository(lookup: lookup, urlParser: parser)
 
         let result = try await fetchExternalRepository(url: "https://github.com/owner/repo")
 
         #expect(result == expected)
         #expect(await lookup.recordedOwnerAndName() == ["owner/repo"])
-    }
-
-    @Test(arguments: [
-        "github.com/owner/repo",
-        "www.github.com/owner/repo",
-        "http://github.com/owner/repo",
-        "http://www.github.com/owner/repo",
-        "https://www.github.com/owner/repo",
-        "HTTPS://GitHub.com/owner/repo",
-    ])
-    func `scheme·www 조합이 달라도 같은 owner-repo로 조회한다`(_ url: String) async throws {
-        let expected = ExternalRepository(
-            canonicalURL: "https://github.com/owner/repo",
-            ownerName: "owner",
-            repositoryName: "repo",
-            imageURL: nil,
-            starCount: 3,
-            techStack: ["Swift"],
-        )
-        let lookup = FetchExternalRepositoryLookup(behavior: .succeed(expected))
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
-
-        let result = try await fetchExternalRepository(url: url)
-
-        #expect(result == expected)
-        #expect(await lookup.recordedOwnerAndName() == ["owner/repo"])
+        #expect(parser.receivedURLs() == ["https://github.com/owner/repo"])
     }
 
     @Test
-    func `파싱할 수 없는 URL은 조회 없이 URL 형식 오류를 던진다`() async throws {
+    func `해석하지 못한 URL은 조회 없이 URL 형식 오류를 던진다`() async throws {
         let lookup = FetchExternalRepositoryLookup(behavior: .succeed(
             ExternalRepository(
                 canonicalURL: "unused",
@@ -63,7 +45,10 @@ struct FetchExternalRepositoryTests {
                 techStack: [],
             )
         ))
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
+        let fetchExternalRepository = FetchExternalRepository(
+            lookup: lookup,
+            urlParser: StubExternalRepositoryURLParser(location: nil),
+        )
 
         await #expect(throws: ExternalRepositoryError.invalidURLFormat) {
             try await fetchExternalRepository(url: "")
@@ -73,8 +58,10 @@ struct FetchExternalRepositoryTests {
 
     @Test
     func `오프라인 오류를 그대로 전파한다`() async throws {
-        let lookup = FetchExternalRepositoryLookup(behavior: .fail(.offline))
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
+        let fetchExternalRepository = FetchExternalRepository(
+            lookup: FetchExternalRepositoryLookup(behavior: .fail(.offline)),
+            urlParser: Self.matchingParser,
+        )
 
         await #expect(throws: ExternalRepositoryError.offline) {
             try await fetchExternalRepository(url: "https://github.com/owner/repo")
@@ -83,13 +70,50 @@ struct FetchExternalRepositoryTests {
 
     @Test
     func `그 밖의 오류를 그대로 전파한다`() async throws {
-        let lookup = FetchExternalRepositoryLookup(behavior: .fail(.other))
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup)
+        let fetchExternalRepository = FetchExternalRepository(
+            lookup: FetchExternalRepositoryLookup(behavior: .fail(.other)),
+            urlParser: Self.matchingParser,
+        )
 
         await #expect(throws: ExternalRepositoryError.other) {
             try await fetchExternalRepository(url: "https://github.com/owner/repo")
         }
     }
+
+    // MARK: Private
+
+    private static var matchingParser: StubExternalRepositoryURLParser {
+        StubExternalRepositoryURLParser(location: ExternalRepositoryLocation(owner: "owner", name: "repo"))
+    }
+
+}
+
+// MARK: - StubExternalRepositoryURLParser
+
+private final class StubExternalRepositoryURLParser: ExternalRepositoryURLParser {
+
+    // MARK: Lifecycle
+
+    init(location: ExternalRepositoryLocation?) {
+        self.location = location
+    }
+
+    // MARK: Internal
+
+    func location(from url: String) -> ExternalRepositoryLocation? {
+        received.withLock { $0.append(url) }
+        return location
+    }
+
+    func receivedURLs() -> [String] {
+        received.withLock(\.self)
+    }
+
+    // MARK: Private
+
+    private let location: ExternalRepositoryLocation?
+    private let received = Mutex([String]())
+
 }
 
 // MARK: - FetchExternalRepositoryLookup
