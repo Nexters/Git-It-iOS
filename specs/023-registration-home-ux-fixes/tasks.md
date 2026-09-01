@@ -80,14 +80,14 @@ staging이 사용자 소유 변경을 의도치 않게 소비하지 않게 한�
 
 ### 승인 필요
 
-- [ ] T003 `GenerationWaitPolicy.retentionLimit` 값을 확정받는다. 제안값은 86400초(24시간)이며,
+- [X] T003 `GenerationWaitPolicy.retentionLimit` 값을 확정받는다. 제안값은 86400초(24시간)이며,
       정상적으로 느린 생성을 끊지 않으면서 멈춘 상태가 하루 안에 해소되는 값이다. 명세는 상한의
       존재만 요구하고 값을 정하지 않았다([data-model.md](./data-model.md) 2절). 확정 전에는
       T009를 시작하지 않는다.
 
 ### 준비와 기반
 
-- [ ] T004 [S2] [S3] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationProgress.swift`에
+- [X] T004 [S2] [S3] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationProgress.swift`에
       `projectID: String`과 `requestedAt: Date`를 갖는 `GenerationProgress`를 추가한다.
       `Equatable`, `Sendable`, `Codable`을 채택한다.
 - [ ] T005 [P] [S2] `sources/Projects/Domain/LearningProject/Contracts/GenerationProgressRepository.swift`에
@@ -100,7 +100,7 @@ staging이 사용자 소유 변경을 의도치 않게 소비하지 않게 한�
 
 - [ ] T007 [P] [S2] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubGenerationProgressRepository.swift`에
       저장 계약 테스트 더블을 추가한다.
-- [ ] T008 [P] [S3] `sources/Projects/Domain/Tests/LearningProject/Models/GenerationWaitPolicyTests.swift`에
+- [X] T008 [P] [S3] `sources/Projects/Domain/Tests/LearningProject/Models/GenerationWaitPolicyTests.swift`에
       `readyDate(for:)`가 `requestedAt + 300초`를 반환하고 `isExpired(_:now:)`가 상한 초과를
       판정하는 테스트를 작성한다.
 - [ ] T009 [S2] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationProgressTests.swift`에
@@ -109,7 +109,7 @@ staging이 사용자 소유 변경을 의도치 않게 소비하지 않게 한�
 
 ### 구현
 
-- [ ] T010 [S3] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationWaitPolicy.swift`에
+- [X] T010 [S3] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationWaitPolicy.swift`에
       `minimumWait = 300`, T003에서 확정한 `retentionLimit`, `readyDate(for:)`,
       `isExpired(_:now:)`와 `standard`를 구현한다. 테스트가 짧은 값으로 대체할 수 있도록 값
       타입으로 둔다.
