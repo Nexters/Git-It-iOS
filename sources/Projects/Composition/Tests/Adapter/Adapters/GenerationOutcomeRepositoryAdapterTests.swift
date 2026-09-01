@@ -11,11 +11,11 @@ struct GenerationOutcomeRepositoryAdapterTests {
 
     @Test
     func `Data DTO를 Domain 모델로 변환해 순서대로 전달한다`() async {
-        let remote = StubGenerationOutcomeStream(dtos: [
-            GenerationOutcomeDTO(projectID: "project-1", status: .completed),
-            GenerationOutcomeDTO(projectID: "project-2", status: .failed),
+        let source = StubQuizGenerationOutcomeSource(dtos: [
+            QuizGenerationOutcomeDTO(projectID: "project-1", status: .completed),
+            QuizGenerationOutcomeDTO(projectID: "project-2", status: .failed),
         ])
-        let adapter = GenerationOutcomeRepositoryAdapter(remote: remote)
+        let adapter = GenerationOutcomeRepositoryAdapter(source: source)
 
         var received = [GenerationOutcome]()
         for await outcome in await adapter.outcomes() {
@@ -30,13 +30,13 @@ struct GenerationOutcomeRepositoryAdapterTests {
 
 }
 
-// MARK: - StubGenerationOutcomeStream
+// MARK: - StubQuizGenerationOutcomeSource
 
-private struct StubGenerationOutcomeStream: GenerationOutcomeStream {
+private struct StubQuizGenerationOutcomeSource: QuizGenerationOutcomeSource {
 
-    let dtos: [GenerationOutcomeDTO]
+    let dtos: [QuizGenerationOutcomeDTO]
 
-    func outcomes() -> AsyncStream<GenerationOutcomeDTO> {
+    func outcomes() -> AsyncStream<QuizGenerationOutcomeDTO> {
         AsyncStream { continuation in
             for dto in dtos {
                 continuation.yield(dto)

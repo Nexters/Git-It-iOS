@@ -20,7 +20,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
@@ -57,7 +57,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
@@ -82,7 +82,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
@@ -103,7 +103,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 

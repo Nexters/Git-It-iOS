@@ -18,7 +18,7 @@ public struct MainShellFeature: Sendable {
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
-        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -28,7 +28,7 @@ public struct MainShellFeature: Sendable {
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
-        self.learningProjectOutcomes = learningProjectOutcomes
+        self.observeGenerationOutcomes = observeGenerationOutcomes
     }
 
     // MARK: Public
@@ -64,7 +64,6 @@ public struct MainShellFeature: Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: String)
             case learningRequested(projectID: String, nextSetID: String, nextQuestionID: String)
-            case projectSelected(projectID: String)
             case questionSelected(BookmarkedQuestion)
             case loggedOut
         }
@@ -75,7 +74,7 @@ public struct MainShellFeature: Sendable {
             HomeFeature(
                 fetchLearningProjects: fetchLearningProjects,
                 fetchMemberProfile: fetchMemberProfile,
-                learningProjectOutcomes: learningProjectOutcomes,
+                observeGenerationOutcomes: observeGenerationOutcomes,
             )
         }
         Scope(state: \.projectList, action: \.projectList) {
@@ -124,7 +123,8 @@ public struct MainShellFeature: Sendable {
                 )
 
             case .projectList(.delegate(.projectSelected(let projectID))):
-                return .send(.delegate(.projectSelected(projectID: projectID)))
+                // child의 UI 사건 이름은 달라도 외부로 내보내는 Navigation 의미는 하나다.
+                return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
             case .saved(.delegate(.questionSelected(let question))):
                 return .send(.delegate(.questionSelected(question)))
@@ -154,6 +154,6 @@ public struct MainShellFeature: Sendable {
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
 
 }

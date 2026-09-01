@@ -10,11 +10,11 @@ public struct HomeFeature: Sendable {
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
-        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.fetchMemberProfile = fetchMemberProfile
-        self.learningProjectOutcomes = learningProjectOutcomes
+        self.observeGenerationOutcomes = observeGenerationOutcomes
     }
 
     // MARK: Public
@@ -52,11 +52,16 @@ public struct HomeFeature: Sendable {
         public var profileRequestID = 0
         public var projectRequestID = 0
         public var generationOutcomeObservation = GenerationOutcomeObservation.idle
+        /// 조회 중 도착한 생성 결과를 폐기하지 않고 조회 완료 시점에 반영하기 위한 예약이다.
+        public var isProjectRefreshPending = false
+        /// 이미 반영한 생성 결과가 다시 도착해도 재조회를 늘리지 않기 위한 기록이다.
+        public var appliedOutcomeProjectIDs = Set<String>()
 
     }
 
     public enum Action: ViewAction, Equatable, Sendable {
         case view(View)
+        case input(Input)
         case effect(Effect)
         case delegate(Delegate)
 
@@ -70,7 +75,12 @@ public struct HomeFeature: Sendable {
             case showAllProjectsTapped
             case projectCardTapped(projectID: String)
             case learningTapped(projectID: String)
-            case reloadRequested
+        }
+
+        /// 부모 Feature 또는 App이 보내는 외부 조정 신호다.
+        @CasePathable
+        public enum Input: Equatable, Sendable {
+            case learningProjectsReloadRequested
         }
 
         @CasePathable
@@ -101,12 +111,15 @@ public struct HomeFeature: Sendable {
                 }
                 if state.generationOutcomeObservation == .idle {
                     state.generationOutcomeObservation = .observing
-                    effects.append(observeGenerationOutcomes())
+                    effects.append(startGenerationOutcomeObservation())
                 }
                 return .merge(effects)
 
-            case .view(.reloadRequested):
-                guard state.projectLoad != .loading else { return .none }
+            case .input(.learningProjectsReloadRequested):
+                guard state.projectLoad != .loading else {
+                    state.isProjectRefreshPending = true
+                    return .none
+                }
                 return startProjectLoad(state: &state)
 
             case .view(.profileRetryTapped):
@@ -153,10 +166,17 @@ public struct HomeFeature: Sendable {
                 case .success(let page): state.projectLoad = .loaded(page)
                 case .failure(let error): state.projectLoad = .failed(error)
                 }
-                return .none
+                // 조회 중 도착해 예약해 둔 갱신을 여기서 소비한다.
+                guard state.isProjectRefreshPending else { return .none }
+                state.isProjectRefreshPending = false
+                return startProjectLoad(state: &state)
 
-            case .effect(.generationOutcomeReceived):
-                guard state.projectLoad != .loading else { return .none }
+            case .effect(.generationOutcomeReceived(let outcome)):
+                guard state.appliedOutcomeProjectIDs.insert(outcome.projectID).inserted else { return .none }
+                guard state.projectLoad != .loading else {
+                    state.isProjectRefreshPending = true
+                    return .none
+                }
                 return startProjectLoad(state: &state)
 
             case .delegate:
@@ -174,7 +194,7 @@ public struct HomeFeature: Sendable {
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
@@ -215,10 +235,10 @@ public struct HomeFeature: Sendable {
         .cancellable(id: CancelID.projects, cancelInFlight: true)
     }
 
-    private func observeGenerationOutcomes() -> ComposableArchitecture.Effect<Action> {
-        let learningProjectOutcomes = learningProjectOutcomes
+    private func startGenerationOutcomeObservation() -> ComposableArchitecture.Effect<Action> {
+        let observeGenerationOutcomes = observeGenerationOutcomes
         return .run { send in
-            for await outcome in await learningProjectOutcomes() {
+            for await outcome in await observeGenerationOutcomes() {
                 await send(.effect(.generationOutcomeReceived(outcome)))
             }
         }

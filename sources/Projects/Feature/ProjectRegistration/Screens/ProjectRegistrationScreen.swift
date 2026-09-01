@@ -23,17 +23,10 @@ public struct ProjectRegistrationScreen: View {
         ScreenContainer {
             content
         }
-        .onChange(of: store.validation) { _, validation in
-            guard case .validated = validation else {
-                hasConfirmedRepository = false
-                hasSelectedQuizLevel = false
-                return
-            }
-        }
-        .sheet(isPresented: Binding(get: { store.isNotificationOptionSheetPresented }, set: { _ in })) {
-            NotificationOptionSheet(
-                onAccept: { send(.notificationOptionAccepted) },
-                onDecline: { send(.notificationOptionDeclined) },
+        .sheet(isPresented: Binding(get: { store.isGenerationReminderSheetPresented }, set: { _ in })) {
+            GenerationReminderSheet(
+                onAccept: { send(.generationReminderAccepted) },
+                onDecline: { send(.generationReminderDeclined) },
             )
             .presentationDetents([.medium])
             .interactiveDismissDisabled()
@@ -46,16 +39,14 @@ public struct ProjectRegistrationScreen: View {
 
     // MARK: Private
 
-    @State private var hasConfirmedRepository = false
-    @State private var hasSelectedQuizLevel = false
     @State private var isGuideExpanded = false
 
     @ViewBuilder
     private var content: some View {
-        switch store.submission {
-        case .committing,
-             .awaitingGeneration:
-            GenerationProgressScreen(
+        switch store.progress {
+        case .submitting,
+             .awaitingOutcome:
+            QuizGenerationProgressScreen(
                 onWaitAtHome: { send(.waitAtHomeTapped) }
             )
 
@@ -64,24 +55,27 @@ public struct ProjectRegistrationScreen: View {
 
         case .idle:
             if case .validated(let repository) = store.validation {
-                if !hasConfirmedRepository {
+                switch store.step {
+                case .repositoryConfirmation:
                     RepositoryConfirmationScreen(
                         repository: repository,
-                        onConfirm: { hasConfirmedRepository = true },
+                        onConfirm: { send(.repositoryConfirmed) },
                         onReject: { send(.repositoryURLChanged(store.repositoryURLInput)) },
                         onBack: { send(.repositoryURLChanged(store.repositoryURLInput)) },
                     )
-                } else if !hasSelectedQuizLevel {
+
+                case .quizLevelSelection:
                     QuizLevelSelectionScreen(
                         selectedLevel: store.quizLevel,
                         onSelect: { send(.quizLevelSelected($0)) },
-                        onNext: { hasSelectedQuizLevel = true },
-                        onBack: { hasConfirmedRepository = false },
+                        onNext: { send(.quizLevelConfirmed) },
+                        onBack: { send(.stepBackTapped) },
                     )
-                } else {
-                    GenerationConfirmationScreen(
+
+                case .generationConfirmation:
+                    QuizGenerationConfirmationScreen(
                         onStart: { send(.submitTapped) },
-                        onBack: { hasSelectedQuizLevel = false },
+                        onBack: { send(.stepBackTapped) },
                     )
                 }
             } else {

@@ -126,6 +126,7 @@ Scaffolds/TabShell/
 | | `Endpoints/` | 엔드포인트와 요청 조립 |
 | | `Contracts/` | Data가 정의하는 remote·store 계약 |
 | | `Remotes/` | 네트워크 계약 구현 |
+| | `Sources/` | 외부에서 주입되는 프로세스 내 데이터 소스 구현 |
 | | `Stores/` | 로컬 저장 계약 구현 |
 | | `Models/` | Data 내부 모델 |
 | | `Errors/` | Data 오류 타입 |

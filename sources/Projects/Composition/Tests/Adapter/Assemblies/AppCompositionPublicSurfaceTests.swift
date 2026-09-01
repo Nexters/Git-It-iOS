@@ -41,8 +41,12 @@ struct AppCompositionPublicSurfaceTests {
             "registerMemberDevice",
             "deleteMemberAccount",
             "fetchExternalRepository",
-            "learningProjectOutcomes",
+            "observeGenerationOutcomes",
             "requestGenerationReminder",
+            "bootstrap",
+            "registerCurrentDevice",
+            "deviceTokenRefreshes",
+            "ingestGenerationOutcomePayload",
         ]
 
         #expect(labels == expected)

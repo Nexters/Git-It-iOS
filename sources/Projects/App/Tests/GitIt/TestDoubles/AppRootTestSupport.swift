@@ -3,6 +3,7 @@ import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Foundation
+import Synchronization
 @testable import GitIt
 
 // MARK: - FetchMemberProfileUseCaseMock
@@ -88,9 +89,11 @@ func makeAppRootStore(
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
     authenticationOutcomes: AuthenticationOutcomesUseCaseMock = AuthenticationOutcomesUseCaseMock(),
     resetAllForTesting: (@Sendable () async -> Void)? = nil,
-    learningProjectOutcomes: LearningProjectOutcomesUseCaseMock =
-        LearningProjectOutcomesUseCaseMock(),
+    observeGenerationOutcomes: ObserveGenerationOutcomesUseCaseMock =
+        ObserveGenerationOutcomesUseCaseMock(),
     requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
+    registerCurrentDevice: RegisterCurrentDeviceSpy = RegisterCurrentDeviceSpy(),
+    deviceTokenRefreshes: DeviceTokenRefreshStream = DeviceTokenRefreshStream(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -110,9 +113,93 @@ func makeAppRootStore(
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
             fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
             createLearningProject: NoopCreateLearningProjectUseCase(),
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
+            registerCurrentDevice: { try await registerCurrentDevice() },
+            deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
             resetAllForTesting: resetAllForTesting,
         )
     }
+}
+
+// MARK: - RegisterCurrentDeviceSpy
+
+/// 기기 등록 호출 횟수와 결과를 관찰한다. 실패 후 재시도와 동시 trigger 직렬화를
+/// 외부 SDK·Keychain 접근 없이 검증하기 위한 대역이다.
+actor RegisterCurrentDeviceSpy {
+
+    // MARK: Lifecycle
+
+    init(results: [Result<Void, any Error>] = [.success(())]) {
+        self.results = results
+    }
+
+    // MARK: Internal
+
+    private(set) var callCount = 0
+
+    func callAsFunction() async throws {
+        callCount += 1
+        guard suspends else { try nextResult().get()
+            return
+        }
+        try await withCheckedThrowingContinuation { continuation in
+            continuations.append((continuation, nextResult()))
+        }
+    }
+
+    func setSuspends(_ suspends: Bool) {
+        self.suspends = suspends
+    }
+
+    func resumeOldest() {
+        guard !continuations.isEmpty else { return }
+        let (continuation, result) = continuations.removeFirst()
+        continuation.resume(with: result)
+    }
+
+    // MARK: Private
+
+    private var results: [Result<Void, any Error>]
+    private var suspends = false
+    private var continuations = [(CheckedContinuation<Void, any Error>, Result<Void, any Error>)]()
+
+    private func nextResult() -> Result<Void, any Error> {
+        guard !results.isEmpty else { return .success(()) }
+        return results.count > 1 ? results.removeFirst() : results[0]
+    }
+
+}
+
+// MARK: - DeviceTokenRefreshStream
+
+/// 등록 token 갱신 신호를 테스트에서 직접 방출하기 위한 대역이다.
+final class DeviceTokenRefreshStream: Sendable {
+
+    // MARK: Internal
+
+    func makeStream() -> AsyncStream<Void> {
+        let (stream, continuation) = AsyncStream<Void>.makeStream()
+        self.continuation.withLock { $0 = continuation }
+        return stream
+    }
+
+    func emit() {
+        continuation.withLock { $0?.yield(()) }
+    }
+
+    func finish() {
+        continuation.withLock { $0?.finish() }
+    }
+
+    // MARK: Private
+
+    private let continuation = Mutex<AsyncStream<Void>.Continuation?>(nil)
+
+}
+
+// MARK: - DeviceRegistrationTestError
+
+enum DeviceRegistrationTestError: Error {
+    case failed
 }

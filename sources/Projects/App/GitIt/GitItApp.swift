@@ -59,16 +59,19 @@ struct GitItApp: App {
                 deleteMemberAccount: composition.deleteMemberAccount,
                 fetchExternalRepository: composition.fetchExternalRepository,
                 createLearningProject: composition.createLearningProject,
-                learningProjectOutcomes: composition.learningProjectOutcomes,
+                observeGenerationOutcomes: composition.observeGenerationOutcomes,
                 requestGenerationReminder: composition.requestGenerationReminder,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)
                 },
+                registerCurrentDevice: composition.registerCurrentDevice,
+                deviceTokenRefreshes: composition.deviceTokenRefreshes,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
                 resetAllForTesting: resetAllForTesting,
             )
         }
+        self.composition = composition
     }
 
     // MARK: Internal
@@ -76,11 +79,25 @@ struct GitItApp: App {
     @UIApplicationDelegateAdaptor(PushNotificationAppDelegate.self) var appDelegate
 
     let rootStore: StoreOf<AppRootFeature>
+    let composition: AppComposition
 
     var body: some Scene {
         WindowGroup {
             AppRootView(store: rootStore)
+                .task {
+                    // 콜백 주입은 Composition 경계 안에서 이뤄지고, 주입 전에 도착한
+                    // launch push는 AppDelegate의 대기 슬롯이 보관한다.
+                    await composition.bootstrap(appDelegate)
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    guard newPhase == .active else { return }
+                    rootStore.send(.view(.applicationBecameActive))
+                }
         }
     }
+
+    // MARK: Private
+
+    @Environment(\.scenePhase) private var scenePhase
 
 }

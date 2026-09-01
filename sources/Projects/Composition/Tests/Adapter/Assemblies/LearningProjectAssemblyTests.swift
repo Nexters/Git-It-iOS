@@ -22,7 +22,7 @@ struct LearningProjectAssemblyTests {
         _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
         _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
         _ = assembly.fetchBookmarkedQuestions as any FetchBookmarkedQuestionsUseCase
-        _ = assembly.learningProjectOutcomes as any LearningProjectOutcomesUseCase
+        _ = assembly.observeGenerationOutcomes as any ObserveGenerationOutcomesUseCase
     }
 
     @Test
@@ -32,7 +32,7 @@ struct LearningProjectAssemblyTests {
             accessTokenProvider: { nil },
         )
 
-        let stream = await assembly.learningProjectOutcomes()
+        let stream = await assembly.observeGenerationOutcomes()
         var iterator = stream.makeAsyncIterator()
 
         await assembly.ingestGenerationOutcomePayload(["projectId": "project-1", "status": "completed"])

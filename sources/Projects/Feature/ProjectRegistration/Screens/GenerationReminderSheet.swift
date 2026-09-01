@@ -2,9 +2,9 @@ import DesignSystem
 import SwiftUI
 import UIComponent
 
-// MARK: - NotificationOptionSheet
+// MARK: - GenerationReminderSheet
 
-struct NotificationOptionSheet: View {
+struct GenerationReminderSheet: View {
 
     let onAccept: () -> Void
     let onDecline: () -> Void
@@ -37,9 +37,9 @@ struct NotificationOptionSheet: View {
 
 }
 
-// MARK: NotificationOptionSheet.Constant
+// MARK: GenerationReminderSheet.Constant
 
-extension NotificationOptionSheet {
+extension GenerationReminderSheet {
     private enum Constant {
         static let contentSpacing: CGFloat = 24
         static let textSetSpacing: CGFloat = 8

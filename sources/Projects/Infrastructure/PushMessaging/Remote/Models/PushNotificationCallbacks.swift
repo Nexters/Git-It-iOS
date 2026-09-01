@@ -8,15 +8,15 @@ public struct PushNotificationCallbacks: Sendable {
 
     public init(
         forwardAPNsToken: @escaping @Sendable (Data) -> Void,
-        ingestPushPayload: @escaping @Sendable ([String: String]) async -> Void,
+        ingestGenerationOutcomePayload: @escaping @Sendable ([String: String]) async -> Void,
     ) {
         self.forwardAPNsToken = forwardAPNsToken
-        self.ingestPushPayload = ingestPushPayload
+        self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
     }
 
     // MARK: Public
 
     public let forwardAPNsToken: @Sendable (Data) -> Void
-    public let ingestPushPayload: @Sendable ([String: String]) async -> Void
+    public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
 }

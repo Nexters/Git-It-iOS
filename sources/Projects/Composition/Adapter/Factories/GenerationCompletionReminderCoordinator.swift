@@ -19,9 +19,12 @@ actor GenerationCompletionReminderCoordinator {
         Self.logger.debug("리마인드 대상 등록: projectID=\(projectID, privacy: .public)")
     }
 
-    func start(learningProjectOutcomes: any LearningProjectOutcomesUseCase) {
+    /// 스트림 확보를 마친 뒤 관찰 Task를 만든다. 따라서 이 함수가 반환한 시점에는 구독이
+    /// 이미 확립돼 있고, 이후 도착하는 생성 결과를 놓치지 않는다.
+    func start(observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase) async {
+        let outcomes = await observeGenerationOutcomes()
         observationTask = Task {
-            for await outcome in await learningProjectOutcomes() {
+            for await outcome in outcomes {
                 await self.handle(outcome)
             }
         }
@@ -37,11 +40,14 @@ actor GenerationCompletionReminderCoordinator {
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "GenerationCompletionReminderCoordinator")
 
     private let localNotificationClient: any LocalNotificationClient
-    private var registeredProjectIDs: Set<String> = []
+    private var registeredProjectIDs = Set<String>()
     private var observationTask: Task<Void, Never>?
 
     private func handle(_ outcome: GenerationOutcome) async {
-        Self.logger.debug("생성 결과 수신: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)")
+        Self.logger
+            .debug(
+                "생성 결과 수신: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)"
+            )
 
         guard registeredProjectIDs.remove(outcome.projectID) != nil else {
             Self.logger.debug("리마인드 미등록 프로젝트라 무시: projectID=\(outcome.projectID, privacy: .public)")

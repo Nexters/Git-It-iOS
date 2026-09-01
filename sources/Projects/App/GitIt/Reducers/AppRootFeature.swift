@@ -28,9 +28,11 @@ nonisolated struct AppRootFeature: Sendable {
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
-        learningProjectOutcomes: any LearningProjectOutcomesUseCase,
+        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
-        openNotificationSettings: @escaping @Sendable () async -> Void = { },
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
+        registerCurrentDevice: @escaping @Sendable () async throws -> Void = { },
+        deviceTokenRefreshes: @escaping @Sendable () -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
         deletesCompletedAccountOnSignIn: Bool = false,
         resetAllForTesting: (@Sendable () async -> Void)? = nil,
     ) {
@@ -49,9 +51,11 @@ nonisolated struct AppRootFeature: Sendable {
         self.deleteMemberAccount = deleteMemberAccount
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
-        self.learningProjectOutcomes = learningProjectOutcomes
+        self.observeGenerationOutcomes = observeGenerationOutcomes
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
+        self.registerCurrentDevice = registerCurrentDevice
+        self.deviceTokenRefreshes = deviceTokenRefreshes
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
         self.resetAllForTesting = resetAllForTesting
     }
@@ -62,6 +66,14 @@ nonisolated struct AppRootFeature: Sendable {
         case restoring
         case onboarding
         case mainShell
+    }
+
+    /// 기기 등록의 진행과 실패를 인증 세션 소유자가 관찰 가능한 상태로 보존한다.
+    enum DeviceRegistrationStatus: Equatable, Sendable {
+        case idle
+        case registering
+        case registered
+        case failed
     }
 
     @ObservableState
@@ -75,6 +87,7 @@ nonisolated struct AppRootFeature: Sendable {
         var appEntry: AppEntryFeature.State
         var onboarding: OnboardingRouterFeature.State
         var mainShell = MainShellFeature.State()
+        var deviceRegistration = DeviceRegistrationStatus.idle
         @Presents var projectRegistration: ProjectRegistrationFeature.State?
     }
 
@@ -86,16 +99,22 @@ nonisolated struct AppRootFeature: Sendable {
         case mainShell(MainShellFeature.Action)
         case projectRegistration(PresentationAction<ProjectRegistrationFeature.Action>)
 
+        // MARK: Internal
+
         @CasePathable
         enum View: Sendable, Equatable {
             case task
             case resetAllTapped
+            case applicationBecameActive
         }
 
         @CasePathable
         enum EffectEvent: Sendable, Equatable {
             case authenticationOutcomeReceived(AuthenticationOutcome)
             case resetAllFinished
+            case deviceRegistrationSucceeded
+            case deviceRegistrationFailed
+            case deviceTokenRefreshed
         }
     }
 
@@ -127,7 +146,7 @@ nonisolated struct AppRootFeature: Sendable {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
-                learningProjectOutcomes: learningProjectOutcomes,
+                observeGenerationOutcomes: observeGenerationOutcomes,
             )
         }
         Reduce { state, action in
@@ -143,37 +162,60 @@ nonisolated struct AppRootFeature: Sendable {
                         }
                     }
                     .cancellable(id: CancelID.authenticationOutcomes),
+                    .run { send in
+                        for await _ in deviceTokenRefreshes() {
+                            await send(.effect(.deviceTokenRefreshed))
+                        }
+                    }
+                    .cancellable(id: CancelID.deviceTokenRefreshes),
                 )
 
             case .appEntry(.delegate(.destinationDecided(let destination))):
                 switch destination {
                 case .mainShell:
                     state.route = .mainShell
+                    return registerDeviceIfNeeded(&state)
 
                 case .onboarding(let entryPoint):
                     let bundleVersion = state.onboarding.guide.bundleVersion
                     state.onboarding = OnboardingRouterFeature.State(startingAt: entryPoint, bundleVersion: bundleVersion)
                     state.route = .onboarding
+                    return .none
                 }
-                return .none
 
             case .appEntry:
                 return .none
 
             case .effect(.authenticationOutcomeReceived(.unauthenticated)):
                 guard state.route == .mainShell else { return .none }
-                returnToOnboarding(&state)
-                return .none
+                return returnToOnboarding(&state)
 
             case .effect(.authenticationOutcomeReceived):
                 return .none
 
             case .onboarding(.delegate(.mainShellRequested)):
                 state.route = .mainShell
-                return .none
+                return registerDeviceIfNeeded(&state)
 
             case .mainShell(.delegate(.loggedOut)):
-                returnToOnboarding(&state)
+                return returnToOnboarding(&state)
+
+            case .view(.applicationBecameActive):
+                // 실패한 등록만 재시도한다. 성공했거나 진행 중이면 서버 요청을 늘리지 않는다.
+                guard state.deviceRegistration == .failed else { return .none }
+                return registerDeviceIfNeeded(&state)
+
+            case .effect(.deviceTokenRefreshed):
+                // token이 갱신되면 최신 token으로 재등록한다. 진행 중이면 그 요청이 최신 token을 읽는다.
+                guard state.route == .mainShell else { return .none }
+                return registerDeviceIfNeeded(&state)
+
+            case .effect(.deviceRegistrationSucceeded):
+                state.deviceRegistration = .registered
+                return .none
+
+            case .effect(.deviceRegistrationFailed):
+                state.deviceRegistration = .failed
                 return .none
 
             case .view(.resetAllTapped):
@@ -185,24 +227,22 @@ nonisolated struct AppRootFeature: Sendable {
                 .cancellable(id: CancelID.resetAll, cancelInFlight: true)
 
             case .effect(.resetAllFinished):
-                returnToOnboarding(&state)
-                return .none
+                return returnToOnboarding(&state)
 
             case .mainShell(.delegate(.projectRegistrationRequested)):
                 state.projectRegistration = ProjectRegistrationFeature.State()
                 return .none
 
-            case .mainShell(.delegate(.projectSelected)),
-                 .mainShell(.delegate(.questionSelected)),
+            case .mainShell(.delegate(.questionSelected)),
                  .mainShell(.delegate(.projectDetailRequested)),
                  .mainShell(.delegate(.learningRequested)):
                 return .none
 
             case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
                 state.projectRegistration = nil
-                return .send(.mainShell(.home(.view(.reloadRequested))))
+                return .send(.mainShell(.home(.input(.learningProjectsReloadRequested))))
 
-            case .projectRegistration(.presented(.delegate(.notificationOptionSelected(_)))):
+            case .projectRegistration(.presented(.delegate(.generationReminderPreferenceSelected(_)))):
                 return .none
 
             case .projectRegistration:
@@ -217,7 +257,7 @@ nonisolated struct AppRootFeature: Sendable {
             ProjectRegistrationFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: createLearningProject,
-                learningProjectOutcomes: learningProjectOutcomes,
+                observeGenerationOutcomes: observeGenerationOutcomes,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
             )
@@ -229,6 +269,8 @@ nonisolated struct AppRootFeature: Sendable {
     private enum CancelID: Hashable {
         case authenticationOutcomes
         case resetAll
+        case deviceRegistration
+        case deviceTokenRefreshes
     }
 
     private let restoreSession: any RestoreSessionUseCase
@@ -246,17 +288,39 @@ nonisolated struct AppRootFeature: Sendable {
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
-    private let openNotificationSettings: @Sendable () async -> Void
+    private let openNotificationSettings: @MainActor @Sendable () async -> Void
+    private let registerCurrentDevice: @Sendable () async throws -> Void
+    private let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
 
-    private func returnToOnboarding(_ state: inout State) {
+    /// 동시에 도착한 재시도 trigger를 하나의 등록 요청으로 직렬화한다.
+    private func registerDeviceIfNeeded(_ state: inout State) -> Effect<Action> {
+        guard state.deviceRegistration != .registering else { return .none }
+        state.deviceRegistration = .registering
+        return .run { send in
+            do {
+                try await registerCurrentDevice()
+                await send(.effect(.deviceRegistrationSucceeded))
+            } catch {
+                await send(.effect(.deviceRegistrationFailed))
+            }
+        }
+        .cancellable(id: CancelID.deviceRegistration)
+    }
+
+    /// 인증 종료 경로의 단일 통로다. 등록 흐름 child와 그 child가 시작한 생성 결과 관찰,
+    /// 그리고 진행 중인 기기 등록 Effect를 함께 제거한다.
+    private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
         let bundleVersion = state.onboarding.guide.bundleVersion
         state.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)
         state.mainShell = MainShellFeature.State()
+        state.projectRegistration = nil
+        state.deviceRegistration = .idle
         state.route = .onboarding
+        return .cancel(id: CancelID.deviceRegistration)
     }
 
 }

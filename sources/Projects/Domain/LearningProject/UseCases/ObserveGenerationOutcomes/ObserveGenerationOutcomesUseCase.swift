@@ -1,3 +1,3 @@
-public protocol LearningProjectOutcomesUseCase: Sendable {
+public protocol ObserveGenerationOutcomesUseCase: Sendable {
     func callAsFunction() async -> AsyncStream<GenerationOutcome>
 }

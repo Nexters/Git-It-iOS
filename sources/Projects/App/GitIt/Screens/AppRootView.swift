@@ -180,7 +180,7 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopLearningProjectOutcomes: LearningProjectOutcomesUseCase {
+    struct NoopObserveGenerationOutcomes: ObserveGenerationOutcomesUseCase {
         func callAsFunction() async -> AsyncStream<GenerationOutcome> {
             AsyncStream { _ in }
         }
@@ -216,7 +216,7 @@ private enum AppRootPreviewSupport {
                 deleteMemberAccount: NoopDeleteMemberAccount(),
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
-                learningProjectOutcomes: NoopLearningProjectOutcomes(),
+                observeGenerationOutcomes: NoopObserveGenerationOutcomes(),
                 requestGenerationReminder: NoopRequestGenerationReminder(),
             )
         }

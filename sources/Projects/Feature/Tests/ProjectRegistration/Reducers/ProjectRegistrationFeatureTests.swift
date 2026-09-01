@@ -112,11 +112,11 @@ struct ProjectRegistrationFeatureTests {
     }
 
     @Test
-    func `committing 중 중복 submitTapped는 차단된다`() async {
+    func `submitting 중 중복 submitTapped는 차단된다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
-        state.submission = .committing
+        state.progress = .submitting
         let store = makeProjectRegistrationStore(createLearningProject: createLearningProject, state: state)
 
         await store.send(.view(.submitTapped))
@@ -127,21 +127,21 @@ struct ProjectRegistrationFeatureTests {
     @Test
     func `submitTapped 성공 시 createLearningProject가 검증된 canonicalURL과 선택된 QuizLevel로 정확히 한 번 호출된다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         state.quizLevel = .l2
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
         await store.send(.view(.submitTapped)) {
-            $0.submission = .committing
+            $0.progress = .submitting
         }
         await store.receive(.effect(.submissionFinished(.success(sampleReceipt)))) {
-            $0.submission = .awaitingGeneration(sampleReceipt)
+            $0.progress = .awaitingOutcome(sampleReceipt)
         }
 
         #expect(
@@ -150,81 +150,81 @@ struct ProjectRegistrationFeatureTests {
             ]
         )
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `waitAtHomeTapped는 알림 옵션이 꺼져 있으면 시트를 거친 뒤 projectRegistered를 정확히 한 번 출력한다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
+        state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
         await store.send(.view(.waitAtHomeTapped))
         await store.receive(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: false))) {
-            $0.isNotificationOptionSheetPresented = true
+            $0.isGenerationReminderSheetPresented = true
         }
-        await store.send(.view(.notificationOptionDeclined)) {
-            $0.isNotificationOptionSheetPresented = false
+        await store.send(.view(.generationReminderDeclined)) {
+            $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.notificationOptionSelected(accepted: false)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: false)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `waitAtHomeTapped는 알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록하고 projectRegistered를 출력한다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(
             results: [.authorized],
             isAuthorizedResult: true,
         )
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
+        state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             state: state,
         )
 
         await store.send(.view(.waitAtHomeTapped))
         await store.receive(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: true)))
-        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        #expect(store.state.isNotificationOptionSheetPresented == false)
+        #expect(store.state.isGenerationReminderSheetPresented == false)
         #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
-    func `awaitingGeneration 중 일치하는 projectID의 completed 수신은 projectRegistered를 출력한다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+    func `awaitingOutcome 중 일치하는 projectID의 completed 수신은 projectRegistered를 출력한다`() async {
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
         await store.send(.view(.submitTapped)) {
-            $0.submission = .committing
+            $0.progress = .submitting
         }
         await store.receive(.effect(.submissionFinished(.success(sampleReceipt)))) {
-            $0.submission = .awaitingGeneration(sampleReceipt)
+            $0.progress = .awaitingOutcome(sampleReceipt)
         }
 
-        await learningProjectOutcomes.emit(
+        await observeGenerationOutcomes.emit(
             GenerationOutcome(projectID: sampleReceipt.projectID, status: .completed)
         )
         await store.receive(
@@ -234,21 +234,21 @@ struct ProjectRegistrationFeatureTests {
         )
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `일치하지 않는 projectID의 이벤트는 무시된다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
+        state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
-        await learningProjectOutcomes.emit(
+        await observeGenerationOutcomes.emit(
             GenerationOutcome(projectID: "other-project", status: .completed)
         )
         await store.receive(
@@ -257,23 +257,23 @@ struct ProjectRegistrationFeatureTests {
             ))
         )
 
-        #expect(store.state.submission == .awaitingGeneration(sampleReceipt))
+        #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `failed 이벤트 수신 시 submission이 failed로 전이한다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
+        state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
-        await learningProjectOutcomes.emit(
+        await observeGenerationOutcomes.emit(
             GenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
         )
         await store.receive(
@@ -281,10 +281,10 @@ struct ProjectRegistrationFeatureTests {
                 GenerationOutcome(projectID: sampleReceipt.projectID, status: .failed)
             ))
         ) {
-            $0.submission = .failed(.unexpected)
+            $0.progress = .failed(.unexpected)
         }
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
@@ -296,32 +296,32 @@ struct ProjectRegistrationFeatureTests {
         let store = makeProjectRegistrationStore(createLearningProject: createLearningProject, state: state)
 
         await store.send(.view(.submitTapped)) {
-            $0.submission = .committing
+            $0.progress = .submitting
         }
         await store.receive(.effect(.submissionFinished(.failure(.temporarilyUnavailable)))) {
-            $0.submission = .failed(.temporarilyUnavailable)
+            $0.progress = .failed(.temporarilyUnavailable)
         }
     }
 
     @Test
     func `retryTapped는 동일 입력으로 재제출한다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
         state.validation = .validated(sampleRepository)
         state.quizLevel = .l3
-        state.submission = .failed(.unexpected)
+        state.progress = .failed(.unexpected)
         let store = makeProjectRegistrationStore(
             createLearningProject: createLearningProject,
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
         await store.send(.view(.retryTapped)) {
-            $0.submission = .committing
+            $0.progress = .submitting
         }
         await store.receive(.effect(.submissionFinished(.success(sampleReceipt)))) {
-            $0.submission = .awaitingGeneration(sampleReceipt)
+            $0.progress = .awaitingOutcome(sampleReceipt)
         }
 
         #expect(
@@ -330,133 +330,133 @@ struct ProjectRegistrationFeatureTests {
             ]
         )
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
-    func `알림 수락은 notificationOptionSelected accepted true를 출력한 뒤 waitAtHomeTapped 동작을 이어간다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+    func `알림 수락은 generationReminderPreferenceSelected accepted true를 출력한 뒤 waitAtHomeTapped 동작을 이어간다`() async {
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
-        state.isNotificationOptionSheetPresented = true
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.isGenerationReminderSheetPresented = true
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
 
-        await store.send(.view(.notificationOptionAccepted)) {
-            $0.isNotificationOptionSheetPresented = false
+        await store.send(.view(.generationReminderAccepted)) {
+            $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `권한이 허용되면 설정 화면 안내 없이 기존 waitAtHome 동작이 유지된다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.authorized])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
-        state.isNotificationOptionSheetPresented = true
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.isGenerationReminderSheetPresented = true
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
         )
 
-        await store.send(.view(.notificationOptionAccepted)) {
-            $0.isNotificationOptionSheetPresented = false
+        await store.send(.view(.generationReminderAccepted)) {
+            $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
         #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
         #expect(await openNotificationSettings.callCount == 0)
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `권한을 방금 거부해도 설정 화면을 안내하지 않는다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.declined])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
-        state.isNotificationOptionSheetPresented = true
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.isGenerationReminderSheetPresented = true
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
         )
 
-        await store.send(.view(.notificationOptionAccepted)) {
-            $0.isNotificationOptionSheetPresented = false
+        await store.send(.view(.generationReminderAccepted)) {
+            $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
         #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
         #expect(await openNotificationSettings.callCount == 0)
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `권한이 이미 거부된 상태면 설정 화면을 정확히 한 번 안내한다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.previouslyDenied])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
-        state.isNotificationOptionSheetPresented = true
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.isGenerationReminderSheetPresented = true
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
         )
 
-        await store.send(.view(.notificationOptionAccepted)) {
-            $0.isNotificationOptionSheetPresented = false
+        await store.send(.view(.generationReminderAccepted)) {
+            $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.notificationOptionSelected(accepted: true)))
+        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
         #expect(await requestGenerationReminder.snapshot() == (1, sampleReceipt.projectID))
         #expect(await openNotificationSettings.callCount == 1)
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `알림 옵션 선택은 상태 전이 자체에 영향을 주지 않는다`() async {
-        let learningProjectOutcomes = StubLearningProjectOutcomesUseCase()
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         var state = ProjectRegistrationFeature.State()
-        state.submission = .awaitingGeneration(sampleReceipt)
-        state.isNotificationOptionSheetPresented = true
+        state.progress = .awaitingOutcome(sampleReceipt)
+        state.isGenerationReminderSheetPresented = true
         let store = makeProjectRegistrationStore(
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             state: state,
         )
         store.exhaustivity = .off
 
-        await store.send(.view(.notificationOptionDeclined))
+        await store.send(.view(.generationReminderDeclined))
 
         #expect(store.state.repositoryURLInput.isEmpty)
         #expect(store.state.quizLevel == .l1)
 
-        await learningProjectOutcomes.finish()
+        await observeGenerationOutcomes.finish()
         await store.finish()
     }
 
@@ -469,7 +469,7 @@ struct ProjectRegistrationFeatureTests {
             ProjectRegistrationHostFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: StubCreateLearningProjectUseCase(),
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
@@ -494,12 +494,12 @@ struct ProjectRegistrationFeatureTests {
             ProjectRegistrationHostFeature(
                 fetchExternalRepository: StubFetchExternalRepositoryUseCase(),
                 createLearningProject: createLearningProject,
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
         await store.send(.child(.presented(.view(.submitTapped)))) {
-            $0.child?.submission = .committing
+            $0.child?.progress = .submitting
         }
         await store.send(.child(.dismiss)) {
             $0.child = nil
@@ -507,6 +507,125 @@ struct ProjectRegistrationFeatureTests {
         await createLearningProject.resumeOldest()
 
         await store.finish()
+    }
+
+    @Test
+    func `생성 요청이 전송되는 시점에 생성 결과 구독이 이미 확립돼 있다`() async {
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let createLearningProject = StubCreateLearningProjectUseCase(
+            results: [.success(sampleReceipt)],
+            suspendsRequests: true,
+        )
+        let store = makeProjectRegistrationStore(
+            createLearningProject: createLearningProject,
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            state: validatedState(),
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.submitTapped))
+        await waitUntil { await createLearningProject.recordedCalls().count == 1 }
+
+        #expect(await observeGenerationOutcomes.hasEstablishedSubscription())
+
+        await createLearningProject.resumeOldest()
+        await observeGenerationOutcomes.finish()
+        await store.skipReceivedActions()
+    }
+
+    @Test
+    func `생성 요청 응답보다 먼저 도착한 완료 결과가 진행 화면에 반영된다`() async {
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let createLearningProject = StubCreateLearningProjectUseCase(
+            results: [.success(sampleReceipt)],
+            suspendsRequests: true,
+        )
+        let store = makeProjectRegistrationStore(
+            createLearningProject: createLearningProject,
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            state: validatedState(),
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.submitTapped))
+        await waitUntil { await createLearningProject.recordedCalls().count == 1 }
+
+        // 응답이 도착하기 전에 완료 신호가 먼저 도착한다.
+        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await createLearningProject.resumeOldest()
+
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+        await observeGenerationOutcomes.finish()
+        await store.skipReceivedActions()
+    }
+
+    @Test
+    func `같은 프로젝트의 완료 결과를 2회 수신해도 상태와 delegate 전달이 1회 수신과 같다`() async {
+        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let store = makeProjectRegistrationStore(
+            createLearningProject: StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)]),
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            state: validatedState(),
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.submitTapped))
+        await waitUntil { await observeGenerationOutcomes.hasEstablishedSubscription() }
+
+        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await observeGenerationOutcomes.finish()
+
+        await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+        // 두 번째 결과는 전달되지 않으므로 남은 Effect 없이 종료된다.
+        await store.finish()
+
+        #expect(await observeGenerationOutcomes.establishedSubscriptionCount() == 1)
+    }
+
+    @Test
+    func `리마인드 시트 표시 중 생성 실패가 도착하면 시트가 닫히고 재시도가 가능해진다`() async {
+        let store = makeProjectRegistrationStore(
+            createLearningProject: StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)]),
+            state: {
+                var state = validatedState()
+                state.progress = .awaitingOutcome(sampleReceipt)
+                state.isGenerationReminderSheetPresented = true
+                return state
+            }(),
+        )
+        store.exhaustivity = .off
+
+        await store.send(.effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .failed)))) {
+            $0.progress = .failed(.unexpected)
+            $0.isGenerationReminderSheetPresented = false
+        }
+
+        // 실패 상태에서 재시도가 유효하다.
+        await store.send(.view(.retryTapped)) {
+            $0.progress = .submitting
+        }
+        await store.skipReceivedActions()
+        await store.finish()
+    }
+
+    @Test
+    func `저장소 확인과 이해도 선택 단계는 Feature 상태로 유지되고 역방향 전이도 가능하다`() async {
+        let store = makeProjectRegistrationStore(state: validatedState())
+
+        await store.send(.view(.repositoryConfirmed)) {
+            $0.step = .quizLevelSelection
+        }
+        await store.send(.view(.quizLevelConfirmed)) {
+            $0.step = .generationConfirmation
+        }
+        await store.send(.view(.stepBackTapped)) {
+            $0.step = .quizLevelSelection
+        }
+        await store.send(.view(.stepBackTapped)) {
+            $0.step = .repositoryConfirmation
+        }
+        await store.send(.view(.stepBackTapped))
     }
 
 }
@@ -528,11 +647,33 @@ private let sampleReceipt = ProjectRegistrationReceipt(
     quizLevel: .l1,
 )
 
+private func validatedState() -> ProjectRegistrationFeature.State {
+    var state = ProjectRegistrationFeature.State()
+    state.validation = .validated(sampleRepository)
+    return state
+}
+
+/// 조건이 만족될 때까지 짧게 양보하며 기다린다. 순서 보장을 검증하는 테스트에서
+/// 고정 지연 대신 실제 진행 시점을 관찰하기 위해 사용한다.
+private func waitUntil(
+    timeout: Duration = .seconds(2),
+    _ condition: @Sendable () async -> Bool,
+) async {
+    let deadline = ContinuousClock.now.advanced(by: timeout)
+    while ContinuousClock.now < deadline {
+        if await condition() {
+            return
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+}
+
 private func makeProjectRegistrationStore(
     fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
     createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    learningProjectOutcomes: StubLearningProjectOutcomesUseCase = StubLearningProjectOutcomesUseCase(),
-    requestGenerationReminder: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(results: [.authorized]),
+    observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase = StubObserveGenerationOutcomesUseCase(),
+    requestGenerationReminder: StubRequestGenerationReminderUseCase =
+        StubRequestGenerationReminderUseCase(results: [.authorized]),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
     state: ProjectRegistrationFeature.State = ProjectRegistrationFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationFeature> {
@@ -540,7 +681,7 @@ private func makeProjectRegistrationStore(
         ProjectRegistrationFeature(
             fetchExternalRepository: fetchExternalRepository,
             createLearningProject: createLearningProject,
-            learningProjectOutcomes: learningProjectOutcomes,
+            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: { await openNotificationSettings() },
         )
@@ -573,7 +714,7 @@ private struct ProjectRegistrationHostFeature {
 
     let fetchExternalRepository: any FetchExternalRepositoryUseCase
     let createLearningProject: any CreateLearningProjectUseCase
-    let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
@@ -581,7 +722,7 @@ private struct ProjectRegistrationHostFeature {
                 ProjectRegistrationFeature(
                     fetchExternalRepository: fetchExternalRepository,
                     createLearningProject: createLearningProject,
-                    learningProjectOutcomes: learningProjectOutcomes,
+                    observeGenerationOutcomes: observeGenerationOutcomes,
                     requestGenerationReminder: StubRequestGenerationReminderUseCase(results: [.authorized]),
                 )
             }

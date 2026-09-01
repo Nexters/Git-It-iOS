@@ -94,7 +94,7 @@ struct MainShellFeatureTests {
                 updateMemberPosition: MainShellUpdatePositionStub(),
                 updateMemberCareerLevel: MainShellUpdateCareerStub(),
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
-                learningProjectOutcomes: StubLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
     }

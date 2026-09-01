@@ -7,14 +7,14 @@ struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
 
     // MARK: Lifecycle
 
-    init(remote: any GenerationOutcomeStream) {
-        self.remote = remote
+    init(source: any QuizGenerationOutcomeSource) {
+        self.source = source
     }
 
     // MARK: Internal
 
     func outcomes() async -> AsyncStream<GenerationOutcome> {
-        let dtoStream = remote.outcomes()
+        let dtoStream = source.outcomes()
         return AsyncStream { continuation in
             let task = Task {
                 for await dto in dtoStream {
@@ -28,9 +28,9 @@ struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
 
     // MARK: Private
 
-    private let remote: any GenerationOutcomeStream
+    private let source: any QuizGenerationOutcomeSource
 
-    private func outcome(from dto: GenerationOutcomeDTO) -> GenerationOutcome {
+    private func outcome(from dto: QuizGenerationOutcomeDTO) -> GenerationOutcome {
         switch dto.status {
         case .completed:
             GenerationOutcome(projectID: dto.projectID, status: .completed)

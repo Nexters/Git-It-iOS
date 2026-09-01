@@ -293,7 +293,7 @@ struct AppRootFeatureTests {
         await store.send(.projectRegistration(.presented(.delegate(.projectRegistered(receipt))))) {
             $0.projectRegistration = nil
         }
-        await store.receive(.mainShell(.home(.view(.reloadRequested))))
+        await store.receive(.mainShell(.home(.input(.learningProjectsReloadRequested))))
     }
 
     @Test
@@ -341,6 +341,140 @@ struct AppRootFeatureTests {
         #expect(store.state.route == .onboarding)
 
         await authenticationOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `인증 세션이 확립되면 기기 등록을 1회 수행한다`() async {
+        let registerCurrentDevice = RegisterCurrentDeviceSpy()
+        let store = makeAppRootStore(registerCurrentDevice: registerCurrentDevice)
+        store.exhaustivity = .off
+
+        await store.send(.appEntry(.delegate(.destinationDecided(.mainShell)))) {
+            $0.route = .mainShell
+            $0.deviceRegistration = .registering
+        }
+        await store.receive(.effect(.deviceRegistrationSucceeded)) {
+            $0.deviceRegistration = .registered
+        }
+
+        #expect(await registerCurrentDevice.callCount == 1)
+        await store.finish()
+    }
+
+    @Test
+    func `기기 등록 실패는 상태로 남고 앱 활성화 시 재시도한다`() async {
+        let registerCurrentDevice = RegisterCurrentDeviceSpy(results: [
+            .failure(DeviceRegistrationTestError.failed),
+            .success(()),
+        ])
+        let store = makeAppRootStore(registerCurrentDevice: registerCurrentDevice)
+        store.exhaustivity = .off
+
+        await store.send(.appEntry(.delegate(.destinationDecided(.mainShell))))
+        await store.receive(.effect(.deviceRegistrationFailed)) {
+            $0.deviceRegistration = .failed
+        }
+
+        await store.send(.view(.applicationBecameActive)) {
+            $0.deviceRegistration = .registering
+        }
+        await store.receive(.effect(.deviceRegistrationSucceeded)) {
+            $0.deviceRegistration = .registered
+        }
+
+        #expect(await registerCurrentDevice.callCount == 2)
+        await store.finish()
+    }
+
+    @Test
+    func `기기 등록 실패 후 token이 갱신되면 갱신 token으로 재시도한다`() async {
+        let registerCurrentDevice = RegisterCurrentDeviceSpy(results: [
+            .failure(DeviceRegistrationTestError.failed),
+            .success(()),
+        ])
+        let store = makeAppRootStore(registerCurrentDevice: registerCurrentDevice)
+        store.exhaustivity = .off
+
+        await store.send(.appEntry(.delegate(.destinationDecided(.mainShell))))
+        await store.receive(.effect(.deviceRegistrationFailed)) {
+            $0.deviceRegistration = .failed
+        }
+
+        await store.send(.effect(.deviceTokenRefreshed)) {
+            $0.deviceRegistration = .registering
+        }
+        await store.receive(.effect(.deviceRegistrationSucceeded)) {
+            $0.deviceRegistration = .registered
+        }
+
+        #expect(await registerCurrentDevice.callCount == 2)
+        await store.finish()
+    }
+
+    @Test
+    func `앱 활성화와 token 갱신이 동시에 발생해도 서버 등록 요청은 1회다`() async {
+        let registerCurrentDevice = RegisterCurrentDeviceSpy()
+        await registerCurrentDevice.setSuspends(true)
+        let store = makeAppRootStore(registerCurrentDevice: registerCurrentDevice)
+        store.exhaustivity = .off
+
+        await store.send(.appEntry(.delegate(.destinationDecided(.mainShell)))) {
+            $0.route = .mainShell
+            $0.deviceRegistration = .registering
+        }
+
+        // 진행 중인 등록이 있으므로 두 trigger 모두 새 요청을 만들지 않는다.
+        await store.send(.view(.applicationBecameActive))
+        await store.send(.effect(.deviceTokenRefreshed))
+
+        #expect(await registerCurrentDevice.callCount == 1)
+
+        await registerCurrentDevice.resumeOldest()
+        await store.receive(.effect(.deviceRegistrationSucceeded)) {
+            $0.deviceRegistration = .registered
+        }
+        await store.finish()
+    }
+
+    @Test
+    func `인증 종료 시 등록 흐름 child와 기기 등록 상태를 함께 제거한다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.deviceRegistration = .failed
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.delegate(.loggedOut))) {
+            $0.projectRegistration = nil
+            $0.deviceRegistration = .idle
+            $0.route = .onboarding
+        }
+
+        await store.finish()
+    }
+
+    @Test
+    func `재로그인 시 이전 세션의 등록 흐름 화면이 다시 표시되지 않는다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.projectRegistration = ProjectRegistrationFeature.State()
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.delegate(.loggedOut))) {
+            $0.projectRegistration = nil
+            $0.route = .onboarding
+        }
+        await store.send(.onboarding(.delegate(.mainShellRequested))) {
+            $0.route = .mainShell
+            $0.deviceRegistration = .registering
+        }
+
+        #expect(store.state.projectRegistration == nil)
+
+        await store.skipReceivedActions()
         await store.finish()
     }
 

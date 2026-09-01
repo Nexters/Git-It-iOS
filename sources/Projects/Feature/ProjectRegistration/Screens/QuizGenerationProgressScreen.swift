@@ -3,9 +3,9 @@ import Foundation
 import SwiftUI
 import UIComponent
 
-// MARK: - GenerationProgressScreen
+// MARK: - QuizGenerationProgressScreen
 
-struct GenerationProgressScreen: View {
+struct QuizGenerationProgressScreen: View {
 
     // MARK: Internal
 
@@ -171,9 +171,9 @@ struct GenerationProgressScreen: View {
 
 }
 
-// MARK: GenerationProgressScreen.Constant
+// MARK: QuizGenerationProgressScreen.Constant
 
-extension GenerationProgressScreen {
+extension QuizGenerationProgressScreen {
     private enum Constant {
         static let topSpacerMinLength: CGFloat = 97
         static let backgroundGradientStartY = 0.6868

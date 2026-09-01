@@ -39,12 +39,12 @@ public struct LearningProjectAssembly: Sendable {
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
         fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
 
-        let generationOutcomeRemote = PushGenerationOutcomeStream()
-        learningProjectOutcomes = LearningProjectOutcomes(
-            repository: GenerationOutcomeRepositoryAdapter(remote: generationOutcomeRemote)
+        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
+        observeGenerationOutcomes = ObserveGenerationOutcomes(
+            repository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource)
         )
         ingestGenerationOutcomePayload = { rawPayload in
-            await generationOutcomeRemote.ingest(rawPayload: rawPayload)
+            await generationOutcomeSource.ingest(rawPayload: rawPayload)
         }
     }
 
@@ -59,7 +59,7 @@ public struct LearningProjectAssembly: Sendable {
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    public let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
 }

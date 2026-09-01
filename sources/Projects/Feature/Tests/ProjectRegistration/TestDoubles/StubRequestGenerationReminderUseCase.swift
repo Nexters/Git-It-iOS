@@ -4,7 +4,10 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [NotificationAuthorizationOutcome] = [.authorized], isAuthorizedResult: Bool = false) {
+    init(
+        results: [NotificationAuthorizationOutcome] = [.authorized],
+        isAuthorizedResult: Bool = false,
+    ) {
         self.results = results
         self.isAuthorizedResult = isAuthorizedResult
     }

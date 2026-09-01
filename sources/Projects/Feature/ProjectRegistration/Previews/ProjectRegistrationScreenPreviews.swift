@@ -20,8 +20,8 @@ private enum ProjectRegistrationPreviewSupport {
         repositoryURLInput: String = "",
         validation: ProjectRegistrationFeature.ValidationStatus = .idle,
         quizLevel: QuizLevel = .l1,
-        submission: ProjectRegistrationFeature.SubmissionStatus = .idle,
-        isNotificationOptionSheetPresented: Bool = false,
+        progress: ProjectRegistrationFeature.RegistrationProgress = .idle,
+        isGenerationReminderSheetPresented: Bool = false,
     ) -> StoreOf<ProjectRegistrationFeature> {
         Store(
             initialState: {
@@ -29,15 +29,15 @@ private enum ProjectRegistrationPreviewSupport {
                 state.repositoryURLInput = repositoryURLInput
                 state.validation = validation
                 state.quizLevel = quizLevel
-                state.submission = submission
-                state.isNotificationOptionSheetPresented = isNotificationOptionSheetPresented
+                state.progress = progress
+                state.isGenerationReminderSheetPresented = isGenerationReminderSheetPresented
                 return state
             }()
         ) {
             ProjectRegistrationFeature(
                 fetchExternalRepository: PreviewFetchExternalRepositoryUseCase(),
                 createLearningProject: PreviewCreateLearningProjectUseCase(),
-                learningProjectOutcomes: PreviewLearningProjectOutcomesUseCase(),
+                observeGenerationOutcomes: PreviewObserveGenerationOutcomesUseCase(),
                 requestGenerationReminder: PreviewRequestGenerationReminderUseCase(),
             )
         }
@@ -67,9 +67,9 @@ private struct PreviewCreateLearningProjectUseCase: CreateLearningProjectUseCase
     }
 }
 
-// MARK: - PreviewLearningProjectOutcomesUseCase
+// MARK: - PreviewObserveGenerationOutcomesUseCase
 
-private struct PreviewLearningProjectOutcomesUseCase: LearningProjectOutcomesUseCase {
+private struct PreviewObserveGenerationOutcomesUseCase: ObserveGenerationOutcomesUseCase {
     func callAsFunction() async -> AsyncStream<GenerationOutcome> {
         AsyncStream { _ in }
     }
@@ -133,14 +133,14 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
 }
 
 #Preview("생성 시작 확정 · 737:10830") {
-    GenerationConfirmationScreen(onStart: { }, onBack: { })
+    QuizGenerationConfirmationScreen(onStart: { }, onBack: { })
 //        .designSystemBackgroundForPreview()
 }
 
 #Preview("생성 진행 · 2026:29388") {
     ProjectRegistrationScreen(
         store: ProjectRegistrationPreviewSupport.store(
-            submission: .awaitingGeneration(
+            progress: .awaitingOutcome(
                 ProjectRegistrationReceipt(projectID: "preview-project", requestStatus: "accepted", quizLevel: .l1)
             )
         )
@@ -149,7 +149,7 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
 }
 
 #Preview("알림 옵션 시트 · 824:12149") {
-    NotificationOptionSheet(onAccept: { }, onDecline: { })
+    GenerationReminderSheet(onAccept: { }, onDecline: { })
 //        .designSystemBackgroundForPreview()
 }
 

@@ -7,6 +7,7 @@ import InfrastructureAuthentication
 import InfrastructureNetworkClient
 import InfrastructurePushMessaging
 import os
+import Synchronization
 
 // MARK: - AppComposition
 
@@ -39,7 +40,7 @@ public struct AppComposition: Sendable {
         submitEssayAnswer = learningProject.submitEssayAnswer
         setQuestionBookmark = learningProject.setQuestionBookmark
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
-        learningProjectOutcomes = learningProject.learningProjectOutcomes
+        observeGenerationOutcomes = learningProject.observeGenerationOutcomes
 
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
@@ -51,45 +52,63 @@ public struct AppComposition: Sendable {
 
         let localNotificationClient = UserNotificationCenterLocalClient()
         let reminderCoordinator = GenerationCompletionReminderCoordinator(
-            localNotificationClient: localNotificationClient,
+            localNotificationClient: localNotificationClient
         )
-        Task { await reminderCoordinator.start(learningProjectOutcomes: learningProject.learningProjectOutcomes) }
         requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
             reminderRegistry: GenerationReminderRegistryAdapter(coordinator: reminderCoordinator),
         )
 
-        let pushClient = FirebaseMessagingPushClient()
-        let forwardAPNsToken: @Sendable (Data) -> Void = { token in
-            pushClient.setAPNsToken(token)
-        }
-        let ingestPushPayload: @Sendable ([String: String]) async -> Void = { rawPayload in
+        // 조립 시점에는 외부 푸시 SDK를 만들지 않는다. client 생성은 bootstrap이 소유하고,
+        // 콜백은 이 상자를 통해 늦게 바인딩되므로 주입 시점이 client 생성보다 앞서도 안전하다.
+        let pushClientBox = PushClientBox()
+        let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
         }
-        PushNotificationAppDelegate.configure(
-            PushNotificationCallbacks(
-                forwardAPNsToken: forwardAPNsToken,
-                ingestPushPayload: ingestPushPayload,
-            )
+        self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
+        let pushNotificationCallbacks = PushNotificationCallbacks(
+            forwardAPNsToken: { token in pushClientBox.client?.setAPNsToken(token) },
+            ingestGenerationOutcomePayload: ingestGenerationOutcomePayload,
         )
 
+        // App은 Infrastructure에 의존할 수 없으므로 콜백 주입도 이 경계 안에서 수행한다.
+        let observeGenerationOutcomes = learningProject.observeGenerationOutcomes
+        bootstrap = { appDelegate in
+            pushClientBox.activate()
+            appDelegate.configure(pushNotificationCallbacks)
+            await reminderCoordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
+        }
+
         let registerMemberDevice = member.registerMemberDevice
-        let deviceID = AppComposition.deviceID(keychainStore: keychainStore)
-        Task {
-            let logger = AppComposition.logger
-            do {
-                let token = try await pushClient.registrationToken()
-                logger.debug("FCM registrationToken 발급 성공: \(token, privacy: .public)")
-                try await registerMemberDevice(MemberDeviceInfo(
-                    deviceID: deviceID,
-                    deviceType: .ios,
-                    appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
-                    osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
-                    deviceToken: token,
-                ))
-                logger.debug("registerMemberDevice 호출 성공: deviceID=\(deviceID, privacy: .public)")
-            } catch {
-                logger.debug("기기 등록 실패: \(String(describing: error), privacy: .public)")
+        registerCurrentDevice = {
+            guard let pushClient = pushClientBox.client else {
+                throw PushBootstrapError.notBootstrapped
+            }
+            let token = try await pushClient.registrationToken()
+            let deviceID = AppComposition.loadOrCreateDeviceID(keychainStore: keychainStore)
+            try await registerMemberDevice(MemberDeviceInfo(
+                deviceID: deviceID,
+                deviceType: .ios,
+                appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
+                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                deviceToken: token,
+            ))
+            AppComposition.logger.debug("기기 등록 성공: deviceID=\(deviceID, privacy: .public)")
+        }
+
+        deviceTokenRefreshes = {
+            guard let pushClient = pushClientBox.client else {
+                return AsyncStream { $0.finish() }
+            }
+            let refreshes = pushClient.registrationTokenRefreshes()
+            return AsyncStream { continuation in
+                let task = Task {
+                    for await _ in refreshes {
+                        continuation.yield(())
+                    }
+                    continuation.finish()
+                }
+                continuation.onTermination = { _ in task.cancel() }
             }
         }
     }
@@ -145,8 +164,16 @@ public struct AppComposition: Sendable {
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
-    public let learningProjectOutcomes: any LearningProjectOutcomesUseCase
+    public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
+
+    /// 푸시 client 생성과 콜백 주입, 리마인드 구독 확립을 순서대로 수행하는 명시적 시작 단계다.
+    /// 반환 시점에는 리마인드 구독이 확립돼 있다.
+    public let bootstrap: @MainActor @Sendable (PushNotificationAppDelegate) async -> Void
+    /// 호출 시점은 App이 결정한다. 실패는 삼키지 않고 던지며 멱등하지 않다.
+    public let registerCurrentDevice: @Sendable () async throws -> Void
+    public let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
+    public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
     public static func live(
         _ environment: Environment,
@@ -190,11 +217,39 @@ public struct AppComposition: Sendable {
 
     // MARK: Private
 
+    /// `bootstrap()` 이전에는 비어 있고, 그 이후에만 실제 푸시 client를 소유한다.
+    /// 콜백이 client보다 먼저 주입돼도 안전하도록 늦은 바인딩 지점을 제공한다.
+    private final class PushClientBox: Sendable {
+
+        // MARK: Internal
+
+        var client: (any PushMessagingClient)? {
+            storage.withLock { $0 }
+        }
+
+        func activate() {
+            storage.withLock { client in
+                guard client == nil else { return }
+                client = FirebaseMessagingPushClient()
+            }
+        }
+
+        // MARK: Private
+
+        private let storage = Mutex<(any PushMessagingClient)?>(nil)
+
+    }
+
+    private enum PushBootstrapError: Error {
+        case notBootstrapped
+    }
+
     private static let deviceKeychainNamespace = KeychainNamespace("com.nexters.hytime.gitit.device")
     private static let deviceKeychainKey = "deviceID"
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "AppComposition")
 
-    private static func deviceID(keychainStore: KeychainStore) -> String {
+    /// 조회에 실패하면 새 식별자를 만들어 저장한다. 이름이 그 부수효과를 드러낸다.
+    private static func loadOrCreateDeviceID(keychainStore: KeychainStore) -> String {
         if
             let data = try? keychainStore.load(for: deviceKeychainKey, in: deviceKeychainNamespace),
             let existing = String(data: data, encoding: .utf8)

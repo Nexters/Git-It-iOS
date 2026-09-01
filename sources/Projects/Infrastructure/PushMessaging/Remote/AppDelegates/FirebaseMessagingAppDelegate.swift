@@ -12,8 +12,28 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 
     // MARK: Public
 
-    public static func configure(_ handlers: PushNotificationCallbacks) {
-        Self.state.withLock { $0 = handlers }
+    /// 콜백을 이 인스턴스가 소유한다. 주입 전에 도착한 APNs token과 remote notification payload는
+    /// 각각 대기 슬롯에 1건 보관했다가 주입 직후 정확히 1회 전달한다.
+    public func configure(_ callbacks: PushNotificationCallbacks) {
+        let pending = state.withLock { state -> PendingDelivery in
+            state.callbacks = callbacks
+            let pending = PendingDelivery(
+                apnsToken: state.pendingAPNsToken,
+                payload: state.pendingPayload,
+            )
+            state.pendingAPNsToken = nil
+            state.pendingPayload = nil
+            return pending
+        }
+
+        if let apnsToken = pending.apnsToken {
+            Self.logger.debug("대기 슬롯의 APNs token을 전달합니다.")
+            callbacks.forwardAPNsToken(apnsToken)
+        }
+        if let payload = pending.payload {
+            Self.logger.debug("대기 슬롯의 payload를 전달합니다.")
+            Task { await callbacks.ingestGenerationOutcomePayload(payload) }
+        }
     }
 
     public func application(
@@ -32,11 +52,19 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         _: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data,
     ) {
-        guard let handlers = Self.state.withLock({ $0 }) else {
-            Self.logger.notice("configure(...) 전에 도착한 didRegisterForRemoteNotificationsWithDeviceToken을 무시합니다.")
+        let callbacks = state.withLock { state -> PushNotificationCallbacks? in
+            guard let callbacks = state.callbacks else {
+                state.pendingAPNsToken = deviceToken
+                return nil
+            }
+            return callbacks
+        }
+
+        guard let callbacks else {
+            Self.logger.notice("configure(_:) 전에 도착한 APNs token을 대기 슬롯에 보관합니다.")
             return
         }
-        handlers.forwardAPNsToken(deviceToken)
+        callbacks.forwardAPNsToken(deviceToken)
     }
 
     public func application(
@@ -44,27 +72,46 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void,
     ) {
-        guard let handlers = Self.state.withLock({ $0 }) else {
-            Self.logger.notice("configure(...) 전에 도착한 didReceiveRemoteNotification을 무시합니다.")
+        let payload = RemoteNotificationPayload(userInfo: userInfo)
+        let callbacks = state.withLock { state -> PushNotificationCallbacks? in
+            guard let callbacks = state.callbacks else {
+                state.pendingPayload = payload.userInfoStrings
+                return nil
+            }
+            return callbacks
+        }
+
+        guard let callbacks else {
+            Self.logger.notice("configure(_:) 전에 도착한 didReceiveRemoteNotification을 대기 슬롯에 보관합니다.")
             completionHandler(.noData)
             return
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
-
-        let payload = RemoteNotificationPayload(userInfo: userInfo)
         Self.logger.debug("didReceiveRemoteNotification 수신: \(payload.userInfoStrings, privacy: .public)")
 
         Task {
-            await handlers.ingestPushPayload(payload.userInfoStrings)
+            await callbacks.ingestGenerationOutcomePayload(payload.userInfoStrings)
             completionHandler(.newData)
         }
     }
 
     // MARK: Private
 
-    private static let state = Mutex<PushNotificationCallbacks?>(nil)
+    private struct PendingDelivery {
+        let apnsToken: Data?
+        let payload: [String: String]?
+    }
+
+    private struct State {
+        var callbacks: PushNotificationCallbacks?
+        var pendingAPNsToken: Data?
+        var pendingPayload: [String: String]?
+    }
+
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "FirebaseMessagingAppDelegate")
+
+    private let state = Mutex(State())
 
 }
 
