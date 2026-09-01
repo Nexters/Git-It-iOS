@@ -90,20 +90,20 @@ staging이 사용자 소유 변경을 의도치 않게 소비하지 않게 한�
 - [X] T004 [S2] [S3] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationProgress.swift`에
       `projectID: String`과 `requestedAt: Date`를 갖는 `GenerationProgress`를 추가한다.
       `Equatable`, `Sendable`, `Codable`을 채택한다.
-- [ ] T005 [P] [S2] `sources/Projects/Domain/LearningProject/Contracts/GenerationProgressRepository.swift`에
+- [X] T005 [P] [S2] `sources/Projects/Domain/LearningProject/Contracts/GenerationProgressRepository.swift`에
       `load() async -> GenerationProgress?`, `save(_:) async`, `clear() async`를 갖는
       `GenerationProgressRepository` 프로토콜을 추가한다.
-- [ ] T006 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgressUseCase.swift`에
+- [X] T006 [P] [S2] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgressUseCase.swift`에
       `begin(projectID:requestedAt:)`, `current()`, `end()`를 갖는 프로토콜을 추가한다.
 
 ### 테스트
 
-- [ ] T007 [P] [S2] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubGenerationProgressRepository.swift`에
+- [X] T007 [P] [S2] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubGenerationProgressRepository.swift`에
       저장 계약 테스트 더블을 추가한다.
 - [X] T008 [P] [S3] `sources/Projects/Domain/Tests/LearningProject/Models/GenerationWaitPolicyTests.swift`에
       `readyDate(for:)`가 `requestedAt + 300초`를 반환하고 `isExpired(_:now:)`가 상한 초과를
       판정하는 테스트를 작성한다.
-- [ ] T009 [S2] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationProgressTests.swift`에
+- [X] T009 [S2] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationProgressTests.swift`에
       `begin` 후 `current`가 값을 반환하고, 두 번 `begin`해도 마지막 1건만 남으며, `end` 후
       `nil`을 반환하는 테스트를 작성한다.
 
@@ -113,13 +113,13 @@ staging이 사용자 소유 변경을 의도치 않게 소비하지 않게 한�
       `minimumWait = 300`, T003에서 확정한 `retentionLimit`, `readyDate(for:)`,
       `isExpired(_:now:)`와 `standard`를 구현한다. 테스트가 짧은 값으로 대체할 수 있도록 값
       타입으로 둔다.
-- [ ] T011 [S2] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgress.swift`에
+- [X] T011 [S2] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgress.swift`에
       `GenerationProgressRepository`를 생성자로 주입받는 `TrackGenerationProgressUseCase`
       구현을 추가한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T012 [no-write] Domain scheme 테스트를 실행해 T008, T009가 통과하는지 확인한다.
+- [X] T012 [no-write] Domain scheme 테스트를 실행해 T008, T009가 통과하는지 확인한다.
 
 **진행 점검**: T003~T012의 변경 파일과 검증 결과를 보고하고 패키지 2로 진행한다.
 
