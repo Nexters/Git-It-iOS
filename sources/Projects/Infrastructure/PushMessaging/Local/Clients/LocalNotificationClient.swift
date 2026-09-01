@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - LocalNotificationClient
 
 public protocol LocalNotificationClient: Sendable {
@@ -10,4 +12,14 @@ public protocol LocalNotificationClient: Sendable {
 
     /// 전달받은 값 그대로 로컬 알림을 즉시 발송한다.
     func present(_ request: LocalNotificationRequest)
+
+    /// 지정한 시각에 발송되도록 시스템에 예약한다. 이미 지난 시각이면 즉시 발송한다.
+    /// 같은 식별자로 다시 예약하면 이전 예약을 대체해 1건만 남는다.
+    func schedule(
+        _ request: LocalNotificationRequest,
+        at date: Date,
+    )
+
+    /// 아직 발송되지 않은 예약을 취소한다. 해당 식별자의 예약이 없으면 아무 일도 하지 않는다.
+    func cancel(identifier: String)
 }

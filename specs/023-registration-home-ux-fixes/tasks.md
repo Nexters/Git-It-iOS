@@ -139,17 +139,17 @@ scheme build만으로 확인한다. 예약 시각 계산의 동작 검증은 가
 
 ### 구현
 
-- [ ] T013 [S3] `sources/Projects/Infrastructure/PushMessaging/Local/Clients/LocalNotificationClient.swift`에
+- [X] T013 [S3] `sources/Projects/Infrastructure/PushMessaging/Local/Clients/LocalNotificationClient.swift`에
       `schedule(_ request: LocalNotificationRequest, at date: Date)`와
       `cancel(identifier: String)`을 추가한다. `present`의 시그니처와 동작은 바꾸지 않는다.
-- [ ] T014 [S3] `sources/Projects/Infrastructure/PushMessaging/Local/Clients/UserNotificationCenterLocalClient.swift`에
+- [X] T014 [S3] `sources/Projects/Infrastructure/PushMessaging/Local/Clients/UserNotificationCenterLocalClient.swift`에
       `UNTimeIntervalNotificationTrigger`와 `removePendingNotificationRequests(withIdentifiers:)`로
       두 메서드를 구현한다. 이미 지난 시각이면 추가 지연 없이 즉시 발송하고, 같은 식별자로 다시
       예약하면 1건만 남게 한다([contracts/infrastructure-local-notification.md](./contracts/infrastructure-local-notification.md)).
 
 ### 정리와 패키지 검증
 
-- [ ] T015 [no-write] Infrastructure scheme build로 추가 API가 기존 호출부를 깨지 않는지
+- [X] T015 [no-write] Infrastructure scheme build로 추가 API가 기존 호출부를 깨지 않는지
       확인한다.
 
 **진행 점검**: T013~T015의 변경 파일과 검증 결과를 보고하고 패키지 3으로 진행한다.
