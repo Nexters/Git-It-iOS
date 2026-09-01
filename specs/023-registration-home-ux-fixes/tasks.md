@@ -267,14 +267,14 @@ build로 확인한다.
 
 ### S2 — 홈 진행 중 표시
 
-- [ ] T028 [S2] `sources/Projects/Feature/Tests/Home/Reducers/`에 진행 중 입력을 받으면 등록
+- [X] T028 [S2] `sources/Projects/Feature/Tests/Home/Reducers/`에 진행 중 입력을 받으면 등록
       진입이 차단되고 해제되면 복귀하는 테스트와, 진행 중에도 프로필 조회·카드 표시·전체 보기
       동작이 달라지지 않는 테스트를 추가한다(FR-005~007, FR-009).
-- [ ] T029 [S2] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에
+- [X] T029 [S2] `sources/Projects/Feature/Home/Reducers/HomeFeature.swift`에
       `Input.generationProgressChanged(isInProgress:)`와 대응 상태 값을 추가하고, 진행 중에는
       `view(.projectRegistrationTapped)`가 `delegate(.projectRegistrationRequested)`를 보내지
       않게 한다(FR-005~007).
-- [ ] T030 [S2] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 `registrationPanel`에
+- [X] T030 [S2] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 `registrationPanel`에
       진행 중 표기("문제 생성 중" 문구, 진행 인디케이터, 비활성 스타일)를 추가한다. 값은 Figma
       `1859:21645`를 근거로 한다(FR-006).
 

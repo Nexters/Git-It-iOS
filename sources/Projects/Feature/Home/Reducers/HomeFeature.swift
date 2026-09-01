@@ -56,6 +56,8 @@ public struct HomeFeature: Sendable {
         public var isProjectRefreshPending = false
         /// 이미 반영한 생성 결과가 다시 도착해도 재조회를 늘리지 않기 위한 기록이다.
         public var appliedOutcomeProjectIDs = Set<String>()
+        /// 학습 세트 생성이 진행 중인 동안 등록 진입을 막고 진행 중 표기를 띄우기 위한 값이다.
+        public var isGenerationInProgress = false
 
     }
 
@@ -82,6 +84,7 @@ public struct HomeFeature: Sendable {
         @CasePathable
         public enum Input: Equatable, Sendable {
             case learningProjectsReloadRequested
+            case generationProgressChanged(isInProgress: Bool)
         }
 
         @CasePathable
@@ -131,7 +134,13 @@ public struct HomeFeature: Sendable {
                 guard case .failed = state.projectLoad else { return .none }
                 return startProjectLoad(state: &state)
 
+            case .input(.generationProgressChanged(let isInProgress)):
+                state.isGenerationInProgress = isInProgress
+                return .none
+
             case .view(.projectRegistrationTapped):
+                // 생성이 진행 중인 동안에는 새 등록 흐름으로 진입하지 않는다.
+                guard !state.isGenerationInProgress else { return .none }
                 return .send(.delegate(.projectRegistrationRequested))
 
             case .view(.showAllProjectsTapped):

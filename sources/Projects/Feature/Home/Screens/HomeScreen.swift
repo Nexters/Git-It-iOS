@@ -65,6 +65,7 @@ public struct HomeScreen: View {
 
         static let usesDefaultAvatar = true
         static let registrationLabel = "프로젝트 지금 불러오기"
+        static let generationInProgressLabel = "문제 생성 중"
         static let showAllLabel = "학습 중인 레포지토리 전체 보기"
         static let disabledLearningHint = "다음 학습 위치가 없습니다"
 
@@ -168,6 +169,9 @@ public struct HomeScreen: View {
         static let projectSectionTopPadding: CGFloat = 36
         static let sectionHeaderSpacing: CGFloat = 0
         static let chevronSize: CGFloat = 16
+        static let progressIndicatorSize: CGFloat = 16
+        static let progressLabelSpacing: CGFloat = 6
+        static let progressLabelHorizontalPadding: CGFloat = 16
     }
 
     @State private var cardListLeadingX: CGFloat?
@@ -238,18 +242,39 @@ public struct HomeScreen: View {
         .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
     }
 
+    @ViewBuilder
     private var registrationButton: some View {
-        Button {
-            send(.projectRegistrationTapped)
-        } label: {
-            StyledText.body2("지금 불러오기", color: .grey700)
-                .frame(width: 104, height: 37)
-                .background(Color(designSystem: .blue100), in: RoundedRectangle(designSystem: .medium))
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
+        if store.isGenerationInProgress {
+            generationInProgressLabel
+        } else {
+            Button {
+                send(.projectRegistrationTapped)
+            } label: {
+                StyledText.body2("지금 불러오기", color: .grey700)
+                    .frame(width: 104, height: 37)
+                    .background(Color(designSystem: .blue100), in: RoundedRectangle(designSystem: .medium))
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Display.registrationLabel)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Display.registrationLabel)
+    }
+
+    /// Figma `1859:21645`의 진행 중 표기다. 새 불러오기를 시작할 수 없는 동안에는 버튼 대신
+    /// 이 비활성 표시를 두어 탭 자체를 받지 않는다.
+    private var generationInProgressLabel: some View {
+        HStack(spacing: Metric.progressLabelSpacing) {
+            ResourceAnimation(asset: .generalLoading)
+                .frame(width: Metric.progressIndicatorSize, height: Metric.progressIndicatorSize)
+            StyledText.body2(Display.generationInProgressLabel, color: .grey300)
+        }
+        .padding(.horizontal, Metric.progressLabelHorizontalPadding)
+        .frame(height: 37)
+        .background(Color(designSystem: .grey500), in: RoundedRectangle(designSystem: .medium))
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Display.generationInProgressLabel)
     }
 
     private var projectSection: some View {
