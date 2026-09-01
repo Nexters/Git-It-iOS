@@ -41,6 +41,7 @@ public struct AppComposition: Sendable {
         setQuestionBookmark = learningProject.setQuestionBookmark
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
         observeGenerationOutcomes = learningProject.observeGenerationOutcomes
+        trackGenerationProgress = learningProject.trackGenerationProgress
 
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
@@ -52,7 +53,8 @@ public struct AppComposition: Sendable {
 
         let localNotificationClient = UserNotificationCenterLocalClient()
         let reminderCoordinator = GenerationCompletionReminderCoordinator(
-            localNotificationClient: localNotificationClient
+            localNotificationClient: localNotificationClient,
+            progressRepository: learningProject.generationProgressRepository,
         )
         requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
@@ -166,6 +168,7 @@ public struct AppComposition: Sendable {
 
     public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
+    public let trackGenerationProgress: any TrackGenerationProgressUseCase
 
     /// 푸시 client 생성과 콜백 주입, 리마인드 구독 확립을 순서대로 수행하는 명시적 시작 단계다.
     /// 반환 시점에는 리마인드 구독이 확립돼 있다.

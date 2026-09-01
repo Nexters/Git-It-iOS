@@ -2,6 +2,7 @@ import DataLearningProject
 import DomainLearningProject
 import Foundation
 import InfrastructureNetworkClient
+import InfrastructureStorage
 
 // MARK: - LearningProjectAssembly
 
@@ -39,6 +40,12 @@ public struct LearningProjectAssembly: Sendable {
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
         fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
 
+        let progressRepository = GenerationProgressRepositoryAdapter(
+            store: LocalGenerationProgressStore(store: UserDefaultsStore(namespace: Self.progressNamespace))
+        )
+        generationProgressRepository = progressRepository
+        trackGenerationProgress = TrackGenerationProgress(progressRepository: progressRepository)
+
         let generationOutcomeSource = PushQuizGenerationOutcomeSource()
         observeGenerationOutcomes = ObserveGenerationOutcomes(
             repository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource)
@@ -60,6 +67,16 @@ public struct LearningProjectAssembly: Sendable {
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
     public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    public let trackGenerationProgress: any TrackGenerationProgressUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
+
+    // MARK: Internal
+
+    /// 진행 상태를 알림 예약 시각 계산에 다시 쓰기 위해 조립 경계 안에서만 공개한다.
+    let generationProgressRepository: any GenerationProgressRepository
+
+    // MARK: Private
+
+    private static let progressNamespace = "com.nexters.hytime.gitit.generationProgress"
 
 }

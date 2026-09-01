@@ -1,4 +1,5 @@
 import DomainLearningProject
+import Foundation
 import InfrastructurePushMessaging
 import os
 
@@ -8,8 +9,14 @@ actor GenerationCompletionReminderCoordinator {
 
     // MARK: Lifecycle
 
-    init(localNotificationClient: any LocalNotificationClient) {
+    init(
+        localNotificationClient: any LocalNotificationClient,
+        progressRepository: any GenerationProgressRepository,
+        waitPolicy: GenerationWaitPolicy = .standard,
+    ) {
         self.localNotificationClient = localNotificationClient
+        self.progressRepository = progressRepository
+        self.waitPolicy = waitPolicy
     }
 
     // MARK: Internal
@@ -40,8 +47,14 @@ actor GenerationCompletionReminderCoordinator {
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "GenerationCompletionReminderCoordinator")
 
     private let localNotificationClient: any LocalNotificationClient
+    private let progressRepository: any GenerationProgressRepository
+    private let waitPolicy: GenerationWaitPolicy
     private var registeredProjectIDs = Set<String>()
     private var observationTask: Task<Void, Never>?
+
+    private static func notificationIdentifier(projectID: String) -> String {
+        "generation-completed-\(projectID)"
+    }
 
     private func handle(_ outcome: GenerationOutcome) async {
         Self.logger
@@ -61,14 +74,30 @@ actor GenerationCompletionReminderCoordinator {
             Self.logger.debug("알림 권한 없어 로컬 알림 미발송: projectID=\(outcome.projectID, privacy: .public)")
             return
         }
-        Self.logger.debug("로컬 알림 발송: projectID=\(outcome.projectID, privacy: .public)")
-        localNotificationClient.present(
+        // 보존된 진행 상태의 요청 시각으로 준비 완료 시각을 계산해 예약한다. 이미 지난
+        // 시각이면 예약 API가 추가 지연 없이 즉시 발송한다.
+        let readyDate = await readyDate(for: outcome.projectID)
+        Self.logger.debug(
+            "로컬 알림 예약: projectID=\(outcome.projectID, privacy: .public) readyDate=\(String(describing: readyDate), privacy: .public)"
+        )
+        localNotificationClient.schedule(
             LocalNotificationRequest(
-                identifier: "generation-completed-\(outcome.projectID)",
+                identifier: Self.notificationIdentifier(projectID: outcome.projectID),
                 title: "세트 생성 완료",
                 body: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
-            )
+            ),
+            at: readyDate,
         )
+    }
+
+    /// 보존된 진행 상태가 같은 프로젝트를 가리킬 때만 최소 대기 시간을 적용한다. 상태가
+    /// 없거나 다른 프로젝트면 지금 시각을 반환해 즉시 발송으로 떨어진다.
+    private func readyDate(for projectID: String) async -> Date {
+        guard
+            let progress = await progressRepository.load(),
+            progress.projectID == projectID
+        else { return Date() }
+        return waitPolicy.readyDate(for: progress)
     }
 
 }

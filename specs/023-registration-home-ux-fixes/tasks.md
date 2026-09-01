@@ -322,7 +322,7 @@ scheme 테스트만으로 확인할 수 있다.
 
 ### 테스트
 
-- [ ] T036 [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`에
+- [X] T036 [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`에
       완료 결과 도착 시 `present`가 아니라 준비 완료 시각으로 `schedule`이 호출되고, 이미 지난
       시각이면 즉시 발송이며, 실패 결과에는 발송하지 않고, 같은 결과가 다시 와도 1회만
       예약되며, 알림 권한이 없으면 예약도 발송도 하지 않는 테스트를 갱신·추가한다
@@ -330,15 +330,15 @@ scheme 테스트만으로 확인할 수 있다.
 
 ### 구현
 
-- [ ] T037 [S2] `sources/Projects/Composition/Adapter/Adapters/GenerationProgressRepositoryAdapter.swift`에
+- [X] T037 [S2] `sources/Projects/Composition/Adapter/Adapters/GenerationProgressRepositoryAdapter.swift`에
       Data의 `GenerationProgressStore`를 Domain의 `GenerationProgressRepository`로 잇는 어댑터를
       추가한다. 기존 `GenerationReminderRegistryAdapter`와 같은 형태를 따른다.
-- [ ] T038 [S3] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`에서
+- [X] T038 [S3] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`에서
       `GenerationProgressRepository`와 `GenerationWaitPolicy`를 생성자 인자로 추가하고,
       보존된 진행 상태의 `requestedAt`과 `GenerationWaitPolicy.readyDate(for:)`로 예약 시각을
       계산해 `schedule`로 발송한다. 즉시 `present` 호출을 제거하되 기존 `isAuthorized` 가드는
       유지한다.
-- [ ] T039 [S2] [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`와
+- [X] T039 [S2] [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`와
       `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`에
       `UserDefaultsStore`, `LocalGenerationProgressStore`, T037의 어댑터,
       `TrackGenerationProgress`를 조립하고 `trackGenerationProgress`를 공개한다. 같은 조립
