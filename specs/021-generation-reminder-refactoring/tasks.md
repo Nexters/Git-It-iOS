@@ -87,7 +87,7 @@ T003이 두 hunk를 함께 커밋하며, 이 예외와 이유를 PR에 기록한
       `sources/Tuist/Package.swift`,
       `sources/Projects/App/GitIt.entitlements`,
       `sources/Projects/App/Config/GoogleService-Info.plist`
-- [ ] T003 로컬 알림 클라이언트 이름 변경을 커밋한다.
+- [X] T003 로컬 알림 클라이언트 이름 변경을 커밋한다.
       `UNUserNotificationCenterLocalNotificationClient`를 `UserNotificationCenterLocalClient`로
       바꾸고 조립 지점의 참조를 갱신한다. 위 **파일 단위 제약**에 따라 `AppComposition.swift`의
       기기 등록 로깅 hunk도 같은 커밋에 포함된다.

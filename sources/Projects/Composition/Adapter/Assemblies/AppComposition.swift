@@ -6,6 +6,7 @@ import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
 import InfrastructurePushMessaging
+import os
 
 // MARK: - AppComposition
 
@@ -48,7 +49,7 @@ public struct AppComposition: Sendable {
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
 
-        let localNotificationClient = UNUserNotificationCenterLocalNotificationClient()
+        let localNotificationClient = UserNotificationCenterLocalClient()
         let reminderCoordinator = GenerationCompletionReminderCoordinator(
             localNotificationClient: localNotificationClient,
         )
@@ -75,14 +76,21 @@ public struct AppComposition: Sendable {
         let registerMemberDevice = member.registerMemberDevice
         let deviceID = AppComposition.deviceID(keychainStore: keychainStore)
         Task {
-            guard let token = try? await pushClient.registrationToken() else { return }
-            try? await registerMemberDevice(MemberDeviceInfo(
-                deviceID: deviceID,
-                deviceType: .ios,
-                appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
-                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
-                deviceToken: token,
-            ))
+            let logger = AppComposition.logger
+            do {
+                let token = try await pushClient.registrationToken()
+                logger.debug("FCM registrationToken 발급 성공: \(token, privacy: .public)")
+                try await registerMemberDevice(MemberDeviceInfo(
+                    deviceID: deviceID,
+                    deviceType: .ios,
+                    appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
+                    osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                    deviceToken: token,
+                ))
+                logger.debug("registerMemberDevice 호출 성공: deviceID=\(deviceID, privacy: .public)")
+            } catch {
+                logger.debug("기기 등록 실패: \(String(describing: error), privacy: .public)")
+            }
         }
     }
 
@@ -184,6 +192,7 @@ public struct AppComposition: Sendable {
 
     private static let deviceKeychainNamespace = KeychainNamespace("com.nexters.hytime.gitit.device")
     private static let deviceKeychainKey = "deviceID"
+    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "AppComposition")
 
     private static func deviceID(keychainStore: KeychainStore) -> String {
         if
