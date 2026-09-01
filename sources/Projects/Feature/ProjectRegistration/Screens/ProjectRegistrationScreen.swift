@@ -135,6 +135,8 @@ public struct ProjectRegistrationScreen: View {
         .background(keyboardDismissLayer)
         // 키보드가 오르내려도 하단 액션 버튼의 화면 내 위치를 고정한다.
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        // 화면이 나타난 사실만 알리고, 자동 검증 여부는 Feature 상태가 판단한다.
+        .task { send(.task) }
     }
 
     private var keyboardDismissLayer: some View {

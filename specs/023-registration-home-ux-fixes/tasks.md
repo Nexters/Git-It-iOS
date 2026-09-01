@@ -579,3 +579,76 @@ Infrastructure·Data를 앞에 두었기 때문에 패키지 5에 도달해야 �
 - 커밋 단위는 단일 패키지가 기본이며, 공유 확장(T045~T052)만 불가분한 다중 파일 단위다.
 - 문제 해결과 암묵지 기록은 구현 작업 ID로 만들지 않는다. 조건이 발생하면 각 전용 기록 스킬을
   별도로 사용한다.
+
+---
+
+## 단계 8: 수렴
+
+**근거**: `/speckit-clarify` 세션 2026-09-02이 공유 진입의 검증 소유자(FR-028, FR-029)와 랜딩
+후 "다음" 자동 실행(FR-025a)을 확정했고, `/speckit-plan` 2026-09-02 개정이 R-013·R-014로
+반영했다. 아래는 현재 코드와 그 확정 사이의 차이만 담는다.
+
+**실행 단위 순서**: Feature → App(통합). 두 단위는 파일이 겹치지 않아 상호 의존은 없지만,
+활성 tasks.md가 확정한 위상 순서(Feature 이전, App 이후)를 그대로 따른다.
+
+### 작업 패키지: Feature
+
+- [X] T058 [S6] `ProjectRegistrationFeature`에 View lifecycle case `task`를 추가하고,
+      `State.init(initialRepositoryURL:)`이 비어 있지 않은 값을 받을 때 1회용 자동 실행
+      표식을 세우며, `task` 수신 시 그 표식을 소비해 `validateTapped`와 같은 내부 시작
+      경로로 검증을 시작하도록
+      `sources/Projects/Feature/ProjectRegistration/Reducers/ProjectRegistrationFeature.swift`를
+      수정한다. per FR-025a, R-013 (missing)
+- [X] T059 [S6] 링크 입력 화면이 표시될 때 `task`를 보내도록
+      `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`의
+      `linkInputContent`를 수정한다. 화면은 자동 실행 여부를 판단하지 않는다. per FR-025a,
+      S6/AC2 (missing)
+- [X] T060 [P] [S6] 초기값이 있으면 `task`에서 검증이 1회 시작되고, 빈 초기값이면 시작되지
+      않으며, `task`를 두 번 보내도 1회만 시작되는지 검증하는 테스트를
+      `sources/Projects/Feature/ProjectRegistration/Tests/ProjectRegistrationFeatureTests.swift`에
+      추가한다. per quickstart 자동 테스트 표, FR-025a (missing)
+
+#### 정리와 패키지 검증
+
+- [ ] T061 [no-write] Feature scheme의 `ProjectRegistration` 테스트로 T060과 기존
+      `ProjectRegistrationFeatureTests`가 모두 통과하는지 확인하고 결과를 보고한다.
+
+### 작업 패키지: App (공유 확장 integration unit)
+
+**분리 불가 근거**: 확장 소스가 `DataExternalRepository`를 import하는 상태에서 manifest의
+의존성 선언만 제거하면 `tuist generate` 후 빌드가 실패하고, 반대로 소스에서 참조만 지우면
+사용되지 않는 의존성이 남아 계획 결정(R-014)을 만족하지 못한다. 중간 상태가 컴파일되지
+않거나 의도를 어기므로 두 파일을 하나의 단위로 변경한다.
+
+**통합 검증**: `make tuist` 이후 App scheme 빌드. 전체 검증은 아래 「전체 수렴 완료 검증」에서
+한 번 수행한다.
+
+- [ ] T062 [S6] `firstRepositoryURL()`이 URL 항목의 첫 번째 값을 형식과 무관하게 반환하도록
+      바꾸고 `GitHubRepositoryURLParser` 사용과 `DataExternalRepository` import를 제거하도록
+      `sources/Projects/App/ShareExtension/ShareViewController.swift`를 수정한다. per FR-028,
+      FR-029, S6/AC6 (contradicts)
+- [ ] T063 [S6] `ShareExtension` target의 `dependencies`에서
+      `.fromData(.DataExternalRepository)`와 관련 주석을 제거해 확장이 프로젝트 내부 패키지를
+      참조하지 않도록
+      `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`를 수정한다.
+      per plan: R-014 (contradicts)
+
+#### 정리와 패키지 검증
+
+- [ ] T064 [no-write] `make tuist`로 파생 workspace·project를 갱신하고, 실행 전후
+      `git status`를 비교해 추적 파일 변경이 없는지 확인한 뒤 App scheme 빌드가 성공하는지
+      확인하고 결과를 보고한다. 추적 파일이 바뀌면 완료로 처리하지 않는다.
+
+### 전체 수렴 완료 검증
+
+**커밋 경계**: 아래 `[no-write]` 작업은 이 수렴 단계의 마지막 커밋 단위에 배정한다. 모든
+검증과 필수 `after_implement` hook을 마친 뒤 그 단위를 최종 commit한다. 반복 승인 없이 같은
+실행에서 이어서 수행한다.
+
+- [ ] T065 [no-write] `project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)`
+      실행 후 `build` → `compile` → `test`를 순차 실행하고 결과를 기록한다. 세 명령은
+      `sources/DerivedData/PreCommit`을 공유하므로 병렬 실행하지 않는다.
+- [ ] T066 [no-write] [S6] [quickstart.md](./quickstart.md) 시나리오 6의 수동 절차로 (1) 공유
+      선택 후 추가 조작 없이 "다음"이 1회 자동 실행되는지, (2) 뒤로 돌아와도 재실행되지
+      않는지, (3) 일반 웹페이지 URL 공유 시 링크 입력 화면에 검증 실패 안내가 표시되는지를
+      확인한다. per FR-025a, FR-028, FR-029, SC-008

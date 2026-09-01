@@ -723,6 +723,75 @@ struct ProjectRegistrationFeatureTests {
         await store.send(.view(.stepBackTapped))
     }
 
+    @Test
+    func `공유 초기값이 있으면 task가 검증을 1회 자동 시작한다`() async {
+        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
+        let store = makeProjectRegistrationStore(
+            fetchExternalRepository: fetchExternalRepository,
+            state: ProjectRegistrationFeature.State(initialRepositoryURL: "https://github.com/owner/repo"),
+        )
+
+        await store.send(.view(.task)) {
+            $0.pendingAutomaticValidation = false
+            $0.validation = .validating
+            $0.validationRequestID = 1
+        }
+        await store.receive(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository)))) {
+            $0.validation = .validated(sampleRepository)
+        }
+
+        #expect(await fetchExternalRepository.snapshot().callCount == 1)
+    }
+
+    @Test
+    func `공유 초기값이 없으면 task가 검증을 시작하지 않는다`() async {
+        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
+        let store = makeProjectRegistrationStore(fetchExternalRepository: fetchExternalRepository)
+
+        await store.send(.view(.task))
+
+        #expect(await fetchExternalRepository.snapshot().callCount == 0)
+    }
+
+    @Test
+    func `task를 두 번 보내도 자동 검증은 1회만 시작한다`() async {
+        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
+        let store = makeProjectRegistrationStore(
+            fetchExternalRepository: fetchExternalRepository,
+            state: ProjectRegistrationFeature.State(initialRepositoryURL: "https://github.com/owner/repo"),
+        )
+
+        await store.send(.view(.task)) {
+            $0.pendingAutomaticValidation = false
+            $0.validation = .validating
+            $0.validationRequestID = 1
+        }
+        await store.receive(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository)))) {
+            $0.validation = .validated(sampleRepository)
+        }
+        await store.send(.view(.task))
+
+        #expect(await fetchExternalRepository.snapshot().callCount == 1)
+    }
+
+    @Test
+    func `자동 검증 실패도 직접 누른 경우와 같은 failed 상태로 전이한다`() async {
+        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.failure(.invalidURLFormat)])
+        let store = makeProjectRegistrationStore(
+            fetchExternalRepository: fetchExternalRepository,
+            state: ProjectRegistrationFeature.State(initialRepositoryURL: "https://example.com/article"),
+        )
+
+        await store.send(.view(.task)) {
+            $0.pendingAutomaticValidation = false
+            $0.validation = .validating
+            $0.validationRequestID = 1
+        }
+        await store.receive(.effect(.validationFinished(requestID: 1, result: .failure(.invalidURLFormat)))) {
+            $0.validation = .failed
+        }
+    }
+
 }
 
 // MARK: - Fixtures

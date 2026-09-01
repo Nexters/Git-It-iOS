@@ -40,11 +40,16 @@ public struct ProjectRegistrationFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         /// 공유 시트로 전달받은 URL을 링크 입력 초기값으로 1회 소비하기 위한 진입점이다.
         /// 검증되지 않은 외부 입력이므로 기존 검증 경로를 그대로 통과한다.
         public init(initialRepositoryURL: String = "") {
             repositoryURLInput = initialRepositoryURL
+            pendingAutomaticValidation = !initialRepositoryURL.isEmpty
         }
+
+        // MARK: Public
 
         public var repositoryURLInput = ""
         public var quizLevel = QuizLevel.l1
@@ -57,6 +62,12 @@ public struct ProjectRegistrationFeature: Sendable {
         public var requestedAt: Date?
         /// 도착했지만 최소 대기 시간이 남아 아직 노출하지 않은 생성 결과다.
         public var pendingOutcome: GenerationOutcome?
+
+        // MARK: Internal
+
+        /// 초기값과 함께 세워지고 화면이 처음 나타날 때 1회만 소비되는 자동 검증 표식이다.
+        /// 자동 실행 여부는 이 화면의 상태이므로 화면이나 App이 아니라 Feature가 소유한다.
+        var pendingAutomaticValidation = false
 
     }
 
@@ -84,6 +95,7 @@ public struct ProjectRegistrationFeature: Sendable {
 
         @CasePathable
         public enum View: Sendable, Equatable {
+            case task
             case repositoryURLChanged(String)
             case quizLevelSelected(QuizLevel)
             case validateTapped
@@ -116,6 +128,11 @@ public struct ProjectRegistrationFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .view(.task):
+                guard state.pendingAutomaticValidation else { return .none }
+                state.pendingAutomaticValidation = false
+                return startValidation(&state)
+
             case .view(.repositoryURLChanged(let text)):
                 state.repositoryURLInput = text
                 state.validation = .idle
@@ -127,21 +144,7 @@ public struct ProjectRegistrationFeature: Sendable {
                 return .none
 
             case .view(.validateTapped):
-                guard !state.repositoryURLInput.isEmpty else { return .none }
-                state.validationRequestID += 1
-                let currentRequestID = state.validationRequestID
-                state.validation = .validating
-                let url = state.repositoryURLInput
-                return .run { send in
-                    do {
-                        let repository = try await fetchExternalRepository(url: url)
-                        await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
-                    } catch {
-                        let mapped = error as? ExternalRepositoryError ?? .other
-                        await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
-                    }
-                }
-                .cancellable(id: CancelID.validation, cancelInFlight: true)
+                return startValidation(&state)
 
             case .view(.repositoryConfirmed):
                 guard case .validated = state.validation else { return .none }
@@ -274,6 +277,26 @@ public struct ProjectRegistrationFeature: Sendable {
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
+
+    /// 사용자가 "다음"을 누른 경로와 공유 진입의 자동 실행 경로가 같은 검증을 수행하도록
+    /// 시작 지점을 하나로 둔다.
+    private func startValidation(_ state: inout State) -> Effect<Action> {
+        guard !state.repositoryURLInput.isEmpty else { return .none }
+        state.validationRequestID += 1
+        let currentRequestID = state.validationRequestID
+        state.validation = .validating
+        let url = state.repositoryURLInput
+        return .run { send in
+            do {
+                let repository = try await fetchExternalRepository(url: url)
+                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
+            } catch {
+                let mapped = error as? ExternalRepositoryError ?? .other
+                await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
+            }
+        }
+        .cancellable(id: CancelID.validation, cancelInFlight: true)
+    }
 
     /// 생성 결과 구독을 먼저 확립한 뒤에 생성을 요청하고, 응답으로 받은 `projectID`로
     /// 이미 확립된 스트림을 필터링한다. 세 단계가 순서가 보장되는 단일 실행 경로에 있으므로
