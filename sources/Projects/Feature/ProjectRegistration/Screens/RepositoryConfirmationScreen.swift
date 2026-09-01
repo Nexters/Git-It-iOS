@@ -51,31 +51,14 @@ struct RepositoryConfirmationScreen: View {
     // MARK: Private
 
     private var thumbnail: some View {
-        Group {
-            if let imageURL = repository.imageURL, let url = URL(string: imageURL) {
-                AsyncImage(url: url) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        thumbnailPlaceholder
-                    }
-                }
-            } else {
-                thumbnailPlaceholder
-            }
-        }
-        .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
-        .designSystemCornerRadius(.medium)
-        .clipped()
-    }
-
-    private var thumbnailPlaceholder: some View {
         RoundedRectangle(designSystem: .medium)
             .fill(Color(designSystem: .grey600))
             .overlay {
                 LinearGradient(designSystem: .gradient3)
                     .opacity(Constant.thumbnailOverlayOpacity)
             }
+            .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+            .designSystemCornerRadius(.medium)
     }
 
 }
