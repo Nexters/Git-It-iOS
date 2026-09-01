@@ -195,26 +195,26 @@ build로 확인한다.
 
 ### 준비와 기반
 
-- [ ] T018 [P] [S2] `sources/Projects/Data/LearningProject/DTOs/GenerationProgressDTO.swift`에
+- [X] T018 [P] [S2] `sources/Projects/Data/LearningProject/DTOs/GenerationProgressDTO.swift`에
       `projectID: String`, `requestedAt: Date`를 갖는 `Codable` DTO를 추가한다.
-- [ ] T019 [P] [S2] `sources/Projects/Data/LearningProject/Contracts/GenerationProgressStore.swift`에
+- [X] T019 [P] [S2] `sources/Projects/Data/LearningProject/Contracts/GenerationProgressStore.swift`에
       `load()`, `save(_:)`, `clear()` 계약을 추가한다.
 
 ### 테스트
 
-- [ ] T020 [S2] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationProgressStoreTests.swift`에
+- [X] T020 [S2] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationProgressStoreTests.swift`에
       저장·복원·해제와 단일 레코드 유지 테스트를 작성한다. 격리된 `UserDefaults` suite를 써서
       다른 테스트와 상태를 공유하지 않는다.
 
 ### 구현
 
-- [ ] T021 [S2] `sources/Projects/Data/LearningProject/Stores/LocalGenerationProgressStore.swift`에
+- [X] T021 [S2] `sources/Projects/Data/LearningProject/Stores/LocalGenerationProgressStore.swift`에
       `InfrastructureStorage.UserDefaultsStore<GenerationProgressDTO>` 기반 구현을 추가한다.
       단일 키에 1건만 보관한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T022 [no-write] Data scheme 테스트로 T020 통과를 확인한다.
+- [X] T022 [no-write] Data scheme 테스트로 T020 통과를 확인한다.
 
 **진행 점검**: T018~T022의 변경 파일과 검증 결과를 보고하고 패키지 5로 진행한다.
 

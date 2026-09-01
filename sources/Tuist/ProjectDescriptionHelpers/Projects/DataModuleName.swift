@@ -62,7 +62,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -91,6 +92,9 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureStorage)
+                ],
             )
 
         case .DataLegalConsent:
