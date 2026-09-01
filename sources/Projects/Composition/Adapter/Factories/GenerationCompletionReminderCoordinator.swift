@@ -1,5 +1,6 @@
 import DomainLearningProject
 import InfrastructurePushMessaging
+import os
 
 // MARK: - GenerationCompletionReminderCoordinator
 
@@ -15,6 +16,7 @@ actor GenerationCompletionReminderCoordinator {
 
     func register(projectID: String) {
         registeredProjectIDs.insert(projectID)
+        Self.logger.debug("리마인드 대상 등록: projectID=\(projectID, privacy: .public)")
     }
 
     func start(learningProjectOutcomes: any LearningProjectOutcomesUseCase) {
@@ -32,14 +34,28 @@ actor GenerationCompletionReminderCoordinator {
 
     // MARK: Private
 
+    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "GenerationCompletionReminderCoordinator")
+
     private let localNotificationClient: any LocalNotificationClient
     private var registeredProjectIDs: Set<String> = []
     private var observationTask: Task<Void, Never>?
 
     private func handle(_ outcome: LearningProjectGenerationOutcome) async {
-        guard registeredProjectIDs.remove(outcome.projectID) != nil else { return }
-        guard outcome.status == .completed else { return }
-        guard await localNotificationClient.isAuthorized() else { return }
+        Self.logger.debug("생성 결과 수신: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)")
+
+        guard registeredProjectIDs.remove(outcome.projectID) != nil else {
+            Self.logger.debug("리마인드 미등록 프로젝트라 무시: projectID=\(outcome.projectID, privacy: .public)")
+            return
+        }
+        guard outcome.status == .completed else {
+            Self.logger.debug("완료가 아니므로 로컬 알림 미발송: projectID=\(outcome.projectID, privacy: .public)")
+            return
+        }
+        guard await localNotificationClient.isAuthorized() else {
+            Self.logger.debug("알림 권한 없어 로컬 알림 미발송: projectID=\(outcome.projectID, privacy: .public)")
+            return
+        }
+        Self.logger.debug("로컬 알림 발송: projectID=\(outcome.projectID, privacy: .public)")
         localNotificationClient.presentGenerationCompletedNotification(projectID: outcome.projectID)
     }
 

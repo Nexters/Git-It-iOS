@@ -98,7 +98,7 @@ T003이 두 hunk를 함께 커밋하며, 이 예외와 이유를 PR에 기록한
       `UNUserNotificationCenterDelegate` 연결, `Messaging.appDidReceiveMessage` 호출을 반영한다.
       `sources/Projects/Infrastructure/PushMessaging/AppDelegates/FirebaseMessagingAppDelegate.swift`,
       `sources/Projects/Infrastructure/PushMessaging/Clients/FirebaseMessagingPushClient.swift`
-- [ ] T005 리마인드 경로 진단 로깅 추가를 커밋한다. 권한 요청 결과, 리마인드 등록·판정 분기,
+- [X] T005 리마인드 경로 진단 로깅 추가를 커밋한다. 권한 요청 결과, 리마인드 등록·판정 분기,
       생성 결과 payload 파싱 결과를 `os.Logger`로 남긴다.
       `sources/Projects/Composition/Adapter/Adapters/NotificationAuthorizationGatewayAdapter.swift`,
       `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`,

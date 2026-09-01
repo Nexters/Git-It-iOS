@@ -1,4 +1,5 @@
 import Foundation
+import os
 import Synchronization
 
 // MARK: - PushProjectGenerationOutcomeRemote
@@ -22,7 +23,11 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
     }
 
     public func ingest(rawPayload: [String: String]) async {
-        guard let outcome = ProjectGenerationOutcomeDTO(rawPayload: rawPayload) else { return }
+        guard let outcome = ProjectGenerationOutcomeDTO(rawPayload: rawPayload) else {
+            Self.logger.debug("생성 결과 payload 파싱 실패: rawPayload=\(rawPayload, privacy: .public)")
+            return
+        }
+        Self.logger.debug("생성 결과 payload 파싱 성공: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)")
         let continuations = state.withLock { Array($0.continuations.values) }
         for continuation in continuations {
             continuation.yield(outcome)
@@ -30,6 +35,8 @@ public final class PushProjectGenerationOutcomeRemote: ProjectGenerationOutcomeR
     }
 
     // MARK: Private
+
+    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "PushProjectGenerationOutcomeRemote")
 
     private struct State {
         var continuations = [UUID: AsyncStream<ProjectGenerationOutcomeDTO>.Continuation]()
