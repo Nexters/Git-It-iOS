@@ -248,17 +248,17 @@ build로 확인한다.
 
 ### S5 — 첫 카드 기울기
 
-- [ ] T025 [S5] `sources/Projects/Feature/Tests/Home/Models/HomeCardScrollLayoutTests.swift`에
+- [X] T025 [S5] `sources/Projects/Feature/Tests/Home/Models/HomeCardScrollLayoutTests.swift`에
       기준 위치에서 각도가 정확히 0이고 기준 위치 좌우로 각도가 연속임을 확인하는 테스트를
       정리한다. T001에서 채택 여부가 정해진 기존 변경분을 함께 반영한다.
-- [ ] T026 [S5] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 `projectCardScroll`에서
+- [X] T026 [S5] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 `projectCardScroll`에서
       카드 목록 콘텐츠 선행 가장자리 앵커를 카드 중심과 **같은 좌표 공간**에서 읽어
       `HomeCardScrollLayout`의 `p0CenterX`로 주입한다. `CardLayout.p0CenterX` 상수 기반 계산을
       제거해 좌표계 원점 가정을 없앤다(R-003, FR-021~022).
 
 ### S4 — 카드 로딩 표시
 
-- [ ] T027 [S4] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 로딩·빈 상태 컨테이너
+- [X] T027 [S4] `sources/Projects/Feature/Home/Screens/HomeScreen.swift`의 로딩·빈 상태 컨테이너
       높이를 실제 카드 영역과 같은 `cardHeight + verticalPadding * 2`로 고정하고, 빈 데크
       실루엣을 그 안에 원본 비율로 배치한다. 로딩 인디케이터 표시는 유지한다(R-004, FR-017~019).
       빈 목록 안내와 조회 실패 안내의 기존 표시는 그대로 보존한다(FR-020). T001에서

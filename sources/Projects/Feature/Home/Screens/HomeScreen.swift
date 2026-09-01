@@ -24,23 +24,20 @@ public struct HomeScreen: View {
                 VStack(alignment: .leading, spacing: 0) {
                     profileHeader
                         .designSystemScreenMargin()
-
                     greeting
-                        .designSystemScreenMargin()
-                        .padding(.top, 8)
+                        .padding(.top, Metric.greetingTopPadding)
 
                     registrationPanel
-                        .designSystemScreenMargin()
-                        .padding(.top, 24)
-
-                    projectSection
-                        .padding(.top, 32)
+                        .padding(.top, Metric.registrationPanelTopPadding)
                 }
-                .padding(.bottom, 32)
+                .designSystemScreenMargin()
+                .padding(.bottom, Metric.projectSectionTopPadding)
+
+                projectSection
             }
             .scrollIndicators(.hidden)
-        }
-        .task { await send(.task).finish() }
+        }.safeAreaPadding()
+            .task { await send(.task).finish() }
     }
 
     // MARK: Internal
@@ -139,19 +136,41 @@ public struct HomeScreen: View {
 
     private enum CardLayout {
 
-        // MARK: Internal
-
         static let cardWidth: CGFloat = 154
+        static let cardHeight: CGFloat = 192
         static let cardSpacing: CGFloat = 2.5
         static let screenMargin: CGFloat = 20
+        static let verticalPadding: CGFloat = 24
         static let cardStride = cardWidth + cardSpacing
-        static let p0CenterX = screenMargin + cardWidth / 2
 
-        static var scrollLayout: HomeCardScrollLayout {
-            HomeCardScrollLayout(p0CenterX: p0CenterX, cardStride: cardStride)
+        /// 로딩·빈 상태 컨테이너가 실제 카드 영역과 같은 높이를 갖게 하는 값이다.
+        static let sectionHeight = cardHeight + verticalPadding * 2
+
+        /// 마지막 카드도 P0까지 스냅될 수 있도록 viewport 나머지 전체를 trailing 여백으로 예약한다.
+        static func trailingInset(viewportWidth: CGFloat) -> CGFloat {
+            max(viewportWidth - screenMargin - cardWidth, screenMargin)
         }
 
     }
+
+    /// 빈 상태 데크의 표현 상수. 실루엣 자체는 `HomeEmptyDeckShape`가 소유한다.
+    private enum EmptyDeck {
+        static let strokeWidth: CGFloat = 1
+    }
+
+    /// Figma `1542:19610`의 세로 리듬 실측값 (조회일 2026-09-01, 근거 A).
+    ///
+    /// 기준 y좌표: Toolbar 끝 127 → 인사말 147~221 → 등록 패널 242~375 →
+    /// 섹션 헤더 411~435 → 카드 영역 434.
+    private enum Metric {
+        static let greetingTopPadding: CGFloat = 20
+        static let registrationPanelTopPadding: CGFloat = 21
+        static let projectSectionTopPadding: CGFloat = 36
+        static let sectionHeaderSpacing: CGFloat = 0
+        static let chevronSize: CGFloat = 16
+    }
+
+    @State private var cardListLeadingX: CGFloat?
 
     @ViewBuilder
     private var profileHeader: some View {
@@ -179,12 +198,13 @@ public struct HomeScreen: View {
 
         case .idle,
              .loading:
-            HStack(spacing: 12) {
-                ProgressView().tint(Color(designSystem: .blue100))
-                StyledText.body2("프로필을 불러오는 중이에요", color: .grey400)
+            ScreenHeader(
+                style: .inlineUser,
+                user: nil,
+                leading: nil,
+            ) {
+                ResourceImage(asset: .icon(.profile), contentMode: .fill)
             }
-            .frame(minHeight: 88)
-            .accessibilityElement(children: .combine)
         }
     }
 
@@ -233,7 +253,7 @@ public struct HomeScreen: View {
     }
 
     private var projectSection: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: Metric.sectionHeaderSpacing) {
             HStack {
                 StyledText.subtitle3("학습 중인 레포지토리")
                 Spacer()
@@ -243,7 +263,7 @@ public struct HomeScreen: View {
                     HStack(spacing: 3) {
                         StyledText.caption1("전체 보기", color: .blue100)
                         ResourceImage(asset: .icon(.chevronRight))
-                            .frame(width: 6, height: 10)
+                            .frame(width: Metric.chevronSize, height: Metric.chevronSize)
                     }
                 }
                 .buttonStyle(.plain)
@@ -258,106 +278,110 @@ public struct HomeScreen: View {
     @ViewBuilder
     private var projectContent: some View {
         switch store.projectLoad {
-        case .idle,
-             .loading:
-            HStack {
-                Spacer()
-                ResourceAnimation(asset: .generalLoading)
-                    .frame(width: 96, height: 96)
-                    .accessibilityLabel("프로젝트를 불러오는 중입니다")
-                Spacer()
-            }
-            .frame(minHeight: 220)
-
         case .loaded(let page) where !page.items.isEmpty:
             projectCards(Display.projects(page.items))
 
-        case .loaded,
-             .failed:
-            emptyProjects
-        }
-    }
-
-    private var emptyProjects: some View {
-        ZStack {
-            emptyProjectCards
-            StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200, alignment: .center)
-                .allowsHitTesting(false)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private var emptyProjectCards: some View {
-        let cardSize = CGSize(width: CardLayout.cardWidth, height: 192)
-        let angles = CardLayout.scrollLayout.initialAngles(cardCount: 3)
-        let centers = angles.indices.map {
-            CGPoint(
-                x: cardSize.width / 2 + CGFloat($0) * CardLayout.cardStride,
-                y: cardSize.height / 2,
-            )
-        }
-        let bounds = Self.cardGroupBounds(centers: centers, size: cardSize, angles: angles)
-
-        return ScrollView(.horizontal) {
-            ZStack {
-                HStack(spacing: CardLayout.cardSpacing) {
-                    ForEach(angles.indices, id: \.self) { index in
-                        emptyProjectCard(size: cardSize)
-                            .rotationEffect(.degrees(angles[index]))
-                    }
-                }
+        case .idle,
+             .loading:
+            emptyProjects {
+                ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
             }
-            .padding(.horizontal, CardLayout.screenMargin)
-            .padding(.vertical, 24)
+
+        case .loaded:
+            emptyProjects {
+                StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .blue200)
+            }
+
+        case .failed:
+            emptyProjects {
+                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    StyledText.body2("프로젝트를 불러오지 못했어요.", color: .error, alignment: .center)
+                    StyledText.caption1("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
+
+                    ActionButton.secondary("다시 시도", size: .small) { send(.projectRetryTapped) }
+                        .fixedSize(horizontal: true, vertical: false)
+                        .padding(.top, 4)
+                }
+                .designSystemScreenMargin()
+            }
         }
+    }
+
+    /// Figma `1542:19623` Union을 그대로 옮긴 빈 상태 데크다. 겹친 경계에는 테두리가 없다.
+    ///
+    /// 원본 크기(501×237)를 유지해 오른쪽이 잘리게 하되, 그 폭이 화면 레이아웃을 넓히지
+    /// 않도록 스크롤 불가능한 가로 ScrollView 안에 둔다.
+    private var emptyProjectCards: some View {
+        ScrollView(.horizontal) {
+            emptyDeckSilhouette
+                .frame(
+                    width: HomeEmptyDeckShape.designSize.width,
+                    height: HomeEmptyDeckShape.designSize.height,
+                )
+                // 캔버스가 이미 상단 27.456pt 여백을 포함하므로 바깥에서 세로 여백을 더하지 않는다.
+                .padding(.leading, CardLayout.screenMargin)
+        }
+        .scrollDisabled(true)
         .scrollIndicators(.hidden)
         .accessibilityHidden(true)
     }
 
-    private static func cardGroupBounds(
-        centers: [CGPoint],
-        size: CGSize,
-        angles: [Double],
-    ) -> CGRect {
-        let halfWidth = size.width / 2
-        let halfHeight = size.height / 2
-        let corners: [(dx: CGFloat, dy: CGFloat)] = [
-            (-halfWidth, -halfHeight),
-            (halfWidth, -halfHeight),
-            (halfWidth, halfHeight),
-            (-halfWidth, halfHeight),
-        ]
-
-        let points = zip(centers, angles).flatMap { center, angle -> [CGPoint] in
-            let radians = angle * .pi / 180
-            return corners.map { corner in
-                CGPoint(
-                    x: center.x + corner.dx * cos(radians) - corner.dy * sin(radians),
-                    y: center.y + corner.dx * sin(radians) + corner.dy * cos(radians),
-                )
+    private var emptyDeckSilhouette: some View {
+        HomeEmptyDeckShape()
+            .fill(Color(designSystem: .blue500))
+            .overlay {
+                // Figma는 inside stroke를 쓴다. 두 배 두께로 그린 뒤 실루엣으로 잘라 안쪽만 남긴다.
+                HomeEmptyDeckShape()
+                    .stroke(Color(designSystem: .blue300), lineWidth: EmptyDeck.strokeWidth * 2)
+                    .clipShape(HomeEmptyDeckShape())
             }
-        }
-
-        guard
-            let minX = points.map(\.x).min(),
-            let maxX = points.map(\.x).max(),
-            let minY = points.map(\.y).min(),
-            let maxY = points.map(\.y).max()
-        else {
-            return .zero
-        }
-
-        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
 
-    private func emptyProjectCard(size: CGSize) -> some View {
-        RoundedRectangle(designSystem: .large)
-            .fill(Color(designSystem: .blue500).opacity(0.3))
-            .frame(width: size.width, height: size.height)
+    /// 카드 목록 콘텐츠의 선행 가장자리에 놓는 0 크기 앵커다. 정지 상태에서 한 번 측정한 값이
+    /// P0 기준 위치가 되므로 이후 스크롤 값으로 덮어쓰지 않는다.
+    private var cardListLeadingAnchor: some View {
+        Color.clear
+            .frame(width: 0, height: 0)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .scrollView(axis: .horizontal)).minX
+            } action: { minX in
+                guard cardListLeadingX == nil else { return }
+                cardListLeadingX = minX
+            }
+    }
+
+    private func emptyProjects(@ViewBuilder accessary: () -> some View) -> some View {
+        ZStack {
+            emptyProjectCards
+            accessary()
+        }
+        // 로딩·빈 목록·조회 실패 표시가 모두 실제 카드 영역과 같은 높이를 차지해, 목록이
+        // 도착해도 아래 콘텐츠가 밀리지 않는다.
+        .frame(height: CardLayout.sectionHeight)
+        // 데크는 이미 accessibility에서 감춰져 있고, 겹쳐진 내용에 버튼이 올 수 있으므로
+        // 하나로 합치지 않고 자식 요소를 그대로 노출한다.
+        .accessibilityElement(children: .contain)
     }
 
     private func projectCards(_ projects: [Display.Project]) -> some View {
-        let layout = CardLayout.scrollLayout
+        GeometryReader { viewport in
+            projectCardScroll(projects, viewportWidth: viewport.size.width)
+        }
+        .frame(height: CardLayout.sectionHeight)
+    }
+
+    private func projectCardScroll(
+        _ projects: [Display.Project],
+        viewportWidth: CGFloat,
+    ) -> some View {
+        // 기준 위치는 화면 좌표 상수가 아니라, 카드 중심과 같은 좌표 공간에서 읽은 카드 목록
+        // 선행 가장자리 실측값이다. 측정 전에는 회전을 적용하지 않는다.
+        let layout = cardListLeadingX.map {
+            HomeCardScrollLayout(
+                p0CenterX: $0 + CardLayout.cardWidth / 2,
+                cardStride: CardLayout.cardStride,
+            )
+        }
 
         return ScrollView(.horizontal) {
             LazyHStack(spacing: CardLayout.cardSpacing) {
@@ -375,15 +399,21 @@ public struct HomeScreen: View {
                     )
                     .visualEffect { content, proxy in
                         content.rotationEffect(
-                            .degrees(layout.angle(cardCenterX: proxy.frame(in: .scrollView(axis: .horizontal)).midX))
+                            .degrees(
+                                layout?.angle(
+                                    cardCenterX: proxy.frame(in: .scrollView(axis: .horizontal)).midX
+                                ) ?? 0
+                            )
                         )
                     }
                 }
             }
+            .background(alignment: .leading) { cardListLeadingAnchor }
             .scrollTargetLayout()
-            .padding(.horizontal, CardLayout.screenMargin)
-            .padding(.vertical, 24)
+            .padding(.vertical, CardLayout.verticalPadding)
         }
+        .safeAreaPadding(.leading, CardLayout.screenMargin)
+        .safeAreaPadding(.trailing, CardLayout.trailingInset(viewportWidth: viewportWidth))
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
     }
