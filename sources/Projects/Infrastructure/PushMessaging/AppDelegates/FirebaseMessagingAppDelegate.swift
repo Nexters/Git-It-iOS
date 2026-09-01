@@ -1,8 +1,10 @@
 import FirebaseCore
+import FirebaseMessaging
 import Foundation
 import os
 import Synchronization
 import UIKit
+import UserNotifications
 
 // MARK: - FirebaseMessagingAppDelegate
 
@@ -18,7 +20,10 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         _ application: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?,
     ) -> Bool {
-        FirebaseApp.configure()
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
+        UNUserNotificationCenter.current().delegate = self
         application.registerForRemoteNotifications()
         return true
     }
@@ -45,7 +50,10 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
             return
         }
 
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+
         let payload = RemoteNotificationPayload(userInfo: userInfo)
+        Self.logger.debug("didReceiveRemoteNotification 수신: \(payload.value, privacy: .public)")
 
         Task {
             await handlers.ingestPushPayload(payload.value)
@@ -58,4 +66,15 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
     private static let state = Mutex<PushNotificationHandlers?>(nil)
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "FirebaseMessagingAppDelegate")
 
+}
+
+// MARK: UNUserNotificationCenterDelegate
+
+extension FirebaseMessagingAppDelegate: UNUserNotificationCenterDelegate {
+    public func userNotificationCenter(
+        _: UNUserNotificationCenter,
+        willPresent _: UNNotification,
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .list, .sound]
+    }
 }

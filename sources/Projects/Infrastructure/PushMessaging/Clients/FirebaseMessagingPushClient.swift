@@ -1,3 +1,4 @@
+import FirebaseCore
 import FirebaseMessaging
 import Foundation
 import Synchronization
@@ -10,6 +11,9 @@ public final class FirebaseMessagingPushClient: NSObject, PushMessagingClient, S
 
     override public init() {
         super.init()
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
         Messaging.messaging().delegate = self
     }
 

@@ -94,7 +94,7 @@ T003이 두 hunk를 함께 커밋하며, 이 예외와 이유를 PR에 기록한
       `sources/Projects/Infrastructure/PushMessaging/Clients/UNUserNotificationCenterLocalNotificationClient.swift`(삭제),
       `sources/Projects/Infrastructure/PushMessaging/Clients/UserNotificationCenterLocalClient.swift`(추가),
       `sources/Projects/Composition/Adapter/Assemblies/AppComposition.swift`
-- [ ] T004 FCM 원격 알림 수신 경로 보완을 커밋한다. `FirebaseApp` 중복 구성 방지,
+- [X] T004 FCM 원격 알림 수신 경로 보완을 커밋한다. `FirebaseApp` 중복 구성 방지,
       `UNUserNotificationCenterDelegate` 연결, `Messaging.appDidReceiveMessage` 호출을 반영한다.
       `sources/Projects/Infrastructure/PushMessaging/AppDelegates/FirebaseMessagingAppDelegate.swift`,
       `sources/Projects/Infrastructure/PushMessaging/Clients/FirebaseMessagingPushClient.swift`
