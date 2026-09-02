@@ -63,6 +63,8 @@ struct AnswerEditor: View {
 
 }
 
+// MARK: AnswerEditor.Constant
+
 extension AnswerEditor {
     enum Constant {
         static let defaultCharacterLimit = 400

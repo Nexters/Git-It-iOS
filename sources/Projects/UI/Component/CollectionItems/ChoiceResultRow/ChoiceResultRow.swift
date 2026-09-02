@@ -76,7 +76,10 @@ public struct ChoiceResultRow: View {
 
     // MARK: Internal
 
-    static func accessibilityLabel(text: String, judgement: Judgement) -> String {
+    static func accessibilityLabel(
+        text: String,
+        judgement: Judgement,
+    ) -> String {
         "\(text), \(judgement.accessibilitySuffix)"
     }
 

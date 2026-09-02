@@ -45,7 +45,6 @@ public struct SheetSurface<Content: View>: View {
             .padding(.bottom, Constant.grabberBottomPadding)
     }
 
-    @ViewBuilder
     private func surface(@ViewBuilder body: () -> some View) -> some View {
         VStack(spacing: 0) {
             grabber

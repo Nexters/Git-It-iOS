@@ -70,16 +70,16 @@ public struct SelectionCard<Thumbnail: View>: View {
 
     // MARK: Private
 
-    private var borderToken: BorderToken {
-        isSelected ? .focus : .default
-    }
-
     private let title: String
     private let supportingText: String?
     private let badgeText: String?
     private let isSelected: Bool
     private let style: SelectionCardStyle
     private let thumbnail: Thumbnail
+
+    private var borderToken: BorderToken {
+        isSelected ? .focus : .default
+    }
 
 }
 

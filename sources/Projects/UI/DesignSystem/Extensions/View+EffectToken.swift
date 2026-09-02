@@ -6,6 +6,8 @@ extension View {
     }
 }
 
+// MARK: - DesignSystemEffectModifier
+
 private struct DesignSystemEffectModifier: ViewModifier {
     let token: EffectToken
 

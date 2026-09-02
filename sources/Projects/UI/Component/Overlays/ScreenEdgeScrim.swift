@@ -30,9 +30,9 @@ public struct ScreenEdgeScrim: View {
         /// 정본 고정값 대신 화면 크기에서 유도한 높이를 쓴다.
         func height(layoutMetrics: LayoutMetrics) -> CGFloat {
             switch self {
-            case let .top(headerStyle):
+            case .top(let headerStyle):
                 CGFloat(layoutMetrics.topScrimHeight(headerStyle: headerStyle))
-            case let .bottom(hasTabBar):
+            case .bottom(let hasTabBar):
                 CGFloat(layoutMetrics.bottomScrimHeight(hasTabBar: hasTabBar))
             }
         }

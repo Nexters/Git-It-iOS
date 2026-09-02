@@ -139,8 +139,9 @@ extension DesignTokenSet {
             ))
         }
         for color in colors {
-            if let opacityPercent = color.opacityPercent,
-               !(0...100).contains(opacityPercent)
+            if
+                let opacityPercent = color.opacityPercent,
+                !(0...100).contains(opacityPercent)
             {
                 errors.append(.outOfRange(
                     category: "ColorToken",

@@ -152,6 +152,13 @@ public struct SplashView: View {
             }
     }
 
+    private static func revealed(
+        _ text: String,
+        characters: Double,
+    ) -> String {
+        String(text.prefix(max(0, Int(characters))))
+    }
+
     private func lines(values: IntroValues) -> some View {
         VStack(alignment: .center, spacing: Constant.lineSpacing) {
             HStack(spacing: 0) {
@@ -190,13 +197,6 @@ public struct SplashView: View {
             }
             .frame(alignment: .leading)
         }
-    }
-
-    private static func revealed(
-        _ text: String,
-        characters: Double,
-    ) -> String {
-        String(text.prefix(max(0, Int(characters))))
     }
 
     private func cursorBar(

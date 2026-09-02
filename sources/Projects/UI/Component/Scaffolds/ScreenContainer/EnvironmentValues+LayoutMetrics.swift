@@ -12,4 +12,5 @@ extension EnvironmentValues {
         safeAreaTop: 62,
         safeAreaBottom: 34,
     )
+
 }

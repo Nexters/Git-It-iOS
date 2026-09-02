@@ -87,7 +87,7 @@ extension EffectToken {
                 offset: Offset(x: 4, y: 4),
                 blur: 15,
                 spread: 10,
-            ),
+            )
         ],
     )
 

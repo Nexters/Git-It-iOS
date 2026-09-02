@@ -58,14 +58,17 @@ public struct TextField: View {
             switch self {
             case .default:
                 .default
+
             case .active:
                 .focus
+
             case .filled:
                 BorderToken(
                     name: SemanticColorToken.mutedText.name,
                     width: 1,
                     colorToken: SemanticColorToken.mutedText.colorToken,
                 )
+
             case .error:
                 .error
             }
@@ -84,13 +87,13 @@ public struct TextField: View {
         }
     }
 
-    // MARK: Private
-
     enum Constant {
         static let horizontalPadding: CGFloat = 16
         static let surfaceHeight: CGFloat = 52
         static let errorSpacing: CGFloat = 4
     }
+
+    // MARK: Private
 
     @FocusState private var isFocused: Bool
 

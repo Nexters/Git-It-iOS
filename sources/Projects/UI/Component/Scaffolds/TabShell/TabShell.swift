@@ -18,6 +18,11 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     // MARK: Public
 
+    /// 규격이 직접 확정한 알약 폭. 인자로 바꿔 채움으로 쓸 수 있다.
+    public static var defaultPillWidth: CGFloat {
+        Constant.pillWidth
+    }
+
     public var body: some View {
         TabView(selection: $selected) {
             ForEach(Item.allCases) { item in
@@ -29,11 +34,6 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
         .overlay(alignment: .bottom) {
             tabBar
         }
-    }
-
-    /// 규격이 직접 확정한 알약 폭. 인자로 바꿔 채움으로 쓸 수 있다.
-    public static var defaultPillWidth: CGFloat {
-        Constant.pillWidth
     }
 
     // MARK: Internal

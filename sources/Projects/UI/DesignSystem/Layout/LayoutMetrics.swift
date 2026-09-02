@@ -5,6 +5,9 @@
 /// 가로는 늘리고 세로는 고정한다. Figma 정본 캔버스 360 × 800은 크기 기준이 아니며
 /// 구성 순서·간격·컴포넌트 높이만 정본에서 가져온다.
 public struct LayoutMetrics: Sendable, Equatable {
+
+    // MARK: Lifecycle
+
     public init(
         screenWidth: Double,
         screenHeight: Double,
