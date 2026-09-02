@@ -22,7 +22,8 @@ public struct ModalOverlay<Content: View>: View {
     public var body: some View {
         ZStack(alignment: .bottom) {
             if isPresented {
-                Color(designSystem: .scrim)
+                Color(designSystem: ColorToken.black)
+                    .designSystemOpacity(.scrim)
                     .ignoresSafeArea()
                     .transition(.opacity)
                     .accessibilityHidden(true)

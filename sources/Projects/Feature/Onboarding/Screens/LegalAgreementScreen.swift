@@ -14,7 +14,7 @@ struct LegalAgreementScreen: View {
     @Bindable var store: StoreOf<OnboardingGuideFeature>
 
     var body: some View {
-        SheetSurface(isScrollable: true) {
+        SheetSurface {
             VStack(alignment: .leading, spacing: 0) {
                 StyledText.subtitle1("약관 동의")
                     .padding(.top, LayoutToken.gutter.cgFloatValue)

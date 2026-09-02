@@ -17,11 +17,12 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .designSystemScreenMargin()
-            .padding(.bottom, Constant.bottomPadding)
+            .padding(.bottom, CGFloat(layoutMetrics.tabBarBottomInset))
     }
 
     // MARK: Private
+
+    @Environment(\.layoutMetrics) private var layoutMetrics
 
     private let content: Content
 

@@ -10,6 +10,24 @@ extension ScreenHeader {
 
         // MARK: Internal
 
+        /// 규격이 확정한 헤더 높이. `.default`가 규격의 plain에 해당한다.
+        var layoutMetricsHeaderStyle: LayoutMetrics.HeaderStyle {
+            switch self {
+            case .default:
+                .plain
+            case .inlineTitle:
+                .inlineTitle
+            case .inlineUser:
+                .inlineUser
+            case .largeTitle:
+                .largeTitle
+            }
+        }
+
+        var height: CGFloat {
+            CGFloat(layoutMetricsHeaderStyle.height)
+        }
+
         var controlRowHeight: CGFloat {
             switch self {
             case .inlineUser:

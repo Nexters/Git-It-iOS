@@ -87,6 +87,7 @@ public struct ScreenHeader: View {
         }
         .padding(.top, style.topPadding)
         .padding(.bottom, Constant.bottomPadding)
+        .frame(height: style.height, alignment: .top)
     }
 
     // MARK: Private

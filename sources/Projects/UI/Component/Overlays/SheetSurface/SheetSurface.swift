@@ -7,45 +7,50 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Lifecycle
 
-    public init(
-        isScrollable: Bool = false,
-        @ViewBuilder content: () -> Content,
-    ) {
-        self.isScrollable = isScrollable
+    public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
     // MARK: Public
 
     public var body: some View {
-        VStack(spacing: 0) {
-            Capsule()
-                .fill(Color(designSystem: .grey400))
-                .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
-                .padding(.top, Constant.grabberTopPadding)
-                .padding(.bottom, Constant.grabberBottomPadding)
-
-            if isScrollable {
-                ScrollView {
-                    content
-                        .background(
-                            GeometryReader { proxy in
-                                Color.clear.preference(
-                                    key: ContentHeightPreferenceKey.self,
-                                    value: proxy.size.height,
-                                )
-                            }
-                        )
-                }
-                .frame(maxHeight: contentHeight)
-                .contentMargins(.all, 0, for: .scrollContent)
-                .scrollBounceBehavior(.basedOnSize)
-                .onPreferenceChange(ContentHeightPreferenceKey.self) { contentHeight = $0 }
-            } else {
+        ViewThatFits(in: .vertical) {
+            surface {
                 content
             }
+
+            surface {
+                ScrollView {
+                    content
+                }
+                .contentMargins(.all, 0, for: .scrollContent)
+                .scrollBounceBehavior(.basedOnSize)
+            }
         }
-        .designSystemScreenMargin()
+        .frame(maxHeight: CGFloat(layoutMetrics.sheetMaximumHeight))
+    }
+
+    // MARK: Private
+
+    @Environment(\.layoutMetrics) private var layoutMetrics
+
+    private let content: Content
+
+    private var grabber: some View {
+        Capsule()
+            .fill(Color(designSystem: .grabber))
+            .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
+            .padding(.top, Constant.grabberTopPadding)
+            .padding(.bottom, Constant.grabberBottomPadding)
+    }
+
+    @ViewBuilder
+    private func surface(@ViewBuilder body: () -> some View) -> some View {
+        VStack(spacing: 0) {
+            grabber
+
+            body()
+        }
         .padding(.bottom, Constant.bottomPadding)
         .background {
             UnevenRoundedRectangle(designSystemTopCorners: .extraLarge)
@@ -54,26 +59,6 @@ public struct SheetSurface<Content: View>: View {
         }
     }
 
-    // MARK: Private
-
-    @State private var contentHeight: CGFloat?
-
-    private let isScrollable: Bool
-    private let content: Content
-
-}
-
-// MARK: - ContentHeightPreferenceKey
-
-private struct ContentHeightPreferenceKey: PreferenceKey {
-    static let defaultValue: CGFloat? = nil
-
-    static func reduce(
-        value: inout CGFloat?,
-        nextValue: () -> CGFloat?,
-    ) {
-        value = nextValue() ?? value
-    }
 }
 
 #Preview("Sheet Surface") {
@@ -95,7 +80,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
     VStack(spacing: 0) {
         Spacer()
 
-        SheetSurface(isScrollable: true) {
+        SheetSurface {
             VStack(spacing: LayoutToken.margin.cgFloatValue) {
                 ForEach(0..<8, id: \.self) { index in
                     StyledText.body1("정책 문서 \(index + 1)")

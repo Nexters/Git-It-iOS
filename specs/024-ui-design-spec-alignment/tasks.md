@@ -274,30 +274,30 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 구현
 
-- [ ] T026 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenContainer.swift`를 타입 패밀리
+- [X] T026 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenContainer.swift`를 타입 패밀리
       폴더 `sources/Projects/UI/Component/Scaffolds/ScreenContainer/ScreenContainer.swift`로
       옮기고, `GeometryReader`와 safe area에서 화면 폭·높이·safe area 상하를 읽어
       `LayoutMetrics`를 만들어 Environment로 주입하는 유일한 지점으로 만든다. 화면 좌우
       여백(`LayoutToken.margin`)도 여기서 한 번만 붙인다 (FR-027)
-- [ ] T027 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenContainer/EnvironmentValues+LayoutMetrics.swift`를
+- [X] T027 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenContainer/EnvironmentValues+LayoutMetrics.swift`를
       새로 만들어 `LayoutMetrics`의 SwiftUI Environment 키와 접근자를 선언한다. 기본값은 주력
       기기(402 × 874, safe area 62/34)로 둔다 (T026 의존)
-- [ ] T028 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader+Style.swift`에
+- [X] T028 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader+Style.swift`에
       `LayoutMetrics.HeaderStyle` 매핑과 높이를 확정한다 — `.default`(규격 plain) 50 ·
       `.inlineTitle` 64 · `.inlineUser` 98 · `.largeTitle` 120. case 이름은 바꾸지 않는다
       (FR-014)
-- [ ] T029 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader.swift`가
+- [X] T029 [S2] `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader.swift`가
       확정된 높이를 사용하고 스크롤과 무관하게 상단 safe area 아래에 고정되게 한다
       (T028 의존)
-- [ ] T030 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`가 Environment의
+- [X] T030 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`가 Environment의
       `LayoutMetrics`를 읽어 상단 높이를 `topScrimHeight(headerStyle:)`로, 하단 높이를
       `bottomScrimHeight(hasTabBar:)`로 계산하게 한다. 헤더 종류와 탭바 유무를 공개 생성
       경로의 값으로 받고, 정본 고정값 103·34·127을 쓰지 않는다 (FR-013 · R-06)
-- [ ] T031 [S2] `sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift`가 알약 폭
+- [X] T031 [S2] `sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift`가 알약 폭
       298을 기본값 인자로 갖고 가로 중앙 정렬하며, 하단 여백을 `tabBarBottomInset`
       (`max(safeAreaBottom, 24)`)으로 쓰게 한다. 표면과 테두리는 `tabBarSurface`·`tabBarBorder`
       역할 색과 `BorderToken.tabBar`를 참조한다 (FR-016)
-- [ ] T032 [S2] `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift`를
+- [X] T032 [S2] `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift`를
       `ViewThatFits(in: .vertical)`로 재구성한다 — 첫 후보는 콘텐츠 그대로, 둘째 후보는
       `ScrollView { 콘텐츠 }`로 두고 전체에 `.frame(maxHeight:)`로 Environment의
       `sheetMaximumHeight`를 건다. 이로써 `@State private var contentHeight`와
@@ -305,21 +305,21 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
       않고 상단 두 모서리만 반경 16을 적용하며 그래버는 `grabber` 역할 색을 쓴다. 같은 파일의
       `.designSystemScreenMargin()` 호출도 함께 제거한다 — 컴포넌트는 화면 좌우 여백을 붙이지
       않고 `ScreenContainer`가 소유한다 (FR-015 · FR-026 · FR-027 · SC-014)
-- [ ] T033 [S2] `sources/Projects/UI/Component/Overlays/ModalOverlay.swift`가 safe area를
+- [X] T033 [S2] `sources/Projects/UI/Component/Overlays/ModalOverlay.swift`가 safe area를
       무시하고 화면 전체를 덮으며 딤을 `OpacityToken.scrim`(70%)으로 표현하게 한다
-- [ ] T034 [S2] `sources/Projects/UI/Component/Scaffolds/BottomActionBar/BottomActionBar.swift`의
+- [X] T034 [S2] `sources/Projects/UI/Component/Scaffolds/BottomActionBar/BottomActionBar.swift`의
       하단 여백을 `LayoutMetrics`에서 읽어 고정값 대신 계산값을 쓰게 하고,
       `.designSystemScreenMargin()` 호출을 제거한다. 이 파일과 `SheetSurface.swift`가
       `Component/**`의 프로덕션 화면 여백 사용처 2곳이다 (FR-027)
-- [ ] T035 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/ScreenContainerContractTests.swift`를
+- [X] T035 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/ScreenContainerContractTests.swift`를
       새로 만들어 `ScreenContainer`가 `LayoutMetrics`를 주입하고 화면 여백을 한 번만 붙이는지
       검증한다. 역할 폴더 `Scaffolds`의 첫 테스트다 (SC-010)
-- [ ] T036 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Overlays/ScreenEdgeScrimContractTests.swift`를
+- [X] T036 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Overlays/ScreenEdgeScrimContractTests.swift`를
       갱신해 헤더 종류·탭바 유무별 스크림 높이가 계산값을 따르는지 검증한다 (T030 의존)
 
 ### 정리와 패키지 검증
 
-- [ ] T037 [no-write] [S2] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
+- [X] T037 [no-write] [S2] `"$project_build_runner" compile`과 `"$project_build_runner" test`를
       순차 실행하고, `grep -rn` 으로 `sources/Projects/UI/Component/Scaffolds`와
       `sources/Projects/UI/Component/Overlays`에 정본 고정값 103·154·34·127·53이 남지 않았는지
       확인한다
