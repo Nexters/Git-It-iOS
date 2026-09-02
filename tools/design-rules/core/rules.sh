@@ -90,6 +90,9 @@ design_rules_path_exempt() (
 	case "$design_rules_name:$design_rules_path" in
 	# 화면 좌우 여백은 ScreenContainer 하나가 소유합니다.
 	component-margin:*/Scaffolds/ScreenContainer/*) return 0 ;;
+	# 시트는 자기 좌우 여백과 스크롤 높이를 직접 관리하는 표시 방식을 씁니다.
+	component-margin:*/Overlays/SheetSurface/*) return 0 ;;
+	component-state:*/Overlays/SheetSurface/*) return 0 ;;
 	# 수치 상수 선언 파일은 값을 모으는 곳이므로 검사 대상이 아닙니다.
 	hardcoded-metric:*+Constant.swift) return 0 ;;
 	*) return 1 ;;

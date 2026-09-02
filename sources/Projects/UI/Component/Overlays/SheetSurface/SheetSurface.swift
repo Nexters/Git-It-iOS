@@ -3,65 +3,76 @@ import SwiftUI
 
 // MARK: - SheetSurface
 
-/// 크기 결정 방식은 `SizingMode.fill` — 높이는 콘텐츠를 따르고 상한만 레이아웃 변수를 쓴다.
 public struct SheetSurface<Content: View>: View {
 
     // MARK: Lifecycle
 
     public init(
-        layoutMetrics: LayoutMetrics = .default,
+        isScrollable: Bool = false,
         @ViewBuilder content: () -> Content,
     ) {
-        self.layoutMetrics = layoutMetrics
+        self.isScrollable = isScrollable
         self.content = content()
     }
 
     // MARK: Public
 
     public var body: some View {
-        ViewThatFits(in: .vertical) {
-            surface {
-                content
-            }
+        VStack(spacing: 0) {
+            Capsule()
+                .fill(Color(designSystem: .grey400))
+                .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
+                .padding(.top, Constant.grabberTopPadding)
+                .padding(.bottom, Constant.grabberBottomPadding)
 
-            surface {
+            if isScrollable {
                 ScrollView {
                     content
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear.preference(
+                                    key: ContentHeightPreferenceKey.self,
+                                    value: proxy.size.height,
+                                )
+                            }
+                        )
                 }
+                .frame(maxHeight: contentHeight)
                 .contentMargins(.all, 0, for: .scrollContent)
                 .scrollBounceBehavior(.basedOnSize)
+                .onPreferenceChange(ContentHeightPreferenceKey.self) { contentHeight = $0 }
+            } else {
+                content
             }
         }
-        .frame(maxHeight: CGFloat(layoutMetrics.sheetMaximumHeight))
+        .designSystemScreenMargin()
+        .padding(.bottom, Constant.bottomPadding)
+        .background(
+            Color(designSystem: .cardBackground),
+            in: UnevenRoundedRectangle(designSystemTopCorners: .extraLarge),
+        )
     }
 
     // MARK: Private
 
-    private let layoutMetrics: LayoutMetrics
+    @State private var contentHeight: CGFloat?
+
+    private let isScrollable: Bool
     private let content: Content
 
-    private var grabber: some View {
-        Capsule()
-            .fill(Color(designSystem: .grabber))
-            .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
-            .padding(.top, Constant.grabberTopPadding)
-            .padding(.bottom, Constant.grabberBottomPadding)
+}
+
+// MARK: - ContentHeightPreferenceKey
+
+private struct ContentHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat? = nil
+
+    static func reduce(
+        value: inout CGFloat?,
+        nextValue: () -> CGFloat?,
+    ) {
+        value = nextValue() ?? value
     }
-
-    private func surface(@ViewBuilder body: () -> some View) -> some View {
-        VStack(spacing: 0) {
-            grabber
-
-            body()
-        }
-        .padding(.bottom, Constant.bottomPadding)
-        .background {
-            UnevenRoundedRectangle(designSystemTopCorners: .extraLarge)
-                .fill(Color(designSystem: .cardBackground))
-                .ignoresSafeArea(edges: .bottom)
-        }
-    }
-
 }
 
 #Preview("Sheet Surface") {
@@ -83,7 +94,7 @@ public struct SheetSurface<Content: View>: View {
     VStack(spacing: 0) {
         Spacer()
 
-        SheetSurface {
+        SheetSurface(isScrollable: true) {
             VStack(spacing: LayoutToken.margin.cgFloatValue) {
                 ForEach(0..<8, id: \.self) { index in
                     StyledText.body1("정책 문서 \(index + 1)")
