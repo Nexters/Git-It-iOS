@@ -47,10 +47,12 @@ public struct SheetSurface<Content: View>: View {
         }
         .designSystemScreenMargin()
         .padding(.bottom, Constant.bottomPadding)
-        .background(
-            Color(designSystem: .cardBackground),
-            in: UnevenRoundedRectangle(designSystemTopCorners: .extraLarge),
-        )
+        .background {
+            // 표면 색만 홈 인디케이터 영역까지 이어 붙여 하단에 다른 색이 비치지 않게 한다.
+            UnevenRoundedRectangle(designSystemTopCorners: .extraLarge)
+                .fill(Color(designSystem: .cardBackground))
+                .ignoresSafeArea(edges: .bottom)
+        }
     }
 
     // MARK: Private

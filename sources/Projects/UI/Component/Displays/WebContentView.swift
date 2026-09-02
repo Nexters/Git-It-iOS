@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 import WebKit
 
@@ -15,6 +16,8 @@ public struct WebContentView: View {
 
     public var body: some View {
         WebView(url: url)
+            .webViewContentBackground(.hidden)
+            .background(Color(designSystem: .cardBackground))
     }
 
     // MARK: Private
