@@ -89,7 +89,6 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
 
 #Preview("링크 입력 · 986:13739") {
     ProjectRegistrationScreen(store: ProjectRegistrationPreviewSupport.store())
-//        .frame(width: 360, height: 800)
 }
 
 #Preview("링크 입력 · 검증 실패") {
@@ -99,7 +98,6 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
             validation: .failed,
         )
     )
-//    .frame(width: 360, height: 800)
 }
 
 #Preview("레포지토리 확인 · 737:10890") {
@@ -109,7 +107,6 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
             validation: .validated(ProjectRegistrationPreviewSupport.repository),
         )
     )
-//    .frame(width: 360, height: 800)
 }
 
 #Preview("이해도 선택 · 737:10882") {
@@ -119,7 +116,6 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
         onNext: { },
         onBack: { },
     )
-//    .designSystemBackgroundForPreview()
 }
 
 #Preview("이해도 선택 · 선택됨 · 737:10874") {
@@ -129,12 +125,10 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
         onNext: { },
         onBack: { },
     )
-//    .designSystemBackgroundForPreview()
 }
 
 #Preview("생성 시작 확정 · 737:10830") {
     QuizGenerationConfirmationScreen(onStart: { }, onBack: { })
-//        .designSystemBackgroundForPreview()
 }
 
 #Preview("생성 진행 · 2026:29388") {
@@ -145,12 +139,10 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
             )
         )
     )
-//    .frame(width: 360, height: 800)
 }
 
 #Preview("알림 옵션 시트 · 824:12149") {
     GenerationReminderSheet(onAccept: { }, onDecline: { })
-//        .designSystemBackgroundForPreview()
 }
 
 extension View {

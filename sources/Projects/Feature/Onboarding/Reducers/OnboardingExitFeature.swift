@@ -3,8 +3,6 @@ import Foundation
 
 // MARK: - OnboardingExitFeature
 
-/// Onboarding Router가 상위(App Root)로 전환해야 하는지("완료 여부"가 아니라 "Router 전환
-/// 여부")만 판단하는 얇은 조건부 Feature.
 @Reducer
 public struct OnboardingExitFeature: Sendable {
 

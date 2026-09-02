@@ -52,11 +52,11 @@ public struct HomeFeature: Sendable {
         public var profileRequestID = 0
         public var projectRequestID = 0
         public var generationOutcomeObservation = GenerationOutcomeObservation.idle
-        /// 조회 중 도착한 생성 결과를 폐기하지 않고 조회 완료 시점에 반영하기 위한 예약이다.
+
         public var isProjectRefreshPending = false
-        /// 이미 반영한 생성 결과가 다시 도착해도 재조회를 늘리지 않기 위한 기록이다.
+
         public var appliedOutcomeProjectIDs = Set<String>()
-        /// 학습 세트 생성이 진행 중인 동안 등록 진입을 막고 진행 중 표기를 띄우기 위한 값이다.
+
         public var isGenerationInProgress = false
 
     }
@@ -80,7 +80,6 @@ public struct HomeFeature: Sendable {
             case learningTapped(projectID: String)
         }
 
-        /// 부모 Feature 또는 App이 보내는 외부 조정 신호다.
         @CasePathable
         public enum Input: Equatable, Sendable {
             case learningProjectsReloadRequested
@@ -139,7 +138,6 @@ public struct HomeFeature: Sendable {
                 return .none
 
             case .view(.projectRegistrationTapped):
-                // 생성이 진행 중인 동안에는 새 등록 흐름으로 진입하지 않는다.
                 guard !state.isGenerationInProgress else { return .none }
                 return .send(.delegate(.projectRegistrationRequested))
 
@@ -180,7 +178,7 @@ public struct HomeFeature: Sendable {
                 case .success(let page): state.projectLoad = .loaded(page)
                 case .failure(let error): state.projectLoad = .failed(error)
                 }
-                // 조회 중 도착해 예약해 둔 갱신을 여기서 소비한다.
+
                 guard state.isProjectRefreshPending else { return .none }
                 state.isProjectRefreshPending = false
                 return startProjectLoad(state: &state)

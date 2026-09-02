@@ -4,10 +4,6 @@ import UIComponent
 
 // MARK: - AnswerEditor
 
-/// 서술형 답안 입력 Sub View.
-///
-/// 입력 문자열은 화면이 `Binding`으로 소유하고, 포커스처럼 자기 영역에만 의미가 있는
-/// 상태는 이 Sub View가 소유한다. 크기 결정 방식은 채움이다.
 struct AnswerEditor: View {
 
     // MARK: Internal

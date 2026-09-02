@@ -2,12 +2,6 @@ import SwiftUI
 
 // MARK: - HomeEmptyDeckShape
 
-/// 프로젝트가 없을 때 표시하는 카드 3장의 합쳐진 실루엣이다.
-///
-/// Figma `1542:19623`(`홈화면 (완)` 안의 boolean operation `Union`)의 outline을 그대로
-/// 옮겼다. Union이므로 카드가 겹친 경계에는 테두리가 없고 바깥 윤곽만 하나로 이어진다.
-/// 좌표는 원본 노드 크기 `501.331 × 236.627`을 기준으로 하며 `path(in:)`에서 비율로
-/// 환산한다 (조회일 2026-09-01, 근거 A).
 struct HomeEmptyDeckShape: Shape {
 
     // MARK: Internal

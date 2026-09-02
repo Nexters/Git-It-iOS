@@ -123,7 +123,6 @@ public struct MainShellFeature: Sendable {
                 )
 
             case .projectList(.delegate(.projectSelected(let projectID))):
-                // child의 UI 사건 이름은 달라도 외부로 내보내는 Navigation 의미는 하나다.
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
             case .saved(.delegate(.questionSelected(let question))):

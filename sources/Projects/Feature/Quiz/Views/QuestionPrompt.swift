@@ -4,9 +4,6 @@ import UIComponent
 
 // MARK: - QuestionPrompt
 
-/// 문제 번호와 지문을 함께 읽히게 묶는 Sub View.
-///
-/// 화면이 소유하는 값을 그대로 받아 표시만 한다. 크기 결정 방식은 채움이다.
 struct QuestionPrompt: View {
 
     // MARK: Internal
