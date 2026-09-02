@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.hug` — 표면은 규격 정사각이고 히트 영역만 44 이상으로 넓힌다.
 public struct IconPlainButton: View {
 
     // MARK: Lifecycle
@@ -45,7 +44,7 @@ public struct IconPlainButton: View {
             )
             .contentShape(Rectangle())
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityLabel(label)
     }
 

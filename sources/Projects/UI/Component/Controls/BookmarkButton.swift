@@ -3,10 +3,6 @@ import SwiftUI
 
 // MARK: - BookmarkButton
 
-/// 저장 여부를 값으로 받는 북마크 버튼.
-///
-/// 접근성 라벨은 생략할 수 없다. 아이콘 이름이 아니라 동작 이름을 받는다.
-/// 크기 결정 방식은 `SizingMode.hug`이며 히트 영역만 44 이상으로 넓힌다.
 public struct BookmarkButton: View {
 
     // MARK: Lifecycle
@@ -33,7 +29,7 @@ public struct BookmarkButton: View {
                 )
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(isSaved ? [.isButton, .isSelected] : .isButton)
     }

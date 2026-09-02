@@ -4,7 +4,6 @@ import SwiftUI
 
 // MARK: - AppleSignInButton
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct AppleSignInButton: View {
 
     // MARK: Lifecycle
@@ -26,7 +25,7 @@ public struct AppleSignInButton: View {
                 StyledText.body1("Apple로 시작하기", color: .black)
             }
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .frame(height: Constant.surfaceHeight)
         .frame(maxWidth: .infinity)
         .designSystemBackground(.white)

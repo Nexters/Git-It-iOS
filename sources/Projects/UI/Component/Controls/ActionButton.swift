@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 높이만 규격 값을 유지한다.
 public struct ActionButton: View {
 
     // MARK: Lifecycle
@@ -117,7 +116,7 @@ public struct ActionButton: View {
             .frame(minHeight: size.touchHeight)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .disabled(!isEnabled)
     }
 

@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - ChoiceAnswerOption
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct ChoiceAnswerOption: View {
 
     // MARK: Lifecycle
@@ -28,7 +27,6 @@ public struct ChoiceAnswerOption: View {
 
         // MARK: Internal
 
-        /// 기본은 테두리를 두지 않는다. 선택은 외곽 강조 테두리를 쓴다.
         var borderToken: BorderToken? {
             switch self {
             case .default:
@@ -98,7 +96,7 @@ public struct ChoiceAnswerOption: View {
                 }
             }
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(state == .selected ? .isSelected : [])
