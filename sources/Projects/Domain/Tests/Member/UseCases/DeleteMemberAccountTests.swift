@@ -9,21 +9,41 @@ struct DeleteMemberAccountTests {
     @Test
     func `성공하면 정확히 한 번 요청한다`() async throws {
         let repository = DeleteMemberAccountRepository()
-        let deleteMemberAccount = DeleteMemberAccount(repository: repository)
+        let localState = LocalStateCleanupSpy()
+        let deleteMemberAccount = DeleteMemberAccount(
+            repository: repository,
+            clearLocalState: { await localState.clear() },
+        )
 
         try await deleteMemberAccount()
 
         #expect(await repository.callCount == 1)
+        #expect(await localState.clearCount == 1)
     }
 
     @Test
     func `실패하면 오류를 그대로 전파한다`() async throws {
         let repository = DeleteMemberAccountRepository(behavior: .fail)
-        let deleteMemberAccount = DeleteMemberAccount(repository: repository)
+        let localState = LocalStateCleanupSpy()
+        let deleteMemberAccount = DeleteMemberAccount(
+            repository: repository,
+            clearLocalState: { await localState.clear() },
+        )
 
         await #expect(throws: MemberError.temporarilyUnavailable) {
             try await deleteMemberAccount()
         }
+        #expect(await localState.clearCount == 0)
+    }
+}
+
+// MARK: - LocalStateCleanupSpy
+
+private actor LocalStateCleanupSpy {
+    private(set) var clearCount = 0
+
+    func clear() {
+        clearCount += 1
     }
 }
 

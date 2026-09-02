@@ -498,8 +498,6 @@ struct AppRootFeatureTests {
 
         await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt)))))) {
             $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
-        }
-        await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))) {
             $0.mainShell.home.isGenerationInProgress = true
         }
 
@@ -581,8 +579,6 @@ struct AppRootFeatureTests {
         await store.receive(.effect(.generationProgressRestored(restored))) {
             $0.generationProgress = restored
             $0.isGenerationProgressRestored = true
-        }
-        await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))) {
             $0.mainShell.home.isGenerationInProgress = true
         }
 

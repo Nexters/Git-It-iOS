@@ -202,6 +202,9 @@ public struct AppComposition: Sendable {
             baseURL: environment.apiBaseURL,
             loginSessionRepository: authentication.loginSessionRepository,
             accessTokenProvider: accessTokenProvider,
+            clearLocalStateAfterAccountDeletion: {
+                await learningProject.trackGenerationProgress.end()
+            },
             transport: transport,
         )
         let externalRepository = ExternalRepositoryAssembly(

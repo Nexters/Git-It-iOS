@@ -268,6 +268,7 @@ nonisolated struct AppRootFeature: Sendable {
                 let progress = GenerationProgress(projectID: receipt.projectID, requestedAt: now())
                 state.generationProgress = progress
                 state.isGenerationProgressRestored = false
+                state.mainShell.home.isGenerationInProgress = true
                 return .merge(
                     .run { [trackGenerationProgress] _ in
                         await trackGenerationProgress.begin(
@@ -275,7 +276,6 @@ nonisolated struct AppRootFeature: Sendable {
                             requestedAt: progress.requestedAt,
                         )
                     },
-                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))),
                     releaseGenerationProgress(progress),
                 )
 
@@ -287,10 +287,8 @@ nonisolated struct AppRootFeature: Sendable {
                 }
                 state.generationProgress = restored
                 state.isGenerationProgressRestored = true
-                return .merge(
-                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true))))),
-                    releaseGenerationProgress(restored),
-                )
+                state.mainShell.home.isGenerationInProgress = true
+                return releaseGenerationProgress(restored)
 
             case .effect(.sharedRepositoryLinkReceived(let link)):
                 // 생성이 진행 중이면 등록 화면을 열지 않고 버린다. 홈의 진행 중 표기가
@@ -309,10 +307,10 @@ nonisolated struct AppRootFeature: Sendable {
                 guard state.generationProgress?.projectID == projectID else { return .none }
                 state.generationProgress = nil
                 state.isGenerationProgressRestored = false
+                state.mainShell.home.isGenerationInProgress = false
                 return .merge(
                     .cancel(id: CancelID.generationProgress),
                     .run { [trackGenerationProgress] _ in await trackGenerationProgress.end() },
-                    .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: false))))),
                 )
 
             case .mainShell(.home(.effect(.projectsLoadFinished(_, .success(let page))))):
