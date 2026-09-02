@@ -27,7 +27,8 @@ for key in \
 	GIT_IT_PROJECT_BUILD_RUNNER \
 	GIT_IT_PROJECT_SETUP_RUNNER \
 	GIT_IT_SCRIPT_TEST_RUNNER \
-	GIT_IT_SCRIPT_VERIFICATION_RUNNER; do
+	GIT_IT_SCRIPT_VERIFICATION_RUNNER \
+	GIT_IT_DESIGN_RULE_RUNNER; do
 	value=$("$paths" "$key")
 	if rg -n -F --hidden --glob '!.git/**' --glob '!**/DerivedData/**' \
 		--glob '!**/.build/**' \

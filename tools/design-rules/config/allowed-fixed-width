@@ -1,0 +1,20 @@
+# fixed-width 규칙의 허용 목록입니다.
+# 한 줄에 `저장소 상대경로<공백>이유`를 적습니다. 종횡비가 의미를 갖는 요소와
+# 규격이 직접 확정한 값만 등록합니다.
+
+sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift Responsive Layout Spec 07이 확정한 알약 폭 298 (인자로 채움 전환 가능)
+sources/Projects/UI/Component/Overlays/ActionMenu/ActionMenu.swift 팝오버 메뉴 규격 폭
+sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift 그래버 규격 크기
+sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader.swift 아바타 원형 종횡비
+sources/Projects/UI/Component/Indicators/PageIndicator.swift 페이지 점 종횡비
+sources/Projects/UI/Component/Indicators/ContinuousProgressBar.swift 진행 폭은 주어진 폭에서 유도하는 계산식
+sources/Projects/UI/Component/Displays/LaunchLogo.swift 로고 종횡비
+sources/Projects/UI/Component/Displays/SplashView.swift 커서 막대는 텍스트 크기에서 유도하는 계산식
+sources/Projects/UI/Component/Controls/IconGlassButton.swift 아이콘 버튼 정사각 표면과 44 히트 영역
+sources/Projects/UI/Component/Controls/IconPlainButton.swift 아이콘 버튼 정사각 표면과 44 히트 영역
+sources/Projects/UI/Component/Controls/PolicyAgreementRow.swift 체크 아이콘 정사각과 44 히트 영역
+sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift 체크 아이콘 정사각과 44 히트 영역
+sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift 지우기 아이콘 정사각과 44 히트 영역
+sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift 2열 카드 폭은 gridColumn2에서 유도하고 재생 버튼만 원형 44 히트 영역
+sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift 썸네일 종횡비
+sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift 썸네일 종횡비

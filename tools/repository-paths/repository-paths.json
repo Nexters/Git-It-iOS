@@ -24,5 +24,6 @@
   "GIT_IT_PROJECT_BUILD_RUNNER": "tools/githooks/project-build/bin/run.sh",
   "GIT_IT_PROJECT_SETUP_RUNNER": "tools/project-setup/bin/run.sh",
   "GIT_IT_SCRIPT_TEST_RUNNER": "tools/script-tests/bin/run.sh",
-  "GIT_IT_SCRIPT_VERIFICATION_RUNNER": "tools/script-verification/bin/run.sh"
+  "GIT_IT_SCRIPT_VERIFICATION_RUNNER": "tools/script-verification/bin/run.sh",
+  "GIT_IT_DESIGN_RULE_RUNNER": "tools/design-rules/bin/run.sh"
 }

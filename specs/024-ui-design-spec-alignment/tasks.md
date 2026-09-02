@@ -683,10 +683,10 @@ Component 계층의 소유 규칙을 회복한다.
 
 ### 구현
 
-- [ ] T083 `tools/design-rules/bin/run.sh`를 새로 만들어 공개 진입점을 제공한다 — 인자 없이
+- [X] T083 `tools/design-rules/bin/run.sh`를 새로 만들어 공개 진입점을 제공한다 — 인자 없이
       실행하면 전체 규칙을 검사하고, 위반이 없으면 종료 코드 0, 있으면 0이 아닌 코드와 함께
       위반 파일·행·규칙 이름을 출력한다. 추적 대상 소스·문서와 Git index를 변경하지 않는다
-- [ ] T084 `tools/design-rules/core/rules.sh`를 새로 만들어 규칙 8종을 정의한다 —
+- [X] T084 `tools/design-rules/core/rules.sh`를 새로 만들어 규칙 8종을 정의한다 —
       `fixed-width`(`sources/Projects/UI/Component/**`의 `.frame(width:`, 허용 목록 예외) ·
       `canvas-constant`(`sources/Projects/UI/Component/**` 프로덕션 코드에서
       103·154·34·127·53을 폭·높이·safe area 차원으로 쓰는 문맥, `#Preview` 제외,
@@ -702,49 +702,49 @@ Component 계층의 소유 규칙을 회복한다.
       `UIFontMetrics`, 예외 없음). `component-margin`과 `component-state`는
       `#Preview` 블록 안의 사용을 위반으로 잡지 않는다 — 현재 저장소의 `LayoutToken.margin`
       사용처 대부분이 프리뷰 스캐폴딩이다 (T083 의존)
-- [ ] T085 `tools/design-rules/core/run.sh`를 새로 만들어 규칙 실행과 결과 집계·보고를
+- [X] T085 `tools/design-rules/core/run.sh`를 새로 만들어 규칙 실행과 결과 집계·보고를
       담당하는 내부 계층을 둔다 (T084 의존)
-- [ ] T086 `tools/design-rules/config/allowed-fixed-width`와
+- [X] T086 `tools/design-rules/config/allowed-fixed-width`와
       `tools/design-rules/config/allowed-vertical-fill`을 새로 만들어 허용 목록을 저장소
       상대경로와 이유로 한 줄씩 기록한다. 전자는 T060이 정리한 고정 폭 목록이며 첫 항목은
       `TabShell` 알약 폭 298이고, 후자는 T059가 보고한 세로 채움 목록이며 첫 항목은
       `sources/Projects/UI/Component/Overlays/WebSheet.swift`(웹 콘텐츠는 채움이 정당)다
       (T059·T060 의존)
-- [ ] T087 `tools/design-rules/tests/test-design-rules.sh`를 새로 만들어 회귀 테스트를 둔다 —
+- [X] T087 `tools/design-rules/tests/test-design-rules.sh`를 새로 만들어 회귀 테스트를 둔다 —
       위반이 있는 fixture에서 실패하고 없는 fixture에서 통과하는지 규칙 8종 각각에 대해
       검사해 규칙이 조용히 무력화되는 것을 막는다. `canvas-constant` fixture는
       `.frame(height: 34)` 같은 레이아웃 사용은 실패하고 `EffectToken` blur 34와
       `safeAreaBottom` 34 테스트 입력은 통과함을 함께 단정한다. 파일 이름이
       `tools/script-tests/core/tests.sh`의 수집 패턴(`*/tests/test-*.sh`)에 맞아야 자동
       수집된다 (T084 의존)
-- [ ] T088 `tools/repository-paths/repository-paths.json`에
+- [X] T088 `tools/repository-paths/repository-paths.json`에
       `"GIT_IT_DESIGN_RULE_RUNNER": "tools/design-rules/bin/run.sh"` 항목을 추가한다
       (T083 의존)
-- [ ] T089 `tools/repository-paths/bin/repository-paths.sh`의 허용 키 목록에
+- [X] T089 `tools/repository-paths/bin/repository-paths.sh`의 허용 키 목록에
       `GIT_IT_DESIGN_RULE_RUNNER`를 추가한다 (T088 의존)
-- [ ] T090 `tools/repository-paths/tests/test-no-hardcoded-paths.sh`의 키 열거 목록에
+- [X] T090 `tools/repository-paths/tests/test-no-hardcoded-paths.sh`의 키 열거 목록에
       `GIT_IT_DESIGN_RULE_RUNNER`를 추가한다 (T089 의존)
-- [ ] T091 `tools/script-tests/core/tests.sh`의 `unset` 목록에 `GIT_IT_DESIGN_RULE_RUNNER`를
+- [X] T091 `tools/script-tests/core/tests.sh`의 `unset` 목록에 `GIT_IT_DESIGN_RULE_RUNNER`를
       추가해 CI의 중앙 경로 환경변수가 fixture를 덮어쓰지 않게 한다 (T088 의존)
-- [ ] T092 `tools/githooks/pre-commit.d/design-rules.sh`를 새로 만들어 pre-commit 단계
+- [X] T092 `tools/githooks/pre-commit.d/design-rules.sh`를 새로 만들어 pre-commit 단계
       스크립트를 추가한다. `GIT_IT_DESIGN_RULE_RUNNER`로 진입점을 읽어 실행한다 (T089 의존)
-- [ ] T093 `tools/githooks/pre-commit`의 알려진 단계 이름 목록(약 52행의 `case` 분기)과 고정
+- [X] T093 `tools/githooks/pre-commit`의 알려진 단계 이름 목록(약 52행의 `case` 분기)과 고정
       실행 순서(약 65행의 `for` 목록)에 `design-rules`를 추가한다. 실행 순서는
       `script-tests` → `swift-format` → `design-rules` → `build` → `compile`로 둔다 — 포맷
       결과가 검사 대상 파일을 바꾸므로 `swift-format` 뒤에 놓는다 (T092 의존)
-- [ ] T094 `tools/githooks/pre-commit.d/enabled`의 단계 설명 주석과 순서 안내에
+- [X] T094 `tools/githooks/pre-commit.d/enabled`의 단계 설명 주석과 순서 안내에
       `design-rules`(디자인 규격 금지 패턴 검사)를 추가한다. **주석 처리된 활성화 목록은 바꾸지
       않는다** — pre-commit 활성화는 이 기능의 범위 밖 협업 결정이다(R-05 · SC-013) (T093 의존)
-- [ ] T095 `tools/githooks/hook-management/tests/test-pre-commit.sh`의 단계 열거(약 26·111행의
+- [X] T095 `tools/githooks/hook-management/tests/test-pre-commit.sh`의 단계 열거(약 26·111행의
       `for step in ...`)와 기대 실행 순서 단정(약 49·78행의 `expected`)에 `design-rules`를
       반영한다 (T093 의존)
 
 ### 정리와 패키지 검증
 
-- [ ] T096 [no-write] `design_rule_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_DESIGN_RULE_RUNNER)`로
+- [X] T096 [no-write] `design_rule_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_DESIGN_RULE_RUNNER)`로
       진입점을 읽고 `"$design_rule_runner"`를 실행해 종료 코드 0을 확인한다. 위반이 남으면
       해당 규칙이 가리키는 작업 패키지로 돌아가 정렬한다 (SC-005 · SC-006 · SC-011 · SC-014)
-- [ ] T097 [no-write] `./tools/script-tests/bin/run.sh`와
+- [X] T097 [no-write] `./tools/script-tests/bin/run.sh`와
       `./tools/script-verification/bin/run.sh`를 순차 실행해 새 도구의 회귀 테스트와 셸 정적
       검사가 통과하는지 확인한다. 최초 실행이면
       `./tools/script-verification/bin/prepare-tools.sh`를 먼저 실행한다
@@ -764,26 +764,26 @@ commit한다. 이미 파일 변경 단위가 모두 commit된 단순 재개에�
 별도 최종 검증 단위를 둔다. 읽기 전용 전체 검증은 반복 승인 없이 같은 실행에서 이어서
 수행한다.
 
-- [ ] T098 [no-write] `git status --porcelain`을 기록하고 `make tuist`를 실행한 뒤 다시 비교해
+- [X] T098 [no-write] `git status --porcelain`을 기록하고 `make tuist`를 실행한 뒤 다시 비교해
       추적 파일 변경이 없는지 확인한다. 파생 workspace·project·심볼릭 링크·cache 갱신만
       허용하며, 추적 파일 diff가 생기면 이 작업을 완료로 표시하지 않는다
-- [ ] T099 [no-write] `"$project_build_runner" build` → `compile` → `test`를 순차 실행하고
+- [X] T099 [no-write] `"$project_build_runner" build` → `compile` → `test`를 순차 실행하고
       결과를 기록한다. 세 명령은 `sources/DerivedData/PreCommit`을 공유하므로 병렬 실행하지
       않는다 (SC-012)
-- [ ] T100 [no-write] `"$design_rule_runner"`를 다시 실행해 최종 상태에서 규칙 8종 전부가
+- [X] T100 [no-write] `"$design_rule_runner"`를 다시 실행해 최종 상태에서 규칙 8종 전부가
       종료 코드 0을 내는지 확인한다 (SC-005 · SC-006 · SC-011 · SC-014 · FR-018 · FR-037)
-- [ ] T101 [no-write] 변경 시나리오별 독립 수용 기준을 검증한다 — S1은
+- [X] T101 [no-write] 변경 시나리오별 독립 수용 기준을 검증한다 — S1은
       `DesignTokenSet.current.validate()` 빈 배열과 토큰 이름 100% 존재, S2는 지원 기기 9종의
       레이아웃 변수 범위와 종횡비·웹 콘텐츠 밖의 세로 채움 0곳(FR-018), S3은 신설 4종 계약 테스트와 상태 매트릭스 및 규격 인덱스 30항목의
       역할 폴더 배치(SC-007), S4는 `Component/`에 상태
       보관·화면 여백·햅틱 0곳, S5는 44pt 히트 영역과 접근성 라벨 계약 및 고정 pt 유지·
       Dynamic Type 연동 API 0곳(FR-037). 판정 절차는
       [quickstart.md](./quickstart.md)를 따른다
-- [ ] T102 [no-write] PR 본문에 넣을 두 표를 확정한다 — (1) 규격 적용으로 표시가 달라진 항목의
+- [X] T102 [no-write] PR 본문에 넣을 두 표를 확정한다 — (1) 규격 적용으로 표시가 달라진 항목의
       화면·값·변경 전후 표. 최소 `TextField` 높이 56→52, 홈 2열 카드 154→`gridColumn2`, 상단
       스크림 103→`topScrimHeight` 세 건을 포함한다(SC-015). (2) 규격 밖 15종의 유지·이동·삭제
       판정과 근거(SC-008). 저장소에 새 문서 파일을 만들지 않는다(FR-041 · R-14)
-- [ ] T103 [no-write] PR 본문의 미검증 범위에 다음 세 건을 남긴다 — pre-commit 단계는 등록만
+- [X] T103 [no-write] PR 본문의 미검증 범위에 다음 세 건을 남긴다 — pre-commit 단계는 등록만
       하고 활성화하지 않았다(SC-013 판정 기준 축소, R-05), 타이포·폰트의 규격 위반 2건은
       "알려진 차이"로 남겼다(R-12), 기존 테스트 함수의 영문 이름은 바꾸지 않았다(R-10).
       Constitution 원칙 3에 따른 기록이다
