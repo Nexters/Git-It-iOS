@@ -1,96 +1,40 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fixed` — 규격이 확정한 알약 폭 298이며 인자로 채움으로 바꿀 수 있다.
-///
-/// 알약 표면은 시스템 기본 글래스(`.regular`)를 쓴다. 색·테두리를 직접 칠하지 않는다.
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
     // MARK: Lifecycle
 
     public init(
         selected: Binding<Item>,
-        layoutMetrics: LayoutMetrics = .default,
-        pillWidth: CGFloat = Self.defaultPillWidth,
         @ViewBuilder content: @escaping (Item) -> Content,
     ) {
         _selected = selected
-        self.layoutMetrics = layoutMetrics
-        self.pillWidth = pillWidth
         self.content = content
     }
 
     // MARK: Public
 
-    /// 규격이 직접 확정한 알약 폭. 인자로 바꿔 채움으로 쓸 수 있다.
-    public static var defaultPillWidth: CGFloat {
-        Constant.pillWidth
-    }
-
     public var body: some View {
         TabView(selection: $selected) {
             ForEach(Item.allCases) { item in
                 content(item)
-                    .toolbar(.hidden, for: .tabBar)
+                    .tabItem {
+                        Image(item.tabSystemImage, bundle: .module)
+                            .padding(.bottom, LayoutToken.tightSpacing.cgFloatValue)
+                        Text.designSystemStyled(item.tabTitle, style: .tabItem)
+                    }
                     .tag(item)
             }
         }
-        .overlay(alignment: .bottom) {
-            tabBar
-        }
-    }
-
-    // MARK: Internal
-
-    enum Constant {
-        static var pillWidth: CGFloat {
-            298
-        }
-
-        static var pillHeight: CGFloat {
-            64
-        }
-
-        static var iconBottomSpacing: CGFloat {
-            4
-        }
+        .tint(Color(designSystem: .brandAccent))
     }
 
     // MARK: Private
 
     @Binding private var selected: Item
 
-    private let layoutMetrics: LayoutMetrics
-    private let pillWidth: CGFloat
     private let content: (Item) -> Content
-
-    private var tabBar: some View {
-        HStack(spacing: 0) {
-            ForEach(Item.allCases) { item in
-                Button {
-                    selected = item
-                } label: {
-                    tabLabel(item)
-                }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .designSystemControlSize(.minimumTouch)
-                .accessibilityLabel(item.tabTitle)
-                .accessibilityAddTraits(item == selected ? [.isButton, .isSelected] : .isButton)
-            }
-        }
-        .frame(width: pillWidth, height: Constant.pillHeight)
-        .glassEffect(.regular, in: .capsule)
-        .padding(.bottom, CGFloat(layoutMetrics.tabBarBottomInset))
-    }
-
-    private func tabLabel(_ item: Item) -> some View {
-        VStack(spacing: Constant.iconBottomSpacing) {
-            Image(item.tabSystemImage, bundle: .module)
-            Text.designSystemStyled(item.tabTitle, style: .tabItem)
-        }
-        .foregroundStyle(Color(designSystem: Item.tabColor(isSelected: item == selected)))
-    }
 
 }
 

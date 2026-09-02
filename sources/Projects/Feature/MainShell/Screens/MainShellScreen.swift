@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DesignSystem
 import SwiftUI
 import UIComponent
 
@@ -19,19 +18,17 @@ public struct MainShellScreen: View {
     @Bindable public var store: StoreOf<MainShellFeature>
 
     public var body: some View {
-        LayoutMetricsReader { layoutMetrics in
-            TabShell(selected: selectedTab, layoutMetrics: layoutMetrics) { tab in
-                switch tab {
-                case .home:
-                    HomeScreen(store: store.scope(state: \.home, action: \.home))
+        TabShell(selected: selectedTab) { tab in
+            switch tab {
+            case .home:
+                HomeScreen(store: store.scope(state: \.home, action: \.home))
 
-                case .projects,
-                     .saved,
-                     .settings:
-                    ScreenContainer { _ in
-                        StyledText.subtitle1(tab.tabTitle, alignment: .center)
-                            .designSystemScreenMargin()
-                    }
+            case .projects,
+                 .saved,
+                 .settings:
+                ScreenContainer { _ in
+                    StyledText.subtitle1(tab.tabTitle, alignment: .center)
+                        .designSystemScreenMargin()
                 }
             }
         }
