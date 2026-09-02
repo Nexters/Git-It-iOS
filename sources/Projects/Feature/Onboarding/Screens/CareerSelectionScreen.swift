@@ -64,7 +64,6 @@ struct CareerSelectionScreen: View {
                     leading: .back,
                     onLeadingTap: { send(.careerBackTapped) },
                 )
-                .designSystemScreenMargin()
 
                 ScrollView {
                     VStack(spacing: Constant.titleToOptionsSpacing) {
@@ -97,7 +96,6 @@ struct CareerSelectionScreen: View {
                             },
                         )
                     }
-                    .designSystemScreenMargin()
                     .padding(.top, LayoutToken.margin.cgFloatValue)
                 }
 

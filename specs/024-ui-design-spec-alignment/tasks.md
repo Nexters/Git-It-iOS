@@ -633,19 +633,19 @@ Component 계층의 소유 규칙을 회복한다.
 
 ### 구현
 
-- [ ] T078 [no-write] [S4] `rg`로 `sources/Projects/Feature`의 `EffectToken` 직접 참조를
+- [X] T078 [no-write] [S4] `rg`로 `sources/Projects/Feature`의 `EffectToken` 직접 참조를
       다시 확인해 계획 시점과 같이 0건인지 보고한다. `GradientToken`은 값과 `all`이 그대로이고
       T009의 `gradient4` 사용처도 0건이므로 Feature 호출부 복구 대상이 아니다
-- [ ] T079 [no-write] [S4] `rg`로 `sources/Projects/Feature`의 UIComponent `TextField`·
+- [X] T079 [no-write] [S4] `rg`로 `sources/Projects/Feature`의 UIComponent `TextField`·
       `IconPlainButton`·`IconGlassButton` 직접 호출을 다시 확인해 계획 시점과 같이 0건인지
       보고한다. 결과가 생기면 이 작업을 완료하지 않고 `/speckit-tasks`로 정확한 소비 파일
       경로를 추가한다
-- [ ] T080 [S4] `ScreenContainer`가 화면 좌우 여백을 소유하게 되었으므로(T026) 여백을 중복
+- [X] T080 [S4] `ScreenContainer`가 화면 좌우 여백을 소유하게 되었으므로(T026) 여백을 중복
       적용하는 화면에서 제거한다 — `sources/Projects/Feature/ProjectRegistration/Screens/ProjectRegistrationScreen.swift`,
       `sources/Projects/Feature/Onboarding/Screens/PositionSelectionScreen.swift`,
       `sources/Projects/Feature/Onboarding/Screens/CareerSelectionScreen.swift`,
       `sources/Projects/Feature/Onboarding/Screens/TutorialScreen.swift` (FR-027)
-- [ ] T081 [S4] 골격 컴포넌트 공개 계약 변경(T030~T034)으로 깨진 아래 정확한 소비 파일을
+- [X] T081 [S4] 골격 컴포넌트 공개 계약 변경(T030~T034)으로 깨진 아래 정확한 소비 파일을
       새 인자 형태에 맞춘다 — `sources/Projects/Feature/MainShell/Screens/MainShellScreen.swift`,
       `sources/Projects/Feature/Onboarding/Screens/CareerSelectionScreen.swift`,
       `sources/Projects/Feature/Onboarding/Screens/LegalAgreementScreen.swift`,
@@ -654,7 +654,7 @@ Component 계층의 소유 규칙을 회복한다.
 
 ### 정리와 패키지 검증
 
-- [ ] T082 [no-write] [S4] `"$project_build_runner" build`와 `"$project_build_runner" test`를
+- [X] T082 [no-write] [S4] `"$project_build_runner" build`와 `"$project_build_runner" test`를
       순차 실행해 앱 전체가 컴파일되고 기존 테스트가 통과하는지 확인한다 (SC-012)
 
 **진행 점검**: T078~T082의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.
