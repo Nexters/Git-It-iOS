@@ -131,7 +131,6 @@ struct GenerationCompletionReminderCoordinatorTests {
 
         #expect(await observeGenerationOutcomes.hasEstablishedSubscription())
 
-        // 확립 직후 도착한 결과도 유실되지 않는다.
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
         await observeGenerationOutcomes.finish()
         await coordinator.waitUntilObservationFinished()

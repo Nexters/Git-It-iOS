@@ -61,8 +61,6 @@ public struct AppComposition: Sendable {
             reminderRegistry: GenerationReminderRegistryAdapter(coordinator: reminderCoordinator),
         )
 
-        // 조립 시점에는 외부 푸시 SDK를 만들지 않는다. client 생성은 bootstrap이 소유하고,
-        // 콜백은 이 상자를 통해 늦게 바인딩되므로 주입 시점이 client 생성보다 앞서도 안전하다.
         let pushClientBox = PushClientBox()
         let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
@@ -73,7 +71,6 @@ public struct AppComposition: Sendable {
             ingestGenerationOutcomePayload: ingestGenerationOutcomePayload,
         )
 
-        // App은 Infrastructure에 의존할 수 없으므로 콜백 주입도 이 경계 안에서 수행한다.
         let observeGenerationOutcomes = learningProject.observeGenerationOutcomes
         bootstrap = { appDelegate in
             pushClientBox.activate()
@@ -170,10 +167,8 @@ public struct AppComposition: Sendable {
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
     public let trackGenerationProgress: any TrackGenerationProgressUseCase
 
-    /// 푸시 client 생성과 콜백 주입, 리마인드 구독 확립을 순서대로 수행하는 명시적 시작 단계다.
-    /// 반환 시점에는 리마인드 구독이 확립돼 있다.
     public let bootstrap: @MainActor @Sendable (PushNotificationAppDelegate) async -> Void
-    /// 호출 시점은 App이 결정한다. 실패는 삼키지 않고 던지며 멱등하지 않다.
+
     public let registerCurrentDevice: @Sendable () async throws -> Void
     public let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
@@ -223,8 +218,6 @@ public struct AppComposition: Sendable {
 
     // MARK: Private
 
-    /// `bootstrap()` 이전에는 비어 있고, 그 이후에만 실제 푸시 client를 소유한다.
-    /// 콜백이 client보다 먼저 주입돼도 안전하도록 늦은 바인딩 지점을 제공한다.
     private final class PushClientBox: Sendable {
 
         // MARK: Internal
@@ -254,7 +247,6 @@ public struct AppComposition: Sendable {
     private static let deviceKeychainKey = "deviceID"
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "AppComposition")
 
-    /// 조회에 실패하면 새 식별자를 만들어 저장한다. 이름이 그 부수효과를 드러낸다.
     private static func loadOrCreateDeviceID(keychainStore: KeychainStore) -> String {
         if
             let data = try? keychainStore.load(for: deviceKeychainKey, in: deviceKeychainNamespace),
