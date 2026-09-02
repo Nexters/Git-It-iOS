@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #141414; }
+  * { text-wrap: pretty; }
+  a { color: #B9D6FE; text-decoration: none; }
+  a:hover { color: #8BB5EF; text-decoration: underline; }
+  ::selection { background: #B9D6FE; color: #141414; }
+</style>
+</helmet>
+
+<div style="background:#141414;color:#FFFFFF;font-family:'Noto Sans KR','Plus Jakarta Sans',sans-serif;min-height:100vh;padding:0 0 120px 0">
+
+  <div style="position:sticky;top:0;z-index:50;background:rgba(20,20,20,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #3B3B3B">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;line-height:1.2;color:#B9D6FE">Git-It Responsive</span>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#BCBCBC">
+        <a href="#basis">기준</a>
+        <a href="#vars">레이아웃 변수</a>
+        <a href="#tokens">고정 토큰</a>
+        <a href="#scaffold">골격 계층</a>
+        <a href="#elements">요소 크기 규칙</a>
+        <a href="#screens">화면별 규칙</a>
+        <a href="#swift">SwiftUI 표현</a>
+        <a href="#open">잠정 확정</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1240px;margin:0 auto;padding:56px 32px 0 32px">
+    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#7E94BB;margin-bottom:18px">Responsive Layout Spec · 375 – 440 · SwiftUI</div>
+    <h1 style="margin:0 0 18px 0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:44px;line-height:1.24;letter-spacing:-0.02em;color:#FFFFFF;max-width:820px">반응형 레이아웃 값과 계층</h1>
+    <p style="margin:0 0 20px 0;font-size:16px;line-height:1.6;color:#BCBCBC;max-width:760px">Figma 정본의 캔버스 크기 360 × 800은 어느 실기기와도 일치하지 않으므로 이 문서에서는 무시합니다. 대신 정본에서 읽은 <span style="color:#FFFFFF">구성·간격·컴포넌트 크기</span>를 그대로 두고, 기기에 따라 달라지는 값만 <span style="color:#FFFFFF">min – max 범위</span>로 정의합니다. 토큰 이름은 규격 문서(Design System Spec)의 것이고 규칙은 UI·UX 가이드 §1·§2·§7을 따릅니다. 새 수치는 만들지 않았습니다.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:72px">
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">375 – 440</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">지원 화면 폭 (pt)</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">667 – 956</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">지원 화면 높이 (pt)</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">11</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">기기에 따라 변하는 레이아웃 변수</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#7FD65A">3</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">정본 근거 없이 잠정값으로 확정한 항목 (§07)</div>
+      </div>
+    </div>
+
+    <div id="basis" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">00</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">기준</h2>
+      </div>
+      <div style="display:grid;gap:12px;margin-bottom:24px">
+        <sc-for list="{{ principles }}" as="p" hint-placeholder-count="4">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px 24px;display:grid;grid-template-columns:32px 1fr;gap:20px;align-items:start">
+            <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB;padding-top:2px">{{ p.id }}</span>
+            <div>
+              <div style="font-size:16px;font-weight:700;line-height:1.48;color:#FFFFFF">{{ p.title }}</div>
+              <div style="font-size:14px;line-height:1.6;color:#919191;margin-top:6px">{{ p.detail }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;margin-bottom:80px">
+        <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB;margin-bottom:12px">값 표기 규칙</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 28px;font-size:13.5px;line-height:1.6;color:#BCBCBC">
+          <div><span style="display:inline-block;padding:1px 8px;border-radius:4px;background:rgba(36,153,0,0.18);color:#7FD65A;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;margin-right:8px">고정</span>기기와 무관한 단일 값. 정본 값 그대로.</div>
+          <div><span style="display:inline-block;padding:1px 8px;border-radius:4px;background:rgba(185,214,254,0.14);color:#B9D6FE;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;margin-right:8px">min – max</span>기기에 따라 변하는 값. 계산식과 함께 두 끝값을 적음.</div>
+          <div><span style="display:inline-block;padding:1px 8px;border-radius:4px;background:rgba(236,189,35,0.16);color:#ECBD23;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;margin-right:8px">§07 확정</span>정본에 근거가 없어 이 문서에서 잠정값으로 확정한 항목. 3건.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="vars" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">01</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">레이아웃 변수 · LayoutMetrics</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">런타임에 기기에서 읽어 계산하는 값입니다. 화면 폭·높이·safe area 셋만 입력이고 나머지는 모두 파생값입니다. 파생값을 상수로 박지 않고 이 이름으로 참조합니다.</p>
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:1.25fr 1.5fr 88px 88px 1.6fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">변수</div>
+          <div style="padding:11px 14px">계산식</div>
+          <div style="padding:11px 14px">min</div>
+          <div style="padding:11px 14px">max</div>
+          <div style="padding:11px 14px">비고</div>
+        </div>
+        <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="11">
+          <div style="display:grid;grid-template-columns:1.25fr 1.5fr 88px 88px 1.6fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:10px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ m.name }}</div>
+            <div style="padding:10px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#ECECEC;overflow-wrap:anywhere">{{ m.formula }}</div>
+            <div style="padding:10px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:13px;line-height:1.5;color:#FFFFFF">{{ m.min }}</div>
+            <div style="padding:10px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:13px;line-height:1.5;color:#FFFFFF">{{ m.max }}</div>
+            <div style="padding:10px 14px;font-size:12px;line-height:1.5;color:#919191">{{ m.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:80px">
+        <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC"><span style="color:#FFFFFF;font-weight:700">가로만 변수, 세로는 상수 —</span> 화면 폭이 달라지면 contentWidth와 그 파생값만 움직입니다. 세로 간격·컴포넌트 높이는 전 기기 동일하고, 남는 높이는 스크롤 여유로 둡니다 (가이드 §7).</div>
+        <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC"><span style="color:#FFFFFF;font-weight:700">가장 좁은 예산이 기준 —</span> contentBudget 최소값 505(SE · plain 헤더)에 잘리지 않으면 전 기기에서 안전합니다. 이 값을 넘는 화면은 항상 ScrollView 안에 둡니다.</div>
+      </div>
+    </div>
+
+    <div id="tokens" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">02</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">고정 토큰 · LayoutToken</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">규격 문서 2장의 간격 토큰입니다. 이 다섯 값은 기기와 무관하게 고정이며, §01의 변수를 계산할 때 상수로 들어갑니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px">
+        <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="5">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 20px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:#B9D6FE;overflow-wrap:anywhere">{{ t.name }}</span>
+              <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:22px;line-height:1.2;color:#FFFFFF">{{ t.value }}</span>
+            </div>
+            <div style="height:1px;background:#3B3B3B;margin:12px 0"></div>
+            <div style="font-size:12.5px;line-height:1.55;color:#919191">{{ t.usage }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#1F1A1A;border:1px solid #4A2A26;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC;margin-bottom:80px"><span style="color:#FF3721;font-weight:700">토큰이 아닌 세로 간격 —</span> 홈 섹션 위 25, 등록 화면 블록 사이 32, 상세 화면 섹션 사이 53·31·28은 한 화면에서만 쓰여 토큰으로 올리지 않았습니다(규격 R5). 화면 파일 안에 리터럴로 두고, 기기에 따라 바꾸지 않습니다.</div>
+    </div>
+
+    <div id="scaffold" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">03</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">화면 골격 계층 · ScreenContainer</h2>
+      </div>
+      <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">모든 Screen이 공유하는 Z 순서와 각 층의 크기 규칙입니다. 아래가 뒤, 위가 앞입니다. 좌표를 쓰지 않고 정렬(alignment)과 safe area로 위치를 표현합니다.</p>
+      <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;margin-bottom:80px">
+        <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ layersVisual }}" as="lv" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;background:{{ lv.bg }};border:1px solid {{ lv.border }}">
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#7E94BB">z{{ lv.z }}</span>
+              <div>
+                <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:#ECECEC">{{ lv.name }}</div>
+                <div style="font-size:11px;line-height:1.4;color:#919191;margin-top:2px">{{ lv.size }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1;min-width:430px;border:1px solid #3B3B3B;border-radius:12px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1.1fr 1fr 1.3fr 1.4fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+            <div style="padding:11px 14px">층</div>
+            <div style="padding:11px 14px">위치</div>
+            <div style="padding:11px 14px">폭 · 높이</div>
+            <div style="padding:11px 14px">규칙</div>
+          </div>
+          <sc-for list="{{ layers }}" as="l" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:1.1fr 1fr 1.3fr 1.4fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+              <div style="padding:10px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ l.name }}</div>
+              <div style="padding:10px 14px;font-size:12px;line-height:1.5;color:#ECECEC">{{ l.pos }}</div>
+              <div style="padding:10px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.55;color:#ECECEC;overflow-wrap:anywhere">{{ l.size }}</div>
+              <div style="padding:10px 14px;font-size:12px;line-height:1.5;color:#919191">{{ l.rule }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="elements" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">04</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">요소 크기 규칙</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">Sub View와 Component가 화면 폭에 어떻게 반응하는지 다섯 가지 방식으로 나눕니다. 높이는 전부 고정이므로 폭 방식만 다릅니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:28px">
+        <sc-for list="{{ sizingModes }}" as="s" hint-placeholder-count="5">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:16px 18px">
+            <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:#B9D6FE">{{ s.name }}</div>
+            <div style="font-size:12.5px;line-height:1.55;color:#919191;margin-top:6px">{{ s.detail }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:80px">
+        <div style="display:grid;grid-template-columns:1.3fr 78px 1.35fr 82px 1.5fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">요소</div>
+          <div style="padding:11px 14px">방식</div>
+          <div style="padding:11px 14px">폭</div>
+          <div style="padding:11px 14px">높이</div>
+          <div style="padding:11px 14px">비고</div>
+        </div>
+        <sc-for list="{{ elements }}" as="e" hint-placeholder-count="24">
+          <div style="display:grid;grid-template-columns:1.3fr 78px 1.35fr 82px 1.5fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ e.name }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10.5px;line-height:1.5;color:{{ e.modeColor }}">{{ e.mode }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.55;color:#ECECEC;overflow-wrap:anywhere">{{ e.width }}</div>
+            <div style="padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:12.5px;line-height:1.5;color:#FFFFFF">{{ e.height }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#919191">{{ e.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="screens" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">05</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">화면별 규칙</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">화면 계층 스펙의 20개 Screen을 골격 값과 함께 정리했습니다. 세로 배치는 <span style="color:#FFFFFF">위 정렬 + 스크롤</span>이 기본이고, 예외인 화면만 따로 적었습니다.</p>
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:80px">
+        <div style="display:grid;grid-template-columns:1.3fr 1fr 96px 1.3fr 1.6fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">Screen</div>
+          <div style="padding:11px 14px">헤더 · 탭바</div>
+          <div style="padding:11px 14px">세로 배치</div>
+          <div style="padding:11px 14px">폭이 변하는 요소</div>
+          <div style="padding:11px 14px">고정 · 비고</div>
+        </div>
+        <sc-for list="{{ screens }}" as="r" hint-placeholder-count="20">
+          <div style="display:grid;grid-template-columns:1.3fr 1fr 96px 1.3fr 1.6fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ r.name }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#ECECEC;overflow-wrap:anywhere">{{ r.chrome }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:{{ r.vColor }}">{{ r.vertical }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#BCBCBC">{{ r.flex }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#919191">{{ r.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="swift" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">06</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">SwiftUI 표현</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">§01의 변수를 코드에서 쓰는 방식입니다. GeometryReader로 폭을 읽어 계산하지 않고, <span style="color:#FFFFFF">maxWidth: .infinity와 padding</span>으로 같은 결과를 얻습니다. 값을 직접 계산해야 하는 곳(스크림 높이, 시트 최대 높이)만 LayoutMetrics를 씁니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:16px;margin-bottom:20px">
+        <div style="background:#0E0E0E;border-radius:8px;padding:16px 18px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.75;color:#BCBCBC;white-space:pre;overflow-x:auto">// 1. 폭 — 콘텍스트에서 파생. 숫자를 박지 않는다
+VStack(spacing: LayoutToken.gutter.cgFloatValue) { … }
+    .frame(maxWidth: .infinity)                        // contentWidth 335–400
+    .padding(.horizontal, LayoutToken.margin.cgFloatValue)
+
+// 2열 카드 — 161.5–194
+LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())],
+          spacing: LayoutToken.gutter.cgFloatValue) { … }
+
+// 3열 통계 카드 — 103.67–125.33
+HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    ForEach(stats) { StatCard($0).frame(maxWidth: .infinity) }
+}
+
+// 가로 스크롤 카드 — 폭 고정 154, 잘림 허용
+ScrollView(.horizontal, showsIndicators: false) {
+    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+        ForEach(repos) { RepositoryCard($0).frame(width: 154) }
+    }
+    .padding(.horizontal, LayoutToken.margin.cgFloatValue)
+}</div>
+        <div style="background:#0E0E0E;border-radius:8px;padding:16px 18px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.75;color:#BCBCBC;white-space:pre;overflow-x:auto">// 2. 세로 — safe area는 읽고, 높이는 고정
+struct LayoutMetrics {
+    let safeTop: CGFloat        // 20 – 68
+    let safeBottom: CGFloat     // 0 – 34
+    let header: ScreenHeader.Style
+
+    var topScrimHeight: CGFloat { safeTop + header.height }
+    var bottomScrimHeight: CGFloat { safeBottom + (hasTabBar ? 93 : 0) }
+    var tabShellInset: CGFloat { max(safeBottom, 24) + 68 }
+}
+
+ScrollView {
+    LazyVStack(spacing: LayoutToken.gutter.cgFloatValue) { … }
+        .padding(.horizontal, LayoutToken.margin.cgFloatValue)
+}
+.safeAreaInset(edge: .top)    { ScreenHeader(style) }   // 50/64/98/120
+.safeAreaInset(edge: .bottom) { Color.clear.frame(height: metrics.tabShellInset) }
+.overlay(alignment: .bottom)  { TabShell(selection) }
+
+// 시트 — 비율을 박지 않고 콘텐츠 높이, 상한만 둔다
+.sheet(isPresented: $show) {
+    SheetContent()
+        .presentationDetents([.height(min(contentHeight,
+                                          screenHeight - safeTop - 16))])
+}</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC;margin-bottom:80px"><span style="color:#FFFFFF;font-weight:700">.frame(width:)를 쓰는 곳은 넷뿐 —</span> RepositoryCard(154), 썸네일(52·80·99), 애니메이션(128·200), 아이콘 버튼(40). 나머지 모든 폭은 부모에서 파생됩니다. 텍스트는 .frame(maxWidth: .infinity, alignment:)로 콘텍스트 폭을 채우고 줄 수 제한은 가이드 §4의 Text Style 규칙을 따릅니다.</div>
+    </div>
+
+    <div id="open" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:28px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">07</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">잠정 확정</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">정본에 근거가 없던 세 값은 아래 잠정값으로 확정해 §03·§04에 반영했습니다. 디자인이 달리 결정되면 이 세 곳만 고칩니다.</p>
+      <div style="display:grid;gap:12px">
+        <sc-for list="{{ open }}" as="o" hint-placeholder-count="3">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;display:grid;grid-template-columns:170px 1fr;gap:20px;align-items:start">
+            <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#ECBD23;overflow-wrap:anywhere">{{ o.name }}</span>
+            <div>
+              <div style="font-size:13.5px;line-height:1.65;color:#BCBCBC">{{ o.issue }}</div>
+              <div style="font-size:12.5px;line-height:1.6;color:#919191;margin-top:6px"><span style="color:#7FD65A">확정 —</span> {{ o.interim }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PRINCIPLES = [
+  ["P1", "정본 캔버스는 기준이 아니다", "360 × 800은 지원 기기 어디에도 없는 크기입니다. 정본에서 가져오는 것은 구성 순서, 간격, 컴포넌트 높이, 색이고, 폭·safe area·화면 높이는 기기에서 읽습니다."],
+  ["P2", "가로는 늘리고 세로는 고정한다", "화면 폭이 커지면 콘텐츠 폭만 늘어납니다(335 → 400). 세로 간격과 컴포넌트 높이는 화면 높이와 무관하게 정본 값을 유지하고, 남는 높이는 스크롤 여유로 둡니다."],
+  ["P3", "변하는 값은 계산식과 범위로 정의한다", "하나의 값이 아니라 계산식(contentWidth = screenWidth − 40)과 지원 기기의 양 끝값(335 – 400)을 함께 적습니다. 구현은 계산식을, 검수는 범위를 봅니다."],
+  ["P4", "고정 폭은 종횡비가 의미를 갖는 요소에만 쓴다", "이미지 썸네일, 로딩 애니메이션, 가로 스크롤 카드처럼 비율이 깨지면 안 되는 요소만 폭을 고정합니다. 버튼·행·카드·텍스트는 모두 콘텍스트 폭을 채웁니다."],
+];
+
+const METRICS = [
+  ["screenWidth", "기기", "375", "440", "iPhone SE 3 – 17 Pro Max. 이 범위 밖은 지원하지 않음"],
+  ["screenHeight", "기기", "667", "956", "SE – 17 Pro Max"],
+  ["safeAreaTop", "기기", "20", "68", "SE 20 · 13 mini 50 · 16e 47 · 16/15 59 · 17 Pro 62 · Air 68"],
+  ["safeAreaBottom", "기기", "0", "34", "홈 인디케이터 없는 SE만 0"],
+  ["contentWidth", "screenWidth − margin × 2", "335", "400", "모든 풀폭 요소의 폭"],
+  ["gridColumn2", "(contentWidth − gutter) / 2", "161.5", "194", "HomeProjectCard. 정본 154를 쓰지 않음"],
+  ["gridColumn3", "(contentWidth − gutter × 2) / 3", "103.67", "125.33", "MyScreen 통계 카드 3개"],
+  ["headerHeight", "ScreenHeader.Style", "50", "120", "plain 50 · inlineTitle 64 · inlineUser 98 · largeTitle 120. 기기 아닌 타입에 따라 변함"],
+  ["topScrimHeight", "safeAreaTop + headerHeight", "70", "188", "정본 103(53+50)을 쓰지 않음. plain·SE 70, largeTitle·Air 188"],
+  ["bottomScrimHeight", "safeAreaBottom + (탭바 ? 93 : 0)", "0", "127", "정본 34 / 127에서 34를 safe area로 치환"],
+  ["contentBudget", "screenHeight − safeAreaTop − safeAreaBottom − headerHeight", "435", "718", "SE·largeTitle 435 · SE·plain 505 · 17 Pro Max·plain 718. 505를 넘는 콘텐츠는 스크롤"],
+];
+
+const TOKENS = [
+  ["LayoutToken.margin", "20", "화면 좌우 여백. 전 화면·전 기기 동일. contentWidth의 유일한 입력 상수"],
+  ["LayoutToken.gutter", "12", "카드·행 사이, 2열·3열 그리드 열 간격, 가로 스크롤 카드 간격"],
+  ["LayoutToken.compactSpacing", "8", "선택지·선택 카드·프로젝트 행·저장 문제 카드 사이"],
+  ["LayoutToken.tightSpacing", "4", "라벨과 값, 제목과 부제 사이"],
+  ["LayoutToken.cardHorizontalPadding", "18", "카드 안쪽 좌우. 화면 여백 20과 다름"],
+];
+
+const LAYERS = [
+  ["SheetSurface", "bottom", "w screenWidth 375–440 · h 콘텐츠, max screenHeight − safeAreaTop − 16", "비율 detent 금지. 그랩 영역 16 + 콘텐츠 + safeAreaBottom. 상단 두 모서리만 16", "#4A4030", "#6B5A38"],
+  ["ModalOverlay", "fill", "w screenWidth · h screenHeight", "safe area 무시하고 전체 덮음. scrim 70%", "#2E2E30", "#4A4A4C"],
+  ["TabShell", "bottom", "w 298 고정 · h 68 + 하단 max(safeAreaBottom, 24)", "알약 중앙 정렬. 정본 하단 여백 24를 safe area가 대신함 — SE(0)에서만 24 유지", "#243040", "#3A4C66"],
+  ["ScreenHeader", "top · safe area 아래", "w screenWidth · h 50 / 64 / 98 / 120", "safeAreaInset(.top). 스크롤과 무관하게 고정", "#243040", "#3A4C66"],
+  ["ScreenEdgeScrim.bottom", "bottom", "w screenWidth · h bottomScrimHeight 0–127", "hitTesting 꺼짐. 탭바가 있으면 탭바 인셋까지 덮음", "#1E1E1F", "#3B3B3B"],
+  ["ScreenEdgeScrim.top", "top", "w screenWidth · h topScrimHeight 70–188", "hitTesting 꺼짐. 헤더 타입이 바뀌면 높이도 따라감", "#1E1E1F", "#3B3B3B"],
+  ["ScrollContent", "fill", "w contentWidth 335–400 · h 콘텍스트, 하단 인셋 tabShellInset", "위 정렬. contentBudget보다 짧아도 아래로 늘리지 않음", "#1A1A1A", "#3B3B3B"],
+  ["ScreenBackground", "fill", "w screenWidth · h screenHeight", "screenBackground grey700. 히어로 그라데이션(상세 h179)은 이 층 위에 top 정렬", "#141414", "#2C2C2D"],
+];
+
+const SIZING_MODES = [
+  ["fill", "부모 폭을 채움. contentWidth 335–400 또는 screenWidth 375–440."],
+  ["grid", "열 수로 나눔. (contentWidth − gutter × (n−1)) / n. 2열 161.5–194, 3열 103.67–125.33."],
+  ["hug", "내용에 맞춤. 최소 폭만 정본에서 가져오고 상한은 부모 폭."],
+  ["fixed", "정본 값 고정. 종횡비가 의미를 갖는 요소만."],
+  ["확인", "정본 근거 부족으로 §07에서 확정한 값. 현재 해당 항목 없음."],
+];
+
+const M = { fill: "#7FD65A", grid: "#7FD65A", hug: "#B9D6FE", fixed: "#BCBCBC", "확인": "#ECBD23" };
+
+const ELEMENTS = [
+  ["ActionButton · LG", "fill", "contentWidth 335–400", "54", "primary·secondary·text 공통. 하단 고정 시 safeAreaInset(.bottom) + 14"],
+  ["ActionButton · MD", "hug", "min 108 · max contentWidth", "40", "라벨 + 좌우 패딩. 한 줄 고정"],
+  ["ActionButton · SM", "hug", "min 68 · max contentWidth", "36", "출처·더보기 버튼. 우측 정렬"],
+  ["BottomActionBar", "fill", "screenWidth 375–440", "54×n + 8×(n−1) + 28", "패딩 4 20 24 20. 버튼은 안에서 fill"],
+  ["TextField", "fill", "contentWidth 335–400", "52", "규격 재작도 값으로 확정. 등록 화면 정본 56은 쓰지 않음 — §07"],
+  ["DisclosureRow", "fill", "contentWidth 335–400", "56", "등록 화면 '불러오기 방법'"],
+  ["Chip", "hug", "min 라벨 + 패딩 · 가로 스크롤", "36", "필터 열. 줄바꿈 대신 가로 스크롤, 좌우 여백 20"],
+  ["TagBadge", "hug", "min 43 · max contentWidth", "16 / 25 / 28", "neutral 43 · accent 78 · selected '문제 1' 58은 내용값, 고정 아님"],
+  ["SelectionCard", "fill", "contentWidth 335–400", "52 / 80", "제목만 52 · 썸네일 52 + 제목 + 부제 80. 사이 compactSpacing 8"],
+  ["ChoiceAnswerOption", "fill", "contentWidth 335–400", "111", "사이 10 — 화면 리터럴"],
+  ["ChoiceResultRow", "fill", "contentWidth 335–400", "59 / 111", "접힘 59 · 펼침 111"],
+  ["WrittenAnswerCard", "fill", "contentWidth 335–400", "262 / auto", "입력·작성중 262 · 결과는 두 장 스택 콘텐츠 높이"],
+  ["ProjectRow", "fill", "contentWidth 335–400", "150 / 94", "기본 150 · 삭제 모드 94"],
+  ["LearningSetRow", "fill", "contentWidth 335–400", "130", "사이 6 — 화면 리터럴"],
+  ["SavedQuestionCard", "fill", "contentWidth 335–400", "185", "사이 compactSpacing 8"],
+  ["SettingRow · SettingOption", "fill", "contentWidth 335–400", "56", "섹션 안에서 위아래 붙음, 그룹 모서리 8"],
+  ["LoadPromptCard", "fill", "contentWidth 335–400", "133", "홈 상단"],
+  ["HomeProjectCard", "grid", "gridColumn2 161.5–194", "192", "2열. 정본 154를 쓰지 않음"],
+  ["RepositoryCard", "fixed", "154", "192", "가로 스크롤. 마지막 카드 잘림 허용"],
+  ["StatCard ×3", "grid", "gridColumn3 103.67–125.33", "88", "MyScreen 학습 현황"],
+  ["WeeklyChartCard", "fill", "contentWidth 335–400", "223", "bar 7개는 안에서 space-between, bar 폭 7 고정"],
+  ["ProfileCard", "fill", "screenWidth 375–440", "118", "좌우 패딩 20은 카드 안쪽"],
+  ["EmptyState", "fill", "contentWidth 335–400", "콘텍스트", "contentBudget 안에서 세로 중앙"],
+  ["RepoThumbnail", "fixed", "52 / 80 / 99", "= 폭", "정사각. 반경 10"],
+  ["ResourceAnimation", "fixed", "128 / 200", "= 폭", "로딩 128 · 완료 200. 가로 중앙"],
+  ["IconPlainButton", "fixed", "40", "40", "히트 영역 44 이상 — 표면은 40 유지"],
+  ["Text 블록", "fill", "max contentWidth 335–400", "줄 수 × 행 높이", "줄 수 제한은 가이드 §4. 폭이 늘면 줄 수가 줄 수 있음 — 세로 위치 고정 금지"],
+  ["TabShell 알약", "fixed", "298", "68", "가로 중앙. 정본이 콘텍스트 폭보다 22 좁음 — §07에서 확정"],
+];
+
+const SCREENS = [
+  ["OnboardingScreen", "— · —", "위 정렬", "AccentPanel(screenWidth) · GoogleSignInButton(contentWidth) · 텍스트", "DevicePreview 212 × 637.8 고정 · 가로 중앙. 시트는 SheetSurface 규칙", "#BCBCBC"],
+  ["TutorialTransitionScreen", "— · —", "중앙", "Gradient(screenWidth 초과 허용)", "Sparkle 94 × 97 고정 · 화면 중앙", "#B9D6FE"],
+  ["SplashScreen", "— · —", "중앙", "—", "텍스트 두 줄 ZStack 중앙. 폭 무관", "#B9D6FE"],
+  ["LevelSelectScreen", "plain 50 · —", "위 정렬", "SelectionCard ×4", "카드 사이 8 · 하단 안내문은 safeAreaInset(.bottom)", "#BCBCBC"],
+  ["ConceptSelectScreen", "plain 50 · —", "위 정렬", "SelectionCard ×4", "LevelSelect와 동일 골격", "#BCBCBC"],
+  ["ProjectRegisterScreen", "plain 50 · —", "위 정렬", "TextField · DisclosureRow", "하단 ActionButton.secondary safeAreaInset(.bottom) + 14", "#BCBCBC"],
+  ["RepoConfirmScreen", "plain 50 · —", "위 정렬", "ActionButton ×2 (BottomActionBar)", "썸네일 80 고정 · 정본 x81은 좌표 무시, 가로 중앙", "#BCBCBC"],
+  ["SetCreatingScreen", "— · —", "위 정렬", "텍스트 세트 · ActionButton.text", "애니메이션 128 고정 · 진행 단계 VStack은 hug, 가로 중앙", "#BCBCBC"],
+  ["HomeScreen", "inlineUser 98 · 탭바", "위 정렬", "LoadPromptCard · HomeProjectCard 2열", "RepositoryCard 154 고정 가로 스크롤 · 하단 스크림 127", "#BCBCBC"],
+  ["ProjectListScreen", "inlineTitle 64 · 탭바", "위 정렬", "ProjectRow ×n", "상하 스크림 · 리스트 상하 패딩 8", "#BCBCBC"],
+  ["ProjectListScreen · empty", "inlineTitle 64 · 탭바", "중앙", "EmptyState", "contentBudget 안에서 세로 중앙 — 유일한 리스트 중앙 정렬", "#B9D6FE"],
+  ["SavedQuestionListScreen · empty", "inlineTitle 64 · 탭바", "중앙", "EmptyState", "위와 동일", "#B9D6FE"],
+  ["DeleteConfirmSheet", "시트", "bottom", "SheetSurface(screenWidth) · BottomActionBar", "이미지 128 고정. 시트 높이 = 16 + 콘텐츠 + 144 + safeAreaBottom, 정본 475는 결과값", "#ECBD23"],
+  ["ProjectDetailScreen", "plain 50 · —", "위 정렬", "요약 블록 · ProgressTrack · LearningSetRow ×n", "히어로 그라데이션 h179 screenWidth · 썸네일 99 고정", "#BCBCBC"],
+  ["QuizScreen", "plain 50 · —", "위 정렬", "ChoiceAnswerOption ×4 · 문항 텍스트", "SourceButton 68 × 36 hug", "#BCBCBC"],
+  ["WrittenAnswerScreen", "plain 50 · —", "위 정렬", "WrittenAnswerCard", "ActionButton SM 우측 정렬 · 키보드 인셋은 safeAreaInset(.bottom)이 처리", "#BCBCBC"],
+  ["QuizCompleteScreen", "plain 50 · —", "위 정렬", "ActionButton.primary", "애니메이션 200 고정 · 버튼은 safeAreaInset(.bottom) + 14", "#BCBCBC"],
+  ["SavedQuestionListScreen", "inlineTitle 64 · 탭바", "위 정렬", "Chip 가로 스크롤 · SavedQuestionCard ×n", "필터 행 h56 · 카운트 행 h41", "#BCBCBC"],
+  ["MyScreen", "inlineTitle 50 · 탭바", "위 정렬", "ProfileCard · StatCard 3열 · WeeklyChartCard", "Avatar 78 고정", "#BCBCBC"],
+  ["SettingListScreen · SettingDetail", "largeTitle 120 · —", "위 정렬", "SettingRow · SelectionCard", "SE에서 contentBudget 435 — 항상 ScrollView", "#BCBCBC"],
+];
+
+const OPEN = [
+  ["TabShell 알약 폭", "정본 298은 콘텐츠 폭 320보다 22 좁습니다. 화면이 넓어질 때 298을 유지할지 contentWidth − 22를 따를지 정본에 근거가 없었습니다.", "298 고정, 가로 중앙으로 확정. 탭 5개 × 44 히트 영역 = 220이 들어가므로 최소값으로 안전합니다. 폭은 인자로 두어 fill로 바꿀 수 있게 합니다."],
+  ["TextField 높이", "규격 문서는 재작도 값 52, 등록 화면 정본은 56이었습니다.", "규격 52로 확정. 등록 화면 블록 간격(16·32)은 그대로 둡니다."],
+  ["시트 최대 높이", "정본에는 시트가 두 종(460·475)만 있고 모두 콘텍스트 높이입니다. 콘텐츠가 긴 시트의 상한이 정의되지 않았습니다.", "screenHeight − safeAreaTop − 16으로 확정. 콘텐츠가 이를 넘으면 시트 안에서 스크롤합니다."],
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      principles: PRINCIPLES.map(([id, title, detail]) => ({ id, title, detail })),
+      metrics: METRICS.map(([name, formula, min, max, note]) => ({ name, formula, min, max, note })),
+      tokens: TOKENS.map(([name, value, usage]) => ({ name, value, usage })),
+      layers: LAYERS.map(([name, pos, size, rule]) => ({ name, pos, size, rule })),
+      layersVisual: LAYERS.map(([name, pos, size, rule, bg, border], i) => ({ name, size, bg, border, z: String(LAYERS.length - i) })),
+      sizingModes: SIZING_MODES.map(([name, detail]) => ({ name, detail })),
+      elements: ELEMENTS.map(([name, mode, width, height, note]) => ({ name, mode, width, height, note, modeColor: M[mode] })),
+      screens: SCREENS.map(([name, chrome, vertical, flex, note, vColor]) => ({ name, chrome, vertical, flex, note, vColor })),
+      open: OPEN.map(([name, issue, interim]) => ({ name, issue, interim })),
+    };
+  }
+}
+</script>
+</body>
+</html>

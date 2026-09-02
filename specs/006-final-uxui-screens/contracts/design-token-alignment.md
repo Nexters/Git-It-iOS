@@ -113,8 +113,8 @@ Figma 변수 컬렉션에 없는 저장소 토큰이다. 삭제하지 않고 근
 | 토큰 | 값 | 근거 | 승격 사유 |
 | --- | --- | --- | --- |
 | `LayoutToken` 8pt 항목 | 8 | `A` | `프로젝트` 목록 항목 간격, `Text Set` 텍스트 간격, `Toolbar - Bottom` 버튼 간격 세 곳에서 같은 역할 |
-| `SemanticColorToken` 진행 바 트랙 | `grey500` | `A` | `ProjectList`와 `학습세트 List-item`이 같은 역할로 사용 |
-| `SemanticColorToken` 진행 바 채움 | `blue200` | `A` | 같은 근거 |
+| `SemanticColorToken` 진행 바 트랙 | `grey500` | `A` | `ProjectList`(연속형)와 `학습세트 List-item`(세그먼트형)이 같은 역할로 사용 |
+| `SemanticColorToken` 진행 바 채움 | `blue200` | `A` | `ProjectList`(연속형, `ContinuousProgressBar` → `SemanticColorToken.progressFill`)만 해당. **정정(2026-09-03, Task 3 문제 풀이 조사)**: `학습세트 List-item`의 세그먼트 채움은 `blue200`이 아니라 `blue100`이다 — `프로젝트 상세(완)`(`1342:19562`) 학습세트 List-item 인스턴스 5개의 `Progress Bar` 세그먼트 fill을 재조회해 확인(`A`, 완료 세그먼트 `#B9D6FE`=blue100, 미완료 `#3B3B3B`=grey500). 이 행이 두 컴포넌트를 "같은 근거"로 묶은 것은 세그먼트 채움에는 적용되지 않는다. 코드는 이미 `ProgressSegments.swift`가 `.blue100`을 직접 사용해 정확히 구현했으므로 production 수정은 불필요하다. `LearningSetRow.swift`가 `ProgressSegments`가 아닌 `ContinuousProgressBar`를 쓰는 구조 격차는 별개 사안이며 이 문서의 범위 밖이다 |
 | `GradientToken` 상단 dim | 아래→위, `#141414` 정지점 2개 | `A` | 참조 화면 6개가 `top dim`의 `문제풀이용` 변형을 사용 |
 | `GradientToken` 하단 dim | 위→아래, `#141414` 정지점 2개 | `A` | 참조 화면 6개가 `bottom dim`을 사용 |
 
