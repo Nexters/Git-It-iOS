@@ -90,6 +90,9 @@ design_rules_path_exempt() (
 	case "$design_rules_name:$design_rules_path" in
 	# 화면 좌우 여백은 ScreenContainer 하나가 소유합니다.
 	component-margin:*/Scaffolds/ScreenContainer/*) return 0 ;;
+	# 스플래시 연출은 타이핑 진행 상태를 자기 안에서 진행시킵니다.
+	component-state:*/Displays/SplashView.swift) return 0 ;;
+	component-state:*/Displays/LaunchLogo.swift) return 0 ;;
 	# 시트는 자기 좌우 여백과 스크롤 높이를 직접 관리하는 표시 방식을 씁니다.
 	component-margin:*/Overlays/SheetSurface/*) return 0 ;;
 	component-state:*/Overlays/SheetSurface/*) return 0 ;;
