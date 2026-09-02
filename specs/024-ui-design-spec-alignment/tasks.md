@@ -347,44 +347,44 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 구현
 
-- [ ] T038 [S3] `sources/Projects/UI/Component/Controls/Chip/Chip.swift`를 새로 만든다 —
+- [X] T038 [S3] `sources/Projects/UI/Component/Controls/Chip/Chip.swift`를 새로 만든다 —
       라벨·선택 여부·탭 콜백을 모두 필수 값으로 받고 선택을 보관하지 않는다. 비선택은
       `raisedBackground` 배경 + `blue100` 라벨, 선택은 `brandAccent` 배경 + `grey700` 라벨,
       반경 `CornerRadiusToken.small`(8), 높이 36, 라벨은 Body 2 1줄 고정. 접근성으로 선택
       특성을 노출한다. doc comment에 `SizingMode.hug`를 명시한다 (FR-019 · FR-034)
-- [ ] T039 [S3] `sources/Projects/UI/Component/Controls/Chip/Chip+Constant.swift`를 새로 만들어
+- [X] T039 [S3] `sources/Projects/UI/Component/Controls/Chip/Chip+Constant.swift`를 새로 만들어
       규격 수치(높이 36 등)를 상수로 모은다 (T038 의존)
-- [ ] T040 [P] [S3] `sources/Projects/UI/Component/Controls/PressOverlayStyle.swift`를 새로
+- [X] T040 [P] [S3] `sources/Projects/UI/Component/Controls/PressOverlayStyle.swift`를 새로
       만들어 버튼 계열 공용 누름 표현을 제공한다 — 눌림 시 `white30` 오버레이 하나만 적용하고
       배경색을 새로 만들지 않는다 (FR-020)
-- [ ] T041 [P] [S3] `sources/Projects/UI/Component/Controls/BookmarkButton.swift`를 새로 만든다
+- [X] T041 [P] [S3] `sources/Projects/UI/Component/Controls/BookmarkButton.swift`를 새로 만든다
       — 저장 여부·접근성 라벨·탭 콜백을 받고 접근성 라벨을 **필수 인자**로 요구한다(생략
       불가). 라벨은 아이콘 이름이 아니라 동작 이름이다. 히트 영역은
       `ControlSizeToken.minimumTouch`(44) 이상 (FR-021 · FR-033)
-- [ ] T042 [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow/ChoiceResultRow.swift`를
+- [X] T042 [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow/ChoiceResultRow.swift`를
       새로 만든다 — 정답·오답 축과 접힘·펼침 축을 값으로 받고 본문·해설과 탭 콜백을 받는다.
       펼침 상태를 보관하지 않고 햅틱을 발생시키지 않는다. `cardBackground` 기본, 판정 시
       `correct`/`incorrect` 배경 + `grey100` 본문. 접근성 라벨에 "정답"·"오답"을 접미로 붙인다.
       접힘 높이 59 · 펼침 높이 111을 적용하고 가로는 `SizingMode.fill`로 둔다 — 스펙 카드의
       `320 × 111` 중 320은 정본 캔버스 360에서 좌우 여백 20을 뺀 값이므로 고정 폭으로 옮기지
       않는다 (FR-022 · FR-035 · FR-017 · FR-018)
-- [ ] T043 [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow/ChoiceResultRow+Constant.swift`를
+- [X] T043 [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow/ChoiceResultRow+Constant.swift`를
       새로 만들어 접힘 높이 59와 펼침 높이 111을 상수로 정의한다. 폭은 상수로 두지 않는다 —
       가로는 채움이다 (T042 의존)
-- [ ] T044 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/ChipTests.swift`를 새로
+- [X] T044 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/ChipTests.swift`를 새로
       만들어 선택·비선택 표현과 상태 비보관을 검증한다
-- [ ] T045 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/BookmarkButtonTests.swift`를
+- [X] T045 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/BookmarkButtonTests.swift`를
       새로 만들어 접근성 라벨 필수성과 44pt 히트 영역을 검증한다
-- [ ] T046 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/ChoiceResultRowTests.swift`를
+- [X] T046 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/ChoiceResultRowTests.swift`를
       새로 만들어 정답·오답 축과 접힘·펼침 축이 값으로 주입되는지, 접근성 라벨에 판정이
       실리는지 검증한다
-- [ ] T047 [S3] `docs/conventions/ui-component.md` §3.4 "현재 컴포넌트 배치" 표의 `Controls/`
+- [X] T047 [S3] `docs/conventions/ui-component.md` §3.4 "현재 컴포넌트 배치" 표의 `Controls/`
       행에 `Chip`·`PressOverlayStyle`·`BookmarkButton`을, `CollectionItems/` 행에
       `ChoiceResultRow`를 추가한다. 책임 패키지는 `UI`다
 
 ### 정리와 패키지 검증
 
-- [ ] T048 [no-write] [S3] `"$project_build_runner" test`로 신설 4종의 계약 테스트가 통과하는지
+- [X] T048 [no-write] [S3] `"$project_build_runner" test`로 신설 4종의 계약 테스트가 통과하는지
       확인한다
 
 **진행 점검**: T038~T048의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.
