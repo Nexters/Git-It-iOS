@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 /// 크기 결정 방식은 `SizingMode.fixed` — 규격이 확정한 알약 폭 298이며 인자로 채움으로 바꿀 수 있다.
+///
+/// 알약 표면은 시스템 기본 글래스(`.regular`)를 쓴다. 색·테두리를 직접 칠하지 않는다.
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
     // MARK: Lifecycle
@@ -70,7 +72,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 } label: {
                     tabLabel(item)
                 }
-                .buttonStyle(.pressOverlay)
+                .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .designSystemControlSize(.minimumTouch)
                 .accessibilityLabel(item.tabTitle)
@@ -78,17 +80,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
             }
         }
         .frame(width: pillWidth, height: Constant.pillHeight)
-        .background {
-            Capsule()
-                .fill(Color(designSystem: .tabBarSurface))
-        }
-        .overlay {
-            Capsule()
-                .strokeBorder(
-                    Color(designSystem: .tabBarBorder),
-                    lineWidth: CGFloat(BorderToken.tabBar.width),
-                )
-        }
+        .glassEffect(.regular, in: .capsule)
         .padding(.bottom, CGFloat(layoutMetrics.tabBarBottomInset))
     }
 
