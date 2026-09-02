@@ -215,23 +215,23 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 구현
 
-- [ ] T019 [S1] [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`에
+- [X] T019 [S1] [S2] `sources/Tuist/ProjectDescriptionHelpers/Projects/UIModuleName.swift`에
       `case DesignSystemTests`를 추가하고, `sourceDirectory`의 `switch`에 `.DesignSystemTests`
       분기를 더해 `"DesignSystem/Unit"`을 반환하게 한 뒤, `targets`에 `.testModule(name:)`으로
       `productionTarget: .target(name: UIModuleName.DesignSystem.rawValue)` 항목을 추가한다
-- [ ] T020 [S1] [S2] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`의
+- [X] T020 [S1] [S2] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`의
       `allTestTargets`에
       `.project(path: ProjectName.UI.projectPath, target: UIModuleName.DesignSystemTests.rawValue)`를
       추가한다 (T019 의존)
-- [ ] T021 [P] [S1] `sources/Projects/UI/Tests/DesignSystem/Unit/Tokens/DesignTokenSetValidationTests.swift`를
+- [X] T021 [P] [S1] `sources/Projects/UI/Tests/DesignSystem/Unit/Tokens/DesignTokenSetValidationTests.swift`를
       새로 만들어 `DesignTokenSet.current.validate()`가 빈 배열을 반환하는지 검증한다
       (SC-001). Swift Testing과 한국어 동작 문장 이름을 쓴다(R-10)
-- [ ] T022 [P] [S1] `sources/Projects/UI/Tests/DesignSystem/Unit/Tokens/DesignTokenCatalogTests.swift`를
+- [X] T022 [P] [S1] `sources/Projects/UI/Tests/DesignSystem/Unit/Tokens/DesignTokenCatalogTests.swift`를
       새로 만들어 카테고리별 개수와 이름 집합을 검증한다 — `BorderToken.all` 6 ·
       `OpacityToken.all` 6 · `EffectToken.all` 2, 빈 배열인 카테고리 0개,
       `EffectToken.sheetElevation.layers` 2개, `design-token-catalog.md`가 나열한 이름 전부
       존재 (SC-002 · SC-003)
-- [ ] T023 [P] [S2] `sources/Projects/UI/Tests/DesignSystem/Unit/Layout/LayoutMetricsTests.swift`를
+- [X] T023 [P] [S2] `sources/Projects/UI/Tests/DesignSystem/Unit/Layout/LayoutMetricsTests.swift`를
       새로 만들어 [quickstart.md](./quickstart.md) §2의 지원 기기 9종 입력 표를 그대로 넣고
       레이아웃 변수 13종이 규격 min–max 범위 안인지 검증한다 — `LayoutMetrics`가 소유하는
       입력 4와 파생 8, 그리고 `LayoutMetrics.HeaderStyle`이 소유하는 `headerHeight` 1이다.
@@ -244,10 +244,10 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 정리와 패키지 검증
 
-- [ ] T024 [no-write] [S1] [S2] `git status --porcelain`을 기록하고 `make tuist`를 실행한 뒤
+- [X] T024 [no-write] [S1] [S2] `git status --porcelain`을 기록하고 `make tuist`를 실행한 뒤
       다시 비교해 추적 파일 변경이 없는지 확인한다. 추적 파일 diff가 생기면 이 작업을 완료로
       표시하지 않는다
-- [ ] T025 [no-write] [S1] [S2] `"$project_build_runner" compile`과
+- [X] T025 [no-write] [S1] [S2] `"$project_build_runner" compile`과
       `"$project_build_runner" test`를 순차 실행해 `DesignSystemTests`가 `AllTests`에 포함되어
       통과하는지 확인한다. 두 명령은 `sources/DerivedData/PreCommit`을 공유하므로 병렬
       실행하지 않는다

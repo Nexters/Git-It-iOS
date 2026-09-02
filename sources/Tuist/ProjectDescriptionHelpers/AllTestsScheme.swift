@@ -47,6 +47,7 @@ extension ProjectName {
                 target: InfrastructureModuleName.InfrastructureStorageTests.rawValue,
             ),
             .project(path: ProjectName.UI.projectPath, target: UIModuleName.UIComponentTests.rawValue),
+            .project(path: ProjectName.UI.projectPath, target: UIModuleName.DesignSystemTests.rawValue),
         ]
     }
 

@@ -4,6 +4,7 @@ import ProjectDescription
 
 enum UIModuleName: String {
     case DesignSystem
+    case DesignSystemTests
     case UIComponent
     case UIComponentTests
 }
@@ -15,7 +16,8 @@ extension UIModuleName {
         case .DesignSystem,
              .UIComponent:
             directoryName
-        case .UIComponentTests:
+        case .DesignSystemTests,
+             .UIComponentTests:
             "\(directoryName.droppingSuffix("Tests"))/Unit"
         }
     }
@@ -87,6 +89,11 @@ extension UIModuleName {
             name: UIModuleName.UIComponentTests.rawValue,
             sourceDirectory: UIModuleName.UIComponentTests.sourceDirectory,
             productionTarget: .target(name: UIModuleName.UIComponent.rawValue),
+        ),
+        .testModule(
+            name: UIModuleName.DesignSystemTests.rawValue,
+            sourceDirectory: UIModuleName.DesignSystemTests.sourceDirectory,
+            productionTarget: .target(name: UIModuleName.DesignSystem.rawValue),
         ),
     ]
 
