@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fixed` — 규격이 확정한 알약 폭 298이며 인자로 채움으로 바꿀 수 있다.
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
     // MARK: Lifecycle
@@ -68,7 +69,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 } label: {
                     tabLabel(item)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressOverlay)
                 .frame(maxWidth: .infinity)
                 .designSystemControlSize(.minimumTouch)
                 .accessibilityLabel(item.tabTitle)
@@ -95,7 +96,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
             Image(item.tabSystemImage, bundle: .module)
             Text.designSystemStyled(item.tabTitle, style: .tabItem)
         }
-        .foregroundStyle(Color(designSystem: item == selected ? SemanticColorToken.brandAccent : .mutedText))
+        .foregroundStyle(Color(designSystem: Item.tabColor(isSelected: item == selected)))
     }
 
 }

@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill` — 화면 전체를 채우고 레이아웃 변수를 주입한다.
 public struct ScreenContainer<Content: View>: View {
 
     // MARK: Lifecycle

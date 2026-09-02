@@ -407,31 +407,31 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 구현
 
-- [ ] T049 [S3] `sources/Projects/UI/Component/Controls/TextField.swift`를 재작도한다 — 높이
+- [X] T049 [S3] `sources/Projects/UI/Component/Controls/TextField.swift`를 재작도한다 — 높이
       52 · 반경 8 · 내부 좌우 16. Material 잔여 형태(반경 4/4/0/0, 하단 active indicator, 라벨
       축소)를 제거하고 상태별 테두리를 기본 `BorderToken.default` · 활성 `BorderToken.focus` ·
       입력됨 `mutedText` 1pt · 오류 `BorderToken.error`(+ Caption 1 오류문)로 맞춘다 (FR-023)
-- [ ] T050 [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/TextFieldTests.swift`를
+- [X] T050 [S3] `sources/Projects/UI/Tests/Component/Unit/Controls/TextFieldTests.swift`를
       재작도된 규격 값(높이 52 · 반경 8 · 좌우 16 · 상태별 테두리)에 맞춰 갱신한다 (T049 의존)
-- [ ] T051 [S3] `sources/Projects/UI/Component/Controls/ActionButton.swift`의 primary·
+- [X] T051 [S3] `sources/Projects/UI/Component/Controls/ActionButton.swift`의 primary·
       secondary·text 세 변형을 상태 매트릭스에 맞추고 눌림 표현을 `PressOverlayStyle`로
       통일한다 (FR-020 · FR-024) (T040 의존)
-- [ ] T052 [P] [S3] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`의 기본은
+- [X] T052 [P] [S3] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`의 기본은
       `cardBackground` 테두리 없음, 선택은 외곽 `BorderToken.focus`로 맞추고 내부 SwiftUI
       `Button`에 `PressOverlayStyle`을 적용한다 (FR-020) (T040 의존)
-- [ ] T053 [P] [S3] `sources/Projects/UI/Component/CollectionItems/LearningSetRow/LearningSetRow.swift`와
+- [X] T053 [P] [S3] `sources/Projects/UI/Component/CollectionItems/LearningSetRow/LearningSetRow.swift`와
       `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`의 기본을
       `screenBackground` + `BorderToken.default`, 선택을 `selectedSurface` 겹침 +
       `BorderToken.focus`로 맞춘다
-- [ ] T054 [P] [S3] `sources/Projects/UI/Component/Scaffolds/TabShell/TabShellItem.swift`의
+- [X] T054 [P] [S3] `sources/Projects/UI/Component/Scaffolds/TabShell/TabShellItem.swift`의
       기본을 `mutedText`, 선택을 `brandAccent` 아이콘·라벨로 맞춘다
-- [ ] T055 [P] [S3] `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift`가
+- [X] T055 [P] [S3] `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift`가
       규격이 정의한 2종(프로젝트 없음 · 저장 문제 없음)만 표현하는지 확인하고 맞춘다
-- [ ] T056 [S3] `sources/Projects/UI/Component/Controls/IconPlainButton.swift`와
+- [X] T056 [S3] `sources/Projects/UI/Component/Controls/IconPlainButton.swift`와
       `sources/Projects/UI/Component/Controls/IconGlassButton.swift`가 눌림 표현으로
       `PressOverlayStyle`을 쓰게 하고, 아이콘 전용 버튼의 접근성 라벨을 필수 인자로 바꾼다
       (FR-020 · FR-033) (T040 의존)
-- [ ] T057 [S3] [S5] 아래 정확한 파일의 프로덕션 SwiftUI `Button` 사용처 전부가
+- [X] T057 [S3] [S5] 아래 정확한 파일의 프로덕션 SwiftUI `Button` 사용처 전부가
       `PressOverlayStyle`을 쓰고, 표면 크기를 유지한 채
       `ControlSizeToken.minimumTouch`(44) 이상의 히트 영역을 갖게 한다
       (FR-020 · FR-032) (T040 의존)
@@ -441,11 +441,11 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
   | CollectionItems | `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift` · `sources/Projects/UI/Component/CollectionItems/LearningSetRow/LearningSetRow.swift` · `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift` · `sources/Projects/UI/Component/CollectionItems/SettingRow/SettingRow.swift` · `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow/ChoiceResultRow.swift` |
   | Controls | `sources/Projects/UI/Component/Controls/AccountActionRow/AccountActionRow.swift` · `sources/Projects/UI/Component/Controls/ActionButton.swift` · `sources/Projects/UI/Component/Controls/AppleSignInButton.swift` · `sources/Projects/UI/Component/Controls/BookmarkButton.swift` · `sources/Projects/UI/Component/Controls/Chip/Chip.swift` · `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift` · `sources/Projects/UI/Component/Controls/IconGlassButton.swift` · `sources/Projects/UI/Component/Controls/IconPlainButton.swift` · `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift` · `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift` · `sources/Projects/UI/Component/Controls/SelectableSettingRow/SelectableSettingRow.swift` · `sources/Projects/UI/Component/Controls/SelectionCardList/SelectionCardList.swift` |
   | Overlays | `sources/Projects/UI/Component/Overlays/ActionMenu/ActionMenu.swift` |
-- [ ] T058 [S5] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`·
+- [X] T058 [S5] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`·
       `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift`·
       `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`처럼 여러
       텍스트를 담는 카드가 하나의 접근성 요소로 읽히도록 묶는다 (FR-036)
-- [ ] T059 [S2] [S3] 아래 표의 정확한 파일에 있는 `.frame(width:` 56곳을 전수 판정한다 —
+- [X] T059 [S2] [S3] 아래 표의 정확한 파일에 있는 `.frame(width:` 56곳을 전수 판정한다 —
       버튼·행·카드·텍스트는 채움(`fill`)으로, 2열·3열 배치는 `LayoutMetrics`의
       `gridColumn2`·`gridColumn3`으로, 칩·배지는 내용맞춤(`hug`)으로 바꾸고, 종횡비가 의미를
       갖는 요소(이미지 썸네일 · Lottie 애니메이션 · 가로 스크롤 카드)와 규격이 확정한
@@ -463,21 +463,21 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
   | Indicators | `sources/Projects/UI/Component/Indicators/ContinuousProgressBar.swift` · `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift` · `sources/Projects/UI/Component/Indicators/LabeledProgressBar.swift` · `sources/Projects/UI/Component/Indicators/PageIndicator.swift` · `sources/Projects/UI/Component/Indicators/ProgressSegments.swift` |
   | Overlays | `sources/Projects/UI/Component/Overlays/ActionMenu/ActionMenu.swift` · `sources/Projects/UI/Component/Overlays/ModalOverlay.swift` · `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift` · `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift` · `sources/Projects/UI/Component/Overlays/WebSheet.swift` |
   | Scaffolds | `sources/Projects/UI/Component/Scaffolds/BottomActionBar/BottomActionBar.swift` · `sources/Projects/UI/Component/Scaffolds/ScreenContainer/ScreenContainer.swift` · `sources/Projects/UI/Component/Scaffolds/ScreenHeader/ScreenHeader.swift` · `sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift` |
-- [ ] T060 [no-write] [S2] [S3] T059에서 고정으로 남긴 각 지점을 저장소 상대경로와 이유로
+- [X] T060 [no-write] [S2] [S3] T059에서 고정으로 남긴 각 지점을 저장소 상대경로와 이유로
       정리해 T086의 입력으로 보고한다. 첫 항목은 Responsive Layout Spec §07이 확정한
       `TabShell` 알약 폭 298이다. 이 작업은 파일을 만들지 않는다 — `tools/design-rules/`는
       작업 패키지 10이 소유한다 (T059 의존)
-- [ ] T061 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Displays/TagBadgeContractTests.swift`를
+- [X] T061 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Displays/TagBadgeContractTests.swift`를
       새로 만들어 `Displays` 역할 폴더의 첫 테스트를 추가한다 — 표현 값과 상태 비보관을
       검증한다 (SC-010)
-- [ ] T062 [P] [S5] `sources/Projects/UI/Tests/Component/Unit/Controls/AccessibilityContractTests.swift`를
+- [X] T062 [P] [S5] `sources/Projects/UI/Tests/Component/Unit/Controls/AccessibilityContractTests.swift`를
       새로 만들어 아이콘 전용 버튼의 접근성 라벨 필수성, 조작 컴포넌트의 44pt 히트 영역,
       선택 특성 노출을 검증한다 (SC-009). Dynamic Type API 부재는 소스 정적 계약이므로
       T084의 `dynamic-type` 규칙과 T087 fixture가 검증한다 (FR-037)
 
 ### 정리와 패키지 검증
 
-- [ ] T063 [no-write] [S3] [S5] `"$project_build_runner" test`를 실행하고, 역할 폴더 6종
+- [X] T063 [no-write] [S3] [S5] `"$project_build_runner" test`를 실행하고, 역할 폴더 6종
       (`Scaffolds`·`Overlays`·`Controls`·`CollectionItems`·`Indicators`·`Displays`) 각각에
       최소 1개의 테스트 파일이 있는지 `sources/Projects/UI/Tests/Component/Unit/` 아래에서
       확인한다 (SC-010). 이어서 규격 컴포넌트 인덱스의 UI 소관 30항목이 지정된 역할 폴더에

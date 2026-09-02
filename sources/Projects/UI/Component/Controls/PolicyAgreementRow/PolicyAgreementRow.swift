@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - PolicyAgreementRow
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct PolicyAgreementRow: View {
 
     // MARK: Lifecycle
@@ -34,7 +35,7 @@ public struct PolicyAgreementRow: View {
                 }
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressOverlay)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(accessibilityLabel)
             .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -48,7 +49,7 @@ public struct PolicyAgreementRow: View {
                            height: Constant.minimumTouchSize)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressOverlay)
             .accessibilityLabel(openLinkAccessibilityLabel)
             .accessibilityIdentifier("policyAgreementRow.openLink.\(title)")
         }

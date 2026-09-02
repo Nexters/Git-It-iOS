@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - LabeledProgressBar
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct LabeledProgressBar: View {
 
     // MARK: Lifecycle

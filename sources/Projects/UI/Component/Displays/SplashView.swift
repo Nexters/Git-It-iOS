@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - SplashView
 
+/// 크기 결정 방식은 `SizingMode.fill` — 내부 도형만 비율로 유도한다.
 public struct SplashView: View {
 
     // MARK: Lifecycle

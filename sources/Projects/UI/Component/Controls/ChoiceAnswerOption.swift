@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - ChoiceAnswerOption
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct ChoiceAnswerOption: View {
 
     // MARK: Lifecycle
@@ -27,13 +28,22 @@ public struct ChoiceAnswerOption: View {
 
         // MARK: Internal
 
-        var borderColor: ColorToken {
+        /// 기본은 테두리를 두지 않는다. 선택은 외곽 강조 테두리를 쓴다.
+        var borderToken: BorderToken? {
             switch self {
-            case .default: .grey500
-            case .selected: .blue100
-            case .correct: .correct
-            case .incorrect: .incorrect
+            case .default:
+                nil
+            case .selected:
+                .focus
+            case .correct:
+                BorderToken(name: "Correct", width: 1, colorToken: .correct)
+            case .incorrect:
+                BorderToken(name: "Incorrect", width: 1, colorToken: .incorrect)
             }
+        }
+
+        var borderColor: ColorToken {
+            borderToken?.colorToken ?? .clear
         }
 
         var symbol: String? {
@@ -79,14 +89,16 @@ public struct ChoiceAnswerOption: View {
             .designSystemBackground(.cardBackground)
             .designSystemCornerRadius(.large)
             .overlay {
-                RoundedRectangle(designSystem: .large)
-                    .stroke(
-                        Color(designSystem: state.borderColor),
-                        lineWidth: Constant.borderWidth,
-                    )
+                if let borderToken = state.borderToken {
+                    RoundedRectangle(designSystem: .large)
+                        .stroke(
+                            Color(designSystem: borderToken.colorToken),
+                            lineWidth: CGFloat(borderToken.width),
+                        )
+                }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressOverlay)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(state == .selected ? .isSelected : [])
@@ -97,7 +109,6 @@ public struct ChoiceAnswerOption: View {
     private enum Constant {
         static let horizontalPadding: CGFloat = 16
         static let minimumHeight: CGFloat = 52
-        static let borderWidth: CGFloat = 1
     }
 
     private let text: String

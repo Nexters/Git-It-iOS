@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - SelectionCard
 
+/// 크기 결정 방식은 `SizingMode.fill` — 썸네일만 종횡비 고정이다.
 public struct SelectionCard<Thumbnail: View>: View {
 
     // MARK: Lifecycle
@@ -48,13 +49,19 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, minHeight: style.minimumHeight, alignment: .leading)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.screenBackground)
         .designSystemCornerRadius(.large)
+        .overlay {
+            if isSelected {
+                RoundedRectangle(designSystem: .large)
+                    .fill(Color(designSystem: SemanticColorToken.selectedSurface))
+            }
+        }
         .overlay {
             RoundedRectangle(designSystem: .large)
                 .stroke(
-                    isSelected ? Color(designSystem: .blue200) : .clear,
-                    lineWidth: Constant.borderWidth,
+                    Color(designSystem: borderToken.colorToken),
+                    lineWidth: CGFloat(borderToken.width),
                 )
         }
         .accessibilityElement(children: .combine)
@@ -62,6 +69,10 @@ public struct SelectionCard<Thumbnail: View>: View {
     }
 
     // MARK: Private
+
+    private var borderToken: BorderToken {
+        isSelected ? .focus : .default
+    }
 
     private let title: String
     private let supportingText: String?

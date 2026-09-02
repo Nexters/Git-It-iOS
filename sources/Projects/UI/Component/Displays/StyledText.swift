@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill` — 텍스트는 주어진 폭을 채운다.
 public struct StyledText: View, Sendable, Equatable {
 
     // MARK: Lifecycle

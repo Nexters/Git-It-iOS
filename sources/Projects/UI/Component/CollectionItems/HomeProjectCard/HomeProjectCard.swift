@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill` — 2열 배치의 한 열 폭(`gridColumn2`)을 따르고 정본 고정값을 쓰지 않는다.
 public struct HomeProjectCard: View {
 
     // MARK: Lifecycle
@@ -35,7 +36,7 @@ public struct HomeProjectCard: View {
                 cardContent
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressOverlay)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(title), \(currentSetLabel), 프로젝트 상세 보기")
 
@@ -43,7 +44,7 @@ public struct HomeProjectCard: View {
                 .padding(.trailing, Constant.headerTrailingPadding)
                 .padding(.top, Constant.headerTopPadding)
         }
-        .frame(width: Constant.cardWidth, height: Constant.cardHeight)
+        .frame(width: cardWidth, height: Constant.cardHeight)
         .background(Color(designSystem: variant.cardColor))
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .contain)
@@ -72,6 +73,8 @@ public struct HomeProjectCard: View {
 
     // MARK: Private
 
+    @Environment(\.layoutMetrics) private var layoutMetrics
+
     private let title: String
     private let technologies: String
     private let progress: Double
@@ -97,7 +100,7 @@ public struct HomeProjectCard: View {
                 )
                 .lineLimit(3)
             }
-            .frame(width: Constant.titleWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, Constant.headerLeadingPadding)
             .padding(.trailing, Constant.headerTrailingPadding + Constant.startTouchSize)
             .padding(.top, Constant.headerTopPadding)
@@ -130,7 +133,12 @@ public struct HomeProjectCard: View {
             .padding(.trailing, Constant.headerTrailingPadding)
             .padding(.bottom, Constant.footerBottomPadding)
         }
-        .frame(width: Constant.cardWidth, height: Constant.cardHeight)
+        .frame(width: cardWidth, height: Constant.cardHeight)
+    }
+
+    /// 2열 배치의 한 열 폭. 정본 캔버스의 154를 쓰지 않는다.
+    private var cardWidth: CGFloat {
+        CGFloat(layoutMetrics.gridColumn2)
     }
 
     private var startButton: some View {
@@ -143,7 +151,7 @@ public struct HomeProjectCard: View {
                 .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressOverlay)
         .disabled(!isLearningEnabled)
         .accessibilityLabel("\(title) 학습 시작")
         .accessibilityHint(isLearningEnabled ? "다음 학습을 시작합니다" : "다음 학습 위치가 없습니다")

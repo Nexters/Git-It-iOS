@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - AccountActionRow
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct AccountActionRow: View {
 
     // MARK: Lifecycle
@@ -29,7 +30,7 @@ public struct AccountActionRow: View {
             .padding(.horizontal, Constant.horizontalPadding)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressOverlay)
     }
 
     // MARK: Private

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - LaunchLogo
 
+/// 크기 결정 방식은 `SizingMode.fixed` — 로고는 종횡비가 의미를 갖는다.
 public struct LaunchLogo: View {
 
     // MARK: Lifecycle

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - ProjectRow
 
+/// 크기 결정 방식은 `SizingMode.fill` — 썸네일만 종횡비 고정이다.
 public struct ProjectRow<Thumbnail: View>: View {
 
     // MARK: Lifecycle

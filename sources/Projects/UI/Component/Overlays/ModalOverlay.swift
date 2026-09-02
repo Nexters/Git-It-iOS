@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - ModalOverlay
 
+/// 크기 결정 방식은 `SizingMode.fill` — safe area를 무시하고 화면 전체를 덮는다.
 public struct ModalOverlay<Content: View>: View {
 
     // MARK: Lifecycle

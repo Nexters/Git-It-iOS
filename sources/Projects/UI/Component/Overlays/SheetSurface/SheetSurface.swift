@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - SheetSurface
 
+/// 크기 결정 방식은 `SizingMode.fill` — 높이는 콘텐츠를 따르고 상한만 레이아웃 변수를 쓴다.
 public struct SheetSurface<Content: View>: View {
 
     // MARK: Lifecycle

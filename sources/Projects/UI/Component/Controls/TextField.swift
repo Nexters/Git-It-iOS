@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill` — 높이만 규격 52를 유지한다.
 public struct TextField: View {
 
     // MARK: Lifecycle
@@ -32,7 +33,7 @@ public struct TextField: View {
                     RoundedRectangle(designSystem: .small)
                         .stroke(
                             Color(designSystem: state.borderColor),
-                            lineWidth: Constant.borderWidth,
+                            lineWidth: state.borderWidth,
                         )
                 }
 
@@ -52,26 +53,42 @@ public struct TextField: View {
 
         // MARK: Internal
 
-        var borderColor: ColorToken {
+        /// 상태별 테두리는 규격 토큰을 참조한다. 입력됨만 역할 색 1pt를 쓴다.
+        var borderToken: BorderToken {
             switch self {
-            case .default: .grey500
-            case .active: .blue100
-            case .filled: .grey400
-            case .error: .error
+            case .default:
+                .default
+            case .active:
+                .focus
+            case .filled:
+                BorderToken(
+                    name: SemanticColorToken.mutedText.name,
+                    width: 1,
+                    colorToken: SemanticColorToken.mutedText.colorToken,
+                )
+            case .error:
+                .error
             }
         }
 
-        var backgroundColor: ColorToken {
-            .grey600
+        var borderColor: ColorToken {
+            borderToken.colorToken
+        }
+
+        var borderWidth: CGFloat {
+            CGFloat(borderToken.width)
+        }
+
+        var backgroundColor: SemanticColorToken {
+            .cardBackground
         }
     }
 
     // MARK: Private
 
-    private enum Constant {
+    enum Constant {
         static let horizontalPadding: CGFloat = 16
         static let surfaceHeight: CGFloat = 52
-        static let borderWidth: CGFloat = 1
         static let errorSpacing: CGFloat = 4
     }
 

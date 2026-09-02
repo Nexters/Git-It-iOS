@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct SelectionCardList: View {
 
     // MARK: Lifecycle
@@ -25,7 +26,7 @@ public struct SelectionCardList: View {
                 } label: {
                     card(for: item)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressOverlay)
             }
         }
     }

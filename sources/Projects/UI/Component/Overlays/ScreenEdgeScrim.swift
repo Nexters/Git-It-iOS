@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill` — 높이만 레이아웃 변수에서 유도한다.
 public struct ScreenEdgeScrim: View {
 
     // MARK: Lifecycle

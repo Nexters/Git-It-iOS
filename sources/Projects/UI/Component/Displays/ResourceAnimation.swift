@@ -2,6 +2,7 @@ import DesignSystem
 import Lottie
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fixed` — 애니메이션은 종횡비가 의미를 갖는다.
 public struct ResourceAnimation: View {
 
     // MARK: Lifecycle

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - LearningSetRow
 
+/// 크기 결정 방식은 `SizingMode.fill` — 가로는 콘텐츠 폭을 채우고 세로만 규격 값을 유지한다.
 public struct LearningSetRow: View {
 
     // MARK: Lifecycle
@@ -42,19 +43,22 @@ public struct LearningSetRow: View {
                 ContinuousProgressBar(progress: progress)
             }
             .padding(Constant.contentPadding)
-            .frame(width: Constant.width, height: Constant.height, alignment: .topLeading)
-            .designSystemBackground(.cardBackground)
+            .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)
+            .designSystemBackground(.screenBackground)
             .designSystemCornerRadius(.large)
+            .overlay {
+                RoundedRectangle(designSystem: .large)
+                    .stroke(
+                        Color(designSystem: BorderToken.default.colorToken),
+                        lineWidth: CGFloat(BorderToken.default.width),
+                    )
+            }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressOverlay)
         .accessibilityElement(children: .combine)
     }
 
     // MARK: Internal
-
-    static var width: CGFloat {
-        Constant.width
-    }
 
     static var height: CGFloat {
         Constant.height

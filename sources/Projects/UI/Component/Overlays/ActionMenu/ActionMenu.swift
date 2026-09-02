@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fixed` — 팝오버 메뉴 폭은 규격 값을 유지한다.
 public struct ActionMenu: View {
 
     // MARK: Lifecycle
@@ -31,7 +32,7 @@ public struct ActionMenu: View {
                         )
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressOverlay)
                 .accessibilityLabel(item.accessibilityLabel)
             }
         }

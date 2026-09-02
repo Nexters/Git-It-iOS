@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - SelectableSettingRow
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct SelectableSettingRow: View {
 
     // MARK: Lifecycle
@@ -35,7 +36,7 @@ public struct SelectableSettingRow: View {
             .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressOverlay)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

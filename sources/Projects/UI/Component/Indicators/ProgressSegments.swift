@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 
+/// 크기 결정 방식은 `SizingMode.fill`.
 public struct ProgressSegments: View {
 
     // MARK: Lifecycle
