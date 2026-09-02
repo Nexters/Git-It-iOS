@@ -138,6 +138,38 @@ extension DesignTokenSet {
                 detail: "percent \(opacity.percent) not in 0...100",
             ))
         }
+        for color in colors {
+            if let opacityPercent = color.opacityPercent,
+               !(0...100).contains(opacityPercent)
+            {
+                errors.append(.outOfRange(
+                    category: "ColorToken",
+                    name: color.name,
+                    detail: "opacityPercent \(opacityPercent) not in 0...100",
+                ))
+            }
+        }
+        for layout in layouts where layout.value < 0 {
+            errors.append(.outOfRange(
+                category: "LayoutToken",
+                name: layout.name,
+                detail: "value \(layout.value) < 0",
+            ))
+        }
+        for cornerRadius in cornerRadii where cornerRadius.value < 0 {
+            errors.append(.outOfRange(
+                category: "CornerRadiusToken",
+                name: cornerRadius.name,
+                detail: "value \(cornerRadius.value) < 0",
+            ))
+        }
+        for border in borders where border.width < 0 {
+            errors.append(.outOfRange(
+                category: "BorderToken",
+                name: border.name,
+                detail: "width \(border.width) < 0",
+            ))
+        }
         for controlSize in controlSizes where controlSize.value < 44 {
             errors.append(.outOfRange(
                 category: "ControlSizeToken",
@@ -161,12 +193,14 @@ extension DesignTokenSet {
                 reference: border.colorToken.name,
             ))
         }
-        for effect in effects where !colorNames.contains(effect.colorToken.name) {
-            errors.append(.danglingReference(
-                category: "EffectToken",
-                name: effect.name,
-                reference: effect.colorToken.name,
-            ))
+        for effect in effects {
+            for layer in effect.layers where !colorNames.contains(layer.colorToken.name) {
+                errors.append(.danglingReference(
+                    category: "EffectToken",
+                    name: effect.name,
+                    reference: layer.colorToken.name,
+                ))
+            }
         }
 
         return errors

@@ -112,34 +112,34 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
       `blue100`) · `highlight`(1, `blue200`) · `error`(1, `error`) · `tabBar`(1,
       `blue300Alpha24`) · `loadingTrack`(4, `grey400`). `default`는 Swift 예약어이므로 backtick
       식별자를 쓴다 (T001 의존)
-- [ ] T008 [S1] `sources/Projects/UI/DesignSystem/Tokens/EffectToken.swift`를 다중 레이어
+- [X] T008 [S1] `sources/Projects/UI/DesignSystem/Tokens/EffectToken.swift`를 다중 레이어
       구조로 재정의한다 — 기존 `colorToken`·`offset`·`blur`·`spread` 저장 프로퍼티를 중첩
       타입 `Layer`(참조 색 토큰·offset·blur·spread)의 배열 `layers`로 바꾸고, `all`에
       `sheetElevation`(`black45` (0,4) blur 6 → `black35` (0,4) blur 34, 2레이어)과
       `cardElevation`(`black25` (4,4) blur 15 spread 10, 1레이어)을 정의한다. 기존
       `Kind`·`Offset`과 같은 파일에 중첩한다 (T001 의존)
-- [ ] T009 [S1] ⛔ `sources/Projects/UI/DesignSystem/Tokens/GradientToken.swift`에서
+- [X] T009 [S1] ⛔ `sources/Projects/UI/DesignSystem/Tokens/GradientToken.swift`에서
       `gradient4`를 제거한다. `all`은 이미 규격 5종(`gradient1`·`gradient2`·`gradient3`·
       `topEdgeScrim`·`bottomEdgeScrim`)과 일치하므로 값 변경이 없고, `gradient4`만 public이면서
       `all`에 없고 `sources/Projects` 사용처가 0건이다. 삭제는 되돌리기 어려우므로 제거 전에
       승인을 받는다. `private` 방향 상수 `topToBottomStart`·`topToBottomEnd`는 토큰이 아니므로
       그대로 둔다 (FR-008)
-- [ ] T010 [S1] `sources/Projects/UI/DesignSystem/Tokens/DesignTokenSet.swift`의 `validate()`를
+- [X] T010 [S1] `sources/Projects/UI/DesignSystem/Tokens/DesignTokenSet.swift`의 `validate()`를
       새 구조에 맞춘다 — `EffectToken` 참조 무결성 검사를 `effect.layers`의 각 레이어에 대해
       수행하도록 바꾸고, data-model의 값 범위 규칙(`BorderToken.width` ≥ 0, 반경·간격 ≥ 0)을
       추가한다 (T007·T008 의존)
-- [ ] T011 [S1] `sources/Projects/UI/DesignSystem/Extensions/View+EffectToken.swift`를 다중
+- [X] T011 [S1] `sources/Projects/UI/DesignSystem/Extensions/View+EffectToken.swift`를 다중
       레이어 적용으로 바꾼다 — 레이어를 가까운 것부터 순서대로 겹쳐 적용하고, Figma blur를
       SwiftUI radius로 환산(blur ÷ 2)하며 spread를 radius로 흡수한다. 토큰 값 자체는 규격
       원본을 보존한다 (T008 의존)
-- [ ] T012 [P] [S1] `sources/Projects/UI/DesignSystem/Extensions/View+BorderToken.swift`가 새
+- [X] T012 [P] [S1] `sources/Projects/UI/DesignSystem/Extensions/View+BorderToken.swift`가 새
       6종을 굵기와 색 토큰 참조로 적용하는지 확인하고 필요한 경우 맞춘다 (T007 의존)
-- [ ] T013 [P] [S1] `sources/Projects/UI/DesignSystem/Extensions/View+OpacityToken.swift`를
+- [X] T013 [P] [S1] `sources/Projects/UI/DesignSystem/Extensions/View+OpacityToken.swift`를
       새로 만들어 `OpacityToken`을 뷰 불투명도로 적용하는 공개 API를 제공한다 (T006 의존)
 
 ### 정리와 패키지 검증
 
-- [ ] T014 [no-write] [S1] `project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)`로
+- [X] T014 [no-write] [S1] `project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)`로
       진입점을 읽고 `"$project_build_runner" build`를 실행해 `DesignSystem`을 포함한 공유
       scheme이 빌드되는지 확인한다
 
