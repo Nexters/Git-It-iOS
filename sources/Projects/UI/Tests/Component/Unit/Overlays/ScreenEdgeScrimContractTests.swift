@@ -46,7 +46,6 @@ struct ScreenEdgeScrimContractTests {
 
     // MARK: Private
 
-    /// iPhone SE 3 규격. 상단 20 · 하단 0으로 하한을 확인한다.
     private static let metrics = LayoutMetrics(
         screenWidth: 375,
         screenHeight: 667,
