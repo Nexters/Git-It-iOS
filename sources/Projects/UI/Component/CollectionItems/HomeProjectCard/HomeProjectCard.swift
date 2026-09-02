@@ -13,6 +13,7 @@ public struct HomeProjectCard: View {
         currentSetLabel: String,
         setTitle: String,
         variant: Variant,
+        layoutMetrics: LayoutMetrics = .default,
         isLearningEnabled: Bool = true,
         onSelect: @escaping () -> Void = { },
         onStart: @escaping () -> Void = { },
@@ -23,6 +24,7 @@ public struct HomeProjectCard: View {
         self.currentSetLabel = currentSetLabel
         self.setTitle = setTitle
         self.variant = variant
+        self.layoutMetrics = layoutMetrics
         self.isLearningEnabled = isLearningEnabled
         self.onSelect = onSelect
         self.onStart = onStart
@@ -73,8 +75,7 @@ public struct HomeProjectCard: View {
 
     // MARK: Private
 
-    @Environment(\.layoutMetrics) private var layoutMetrics
-
+    private let layoutMetrics: LayoutMetrics
     private let title: String
     private let technologies: String
     private let progress: Double

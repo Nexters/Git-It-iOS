@@ -22,6 +22,14 @@ public struct LayoutMetrics: Sendable, Equatable {
 
     // MARK: Public
 
+    /// 주력 기기 규격. 화면 크기를 아직 읽지 못한 지점의 기본값이다.
+    public static let `default` = LayoutMetrics(
+        screenWidth: 402,
+        screenHeight: 874,
+        safeAreaTop: 62,
+        safeAreaBottom: 34,
+    )
+
     public let screenWidth: Double
     public let screenHeight: Double
     public let safeAreaTop: Double

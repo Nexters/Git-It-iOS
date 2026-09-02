@@ -6,8 +6,12 @@ public struct ScreenEdgeScrim: View {
 
     // MARK: Lifecycle
 
-    private init(_ style: Style) {
+    private init(
+        _ style: Style,
+        layoutMetrics: LayoutMetrics,
+    ) {
         self.style = style
+        self.layoutMetrics = layoutMetrics
     }
 
     // MARK: Public
@@ -45,12 +49,18 @@ public struct ScreenEdgeScrim: View {
             .accessibilityHidden(true)
     }
 
-    public static func top(headerStyle: LayoutMetrics.HeaderStyle = .plain) -> Self {
-        Self(.top(headerStyle: headerStyle))
+    public static func top(
+        headerStyle: LayoutMetrics.HeaderStyle = .plain,
+        layoutMetrics: LayoutMetrics = .default,
+    ) -> Self {
+        Self(.top(headerStyle: headerStyle), layoutMetrics: layoutMetrics)
     }
 
-    public static func bottom(hasTabBar: Bool = false) -> Self {
-        Self(.bottom(hasTabBar: hasTabBar))
+    public static func bottom(
+        hasTabBar: Bool = false,
+        layoutMetrics: LayoutMetrics = .default,
+    ) -> Self {
+        Self(.bottom(hasTabBar: hasTabBar), layoutMetrics: layoutMetrics)
     }
 
     // MARK: Internal
@@ -65,8 +75,7 @@ public struct ScreenEdgeScrim: View {
         static let allowsHitTesting = false
     }
 
-    @Environment(\.layoutMetrics) private var layoutMetrics
-
+    private let layoutMetrics: LayoutMetrics
     private let style: Style
 
 }

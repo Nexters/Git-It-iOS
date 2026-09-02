@@ -20,7 +20,7 @@ public struct ProjectRegistrationScreen: View {
     @Bindable public var store: StoreOf<ProjectRegistrationFeature>
 
     public var body: some View {
-        ScreenContainer {
+        ScreenContainer { _ in
             content
         }
         .sheet(isPresented: Binding(get: { store.isGenerationReminderSheetPresented }, set: { _ in })) {

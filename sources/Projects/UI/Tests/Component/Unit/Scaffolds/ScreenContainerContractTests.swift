@@ -7,8 +7,8 @@ import Testing
 @Suite("ScreenContainer 계약")
 struct ScreenContainerContractTests {
     @Test
-    func `Environment 기본 레이아웃 변수는 주력 기기 규격을 따른다`() {
-        let metrics = EnvironmentValues().layoutMetrics
+    func `기본 레이아웃 변수는 주력 기기 규격을 따른다`() {
+        let metrics = LayoutMetrics.default
 
         #expect(metrics.screenWidth == 402)
         #expect(metrics.screenHeight == 874)
@@ -23,10 +23,10 @@ struct ScreenContainerContractTests {
 
     @Test
     func `배경 역할 색을 받아 생성한다`() {
-        _ = ScreenContainer {
+        _ = ScreenContainer { _ in
             StyledText.body1("콘텐츠")
         }
-        _ = ScreenContainer(background: .cardBackground) {
+        _ = ScreenContainer(background: .cardBackground) { _ in
             StyledText.body1("콘텐츠")
         }
     }

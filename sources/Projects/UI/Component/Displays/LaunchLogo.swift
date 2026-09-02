@@ -63,7 +63,7 @@ public struct LaunchLogo: View {
 }
 
 #Preview("Launch Logo") {
-    ScreenContainer {
+    ScreenContainer { _ in
         LaunchLogo()
     }
     .frame(width: 390, height: 700)

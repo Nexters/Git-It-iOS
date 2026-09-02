@@ -8,10 +8,12 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     public init(
         selected: Binding<Item>,
+        layoutMetrics: LayoutMetrics = .default,
         pillWidth: CGFloat = Self.defaultPillWidth,
         @ViewBuilder content: @escaping (Item) -> Content,
     ) {
         _selected = selected
+        self.layoutMetrics = layoutMetrics
         self.pillWidth = pillWidth
         self.content = content
     }
@@ -56,8 +58,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     @Binding private var selected: Item
 
-    @Environment(\.layoutMetrics) private var layoutMetrics
-
+    private let layoutMetrics: LayoutMetrics
     private let pillWidth: CGFloat
     private let content: (Item) -> Content
 
@@ -103,7 +104,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
 #Preview("Tab Shell") {
     TabShell(selected: .constant(TabShellPreviewItem.home)) { _ in
-        ScreenContainer {
+        ScreenContainer { _ in
             StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
         }
     }

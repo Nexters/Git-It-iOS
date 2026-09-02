@@ -155,7 +155,7 @@ private struct PreviewRequestGenerationReminderUseCase: RequestGenerationReminde
 
 extension View {
     func designSystemBackgroundForPreview() -> some View {
-        ScreenContainer { self }
+        ScreenContainer { _ in self }
             .frame(width: 360, height: 800)
     }
 }

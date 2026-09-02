@@ -8,7 +8,11 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Lifecycle
 
-    public init(@ViewBuilder content: () -> Content) {
+    public init(
+        layoutMetrics: LayoutMetrics = .default,
+        @ViewBuilder content: () -> Content,
+    ) {
+        self.layoutMetrics = layoutMetrics
         self.content = content()
     }
 
@@ -33,8 +37,7 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Private
 
-    @Environment(\.layoutMetrics) private var layoutMetrics
-
+    private let layoutMetrics: LayoutMetrics
     private let content: Content
 
     private var grabber: some View {

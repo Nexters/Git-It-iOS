@@ -40,7 +40,7 @@ struct PositionSelectionScreen: View {
     @Bindable var store: StoreOf<CurationFeature>
 
     var body: some View {
-        ScreenContainer {
+        ScreenContainer { layoutMetrics in
             VStack(spacing: 0) {
                 ScreenHeader(
                     leading: .close,
@@ -80,7 +80,7 @@ struct PositionSelectionScreen: View {
                     .padding(.top, LayoutToken.margin.cgFloatValue)
                 }
 
-                BottomActionBar {
+                BottomActionBar(layoutMetrics: layoutMetrics) {
                     ActionButton.primary(
                         "다음",
                         isEnabled: store.selection.position != nil,

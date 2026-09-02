@@ -19,7 +19,7 @@ public struct HomeScreen: View {
     @Bindable public var store: StoreOf<HomeFeature>
 
     public var body: some View {
-        ScreenContainer {
+        ScreenContainer { layoutMetrics in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     profileHeader
@@ -33,7 +33,7 @@ public struct HomeScreen: View {
                 .designSystemScreenMargin()
                 .padding(.bottom, Metric.projectSectionTopPadding)
 
-                projectSection
+                projectSection(layoutMetrics)
             }
             .scrollIndicators(.hidden)
         }.safeAreaPadding()
@@ -137,18 +137,24 @@ public struct HomeScreen: View {
 
     private enum CardLayout {
 
-        static let cardWidth: CGFloat = 154
         static let cardHeight: CGFloat = 192
         static let cardSpacing: CGFloat = 2.5
         static let screenMargin: CGFloat = 20
         static let verticalPadding: CGFloat = 24
-        static let cardStride = cardWidth + cardSpacing
 
         /// 로딩·빈 상태 컨테이너가 실제 카드 영역과 같은 높이를 갖게 하는 값이다.
         static let sectionHeight = cardHeight + verticalPadding * 2
 
+        /// 카드 폭은 화면에서 파생되므로 stride도 함께 계산한다.
+        static func cardStride(cardWidth: CGFloat) -> CGFloat {
+            cardWidth + cardSpacing
+        }
+
         /// 마지막 카드도 P0까지 스냅될 수 있도록 viewport 나머지 전체를 trailing 여백으로 예약한다.
-        static func trailingInset(viewportWidth: CGFloat) -> CGFloat {
+        static func trailingInset(
+            viewportWidth: CGFloat,
+            cardWidth: CGFloat,
+        ) -> CGFloat {
             max(viewportWidth - screenMargin - cardWidth, screenMargin)
         }
 
@@ -277,61 +283,6 @@ public struct HomeScreen: View {
         .accessibilityLabel(Display.generationInProgressLabel)
     }
 
-    private var projectSection: some View {
-        VStack(alignment: .leading, spacing: Metric.sectionHeaderSpacing) {
-            HStack {
-                StyledText.subtitle3("학습 중인 레포지토리")
-                Spacer()
-                Button {
-                    send(.showAllProjectsTapped)
-                } label: {
-                    HStack(spacing: 3) {
-                        StyledText.caption1("전체 보기", color: .blue100)
-                        ResourceImage(asset: .icon(.chevronRight))
-                            .frame(width: Metric.chevronSize, height: Metric.chevronSize)
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Display.showAllLabel)
-            }
-            .designSystemScreenMargin()
-
-            projectContent
-        }
-    }
-
-    @ViewBuilder
-    private var projectContent: some View {
-        switch store.projectLoad {
-        case .loaded(let page) where !page.items.isEmpty:
-            projectCards(Display.projects(page.items))
-
-        case .idle,
-             .loading:
-            emptyProjects {
-                ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
-            }
-
-        case .loaded:
-            emptyProjects {
-                StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .blue200)
-            }
-
-        case .failed:
-            emptyProjects {
-                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                    StyledText.body2("프로젝트를 불러오지 못했어요.", color: .error, alignment: .center)
-                    StyledText.caption1("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
-
-                    ActionButton.secondary("다시 시도", size: .small) { send(.projectRetryTapped) }
-                        .fixedSize(horizontal: true, vertical: false)
-                        .padding(.top, 4)
-                }
-                .designSystemScreenMargin()
-            }
-        }
-    }
-
     /// Figma `1542:19623` Union을 그대로 옮긴 빈 상태 데크다. 겹친 경계에는 테두리가 없다.
     ///
     /// 원본 크기(501×237)를 유지해 오른쪽이 잘리게 하되, 그 폭이 화면 레이아웃을 넓히지
@@ -375,6 +326,61 @@ public struct HomeScreen: View {
             }
     }
 
+    private func projectSection(_ layoutMetrics: LayoutMetrics) -> some View {
+        VStack(alignment: .leading, spacing: Metric.sectionHeaderSpacing) {
+            HStack {
+                StyledText.subtitle3("학습 중인 레포지토리")
+                Spacer()
+                Button {
+                    send(.showAllProjectsTapped)
+                } label: {
+                    HStack(spacing: 3) {
+                        StyledText.caption1("전체 보기", color: .blue100)
+                        ResourceImage(asset: .icon(.chevronRight))
+                            .frame(width: Metric.chevronSize, height: Metric.chevronSize)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Display.showAllLabel)
+            }
+            .designSystemScreenMargin()
+
+            projectContent(layoutMetrics)
+        }
+    }
+
+    @ViewBuilder
+    private func projectContent(_ layoutMetrics: LayoutMetrics) -> some View {
+        switch store.projectLoad {
+        case .loaded(let page) where !page.items.isEmpty:
+            projectCards(Display.projects(page.items), layoutMetrics: layoutMetrics)
+
+        case .idle,
+             .loading:
+            emptyProjects {
+                ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
+            }
+
+        case .loaded:
+            emptyProjects {
+                StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .blue200)
+            }
+
+        case .failed:
+            emptyProjects {
+                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    StyledText.body2("프로젝트를 불러오지 못했어요.", color: .error, alignment: .center)
+                    StyledText.caption1("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
+
+                    ActionButton.secondary("다시 시도", size: .small) { send(.projectRetryTapped) }
+                        .fixedSize(horizontal: true, vertical: false)
+                        .padding(.top, 4)
+                }
+                .designSystemScreenMargin()
+            }
+        }
+    }
+
     private func emptyProjects(@ViewBuilder accessary: () -> some View) -> some View {
         ZStack {
             emptyProjectCards
@@ -388,23 +394,32 @@ public struct HomeScreen: View {
         .accessibilityElement(children: .contain)
     }
 
-    private func projectCards(_ projects: [Display.Project]) -> some View {
+    private func projectCards(
+        _ projects: [Display.Project],
+        layoutMetrics: LayoutMetrics,
+    ) -> some View {
         GeometryReader { viewport in
-            projectCardScroll(projects, viewportWidth: viewport.size.width)
+            projectCardScroll(
+                projects,
+                layoutMetrics: layoutMetrics,
+                viewportWidth: viewport.size.width,
+            )
         }
         .frame(height: CardLayout.sectionHeight)
     }
 
     private func projectCardScroll(
         _ projects: [Display.Project],
+        layoutMetrics: LayoutMetrics,
         viewportWidth: CGFloat,
     ) -> some View {
+        let cardWidth = CGFloat(layoutMetrics.gridColumn2)
         // 기준 위치는 화면 좌표 상수가 아니라, 카드 중심과 같은 좌표 공간에서 읽은 카드 목록
         // 선행 가장자리 실측값이다. 측정 전에는 회전을 적용하지 않는다.
         let layout = cardListLeadingX.map {
             HomeCardScrollLayout(
-                p0CenterX: $0 + CardLayout.cardWidth / 2,
-                cardStride: CardLayout.cardStride,
+                p0CenterX: $0 + cardWidth / 2,
+                cardStride: CardLayout.cardStride(cardWidth: cardWidth),
             )
         }
 
@@ -418,6 +433,7 @@ public struct HomeScreen: View {
                         currentSetLabel: project.currentSetLabel,
                         setTitle: project.setTitle,
                         variant: project.variant,
+                        layoutMetrics: layoutMetrics,
                         isLearningEnabled: project.learningIntent != nil,
                         onSelect: { send(.projectCardTapped(projectID: project.projectID)) },
                         onStart: { send(.learningTapped(projectID: project.projectID)) },
@@ -438,7 +454,10 @@ public struct HomeScreen: View {
             .padding(.vertical, CardLayout.verticalPadding)
         }
         .safeAreaPadding(.leading, CardLayout.screenMargin)
-        .safeAreaPadding(.trailing, CardLayout.trailingInset(viewportWidth: viewportWidth))
+        .safeAreaPadding(
+            .trailing,
+            CardLayout.trailingInset(viewportWidth: viewportWidth, cardWidth: cardWidth),
+        )
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
     }

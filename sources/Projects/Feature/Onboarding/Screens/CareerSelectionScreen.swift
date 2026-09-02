@@ -58,7 +58,7 @@ struct CareerSelectionScreen: View {
     @Bindable var store: StoreOf<CurationFeature>
 
     var body: some View {
-        ScreenContainer {
+        ScreenContainer { layoutMetrics in
             VStack(spacing: 0) {
                 ScreenHeader(
                     leading: .back,
@@ -99,7 +99,7 @@ struct CareerSelectionScreen: View {
                     .padding(.top, LayoutToken.margin.cgFloatValue)
                 }
 
-                BottomActionBar {
+                BottomActionBar(layoutMetrics: layoutMetrics) {
                     VStack(spacing: LayoutToken.gutter.cgFloatValue) {
                         StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
 

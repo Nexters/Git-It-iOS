@@ -16,7 +16,7 @@ public struct AppEntryScreen: View {
     // MARK: Public
 
     public var body: some View {
-        ScreenContainer {
+        ScreenContainer { _ in
             VStack(spacing: Constant.contentSpacing) {
                 Spacer()
 
