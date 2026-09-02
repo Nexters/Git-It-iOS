@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct SavedQuestionCard: View {
 
     // MARK: Lifecycle
@@ -38,7 +37,7 @@ public struct SavedQuestionCard: View {
                         .designSystemBackground(.blue100)
                         .designSystemCornerRadius(.small)
                 }
-                .buttonStyle(.pressOverlay)
+                .buttonStyle(.plain)
                 .frame(maxWidth: Constant.actionMaximumWidth)
                 .designSystemControlSize(.minimumTouch)
             }

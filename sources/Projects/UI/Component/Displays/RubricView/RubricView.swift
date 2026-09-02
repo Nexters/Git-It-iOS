@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - RubricView
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct RubricView: View {
 
     // MARK: Lifecycle

@@ -7,7 +7,6 @@ extension EmptyState {
             128
         }
 
-        /// 삽화와 문구 사이 세로 간격. 화면 좌우 여백 토큰과 의미가 다르다.
         static var illustrationSpacing: CGFloat {
             20
         }

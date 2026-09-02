@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 높이만 레이아웃 변수에서 유도한다.
 public struct ScreenEdgeScrim: View {
 
     // MARK: Lifecycle
@@ -31,7 +30,6 @@ public struct ScreenEdgeScrim: View {
             }
         }
 
-        /// 정본 고정값 대신 화면 크기에서 유도한 높이를 쓴다.
         func height(layoutMetrics: LayoutMetrics) -> CGFloat {
             switch self {
             case .top(let headerStyle):

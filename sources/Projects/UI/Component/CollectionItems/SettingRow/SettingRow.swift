@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - SettingRow
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct SettingRow: View {
 
     // MARK: Lifecycle
@@ -43,7 +42,7 @@ public struct SettingRow: View {
             .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
     }
 

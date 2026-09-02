@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 높이만 헤더 종류가 정한다.
 public struct ScreenHeader: View {
 
     // MARK: Lifecycle

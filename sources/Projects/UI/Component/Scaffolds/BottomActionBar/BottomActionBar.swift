@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - BottomActionBar
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct BottomActionBar<Content: View>: View {
 
     // MARK: Lifecycle

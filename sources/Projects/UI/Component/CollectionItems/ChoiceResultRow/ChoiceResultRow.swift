@@ -3,9 +3,6 @@ import SwiftUI
 
 // MARK: - ChoiceResultRow
 
-/// 채점 결과 행. 펼침 상태를 소유하지 않는다 — 이를 담는 패널이 `expanded` 집합으로 갖는다.
-///
-/// 크기 결정 방식은 `SizingMode.fill`이다. 세로만 규격 값(접힘 59 · 펼침 111)을 유지한다.
 public struct ChoiceResultRow: View {
 
     // MARK: Lifecycle
@@ -68,7 +65,7 @@ public struct ChoiceResultRow: View {
             .designSystemBackground(judgement.backgroundColor)
             .designSystemCornerRadius(.large)
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(isExpanded ? [.isButton, .isSelected] : .isButton)

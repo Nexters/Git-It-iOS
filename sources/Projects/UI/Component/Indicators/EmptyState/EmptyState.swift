@@ -3,11 +3,6 @@ import SwiftUI
 
 // MARK: - EmptyState
 
-/// 빈 상태 표시.
-///
-/// 규격이 정의한 2종(프로젝트 없음 · 저장 문제 없음)에만 쓴다. 네트워크 오류처럼
-/// 규격 밖의 상태를 이 컴포넌트로 새로 만들지 않는다.
-/// 크기 결정 방식은 `SizingMode.fill`이다 — 삽화만 규격 크기를 유지한다.
 public struct EmptyState<Illustration: View>: View {
 
     // MARK: Lifecycle

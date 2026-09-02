@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.hug` — 라벨 폭에 맞춘다.
 public struct TagBadge: View {
 
     // MARK: Lifecycle

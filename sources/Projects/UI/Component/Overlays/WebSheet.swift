@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - WebSheet
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct WebSheet: View {
 
     // MARK: Lifecycle

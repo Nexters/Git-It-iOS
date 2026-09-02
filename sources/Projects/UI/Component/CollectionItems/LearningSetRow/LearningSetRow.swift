@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - LearningSetRow
 
-/// 크기 결정 방식은 `SizingMode.fill` — 가로는 콘텐츠 폭을 채우고 세로만 규격 값을 유지한다.
 public struct LearningSetRow: View {
 
     // MARK: Lifecycle
@@ -54,7 +53,7 @@ public struct LearningSetRow: View {
                     )
             }
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
     }
 

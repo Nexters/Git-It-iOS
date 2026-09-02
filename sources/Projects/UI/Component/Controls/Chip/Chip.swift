@@ -3,9 +3,6 @@ import SwiftUI
 
 // MARK: - Chip
 
-/// 선택을 소유하지 않는 필터 칩. 선택은 이를 담는 목록이 갖는다.
-///
-/// 크기 결정 방식은 `SizingMode.hug`다 — 라벨 폭에 맞춰 줄어들고 고정 폭을 쓰지 않는다.
 public struct Chip: View {
 
     // MARK: Lifecycle
@@ -31,7 +28,7 @@ public struct Chip: View {
                 .designSystemBackground(backgroundColor)
                 .designSystemCornerRadius(.small)
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .designSystemControlSize(.minimumTouch)
         .accessibilityLabel(label)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)

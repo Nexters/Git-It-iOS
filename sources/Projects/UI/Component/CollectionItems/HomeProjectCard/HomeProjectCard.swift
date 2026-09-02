@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 2열 배치의 한 열 폭(`gridColumn2`)을 따르고 정본 고정값을 쓰지 않는다.
 public struct HomeProjectCard: View {
 
     // MARK: Lifecycle
@@ -38,7 +37,7 @@ public struct HomeProjectCard: View {
                 cardContent
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.pressOverlay)
+            .buttonStyle(.plain)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(title), \(currentSetLabel), 프로젝트 상세 보기")
 
@@ -137,7 +136,6 @@ public struct HomeProjectCard: View {
         .frame(width: cardWidth, height: Constant.cardHeight)
     }
 
-    /// 2열 배치의 한 열 폭. 정본 캔버스의 154를 쓰지 않는다.
     private var cardWidth: CGFloat {
         CGFloat(layoutMetrics.gridColumn2)
     }
@@ -152,7 +150,7 @@ public struct HomeProjectCard: View {
                 .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.pressOverlay)
+        .buttonStyle(.plain)
         .disabled(!isLearningEnabled)
         .accessibilityLabel("\(title) 학습 시작")
         .accessibilityHint(isLearningEnabled ? "다음 학습을 시작합니다" : "다음 학습 위치가 없습니다")

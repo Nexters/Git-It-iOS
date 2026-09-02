@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 진행 폭은 주어진 폭에서 유도한다.
 public struct ContinuousProgressBar: View {
 
     // MARK: Lifecycle

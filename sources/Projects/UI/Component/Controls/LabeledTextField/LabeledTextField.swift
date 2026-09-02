@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - LabeledTextField
 
-/// 크기 결정 방식은 `SizingMode.fill`.
 public struct LabeledTextField: View {
 
     // MARK: Lifecycle
@@ -60,7 +59,7 @@ public struct LabeledTextField: View {
                         ResourceImage(asset: .icon(.cancel), contentMode: .fit)
                             .frame(width: Constant.clearIconSize, height: Constant.clearIconSize)
                     }
-                    .buttonStyle(.pressOverlay)
+                    .buttonStyle(.plain)
                     .frame(width: Constant.clearButtonTouchSize, height: Constant.clearButtonTouchSize)
                     .accessibilityLabel("입력 지우기")
                 }
@@ -85,7 +84,6 @@ public struct LabeledTextField: View {
 
     // MARK: Private
 
-    /// 호출부가 포커스를 관찰하지 않을 때 `focused(_:)`에 넘길 내부 상태입니다.
     @FocusState private var unboundFocus: Bool
 
     private let label: String

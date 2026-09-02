@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - PageIndicator
 
-/// 크기 결정 방식은 `SizingMode.hug` — 점은 종횡비가 의미를 갖는다.
 public struct PageIndicator: View {
 
     // MARK: Lifecycle

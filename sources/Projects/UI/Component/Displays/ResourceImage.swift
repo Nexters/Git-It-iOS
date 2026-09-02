@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - ResourceImage
 
-/// 크기 결정 방식은 `SizingMode.fixed` — 이미지는 종횡비가 의미를 갖는다.
 public struct ResourceImage: View {
 
     // MARK: Lifecycle

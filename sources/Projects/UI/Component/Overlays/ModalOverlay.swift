@@ -3,8 +3,6 @@ import SwiftUI
 
 // MARK: - ModalOverlay
 
-/// 크기 결정 방식은 `SizingMode.fill` — 어둠막은 화면 전체를 덮고, 시트 콘텐츠는 safe area
-/// 안에 둔다. 시트 표면이 화면 하단까지 이어지는 것은 `SheetSurface`의 배경이 담당한다.
 public struct ModalOverlay<Content: View>: View {
 
     // MARK: Lifecycle
