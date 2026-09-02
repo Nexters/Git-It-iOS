@@ -37,16 +37,11 @@ extension BorderToken {
         width: 1,
         colorToken: .error,
     )
-    public static let tabBar = BorderToken(
-        name: "TabBar",
-        width: 1,
-        colorToken: .blue300Alpha24,
-    )
     public static let loadingTrack = BorderToken(
         name: "LoadingTrack",
         width: 4,
         colorToken: .grey400,
     )
 
-    public static let all = [`default`, focus, highlight, error, tabBar, loadingTrack]
+    public static let all = [`default`, focus, highlight, error, loadingTrack]
 }

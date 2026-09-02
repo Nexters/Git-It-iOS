@@ -6,7 +6,7 @@ import Testing
 struct DesignTokenCatalogTests {
     @Test
     func `신설 카테고리는 규격 개수만큼 토큰을 노출한다`() {
-        #expect(BorderToken.all.count == 6)
+        #expect(BorderToken.all.count == 5)
         #expect(OpacityToken.all.count == 6)
         #expect(EffectToken.all.count == 2)
     }
@@ -63,7 +63,6 @@ struct DesignTokenCatalogTests {
         #expect(widths["Focus"] == 1)
         #expect(widths["Highlight"] == 1)
         #expect(widths["Error"] == 1)
-        #expect(widths["TabBar"] == 1)
         #expect(widths["LoadingTrack"] == 4)
     }
 
@@ -94,8 +93,6 @@ struct DesignTokenCatalogTests {
             "Blue300Alpha24",
         ]))
         #expect(semanticNames.isSuperset(of: [
-            "TabBarSurface",
-            "TabBarBorder",
             "SelectedSurface",
             "Grabber",
             "DisabledText",

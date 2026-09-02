@@ -68,14 +68,6 @@ extension SemanticColorToken {
         name: "ProgressFill",
         colorToken: .blue200,
     )
-    public static let tabBarSurface = SemanticColorToken(
-        name: "TabBarSurface",
-        colorToken: .blue300Alpha10,
-    )
-    public static let tabBarBorder = SemanticColorToken(
-        name: "TabBarBorder",
-        colorToken: .blue300Alpha24,
-    )
     public static let grabber = SemanticColorToken(
         name: "Grabber",
         colorToken: .grey500,
@@ -95,8 +87,6 @@ extension SemanticColorToken {
         brandAccent,
         progressTrack,
         progressFill,
-        tabBarSurface,
-        tabBarBorder,
         grabber,
     ]
 }
