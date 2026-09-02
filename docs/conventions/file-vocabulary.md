@@ -148,6 +148,7 @@ Scaffolds/TabShell/
 | | `Previews/` | 화면 프리뷰와 프리뷰 전용 타입 |
 | | `Models/` | 화면 전용 표시 모델 |
 | `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |
+| | `Layout/` | 화면 크기에서 파생하는 런타임 레이아웃 변수 |
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
 | | `Resources/` | 폰트 자산 |
 | `UI/Component/` | 역할 폴더 | [UIComponent 컨벤션 §3](./ui-component.md#3-컴포넌트-역할-분류)이 소유 |

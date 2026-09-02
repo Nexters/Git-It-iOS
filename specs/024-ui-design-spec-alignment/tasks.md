@@ -163,7 +163,7 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 구현
 
-- [ ] T015 [S2] `sources/Projects/UI/DesignSystem/Layout/LayoutMetrics.swift`를 새로 만든다 —
+- [X] T015 [S2] `sources/Projects/UI/DesignSystem/Layout/LayoutMetrics.swift`를 새로 만든다 —
       입력 4종(`screenWidth`·`screenHeight`·`safeAreaTop`·`safeAreaBottom`)을 받는
       이니셜라이저와 파생값을 정의한다. 프로퍼티: `contentWidth` =
       `screenWidth − LayoutToken.margin × 2`, `gridColumn2` = `(contentWidth − gutter) / 2`,
@@ -175,16 +175,16 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
       `screenHeight − safeAreaTop − safeAreaBottom − headerHeight − tabBarClearance`로 두고
       `tabBarClearance`는 UIUX Guide §7.3의 92로 정의한다. `import SwiftUI`를 쓰지 않는다
       (R-01 · R-02 · R-15)
-- [ ] T016 [S2] `sources/Projects/UI/DesignSystem/Layout/LayoutMetrics+HeaderStyle.swift`를
+- [X] T016 [S2] `sources/Projects/UI/DesignSystem/Layout/LayoutMetrics+HeaderStyle.swift`를
       새로 만들어 중첩 타입 `LayoutMetrics.HeaderStyle`을 `extension`으로 선언한다 — case는
       `plain` 50 · `inlineTitle` 64 · `inlineUser` 98 · `largeTitle` 120이며 `height`를
       노출한다. `UIComponent`의 `ScreenHeader.Style`을 참조하지 않는다(의존 방향 유지)
-- [ ] T017 [S2] `docs/conventions/file-vocabulary.md` §3의 형태 어휘 표에 `UI/DesignSystem/`
+- [X] T017 [S2] `docs/conventions/file-vocabulary.md` §3의 형태 어휘 표에 `UI/DesignSystem/`
       소스 루트의 `Layout/`(런타임 레이아웃 변수) 행을 추가한다. 책임 패키지는 `UI`다
 
 ### 정리와 패키지 검증
 
-- [ ] T018 [no-write] [S2] `"$project_build_runner" build`로 `DesignSystem`이 빌드되는지
+- [X] T018 [no-write] [S2] `"$project_build_runner" build`로 `DesignSystem`이 빌드되는지
       확인하고, `sources/Projects/UI/DesignSystem/Layout/`에 `import SwiftUI`가 없는지
       `grep`으로 확인한다
 
