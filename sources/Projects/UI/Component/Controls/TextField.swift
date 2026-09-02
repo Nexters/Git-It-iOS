@@ -1,7 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-/// 크기 결정 방식은 `SizingMode.fill` — 높이만 규격 52를 유지한다.
 public struct TextField: View {
 
     // MARK: Lifecycle
@@ -53,7 +52,6 @@ public struct TextField: View {
 
         // MARK: Internal
 
-        /// 상태별 테두리는 규격 토큰을 참조한다. 입력됨만 역할 색 1pt를 쓴다.
         var borderToken: BorderToken {
             switch self {
             case .default:
