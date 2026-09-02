@@ -30,6 +30,7 @@ public struct MainShellScreen: View {
                      .settings:
                     ScreenContainer { _ in
                         StyledText.subtitle1(tab.tabTitle, alignment: .center)
+                            .designSystemScreenMargin()
                     }
                 }
             }

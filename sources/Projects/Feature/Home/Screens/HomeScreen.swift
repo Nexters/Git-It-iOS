@@ -23,7 +23,6 @@ public struct HomeScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     profileHeader
-                        .designSystemScreenMargin()
                     greeting
                         .padding(.top, Metric.greetingTopPadding)
 
@@ -36,8 +35,8 @@ public struct HomeScreen: View {
                 projectSection(layoutMetrics)
             }
             .scrollIndicators(.hidden)
-        }.safeAreaPadding()
-            .task { await send(.task).finish() }
+        }
+        .task { await send(.task).finish() }
     }
 
     // MARK: Internal

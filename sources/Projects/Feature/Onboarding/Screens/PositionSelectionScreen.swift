@@ -46,6 +46,7 @@ struct PositionSelectionScreen: View {
                     leading: .close,
                     onLeadingTap: { send(.positionBackTapped) },
                 )
+                .designSystemScreenMargin()
 
                 ScrollView {
                     VStack(spacing: Constant.titleToOptionsSpacing) {
@@ -77,6 +78,7 @@ struct PositionSelectionScreen: View {
                             },
                         )
                     }
+                    .designSystemScreenMargin()
                     .padding(.top, LayoutToken.margin.cgFloatValue)
                 }
 

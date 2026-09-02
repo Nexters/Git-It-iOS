@@ -25,7 +25,9 @@ struct TutorialScreen: View {
                 .onAppear {
                     UIScrollView.appearance().bounces = false
                 }
-                .designSystemBackground(.blue500)
+                .background {
+                    Color(designSystem: ColorToken.blue500).ignoresSafeArea(edges: .top)
+                }
                 signInSection
             }
         }
@@ -97,6 +99,7 @@ struct TutorialScreen: View {
             StyledText.body2("버전 \(store.bundleVersion)", color: .grey500, alignment: .center)
                 .padding(.top, Constant.versionTopSpacing)
         }
+        .designSystemScreenMargin()
         .padding(.bottom, Constant.bottomInset)
     }
 
@@ -125,6 +128,7 @@ struct TutorialScreen: View {
                 .frame(width: Constant.mockupWidth)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .designSystemScreenMargin()
     }
 
 }

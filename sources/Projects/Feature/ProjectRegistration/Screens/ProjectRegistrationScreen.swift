@@ -92,6 +92,7 @@ public struct ProjectRegistrationScreen: View {
                 style: .largeTitle,
                 onLeadingTap: { dismiss() },
             )
+            .designSystemScreenMargin()
 
             VStack(alignment: .leading, spacing: Constant.titleFieldSpacing) {
                 StyledText.subtitle1("GitHub 레포지토리\n링크를 붙여넣어 주세요")
@@ -112,6 +113,7 @@ public struct ProjectRegistrationScreen: View {
                     focus: $isLinkFieldFocused,
                 )
             }
+            .designSystemScreenMargin()
             .padding(.top, Constant.headerContentSpacing)
 
             guideSection
@@ -125,6 +127,7 @@ public struct ProjectRegistrationScreen: View {
                 isEnabled: canValidate,
                 action: { send(.validateTapped) },
             )
+            .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)
         }
         // 배경 레이어에만 해제 제스처를 두어 안내 패널·입력 지우기·액션 버튼의 히트 테스트를
@@ -202,6 +205,7 @@ public struct ProjectRegistrationScreen: View {
     private var failureContent: some View {
         VStack(spacing: LayoutToken.margin.cgFloatValue) {
             ScreenHeader(style: .largeTitle, onLeadingTap: { dismiss() })
+                .designSystemScreenMargin()
 
             Spacer(minLength: 0)
 
@@ -213,6 +217,7 @@ public struct ProjectRegistrationScreen: View {
             Spacer(minLength: 0)
 
             ActionButton.primary("다시 시도하기", action: { send(.retryTapped) })
+                .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
         }
     }

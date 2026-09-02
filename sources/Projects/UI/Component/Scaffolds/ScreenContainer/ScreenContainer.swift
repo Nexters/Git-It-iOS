@@ -5,6 +5,10 @@ import SwiftUI
 ///
 /// `LayoutMetricsReader`로 만든 레이아웃 변수를 콘텐츠 빌더의 인자로 전달한다. 이를 필요로
 /// 하는 컴포넌트는 Environment가 아니라 생성자로 주입받는다.
+///
+/// 좌우 화면 여백은 붙이지 않는다. 히어로 배경·가로 캐러셀·스크림처럼 화면 폭을 가득 채워야
+/// 하는 요소가 있으므로, 여백은 각 화면이 콘텐츠 열에 `designSystemScreenMargin()`으로 붙인다.
+/// 배경만 safe area 밖까지 채우고 콘텐츠는 safe area 안에 둔다.
 public struct ScreenContainer<Content: View>: View {
 
     // MARK: Lifecycle
@@ -22,13 +26,9 @@ public struct ScreenContainer<Content: View>: View {
     public var body: some View {
         LayoutMetricsReader { layoutMetrics in
             content(layoutMetrics)
-                .designSystemScreenMargin()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.top, CGFloat(layoutMetrics.safeAreaTop))
-                .padding(.bottom, CGFloat(layoutMetrics.safeAreaBottom))
         }
-        .ignoresSafeArea()
-        .background(Color(designSystem: background))
+        .background(Color(designSystem: background).ignoresSafeArea())
         .preferredColorScheme(.dark)
     }
 
