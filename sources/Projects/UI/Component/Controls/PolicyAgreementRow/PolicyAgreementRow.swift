@@ -27,7 +27,7 @@ public struct PolicyAgreementRow: View {
     public var body: some View {
         HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
             Button(action: onToggle) {
-                HStack(spacing: 12) {
+                HStack(spacing: LayoutToken.gutter.cgFloatValue) {
                     ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)

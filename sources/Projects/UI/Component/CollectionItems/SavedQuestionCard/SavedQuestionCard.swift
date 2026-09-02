@@ -23,7 +23,7 @@ public struct SavedQuestionCard: View {
     public var body: some View {
         VStack(alignment: .leading) {
             StyledText.caption1(metadata, color: .grey300)
-                .padding(.top, 14)
+                .padding(.top, LayoutToken.cardTopPadding.cgFloatValue)
             StyledText.subtitle3(prompt)
                 .padding(.top, 10)
             HStack {

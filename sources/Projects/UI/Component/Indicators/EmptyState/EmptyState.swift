@@ -25,7 +25,7 @@ public struct EmptyState<Illustration: View>: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(spacing: LayoutToken.margin.cgFloatValue) {
+        VStack(spacing: Constant.illustrationSpacing) {
             illustration
                 .frame(
                     width: Constant.illustrationSize,
