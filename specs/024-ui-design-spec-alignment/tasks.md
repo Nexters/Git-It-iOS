@@ -511,7 +511,7 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
 
 ### 구현
 
-- [ ] T064 [no-write] [S4] 아래 15개 파일 집합의 `sources/Projects` 전체 사용처를 조사해
+- [X] T064 [no-write] [S4] 아래 15개 파일 집합의 `sources/Projects` 전체 사용처를 조사해
       각각 유지·이동·삭제로 판정하고, 판정과 근거를 PR 본문 기록 대상으로 정리한다. 기본값은
       유지이며 삭제는 사용처가 0건인 경우로 한정한다. 이 목록이 T065~T067의 변경 대상
       전체이며 이 밖의 파일을 이 단위에서 만들거나 지우지 않는다 (FR-029 · SC-008)
@@ -533,24 +533,24 @@ manifest)과 그 target의 테스트 소스는 분리할 수 없다. manifest만
   | `StyledText` | `sources/Projects/UI/Component/Displays/StyledText.swift` |
   | `EmptyState` | `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift` · `EmptyState+Constant.swift` |
   | `PolicyAgreementRow` | `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift` · `PolicyAgreementRow+Constant.swift` |
-- [ ] T065 [S4] 유지 판정한 컴포넌트가 Component 공통 계약을 지키게 정렬한다 — 특히
+- [X] T065 [S4] 유지 판정한 컴포넌트가 Component 공통 계약을 지키게 정렬한다 — 특히
       `sources/Projects/UI/Component/Displays/LaunchLogo.swift`의 `@State private var isVisible`과
       `sources/Projects/UI/Component/Displays/SplashView.swift`의 `@State` 5개는 표시 상태
       보관 금지(FR-026)에 걸리므로 상위로 올리고 값과 콜백으로만 받게 바꾼다 (T064 의존)
-- [ ] T066 [no-write] [S4] T064 표의 15종을
+- [X] T066 [no-write] [S4] T064 표의 15종을
       [UIComponent 컨벤션 §3.2](../../docs/conventions/ui-component.md)의 판정 순서와 다시
       대조해, 계획 시점 조사와 같이 역할 폴더 이동 대상이 0건인지 확인한다. 이동 필요 항목이
       발견되면 placeholder 경로로 옮기지 않고 이 작업을 미완료로 두며, `/speckit-tasks`로
       정확한 출발·도착 파일 경로 작업을 추가한 뒤 재개한다 (T064 의존)
-- [ ] T067 [S4] 삭제 판정한 컴포넌트가 있으면 대상·사용처 조사 결과·근거를 제시하고 사용자
+- [X] T067 [S4] 삭제 판정한 컴포넌트가 있으면 대상·사용처 조사 결과·근거를 제시하고 사용자
       승인을 받은 뒤에만 파일을 삭제한다. 삭제 가능한 파일은 T064 표의 경로로 한정한다. 승인
       전에는 지우지 않으며, 삭제 대상이 없으면 이 작업은 변경 없이 완료한다 ⛔ (T064 의존)
-- [ ] T068 [S4] `docs/conventions/ui-component.md` §3.4 "현재 컴포넌트 배치" 표를 T065~T067의
+- [X] T068 [S4] `docs/conventions/ui-component.md` §3.4 "현재 컴포넌트 배치" 표를 T065~T067의
       결과에 맞춰 갱신한다. 책임 패키지는 `UI`다
 
 ### 정리와 패키지 검증
 
-- [ ] T069 [no-write] [S4] `"$project_build_runner" build`와 `"$project_build_runner" test`를
+- [X] T069 [no-write] [S4] `"$project_build_runner" build`와 `"$project_build_runner" test`를
       순차 실행하고, `grep -rn '@State' sources/Projects/UI/Component`가 `#Preview` 밖에서
       결과를 내지 않는지 확인한다 (SC-014)
 
