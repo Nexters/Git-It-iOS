@@ -79,7 +79,7 @@ public struct LayoutMetrics: Sendable, Equatable {
 
     /// UIUX Guide §7.3이 정한 탭바 여유 높이.
     private static let tabBarClearance: Double = 92
-    private static let tabBarScrimHeight: Double = 93
+    private static let tabBarScrimHeight: Double = 92
     private static let minimumTabBarBottomInset: Double = 24
     private static let sheetTopClearance: Double = 16
 

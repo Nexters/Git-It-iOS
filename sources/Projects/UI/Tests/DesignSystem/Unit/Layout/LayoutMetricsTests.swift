@@ -39,18 +39,18 @@ struct LayoutMetricsTests {
             let metrics = device.metrics
 
             for headerStyle in LayoutMetrics.HeaderStyle.allCases {
-                #expect((50.0...120.0).contains(headerStyle.height), "headerHeight")
+                #expect((43.0...99.0).contains(headerStyle.height), "headerHeight")
                 #expect(
-                    (70.0...188.0).contains(metrics.topScrimHeight(headerStyle: headerStyle)),
+                    (63.0...167.0).contains(metrics.topScrimHeight(headerStyle: headerStyle)),
                     "\(device.name) topScrimHeight",
                 )
             }
             #expect(
-                (0.0...127.0).contains(metrics.bottomScrimHeight(hasTabBar: false)),
+                (0.0...126.0).contains(metrics.bottomScrimHeight(hasTabBar: false)),
                 "\(device.name) bottomScrimHeight 탭바 없음",
             )
             #expect(
-                (0.0...127.0).contains(metrics.bottomScrimHeight(hasTabBar: true)),
+                (0.0...126.0).contains(metrics.bottomScrimHeight(hasTabBar: true)),
                 "\(device.name) bottomScrimHeight 탭바 있음",
             )
         }
@@ -63,7 +63,7 @@ struct LayoutMetricsTests {
 
             for headerStyle in LayoutMetrics.HeaderStyle.allCases {
                 #expect(
-                    (435.0...718.0).contains(metrics.contentBudget(headerStyle: headerStyle)),
+                    (456.0...725.0).contains(metrics.contentBudget(headerStyle: headerStyle)),
                     "\(device.name) contentBudget",
                 )
             }
@@ -88,10 +88,10 @@ struct LayoutMetricsTests {
         )
 
         #expect(metrics.contentWidth == 335)
-        #expect(metrics.topScrimHeight(headerStyle: .plain) == 70)
+        #expect(metrics.topScrimHeight(headerStyle: .inlineTitle) == 63)
         #expect(metrics.tabBarBottomInset == 24)
         #expect(metrics.contentBudget(headerStyle: .plain) == 505)
-        #expect(metrics.contentBudget(headerStyle: .largeTitle) == 435)
+        #expect(metrics.contentBudget(headerStyle: .largeTitle) == 456)
         #expect(metrics.sheetMaximumHeight == 631)
     }
 
@@ -106,7 +106,7 @@ struct LayoutMetricsTests {
 
         #expect(metrics.contentWidth == 400)
         #expect(metrics.gridColumn2 == 194)
-        #expect(metrics.contentBudget(headerStyle: .plain) == 718)
+        #expect(metrics.contentBudget(headerStyle: .inlineTitle) == 725)
         #expect(metrics.sheetMaximumHeight == 878)
     }
 
@@ -119,15 +119,15 @@ struct LayoutMetricsTests {
             safeAreaBottom: 34,
         )
 
-        #expect(metrics.topScrimHeight(headerStyle: .largeTitle) == 188)
+        #expect(metrics.topScrimHeight(headerStyle: .largeTitle) == 167)
     }
 
     @Test
     func `헤더 종류별 높이가 규격 값과 일치한다`() {
         #expect(LayoutMetrics.HeaderStyle.plain.height == 50)
-        #expect(LayoutMetrics.HeaderStyle.inlineTitle.height == 64)
-        #expect(LayoutMetrics.HeaderStyle.inlineUser.height == 98)
-        #expect(LayoutMetrics.HeaderStyle.largeTitle.height == 120)
+        #expect(LayoutMetrics.HeaderStyle.inlineTitle.height == 43)
+        #expect(LayoutMetrics.HeaderStyle.inlineUser.height == 74)
+        #expect(LayoutMetrics.HeaderStyle.largeTitle.height == 99)
     }
 
     // MARK: Private

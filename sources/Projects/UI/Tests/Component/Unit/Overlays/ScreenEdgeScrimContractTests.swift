@@ -25,15 +25,15 @@ struct ScreenEdgeScrimContractTests {
     @Test
     func `상단 스크림 높이는 헤더 종류별 계산값을 따른다`() {
         #expect(ScreenEdgeScrim.Style.top(headerStyle: .plain).height(layoutMetrics: Self.metrics) == 70)
-        #expect(ScreenEdgeScrim.Style.top(headerStyle: .inlineTitle).height(layoutMetrics: Self.metrics) == 84)
-        #expect(ScreenEdgeScrim.Style.top(headerStyle: .inlineUser).height(layoutMetrics: Self.metrics) == 118)
-        #expect(ScreenEdgeScrim.Style.top(headerStyle: .largeTitle).height(layoutMetrics: Self.metrics) == 140)
+        #expect(ScreenEdgeScrim.Style.top(headerStyle: .inlineTitle).height(layoutMetrics: Self.metrics) == 63)
+        #expect(ScreenEdgeScrim.Style.top(headerStyle: .inlineUser).height(layoutMetrics: Self.metrics) == 94)
+        #expect(ScreenEdgeScrim.Style.top(headerStyle: .largeTitle).height(layoutMetrics: Self.metrics) == 119)
     }
 
     @Test
     func `하단 스크림 높이는 탭바 유무에 따라 계산값을 따른다`() {
         #expect(ScreenEdgeScrim.Style.bottom(hasTabBar: false).height(layoutMetrics: Self.metrics) == 0)
-        #expect(ScreenEdgeScrim.Style.bottom(hasTabBar: true).height(layoutMetrics: Self.metrics) == 93)
+        #expect(ScreenEdgeScrim.Style.bottom(hasTabBar: true).height(layoutMetrics: Self.metrics) == 92)
     }
 
     @Test
@@ -41,7 +41,7 @@ struct ScreenEdgeScrimContractTests {
         let large = LayoutMetrics(screenWidth: 440, screenHeight: 956, safeAreaTop: 62, safeAreaBottom: 34)
 
         #expect(ScreenEdgeScrim.Style.top(headerStyle: .plain).height(layoutMetrics: large) == 112)
-        #expect(ScreenEdgeScrim.Style.bottom(hasTabBar: true).height(layoutMetrics: large) == 127)
+        #expect(ScreenEdgeScrim.Style.bottom(hasTabBar: true).height(layoutMetrics: large) == 126)
     }
 
     // MARK: Private

@@ -46,7 +46,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
         }
 
         static var pillHeight: CGFloat {
-            68
+            64
         }
 
         static var iconBottomSpacing: CGFloat {
