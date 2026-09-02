@@ -70,7 +70,6 @@ extension FirebaseMessagingPushClient: MessagingDelegate {
             let pending = state.pendingContinuations
             state.pendingContinuations.removeAll()
 
-            // 최초 발급은 registrationToken()이 소유하므로 갱신 스트림으로 방출하지 않는다.
             let isRefresh = state.hasIssuedInitialToken
             state.hasIssuedInitialToken = true
             let refreshes = isRefresh ? Array(state.refreshContinuations.values) : []
