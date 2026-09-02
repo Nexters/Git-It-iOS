@@ -102,10 +102,10 @@ target이 소유합니다.
 | --- | --- |
 | `Scaffolds/` | `BottomActionBar`, `ScreenContainer`, `ScreenHeader`, `TabShell` |
 | `Overlays/` | `ActionMenu`, `ModalOverlay`, `ScreenEdgeScrim`, `SheetSurface`, `WebSheet` |
-| `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `EssayAnswerInput`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
+| `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
 | `CollectionItems/` | `ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `SelectionCard`, `SettingRow` |
 | `Indicators/` | `ContinuousProgressBar`, `EmptyState`, `LabeledProgressBar`, `PageIndicator`, `ProgressSegments` |
-| `Displays/` | `LaunchLogo`, `OnboardingMockup`, `QuestionPrompt`, `ResourceAnimation`, `ResourceImage`, `RubricView`, `SplashView`, `StyledText`, `TagBadge`, `WebContentView` |
+| `Displays/` | `LaunchLogo`, `OnboardingMockup`, `ResourceAnimation`, `ResourceImage`, `RubricView`, `SplashView`, `StyledText`, `TagBadge`, `WebContentView` |
 
 ### 3.5 재분류 기준
 

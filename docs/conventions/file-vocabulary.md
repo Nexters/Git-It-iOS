@@ -145,6 +145,7 @@ Scaffolds/TabShell/
 | | `Factories/` | 구현 선택과 생성 |
 | `Feature/<기능>/` | `Reducers/` | Feature, State, Action, Reducer |
 | | `Screens/` | 화면 View |
+| | `Views/` | Screen을 구성하는 Sub View |
 | | `Previews/` | 화면 프리뷰와 프리뷰 전용 타입 |
 | | `Models/` | 화면 전용 표시 모델 |
 | `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |

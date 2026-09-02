@@ -583,35 +583,35 @@ Component 계층의 소유 규칙을 회복한다.
 
 ### 구현
 
-- [ ] T070 [S4] `sources/Projects/Feature/Quiz/Views/QuestionPrompt.swift`를 새로 만들어
+- [X] T070 [S4] `sources/Projects/Feature/Quiz/Views/QuestionPrompt.swift`를 새로 만들어
       기존 `sources/Projects/UI/Component/Displays/QuestionPrompt.swift`의 구현을 Sub View로
       옮긴다. 이 저장소의 디렉터리·파일 컨벤션에 맞춰 다시 작성하고 참조 구현을 그대로 복사해
       넣지 않는다 (FR-030)
-- [ ] T071 [S4] `sources/Projects/Feature/Quiz/Views/AnswerEditor.swift`를 새로 만들어 기존
+- [X] T071 [S4] `sources/Projects/Feature/Quiz/Views/AnswerEditor.swift`를 새로 만들어 기존
       `sources/Projects/UI/Component/Controls/EssayAnswerInput/EssayAnswerInput.swift`의 구현을
       규격의 Sub View 이름 `AnswerEditor`로 옮긴다. 자기 영역의 상태(`text`·포커스)를 Sub View가
       소유한다 (FR-030)
-- [ ] T072 [no-write] [S4]
+- [X] T072 [no-write] [S4]
       `sources/Projects/UI/Component/Displays/QuestionPrompt.swift`와
       `sources/Projects/UI/Component/Controls/EssayAnswerInput/EssayAnswerInput.swift`를
       재확인한다. 계획 시점 조사에서 별도 추출할 무상태 조각은 0건이고,
       `sources/Projects/UI/Component/Indicators/ProgressSegments.swift`는 이미 독립
       컴포넌트이므로 새 UI 파일을 만들지 않는다는 결과를 보고한다 (FR-031)
       (T070·T071 의존)
-- [ ] T073 [S4] `sources/Projects/UI/Component/Displays/QuestionPrompt.swift`를 삭제한다
+- [X] T073 [S4] `sources/Projects/UI/Component/Displays/QuestionPrompt.swift`를 삭제한다
       (T070·T072 의존)
-- [ ] T074 [S4] `sources/Projects/UI/Component/Controls/EssayAnswerInput/EssayAnswerInput.swift`와
+- [X] T074 [S4] `sources/Projects/UI/Component/Controls/EssayAnswerInput/EssayAnswerInput.swift`와
       `sources/Projects/UI/Component/Controls/EssayAnswerInput/EssayAnswerInput+Constant.swift`를
       삭제한다 (T071·T072 의존)
-- [ ] T075 [S4] `docs/conventions/file-vocabulary.md` §3의 형태 어휘 표 `Feature/<기능>/` 행에
+- [X] T075 [S4] `docs/conventions/file-vocabulary.md` §3의 형태 어휘 표 `Feature/<기능>/` 행에
       `Views/`(Screen을 구성하는 Sub View) 항목을 추가한다. 책임 패키지는 `Feature`다
-- [ ] T076 [S4] `docs/conventions/ui-component.md` §3.4 표의 `Controls/` 행에서
+- [X] T076 [S4] `docs/conventions/ui-component.md` §3.4 표의 `Controls/` 행에서
       `EssayAnswerInput`을, `Displays/` 행에서 `QuestionPrompt`를 제거한다. 책임 패키지는
       `UI`다
 
 ### 정리와 패키지 검증
 
-- [ ] T077 [no-write] [S4] `"$project_build_runner" build`로 UI와 Feature를 포함한 전체 빌드가
+- [X] T077 [no-write] [S4] `"$project_build_runner" build`로 UI와 Feature를 포함한 전체 빌드가
       성공하는지 확인하고, `Component/` 계층에 상태를 소유하는 타입이 남지 않았는지
       확인한다
 
