@@ -86,8 +86,6 @@ struct GitItApp: App {
         WindowGroup {
             AppRootView(store: rootStore)
                 .task {
-                    // 콜백 주입은 Composition 경계 안에서 이뤄지고, 주입 전에 도착한
-                    // launch push는 AppDelegate의 대기 슬롯이 보관한다.
                     await composition.bootstrap(appDelegate)
                 }
                 .onChange(of: scenePhase) { _, newPhase in
@@ -112,8 +110,6 @@ struct GitItApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    /// App Group 컨테이너에서 값을 읽는 즉시 컨테이너에서 지운다. 이후 수명은 앱 실행 중
-    /// 메모리로만 유지한다.
     private static func takeSharedRepositoryLink() -> SharedRepositoryLink? {
         guard let defaults = UserDefaults(suiteName: Constant.appGroupIdentifier) else { return nil }
         guard let urlString = defaults.string(forKey: Constant.sharedLinkStorageKey) else { return nil }

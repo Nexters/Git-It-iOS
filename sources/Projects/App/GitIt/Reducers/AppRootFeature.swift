@@ -74,7 +74,6 @@ nonisolated struct AppRootFeature: Sendable {
         case mainShell
     }
 
-    /// 기기 등록의 진행과 실패를 인증 세션 소유자가 관찰 가능한 상태로 보존한다.
     enum DeviceRegistrationStatus: Equatable, Sendable {
         case idle
         case registering
@@ -94,12 +93,11 @@ nonisolated struct AppRootFeature: Sendable {
         var onboarding: OnboardingRouterFeature.State
         var mainShell = MainShellFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
-        /// 진행 중인 학습 세트 생성 1건이다. 요청 제출부터 해제 시점까지 App이 수명을 소유한다.
+
         var generationProgress: GenerationProgress?
-        /// 앱 재실행으로 복원한 진행 상태인지 여부다. 복원 경로에서만 학습 프로젝트 목록을
-        /// 1차 해소 수단으로 사용한다.
+
         var isGenerationProgressRestored = false
-        /// 아직 소비하지 못한 공유 링크다. 앱 실행 동안만 메모리에 유지한다.
+
         var pendingSharedLink: SharedRepositoryLink?
         @Presents var projectRegistration: ProjectRegistrationFeature.State?
     }
@@ -226,12 +224,10 @@ nonisolated struct AppRootFeature: Sendable {
                 return returnToOnboarding(&state)
 
             case .view(.applicationBecameActive):
-                // 실패한 등록만 재시도한다. 성공했거나 진행 중이면 서버 요청을 늘리지 않는다.
                 guard state.deviceRegistration == .failed else { return .none }
                 return registerDeviceIfNeeded(&state)
 
             case .effect(.deviceTokenRefreshed):
-                // token이 갱신되면 최신 token으로 재등록한다. 진행 중이면 그 요청이 최신 token을 읽는다.
                 guard state.route == .mainShell else { return .none }
                 return registerDeviceIfNeeded(&state)
 
@@ -264,7 +260,6 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .projectRegistration(.presented(.effect(.submissionFinished(.success(let receipt))))):
-                // 생성 진행 상태의 수명은 등록 화면이 닫힌 뒤에도 이어지므로 App이 소유한다.
                 let progress = GenerationProgress(projectID: receipt.projectID, requestedAt: now())
                 state.generationProgress = progress
                 state.isGenerationProgressRestored = false
@@ -282,7 +277,6 @@ nonisolated struct AppRootFeature: Sendable {
             case .effect(.generationProgressRestored(let restored)):
                 guard let restored, state.generationProgress == nil else { return .none }
                 guard !waitPolicy.isExpired(restored, now: now()) else {
-                    // 보존 상한을 넘긴 상태는 결과와 무관하게 해제한다.
                     return .run { [trackGenerationProgress] _ in await trackGenerationProgress.end() }
                 }
                 state.generationProgress = restored
@@ -291,11 +285,8 @@ nonisolated struct AppRootFeature: Sendable {
                 return releaseGenerationProgress(restored)
 
             case .effect(.sharedRepositoryLinkReceived(let link)):
-                // 생성이 진행 중이면 등록 화면을 열지 않고 버린다. 홈의 진행 중 표기가
-                // 등록 화면이 열리지 않은 이유를 설명하는 피드백이 된다.
                 guard state.generationProgress == nil else { return .none }
                 guard state.route == .mainShell else {
-                    // 미인증이면 진입 흐름을 마칠 때까지 메모리에 보관한다.
                     state.pendingSharedLink = link
                     return .none
                 }
@@ -314,8 +305,6 @@ nonisolated struct AppRootFeature: Sendable {
                 )
 
             case .mainShell(.home(.effect(.projectsLoadFinished(_, .success(let page))))):
-                // 복원된 상태는 결과가 도착하지 않을 수 있으므로, 최소 대기 시간이 지난 뒤
-                // 해당 프로젝트가 목록에 나타나면 1차 해소 수단으로 해제한다.
                 guard
                     state.isGenerationProgressRestored,
                     let progress = state.generationProgress,
@@ -386,7 +375,6 @@ nonisolated struct AppRootFeature: Sendable {
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
 
-    /// 동시에 도착한 재시도 trigger를 하나의 등록 요청으로 직렬화한다.
     private func registerDeviceIfNeeded(_ state: inout State) -> Effect<Action> {
         guard state.deviceRegistration != .registering else { return .none }
         state.deviceRegistration = .registering
@@ -401,8 +389,6 @@ nonisolated struct AppRootFeature: Sendable {
         .cancellable(id: CancelID.deviceRegistration)
     }
 
-    /// 보관해 둔 공유 링크를 링크 입력 초기값으로 1회만 소비한다. 소비 여부와 무관하게
-    /// 보관을 해제해 같은 링크가 다시 쓰이지 않게 한다.
     private func consumePendingSharedLink(_ state: inout State) -> Effect<Action> {
         guard let link = state.pendingSharedLink else { return .none }
         state.pendingSharedLink = nil
@@ -411,13 +397,10 @@ nonisolated struct AppRootFeature: Sendable {
         return .none
     }
 
-    /// 진행 상태를 `max(요청 + 최소 대기 시간, 결과 확정)` 시점에 해제한다. 결과가 끝내
-    /// 도착하지 않으면 보존 상한에서 해제해 상태가 영구히 남지 않게 한다.
     private func releaseGenerationProgress(_ progress: GenerationProgress) -> Effect<Action> {
         .run { [observeGenerationOutcomes, waitPolicy, now] send in
             let deadline = progress.requestedAt.addingTimeInterval(waitPolicy.retentionLimit)
 
-            // 결과 도착과 보존 상한 중 먼저 오는 쪽까지 기다린다.
             await withTaskGroup(of: Void.self) { group in
                 group.addTask {
                     for await outcome in await observeGenerationOutcomes()
@@ -435,7 +418,6 @@ nonisolated struct AppRootFeature: Sendable {
                 group.cancelAll()
             }
 
-            // 결과가 먼저 도착했다면 남은 최소 대기 시간만큼 더 유지한다.
             let remainingMinimum = waitPolicy.readyDate(for: progress).timeIntervalSince(now())
             if remainingMinimum > 0 {
                 try? await Task.sleep(for: .seconds(remainingMinimum))
@@ -445,8 +427,6 @@ nonisolated struct AppRootFeature: Sendable {
         .cancellable(id: CancelID.generationProgress, cancelInFlight: true)
     }
 
-    /// 인증 종료 경로의 단일 통로다. 등록 흐름 child와 그 child가 시작한 생성 결과 관찰,
-    /// 그리고 진행 중인 기기 등록 Effect를 함께 제거한다.
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
         let bundleVersion = state.onboarding.guide.bundleVersion
         state.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)

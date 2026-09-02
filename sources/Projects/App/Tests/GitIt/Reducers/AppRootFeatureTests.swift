@@ -427,7 +427,6 @@ struct AppRootFeatureTests {
             $0.deviceRegistration = .registering
         }
 
-        // 진행 중인 등록이 있으므로 두 trigger 모두 새 요청을 만들지 않는다.
         await store.send(.view(.applicationBecameActive))
         await store.send(.effect(.deviceTokenRefreshed))
 
@@ -525,7 +524,6 @@ struct AppRootFeatureTests {
         await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
 
-        // 최소 대기 시간이 남아 있으므로 해제되지 않는다.
         #expect(store.state.generationProgress?.projectID == "project-1")
 
         await store.send(.mainShell(.delegate(.loggedOut)))

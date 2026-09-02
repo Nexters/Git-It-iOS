@@ -130,8 +130,6 @@ func makeAppRootStore(
 
 // MARK: - TrackGenerationProgressSpy
 
-/// 진행 상태 저장·복원 호출을 관찰한다. 기기 저장소 없이 App의 수명 규칙만 검증하기 위한
-/// 대역이다.
 actor TrackGenerationProgressSpy: TrackGenerationProgressUseCase {
 
     // MARK: Lifecycle
@@ -170,8 +168,6 @@ actor TrackGenerationProgressSpy: TrackGenerationProgressUseCase {
 
 // MARK: - RegisterCurrentDeviceSpy
 
-/// 기기 등록 호출 횟수와 결과를 관찰한다. 실패 후 재시도와 동시 trigger 직렬화를
-/// 외부 SDK·Keychain 접근 없이 검증하기 위한 대역이다.
 actor RegisterCurrentDeviceSpy {
 
     // MARK: Lifecycle
@@ -219,7 +215,6 @@ actor RegisterCurrentDeviceSpy {
 
 // MARK: - DeviceTokenRefreshStream
 
-/// 등록 token 갱신 신호를 테스트에서 직접 방출하기 위한 대역이다.
 final class DeviceTokenRefreshStream: Sendable {
 
     // MARK: Internal
