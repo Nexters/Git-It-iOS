@@ -59,9 +59,7 @@ struct AnswerEditor: View {
 
 }
 
-// MARK: AnswerEditor.Constant
-
-extension AnswerEditor {
+private extension AnswerEditor {
     enum Constant {
         static let defaultCharacterLimit = 400
         static let minimumHeight: CGFloat = 160
