@@ -13,59 +13,79 @@ struct SavedScreen: View {
     @Bindable var store: StoreOf<SavedFeature>
 
     var body: some View {
-        Group {
-            if case .failed = store.loadStatus {
+        screen
+            .task { await store.send(.view(.task)).finish() }
+    }
+
+    // MARK: Private
+
+    @ViewBuilder
+    private var screen: some View {
+        switch (store.loadStatus, store.isEmpty) {
+        case (.failed, _):
+            ScreenContainer { _ in
                 ErrorView(
                     isBackControlPresented: store.isBackControlPresented,
                     onBack: { send(.backTapped) },
                     onRetry: { send(.retryTapped) },
                 )
-            } else {
-                content
             }
+
+        case (_, true):
+            ScreenContainer { _ in
+                VStack(spacing: 0) {
+                    header
+
+                    Spacer(minLength: 0)
+
+                    EmptyState(
+                        title: "bookmarks = []",
+                        message: "아직 저장한 문제가 없습니다.\n다시 볼 문제를 저장해 보세요.",
+                    ) {
+                        ResourceAnimation(asset: .storageEmpty, isLooping: false)
+                    }
+                    .designSystemScreenMargin()
+
+                    Spacer(minLength: 0)
+                }
+            }
+
+        case (_, false):
+            content
         }
-        .task { await store.send(.view(.task)).finish() }
     }
 
-    // MARK: Private
+    private var header: some View {
+        ScreenHeader(
+            title: "저장한 문제",
+            style: .largeTitle,
+            leading: store.isBackControlPresented ? .back : nil,
+            onLeadingTap: { send(.backTapped) },
+        )
+        .designSystemScreenMargin()
+    }
 
     private var content: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ScreenHeader(
+        OverlayContainer { layoutMetrics in
+            ScreenOverlayHeader(
                 title: "저장한 문제",
                 style: .largeTitle,
                 leading: store.isBackControlPresented ? .back : nil,
+                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
             )
-            .designSystemScreenMargin()
-
-            if store.isEmpty {
-                Spacer(minLength: 0)
-
-                EmptyState(
-                    title: "bookmarks = []",
-                    message: "아직 저장한 문제가 없습니다.\n다시 볼 문제를 저장해 보세요.",
-                ) {
-                    ResourceAnimation(asset: .storageEmpty, isLooping: false)
-                }
-                .designSystemScreenMargin()
-
-                Spacer(minLength: 0)
-            } else {
-                ScrollView {
-                    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-                        ForEach(SavedQuestionDisplay.list(questions: store.collection?.bookmarks ?? [])) { question in
-                            QuestionRow(
-                                prompt: question.prompt,
-                                actionTitle: SavedQuestionDisplay.actionTitle,
-                                onSolveTap: { solve(questionID: question.id) },
-                            )
-                        }
-                    }
-                    .designSystemScreenMargin()
-                    .padding(.vertical, Constant.contentVerticalPadding)
+        } content: { _ in
+            VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                ForEach(SavedQuestionDisplay.list(questions: store.collection?.bookmarks ?? [])) { question in
+                    QuestionRow(
+                        prompt: question.prompt,
+                        actionTitle: SavedQuestionDisplay.actionTitle,
+                        onSolveTap: { solve(questionID: question.id) },
+                    )
                 }
             }
+            .designSystemScreenMargin()
+            .padding(.vertical, Constant.contentVerticalPadding)
         }
     }
 
@@ -77,8 +97,10 @@ struct SavedScreen: View {
 
 }
 
-private extension SavedScreen {
-    enum Constant {
+// MARK: SavedScreen.Constant
+
+extension SavedScreen {
+    fileprivate enum Constant {
         static let contentVerticalPadding: CGFloat = 16
     }
 }

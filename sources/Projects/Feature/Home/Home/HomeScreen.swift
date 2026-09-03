@@ -2,6 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
+// MARK: - HomeScreen
+
 @ViewAction(for: HomeFeature.self)
 public struct HomeScreen: View {
 
@@ -13,42 +15,40 @@ public struct HomeScreen: View {
 
     // MARK: Public
 
-    @Bindable private var store: StoreOf<HomeFeature>
+    @Bindable public var store: StoreOf<HomeFeature>
 
     public var body: some View {
-        ScreenContainer { layoutMetrics in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    Self.ProfileHeaderView(
-                        display: HomeProfileDisplay(store.profileLoad),
-                        onRetry: { send(.profileRetryTapped) },
-                    )
-                    .padding(.top, Constant.profileTopPadding)
-
-                    Self.GreetingView()
-                        .padding(.top, Constant.greetingTopPadding)
-
-                    Self.RegistrationPanelView(
-                        isGenerationInProgress: store.isGenerationInProgress,
-                        onRegister: { send(.projectRegistrationTapped) },
-                    )
-                    .padding(.top, Constant.registrationPanelTopPadding)
-                }
-                .designSystemScreenMargin()
-                .padding(.bottom, Constant.projectSectionTopPadding)
-
-                Self.ProjectSection(
-                    state: HomeProjectSectionState(store.projectLoad),
-                    layoutMetrics: layoutMetrics,
-                    cardListLeadingX: $cardListLeadingX,
-                    onShowAllTapped: { send(.showAllProjectsTapped) },
-                    onProjectRetryTapped: { send(.projectRetryTapped) },
-                    onProjectCardTapped: { send(.projectCardTapped(projectID: $0)) },
-                    onLearningTapped: { send(.learningTapped(projectID: $0)) },
+        OverlayContainer(content: { layoutMetrics in
+            VStack(alignment: .leading, spacing: 0) {
+                Self.ProfileHeaderView(
+                    display: HomeProfileDisplay(store.profileLoad),
+                    onRetry: { send(.profileRetryTapped) },
                 )
+                .padding(.top, Constant.profileTopPadding)
+
+                Self.GreetingView()
+                    .padding(.top, Constant.greetingTopPadding)
+
+                Self.RegistrationPanelView(
+                    isGenerationInProgress: store.isGenerationInProgress,
+                    onRegister: { send(.projectRegistrationTapped) },
+                )
+                .padding(.top, Constant.registrationPanelTopPadding)
             }
-            .scrollIndicators(.hidden)
-        }
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.projectSectionTopPadding)
+
+            Self.ProjectSection(
+                state: HomeProjectSectionState(store.projectLoad),
+                layoutMetrics: layoutMetrics,
+                cardListLeadingX: $cardListLeadingX,
+                onShowAllTapped: { send(.showAllProjectsTapped) },
+                onProjectRetryTapped: { send(.projectRetryTapped) },
+                onProjectCardTapped: { send(.projectCardTapped(projectID: $0)) },
+                onLearningTapped: { send(.learningTapped(projectID: $0)) },
+            )
+        })
+        .scrollIndicators(.hidden)
         .task { await send(.task).finish() }
     }
 
@@ -58,8 +58,10 @@ public struct HomeScreen: View {
 
 }
 
-private extension HomeScreen {
-    enum Constant {
+// MARK: HomeScreen.Constant
+
+extension HomeScreen {
+    fileprivate enum Constant {
         static let profileTopPadding: CGFloat = 12
         static let greetingTopPadding: CGFloat = 16
         static let registrationPanelTopPadding: CGFloat = 24

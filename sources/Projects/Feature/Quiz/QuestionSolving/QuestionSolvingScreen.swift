@@ -14,50 +14,57 @@ struct QuestionSolvingScreen: View {
     @Bindable var store: StoreOf<QuestionSolvingFeature>
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScreenHeader(style: .default, onLeadingTap: { send(.backTapped) })
-                .designSystemScreenMargin().designSystemBackground(.clear)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
-                    QuestionPrompt(
+        content
+            .overlay {
+                ModalOverlay(
+                    isPresented: store.isSourceSheetPresented,
+                    onDismiss: { send(.sourceSheetDismissed) },
+                ) {
+                    SourceSheet(
                         questionNumber: store.questionNumber,
-                        prompt: store.question.prompt,
+                        sources: QuestionSourceDisplay.list(sources: store.question.sources),
+                        onLinkTap: { send(.sourceLinkTapped($0)) },
+                        onClose: { send(.sourceSheetDismissed) },
                     )
-
-                    answerSection
-
-                    if store.submissionError != nil {
-                        submissionFailureNotice
-                    }
-
-                    if store.isSourceControlPresented {
-                        HStack {
-                            Spacer()
-
-                            sourceButton
-                        }
-                    }
                 }
-                .designSystemScreenMargin()
-                .padding(.vertical, Constant.contentVerticalPadding)
             }
-
-            bottomActions
-        }
-        .overlay {
-            ModalOverlay(isPresented: store.isSourceSheetPresented, onDismiss: { send(.sourceSheetDismissed) }) {
-                SourceSheet(
-                    questionNumber: store.questionNumber,
-                    sources: QuestionSourceDisplay.list(sources: store.question.sources),
-                    onLinkTap: { send(.sourceLinkTapped($0)) },
-                    onClose: { send(.sourceSheetDismissed) },
-                )
-            }
-        }
     }
 
     // MARK: Private
+
+    private var content: some View {
+        OverlayContainer { layoutMetrics in
+            ScreenOverlayHeader(
+                layoutMetrics: layoutMetrics,
+                onLeadingTap: { send(.backTapped) },
+            )
+        } content: { _ in
+            VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
+                QuestionPrompt(
+                    questionNumber: store.questionNumber,
+                    prompt: store.question.prompt,
+                )
+
+                answerSection
+
+                if store.submissionError != nil {
+                    submissionFailureNotice
+                }
+
+                if store.isSourceControlPresented {
+                    HStack {
+                        Spacer()
+
+                        sourceButton
+                    }
+                }
+            }
+            .designSystemScreenMargin()
+            .padding(.vertical, Constant.contentVerticalPadding)
+        } footer: { layoutMetrics in
+            bottomActions(layoutMetrics: layoutMetrics)
+        }
+    }
 
     private var essayTextBinding: Binding<String> {
         Binding(
@@ -131,22 +138,6 @@ struct QuestionSolvingScreen: View {
         )
     }
 
-    private var bottomActions: some View {
-        BottomActionBar {
-            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-                BookmarkButton(
-                    isSaved: store.isBookmarked,
-                    accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
-                    onTap: { send(.bookmarkToggleTapped) },
-                )
-
-                primaryAction
-            }
-            .designSystemScreenMargin()
-        }
-        .designSystemBackground(.screenBackground)
-    }
-
     @ViewBuilder
     private var primaryAction: some View {
         if store.answerOutcome == nil {
@@ -167,10 +158,26 @@ struct QuestionSolvingScreen: View {
         StyledText.body2(Constant.submissionFailureMessage, color: .grey400)
     }
 
+    private func bottomActions(layoutMetrics: LayoutMetrics) -> some View {
+        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                BookmarkButton(
+                    isSaved: store.isBookmarked,
+                    accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
+                    onTap: { send(.bookmarkToggleTapped) },
+                )
+
+                primaryAction
+            }
+        }
+    }
+
 }
 
-private extension QuestionSolvingScreen {
-    enum Constant {
+// MARK: QuestionSolvingScreen.Constant
+
+extension QuestionSolvingScreen {
+    fileprivate enum Constant {
         static let sectionSpacing: CGFloat = 24
         static let contentVerticalPadding: CGFloat = 16
         static let essayPlaceholder = "답안을 서술해주세요"

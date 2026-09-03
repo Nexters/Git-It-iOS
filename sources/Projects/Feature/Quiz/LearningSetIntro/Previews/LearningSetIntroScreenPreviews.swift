@@ -21,35 +21,27 @@ private func previewState(
 }
 
 #Preview("세트 소개 · s02") {
-    ScreenContainer { _ in
-        LearningSetIntroScreen(
-            store: Store(initialState: previewState(setLoad: .loaded(previewSet))) { EmptyReducer() }
-        )
-    }
+    LearningSetIntroScreen(
+        store: Store(initialState: previewState(setLoad: .loaded(previewSet))) { EmptyReducer() }
+    )
 }
 
 #Preview("세트 소개 · 로딩") {
-    ScreenContainer { _ in
-        LearningSetIntroScreen(
-            store: Store(initialState: previewState(setLoad: .loading(requestID: 1))) { EmptyReducer() }
-        )
-    }
+    LearningSetIntroScreen(
+        store: Store(initialState: previewState(setLoad: .loading(requestID: 1))) { EmptyReducer() }
+    )
 }
 
 #Preview("세트 소개 · 실패") {
-    ScreenContainer { _ in
-        LearningSetIntroScreen(
-            store: Store(initialState: previewState(setLoad: .failed(.temporarilyUnavailable))) { EmptyReducer() }
-        )
-    }
+    LearningSetIntroScreen(
+        store: Store(initialState: previewState(setLoad: .failed(.temporarilyUnavailable))) { EmptyReducer() }
+    )
 }
 
 #Preview("세트 소개 · 문제 없음") {
-    ScreenContainer { _ in
-        LearningSetIntroScreen(
-            store: Store(
-                initialState: previewState(setLoad: .loaded(previewSet), isEmptySetReported: true)
-            ) { EmptyReducer() }
-        )
-    }
+    LearningSetIntroScreen(
+        store: Store(
+            initialState: previewState(setLoad: .loaded(previewSet), isEmptySetReported: true)
+        ) { EmptyReducer() }
+    )
 }

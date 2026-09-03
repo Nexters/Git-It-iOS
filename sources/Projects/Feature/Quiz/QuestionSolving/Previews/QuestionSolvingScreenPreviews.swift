@@ -89,100 +89,84 @@ private let essayResult = EssayAnswerResult(
 )
 
 #Preview("문제 풀이 · 미선택 · s03") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(store: previewStore(previewState()))
-    }
+    QuestionSolvingScreen(store: previewStore(previewState()))
 }
 
 #Preview("문제 풀이 · 출처 Sheet · s04") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(store: previewStore(previewState(isSourceSheetPresented: true)))
-    }
+    QuestionSolvingScreen(
+        store: previewStore(previewState(isSourceSheetPresented: true))
+    )
 }
 
 #Preview("문제 풀이 · 선택 · s05") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(store: previewStore(previewState(draftChoiceIndex: 1)))
-    }
+    QuestionSolvingScreen(
+        store: previewStore(previewState(draftChoiceIndex: 1))
+    )
 }
 
 #Preview("문제 풀이 · 제출 중 · s06") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(previewState(submission: .submitting, draftChoiceIndex: 1))
-        )
-    }
+    QuestionSolvingScreen(
+        store: previewStore(previewState(submission: .submitting, draftChoiceIndex: 1))
+    )
 }
 
 #Preview("문제 풀이 · 제출 실패 · s07") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(submission: .failed(.temporarilyUnavailable), draftChoiceIndex: 1)
-            )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(submission: .failed(.temporarilyUnavailable), draftChoiceIndex: 1)
         )
-    }
+    )
 }
 
 #Preview("문제 풀이 · 정답 · s08") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(submission: .answered(.choice(correctResult)), draftChoiceIndex: 0)
-            )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(submission: .answered(.choice(correctResult)), draftChoiceIndex: 0)
         )
-    }
+    )
 }
 
 #Preview("문제 풀이 · 오답 · s09") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(submission: .answered(.choice(incorrectResult)), draftChoiceIndex: 2)
-            )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(submission: .answered(.choice(incorrectResult)), draftChoiceIndex: 2)
         )
-    }
+    )
 }
 
 #Preview("서술형 · 빈 입력 · s10") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(store: previewStore(previewState(question: essayQuestion)))
-    }
+    QuestionSolvingScreen(
+        store: previewStore(previewState(question: essayQuestion))
+    )
 }
 
 #Preview("서술형 · 입력 중 · s11") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(
-                    question: essayQuestion,
-                    draftEssayText: "생성자 주입은 필요한 의존성을 타입 시그니처에 드러냅니다.",
-                )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(
+                question: essayQuestion,
+                draftEssayText: "생성자 주입은 필요한 의존성을 타입 시그니처에 드러냅니다.",
             )
         )
-    }
+    )
 }
 
 #Preview("서술형 · 결과 · s12") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(
-                    question: essayQuestion,
-                    submission: .answered(.essay(essayResult)),
-                    draftEssayText: "생성자 주입은 필요한 의존성을 타입 시그니처에 드러냅니다.",
-                )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(
+                question: essayQuestion,
+                submission: .answered(.essay(essayResult)),
+                draftEssayText: "생성자 주입은 필요한 의존성을 타입 시그니처에 드러냅니다.",
             )
         )
-    }
+    )
 }
 
 #Preview("문제 풀이 · 순번 없는 단일 문제") {
-    ScreenContainer { _ in
-        QuestionSolvingScreen(
-            store: previewStore(
-                previewState(questionNumber: nil, advanceActionTitle: "완료")
-            )
+    QuestionSolvingScreen(
+        store: previewStore(
+            previewState(questionNumber: nil, advanceActionTitle: "완료")
         )
-    }
+    )
 }

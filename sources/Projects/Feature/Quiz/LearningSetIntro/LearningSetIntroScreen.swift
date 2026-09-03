@@ -15,11 +15,13 @@ struct LearningSetIntroScreen: View {
     var body: some View {
         Group {
             if case .failed = store.setLoad {
-                ErrorView(
-                    bottomButtonPadding: Constant.bottomButtonPadding,
-                    onBack: { send(.backTapped) },
-                    onRetry: { send(.retryTapped) },
-                )
+                ScreenContainer { _ in
+                    ErrorView(
+                        bottomButtonPadding: Constant.bottomButtonPadding,
+                        onBack: { send(.backTapped) },
+                        onRetry: { send(.retryTapped) },
+                    )
+                }
             } else {
                 content
             }
@@ -30,34 +32,24 @@ struct LearningSetIntroScreen: View {
     // MARK: Private
 
     private var content: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ScreenHeader(style: .largeTitle, onLeadingTap: { send(.backTapped) })
-                .designSystemScreenMargin()
-
+        OverlayContainer { layoutMetrics in
+            ScreenOverlayHeader(
+                style: .largeTitle,
+                layoutMetrics: layoutMetrics,
+                onLeadingTap: { send(.backTapped) },
+            )
+        } content: { _ in
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
                 StyledText.subtitle2(store.label, color: .blue100)
                 StyledText.subtitle1(store.learningSet?.title ?? "")
                 StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
-                    .padding(.top, 10)
+                    .padding(.top, Constant.descriptionTopPadding)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .designSystemScreenMargin()
             .padding(.top, Constant.textTopPadding)
-
-            Spacer(minLength: 0)
-
-            if store.isEmptySetReported {
-                StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
-                    .designSystemScreenMargin()
-                    .padding(.bottom, Constant.textSpacing)
-            }
-
-            ActionButton.primary(
-                "시작하기",
-                isEnabled: store.isStartEnabled,
-                action: { send(.startTapped) },
-            )
-            .designSystemScreenMargin()
-            .padding(.bottom, Constant.bottomButtonPadding)
+        } footer: { layoutMetrics in
+            startAction(layoutMetrics: layoutMetrics)
         }
         .overlay {
             if case .loading = store.setLoad {
@@ -67,12 +59,31 @@ struct LearningSetIntroScreen: View {
         }
     }
 
+    private func startAction(layoutMetrics: LayoutMetrics) -> some View {
+        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+            VStack(spacing: Constant.textSpacing) {
+                if store.isEmptySetReported {
+                    StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
+                }
+
+                ActionButton.primary(
+                    "시작하기",
+                    isEnabled: store.isStartEnabled,
+                    action: { send(.startTapped) },
+                )
+            }
+        }
+    }
+
 }
 
-private extension LearningSetIntroScreen {
-    enum Constant {
+// MARK: LearningSetIntroScreen.Constant
+
+extension LearningSetIntroScreen {
+    fileprivate enum Constant {
         static let textTopPadding: CGFloat = 24
         static let textSpacing: CGFloat = 8
+        static let descriptionTopPadding: CGFloat = 10
         static let bottomButtonPadding: CGFloat = 34
     }
 }

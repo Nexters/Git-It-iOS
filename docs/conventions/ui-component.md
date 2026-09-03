@@ -100,7 +100,7 @@ target이 소유합니다.
 
 | 폴더 | 컴포넌트 |
 | --- | --- |
-| `Scaffolds/` | `BottomActionBar`, `ScreenContainer`, `ScreenHeader`, `TabShell` |
+| `Scaffolds/` | `BottomActionBar`, `OverlayContainer`, `ScreenContainer`, `ScreenHeader`, `ScreenOverlayFooter`, `ScreenOverlayHeader`, `TabShell` |
 | `Overlays/` | `ActionMenu`, `ConfirmationSheet`, `ModalOverlay`, `ScreenEdgeScrim`, `SheetSurface`, `WebSheet` |
 | `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
 | `CollectionItems/` | `ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `SelectionCard`, `SettingRow` |

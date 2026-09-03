@@ -182,15 +182,24 @@ Reducer의 `State`가 소유합니다.
 
 | 책임 | 컴포넌트 |
 |---|---|
-| 화면 배경·색 구성표·전체 영역 | `ScreenContainer` |
+| 화면 배경·색 구성표·전체 영역 (스크롤 없음) | `ScreenContainer` |
+| 화면 배경·색 구성표·전체 영역 (본문이 헤더 뒤로 스크롤) | `OverlayContainer` |
 | 상단 제목과 좌우 컨트롤 | `ScreenHeader` |
+| 겹쳐 놓는 상단 헤더 (여백·scrim 포함) | `ScreenOverlayHeader` |
 | 하단 고정 액션 영역 | `BottomActionBar` |
+| 겹쳐 놓는 하단 액션 영역 (여백·배경 포함) | `ScreenOverlayFooter` |
 | 시트 표면 | `SheetSurface` |
 | 탭 구조 | `TabShell` |
 
-**색 구성표는 `ScreenContainer`가 단독으로 소유합니다.** 화면에서
-`preferredColorScheme(_:)`를 다시 지정하지 않습니다. `ScreenContainer` 밖에 오버레이를
-쌓아야 해서 색 구성표가 적용되지 않는 경우에는 오버레이를 `ScreenContainer` 안으로
+**화면 루트는 `ScreenContainer` 또는 `OverlayContainer` 중 하나입니다.** 본문이 헤더·푸터
+뒤로 스크롤하는 화면은 `OverlayContainer`를, 세로 중앙 정렬처럼 스크롤하지 않는 화면은
+`ScreenContainer`를 씁니다. `ScrollView` 안에서는 `Spacer`가 접히므로 중앙 정렬 화면을
+`OverlayContainer`에 담지 않습니다. 두 컨테이너를 중첩하지 않습니다.
+
+**색 구성표와 `LayoutMetrics` 공급은 화면 루트 컨테이너가 소유합니다.** 화면에서
+`preferredColorScheme(_:)`를 다시 지정하지 않고, `LayoutMetricsReader`를 화면에서 직접
+열지 않습니다. 컨테이너가 슬롯으로 내려주는 `LayoutMetrics`를 사용합니다. 루트 컨테이너
+밖에 오버레이를 쌓아야 해서 색 구성표가 적용되지 않는 경우에는 오버레이를 컨테이너 안으로
 옮기고, 구조상 불가능하면 그 이유를 코드 주석이 아니라 이 문서의 예외로 기록합니다.
 
 ### 4.2 화면이 소유하는 것과 소유하지 않는 것

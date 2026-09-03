@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
@@ -12,15 +13,13 @@ public struct QuizRouter: View {
 
     // MARK: Public
 
-    @Bindable private var store: StoreOf<QuizRouterFeature>
-
     public var body: some View {
-        ScreenContainer { _ in
-            content
-        }
+        content
     }
 
     // MARK: Private
+
+    @Bindable private var store: StoreOf<QuizRouterFeature>
 
     @ViewBuilder
     private var content: some View {

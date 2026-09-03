@@ -24,7 +24,7 @@ extension QuestionSolvingScreen {
                             sourceBlock(source: source)
                         }
                     }
-                    .padding(.top, Constant.titleToSourcesSpacing)
+                    .padding(.vertical, Constant.titleToSourcesSpacing)
 
                     ActionButton.primary("닫기", action: onClose)
                         .padding(.top, Constant.buttonTopPadding)
@@ -51,7 +51,6 @@ extension QuestionSolvingScreen {
             return "문제 \(questionNumber) 출처"
         }
 
-        @ViewBuilder
         private func sourceBlock(source: QuestionSourceDisplay) -> some View {
             VStack(alignment: .leading, spacing: Constant.descriptionToLinkSpacing) {
                 if let summary = source.summary {
@@ -79,7 +78,10 @@ extension QuestionSolvingScreen {
             }
         }
 
-        private func linkChipContent(source: QuestionSourceDisplay, showsIcon: Bool) -> some View {
+        private func linkChipContent(
+            source: QuestionSourceDisplay,
+            showsIcon: Bool,
+        ) -> some View {
             HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
                 StyledText.body1(source.linkLabel, color: .white70)
                     .lineLimit(1)

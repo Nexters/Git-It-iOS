@@ -4,67 +4,63 @@ import DomainMember
 import SwiftUI
 import UIComponent
 
+// MARK: - CareerSelectionScreen
+
 @ViewAction(for: CareerSelectionFeature.self)
 struct CareerSelectionScreen: View {
-
-    // MARK: Internal
 
     @Bindable var store: StoreOf<CareerSelectionFeature>
 
     var body: some View {
-        ScreenContainer { layoutMetrics in
-            VStack(spacing: 0) {
-                ScreenHeader(
-                    leading: .back,
-                    onLeadingTap: { send(.backTapped) },
-                )
-                .designSystemScreenMargin()
+        OverlayContainer { layoutMetrics in
+            ScreenOverlayHeader(
+                leading: .back,
+                layoutMetrics: layoutMetrics,
+                onLeadingTap: { send(.backTapped) },
+            )
+        } content: { _ in
+            VStack(spacing: Constant.titleToOptionsSpacing) {
+                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    StyledText.subtitle1(Constant.title, alignment: .center)
 
-                ScrollView {
-                    VStack(spacing: Constant.titleToOptionsSpacing) {
-                        VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                            StyledText.subtitle1(Constant.title, alignment: .center)
-
-                            if store.submission == .failed {
-                                StyledText.caption1(
-                                    "제출에 실패했어요. 다시 시도해 주세요.",
-                                    color: .error,
-                                    alignment: .center,
-                                )
-                            }
-                        }
-
-                        SelectionCardList(
-                            items: Display.orderedLevels.map { level in
-                                .init(
-                                    id: Display.identifier(for: level),
-                                    title: Display.title(for: level),
-                                    supportingText: Display.description(for: level),
-                                    illust: Display.illust(for: level),
-                                    isSelected: store.careerLevel == level,
-                                )
-                            },
-                            onSelect: { identifier in
-                                if let level = Display.level(forIdentifier: identifier) {
-                                    send(.careerLevelSelected(level))
-                                }
-                            },
+                    if store.submission == .failed {
+                        StyledText.caption1(
+                            "제출에 실패했어요. 다시 시도해 주세요.",
+                            color: .error,
+                            alignment: .center,
                         )
                     }
-                    .designSystemScreenMargin()
-                    .padding(.top, LayoutToken.margin.cgFloatValue)
                 }
 
-                BottomActionBar(layoutMetrics: layoutMetrics) {
-                    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-                        StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
-
-                        ActionButton.primary(
-                            "다음",
-                            isEnabled: store.careerLevel != nil && store.submission != .submitting,
-                            action: { send(.submitTapped) },
+                SelectionCardList(
+                    items: Display.orderedLevels.map { level in
+                        .init(
+                            id: Display.identifier(for: level),
+                            title: Display.title(for: level),
+                            supportingText: Display.description(for: level),
+                            illust: Display.illust(for: level),
+                            isSelected: store.careerLevel == level,
                         )
-                    }
+                    },
+                    onSelect: { identifier in
+                        if let level = Display.level(forIdentifier: identifier) {
+                            send(.careerLevelSelected(level))
+                        }
+                    },
+                )
+            }
+            .designSystemScreenMargin()
+            .padding(.top, LayoutToken.margin.cgFloatValue)
+        } footer: { layoutMetrics in
+            ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+                VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                    StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
+
+                    ActionButton.primary(
+                        "다음",
+                        isEnabled: store.careerLevel != nil && store.submission != .submitting,
+                        action: { send(.submitTapped) },
+                    )
                 }
             }
         }
@@ -72,8 +68,8 @@ struct CareerSelectionScreen: View {
 
 }
 
-private extension CareerSelectionScreen {
-    enum Display {
+extension CareerSelectionScreen {
+    fileprivate enum Display {
         static let orderedLevels: [CareerLevel] = [.entry, .junior, .middle, .senior]
 
         static func identifier(for level: CareerLevel) -> String {
@@ -117,7 +113,7 @@ private extension CareerSelectionScreen {
         }
     }
 
-    enum Constant {
+    fileprivate enum Constant {
         static let title = "실제 프로젝트 코드를\n어느 정도 이해할 수 있나요?"
         static let guidance = "정답은 없어요. 현재 가장 가까운 수준을 선택해주세요."
         static let titleToOptionsSpacing: CGFloat = 64

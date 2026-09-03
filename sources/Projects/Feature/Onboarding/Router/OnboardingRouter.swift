@@ -5,16 +5,22 @@ import UIComponent
 @ViewAction(for: OnboardingRouterFeature.self)
 public struct OnboardingRouter: View {
 
+    // MARK: Lifecycle
+
     public init(store: StoreOf<OnboardingRouterFeature>) {
         self.store = store
     }
 
-    @Bindable private var store: StoreOf<OnboardingRouterFeature>
+    // MARK: Public
 
     public var body: some View {
         content
             .accessibilityElement(children: .contain)
     }
+
+    // MARK: Private
+
+    @Bindable private var store: StoreOf<OnboardingRouterFeature>
 
     @ViewBuilder
     private var content: some View {

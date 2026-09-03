@@ -14,10 +14,7 @@ extension ProjectDetailScreen {
             VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
                 StyledText.subtitle2("학습 세트")
 
-                ScrollView {
-                    cards
-                        .padding(.bottom, Constant.cardListBottomPadding)
-                }
+                cards
             }
         }
 
@@ -25,7 +22,6 @@ extension ProjectDetailScreen {
 
         private enum Constant {
             static let emptyStateVerticalPadding: CGFloat = 32
-            static let cardListBottomPadding: CGFloat = 16
         }
 
         @ViewBuilder

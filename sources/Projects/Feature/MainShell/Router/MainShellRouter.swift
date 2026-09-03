@@ -15,23 +15,27 @@ public struct MainShellRouter: View {
 
     // MARK: Public
 
-    @Bindable private var store: StoreOf<MainShellRouterFeature>
-
     public var body: some View {
         TabShell(selected: selectedTab) { tab in
             switch tab {
             case .home:
                 HomeScreen(store: store.scope(state: \.home, action: \.home))
 
-            case .projects,
-                 .saved,
-                 .settings:
+            case .projects:
+                ProjectListScreen(store: store.scope(state: \.projectList, action: \.projectList))
+
+            case .saved:
+                SavedScreen(store: store.scope(state: \.saved, action: \.saved))
+
+            case .settings:
                 Self.PlaceholderView(title: tab.tabTitle)
             }
         }
     }
 
     // MARK: Private
+
+    @Bindable private var store: StoreOf<MainShellRouterFeature>
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(

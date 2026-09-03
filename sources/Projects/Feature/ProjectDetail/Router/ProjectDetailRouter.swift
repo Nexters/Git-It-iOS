@@ -13,27 +13,25 @@ public struct ProjectDetailRouter: View {
 
     // MARK: Public
 
-    @Bindable private var store: StoreOf<ProjectDetailRouterFeature>
-
     public var body: some View {
-        ScreenContainer { _ in
-            content
-                .overlay {
-                    if store.singleQuestionEntry.isPreparing {
-                        entryOverlay
-                    }
+        content
+            .overlay {
+                if store.singleQuestionEntry.isPreparing {
+                    entryOverlay
                 }
-                .alert("문제를 불러오지 못했어요", isPresented: entryFailureBinding) {
-                    Button("확인", role: .cancel) {
-                        store.send(.singleQuestionEntry(.input(.failureDismissed)))
-                    }
-                } message: {
-                    Text("잠시 후 다시 시도해 주세요.")
+            }
+            .alert("문제를 불러오지 못했어요", isPresented: entryFailureBinding) {
+                Button("확인", role: .cancel) {
+                    store.send(.singleQuestionEntry(.input(.failureDismissed)))
                 }
-        }
+            } message: {
+                Text("잠시 후 다시 시도해 주세요.")
+            }
     }
 
     // MARK: Private
+
+    @Bindable private var store: StoreOf<ProjectDetailRouterFeature>
 
     private var entryFailureBinding: Binding<Bool> {
         Binding(

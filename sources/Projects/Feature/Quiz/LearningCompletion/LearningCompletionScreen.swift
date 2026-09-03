@@ -8,9 +8,19 @@ import UIComponent
 @ViewAction(for: LearningCompletionFeature.self)
 struct LearningCompletionScreen: View {
 
+    // MARK: Internal
+
     @Bindable var store: StoreOf<LearningCompletionFeature>
 
     var body: some View {
+        ScreenContainer { _ in
+            screen
+        }
+    }
+
+    // MARK: Private
+
+    private var screen: some View {
         VStack(spacing: 0) {
             ScreenHeader(
                 style: .largeTitle,
@@ -51,8 +61,10 @@ struct LearningCompletionScreen: View {
 
 }
 
-private extension LearningCompletionScreen {
-    enum Constant {
+// MARK: LearningCompletionScreen.Constant
+
+extension LearningCompletionScreen {
+    fileprivate enum Constant {
         static let contentSpacing: CGFloat = 16
         static let animationSize: CGFloat = 180
         static let bottomButtonPadding: CGFloat = 34

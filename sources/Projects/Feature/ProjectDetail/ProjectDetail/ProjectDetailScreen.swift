@@ -15,10 +15,12 @@ struct ProjectDetailScreen: View {
     var body: some View {
         Group {
             if case .failed = store.loadStatus {
-                ErrorView(
-                    onBack: { send(.backTapped) },
-                    onRetry: { send(.retryTapped) },
-                )
+                ScreenContainer { _ in
+                    ErrorView(
+                        onBack: { send(.backTapped) },
+                        onRetry: { send(.retryTapped) },
+                    )
+                }
             } else {
                 content
             }
@@ -74,64 +76,61 @@ struct ProjectDetailScreen: View {
     }
 
     private var content: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
-
-            SetListSection(
-                sets: ProjectDetailSetDisplay.list(sets: store.detail?.sets ?? []),
-                onStart: { send(.setStartTapped(setID: $0)) },
-            )
-            .designSystemScreenMargin()
-            .padding(.top, Constant.setListTopSpacing)
-        }
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
-            ScreenHeader(
-                style: .default,
+        OverlayContainer { layoutMetrics in
+            ScreenOverlayHeader(
                 trailing: Constant.menuControl,
+                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )
+        } content: { _ in
+            VStack(alignment: .leading, spacing: 0) {
+                RepositorySummaryView(
+                    repositoryName: store.detail?.repositoryName ?? "",
+                    repositoryImageURL: store.detail?.repositoryImageURL,
+                    starCount: store.detail?.starCount ?? 0,
+                    techStack: store.detail?.techStack ?? [],
+                    overallProgressPercent: store.detail?.overallProgressPercent ?? 0,
+                    isResumeEnabled: store.isResumeEnabled,
+                    onResumeTap: { send(.resumeTapped) },
+                )
+                .designSystemScreenMargin()
 
-            RepositorySummaryView(
-                repositoryName: store.detail?.repositoryName ?? "",
-                repositoryImageURL: store.detail?.repositoryImageURL,
-                starCount: store.detail?.starCount ?? 0,
-                techStack: store.detail?.techStack ?? [],
-                overallProgressPercent: store.detail?.overallProgressPercent ?? 0,
-                isResumeEnabled: store.isResumeEnabled,
-                onResumeTap: { send(.resumeTapped) },
-            )
+                SetListSection(
+                    sets: ProjectDetailSetDisplay.list(sets: store.detail?.sets ?? []),
+                    onStart: { send(.setStartTapped(setID: $0)) },
+                )
+                .designSystemScreenMargin()
+                .padding(.top, Constant.setListTopSpacing)
+            }
+            .padding(.top, Constant.summaryTopSpacing)
+            .padding(.bottom, Constant.contentBottomPadding)
+        } background: { _ in
+            heroBackground
         }
-        .designSystemScreenMargin()
-        .background(alignment: .top) { heroBackground }
     }
 
     private var heroBackground: some View {
-        ZStack(alignment: .top) {
-            Color(designSystem: .grey700)
-            LinearGradient(designSystem: Constant.heroGradient)
-                .frame(height: Constant.heroGradientHeight)
-        }
-        .ignoresSafeArea(edges: .top)
-        .accessibilityHidden(true)
+        LinearGradient(designSystem: Constant.heroGradient)
+            .frame(height: Constant.heroGradientHeight)
+            .accessibilityHidden(true)
     }
 
 }
 
-private extension ProjectDetailScreen {
-    enum Constant {
-        static let sectionSpacing: CGFloat = 24
+// MARK: ProjectDetailScreen.Constant
+
+extension ProjectDetailScreen {
+    fileprivate enum Constant {
+        static let summaryTopSpacing: CGFloat = 24
         static let menuControl = ScreenHeader.Control(symbol: "line.3.horizontal", label: "메뉴 열기")
 
         static let setListTopSpacing: CGFloat = 54
+        static let contentBottomPadding: CGFloat = 16
         static let heroGradientHeight: CGFloat = 179
 
-        /// 메뉴 시트는 `ScreenHeader`의 `default` 스타일 아래에 붙습니다.
         static let menuTopOffset = CGFloat(LayoutMetrics.HeaderStyle.plain.height)
-        static let menuTransitionDuration: Double = 0.2
+        static let menuTransitionDuration = 0.2
 
         static let heroGradient = GradientToken(
             name: "Gradient 1 · 프로젝트 상세",

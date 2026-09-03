@@ -56,43 +56,35 @@ private func previewState(
 }
 
 #Preview("프로젝트 상세 · s01") {
-    ScreenContainer { _ in
-        ProjectDetailScreen(store: Store(initialState: previewState()) { EmptyReducer() })
-    }
+    ProjectDetailScreen(
+        store: Store(initialState: previewState()) { EmptyReducer() }
+    )
 }
 
 #Preview("프로젝트 상세 · 메뉴 펼침") {
-    ScreenContainer { _ in
-        ProjectDetailScreen(
-            store: Store(initialState: previewState(isMenuPresented: true)) { EmptyReducer() }
-        )
-    }
+    ProjectDetailScreen(
+        store: Store(initialState: previewState(isMenuPresented: true)) { EmptyReducer() }
+    )
 }
 
 #Preview("프로젝트 상세 · 삭제 확인") {
-    ScreenContainer { _ in
-        ProjectDetailScreen(
-            store: Store(initialState: previewState(deletion: .confirming)) { EmptyReducer() }
-        )
-    }
+    ProjectDetailScreen(
+        store: Store(initialState: previewState(deletion: .confirming)) { EmptyReducer() }
+    )
 }
 
 #Preview("프로젝트 상세 · 빈 상태") {
-    ScreenContainer { _ in
-        ProjectDetailScreen(
-            store: Store(
-                initialState: previewState(detail: previewDetail(sets: []))
-            ) { EmptyReducer() }
-        )
-    }
+    ProjectDetailScreen(
+        store: Store(
+            initialState: previewState(detail: previewDetail(sets: []))
+        ) { EmptyReducer() }
+    )
 }
 
 #Preview("프로젝트 상세 · 실패") {
-    ScreenContainer { _ in
-        ProjectDetailScreen(
-            store: Store(
-                initialState: previewState(detail: nil, loadStatus: .failed(.temporarilyUnavailable))
-            ) { EmptyReducer() }
-        )
-    }
+    ProjectDetailScreen(
+        store: Store(
+            initialState: previewState(detail: nil, loadStatus: .failed(.temporarilyUnavailable))
+        ) { EmptyReducer() }
+    )
 }
