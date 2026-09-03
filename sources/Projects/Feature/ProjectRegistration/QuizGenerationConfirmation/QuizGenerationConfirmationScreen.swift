@@ -1,17 +1,20 @@
+import ComposableArchitecture
 import DesignSystem
 import SwiftUI
 import UIComponent
 
-// MARK: - QuizGenerationConfirmationScreen
-
+@ViewAction(for: QuizGenerationConfirmationFeature.self)
 struct QuizGenerationConfirmationScreen: View {
 
-    let onStart: () -> Void
-    let onBack: () -> Void
+    init(store: StoreOf<QuizGenerationConfirmationFeature>) {
+        self.store = store
+    }
+
+    @Bindable var store: StoreOf<QuizGenerationConfirmationFeature>
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(style: .largeTitle, onLeadingTap: onBack)
+            ScreenHeader(style: .largeTitle, onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             Spacer(minLength: 0)
@@ -24,7 +27,7 @@ struct QuizGenerationConfirmationScreen: View {
 
             Spacer(minLength: 0)
 
-            ActionButton.primary("시작하기", action: onStart)
+            ActionButton.primary("시작하기", action: { send(.startTapped) })
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
         }
@@ -32,10 +35,8 @@ struct QuizGenerationConfirmationScreen: View {
 
 }
 
-// MARK: QuizGenerationConfirmationScreen.Constant
-
-extension QuizGenerationConfirmationScreen {
-    private enum Constant {
+private extension QuizGenerationConfirmationScreen {
+    enum Constant {
         static let textSetSpacing: CGFloat = 16
         static let bottomButtonPadding: CGFloat = 34
     }

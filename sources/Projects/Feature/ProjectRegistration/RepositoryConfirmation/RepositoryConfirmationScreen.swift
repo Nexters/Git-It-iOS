@@ -1,22 +1,22 @@
+import ComposableArchitecture
 import DesignSystem
 import DomainLearningProject
+import Foundation
 import SwiftUI
 import UIComponent
 
-// MARK: - RepositoryConfirmationScreen
-
+@ViewAction(for: RepositoryConfirmationFeature.self)
 struct RepositoryConfirmationScreen: View {
 
-    // MARK: Internal
+    init(store: StoreOf<RepositoryConfirmationFeature>) {
+        self.store = store
+    }
 
-    let repository: ExternalRepository
-    let onConfirm: () -> Void
-    let onReject: () -> Void
-    let onBack: () -> Void
+    @Bindable var store: StoreOf<RepositoryConfirmationFeature>
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(style: .largeTitle, onLeadingTap: onBack)
+            ScreenHeader(style: .largeTitle, onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             Spacer(minLength: 0)
@@ -25,11 +25,11 @@ struct RepositoryConfirmationScreen: View {
                 StyledText.subtitle1("이 레포지토리가 맞으면\n학습 설정을 진행할게요", alignment: .center)
 
                 HStack(spacing: Constant.thumbnailSpacing) {
-                    thumbnail
+                    Self.ThumbnailView(avatarURL: avatarURL)
 
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText.body2(repository.ownerName, color: .white70)
-                        StyledText.subtitle3(repository.repositoryName)
+                        StyledText.body2(store.repository?.ownerName ?? "", color: .white70)
+                        StyledText.subtitle3(store.repository?.repositoryName ?? "")
                     }
                 }
                 .padding(.top, Constant.thumbnailTopPadding)
@@ -40,8 +40,8 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                ActionButton.primary("다음", action: onConfirm)
-                ActionButton.secondary("이 레포지토리가 아니에요", action: onReject)
+                ActionButton.primary("다음", action: { send(.confirmTapped) })
+                ActionButton.secondary("이 레포지토리가 아니에요", action: { send(.rejectTapped) })
             }
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)
@@ -50,28 +50,17 @@ struct RepositoryConfirmationScreen: View {
 
     // MARK: Private
 
-    private var thumbnail: some View {
-        RoundedRectangle(designSystem: .medium)
-            .fill(Color(designSystem: .grey600))
-            .overlay {
-                LinearGradient(designSystem: .gradient3)
-                    .opacity(Constant.thumbnailOverlayOpacity)
-            }
-            .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
-            .designSystemCornerRadius(.medium)
+    private var avatarURL: URL? {
+        store.repository?.imageURL.flatMap(URL.init(string:))
     }
 
 }
 
-// MARK: RepositoryConfirmationScreen.Constant
-
-extension RepositoryConfirmationScreen {
-    private enum Constant {
+private extension RepositoryConfirmationScreen {
+    enum Constant {
         static let textSetSpacing: CGFloat = 16
         static let thumbnailSpacing: CGFloat = 12
         static let thumbnailTopPadding: CGFloat = 40
-        static let thumbnailSize: CGFloat = 80
-        static let thumbnailOverlayOpacity = 0.2
         static let bottomButtonPadding: CGFloat = 34
     }
 }

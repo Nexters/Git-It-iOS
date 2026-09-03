@@ -2,15 +2,10 @@ import ComposableArchitecture
 import DomainLearningProject
 import Foundation
 
-// MARK: - ProjectRegistrationFeature
-
 @Reducer
-public struct ProjectRegistrationFeature: Sendable {
-
-    // MARK: Lifecycle
+public struct QuizGenerationProgressFeature: Sendable {
 
     public init(
-        fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
         observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
@@ -18,58 +13,12 @@ public struct ProjectRegistrationFeature: Sendable {
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
     ) {
-        self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
         self.observeGenerationOutcomes = observeGenerationOutcomes
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
         self.waitPolicy = waitPolicy
         self.now = now
-    }
-
-    // MARK: Public
-
-    public enum RegistrationStep: Equatable, Sendable {
-        case repositoryConfirmation
-        case quizLevelSelection
-        case generationConfirmation
-    }
-
-    @ObservableState
-    public struct State: Equatable, Sendable {
-
-        // MARK: Lifecycle
-
-        public init(initialRepositoryURL: String = "") {
-            repositoryURLInput = initialRepositoryURL
-            pendingAutomaticValidation = !initialRepositoryURL.isEmpty
-        }
-
-        // MARK: Public
-
-        public var repositoryURLInput = ""
-        public var quizLevel = QuizLevel.l1
-        public var validation = ValidationStatus.idle
-        public var progress = RegistrationProgress.idle
-        public var step = RegistrationStep.repositoryConfirmation
-        public var validationRequestID = 0
-        public var isGenerationReminderSheetPresented = false
-
-        public var requestedAt: Date?
-
-        public var pendingOutcome: GenerationOutcome?
-
-        // MARK: Internal
-
-        var pendingAutomaticValidation = false
-
-    }
-
-    public enum ValidationStatus: Equatable, Sendable {
-        case idle
-        case validating
-        case validated(ExternalRepository)
-        case failed
     }
 
     public enum RegistrationProgress: Equatable, Sendable {
@@ -79,32 +28,37 @@ public struct ProjectRegistrationFeature: Sendable {
         case failed(LearningProjectError)
     }
 
+    @ObservableState
+    public struct State: Equatable, Sendable {
+
+        public init() { }
+
+        public var progress = RegistrationProgress.idle
+        public var isGenerationReminderSheetPresented = false
+        public var requestedAt: Date?
+        public var pendingOutcome: GenerationOutcome?
+
+        var repository: ExternalRepository?
+        var quizLevel = QuizLevel.l1
+    }
+
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case effect(EffectEvent)
+        case submit(repository: ExternalRepository, quizLevel: QuizLevel)
         case delegate(Delegate)
-
-        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
-            case task
-            case repositoryURLChanged(String)
-            case quizLevelSelected(QuizLevel)
-            case validateTapped
-            case repositoryConfirmed
-            case quizLevelConfirmed
-            case stepBackTapped
-            case submitTapped
             case waitAtHomeTapped
+            case retryTapped
+            case dismissTapped
             case generationReminderAccepted
             case generationReminderDeclined
-            case retryTapped
         }
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case validationFinished(requestID: Int, result: Result<ExternalRepository, ExternalRepositoryError>)
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
             case generationOutcomeReceived(GenerationOutcome)
             case waitAtHomeAuthorizationChecked(isAuthorized: Bool)
@@ -115,66 +69,27 @@ public struct ProjectRegistrationFeature: Sendable {
         public enum Delegate: Sendable, Equatable {
             case projectRegistered(ProjectRegistrationReceipt)
             case generationReminderPreferenceSelected(isEnabled: Bool)
+            case dismissRequested
         }
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard state.pendingAutomaticValidation else { return .none }
-                state.pendingAutomaticValidation = false
-                return startValidation(&state)
-
-            case .view(.repositoryURLChanged(let text)):
-                state.repositoryURLInput = text
-                state.validation = .idle
-                state.step = .repositoryConfirmation
-                return .none
-
-            case .view(.quizLevelSelected(let level)):
-                state.quizLevel = level
-                return .none
-
-            case .view(.validateTapped):
-                return startValidation(&state)
-
-            case .view(.repositoryConfirmed):
-                guard case .validated = state.validation else { return .none }
-                state.step = .quizLevelSelection
-                return .none
-
-            case .view(.quizLevelConfirmed):
-                guard state.step == .quizLevelSelection else { return .none }
-                state.step = .generationConfirmation
-                return .none
-
-            case .view(.stepBackTapped):
-                switch state.step {
-                case .generationConfirmation:
-                    state.step = .quizLevelSelection
-
-                case .quizLevelSelection:
-                    state.step = .repositoryConfirmation
-
-                case .repositoryConfirmation:
-                    break
-                }
-                return .none
-
-            case .view(.submitTapped):
-                guard
-                    case .validated(let repository) = state.validation,
-                    state.progress != .submitting
-                else { return .none }
-                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+            case .submit(let repository, let quizLevel):
+                state.repository = repository
+                state.quizLevel = quizLevel
+                return submit(repository: repository, quizLevel: quizLevel, state: &state)
 
             case .view(.retryTapped):
                 guard
                     case .failed = state.progress,
-                    case .validated(let repository) = state.validation
+                    let repository = state.repository
                 else { return .none }
                 return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+
+            case .view(.dismissTapped):
+                return .send(.delegate(.dismissRequested))
 
             case .view(.waitAtHomeTapped):
                 guard case .awaitingOutcome = state.progress else { return .none }
@@ -200,19 +115,6 @@ public struct ProjectRegistrationFeature: Sendable {
                 guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
                 state.isGenerationReminderSheetPresented = false
                 return finishWaiting(receipt: receipt, isReminderEnabled: false)
-
-            case .effect(.validationFinished(let requestID, let result)):
-                guard requestID == state.validationRequestID else { return .none }
-                switch result {
-                case .success(let repository):
-                    state.validation = .validated(repository)
-                    state.step = .repositoryConfirmation
-
-                case .failure:
-                    state.validation = .failed
-                    state.step = .repositoryConfirmation
-                }
-                return .none
 
             case .effect(.submissionFinished(.success(let receipt))):
                 state.progress = .awaitingOutcome(receipt)
@@ -251,41 +153,18 @@ public struct ProjectRegistrationFeature: Sendable {
         }
     }
 
-    // MARK: Private
-
     private enum CancelID: Hashable {
-        case validation
-
         case registrationPipeline
 
         case minimumWait
     }
 
-    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
-
-    private func startValidation(_ state: inout State) -> Effect<Action> {
-        guard !state.repositoryURLInput.isEmpty else { return .none }
-        state.validationRequestID += 1
-        let currentRequestID = state.validationRequestID
-        state.validation = .validating
-        let url = state.repositoryURLInput
-        return .run { send in
-            do {
-                let repository = try await fetchExternalRepository(url: url)
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
-            } catch {
-                let mapped = error as? ExternalRepositoryError ?? .other
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
-            }
-        }
-        .cancellable(id: CancelID.validation, cancelInFlight: true)
-    }
 
     private func submit(
         repository: ExternalRepository,
