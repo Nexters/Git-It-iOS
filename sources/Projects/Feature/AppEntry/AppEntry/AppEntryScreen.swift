@@ -43,8 +43,10 @@ public struct AppEntryScreen: View {
 
 }
 
-private extension AppEntryScreen {
-    enum Constant {
+// MARK: AppEntryScreen.Constant
+
+extension AppEntryScreen {
+    fileprivate enum Constant {
         static let contentSpacing: CGFloat = 16
     }
 }

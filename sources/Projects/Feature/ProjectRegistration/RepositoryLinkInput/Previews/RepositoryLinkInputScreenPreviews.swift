@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
-private extension RepositoryLinkInputFeature.State {
-    static func preview(
+extension RepositoryLinkInputFeature.State {
+    fileprivate static func preview(
         repositoryURLInput: String = "",
         validation: RepositoryLinkInputFeature.ValidationStatus = .idle,
     ) -> Self {

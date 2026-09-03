@@ -4,17 +4,23 @@ import UIComponent
 
 public struct ProjectRegistrationRouter: View {
 
+    // MARK: Lifecycle
+
     public init(store: StoreOf<ProjectRegistrationRouterFeature>) {
         self.store = store
     }
 
-    @Bindable private var store: StoreOf<ProjectRegistrationRouterFeature>
+    // MARK: Public
 
     public var body: some View {
         ScreenContainer { _ in
             content
         }
     }
+
+    // MARK: Private
+
+    @Bindable private var store: StoreOf<ProjectRegistrationRouterFeature>
 
     @ViewBuilder
     private var content: some View {

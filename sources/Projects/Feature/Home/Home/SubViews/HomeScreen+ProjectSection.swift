@@ -1,6 +1,6 @@
+import DesignSystem
 import SwiftUI
 import UIComponent
-import DesignSystem
 
 extension HomeScreen {
     struct ProjectSection: View {
@@ -94,7 +94,7 @@ extension HomeScreen {
                     VStack(spacing: 0) {
                         StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
 
-                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped)                            .padding(.top, 4)
+                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped).padding(.top, 4)
                     }
                     .designSystemScreenMargin()
                 }

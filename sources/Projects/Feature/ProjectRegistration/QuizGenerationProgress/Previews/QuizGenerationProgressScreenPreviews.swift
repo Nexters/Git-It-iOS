@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
-private extension QuizGenerationProgressFeature.State {
-    static func preview(progress: QuizGenerationProgressFeature.RegistrationProgress) -> Self {
+extension QuizGenerationProgressFeature.State {
+    fileprivate static func preview(progress: QuizGenerationProgressFeature.RegistrationProgress) -> Self {
         var state = QuizGenerationProgressFeature.State()
         state.progress = progress
         return state

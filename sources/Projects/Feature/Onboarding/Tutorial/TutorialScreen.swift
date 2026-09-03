@@ -41,7 +41,9 @@ struct TutorialScreen: View {
 
     // MARK: Private
 
-    private var isLastPage: Bool { store.page == store.pageProgress.totalPages }
+    private var isLastPage: Bool {
+        store.page == store.pageProgress.totalPages
+    }
 
     private var pageBinding: Binding<Int> {
         Binding(

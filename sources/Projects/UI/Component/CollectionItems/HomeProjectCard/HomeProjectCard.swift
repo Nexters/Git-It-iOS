@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - HomeProjectCard
+
 public struct HomeProjectCard: View {
 
     // MARK: Lifecycle
@@ -176,8 +178,10 @@ public struct HomeProjectCard: View {
 
 }
 
-private extension HomeProjectCard {
-    enum Constant {
+// MARK: HomeProjectCard.Constant
+
+extension HomeProjectCard {
+    fileprivate enum Constant {
         static let cardHeight = HomeProjectCard.designHeight
         static let titleSpacing: CGFloat = 6
         static let headerLeadingPadding: CGFloat = 14
@@ -220,6 +224,7 @@ private extension HomeProjectCard {
     }
 }
 
+// MARK: HomeProjectCard.Variant
 
 extension HomeProjectCard {
     public enum Variant: Sendable, Equatable {
@@ -285,7 +290,6 @@ extension HomeProjectCard {
         }
     }
 }
-
 
 #Preview("Home Project Card") {
     HStack(spacing: LayoutToken.margin.cgFloatValue) {
