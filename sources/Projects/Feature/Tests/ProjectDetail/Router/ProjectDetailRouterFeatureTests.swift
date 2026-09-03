@@ -96,6 +96,22 @@ struct ProjectDetailRouterFeatureTests {
     }
 
     @Test
+    func `단일 문제 화면의 뒤로가기도 저장한 문제 목록으로 돌아간다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+        await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
+            question: QuizTestFixture.unansweredSet.questions[0],
+            projectID: ProjectDetailTestFixture.projectID,
+        ))))
+
+        await store.send(.singleQuestion(.delegate(.backRequested)))
+
+        #expect(store.state.activeScreen == .savedQuestions)
+        #expect(store.state.singleQuestion == nil)
+        #expect(store.state.screenTransitions.last?.cause == .singleQuestionFinished)
+    }
+
+    @Test
     func `저장한 문제 화면의 뒤로가기는 상세 화면으로 되돌린다`() async {
         let store = makeStore()
         store.exhaustivity = .off
