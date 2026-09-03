@@ -17,6 +17,10 @@ struct QuestionSourceDisplayTests {
         #expect(displays.map(\.id) == [0, 1])
         #expect(displays[0].title == "Sources/App/AppDelegate.swift")
         #expect(displays[0].detail == "10–24행")
+        #expect(displays[0].lineAnchor == "L10-L24")
+        #expect(displays[0].linkLabel == "Sources/App/AppDelegate.swift:L10-L24")
+        #expect(displays[1].lineAnchor == nil)
+        #expect(displays[1].linkLabel == "https://developer.apple.com/documentation/swiftui")
     }
 
     @Test

@@ -35,9 +35,10 @@ struct LearningSetIntroScreen: View {
                 .designSystemScreenMargin()
 
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                TagBadge.neutral(store.label)
+                StyledText.subtitle2(store.label, color: .blue100)
                 StyledText.subtitle1(store.learningSet?.title ?? "")
                 StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
+                    .padding(.top, 10)
             }
             .designSystemScreenMargin()
             .padding(.top, Constant.textTopPadding)
@@ -73,7 +74,7 @@ struct LearningSetIntroScreen: View {
 extension LearningSetIntroScreen {
     fileprivate enum Constant {
         static let textTopPadding: CGFloat = 24
-        static let textSpacing: CGFloat = 12
+        static let textSpacing: CGFloat = 8
         static let bottomButtonPadding: CGFloat = 34
     }
 }

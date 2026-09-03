@@ -23,9 +23,11 @@ public struct BookmarkButton: View {
         Button(action: onTap) {
             Image(systemName: symbol)
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
+                .frame(width: Constant.surfaceSize, height: Constant.surfaceSize)
+                .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
                 .frame(
-                    width: ControlSizeToken.minimumTouch.cgFloatValue,
-                    height: ControlSizeToken.minimumTouch.cgFloatValue,
+                    minWidth: ControlSizeToken.minimumTouch.cgFloatValue,
+                    minHeight: ControlSizeToken.minimumTouch.cgFloatValue,
                 )
                 .contentShape(Rectangle())
         }
@@ -41,6 +43,10 @@ public struct BookmarkButton: View {
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static let surfaceSize: CGFloat = ControlSizeToken.action.cgFloatValue
+    }
 
     private let isSaved: Bool
     private let accessibilityLabel: String

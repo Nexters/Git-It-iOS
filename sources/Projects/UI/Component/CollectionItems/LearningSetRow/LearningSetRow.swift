@@ -3,9 +3,6 @@ import SwiftUI
 
 // MARK: - LearningSetRow
 
-/// 프로젝트 상세의 학습 세트 목록 항목입니다.
-///
-/// 항목 본문은 정보 표시이고, 조작 단위는 우측의 시작 버튼 하나뿐입니다.
 public struct LearningSetRow: View {
 
     // MARK: Lifecycle
@@ -27,21 +24,23 @@ public struct LearningSetRow: View {
     // MARK: Public
 
     public var body: some View {
-        HStack(alignment: .top, spacing: LayoutToken.compactSpacing.cgFloatValue) {
-            VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
-                StyledText.subtitle3(label, color: .blue100)
+        VStack {
+            HStack(alignment: .top, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+                    StyledText.subtitle3(label, color: .blue100)
 
-                StyledText.body1(title)
-                    .lineLimit(2)
+                    StyledText.body1(title)
+                        .lineLimit(2)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
 
-                ProgressSegments(completed: clampedCompletedCount, total: questionCount)
+                startButton
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityElement(children: .combine)
 
-            startButton
+            ProgressSegments(completed: clampedCompletedCount, total: questionCount)
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)

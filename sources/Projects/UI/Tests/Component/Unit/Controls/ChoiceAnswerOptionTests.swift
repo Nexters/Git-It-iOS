@@ -31,8 +31,9 @@ struct ChoiceAnswerOptionTests {
     }
 
     @Test
-    func `selected 상태는 정답과 동일한 채움색을 쓰고 접근성 접미사가 없다`() {
-        #expect(ChoiceAnswerOption.State.selected.fillToken == .correct)
+    func `selected 상태는 채움색 없이 보더로 구별하고 접근성 접미사가 없다`() {
+        #expect(ChoiceAnswerOption.State.selected.fillToken == nil)
+        #expect(ChoiceAnswerOption.State.selected.borderToken == .focus)
         #expect(ChoiceAnswerOption.State.selected.accessibilitySuffix == nil)
     }
 

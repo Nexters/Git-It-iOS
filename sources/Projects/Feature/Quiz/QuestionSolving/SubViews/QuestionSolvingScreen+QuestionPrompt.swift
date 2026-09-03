@@ -7,15 +7,15 @@ extension QuestionSolvingScreen {
 
         // MARK: Internal
 
-        /// `nil`이면 순번을 그리지 않습니다.
         let questionNumber: Int?
         let questionCount: Int?
         let prompt: String
 
         var body: some View {
             VStack(alignment: .leading, spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                if let orderText {
-                    StyledText.caption1(orderText, color: .blue100)
+                
+                if let questionNumber {
+                    TagBadge(text: "문제 \(questionNumber)", style: .accent)
                 }
                 StyledText.subtitle2(prompt)
             }
