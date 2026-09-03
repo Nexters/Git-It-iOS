@@ -33,9 +33,11 @@ public struct MainShellRouter: View {
         }
     }
 
-    // MARK: Private
+    // MARK: Public
 
-    @Bindable private var store: StoreOf<MainShellRouterFeature>
+    @Bindable public var store: StoreOf<MainShellRouterFeature>
+
+    // MARK: Private
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(
