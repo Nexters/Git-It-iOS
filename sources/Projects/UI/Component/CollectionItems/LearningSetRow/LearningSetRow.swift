@@ -38,6 +38,7 @@ public struct LearningSetRow: View {
 
                 ProgressSegments(completed: clampedCompletedCount, total: questionCount)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
 
             startButton
@@ -66,7 +67,10 @@ public struct LearningSetRow: View {
         Constant.startTouchSize
     }
 
-    static func clampedCompletedCount(completed: Int, total: Int) -> Int {
+    static func clampedCompletedCount(
+        completed: Int,
+        total: Int,
+    ) -> Int {
         min(max(completed, 0), max(total, 0))
     }
 
