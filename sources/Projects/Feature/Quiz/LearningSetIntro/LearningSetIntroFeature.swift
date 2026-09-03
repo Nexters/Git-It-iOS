@@ -42,10 +42,12 @@ public struct LearningSetIntroFeature: Sendable {
             projectID: String,
             setID: String,
             label: String,
+            autoStartsOnLoad: Bool = false,
         ) {
             self.projectID = projectID
             self.setID = setID
             self.label = label
+            self.autoStartsOnLoad = autoStartsOnLoad
         }
 
         // MARK: Public
@@ -53,6 +55,9 @@ public struct LearningSetIntroFeature: Sendable {
         public let projectID: String
         public let setID: String
         public let label: String
+        /// 홈 화면 카드의 이어풀기처럼 사용자가 이미 세트를 선택한 진입 경로에서
+        /// 세트를 불러오는 즉시 시작 확인 탭 없이 바로 문제풀이로 진행합니다.
+        public let autoStartsOnLoad: Bool
 
         public var setLoad = SetLoad.idle
         public var bookmarkLoad = BookmarkLoad.idle
@@ -124,11 +129,7 @@ public struct LearningSetIntroFeature: Sendable {
 
             case .view(.startTapped):
                 guard let set = state.learningSet, !state.isEmptySetReported else { return .none }
-                return .send(.delegate(.startRequested(
-                    set: set,
-                    resumption: LearningSetResumption(set: set),
-                    bookmarkedQuestionIDs: state.bookmarkedQuestionIDs,
-                )))
+                return startEffect(set: set, state: state)
 
             case .view(.backTapped):
                 return .send(.delegate(.backRequested))
@@ -142,11 +143,13 @@ public struct LearningSetIntroFeature: Sendable {
                 switch result {
                 case .success(let set):
                     state.setLoad = .loaded(set)
+                    guard state.autoStartsOnLoad else { return .none }
+                    return startEffect(set: set, state: state)
 
                 case .failure(let error):
                     state.setLoad = .failed(error)
+                    return .none
                 }
-                return .none
 
             case .effect(.bookmarksLoadFinished(let result)):
                 switch result {
@@ -173,6 +176,14 @@ public struct LearningSetIntroFeature: Sendable {
 
     private let fetchLearningSet: any FetchLearningSetUseCase
     private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+
+    private func startEffect(set: LearningSet, state: State) -> Effect<Action> {
+        .send(.delegate(.startRequested(
+            set: set,
+            resumption: LearningSetResumption(set: set),
+            bookmarkedQuestionIDs: state.bookmarkedQuestionIDs,
+        )))
+    }
 
     private func loadSet(_ state: inout State) -> Effect<Action> {
         state.loadRequestID += 1

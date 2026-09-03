@@ -274,8 +274,20 @@ nonisolated struct AppRootFeature: Sendable {
                 state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 return .none
 
-            case .mainShell(.delegate(.questionSelected)),
-                 .mainShell(.delegate(.learningRequested)):
+            case .mainShell(.delegate(.questionSelected)):
+                return .none
+
+            case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID, _))):
+                guard
+                    case .loaded(let page) = state.mainShell.home.projectLoad,
+                    let project = page.items.first(where: { $0.projectID == projectID })
+                else { return .none }
+                state.quiz = QuizRouterFeature.State(
+                    projectID: projectID,
+                    setID: nextSetID,
+                    setLabel: project.currentSetLabel,
+                    autoStartsLearning: true,
+                )
                 return .none
 
             case .projectDetail(.presented(.delegate(.learningSetRequested(let projectID, let setID, let label)))):

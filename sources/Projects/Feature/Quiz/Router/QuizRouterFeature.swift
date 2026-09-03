@@ -68,6 +68,7 @@ public struct QuizRouterFeature: Sendable {
             projectID: String,
             setID: String,
             setLabel: String,
+            autoStartsLearning: Bool = false,
         ) {
             self.projectID = projectID
             self.setID = setID
@@ -76,6 +77,7 @@ public struct QuizRouterFeature: Sendable {
                 projectID: projectID,
                 setID: setID,
                 label: setLabel,
+                autoStartsOnLoad: autoStartsLearning,
             )
             learningCompletion = LearningCompletionFeature.State(projectID: projectID)
         }

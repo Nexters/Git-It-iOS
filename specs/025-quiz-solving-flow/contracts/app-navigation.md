@@ -29,7 +29,7 @@ App은 Feature의 delegate를 해석해 목적지와 표시 방식을 결정한�
 | `quiz(.presented(.delegate(.externalURLRequested(url))))` | `openExternalURL(url)` 실행 |
 | `quiz(.presented(.delegate(.progressInvalidated(projectID:))))` | 표시 중인 상세가 같은 프로젝트면 `.projectDetail(.presented(.projectDetail(.input(.refreshRequested))))` |
 | `quiz(.presented(.delegate(.dismissRequested(projectID:))))` | `quiz = nil`. 상세가 없거나 다른 프로젝트면 `projectDetail = .init(projectID:)`로 맞춘 뒤, 같은 프로젝트면 `refreshRequested` 전달 |
-| `mainShell(.delegate(.learningRequested))` | 이번 범위에서는 처리하지 않는다(명세 §범위 밖). 기존 무처리 유지 |
+| `mainShell(.delegate(.learningRequested(projectID:nextSetID:nextQuestionID:)))` | Home `projectLoad`에서 `projectID`로 프로젝트를 찾아 `quiz = .init(projectID:setID: nextSetID, setLabel: project.currentSetLabel)`. `nextQuestionID`는 사용하지 않는다(FR-041a·§범위 밖: 세트 시작 화면을 거친다). 프로젝트를 찾지 못하면 무처리. **승인된 차이**(Constitution 원칙 3): 명세 초안은 이 delegate를 범위 밖으로 두었으나, 홈 카드 이어하기가 프로젝트 상세 이어하기와 동일한 진입 규칙(FR-041a)을 따라야 한다는 사용자 요청으로 이번 브랜치에서 함께 구현했다. |
 | `mainShell(.delegate(.questionSelected))` | 기존 무처리 유지 |
 
 ## 3. 주입

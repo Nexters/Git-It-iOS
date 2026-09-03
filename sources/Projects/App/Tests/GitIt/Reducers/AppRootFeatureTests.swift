@@ -249,7 +249,7 @@ struct AppRootFeatureTests {
     }
 
     @Test
-    func `MainShell의 등록·ProjectDetail·학습 delegate는 payload를 보존하며 route와 MainShell 상태를 바꾸지 않는다`() async {
+    func `MainShell의 등록·ProjectDetail delegate는 payload를 보존하며 route와 MainShell 상태를 바꾸지 않는다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
         let store = makeAppRootStore(state: state)
@@ -262,6 +262,14 @@ struct AppRootFeatureTests {
         await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
         #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell == MainShellRouterFeature.State())
+    }
+
+    @Test
+    func `Home 학습 요청은 일치하는 프로젝트가 없으면 풀이 흐름을 열지 않는다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
 
         await store.send(
             .mainShell(
@@ -270,8 +278,43 @@ struct AppRootFeatureTests {
                 )
             )
         )
-        #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellRouterFeature.State())
+        #expect(store.state.quiz == nil)
+    }
+
+    @Test
+    func `Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.mainShell.home.projectLoad = .loaded(
+            LearningProjectPage(
+                items: [
+                    LearningProjectSummary(
+                        projectID: "project-1",
+                        repositoryName: "repo",
+                        repositoryImageURL: nil,
+                        techStack: ["Swift"],
+                        currentSetLabel: "Set 1",
+                        currentSetTitle: "Basics",
+                        nextSetID: "set-1",
+                        nextQuestionID: "question-1",
+                        overallProgressPercent: 0,
+                    )
+                ],
+                hasNext: false,
+            )
+        )
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(
+            .mainShell(
+                .delegate(
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1")
+                )
+            )
+        ) {
+            $0.quiz = QuizRouterFeature.State(projectID: "project-1", setID: "set-1", setLabel: "Set 1")
+        }
     }
 
     @Test
