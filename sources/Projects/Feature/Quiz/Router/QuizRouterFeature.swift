@@ -50,7 +50,6 @@ public struct QuizRouterFeature: Sendable {
         public enum Cause: Equatable, Sendable {
             case startRequested
             case advancedToCompletion
-            case backRequested
         }
 
         public let from: ActiveScreen
@@ -157,7 +156,7 @@ public struct QuizRouterFeature: Sendable {
                 return .send(.delegate(.dismissRequested(projectID: state.projectID)))
 
             case .questionSolving(.delegate(.backRequested)):
-                return activate(.learningSetIntro, cause: .backRequested, state: &state)
+                return .send(.delegate(.dismissRequested(projectID: state.projectID)))
 
             case .questionSolving(.delegate(.answerSubmitted(_, let choiceCorrect))):
                 if choiceCorrect == true {

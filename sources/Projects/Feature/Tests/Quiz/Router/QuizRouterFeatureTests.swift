@@ -46,35 +46,16 @@ struct QuizRouterFeatureTests {
     }
 
     @Test
-    func `문제 화면 뒤로가기는 활성 화면만 되돌리고 진행 상태를 유지한다`() async {
+    func `문제 화면 뒤로가기는 소개 화면을 건너뛰고 바로 흐름을 이탈한다`() async {
         let store = makeStore()
         store.exhaustivity = .off
         await startFirstQuestion(store)
 
         await store.send(.questionSolving(.delegate(.backRequested)))
-
-        #expect(store.state.activeScreen == .learningSetIntro)
-        #expect(store.state.questionSolving != nil)
-        #expect(store.state.screenTransitions.last?.cause == .backRequested)
-    }
-
-    @Test
-    func `되돌아온 뒤 다시 시작하면 진행 중이던 문제를 이어서 푼다`() async {
-        let store = makeStore()
-        store.exhaustivity = .off
-        await startFirstQuestion(store)
-        await store.send(.questionSolving(.view(.choiceSelected(2))))
-        await store.send(.questionSolving(.delegate(.backRequested)))
-
-        await store.send(.learningSetIntro(.delegate(.startRequested(
-            set: QuizTestFixture.unansweredSet,
-            resumption: LearningSetResumption(set: QuizTestFixture.unansweredSet),
-            bookmarkedQuestionIDs: [],
-        ))))
+        await store.receive(.delegate(.dismissRequested(projectID: QuizTestFixture.projectID)))
 
         #expect(store.state.activeScreen == .questionSolving)
-        #expect(store.state.currentQuestionIndex == 0)
-        #expect(store.state.questionSolving?.draftChoiceIndex == 2)
+        #expect(store.state.questionSolving != nil)
     }
 
     @Test
