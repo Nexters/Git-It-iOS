@@ -66,7 +66,7 @@ extension QuestionSolvingScreen {
             }
         }
 
-        static func optionState(emphasis: ChoiceOptionDisplay.Emphasis) -> ChoiceAnswerOption.State {
+        private static func optionState(emphasis: ChoiceOptionDisplay.Emphasis) -> ChoiceAnswerOption.State {
             switch emphasis {
             case .neutral:
                 .default
@@ -82,7 +82,7 @@ extension QuestionSolvingScreen {
             }
         }
 
-        static func letter(forID id: Int) -> String {
+        private static func letter(forID id: Int) -> String {
             guard id >= 0, id < Constant.letters.count else {
                 return "\(id + 1)"
             }

@@ -8,7 +8,7 @@ public struct ProjectRegistrationRouter: View {
         self.store = store
     }
 
-    @Bindable public var store: StoreOf<ProjectRegistrationRouterFeature>
+    @Bindable private var store: StoreOf<ProjectRegistrationRouterFeature>
 
     public var body: some View {
         ScreenContainer { _ in

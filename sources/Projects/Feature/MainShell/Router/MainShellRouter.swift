@@ -15,7 +15,7 @@ public struct MainShellRouter: View {
 
     // MARK: Public
 
-    @Bindable public var store: StoreOf<MainShellRouterFeature>
+    @Bindable private var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
         TabShell(selected: selectedTab) { tab in

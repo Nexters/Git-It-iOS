@@ -12,7 +12,7 @@ public struct QuizRouter: View {
 
     // MARK: Public
 
-    @Bindable public var store: StoreOf<QuizRouterFeature>
+    @Bindable private var store: StoreOf<QuizRouterFeature>
 
     public var body: some View {
         ScreenContainer { _ in

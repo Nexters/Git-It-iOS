@@ -13,7 +13,7 @@ public struct ProjectDetailRouter: View {
 
     // MARK: Public
 
-    @Bindable public var store: StoreOf<ProjectDetailRouterFeature>
+    @Bindable private var store: StoreOf<ProjectDetailRouterFeature>
 
     public var body: some View {
         ScreenContainer { _ in

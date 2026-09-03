@@ -13,7 +13,7 @@ public struct HomeScreen: View {
 
     // MARK: Public
 
-    @Bindable public var store: StoreOf<HomeFeature>
+    @Bindable private var store: StoreOf<HomeFeature>
 
     public var body: some View {
         ScreenContainer { layoutMetrics in

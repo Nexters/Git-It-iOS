@@ -9,7 +9,7 @@ public struct OnboardingRouter: View {
         self.store = store
     }
 
-    @Bindable public var store: StoreOf<OnboardingRouterFeature>
+    @Bindable private var store: StoreOf<OnboardingRouterFeature>
 
     public var body: some View {
         content
