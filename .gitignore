@@ -145,6 +145,9 @@ htmlcov/
 CLAUDE.md
 .agents/skills/implement-figma-ui/**
 
+# Agent tool local configuration
+.codex/
+
 # Spec Kit working feature state
 .specify/feature.json
 .specify/extensions/.cache/

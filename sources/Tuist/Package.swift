@@ -22,7 +22,7 @@ let packageSettings = PackageSettings(
         "OrderedCollections": .framework,
         "Perception": .framework,
         "PerceptionCore": .framework,
-        "Sharing": .framework,
+        "Sharing": .staticFramework,
         "Sharing1": .framework,
         "Sharing2": .framework,
         "SwiftNavigation": .framework,

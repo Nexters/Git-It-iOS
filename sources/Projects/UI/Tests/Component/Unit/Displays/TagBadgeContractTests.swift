@@ -16,8 +16,8 @@ struct TagBadgeContractTests {
     func `스타일별 배경과 라벨 색은 색 토큰을 참조한다`() {
         #expect(TagBadge.Style.neutral.backgroundColor == ColorToken.grey500)
         #expect(TagBadge.Style.neutral.textColor == ColorToken.blue100)
-        #expect(TagBadge.Style.accent.backgroundColor == ColorToken.blue100)
-        #expect(TagBadge.Style.accent.textColor == ColorToken.grey700)
+        #expect(TagBadge.Style.accent.backgroundColor == ColorToken.blue400)
+        #expect(TagBadge.Style.accent.textColor == ColorToken.blue100)
         #expect(TagBadge.Style.selected.backgroundColor == ColorToken.blue400)
         #expect(TagBadge.Style.selected.textColor == ColorToken.grey100)
     }
