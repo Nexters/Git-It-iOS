@@ -40,11 +40,11 @@ struct ProjectDetailScreen: View {
                     onDeleteTap: { send(.deleteTapped) },
                 )
                 .padding(.trailing, LayoutToken.margin.cgFloatValue)
-                .offset(y: headerHeight)
+                .offset(y: Constant.menuTopOffset)
                 .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: store.isMenuPresented)
+        .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.isMenuPresented)
         .overlay {
             ModalOverlay(isPresented: isDeletionConfirmationPresented, onDismiss: { send(.deletionCancelled) }) {
                 ConfirmationSheet(
@@ -68,8 +68,6 @@ struct ProjectDetailScreen: View {
     }
 
     // MARK: Private
-
-    @State private var headerHeight: CGFloat = 0
 
     private var isDeletionConfirmationPresented: Bool {
         store.deletion == .confirming
@@ -96,12 +94,6 @@ struct ProjectDetailScreen: View {
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(key: HeaderHeightPreferenceKey.self, value: proxy.size.height)
-                }
-            )
-            .onPreferenceChange(HeaderHeightPreferenceKey.self) { headerHeight = $0 }
 
             RepositorySummaryView(
                 repositoryName: store.detail?.repositoryName ?? "",
@@ -129,29 +121,17 @@ struct ProjectDetailScreen: View {
 
 }
 
-// MARK: - HeaderHeightPreferenceKey
-
-private struct HeaderHeightPreferenceKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-
-    static func reduce(
-        value: inout CGFloat,
-        nextValue: () -> CGFloat,
-    ) {
-        value = nextValue()
-    }
-}
-
-// MARK: - ProjectDetailScreen.Constant
-
-extension ProjectDetailScreen {
-    fileprivate enum Constant {
+private extension ProjectDetailScreen {
+    enum Constant {
         static let sectionSpacing: CGFloat = 24
         static let menuControl = ScreenHeader.Control(symbol: "line.3.horizontal", label: "메뉴 열기")
 
         static let setListTopSpacing: CGFloat = 54
         static let heroGradientHeight: CGFloat = 179
-        static let topDimHeight: CGFloat = 103
+
+        /// 메뉴 시트는 `ScreenHeader`의 `default` 스타일 아래에 붙습니다.
+        static let menuTopOffset = CGFloat(LayoutMetrics.HeaderStyle.plain.height)
+        static let menuTransitionDuration: Double = 0.2
 
         static let heroGradient = GradientToken(
             name: "Gradient 1 · 프로젝트 상세",
