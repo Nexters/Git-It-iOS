@@ -15,6 +15,8 @@ struct QuestionSolvingScreen: View {
 
     var body: some View {
         content
+            .contentShape(Rectangle())
+            .onTapGesture { isEssayFieldFocused = false }
             .overlay {
                 ModalOverlay(
                     isPresented: store.isSourceSheetPresented,
@@ -31,6 +33,8 @@ struct QuestionSolvingScreen: View {
     }
 
     // MARK: Private
+
+    @FocusState private var isEssayFieldFocused: Bool
 
     private var content: some View {
         OverlayContainer {
@@ -117,6 +121,7 @@ struct QuestionSolvingScreen: View {
             } else {
                 AnswerEditor(
                     text: essayTextBinding,
+                    isFocused: $isEssayFieldFocused,
                     placeholder: Constant.essayPlaceholder,
                     characterLimit: QuestionSolvingFeature.essayCharacterLimit,
                     isDisabled: store.isSubmitting,

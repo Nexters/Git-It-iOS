@@ -8,6 +8,7 @@ extension QuestionSolvingScreen {
         // MARK: Internal
 
         @Binding var text: String
+        var isFocused: FocusState<Bool>.Binding
 
         let placeholder: String
         let characterLimit: Int
@@ -24,7 +25,7 @@ extension QuestionSolvingScreen {
                     TextEditor(text: $text)
                         .scrollContentBackground(.hidden)
                         .scrollDisabled(true)
-                        .focused($isFocused)
+                        .focused(isFocused)
                         .designSystemForeground(.grey100)
                         .padding(.horizontal, Constant.editorHorizontalInset)
                         .disabled(isDisabled)
@@ -54,10 +55,8 @@ extension QuestionSolvingScreen {
             static let editorHorizontalInset: CGFloat = 12
         }
 
-        @FocusState private var isFocused: Bool
-
         private var borderToken: BorderToken {
-            isFocused ? .focus : .default
+            isFocused.wrappedValue ? .focus : .default
         }
 
     }
