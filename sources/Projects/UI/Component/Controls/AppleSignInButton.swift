@@ -18,9 +18,9 @@ public struct AppleSignInButton: View {
 
     public var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: LayoutToken.iconSpacing.cgFloatValue) {
+            HStack(alignment: .center, spacing: Constant.horizontalSpacing) {
                 Image(systemName: "applelogo")
-                    .font(.system(size: 16))
+                    .font(.system(size: Constant.fontSize))
                     .designSystemForeground(.black)
                 StyledText.body1("Apple로 시작하기", color: .black)
             }
@@ -35,7 +35,10 @@ public struct AppleSignInButton: View {
     // MARK: Private
 
     private enum Constant {
+        static let horizontalSpacing: CGFloat = LayoutToken.iconSpacing.cgFloatValue
         static let surfaceHeight: CGFloat = 54
+        
+        static let fontSize: CGFloat = 16
     }
 
     private let action: () -> Void
