@@ -31,6 +31,10 @@ public struct HomeProjectCard: View {
 
     // MARK: Public
 
+    /// 카드가 그려지는 고정 높이. 카드를 담는 화면이 회전·여백을 포함한 영역 높이를
+    /// 계산할 때 사용합니다.
+    public static let designHeight: CGFloat = 192
+
     public var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: select) {
@@ -42,8 +46,8 @@ public struct HomeProjectCard: View {
             .accessibilityLabel("\(title), \(currentSetLabel), 프로젝트 상세 보기")
 
             startButton
-                .padding(.trailing, Constant.headerTrailingPadding)
-                .padding(.top, Constant.headerTopPadding)
+                .padding(.trailing, Constant.startTrailingPadding)
+                .padding(.top, Constant.startTopPadding)
         }
         .frame(width: cardWidth, height: Constant.cardHeight)
         .background(Color(designSystem: variant.cardColor))
@@ -88,8 +92,9 @@ public struct HomeProjectCard: View {
     private var cardContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                StyledText.subtitle2(
-                    title,
+                StyledText(
+                    text: title,
+                    style: Constant.titleStyle,
                     color: variant.titleColor,
                 )
                 .lineLimit(2)
@@ -98,13 +103,12 @@ public struct HomeProjectCard: View {
                     technologies,
                     color: variant.technologyColor,
                 )
-                .lineLimit(3)
+                .lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, Constant.headerLeadingPadding)
-            .padding(.trailing, Constant.headerTrailingPadding + Constant.startTouchSize)
+            .padding(.trailing, Constant.headerTextTrailingReserve)
             .padding(.top, Constant.headerTopPadding)
-
             progressBar
                 .padding(.horizontal, Constant.headerLeadingPadding)
                 .padding(.top, LayoutToken.gutter.cgFloatValue)
@@ -137,7 +141,7 @@ public struct HomeProjectCard: View {
     }
 
     private var cardWidth: CGFloat {
-        CGFloat(layoutMetrics.gridColumn2)
+        154
     }
 
     private var startButton: some View {
@@ -171,6 +175,117 @@ public struct HomeProjectCard: View {
     }
 
 }
+
+private extension HomeProjectCard {
+    enum Constant {
+        static let cardHeight = HomeProjectCard.designHeight
+        static let titleSpacing: CGFloat = 6
+        static let headerLeadingPadding: CGFloat = 14
+        static let headerTrailingPadding: CGFloat = 10
+        static let headerTopPadding: CGFloat = 18
+        static let progressBarHeight: CGFloat = 5
+        static let footerSpacing: CGFloat = 3
+        static let footerBottomPadding: CGFloat = 18
+        static let setBadgeHorizontalPadding: CGFloat = 5
+        static let setBadgeHeight: CGFloat = 19
+
+        /// 원본 기준 보이는 원의 카드 상단·우측 여백.
+        static let startVisualTopInset: CGFloat = 20
+        static let startVisualTrailingInset: CGFloat = 12
+
+        static let startSymbolSize: CGFloat = 12
+
+        /// 원본 `Play1` 인스턴스 크기. 보이는 원(`startSurfaceSize`)을 감싼 레이아웃 박스다.
+        static let startBoxSize: CGFloat = 36
+        static let startSurfaceSize: CGFloat = 32
+        static let startTouchSize: CGFloat = 44
+
+        /// 원본 `Play1` 인스턴스(36×36) 기준으로 제목이 비워야 하는 우측 폭.
+        static let headerTextTrailingReserve = headerTrailingPadding + startBoxSize
+
+        /// 44pt 터치 영역이 보이는 원보다 각 변에서 더 차지하는 폭.
+        static let startTouchOverhang = (startTouchSize - startSurfaceSize) / 2
+        static let startTopPadding = startVisualTopInset - startTouchOverhang
+        static let startTrailingPadding = startVisualTrailingInset - startTouchOverhang
+
+        /// 카드 제목. 원본에서 공유 텍스트 스타일 없이 18pt Bold 120%로 지정되어 있어
+        /// `TextStyleToken.subtitle2`(148%)를 쓸 수 없다. 타입 램프에 18pt 120%가
+        /// 추가되면 그 토큰으로 옮긴다.
+        static let titleStyle = TextStyleToken(
+            name: "Home Project Card Title",
+            weight: .bold,
+            size: 18,
+            lineHeightPercent: 120,
+        )
+    }
+}
+
+
+extension HomeProjectCard {
+    public enum Variant: Sendable, Equatable {
+        case purple
+        case lightBlue
+        case darkBlue
+
+        // MARK: Lifecycle
+
+        public init(index: Int) {
+            self =
+                switch index % 3 {
+                case 1: .lightBlue
+                case 2: .darkBlue
+                default: .purple
+                }
+        }
+
+        // MARK: Internal
+
+        var cardColor: ColorToken {
+            switch self {
+            case .purple: .purple300
+            case .lightBlue: .blue100
+            case .darkBlue: .blue500
+            }
+        }
+
+        var titleColor: ColorToken {
+            .grey100
+        }
+
+        var technologyColor: ColorToken {
+            switch self {
+            case .purple: .grey200
+            case .lightBlue: .grey500
+            case .darkBlue: .grey400
+            }
+        }
+
+        var trackColor: ColorToken {
+            switch self {
+            case .purple: .purple200
+            case .lightBlue: .grey200
+            case .darkBlue: .purple300
+            }
+        }
+
+        var progressColor: ColorToken {
+            switch self {
+            case .purple: .purple400
+            case .lightBlue: .blue200
+            case .darkBlue: .blue400
+            }
+        }
+
+        var setTitleColor: ColorToken {
+            switch self {
+            case .lightBlue: .grey500
+            case .purple,
+                 .darkBlue: .grey100
+            }
+        }
+    }
+}
+
 
 #Preview("Home Project Card") {
     HStack(spacing: LayoutToken.margin.cgFloatValue) {
