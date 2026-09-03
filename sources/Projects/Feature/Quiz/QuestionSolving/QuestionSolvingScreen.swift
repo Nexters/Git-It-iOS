@@ -27,10 +27,10 @@ struct QuestionSolvingScreen: View {
 
                     answerSection
 
-                    if let error = store.submissionError {
-                        submissionFailureNotice(error: error)
+                    if store.submissionError != nil {
+                        submissionFailureNotice
                     }
-                    
+
                     if store.isSourceControlPresented {
                         HStack {
                             Spacer()
@@ -38,11 +38,9 @@ struct QuestionSolvingScreen: View {
                             sourceButton
                         }
                     }
-
                 }
                 .designSystemScreenMargin()
                 .padding(.vertical, Constant.contentVerticalPadding)
-                
             }
 
             bottomActions
@@ -75,28 +73,16 @@ struct QuestionSolvingScreen: View {
 
                 ResourceImage(asset: .icon(.chevronRight), contentMode: .fit)
                     .designSystemForeground(.blue100)
-                    .frame(width: 10, height: 10)
-                    .frame(width: 16, height: 16)
+                    .frame(width: Constant.sourceButtonChevronGlyphSize, height: Constant.sourceButtonChevronGlyphSize)
+                    .frame(width: Constant.sourceButtonChevronSize, height: Constant.sourceButtonChevronSize)
             }
-            .padding(.leading, 16)
-            .padding(.trailing, 8)
+            .padding(.leading, Constant.sourceButtonLeadingPadding)
+            .padding(.trailing, Constant.sourceButtonTrailingPadding)
             .padding(.vertical, Constant.sourceButtonVerticalPadding)
             .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("출처 보기")
-    }
-
-    private func explanationCard(text: String) -> some View {
-        VStack(alignment: .leading, spacing: Constant.explanationTitleSpacing) {
-            StyledText.caption1("AI 해설", color: .blue100)
-            StyledText.body2(text, color: .grey100)
-        }
-        .padding(Constant.explanationPadding)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .designSystemBackground(.accentSurface)
-        .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
@@ -112,7 +98,7 @@ struct QuestionSolvingScreen: View {
             )
 
             if case .choice(let result) = store.answerOutcome {
-                explanationCard(text: result.explanation)
+                LabeledCard.accent(label: "AI 해설", text: result.explanation)
             }
 
         case .essay:
@@ -177,25 +163,23 @@ struct QuestionSolvingScreen: View {
         }
     }
 
-    private func submissionFailureNotice(error _: LearningProjectError) -> some View {
+    private var submissionFailureNotice: some View {
         StyledText.body2(Constant.submissionFailureMessage, color: .grey400)
     }
 
 }
 
-// MARK: QuestionSolvingScreen.Constant
-
-extension QuestionSolvingScreen {
-    fileprivate enum Constant {
+private extension QuestionSolvingScreen {
+    enum Constant {
         static let sectionSpacing: CGFloat = 24
         static let contentVerticalPadding: CGFloat = 16
         static let essayPlaceholder = "답안을 서술해주세요"
         static let submissionFailureMessage = "답안을 제출하지 못했어요. 다시 시도해 주세요."
         static let sourceButtonSpacing: CGFloat = 2
+        static let sourceButtonChevronGlyphSize: CGFloat = 10
         static let sourceButtonChevronSize: CGFloat = 16
-        static let sourceButtonHorizontalPadding: CGFloat = 16
+        static let sourceButtonLeadingPadding: CGFloat = 16
+        static let sourceButtonTrailingPadding: CGFloat = 8
         static let sourceButtonVerticalPadding: CGFloat = 8
-        static let explanationTitleSpacing: CGFloat = 8
-        static let explanationPadding: CGFloat = 16
     }
 }
