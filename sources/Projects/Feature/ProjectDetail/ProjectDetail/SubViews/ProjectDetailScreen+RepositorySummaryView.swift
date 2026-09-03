@@ -17,51 +17,46 @@ extension ProjectDetailScreen {
         let onResumeTap: () -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.contentSpacing) {
-                HStack(alignment: .center, spacing: LayoutToken.gutter.cgFloatValue) {
-                    banner
+            VStack(alignment: .leading, spacing: Constant.bannerToContentSpacing) {
+                banner
 
-                    VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                        StyledText.subtitle2(repositoryName)
-                        StyledText.caption1("★ \(starCount)", color: .grey400)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    resumeButton
-                }
-
-                if !techStack.isEmpty {
-                    HStack(spacing: Constant.tagSpacing) {
-                        ForEach(techStack, id: \.self) { technology in
-                            TagBadge.neutral(technology)
+                VStack(alignment: .leading, spacing: Constant.contentSpacing) {
+                    HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
+                        VStack(alignment: .leading, spacing: Constant.textSpacing) {
+                            StyledText.headline2(repositoryName)
+                            metaRow
                         }
-                    }
-                }
 
-                LabeledProgressBar(
-                    label: "전체 진행률",
-                    progress: Double(overallProgressPercent) / 100,
-                    valueText: "\(overallProgressPercent)%",
-                )
+                        Spacer(minLength: 0)
+
+                        resumeButton
+                    }
+
+                    LabeledProgressBar(
+                        label: "전체 진행률",
+                        progress: Double(overallProgressPercent) / 100,
+                        valueText: "\(overallProgressPercent)%",
+                        valueColor: .blue100,
+                    )
+                }
             }
-            .padding(Constant.contentPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .designSystemBackground(.cardBackground)
-            .designSystemCornerRadius(.large)
         }
 
         // MARK: Private
 
         private enum Constant {
-            static let contentSpacing: CGFloat = 16
-            static let textSpacing: CGFloat = 4
-            static let tagSpacing: CGFloat = 6
-            static let contentPadding: CGFloat = 16
-            static let bannerSize: CGFloat = 44
-            static let resumeSymbolSize: CGFloat = 16
+            static let bannerToContentSpacing: CGFloat = 31
+            static let contentSpacing: CGFloat = 28
+            static let textSpacing: CGFloat = 5
+            static let metaSpacing: CGFloat = 9
+            static let starSpacing: CGFloat = 5
+            static let dividerHeight: CGFloat = 16
+            static let bannerSize: CGFloat = 99
+            static let starSize: CGFloat = 16
             static let resumeSurfaceSize: CGFloat = 40
             static let resumeTouchSize: CGFloat = 44
+            static let disabledOpacity = 0.4
         }
 
         @ViewBuilder
@@ -73,26 +68,41 @@ extension ProjectDetailScreen {
                     Color(designSystem: .grey500)
                 }
                 .frame(width: Constant.bannerSize, height: Constant.bannerSize)
-                .clipShape(Circle())
+                .designSystemCornerRadius(.medium)
                 .accessibilityHidden(true)
             } else {
-                Circle()
-                    .fill(Color(designSystem: .grey500))
+                Color(designSystem: .grey500)
                     .frame(width: Constant.bannerSize, height: Constant.bannerSize)
+                    .designSystemCornerRadius(.medium)
                     .accessibilityHidden(true)
             }
         }
 
+        private var metaRow: some View {
+            HStack(spacing: Constant.metaSpacing) {
+                HStack(spacing: Constant.starSpacing) {
+                    ResourceImage(asset: .icon(.star))
+                        .frame(width: Constant.starSize, height: Constant.starSize)
+                    StyledText.caption1("\(starCount)", color: .blue100)
+                }
+
+                if !techStack.isEmpty {
+                    Rectangle()
+                        .fill(Color(designSystem: .grey500))
+                        .frame(width: 1, height: Constant.dividerHeight)
+
+                    StyledText.caption1(techStack.joined(separator: " · "), color: .blue100)
+                        .lineLimit(1)
+                }
+            }
+            .accessibilityElement(children: .combine)
+        }
+
         private var resumeButton: some View {
             Button(action: onResumeTap) {
-                Image(systemName: "play.fill")
-                    .font(.system(size: Constant.resumeSymbolSize, weight: .bold))
-                    .designSystemForeground(.grey100)
+                ResourceImage(asset: .icon(.playSmall))
                     .frame(width: Constant.resumeSurfaceSize, height: Constant.resumeSurfaceSize)
-                    .background(
-                        Color(designSystem: isResumeEnabled ? .blue300 : .grey500),
-                        in: Circle(),
-                    )
+                    .opacity(isResumeEnabled ? 1 : Constant.disabledOpacity)
                     .frame(width: Constant.resumeTouchSize, height: Constant.resumeTouchSize)
                     .contentShape(Rectangle())
             }

@@ -38,6 +38,12 @@ struct ProjectDetailScreen: View {
         } message: {
             Text("삭제하면 학습 기록도 함께 사라집니다.")
         }
+        .overlay {
+            if store.loadStatus == .idle || store.loadStatus == .loading {
+                ProgressView()
+                    .tint(Color(designSystem: .blue100))
+            }
+        }
         .task { await store.send(.view(.task)).finish() }
     }
 
