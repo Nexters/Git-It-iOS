@@ -253,9 +253,9 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 검증은 반복 승인 없이 같은 실행에서 이어서 수행한다.
 
 - [ ] T079 [no-write] `GIT_IT_PROJECT_BUILD_RUNNER`의 `build`·`compile`·`test`를 순서대로 실행하고 결과를 기록한다 (SC-015)
-- [ ] T080 [no-write] [quickstart.md §4](./quickstart.md)의 정적 검사 8항목을 확인한다 — 흐름 코드의 `NavigationStack`·`StackState` 0건, 변경 파일 중 `sources/Projects/Data/` 0건, UIComponent 인자의 `Store`·Feature `State`·Domain 모델 0건, `SubViews/` 파일의 `ComposableArchitecture`·Domain import 0건, 새 raw RGB·hex 색상과 임의 Typography 0건, 화면·Feature의 직접 URL 열기 0건, 아키텍처 §3.1 허용 방향 밖 import 0건, 버튼·링크·선택지 hit area 44pt 이상 (SC-003, SC-009, SC-010, SC-011, SC-021, FR-051, FR-056)
+- [X] T080 [no-write] [quickstart.md §4](./quickstart.md)의 정적 검사 8항목을 확인한다 — 흐름 코드의 `NavigationStack`·`StackState` 0건, 변경 파일 중 `sources/Projects/Data/` 0건, UIComponent 인자의 `Store`·Feature `State`·Domain 모델 0건, `SubViews/` 파일의 `ComposableArchitecture`·Domain import 0건, 새 raw RGB·hex 색상과 임의 Typography 0건, 화면·Feature의 직접 URL 열기 0건, 아키텍처 §3.1 허용 방향 밖 import 0건, 버튼·링크·선택지 hit area 44pt 이상 (SC-003, SC-009, SC-010, SC-011, SC-021, FR-051, FR-056)
 - [ ] T081 [no-write] 변경 시나리오 S1~S8의 독립 수용 기준을 [quickstart.md §3·§5](./quickstart.md)로 검증하고, Preview 이름이 `s01`~`s13`과 1:1로 대응하는지, 전부 답변된 세트를 재풀이한 뒤 프로젝트·세트 진행 표시가 감소하거나 초기화되지 않는지, Simulator에서 두 경로(세트 풀이·저장한 문제 단일 풀이)를 확인한다 (SC-001, SC-002, FR-004c)
-- [ ] T082 [no-write] [contracts/feature-reducers.md §1](./contracts/feature-reducers.md)의 Reducer별 주입 UseCase 표와 구현된 각 Reducer의 생성자 인자가 일치하는지 대조한다 (SC-013)
+- [X] T082 [no-write] [contracts/feature-reducers.md §1](./contracts/feature-reducers.md)의 Reducer별 주입 UseCase 표와 구현된 각 Reducer의 생성자 인자가 일치하는지 대조한다 (SC-013)
 
 ## 의존성과 실행 순서
 
