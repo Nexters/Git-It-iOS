@@ -71,7 +71,7 @@ struct GitItApp: App {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)
                 },
-                openExternalURL: { url in
+                openExternalURL: { @MainActor url in
                     await UIApplication.shared.open(url)
                 },
                 registerCurrentDevice: composition.registerCurrentDevice,
