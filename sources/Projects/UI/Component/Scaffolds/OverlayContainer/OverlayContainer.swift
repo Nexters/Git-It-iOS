@@ -53,6 +53,7 @@ public struct OverlayContainer<
                 Spacer(minLength: 0)
 
                 footer()
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footerHeight = $0 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -68,6 +69,8 @@ public struct OverlayContainer<
     private let background: () -> Background
     private let footer: () -> Footer
 
+    @State private var footerHeight: CGFloat = 0
+
     private var scrollingContent: some View {
         GeometryReader { proxy in
             ScrollView {
@@ -76,13 +79,16 @@ public struct OverlayContainer<
 
                     content()
 
-                    occlusionSpacer { footer() }
+                    Color.clear.frame(height: footerHeight)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, proxy.safeAreaInsets.top)
                 .background(alignment: .top) { background() }
             }
             .ignoresSafeArea(edges: .top)
+            .onAppear {
+                UIScrollView.appearance().bounces = false
+            }
         }
     }
 

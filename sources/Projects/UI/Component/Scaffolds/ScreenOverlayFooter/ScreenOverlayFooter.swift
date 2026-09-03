@@ -22,13 +22,26 @@ public struct ScreenOverlayFooter<Content: View>: View {
             content
                 .designSystemScreenMargin()
         }
-        .designSystemBackground(background)
+        .background {
+            ZStack(alignment: .top) {
+                Color(designSystem: background)
+
+                scrim
+            }
+            .ignoresSafeArea(edges: .bottom)
+        }
     }
 
     // MARK: Private
 
     private let background: SemanticColorToken
     private let content: Content
+
+    private var scrim: some View {
+        GeometryReader { proxy in
+            ScreenEdgeScrim.bottom(height: proxy.size.height)
+        }
+    }
 
 }
 
