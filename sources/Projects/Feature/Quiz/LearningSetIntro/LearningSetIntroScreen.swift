@@ -69,10 +69,8 @@ struct LearningSetIntroScreen: View {
 
 }
 
-// MARK: LearningSetIntroScreen.Constant
-
-extension LearningSetIntroScreen {
-    fileprivate enum Constant {
+private extension LearningSetIntroScreen {
+    enum Constant {
         static let textTopPadding: CGFloat = 24
         static let textSpacing: CGFloat = 8
         static let bottomButtonPadding: CGFloat = 34

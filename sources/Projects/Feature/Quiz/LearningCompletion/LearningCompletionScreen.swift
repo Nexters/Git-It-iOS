@@ -51,10 +51,8 @@ struct LearningCompletionScreen: View {
 
 }
 
-// MARK: LearningCompletionScreen.Constant
-
-extension LearningCompletionScreen {
-    fileprivate enum Constant {
+private extension LearningCompletionScreen {
+    enum Constant {
         static let contentSpacing: CGFloat = 16
         static let animationSize: CGFloat = 180
         static let bottomButtonPadding: CGFloat = 34

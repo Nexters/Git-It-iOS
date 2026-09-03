@@ -77,10 +77,8 @@ struct SavedScreen: View {
 
 }
 
-// MARK: SavedScreen.Constant
-
-extension SavedScreen {
-    fileprivate enum Constant {
+private extension SavedScreen {
+    enum Constant {
         static let contentVerticalPadding: CGFloat = 16
     }
 }
