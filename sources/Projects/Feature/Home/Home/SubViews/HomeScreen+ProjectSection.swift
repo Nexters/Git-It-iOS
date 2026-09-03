@@ -22,14 +22,17 @@ extension HomeScreen {
                     StyledText.subtitle3("학습 중인 레포지토리")
                     Spacer()
                     Button(action: onShowAllTapped) {
-                        HStack(spacing: 3) {
-                            StyledText.caption1("전체 보기", color: .blue100)
+                        HStack(spacing: 8) {
+                            StyledText.body2("전체 보기", color: .blue100)
                             ResourceImage(asset: .icon(.chevronRight))
                                 .frame(width: Constant.chevronSize, height: Constant.chevronSize)
+                                .designSystemForeground(.blue100)
                         }
                     }
                     .buttonStyle(.plain)
+                    .padding(8)
                     .accessibilityLabel(Constant.showAllLabel)
+                    
                 }
                 .designSystemScreenMargin()
 
@@ -45,7 +48,7 @@ extension HomeScreen {
         private enum Constant {
             static let showAllLabel = "학습 중인 레포지토리 전체 보기"
             static let sectionHeaderSpacing: CGFloat = 16
-            static let chevronSize: CGFloat = 24
+            static let chevronSize: CGFloat = 12
             static let screenMargin: CGFloat = 16
             static let cardSpacing: CGFloat = 12
             static let strokeWidth: CGFloat = 2
