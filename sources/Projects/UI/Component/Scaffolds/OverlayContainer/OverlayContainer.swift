@@ -13,10 +13,10 @@ public struct OverlayContainer<
     // MARK: Lifecycle
 
     public init(
-        @ViewBuilder header: @escaping (LayoutMetrics) -> Header = { _ in EmptyView() },
-        @ViewBuilder content: @escaping (LayoutMetrics) -> Content,
-        @ViewBuilder background: @escaping (LayoutMetrics) -> Background,
-        @ViewBuilder footer: @escaping (LayoutMetrics) -> Footer = { _ in EmptyView() },
+        @ViewBuilder header: @escaping () -> Header = { EmptyView() },
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder background: @escaping () -> Background,
+        @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
     ) {
         self.init(
             screenBackground: .screenBackground,
@@ -29,10 +29,10 @@ public struct OverlayContainer<
 
     private init(
         screenBackground: SemanticColorToken,
-        header: @escaping (LayoutMetrics) -> Header,
-        content: @escaping (LayoutMetrics) -> Content,
-        background: @escaping (LayoutMetrics) -> Background,
-        footer: @escaping (LayoutMetrics) -> Footer,
+        header: @escaping () -> Header,
+        content: @escaping () -> Content,
+        background: @escaping () -> Background,
+        footer: @escaping () -> Footer,
     ) {
         self.screenBackground = screenBackground
         self.header = header
@@ -44,20 +44,18 @@ public struct OverlayContainer<
     // MARK: Public
 
     public var body: some View {
-        LayoutMetricsReader { layoutMetrics in
-            ZStack(alignment: .top) {
-                scrollingContent(layoutMetrics)
+        ZStack(alignment: .top) {
+            scrollingContent
 
-                VStack(spacing: 0) {
-                    header(layoutMetrics)
+            VStack(spacing: 0) {
+                header()
 
-                    Spacer(minLength: 0)
+                Spacer(minLength: 0)
 
-                    footer(layoutMetrics)
-                }
+                footer()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(designSystem: screenBackground).ignoresSafeArea())
         .preferredColorScheme(.dark)
     }
@@ -65,25 +63,27 @@ public struct OverlayContainer<
     // MARK: Private
 
     private let screenBackground: SemanticColorToken
-    private let header: (LayoutMetrics) -> Header
-    private let content: (LayoutMetrics) -> Content
-    private let background: (LayoutMetrics) -> Background
-    private let footer: (LayoutMetrics) -> Footer
+    private let header: () -> Header
+    private let content: () -> Content
+    private let background: () -> Background
+    private let footer: () -> Footer
 
-    private func scrollingContent(_ layoutMetrics: LayoutMetrics) -> some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                occlusionSpacer { header(layoutMetrics) }
+    private var scrollingContent: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    occlusionSpacer { header() }
 
-                content(layoutMetrics)
+                    content()
 
-                occlusionSpacer { footer(layoutMetrics) }
+                    occlusionSpacer { footer() }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, proxy.safeAreaInsets.top)
+                .background(alignment: .top) { background() }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.top, CGFloat(layoutMetrics.safeAreaTop))
-            .background(alignment: .top) { background(layoutMetrics) }
+            .ignoresSafeArea(edges: .top)
         }
-        .ignoresSafeArea(edges: .top)
     }
 
     private func occlusionSpacer(matching view: () -> some View) -> some View {
@@ -100,15 +100,15 @@ extension OverlayContainer where Background == EmptyView {
 
     public init(
         screenBackground: SemanticColorToken = .screenBackground,
-        @ViewBuilder header: @escaping (LayoutMetrics) -> Header = { _ in EmptyView() },
-        @ViewBuilder content: @escaping (LayoutMetrics) -> Content,
-        @ViewBuilder footer: @escaping (LayoutMetrics) -> Footer = { _ in EmptyView() },
+        @ViewBuilder header: @escaping () -> Header = { EmptyView() },
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
     ) {
         self.init(
             screenBackground: screenBackground,
             header: header,
             content: content,
-            background: { _ in EmptyView() },
+            background: { EmptyView() },
             footer: footer,
         )
     }
@@ -116,24 +116,17 @@ extension OverlayContainer where Background == EmptyView {
 }
 
 #Preview("Overlay Container") {
-    OverlayContainer { layoutMetrics in
-        ScreenOverlayHeader(
-            title: "오버레이 헤더",
-            style: .largeTitle,
-            layoutMetrics: layoutMetrics,
-        )
-    } content: { _ in
+    OverlayContainer {
+        ScreenOverlayHeader(title: "오버레이 헤더", style: .largeTitle)
+    } content: {
         VStack(spacing: LayoutToken.gutter.cgFloatValue) {
             ForEach(0..<20, id: \.self) { index in
                 LabeledCard.neutral(label: "항목 \(index)", text: "스크롤하면 헤더 뒤로 지나갑니다.")
             }
         }
         .designSystemScreenMargin()
-    } background: { layoutMetrics in
-        LinearGradient(designSystem: .topEdgeScrim)
-            .frame(height: CGFloat(layoutMetrics.topScrimHeight(headerStyle: .largeTitle)))
-    } footer: { layoutMetrics in
-        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+    } footer: {
+        ScreenOverlayFooter {
             ActionButton.primary("계속하기")
         }
     }

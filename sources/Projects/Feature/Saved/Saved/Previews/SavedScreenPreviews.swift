@@ -33,7 +33,7 @@ private func previewState(
 }
 
 #Preview("저장한 문제 · 목록") {
-    ScreenContainer { _ in
+    ScreenContainer {
         SavedScreen(
             store: Store(
                 initialState: previewState(collection: previewCollection, loadStatus: .loaded)
@@ -43,7 +43,7 @@ private func previewState(
 }
 
 #Preview("저장한 문제 · 빈 상태") {
-    ScreenContainer { _ in
+    ScreenContainer {
         SavedScreen(
             store: Store(
                 initialState: previewState(
@@ -60,7 +60,7 @@ private func previewState(
 }
 
 #Preview("저장한 문제 · 실패") {
-    ScreenContainer { _ in
+    ScreenContainer {
         SavedScreen(
             store: Store(
                 initialState: previewState(collection: nil, loadStatus: .failed(.temporarilyUnavailable))

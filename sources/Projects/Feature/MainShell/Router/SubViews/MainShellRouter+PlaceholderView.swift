@@ -6,7 +6,7 @@ extension MainShellRouter {
         let title: String
 
         var body: some View {
-            ScreenContainer { _ in
+            ScreenContainer {
                 StyledText.subtitle1(title, alignment: .center)
                     .designSystemScreenMargin()
             }

@@ -59,12 +59,12 @@ public struct ProjectListScreen: View {
     private var screen: some View {
         switch (store.initialLoad, store.projects.isEmpty) {
         case (.failed, _):
-            ScreenContainer { _ in
+            ScreenContainer {
                 Self.FailureView(onRetry: { send(.refreshRequested) })
             }
 
         case (_, true):
-            ScreenContainer { _ in
+            ScreenContainer {
                 Self.EmptyProjectsView()
             }
 
@@ -92,16 +92,15 @@ public struct ProjectListScreen: View {
     }
 
     private var content: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 title: "프로젝트",
                 style: .largeTitle,
                 leading: nil,
                 trailing: editingControl,
-                layoutMetrics: layoutMetrics,
                 onTrailingTap: { isEditing.toggle() },
             )
-        } content: { _ in
+        } content: {
             VStack(spacing: LayoutToken.gutter.cgFloatValue) {
                 ForEach(projects) { project in
                     row(project)

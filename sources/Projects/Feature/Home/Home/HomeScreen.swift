@@ -18,7 +18,7 @@ public struct HomeScreen: View {
     @Bindable public var store: StoreOf<HomeFeature>
 
     public var body: some View {
-        OverlayContainer(content: { layoutMetrics in
+        OverlayContainer(content: {
             VStack(alignment: .leading, spacing: 0) {
                 Self.ProfileHeaderView(
                     display: HomeProfileDisplay(store.profileLoad),
@@ -40,7 +40,6 @@ public struct HomeScreen: View {
 
             Self.ProjectSection(
                 state: HomeProjectSectionState(store.projectLoad),
-                layoutMetrics: layoutMetrics,
                 cardListLeadingX: $cardListLeadingX,
                 onShowAllTapped: { send(.showAllProjectsTapped) },
                 onProjectRetryTapped: { send(.projectRetryTapped) },

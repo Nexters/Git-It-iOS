@@ -3,7 +3,7 @@ import SwiftUI
 import UIComponent
 
 #Preview("학습 완료 · s13") {
-    ScreenContainer { _ in
+    ScreenContainer {
         LearningCompletionScreen(
             store: Store(
                 initialState: LearningCompletionFeature.State(
@@ -17,7 +17,7 @@ import UIComponent
 }
 
 #Preview("학습 완료 · 점수 없음") {
-    ScreenContainer { _ in
+    ScreenContainer {
         LearningCompletionScreen(
             store: Store(
                 initialState: LearningCompletionFeature.State(projectID: "project-1")

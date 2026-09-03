@@ -15,13 +15,13 @@ extension RepositoryLinkInputFeature.State {
 }
 
 #Preview("링크 입력 · 986:13739") {
-    ScreenContainer { _ in
+    ScreenContainer {
         RepositoryLinkInputScreen(store: Store(initialState: .preview()) { EmptyReducer() })
     }
 }
 
 #Preview("링크 입력 · 검증 실패") {
-    ScreenContainer { _ in
+    ScreenContainer {
         RepositoryLinkInputScreen(
             store: Store(
                 initialState: .preview(

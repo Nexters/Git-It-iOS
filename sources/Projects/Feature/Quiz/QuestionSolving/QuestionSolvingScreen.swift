@@ -33,12 +33,11 @@ struct QuestionSolvingScreen: View {
     // MARK: Private
 
     private var content: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
-                layoutMetrics: layoutMetrics,
-                onLeadingTap: { send(.backTapped) },
+                onLeadingTap: { send(.backTapped) }
             )
-        } content: { _ in
+        } content: {
             VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
                 QuestionPrompt(
                     questionNumber: store.questionNumber,
@@ -61,8 +60,8 @@ struct QuestionSolvingScreen: View {
             }
             .designSystemScreenMargin()
             .padding(.vertical, Constant.contentVerticalPadding)
-        } footer: { layoutMetrics in
-            bottomActions(layoutMetrics: layoutMetrics)
+        } footer: {
+            bottomActions
         }
     }
 
@@ -158,8 +157,8 @@ struct QuestionSolvingScreen: View {
         StyledText.body2(Constant.submissionFailureMessage, color: .grey400)
     }
 
-    private func bottomActions(layoutMetrics: LayoutMetrics) -> some View {
-        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+    private var bottomActions: some View {
+        ScreenOverlayFooter {
             HStack(spacing: LayoutToken.gutter.cgFloatValue) {
                 BookmarkButton(
                     isSaved: store.isBookmarked,

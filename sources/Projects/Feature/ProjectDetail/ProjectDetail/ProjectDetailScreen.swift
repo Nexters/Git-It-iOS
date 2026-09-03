@@ -15,7 +15,7 @@ struct ProjectDetailScreen: View {
     var body: some View {
         Group {
             if case .failed = store.loadStatus {
-                ScreenContainer { _ in
+                ScreenContainer {
                     ErrorView(
                         onBack: { send(.backTapped) },
                         onRetry: { send(.retryTapped) },
@@ -76,14 +76,13 @@ struct ProjectDetailScreen: View {
     }
 
     private var content: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 trailing: Constant.menuControl,
-                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )
-        } content: { _ in
+        } content: {
             VStack(alignment: .leading, spacing: 0) {
                 RepositorySummaryView(
                     repositoryName: store.detail?.repositoryName ?? "",
@@ -105,7 +104,7 @@ struct ProjectDetailScreen: View {
             }
             .padding(.top, Constant.summaryTopSpacing)
             .padding(.bottom, Constant.contentBottomPadding)
-        } background: { _ in
+        } background: {
             heroBackground
         }
     }
@@ -129,7 +128,8 @@ extension ProjectDetailScreen {
         static let contentBottomPadding: CGFloat = 16
         static let heroGradientHeight: CGFloat = 179
 
-        static let menuTopOffset = CGFloat(LayoutMetrics.HeaderStyle.plain.height)
+        /// plain 스타일 헤더 높이(50)만큼 내려 메뉴를 헤더 바로 아래에 붙인다.
+        static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
 
         static let heroGradient = GradientToken(

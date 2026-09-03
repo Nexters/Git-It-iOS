@@ -13,7 +13,7 @@ public struct ProjectRegistrationRouter: View {
     // MARK: Public
 
     public var body: some View {
-        ScreenContainer { _ in
+        ScreenContainer {
             content
         }
     }

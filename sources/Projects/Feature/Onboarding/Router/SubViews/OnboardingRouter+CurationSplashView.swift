@@ -10,7 +10,7 @@ extension OnboardingRouter {
         let onCompletion: @MainActor @Sendable () -> Void
 
         var body: some View {
-            ScreenContainer { _ in
+            ScreenContainer {
                 SplashView(onCompletion: onCompletion)
                     .designSystemScreenMargin()
             }

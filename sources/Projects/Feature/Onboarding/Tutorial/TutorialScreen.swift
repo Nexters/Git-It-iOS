@@ -11,7 +11,7 @@ struct TutorialScreen: View {
     @Bindable var store: StoreOf<TutorialFeature>
 
     var body: some View {
-        ScreenContainer { _ in
+        ScreenContainer {
             VStack(spacing: 0) {
                 TabView(selection: pageBinding) {
                     ForEach(1...store.pageProgress.totalPages, id: \.self) { page in

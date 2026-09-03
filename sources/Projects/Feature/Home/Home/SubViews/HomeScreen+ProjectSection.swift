@@ -8,7 +8,6 @@ extension HomeScreen {
         // MARK: Internal
 
         let state: HomeProjectSectionState
-        let layoutMetrics: LayoutMetrics
 
         @Binding var cardListLeadingX: CGFloat?
 
@@ -34,14 +33,54 @@ extension HomeScreen {
                 }
                 .designSystemScreenMargin()
 
-                projectContent(layoutMetrics)
+                projectContent
             }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { sectionWidth = $0 }
         }
 
         // MARK: Private
 
+        private enum Constant {
+            static let showAllLabel = "학습 중인 레포지토리 전체 보기"
+            static let sectionHeaderSpacing: CGFloat = 16
+            static let chevronSize: CGFloat = 24
+            static let screenMargin: CGFloat = 16
+            static let cardSpacing: CGFloat = 12
+            static let strokeWidth: CGFloat = 2
+            static let maximumCardRotationDegrees: CGFloat = 16
+            static let trailingInset: CGFloat = 16
+
+            /// 실측 전 첫 프레임에 쓰는 기준 기기(iPhone 17 · 17 Pro · 16 Pro) 화면 폭.
+            static let defaultSectionWidth: CGFloat = 402
+
+            static func cardWidth(forSectionWidth sectionWidth: CGFloat) -> CGFloat {
+                let contentWidth = sectionWidth - LayoutToken.margin.cgFloatValue * 2
+                return (contentWidth - LayoutToken.gutter.cgFloatValue) / 2
+            }
+
+            static func cardStride(cardWidth: CGFloat) -> CGFloat {
+                cardWidth + cardSpacing
+            }
+
+            static func rotationSlack(cardWidth: CGFloat) -> CGFloat {
+                let radians = maximumCardRotationDegrees * .pi / 180
+                let cardHeight = HomeProjectCard.designHeight
+                let rotatedHeight = cardWidth * sin(radians) + cardHeight * cos(radians)
+
+                return max((rotatedHeight - cardHeight) / 2, 0)
+            }
+
+            static func sectionHeight(cardWidth: CGFloat) -> CGFloat {
+                HomeProjectCard.designHeight + rotationSlack(cardWidth: cardWidth) * 2
+            }
+        }
+
+        @State private var sectionWidth: CGFloat = Constant.defaultSectionWidth
+
         private var cardWidth: CGFloat {
-            CGFloat(layoutMetrics.gridColumn2)
+            Constant.cardWidth(forSectionWidth: sectionWidth)
         }
 
         /// 카드가 최대 각도로 기울어져도 잘리지 않는 섹션 높이.
@@ -74,10 +113,10 @@ extension HomeScreen {
         }
 
         @ViewBuilder
-        private func projectContent(_ layoutMetrics: LayoutMetrics) -> some View {
+        private var projectContent: some View {
             switch state {
             case .loaded(let projects):
-                projectCards(projects, layoutMetrics: layoutMetrics)
+                projectCards(projects)
 
             case .loading:
                 emptyProjects {
@@ -110,25 +149,12 @@ extension HomeScreen {
             .accessibilityElement(children: .contain)
         }
 
-        private func projectCards(
-            _ projects: [HomeProjectDisplay],
-            layoutMetrics: LayoutMetrics,
-        ) -> some View {
-            GeometryReader { viewport in
-                projectCardScroll(
-                    projects,
-                    layoutMetrics: layoutMetrics,
-                    viewportWidth: viewport.size.width,
-                )
-            }
-            .frame(height: sectionHeight)
+        private func projectCards(_ projects: [HomeProjectDisplay]) -> some View {
+            projectCardScroll(projects)
+                .frame(height: sectionHeight)
         }
 
-        private func projectCardScroll(
-            _ projects: [HomeProjectDisplay],
-            layoutMetrics: LayoutMetrics,
-            viewportWidth: CGFloat,
-        ) -> some View {
+        private func projectCardScroll(_ projects: [HomeProjectDisplay]) -> some View {
             let layout = cardListLeadingX.map {
                 HomeCardScrollLayout(
                     p0CenterX: $0 + cardWidth / 2,
@@ -146,7 +172,6 @@ extension HomeScreen {
                             currentSetLabel: project.currentSetLabel,
                             setTitle: project.setTitle,
                             variant: project.variant,
-                            layoutMetrics: layoutMetrics,
                             isLearningEnabled: project.isLearningEnabled,
                             onSelect: { onProjectCardTapped(String(project.projectID)) },
                             onStart: { onLearningTapped(String(project.projectID)) },
@@ -176,38 +201,9 @@ extension HomeScreen {
                 .padding(.vertical, Constant.rotationSlack(cardWidth: cardWidth))
             }
             .safeAreaPadding(.leading, Constant.screenMargin)
-            .safeAreaPadding(
-                .trailing,
-                Constant.trailingInset(viewportWidth: viewportWidth, cardWidth: cardWidth),
-            )
+            .safeAreaPadding(.trailing, Constant.trailingInset)
             .scrollIndicators(.hidden)
             .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
-        }
-
-        private enum Constant {
-            static let showAllLabel = "학습 중인 레포지토리 전체 보기"
-            static let sectionHeaderSpacing: CGFloat = 16
-            static let chevronSize: CGFloat = 24
-            static let screenMargin: CGFloat = 16
-            static let cardSpacing: CGFloat = 12
-            static let strokeWidth: CGFloat = 2
-            static let maximumCardRotationDegrees: CGFloat = 16
-
-            static func cardStride(cardWidth: CGFloat) -> CGFloat { cardWidth + cardSpacing }
-
-            static func rotationSlack(cardWidth: CGFloat) -> CGFloat {
-                let radians = maximumCardRotationDegrees * .pi / 180
-                let cardHeight = HomeProjectCard.designHeight
-                let rotatedHeight = cardWidth * sin(radians) + cardHeight * cos(radians)
-
-                return max((rotatedHeight - cardHeight) / 2, 0)
-            }
-
-            static func sectionHeight(cardWidth: CGFloat) -> CGFloat {
-                HomeProjectCard.designHeight + rotationSlack(cardWidth: cardWidth) * 2
-            }
-
-            static func trailingInset(viewportWidth _: CGFloat, cardWidth _: CGFloat) -> CGFloat { 16 }
         }
 
     }

@@ -8,10 +8,8 @@ public struct BottomActionBar<Content: View>: View {
     // MARK: Lifecycle
 
     public init(
-        layoutMetrics: LayoutMetrics = .default,
-        @ViewBuilder content: () -> Content,
+        @ViewBuilder content: () -> Content
     ) {
-        self.layoutMetrics = layoutMetrics
         self.content = content()
     }
 
@@ -21,12 +19,19 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .padding(.bottom, CGFloat(layoutMetrics.tabBarBottomInset))
+            .background {
+                Color.clear
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.safeAreaInsets.bottom
+                    } action: { safeAreaBottomInset = $0 }
+            }
+            .padding(.bottom, max(safeAreaBottomInset, Constant.minimumBottomInset))
     }
 
     // MARK: Private
 
-    private let layoutMetrics: LayoutMetrics
+    @State private var safeAreaBottomInset: CGFloat = 0
+
     private let content: Content
 
 }

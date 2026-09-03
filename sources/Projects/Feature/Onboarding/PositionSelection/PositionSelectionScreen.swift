@@ -12,13 +12,12 @@ struct PositionSelectionScreen: View {
     @Bindable var store: StoreOf<PositionSelectionFeature>
 
     var body: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 leading: .close,
-                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
             )
-        } content: { _ in
+        } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
                     StyledText.subtitle1(Constant.title, alignment: .center)
@@ -50,8 +49,8 @@ struct PositionSelectionScreen: View {
             }
             .designSystemScreenMargin()
             .padding(.top, LayoutToken.margin.cgFloatValue)
-        } footer: { layoutMetrics in
-            ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+        } footer: {
+            ScreenOverlayFooter {
                 ActionButton.primary(
                     "다음",
                     isEnabled: store.position != nil,

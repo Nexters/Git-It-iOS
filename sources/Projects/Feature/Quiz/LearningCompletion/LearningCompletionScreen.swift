@@ -13,7 +13,7 @@ struct LearningCompletionScreen: View {
     @Bindable var store: StoreOf<LearningCompletionFeature>
 
     var body: some View {
-        ScreenContainer { _ in
+        ScreenContainer {
             screen
         }
     }

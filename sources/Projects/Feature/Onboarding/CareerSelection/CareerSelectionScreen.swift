@@ -12,13 +12,12 @@ struct CareerSelectionScreen: View {
     @Bindable var store: StoreOf<CareerSelectionFeature>
 
     var body: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 leading: .back,
-                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
             )
-        } content: { _ in
+        } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
                     StyledText.subtitle1(Constant.title, alignment: .center)
@@ -51,8 +50,8 @@ struct CareerSelectionScreen: View {
             }
             .designSystemScreenMargin()
             .padding(.top, LayoutToken.margin.cgFloatValue)
-        } footer: { layoutMetrics in
-            ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+        } footer: {
+            ScreenOverlayFooter {
                 VStack(spacing: LayoutToken.gutter.cgFloatValue) {
                     StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
 

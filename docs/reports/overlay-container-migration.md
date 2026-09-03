@@ -266,3 +266,39 @@ ShareExtension → App Group(UserDefaults) → gitit://shared-link
 `.screenBackground`로 깔립니다. `background:` 슬롯은 콘텐츠와 함께 스크롤되어 사라지므로 그 뒤에
 고정 배경이 없으면 스크롤 후 화면이 비기 때문입니다. 스크롤 배경 생성자가 토큰까지 함께 받아야
 한다면 이 가정을 바꿔야 합니다.
+
+## 15. `LayoutMetrics` 타입 전체 제거
+
+**결정** — `LayoutMetrics`/`LayoutMetricsReader`/`LayoutMetrics.HeaderStyle` 타입과
+이를 화면·컴포넌트 트리에 걸쳐 주입하던 `(LayoutMetrics) -> View` 슬롯 시그니처를
+모두 제거했습니다. `LayoutMetricsTests.swift`(9개 기기 파생값 회귀 테스트)도 함께
+삭제했습니다.
+
+**근거** — 공유 측정 타입을 화면부터 리프 컴포넌트까지 주입해 내려보내는 구조 자체가
+과도한 결합과 보일러플레이트를 만든다는 판단입니다. 실제로 값을 계산에 쓰는 지점은
+`ScreenOverlayHeader`(상단 scrim 높이), `BottomActionBar`(하단 최소 여백),
+`HomeScreen.ProjectSection`(카드 그리드 폭) 세 곳뿐이었고, 나머지는 전부 파라미터를
+그대로 통과시키기만 하는 보일러플레이트였습니다.
+
+**대체 방식** — 공식은 그대로 유지하되, 값이 필요한 컴포넌트가 각자 자체
+`GeometryReader`/`onGeometryChange`로 직접 측정합니다.
+
+| 컴포넌트 | 이전 | 이후 |
+| --- | --- | --- |
+| `ScreenOverlayHeader` | 주입받은 `layoutMetrics.safeAreaTop + style.height` | 자체 `GeometryReader`의 `proxy.safeAreaInsets.top + style.height` |
+| `BottomActionBar` | 주입받은 `max(layoutMetrics.safeAreaBottom, 24)` | `.background { onGeometryChange }`로 측정한 `max(safeAreaBottomInset, 24)` — 패딩 적용 *전* 시점에서 측정해 자기 참조를 피함 |
+| `HomeScreen.ProjectSection` | 주입받은 `layoutMetrics.gridColumn2` | 자체 `onGeometryChange`로 측정한 섹션 폭에서 동일 공식으로 계산 |
+| `ScreenEdgeScrim` | `Style` enum + `LayoutMetrics.HeaderStyle`을 받아 내부에서 높이 계산 | 호출부가 계산한 `height: CGFloat`만 받는 순수 프레젠테이션 컴포넌트로 축소 |
+| `HomeProjectCard` | `layoutMetrics` 저장 프로퍼티 (내부에서 실제로는 한 번도 읽지 않던 죽은 파라미터) | 파라미터 자체를 삭제 |
+
+**트레이드오프** — 기존에는 화면 루트 한 곳(`LayoutMetricsReader`)에서만 측정해
+`GeometryReader` 1회로 끝났지만, 이제 값이 필요한 3곳이 각자 측정합니다.
+`BottomActionBar`와 `ProjectSection`은 `onGeometryChange`를 쓰므로 최초 프레임에는
+기본값(각각 0, 402pt 기준 카드 폭)으로 그려졌다가 한 프레임 뒤 실측값으로 갱신됩니다 —
+이 지연은 같은 파일(`HomeScreen+ProjectSection.swift`)이 카드 스크롤 오프셋 측정에
+이미 쓰던 것과 같은 패턴입니다.
+
+**미검증 범위** — 이 변경은 빌드·시뮬레이터로 시각 확인을 하지 않았습니다. 특히
+`BottomActionBar`의 `.background { onGeometryChange }` 측정 시점(패딩 적용 전 프레임 기준)이
+의도대로 실제 safe area 값을 보고하는지, `ScreenOverlayHeader`의 scrim이 여전히 노치·상단
+안전영역까지 정확히 덮는지는 사용자가 시뮬레이터에서 직접 확인해야 합니다.

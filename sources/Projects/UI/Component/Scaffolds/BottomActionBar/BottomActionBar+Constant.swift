@@ -10,5 +10,9 @@ extension BottomActionBar {
         static var bottomPadding: CGFloat {
             24
         }
+
+        static var minimumBottomInset: CGFloat {
+            24
+        }
     }
 }

@@ -23,7 +23,7 @@ struct SavedScreen: View {
     private var screen: some View {
         switch (store.loadStatus, store.isEmpty) {
         case (.failed, _):
-            ScreenContainer { _ in
+            ScreenContainer {
                 ErrorView(
                     isBackControlPresented: store.isBackControlPresented,
                     onBack: { send(.backTapped) },
@@ -32,7 +32,7 @@ struct SavedScreen: View {
             }
 
         case (_, true):
-            ScreenContainer { _ in
+            ScreenContainer {
                 VStack(spacing: 0) {
                     header
 
@@ -66,15 +66,14 @@ struct SavedScreen: View {
     }
 
     private var content: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 title: "저장한 문제",
                 style: .largeTitle,
                 leading: store.isBackControlPresented ? .back : nil,
-                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
             )
-        } content: { _ in
+        } content: {
             VStack(spacing: LayoutToken.gutter.cgFloatValue) {
                 ForEach(SavedQuestionDisplay.list(questions: store.collection?.bookmarks ?? [])) { question in
                     QuestionRow(

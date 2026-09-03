@@ -15,7 +15,7 @@ struct LearningSetIntroScreen: View {
     var body: some View {
         Group {
             if case .failed = store.setLoad {
-                ScreenContainer { _ in
+                ScreenContainer {
                     ErrorView(
                         bottomButtonPadding: Constant.bottomButtonPadding,
                         onBack: { send(.backTapped) },
@@ -32,13 +32,12 @@ struct LearningSetIntroScreen: View {
     // MARK: Private
 
     private var content: some View {
-        OverlayContainer { layoutMetrics in
+        OverlayContainer {
             ScreenOverlayHeader(
                 style: .largeTitle,
-                layoutMetrics: layoutMetrics,
                 onLeadingTap: { send(.backTapped) },
             )
-        } content: { _ in
+        } content: {
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
                 StyledText.subtitle2(store.label, color: .blue100)
                 StyledText.subtitle1(store.learningSet?.title ?? "")
@@ -48,8 +47,8 @@ struct LearningSetIntroScreen: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .designSystemScreenMargin()
             .padding(.top, Constant.textTopPadding)
-        } footer: { layoutMetrics in
-            startAction(layoutMetrics: layoutMetrics)
+        } footer: {
+            startAction
         }
         .overlay {
             if case .loading = store.setLoad {
@@ -59,8 +58,8 @@ struct LearningSetIntroScreen: View {
         }
     }
 
-    private func startAction(layoutMetrics: LayoutMetrics) -> some View {
-        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+    private var startAction: some View {
+        ScreenOverlayFooter {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
                     StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)

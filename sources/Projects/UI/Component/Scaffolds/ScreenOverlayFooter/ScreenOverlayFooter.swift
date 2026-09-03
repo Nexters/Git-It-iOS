@@ -9,18 +9,16 @@ public struct ScreenOverlayFooter<Content: View>: View {
 
     public init(
         background: SemanticColorToken = .screenBackground,
-        layoutMetrics: LayoutMetrics = .default,
         @ViewBuilder content: () -> Content,
     ) {
         self.background = background
-        self.layoutMetrics = layoutMetrics
         self.content = content()
     }
 
     // MARK: Public
 
     public var body: some View {
-        BottomActionBar(layoutMetrics: layoutMetrics) {
+        BottomActionBar {
             content
                 .designSystemScreenMargin()
         }
@@ -30,23 +28,22 @@ public struct ScreenOverlayFooter<Content: View>: View {
     // MARK: Private
 
     private let background: SemanticColorToken
-    private let layoutMetrics: LayoutMetrics
     private let content: Content
 
 }
 
 #Preview("Screen Overlay Footer") {
-    OverlayContainer { layoutMetrics in
-        ScreenOverlayHeader(title: "문제 풀이", layoutMetrics: layoutMetrics)
-    } content: { _ in
+    OverlayContainer {
+        ScreenOverlayHeader(title: "문제 풀이")
+    } content: {
         VStack(spacing: LayoutToken.gutter.cgFloatValue) {
             ForEach(0..<12, id: \.self) { index in
                 LabeledCard.neutral(label: "항목 \(index)", text: "푸터 뒤로 지나가지 않습니다.")
             }
         }
         .designSystemScreenMargin()
-    } footer: { layoutMetrics in
-        ScreenOverlayFooter(layoutMetrics: layoutMetrics) {
+    } footer: {
+        ScreenOverlayFooter {
             ActionButton.primary("계속하기")
         }
     }

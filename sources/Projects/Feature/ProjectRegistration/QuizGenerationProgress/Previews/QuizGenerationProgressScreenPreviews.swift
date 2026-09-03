@@ -11,7 +11,7 @@ extension QuizGenerationProgressFeature.State {
 }
 
 #Preview("생성 진행 · 2026:29388") {
-    ScreenContainer { _ in
+    ScreenContainer {
         QuizGenerationProgressScreen(
             store: Store(
                 initialState: .preview(
@@ -23,7 +23,7 @@ extension QuizGenerationProgressFeature.State {
 }
 
 #Preview("생성 실패") {
-    ScreenContainer { _ in
+    ScreenContainer {
         QuizGenerationProgressScreen(
             store: Store(initialState: .preview(progress: .failed(.unexpected))) { EmptyReducer() }
         )
