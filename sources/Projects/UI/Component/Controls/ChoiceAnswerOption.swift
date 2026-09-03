@@ -8,12 +8,16 @@ public struct ChoiceAnswerOption: View {
     // MARK: Lifecycle
 
     public init(
+        letter: String,
         text: String,
         state: State = .default,
+        isExpanded: Bool = false,
         onTap: @escaping () -> Void = { },
     ) {
+        self.letter = letter
         self.text = text
         self.state = state
+        self.isExpanded = isExpanded
         self.onTap = onTap
     }
 
@@ -27,33 +31,31 @@ public struct ChoiceAnswerOption: View {
 
         // MARK: Internal
 
-        var borderToken: BorderToken? {
+        var fillToken: ColorToken? {
             switch self {
             case .default:
                 nil
-            case .selected:
-                .focus
-            case .correct:
-                BorderToken(name: "Correct", width: 1, colorToken: .correct)
+            case .selected,
+                 .correct:
+                .correct
             case .incorrect:
-                BorderToken(name: "Incorrect", width: 1, colorToken: .incorrect)
+                .incorrect
             }
         }
 
-        var borderColor: ColorToken {
-            borderToken?.colorToken ?? .clear
-        }
-
-        var symbol: String? {
+        var letterColor: ColorToken {
             switch self {
-            case .default,
-                 .selected:
-                nil
-            case .correct:
-                "checkmark.circle.fill"
-            case .incorrect:
-                "xmark.circle.fill"
+            case .default:
+                .blue200
+            case .selected,
+                 .correct,
+                 .incorrect:
+                .grey100
             }
+        }
+
+        var textColor: ColorToken {
+            .grey100
         }
 
         var accessibilitySuffix: String? {
@@ -71,30 +73,29 @@ public struct ChoiceAnswerOption: View {
 
     public var body: some View {
         Button(action: onTap) {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                StyledText.body1(text)
-                    .lineLimit(2)
+            VStack(alignment: .leading, spacing: Constant.rowSpacing) {
+                HStack {
+                    StyledText.subtitle2(letter, color: state.letterColor)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
 
-                if let symbol = state.symbol {
-                    Image(systemName: symbol)
-                        .designSystemForeground(state.borderColor)
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .designSystemForeground(state.letterColor)
+                }
+
+                if isExpanded {
+                    StyledText.subtitle3(text, color: state.textColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .padding(.horizontal, Constant.horizontalPadding)
-            .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight, alignment: .leading)
-            .designSystemBackground(.cardBackground)
+            .padding(.top, Constant.topPadding)
+            .padding(.bottom, Constant.bottomPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                state.fillToken.map { Color(designSystem: $0) } ?? Color(designSystem: .grey600)
+            )
             .designSystemCornerRadius(.large)
-            .overlay {
-                if let borderToken = state.borderToken {
-                    RoundedRectangle(designSystem: .large)
-                        .stroke(
-                            Color(designSystem: borderToken.colorToken),
-                            lineWidth: CGFloat(borderToken.width),
-                        )
-                }
-            }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -105,29 +106,33 @@ public struct ChoiceAnswerOption: View {
     // MARK: Private
 
     private enum Constant {
-        static let horizontalPadding: CGFloat = 16
-        static let minimumHeight: CGFloat = 52
+        static let horizontalPadding: CGFloat = 18
+        static let topPadding: CGFloat = 14
+        static let bottomPadding: CGFloat = 18
+        static let rowSpacing: CGFloat = 4
     }
 
+    private let letter: String
     private let text: String
     private let state: State
+    private let isExpanded: Bool
     private let onTap: () -> Void
 
     private var accessibilityLabel: String {
         guard let suffix = state.accessibilitySuffix else {
-            return text
+            return "\(letter), \(text)"
         }
-        return "\(text), \(suffix)"
+        return "\(letter), \(text), \(suffix)"
     }
 
 }
 
 #Preview("Choice Answer Option") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-        ChoiceAnswerOption(text: "State", state: .default)
-        ChoiceAnswerOption(text: "Binding", state: .selected)
-        ChoiceAnswerOption(text: "ObservedObject", state: .correct)
-        ChoiceAnswerOption(text: "EnvironmentObject", state: .incorrect)
+    VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+        ChoiceAnswerOption(letter: "A", text: "State", state: .default)
+        ChoiceAnswerOption(letter: "B", text: "Binding", state: .selected, isExpanded: true)
+        ChoiceAnswerOption(letter: "C", text: "ObservedObject", state: .correct, isExpanded: true)
+        ChoiceAnswerOption(letter: "D", text: "EnvironmentObject", state: .incorrect, isExpanded: true)
     }
     .frame(width: 320)
     .designSystemScreenMargin()
