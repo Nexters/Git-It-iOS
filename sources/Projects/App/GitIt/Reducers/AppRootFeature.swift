@@ -282,6 +282,7 @@ nonisolated struct AppRootFeature: Sendable {
                     case .loaded(let page) = state.mainShell.home.projectLoad,
                     let project = page.items.first(where: { $0.projectID == projectID })
                 else { return .none }
+                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 state.quiz = QuizRouterFeature.State(
                     projectID: projectID,
                     setID: nextSetID,
