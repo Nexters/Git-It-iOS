@@ -81,7 +81,14 @@ public struct ChoiceResultRow: View {
     }
 
     // MARK: Private
+    
 
+    private enum Constant {
+        static let collapsedHeight: CGFloat = 59
+        static let expandedHeight: CGFloat = 111
+        static let horizontalPadding: CGFloat = 16
+    }
+    
     private let judgement: Judgement
     private let isExpanded: Bool
     private let text: String
@@ -95,7 +102,6 @@ public struct ChoiceResultRow: View {
     private var accessibilityLabel: String {
         Self.accessibilityLabel(text: text, judgement: judgement)
     }
-
 }
 
 #Preview("Choice Result Row") {
