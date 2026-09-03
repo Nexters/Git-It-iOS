@@ -8,12 +8,7 @@ struct HomeProfileDisplay: Equatable, Sendable {
         switch profileLoad {
         case .loaded(let profile):
             name = profile.name
-            role = [
-                profile.position.map(Self.positionTitle),
-                profile.careerLevel.map(Self.careerTitle),
-            ]
-            .compactMap { $0 }
-            .joined(separator: " · ")
+            role = Self.careerTitle(profile.careerLevel ?? .none) + " Developer"
             isFailed = false
 
         case .failed:
@@ -47,12 +42,12 @@ struct HomeProfileDisplay: Equatable, Sendable {
         }
     }
 
-    private static func careerTitle(_ career: CareerLevel) -> String {
+    private static func careerTitle(_ career: CareerLevel?) -> String {
         switch career {
-        case .entry: "입문"
-        case .junior: "주니어"
-        case .middle: "미들"
-        case .senior: "시니어"
+        case .entry: "Entry"
+        case .junior: "Junior"
+        case .middle: "Middle"
+        case .senior: "Senior"
         @unknown default: ""
         }
     }
