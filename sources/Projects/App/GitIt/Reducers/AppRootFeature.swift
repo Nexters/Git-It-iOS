@@ -91,7 +91,7 @@ nonisolated struct AppRootFeature: Sendable {
         var route = Route.restoring
         var appEntry: AppEntryFeature.State
         var onboarding: OnboardingRouterFeature.State
-        var mainShell = MainShellFeature.State()
+        var mainShell = MainShellRouterFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
 
         var generationProgress: GenerationProgress?
@@ -99,7 +99,7 @@ nonisolated struct AppRootFeature: Sendable {
         var isGenerationProgressRestored = false
 
         var pendingSharedLink: SharedRepositoryLink?
-        @Presents var projectRegistration: ProjectRegistrationFeature.State?
+        @Presents var projectRegistration: ProjectRegistrationRouterFeature.State?
     }
 
     enum Action: ViewAction, Sendable, Equatable {
@@ -107,8 +107,8 @@ nonisolated struct AppRootFeature: Sendable {
         case effect(EffectEvent)
         case appEntry(AppEntryFeature.Action)
         case onboarding(OnboardingRouterFeature.Action)
-        case mainShell(MainShellFeature.Action)
-        case projectRegistration(PresentationAction<ProjectRegistrationFeature.Action>)
+        case mainShell(MainShellRouterFeature.Action)
+        case projectRegistration(PresentationAction<ProjectRegistrationRouterFeature.Action>)
 
         // MARK: Internal
 
@@ -151,7 +151,7 @@ nonisolated struct AppRootFeature: Sendable {
             )
         }
         Scope(state: \.mainShell, action: \.mainShell) {
-            MainShellFeature(
+            MainShellRouterFeature(
                 fetchLearningProjects: fetchLearningProjects,
                 deleteLearningProject: deleteLearningProject,
                 fetchBookmarkedQuestions: fetchBookmarkedQuestions,
@@ -197,7 +197,7 @@ nonisolated struct AppRootFeature: Sendable {
                     )
 
                 case .onboarding(let entryPoint):
-                    let bundleVersion = state.onboarding.guide.bundleVersion
+                    let bundleVersion = state.onboarding.tutorial.bundleVersion
                     state.onboarding = OnboardingRouterFeature.State(startingAt: entryPoint, bundleVersion: bundleVersion)
                     state.route = .onboarding
                     return .none
@@ -251,7 +251,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return returnToOnboarding(&state)
 
             case .mainShell(.delegate(.projectRegistrationRequested)):
-                state.projectRegistration = ProjectRegistrationFeature.State()
+                state.projectRegistration = ProjectRegistrationRouterFeature.State()
                 return .none
 
             case .mainShell(.delegate(.questionSelected)),
@@ -259,7 +259,7 @@ nonisolated struct AppRootFeature: Sendable {
                  .mainShell(.delegate(.learningRequested)):
                 return .none
 
-            case .projectRegistration(.presented(.effect(.submissionFinished(.success(let receipt))))):
+            case .projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(let receipt)))))):
                 let progress = GenerationProgress(projectID: receipt.projectID, requestedAt: now())
                 state.generationProgress = progress
                 state.isGenerationProgressRestored = false
@@ -291,7 +291,7 @@ nonisolated struct AppRootFeature: Sendable {
                     return .none
                 }
                 state.pendingSharedLink = nil
-                state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+                state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
                 return .none
 
             case .effect(.generationProgressReleased(let projectID)):
@@ -320,6 +320,10 @@ nonisolated struct AppRootFeature: Sendable {
             case .projectRegistration(.presented(.delegate(.generationReminderPreferenceSelected(_)))):
                 return .none
 
+            case .projectRegistration(.presented(.delegate(.dismissRequested))):
+                state.projectRegistration = nil
+                return .none
+
             case .projectRegistration:
                 return .none
 
@@ -329,7 +333,7 @@ nonisolated struct AppRootFeature: Sendable {
             }
         }
         .ifLet(\.$projectRegistration, action: \.projectRegistration) {
-            ProjectRegistrationFeature(
+            ProjectRegistrationRouterFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: createLearningProject,
                 observeGenerationOutcomes: observeGenerationOutcomes,
@@ -393,7 +397,7 @@ nonisolated struct AppRootFeature: Sendable {
         guard let link = state.pendingSharedLink else { return .none }
         state.pendingSharedLink = nil
         guard state.generationProgress == nil else { return .none }
-        state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+        state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
         return .none
     }
 
@@ -428,9 +432,9 @@ nonisolated struct AppRootFeature: Sendable {
     }
 
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
-        let bundleVersion = state.onboarding.guide.bundleVersion
+        let bundleVersion = state.onboarding.tutorial.bundleVersion
         state.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)
-        state.mainShell = MainShellFeature.State()
+        state.mainShell = MainShellRouterFeature.State()
         state.projectRegistration = nil
         state.deviceRegistration = .idle
         state.generationProgress = nil

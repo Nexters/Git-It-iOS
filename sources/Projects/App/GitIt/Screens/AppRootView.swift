@@ -33,10 +33,10 @@ struct AppRootView: View {
             AppEntryScreen(store: store.scope(state: \.appEntry, action: \.appEntry))
 
         case .onboarding:
-            OnboardingScreen(store: store.scope(state: \.onboarding, action: \.onboarding))
+            OnboardingRouter(store: store.scope(state: \.onboarding, action: \.onboarding))
 
         case .mainShell:
-            MainShellScreen(store: store.scope(state: \.mainShell, action: \.mainShell))
+            MainShellRouter(store: store.scope(state: \.mainShell, action: \.mainShell))
             #if DEBUG
                 .safeAreaInset(edge: .bottom) {
                     ResetAllButton(action: { send(.resetAllTapped) })
@@ -45,7 +45,7 @@ struct AppRootView: View {
                 .fullScreenCover(
                     item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
                 ) { store in
-                    ProjectRegistrationScreen(store: store)
+                    ProjectRegistrationRouter(store: store)
                 }
         }
     }

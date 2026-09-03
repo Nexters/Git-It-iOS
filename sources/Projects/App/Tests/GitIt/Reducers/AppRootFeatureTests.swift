@@ -193,7 +193,7 @@ struct AppRootFeatureTests {
 
         await loggedOutStore.send(.mainShell(.delegate(.loggedOut))) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await loggedOutStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -216,7 +216,7 @@ struct AppRootFeatureTests {
         await authenticationOutcomes.emit(.unauthenticated)
         await sessionStore.receive(.effect(.authenticationOutcomeReceived(.unauthenticated))) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await sessionStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -237,7 +237,7 @@ struct AppRootFeatureTests {
         await resetStore.send(.view(.resetAllTapped))
         await resetStore.receive(.effect(.resetAllFinished)) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await resetStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -255,11 +255,11 @@ struct AppRootFeatureTests {
 
         await store.send(.mainShell(.delegate(.projectRegistrationRequested)))
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.mainShell == MainShellRouterFeature.State())
 
         await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.mainShell == MainShellRouterFeature.State())
 
         await store.send(
             .mainShell(
@@ -269,7 +269,7 @@ struct AppRootFeatureTests {
             )
         )
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.mainShell == MainShellRouterFeature.State())
     }
 
     @Test
@@ -280,7 +280,7 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.mainShell(.delegate(.projectRegistrationRequested))) {
-            $0.projectRegistration = ProjectRegistrationFeature.State()
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State()
         }
     }
 
@@ -288,7 +288,7 @@ struct AppRootFeatureTests {
     func `등록 완료 delegate는 등록 흐름을 닫고 Home을 정확히 한 번 재조회한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
@@ -443,7 +443,7 @@ struct AppRootFeatureTests {
     func `인증 종료 시 등록 흐름 child와 기기 등록 상태를 함께 제거한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         state.deviceRegistration = .failed
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
@@ -461,7 +461,7 @@ struct AppRootFeatureTests {
     func `재로그인 시 이전 세션의 등록 흐름 화면이 다시 표시되지 않는다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
@@ -486,7 +486,7 @@ struct AppRootFeatureTests {
         let trackGenerationProgress = TrackGenerationProgressSpy()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             trackGenerationProgress: trackGenerationProgress,
             waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
@@ -495,7 +495,7 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt)))))) {
+        await store.send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt))))))) {
             $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
             $0.mainShell.home.isGenerationInProgress = true
         }
@@ -512,7 +512,7 @@ struct AppRootFeatureTests {
         let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             observeGenerationOutcomes: observeGenerationOutcomes,
             waitPolicy: GenerationWaitPolicy(minimumWait: 60, retentionLimit: 3_600),
@@ -521,7 +521,7 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await store.send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
 
         #expect(store.state.generationProgress?.projectID == "project-1")
@@ -539,7 +539,7 @@ struct AppRootFeatureTests {
         let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             observeGenerationOutcomes: observeGenerationOutcomes,
             trackGenerationProgress: trackGenerationProgress,
@@ -549,7 +549,7 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await store.send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
 
         await store.receive(.effect(.generationProgressReleased(projectID: "project-1")), timeout: .seconds(5)) {
@@ -643,10 +643,10 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL)))) {
-            $0.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: Self.sharedURL)
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
         }
 
-        #expect(store.state.projectRegistration?.repositoryURLInput == Self.sharedURL)
+        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
         #expect(store.state.pendingSharedLink == nil)
 
         await store.skipReceivedActions()
@@ -666,7 +666,7 @@ struct AppRootFeatureTests {
         await store.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
             $0.pendingSharedLink = nil
-            $0.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: Self.sharedURL)
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
         }
 
         await store.skipReceivedActions()
@@ -700,7 +700,7 @@ struct AppRootFeatureTests {
 
         await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL))))
         await store.send(.onboarding(.delegate(.mainShellRequested)))
-        #expect(store.state.projectRegistration?.repositoryURLInput == Self.sharedURL)
+        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
 
         await store.send(.mainShell(.delegate(.loggedOut))) {
             $0.projectRegistration = nil
