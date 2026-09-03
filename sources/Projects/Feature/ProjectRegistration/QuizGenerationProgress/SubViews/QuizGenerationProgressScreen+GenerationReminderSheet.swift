@@ -38,7 +38,6 @@ extension QuizGenerationProgressScreen {
             static let contentSpacing: CGFloat = 24
             static let textSetSpacing: CGFloat = 8
             static let bellSize: CGFloat = 120
-            static let bellIconSize: CGFloat = 48
             static let contentTopPadding: CGFloat = 16
         }
     }
