@@ -221,7 +221,6 @@ public struct QuizRouterFeature: Sendable {
             projectID: state.projectID,
             question: question,
             questionNumber: state.currentQuestionIndex + 1,
-            questionCount: set.questions.count,
             advanceActionTitle: isLastQuestion ? Self.completeActionTitle : Self.nextQuestionActionTitle,
             isBookmarked: state.bookmarkedQuestionIDs.contains(question.questionID),
         )

@@ -48,14 +48,12 @@ public struct QuestionSolvingFeature: Sendable {
             projectID: String,
             question: Question,
             questionNumber: Int? = nil,
-            questionCount: Int? = nil,
             advanceActionTitle: String,
             isBookmarked: Bool = false,
         ) {
             self.projectID = projectID
             self.question = question
             self.questionNumber = questionNumber
-            self.questionCount = questionCount
             self.advanceActionTitle = advanceActionTitle
             self.isBookmarked = isBookmarked
         }
@@ -66,7 +64,6 @@ public struct QuestionSolvingFeature: Sendable {
         public var question: Question
         /// `nil`이면 순번을 표시하지 않습니다.
         public var questionNumber: Int?
-        public var questionCount: Int?
         /// 결과 상태 하단 컨트롤의 문구입니다. 이 Feature는 자신을 쓰는 흐름을 알지 않습니다.
         public let advanceActionTitle: String
 

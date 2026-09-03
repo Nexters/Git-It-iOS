@@ -48,7 +48,6 @@ private let essayQuestion = Question(
 private func previewState(
     question: Question = choiceQuestion,
     questionNumber: Int? = 3,
-    questionCount: Int? = 10,
     advanceActionTitle: String = "다음 문제",
     submission: QuestionSolvingFeature.Submission = .editing,
     draftChoiceIndex: Int? = nil,
@@ -59,7 +58,6 @@ private func previewState(
         projectID: "project-1",
         question: question,
         questionNumber: questionNumber,
-        questionCount: questionCount,
         advanceActionTitle: advanceActionTitle,
     )
     state.submission = submission
@@ -183,7 +181,7 @@ private let essayResult = EssayAnswerResult(
     ScreenContainer { _ in
         QuestionSolvingScreen(
             store: previewStore(
-                previewState(questionNumber: nil, questionCount: nil, advanceActionTitle: "완료")
+                previewState(questionNumber: nil, advanceActionTitle: "완료")
             )
         )
     }

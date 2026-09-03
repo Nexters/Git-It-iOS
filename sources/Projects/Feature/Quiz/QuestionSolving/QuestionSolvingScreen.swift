@@ -22,7 +22,6 @@ struct QuestionSolvingScreen: View {
                 VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
                     QuestionPrompt(
                         questionNumber: store.questionNumber,
-                        questionCount: store.questionCount,
                         prompt: store.question.prompt,
                     )
 

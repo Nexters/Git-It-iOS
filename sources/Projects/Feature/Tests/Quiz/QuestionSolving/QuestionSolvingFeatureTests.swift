@@ -192,7 +192,6 @@ struct QuestionSolvingFeatureTests {
             projectID: QuizTestFixture.projectID,
             question: question,
             questionNumber: 1,
-            questionCount: 3,
             advanceActionTitle: advanceActionTitle,
         )
     }
@@ -202,7 +201,6 @@ struct QuestionSolvingFeatureTests {
             projectID: QuizTestFixture.projectID,
             question: QuizTestFixture.essayQuestion(index: 2, myAnswer: nil),
             questionNumber: 3,
-            questionCount: 3,
             advanceActionTitle: "학습 완료",
         )
         state.draftEssayText = draftEssayText

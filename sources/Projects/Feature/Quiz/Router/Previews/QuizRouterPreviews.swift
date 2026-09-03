@@ -27,7 +27,6 @@ private func previewState(activeScreen: QuizRouterFeature.ActiveScreen) -> QuizR
         projectID: "project-1",
         question: previewSet.questions[0],
         questionNumber: 1,
-        questionCount: 1,
         advanceActionTitle: QuizRouterFeature.completeActionTitle,
     )
     state.learningCompletion.choiceQuestionCount = 1
