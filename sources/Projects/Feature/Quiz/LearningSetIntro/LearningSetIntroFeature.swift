@@ -57,7 +57,12 @@ public struct LearningSetIntroFeature: Sendable {
         public let label: String
         /// 홈 화면 카드의 이어풀기처럼 사용자가 이미 세트를 선택한 진입 경로에서
         /// 세트를 불러오는 즉시 시작 확인 탭 없이 바로 문제풀이로 진행합니다.
-        public let autoStartsOnLoad: Bool
+        /// 시작이 실행되는 즉시 꺼지며, 이 상태는 두 가지 역할을 겸합니다.
+        /// - 문제풀이에서 뒤로가기로 돌아왔을 때 다시 자동 시작되지 않도록 막습니다.
+        /// - 시작 버튼의 중복 탭(더블 탭)으로 시작 요청이 두 번 전송되지 않도록
+        ///   쓰로틀합니다. `true`인 동안에는 자동/수동 시작 요청 모두 재실행을
+        ///   막고, 시작 요청을 한 번 보낸 뒤 바로 꺼집니다.
+        public var autoStartsOnLoad: Bool
 
         public var setLoad = SetLoad.idle
         public var bookmarkLoad = BookmarkLoad.idle
@@ -128,7 +133,12 @@ public struct LearningSetIntroFeature: Sendable {
                 return loadSet(&state)
 
             case .view(.startTapped):
-                guard let set = state.learningSet, !state.isEmptySetReported else { return .none }
+                guard
+                    let set = state.learningSet,
+                    !state.isEmptySetReported,
+                    !state.autoStartsOnLoad
+                else { return .none }
+                state.autoStartsOnLoad = true
                 return startEffect(set: set, state: state)
 
             case .view(.backTapped):
@@ -144,6 +154,7 @@ public struct LearningSetIntroFeature: Sendable {
                 case .success(let set):
                     state.setLoad = .loaded(set)
                     guard state.autoStartsOnLoad else { return .none }
+                    state.autoStartsOnLoad = false
                     return startEffect(set: set, state: state)
 
                 case .failure(let error):
