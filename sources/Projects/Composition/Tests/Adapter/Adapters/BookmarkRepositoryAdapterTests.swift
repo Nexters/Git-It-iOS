@@ -40,6 +40,30 @@ struct BookmarkRepositoryAdapterTests {
     }
 
     @Test
+    func `목록 응답의 문제 본문을 그대로 보존한다`() async throws {
+        let remote = StubBookmarkRemote(listResult: .success(BookmarkedQuestionListResponseDTO(
+            totalCount: 1,
+            availableProjects: [],
+            bookmarks: [
+                BookmarkedQuestionResponseDTO(
+                    projectID: "project-1",
+                    setID: "set-1",
+                    questionID: "question-1",
+                    question: "`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?",
+                )
+            ],
+        )))
+        let adapter = BookmarkRepositoryAdapter(remote: remote)
+
+        let collection = try await adapter.fetchBookmarkedQuestions(projectID: nil)
+
+        #expect(
+            collection.bookmarks.map(\.prompt)
+                == ["`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?"]
+        )
+    }
+
+    @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
         let remote = StubBookmarkRemote(setResult: .failure(.unauthorized))
         let adapter = BookmarkRepositoryAdapter(remote: remote)

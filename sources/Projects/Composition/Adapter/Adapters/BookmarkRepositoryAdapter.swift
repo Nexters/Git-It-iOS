@@ -41,7 +41,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
                         projectID: $0.projectID,
                         setID: $0.setID,
                         questionID: $0.questionID,
-                        prompt: "",
+                        prompt: $0.question,
                     )
                 },
             )
