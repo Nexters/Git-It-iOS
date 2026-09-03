@@ -29,9 +29,9 @@ public struct LearningSetRow: View {
     public var body: some View {
         HStack(alignment: .top, spacing: LayoutToken.compactSpacing.cgFloatValue) {
             VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
-                StyledText.caption1(label, color: .blue100)
+                StyledText.subtitle3(label, color: .blue100)
 
-                StyledText.subtitle3(title)
+                StyledText.body1(title)
                     .lineLimit(2)
 
                 Spacer(minLength: 0)
