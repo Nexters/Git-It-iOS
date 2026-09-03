@@ -14,12 +14,12 @@ extension QuestionSolvingScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: LayoutToken.margin.cgFloatValue) {
                 LabeledCard.neutral(label: "나의 답안", text: myAnswer)
-                LabeledCard.neutral(label: "AI의 답안", text: aiAnswer)
-
-                if !criteria.isEmpty {
-                    RubricView(criteria: criteria)
-                }
+                LabeledCard.accent(label: "AI 해설", text: aiAnswer)
             }
+//                if !criteria.isEmpty {
+//                    RubricView(criteria: criteria)
+//                }
+//            }
         }
 
     }
