@@ -277,7 +277,7 @@ nonisolated struct AppRootFeature: Sendable {
             case .mainShell(.delegate(.questionSelected)):
                 return .none
 
-            case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID, _))):
+            case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
                 guard
                     case .loaded(let page) = state.mainShell.home.projectLoad,
                     let project = page.items.first(where: { $0.projectID == projectID })

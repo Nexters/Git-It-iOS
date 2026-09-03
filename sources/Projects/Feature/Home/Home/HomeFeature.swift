@@ -97,7 +97,7 @@ public struct HomeFeature: Sendable {
         public enum Delegate: Equatable, Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: String)
-            case learningRequested(projectID: String, nextSetID: String, nextQuestionID: String)
+            case learningRequested(projectID: String, nextSetID: String)
         }
     }
 
@@ -152,16 +152,10 @@ public struct HomeFeature: Sendable {
                     case .loaded(let page) = state.projectLoad,
                     let project = page.items.first(where: { $0.projectID == projectID }),
                     let nextSetID = project.nextSetID,
-                    let nextQuestionID = project.nextQuestionID
+                    project.nextQuestionID != nil
                 else { return .none }
                 return .send(
-                    .delegate(
-                        .learningRequested(
-                            projectID: projectID,
-                            nextSetID: nextSetID,
-                            nextQuestionID: nextQuestionID,
-                        )
-                    )
+                    .delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID))
                 )
 
             case .effect(.profileLoadFinished(let requestID, let result)):

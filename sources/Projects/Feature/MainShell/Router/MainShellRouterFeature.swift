@@ -63,7 +63,7 @@ public struct MainShellRouterFeature: Sendable {
         public enum Delegate: Sendable, Equatable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: String)
-            case learningRequested(projectID: String, nextSetID: String, nextQuestionID: String)
+            case learningRequested(projectID: String, nextSetID: String)
             case questionSelected(BookmarkedQuestion)
             case loggedOut
         }
@@ -111,16 +111,8 @@ public struct MainShellRouterFeature: Sendable {
             case .home(.delegate(.projectDetailRequested(let projectID))):
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
-            case .home(.delegate(.learningRequested(let projectID, let nextSetID, let nextQuestionID))):
-                return .send(
-                    .delegate(
-                        .learningRequested(
-                            projectID: projectID,
-                            nextSetID: nextSetID,
-                            nextQuestionID: nextQuestionID,
-                        )
-                    )
-                )
+            case .home(.delegate(.learningRequested(let projectID, let nextSetID))):
+                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
 
             case .projectList(.delegate(.projectSelected(let projectID))):
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))

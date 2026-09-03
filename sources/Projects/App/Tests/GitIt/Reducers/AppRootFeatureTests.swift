@@ -274,7 +274,7 @@ struct AppRootFeatureTests {
         await store.send(
             .mainShell(
                 .delegate(
-                    .learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1")
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1")
                 )
             )
         )
@@ -309,7 +309,7 @@ struct AppRootFeatureTests {
         await store.send(
             .mainShell(
                 .delegate(
-                    .learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1")
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1")
                 )
             )
         ) {

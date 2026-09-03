@@ -40,7 +40,7 @@ struct HomeFeatureNavigationTests {
 
         await store.send(.view(.learningTapped(projectID: "project-1")))
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1"))
+            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
         )
         await store.send(.view(.learningTapped(projectID: "missing")))
     }
