@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-17
 
-**최종 수정일**: 2026-08-31 (디자인 토큰과 View 내부 선언을 별도 문서로 분리)
+**최종 수정일**: 2026-09-03 (화면 전용 서브뷰 규칙 추가, 경계 이름을 `typealias`로 한정)
 
 ## 목적
 
@@ -119,7 +119,7 @@ SelectionToggle(state: .init(isSelected: store.isSelected))
 변형을 구분하는 `Style` 열거형은 표시 상태 wrapper가 아니라 시각 규칙의
 네임스페이스입니다. 호출부의 기본 선택 수단은 팩토리이며, 직접 초기화가 필요한 공개
 계약에서만 `Style`을 인자로 받습니다. `Style`의 선언 위치와 책임은
-[View 내부 선언 컨벤션 §2.2](./view-declarations.md#22-style)를 따릅니다.
+[View 내부 선언 컨벤션 §2.3](./view-declarations.md#23-style)를 따릅니다.
 
 ### 3.4 화면의 생성 경로
 
@@ -164,7 +164,7 @@ Presentation 보조 타입은
   생성되는 화면은 `internal`
 - UI 컴포넌트에 중첩한 `Style`과 그 밖의 비상태 보조 타입: 공개 계약에 필요한 경우만
   `public`, 그 외에는 `private`
-- View에 중첩한 `Constant`: 항상 `private`
+- View가 소유한 `Constant`와 그 밖의 보조 선언: 항상 `private`([View 내부 선언 컨벤션 §2.1](./view-declarations.md#21-constant))
 
 "모든 화면을 `public`으로 연다"와 "필요할 때 연다"를 파일마다 다르게 적용하지
 않습니다. 화면을 `public`으로 여는 근거는 App의 Navigation에서 생성되는지 여부
@@ -197,13 +197,73 @@ Reducer의 `State`가 소유합니다.
 
 - 화면은 상태 분기, 화면 목적지 생성, 컴포넌트 조립을 소유합니다.
 - 화면에서 독립적으로 이름 붙일 수 있는 표현 책임은 UIComponent로 옮깁니다.
-- 화면 전용 렌더링 조각은 별도 `View` 타입으로 추출하지 않고 화면의 private 연산
-  프로퍼티 또는 메서드로 유지합니다.
+- 화면 전용 렌더링 조각은 §4.3의 화면 전용 서브뷰로 분리하고, 패키지 수준의 재사용
+  `View` 타입으로 노출하지 않습니다.
 
 화면이 Store와 Action을 다루는 경계는
 [TCA Navigation 컨벤션 §2.2](./tca/navigation.md#22-tca-화면)를 따릅니다.
 
-### 4.3 표시용 표본 데이터
+### 4.3 화면 전용 서브뷰
+
+**UIComponent가 지원하지 않는 표현이면서 한 화면에서만 쓰는 렌더링 조각은, 화면
+타입에 중첩한 `View` 타입으로 정의해 화면에서 그 책임을 분리합니다.** 재사용 가능한
+표현이면 서브뷰로 만들지 않고
+[UIComponent 컨벤션 §4](./ui-component.md#4-재사용-판단)에 따라 컴포넌트로 옮깁니다.
+
+```swift
+// ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen+ThumbnailView.swift
+extension RepositoryConfirmationScreen {
+    struct ThumbnailView: View {
+        var body: some View { ... }
+
+        private enum Constant {
+            static let cornerRadius: CGFloat = 12
+        }
+    }
+}
+```
+
+- 서브뷰는 화면 타입에 중첩합니다. 화면 파일 최상위나 다른 화면에서 참조할 수 있는
+  위치에 두지 않습니다.
+- **화면 `body`에서 서브뷰를 호출할 때는 `Self.`을 붙입니다.** 그 표현이 이 화면이
+  소유한 서브뷰라는 것을 호출부에서 바로 드러내기 위한 것입니다
+  (`Self.ThumbnailView()`).
+- 서브뷰의 상수는 화면과 같은 방식으로 **서브뷰 자신의 `Constant`** 에 정의합니다.
+  부모 화면의 `Constant`를 직접 참조하지 않으며, 같은 값을 써야 하면 서브뷰 생성자로
+  주입받고 부모 화면이 초기화 시 넘깁니다
+  ([View 내부 선언 컨벤션 §2.1](./view-declarations.md#21-constant)).
+- **서브뷰는 SwiftUI와 UI 패키지에만 의존합니다.** 서브뷰 파일이 `import`할 수 있는
+  것은 `SwiftUI`, `DesignSystem`, `UIComponent`와 `Foundation`·`CoreGraphics`뿐입니다.
+  `ComposableArchitecture`와 Domain 패키지를 import하면 규칙 위반이며, 이것이 이
+  규칙의 기계적 확인 기준입니다.
+- 따라서 `StoreOf<Feature>`, `Feature.State.*`, `Action`, Domain 모델을 서브뷰의
+  입력으로 쓰지 않습니다. **화면이 그 값을 표시 값으로 변환해 전달합니다** — 문자열,
+  숫자, `Bool`, 콜백, 그리고 UIComponent가 정의한 타입입니다.
+- 화면이 서브뷰에게 이름 붙인 경계가 필요하면 화면 파일에 `typealias`로 정의합니다.
+  같은 모듈이라 import가 필요 없으므로 위 제약을 지키면서 이름을 줄 수 있습니다.
+  값을 담는 표시 타입은 화면에 중첩하지 않고 최상위 타입으로 분리합니다
+  ([View 내부 선언 컨벤션 §2.2](./view-declarations.md#22-private을-붙일-수-없으면-소유가-잘못된-것입니다)).
+
+  ```swift
+  extension HomeScreen {
+      struct ProfileHeaderView: View {
+          let name: String?
+          let role: String
+          let isFailed: Bool
+          let onRetry: () -> Void
+      }
+  }
+  ```
+
+  화면은 `HomeFeature.State.ProfileLoad`를 읽어 이 값들을 만들어 넘깁니다. 서브뷰는
+  Feature도 Domain도 모릅니다.
+
+- 화면 파일이 길어지면 서브뷰를
+  [파일·형태 어휘 컨벤션 §2.2](./file-vocabulary.md#22-중첩-타입-분리)의
+  `{화면}+{서브뷰}.swift`로 나누고, 그 화면 폴더의 `SubViews/`에 둡니다
+  ([디렉터리·파일 컨벤션 §4.3](./directory-file.md#43-feature-패키지의-흐름-배치)).
+
+### 4.4 표시용 표본 데이터
 
 레이아웃 검토 단계의 화면이 참조하는 표본 데이터는 화면 파일에 하드코딩하지 않고
 `Shared/Models/`의 `internal` 표본 타입에 모읍니다. 표본 타입은 컴포넌트
@@ -218,14 +278,20 @@ SwiftUI `Binding`으로 대체하고, 표본 타입은 해당 화면의 참조�
 | 대상 | 위치 | 이름 |
 |---|---|---|
 | UIComponent | 컴포넌트 파일 하단 `#Preview` | 컴포넌트 이름 |
-| Feature 화면 | `Previews/<영역>Previews.swift` | 화면과 상태를 설명하는 한국어 이름 |
+| Feature 화면 | 그 화면 폴더의 `Previews/` 안 `<화면 타입 이름>Previews.swift` | 화면과 상태를 설명하는 한국어 이름 |
 
 - 컴포넌트 프리뷰는 모든 시각 변형을 한 프리뷰에 나열해 변형 간 차이를 함께 봅니다.
 - 컴포넌트 프리뷰의 배경은 `designSystemBackground(.grey700)`으로 실제 화면 배경 위의
   대비를 확인합니다.
 - 화면 프리뷰는 `catalogPreviewFrame()`으로 동일한 검토 프레임을 사용합니다.
 - 화면 파일 안에 `#Preview`를 두지 않습니다. 화면 프리뷰는 상태 조합마다 늘어나므로
-  화면 구현과 분리해 목록으로 관리합니다.
+  화면 구현과 분리합니다.
+- **Feature 프리뷰 파일은 언제나 `Previews/` 폴더로 분리합니다.** 한 화면의 프리뷰는 그
+  화면 폴더의 `Previews/`에, 여러 화면이 함께 쓰는 프리뷰 전용 지원 타입은 흐름 1뎁스의
+  `Previews/`에 둡니다
+  ([디렉터리·파일 컨벤션 §4.3](./directory-file.md#43-feature-패키지의-흐름-배치)).
+- 파일 이름은 화면 타입 이름 뒤에 `Previews`를 붙입니다 —
+  `RepositoryConfirmationScreenPreviews.swift`, `OnboardingRouterPreviews.swift`.
 - 프리뷰 전용 타입은 프리뷰가 필요한 컴포넌트 파일이 아니라 독립 파일에 둡니다.
 
 ## 6. 검토 체크리스트
@@ -245,11 +311,15 @@ SwiftUI `Binding`으로 대체하고, 표본 타입은 해당 화면의 참조�
 
 ### 화면 조립과 프리뷰
 
-- [ ] 화면 안에 별도 `View` 타입을 정의하지 않았는가?
+- [ ] 화면 전용 서브뷰가 화면 타입에 중첩되어 있고, `body`에서 `Self.`으로
+      호출되는가?
+- [ ] 재사용 가능한 표현을 화면 전용 서브뷰로 남겨 두지 않았는가?
+- [ ] 서브뷰 파일의 `import`가 SwiftUI·DesignSystem·UIComponent로 한정되는가?
+- [ ] 서브뷰 입력에 `Store`·Feature `State`·Domain 모델이 없는가?
 - [ ] 화면이 `preferredColorScheme`을 다시 지정하지 않는가?
 - [ ] 검토 전용 UI가 `UIComponentPreviewApp` target에 있는가?
 - [ ] 컴포넌트 프리뷰가 모든 시각 변형을 포함하는가?
-- [ ] 화면 프리뷰가 `Previews/`에 있는가?
+- [ ] 화면 프리뷰가 그 화면 폴더의 `Previews/` 안 `<화면 타입 이름>Previews.swift`에 있는가?
 
 디자인 토큰과 View 내부 선언의 체크리스트는 각 문서 —
 [View 토큰 컨벤션](./view-tokens.md#3-검토-체크리스트),

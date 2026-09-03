@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-08-31 ([디렉터리·파일 컨벤션](./directory-file.md)에서 분리)
+**최종 수정일**: 2026-09-03 (Feature 흐름 배치와 화면 전용 서브뷰 파일 이름 반영)
 
 ## 목적
 
@@ -22,7 +22,7 @@
 
 - `sources/Projects/<패키지>/` 아래 production·test Swift 소스 파일 이름과 파일당
   타입 개수
-- [디렉터리·파일 컨벤션 §4](./directory-file.md#4-1뎁스--형태-폴더)가 정의하는 1뎁스
+- [디렉터리·파일 컨벤션 §4](./directory-file.md#4-1뎁스--형태-폴더와-feature-흐름-단위)가 정의하는 1뎁스
   형태 폴더 자리에 쓸 수 있는 이름의 목록
 
 적용하지 않습니다.
@@ -67,9 +67,15 @@ extension ScreenHeader {
 }
 ```
 
+화면 전용 서브뷰도 같은 규칙을 씁니다 —
+`ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen+ThumbnailView.swift`.
+`Constant`는 예외로 파일을 나누지 않고 소유 View와 같은 파일에 둡니다
+([View 내부 선언 컨벤션 §2.1](./view-declarations.md#21-constant)).
+
 중첩할지 여부 자체는
-[View 내부 선언 컨벤션 §2](./view-declarations.md#2-view-내부-선언)가 정합니다. 이
-문서는 나눈 파일의 이름과 위치만 정합니다.
+[View 내부 선언 컨벤션 §2](./view-declarations.md#2-view-내부-선언)가, 화면 전용
+서브뷰를 만드는 기준은 [View 컨벤션 §4.3](./view.md#43-화면-전용-서브뷰)이 정합니다.
+이 문서는 나눈 파일의 이름과 위치만 정합니다.
 
 ### 2.3 기존 타입 확장
 
@@ -88,7 +94,7 @@ Models/HTTPRequest+QueryItem.swift
 
 프로토콜처럼 Swift 제약으로 중첩할 수 없거나, 제네릭 타입에 중첩하면 호출부가 제네릭
 인자를 적어야 하는 선언은 최상위에 두고 이름에 소유 타입을 남깁니다
-([View 내부 선언 컨벤션 §2.4](./view-declarations.md#24-중첩할-수-없는-경우)). 파일은
+([View 내부 선언 컨벤션 §2.5](./view-declarations.md#25-중첩할-수-없는-경우)). 파일은
 소유 타입의 패밀리 폴더에 둡니다.
 
 ```text
@@ -101,7 +107,9 @@ Scaffolds/TabShell/
 ### 2.5 프리뷰 전용 타입
 
 프리뷰 전용 타입은 컴포넌트의 계약이 아니므로 컴포넌트 파일에 두지 않고
-`{소유타입}Preview{역할}.swift`로 분리해 같은 패밀리 폴더에 둡니다
+`{소유타입}Preview{역할}.swift`로 분리합니다. UI 패키지에서는 같은 패밀리 폴더에,
+Feature 패키지에서는 그 화면의 `Previews/` 폴더에, 여러 화면이 공유하면 흐름 1뎁스의
+`Previews/` 폴더에 둡니다
 ([View 컨벤션 §5](./view.md#5-프리뷰)).
 
 ### 2.6 테스트 파일 이름
@@ -111,11 +119,13 @@ Scaffolds/TabShell/
 
 ## 3. 패키지별 형태 어휘
 
-아래 표가 형태 폴더 이름의 정본이며 현재 저장소 구조와 일치합니다. 표에 없는 형태를
+아래 표가 형태 폴더 이름의 정본입니다. Feature 패키지의 1뎁스는 형태가 아니라 흐름의
+단위 폴더이므로 [디렉터리·파일 컨벤션 §4.3](./directory-file.md#43-feature-패키지의-흐름-배치)을
+따르며, 표에는 그 단위 폴더를 함께 적습니다. 표에 없는 형태를
 추가하려면 같은 PR에서 이 표를 갱신합니다. 형태 폴더를 판단하는 기준 자체는
 [디렉터리·파일 컨벤션 §4.1](./directory-file.md#41-판단-기준)을 따릅니다.
 
-| 소스 루트 | 형태 폴더 | 담는 선언 |
+| 소스 루트 | 1뎁스 폴더 | 담는 선언 |
 | --- | --- | --- |
 | `Domain/<관심사>/` | `Models/` | 비즈니스 모델과 값 타입 |
 | | `Contracts/` | Domain이 외부에 요구하는 계약 프로토콜 |
@@ -143,11 +153,16 @@ Scaffolds/TabShell/
 | | `Codings/` | 경계 간 인코딩·디코딩 |
 | | `Layouts/` | 저장소 키 배치 |
 | | `Factories/` | 구현 선택과 생성 |
-| `Feature/<기능>/` | `Reducers/` | Feature, State, Action, Reducer |
-| | `Screens/` | 화면 View |
-| | `Views/` | Screen을 구성하는 Sub View |
-| | `Previews/` | 화면 프리뷰와 프리뷰 전용 타입 |
-| | `Models/` | 화면 전용 표시 모델 |
+| `Feature/<흐름>/` | `Router/` | Router View, RouterFeature와 활성 화면 값 타입 |
+| | `<화면>/` | 화면 하나와 그 짝인 Feature 하나 |
+| | `Previews/` | 여러 화면의 프리뷰가 함께 쓰는 프리뷰 전용 타입 |
+| | `Shared/` | 둘 이상의 화면이 함께 쓰는 선언 — 이 아래에서만 형태 폴더를 씁니다 |
+| | `Resources/` | 흐름이 소유하는 자산 |
+| `Feature/<흐름>/<화면>/` | `SubViews/` | 그 화면 전용 서브뷰 |
+| | `ViewModels/` | 그 화면이 `State`에서 파생하는 표시 모델과 계산 타입 |
+| | `Previews/` | 그 화면의 프리뷰 |
+| `Feature/<흐름>/Shared/` | `Views/` | 둘 이상의 화면이 함께 쓰는 View |
+| | `Models/` | 둘 이상의 화면이 함께 쓰는 표시 모델 |
 | `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |
 | | `Layout/` | 화면 크기에서 파생하는 런타임 레이아웃 변수 |
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
@@ -162,6 +177,7 @@ Scaffolds/TabShell/
 | | `AppDelegates/` | 플랫폼 생명주기 delegate 타입 |
 | `Tests/<역할>/` | production과 같은 형태 폴더 | 대상 형태를 그대로 사용 |
 | | `TestDoubles/` | 둘 이상의 파일에서 쓰는 Test Double |
+| `Feature/Tests/<흐름>/` | `Router/` · `<화면>/` | production의 흐름 축을 그대로 미러링 |
 
 `Mocks/`는 사용하지 않습니다. Stub·Spy·Fake를 모두 포함하는 `TestDoubles/`로 통일합니다.
 

@@ -7,12 +7,12 @@
 | 문서 | 소유하는 규칙 |
 | --- | --- |
 | [네이밍](./naming.md) | 공개 이름, 경계 값, 접두어·접미어와 외부 고정 명칭 |
-| [디렉터리·파일](./directory-file.md) | 소스 루트, 폴더 뎁스와 관심사 세그먼트, 자산·매니페스트 일치 |
+| [디렉터리·파일](./directory-file.md) | 소스 루트, 폴더 뎁스와 관심사 세그먼트, Feature 흐름 배치, 자산·매니페스트 일치 |
 | [파일·형태 어휘](./file-vocabulary.md) | 파일당 타입 개수, 파일 이름 규칙, 패키지별 형태 폴더 어휘 |
 | [테스트](./test.md) | 프레임워크, 테스트 이름·구성, Test Double과 target 배치 |
-| [View](./view.md) | SwiftUI 공개 생성 경로, 화면 조립과 프리뷰 |
+| [View](./view.md) | SwiftUI 공개 생성 경로, 화면 조립, 화면 전용 서브뷰와 프리뷰 |
 | [View 토큰](./view-tokens.md) | 색상·레이아웃·Typography 토큰 사용 규칙 |
-| [View 내부 선언](./view-declarations.md) | `Constant`·`Style` 등 View 내부 선언과 중첩 규칙 |
+| [View 내부 선언](./view-declarations.md) | `Constant`·`Style` 등 View 내부 선언의 정의 위치, 접근 수준과 소유 판정 |
 | [UIComponent](./ui-component.md) | 컴포넌트 경계, 공개 입력, 파일·자산 구성과 검증 |
 | [TCA](./tca/README.md) | TCA 핵심 용어, 제약조건과 하위 문서 안내 |
 

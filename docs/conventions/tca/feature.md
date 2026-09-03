@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-08-31 ([TCA 컨벤션](./README.md)에서 분리)
+**최종 수정일**: 2026-09-03 (화면-Feature 1:1과 흐름 Router 소유 규칙 반영)
 
 ## 목적
 
@@ -33,11 +33,19 @@ Reducer·Effect 작성은 [Effect 컨벤션](./effect.md), Navigation 출력은
 - 하나의 사용자 기능은 `@Reducer`가 붙은 Feature 타입 하나를 중심으로 구성합니다.
 - 같은 논리 화면의 loading, loaded, empty, menu, confirmation과 오류 표현은 별도
   Feature가 아니라 원칙적으로 하나의 Feature가 소유하는 State 변형입니다.
-- 하나의 Feature는 여러 View를 렌더링할 수 있고, 하나의 화면은 부모 Feature와 여러
-  Child Feature를 조합할 수 있으므로 Feature와 View를 1:1로 맞추지 않습니다.
-- 한 사용자 기능의 Reducer와 화면은 `<기능>/`에 함께 둡니다.
-- 여러 화면이 공유하는 View가 아닌 Presentation 보조 타입만 `Shared/`에
-  둘 수 있습니다.
+- **화면(Screen)은 자신과 1:1로 대응하는 Feature 하나를 소유합니다.** 화면의 상태
+  정본이 어느 Feature에 있는지 찾아 헤매지 않게 하고, 화면 단위로 독립 검증할 수 있게
+  하기 위한 것입니다.
+- 1:1 대상은 **화면**이지 모든 `View`가 아닙니다. 한 Feature는 그 화면이 소유한
+  서브뷰를 여럿 렌더링할 수 있고([View 컨벤션 §4.3](../view.md#43-화면-전용-서브뷰)),
+  한 화면이 Child Feature를 조합할 수도 있습니다.
+- **여러 화면으로 이어지는 흐름은 화면 Feature들을 조합하는 Router-Feature가
+  소유합니다**([Navigation 컨벤션 §2.3](./navigation.md#23-router-feature와-화면-전환-소유)).
+  화면 여럿을 하나의 Feature가 직접 담지 않습니다.
+- 화면과 그 짝인 Feature는 같은 관심사 폴더에 함께 두고, 여러 화면이 공유하는
+  Presentation 보조 타입만 `Shared/`에 둡니다. 폴더 배치는
+  [디렉터리·파일 컨벤션 §4.3](../directory-file.md#43-feature-패키지의-흐름-배치)이
+  소유합니다.
 
 논리 화면이나 상태 영역이 다음 중 하나 이상을 소유하면 Feature 후보로 봅니다.
 
