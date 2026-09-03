@@ -5,7 +5,7 @@ import DomainMember
 import Foundation
 
 @Reducer
-public struct MainShellFeature: Sendable {
+public struct MainShellRouterFeature: Sendable {
 
     // MARK: Lifecycle
 
@@ -130,7 +130,7 @@ public struct MainShellFeature: Sendable {
 
             case .settings(.delegate(.signedOut)),
                  .settings(.delegate(.accountDeleted)):
-                state = MainShellFeature.State()
+                state = MainShellRouterFeature.State()
                 return .send(.delegate(.loggedOut))
 
             case .home,

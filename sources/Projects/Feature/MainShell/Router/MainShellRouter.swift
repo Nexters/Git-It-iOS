@@ -2,20 +2,20 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
-// MARK: - MainShellScreen
+// MARK: - MainShellRouter
 
-@ViewAction(for: MainShellFeature.self)
-public struct MainShellScreen: View {
+@ViewAction(for: MainShellRouterFeature.self)
+public struct MainShellRouter: View {
 
     // MARK: Lifecycle
 
-    public init(store: StoreOf<MainShellFeature>) {
+    public init(store: StoreOf<MainShellRouterFeature>) {
         self.store = store
     }
 
     // MARK: Public
 
-    @Bindable public var store: StoreOf<MainShellFeature>
+    @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
         TabShell(selected: selectedTab) { tab in
@@ -26,10 +26,7 @@ public struct MainShellScreen: View {
             case .projects,
                  .saved,
                  .settings:
-                ScreenContainer { _ in
-                    StyledText.subtitle1(tab.tabTitle, alignment: .center)
-                        .designSystemScreenMargin()
-                }
+                Self.PlaceholderView(title: tab.tabTitle)
             }
         }
     }

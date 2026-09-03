@@ -5,17 +5,17 @@ import Testing
 
 @testable import Feature
 
-// MARK: - MainShellFeatureTests
+// MARK: - MainShellRouterFeatureTests
 
 @MainActor
 @Suite("MainShell Home 통합")
-struct MainShellFeatureTests {
+struct MainShellRouterFeatureTests {
 
     // MARK: Internal
 
     @Test
     func `Home이 기본이고 탭 순서는 Home 프로젝트 저장 마이다`() {
-        #expect(MainShellFeature.State().selectedTab == .home)
+        #expect(MainShellRouterFeature.State().selectedTab == .home)
         #expect(MainShellTab.allCases == [.home, .projects, .saved, .settings])
     }
 
@@ -23,7 +23,7 @@ struct MainShellFeatureTests {
     func `탭을 왕복해도 Home child 상태를 보존하고 조회를 다시 시작하지 않는다`() async {
         let profile = HomeMemberProfileUseCaseMock()
         let projects = HomeLearningProjectsUseCaseMock()
-        var state = MainShellFeature.State()
+        var state = MainShellRouterFeature.State()
         state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(state: state, projects: projects, profile: profile)
@@ -66,13 +66,13 @@ struct MainShellFeatureTests {
     func `로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다`(
         delegate: SettingsFeature.Action.Delegate
     ) async {
-        var state = MainShellFeature.State()
+        var state = MainShellRouterFeature.State()
         state.selectedTab = .settings
         state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         let store = makeStore(state: state)
 
         await store.send(.settings(.delegate(delegate))) {
-            $0 = MainShellFeature.State()
+            $0 = MainShellRouterFeature.State()
         }
         await store.receive(.delegate(.loggedOut))
     }
@@ -80,12 +80,12 @@ struct MainShellFeatureTests {
     // MARK: Private
 
     private func makeStore(
-        state: MainShellFeature.State = .init(),
+        state: MainShellRouterFeature.State = .init(),
         projects: HomeLearningProjectsUseCaseMock = .init(),
         profile: HomeMemberProfileUseCaseMock = .init(),
-    ) -> TestStoreOf<MainShellFeature> {
+    ) -> TestStoreOf<MainShellRouterFeature> {
         TestStore(initialState: state) {
-            MainShellFeature(
+            MainShellRouterFeature(
                 fetchLearningProjects: projects,
                 deleteLearningProject: MainShellDeleteProjectStub(),
                 fetchBookmarkedQuestions: MainShellBookmarksStub(),
