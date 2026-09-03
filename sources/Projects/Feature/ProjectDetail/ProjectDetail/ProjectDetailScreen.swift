@@ -24,19 +24,39 @@ struct ProjectDetailScreen: View {
             }
         }
         .overlay {
-            ModalOverlay(isPresented: store.isMenuPresented, onDismiss: { send(.menuDismissed) }) {
+            if store.isMenuPresented {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .accessibilityHidden(true)
+                    .onTapGesture { send(.menuDismissed) }
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if store.isMenuPresented {
                 MenuSheet(
                     onSavedQuestionsTap: { send(.savedQuestionsTapped) },
                     onRepositoryLinkTap: { send(.repositoryLinkTapped) },
                     onDeleteTap: { send(.deleteTapped) },
                 )
+                .padding(.trailing, LayoutToken.margin.cgFloatValue)
+                .offset(y: headerHeight)
+                .transition(.opacity)
             }
         }
-        .alert("프로젝트를 삭제할까요?", isPresented: deletionConfirmBinding) {
-            Button("취소", role: .cancel) { send(.deletionCancelled) }
-            Button("삭제하기", role: .destructive) { send(.deletionConfirmed) }
-        } message: {
-            Text("삭제하면 학습 기록도 함께 사라집니다.")
+        .animation(.easeInOut(duration: 0.2), value: store.isMenuPresented)
+        .overlay {
+            ModalOverlay(isPresented: isDeletionConfirmationPresented, onDismiss: { send(.deletionCancelled) }) {
+                ConfirmationSheet(
+                    imageURL: store.detail?.repositoryImageURL,
+                    title: "프로젝트를 삭제할까요?",
+                    message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
+                    confirmTitle: "삭제",
+                    cancelTitle: "취소",
+                    onConfirmTap: { send(.deletionConfirmed) },
+                    onCancelTap: { send(.deletionCancelled) },
+                )
+            }
         }
         .overlay {
             if store.loadStatus == .idle || store.loadStatus == .loading {
@@ -49,57 +69,99 @@ struct ProjectDetailScreen: View {
 
     // MARK: Private
 
-    private var deletionConfirmBinding: Binding<Bool> {
-        Binding(
-            get: { store.deletion == .confirming },
-            set: { isPresented in
-                guard !isPresented else { return }
-                send(.deletionCancelled)
-            },
-        )
+    @State private var headerHeight: CGFloat = 0
+
+    private var isDeletionConfirmationPresented: Bool {
+        store.deletion == .confirming
     }
 
     private var content: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
+            header
+
+            SetListSection(
+                sets: ProjectDetailSetDisplay.list(sets: store.detail?.sets ?? []),
+                onStart: { send(.setStartTapped(setID: $0)) },
+            )
+            .designSystemScreenMargin()
+            .padding(.top, Constant.setListTopSpacing)
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
             ScreenHeader(
                 style: .default,
                 trailing: Constant.menuControl,
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )
-            .designSystemScreenMargin()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
-                    RepositorySummaryView(
-                        repositoryName: store.detail?.repositoryName ?? "",
-                        repositoryImageURL: store.detail?.repositoryImageURL,
-                        starCount: store.detail?.starCount ?? 0,
-                        techStack: store.detail?.techStack ?? [],
-                        overallProgressPercent: store.detail?.overallProgressPercent ?? 0,
-                        isResumeEnabled: store.isResumeEnabled,
-                        onResumeTap: { send(.resumeTapped) },
-                    )
-
-                    SetListSection(
-                        sets: ProjectDetailSetDisplay.list(sets: store.detail?.sets ?? []),
-                        onStart: { send(.setStartTapped(setID: $0)) },
-                    )
+            .background(
+                GeometryReader { proxy in
+                    Color.clear.preference(key: HeaderHeightPreferenceKey.self, value: proxy.size.height)
                 }
-                .designSystemScreenMargin()
-                .padding(.vertical, Constant.contentVerticalPadding)
-            }
+            )
+            .onPreferenceChange(HeaderHeightPreferenceKey.self) { headerHeight = $0 }
+
+            RepositorySummaryView(
+                repositoryName: store.detail?.repositoryName ?? "",
+                repositoryImageURL: store.detail?.repositoryImageURL,
+                starCount: store.detail?.starCount ?? 0,
+                techStack: store.detail?.techStack ?? [],
+                overallProgressPercent: store.detail?.overallProgressPercent ?? 0,
+                isResumeEnabled: store.isResumeEnabled,
+                onResumeTap: { send(.resumeTapped) },
+            )
         }
+        .designSystemScreenMargin()
+        .background(alignment: .top) { heroBackground }
+    }
+
+    private var heroBackground: some View {
+        ZStack(alignment: .top) {
+            Color(designSystem: .grey700)
+            LinearGradient(designSystem: Constant.heroGradient)
+                .frame(height: Constant.heroGradientHeight)
+        }
+        .ignoresSafeArea(edges: .top)
+        .accessibilityHidden(true)
     }
 
 }
 
-// MARK: ProjectDetailScreen.Constant
+// MARK: - HeaderHeightPreferenceKey
+
+private struct HeaderHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(
+        value: inout CGFloat,
+        nextValue: () -> CGFloat,
+    ) {
+        value = nextValue()
+    }
+}
+
+// MARK: - ProjectDetailScreen.Constant
 
 extension ProjectDetailScreen {
     fileprivate enum Constant {
         static let sectionSpacing: CGFloat = 24
-        static let contentVerticalPadding: CGFloat = 16
         static let menuControl = ScreenHeader.Control(symbol: "line.3.horizontal", label: "메뉴 열기")
+
+        static let setListTopSpacing: CGFloat = 54
+        static let heroGradientHeight: CGFloat = 179
+        static let topDimHeight: CGFloat = 103
+
+        static let heroGradient = GradientToken(
+            name: "Gradient 1 · 프로젝트 상세",
+            start: .init(x: 0.5, y: 0),
+            end: .init(x: 0.5, y: 1),
+            stops: [
+                GradientToken.Stop(position: 0, hex: "#56718A"),
+                GradientToken.Stop(position: 0.5, hex: "#485469"),
+                GradientToken.Stop(position: 1, hex: "#3B3749"),
+            ],
+        )
     }
 }

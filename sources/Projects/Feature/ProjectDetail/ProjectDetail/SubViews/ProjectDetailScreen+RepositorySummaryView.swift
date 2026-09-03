@@ -83,7 +83,7 @@ extension ProjectDetailScreen {
                 HStack(spacing: Constant.starSpacing) {
                     ResourceImage(asset: .icon(.star))
                         .frame(width: Constant.starSize, height: Constant.starSize)
-                    StyledText.caption1("\(starCount)", color: .blue100)
+                    StyledText.caption1(formattedStarCount, color: .blue100)
                 }
 
                 if !techStack.isEmpty {
@@ -98,6 +98,19 @@ extension ProjectDetailScreen {
             .accessibilityElement(children: .combine)
         }
 
+        private var formattedStarCount: String {
+            switch starCount {
+            case 1_000_000...:
+                "\(abbreviatedUnit(starCount, divisor: 1_000_000))m"
+
+            case 1_000...:
+                "\(abbreviatedUnit(starCount, divisor: 1_000))k"
+
+            default:
+                "\(starCount)"
+            }
+        }
+
         private var resumeButton: some View {
             Button(action: onResumeTap) {
                 ResourceImage(asset: .icon(.playSmall))
@@ -109,6 +122,16 @@ extension ProjectDetailScreen {
             .buttonStyle(.plain)
             .disabled(!isResumeEnabled)
             .accessibilityLabel("이어서 학습")
+        }
+
+        private func abbreviatedUnit(
+            _ count: Int,
+            divisor: Int,
+        ) -> String {
+            let scaled = (Double(count) / Double(divisor) * 10).rounded(.down) / 10
+            return scaled.truncatingRemainder(dividingBy: 1) == 0
+                ? String(format: "%.0f", scaled)
+                : String(format: "%.1f", scaled)
         }
 
     }
