@@ -94,15 +94,15 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 테스트
 
-- [ ] T010 [S6] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/LearningSetRowTests.swift`를 새 계약(`label`·`title`·`questionCount`·`completedCount`·`onStart`)으로 갱신하고, 탭 가능한 컨트롤이 시작 버튼 하나뿐이며 진행 표시가 문제 수만큼의 세그먼트인지 검증한다 (SC-019, FR-042·042a·042b)
+- [X] T010 [S6] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/LearningSetRowTests.swift`를 새 계약(`label`·`title`·`questionCount`·`completedCount`·`onStart`)으로 갱신하고, 탭 가능한 컨트롤이 시작 버튼 하나뿐이며 진행 표시가 문제 수만큼의 세그먼트인지 검증한다 (SC-019, FR-042·042a·042b)
 
 ### 구현
 
-- [ ] T011 [S6] `sources/Projects/UI/Component/CollectionItems/LearningSetRow/LearningSetRow.swift`를 [data-model.md §2.1](./data-model.md)의 계약으로 개편한다. 카드 전체를 감싼 `Button`을 제거하고 우측 시작 버튼만 조작 단위로 두며, 진행 표시를 `ProgressSegments(completed:total:)`로 바꾸고 `문제 N개` 캡션과 `완료` 배지를 제거한다. 역할 폴더는 `CollectionItems/`를 유지한다 (D-009, FR-050a)
+- [X] T011 [S6] `sources/Projects/UI/Component/CollectionItems/LearningSetRow/LearningSetRow.swift`를 [data-model.md §2.1](./data-model.md)의 계약으로 개편한다. 카드 전체를 감싼 `Button`을 제거하고 우측 시작 버튼만 조작 단위로 두며, 진행 표시를 `ProgressSegments(completed:total:)`로 바꾸고 `문제 N개` 캡션과 `완료` 배지를 제거한다. 역할 폴더는 `CollectionItems/`를 유지한다 (D-009, FR-050a)
 
 ### 정리와 패키지 검증
 
-- [ ] T012 [no-write] UI 테스트 scheme을 실행해 T010이 통과하는지 확인하고, 시작 버튼의 hit area가 44pt 이상인지 확인해 결과를 기록한다 (FR-056)
+- [X] T012 [no-write] UI 테스트 scheme을 실행해 T010이 통과하는지 확인하고, 시작 버튼의 hit area가 44pt 이상인지 확인해 결과를 기록한다 (FR-056)
 
 **진행 점검**: T010~T012의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행 단위로
 진행한다.
