@@ -59,21 +59,21 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 테스트
 
-- [ ] T001 [P] [S1] [S4] `sources/Projects/Domain/Tests/LearningProject/Models/Quiz/SubmittedAnswerTests.swift`에 기존 답변이 선택 index·답안 텍스트·정답 여부를 각각 보존하고 서술형의 정답 여부가 비어 있음을 확인하는 테스트를 작성한다
-- [ ] T002 [P] [S3] [S5] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningSetRepositoryAdapterTests.swift`에 세트 설명, 출처 배열 전체와 각 출처의 줄 번호·심볼·설명, 기존 답변의 선택 index·정답 여부가 복원되고 배열 순서가 유지되는 테스트를 추가한다 (FR-039, FR-040)
-- [ ] T003 `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningSetTests.swift`의 fixture를 새 `Question`·`QuestionSource`·`SubmittedAnswer` 이니셜라이저로 갱신한다
+- [X] T001 [P] [S1] [S4] `sources/Projects/Domain/Tests/LearningProject/Models/Quiz/SubmittedAnswerTests.swift`에 기존 답변이 선택 index·답안 텍스트·정답 여부를 각각 보존하고 서술형의 정답 여부가 비어 있음을 확인하는 테스트를 작성한다
+- [X] T002 [P] [S3] [S5] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningSetRepositoryAdapterTests.swift`에 세트 설명, 출처 배열 전체와 각 출처의 줄 번호·심볼·설명, 기존 답변의 선택 index·정답 여부가 복원되고 배열 순서가 유지되는 테스트를 추가한다 (FR-039, FR-040)
+- [X] T003 `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningSetTests.swift`의 fixture를 새 `Question`·`QuestionSource`·`SubmittedAnswer` 이니셜라이저로 갱신한다
 
 ### 구현
 
-- [ ] T004 [S1] [S4] `sources/Projects/Domain/LearningProject/Models/Quiz/SubmittedAnswer.swift`에 `selectedIndex`, `text`, `correct`를 가진 `SubmittedAnswer` 모델을 신설한다 ([data-model.md §1.4](./data-model.md))
-- [ ] T005 [P] [S5] `sources/Projects/Domain/LearningProject/Models/Quiz/QuestionSource.swift`에 `startLine`, `endLine`, `symbol`, `summary`를 optional로 추가한다
-- [ ] T006 [P] [S3] `sources/Projects/Domain/LearningProject/Models/Quiz/LearningSet.swift`에 `description`을 추가한다
-- [ ] T007 [S1] [S5] `sources/Projects/Domain/LearningProject/Models/Quiz/Question.swift`의 `source: QuestionSource`를 `sources: [QuestionSource]`로 바꾸고 `myAnswer`를 `SubmittedAnswer?`로 바꾼다
-- [ ] T008 [S3] [S5] `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 매핑을 [data-model.md §1.5](./data-model.md)의 표대로 복원하고 배열을 재정렬하지 않는다
+- [X] T004 [S1] [S4] `sources/Projects/Domain/LearningProject/Models/Quiz/SubmittedAnswer.swift`에 `selectedIndex`, `text`, `correct`를 가진 `SubmittedAnswer` 모델을 신설한다 ([data-model.md §1.4](./data-model.md))
+- [X] T005 [P] [S5] `sources/Projects/Domain/LearningProject/Models/Quiz/QuestionSource.swift`에 `startLine`, `endLine`, `symbol`, `summary`를 optional로 추가한다
+- [X] T006 [P] [S3] `sources/Projects/Domain/LearningProject/Models/Quiz/LearningSet.swift`에 `description`을 추가한다
+- [X] T007 [S1] [S5] `sources/Projects/Domain/LearningProject/Models/Quiz/Question.swift`의 `source: QuestionSource`를 `sources: [QuestionSource]`로 바꾸고 `myAnswer`를 `SubmittedAnswer?`로 바꾼다
+- [X] T008 [S3] [S5] `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 매핑을 [data-model.md §1.5](./data-model.md)의 표대로 복원하고 배열을 재정렬하지 않는다
 
 ### 정리와 패키지 검증
 
-- [ ] T009 [no-write] Domain과 Composition 테스트 scheme을 실행해 T001~T003이 통과하는지 확인하고 결과를 기록한다
+- [X] T009 [no-write] Domain과 Composition 테스트 scheme을 실행해 T001~T003이 통과하는지 확인하고 결과를 기록한다
 
 **진행 점검**: T001~T009의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행 단위로
 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

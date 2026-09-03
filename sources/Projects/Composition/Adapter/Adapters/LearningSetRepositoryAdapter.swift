@@ -22,6 +22,7 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
             return LearningSet(
                 setID: response.setID,
                 title: response.title,
+                description: response.description,
                 questions: response.questions.map(question(from:)),
             )
         } catch let error as DataLearningProjectError {
@@ -39,11 +40,27 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
             prompt: dto.text,
             format: format(from: dto.format),
             choices: dto.choices.isEmpty ? nil : dto.choices,
-            source: QuestionSource(
-                filePath: dto.sources.first?.file,
-                referenceURL: dto.sources.first?.url,
-            ),
-            myAnswer: dto.myAnswer?.text ?? dto.myAnswer?.selectedIndex.map(String.init),
+            sources: dto.sources.map(source(from:)),
+            myAnswer: dto.myAnswer.map(submittedAnswer(from:)),
+        )
+    }
+
+    private func source(from dto: SourceResponseDTO) -> QuestionSource {
+        QuestionSource(
+            filePath: dto.file,
+            startLine: dto.startLine,
+            endLine: dto.endLine,
+            symbol: dto.symbol,
+            summary: dto.summary,
+            referenceURL: dto.url,
+        )
+    }
+
+    private func submittedAnswer(from dto: MyAnswerResponseDTO) -> SubmittedAnswer {
+        SubmittedAnswer(
+            selectedIndex: dto.selectedIndex,
+            text: dto.text,
+            correct: dto.correct,
         )
     }
 
