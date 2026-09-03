@@ -1,4 +1,4 @@
-import CoreGraphics
+import SwiftUI
 import Testing
 
 @testable import Feature

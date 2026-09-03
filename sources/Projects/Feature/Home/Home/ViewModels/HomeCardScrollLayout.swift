@@ -1,4 +1,4 @@
-import CoreGraphics
+import SwiftUI
 
 struct HomeCardScrollLayout: Equatable, Sendable {
 
