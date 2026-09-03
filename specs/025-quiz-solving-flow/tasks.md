@@ -128,25 +128,25 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 준비와 기반
 
-- [ ] T013 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubFetchLearningSetUseCase.swift`에 성공·실패 동작을 지정할 수 있는 Stub을 추가한다 (T023·T031이 함께 사용)
-- [ ] T014 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubFetchBookmarkedQuestionsUseCase.swift`에 성공·실패 Stub을 추가한다 (T023·T030이 함께 사용)
-- [ ] T015 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSubmitChoiceAnswerUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다 (T024·T028·T032가 함께 사용)
-- [ ] T016 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSubmitEssayAnswerUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다
-- [ ] T017 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSetQuestionBookmarkUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다
+- [X] T013 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubFetchLearningSetUseCase.swift`에 성공·실패 동작을 지정할 수 있는 Stub을 추가한다 (T023·T031이 함께 사용)
+- [X] T014 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubFetchBookmarkedQuestionsUseCase.swift`에 성공·실패 Stub을 추가한다 (T023·T030이 함께 사용)
+- [X] T015 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSubmitChoiceAnswerUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다 (T024·T028·T032가 함께 사용)
+- [X] T016 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSubmitEssayAnswerUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다
+- [X] T017 [P] `sources/Projects/Feature/Tests/Quiz/TestDoubles/StubSetQuestionBookmarkUseCase.swift`에 호출 인자를 기록하는 Stub을 추가한다
 - [ ] T018 [P] `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/StubFetchLearningProjectDetailUseCase.swift`에 성공·실패 Stub을 추가한다 (T029·T032가 함께 사용)
 - [ ] T019 [P] `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/StubDeleteLearningProjectUseCase.swift`에 성공·실패와 호출 횟수를 기록하는 Stub을 추가한다 (T029·T032가 함께 사용)
-- [ ] T020 `sources/Projects/Feature/Tests/Quiz/TestDoubles/QuizTestFixture.swift`에 세트 fixture 세 종류(기존 답변 없음 / 앞쪽 문제만 답변 / 전부 답변)와 객관식·서술형 혼합·서술형 전용 세트, 출처가 없는 문제와 출처가 여럿인 문제를 추가한다
+- [X] T020 `sources/Projects/Feature/Tests/Quiz/TestDoubles/QuizTestFixture.swift`에 세트 fixture 세 종류(기존 답변 없음 / 앞쪽 문제만 답변 / 전부 답변)와 객관식·서술형 혼합·서술형 전용 세트, 출처가 없는 문제와 출처가 여럿인 문제를 추가한다
 - [ ] T021 `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/ProjectDetailTestFixture.swift`에 세트 진행이 섞인 프로젝트 상세 fixture와 저장한 문제 목록 fixture를 추가한다
 
 ### 테스트
 
-- [ ] T022 [P] [S3] [S4] `sources/Projects/Feature/Tests/Quiz/Shared/Models/LearningSetResumptionTests.swift`에 시작 index 판정 3종과 `choiceQuestionCount`·`skippedCorrectChoiceCount` 계산을 검증하는 테스트를 작성한다 (SC-014, SC-016)
-- [ ] T023 [P] [S3] `sources/Projects/Feature/Tests/Quiz/LearningSetIntro/LearningSetIntroFeatureTests.swift`에 진입 조회 1회, `SetLoad`·`BookmarkLoad` 상태 분리, 두 실패의 오류 의미 보존, 늦은 응답을 `requestID`로 거부, 조회 중 시작 차단, 재시도, `input(.emptySetReported)` 처리, `startRequested` payload를 검증하는 테스트를 작성한다 (FR-032a·b·c)
-- [ ] T024 [P] [S1] [S2] [S5] [S7] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/QuestionSolvingFeatureTests.swift`에 단일 선택, 미선택·공백 제출 차단, 400자 상한, 제출 중 중복·진행·뒤로가기 차단, 실패 후 draft 보존, 결과 상태 전이, 출처 Sheet 개폐 전후 상태 보존, 빈 출처에서 컨트롤 미노출, `sourceLinkTapped`가 `externalURLRequested`로 나가는지, 북마크 중복 차단과 ID 일치 반영을 검증하는 테스트를 작성한다 (SC-004, SC-005, SC-006, FR-010a·c, FR-035c)
-- [ ] T025 [P] [S1] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/ViewModels/ChoiceOptionDisplayTests.swift`에 선택지 표시 상태가 서버 채점 결과에서만 도출되고 배열 위치·문자로 추론되지 않는지, 결과 상태에서 선택되지 않은 선택지가 중립으로 남는지, 옵션 식별자·선택 여부·색 이외 구별 수단이 접근성 문자열에 담기는지 검증하는 테스트를 작성한다 (SC-007, FR-052, FR-053)
-- [ ] T026 [P] [S5] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/ViewModels/QuestionSourceDisplayTests.swift`에 출처 배열 전체가 순서대로 변환되고 URL 행이 링크 접근성 문자열을 갖는지 검증하는 테스트를 작성한다 (FR-010b, FR-054)
-- [ ] T027 [P] [S4] `sources/Projects/Feature/Tests/Quiz/LearningCompletion/LearningCompletionFeatureTests.swift`에 점수 표시 여부와 "객관식 N문제 중 M문제 정답" 형태의 접근성 레이블 문장을 검증하는 테스트를 작성한다 (FR-038, FR-055)
-- [ ] T028 [P] [S3] [S4] `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`에 활성 화면 전환, 이동 이벤트의 `from`·`to`·`cause` 기록과 미기록, 문제 화면 뒤로가기가 활성 화면만 되돌리고 child State를 유지하는지, 되돌아온 뒤 `시작하기`가 진행을 이어가는지, 문제 이동 시 이전 상태 미잔류, 건너뛴 정답을 포함한 완료 카운터, 문제 없는 세트 처리, 흐름 이탈 delegate를 검증하는 테스트를 작성한다 (SC-003, SC-014, SC-022, FR-034, FR-035a·b·d)
+- [X] T022 [P] [S3] [S4] `sources/Projects/Feature/Tests/Quiz/Shared/Models/LearningSetResumptionTests.swift`에 시작 index 판정 3종과 `choiceQuestionCount`·`skippedCorrectChoiceCount` 계산을 검증하는 테스트를 작성한다 (SC-014, SC-016)
+- [X] T023 [P] [S3] `sources/Projects/Feature/Tests/Quiz/LearningSetIntro/LearningSetIntroFeatureTests.swift`에 진입 조회 1회, `SetLoad`·`BookmarkLoad` 상태 분리, 두 실패의 오류 의미 보존, 늦은 응답을 `requestID`로 거부, 조회 중 시작 차단, 재시도, `input(.emptySetReported)` 처리, `startRequested` payload를 검증하는 테스트를 작성한다 (FR-032a·b·c)
+- [X] T024 [P] [S1] [S2] [S5] [S7] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/QuestionSolvingFeatureTests.swift`에 단일 선택, 미선택·공백 제출 차단, 400자 상한, 제출 중 중복·진행·뒤로가기 차단, 실패 후 draft 보존, 결과 상태 전이, 출처 Sheet 개폐 전후 상태 보존, 빈 출처에서 컨트롤 미노출, `sourceLinkTapped`가 `externalURLRequested`로 나가는지, 북마크 중복 차단과 ID 일치 반영을 검증하는 테스트를 작성한다 (SC-004, SC-005, SC-006, FR-010a·c, FR-035c)
+- [X] T025 [P] [S1] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/ViewModels/ChoiceOptionDisplayTests.swift`에 선택지 표시 상태가 서버 채점 결과에서만 도출되고 배열 위치·문자로 추론되지 않는지, 결과 상태에서 선택되지 않은 선택지가 중립으로 남는지, 옵션 식별자·선택 여부·색 이외 구별 수단이 접근성 문자열에 담기는지 검증하는 테스트를 작성한다 (SC-007, FR-052, FR-053)
+- [X] T026 [P] [S5] `sources/Projects/Feature/Tests/Quiz/QuestionSolving/ViewModels/QuestionSourceDisplayTests.swift`에 출처 배열 전체가 순서대로 변환되고 URL 행이 링크 접근성 문자열을 갖는지 검증하는 테스트를 작성한다 (FR-010b, FR-054)
+- [X] T027 [P] [S4] `sources/Projects/Feature/Tests/Quiz/LearningCompletion/LearningCompletionFeatureTests.swift`에 점수 표시 여부와 "객관식 N문제 중 M문제 정답" 형태의 접근성 레이블 문장을 검증하는 테스트를 작성한다 (FR-038, FR-055)
+- [X] T028 [P] [S3] [S4] `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`에 활성 화면 전환, 이동 이벤트의 `from`·`to`·`cause` 기록과 미기록, 문제 화면 뒤로가기가 활성 화면만 되돌리고 child State를 유지하는지, 되돌아온 뒤 `시작하기`가 진행을 이어가는지, 문제 이동 시 이전 상태 미잔류, 건너뛴 정답을 포함한 완료 카운터, 문제 없는 세트 처리, 흐름 이탈 delegate를 검증하는 테스트를 작성한다 (SC-003, SC-014, SC-022, FR-034, FR-035a·b·d)
 - [ ] T029 [P] [S6] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift`에 상세 조회, 세트 진행 표시와 라벨 값, `setStartRequested` payload, 저장소 시작 컨트롤이 첫 미완료 세트로 같은 의도를 만드는지, 미완료 세트가 없으면 비활성인지, 메뉴 펼침, `repositoryLinkTapped`의 `externalURLRequested`, 삭제 확인 단계·취소·중복 차단·성공 후 delegate, `input(.refreshRequested)` 재조회가 서버 값을 그대로 반영하는지 검증하는 테스트를 작성한다 (SC-008, SC-017, SC-018, FR-004c, FR-041a, FR-044b·c)
 - [ ] T030 [P] [S8] `sources/Projects/Feature/Tests/Saved/Saved/SavedFeatureTests.swift`에 프로젝트 필터 고정 시 다른 프로젝트 문제가 포함되지 않는지, 목록 표시에 세트 조회가 발생하지 않는지, 빈 상태·실패·재시도, `solveTapped`만 진입 의도를 만드는지, `isBackControlPresented`가 `false`면 `backRequested`가 발생하지 않는지 검증하는 테스트를 작성한다 (SC-020, FR-044a·a-2·a-6·a-7)
 - [ ] T031 [P] [S8] `sources/Projects/Feature/Tests/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeatureTests.swift`에 세트 조회 성공 시 대상 문제를 찾아 `questionPrepared`를 보내는지, 문제를 찾지 못하거나 조회가 실패하면 `preparationFailed`를 보내는지, 진행 중 같은 입력을 무시하고 `questionID` 불일치 결과를 거부하는지 검증하는 테스트를 작성한다 (FR-032c, FR-044a-3)
@@ -154,11 +154,11 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 구현 — 흐름 모델과 Reducer
 
-- [ ] T033 [S3] [S4] `sources/Projects/Feature/Quiz/Shared/Models/LearningSetResumption.swift`에 `startIndex`, `choiceQuestionCount`, `skippedCorrectChoiceCount`를 계산하는 값 타입을 추가한다 ([data-model.md §4.1](./data-model.md))
-- [ ] T034 [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/LearningSetIntroFeature.swift`에 [contracts/feature-reducers.md §7](./contracts/feature-reducers.md)의 계약대로 Reducer를 구현하고 `FetchLearningSetUseCase`·`FetchBookmarkedQuestionsUseCase`를 생성자 주입으로 받는다
-- [ ] T035 [S1] [S2] [S5] [S7] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingFeature.swift`에 §8의 계약대로 Reducer를 구현하고 `SubmitChoiceAnswerUseCase`·`SubmitEssayAnswerUseCase`·`SetQuestionBookmarkUseCase`를 생성자 주입으로 받는다. 진행 입력은 흐름과 무관하게 `advanceRequested` 하나만 보낸다 (D-004, FR-045b)
-- [ ] T036 [S4] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionFeature.swift`에 §9의 계약대로 Reducer를 구현한다
-- [ ] T037 [S3] [S4] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`에 §6의 계약대로 `ActiveScreen`, `ScreenTransition`(`from`·`to`·`cause`), child State와 전환 규칙을 구현하고 UseCase 5종을 자식 생성용으로만 전달한다
+- [X] T033 [S3] [S4] `sources/Projects/Feature/Quiz/Shared/Models/LearningSetResumption.swift`에 `startIndex`, `choiceQuestionCount`, `skippedCorrectChoiceCount`를 계산하는 값 타입을 추가한다 ([data-model.md §4.1](./data-model.md))
+- [X] T034 [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/LearningSetIntroFeature.swift`에 [contracts/feature-reducers.md §7](./contracts/feature-reducers.md)의 계약대로 Reducer를 구현하고 `FetchLearningSetUseCase`·`FetchBookmarkedQuestionsUseCase`를 생성자 주입으로 받는다
+- [X] T035 [S1] [S2] [S5] [S7] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingFeature.swift`에 §8의 계약대로 Reducer를 구현하고 `SubmitChoiceAnswerUseCase`·`SubmitEssayAnswerUseCase`·`SetQuestionBookmarkUseCase`를 생성자 주입으로 받는다. 진행 입력은 흐름과 무관하게 `advanceRequested` 하나만 보낸다 (D-004, FR-045b)
+- [X] T036 [S4] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionFeature.swift`에 §9의 계약대로 Reducer를 구현한다
+- [X] T037 [S3] [S4] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`에 §6의 계약대로 `ActiveScreen`, `ScreenTransition`(`from`·`to`·`cause`), child State와 전환 규칙을 구현하고 UseCase 5종을 자식 생성용으로만 전달한다
 - [ ] T038 [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/ProjectDetailFeature.swift`를 §3의 계약으로 확장한다. 메뉴 3항목, `Deletion` 상태 기계, `resumeTapped`, `repositoryLinkTapped`, `input(.refreshRequested)`와 delegate 5종을 추가하고 `DeleteLearningProjectUseCase`를 생성자 주입에 더한다 (D-012)
 - [ ] T039 [S8] `sources/Projects/Feature/Saved/Saved/SavedFeature.swift`를 §4의 계약으로 확장한다. `projectFilter`와 `isBackControlPresented`를 **기본값이 있는** 이니셜라이저 인자로 추가해 `MainShellRouterFeature`의 기존 `SavedFeature.State()` 호출부가 그대로 compile되게 하고, `retryTapped`·`backTapped`·`backRequested`를 추가하며 `bookmarkRowTapped`를 `solveTapped`로 바꾼다 (D-016, FR-044a-1)
 - [ ] T040 [S8] `sources/Projects/Feature/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeature.swift`에 §5의 계약대로 화면 없는 조건부 Feature를 구현하고 `FetchLearningSetUseCase`를 생성자 주입으로 받는다 (D-005)
@@ -166,22 +166,22 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 구현 — 표시 모델
 
-- [ ] T042 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/ViewModels/ChoiceOptionDisplay.swift`에 선택지 표시 상태를 서버 결과에서 파생하는 표시 모델을 추가한다
-- [ ] T043 [P] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/ViewModels/QuestionSourceDisplay.swift`에 출처 배열을 서브뷰용 표시 값으로 변환하는 표시 모델을 추가한다 (D-008)
+- [X] T042 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/ViewModels/ChoiceOptionDisplay.swift`에 선택지 표시 상태를 서버 결과에서 파생하는 표시 모델을 추가한다
+- [X] T043 [P] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/ViewModels/QuestionSourceDisplay.swift`에 출처 배열을 서브뷰용 표시 값으로 변환하는 표시 모델을 추가한다 (D-008)
 - [ ] T044 [P] [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/ViewModels/ProjectDetailSetDisplay.swift`에 세트별 라벨·제목·문제 수·완료 수·시작 가능 여부를 파생하는 표시 모델을 추가한다
 - [ ] T045 [P] [S8] `sources/Projects/Feature/Saved/Saved/ViewModels/SavedQuestionDisplay.swift`에 저장한 문제 항목의 표시 값을 파생하는 표시 모델을 추가한다
 
 ### 구현 — 화면과 서브뷰
 
-- [ ] T046 [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/LearningSetIntroScreen.swift`와 `sources/Projects/Feature/Quiz/LearningSetIntro/SubViews/LearningSetIntroScreen+ErrorView.swift`에 라벨·제목·설명과 `시작하기` CTA, 로딩 표현, 문제 없음 안내, D-014의 실패 서브뷰를 조립한다
-- [ ] T047 [S1] [S2] [S7] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`에 스크롤 본문, safe area 위 고정 하단 액션(`BookmarkButton` 포함), 결과 상태 CTA 문구를 `advanceActionTitle`에서 읽는 구성, 제출 실패 안내와 재제출 경로를 조립한다
-- [ ] T048 [P] [S1] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+QuestionPrompt.swift`에 문제 번호와 질문 서브뷰를 중첩 타입으로 구현한다. `questionNumber`가 없으면 순번을 그리지 않는다
-- [ ] T049 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift`에 `ChoiceOptionDisplay` 배열을 받아 `ChoiceAnswerOption`으로 편집·결과 표현을 구성한다. 중립 선택지를 표현할 수 없는 `ChoiceResultRow`는 쓰지 않는다
-- [ ] T050 [P] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+AnswerEditor.swift`에 서술형 입력과 `현재 글자 수 / 400` 표시를 중첩 타입으로 구현한다
-- [ ] T051 [P] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+EssayResultSection.swift`에 `나의 답안`과 `AI의 답안` 읽기 전용 카드를 구성한다
-- [ ] T052 [P] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+SourceSheet.swift`에 `SheetSurface`로 `QuestionSourceDisplay` 배열과 `닫기` CTA를 구성하고 URL 행에 링크 접근성 특성을 부여한다 (FR-054)
-- [ ] T053 [S4] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionScreen.swift`에 완료 제목, `ResourceAnimation(asset: .complete, isLooping: false)`, 점수, 메시지, 하단 CTA를 조립한다 (D-013)
-- [ ] T054 [S3] [S4] `sources/Projects/Feature/Quiz/Router/QuizRouter.swift`에 `ScreenContainer` 골격과 활성 화면 `switch`를 구현한다
+- [X] T046 [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/LearningSetIntroScreen.swift`와 `sources/Projects/Feature/Quiz/LearningSetIntro/SubViews/LearningSetIntroScreen+ErrorView.swift`에 라벨·제목·설명과 `시작하기` CTA, 로딩 표현, 문제 없음 안내, D-014의 실패 서브뷰를 조립한다
+- [X] T047 [S1] [S2] [S7] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`에 스크롤 본문, safe area 위 고정 하단 액션(`BookmarkButton` 포함), 결과 상태 CTA 문구를 `advanceActionTitle`에서 읽는 구성, 제출 실패 안내와 재제출 경로를 조립한다
+- [X] T048 [P] [S1] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+QuestionPrompt.swift`에 문제 번호와 질문 서브뷰를 중첩 타입으로 구현한다. `questionNumber`가 없으면 순번을 그리지 않는다
+- [X] T049 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift`에 `ChoiceOptionDisplay` 배열을 받아 `ChoiceAnswerOption`으로 편집·결과 표현을 구성한다. 중립 선택지를 표현할 수 없는 `ChoiceResultRow`는 쓰지 않는다
+- [X] T050 [P] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+AnswerEditor.swift`에 서술형 입력과 `현재 글자 수 / 400` 표시를 중첩 타입으로 구현한다
+- [X] T051 [P] [S2] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+EssayResultSection.swift`에 `나의 답안`과 `AI의 답안` 읽기 전용 카드를 구성한다
+- [X] T052 [P] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+SourceSheet.swift`에 `SheetSurface`로 `QuestionSourceDisplay` 배열과 `닫기` CTA를 구성하고 URL 행에 링크 접근성 특성을 부여한다 (FR-054)
+- [X] T053 [S4] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionScreen.swift`에 완료 제목, `ResourceAnimation(asset: .complete, isLooping: false)`, 점수, 메시지, 하단 CTA를 조립한다 (D-013)
+- [X] T054 [S3] [S4] `sources/Projects/Feature/Quiz/Router/QuizRouter.swift`에 `ScreenContainer` 골격과 활성 화면 `switch`를 구현한다
 - [ ] T055 [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/ProjectDetailScreen.swift`와 `sources/Projects/Feature/ProjectDetail/ProjectDetail/SubViews/ProjectDetailScreen+ErrorView.swift`에 저장소 정보·전체 진행률·세트 목록·삭제 확인 alert와 D-014의 실패 서브뷰를 조립한다
 - [ ] T056 [P] [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`에 저장소 배너·이름·별 수·기술 태그와 시작 컨트롤을 구성한다
 - [ ] T057 [P] [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`에 `TagBadge`(라벨)와 `LearningSetRow`를 묶은 세트 항목 목록과 빈 상태를 구성한다 (FR-042)
@@ -192,19 +192,19 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 구현 — 프리뷰
 
-- [ ] T062 [P] [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/Previews/LearningSetIntroScreenPreviews.swift`에 `s02` 기준 상태와 로딩·실패·문제 없음 프리뷰를 추가한다
-- [ ] T063 [P] [S1] [S2] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/Previews/QuestionSolvingScreenPreviews.swift`에 `s03`~`s12` 기준 상태와 순번 없는 단일 문제 프리뷰를 추가한다
-- [ ] T064 [P] [S4] `sources/Projects/Feature/Quiz/LearningCompletion/Previews/LearningCompletionScreenPreviews.swift`에 `s13`과 점수 없는 상태 프리뷰를 추가한다
-- [ ] T065 [P] [S3] [S4] `sources/Projects/Feature/Quiz/Router/Previews/QuizRouterPreviews.swift`에 활성 화면별 프리뷰를 추가한다
+- [X] T062 [P] [S3] `sources/Projects/Feature/Quiz/LearningSetIntro/Previews/LearningSetIntroScreenPreviews.swift`에 `s02` 기준 상태와 로딩·실패·문제 없음 프리뷰를 추가한다
+- [X] T063 [P] [S1] [S2] [S5] `sources/Projects/Feature/Quiz/QuestionSolving/Previews/QuestionSolvingScreenPreviews.swift`에 `s03`~`s12` 기준 상태와 순번 없는 단일 문제 프리뷰를 추가한다
+- [X] T064 [P] [S4] `sources/Projects/Feature/Quiz/LearningCompletion/Previews/LearningCompletionScreenPreviews.swift`에 `s13`과 점수 없는 상태 프리뷰를 추가한다
+- [X] T065 [P] [S3] [S4] `sources/Projects/Feature/Quiz/Router/Previews/QuizRouterPreviews.swift`에 활성 화면별 프리뷰를 추가한다
 - [ ] T066 [P] [S6] `sources/Projects/Feature/ProjectDetail/ProjectDetail/Previews/ProjectDetailScreenPreviews.swift`에 `s01`과 메뉴 펼침·삭제 확인·빈 상태·실패 프리뷰를 추가한다
 - [ ] T067 [P] [S8] `sources/Projects/Feature/Saved/Saved/Previews/SavedScreenPreviews.swift`에 목록·빈 상태·실패 프리뷰를 추가한다
 - [ ] T068 [P] [S6] [S8] `sources/Projects/Feature/ProjectDetail/Router/Previews/ProjectDetailRouterPreviews.swift`에 활성 화면별 프리뷰와 진입 실패 alert 프리뷰를 추가한다
 
 ### 정리와 패키지 검증
 
-- [ ] T069 `sources/Projects/Feature/Quiz/Quiz/QuizFeature.swift`를 삭제한다
-- [ ] T070 [P] `sources/Projects/Feature/Quiz/Quiz/AnswerEditor.swift`를 삭제한다
-- [ ] T071 [P] `sources/Projects/Feature/Quiz/Quiz/QuestionPrompt.swift`를 삭제한다
+- [X] T069 `sources/Projects/Feature/Quiz/Quiz/QuizFeature.swift`를 삭제한다
+- [X] T070 [P] `sources/Projects/Feature/Quiz/Quiz/AnswerEditor.swift`를 삭제한다
+- [X] T071 [P] `sources/Projects/Feature/Quiz/Quiz/QuestionPrompt.swift`를 삭제한다
 - [ ] T072 [no-write] Feature 테스트 scheme을 실행해 T022~T032가 통과하는지 확인하고 결과를 기록한다
 
 **진행 점검**: T013~T072의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행 단위로
