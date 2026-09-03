@@ -226,14 +226,14 @@ DTO → Domain 매핑만으로 복원 결과를 확인한다. UI·Feature·App �
 
 ### 테스트
 
-- [ ] T073 [S6] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`에 새로 주입되는 UseCase 5종과 `openExternalURL` 호출을 기록하는 test double을 추가한다
-- [ ] T074 [S3] [S4] [S6] [S8] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 프로젝트 상세 흐름 표시, 세트 선택 시 풀이 흐름 표시, 흐름 종료 시 상세 복귀와 `refreshRequested` 전달, 외부 URL delegate가 `openExternalURL`을 정확히 한 번 호출, 삭제 완료 delegate가 상세 표시를 해제하는지 검증하는 테스트를 추가한다 (SC-002, SC-021)
+- [X] T073 [S6] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`에 새로 주입되는 UseCase 5종과 `openExternalURL` 호출을 기록하는 test double을 추가한다
+- [X] T074 [S3] [S4] [S6] [S8] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 프로젝트 상세 흐름 표시, 세트 선택 시 풀이 흐름 표시, 흐름 종료 시 상세 복귀와 `refreshRequested` 전달, 외부 URL delegate가 `openExternalURL`을 정확히 한 번 호출, 삭제 완료 delegate가 상세 표시를 해제하는지 검증하는 테스트를 추가한다 (SC-002, SC-021)
 
 ### 구현
 
-- [ ] T075 [S3] [S4] [S6] [S8] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 `@Presents` 상세 흐름·풀이 흐름 상태와 [contracts/app-navigation.md §2](./contracts/app-navigation.md)의 delegate 해석을 추가하고, `fetchLearningProjectDetail`·`fetchLearningSet`·`submitChoiceAnswer`·`submitEssayAnswer`·`setQuestionBookmark`와 `openExternalURL`을 생성자 주입으로 받는다
-- [ ] T076 [S6] `sources/Projects/App/GitIt/Screens/AppRootView.swift`에 프로젝트 상세 흐름과 그 위의 풀이 흐름 표시를 추가하고 프리뷰 지원의 Noop UseCase를 보강한다
-- [ ] T077 [S6] `sources/Projects/App/GitIt/GitItApp.swift`에서 `AppComposition`이 공개하는 UseCase 5종과 `UIApplication.shared.open`을 감싼 `openExternalURL` 클로저를 `AppRootFeature`에 전달한다 (D-011)
+- [X] T075 [S3] [S4] [S6] [S8] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 `@Presents` 상세 흐름·풀이 흐름 상태와 [contracts/app-navigation.md §2](./contracts/app-navigation.md)의 delegate 해석을 추가하고, `fetchLearningProjectDetail`·`fetchLearningSet`·`submitChoiceAnswer`·`submitEssayAnswer`·`setQuestionBookmark`와 `openExternalURL`을 생성자 주입으로 받는다
+- [X] T076 [S6] `sources/Projects/App/GitIt/Screens/AppRootView.swift`에 프로젝트 상세 흐름과 그 위의 풀이 흐름 표시를 추가하고 프리뷰 지원의 Noop UseCase를 보강한다
+- [X] T077 [S6] `sources/Projects/App/GitIt/GitItApp.swift`에서 `AppComposition`이 공개하는 UseCase 5종과 `UIApplication.shared.open`을 감싼 `openExternalURL` 클로저를 `AppRootFeature`에 전달한다 (D-011)
 
 ### 정리와 패키지 검증
 

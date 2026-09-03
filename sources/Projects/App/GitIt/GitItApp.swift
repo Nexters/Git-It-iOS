@@ -52,8 +52,13 @@ struct GitItApp: App {
                 completeCuration: composition.completeCuration,
                 policyConsent: composition.policyConsent,
                 fetchLearningProjects: composition.fetchLearningProjects,
+                fetchLearningProjectDetail: composition.fetchLearningProjectDetail,
                 deleteLearningProject: composition.deleteLearningProject,
                 fetchBookmarkedQuestions: composition.fetchBookmarkedQuestions,
+                fetchLearningSet: composition.fetchLearningSet,
+                submitChoiceAnswer: composition.submitChoiceAnswer,
+                submitEssayAnswer: composition.submitEssayAnswer,
+                setQuestionBookmark: composition.setQuestionBookmark,
                 updateMemberPosition: composition.updateMemberPosition,
                 updateMemberCareerLevel: composition.updateMemberCareerLevel,
                 deleteMemberAccount: composition.deleteMemberAccount,
@@ -64,6 +69,9 @@ struct GitItApp: App {
                 trackGenerationProgress: composition.trackGenerationProgress,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    await UIApplication.shared.open(url)
+                },
+                openExternalURL: { url in
                     await UIApplication.shared.open(url)
                 },
                 registerCurrentDevice: composition.registerCurrentDevice,

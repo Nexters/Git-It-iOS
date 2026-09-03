@@ -47,6 +47,16 @@ struct AppRootView: View {
                 ) { store in
                     ProjectRegistrationRouter(store: store)
                 }
+                .fullScreenCover(
+                    item: $store.scope(state: \.projectDetail, action: \.projectDetail)
+                ) { projectDetailStore in
+                    ProjectDetailRouter(store: projectDetailStore)
+                        .fullScreenCover(
+                            item: $store.scope(state: \.quiz, action: \.quiz)
+                        ) { quizStore in
+                            QuizRouter(store: quizStore)
+                        }
+                }
         }
     }
 
@@ -148,6 +158,51 @@ private enum AppRootPreviewSupport {
         }
     }
 
+    struct NoopFetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
+        func callAsFunction(projectID _: String) async throws -> LearningProjectDetail {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopFetchLearningSet: FetchLearningSetUseCase {
+        func callAsFunction(
+            projectID _: String,
+            setID _: String,
+        ) async throws -> LearningSet {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSubmitChoiceAnswer: SubmitChoiceAnswerUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            selectedIndex _: Int,
+        ) async throws -> ChoiceAnswerResult {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSubmitEssayAnswer: SubmitEssayAnswerUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            text _: String,
+        ) async throws -> EssayAnswerResult {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSetQuestionBookmark: SetQuestionBookmarkUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            bookmarked _: Bool,
+        ) async throws -> BookmarkState {
+            throw CancellationError()
+        }
+    }
+
     struct NoopUpdateMemberPosition: UpdateMemberPositionUseCase {
         func callAsFunction(_: MemberPosition) async throws {
             throw CancellationError()
@@ -223,8 +278,13 @@ private enum AppRootPreviewSupport {
                 completeCuration: NoopCompleteCuration(),
                 policyConsent: NoopPolicyConsent(),
                 fetchLearningProjects: NoopFetchLearningProjects(),
+                fetchLearningProjectDetail: NoopFetchLearningProjectDetail(),
                 deleteLearningProject: NoopDeleteLearningProject(),
                 fetchBookmarkedQuestions: NoopFetchBookmarkedQuestions(),
+                fetchLearningSet: NoopFetchLearningSet(),
+                submitChoiceAnswer: NoopSubmitChoiceAnswer(),
+                submitEssayAnswer: NoopSubmitEssayAnswer(),
+                setQuestionBookmark: NoopSetQuestionBookmark(),
                 updateMemberPosition: NoopUpdateMemberPosition(),
                 updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),

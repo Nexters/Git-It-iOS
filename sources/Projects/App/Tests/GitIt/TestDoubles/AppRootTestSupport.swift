@@ -61,6 +61,77 @@ struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
     }
 }
 
+// MARK: - NoopFetchLearningProjectDetailUseCase
+
+struct NoopFetchLearningProjectDetailUseCase: FetchLearningProjectDetailUseCase {
+    func callAsFunction(projectID: String) async throws -> LearningProjectDetail {
+        AppRootTestFixture.projectDetail(projectID: projectID)
+    }
+}
+
+// MARK: - NoopFetchLearningSetUseCase
+
+struct NoopFetchLearningSetUseCase: FetchLearningSetUseCase {
+    func callAsFunction(
+        projectID _: String,
+        setID: String,
+    ) async throws -> LearningSet {
+        AppRootTestFixture.learningSet(setID: setID)
+    }
+}
+
+// MARK: - NoopSubmitChoiceAnswerUseCase
+
+struct NoopSubmitChoiceAnswerUseCase: SubmitChoiceAnswerUseCase {
+    func callAsFunction(
+        projectID _: String,
+        questionID _: String,
+        selectedIndex _: Int,
+    ) async throws -> ChoiceAnswerResult {
+        ChoiceAnswerResult(correct: true, answerIndex: 0, explanation: "")
+    }
+}
+
+// MARK: - NoopSubmitEssayAnswerUseCase
+
+struct NoopSubmitEssayAnswerUseCase: SubmitEssayAnswerUseCase {
+    func callAsFunction(
+        projectID _: String,
+        questionID _: String,
+        text _: String,
+    ) async throws -> EssayAnswerResult {
+        EssayAnswerResult(explanation: "", rubric: Rubric(criteria: []))
+    }
+}
+
+// MARK: - NoopSetQuestionBookmarkUseCase
+
+struct NoopSetQuestionBookmarkUseCase: SetQuestionBookmarkUseCase {
+    func callAsFunction(
+        projectID _: String,
+        questionID _: String,
+        bookmarked: Bool,
+    ) async throws -> BookmarkState {
+        BookmarkState(bookmarked: bookmarked)
+    }
+}
+
+// MARK: - OpenExternalURLSpy
+
+actor OpenExternalURLSpy {
+
+    private(set) var openedURLs = [URL]()
+
+    var callCount: Int {
+        openedURLs.count
+    }
+
+    func callAsFunction(_ url: URL) {
+        openedURLs.append(url)
+    }
+
+}
+
 // MARK: - AppRootTestFixture
 
 enum AppRootTestFixture {
@@ -81,6 +152,39 @@ enum AppRootTestFixture {
         careerLevel: .junior,
         statistics: LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: []),
     )
+
+    static let repositoryURL = "https://github.com/owner/repo"
+
+    static func projectDetail(projectID: String) -> LearningProjectDetail {
+        LearningProjectDetail(
+            projectID: projectID,
+            repositoryURL: repositoryURL,
+            repositoryName: "owner/repo",
+            repositoryImageURL: nil,
+            starCount: 10,
+            techStack: ["Swift"],
+            overallProgressPercent: 40,
+            nextQuestionID: nil,
+            sets: [
+                LearningProjectSetProgress(
+                    setID: "set-1",
+                    label: "CHAPTER 1",
+                    title: "모듈 경계",
+                    problemCount: 5,
+                    completedCount: 2,
+                )
+            ],
+        )
+    }
+
+    static func learningSet(setID: String) -> LearningSet {
+        LearningSet(
+            setID: setID,
+            title: "모듈 경계",
+            description: "세트 설명",
+            questions: [],
+        )
+    }
 }
 
 func makeAppRootStore(
@@ -97,6 +201,7 @@ func makeAppRootStore(
     now: @escaping @Sendable () -> Date = { Date() },
     registerCurrentDevice: RegisterCurrentDeviceSpy = RegisterCurrentDeviceSpy(),
     deviceTokenRefreshes: DeviceTokenRefreshStream = DeviceTokenRefreshStream(),
+    openExternalURL: OpenExternalURLSpy = OpenExternalURLSpy(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -109,8 +214,13 @@ func makeAppRootStore(
             completeCuration: NoopCompleteCurationUseCase(),
             policyConsent: NoopPolicyConsentUseCase(),
             fetchLearningProjects: NoopFetchLearningProjectsUseCase(),
+            fetchLearningProjectDetail: NoopFetchLearningProjectDetailUseCase(),
             deleteLearningProject: NoopDeleteLearningProjectUseCase(),
             fetchBookmarkedQuestions: NoopFetchBookmarkedQuestionsUseCase(),
+            fetchLearningSet: NoopFetchLearningSetUseCase(),
+            submitChoiceAnswer: NoopSubmitChoiceAnswerUseCase(),
+            submitEssayAnswer: NoopSubmitEssayAnswerUseCase(),
+            setQuestionBookmark: NoopSetQuestionBookmarkUseCase(),
             updateMemberPosition: NoopUpdateMemberPositionUseCase(),
             updateMemberCareerLevel: NoopUpdateMemberCareerLevelUseCase(),
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
@@ -121,6 +231,7 @@ func makeAppRootStore(
             trackGenerationProgress: trackGenerationProgress,
             waitPolicy: waitPolicy,
             now: now,
+            openExternalURL: { await openExternalURL($0) },
             registerCurrentDevice: { try await registerCurrentDevice() },
             deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
             resetAllForTesting: resetAllForTesting,
