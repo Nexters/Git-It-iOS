@@ -244,7 +244,7 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
   반환하도록 수정한다. 이로써 쓰이지 않게 되는
   `sources/Projects/Feature/MainShell/Router/SubViews/MainShellRouter+PlaceholderView.swift`를
   삭제한다.
-- [ ] T024 [S1] `sources/Projects/Feature/Home/Home/Previews/HomeScreenPreviews.swift`의
+- [X] T024 [S1] `sources/Projects/Feature/Home/Home/Previews/HomeScreenPreviews.swift`의
   `LearningStatistics(totalAnsweredCount: 12, totalCorrectCount: 9, weeklyCounts: [])`
   호출을 새 필드명으로 갱신한다(Domain 필드 교정으로 인한 fixture 갱신, 기능 변경
   없음).
@@ -268,7 +268,7 @@ T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작
   배지·설정 값·선택 카드가 공유하는 직군/연차 표시 값(문구·순서·일러스트, FR-006a
   "선택 안 함")을 정의한다. 개발 분야 순서는 Figma `1535:18281`의 Front-end → Back-end →
   iOS → Android를 따른다(온보딩 순서와 다름).
-- [ ] T033 [S1] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`,
+- [X] T033 [S1] `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`,
   `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestFixture.swift`의
   `LearningStatistics(...)` 호출을 새 필드명으로 갱신한다(Domain 필드 교정에 따른 fixture
   갱신).

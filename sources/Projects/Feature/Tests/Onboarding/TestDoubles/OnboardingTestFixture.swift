@@ -37,7 +37,7 @@ enum OnboardingTestFixture {
             email: "tester@example.com",
             position: position,
             careerLevel: careerLevel,
-            statistics: LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: []),
+            statistics: LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0, streakDays: 0, weeklyCounts: []),
         )
     }
 }

@@ -9,7 +9,7 @@ private enum HomePreviewFixture {
         email: "cat@git-it.dev",
         position: .ios,
         careerLevel: .junior,
-        statistics: .init(totalAnsweredCount: 12, totalCorrectCount: 9, weeklyCounts: []),
+        statistics: .init(thisWeekSolvedCount: 12, thisMonthSolvedCount: 9, streakDays: 3, weeklyCounts: []),
     )
 
     static func project(_ index: Int) -> LearningProjectSummary {
