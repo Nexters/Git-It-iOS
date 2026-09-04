@@ -254,7 +254,7 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작업이다. ID는 뒤에 붙였지만
 실행 순서는 아래 의존성 절에 따른다.
 
-- [ ] T031 [S2] [S3] [S4] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에
+- [X] T031 [S2] [S3] [S4] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에
   Router가 해석하는 내비게이션 View Action(`backTapped`/`positionRowTapped`/
   `careerLevelRowTapped`/`termsTapped`)과 Delegate(`backRequested`/
   `positionSelectionRequested`/`careerLevelSelectionRequested`/`accountDeletionRequested`/

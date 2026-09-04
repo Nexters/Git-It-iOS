@@ -56,6 +56,22 @@ public struct SettingsFeature: Sendable {
         case confirmingDeletion
         case deletingAccount
         case failed(MemberError)
+
+        // MARK: Fileprivate
+
+        /// 대기 중이거나 이전 요청이 실패한 뒤에는 새 계정 작업을 다시 시작할 수 있다.
+        fileprivate var canStartAccountAction: Bool {
+            switch self {
+            case .idle,
+                 .failed:
+                true
+
+            case .signingOut,
+                 .confirmingDeletion,
+                 .deletingAccount:
+                false
+            }
+        }
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -68,6 +84,10 @@ public struct SettingsFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case task
+            case backTapped
+            case positionRowTapped
+            case careerLevelRowTapped
+            case termsTapped
             case positionSelected(MemberPosition)
             case careerLevelSelected(CareerLevel)
             case signOutTapped
@@ -87,6 +107,12 @@ public struct SettingsFeature: Sendable {
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
+            case backRequested
+            case positionSelectionRequested
+            case careerLevelSelectionRequested
+            case accountDeletionRequested
+            case accountDeletionCancelled
+            case externalURLRequested(URL)
             case signedOut
             case accountDeleted
         }
@@ -106,6 +132,19 @@ public struct SettingsFeature: Sendable {
                         await send(.effect(.profileLoadFinished(.failure(mapped))))
                     }
                 }
+
+            case .view(.backTapped):
+                return .send(.delegate(.backRequested))
+
+            case .view(.positionRowTapped):
+                return .send(.delegate(.positionSelectionRequested))
+
+            case .view(.careerLevelRowTapped):
+                return .send(.delegate(.careerLevelSelectionRequested))
+
+            case .view(.termsTapped):
+                guard let url = Constant.servicePolicyURL else { return .none }
+                return .send(.delegate(.externalURLRequested(url)))
 
             case .view(.positionSelected(let position)):
                 guard state.positionMutation != .committing else { return .none }
@@ -136,7 +175,7 @@ public struct SettingsFeature: Sendable {
                 .cancellable(id: CancelID.careerLevelMutation)
 
             case .view(.signOutTapped):
-                guard state.accountAction == .idle else { return .none }
+                guard state.accountAction.canStartAccountAction else { return .none }
                 state.accountAction = .signingOut
                 return .run { send in
                     let result = await signOut()
@@ -145,18 +184,34 @@ public struct SettingsFeature: Sendable {
                 .cancellable(id: CancelID.accountAction)
 
             case .view(.deleteAccountTapped):
-                guard state.accountAction == .idle else { return .none }
+                guard state.accountAction.canStartAccountAction else { return .none }
                 state.accountAction = .confirmingDeletion
-                return .none
+                return .send(.delegate(.accountDeletionRequested))
 
             case .view(.deleteAccountCancelled):
-                if state.accountAction == .confirmingDeletion {
+                switch state.accountAction {
+                case .confirmingDeletion,
+                     .failed:
                     state.accountAction = .idle
+
+                case .idle,
+                     .signingOut,
+                     .deletingAccount:
+                    break
                 }
-                return .none
+                return .send(.delegate(.accountDeletionCancelled))
 
             case .view(.deleteAccountConfirmed):
-                guard state.accountAction == .confirmingDeletion else { return .none }
+                switch state.accountAction {
+                case .confirmingDeletion,
+                     .failed:
+                    break
+
+                case .idle,
+                     .signingOut,
+                     .deletingAccount:
+                    return .none
+                }
                 state.accountAction = .deletingAccount
                 return .run { send in
                     do {
@@ -182,9 +237,7 @@ public struct SettingsFeature: Sendable {
 
             case .effect(.positionUpdateFinished(let position, nil)):
                 state.positionMutation = .idle
-                if state.profile != nil {
-                    state.profile?.replacePosition(position)
-                }
+                state.profile = state.profile?.replacing(position: position)
                 return .none
 
             case .effect(.positionUpdateFinished(_, .some(let error))):
@@ -193,9 +246,7 @@ public struct SettingsFeature: Sendable {
 
             case .effect(.careerLevelUpdateFinished(let careerLevel, nil)):
                 state.careerLevelMutation = .idle
-                if state.profile != nil {
-                    state.profile?.replaceCareerLevel(careerLevel)
-                }
+                state.profile = state.profile?.replacing(careerLevel: careerLevel)
                 return .none
 
             case .effect(.careerLevelUpdateFinished(_, .some(let error))):
@@ -235,6 +286,13 @@ public struct SettingsFeature: Sendable {
         case accountAction
     }
 
+    private enum Constant {
+        /// Figma `1465:19712` 주석: "클릭 시 브라우저를 열고 서비스 정책 노션을 호출함".
+        static let servicePolicyURL = URL(
+            string: "https://git-it-service-policy.notion.site/Git-it-3bb7221e5fe78005bcd9fab953906df1"
+        )
+    }
+
     private let signOut: any SignOutUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
     private let updateMemberPosition: any UpdateMemberPositionUseCase
@@ -244,22 +302,16 @@ public struct SettingsFeature: Sendable {
 }
 
 extension MemberProfile {
-    fileprivate mutating func replacePosition(_ position: MemberPosition) {
-        self = MemberProfile(
+    /// 저장에 성공한 직군·연차만 갈아 끼운 프로필을 만든다. 생략한 항목은 기존 값을 유지한다.
+    fileprivate func replacing(
+        position: MemberPosition? = nil,
+        careerLevel: CareerLevel? = nil,
+    ) -> MemberProfile {
+        MemberProfile(
             name: name,
             email: email,
-            position: position,
-            careerLevel: careerLevel,
-            statistics: statistics,
-        )
-    }
-
-    fileprivate mutating func replaceCareerLevel(_ careerLevel: CareerLevel) {
-        self = MemberProfile(
-            name: name,
-            email: email,
-            position: position,
-            careerLevel: careerLevel,
+            position: position ?? self.position,
+            careerLevel: careerLevel ?? self.careerLevel,
             statistics: statistics,
         )
     }
