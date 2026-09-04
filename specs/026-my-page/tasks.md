@@ -177,7 +177,7 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 
 ### 준비
 
-- [ ] T010 [S1] [S2] [S3] [S4] `implement-figma-ui` 스킬로 노드 `1539:19209`(프로필,
+- [X] T010 [S1] [S2] [S3] [S4] `implement-figma-ui` 스킬로 노드 `1539:19209`(프로필,
   이미 조회한 스크린샷 재확인), `1465:19689`(설정), `1535:18281`(개발 분야 선택),
   `1535:18378`(개발 수준 선택), `1636:31714`(계정 삭제 확인)를 조회해 각 화면의 정확한
   레이아웃·문구·색상·타이포그래피를 확정한다. 기존 컴포넌트로 표현할 수 없는 요소를
@@ -263,7 +263,7 @@ T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작
   따른다. 실패(`.failed`) 뒤 로그아웃·계정 삭제를 재시도할 수 있게 guard를 완화하고, 약관
   URL은 Figma `1465:19712` 주석("클릭 시 브라우저를 열고 서비스 정책 노션을 호출함")의
   링크를 상수로 둔다.
-- [ ] T032 [S1] [S2] `sources/Projects/Feature/Settings/Shared/ViewModels/PositionDisplay.swift`,
+- [X] T032 [S1] [S2] `sources/Projects/Feature/Settings/Shared/ViewModels/PositionDisplay.swift`,
   `sources/Projects/Feature/Settings/Shared/ViewModels/CareerLevelDisplay.swift`에 프로필
   배지·설정 값·선택 카드가 공유하는 직군/연차 표시 값(문구·순서·일러스트, FR-006a
   "선택 안 함")을 정의한다. 개발 분야 순서는 Figma `1535:18281`의 Front-end → Back-end →
