@@ -1,4 +1,3 @@
-import Foundation
 import Testing
 
 @testable import DomainMember
@@ -10,9 +9,10 @@ struct FetchMemberProfileTests {
     @Test
     func `전체 프로필과 통계를 손실 없이 전달한다`() async throws {
         let statistics = LearningStatistics(
-            totalAnsweredCount: 10,
-            totalCorrectCount: 7,
-            weeklyCounts: [WeeklyLearningCount(weekStartDate: .distantPast, count: 3)],
+            thisWeekSolvedCount: 10,
+            thisMonthSolvedCount: 7,
+            streakDays: 2,
+            weeklyCounts: [WeeklyLearningCount(dayLabel: "월", count: 3)],
         )
         let profile = MemberProfile(
             name: "홍길동",

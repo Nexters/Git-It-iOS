@@ -6,7 +6,7 @@ import Testing
 struct MemberProfileTests {
     @Test
     func `position과 careerLevel의 개별 null을 그대로 보존한다`() {
-        let statistics = LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: [])
+        let statistics = LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0, streakDays: 0, weeklyCounts: [])
         let bothMissing = MemberProfile(
             name: "홍길동",
             email: "gildong@example.com",
@@ -39,7 +39,7 @@ struct MemberProfileTests {
 
     @Test
     func `둘 중 하나가 null이면 전체 큐레이션이 필요하다`() {
-        let statistics = LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: [])
+        let statistics = LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0, streakDays: 0, weeklyCounts: [])
         let profiles = [
             MemberProfile(name: "A", email: "a@example.com", position: nil, careerLevel: .entry, statistics: statistics),
             MemberProfile(name: "B", email: "b@example.com", position: .ios, careerLevel: nil, statistics: statistics),
