@@ -215,21 +215,21 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 - [ ] T017 [S1] [S2] [S3] `sources/Projects/Feature/Settings/Router/SettingsRouter.swift`에
   `activeScreen`을 `switch`해 `ProfileScreen`/`SettingsScreen`(및 그 서브뷰)을 그리는
   Router View를 구현한다.
-- [ ] T018 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`(목록)와
+- [X] T018 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`(목록)와
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`,
   `SettingsScreen+CareerLevelSelectionView.swift`에 `SelectRow`(개발 분야/수준/약관),
   `SelectionCardList` 기반 선택 화면을 구현하고 기존 `SettingsFeature`의
   `positionSelected`/`careerLevelSelected`에 연결한다. 온보딩의
   `PositionSelectionScreen.Display`/`CareerSelectionScreen.Display`와 동일한 문구·순서로
   설정 전용 `Display`를 각 파일에 정의한다([research.md §5](./research.md#5-직군연차-선택-화면--selectioncardlist-재사용)).
-- [ ] T019 [S3] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`에
+- [X] T019 [S3] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`에
   `accountAction == .confirmingDeletion` 표시 조건의 계정 삭제 확인 전체 화면을
   구현하고 `deleteAccountConfirmed`/`deleteAccountCancelled`에 연결한다
   ([research.md §6](./research.md#6-계정-삭제-확인--전체-화면)).
-- [ ] T020 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`에
+- [X] T020 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`에
   `AccountActionRow`로 로그아웃(`.view(.signOutTapped)`)을 추가하고, 미설정 직군·연차는
   "선택 안 함"으로 표시한다(FR-006a).
-- [ ] T021 [S4] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`에
+- [X] T021 [S4] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`에
   "서비스 약관 및 정책" 행을 추가한다. 목적지(정적 인앱 화면 vs 외부 링크)는 T010에서
   확정한 내용에 따라 구현한다([contracts/profile-screen-contract.md §5](./contracts/profile-screen-contract.md#5-fr-013-확장약관-계약-참고)).
 - [ ] T022 [S1] [S2] [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의
@@ -278,7 +278,7 @@ T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작
 
 ### 정리와 패키지 검증
 
-- [ ] T025 [S1] `sources/Projects/Feature/Settings/Profile/Previews/ProfileScreenPreviews.swift`,
+- [X] T025 [S1] `sources/Projects/Feature/Settings/Profile/Previews/ProfileScreenPreviews.swift`,
   `sources/Projects/Feature/Settings/Settings/Previews/SettingsScreenPreviews.swift`에
   로딩·정상(직군·연차 설정됨)·정상(미설정)·실패 상태별 프리뷰를 추가한다(Figma node
   ID를 프리뷰 이름에 포함).
