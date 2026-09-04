@@ -314,7 +314,7 @@ T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작
 - [X] T035 [S4] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 외부 링크 처리
   `case`(`.projectDetail(.presented(.delegate(.externalURLRequested)))` 등)에
   `.mainShell(.delegate(.externalURLRequested(let url)))`를 추가해 `openExternalURL`로 연다.
-- [ ] T036 [S1] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`,
+- [X] T036 [S1] `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`,
   `sources/Projects/App/Tests/GitIt/TestDoubles/NoopFetchMemberProfileUseCase.swift`의
   `LearningStatistics(...)` 호출을 새 필드명으로 갱신한다.
 
