@@ -57,15 +57,6 @@ extension AppModuleName {
                         "FirebaseAppDelegateProxyEnabled": false,
                         "GIT_IT_API_HOST": "$(GIT_IT_API_HOST)",
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
-                        "CFBundleURLTypes": [
-                            [
-                                "CFBundleTypeRole": "Editor",
-                                "CFBundleURLName": "com.nexters.hytime.gitit.sharedLink",
-                                "CFBundleURLSchemes": [
-                                    "gitit"
-                                ],
-                            ]
-                        ],
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
                             "UIInterfaceOrientationPortrait",

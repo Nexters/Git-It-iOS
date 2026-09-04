@@ -101,7 +101,7 @@ struct GitItApp: App {
                     rootStore.send(.view(.applicationBecameActive))
                 }
                 .onOpenURL { url in
-                    guard url.scheme == Constant.sharedLinkURLScheme else { return }
+                    guard url.host() == Constant.sharedLinkHost, url.path() == Constant.sharedLinkPath else { return }
                     guard let link = Self.takeSharedRepositoryLink() else { return }
                     rootStore.send(.effect(.sharedRepositoryLinkReceived(link)))
                 }
@@ -111,7 +111,8 @@ struct GitItApp: App {
     // MARK: Private
 
     private enum Constant {
-        static let sharedLinkURLScheme = "gitit"
+        static let sharedLinkHost = "git-it.kr"
+        static let sharedLinkPath = "/shared-link"
         static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
         static let sharedLinkStorageKey = "sharedRepositoryURL"
     }
