@@ -91,7 +91,7 @@ Domain을 다른 모든 패키지가 참조하므로 가장 먼저 진행). 변�
 
 ### 구현
 
-- [ ] T005 [S1] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의
+- [X] T005 [S1] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의
   `LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: [])`
   호출을 `LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0,
   streakDays: 0, weeklyCounts: [])`로 갱신한다.

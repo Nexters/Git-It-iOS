@@ -109,7 +109,12 @@ private enum AppRootPreviewSupport {
                 email: "preview@example.com",
                 position: nil,
                 careerLevel: nil,
-                statistics: LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: []),
+                statistics: LearningStatistics(
+                    thisWeekSolvedCount: 0,
+                    thisMonthSolvedCount: 0,
+                    streakDays: 0,
+                    weeklyCounts: [],
+                ),
             )
         }
     }
