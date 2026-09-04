@@ -20,16 +20,16 @@ struct MemberProfileResponseDTOTests {
               "thisMonthSolvedCount": 12,
               "streakDays": 5,
               "weeklyChart": [
-                {"dayLabel": "2026-08-19", "count": 2},
-                {"dayLabel": "2026-08-17", "count": 1},
-                {"dayLabel": "2026-08-18", "count": 0}
+                {"dayLabel": "수", "count": 2},
+                {"dayLabel": "월", "count": 1},
+                {"dayLabel": "화", "count": 0}
               ]
             }
             """#.utf8)
 
         let profile = try JSONDecoder().decode(MemberProfileResponseDTO.self, from: json)
 
-        #expect(profile.weeklyChart.map(\.dayLabel) == ["2026-08-19", "2026-08-17", "2026-08-18"])
+        #expect(profile.weeklyChart.map(\.dayLabel) == ["수", "월", "화"])
     }
 
     @Test
