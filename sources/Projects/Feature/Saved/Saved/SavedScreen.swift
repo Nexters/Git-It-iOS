@@ -39,10 +39,10 @@ struct SavedScreen: View {
                     Spacer(minLength: 0)
 
                     EmptyState(
-                        title: "bookmarks = []",
-                        message: "아직 저장한 문제가 없습니다.\n다시 볼 문제를 저장해 보세요.",
+                        title: "Nothing saved yet.",
+                        message: "아직 저장한 문제가 없네요!\n다시 확인하고 싶은 문제를 저장해 보세요.",
                     ) {
-                        ResourceAnimation(asset: .storageEmpty, isLooping: false)
+                        ResourceAnimation(asset: .storageEmpty, isLooping: true)
                     }
                     .designSystemScreenMargin()
 

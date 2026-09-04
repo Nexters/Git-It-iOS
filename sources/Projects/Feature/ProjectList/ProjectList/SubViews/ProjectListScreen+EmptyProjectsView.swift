@@ -14,9 +14,9 @@ extension ProjectListScreen {
 
                 EmptyState(
                     title: "projects = []",
-                    message: "아직 등록한 프로젝트가 없습니다.\n레포지토리를 연결해 학습을 시작해 보세요.",
+                    message: "아직 등록한 프로젝트가 없어요.\n관심 있는 오픈소스를 가져와 문제로 만들어보세요.",
                 ) {
-                    ResourceAnimation(asset: .storageEmpty, isLooping: false)
+                    ResourceAnimation(asset: .projectEmpty, isLooping: true)
                 }
                 .designSystemScreenMargin()
 
