@@ -186,7 +186,7 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 
 ### 테스트
 
-- [ ] T011 [P] [S1] `sources/Projects/Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`에
+- [X] T011 [P] [S1] `sources/Projects/Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`에
   `ProfileFeature.State.ProfileLoad`의 `idle`/`loading`/`loaded`/`failed` 전이가
   이름·이메일·배지(직군·연차 `nil`이면 배지 숨김)·통계 3종·주간 추이를 올바르게
   파생하는지 검증하는 실패 테스트를 작성한다([data-model.md §4](./data-model.md#4-신규-표시-모델-feature-패키지)).
@@ -198,13 +198,13 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 
 ### 구현
 
-- [ ] T013 [S1] `sources/Projects/Feature/Settings/Profile/ProfileFeature.swift`에
+- [X] T013 [S1] `sources/Projects/Feature/Settings/Profile/ProfileFeature.swift`에
   `FetchMemberProfileUseCase`를 생성자로 받아 `task`에서 1회 프로필을 조회하는 신규
   Reducer를 T011을 통과시키며 구현한다.
-- [ ] T014 [S1] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`에
+- [X] T014 [S1] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`에
   `HomeProfileDisplay` 패턴을 재사용해 `ProfileFeature.State`를 표시 값으로 변환하는
   `ProfileDisplay`를 구현한다.
-- [ ] T015 [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`와
+- [X] T015 [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`와
   `sources/Projects/Feature/Settings/Profile/SubViews/`(프로필 헤더, 통계 카드, 주간
   추이 서브뷰 — T010에서 확정한 구성에 따라 파일 분할)에 화면을 구현한다. 로딩·실패
   상태를 포함한다([contracts/profile-screen-contract.md §1](./contracts/profile-screen-contract.md#1-profilefeature--profilescreen-신규)).
