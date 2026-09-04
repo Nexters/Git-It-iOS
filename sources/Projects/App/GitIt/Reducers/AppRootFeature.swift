@@ -295,7 +295,8 @@ nonisolated struct AppRootFeature: Sendable {
                 state.quiz = QuizRouterFeature.State(projectID: projectID, setID: setID, setLabel: label)
                 return .none
 
-            case .projectDetail(.presented(.delegate(.externalURLRequested(let url)))),
+            case .mainShell(.delegate(.externalURLRequested(let url))),
+                 .projectDetail(.presented(.delegate(.externalURLRequested(let url)))),
                  .quiz(.presented(.delegate(.externalURLRequested(let url)))):
                 return .run { [openExternalURL] _ in await openExternalURL(url) }
 
