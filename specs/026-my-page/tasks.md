@@ -232,13 +232,13 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
 - [X] T021 [S4] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`에
   "서비스 약관 및 정책" 행을 추가한다. 목적지(정적 인앱 화면 vs 외부 링크)는 T010에서
   확정한 내용에 따라 구현한다([contracts/profile-screen-contract.md §5](./contracts/profile-screen-contract.md#5-fr-013-확장약관-계약-참고)).
-- [ ] T022 [S1] [S2] [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의
+- [X] T022 [S1] [S2] [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의
   `State.settings` 타입을 `SettingsFeature.State`에서 `SettingsRouterFeature.State`로,
   `Action.settings` 페이로드를 `SettingsRouterFeature.Action`으로 바꾸고,
   `Scope(state: \.settings, action: \.settings)`가 `SettingsRouterFeature(...)`를
   생성하도록 갱신한다. `.settings(.delegate(.signedOut)), .settings(.delegate(.accountDeleted))`
   패턴 매칭 경로도 갱신한다([contracts/settings-router-contract.md §4](./contracts/settings-router-contract.md#4-mainshellrouterfeature-연동)).
-- [ ] T023 [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의
+- [X] T023 [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의
   `case .settings`가 `Self.PlaceholderView(title: tab.tabTitle)` 대신
   `SettingsRouter(store: store.scope(state: \.settings, action: \.settings))`를
   반환하도록 수정한다. 이로써 쓰이지 않게 되는
@@ -272,7 +272,7 @@ T010의 Figma 재확인과 Router 설계 과정에서 필요성이 드러난 작
   `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestFixture.swift`의
   `LearningStatistics(...)` 호출을 새 필드명으로 갱신한다(Domain 필드 교정에 따른 fixture
   갱신).
-- [ ] T034 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의
+- [X] T034 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의
   로그아웃·계정 삭제 delegate 인자 타입을 `SettingsRouterFeature.Action.Delegate`로
   갱신한다.
 

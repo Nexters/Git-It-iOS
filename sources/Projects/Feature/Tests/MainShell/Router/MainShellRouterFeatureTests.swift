@@ -62,9 +62,9 @@ struct MainShellRouterFeatureTests {
         )
     }
 
-    @Test(arguments: [SettingsFeature.Action.Delegate.signedOut, .accountDeleted])
+    @Test(arguments: [SettingsRouterFeature.Action.Delegate.signedOut, .accountDeleted])
     func `로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다`(
-        delegate: SettingsFeature.Action.Delegate
+        delegate: SettingsRouterFeature.Action.Delegate
     ) async {
         var state = MainShellRouterFeature.State()
         state.selectedTab = .settings

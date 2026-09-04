@@ -41,7 +41,7 @@ public struct MainShellRouterFeature: Sendable {
         public var home = HomeFeature.State()
         public var projectList = ProjectListFeature.State()
         public var saved = SavedFeature.State()
-        public var settings = SettingsFeature.State()
+        public var settings = SettingsRouterFeature.State()
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -50,7 +50,7 @@ public struct MainShellRouterFeature: Sendable {
         case home(HomeFeature.Action)
         case projectList(ProjectListFeature.Action)
         case saved(SavedFeature.Action)
-        case settings(SettingsFeature.Action)
+        case settings(SettingsRouterFeature.Action)
 
         // MARK: Public
 
@@ -65,6 +65,7 @@ public struct MainShellRouterFeature: Sendable {
             case projectDetailRequested(projectID: String)
             case learningRequested(projectID: String, nextSetID: String)
             case questionSelected(BookmarkedQuestion)
+            case externalURLRequested(URL)
             case loggedOut
         }
     }
@@ -87,7 +88,7 @@ public struct MainShellRouterFeature: Sendable {
             SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
         }
         Scope(state: \.settings, action: \.settings) {
-            SettingsFeature(
+            SettingsRouterFeature(
                 signOut: signOut,
                 fetchMemberProfile: fetchMemberProfile,
                 updateMemberPosition: updateMemberPosition,
@@ -119,6 +120,9 @@ public struct MainShellRouterFeature: Sendable {
 
             case .saved(.delegate(.questionSelected(let question))):
                 return .send(.delegate(.questionSelected(question)))
+
+            case .settings(.delegate(.externalURLRequested(let url))):
+                return .send(.delegate(.externalURLRequested(url)))
 
             case .settings(.delegate(.signedOut)),
                  .settings(.delegate(.accountDeleted)):

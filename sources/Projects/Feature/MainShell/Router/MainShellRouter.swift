@@ -28,7 +28,7 @@ public struct MainShellRouter: View {
                 SavedScreen(store: store.scope(state: \.saved, action: \.saved))
 
             case .settings:
-                Self.PlaceholderView(title: tab.tabTitle)
+                SettingsRouter(store: store.scope(state: \.settings, action: \.settings))
             }
         }
     }
