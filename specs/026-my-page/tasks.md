@@ -190,7 +190,7 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
   `ProfileFeature.State.ProfileLoad`의 `idle`/`loading`/`loaded`/`failed` 전이가
   이름·이메일·배지(직군·연차 `nil`이면 배지 숨김)·통계 3종·주간 추이를 올바르게
   파생하는지 검증하는 실패 테스트를 작성한다([data-model.md §4](./data-model.md#4-신규-표시-모델-feature-패키지)).
-- [ ] T012 [P] [S1] [S2] [S3] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`에
+- [X] T012 [P] [S1] [S2] [S3] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`에
   설정 아이콘 탭 → `.settings(.list)`, 개발 분야/수준 행 탭 → 해당 선택 화면,
   뒤로가기 → 이전 화면으로 되돌아가는 `activeScreen` 전이와 `settings(.delegate(...))`가
   Router의 `delegate`로 그대로 전달되는지 검증하는 실패 테스트를 작성한다
@@ -208,11 +208,11 @@ Simulator에서 "마이" 탭 진입 시 프로필 화면 → (설정 아이콘) 
   `sources/Projects/Feature/Settings/Profile/SubViews/`(프로필 헤더, 통계 카드, 주간
   추이 서브뷰 — T010에서 확정한 구성에 따라 파일 분할)에 화면을 구현한다. 로딩·실패
   상태를 포함한다([contracts/profile-screen-contract.md §1](./contracts/profile-screen-contract.md#1-profilefeature--profilescreen-신규)).
-- [ ] T016 [S1] [S2] [S3] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`에
+- [X] T016 [S1] [S2] [S3] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`에
   `profile: ProfileFeature.State`·`settings: SettingsFeature.State`를 항상 보유하고
   `ActiveScreen`/`SettingsStep`을 소유하는 Router Reducer를 T012를 통과시키며 구현한다
   ([data-model.md §3](./data-model.md#3-router-상태-feature-패키지-신규)).
-- [ ] T017 [S1] [S2] [S3] `sources/Projects/Feature/Settings/Router/SettingsRouter.swift`에
+- [X] T017 [S1] [S2] [S3] `sources/Projects/Feature/Settings/Router/SettingsRouter.swift`에
   `activeScreen`을 `switch`해 `ProfileScreen`/`SettingsScreen`(및 그 서브뷰)을 그리는
   Router View를 구현한다.
 - [X] T018 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`(목록)와
