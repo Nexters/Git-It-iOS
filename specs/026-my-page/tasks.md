@@ -121,7 +121,7 @@ Domain을 다른 모든 패키지가 참조하므로 가장 먼저 진행). 변�
 
 ### 테스트
 
-- [ ] T007 [S1] `sources/Projects/Composition/Tests/Adapter/Adapters/MemberRepositoryAdapterTests.swift`의
+- [X] T007 [S1] `sources/Projects/Composition/Tests/Adapter/Adapters/MemberRepositoryAdapterTests.swift`의
   `프로필 응답 DTO를 Domain MemberProfile로 변환한다` 테스트에
   `#expect(profile.statistics.thisWeekSolvedCount == 3)`,
   `#expect(profile.statistics.thisMonthSolvedCount == 12)`,
@@ -132,7 +132,7 @@ Domain을 다른 모든 패키지가 참조하므로 가장 먼저 진행). 변�
 
 ### 구현
 
-- [ ] T008 [S1] `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`의
+- [X] T008 [S1] `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`의
   `fetchProfile()`이 `LearningStatistics(thisWeekSolvedCount: response.thisWeekSolvedCount,
   thisMonthSolvedCount: response.thisMonthSolvedCount, streakDays: response.streakDays,
   weeklyCounts: response.weeklyChart.map { WeeklyLearningCount(dayLabel: $0.dayLabel,
