@@ -39,14 +39,12 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
-        public init(initialRepositoryURL: String = "") {
-            repositoryLinkInput = RepositoryLinkInputFeature.State(initialRepositoryURL: initialRepositoryURL)
-        }
+        public init() { }
 
         public var activeScreen = ActiveScreen.repositoryLinkInput
         public var screenTransitions: [ScreenTransition] = []
 
-        public var repositoryLinkInput: RepositoryLinkInputFeature.State
+        public var repositoryLinkInput = RepositoryLinkInputFeature.State()
         public var repositoryConfirmation = RepositoryConfirmationFeature.State()
         public var quizLevelSelection = QuizLevelSelectionFeature.State()
         public var quizGenerationConfirmation = QuizGenerationConfirmationFeature.State()

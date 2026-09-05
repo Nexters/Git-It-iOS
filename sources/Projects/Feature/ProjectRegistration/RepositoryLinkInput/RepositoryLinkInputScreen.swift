@@ -54,7 +54,6 @@ struct RepositoryLinkInputScreen: View {
         }
         .background(Self.KeyboardDismissLayer(onTap: { isLinkFieldFocused = false }))
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .task { send(.task) }
     }
 
     @FocusState private var isLinkFieldFocused: Bool
