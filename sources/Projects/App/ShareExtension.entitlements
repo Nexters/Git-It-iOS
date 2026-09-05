@@ -6,5 +6,9 @@
 	<array>
 		<string>group.com.nexters.hytime.gitit</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.nexters.hytime.gitit.shared</string>
+	</array>
 </dict>
 </plist>

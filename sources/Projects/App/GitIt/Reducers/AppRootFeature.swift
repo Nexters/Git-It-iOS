@@ -110,7 +110,6 @@ nonisolated struct AppRootFeature: Sendable {
 
         var isGenerationProgressRestored = false
 
-        var pendingSharedLink: SharedRepositoryLink?
         @Presents var projectRegistration: ProjectRegistrationRouterFeature.State?
         @Presents var projectDetail: ProjectDetailRouterFeature.State?
         @Presents var quiz: QuizRouterFeature.State?
@@ -144,7 +143,6 @@ nonisolated struct AppRootFeature: Sendable {
             case deviceTokenRefreshed
             case generationProgressRestored(GenerationProgress?)
             case generationProgressReleased(projectID: String)
-            case sharedRepositoryLinkReceived(SharedRepositoryLink)
         }
     }
 
@@ -207,10 +205,7 @@ nonisolated struct AppRootFeature: Sendable {
                 switch destination {
                 case .mainShell:
                     state.route = .mainShell
-                    return .merge(
-                        registerDeviceIfNeeded(&state),
-                        consumePendingSharedLink(&state),
-                    )
+                    return registerDeviceIfNeeded(&state)
 
                 case .onboarding(let entryPoint):
                     let bundleVersion = state.onboarding.tutorial.bundleVersion
@@ -231,17 +226,22 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .onboarding(.delegate(.mainShellRequested)):
                 state.route = .mainShell
-                return .merge(
-                    registerDeviceIfNeeded(&state),
-                    consumePendingSharedLink(&state),
-                )
+                return registerDeviceIfNeeded(&state)
 
             case .mainShell(.delegate(.loggedOut)):
                 return returnToOnboarding(&state)
 
             case .view(.applicationBecameActive):
-                guard state.deviceRegistration == .failed else { return .none }
-                return registerDeviceIfNeeded(&state)
+                // Share Extension이나 다른 기기에서 등록한 프로젝트가 복귀 즉시 보이도록
+                // 목록을 다시 불러온다. Extension이 남기는 신호에 의존하지 않는다.
+                var effects = [Effect<Action>]()
+                if state.route == .mainShell {
+                    effects.append(.send(.mainShell(.home(.input(.learningProjectsReloadRequested)))))
+                }
+                if state.deviceRegistration == .failed {
+                    effects.append(registerDeviceIfNeeded(&state))
+                }
+                return .merge(effects)
 
             case .effect(.deviceTokenRefreshed):
                 guard state.route == .mainShell else { return .none }
@@ -348,16 +348,6 @@ nonisolated struct AppRootFeature: Sendable {
                 state.isGenerationProgressRestored = true
                 state.mainShell.home.isGenerationInProgress = true
                 return releaseGenerationProgress(restored)
-
-            case .effect(.sharedRepositoryLinkReceived(let link)):
-                guard state.generationProgress == nil else { return .none }
-                guard state.route == .mainShell else {
-                    state.pendingSharedLink = link
-                    return .none
-                }
-                state.pendingSharedLink = nil
-                state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
-                return .none
 
             case .effect(.generationProgressReleased(let projectID)):
                 guard state.generationProgress?.projectID == projectID else { return .none }
@@ -484,14 +474,6 @@ nonisolated struct AppRootFeature: Sendable {
         .cancellable(id: CancelID.deviceRegistration)
     }
 
-    private func consumePendingSharedLink(_ state: inout State) -> Effect<Action> {
-        guard let link = state.pendingSharedLink else { return .none }
-        state.pendingSharedLink = nil
-        guard state.generationProgress == nil else { return .none }
-        state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
-        return .none
-    }
-
     private func releaseGenerationProgress(_ progress: GenerationProgress) -> Effect<Action> {
         .run { [observeGenerationOutcomes, waitPolicy, now] send in
             let deadline = progress.requestedAt.addingTimeInterval(waitPolicy.retentionLimit)
@@ -532,7 +514,6 @@ nonisolated struct AppRootFeature: Sendable {
         state.deviceRegistration = .idle
         state.generationProgress = nil
         state.isGenerationProgressRestored = false
-        state.pendingSharedLink = nil
         state.route = .onboarding
         return .merge(
             .cancel(id: CancelID.deviceRegistration),

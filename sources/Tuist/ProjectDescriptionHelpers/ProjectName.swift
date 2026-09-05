@@ -43,7 +43,8 @@ extension ProjectName {
                     .package(
                         name: rawValue,
                         buildTargets: [
-                            AppModuleName.GitIt.rawValue
+                            AppModuleName.GitIt.rawValue,
+                            AppModuleName.ShareExtension.rawValue,
                         ],
                         testTargets: [],
                         runTarget: AppModuleName.GitIt.rawValue,

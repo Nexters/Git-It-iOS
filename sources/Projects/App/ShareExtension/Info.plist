@@ -20,6 +20,10 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>GIT_IT_API_HOST</key>
+	<string>$(GIT_IT_API_HOST)</string>
+	<key>GIT_IT_EXTERNAL_REPOSITORY_HOST</key>
+	<string>$(GIT_IT_EXTERNAL_REPOSITORY_HOST)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
@@ -30,8 +34,7 @@
 				SUBQUERY (
 					$extensionItem.attachments, $attachment,
 					ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
-					|| ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.plain-text"
-				).@count &gt;= 1
+				).@count == 1
 			).@count == 1</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

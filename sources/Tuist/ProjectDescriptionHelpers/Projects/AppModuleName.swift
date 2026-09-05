@@ -80,7 +80,7 @@ extension AppModuleName {
                 dependencies: [
                     .target(name: AppModuleName.AppDebug.rawValue),
                     .target(name: AppModuleName.ShareExtension.rawValue),
-                    .fromComposition(.CompositionAdapter),
+                    .fromComposition(.CompositionApp),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
                 ],
@@ -118,12 +118,17 @@ extension AppModuleName {
                 bundleId: "com.nexters.hytime.gitit.tests",
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
-                sources: ["\(sourceDirectory)/**"],
+                // app extension target은 unit test target이 링크할 수 없어, 검증 대상
+                // 파일만 테스트 target에 직접 포함한다.
+                sources: [
+                    "\(sourceDirectory)/**",
+                    "\(AppModuleName.ShareExtension.sourceDirectory)/SharedItemURLResolver.swift",
+                ],
                 dependencies: [
                     .target(name: AppModuleName.GitIt.rawValue),
                     .external(.ComposableArchitecture),
                     .fromFeature(.Feature),
-                    .fromComposition(.CompositionAdapter),
+                    .fromComposition(.CompositionApp),
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromDomain(.DomainMember),
@@ -133,6 +138,9 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        // TestStore는 MainActor에서 생성해야 한다. GitIt target과 같은 기본
+                        // 격리를 쓰지 않으면 테스트가 협력 스레드에서 실행돼 SIGTRAP으로 죽는다.
+                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
                     ]
                 ),
@@ -148,9 +156,14 @@ extension AppModuleName {
                 infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
                 sources: ["\(sourceDirectory)/**/*.swift"],
                 entitlements: .file(path: "ShareExtension.entitlements"),
-                // 확장은 URL 형식을 판정하지 않고 그대로 앱에 넘기므로 프로젝트 내부 패키지에
-                // 의존하지 않는다.
-                dependencies: [],
+                // 원격 푸시를 링크하지 않는 조립 루트와 화면만 의존한다.
+                dependencies: [
+                    .fromComposition(.CompositionShareExtension),
+                    .fromComposition(.CompositionAdapter),
+                    .fromFeature(.Feature),
+                    .fromDomain(.DomainLearningProject),
+                    .external(.ComposableArchitecture),
+                ],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",

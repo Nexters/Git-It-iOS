@@ -436,6 +436,46 @@ struct AppRootFeatureTests {
     }
 
     @Test
+    func `mainShell 표시 중 앱이 활성화되면 프로젝트 목록을 다시 조회한다`() async {
+        let store = makeAppRootStore(state: mainShellState())
+        store.exhaustivity = .off
+
+        await store.send(.view(.applicationBecameActive))
+        await store.receive(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+
+        await store.finish()
+    }
+
+    @Test
+    func `onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .onboarding
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.view(.applicationBecameActive))
+
+        #expect(store.state.mainShell.home.projectLoad == .idle)
+        await store.finish()
+    }
+
+    @Test
+    func `포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다`() async {
+        let store = makeAppRootStore(state: mainShellState())
+        store.exhaustivity = .off
+
+        await store.send(.view(.applicationBecameActive))
+        await store.receive(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+        await store.receive(
+            .mainShell(.home(.effect(.projectsLoadFinished(requestID: 1, result: .failure(.unexpected)))))
+        )
+
+        #expect(store.state.route == .mainShell)
+        #expect(store.state.mainShell.home.projectLoad == .failed(.unexpected))
+        await store.finish()
+    }
+
+    @Test
     func `기기 등록 실패 후 token이 갱신되면 갱신 token으로 재시도한다`() async {
         let registerCurrentDevice = RegisterCurrentDeviceSpy(results: [
             .failure(DeviceRegistrationTestError.failed),
@@ -685,91 +725,7 @@ struct AppRootFeatureTests {
         await store.finish()
     }
 
-    @Test
-    func `인증 완료 상태에서 공유 링크를 받으면 링크가 채워진 등록 화면을 연다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL)))) {
-            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
-        }
-
-        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
-        #expect(store.state.pendingSharedLink == nil)
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `미인증 상태의 공유 링크는 보관했다가 진입 흐름을 마친 뒤 소비한다`() async {
-        let store = makeAppRootStore()
-        store.exhaustivity = .off
-
-        await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL)))) {
-            $0.pendingSharedLink = SharedRepositoryLink(url: Self.sharedURL)
-        }
-        #expect(store.state.projectRegistration == nil)
-
-        await store.send(.onboarding(.delegate(.mainShellRequested))) {
-            $0.route = .mainShell
-            $0.pendingSharedLink = nil
-            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
-        }
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `생성이 진행 중이면 공유 링크를 버리고 등록 화면을 열지 않는다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        state.generationProgress = GenerationProgress(
-            projectID: "project-1",
-            requestedAt: Date(timeIntervalSince1970: 1_000),
-        )
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL))))
-
-        #expect(store.state.projectRegistration == nil)
-        #expect(store.state.pendingSharedLink == nil)
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `보관된 공유 링크는 1회만 소비되고 재진입에서 다시 쓰이지 않는다`() async {
-        let store = makeAppRootStore()
-        store.exhaustivity = .off
-
-        await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL))))
-        await store.send(.onboarding(.delegate(.mainShellRequested)))
-        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
-
-        await store.send(.mainShell(.delegate(.loggedOut))) {
-            $0.projectRegistration = nil
-            $0.pendingSharedLink = nil
-            $0.route = .onboarding
-        }
-        await store.send(.onboarding(.delegate(.mainShellRequested))) {
-            $0.route = .mainShell
-        }
-
-        #expect(store.state.projectRegistration == nil)
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
     // MARK: Private
-
-    private static let sharedURL = "https://github.com/owner/repo"
 
     private static let receipt = ProjectRegistrationReceipt(
         projectID: "project-1",

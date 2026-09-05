@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import CompositionAdapter
+import CompositionApp
 import DomainAuthentication
 import DomainMember
 import Foundation
@@ -100,30 +100,11 @@ struct GitItApp: App {
                     guard newPhase == .active else { return }
                     rootStore.send(.view(.applicationBecameActive))
                 }
-                .onOpenURL { url in
-                    guard url.host() == Constant.sharedLinkHost, url.path() == Constant.sharedLinkPath else { return }
-                    guard let link = Self.takeSharedRepositoryLink() else { return }
-                    rootStore.send(.effect(.sharedRepositoryLinkReceived(link)))
-                }
         }
     }
 
     // MARK: Private
 
-    private enum Constant {
-        static let sharedLinkHost = "git-it.kr"
-        static let sharedLinkPath = "/shared-link"
-        static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
-        static let sharedLinkStorageKey = "sharedRepositoryURL"
-    }
-
     @Environment(\.scenePhase) private var scenePhase
-
-    private static func takeSharedRepositoryLink() -> SharedRepositoryLink? {
-        guard let defaults = UserDefaults(suiteName: Constant.appGroupIdentifier) else { return nil }
-        guard let urlString = defaults.string(forKey: Constant.sharedLinkStorageKey) else { return nil }
-        defaults.removeObject(forKey: Constant.sharedLinkStorageKey)
-        return SharedRepositoryLink(url: urlString)
-    }
 
 }
