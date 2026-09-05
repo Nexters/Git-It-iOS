@@ -12,9 +12,12 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     init(
         remote: AuthenticationRemote,
         keychainStore: KeychainStore,
+        sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = SharedSessionLayout.makeSharedDefaults()
+            .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
     ) {
         self.remote = remote
         self.keychainStore = keychainStore
+        self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding
         sessionCoding = SessionRecordKeychainCoding(keychainStore: keychainStore)
     }
 
@@ -36,6 +39,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
                     acceptedAt: nil,
                 ),
             ))
+            await recordSharedSessionState(isSignedIn: true)
             guard let userID = try loadAppleUserID() else { throw LoginSessionError.temporarilyUnavailable }
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
         } catch let error as DataAuthenticationError {
@@ -57,6 +61,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     func signOut() async throws {
         do {
             try sessionCoding.delete()
+            await recordSharedSessionState(isSignedIn: false)
         } catch is KeychainStoreError {
             throw LoginSessionError.temporarilyUnavailable
         }
@@ -104,6 +109,13 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     private let remote: AuthenticationRemote
     private let keychainStore: KeychainStore
     private let sessionCoding: SessionRecordKeychainCoding
+    private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?
+
+    /// Share Extension은 이 마커로 "본 앱 실행 필요"와 "로그인 필요"를 구분한다.
+    /// 기록 실패는 로그인·로그아웃 흐름을 막지 않는다.
+    private func recordSharedSessionState(isSignedIn: Bool) async {
+        await sharedSessionStateMarkerCoding?.save(isSignedIn: isSignedIn)
+    }
 
     private func loadAppleUserID() throws -> String? {
         guard

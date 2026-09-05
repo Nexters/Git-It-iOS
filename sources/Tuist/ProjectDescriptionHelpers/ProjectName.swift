@@ -64,10 +64,14 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        CompositionModuleName.CompositionAdapter.rawValue
+                        CompositionModuleName.CompositionAdapter.rawValue,
+                        CompositionModuleName.CompositionApp.rawValue,
+                        CompositionModuleName.CompositionShareExtension.rawValue,
                     ],
                     testTargets: [
-                        CompositionModuleName.CompositionAdapterTests.rawValue
+                        CompositionModuleName.CompositionAdapterTests.rawValue,
+                        CompositionModuleName.CompositionAppTests.rawValue,
+                        CompositionModuleName.CompositionShareExtensionTests.rawValue,
                     ],
                 )]
 

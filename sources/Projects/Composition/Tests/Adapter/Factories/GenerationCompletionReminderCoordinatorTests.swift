@@ -3,7 +3,7 @@ import Foundation
 import Synchronization
 import Testing
 @testable import CompositionAdapter
-@testable import InfrastructurePushMessaging
+@testable import InfrastructureLocalNotification
 
 // MARK: - GenerationCompletionReminderCoordinatorTests
 

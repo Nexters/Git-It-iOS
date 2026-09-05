@@ -1,6 +1,6 @@
 import DomainLearningProject
 import Foundation
-import InfrastructurePushMessaging
+import InfrastructureLocalNotification
 import os
 
 // MARK: - GenerationCompletionReminderCoordinator
@@ -12,10 +12,12 @@ actor GenerationCompletionReminderCoordinator {
     init(
         localNotificationClient: any LocalNotificationClient,
         progressRepository: any GenerationProgressRepository,
+        pendingReminderCoding: PendingGenerationReminderCoding? = nil,
         waitPolicy: GenerationWaitPolicy = .standard,
     ) {
         self.localNotificationClient = localNotificationClient
         self.progressRepository = progressRepository
+        self.pendingReminderCoding = pendingReminderCoding
         self.waitPolicy = waitPolicy
     }
 
@@ -26,7 +28,17 @@ actor GenerationCompletionReminderCoordinator {
         Self.logger.debug("리마인드 대상 등록: projectID=\(projectID, privacy: .public)")
     }
 
+    /// Share Extension이 남긴 대기 항목을 등록 대상으로 흡수한다. 다른 프로세스에서
+    /// 등록된 프로젝트도 이 시점부터 기존과 같은 경로로 알림을 받는다.
+    func absorbPendingReminders() async {
+        guard let pendingReminderCoding else { return }
+        for projectID in await pendingReminderCoding.drainProjectIDs() {
+            register(projectID: projectID)
+        }
+    }
+
     func start(observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase) async {
+        await absorbPendingReminders()
         let outcomes = await observeGenerationOutcomes()
         observationTask = Task {
             for await outcome in outcomes {
@@ -45,6 +57,7 @@ actor GenerationCompletionReminderCoordinator {
 
     private let localNotificationClient: any LocalNotificationClient
     private let progressRepository: any GenerationProgressRepository
+    private let pendingReminderCoding: PendingGenerationReminderCoding?
     private let waitPolicy: GenerationWaitPolicy
     private var registeredProjectIDs = Set<String>()
     private var observationTask: Task<Void, Never>?

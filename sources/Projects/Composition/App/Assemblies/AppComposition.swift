@@ -1,3 +1,4 @@
+import CompositionAdapter
 import DataExternalRepository
 import DomainAuthentication
 import DomainLearningProject
@@ -20,6 +21,7 @@ public struct AppComposition: Sendable {
         learningProject: LearningProjectAssembly,
         member: MemberAssembly,
         externalRepository: ExternalRepositoryAssembly,
+        generationReminder: GenerationReminderAssembly,
         keychainStore: KeychainStore,
     ) {
         signIn = authentication.signIn
@@ -51,15 +53,7 @@ public struct AppComposition: Sendable {
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
 
-        let localNotificationClient = UserNotificationCenterLocalClient()
-        let reminderCoordinator = GenerationCompletionReminderCoordinator(
-            localNotificationClient: localNotificationClient,
-            progressRepository: learningProject.generationProgressRepository,
-        )
-        requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
-            reminderRegistry: GenerationReminderRegistryAdapter(coordinator: reminderCoordinator),
-        )
+        requestGenerationReminder = generationReminder.requestGenerationReminder
 
         let pushClientBox = PushClientBox()
         let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
@@ -72,10 +66,19 @@ public struct AppComposition: Sendable {
         )
 
         let observeGenerationOutcomes = learningProject.observeGenerationOutcomes
+        let startObservingGenerationOutcomes = generationReminder.startObservingGenerationOutcomes
+        let markerCoding = SharedSessionLayout.makeSharedDefaults()
+            .map(SharedSessionStateMarkerCoding.init(userDefaults:))
+        let hasStoredSession: @Sendable () async -> Bool = {
+            await authentication.accessTokenProvider() != nil
+        }
         bootstrap = { appDelegate in
+            // 본 앱이 실행됐다는 사실과 현재 로그인 여부를 남긴다. Share Extension은 이
+            // 마커가 없을 때만 "앱 실행 필요"로 안내한다.
+            await markerCoding?.save(isSignedIn: hasStoredSession())
             pushClientBox.activate()
             appDelegate.configure(pushNotificationCallbacks)
-            await reminderCoordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
+            await startObservingGenerationOutcomes(observeGenerationOutcomes)
         }
 
         let registerMemberDevice = member.registerMemberDevice
@@ -175,19 +178,23 @@ public struct AppComposition: Sendable {
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = KeychainStore(),
+        keychainStore: KeychainStore = SharedSessionLayout.makeSharedKeychainStore(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
+        // 접근 그룹을 지정하기 전에 저장된 세션을 공유 저장소로 옮긴다. 실패해도 기존
+        // 항목을 남겨 사용자가 로그아웃되지 않는다.
+        SessionKeychainMigration(
+            sharedKeychainStore: keychainStore,
+            legacyKeychainStore: SharedSessionLayout.makeLegacyKeychainStore(),
+        )()
+
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,
             policyDocuments: environment.policyDocuments,
             keychainStore: keychainStore,
             transport: transport,
         )
-        let sessionCoding = SessionRecordKeychainCoding(keychainStore: keychainStore)
-        let accessTokenProvider: @Sendable () async -> String? = {
-            (try? sessionCoding.load())?.tokens.accessToken
-        }
+        let accessTokenProvider = authentication.accessTokenProvider
         let learningProject = LearningProjectAssembly(
             baseURL: environment.apiBaseURL,
             accessTokenProvider: accessTokenProvider,
@@ -212,6 +219,7 @@ public struct AppComposition: Sendable {
             learningProject: learningProject,
             member: member,
             externalRepository: externalRepository,
+            generationReminder: GenerationReminderAssembly(learningProject: learningProject),
             keychainStore: keychainStore,
         )
     }

@@ -2,6 +2,7 @@ import Foundation
 import Testing
 
 @testable import CompositionAdapter
+@testable import CompositionApp
 
 @Suite("AppComposition 공개 표면")
 struct AppCompositionPublicSurfaceTests {

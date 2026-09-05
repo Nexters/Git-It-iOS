@@ -63,6 +63,7 @@ public struct AuthenticationAssembly: Sendable {
             policyConsentRepository: PolicyConsentRepositoryAdapter(store: policyConsentStore),
         )
         self.loginSessionRepository = loginSessionRepository
+        self.accessTokenProvider = accessTokenProvider
     }
 
     // MARK: Public
@@ -75,8 +76,9 @@ public struct AuthenticationAssembly: Sendable {
     public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
 
-    // MARK: Internal
+    /// 저장된 세션의 접근 토큰을 그대로 돌려준다. 갱신을 수행하지 않는다.
+    public let accessTokenProvider: @Sendable () async -> String?
 
-    let loginSessionRepository: any LoginSessionRepository
+    public let loginSessionRepository: any LoginSessionRepository
 
 }

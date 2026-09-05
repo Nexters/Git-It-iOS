@@ -1,5 +1,5 @@
 import DomainLearningProject
-import InfrastructurePushMessaging
+import InfrastructureLocalNotification
 import os
 
 // MARK: - NotificationAuthorizationGatewayAdapter
