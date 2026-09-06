@@ -35,10 +35,10 @@ public struct OverlayContainer<
         footer: @escaping () -> Footer,
     ) {
         self.screenBackground = screenBackground
-        self.header = header
-        self.content = content
-        self.background = background
-        self.footer = footer
+        self.header = header()
+        self.content = content()
+        self.background = background()
+        self.footer = footer()
     }
 
     // MARK: Public
@@ -47,13 +47,22 @@ public struct OverlayContainer<
         ZStack(alignment: .top) {
             scrollingContent
 
-            VStack(spacing: 0) {
-                header().padding(.bottom, 12).designSystemBackground(.quizTopScrim)
+            VStack {
+                header
+                    .background {
+                        LinearGradient(designSystem: .overlayHeaderScrim)
+                            .ignoresSafeArea(edges: .top)
+                    }
 
-                Spacer(minLength: 0)
-
-                footer().padding(.top, 12).designSystemBackground(.bottomEdgeScrim)
+                Spacer()
+                footer
+                    .padding(.top, 12)
+                    .background {
+                        LinearGradient(designSystem: .overlayFooterScrim)
+                            .ignoresSafeArea(edges: .bottom)
+                    }
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(designSystem: screenBackground).ignoresSafeArea())
@@ -63,24 +72,22 @@ public struct OverlayContainer<
     // MARK: Private
 
     private let screenBackground: SemanticColorToken
-    private let header: () -> Header
-    private let content: () -> Content
-    private let background: () -> Background
-    private let footer: () -> Footer
+    private let header: Header
+    private let content: Content
+    private let background: Background
+    private let footer: Footer
 
     private var scrollingContent: some View {
         GeometryReader { proxy in
             ScrollView {
                 VStack(spacing: 0) {
-                    occlusionSpacer { header() }
-
-                    content()
-
-                    occlusionSpacer { footer() }
+                    occlusionSpacer { header }
+                    content
+                    occlusionSpacer { footer }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, proxy.safeAreaInsets.top)
-                .background(alignment: .top) { background() }
+                .background(alignment: .top) { background }
             }
             .ignoresSafeArea(edges: .top)
             .onAppear {

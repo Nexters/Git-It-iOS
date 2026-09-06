@@ -19,12 +19,6 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .background {
-                Color.clear
-                    .onGeometryChange(for: CGFloat.self) { proxy in
-                        proxy.safeAreaInsets.bottom
-                    } action: { safeAreaBottomInset = $0 }
-            }
             .padding(.bottom, max(safeAreaBottomInset, Constant.minimumBottomInset))
     }
 
