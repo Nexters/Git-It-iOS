@@ -75,6 +75,7 @@ extension AppModuleName {
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_PREVIEWS": "YES",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        "CURRENT_PROJECT_VERSION": "4",
                         "MARKETING_VERSION": "1.0.0",
                         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                         "SUPPORTS_MACCATALYST": "NO",
@@ -145,7 +146,6 @@ extension AppModuleName {
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",
-                        "CURRENT_PROJECT_VERSION": "1",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                         "MARKETING_VERSION": "1.0.0",
