@@ -13,7 +13,7 @@ struct QuizLevelSelectionScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScreenHeader(style: .default, onLeadingTap: { send(.backTapped) })
+            ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             StyledText.subtitle1("이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?")

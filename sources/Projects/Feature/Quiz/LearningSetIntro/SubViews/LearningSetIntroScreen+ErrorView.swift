@@ -12,8 +12,8 @@ extension LearningSetIntroScreen {
         let onRetry: () -> Void
 
         var body: some View {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                ScreenHeader(style: .default, onLeadingTap: onBack)
+            VStack(spacing: LayoutToken.margin) {
+                ScreenControlBar(onLeadingTap: onBack)
                     .designSystemScreenMargin()
 
                 Spacer(minLength: 0)

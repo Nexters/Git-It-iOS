@@ -33,16 +33,20 @@ struct LearningSetIntroScreen: View {
 
     private var content: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
-                style: .default,
-                onLeadingTap: { send(.backTapped) },
+            ScreenControlBar(
+                onLeadingTap: { send(.backTapped) }
             )
+            .designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                StyledText.subtitle3(store.label, color: .blue100)
-                StyledText.subtitle1(store.learningSet?.title ?? "")
-                StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
-                    .padding(.top, Constant.descriptionTopPadding)
+            VStack {
+                Spacer()
+                VStack(alignment: .leading, spacing: Constant.textSpacing) {
+                    StyledText.subtitle3(store.label, color: .blue100)
+                    StyledText.subtitle1(store.learningSet?.title ?? "")
+                    StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
+                        .padding(.top, Constant.descriptionTopPadding)
+                }
+                Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .designSystemScreenMargin()
@@ -59,7 +63,7 @@ struct LearningSetIntroScreen: View {
     }
 
     private var startAction: some View {
-        ScreenOverlayFooter {
+        BottomActionBar {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
                     StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
@@ -71,6 +75,7 @@ struct LearningSetIntroScreen: View {
                     action: { send(.startTapped) },
                 )
             }
+            .designSystemScreenMargin()
         }
     }
 

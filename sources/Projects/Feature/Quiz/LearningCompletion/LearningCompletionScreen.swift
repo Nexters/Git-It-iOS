@@ -22,8 +22,7 @@ struct LearningCompletionScreen: View {
 
     private var screen: some View {
         VStack(spacing: 0) {
-            ScreenHeader(
-                style: .default,
+            ScreenControlBar(
                 leading: .close,
                 onLeadingTap: { send(.closeTapped) },
             )

@@ -38,9 +38,10 @@ struct QuestionSolvingScreen: View {
 
     private var content: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
+            ScreenControlBar(
                 onLeadingTap: { send(.backTapped) }
             )
+            .designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
                 QuestionPrompt(
@@ -163,8 +164,8 @@ struct QuestionSolvingScreen: View {
     }
 
     private var bottomActions: some View {
-        ScreenOverlayFooter {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+        BottomActionBar {
+            HStack(spacing: LayoutToken.compactSpacing) {
                 BookmarkButton(
                     isSaved: store.isBookmarked,
                     accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
@@ -173,6 +174,7 @@ struct QuestionSolvingScreen: View {
 
                 primaryAction
             }
+            .designSystemScreenMargin()
         }
     }
 
@@ -191,6 +193,6 @@ extension QuestionSolvingScreen {
         static let sourceButtonChevronSize: CGFloat = 16
         static let sourceButtonLeadingPadding: CGFloat = 16
         static let sourceButtonTrailingPadding: CGFloat = 8
-        static let sourceButtonVerticalPadding: CGFloat = 4
+        static let sourceButtonVerticalPadding: CGFloat = 8
     }
 }

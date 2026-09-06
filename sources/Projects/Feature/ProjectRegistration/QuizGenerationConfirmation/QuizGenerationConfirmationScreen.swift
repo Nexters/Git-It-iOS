@@ -12,7 +12,7 @@ struct QuizGenerationConfirmationScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(style: .default, onLeadingTap: { send(.backTapped) })
+            ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             Spacer(minLength: 0)

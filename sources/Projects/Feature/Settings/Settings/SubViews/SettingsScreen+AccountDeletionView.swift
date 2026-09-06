@@ -1,9 +1,9 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
 extension SettingsScreen {
-    /// 계정 삭제 확인 단계(Figma `1636:31714`). 뒤로가기는 삭제 확인을 취소한다.
     @ViewAction(for: SettingsFeature.self)
     struct AccountDeletionView: View {
 
@@ -13,12 +13,24 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                ScreenOverlayHeader(
-                    title: Constant.title,
-                    style: .largeTitle,
-                    leading: .back,
-                    onLeadingTap: { send(.deleteAccountCancelled) },
-                )
+                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                        IconGlassButton.neutral(
+                            icon: ScreenControlBar.Control.back.icon,
+                            label: ScreenControlBar.Control.back.label,
+                            size: .medium,
+                            action: { send(.deleteAccountCancelled) },
+                        )
+
+                        Spacer(minLength: 0)
+                    }
+                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+
+                    ScreenHeaderTitle(title: Constant.title)
+                }
+                .padding(.bottom, Constant.headerBottomPadding)
+                .frame(height: Constant.headerHeight, alignment: .top)
+                .designSystemScreenMargin()
             } content: {
                 VStack(alignment: .leading, spacing: Constant.paragraphSpacing) {
                     ForEach(Constant.paragraphs, id: \.self) { paragraph in
@@ -33,12 +45,13 @@ extension SettingsScreen {
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             } footer: {
-                ScreenOverlayFooter {
+                BottomActionBar {
                     ActionButton.text(
                         styledText: StyledText.body1(Constant.confirmTitle, color: .error, alignment: .center),
                         isEnabled: store.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
+                    .designSystemScreenMargin()
                 }
             }
         }
@@ -56,6 +69,10 @@ extension SettingsScreen {
             static let failureMessage = "계정을 삭제하지 못했어요. 다시 시도해 주세요."
             static let paragraphSpacing: CGFloat = 24
             static let contentTopPadding: CGFloat = 8
+            static let headerControlRowHeight: CGFloat = 40
+            static let headerTitleSpacing: CGFloat = 16
+            static let headerBottomPadding: CGFloat = 10
+            static let headerHeight: CGFloat = 99
         }
 
     }

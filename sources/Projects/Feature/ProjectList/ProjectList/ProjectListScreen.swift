@@ -32,9 +32,10 @@ public struct ProjectListScreen: View {
             .overlay(alignment: .topTrailing) {
                 if store.mode == .menuPresented {
                     ActionMenu(items: Constant.menuItems) { _ in send(.deletionMenuItemTapped) }
-                        .padding(.trailing, LayoutToken.margin.cgFloatValue)
+                        .padding(.trailing, LayoutToken.margin)
                         .offset(y: Constant.menuTopOffset)
                         .transition(.opacity)
+                        .padding(.top, 10)
                 }
             }
             .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.mode)
@@ -52,6 +53,7 @@ public struct ProjectListScreen: View {
                         onConfirmTap: { send(.deletionConfirmed) },
                         onCancelTap: { send(.deletionCancelled) },
                     )
+                    .designSystemScreenMargin()
                 }
             }
             .overlay {
@@ -90,6 +92,49 @@ public struct ProjectListScreen: View {
         }
     }
 
+    private var content: some View {
+        OverlayContainer {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                    if let headerLeading {
+                        IconGlassButton.neutral(
+                            icon: headerLeading.icon,
+                            label: headerLeading.label,
+                            size: .medium,
+                            action: headerLeadingTapped,
+                        )
+                    }
+                    ScreenHeaderTitle(title: headerTitle)
+                        .frame(height: 32)
+                }
+
+                Spacer()
+
+                if let headerTrailing {
+                    IconGlassButton.neutral(
+                        icon: headerTrailing.icon,
+                        label: headerTrailing.label,
+                        size: .medium,
+                        action: headerTrailingTapped,
+                    )
+                }
+            }
+            .padding(.vertical, Constant.headerBottomPadding)
+            .frame(minHeight: Constant.headerControlRowHeight)
+            .designSystemScreenMargin()
+
+        } content: {
+            VStack(spacing: LayoutToken.compactSpacing) {
+                ForEach(projects) { project in
+                    row(project)
+                }
+            }
+            .designSystemScreenMargin()
+            .padding(.vertical, Constant.contentVerticalPadding)
+        }
+        .refreshable { await store.send(.view(.refreshRequested)).finish() }
+    }
+
     private var deletionTarget: ProjectListDisplay? {
         guard case .confirming(let projectID) = store.deletion else { return nil }
         return projects.first { $0.id == projectID }
@@ -106,34 +151,12 @@ public struct ProjectListScreen: View {
         store.mode == .deleting ? "프로젝트 삭제" : "프로젝트"
     }
 
-    private var headerLeading: ScreenHeader.Control? {
+    private var headerLeading: ScreenControlBar.Control? {
         store.mode == .deleting ? .back : nil
     }
 
-    private var headerTrailing: ScreenHeader.Control? {
+    private var headerTrailing: ScreenControlBar.Control? {
         store.mode == .deleting ? nil : Constant.menuControl
-    }
-
-    private var content: some View {
-        OverlayContainer {
-            ScreenOverlayHeader(
-                title: headerTitle,
-                style: .largeTitle,
-                leading: headerLeading,
-                trailing: headerTrailing,
-                onLeadingTap: headerLeadingTapped,
-                onTrailingTap: headerTrailingTapped,
-            )
-        } content: {
-            VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                ForEach(projects) { project in
-                    row(project)
-                }
-            }
-            .designSystemScreenMargin()
-            .padding(.vertical, Constant.contentVerticalPadding)
-        }
-        .refreshable { await store.send(.view(.refreshRequested)).finish() }
     }
 
     private func headerLeadingTapped() {
@@ -179,14 +202,17 @@ public struct ProjectListScreen: View {
 extension ProjectListScreen {
     fileprivate enum Constant {
         static let contentVerticalPadding: CGFloat = 16
-        static let menuControl = ScreenHeader.Control(symbol: "line.3.horizontal", label: "메뉴 열기")
+        static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
         static let menuItems: [ActionMenu.Item] = [
             .init(id: "delete", title: "프로젝트 삭제", accessibilityLabel: "프로젝트 삭제 화면 열기")
         ]
 
-        /// 컨트롤 행 높이(40) + 10pt만큼 내려 메뉴를 헤더 버튼 바로 아래에 붙인다.
-        /// `ScreenHeader.Style.controlRowHeight`는 `.default`·`.largeTitle` 모두 40이라 두 헤더 스타일에 공통으로 쓴다.
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
+        static let headerControlRowHeight: CGFloat = 40
+        static let headerTitleHeight: CGFloat = 32
+        static let headerTitleSpacing: CGFloat = 16
+        static let headerTopPadding: CGFloat = 4
+        static let headerBottomPadding: CGFloat = 10
     }
 }

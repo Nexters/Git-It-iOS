@@ -9,12 +9,14 @@ struct OverlayContainerContractTests {
     @Test
     func `헤더와 본문과 푸터를 각각 받아 생성한다`() {
         _ = OverlayContainer {
-            ScreenOverlayHeader()
+            ScreenControlBar()
+                .designSystemScreenMargin()
         } content: {
             StyledText.body1("본문")
         } footer: {
-            ScreenOverlayFooter {
+            BottomActionBar {
                 ActionButton.primary("계속하기")
+                    .designSystemScreenMargin()
             }
         }
     }
@@ -29,7 +31,8 @@ struct OverlayContainerContractTests {
     @Test
     func `본문과 함께 스크롤되는 배경을 받는다`() {
         _ = OverlayContainer {
-            ScreenOverlayHeader()
+            ScreenControlBar()
+                .designSystemScreenMargin()
         } content: {
             StyledText.body1("본문")
         } background: {

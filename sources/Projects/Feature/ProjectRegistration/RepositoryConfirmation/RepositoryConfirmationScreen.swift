@@ -16,7 +16,7 @@ struct RepositoryConfirmationScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(style: .default, onLeadingTap: { send(.backTapped) })
+            ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             Spacer(minLength: 0)
@@ -39,7 +39,7 @@ struct RepositoryConfirmationScreen: View {
 
             Spacer(minLength: 0)
 
-            VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            VStack(spacing: LayoutToken.compactSpacing) {
                 ActionButton.primary("다음", action: { send(.confirmTapped) })
                 ActionButton.secondary("이 레포지토리가 아니에요", action: { send(.rejectTapped) })
             }

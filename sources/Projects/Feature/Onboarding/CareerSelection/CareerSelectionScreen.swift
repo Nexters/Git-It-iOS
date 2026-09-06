@@ -13,13 +13,14 @@ struct CareerSelectionScreen: View {
 
     var body: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
+            ScreenControlBar(
                 leading: .back,
                 onLeadingTap: { send(.backTapped) },
             )
+            .designSystemScreenMargin()
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
-                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                VStack(spacing: LayoutToken.compactSpacing) {
                     StyledText.subtitle1(Constant.title, alignment: .center)
 
                     if store.submission == .failed {
@@ -49,10 +50,10 @@ struct CareerSelectionScreen: View {
                 )
             }
             .designSystemScreenMargin()
-            .padding(.top, LayoutToken.margin.cgFloatValue)
+            .padding(.top, LayoutToken.margin)
         } footer: {
-            ScreenOverlayFooter {
-                VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+            BottomActionBar {
+                VStack(spacing: LayoutToken.gutter) {
                     StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
 
                     ActionButton.primary(
@@ -61,6 +62,7 @@ struct CareerSelectionScreen: View {
                         action: { send(.submitTapped) },
                     )
                 }
+                .designSystemScreenMargin()
             }
         }
     }

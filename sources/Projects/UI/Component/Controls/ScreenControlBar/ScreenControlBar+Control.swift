@@ -1,26 +1,34 @@
 import DesignSystem
 import SwiftUI
 
-extension ScreenHeader {
+extension ScreenControlBar {
     public struct Control: Sendable, Equatable {
+
+        // MARK: Lifecycle
+
         public init(
-            symbol: String,
+            icon: Icon,
             label: String,
         ) {
-            self.symbol = symbol
+            self.icon = icon
             self.label = label
         }
 
+        // MARK: Public
+
+        public typealias Icon = ResourceImage.Asset.Icon
+
         public static let back = Control(
-            symbol: "chevron.left",
+            icon: .chevronLeftWhite,
             label: "뒤로 가기",
         )
         public static let close = Control(
-            symbol: "xmark",
+            icon: .x,
             label: "닫기",
         )
 
-        public let symbol: String
+        public let icon: Icon
         public let label: String
+
     }
 }

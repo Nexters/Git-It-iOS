@@ -1,9 +1,9 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
 extension SettingsScreen {
-    /// 개발 수준 선택 단계(Figma `1535:18378`). 선택 즉시 `careerLevelSelected`로 저장한다.
     @ViewAction(for: SettingsFeature.self)
     struct CareerLevelSelectionView: View {
 
@@ -13,12 +13,24 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                ScreenOverlayHeader(
-                    title: Constant.title,
-                    style: .largeTitle,
-                    leading: .back,
-                    onLeadingTap: { send(.backTapped) },
-                )
+                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                        IconGlassButton.neutral(
+                            icon: ScreenControlBar.Control.back.icon,
+                            label: ScreenControlBar.Control.back.label,
+                            size: .medium,
+                            action: { send(.backTapped) },
+                        )
+
+                        Spacer(minLength: 0)
+                    }
+                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+
+                    ScreenHeaderTitle(title: Constant.title)
+                }
+                .padding(.bottom, Constant.headerBottomPadding)
+                .frame(height: Constant.headerHeight, alignment: .top)
+                .designSystemScreenMargin()
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.careerLevelMutation {
@@ -54,6 +66,10 @@ extension SettingsScreen {
             static let failureMessage = "변경에 실패했어요. 다시 시도해 주세요."
             static let messageSpacing: CGFloat = 12
             static let contentTopPadding: CGFloat = 8
+            static let headerControlRowHeight: CGFloat = 40
+            static let headerTitleSpacing: CGFloat = 16
+            static let headerBottomPadding: CGFloat = 10
+            static let headerHeight: CGFloat = 99
         }
 
     }

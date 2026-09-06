@@ -10,9 +10,16 @@ extension ProjectListScreen {
         let onRetry: () -> Void
 
         var body: some View {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                ScreenHeader(title: "프로젝트", style: .largeTitle, leading: nil)
-                    .designSystemScreenMargin()
+            VStack(spacing: LayoutToken.margin) {
+                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                    Spacer(minLength: 0)
+                        .frame(height: Constant.headerControlRowHeight)
+
+                    ScreenHeaderTitle(title: "프로젝트")
+                }
+                .padding(.bottom, Constant.headerBottomPadding)
+                .frame(height: Constant.headerHeight, alignment: .top)
+                .designSystemScreenMargin()
 
                 Spacer(minLength: 0)
 
@@ -34,6 +41,10 @@ extension ProjectListScreen {
         private enum Constant {
             static let textSpacing: CGFloat = 10
             static let bottomButtonPadding: CGFloat = 24
+            static let headerControlRowHeight: CGFloat = 40
+            static let headerTitleSpacing: CGFloat = 16
+            static let headerBottomPadding: CGFloat = 10
+            static let headerHeight: CGFloat = 99
         }
 
     }

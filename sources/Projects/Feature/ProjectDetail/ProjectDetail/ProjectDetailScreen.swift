@@ -37,7 +37,7 @@ struct ProjectDetailScreen: View {
         .overlay(alignment: .topTrailing) {
             if store.isMenuPresented {
                 ActionMenu(items: Constant.menuItems, onSelect: menuItemSelected)
-                    .padding(.trailing, LayoutToken.margin.cgFloatValue)
+                    .padding(.trailing, LayoutToken.margin)
                     .offset(y: Constant.menuTopOffset)
                     .transition(.opacity)
             }
@@ -73,11 +73,12 @@ struct ProjectDetailScreen: View {
 
     private var content: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
+            ScreenControlBar(
                 trailing: Constant.menuControl,
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )
+            .designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: 0) {
                 RepositorySummaryView(
@@ -140,7 +141,7 @@ extension ProjectDetailScreen {
         }
 
         static let summaryTopSpacing: CGFloat = 27
-        static let menuControl = ScreenHeader.Control(symbol: "line.3.horizontal", label: "메뉴 열기")
+        static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
 
         static let menuItems: [ActionMenu.Item] = [
             .init(id: MenuItemID.savedQuestions, title: "저장한 문제", accessibilityLabel: "저장한 문제 보기"),
@@ -152,7 +153,6 @@ extension ProjectDetailScreen {
         static let contentBottomPadding: CGFloat = 16
         static let heroGradientHeight: CGFloat = 179
 
-        /// plain 스타일 헤더 높이(50)만큼 내려 메뉴를 헤더 바로 아래에 붙인다.
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
 

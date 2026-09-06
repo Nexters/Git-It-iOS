@@ -48,12 +48,11 @@ public struct OverlayContainer<
             scrollingContent
 
             VStack(spacing: 0) {
-                header()
+                header().padding(.bottom, 12).designSystemBackground(.quizTopScrim)
 
                 Spacer(minLength: 0)
 
-                footer()
-                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footerHeight = $0 }
+                footer().padding(.top, 12).designSystemBackground(.bottomEdgeScrim)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -69,8 +68,6 @@ public struct OverlayContainer<
     private let background: () -> Background
     private let footer: () -> Footer
 
-    @State private var footerHeight: CGFloat = 0
-
     private var scrollingContent: some View {
         GeometryReader { proxy in
             ScrollView {
@@ -79,7 +76,7 @@ public struct OverlayContainer<
 
                     content()
 
-                    Color.clear.frame(height: footerHeight)
+                    occlusionSpacer { footer() }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, proxy.safeAreaInsets.top)
@@ -123,17 +120,26 @@ extension OverlayContainer where Background == EmptyView {
 
 #Preview("Overlay Container") {
     OverlayContainer {
-        ScreenOverlayHeader(title: "오버레이 헤더", style: .largeTitle)
+        VStack(alignment: .leading, spacing: 16) {
+            Spacer(minLength: 0)
+                .frame(height: 40)
+
+            ScreenHeaderTitle(title: "오버레이 헤더")
+        }
+        .padding(.bottom, 10)
+        .frame(height: 99, alignment: .top)
+        .designSystemScreenMargin()
     } content: {
-        VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+        VStack(spacing: LayoutToken.gutter) {
             ForEach(0..<20, id: \.self) { index in
                 LabeledCard.neutral(label: "항목 \(index)", text: "스크롤하면 헤더 뒤로 지나갑니다.")
             }
         }
         .designSystemScreenMargin()
     } footer: {
-        ScreenOverlayFooter {
+        BottomActionBar {
             ActionButton.primary("계속하기")
+                .designSystemScreenMargin()
         }
     }
 }

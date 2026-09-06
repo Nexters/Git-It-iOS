@@ -1,10 +1,10 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
 // MARK: - ProfileScreen
 
-/// "마이" 탭의 프로필 화면(Figma `1539:19209`).
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
 
@@ -21,13 +21,20 @@ public struct ProfileScreen: View {
     public var body: some View {
         OverlayContainer(content: {
             VStack(alignment: .leading, spacing: 0) {
-                ScreenHeader(
-                    title: Constant.title,
-                    style: .inlineTitle,
-                    leading: nil,
-                    trailing: Constant.settingsControl,
-                    onTrailingTap: { send(.settingsTapped) },
-                )
+                HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                    ScreenHeaderTitle(title: Constant.title)
+
+                    Spacer(minLength: 0)
+
+                    IconGlassButton.neutral(
+                        icon: Constant.settingsControl.icon,
+                        label: Constant.settingsControl.label,
+                        size: .medium,
+                        action: { send(.settingsTapped) },
+                    )
+                }
+                .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                .padding(.bottom, Constant.headerBottomPadding)
                 .designSystemScreenMargin()
 
                 content
@@ -81,7 +88,7 @@ extension ProfileScreen {
     fileprivate enum Constant {
         static let title = "마이"
         static let statisticsSectionTitle = "학습 현황"
-        static let settingsControl = ScreenHeader.Control(symbol: "gearshape", label: "설정")
+        static let settingsControl = ScreenControlBar.Control(icon: .setting, label: "설정")
         static let profileCardPadding: CGFloat = 20
         static let sectionTitleTopPadding: CGFloat = 20
         static let sectionTitleBottomPadding: CGFloat = 10
@@ -89,5 +96,7 @@ extension ProfileScreen {
         static let contentBottomPadding: CGFloat = 32
         static let loadingTopPadding: CGFloat = 120
         static let failureTopPadding: CGFloat = 20
+        static let headerControlRowHeight: CGFloat = 40
+        static let headerBottomPadding: CGFloat = 10
     }
 }

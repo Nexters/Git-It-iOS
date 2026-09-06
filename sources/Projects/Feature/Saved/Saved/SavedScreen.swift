@@ -51,66 +51,68 @@ struct SavedScreen: View {
             }
 
         case (_, false):
-            content
-        }
-    }
-
-    private var header: some View {
-        ScreenHeader(
-            title: "저장한 문제",
-            style: .largeTitle,
-            leading: store.isBackControlPresented ? .back : nil,
-            onLeadingTap: { send(.backTapped) },
-        )
-        .designSystemScreenMargin()
-    }
-
-    private var content: some View {
-        OverlayContainer {
-            ScreenOverlayHeader(
-                title: "저장한 문제",
-                style: .largeTitle,
-                leading: store.isBackControlPresented ? .back : nil,
-                onLeadingTap: { send(.backTapped) },
-            )
-        } content: {
-            VStack(alignment: .leading, spacing: 0) {
-                if isFilterPresented {
-                    FilterSection(
-                        projects: store.collection?.availableProjects ?? [],
-                        selectedProjectID: store.selectedProjectID,
-                        count: store.collection?.totalCount ?? 0,
-                        onSelect: { send(.filterSelected(projectID: $0)) },
-                    )
-                }
-
-                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                    ForEach(
-                        SavedQuestionDisplay.list(
-                            questions: store.collection?.bookmarks ?? [],
-                            bookmarkOverrides: store.bookmarkOverrides,
-                        )
-                    ) { question in
-                        SavedQuestionCard(
-                            metadata: question.metadata,
-                            prompt: question.prompt,
-                            actionTitle: SavedQuestionDisplay.actionTitle,
-                            isBookmarked: question.isBookmarked,
-                            onActionTap: { solve(questionID: question.id) },
-                            onBookmarkTap: { toggleBookmark(questionID: question.id) },
-                        )
-                    }
-                }
-                .designSystemScreenMargin()
-                .padding(.top, isFilterPresented ? 0 : Constant.listTopPadding)
-                .padding(.bottom, Constant.contentBottomPadding)
+            OverlayContainer {
+                header
+            } content: {
+                content
             }
         }
     }
 
-    /// 프로젝트 필터로 진입한 화면은 칩 행을 감춘다.
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Constant.headerBottomPadding) {
+            VStack(spacing: Constant.headerVerticalSpacing) {
+                if store.isBackControlPresented {
+                    IconGlassButton.neutral(
+                        icon: ScreenControlBar.Control.back.icon,
+                        label: ScreenControlBar.Control.back.label,
+                        size: .medium,
+                        action: { send(.backTapped) },
+                    )
+                    .frame(height: Constant.headerRowHeight)
+                }
+                ScreenHeaderTitle(title: "저장한 문제")
+                    .frame(height: Constant.headerTitleHeight)
+            }
+
+            if isFilterPresented {
+                FilterSection(
+                    projects: store.collection?.availableProjects ?? [],
+                    selectedProjectID: store.selectedProjectID,
+                    count: store.collection?.totalCount ?? 0,
+                    onSelect: { send(.filterSelected(projectID: $0)) },
+                )
+            }
+        }
+        .designSystemScreenMargin()
+        .padding(.top, 8)
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: LayoutToken.compactSpacing) {
+            ForEach(
+                SavedQuestionDisplay.list(
+                    questions: store.collection?.bookmarks ?? [],
+                    bookmarkOverrides: store.bookmarkOverrides,
+                )
+            ) { question in
+                SavedQuestionCard(
+                    metadata: question.metadata,
+                    prompt: question.prompt,
+                    actionTitle: SavedQuestionDisplay.actionTitle,
+                    isBookmarked: question.isBookmarked,
+                    onActionTap: { solve(questionID: question.id) },
+                    onBookmarkTap: { toggleBookmark(questionID: question.id) },
+                )
+            }
+        }
+        .designSystemScreenMargin()
+        .padding(.top, isFilterPresented ? 0 : Constant.listTopPadding)
+        .padding(.bottom, Constant.contentBottomPadding)
+    }
+
     private var isFilterPresented: Bool {
-        store.projectFilter == nil
+        (store.collection?.totalCount ?? 0) > 0
     }
 
     private func solve(questionID: String) {
@@ -133,5 +135,9 @@ extension SavedScreen {
     fileprivate enum Constant {
         static let listTopPadding: CGFloat = 16
         static let contentBottomPadding: CGFloat = 24
+        static let headerTitleHeight: CGFloat = 32
+        static let headerRowHeight: CGFloat = 40
+        static let headerVerticalSpacing: CGFloat = 16
+        static let headerBottomPadding: CGFloat = 14
     }
 }

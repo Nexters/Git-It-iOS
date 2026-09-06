@@ -12,8 +12,8 @@ extension QuizGenerationProgressScreen {
         let onRetry: () -> Void
 
         var body: some View {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                ScreenHeader(style: .default, onLeadingTap: onDismiss)
+            VStack(spacing: LayoutToken.margin) {
+                ScreenControlBar(onLeadingTap: onDismiss)
                     .designSystemScreenMargin()
 
                 Spacer(minLength: 0)

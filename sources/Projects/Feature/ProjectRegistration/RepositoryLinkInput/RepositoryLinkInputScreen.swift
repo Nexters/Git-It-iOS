@@ -19,9 +19,8 @@ struct RepositoryLinkInputScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScreenHeader(
-                style: .default,
-                onLeadingTap: { send(.dismissTapped) },
+            ScreenControlBar(
+                onLeadingTap: { send(.dismissTapped) }
             )
             .designSystemScreenMargin()
 
