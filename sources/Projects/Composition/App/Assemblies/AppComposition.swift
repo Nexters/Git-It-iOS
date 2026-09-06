@@ -67,6 +67,7 @@ public struct AppComposition: Sendable {
 
         let observeGenerationOutcomes = learningProject.observeGenerationOutcomes
         let startObservingGenerationOutcomes = generationReminder.startObservingGenerationOutcomes
+        let startObservingRepositoryCreationState = learningProject.startObservingRepositoryCreationState
         let markerCoding = SharedSessionLayout.makeSharedDefaults()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:))
         let hasStoredSession: @Sendable () async -> Bool = {
@@ -79,6 +80,7 @@ public struct AppComposition: Sendable {
             pushClientBox.activate()
             appDelegate.configure(pushNotificationCallbacks)
             await startObservingGenerationOutcomes(observeGenerationOutcomes)
+            await startObservingRepositoryCreationState(observeGenerationOutcomes)
         }
 
         let registerMemberDevice = member.registerMemberDevice

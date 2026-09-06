@@ -108,7 +108,7 @@ UseCase가 이를 사용해 중복 생성을 막고 목록을 필터링하도록
 
 ### 구현
 
-- [ ] T009 [S1] [S2] [S3] `sources/Projects/Composition/Adapter/Adapters/RepositoryCreationStateRepositoryAdapter.swift`를
+- [X] T009 [S1] [S2] [S3] `sources/Projects/Composition/Adapter/Adapters/RepositoryCreationStateRepositoryAdapter.swift`를
   신설한다: `RepositoryCreationStateRepository`를 구현하는 `actor`로,
   - `githubRepoURL` 정규화(트림·소문자·끝 슬래시 제거)와 `RepositoryCreationState` 딕셔너리
     보관,
@@ -122,20 +122,25 @@ UseCase가 이를 사용해 중복 생성을 막고 목록을 필터링하도록
     형태이되, 이 타입은 `Adapter/Factories/`의 순수 outcome 구독자가 아니라 `Adapter/Adapters/`의
     기존 `*Adapter` 명명 관례를 따르는 Domain 계약 구현체다)
   을 구현한다.
-- [ ] T010 [S1] [S2] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`를
+- [X] T010 [S1] [S2] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`를
   수정한다: `RepositoryCreationStateRepositoryAdapter` 인스턴스를 생성해 `createLearningProject`와
   `fetchLearningProjects` 초기화에 `creationStateRepository:`로 전달하고, App 부트스트랩이
   구독을 시작할 수 있도록 concrete 타입을 공개 프로퍼티 `repositoryCreationStateAdapter`로
   노출한다(`start(observeGenerationOutcomes:)`가 Domain 계약에 없는 Adapter 전용 메서드이므로
   `any RepositoryCreationStateRepository`가 아닌 concrete 타입으로 노출해야 한다).
-- [ ] T011 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`를 수정한다:
+  구현 시 `GenerationReminderAssembly`의 기존 관례(내부 concrete 인스턴스는 `internal let`으로,
+  구독 시작은 공개 `@Sendable` 클로저 프로퍼티 `startObservingRepositoryCreationState`로 노출)를
+  그대로 따라 concrete 타입 자체를 `public`으로 노출하지 않았다. 결과적으로 T011의 구독 배선
+  목적은 동일하게 달성된다.
+- [X] T011 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`를 수정한다:
   기존 `startObservingGenerationOutcomes(observeGenerationOutcomes)` 호출 지점(부트스트랩
-  클로저)에 `await learningProject.repositoryCreationStateAdapter.start(observeGenerationOutcomes: observeGenerationOutcomes)`
-  호출을 추가해 앱 실행 시 구독이 시작되도록 배선한다.
+  클로저)에 `await learningProject.startObservingRepositoryCreationState(observeGenerationOutcomes)`
+  호출을 추가해 앱 실행 시 구독이 시작되도록 배선한다(T010의 클로저 노출 방식에 맞춰 호출
+  형태를 조정).
 
 ### 테스트
 
-- [ ] T012 [P] [S1] [S2] [S3] `sources/Projects/Composition/Tests/Adapter/Adapters/RepositoryCreationStateRepositoryAdapterTests.swift`를
+- [X] T012 [P] [S1] [S2] [S3] `sources/Projects/Composition/Tests/Adapter/Adapters/RepositoryCreationStateRepositoryAdapterTests.swift`를
   신설한다: (a) `beginCreation` → `attachProjectID` → `activeProjectIDs()` 반영, (b) 동일
   정규화 URL 두 번째 `beginCreation`이 `false`를 반환하고 그 URL에 대한 `isCreating`이 `true`를
   반환, (c) `endCreation(githubRepoURL:)`/`endCreation(projectID:)` 해제 뒤 `isCreating`이

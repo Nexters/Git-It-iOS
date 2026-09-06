@@ -30,9 +30,21 @@ public struct LearningProjectAssembly: Sendable {
             remote: HTTPBookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
 
-        fetchLearningProjects = FetchLearningProjects(repository: projectRepository)
+        let creationStateRepositoryAdapter = RepositoryCreationStateRepositoryAdapter()
+        self.creationStateRepositoryAdapter = creationStateRepositoryAdapter
+        startObservingRepositoryCreationState = { observeGenerationOutcomes in
+            await creationStateRepositoryAdapter.start(observeGenerationOutcomes: observeGenerationOutcomes)
+        }
+
+        fetchLearningProjects = FetchLearningProjects(
+            repository: projectRepository,
+            creationStateRepository: creationStateRepositoryAdapter,
+        )
         fetchLearningProjectDetail = FetchLearningProjectDetail(repository: projectRepository)
-        createLearningProject = CreateLearningProject(repository: projectRepository)
+        createLearningProject = CreateLearningProject(
+            repository: projectRepository,
+            creationStateRepository: creationStateRepositoryAdapter,
+        )
         deleteLearningProject = DeleteLearningProject(repository: projectRepository)
         fetchLearningSet = FetchLearningSet(repository: learningSetRepository)
         submitChoiceAnswer = SubmitChoiceAnswer(repository: answerRepository)
@@ -69,10 +81,12 @@ public struct LearningProjectAssembly: Sendable {
     public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     public let trackGenerationProgress: any TrackGenerationProgressUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
+    public let startObservingRepositoryCreationState: @Sendable (any ObserveGenerationOutcomesUseCase) async -> Void
 
     // MARK: Internal
 
     let generationProgressRepository: any GenerationProgressRepository
+    let creationStateRepositoryAdapter: RepositoryCreationStateRepositoryAdapter
 
     // MARK: Private
 
