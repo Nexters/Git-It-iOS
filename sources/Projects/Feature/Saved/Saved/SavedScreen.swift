@@ -74,6 +74,7 @@ struct SavedScreen: View {
                 ScreenHeaderTitle(title: "저장한 문제")
                     .frame(height: Constant.headerTitleHeight)
             }
+            .designSystemScreenMargin()
 
             if isFilterPresented {
                 FilterSection(
@@ -82,10 +83,10 @@ struct SavedScreen: View {
                     count: store.collection?.totalCount ?? 0,
                     onSelect: { send(.filterSelected(projectID: $0)) },
                 )
+                .padding(.leading, 20)
             }
         }
-        .designSystemScreenMargin()
-        .padding(.top, 8)
+        .padding(.vertical, 8)
     }
 
     private var content: some View {
