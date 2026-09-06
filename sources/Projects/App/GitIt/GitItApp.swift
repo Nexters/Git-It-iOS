@@ -30,17 +30,6 @@ struct GitItApp: App {
         let restoreSession = composition.restoreSession
         let deletesCompletedAccountOnSignIn = false
 
-        #if DEBUG
-        let resetAll = ResetAllUseCase(
-            deleteMemberAccount: composition.deleteMemberAccount,
-            signOut: composition.signOut,
-            policyConsent: composition.policyConsent,
-        )
-        let resetAllForTesting: (@Sendable () async -> Void)? = { await resetAll() }
-        #else
-        let resetAllForTesting: (@Sendable () async -> Void)? = nil
-        #endif
-
         let bundleVersion = AppBundleMetadata.shortVersion.value
         rootStore = Store(initialState: AppRootFeature.State(bundleVersion: bundleVersion)) {
             AppRootFeature(
@@ -77,7 +66,6 @@ struct GitItApp: App {
                 registerCurrentDevice: composition.registerCurrentDevice,
                 deviceTokenRefreshes: composition.deviceTokenRefreshes,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
-                resetAllForTesting: resetAllForTesting,
             )
         }
         self.composition = composition

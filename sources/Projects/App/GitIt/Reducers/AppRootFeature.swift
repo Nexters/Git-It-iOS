@@ -43,7 +43,6 @@ nonisolated struct AppRootFeature: Sendable {
         registerCurrentDevice: @escaping @Sendable () async throws -> Void = { },
         deviceTokenRefreshes: @escaping @Sendable () -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
         deletesCompletedAccountOnSignIn: Bool = false,
-        resetAllForTesting: (@Sendable () async -> Void)? = nil,
     ) {
         self.restoreSession = restoreSession
         self.signIn = signIn
@@ -75,7 +74,6 @@ nonisolated struct AppRootFeature: Sendable {
         self.registerCurrentDevice = registerCurrentDevice
         self.deviceTokenRefreshes = deviceTokenRefreshes
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
-        self.resetAllForTesting = resetAllForTesting
     }
 
     // MARK: Internal
@@ -130,14 +128,12 @@ nonisolated struct AppRootFeature: Sendable {
         @CasePathable
         enum View: Sendable, Equatable {
             case task
-            case resetAllTapped
             case applicationBecameActive
         }
 
         @CasePathable
         enum EffectEvent: Sendable, Equatable {
             case authenticationOutcomeReceived(AuthenticationOutcome)
-            case resetAllFinished
             case deviceRegistrationSucceeded
             case deviceRegistrationFailed
             case deviceTokenRefreshed
@@ -179,6 +175,8 @@ nonisolated struct AppRootFeature: Sendable {
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
                 observeGenerationOutcomes: observeGenerationOutcomes,
+                requestGenerationReminder: requestGenerationReminder,
+                openNotificationSettings: openNotificationSettings,
             )
         }
         Reduce { state, action in
@@ -236,8 +234,6 @@ nonisolated struct AppRootFeature: Sendable {
                 return returnToOnboarding(&state)
 
             case .view(.applicationBecameActive):
-                // Share Extension이나 다른 기기에서 등록한 프로젝트가 복귀 즉시 보이도록
-                // 목록을 다시 불러온다. Extension이 남기는 신호에 의존하지 않는다.
                 var effects = [Effect<Action>]()
                 if state.route == .mainShell {
                     effects.append(.send(.mainShell(.home(.input(.learningProjectsReloadRequested)))))
@@ -258,17 +254,6 @@ nonisolated struct AppRootFeature: Sendable {
             case .effect(.deviceRegistrationFailed):
                 state.deviceRegistration = .failed
                 return .none
-
-            case .view(.resetAllTapped):
-                guard let resetAllForTesting else { return .none }
-                return .run { send in
-                    await resetAllForTesting()
-                    await send(.effect(.resetAllFinished))
-                }
-                .cancellable(id: CancelID.resetAll, cancelInFlight: true)
-
-            case .effect(.resetAllFinished):
-                return returnToOnboarding(&state)
 
             case .mainShell(.delegate(.projectRegistrationRequested)):
                 state.projectRegistration = ProjectRegistrationRouterFeature.State()
@@ -420,7 +405,6 @@ nonisolated struct AppRootFeature: Sendable {
 
     private enum CancelID: Hashable {
         case authenticationOutcomes
-        case resetAll
         case deviceRegistration
         case deviceTokenRefreshes
         case generationProgress
@@ -456,9 +440,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let registerCurrentDevice: @Sendable () async throws -> Void
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
     private let deletesCompletedAccountOnSignIn: Bool
-    private let resetAllForTesting: (@Sendable () async -> Void)?
 
-    /// 학습 요청을 보낸 탭이 Home일 수도 프로젝트 목록일 수도 있어 두 곳에서 모두 찾습니다.
     private func loadedProject(
         projectID: String,
         state: State,

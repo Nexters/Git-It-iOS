@@ -39,16 +39,6 @@ actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
 
 }
 
-// MARK: - ResetAllForTestingSpy
-
-actor ResetAllForTestingSpy {
-    private(set) var callCount = 0
-
-    func callAsFunction() {
-        callCount += 1
-    }
-}
-
 // MARK: - NoopRequestGenerationReminderUseCase
 
 struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
@@ -192,7 +182,6 @@ func makeAppRootStore(
     fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
     authenticationOutcomes: AuthenticationOutcomesUseCaseMock = AuthenticationOutcomesUseCaseMock(),
-    resetAllForTesting: (@Sendable () async -> Void)? = nil,
     observeGenerationOutcomes: ObserveGenerationOutcomesUseCaseMock =
         ObserveGenerationOutcomesUseCaseMock(),
     requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
@@ -234,7 +223,6 @@ func makeAppRootStore(
             openExternalURL: { await openExternalURL($0) },
             registerCurrentDevice: { try await registerCurrentDevice() },
             deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
-            resetAllForTesting: resetAllForTesting,
         )
     }
 }

@@ -145,34 +145,6 @@ struct AppRootFeatureTests {
     }
 
     @Test
-    func `resetAll 탭은 주입된 초기화 동작을 실행한 뒤 onboarding 안내부터 다시 시작한다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        let spy = ResetAllForTestingSpy()
-        let store = makeAppRootStore(resetAllForTesting: { await spy() }, state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.resetAllTapped))
-        await store.receive(.effect(.resetAllFinished)) {
-            $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        }
-
-        #expect(await spy.callCount == 1)
-    }
-
-    @Test
-    func `resetAll 탭은 주입된 초기화 동작이 없으면 아무 일도 하지 않는다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        let store = makeAppRootStore(state: state)
-
-        await store.send(.view(.resetAllTapped))
-
-        #expect(store.state.route == .mainShell)
-    }
-
-    @Test
     func `mainShell logout delegate는 onboarding 안내부터 다시 시작한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
@@ -228,24 +200,6 @@ struct AppRootFeatureTests {
 
         await authenticationOutcomes.finish()
         await sessionStore.finish()
-
-        var resetState = AppRootFeature.State(bundleVersion: "1.0.0")
-        resetState.route = .mainShell
-        resetState.mainShell.selectedTab = .saved
-        let spy = ResetAllForTestingSpy()
-        let resetStore = makeAppRootStore(resetAllForTesting: { await spy() }, state: resetState)
-        resetStore.exhaustivity = .off
-
-        await resetStore.send(.view(.resetAllTapped))
-        await resetStore.receive(.effect(.resetAllFinished)) {
-            $0.route = .onboarding
-            $0.mainShell = MainShellRouterFeature.State()
-        }
-        await resetStore.send(.onboarding(.delegate(.mainShellRequested))) {
-            $0.route = .mainShell
-        }
-        #expect(resetStore.state.mainShell.selectedTab == .home)
-        #expect(resetStore.state.mainShell.home == HomeFeature.State())
     }
 
     @Test
