@@ -26,7 +26,8 @@ struct LearningProjectLifecycleTests {
             urlParser: LifecycleExternalRepositoryURLParser(),
         )
         let createLearningProject = CreateLearningProject(
-            repository: LifecycleLearningProjectRepository(registration: registration)
+            repository: LifecycleLearningProjectRepository(registration: registration),
+            creationStateRepository: LifecycleRepositoryCreationStateRepository(),
         )
 
         let fetchedRepository = try await fetchExternalRepository(url: "https://github.com/owner/repo")
@@ -144,4 +145,26 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
     private let registration: ProjectRegistrationReceipt
     private var deleted = false
 
+}
+
+// MARK: - LifecycleRepositoryCreationStateRepository
+
+private actor LifecycleRepositoryCreationStateRepository: RepositoryCreationStateRepository {
+    func isCreating(githubRepoURL _: String) async -> Bool {
+        false
+    }
+
+    func beginCreation(githubRepoURL _: String) async -> Bool {
+        true
+    }
+
+    func attachProjectID(_: String, toGithubRepoURL _: String) async {}
+
+    func endCreation(githubRepoURL _: String) async {}
+
+    func endCreation(projectID _: String) async {}
+
+    func activeProjectIDs() async -> Set<String> {
+        []
+    }
 }

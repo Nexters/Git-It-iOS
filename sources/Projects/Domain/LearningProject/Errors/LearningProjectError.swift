@@ -6,4 +6,5 @@ public enum LearningProjectError: CaseIterable, Equatable, Error, Sendable {
     case questionUnavailable
     case temporarilyUnavailable
     case unexpected
+    case duplicateCreationInProgress
 }

@@ -15,6 +15,7 @@ struct LearningProjectErrorTests {
                 .questionUnavailable,
                 .temporarilyUnavailable,
                 .unexpected,
+                .duplicateCreationInProgress,
             ]
         )
     }
