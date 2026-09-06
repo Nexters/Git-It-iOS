@@ -8,7 +8,7 @@ struct NotificationAuthorizationGatewayAdapter: NotificationAuthorizationGateway
 
     // MARK: Internal
 
-    let localNotificationClient: any LocalNotificationClient
+    let localNotificationClient: any NotificationAuthorizationClient
 
     func requestAuthorization() async -> NotificationAuthorizationOutcome {
         let outcome: NotificationAuthorizationOutcome =

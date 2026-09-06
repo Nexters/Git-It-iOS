@@ -11,6 +11,8 @@ import Testing
 @Suite("ShareExtensionComposition")
 struct ShareExtensionCompositionTests {
 
+    // MARK: Internal
+
     @Test
     func `마커가 없으면 앱 실행 필요로 판정한다`() async throws {
         let context = try Context()
@@ -51,7 +53,7 @@ struct ShareExtensionCompositionTests {
             try Context.environment(),
             keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
             sharedDefaults: nil,
-            localNotificationClient: SpyLocalNotificationClient(isAuthorized: false),
+            localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
         )
 
         #expect(await composition.resolveSessionAvailability() == .appLaunchRequired)
@@ -69,7 +71,7 @@ struct ShareExtensionCompositionTests {
             )
             keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
             markerCoding = SharedSessionStateMarkerCoding(userDefaults: userDefaults)
-            let localNotificationClient = SpyLocalNotificationClient(isAuthorized: isNotificationAuthorized)
+            let localNotificationClient = SpyNotificationAuthorizationClient(isAuthorized: isNotificationAuthorized)
             self.localNotificationClient = localNotificationClient
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
@@ -84,7 +86,7 @@ struct ShareExtensionCompositionTests {
         let userDefaults: UserDefaults
         let keychainStore: KeychainStore
         let markerCoding: SharedSessionStateMarkerCoding
-        let localNotificationClient: SpyLocalNotificationClient
+        let localNotificationClient: SpyNotificationAuthorizationClient
         let composition: ShareExtensionComposition
 
         static func environment() throws -> ShareExtensionComposition.Environment {

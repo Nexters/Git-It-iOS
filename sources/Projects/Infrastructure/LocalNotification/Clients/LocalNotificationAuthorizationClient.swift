@@ -1,0 +1,112 @@
+import Foundation
+import os
+import UserNotifications
+
+// MARK: - LocalNotificationAuthorizationClient
+
+public final class LocalNotificationAuthorizationClient: NotificationAuthorizationClient, Sendable {
+
+    // MARK: Lifecycle
+
+    public init() { }
+
+    // MARK: Public
+
+    public func requestAuthorization() async -> NotificationAuthorizationStatus {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        let outcome: NotificationAuthorizationStatus
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            do {
+                let granted = try await UNUserNotificationCenter.current().requestAuthorization(
+                    options: [.alert, .badge, .sound]
+                )
+                outcome = granted ? .authorized : .declined
+            } catch {
+                Self.logger.debug("requestAuthorization 호출 실패: \(String(describing: error), privacy: .public)")
+                outcome = .declined
+            }
+
+        case .denied:
+            outcome = .previouslyDenied
+
+        case .authorized,
+             .provisional,
+             .ephemeral:
+            outcome = .authorized
+
+        @unknown default:
+            outcome = .declined
+        }
+        Self.logger.debug("requestAuthorization 결과: \(String(describing: outcome), privacy: .public)")
+        return outcome
+    }
+
+    public func isAuthorized() async -> Bool {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .authorized,
+             .provisional,
+             .ephemeral:
+            return true
+
+        case .notDetermined,
+             .denied:
+            return false
+
+        @unknown default:
+            return false
+        }
+    }
+
+    public func present(_ request: LocalNotificationRequest) {
+        Self.logger.debug("로컬 알림 발송: identifier=\(request.identifier, privacy: .public)")
+        add(request, trigger: nil)
+    }
+
+    public func schedule(
+        _ request: LocalNotificationRequest,
+        at date: Date,
+    ) {
+        let delay = date.timeIntervalSinceNow
+        Self.logger.debug(
+            "로컬 알림 예약: identifier=\(request.identifier, privacy: .public) delay=\(delay, privacy: .public)"
+        )
+
+        cancel(identifier: request.identifier)
+        guard delay > 0 else {
+            add(request, trigger: nil)
+            return
+        }
+        add(request, trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
+    }
+
+    public func cancel(identifier: String) {
+        Self.logger.debug("로컬 알림 예약 취소: identifier=\(identifier, privacy: .public)")
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+    }
+
+    // MARK: Private
+
+    private static let logger = Logger(
+        subsystem: "com.nexters.hytime.gitit",
+        category: "LocalNotificationAuthorizationClient",
+    )
+
+    private func add(
+        _ request: LocalNotificationRequest,
+        trigger: UNNotificationTrigger?,
+    ) {
+        let content = UNMutableNotificationContent()
+        content.title = request.title
+        content.body = request.body
+        content.sound = .default
+        let notificationRequest = UNNotificationRequest(
+            identifier: request.identifier,
+            content: content,
+            trigger: trigger,
+        )
+        UNUserNotificationCenter.current().add(notificationRequest)
+    }
+
+}

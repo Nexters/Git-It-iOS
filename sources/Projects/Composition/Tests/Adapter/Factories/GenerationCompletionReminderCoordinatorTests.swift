@@ -15,7 +15,7 @@ struct GenerationCompletionReminderCoordinatorTests {
     @Test
     func `완료 결과는 즉시 발송이 아니라 준비 완료 시각으로 예약된다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -27,7 +27,7 @@ struct GenerationCompletionReminderCoordinatorTests {
         #expect(localNotificationClient.presentedIdentifiers().isEmpty)
         #expect(
             localNotificationClient.scheduled() == [
-                StubLocalNotificationClient.Scheduled(
+                StubNotificationAuthorizationClient.Scheduled(
                     identifier: "generation-completed-project-1",
                     date: requestedAt.addingTimeInterval(300),
                 )
@@ -38,7 +38,7 @@ struct GenerationCompletionReminderCoordinatorTests {
     @Test
     func `준비 완료 시각이 이미 지났으면 지난 시각으로 예약해 즉시 발송된다`() async {
         let requestedAt = Date(timeIntervalSince1970: 0)
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -54,7 +54,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `보존된 진행 상태가 없으면 최소 대기 없이 지금 시각으로 예약한다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(localNotificationClient: localNotificationClient, progress: nil)
 
@@ -68,7 +68,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `권한이 허용되지 않으면 예약도 발송도 하지 않는다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: false)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: false)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -83,7 +83,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `등록하지 않은 projectID의 completed 이벤트는 무시된다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -100,7 +100,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `등록된 projectID의 failed 이벤트는 예약 없이 등록 집합에서 제거만 한다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -119,7 +119,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `start가 반환한 시점에 생성 결과 구독이 이미 확립돼 있다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -140,7 +140,7 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `같은 projectID에 completed 이벤트가 두 번 도착해도 예약은 1회뿐이다`() async {
-        let localNotificationClient = StubLocalNotificationClient(isAuthorizedResult: true)
+        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
         let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
         let coordinator = makeCoordinator(
             localNotificationClient: localNotificationClient,
@@ -160,7 +160,7 @@ struct GenerationCompletionReminderCoordinatorTests {
     // MARK: Private
 
     private func makeCoordinator(
-        localNotificationClient: StubLocalNotificationClient,
+        localNotificationClient: StubNotificationAuthorizationClient,
         progress: GenerationProgress?,
     ) -> GenerationCompletionReminderCoordinator {
         GenerationCompletionReminderCoordinator(
@@ -244,9 +244,9 @@ private actor StubGenerationProgressRepository: GenerationProgressRepository {
 
 }
 
-// MARK: - StubLocalNotificationClient
+// MARK: - StubNotificationAuthorizationClient
 
-private final class StubLocalNotificationClient: LocalNotificationClient, Sendable {
+private final class StubNotificationAuthorizationClient: NotificationAuthorizationClient, Sendable {
 
     // MARK: Lifecycle
 
@@ -262,7 +262,7 @@ private final class StubLocalNotificationClient: LocalNotificationClient, Sendab
         let date: Date
     }
 
-    func requestAuthorization() async -> LocalNotificationAuthorizationOutcome {
+    func requestAuthorization() async -> NotificationAuthorizationStatus {
         .authorized
     }
 

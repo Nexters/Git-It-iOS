@@ -10,7 +10,7 @@ actor GenerationCompletionReminderCoordinator {
     // MARK: Lifecycle
 
     init(
-        localNotificationClient: any LocalNotificationClient,
+        localNotificationClient: any NotificationAuthorizationClient,
         progressRepository: any GenerationProgressRepository,
         pendingReminderCoding: PendingGenerationReminderCoding? = nil,
         waitPolicy: GenerationWaitPolicy = .standard,
@@ -28,8 +28,6 @@ actor GenerationCompletionReminderCoordinator {
         Self.logger.debug("리마인드 대상 등록: projectID=\(projectID, privacy: .public)")
     }
 
-    /// Share Extension이 남긴 대기 항목을 등록 대상으로 흡수한다. 다른 프로세스에서
-    /// 등록된 프로젝트도 이 시점부터 기존과 같은 경로로 알림을 받는다.
     func absorbPendingReminders() async {
         guard let pendingReminderCoding else { return }
         for projectID in await pendingReminderCoding.drainProjectIDs() {
@@ -55,7 +53,7 @@ actor GenerationCompletionReminderCoordinator {
 
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "GenerationCompletionReminderCoordinator")
 
-    private let localNotificationClient: any LocalNotificationClient
+    private let localNotificationClient: any NotificationAuthorizationClient
     private let progressRepository: any GenerationProgressRepository
     private let pendingReminderCoding: PendingGenerationReminderCoding?
     private let waitPolicy: GenerationWaitPolicy
