@@ -36,6 +36,7 @@ public enum SharedSessionLayout {
     static let namespace = "com.nexters.hytime.gitit.sharedSession"
     static let stateMarkerKey = "stateMarker"
     static let pendingGenerationRemindersKey = "pendingGenerationReminders"
+    static let repositoryCreationStatesKey = "repositoryCreationStates"
     static let markerSchemaVersion = 1
     static let pendingReminderLimit = 32
 

@@ -9,8 +9,8 @@ import Testing
 struct RepositoryCreationStateRepositoryAdapterTests {
 
     @Test
-    func `생성을 시작하고 projectID를 연결하면 활성 목록에 반영된다`() async {
-        let adapter = RepositoryCreationStateRepositoryAdapter()
+    func `생성을 시작하고 projectID를 연결하면 활성 목록에 반영된다`() async throws {
+        let adapter = RepositoryCreationStateRepositoryAdapter(userDefaults: try Self.makeUserDefaults())
 
         let began = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
         await adapter.attachProjectID("project-1", toGithubRepoURL: "https://github.com/owner/repo")
@@ -21,8 +21,8 @@ struct RepositoryCreationStateRepositoryAdapterTests {
     }
 
     @Test
-    func `동일 정규화 URL에 대한 두 번째 시작은 거부되고 isCreating은 true를 유지한다`() async {
-        let adapter = RepositoryCreationStateRepositoryAdapter()
+    func `동일 정규화 URL에 대한 두 번째 시작은 거부되고 isCreating은 true를 유지한다`() async throws {
+        let adapter = RepositoryCreationStateRepositoryAdapter(userDefaults: try Self.makeUserDefaults())
 
         _ = await adapter.beginCreation(githubRepoURL: "https://GitHub.com/owner/repo/")
         let secondBegan = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
@@ -33,8 +33,8 @@ struct RepositoryCreationStateRepositoryAdapterTests {
     }
 
     @Test
-    func `githubRepoURL로 해제하면 isCreating이 false로 돌아온다`() async {
-        let adapter = RepositoryCreationStateRepositoryAdapter()
+    func `githubRepoURL로 해제하면 isCreating이 false로 돌아온다`() async throws {
+        let adapter = RepositoryCreationStateRepositoryAdapter(userDefaults: try Self.makeUserDefaults())
         _ = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
 
         await adapter.endCreation(githubRepoURL: "https://github.com/owner/repo")
@@ -44,8 +44,8 @@ struct RepositoryCreationStateRepositoryAdapterTests {
     }
 
     @Test
-    func `projectID로 해제하면 활성 목록에서 제거된다`() async {
-        let adapter = RepositoryCreationStateRepositoryAdapter()
+    func `projectID로 해제하면 활성 목록에서 제거된다`() async throws {
+        let adapter = RepositoryCreationStateRepositoryAdapter(userDefaults: try Self.makeUserDefaults())
         _ = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
         await adapter.attachProjectID("project-1", toGithubRepoURL: "https://github.com/owner/repo")
 
@@ -58,13 +58,13 @@ struct RepositoryCreationStateRepositoryAdapterTests {
     }
 
     @Test
-    func `outcome 스트림에서 완료 신호를 받으면 생성 중 상태를 해제한다`() async {
-        let adapter = RepositoryCreationStateRepositoryAdapter()
+    func `outcome 스트림에서 완료 신호를 받으면 생성 중 상태를 해제한다`() async throws {
+        let adapter = RepositoryCreationStateRepositoryAdapter(userDefaults: try Self.makeUserDefaults())
         _ = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
         await adapter.attachProjectID("project-1", toGithubRepoURL: "https://github.com/owner/repo")
 
         let outcomeSource = StubObserveGenerationOutcomesUseCase(outcomes: [
-            GenerationOutcome(projectID: "project-1", status: .completed),
+            GenerationOutcome(projectID: "project-1", status: .completed)
         ])
         await adapter.start(observeGenerationOutcomes: outcomeSource)
 
@@ -80,15 +80,41 @@ struct RepositoryCreationStateRepositoryAdapterTests {
     }
 
     @Test
-    func `900초를 초과한 레코드는 다음 조회에서 만료된 것으로 취급한다`() async {
+    func `900초를 초과한 레코드는 다음 조회에서 만료된 것으로 취급한다`() async throws {
         let clockBox = ClockBox(current: Date(timeIntervalSince1970: 0))
-        let adapter = RepositoryCreationStateRepositoryAdapter(clock: { clockBox.current })
+        let adapter = RepositoryCreationStateRepositoryAdapter(
+            userDefaults: try Self.makeUserDefaults(),
+            clock: { clockBox.current },
+        )
         _ = await adapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
 
         clockBox.current = clockBox.current.addingTimeInterval(901)
         let isCreating = await adapter.isCreating(githubRepoURL: "https://github.com/owner/repo")
 
         #expect(isCreating == false)
+    }
+
+    @Test
+    func `App과 Share Extension처럼 서로 다른 인스턴스가 같은 저장소를 공유하면 중복 생성을 막는다`() async throws {
+        let userDefaults = try Self.makeUserDefaults()
+        let appAdapter = RepositoryCreationStateRepositoryAdapter(userDefaults: userDefaults)
+        let shareExtensionAdapter = RepositoryCreationStateRepositoryAdapter(userDefaults: userDefaults)
+
+        let began = await appAdapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
+        let duplicateBegan = await shareExtensionAdapter.beginCreation(githubRepoURL: "https://github.com/owner/repo")
+
+        #expect(began == true)
+        #expect(duplicateBegan == false)
+        let isCreatingFromOtherInstance = await shareExtensionAdapter.isCreating(
+            githubRepoURL: "https://github.com/owner/repo",
+        )
+        #expect(isCreatingFromOtherInstance == true)
+    }
+
+    // MARK: Private
+
+    private static func makeUserDefaults() throws -> UserDefaults {
+        try #require(UserDefaults(suiteName: "RepositoryCreationStateRepositoryAdapterTests.\(UUID().uuidString)"))
     }
 
 }

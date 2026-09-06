@@ -1,47 +1,63 @@
 import DomainLearningProject
 import Foundation
+import InfrastructureStorage
 
 // MARK: - RepositoryCreationStateRepositoryAdapter
 
+/// 본 앱과 Share Extension이 서로 다른 프로세스이므로, 생성 중 상태를 App Group 공유
+/// `UserDefaults`에 저장해 두 프로세스가 동일한 상태를 보고 갱신하도록 한다.
 actor RepositoryCreationStateRepositoryAdapter: RepositoryCreationStateRepository {
 
     // MARK: Lifecycle
 
-    init(clock: @escaping @Sendable () -> Date = Date.init) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        clock: @escaping @Sendable () -> Date = Date.init,
+    ) {
+        store = UserDefaultsStore(namespace: SharedSessionLayout.namespace, userDefaults: userDefaults)
         self.clock = clock
     }
 
     // MARK: Internal
 
     func isCreating(githubRepoURL: String) async -> Bool {
-        purgeExpired()
+        let records = await purgeExpired()
         return records[normalize(githubRepoURL)] != nil
     }
 
     func beginCreation(githubRepoURL: String) async -> Bool {
-        purgeExpired()
+        var records = await purgeExpired()
         let key = normalize(githubRepoURL)
         guard records[key] == nil else { return false }
         records[key] = RepositoryCreationState(normalizedGithubRepoURL: key, recordedAt: clock())
+        await save(records)
         return true
     }
 
-    func attachProjectID(_ projectID: String, toGithubRepoURL githubRepoURL: String) async {
-        purgeExpired()
+    func attachProjectID(
+        _ projectID: String,
+        toGithubRepoURL githubRepoURL: String,
+    ) async {
+        var records = await purgeExpired()
         records[normalize(githubRepoURL)]?.projectID = projectID
+        await save(records)
     }
 
     func endCreation(githubRepoURL: String) async {
+        var records = await loadRecords()
         records.removeValue(forKey: normalize(githubRepoURL))
+        await save(records)
     }
 
     func endCreation(projectID: String) async {
+        var records = await loadRecords()
         guard let key = records.first(where: { $0.value.projectID == projectID })?.key else { return }
         records.removeValue(forKey: key)
+        await save(records)
     }
 
     func activeProjectIDs() async -> Set<String> {
-        purgeExpired()
+        let records = await purgeExpired()
         return Set(records.values.compactMap(\.projectID))
     }
 
@@ -57,9 +73,10 @@ actor RepositoryCreationStateRepositoryAdapter: RepositoryCreationStateRepositor
     // MARK: Private
 
     private static let expiryInterval: TimeInterval = 900
+    private static let recordsKey = SharedSessionLayout.repositoryCreationStatesKey
 
+    private let store: UserDefaultsStore<[String: RepositoryCreationState]>
     private let clock: @Sendable () -> Date
-    private var records = [String: RepositoryCreationState]()
     private var observationTask: Task<Void, Never>?
 
     private func normalize(_ githubRepoURL: String) -> String {
@@ -70,9 +87,23 @@ actor RepositoryCreationStateRepositoryAdapter: RepositoryCreationStateRepositor
         return normalized
     }
 
-    private func purgeExpired() {
+    private func loadRecords() async -> [String: RepositoryCreationState] {
+        await store.value(forKey: Self.recordsKey) ?? [:]
+    }
+
+    private func purgeExpired() async -> [String: RepositoryCreationState] {
         let now = clock()
-        records = records.filter { now.timeIntervalSince($0.value.recordedAt) < Self.expiryInterval }
+        let records = await loadRecords().filter { now.timeIntervalSince($0.value.recordedAt) < Self.expiryInterval }
+        await save(records)
+        return records
+    }
+
+    private func save(_ records: [String: RepositoryCreationState]) async {
+        if records.isEmpty {
+            await store.removeValue(forKey: Self.recordsKey)
+        } else {
+            await store.store(records, forKey: Self.recordsKey)
+        }
     }
 
 }

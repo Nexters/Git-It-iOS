@@ -15,6 +15,7 @@ public struct LearningProjectAssembly: Sendable {
         accessTokenProvider: @escaping @Sendable () async -> String?,
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        sharedDefaults: UserDefaults? = SharedSessionLayout.makeSharedDefaults(),
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let projectRepository = LearningProjectRepositoryAdapter(
@@ -30,7 +31,9 @@ public struct LearningProjectAssembly: Sendable {
             remote: HTTPBookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
 
-        let creationStateRepositoryAdapter = RepositoryCreationStateRepositoryAdapter()
+        let creationStateRepositoryAdapter = RepositoryCreationStateRepositoryAdapter(
+            userDefaults: sharedDefaults ?? .standard,
+        )
         self.creationStateRepositoryAdapter = creationStateRepositoryAdapter
         startObservingRepositoryCreationState = { observeGenerationOutcomes in
             await creationStateRepositoryAdapter.start(observeGenerationOutcomes: observeGenerationOutcomes)
