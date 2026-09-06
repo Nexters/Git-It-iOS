@@ -40,8 +40,7 @@ struct QuestionSolvingScreen: View {
         OverlayContainer {
             ScreenControlBar(
                 onLeadingTap: { send(.backTapped) }
-            )
-            .designSystemScreenMargin()
+            ).designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
                 QuestionPrompt(

@@ -92,8 +92,7 @@ public struct SettingsScreen: View {
                     )
                     SettingRow(
                         content: {
-                            StyledText.body2(Constant.deleteAccountTitle)
-                                .designSystemForeground(.grey400)
+                            StyledText.body2(Constant.deleteAccountTitle, color: .grey400)
                         },
                         onTap: {
                             send(.deleteAccountTapped)
