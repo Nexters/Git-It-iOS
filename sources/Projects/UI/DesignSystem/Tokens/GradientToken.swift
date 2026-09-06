@@ -150,14 +150,60 @@ extension GradientToken {
         end: topToBottomEnd,
         stops: [
             Stop(
-                position: 0.7,
+                position: 1,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 0.2,
                 hex: "#141414",
                 opacity: 0.6,
+            ),
+        ],
+    )
+
+    public static let overlayHeaderScrim = GradientToken(
+        name: "OverlayHeaderScrim",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0.6,
+            ),
+            Stop(
+                position: 0.65,
+                hex: "#141414",
+                opacity: 0.2,
             ),
             Stop(
                 position: 1,
                 hex: "#141414",
                 opacity: 0,
+            ),
+        ],
+    )
+
+    public static let overlayFooterScrim = GradientToken(
+        name: "OverlayFooterScrim",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 0.2,
+                hex: "#141414",
+                opacity: 0.8,
+            ),
+            Stop(
+                position: 1,
+                hex: "#141414",
+                opacity: 1,
             ),
         ],
     )
