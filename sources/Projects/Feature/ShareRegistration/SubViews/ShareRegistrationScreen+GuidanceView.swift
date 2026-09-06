@@ -13,6 +13,7 @@ extension ShareRegistrationScreen {
         let title: String
         let message: String
         let retryTitle: String?
+        let dismissTitle: String
         let onRetry: () -> Void
         let onDismiss: () -> Void
 
@@ -36,7 +37,7 @@ extension ShareRegistrationScreen {
                     if let retryTitle {
                         ActionButton.primary(retryTitle, action: onRetry)
                     }
-                    ActionButton.secondary(ShareRegistrationScreen.dismissTitle, action: onDismiss)
+                    ActionButton.secondary(dismissTitle, action: onDismiss)
                 }
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
