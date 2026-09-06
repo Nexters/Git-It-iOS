@@ -1,5 +1,6 @@
 import DesignSystem
 import SwiftUI
+import UIKit
 
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
@@ -28,6 +29,9 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
             }
         }
         .tint(Color(designSystem: .brandAccent))
+        .onAppear {
+            UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .brandAccent))
+        }
     }
 
     // MARK: Private
