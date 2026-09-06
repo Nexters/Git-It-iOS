@@ -20,19 +20,20 @@ extension QuestionSolvingScreen {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
                         StyledText.body1(placeholder, color: .grey400)
-                            .padding(Constant.textInset)
+                            .allowsHitTesting(false)
                     }
 
                     TextEditor(text: $text)
                         .scrollContentBackground(.hidden)
-                        .scrollDisabled(true)
+                        .contentMargins(.all, 0, for: .scrollContent)
+                        .font(Font.designSystem(Constant.textStyle))
+                        .designSystemLineSpacing(Constant.textStyle)
                         .focused(isFocused)
                         .designSystemForeground(.grey100)
-                        .padding(.horizontal, Constant.editorHorizontalInset)
                         .disabled(isDisabled)
-                        .frame(maxHeight: Constant.maximumHeight)
                 }
-                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight)
+                .padding(Constant.textInset)
+                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight, alignment: .top)
                 .designSystemBackground(.cardBackground)
                 .designSystemCornerRadius(.small)
                 .overlay {
@@ -50,10 +51,10 @@ extension QuestionSolvingScreen {
         // MARK: Private
 
         private enum Constant {
+            static let textStyle = TextStyleToken.body1
             static let minimumHeight: CGFloat = 160
             static let maximumHeight: CGFloat = 240
             static let textInset: CGFloat = 16
-            static let editorHorizontalInset: CGFloat = 12
         }
 
         private var borderToken: BorderToken {
