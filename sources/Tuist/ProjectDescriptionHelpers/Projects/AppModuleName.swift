@@ -46,8 +46,6 @@ extension AppModuleName {
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
                             "UIInterfaceOrientationPortrait",
-                            "UIInterfaceOrientationLandscapeLeft",
-                            "UIInterfaceOrientationLandscapeRight",
                         ],
                         "UISupportedInterfaceOrientations~ipad": [
                             "UIInterfaceOrientationPortrait",
