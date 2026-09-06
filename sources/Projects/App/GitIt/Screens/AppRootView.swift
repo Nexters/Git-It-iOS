@@ -6,10 +6,6 @@ import Feature
 import Foundation
 import SwiftUI
 
-#if DEBUG
-import AppDebug
-#endif
-
 // MARK: - AppRootView
 
 @ViewAction(for: AppRootFeature.self)

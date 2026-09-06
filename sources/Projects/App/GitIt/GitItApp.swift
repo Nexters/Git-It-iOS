@@ -6,10 +6,6 @@ import Foundation
 import SwiftUI
 import UIKit
 
-#if DEBUG
-import AppDebug
-#endif
-
 // MARK: - GitItApp
 
 @main
