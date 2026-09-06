@@ -162,6 +162,7 @@ struct MainShellRouterFeatureTests {
                 updateMemberCareerLevel: MainShellUpdateCareerStub(),
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
                 observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                requestGenerationReminder: StubRequestGenerationReminderUseCase(),
             )
         }
     }

@@ -1,11 +1,10 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
 // MARK: - SettingsScreen
 
-/// 설정 목록 화면(Figma `1465:19689`). 개발 분야·개발 수준·서비스 약관·로그아웃·계정 삭제 행을 담는다.
-/// FR-014에 따라 "세트 생성 완료 알림" 섹션은 이번 범위에서 제외한다.
 @ViewAction(for: SettingsFeature.self)
 public struct SettingsScreen: View {
 
@@ -21,43 +20,84 @@ public struct SettingsScreen: View {
 
     public var body: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
-                title: Constant.title,
-                style: .largeTitle,
-                leading: .back,
-                onLeadingTap: { send(.backTapped) },
-            )
+            VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                    IconGlassButton.neutral(
+                        icon: ScreenControlBar.Control.back.icon,
+                        label: ScreenControlBar.Control.back.label,
+                        size: .medium,
+                        action: { send(.backTapped) },
+                    )
+
+                    Spacer(minLength: 0)
+                }
+                .frame(height: Constant.headerControlRowHeight, alignment: .top)
+
+                ScreenHeaderTitle(title: Constant.title)
+            }
+            .padding(.bottom, Constant.headerBottomPadding)
+            .frame(height: Constant.headerHeight, alignment: .top)
+            .designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 10) {
                 Self.SectionView(title: Constant.learningSectionTitle) {
                     SettingRow(
-                        title: Constant.positionTitle,
                         value: PositionDisplay.settingValue(for: store.profile?.position),
-                        onTap: { send(.positionRowTapped) },
+                        content: {
+                            Self.SettingRowContent(icon: .settingDevelop, title: Constant.positionTitle)
+                        },
+                        onTap: {
+                            send(.positionRowTapped)
+                        },
                     )
-                    rowDivider
                     SettingRow(
-                        title: Constant.careerLevelTitle,
                         value: CareerLevelDisplay.settingValue(for: store.profile?.careerLevel),
+                        content: {
+                            Self.SettingRowContent(icon: .settingLevel, title: Constant.careerLevelTitle)
+                        },
                         onTap: { send(.careerLevelRowTapped) },
+                    )
+                }
+
+                Self.SectionView(title: Constant.notificationSectionTitle) {
+                    SettingRow(
+                        value: notificationValue,
+                        content: {
+                            Self.SettingRowContent(icon: .settingAlert, title: Constant.notificationTitle)
+                        },
+                        onTap: {
+                            send(.notificationRowTapped)
+                        },
                     )
                 }
 
                 Self.SectionView(title: Constant.generalSectionTitle) {
                     SettingRow(
-                        title: Constant.termsTitle,
+                        content: {
+                            Self.SettingRowContent(icon: .settingPolicy, title: Constant.termsTitle)
+                        },
                         onTap: { send(.termsTapped) },
                     )
-                    rowDivider
-                    AccountActionRow(
-                        title: Constant.signOutTitle,
-                        isDestructive: true,
-                        onTap: { send(.signOutTapped) },
+                    SettingRow(
+                        content: {
+                            HStack(spacing: 10) {
+                                ResourceImage(asset: .icon(.settingLogout))
+                                    .frame(width: 16, height: 16)
+                                StyledText.body2(Constant.signOutTitle, color: .error)
+                            }
+                        },
+                        onTap: {
+                            send(.signOutTapped)
+                        },
                     )
-                    rowDivider
-                    AccountActionRow(
-                        title: Constant.deleteAccountTitle,
-                        onTap: { send(.deleteAccountTapped) },
+                    SettingRow(
+                        content: {
+                            StyledText.body2(Constant.deleteAccountTitle)
+                                .designSystemForeground(.grey400)
+                        },
+                        onTap: {
+                            send(.deleteAccountTapped)
+                        },
                     )
                 }
 
@@ -77,7 +117,7 @@ public struct SettingsScreen: View {
     private var rowDivider: some View {
         Rectangle()
             .fill(Color(designSystem: .grey500))
-            .frame(height: Constant.dividerHeight)
+            .frame(height: 0)
     }
 
     private var failureMessage: String? {
@@ -94,9 +134,21 @@ public struct SettingsScreen: View {
     }
 
     private var profileFailureMessage: String? {
-        // 프로필을 한 번도 받지 못한 경우에만 조회 실패를 알린다(값이 있으면 유지, FR-007).
         guard case .failed = store.profileLoad, store.profile == nil else { return nil }
         return Constant.profileFailureMessage
+    }
+
+    private var notificationValue: String? {
+        switch store.notificationStatus {
+        case .idle:
+            nil
+
+        case .allowed:
+            Constant.notificationOnValue
+
+        case .denied:
+            Constant.notificationOffValue
+        }
     }
 
 }
@@ -107,9 +159,13 @@ extension SettingsScreen {
     fileprivate enum Constant {
         static let title = "설정"
         static let learningSectionTitle = "학습 설정"
+        static let notificationSectionTitle = "알림"
         static let generalSectionTitle = "일반"
         static let positionTitle = "개발 분야"
         static let careerLevelTitle = "개발 수준"
+        static let notificationTitle = "세트 생성 완료 알림"
+        static let notificationOnValue = "켜짐"
+        static let notificationOffValue = "꺼짐"
         static let termsTitle = "서비스 약관 및 정책"
         static let signOutTitle = "로그아웃"
         static let deleteAccountTitle = "계정 삭제"
@@ -118,5 +174,9 @@ extension SettingsScreen {
         static let dividerHeight: CGFloat = 1
         static let failureTopPadding: CGFloat = 16
         static let contentBottomPadding: CGFloat = 32
+        static let headerControlRowHeight: CGFloat = 40
+        static let headerTitleSpacing: CGFloat = 16
+        static let headerBottomPadding: CGFloat = 10
+        static let headerHeight: CGFloat = 99
     }
 }

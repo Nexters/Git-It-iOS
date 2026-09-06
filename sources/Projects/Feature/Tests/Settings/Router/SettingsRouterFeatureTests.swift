@@ -26,7 +26,7 @@ struct SettingsRouterFeatureTests {
 
         await store.send(.profile(.view(.settingsTapped)))
         await store.receive(.profile(.delegate(.settingsRequested))) {
-            $0.settings.profile = self.profile
+            $0.settings.profile = profile
             $0.settings.profileLoad = .loaded
             $0.activeScreen = .settings(.list)
         }
@@ -67,7 +67,7 @@ struct SettingsRouterFeatureTests {
 
         await store.send(.settings(.view(.backTapped)))
         await store.receive(.settings(.delegate(.backRequested))) {
-            $0.profile.profileLoad = .loaded(self.updatedProfile)
+            $0.profile.profileLoad = .loaded(updatedProfile)
             $0.activeScreen = .profile
         }
     }
@@ -145,7 +145,7 @@ struct SettingsRouterFeatureTests {
     )
 
     private func makeStore(
-        state: SettingsRouterFeature.State = .init(),
+        state: SettingsRouterFeature.State = .init()
     ) -> TestStoreOf<SettingsRouterFeature> {
         TestStore(initialState: state) {
             SettingsRouterFeature(
@@ -154,6 +154,7 @@ struct SettingsRouterFeatureTests {
                 updateMemberPosition: UpdateMemberPositionUseCaseMock(),
                 updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock(),
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
+                requestGenerationReminder: StubRequestGenerationReminderUseCase(),
             )
         }
     }

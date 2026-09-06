@@ -23,6 +23,8 @@ public struct MainShellRouterFeature: Sendable {
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -37,12 +39,11 @@ public struct MainShellRouterFeature: Sendable {
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
         self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.requestGenerationReminder = requestGenerationReminder
+        self.openNotificationSettings = openNotificationSettings
     }
 
     // MARK: Public
-
-    /// 저장한 문제 하나를 여는 흐름에서 결과 상태 하단 컨트롤의 문구입니다.
-    public static let singleQuestionAdvanceActionTitle = "완료"
 
     @ObservableState
     public struct State: Equatable, Sendable {
@@ -84,6 +85,8 @@ public struct MainShellRouterFeature: Sendable {
         }
     }
 
+    public static let singleQuestionAdvanceActionTitle = "완료"
+
     public var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {
             HomeFeature(
@@ -111,6 +114,8 @@ public struct MainShellRouterFeature: Sendable {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
+                requestGenerationReminder: requestGenerationReminder,
+                openNotificationSettings: openNotificationSettings,
             )
         }
         Reduce { state, action in
@@ -210,5 +215,7 @@ public struct MainShellRouterFeature: Sendable {
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let openNotificationSettings: @MainActor @Sendable () async -> Void
 
 }

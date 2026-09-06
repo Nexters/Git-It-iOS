@@ -23,6 +23,9 @@ struct SettingsFeatureTests {
             $0.profile = SettingsTestFixture.curatedProfile
             $0.profileLoad = .loaded
         }
+        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: false))) {
+            $0.notificationStatus = .denied
+        }
 
         #expect(await fetchMemberProfile.snapshot() == 1)
     }
@@ -39,8 +42,38 @@ struct SettingsFeatureTests {
         await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
             $0.profileLoad = .failed(.temporarilyUnavailable)
         }
+        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: false))) {
+            $0.notificationStatus = .denied
+        }
 
         #expect(store.state.profile == nil)
+    }
+
+    @Test
+    func `task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다`() async {
+        let store = makeStore(
+            requestGenerationReminder: StubRequestGenerationReminderUseCase(isAuthorizedResult: true)
+        )
+
+        await store.send(.view(.task)) {
+            $0.profileLoad = .loading
+        }
+        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
+            $0.profileLoad = .failed(.temporarilyUnavailable)
+        }
+        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: true))) {
+            $0.notificationStatus = .allowed
+        }
+    }
+
+    @Test
+    func `알림 행 탭은 시스템 알림 설정 화면을 연다`() async {
+        let openedNotificationSettings = LockIsolated(0)
+        let store = makeStore(openNotificationSettings: { openedNotificationSettings.withValue { $0 += 1 } })
+
+        await store.send(.view(.notificationRowTapped))
+
+        #expect(openedNotificationSettings.value == 1)
     }
 
     @Test
@@ -151,6 +184,8 @@ struct SettingsFeatureTests {
         fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
         updateMemberPosition: UpdateMemberPositionUseCaseMock = UpdateMemberPositionUseCaseMock(),
         updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock = UpdateMemberCareerLevelUseCaseMock(),
+        requestGenerationReminder: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(),
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) -> TestStoreOf<SettingsFeature> {
         TestStore(initialState: state) {
             SettingsFeature(
@@ -159,6 +194,8 @@ struct SettingsFeatureTests {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
+                requestGenerationReminder: requestGenerationReminder,
+                openNotificationSettings: openNotificationSettings,
             )
         }
     }

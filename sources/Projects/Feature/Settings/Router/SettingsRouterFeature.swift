@@ -1,10 +1,9 @@
 import ComposableArchitecture
 import DomainAuthentication
+import DomainLearningProject
 import DomainMember
 import Foundation
 
-/// "마이" 탭의 순차 흐름 Router. 프로필 화면과 설정 화면(목록·개발 분야 선택·개발 수준 선택·
-/// 계정 삭제 확인 4단계)의 State를 항상 보유하고 활성 화면만 전환한다.
 @Reducer
 public struct SettingsRouterFeature: Sendable {
 
@@ -16,12 +15,16 @@ public struct SettingsRouterFeature: Sendable {
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
+        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
         self.signOut = signOut
         self.fetchMemberProfile = fetchMemberProfile
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
+        self.requestGenerationReminder = requestGenerationReminder
+        self.openNotificationSettings = openNotificationSettings
     }
 
     // MARK: Public
@@ -79,12 +82,13 @@ public struct SettingsRouterFeature: Sendable {
                 updateMemberPosition: updateMemberPosition,
                 updateMemberCareerLevel: updateMemberCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
+                requestGenerationReminder: requestGenerationReminder,
+                openNotificationSettings: openNotificationSettings,
             )
         }
         Reduce { state, action in
             switch action {
             case .profile(.delegate(.settingsRequested)):
-                // 프로필 화면이 이미 받은 값을 설정 화면에 넘겨 재조회 전까지 빈 값이 보이지 않게 한다.
                 if case .loaded(let profile) = state.profile.profileLoad {
                     state.settings.profile = profile
                     state.settings.profileLoad = .loaded
@@ -95,7 +99,6 @@ public struct SettingsRouterFeature: Sendable {
             case .settings(.delegate(.backRequested)):
                 switch state.activeScreen {
                 case .settings(.list):
-                    // 설정에서 바꾼 직군·연차를 프로필 화면에 즉시 반영한다(S2 수용 기준).
                     if let profile = state.settings.profile {
                         state.profile.profileLoad = .loaded(profile)
                     }
@@ -151,5 +154,7 @@ public struct SettingsRouterFeature: Sendable {
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
+    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let openNotificationSettings: @MainActor @Sendable () async -> Void
 
 }

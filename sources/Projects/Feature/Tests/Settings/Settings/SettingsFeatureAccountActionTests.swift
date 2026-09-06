@@ -164,6 +164,7 @@ struct SettingsFeatureAccountActionTests {
                 updateMemberPosition: UpdateMemberPositionUseCaseMock(),
                 updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock(),
                 deleteMemberAccount: deleteMemberAccount,
+                requestGenerationReminder: StubRequestGenerationReminderUseCase(),
             )
         }
     }
