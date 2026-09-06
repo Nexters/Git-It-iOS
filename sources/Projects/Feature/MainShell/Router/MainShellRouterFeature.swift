@@ -13,6 +13,10 @@ public struct MainShellRouterFeature: Sendable {
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         deleteLearningProject: any DeleteLearningProjectUseCase,
         fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        fetchLearningSet: any FetchLearningSetUseCase,
+        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
+        submitEssayAnswer: any SubmitEssayAnswerUseCase,
+        setQuestionBookmark: any SetQuestionBookmarkUseCase,
         signOut: any SignOutUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
         updateMemberPosition: any UpdateMemberPositionUseCase,
@@ -23,6 +27,10 @@ public struct MainShellRouterFeature: Sendable {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
         self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
+        self.fetchLearningSet = fetchLearningSet
+        self.submitChoiceAnswer = submitChoiceAnswer
+        self.submitEssayAnswer = submitEssayAnswer
+        self.setQuestionBookmark = setQuestionBookmark
         self.signOut = signOut
         self.fetchMemberProfile = fetchMemberProfile
         self.updateMemberPosition = updateMemberPosition
@@ -33,6 +41,9 @@ public struct MainShellRouterFeature: Sendable {
 
     // MARK: Public
 
+    /// 저장한 문제 하나를 여는 흐름에서 결과 상태 하단 컨트롤의 문구입니다.
+    public static let singleQuestionAdvanceActionTitle = "완료"
+
     @ObservableState
     public struct State: Equatable, Sendable {
         public init() { }
@@ -42,6 +53,8 @@ public struct MainShellRouterFeature: Sendable {
         public var projectList = ProjectListFeature.State()
         public var saved = SavedFeature.State()
         public var settings = SettingsRouterFeature.State()
+        public var singleQuestionEntry: SingleQuestionEntryFeature.State?
+        @Presents public var singleQuestion: QuestionSolvingFeature.State?
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -51,6 +64,8 @@ public struct MainShellRouterFeature: Sendable {
         case projectList(ProjectListFeature.Action)
         case saved(SavedFeature.Action)
         case settings(SettingsRouterFeature.Action)
+        case singleQuestionEntry(SingleQuestionEntryFeature.Action)
+        case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
 
         // MARK: Public
 
@@ -64,7 +79,6 @@ public struct MainShellRouterFeature: Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: String)
             case learningRequested(projectID: String, nextSetID: String)
-            case questionSelected(BookmarkedQuestion)
             case externalURLRequested(URL)
             case loggedOut
         }
@@ -85,7 +99,10 @@ public struct MainShellRouterFeature: Sendable {
             )
         }
         Scope(state: \.saved, action: \.saved) {
-            SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+            SavedFeature(
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
         Scope(state: \.settings, action: \.settings) {
             SettingsRouterFeature(
@@ -118,8 +135,35 @@ public struct MainShellRouterFeature: Sendable {
             case .projectList(.delegate(.projectSelected(let projectID))):
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
+            case .projectList(.delegate(.learningRequested(let projectID, let nextSetID))):
+                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
+
             case .saved(.delegate(.questionSelected(let question))):
-                return .send(.delegate(.questionSelected(question)))
+                state.singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: question.projectID)
+                return .send(.singleQuestionEntry(.input(.questionRequested(
+                    setID: question.setID,
+                    questionID: question.questionID,
+                ))))
+
+            case .singleQuestionEntry(.delegate(.questionPrepared(let question, let projectID))):
+                state.singleQuestion = QuestionSolvingFeature.State(
+                    projectID: projectID,
+                    question: question,
+                    advanceActionTitle: Self.singleQuestionAdvanceActionTitle,
+                    isBookmarked: true,
+                )
+                return .none
+
+            case .singleQuestionEntry(.delegate(.preparationFailed)):
+                return .none
+
+            case .singleQuestion(.presented(.delegate(.advanceRequested))),
+                 .singleQuestion(.presented(.delegate(.backRequested))):
+                state.singleQuestion = nil
+                return .none
+
+            case .singleQuestion(.presented(.delegate(.externalURLRequested(let url)))):
+                return .send(.delegate(.externalURLRequested(url)))
 
             case .settings(.delegate(.externalURLRequested(let url))):
                 return .send(.delegate(.externalURLRequested(url)))
@@ -133,9 +177,21 @@ public struct MainShellRouterFeature: Sendable {
                  .projectList,
                  .saved,
                  .settings,
+                 .singleQuestionEntry,
+                 .singleQuestion,
                  .delegate:
                 return .none
             }
+        }
+        .ifLet(\.singleQuestionEntry, action: \.singleQuestionEntry) {
+            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)
+        }
+        .ifLet(\.$singleQuestion, action: \.singleQuestion) {
+            QuestionSolvingFeature(
+                submitChoiceAnswer: submitChoiceAnswer,
+                submitEssayAnswer: submitEssayAnswer,
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
     }
 
@@ -144,6 +200,10 @@ public struct MainShellRouterFeature: Sendable {
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let deleteLearningProject: any DeleteLearningProjectUseCase
     private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
+    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
+    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
     private let signOut: any SignOutUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
     private let updateMemberPosition: any UpdateMemberPositionUseCase

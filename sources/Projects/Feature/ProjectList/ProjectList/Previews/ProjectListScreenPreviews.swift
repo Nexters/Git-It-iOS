@@ -20,11 +20,13 @@ private func previewProject(index: Int) -> LearningProjectSummary {
 private func previewState(
     projects: [LearningProjectSummary] = (1...4).map(previewProject(index:)),
     initialLoad: ProjectListFeature.InitialLoad = .loaded,
+    mode: ProjectListFeature.Mode = .browsing,
     deletion: ProjectListFeature.Deletion = .idle,
 ) -> ProjectListFeature.State {
     var state = ProjectListFeature.State()
     state.projects = projects
     state.initialLoad = initialLoad
+    state.mode = mode
     state.deletion = deletion
     return state
 }
@@ -37,9 +39,17 @@ private func previewStore(_ state: ProjectListFeature.State) -> StoreOf<ProjectL
     ProjectListScreen(store: previewStore(previewState()))
 }
 
+#Preview("프로젝트 목록 · 메뉴 열림") {
+    ProjectListScreen(store: previewStore(previewState(mode: .menuPresented)))
+}
+
+#Preview("프로젝트 목록 · 삭제 모드") {
+    ProjectListScreen(store: previewStore(previewState(mode: .deleting)))
+}
+
 #Preview("프로젝트 목록 · 삭제 확인") {
     ProjectListScreen(
-        store: previewStore(previewState(deletion: .confirming(projectID: "project-1")))
+        store: previewStore(previewState(mode: .deleting, deletion: .confirming(projectID: "project-1")))
     )
 }
 

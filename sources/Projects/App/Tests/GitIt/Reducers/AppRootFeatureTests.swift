@@ -282,6 +282,40 @@ struct AppRootFeatureTests {
     }
 
     @Test
+    func `프로젝트 목록의 학습 요청은 상세 위에 그 세트의 풀이 흐름을 연다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.mainShell.projectList.projects = [
+            LearningProjectSummary(
+                projectID: "project-1",
+                repositoryName: "repo",
+                repositoryImageURL: nil,
+                techStack: ["Swift"],
+                currentSetLabel: "Set 1",
+                currentSetTitle: "Basics",
+                nextSetID: "set-1",
+                nextQuestionID: "question-1",
+                overallProgressPercent: 0,
+            )
+        ]
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(
+            .mainShell(
+                .delegate(
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1")
+                )
+            )
+        )
+
+        #expect(store.state.quiz?.projectID == "project-1")
+        #expect(store.state.quiz?.setID == "set-1")
+        #expect(store.state.quiz?.setLabel == "Set 1")
+        #expect(store.state.projectDetail?.projectID == "project-1")
+    }
+
+    @Test
     func `Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell

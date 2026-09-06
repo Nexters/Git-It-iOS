@@ -35,7 +35,10 @@ struct BookmarkRepositoryAdapterTests {
 
         let collection = try await adapter.fetchBookmarkedQuestions(projectID: "project-1")
 
-        #expect(collection.availableProjects == ["project-1", "project-2"])
+        #expect(collection.availableProjects == [
+            BookmarkedProject(id: "project-1", name: "repo-1"),
+            BookmarkedProject(id: "project-2", name: "repo-2"),
+        ])
         #expect(collection.totalCount == 2)
     }
 
@@ -61,6 +64,32 @@ struct BookmarkRepositoryAdapterTests {
             collection.bookmarks.map(\.prompt)
                 == ["`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?"]
         )
+    }
+
+    @Test
+    func `목록 응답의 프로젝트명·세트 라벨·문제 번호를 그대로 보존한다`() async throws {
+        let remote = StubBookmarkRemote(listResult: .success(BookmarkedQuestionListResponseDTO(
+            totalCount: 1,
+            availableProjects: [],
+            bookmarks: [
+                BookmarkedQuestionResponseDTO(
+                    projectID: "project-1",
+                    projectName: "Now in Android",
+                    setID: "set-1",
+                    setLabel: "Set 2",
+                    problemNumber: 1,
+                    questionID: "question-1",
+                )
+            ],
+        )))
+        let adapter = BookmarkRepositoryAdapter(remote: remote)
+
+        let collection = try await adapter.fetchBookmarkedQuestions(projectID: nil)
+
+        let bookmark = try #require(collection.bookmarks.first)
+        #expect(bookmark.projectName == "Now in Android")
+        #expect(bookmark.setLabel == "Set 2")
+        #expect(bookmark.problemNumber == 1)
     }
 
     @Test

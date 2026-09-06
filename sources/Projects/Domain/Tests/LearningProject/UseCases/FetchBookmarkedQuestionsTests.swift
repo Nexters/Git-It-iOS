@@ -10,7 +10,10 @@ struct FetchBookmarkedQuestionsTests {
     func `필터와 무관하게 availableProjects는 전체 목록을 유지한다`() async throws {
         let collection = BookmarkedQuestionCollection(
             totalCount: 3,
-            availableProjects: ["project-1", "project-2"],
+            availableProjects: [
+                BookmarkedProject(id: "project-1", name: "repo-1"),
+                BookmarkedProject(id: "project-2", name: "repo-2"),
+            ],
             bookmarks: [
                 BookmarkedQuestion(projectID: "project-1", setID: "set-1", questionID: "q1", prompt: "p1")
             ],
@@ -20,13 +23,20 @@ struct FetchBookmarkedQuestionsTests {
 
         let result = try await fetchBookmarkedQuestions(projectID: "project-1")
 
-        #expect(result.availableProjects == ["project-1", "project-2"])
+        #expect(result.availableProjects == [
+            BookmarkedProject(id: "project-1", name: "repo-1"),
+            BookmarkedProject(id: "project-2", name: "repo-2"),
+        ])
     }
 
     @Test
     func `route 식별자를 완전하게 보존한다`() async throws {
         let bookmark = BookmarkedQuestion(projectID: "project-1", setID: "set-1", questionID: "q1", prompt: "p1")
-        let collection = BookmarkedQuestionCollection(totalCount: 1, availableProjects: ["project-1"], bookmarks: [bookmark])
+        let collection = BookmarkedQuestionCollection(
+            totalCount: 1,
+            availableProjects: [BookmarkedProject(id: "project-1", name: "repo-1")],
+            bookmarks: [bookmark],
+        )
         let repository = FetchBookmarkedQuestionsRepository(behavior: .succeed(collection))
         let fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: repository)
 

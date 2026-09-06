@@ -89,7 +89,7 @@ enum QuizTestFixture {
 
     static let bookmarkCollection = BookmarkedQuestionCollection(
         totalCount: 1,
-        availableProjects: [projectID],
+        availableProjects: [BookmarkedProject(id: projectID, name: "owner/repo")],
         bookmarks: [bookmarkedQuestion(index: 0)],
     )
 

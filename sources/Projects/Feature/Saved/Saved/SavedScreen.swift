@@ -74,18 +74,43 @@ struct SavedScreen: View {
                 onLeadingTap: { send(.backTapped) },
             )
         } content: {
-            VStack(spacing: LayoutToken.gutter.cgFloatValue) {
-                ForEach(SavedQuestionDisplay.list(questions: store.collection?.bookmarks ?? [])) { question in
-                    QuestionRow(
-                        prompt: question.prompt,
-                        actionTitle: SavedQuestionDisplay.actionTitle,
-                        onSolveTap: { solve(questionID: question.id) },
+            VStack(alignment: .leading, spacing: 0) {
+                if isFilterPresented {
+                    FilterSection(
+                        projects: store.collection?.availableProjects ?? [],
+                        selectedProjectID: store.selectedProjectID,
+                        count: store.collection?.totalCount ?? 0,
+                        onSelect: { send(.filterSelected(projectID: $0)) },
                     )
                 }
+
+                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    ForEach(
+                        SavedQuestionDisplay.list(
+                            questions: store.collection?.bookmarks ?? [],
+                            bookmarkOverrides: store.bookmarkOverrides,
+                        )
+                    ) { question in
+                        SavedQuestionCard(
+                            metadata: question.metadata,
+                            prompt: question.prompt,
+                            actionTitle: SavedQuestionDisplay.actionTitle,
+                            isBookmarked: question.isBookmarked,
+                            onActionTap: { solve(questionID: question.id) },
+                            onBookmarkTap: { toggleBookmark(questionID: question.id) },
+                        )
+                    }
+                }
+                .designSystemScreenMargin()
+                .padding(.top, isFilterPresented ? 0 : Constant.listTopPadding)
+                .padding(.bottom, Constant.contentBottomPadding)
             }
-            .designSystemScreenMargin()
-            .padding(.vertical, Constant.contentVerticalPadding)
         }
+    }
+
+    /// 프로젝트 필터로 진입한 화면은 칩 행을 감춘다.
+    private var isFilterPresented: Bool {
+        store.projectFilter == nil
     }
 
     private func solve(questionID: String) {
@@ -94,12 +119,19 @@ struct SavedScreen: View {
         send(.solveTapped(question))
     }
 
+    private func toggleBookmark(questionID: String) {
+        guard let question = store.collection?.bookmarks.first(where: { $0.questionID == questionID })
+        else { return }
+        send(.bookmarkToggleTapped(question))
+    }
+
 }
 
 // MARK: SavedScreen.Constant
 
 extension SavedScreen {
     fileprivate enum Constant {
-        static let contentVerticalPadding: CGFloat = 16
+        static let listTopPadding: CGFloat = 16
+        static let contentBottomPadding: CGFloat = 24
     }
 }

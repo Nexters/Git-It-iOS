@@ -25,6 +25,7 @@ public struct ProjectListFeature: Sendable {
 
         public var projects = [LearningProjectSummary]()
         public var initialLoad = InitialLoad.idle
+        public var mode = Mode.browsing
         public var deletion = Deletion.idle
         public var refreshRequestID = 0
     }
@@ -34,6 +35,14 @@ public struct ProjectListFeature: Sendable {
         case loading
         case loaded
         case failed(LearningProjectError)
+    }
+
+    /// 헤더·행 표현을 가르는 배타 화면 모드입니다. 삭제 확인 모달(`Deletion`)은
+    /// `deleting` 모드 안에서 동시에 존재할 수 있으므로 이 enum에 합치지 않습니다.
+    public enum Mode: Equatable, Sendable {
+        case browsing
+        case menuPresented
+        case deleting
     }
 
     public enum Deletion: Equatable, Sendable {
@@ -55,6 +64,11 @@ public struct ProjectListFeature: Sendable {
             case task
             case refreshRequested
             case projectRowTapped(projectID: String)
+            case learningTapped(projectID: String)
+            case menuTapped
+            case menuDismissed
+            case deletionMenuItemTapped
+            case backTapped
             case deleteButtonTapped(projectID: String)
             case deletionCancelled
             case deletionConfirmed
@@ -69,6 +83,7 @@ public struct ProjectListFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectSelected(projectID: String)
+            case learningRequested(projectID: String, nextSetID: String)
         }
     }
 
@@ -92,10 +107,41 @@ public struct ProjectListFeature: Sendable {
                 .cancellable(id: CancelID.load, cancelInFlight: true)
 
             case .view(.projectRowTapped(let projectID)):
+                guard state.mode != .deleting else { return .none }
                 return .send(.delegate(.projectSelected(projectID: projectID)))
 
+            case .view(.learningTapped(let projectID)):
+                guard state.mode != .deleting else { return .none }
+                guard
+                    let project = state.projects.first(where: { $0.projectID == projectID }),
+                    let nextSetID = project.nextSetID,
+                    project.nextQuestionID != nil
+                else { return .none }
+                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
+
+            case .view(.menuTapped):
+                guard state.mode == .browsing else { return .none }
+                state.mode = .menuPresented
+                return .none
+
+            case .view(.menuDismissed):
+                guard state.mode == .menuPresented else { return .none }
+                state.mode = .browsing
+                return .none
+
+            case .view(.deletionMenuItemTapped):
+                guard state.mode == .menuPresented else { return .none }
+                state.mode = .deleting
+                return .none
+
+            case .view(.backTapped):
+                guard state.mode == .deleting else { return .none }
+                state.mode = .browsing
+                state.deletion = .idle
+                return .none
+
             case .view(.deleteButtonTapped(let projectID)):
-                guard case .idle = state.deletion else { return .none }
+                guard state.mode == .deleting, case .idle = state.deletion else { return .none }
                 state.deletion = .confirming(projectID: projectID)
                 return .none
 
@@ -134,11 +180,17 @@ public struct ProjectListFeature: Sendable {
             case .effect(.deletionFinished(let projectID, nil)):
                 state.projects.removeAll { $0.projectID == projectID }
                 state.deletion = .idle
+                if state.projects.isEmpty {
+                    state.mode = .browsing
+                }
                 return .none
 
             case .effect(.deletionFinished(let projectID, .some(.notFound))):
                 state.projects.removeAll { $0.projectID == projectID }
                 state.deletion = .idle
+                if state.projects.isEmpty {
+                    state.mode = .browsing
+                }
                 return .none
 
             case .effect(.deletionFinished(let projectID, .some(let error))):

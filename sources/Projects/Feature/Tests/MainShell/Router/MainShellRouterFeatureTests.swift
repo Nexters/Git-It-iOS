@@ -77,6 +77,69 @@ struct MainShellRouterFeatureTests {
         await store.receive(.delegate(.loggedOut))
     }
 
+    @Test
+    func `프로젝트 목록의 이어하기 요청을 payload 손실 없이 상위로 중계한다`() async {
+        let store = makeStore()
+
+        await store.send(
+            .projectList(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+        )
+        await store.receive(
+            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+        )
+    }
+
+    @Test
+    func `저장한 문제를 고르면 그 프로젝트 세트로 준비를 요청한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
+
+        await store.send(.saved(.delegate(.questionSelected(question))))
+        await store.receive(
+            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "question-0")))
+        )
+
+        #expect(store.state.singleQuestionEntry?.projectID == question.projectID)
+    }
+
+    @Test
+    func `준비가 끝나면 단일 문제 화면을 연다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+        let question = QuizTestFixture.unansweredSet.questions[0]
+
+        await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
+            question: question,
+            projectID: ProjectDetailTestFixture.projectID,
+        ))))
+
+        #expect(store.state.singleQuestion?.question == question)
+        #expect(
+            store.state.singleQuestion?.advanceActionTitle
+                == MainShellRouterFeature.singleQuestionAdvanceActionTitle
+        )
+    }
+
+    @Test
+    func `단일 문제 화면의 뒤로가기는 저장 탭으로 바로 돌아간다`() async {
+        var state = MainShellRouterFeature.State()
+        state.selectedTab = .saved
+        state.singleQuestion = QuestionSolvingFeature.State(
+            projectID: ProjectDetailTestFixture.projectID,
+            question: QuizTestFixture.unansweredSet.questions[0],
+            advanceActionTitle: MainShellRouterFeature.singleQuestionAdvanceActionTitle,
+            isBookmarked: true,
+        )
+        let store = makeStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.singleQuestion(.presented(.delegate(.backRequested))))
+
+        #expect(store.state.singleQuestion == nil)
+        #expect(store.state.selectedTab == .saved)
+    }
+
     // MARK: Private
 
     private func makeStore(
@@ -89,6 +152,10 @@ struct MainShellRouterFeatureTests {
                 fetchLearningProjects: projects,
                 deleteLearningProject: MainShellDeleteProjectStub(),
                 fetchBookmarkedQuestions: MainShellBookmarksStub(),
+                fetchLearningSet: StubFetchLearningSetUseCase(),
+                submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
+                submitEssayAnswer: StubSubmitEssayAnswerUseCase(),
+                setQuestionBookmark: StubSetQuestionBookmarkUseCase(),
                 signOut: SignOutUseCaseMock(),
                 fetchMemberProfile: profile,
                 updateMemberPosition: MainShellUpdatePositionStub(),

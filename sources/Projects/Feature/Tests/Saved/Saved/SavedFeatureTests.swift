@@ -106,19 +106,51 @@ struct SavedFeatureTests {
         await store.send(.view(.backTapped))
     }
 
+    @Test
+    func `북마크를 해제하면 목록에서 제거하지 않고 상태만 갱신한다`() async {
+        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
+        let setQuestionBookmark = StubSetQuestionBookmarkUseCase(
+            results: [.success(BookmarkState(bookmarked: false))]
+        )
+        let store = makeStore(setQuestionBookmark: setQuestionBookmark)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.bookmarksLoadFinished)
+
+        await store.send(.view(.bookmarkToggleTapped(question)))
+        await store.receive(\.effect.bookmarkToggleFinished) {
+            $0.bookmarkOverrides[question.questionID] = false
+            $0.bookmarkMutations[question.questionID] = .idle
+        }
+
+        #expect(await setQuestionBookmark.invocations == [
+            StubSetQuestionBookmarkUseCase.Invocation(
+                projectID: question.projectID,
+                questionID: question.questionID,
+                bookmarked: false,
+            ),
+        ])
+        #expect(store.state.collection?.bookmarks.contains(where: { $0.questionID == question.questionID }) == true)
+    }
+
     // MARK: Private
 
     private func makeStore(
         fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
             results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
         ),
+        setQuestionBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
         state: SavedFeature.State = SavedFeature.State(
             projectFilter: ProjectDetailTestFixture.projectID,
             isBackControlPresented: true,
         ),
     ) -> TestStoreOf<SavedFeature> {
         TestStore(initialState: state) {
-            SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+            SavedFeature(
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
     }
 

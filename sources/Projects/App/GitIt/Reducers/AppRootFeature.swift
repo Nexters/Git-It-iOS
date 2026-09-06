@@ -169,6 +169,10 @@ nonisolated struct AppRootFeature: Sendable {
                 fetchLearningProjects: fetchLearningProjects,
                 deleteLearningProject: deleteLearningProject,
                 fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchLearningSet: fetchLearningSet,
+                submitChoiceAnswer: submitChoiceAnswer,
+                submitEssayAnswer: submitEssayAnswer,
+                setQuestionBookmark: setQuestionBookmark,
                 signOut: signOut,
                 fetchMemberProfile: fetchMemberProfile,
                 updateMemberPosition: updateMemberPosition,
@@ -274,14 +278,8 @@ nonisolated struct AppRootFeature: Sendable {
                 state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 return .none
 
-            case .mainShell(.delegate(.questionSelected)):
-                return .none
-
             case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
-                guard
-                    case .loaded(let page) = state.mainShell.home.projectLoad,
-                    let project = page.items.first(where: { $0.projectID == projectID })
-                else { return .none }
+                guard let project = loadedProject(projectID: projectID, state: state) else { return .none }
                 state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 state.quiz = QuizRouterFeature.State(
                     projectID: projectID,
@@ -459,6 +457,20 @@ nonisolated struct AppRootFeature: Sendable {
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
     private let deletesCompletedAccountOnSignIn: Bool
     private let resetAllForTesting: (@Sendable () async -> Void)?
+
+    /// 학습 요청을 보낸 탭이 Home일 수도 프로젝트 목록일 수도 있어 두 곳에서 모두 찾습니다.
+    private func loadedProject(
+        projectID: String,
+        state: State,
+    ) -> LearningProjectSummary? {
+        if
+            case .loaded(let page) = state.mainShell.home.projectLoad,
+            let project = page.items.first(where: { $0.projectID == projectID })
+        {
+            return project
+        }
+        return state.mainShell.projectList.projects.first { $0.projectID == projectID }
+    }
 
     private func registerDeviceIfNeeded(_ state: inout State) -> Effect<Action> {
         guard state.deviceRegistration != .registering else { return .none }

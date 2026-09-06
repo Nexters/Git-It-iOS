@@ -35,11 +35,16 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
             let response = try await remote.fetchBookmarks(projectID: projectID)
             return BookmarkedQuestionCollection(
                 totalCount: response.totalCount,
-                availableProjects: response.availableProjects.map(\.projectID),
+                availableProjects: response.availableProjects.map {
+                    BookmarkedProject(id: $0.projectID, name: $0.repositoryName)
+                },
                 bookmarks: response.bookmarks.map {
                     BookmarkedQuestion(
                         projectID: $0.projectID,
+                        projectName: $0.projectName,
                         setID: $0.setID,
+                        setLabel: $0.setLabel,
+                        problemNumber: $0.problemNumber,
                         questionID: $0.questionID,
                         prompt: $0.question,
                     )
