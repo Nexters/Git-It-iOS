@@ -52,10 +52,16 @@ public struct ProjectListFeature: Sendable {
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case effect(EffectEvent)
         case delegate(Delegate)
 
         // MARK: Public
+
+        @CasePathable
+        public enum Input: Sendable, Equatable {
+            case learningProjectsReloadRequested
+        }
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -82,6 +88,7 @@ public struct ProjectListFeature: Sendable {
         public enum Delegate: Sendable, Equatable {
             case projectSelected(projectID: String)
             case learningRequested(projectID: String, nextSetID: String)
+            case projectDeleted
         }
     }
 
@@ -89,7 +96,8 @@ public struct ProjectListFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .view(.task),
-                 .view(.refreshRequested):
+                 .view(.refreshRequested),
+                 .input(.learningProjectsReloadRequested):
                 state.refreshRequestID += 1
                 let currentRequestID = state.refreshRequestID
                 state.initialLoad = state.projects.isEmpty ? .loading : state.initialLoad
@@ -171,25 +179,20 @@ public struct ProjectListFeature: Sendable {
                     state.initialLoad = .loaded
 
                 case .failure(let error):
-                    state.initialLoad = .failed(error)
+                    if state.projects.isEmpty {
+                        state.initialLoad = .failed(error)
+                    }
                 }
                 return .none
 
-            case .effect(.deletionFinished(let projectID, nil)):
+            case .effect(.deletionFinished(let projectID, nil)),
+                 .effect(.deletionFinished(let projectID, .some(.notFound))):
                 state.projects.removeAll { $0.projectID == projectID }
                 state.deletion = .idle
                 if state.projects.isEmpty {
                     state.mode = .browsing
                 }
-                return .none
-
-            case .effect(.deletionFinished(let projectID, .some(.notFound))):
-                state.projects.removeAll { $0.projectID == projectID }
-                state.deletion = .idle
-                if state.projects.isEmpty {
-                    state.mode = .browsing
-                }
-                return .none
+                return .send(.delegate(.projectDeleted))
 
             case .effect(.deletionFinished(let projectID, .some(let error))):
                 state.deletion = .failed(projectID: projectID, error: error)

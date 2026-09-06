@@ -20,30 +20,33 @@ struct MainShellRouterFeatureTests {
     }
 
     @Test
-    func `탭을 왕복해도 Home child 상태를 보존하고 조회를 다시 시작하지 않는다`() async {
+    func `탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다`() async {
         let profile = HomeMemberProfileUseCaseMock()
         let projects = HomeLearningProjectsUseCaseMock()
         var state = MainShellRouterFeature.State()
         state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(state: state, projects: projects, profile: profile)
+        store.exhaustivity = .off
 
         await store.send(.view(.tabSelected(.projects))) { $0.selectedTab = .projects }
         await store.send(.view(.tabSelected(.home))) { $0.selectedTab = .home }
-        await store.send(.home(.view(.task)))
+        await store.finish()
 
         #expect(await profile.snapshot().callCount == 0)
-        #expect(await projects.snapshot().callCount == 0)
+        #expect(await projects.snapshot().callCount > 0)
         #expect(store.state.home.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
     }
 
     @Test
     func `Home 전체 보기는 프로젝트 탭을 선택한다`() async {
         let store = makeStore()
+        store.exhaustivity = .off
 
         await store.send(.home(.view(.showAllProjectsTapped))) {
             $0.selectedTab = .projects
         }
+        await store.finish()
     }
 
     @Test

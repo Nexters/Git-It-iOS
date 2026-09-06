@@ -236,7 +236,7 @@ nonisolated struct AppRootFeature: Sendable {
             case .view(.applicationBecameActive):
                 var effects = [Effect<Action>]()
                 if state.route == .mainShell {
-                    effects.append(.send(.mainShell(.home(.input(.learningProjectsReloadRequested)))))
+                    effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))
                 }
                 if state.deviceRegistration == .failed {
                     effects.append(registerDeviceIfNeeded(&state))
@@ -285,7 +285,7 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .projectDetail(.presented(.delegate(.projectDeleted))):
                 state.projectDetail = nil
-                return .send(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+                return .send(.mainShell(.input(.learningProjectsReloadRequested)))
 
             case .projectDetail(.presented(.delegate(.dismissRequested))):
                 state.projectDetail = nil
@@ -353,7 +353,7 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
                 state.projectRegistration = nil
-                return .send(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+                return .send(.mainShell(.input(.learningProjectsReloadRequested)))
 
             case .projectRegistration(.presented(.delegate(.generationReminderPreferenceSelected(_)))):
                 return .none

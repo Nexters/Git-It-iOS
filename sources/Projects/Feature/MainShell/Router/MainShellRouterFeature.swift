@@ -60,6 +60,7 @@ public struct MainShellRouterFeature: Sendable {
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case delegate(Delegate)
         case home(HomeFeature.Action)
         case projectList(ProjectListFeature.Action)
@@ -69,6 +70,11 @@ public struct MainShellRouterFeature: Sendable {
         case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
 
         // MARK: Public
+
+        @CasePathable
+        public enum Input: Sendable, Equatable {
+            case learningProjectsReloadRequested
+        }
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -120,13 +126,16 @@ public struct MainShellRouterFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
+            case .input(.learningProjectsReloadRequested):
+                return reloadLearningProjects()
+
             case .view(.tabSelected(let tab)):
                 state.selectedTab = tab
-                return .none
+                return reloadLearningProjects()
 
             case .home(.view(.showAllProjectsTapped)):
                 state.selectedTab = .projects
-                return .none
+                return reloadLearningProjects()
 
             case .home(.delegate(.projectRegistrationRequested)):
                 return .send(.delegate(.projectRegistrationRequested))
@@ -136,6 +145,9 @@ public struct MainShellRouterFeature: Sendable {
 
             case .home(.delegate(.learningRequested(let projectID, let nextSetID))):
                 return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
+
+            case .projectList(.delegate(.projectDeleted)):
+                return .send(.home(.input(.learningProjectsReloadRequested)))
 
             case .projectList(.delegate(.projectSelected(let projectID))):
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
@@ -217,5 +229,12 @@ public struct MainShellRouterFeature: Sendable {
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func reloadLearningProjects() -> ComposableArchitecture.Effect<Action> {
+        .merge(
+            .send(.home(.input(.learningProjectsReloadRequested))),
+            .send(.projectList(.input(.learningProjectsReloadRequested))),
+        )
+    }
 
 }

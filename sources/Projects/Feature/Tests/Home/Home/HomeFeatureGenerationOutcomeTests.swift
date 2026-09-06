@@ -79,7 +79,6 @@ struct HomeFeatureGenerationOutcomeTests {
             .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
         ) {
             $0.appliedOutcomeProjectIDs = ["project-1"]
-            $0.projectLoad = .loading
             $0.projectRequestID = 1
         }
         await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
@@ -136,7 +135,7 @@ struct HomeFeatureGenerationOutcomeTests {
         #expect(await projects.snapshot().callCount == 0)
 
         await store.send(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.oneProjectPage)))) {
-            $0.projectLoad = .loading
+            $0.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
             $0.isProjectRefreshPending = false
             $0.projectRequestID = 2
         }

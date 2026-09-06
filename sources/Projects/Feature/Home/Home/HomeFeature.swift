@@ -40,6 +40,13 @@ public struct HomeFeature: Sendable {
             case loading
             case loaded(LearningProjectPage)
             case failed(LearningProjectError)
+
+            var isLoaded: Bool {
+                if case .loaded = self {
+                    return true
+                }
+                return false
+            }
         }
 
         public enum GenerationOutcomeObservation: Equatable, Sendable {
@@ -169,8 +176,13 @@ public struct HomeFeature: Sendable {
             case .effect(.projectsLoadFinished(let requestID, let result)):
                 guard requestID == state.projectRequestID else { return .none }
                 switch result {
-                case .success(let page): state.projectLoad = .loaded(page)
-                case .failure(let error): state.projectLoad = .failed(error)
+                case .success(let page):
+                    state.projectLoad = .loaded(page)
+
+                case .failure(let error):
+                    if !state.projectLoad.isLoaded {
+                        state.projectLoad = .failed(error)
+                    }
                 }
 
                 guard state.isProjectRefreshPending else { return .none }
@@ -222,7 +234,9 @@ public struct HomeFeature: Sendable {
 
     private func startProjectLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.projectRequestID += 1
-        state.projectLoad = .loading
+        if !state.projectLoad.isLoaded {
+            state.projectLoad = .loading
+        }
         let requestID = state.projectRequestID
         let fetchLearningProjects = fetchLearningProjects
 
