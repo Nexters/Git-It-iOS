@@ -24,7 +24,7 @@ extension QuizGenerationProgressScreen {
                             StyledText.caption1("프로필 설정페이지에서 언제든 설정할 수 있어요.", color: .grey400, alignment: .center)
                         }
 
-                        VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                        VStack(spacing: LayoutToken.compactSpacing) {
                             ActionButton.primary("리마인드 알림 설정하기", action: onAccept)
                             ActionButton.text("다시 보지 않기", size: .small, action: onDecline)
                         }

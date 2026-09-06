@@ -25,7 +25,7 @@ public struct LearningSetRow: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: Constant.contentSpacing) {
-            HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
+            HStack(alignment: .top, spacing: LayoutToken.gutter) {
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                     StyledText.subtitle3(label, color: .blue100)
 
@@ -83,7 +83,6 @@ public struct LearningSetRow: View {
         static let contentSpacing: CGFloat = 25
         static let titleSpacing: CGFloat = 10
         static let startSymbolSize: CGFloat = 12
-        /// 보이는 원의 지름. 터치 영역(`startTouchSize`)이 이를 감쌉니다.
         static let startSurfaceSize: CGFloat = 32
         static let startTouchSize: CGFloat = 44
     }
@@ -115,7 +114,7 @@ public struct LearningSetRow: View {
 }
 
 #Preview("Learning Set Row") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         LearningSetRow(
             label: "Set 1",
             title: "아이디어 PT 핵심 내용 확인하기",
@@ -130,6 +129,6 @@ public struct LearningSetRow: View {
         )
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

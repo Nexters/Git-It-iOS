@@ -126,7 +126,7 @@ public struct StyledText: View, Sendable, Equatable {
 }
 
 #Preview("Styled Text") {
-    VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(alignment: .leading, spacing: LayoutToken.gutter) {
         StyledText.headline1("Headline 1")
         StyledText.headline2("Headline 2")
         StyledText.subtitle1("Subtitle 1", color: .blue100)
@@ -140,6 +140,6 @@ public struct StyledText: View, Sendable, Equatable {
     }
     .frame(width: 320, alignment: .leading)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

@@ -50,12 +50,22 @@ public struct Chip: View {
 
 }
 
+// MARK: Chip.Constant
+
+extension Chip {
+    fileprivate enum Constant {
+        static let height: CGFloat = 36
+        static let horizontalPadding: CGFloat = 8
+        static let labelLineLimit = 1
+    }
+}
+
 #Preview("Chip") {
-    HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+    HStack(spacing: LayoutToken.compactSpacing) {
         Chip(label: "전체", isSelected: true) { }
         Chip(label: "SwiftUI", isSelected: false) { }
         Chip(label: "동시성", isSelected: false) { }
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

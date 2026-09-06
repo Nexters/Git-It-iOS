@@ -15,7 +15,7 @@ struct LegalAgreementScreen: View {
         SheetSurface(isScrollable: true) {
             VStack(alignment: .leading, spacing: 0) {
                 StyledText.subtitle1("약관 동의")
-                    .padding(.top, LayoutToken.gutter.cgFloatValue)
+                    .padding(.top, LayoutToken.gutter)
                     .padding(.bottom, Constant.titleBottomSpacing)
 
                 Self.AllAgreementRow(
@@ -37,7 +37,7 @@ struct LegalAgreementScreen: View {
                 }
                 .padding(.top, Constant.documentsTopSpacing)
 
-                HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                HStack(spacing: LayoutToken.compactSpacing) {
                     ActionButton.secondary("취소", action: { send(.cancelTapped) })
 
                     ActionButton.primary(

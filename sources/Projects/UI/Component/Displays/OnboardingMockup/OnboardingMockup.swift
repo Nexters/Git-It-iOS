@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - OnboardingMockup
+
 public struct OnboardingMockup: View {
 
     // MARK: Lifecycle
@@ -30,14 +32,22 @@ public struct OnboardingMockup: View {
 
 }
 
+// MARK: OnboardingMockup.Constant
+
+extension OnboardingMockup {
+    fileprivate enum Constant {
+        static let bezelWidth: CGFloat = 8
+    }
+}
+
 #Preview("Onboarding Mockup") {
-    HStack(spacing: LayoutToken.margin.cgFloatValue) {
+    HStack(spacing: LayoutToken.margin) {
         OnboardingMockup(page: 1)
         OnboardingMockup(page: 2)
         OnboardingMockup(page: 3)
     }
     .frame(height: 400)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

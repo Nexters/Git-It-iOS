@@ -63,10 +63,10 @@ public struct BookmarkButton: View {
 }
 
 #Preview("Bookmark Button") {
-    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    HStack(spacing: LayoutToken.gutter) {
         BookmarkButton(isSaved: false, accessibilityLabel: "저장하기") { }
         BookmarkButton(isSaved: true, accessibilityLabel: "저장 해제하기") { }
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

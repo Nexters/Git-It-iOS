@@ -130,7 +130,7 @@ public struct TextField: View {
 }
 
 #Preview("Text Field") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         TextField(
             placeholder: "닉네임을 입력해주세요",
             text: .constant(""),
@@ -147,6 +147,6 @@ public struct TextField: View {
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

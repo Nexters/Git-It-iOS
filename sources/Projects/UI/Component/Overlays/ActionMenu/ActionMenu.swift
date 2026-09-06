@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - ActionMenu
+
 public struct ActionMenu: View {
 
     // MARK: Lifecycle
@@ -70,6 +72,18 @@ public struct ActionMenu: View {
 
 }
 
+// MARK: ActionMenu.Constant
+
+extension ActionMenu {
+    fileprivate enum Constant {
+        static let menuWidth: CGFloat = 160
+        static let containerPadding: CGFloat = 4
+        static let rowHorizontalPadding: CGFloat = 10
+        static let rowTopPadding: CGFloat = 9
+        static let rowBottomPadding: CGFloat = 10
+    }
+}
+
 #Preview("Action Menu") {
     ActionMenu(
         items: [
@@ -81,7 +95,7 @@ public struct ActionMenu: View {
         ]
     )
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .designSystemBackground(.grey700)
 }
@@ -108,7 +122,7 @@ public struct ActionMenu: View {
         ]
     )
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .designSystemBackground(.grey700)
 }

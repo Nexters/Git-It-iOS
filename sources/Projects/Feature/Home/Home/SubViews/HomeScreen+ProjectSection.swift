@@ -47,22 +47,22 @@ extension HomeScreen {
         private enum Constant {
             static let showAllLabel = "학습 중인 레포지토리 전체 보기"
             static let sectionHeaderSpacing: CGFloat = 16
+            static let retryMessageSpacing: CGFloat = 8
             static let chevronSize: CGFloat = 12
             static let screenMargin: CGFloat = 16
-            static let cardSpacing: CGFloat = 12
+            static let cardSpacing: CGFloat = 0
             static let strokeWidth: CGFloat = 2
             static let maximumCardRotationDegrees: CGFloat = 16
             static let trailingInset: CGFloat = 16
 
-            static let emptyDeckCardSpacing: CGFloat = 2.5
+            static let emptyDeckCardSpacing: CGFloat = 0
             static let emptyDeckCardRotations: [Angle] = [.zero, .degrees(12), .degrees(-14)]
 
-            /// 실측 전 첫 프레임에 쓰는 기준 기기(iPhone 17 · 17 Pro · 16 Pro) 화면 폭.
             static let defaultSectionWidth: CGFloat = 402
 
             static func cardWidth(forSectionWidth sectionWidth: CGFloat) -> CGFloat {
-                let contentWidth = sectionWidth - LayoutToken.margin.cgFloatValue * 2
-                return (contentWidth - LayoutToken.gutter.cgFloatValue) / 2
+                let contentWidth = sectionWidth - LayoutToken.margin * 2
+                return (contentWidth - LayoutToken.gutter) / 2
             }
 
             static func cardStride(cardWidth: CGFloat) -> CGFloat {
@@ -108,7 +108,6 @@ extension HomeScreen {
             Constant.cardWidth(forSectionWidth: sectionWidth)
         }
 
-        /// 카드가 최대 각도로 기울어져도 잘리지 않는 섹션 높이.
         private var sectionHeight: CGFloat {
             Constant.sectionHeight(cardWidth: cardWidth)
         }
@@ -151,10 +150,9 @@ extension HomeScreen {
 
             case .failed:
                 emptyProjects {
-                    VStack(spacing: 0) {
+                    VStack(spacing: Constant.retryMessageSpacing) {
                         StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
-
-                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped).padding(.top, 4)
+                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped)
                     }
                     .designSystemScreenMargin()
                 }

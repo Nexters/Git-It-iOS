@@ -7,14 +7,6 @@ public struct LabeledCard: View {
 
     // MARK: Public
 
-    public static func accent(label: String, text: String) -> Self {
-        Self(label: label, text: text, style: .accent)
-    }
-
-    public static func neutral(label: String, text: String) -> Self {
-        Self(label: label, text: text, style: .neutral)
-    }
-
     public var body: some View {
         VStack(alignment: .leading, spacing: Constant.titleSpacing) {
             StyledText.caption1(label, color: .blue100)
@@ -25,6 +17,20 @@ public struct LabeledCard: View {
         .designSystemBackground(style.background)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
+    }
+
+    public static func accent(
+        label: String,
+        text: String,
+    ) -> Self {
+        Self(label: label, text: text, style: .accent)
+    }
+
+    public static func neutral(
+        label: String,
+        text: String,
+    ) -> Self {
+        Self(label: label, text: text, style: .neutral)
     }
 
     // MARK: Private
@@ -59,20 +65,14 @@ public struct LabeledCard: View {
     private let text: String
     private let style: Style
 
-    private init(label: String, text: String, style: Style) {
-        self.label = label
-        self.text = text
-        self.style = style
-    }
-
 }
 
 #Preview("Labeled Card") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         LabeledCard.accent(label: "AI 해설", text: "State는 값 타입 소유에 씁니다.")
         LabeledCard.neutral(label: "나의 답안", text: "State는 값 타입을 소유할 때 사용합니다.")
         LabeledCard.neutral(label: "AI의 답안", text: "State는 값 타입 소유에 씁니다.")
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

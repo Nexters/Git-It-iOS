@@ -24,9 +24,9 @@ public struct PolicyAgreementRow: View {
     // MARK: Public
 
     public var body: some View {
-        HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+        HStack(spacing: LayoutToken.compactSpacing) {
             Button(action: onToggle) {
-                HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                HStack(spacing: LayoutToken.gutter) {
                     ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
@@ -83,13 +83,24 @@ public struct PolicyAgreementRow: View {
 
 }
 
+// MARK: PolicyAgreementRow.Constant
+
+extension PolicyAgreementRow {
+    fileprivate enum Constant {
+        static let checkSize: CGFloat = 24
+        static let linkSurfaceSize: CGFloat = 36
+        static let checkboxSpacing: CGFloat = 8
+        static let minimumTouchSize: CGFloat = 44
+    }
+}
+
 #Preview("Policy Agreement Row") {
-    VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+    VStack(spacing: LayoutToken.compactSpacing) {
         PolicyAgreementRow(title: "개인정보 처리방침", isRequired: true, isSelected: true)
         PolicyAgreementRow(title: "서비스 이용 약관", isRequired: true)
         PolicyAgreementRow(title: "마케팅 정보 수신", isRequired: false)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

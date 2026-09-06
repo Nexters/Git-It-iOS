@@ -57,6 +57,28 @@ public struct SheetSurface<Content: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var grabberWidth: CGFloat {
+            58
+        }
+
+        static var grabberHeight: CGFloat {
+            4
+        }
+
+        static var grabberTopPadding: CGFloat {
+            5
+        }
+
+        static var grabberBottomPadding: CGFloat {
+            7
+        }
+
+        static var bottomPadding: CGFloat {
+            24
+        }
+    }
+
     @State private var contentHeight: CGFloat?
 
     private let isScrollable: Bool
@@ -82,7 +104,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         Spacer()
 
         SheetSurface {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
+            VStack(spacing: LayoutToken.margin) {
                 StyledText.subtitle2("알림을 받아보시겠어요?", alignment: .center)
                 ActionButton.primary("알림 받기")
             }
@@ -97,7 +119,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         Spacer()
 
         SheetSurface(isScrollable: true) {
-            VStack(spacing: LayoutToken.margin.cgFloatValue) {
+            VStack(spacing: LayoutToken.margin) {
                 ForEach(0..<8, id: \.self) { index in
                     StyledText.body1("정책 문서 \(index + 1)")
                 }

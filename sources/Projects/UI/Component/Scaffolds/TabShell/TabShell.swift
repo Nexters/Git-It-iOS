@@ -21,7 +21,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 content(item)
                     .tabItem {
                         Image(item.tabSystemImage, bundle: .module)
-                            .padding(.bottom, LayoutToken.tightSpacing.cgFloatValue)
+                            .padding(.bottom, LayoutToken.tightSpacing)
                         Text.designSystemStyled(item.tabTitle, style: .tabItem)
                     }
                     .tag(item)

@@ -20,7 +20,6 @@ struct DesignTokenCatalogTests {
             set.gradients.count,
             set.fontFamilies.count,
             set.textStyles.count,
-            set.layouts.count,
             set.opacities.count,
             set.cornerRadii.count,
             set.borders.count,
@@ -100,13 +99,7 @@ struct DesignTokenCatalogTests {
     }
 
     @Test
-    func `규격이 추가한 간격 반경 크기 토큰이 모두 존재한다`() {
-        let layouts = Dictionary(uniqueKeysWithValues: LayoutToken.all.map { ($0.name, $0.value) })
-
-        #expect(layouts["CardHorizontalPadding"] == 18)
-        #expect(layouts["CardTopPadding"] == 14)
-        #expect(layouts["IconSpacing"] == 6)
-        #expect(layouts["TightSpacing"] == 4)
+    func `규격이 추가한 반경 크기 토큰이 모두 존재한다`() {
         #expect(CornerRadiusToken.all.contains { $0.name == "Pill" && $0.value == 999 })
         #expect(ControlSizeToken.all.contains { $0.name == "MinimumTouch" && $0.value == 44 })
     }

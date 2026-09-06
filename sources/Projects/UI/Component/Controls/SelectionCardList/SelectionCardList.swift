@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - SelectionCardList
+
 public struct SelectionCardList: View {
 
     // MARK: Lifecycle
@@ -69,6 +71,15 @@ public struct SelectionCardList: View {
 
 }
 
+// MARK: SelectionCardList.Constant
+
+extension SelectionCardList {
+    fileprivate enum Constant {
+        static let itemSpacing: CGFloat = 8
+        static let thumbnailOverlayOpacity = 0.2
+    }
+}
+
 #Preview("Selection Card List") {
     SelectionCardList(items: [
         .init(
@@ -93,6 +104,6 @@ public struct SelectionCardList: View {
     ])
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

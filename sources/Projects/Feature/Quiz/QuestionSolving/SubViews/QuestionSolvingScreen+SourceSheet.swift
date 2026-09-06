@@ -82,7 +82,7 @@ extension QuestionSolvingScreen {
             source: QuestionSourceDisplay,
             showsIcon: Bool,
         ) -> some View {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            HStack(spacing: LayoutToken.compactSpacing) {
                 StyledText.body1(source.linkLabel, color: .white70)
                     .lineLimit(1)
                     .truncationMode(.head)

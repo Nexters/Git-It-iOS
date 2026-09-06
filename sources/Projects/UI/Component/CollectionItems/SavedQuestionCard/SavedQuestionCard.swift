@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - SavedQuestionCard
+
 public struct SavedQuestionCard: View {
 
     // MARK: Lifecycle
@@ -26,7 +28,7 @@ public struct SavedQuestionCard: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             StyledText.body2(metadata, color: .grey300)
-                .padding(.top, LayoutToken.cardTopPadding.cgFloatValue)
+                .padding(.top, LayoutToken.cardTopPadding)
             StyledText.subtitle3(prompt)
                 .padding(.top, Constant.promptTopPadding)
             HStack(spacing: Constant.actionRowSpacing) {
@@ -88,8 +90,22 @@ public struct SavedQuestionCard: View {
 
 }
 
+// MARK: SavedQuestionCard.Constant
+
+extension SavedQuestionCard {
+    fileprivate enum Constant {
+        static let contentPadding: CGFloat = 18
+        static let promptTopPadding: CGFloat = 10
+        static let actionRowSpacing: CGFloat = 6
+        static let actionRowVerticalPadding: CGFloat = 16
+        static let bookmarkSize: CGFloat = 24
+        static let actionHeight: CGFloat = 36
+        static let actionMaximumWidth: CGFloat = 84
+    }
+}
+
 #Preview("Saved Question Card") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         SavedQuestionCard(
             metadata: "Now in Android · Set 2 · 문제 1",
             prompt: "BlueprintSetupState 클래스는 어떤 목적을 가진 객체인가?",
@@ -105,6 +121,6 @@ public struct SavedQuestionCard: View {
     }
     .frame(width: 350)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

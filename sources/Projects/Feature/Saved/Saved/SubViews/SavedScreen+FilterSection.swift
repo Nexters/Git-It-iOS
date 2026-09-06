@@ -14,9 +14,9 @@ extension SavedScreen {
         let onSelect: (String?) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 10) {
                 ScrollView(.horizontal) {
-                    HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    HStack(spacing: LayoutToken.compactSpacing) {
                         Chip(label: Constant.allLabel, isSelected: selectedProjectID == nil) {
                             onSelect(nil)
                         }
@@ -26,14 +26,9 @@ extension SavedScreen {
                             }
                         }
                     }
-                    .designSystemScreenMargin()
                 }
                 .scrollIndicators(.hidden)
-                .padding(.vertical, Constant.rowVerticalPadding)
-
                 StyledText.body2("\(count)개", color: .grey400)
-                    .designSystemScreenMargin()
-                    .padding(.vertical, Constant.rowVerticalPadding)
             }
         }
 

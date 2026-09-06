@@ -116,16 +116,16 @@ public struct ActionButton: View {
                 content
                     .frame(maxWidth: .infinity)
                     .frame(height: size.surfaceHeight)
-                    .background(
-                        style.backgroundColor(isEnabled: isEnabled),
-                        in: RoundedRectangle(designSystem: .large),
-                    )
             }
-            .frame(minHeight: size.touchHeight)
-            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
+        .frame(minHeight: size.touchHeight)
+        .contentShape(Rectangle())
+        .background(
+            style.backgroundColor(isEnabled: isEnabled),
+            in: RoundedRectangle(designSystem: .large),
+        )
     }
 
     public static func primary(
@@ -296,7 +296,7 @@ public struct ActionButton: View {
 }
 
 #Preview("Action Button") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ActionButton.primary("Primary")
         ActionButton.secondary("Secondary")
         ActionButton.destructive("Destructive")
@@ -305,6 +305,6 @@ public struct ActionButton: View {
         ActionButton.text("Disabled Text", isEnabled: false)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

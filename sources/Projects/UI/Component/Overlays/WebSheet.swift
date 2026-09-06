@@ -22,14 +22,14 @@ public struct WebSheet: View {
     public var body: some View {
         SheetSurface {
             VStack(spacing: 0) {
-                HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+                HStack(spacing: LayoutToken.gutter) {
                     StyledText.subtitle1(title)
 
                     Spacer(minLength: 0)
 
-                    IconGlassButton.neutral(symbol: "xmark", label: "닫기", action: onDismiss)
+                    IconGlassButton.neutral(icon: .x, label: "닫기", action: onDismiss)
                 }
-                .padding(.bottom, LayoutToken.gutter.cgFloatValue)
+                .padding(.bottom, LayoutToken.gutter)
 
                 WebContentView(url: url)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

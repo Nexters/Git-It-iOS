@@ -15,11 +15,8 @@ public struct ContinuousProgressBar: View {
 
     // MARK: Public
 
-    /// Figma가 정의한 두 가지 진행 바 표면 높이.
     public enum Height: Sendable, Equatable {
-        /// 프로젝트 목록 행의 6pt 바.
         case row
-        /// 프로젝트 상세 요약의 10pt 바.
         case detail
 
         // MARK: Internal
@@ -86,13 +83,13 @@ public struct ContinuousProgressBar: View {
 }
 
 #Preview("Continuous Progress Bar") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         ContinuousProgressBar(progress: 0)
         ContinuousProgressBar(progress: 0.45)
         ContinuousProgressBar(progress: 1)
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

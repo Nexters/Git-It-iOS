@@ -21,7 +21,7 @@ extension ProjectDetailScreen {
                 banner
 
                 VStack(alignment: .leading, spacing: Constant.contentSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
+                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
                         VStack(alignment: .leading, spacing: Constant.textSpacing) {
                             StyledText.headline2(repositoryName)
                             metaRow

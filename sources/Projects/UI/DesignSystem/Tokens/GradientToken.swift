@@ -102,8 +102,33 @@ extension GradientToken {
         ],
     )
 
+    public static let backgroundGradient = GradientToken(
+        name: "BackgroundGradientGradient",
+        start: .init(x: 0.5, y: 0.6868),
+        end: .init(x: 0.5, y: 1.79211),
+        stops: GradientToken.gradient2.stops,
+    )
+
     public static let topEdgeScrim = GradientToken(
         name: "TopEdgeScrim",
+        start: topToBottomEnd,
+        end: topToBottomStart,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 1,
+                hex: "#141414",
+                opacity: 0.5,
+            ),
+        ],
+    )
+
+    public static let quizTopScrim = GradientToken(
+        name: "QuizTopScrim",
         start: topToBottomEnd,
         end: topToBottomStart,
         stops: [
@@ -119,7 +144,6 @@ extension GradientToken {
             ),
         ],
     )
-
     public static let bottomEdgeScrim = GradientToken(
         name: "BottomEdgeScrim",
         start: topToBottomStart,

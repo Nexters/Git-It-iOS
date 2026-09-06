@@ -14,7 +14,7 @@ extension TutorialScreen {
                 StyledText.subtitle1(Constant.title(for: page), alignment: .center)
                     .padding(.top, Constant.titleTopInset)
 
-                Spacer(minLength: LayoutToken.margin.cgFloatValue)
+                Spacer(minLength: LayoutToken.margin)
 
                 OnboardingMockup(page: page)
                     .frame(width: Constant.mockupWidth)

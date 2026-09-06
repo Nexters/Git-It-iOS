@@ -31,12 +31,8 @@ public struct HomeProjectCard: View {
 
     // MARK: Public
 
-    /// 카드가 그려지는 고정 높이. 카드를 담는 화면이 회전·여백을 포함한 영역 높이를
-    /// 계산할 때 사용합니다.
     public static let designHeight: CGFloat = 192
 
-    /// 카드가 그려지는 고정 폭. 카드를 조립하는 화면이 카드 실루엣과 배치를 계산할 때
-    /// 사용합니다.
     public static let designWidth: CGFloat = 154
 
     public var body: some View {
@@ -114,7 +110,7 @@ public struct HomeProjectCard: View {
             .padding(.top, Constant.headerTopPadding)
             progressBar
                 .padding(.horizontal, Constant.headerLeadingPadding)
-                .padding(.top, LayoutToken.gutter.cgFloatValue)
+                .padding(.top, LayoutToken.gutter)
 
             Spacer(minLength: 0)
 
@@ -136,7 +132,7 @@ public struct HomeProjectCard: View {
                 )
                 .lineLimit(1)
             }
-            .padding(.leading, LayoutToken.gutter.cgFloatValue)
+            .padding(.leading, LayoutToken.gutter)
             .padding(.trailing, Constant.headerTrailingPadding)
             .padding(.bottom, Constant.footerBottomPadding)
         }
@@ -194,28 +190,21 @@ extension HomeProjectCard {
         static let setBadgeHorizontalPadding: CGFloat = 5
         static let setBadgeHeight: CGFloat = 19
 
-        /// 원본 기준 보이는 원의 카드 상단·우측 여백.
         static let startVisualTopInset: CGFloat = 20
         static let startVisualTrailingInset: CGFloat = 12
 
         static let startSymbolSize: CGFloat = 12
 
-        /// 원본 `Play1` 인스턴스 크기. 보이는 원(`startSurfaceSize`)을 감싼 레이아웃 박스다.
         static let startBoxSize: CGFloat = 36
         static let startSurfaceSize: CGFloat = 32
         static let startTouchSize: CGFloat = 44
 
-        /// 원본 `Play1` 인스턴스(36×36) 기준으로 제목이 비워야 하는 우측 폭.
         static let headerTextTrailingReserve = headerTrailingPadding + startBoxSize
 
-        /// 44pt 터치 영역이 보이는 원보다 각 변에서 더 차지하는 폭.
         static let startTouchOverhang = (startTouchSize - startSurfaceSize) / 2
         static let startTopPadding = startVisualTopInset - startTouchOverhang
         static let startTrailingPadding = startVisualTrailingInset - startTouchOverhang
 
-        /// 카드 제목. 원본에서 공유 텍스트 스타일 없이 18pt Bold 120%로 지정되어 있어
-        /// `TextStyleToken.subtitle2`(148%)를 쓸 수 없다. 타입 램프에 18pt 120%가
-        /// 추가되면 그 토큰으로 옮긴다.
         static let titleStyle = TextStyleToken(
             name: "Home Project Card Title",
             weight: .bold,
@@ -293,7 +282,7 @@ extension HomeProjectCard {
 }
 
 #Preview("Home Project Card") {
-    HStack(spacing: LayoutToken.margin.cgFloatValue) {
+    HStack(spacing: LayoutToken.margin) {
         HomeProjectCard(
             title: "Nexters",
             technologies: "Kotlin · Compose · Coroutines",
@@ -319,7 +308,7 @@ extension HomeProjectCard {
             variant: .darkBlue,
         )
     }
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemScreenMargin()
     .designSystemBackground(.grey700)
 }

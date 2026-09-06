@@ -19,7 +19,7 @@ extension RepositoryLinkInputScreen {
                             .frame(width: Constant.chevronSize, height: Constant.chevronSize)
                             .frame(width: Constant.chevronBoxSize, height: Constant.chevronBoxSize)
                     }
-                    .padding(.leading, LayoutToken.margin.cgFloatValue)
+                    .padding(.leading, LayoutToken.margin)
                     .padding(.trailing, Constant.headerTrailingPadding)
                     .frame(height: Constant.headerHeight)
                     .contentShape(Rectangle())
@@ -32,7 +32,7 @@ extension RepositoryLinkInputScreen {
                 if isGuideExpanded {
                     VStack(alignment: .leading, spacing: Constant.guideStepSpacing) {
                         ForEach(Array(Constant.guideSteps.enumerated()), id: \.offset) { index, text in
-                            HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
+                            HStack(alignment: .top, spacing: LayoutToken.gutter) {
                                 ZStack {
                                     Circle()
                                         .fill(Color(designSystem: .grey500))
@@ -43,7 +43,7 @@ extension RepositoryLinkInputScreen {
                             }
                         }
                     }
-                    .padding(.horizontal, LayoutToken.margin.cgFloatValue)
+                    .padding(.horizontal, LayoutToken.margin)
                     .padding(.bottom, Constant.bodyVerticalPadding)
                 }
             }

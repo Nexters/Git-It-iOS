@@ -10,7 +10,6 @@ public struct DesignTokenSet: Sendable {
         gradients: [GradientToken],
         fontFamilies: [FontFamilyToken],
         textStyles: [TextStyleToken],
-        layouts: [LayoutToken],
         opacities: [OpacityToken],
         cornerRadii: [CornerRadiusToken],
         borders: [BorderToken],
@@ -22,7 +21,6 @@ public struct DesignTokenSet: Sendable {
         self.gradients = gradients
         self.fontFamilies = fontFamilies
         self.textStyles = textStyles
-        self.layouts = layouts
         self.opacities = opacities
         self.cornerRadii = cornerRadii
         self.borders = borders
@@ -37,7 +35,6 @@ public struct DesignTokenSet: Sendable {
     public let gradients: [GradientToken]
     public let fontFamilies: [FontFamilyToken]
     public let textStyles: [TextStyleToken]
-    public let layouts: [LayoutToken]
     public let opacities: [OpacityToken]
     public let cornerRadii: [CornerRadiusToken]
     public let borders: [BorderToken]
@@ -53,7 +50,6 @@ extension DesignTokenSet {
         gradients: GradientToken.all,
         fontFamilies: FontFamilyToken.all,
         textStyles: TextStyleToken.all,
-        layouts: LayoutToken.all,
         opacities: OpacityToken.all,
         cornerRadii: CornerRadiusToken.all,
         borders: BorderToken.all,
@@ -94,10 +90,6 @@ extension DesignTokenSet {
         errors += Self.duplicateNameErrors(
             category: "TextStyleToken",
             names: textStyles.map(\.name),
-        )
-        errors += Self.duplicateNameErrors(
-            category: "LayoutToken",
-            names: layouts.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "OpacityToken",
@@ -149,13 +141,6 @@ extension DesignTokenSet {
                     detail: "opacityPercent \(opacityPercent) not in 0...100",
                 ))
             }
-        }
-        for layout in layouts where layout.value < 0 {
-            errors.append(.outOfRange(
-                category: "LayoutToken",
-                name: layout.name,
-                detail: "value \(layout.value) < 0",
-            ))
         }
         for cornerRadius in cornerRadii where cornerRadius.value < 0 {
             errors.append(.outOfRange(

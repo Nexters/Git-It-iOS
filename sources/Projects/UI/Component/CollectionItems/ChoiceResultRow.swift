@@ -50,7 +50,7 @@ public struct ChoiceResultRow: View {
 
     public var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: LayoutToken.tightSpacing.cgFloatValue) {
+            VStack(alignment: .leading, spacing: LayoutToken.tightSpacing) {
                 StyledText.body1(text, color: .grey100)
                     .lineLimit(1)
 
@@ -61,7 +61,7 @@ public struct ChoiceResultRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Constant.horizontalPadding)
             .frame(height: height, alignment: .top)
-            .padding(.top, LayoutToken.compactSpacing.cgFloatValue)
+            .padding(.top, LayoutToken.compactSpacing)
             .designSystemBackground(judgement.backgroundColor)
             .designSystemCornerRadius(.large)
         }
@@ -81,14 +81,13 @@ public struct ChoiceResultRow: View {
     }
 
     // MARK: Private
-    
 
     private enum Constant {
         static let collapsedHeight: CGFloat = 59
         static let expandedHeight: CGFloat = 111
         static let horizontalPadding: CGFloat = 16
     }
-    
+
     private let judgement: Judgement
     private let isExpanded: Bool
     private let text: String
@@ -102,10 +101,11 @@ public struct ChoiceResultRow: View {
     private var accessibilityLabel: String {
         Self.accessibilityLabel(text: text, judgement: judgement)
     }
+
 }
 
 #Preview("Choice Result Row") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ChoiceResultRow(
             judgement: .correct,
             isExpanded: false,
@@ -120,6 +120,6 @@ public struct ChoiceResultRow: View {
             explanation: "Binding은 소유하지 않고 참조만 전달합니다.",
         ) { }
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

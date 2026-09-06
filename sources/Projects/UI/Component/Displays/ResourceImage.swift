@@ -35,12 +35,12 @@ public struct ResourceImage: View {
             case cancel = "ic-cancel"
             case checkmarkChecked = "ic-checkmark-checked"
             case checkmarkDisable = "ic-checkmark-disable"
-            case chevronDown = "ic-chevron-down-1"
-            case chevronLeft = "ic-chevron-left-1"
-            case chevronLeftLarge = "ic-chevron-left-2"
-            case chevronRight = "ic-chevron-right-1"
-            case chevronRightLarge = "ic-chevron-right-2"
-            case chevronUp = "ic-chevron-up-1"
+            case chevronDown = "ic-chevron-down"
+            case chevronLeft = "ic-chevron-left"
+            case chevronRight = "ic-chevron-right"
+            case chevronUp = "ic-chevron-up"
+            case chevronLeftWhite = "ic-chevron-left-white"
+            case chevronRightWhite = "ic-chevron-white"
             case edit = "ic-edit"
             case fileText = "ic-file-text"
             case home = "ic-home"
@@ -107,7 +107,7 @@ public struct ResourceImage: View {
 }
 
 #Preview("Resource Image") {
-    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    HStack(spacing: LayoutToken.gutter) {
         ResourceImage(asset: .illust(.knowledgeBasic), contentMode: .fill)
             .frame(width: 96, height: 96)
             .designSystemCornerRadius(.extraLarge)
@@ -120,7 +120,7 @@ public struct ResourceImage: View {
             .frame(width: 96, height: 96)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }
 

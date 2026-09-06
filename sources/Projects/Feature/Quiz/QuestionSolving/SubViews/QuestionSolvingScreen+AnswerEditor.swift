@@ -8,6 +8,7 @@ extension QuestionSolvingScreen {
         // MARK: Internal
 
         @Binding var text: String
+
         var isFocused: FocusState<Bool>.Binding
 
         let placeholder: String
@@ -15,7 +16,7 @@ extension QuestionSolvingScreen {
         let isDisabled: Bool
 
         var body: some View {
-            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing) {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
                         StyledText.body1(placeholder, color: .grey400)

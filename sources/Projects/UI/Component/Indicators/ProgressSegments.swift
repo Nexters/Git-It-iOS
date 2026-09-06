@@ -40,13 +40,13 @@ public struct ProgressSegments: View {
 }
 
 #Preview("Progress Segments") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         ProgressSegments(completed: 0, total: 5)
         ProgressSegments(completed: 2, total: 5)
         ProgressSegments(completed: 5, total: 5)
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

@@ -30,6 +30,7 @@ public struct AppEntryScreen: View {
             }
             .designSystemScreenMargin()
         }
+        .designSystemBackground(store.isShowingRecoverableError ? .gradient1 : Constant.backgroundGradient)
         .task { send(.task) }
     }
 
@@ -48,5 +49,12 @@ public struct AppEntryScreen: View {
 extension AppEntryScreen {
     fileprivate enum Constant {
         static let contentSpacing: CGFloat = 16
+
+        static let backgroundGradient = GradientToken(
+            name: "Gradient 2 · 스플래시 화면",
+            start: .init(x: 0.5, y: 0.6868),
+            end: .init(x: 0.5, y: 1.79211),
+            stops: GradientToken.gradient2.stops,
+        )
     }
 }

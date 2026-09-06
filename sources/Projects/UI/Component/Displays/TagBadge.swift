@@ -114,12 +114,12 @@ public struct TagBadge: View {
 }
 
 #Preview("Tag Badge") {
-    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    HStack(spacing: LayoutToken.gutter) {
         TagBadge.neutral("Neutral")
         TagBadge.accent("Accent")
         TagBadge.selected("Selected")
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

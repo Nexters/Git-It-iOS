@@ -30,7 +30,7 @@ public struct ProjectRow<Thumbnail: View>: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+        VStack(alignment: .leading, spacing: LayoutToken.gutter) {
             HStack(spacing: Constant.thumbnailSpacing) {
                 thumbnail
                     .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
@@ -52,7 +52,7 @@ public struct ProjectRow<Thumbnail: View>: View {
             if !isDeleting {
                 ContinuousProgressBar(progress: progress)
 
-                HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                HStack(spacing: LayoutToken.compactSpacing) {
                     TagBadge.muted("Set \(currentSet)").designSystemCornerRadius(.pill)
                     StyledText.body2(setTitle, color: .grey300)
                         .lineLimit(1)
@@ -69,6 +69,48 @@ public struct ProjectRow<Thumbnail: View>: View {
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static var thumbnailSize: CGFloat {
+            60
+        }
+
+        static var thumbnailSpacing: CGFloat {
+            14
+        }
+
+        static var titleSpacing: CGFloat {
+            4
+        }
+
+        static var textColumnTopPadding: CGFloat {
+            4
+        }
+
+        static var minimumTrailingSpacing: CGFloat {
+            4
+        }
+
+        static var topPadding: CGFloat {
+            16
+        }
+
+        static var horizontalPadding: CGFloat {
+            18
+        }
+
+        static var bottomPadding: CGFloat {
+            18
+        }
+
+        static var defaultMinimumHeight: CGFloat {
+            150
+        }
+
+        static var deletingMinimumHeight: CGFloat {
+            94
+        }
+    }
 
     private let name: String
     private let supportingText: String
@@ -89,14 +131,14 @@ public struct ProjectRow<Thumbnail: View>: View {
     private var accessoryButton: some View {
         if isDeleting {
             IconGlassButton.destructive(
-                symbol: "minus",
+                icon: .minus,
                 label: "\(name) 삭제",
                 size: .medium,
                 action: onAccessoryTap,
             ).designSystemBackground(.clear)
         } else {
             IconPlainButton(
-                symbol: "ic-play-1",
+                icon: .play,
                 label: "\(name) 학습 시작",
                 action: onAccessoryTap,
             )
@@ -106,7 +148,7 @@ public struct ProjectRow<Thumbnail: View>: View {
 }
 
 #Preview("Project Row") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ProjectRow(
             name: "Git It iOS",
             supportingText: "Swift · SwiftUI · TCA",
@@ -132,6 +174,6 @@ public struct ProjectRow<Thumbnail: View>: View {
     }
     .frame(width: 360)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

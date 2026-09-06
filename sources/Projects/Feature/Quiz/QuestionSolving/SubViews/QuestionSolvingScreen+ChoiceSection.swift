@@ -14,7 +14,7 @@ extension QuestionSolvingScreen {
         let onSelect: (Int) -> Void
 
         var body: some View {
-            VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            VStack(spacing: LayoutToken.compactSpacing) {
                 ForEach(options) { option in
                     ChoiceAnswerOption(
                         letter: Self.letter(forID: option.id),
