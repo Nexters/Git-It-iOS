@@ -138,7 +138,7 @@ public struct ChoiceAnswerOption: View {
         static let topPadding: CGFloat = 14
         static let bottomPadding: CGFloat = 18
         static let rowSpacing: CGFloat = 4
-        static let chevronIconSize: CGFloat = 10
+        static let chevronIconSize: CGFloat = 16
         static let chevronTapSize: CGFloat = 36
     }
 
@@ -155,7 +155,10 @@ public struct ChoiceAnswerOption: View {
         return "\(letter), \(text), \(suffix)"
     }
 
-    private func card(isExpanded: Bool, reservesChevronSpace: Bool) -> some View {
+    private func card(
+        isExpanded: Bool,
+        reservesChevronSpace: Bool,
+    ) -> some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: Constant.rowSpacing) {
                 HStack {

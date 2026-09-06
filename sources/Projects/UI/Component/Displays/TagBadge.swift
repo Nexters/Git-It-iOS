@@ -8,9 +8,11 @@ public struct TagBadge: View {
     public init(
         text: String,
         style: Style = .neutral,
+        size: Size = .regular,
     ) {
         self.text = text
         self.style = style
+        self.size = size
     }
 
     // MARK: Public
@@ -19,6 +21,7 @@ public struct TagBadge: View {
         case neutral
         case accent
         case selected
+        case muted
 
         // MARK: Internal
 
@@ -27,6 +30,7 @@ public struct TagBadge: View {
             case .neutral: .grey500
             case .accent: .blue400
             case .selected: .blue400
+            case .muted: .grey500
             }
         }
 
@@ -35,13 +39,28 @@ public struct TagBadge: View {
             case .neutral: .blue100
             case .accent: .blue100
             case .selected: .grey100
+            case .muted: .grey300
+            }
+        }
+    }
+
+    public enum Size: Sendable, Equatable {
+        case regular
+        case compact
+
+        // MARK: Internal
+
+        var textStyle: TextStyleToken {
+            switch self {
+            case .regular: .body2
+            case .compact: .body3
             }
         }
     }
 
     public var body: some View {
-        Text.designSystemStyled(text, style: .body2)
-            .designSystemLineSpacing(.body2)
+        Text.designSystemStyled(text, style: size.textStyle)
+            .designSystemLineSpacing(size.textStyle)
             .designSystemForeground(style.textColor)
             .padding(.horizontal, Constant.horizontalPadding)
             .padding(.top, Constant.topPadding)
@@ -52,16 +71,32 @@ public struct TagBadge: View {
             )
     }
 
-    public static func neutral(_ text: String) -> Self {
-        Self(text: text, style: .neutral)
+    public static func neutral(
+        _ text: String,
+        size: Size = .regular,
+    ) -> Self {
+        Self(text: text, style: .neutral, size: size)
     }
 
-    public static func accent(_ text: String) -> Self {
-        Self(text: text, style: .accent)
+    public static func accent(
+        _ text: String,
+        size: Size = .regular,
+    ) -> Self {
+        Self(text: text, style: .accent, size: size)
     }
 
-    public static func selected(_ text: String) -> Self {
-        Self(text: text, style: .selected)
+    public static func selected(
+        _ text: String,
+        size: Size = .regular,
+    ) -> Self {
+        Self(text: text, style: .selected, size: size)
+    }
+
+    public static func muted(
+        _ text: String,
+        size: Size = .compact,
+    ) -> Self {
+        Self(text: text, style: .muted, size: size)
     }
 
     // MARK: Private
@@ -74,6 +109,7 @@ public struct TagBadge: View {
 
     private let text: String
     private let style: Style
+    private let size: Size
 
 }
 

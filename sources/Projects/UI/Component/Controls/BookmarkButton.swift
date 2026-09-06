@@ -22,9 +22,11 @@ public struct BookmarkButton: View {
     public var body: some View {
         Button(action: onTap) {
             Image(systemName: symbol)
+                .font(.system(size: Constant.glyphSize))
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
-                .frame(width: Constant.surfaceSize, height: Constant.surfaceSize)
-                .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+                .frame(width: Constant.surfaceWidth, height: Constant.surfaceHeight)
+                .designSystemBackground(.raisedBackground)
+                .designSystemCornerRadius(.large)
                 .frame(
                     minWidth: ControlSizeToken.minimumTouch.cgFloatValue,
                     minHeight: ControlSizeToken.minimumTouch.cgFloatValue,
@@ -45,7 +47,9 @@ public struct BookmarkButton: View {
     // MARK: Private
 
     private enum Constant {
-        static let surfaceSize: CGFloat = ControlSizeToken.action.cgFloatValue
+        static let surfaceWidth: CGFloat = 40
+        static let surfaceHeight: CGFloat = ControlSizeToken.action.cgFloatValue
+        static let glyphSize: CGFloat = 16
     }
 
     private let isSaved: Bool

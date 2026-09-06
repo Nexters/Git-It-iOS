@@ -2,19 +2,25 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
+// MARK: - RepositoryLinkInputScreen
+
 @ViewAction(for: RepositoryLinkInputFeature.self)
 struct RepositoryLinkInputScreen: View {
+
+    // MARK: Lifecycle
 
     init(store: StoreOf<RepositoryLinkInputFeature>) {
         self.store = store
     }
+
+    // MARK: Internal
 
     @Bindable var store: StoreOf<RepositoryLinkInputFeature>
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ScreenHeader(
-                style: .largeTitle,
+                style: .default,
                 onLeadingTap: { send(.dismissTapped) },
             )
             .designSystemScreenMargin()
@@ -56,6 +62,8 @@ struct RepositoryLinkInputScreen: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 
+    // MARK: Private
+
     @FocusState private var isLinkFieldFocused: Bool
 
     private var repositoryURLInput: Binding<String> {
@@ -65,15 +73,16 @@ struct RepositoryLinkInputScreen: View {
         )
     }
 
-
 }
 
-private extension RepositoryLinkInputScreen {
-    enum Constant {
+// MARK: RepositoryLinkInputScreen.Constant
+
+extension RepositoryLinkInputScreen {
+    fileprivate enum Constant {
         static let titleFieldSpacing: CGFloat = 16
-        static let headerContentSpacing: CGFloat = 32
+        static let headerContentSpacing: CGFloat = 18
         static let fieldGuideSpacing: CGFloat = 32
         static let guideHorizontalPadding: CGFloat = 20
-        static let bottomButtonPadding: CGFloat = 34
+        static let bottomButtonPadding: CGFloat = 24
     }
 }

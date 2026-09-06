@@ -40,12 +40,14 @@ public struct ActionButton: View {
         case secondary
         case destructive
         case text
+        case primaryText
 
         // MARK: Internal
 
         func backgroundColor(isEnabled: Bool) -> Color {
             switch self {
-            case .text:
+            case .text,
+                 .primaryText:
                 return Color(designSystem: ColorToken.clear)
 
             case .secondary:
@@ -67,6 +69,8 @@ public struct ActionButton: View {
             switch self {
             case .primary:
                 return .grey700
+            case .primaryText:
+                return .blue100
             case .secondary,
                  .destructive,
                  .text:
@@ -234,6 +238,21 @@ public struct ActionButton: View {
         Self(
             styledText: styledText,
             style: .text,
+            size: size,
+            isEnabled: isEnabled,
+            action: action,
+        )
+    }
+
+    public static func primaryText(
+        _ title: String,
+        size: Size = .large,
+        isEnabled: Bool = true,
+        action: @escaping () -> Void = { },
+    ) -> Self {
+        Self(
+            title: title,
+            style: .primaryText,
             size: size,
             isEnabled: isEnabled,
             action: action,

@@ -32,7 +32,6 @@ extension HomeScreen {
                     .buttonStyle(.plain)
                     .padding(8)
                     .accessibilityLabel(Constant.showAllLabel)
-                    
                 }
                 .designSystemScreenMargin()
 
@@ -54,6 +53,9 @@ extension HomeScreen {
             static let strokeWidth: CGFloat = 2
             static let maximumCardRotationDegrees: CGFloat = 16
             static let trailingInset: CGFloat = 16
+
+            static let emptyDeckCardSpacing: CGFloat = 2.5
+            static let emptyDeckCardRotations: [Angle] = [.zero, .degrees(12), .degrees(-14)]
 
             /// 실측 전 첫 프레임에 쓰는 기준 기기(iPhone 17 · 17 Pro · 16 Pro) 화면 폭.
             static let defaultSectionWidth: CGFloat = 402
@@ -78,6 +80,26 @@ extension HomeScreen {
             static func sectionHeight(cardWidth: CGFloat) -> CGFloat {
                 HomeProjectCard.designHeight + rotationSlack(cardWidth: cardWidth) * 2
             }
+
+            static func emptyDeckCards() -> [HomeScreen.EmptyDeckShape.Card] {
+                let cardSize = CGSize(
+                    width: HomeProjectCard.designWidth,
+                    height: HomeProjectCard.designHeight,
+                )
+
+                return emptyDeckCardRotations.enumerated().map { index, rotation in
+                    HomeScreen.EmptyDeckShape.Card(
+                        frame: CGRect(
+                            x: CGFloat(index) * (cardSize.width + emptyDeckCardSpacing),
+                            y: 0,
+                            width: cardSize.width,
+                            height: cardSize.height,
+                        ),
+                        rotation: rotation,
+                        cornerRadius: CornerRadiusToken.large.cgFloatValue,
+                    )
+                }
+            }
         }
 
         @State private var sectionWidth: CGFloat = Constant.defaultSectionWidth
@@ -92,11 +114,13 @@ extension HomeScreen {
         }
 
         private var emptyProjectCards: some View {
-            ScrollView(.horizontal) {
-                emptyDeckSilhouette
+            let shape = emptyDeckShape
+
+            return ScrollView(.horizontal) {
+                emptyDeckSilhouette(shape: shape)
                     .frame(
-                        width: HomeScreen.EmptyDeckShape.designSize.width,
-                        height: HomeScreen.EmptyDeckShape.designSize.height,
+                        width: shape.size.width,
+                        height: shape.size.height,
                     )
                     .padding(.leading, Constant.screenMargin)
             }
@@ -105,14 +129,8 @@ extension HomeScreen {
             .accessibilityHidden(true)
         }
 
-        private var emptyDeckSilhouette: some View {
-            HomeScreen.EmptyDeckShape()
-                .fill(Color(designSystem: .blue500))
-                .overlay {
-                    HomeScreen.EmptyDeckShape()
-                        .stroke(Color(designSystem: .blue300), lineWidth: Constant.strokeWidth * 2)
-                        .clipShape(HomeScreen.EmptyDeckShape())
-                }
+        private var emptyDeckShape: HomeScreen.EmptyDeckShape {
+            HomeScreen.EmptyDeckShape(cards: Constant.emptyDeckCards())
         }
 
         @ViewBuilder
@@ -141,6 +159,16 @@ extension HomeScreen {
                     .designSystemScreenMargin()
                 }
             }
+        }
+
+        private func emptyDeckSilhouette(shape: HomeScreen.EmptyDeckShape) -> some View {
+            shape
+                .fill(Color(designSystem: .blue500))
+                .overlay {
+                    shape
+                        .stroke(Color(designSystem: .blue300), lineWidth: Constant.strokeWidth * 2)
+                        .clipShape(shape)
+                }
         }
 
         private func emptyProjects(@ViewBuilder accessary: () -> some View) -> some View {

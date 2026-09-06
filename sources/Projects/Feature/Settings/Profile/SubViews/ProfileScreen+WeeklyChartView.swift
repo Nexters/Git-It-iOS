@@ -12,7 +12,7 @@ extension ProfileScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
                 VStack(alignment: .leading, spacing: Constant.headerSpacing) {
-                    StyledText.caption2(Constant.sectionLabel, color: .grey400)
+                    StyledText.body3(Constant.sectionLabel, color: .grey400)
                     StyledText.subtitle3(display.weeklyTitle)
                 }
 

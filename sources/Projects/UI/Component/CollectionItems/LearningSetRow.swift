@@ -24,13 +24,13 @@ public struct LearningSetRow: View {
     // MARK: Public
 
     public var body: some View {
-        VStack {
-            HStack(alignment: .top, spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+        VStack(alignment: .leading, spacing: Constant.contentSpacing) {
+            HStack(alignment: .top, spacing: LayoutToken.gutter.cgFloatValue) {
+                VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                     StyledText.subtitle3(label, color: .blue100)
 
                     StyledText.body1(title)
-                        .lineLimit(2)
+                        .lineLimit(1)
 
                     Spacer(minLength: 0)
                 }
@@ -42,7 +42,8 @@ public struct LearningSetRow: View {
 
             ProgressSegments(completed: clampedCompletedCount, total: questionCount)
         }
-        .padding(Constant.contentPadding)
+        .padding(.horizontal, Constant.horizontalPadding)
+        .padding(.vertical, Constant.verticalPadding)
         .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)
         .designSystemBackground(.screenBackground)
         .designSystemCornerRadius(.large)
@@ -77,7 +78,10 @@ public struct LearningSetRow: View {
 
     private enum Constant {
         static let height: CGFloat = 130
-        static let contentPadding: CGFloat = 18
+        static let horizontalPadding: CGFloat = 18
+        static let verticalPadding: CGFloat = 20
+        static let contentSpacing: CGFloat = 25
+        static let titleSpacing: CGFloat = 10
         static let startSymbolSize: CGFloat = 12
         /// 보이는 원의 지름. 터치 영역(`startTouchSize`)이 이를 감쌉니다.
         static let startSurfaceSize: CGFloat = 32
@@ -98,9 +102,9 @@ public struct LearningSetRow: View {
         Button(action: onStart) {
             Image(systemName: "play.fill")
                 .font(.system(size: Constant.startSymbolSize, weight: .bold))
-                .designSystemForeground(.grey100)
+                .designSystemForeground(.blue100)
                 .frame(width: Constant.startSurfaceSize, height: Constant.startSurfaceSize)
-                .background(Color(designSystem: .blue300), in: Circle())
+                .background(Color(designSystem: .blue400), in: Circle())
                 .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
                 .contentShape(Rectangle())
         }

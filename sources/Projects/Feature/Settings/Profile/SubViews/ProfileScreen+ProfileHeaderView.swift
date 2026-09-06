@@ -25,10 +25,10 @@ extension ProfileScreen {
                     if display.hasBadges {
                         HStack(spacing: Constant.badgeSpacing) {
                             if let position = display.positionBadgeText {
-                                TagBadge.accent(position)
+                                TagBadge.accent(position, size: .compact)
                             }
                             if let careerLevel = display.careerLevelBadgeText {
-                                TagBadge.neutral(careerLevel)
+                                TagBadge.neutral(careerLevel, size: .compact)
                             }
                         }
                     }

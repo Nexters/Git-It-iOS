@@ -28,11 +28,11 @@ extension QuizGenerationProgressScreen {
                 }
 
                 QuizGenerationProgressScreen.ChecklistView(progress: progress)
-                    .padding(.vertical)
+                    .padding(.top, Constant.checklistTopSpacing)
             }
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
-                ActionButton.text("홈에서 기다리기", action: onWaitAtHome)
+                ActionButton.primaryText("홈에서 기다리기", action: onWaitAtHome)
                     .designSystemScreenMargin()
                     .padding(.bottom, Constant.bottomButtonPadding)
             }
@@ -41,6 +41,26 @@ extension QuizGenerationProgressScreen {
         }
 
         // MARK: Private
+
+        private enum Constant {
+            static let topSpacerMinLength: CGFloat = 97
+            static let loadingGraphicSize: CGFloat = 200
+            static let loadingGraphicFadeStart: CGFloat = 0.62
+            static let loadingGraphicBottomSpacing: CGFloat = 25
+            static let textSetSpacing: CGFloat = 16
+            static let checklistTopSpacing: CGFloat = 53
+            static let bottomButtonPadding: CGFloat = 24
+            static let simulatedDurationRange: ClosedRange<Double> = 180...300
+            static let maxSimulatedProgress = 0.98
+            static let simulatedProgressTickInterval = Duration.milliseconds(200)
+
+            static let backgroundGradient = GradientToken(
+                name: "Gradient 2 · 생성 진행 화면",
+                start: .init(x: 0.5, y: 0.6868),
+                end: .init(x: 0.5, y: 1.79211),
+                stops: GradientToken.gradient2.stops,
+            )
+        }
 
         @State private var progress: Double = 0
 
@@ -68,25 +88,6 @@ extension QuizGenerationProgressScreen {
                 }
                 try? await Task.sleep(for: Constant.simulatedProgressTickInterval)
             }
-        }
-
-        private enum Constant {
-            static let topSpacerMinLength: CGFloat = 97
-            static let loadingGraphicSize: CGFloat = 200
-            static let loadingGraphicFadeStart: CGFloat = 0.62
-            static let loadingGraphicBottomSpacing: CGFloat = 25
-            static let textSetSpacing: CGFloat = 16
-            static let bottomButtonPadding: CGFloat = 58
-            static let simulatedDurationRange: ClosedRange<Double> = 180...300
-            static let maxSimulatedProgress = 0.98
-            static let simulatedProgressTickInterval = Duration.milliseconds(200)
-
-            static let backgroundGradient = GradientToken(
-                name: "Gradient 2 · 생성 진행 화면",
-                start: .init(x: 0.5, y: 0.6868),
-                end: .init(x: 0.5, y: 1.79211),
-                stops: GradientToken.gradient2.stops,
-            )
         }
 
     }

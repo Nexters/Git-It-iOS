@@ -35,6 +35,10 @@ public struct HomeProjectCard: View {
     /// 계산할 때 사용합니다.
     public static let designHeight: CGFloat = 192
 
+    /// 카드가 그려지는 고정 폭. 카드를 조립하는 화면이 카드 실루엣과 배치를 계산할 때
+    /// 사용합니다.
+    public static let designWidth: CGFloat = 154
+
     public var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: select) {
@@ -140,7 +144,7 @@ public struct HomeProjectCard: View {
     }
 
     private var cardWidth: CGFloat {
-        154
+        Self.designWidth
     }
 
     private var startButton: some View {

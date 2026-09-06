@@ -37,11 +37,12 @@ public struct ProjectRow<Thumbnail: View>: View {
                     .designSystemCornerRadius(.small)
 
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText.subtitle3(name)
+                    StyledText.subtitle2(name)
                         .lineLimit(2)
-                    StyledText.caption1(supportingText, color: .grey400)
+                    StyledText.body3(supportingText, color: .grey400)
                         .lineLimit(1)
                 }
+                .padding(.top, Constant.textColumnTopPadding)
 
                 Spacer(minLength: Constant.minimumTrailingSpacing)
 
@@ -52,7 +53,7 @@ public struct ProjectRow<Thumbnail: View>: View {
                 ContinuousProgressBar(progress: progress)
 
                 HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                    TagBadge.neutral("Set \(currentSet)").designSystemCornerRadius(.pill)
+                    TagBadge.muted("Set \(currentSet)").designSystemCornerRadius(.pill)
                     StyledText.body2(setTitle, color: .grey300)
                         .lineLimit(1)
                 }

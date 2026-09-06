@@ -119,7 +119,10 @@ public struct ProjectDetailRouterFeature: Sendable {
             )
         }
         Scope(state: \.savedQuestions, action: \.savedQuestions) {
-            SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+            SavedFeature(
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
         Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
             SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)

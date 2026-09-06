@@ -79,7 +79,7 @@ struct QuestionSolvingScreen: View {
     private var sourceButton: some View {
         Button(action: { send(.sourceTapped) }) {
             HStack(spacing: Constant.sourceButtonSpacing) {
-                StyledText.body1("출처", color: .blue100)
+                StyledText.body2("출처", color: .blue100)
 
                 ResourceImage(asset: .icon(.chevronRight), contentMode: .fit)
                     .designSystemForeground(.blue100)
@@ -89,8 +89,8 @@ struct QuestionSolvingScreen: View {
             .padding(.leading, Constant.sourceButtonLeadingPadding)
             .padding(.trailing, Constant.sourceButtonTrailingPadding)
             .padding(.vertical, Constant.sourceButtonVerticalPadding)
-            .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
         }
+        .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .small))
         .buttonStyle(.plain)
         .accessibilityLabel("출처 보기")
     }
@@ -164,7 +164,7 @@ struct QuestionSolvingScreen: View {
 
     private var bottomActions: some View {
         ScreenOverlayFooter {
-            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
                 BookmarkButton(
                     isSaved: store.isBookmarked,
                     accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
@@ -183,14 +183,14 @@ struct QuestionSolvingScreen: View {
 extension QuestionSolvingScreen {
     fileprivate enum Constant {
         static let sectionSpacing: CGFloat = 24
-        static let contentVerticalPadding: CGFloat = 16
+        static let contentVerticalPadding: CGFloat = 20
         static let essayPlaceholder = "답안을 서술해주세요"
         static let submissionFailureMessage = "답안을 제출하지 못했어요. 다시 시도해 주세요."
         static let sourceButtonSpacing: CGFloat = 2
-        static let sourceButtonChevronGlyphSize: CGFloat = 10
+        static let sourceButtonChevronGlyphSize: CGFloat = 16
         static let sourceButtonChevronSize: CGFloat = 16
         static let sourceButtonLeadingPadding: CGFloat = 16
         static let sourceButtonTrailingPadding: CGFloat = 8
-        static let sourceButtonVerticalPadding: CGFloat = 8
+        static let sourceButtonVerticalPadding: CGFloat = 4
     }
 }

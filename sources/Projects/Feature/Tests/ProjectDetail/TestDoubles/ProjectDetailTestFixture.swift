@@ -25,7 +25,7 @@ enum ProjectDetailTestFixture {
 
     static let savedQuestionCollection = BookmarkedQuestionCollection(
         totalCount: 2,
-        availableProjects: [projectID],
+        availableProjects: [BookmarkedProject(id: projectID, name: "owner/repo")],
         bookmarks: [
             BookmarkedQuestion(
                 projectID: projectID,
@@ -44,7 +44,7 @@ enum ProjectDetailTestFixture {
 
     static let otherProjectQuestionCollection = BookmarkedQuestionCollection(
         totalCount: 1,
-        availableProjects: ["project-2"],
+        availableProjects: [BookmarkedProject(id: "project-2", name: "다른 프로젝트")],
         bookmarks: [
             BookmarkedQuestion(
                 projectID: "project-2",

@@ -22,19 +22,23 @@ public struct LabeledProgressBar: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+        VStack(alignment: .leading, spacing: Constant.labelSpacing) {
             HStack {
                 StyledText.caption1(label, color: .grey400)
                 Spacer(minLength: 0)
                 StyledText.caption1(valueText, color: valueColor)
             }
 
-            ContinuousProgressBar(progress: progress)
+            ContinuousProgressBar(progress: progress, height: .detail)
         }
         .accessibilityElement(children: .combine)
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static let labelSpacing: CGFloat = 10
+    }
 
     private let label: String
     private let progress: Double

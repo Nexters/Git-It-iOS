@@ -1,8 +1,11 @@
+import DesignSystem
 import SwiftUI
 import UIComponent
-import DesignSystem
 
 extension QuizGenerationProgressScreen {
+
+    // MARK: Internal
+
     struct ChecklistView: View {
 
         // MARK: Internal
@@ -23,6 +26,7 @@ extension QuizGenerationProgressScreen {
 
         private enum Constant {
             static let rowSpacing: CGFloat = 19
+            static let itemSpacing: CGFloat = 14
             static let iconSize: CGFloat = 24
         }
 
@@ -30,7 +34,7 @@ extension QuizGenerationProgressScreen {
             title: String,
             status: ChecklistStatus,
         ) -> some View {
-            HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+            HStack(spacing: Constant.itemSpacing) {
                 status.icon
                     .frame(
                         width: Constant.iconSize,

@@ -12,7 +12,11 @@ extension ProjectRow {
         }
 
         static var titleSpacing: CGFloat {
-            2
+            4
+        }
+
+        static var textColumnTopPadding: CGFloat {
+            4
         }
 
         static var minimumTrailingSpacing: CGFloat {

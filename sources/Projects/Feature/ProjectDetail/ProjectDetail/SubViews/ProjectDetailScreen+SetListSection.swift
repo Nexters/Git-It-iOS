@@ -11,7 +11,7 @@ extension ProjectDetailScreen {
         let onStart: (String) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+            VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                 StyledText.subtitle2("학습 세트")
 
                 cards
@@ -22,6 +22,8 @@ extension ProjectDetailScreen {
 
         private enum Constant {
             static let emptyStateVerticalPadding: CGFloat = 32
+            static let titleSpacing: CGFloat = 16
+            static let cardSpacing: CGFloat = 6
         }
 
         @ViewBuilder
@@ -35,7 +37,7 @@ extension ProjectDetailScreen {
                 }
                 .padding(.vertical, Constant.emptyStateVerticalPadding)
             } else {
-                VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+                VStack(alignment: .leading, spacing: Constant.cardSpacing) {
                     ForEach(sets) { set in
                         LearningSetRow(
                             label: set.label,

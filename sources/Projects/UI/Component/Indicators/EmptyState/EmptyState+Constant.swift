@@ -8,7 +8,7 @@ extension EmptyState {
         }
 
         static var illustrationSpacing: CGFloat {
-            20
+            16
         }
 
         static var textSpacing: CGFloat {

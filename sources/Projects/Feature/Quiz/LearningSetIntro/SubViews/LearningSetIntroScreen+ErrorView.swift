@@ -13,7 +13,7 @@ extension LearningSetIntroScreen {
 
         var body: some View {
             VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                ScreenHeader(style: .largeTitle, onLeadingTap: onBack)
+                ScreenHeader(style: .default, onLeadingTap: onBack)
                     .designSystemScreenMargin()
 
                 Spacer(minLength: 0)

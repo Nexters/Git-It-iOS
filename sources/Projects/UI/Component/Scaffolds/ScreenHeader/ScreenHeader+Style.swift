@@ -15,7 +15,7 @@ extension ScreenHeader {
             case .default:
                 50
             case .inlineTitle:
-                43
+                50
             case .inlineUser:
                 74
             case .largeTitle:

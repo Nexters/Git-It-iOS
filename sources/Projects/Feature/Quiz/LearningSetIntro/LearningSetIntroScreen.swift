@@ -34,12 +34,12 @@ struct LearningSetIntroScreen: View {
     private var content: some View {
         OverlayContainer {
             ScreenOverlayHeader(
-                style: .largeTitle,
+                style: .default,
                 onLeadingTap: { send(.backTapped) },
             )
         } content: {
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                StyledText.subtitle2(store.label, color: .blue100)
+                StyledText.subtitle3(store.label, color: .blue100)
                 StyledText.subtitle1(store.learningSet?.title ?? "")
                 StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
                     .padding(.top, Constant.descriptionTopPadding)
@@ -82,7 +82,7 @@ extension LearningSetIntroScreen {
     fileprivate enum Constant {
         static let textTopPadding: CGFloat = 24
         static let textSpacing: CGFloat = 8
-        static let descriptionTopPadding: CGFloat = 10
-        static let bottomButtonPadding: CGFloat = 34
+        static let descriptionTopPadding: CGFloat = 8
+        static let bottomButtonPadding: CGFloat = 24
     }
 }

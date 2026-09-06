@@ -23,7 +23,7 @@ struct LearningCompletionScreen: View {
     private var screen: some View {
         VStack(spacing: 0) {
             ScreenHeader(
-                style: .largeTitle,
+                style: .default,
                 leading: .close,
                 onLeadingTap: { send(.closeTapped) },
             )
@@ -39,15 +39,12 @@ struct LearningCompletionScreen: View {
                 StyledText.subtitle1("학습을 마쳤어요", alignment: .center)
 
                 if let scoreLabel = store.scoreAccessibilityLabel {
-                    StyledText
-                        .headline2(
-                            "\(store.correctChoiceCount) / \(store.choiceQuestionCount)",
-                            alignment: .center,
-                        )
+                    scoreView
+                        .accessibilityElement(children: .ignore)
                         .accessibilityLabel(scoreLabel)
                 }
 
-                StyledText.body2(Constant.message, color: .grey400, alignment: .center)
+                StyledText.body1(Constant.message, color: .grey400, alignment: .center)
             }
             .designSystemScreenMargin()
 
@@ -59,6 +56,18 @@ struct LearningCompletionScreen: View {
         }
     }
 
+    private var scoreView: some View {
+        HStack(spacing: Constant.scoreSpacing) {
+            StyledText.subtitle1("\(store.correctChoiceCount)", color: .blue200)
+
+            Rectangle()
+                .fill(Color(designSystem: .grey400))
+                .frame(width: Constant.scoreDividerWidth, height: Constant.scoreDividerHeight)
+
+            StyledText.subtitle1("\(store.choiceQuestionCount)", color: .grey400)
+        }
+    }
+
 }
 
 // MARK: LearningCompletionScreen.Constant
@@ -66,8 +75,11 @@ struct LearningCompletionScreen: View {
 extension LearningCompletionScreen {
     fileprivate enum Constant {
         static let contentSpacing: CGFloat = 16
-        static let animationSize: CGFloat = 180
-        static let bottomButtonPadding: CGFloat = 34
+        static let animationSize: CGFloat = 200
+        static let scoreSpacing: CGFloat = 5
+        static let scoreDividerWidth: CGFloat = 1
+        static let scoreDividerHeight: CGFloat = 22
+        static let bottomButtonPadding: CGFloat = 24
         static let message = "다음 세트에서 이어서 학습해 보세요."
     }
 }

@@ -31,6 +31,7 @@ public struct EmptyState<Illustration: View>: View {
                 StyledText
                     .subtitle1(
                         title,
+                        color: .grey200,
                         alignment: .center,
                     )
                 StyledText

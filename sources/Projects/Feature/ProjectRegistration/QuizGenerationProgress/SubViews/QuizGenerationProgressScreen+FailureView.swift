@@ -13,7 +13,7 @@ extension QuizGenerationProgressScreen {
 
         var body: some View {
             VStack(spacing: LayoutToken.margin.cgFloatValue) {
-                ScreenHeader(style: .largeTitle, onLeadingTap: onDismiss)
+                ScreenHeader(style: .default, onLeadingTap: onDismiss)
                     .designSystemScreenMargin()
 
                 Spacer(minLength: 0)

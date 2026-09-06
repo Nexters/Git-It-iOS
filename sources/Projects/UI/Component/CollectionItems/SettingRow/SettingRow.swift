@@ -24,7 +24,7 @@ public struct SettingRow: View {
     public var body: some View {
         Button(action: onTap) {
             HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                StyledText.body1(title)
+                StyledText.body2(title)
 
                 Spacer(minLength: Constant.minimumTrailingSpacing)
 

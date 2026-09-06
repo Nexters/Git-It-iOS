@@ -5,11 +5,34 @@ public struct ContinuousProgressBar: View {
 
     // MARK: Lifecycle
 
-    public init(progress: Double) {
+    public init(
+        progress: Double,
+        height: Height = .row,
+    ) {
         self.progress = Self.clampedProgress(progress)
+        self.height = height
     }
 
     // MARK: Public
+
+    /// Figma가 정의한 두 가지 진행 바 표면 높이.
+    public enum Height: Sendable, Equatable {
+        /// 프로젝트 목록 행의 6pt 바.
+        case row
+        /// 프로젝트 상세 요약의 10pt 바.
+        case detail
+
+        // MARK: Internal
+
+        var value: CGFloat {
+            switch self {
+            case .row:
+                Constant.rowHeight
+            case .detail:
+                Constant.detailHeight
+            }
+        }
+    }
 
     public var body: some View {
         GeometryReader { proxy in
@@ -22,7 +45,7 @@ public struct ContinuousProgressBar: View {
                     .frame(width: proxy.size.width * progress)
             }
         }
-        .frame(height: Constant.surfaceHeight)
+        .frame(height: height.value)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("학습 진행률")
         .accessibilityValue("\(Int((progress * 100).rounded()))퍼센트")
@@ -31,7 +54,7 @@ public struct ContinuousProgressBar: View {
     // MARK: Internal
 
     static var surfaceHeight: CGFloat {
-        Constant.surfaceHeight
+        Constant.rowHeight
     }
 
     static var trackColorToken: SemanticColorToken {
@@ -51,12 +74,14 @@ public struct ContinuousProgressBar: View {
     // MARK: Private
 
     private enum Constant {
-        static let surfaceHeight: CGFloat = 6
+        static let rowHeight: CGFloat = 6
+        static let detailHeight: CGFloat = 10
         static let trackColorToken = SemanticColorToken.progressTrack
         static let fillColorToken = SemanticColorToken.progressFill
     }
 
     private let progress: Double
+    private let height: Height
 
 }
 

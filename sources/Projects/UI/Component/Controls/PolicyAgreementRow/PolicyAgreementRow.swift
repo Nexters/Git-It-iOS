@@ -30,7 +30,7 @@ public struct PolicyAgreementRow: View {
                     ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
-                    StyledText.body1(title)
+                    StyledText.body2(title)
                 }
                 .contentShape(Rectangle())
             }
@@ -44,6 +44,8 @@ public struct PolicyAgreementRow: View {
             Button(action: onOpenLink) {
                 Image(systemName: "chevron.right")
                     .designSystemForeground(.grey300)
+                    .frame(width: Constant.linkSurfaceSize,
+                           height: Constant.linkSurfaceSize)
                     .frame(width: Constant.minimumTouchSize,
                            height: Constant.minimumTouchSize)
                     .contentShape(Rectangle())

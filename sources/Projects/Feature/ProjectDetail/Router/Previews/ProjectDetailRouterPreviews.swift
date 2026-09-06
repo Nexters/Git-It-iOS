@@ -33,11 +33,14 @@ private let previewDetail = LearningProjectDetail(
 
 private let previewCollection = BookmarkedQuestionCollection(
     totalCount: 1,
-    availableProjects: ["project-1"],
+    availableProjects: [BookmarkedProject(id: "project-1", name: "owner/repo")],
     bookmarks: [
         BookmarkedQuestion(
             projectID: "project-1",
+            projectName: "owner/repo",
             setID: "set-0",
+            setLabel: "Set 1",
+            problemNumber: 1,
             questionID: "question-0",
             prompt: "Composition 패키지가 Domain에 의존해도 되는 이유는 무엇인가?",
         )

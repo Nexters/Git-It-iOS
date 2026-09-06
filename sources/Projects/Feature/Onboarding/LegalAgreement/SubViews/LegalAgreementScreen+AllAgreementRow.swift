@@ -16,7 +16,7 @@ extension LegalAgreementScreen {
                     ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
-                    StyledText.body1(Constant.title)
+                    StyledText.body2(Constant.title)
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, Constant.rowHorizontalPadding)

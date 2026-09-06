@@ -139,6 +139,21 @@ HomeProjectCard(play) → onStart → HomeFeature.learningTapped
 않고 화면만으로 해결했습니다. 편집 모드를 리듀서 상태로 올리거나 재생 버튼에서 바로 학습을
 시작하려면 액션 추가가 필요합니다.
 
+**2026-09-04 후속 결정 — 결정 9-1 폐기**: 사용자가 제시한 프로젝트 목록 3상태(기본·메뉴 열림·삭제
+화면) 스크린샷을 반영하면서 이 결정을 폐기했다. `docs/conventions/tca/state.md` §5(SwiftUI 로컬
+상태 5조건)를 `@State isEditing`이 이미 위반하고 있었고(삭제 실행 경로를 가르고, Reducer test
+대상이며, `specs/006-final-uxui-screens` FR-014가 요구하는 `menu`/`deleting` 상태 전이 검증이
+애초에 불가능했다), 같은 문서 §3 예시(`isMenuPresented: Bool` + `Deletion` enum)가 이 화면 모양의
+정본 형태였다. `ProjectListFeature.State`에 배타 `enum Mode { browsing, menuPresented, deleting }`를
+두고 `@State isEditing`을 제거했다. 상세 근거는 이 세션의 조사 결과(governance 조사 에이전트)를
+따른다 — 요약: (1) 메뉴 열림·삭제 모드는 spec 006이 이미 확정한 상태 변형이므로 이번 구현은 미이행
+상태의 복구다, (2) `@State` 유지는 컨벤션 위반이 확정적이라 이번 변경이 아니어도 언젠가 교정
+대상이었다. 메뉴 표면은 `Overlays/ActionMenu`가 `ProjectDetailScreen`의 옛 `MenuSheet` 계약(폭
+160·glassEffect·내용 높이·역할별 색)을 흡수해 두 화면이 공유한다 — 기존 `ActionMenu`의 181×126pt
+확정값(spec 006 A등급 근거)은 이 교정으로 대체됐으며, 이는 FR-029가 요구하는 새 Figma 근거 없이
+이뤄진 편차이므로 PR에 남긴다. 삭제 화면의 탭바 숨김(`.toolbar(.hidden, for: .tabBar)`)은 이
+저장소에 선례가 없는 시도이며 동작이 시뮬레이터로 검증됐는지 별도로 확인해야 한다.
+
 ### 결정 9-2. 세트 번호를 라벨에서 파싱
 
 `ProjectRow`는 `currentSet: Int`를 받는데 `LearningProjectSummary.currentSetLabel`은 문자열
@@ -156,42 +171,14 @@ HomeProjectCard(play) → onStart → HomeFeature.learningTapped
 **주의** — 탭에서 열 때 `isBackControlPresented`가 기본값 `false`라 뒤로가기 컨트롤이 없습니다.
 탭 진입에는 맞는 동작이고, 프로젝트 상세에서 진입할 때는 `true`로 들어옵니다.
 
-## 11. 공유 URL → 레포지토리 등록 랜딩 (작업 5)
-
-**상황** — 경로 자체는 이미 있었습니다.
-
-```
-ShareExtension → App Group(UserDefaults) → gitit://shared-link
-  → GitItApp.onOpenURL → AppRootFeature.sharedRepositoryLinkReceived
-  → ProjectRegistrationRouterFeature(initialRepositoryURL:)
-  → RepositoryLinkInputFeature(pendingAutomaticValidation: true) → 자동 검증
-```
-
-**공백** — 확장이 `NSExtensionActivationSupportsWebURLWithMaxCount: 1`로만 활성화되고
-`public.url` 첨부만 읽었습니다. 메신저·메모처럼 **텍스트로 공유된 GitHub 링크는 확장이 뜨지도
-않았습니다.**
-
-**결정** — 활성화 규칙을 predicate로 바꿔 `public.url` 또는 `public.plain-text`를 받고,
-`ShareViewController`가 텍스트 첨부에서 `NSDataDetector`로 첫 http(s) 링크를 뽑도록 했습니다
-(`SharedURLExtractor`).
-
-**형식 판정은 앱에 남겼습니다.** `AppModuleName.swift`에 "확장은 URL 형식을 판정하지 않고 그대로
-앱에 넘기므로 프로젝트 내부 패키지에 의존하지 않는다"는 설계 노트가 있어 그대로 따랐습니다.
-지원 형식 판정은 `GitHubRepositoryURLParser`(github.com 호스트, `owner/name` 경로, `.git` 접미사 제거)가
-링크 입력 화면의 자동 검증에서 수행하고, 지원하지 않는 링크는 그 화면에서 검증 실패로 보입니다.
-
-**미검증** — `SharedURLExtractor`에 단위 테스트를 두지 않았습니다. `GitItTests`가 `ShareExtension`
-타깃에 의존하지 않고(확장은 `dependencies: []`), 기존에도 확장 테스트가 없습니다. 테스트를 두려면
-추출 로직을 별도 프레임워크로 빼야 하는데, 확장을 의존성 없이 유지하려는 설계와 충돌합니다.
-
-## 12. 데드코드 도구 결과는 사용하지 않음
+## 11. 데드코드 도구 결과는 사용하지 않음
 
 `code-review-graph`의 `dead_code` 모드가 513건을 보고했지만 대부분 오탐이었습니다.
 `CodingKeys`·`Action`·`CancelID`·`Constant` 같은 중첩 타입을 미참조로 판정했고, 그래프 경로가
 이전 디렉터리 구조(`Feature/Quiz/Reducers/`, `Feature/ProjectList/Reducers/`)로 남아 있어 실제 파일과
 맞지 않았습니다. 레거시 판단은 직접 읽어서 했습니다.
 
-## 13. 컨벤션 정합성 점검
+## 12. 컨벤션 정합성 점검
 
 ### 13-1. `docs/conventions/view.md` §4.1 갱신 (수정함)
 
@@ -240,7 +227,7 @@ ShareExtension → App Group(UserDefaults) → gitit://shared-link
 - `TagBadgeContractTests.swift` — `accent` 스타일 기대값을 `blue400`/`blue100`으로. 커밋된
   `TagBadge.swift`의 실제 값과 일치시키는 수정이라 그대로 두었습니다.
 
-## 14. 배경 API를 생성자 두 개로 분리
+## 13. 배경 API를 생성자 두 개로 분리
 
 **결정** — 2번에서 나눈 두 배경을 이제 *서로 다른 생성자*로 호출합니다. 두 값을 한 생성자에
 나란히 받지 않습니다.
@@ -267,7 +254,7 @@ ShareExtension → App Group(UserDefaults) → gitit://shared-link
 고정 배경이 없으면 스크롤 후 화면이 비기 때문입니다. 스크롤 배경 생성자가 토큰까지 함께 받아야
 한다면 이 가정을 바꿔야 합니다.
 
-## 15. `LayoutMetrics` 타입 전체 제거
+## 14. `LayoutMetrics` 타입 전체 제거
 
 **결정** — `LayoutMetrics`/`LayoutMetricsReader`/`LayoutMetrics.HeaderStyle` 타입과
 이를 화면·컴포넌트 트리에 걸쳐 주입하던 `(LayoutMetrics) -> View` 슬롯 시그니처를

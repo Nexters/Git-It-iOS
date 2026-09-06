@@ -5,18 +5,18 @@ import Foundation
 import SwiftUI
 import UIComponent
 
+// MARK: - RepositoryConfirmationScreen
+
 @ViewAction(for: RepositoryConfirmationFeature.self)
 struct RepositoryConfirmationScreen: View {
 
-    init(store: StoreOf<RepositoryConfirmationFeature>) {
-        self.store = store
-    }
+    // MARK: Internal
 
     @Bindable var store: StoreOf<RepositoryConfirmationFeature>
 
     var body: some View {
         VStack(spacing: 0) {
-            ScreenHeader(style: .largeTitle, onLeadingTap: { send(.backTapped) })
+            ScreenHeader(style: .default, onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
             Spacer(minLength: 0)
@@ -56,11 +56,13 @@ struct RepositoryConfirmationScreen: View {
 
 }
 
-private extension RepositoryConfirmationScreen {
-    enum Constant {
+// MARK: RepositoryConfirmationScreen.Constant
+
+extension RepositoryConfirmationScreen {
+    fileprivate enum Constant {
         static let textSetSpacing: CGFloat = 16
-        static let thumbnailSpacing: CGFloat = 12
-        static let thumbnailTopPadding: CGFloat = 40
-        static let bottomButtonPadding: CGFloat = 34
+        static let thumbnailSpacing: CGFloat = 21
+        static let thumbnailTopPadding: CGFloat = 29
+        static let bottomButtonPadding: CGFloat = 24
     }
 }

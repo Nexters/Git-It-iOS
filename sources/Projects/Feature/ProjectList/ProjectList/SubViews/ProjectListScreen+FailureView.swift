@@ -33,7 +33,7 @@ extension ProjectListScreen {
 
         private enum Constant {
             static let textSpacing: CGFloat = 10
-            static let bottomButtonPadding: CGFloat = 34
+            static let bottomButtonPadding: CGFloat = 24
         }
 
     }
