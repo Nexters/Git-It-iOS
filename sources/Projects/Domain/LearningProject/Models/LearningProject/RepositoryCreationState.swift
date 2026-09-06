@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RepositoryCreationState: Equatable, Sendable {
+public struct RepositoryCreationState: Codable, Equatable, Sendable {
 
     // MARK: Lifecycle
 
