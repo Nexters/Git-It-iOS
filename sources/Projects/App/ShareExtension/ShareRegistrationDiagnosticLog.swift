@@ -4,8 +4,6 @@ import os
 
 // MARK: - ShareRegistrationDiagnosticLog
 
-/// 진단 이벤트를 기기 안에만 기록한다. 토큰·개인정보를 남기지 않고 원격으로 전송하지
-/// 않는다.
 struct ShareRegistrationDiagnosticLog: Sendable {
 
     // MARK: Lifecycle

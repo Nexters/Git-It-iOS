@@ -4,9 +4,13 @@ import DomainMember
 @Reducer
 public struct CareerSelectionFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(completeCuration: any CompleteCurationUseCase) {
         self.completeCuration = completeCuration
     }
+
+    // MARK: Public
 
     public enum Submission: Equatable, Sendable {
         case idle
@@ -28,6 +32,8 @@ public struct CareerSelectionFeature: Sendable {
         case view(View)
         case effect(EffectEvent)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -90,6 +96,8 @@ public struct CareerSelectionFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum CancelID: Hashable {
         case curation

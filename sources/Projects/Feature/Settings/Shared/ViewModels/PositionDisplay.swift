@@ -1,10 +1,6 @@
 import DomainMember
 
-/// 설정 흐름(프로필 배지·설정 값·개발 분야 선택)이 공유하는 직군 표시 값.
-/// 순서는 Figma `1535:18281`(개발 분야 선택)의 카드 순서를 따른다.
 enum PositionDisplay {
-
-    // MARK: Internal
 
     static let orderedPositions: [MemberPosition] = [.frontend, .backend, .ios, .android]
 
@@ -34,7 +30,6 @@ enum PositionDisplay {
         }
     }
 
-    /// 미설정(`nil`)이면 FR-006a의 "선택 안 함"을 돌려준다.
     static func settingValue(for position: MemberPosition?) -> String {
         position.map(title(for:)) ?? unselectedTitle
     }

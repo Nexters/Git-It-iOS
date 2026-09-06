@@ -11,6 +11,8 @@ import Testing
 @Suite("ShareRegistrationFeature 검증")
 struct ShareRegistrationFeatureValidationTests {
 
+    // MARK: Internal
+
     @Test
     func `공유 항목에 URL이 없으면 네트워크 호출 없이 오류 상태가 된다`() async {
         let store = Self.makeStore(sharedURL: nil)

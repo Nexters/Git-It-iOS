@@ -50,7 +50,6 @@ public final class KeychainStore: Sendable {
                     namespace: namespace,
                     accessGroup: accessGroup,
                 )
-                // 실제 Keychain과 같이 신규 항목에만 접근성을 부여한다.
                 if state.values[storageKey] == nil {
                     state.accessibility = accessibility
                 }
@@ -113,9 +112,6 @@ public final class KeychainStore: Sendable {
 
     }
 
-    /// 새 항목은 기기 최초 잠금 해제 이후 읽을 수 있도록 저장한다. 이미 존재하는 항목은
-    /// 갱신 경로를 타므로 접근성 속성이 바뀌지 않는다. 접근성 전환이 필요하면 항목을
-    /// 삭제하고 다시 저장해야 한다.
     public func save(
         _ value: Data,
         for key: String,

@@ -49,6 +49,24 @@ public struct EmptyState<Illustration: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var illustrationSize: CGFloat {
+            128
+        }
+
+        static var illustrationSpacing: CGFloat {
+            16
+        }
+
+        static var textSpacing: CGFloat {
+            8
+        }
+
+        static var textMaxWidth: CGFloat {
+            320
+        }
+    }
+
     private let title: String
     private let message: String
     private let illustration: Illustration

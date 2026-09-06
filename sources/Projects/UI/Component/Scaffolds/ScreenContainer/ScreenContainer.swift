@@ -18,7 +18,7 @@ public struct ScreenContainer<Content: View>: View {
     public var body: some View {
         content()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(designSystem: background).ignoresSafeArea())
+            .background(Color(designSystem: background))
             .preferredColorScheme(.dark)
     }
 

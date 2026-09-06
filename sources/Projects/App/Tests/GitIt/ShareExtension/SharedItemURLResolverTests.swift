@@ -6,6 +6,8 @@ import Testing
 @Suite("SharedItemURLResolver")
 struct SharedItemURLResolverTests {
 
+    // MARK: Internal
+
     @Test
     func `URL 항목이 있으면 텍스트보다 먼저 사용한다`() async throws {
         let resolver = SharedItemURLResolver()

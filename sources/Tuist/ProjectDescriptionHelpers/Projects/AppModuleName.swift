@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - AppModuleName
 
 enum AppModuleName: String, CaseIterable {
-    case AppDebug
     case GitIt
     case GitItTests
     case ShareExtension
@@ -13,8 +12,6 @@ extension AppModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.App.rawValue)
         return switch self {
-        case .AppDebug:
-            directoryName
         case .GitIt:
             directoryName
         case .GitItTests:
@@ -26,17 +23,6 @@ extension AppModuleName {
 
     var target: Target {
         switch self {
-        case .AppDebug:
-            .module(
-                name: rawValue,
-                sourceDirectory: sourceDirectory,
-                dependencies: [
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainMember),
-                ],
-                buildLibraryForDistribution: false,
-            )
-
         case .GitIt:
             .target(
                 name: rawValue,
@@ -78,7 +64,6 @@ extension AppModuleName {
                 ],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
-                    .target(name: AppModuleName.AppDebug.rawValue),
                     .target(name: AppModuleName.ShareExtension.rawValue),
                     .fromComposition(.CompositionApp),
                     .fromFeature(.Feature),
@@ -118,8 +103,6 @@ extension AppModuleName {
                 bundleId: "com.nexters.hytime.gitit.tests",
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
-                // app extension target은 unit test target이 링크할 수 없어, 검증 대상
-                // 파일만 테스트 target에 직접 포함한다.
                 sources: [
                     "\(sourceDirectory)/**",
                     "\(AppModuleName.ShareExtension.sourceDirectory)/SharedItemURLResolver.swift",
@@ -138,8 +121,6 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        // TestStore는 MainActor에서 생성해야 한다. GitIt target과 같은 기본
-                        // 격리를 쓰지 않으면 테스트가 협력 스레드에서 실행돼 SIGTRAP으로 죽는다.
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
                     ]
@@ -156,7 +137,6 @@ extension AppModuleName {
                 infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
                 sources: ["\(sourceDirectory)/**/*.swift"],
                 entitlements: .file(path: "ShareExtension.entitlements"),
-                // 원격 푸시를 링크하지 않는 조립 루트와 화면만 의존한다.
                 dependencies: [
                     .fromComposition(.CompositionShareExtension),
                     .fromComposition(.CompositionAdapter),

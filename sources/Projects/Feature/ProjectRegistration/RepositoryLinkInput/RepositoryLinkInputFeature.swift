@@ -5,9 +5,13 @@ import Foundation
 @Reducer
 public struct RepositoryLinkInputFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(fetchExternalRepository: any FetchExternalRepositoryUseCase) {
         self.fetchExternalRepository = fetchExternalRepository
     }
+
+    // MARK: Public
 
     public enum ValidationStatus: Equatable, Sendable {
         case idle
@@ -19,7 +23,11 @@ public struct RepositoryLinkInputFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         public init() { }
+
+        // MARK: Public
 
         public var repositoryURLInput = ""
         public var validation = ValidationStatus.idle
@@ -39,12 +47,15 @@ public struct RepositoryLinkInputFeature: Sendable {
         public var validateButtonTitle: String {
             validation == .validating ? "확인 중…" : "다음"
         }
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case effect(EffectEvent)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -96,6 +107,8 @@ public struct RepositoryLinkInputFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum CancelID: Hashable {
         case validation

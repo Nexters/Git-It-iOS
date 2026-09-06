@@ -63,7 +63,7 @@ struct ProfileDisplayTests {
         let display = ProfileDisplay(.loaded(empty), todayLabel: "월")
 
         #expect(display.weeklyBars.map(\.dayLabel) == ProfileDisplay.defaultDayLabels)
-        #expect(display.weeklyBars.allSatisfy { $0.count == 0 })
+        #expect(display.weeklyBars.map(\.count).allSatisfy { $0 == 0 })
         #expect(display.weeklyBars.first?.isHighlighted == true)
         #expect(display.maxWeeklyCount == 0)
     }

@@ -5,9 +5,13 @@ import DomainMember
 @Reducer
 public struct PositionSelectionFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(signOut: any SignOutUseCase) {
         self.signOut = signOut
     }
+
+    // MARK: Public
 
     public enum ExitStatus: Equatable, Sendable {
         case idle
@@ -27,6 +31,8 @@ public struct PositionSelectionFeature: Sendable {
         case view(View)
         case effect(EffectEvent)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -83,6 +89,8 @@ public struct PositionSelectionFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum CancelID: Hashable {
         case exit

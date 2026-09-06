@@ -4,8 +4,6 @@ import InfrastructureStorage
 
 // MARK: - RepositoryCreationStateRepositoryAdapter
 
-/// 본 앱과 Share Extension이 서로 다른 프로세스이므로, 생성 중 상태를 App Group 공유
-/// `UserDefaults`에 저장해 두 프로세스가 동일한 상태를 보고 갱신하도록 한다.
 actor RepositoryCreationStateRepositoryAdapter: RepositoryCreationStateRepository {
 
     // MARK: Lifecycle

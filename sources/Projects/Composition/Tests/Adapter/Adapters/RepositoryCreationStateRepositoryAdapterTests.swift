@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 import Testing
 @testable import CompositionAdapter
 @testable import DomainLearningProject
@@ -7,6 +8,8 @@ import Testing
 
 @Suite("RepositoryCreationStateRepositoryAdapter")
 struct RepositoryCreationStateRepositoryAdapterTests {
+
+    // MARK: Internal
 
     @Test
     func `생성을 시작하고 projectID를 연결하면 활성 목록에 반영된다`() async throws {
@@ -106,7 +109,7 @@ struct RepositoryCreationStateRepositoryAdapterTests {
         #expect(began == true)
         #expect(duplicateBegan == false)
         let isCreatingFromOtherInstance = await shareExtensionAdapter.isCreating(
-            githubRepoURL: "https://github.com/owner/repo",
+            githubRepoURL: "https://github.com/owner/repo"
         )
         #expect(isCreatingFromOtherInstance == true)
     }
@@ -121,17 +124,28 @@ struct RepositoryCreationStateRepositoryAdapterTests {
 
 // MARK: - ClockBox
 
-private final class ClockBox: @unchecked Sendable {
+private final class ClockBox: Sendable {
 
     // MARK: Lifecycle
 
     init(current: Date) {
-        self.current = current
+        storage = Mutex(current)
     }
 
     // MARK: Internal
 
-    var current: Date
+    var current: Date {
+        get {
+            storage.withLock { $0 }
+        }
+        set {
+            storage.withLock { $0 = newValue }
+        }
+    }
+
+    // MARK: Private
+
+    private let storage: Mutex<Date>
 
 }
 

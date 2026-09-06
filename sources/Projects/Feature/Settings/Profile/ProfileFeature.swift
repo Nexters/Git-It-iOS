@@ -68,7 +68,6 @@ public struct ProfileFeature: Sendable {
                     return startProfileLoad(state: &state, showsLoading: true)
 
                 case .loaded:
-                    // 이미 보여 주는 값은 유지한 채 최신 통계를 다시 받아온다(FR-007).
                     return startProfileLoad(state: &state, showsLoading: false)
 
                 case .loading:
@@ -89,8 +88,9 @@ public struct ProfileFeature: Sendable {
                     state.profileLoad = .loaded(profile)
 
                 case .failure(let error):
-                    // 갱신 실패는 기존 값을 유지하고, 처음 조회 실패만 실패 상태로 노출한다.
-                    if case .loaded = state.profileLoad { return .none }
+                    if case .loaded = state.profileLoad {
+                        return .none
+                    }
                     state.profileLoad = .failed(error)
                 }
                 return .none

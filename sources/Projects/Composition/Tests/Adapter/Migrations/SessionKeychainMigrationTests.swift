@@ -9,6 +9,8 @@ import Testing
 @Suite("SessionKeychainMigration")
 struct SessionKeychainMigrationTests {
 
+    // MARK: Internal
+
     @Test
     func `접근 그룹이 없던 기존 세션을 공유 저장소로 옮기고 기존 항목을 지운다`() throws {
         let backend = KeychainStore.InMemoryBackend()

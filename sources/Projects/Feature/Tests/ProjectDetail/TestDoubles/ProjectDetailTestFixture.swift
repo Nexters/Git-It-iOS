@@ -7,20 +7,17 @@ enum ProjectDetailTestFixture {
     static let projectID = "project-1"
     static let repositoryURL = "https://github.com/owner/repo"
 
-    /// 완료된 세트와 진행 중 세트, 시작 전 세트가 섞인 상세입니다.
     static let mixedProgressDetail = detail(sets: [
         setProgress(index: 0, problemCount: 5, completedCount: 5),
         setProgress(index: 1, problemCount: 4, completedCount: 2),
         setProgress(index: 2, problemCount: 3, completedCount: 0),
     ])
 
-    /// 모든 세트가 완료된 상세입니다.
     static let completedDetail = detail(sets: [
         setProgress(index: 0, problemCount: 5, completedCount: 5),
         setProgress(index: 1, problemCount: 4, completedCount: 4),
     ])
 
-    /// 세트가 하나도 없는 상세입니다.
     static let emptyDetail = detail(sets: [])
 
     static let savedQuestionCollection = BookmarkedQuestionCollection(

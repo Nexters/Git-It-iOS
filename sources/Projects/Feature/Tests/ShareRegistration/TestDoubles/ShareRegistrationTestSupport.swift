@@ -4,7 +4,6 @@ import Synchronization
 
 // MARK: - StubRepositoryURLParser
 
-/// 로컬 판정 결과를 고정한다. 네트워크를 사용하지 않는다.
 struct StubRepositoryURLParser: ExternalRepositoryURLParser {
 
     // MARK: Lifecycle
@@ -15,7 +14,7 @@ struct StubRepositoryURLParser: ExternalRepositoryURLParser {
 
     // MARK: Internal
 
-    func location(from url: String) -> ExternalRepositoryLocation? {
+    func location(from _: String) -> ExternalRepositoryLocation? {
         location
     }
 
@@ -37,19 +36,23 @@ struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
 
     // MARK: Internal
 
-    func callAsFunction(url: String) async throws -> ExternalRepository {
-        try result.value.get()
+    func callAsFunction(url _: String) async throws -> ExternalRepository {
+        try result.resolve()
     }
 
     // MARK: Private
 
-    private struct ResultBox: @unchecked Sendable {
+    private struct ResultBox: Sendable {
 
         init(_ value: Result<ExternalRepository, any Error>) {
-            self.value = value
+            storage = Mutex(value)
         }
 
-        let value: Result<ExternalRepository, any Error>
+        func resolve() throws -> ExternalRepository {
+            try storage.withLock { try $0.get() }
+        }
+
+        private let storage: Mutex<Result<ExternalRepository, any Error>>
 
     }
 
@@ -59,7 +62,6 @@ struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
 
 // MARK: - SpyCreateLearningProject
 
-/// 등록 호출 횟수와 전달된 난이도를 기록한다.
 final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
 
     // MARK: Lifecycle
@@ -84,13 +86,12 @@ final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
         calls.withLock { $0.last }
     }
 
-    /// 진행 중 상태를 유지하려고 멈춰 둔 호출을 끝낸다.
     func resume() {
         gate.continuation.finish()
     }
 
     func callAsFunction(
-        githubRepoURL: String,
+        githubRepoURL _: String,
         quizLevel: QuizLevel,
     ) async throws -> ProjectRegistrationReceipt {
         calls.withLock { state in
@@ -100,7 +101,9 @@ final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
         if suspendsUntilResumed {
             for await _ in gate.stream { }
         }
-        if let error { throw error }
+        if let error {
+            throw error
+        }
         return ProjectRegistrationReceipt(
             projectID: projectID,
             requestStatus: "accepted",

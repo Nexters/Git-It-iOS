@@ -4,7 +4,11 @@ import DomainLearningProject
 @Reducer
 public struct QuizLevelSelectionFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init() { }
+
+    // MARK: Public
 
     @ObservableState
     public struct State: Equatable, Sendable {
@@ -14,6 +18,7 @@ public struct QuizLevelSelectionFeature: Sendable {
         }
 
         public var quizLevel: QuizLevel
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {

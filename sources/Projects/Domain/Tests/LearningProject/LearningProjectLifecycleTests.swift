@@ -158,11 +158,14 @@ private actor LifecycleRepositoryCreationStateRepository: RepositoryCreationStat
         true
     }
 
-    func attachProjectID(_: String, toGithubRepoURL _: String) async {}
+    func attachProjectID(
+        _: String,
+        toGithubRepoURL _: String,
+    ) async { }
 
-    func endCreation(githubRepoURL _: String) async {}
+    func endCreation(githubRepoURL _: String) async { }
 
-    func endCreation(projectID _: String) async {}
+    func endCreation(projectID _: String) async { }
 
     func activeProjectIDs() async -> Set<String> {
         []

@@ -118,7 +118,6 @@ public struct QuizRouterFeature: Sendable {
         }
     }
 
-    /// 진행 컨트롤 문구입니다. 문제 화면은 이 값만 읽고 흐름을 알지 않습니다.
     public static let nextQuestionActionTitle = "다음 문제"
     public static let completeActionTitle = "학습 완료"
 

@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// "마이" 탭 Router View. `activeScreen`에 따라 프로필 화면 또는 설정 화면의 단계를 그린다.
 public struct SettingsRouter: View {
 
     // MARK: Lifecycle

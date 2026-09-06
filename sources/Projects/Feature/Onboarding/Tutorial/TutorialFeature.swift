@@ -5,6 +5,8 @@ import DomainMember
 @Reducer
 public struct TutorialFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         signIn: any SignInUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
@@ -14,6 +16,8 @@ public struct TutorialFeature: Sendable {
         self.deleteMemberAccount = deleteMemberAccount
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
+
+    // MARK: Public
 
     public enum AuthenticationStatus: Equatable, Sendable {
         case idle
@@ -47,6 +51,7 @@ public struct TutorialFeature: Sendable {
         public var isShowingRecoverableError: Bool {
             authentication == .retryableFailure || authentication == .cancelled
         }
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -54,6 +59,8 @@ public struct TutorialFeature: Sendable {
         case effect(EffectEvent)
         case input(Input)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -129,6 +136,8 @@ public struct TutorialFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum Constant {
         static let pageCount = 3

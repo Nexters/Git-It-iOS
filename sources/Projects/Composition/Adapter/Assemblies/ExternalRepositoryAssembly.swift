@@ -27,7 +27,6 @@ public struct ExternalRepositoryAssembly: Sendable {
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
-    /// 네트워크 호출 없이 저장소 URL을 판정한다. 조회 전에 형식을 거르는 용도다.
     public let urlParser: any ExternalRepositoryURLParser
 
 }

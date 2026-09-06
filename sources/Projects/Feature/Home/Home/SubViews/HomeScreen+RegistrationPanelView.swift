@@ -46,6 +46,14 @@ extension HomeScreen {
 
         // MARK: Private
 
+        private enum Constant {
+            static let registrationLabel = "프로젝트 지금 불러오기"
+            static let generationInProgressLabel = "문제 생성 중"
+            static let progressLabelSpacing: CGFloat = 8
+            static let progressIndicatorSize: CGFloat = 20
+            static let progressLabelHorizontalPadding: CGFloat = 12
+        }
+
         private var generationInProgressLabel: some View {
             HStack(spacing: Constant.progressLabelSpacing) {
                 ResourceAnimation(asset: .generalLoading)
@@ -58,15 +66,6 @@ extension HomeScreen {
             .frame(minHeight: 44)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(Constant.generationInProgressLabel)
-        }
-
-
-        private enum Constant {
-            static let registrationLabel = "프로젝트 지금 불러오기"
-            static let generationInProgressLabel = "학습세트 생성 중..."
-            static let progressLabelSpacing: CGFloat = 8
-            static let progressIndicatorSize: CGFloat = 20
-            static let progressLabelHorizontalPadding: CGFloat = 12
         }
 
     }

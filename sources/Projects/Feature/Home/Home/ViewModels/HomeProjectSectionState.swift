@@ -1,5 +1,10 @@
 enum HomeProjectSectionState: Equatable, Sendable {
 
+    case loading
+    case empty
+    case failed
+    case loaded([HomeProjectDisplay])
+
     // MARK: Lifecycle
 
     init(_ projectLoad: HomeFeature.State.ProjectLoad) {
@@ -18,12 +23,5 @@ enum HomeProjectSectionState: Equatable, Sendable {
             self = .failed
         }
     }
-
-    // MARK: Internal
-
-    case loading
-    case empty
-    case failed
-    case loaded([HomeProjectDisplay])
 
 }

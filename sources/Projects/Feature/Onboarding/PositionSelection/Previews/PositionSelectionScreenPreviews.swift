@@ -2,8 +2,8 @@ import ComposableArchitecture
 import DomainMember
 import SwiftUI
 
-private extension PositionSelectionFeature.State {
-    static func preview(
+extension PositionSelectionFeature.State {
+    fileprivate static func preview(
         position: MemberPosition? = nil,
         exitStatus: PositionSelectionFeature.ExitStatus = .idle,
     ) -> Self {

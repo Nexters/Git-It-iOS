@@ -13,14 +13,12 @@ public struct OnboardingRouter: View {
 
     // MARK: Public
 
+    @Bindable public var store: StoreOf<OnboardingRouterFeature>
+
     public var body: some View {
         content
             .accessibilityElement(children: .contain)
     }
-
-    // MARK: Public
-
-    @Bindable public var store: StoreOf<OnboardingRouterFeature>
 
     // MARK: Private
 

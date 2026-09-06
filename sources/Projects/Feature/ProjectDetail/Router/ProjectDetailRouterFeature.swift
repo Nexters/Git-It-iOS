@@ -108,7 +108,6 @@ public struct ProjectDetailRouterFeature: Sendable {
         }
     }
 
-    /// 단일 문제 결과에서 목록으로 돌아가는 컨트롤 문구입니다.
     public static let singleQuestionAdvanceActionTitle = "완료"
 
     public var body: some ReducerOf<Self> {

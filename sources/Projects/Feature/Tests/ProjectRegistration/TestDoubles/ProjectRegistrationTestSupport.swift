@@ -93,6 +93,8 @@ func waitUntil(
     }
 }
 
+// MARK: - OpenNotificationSettingsSpy
+
 actor OpenNotificationSettingsSpy {
 
     private(set) var callCount = 0

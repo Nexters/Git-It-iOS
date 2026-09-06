@@ -12,6 +12,8 @@ import Testing
 @Suite("ShareRegistration 진단 이벤트")
 struct ShareRegistrationDiagnosticsTests {
 
+    // MARK: Internal
+
     @Test
     func `링크 판정 실패를 진단 이벤트로 남긴다`() async {
         let recorder = Recorder()
@@ -64,11 +66,15 @@ struct ShareRegistrationDiagnosticsTests {
 
         #expect(recorder.events.contains(.sessionResolved(.available)))
         #expect(recorder.events.contains { event in
-            if case .repositoryLookupFailed = event { return true }
+            if case .repositoryLookupFailed = event {
+                return true
+            }
             return false
         })
         #expect(recorder.events.contains { event in
-            if case .registrationFailed = event { return true }
+            if case .registrationFailed = event {
+                return true
+            }
             return false
         } == false)
     }

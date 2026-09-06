@@ -5,6 +5,8 @@ import Testing
 
 @testable import Feature
 
+// MARK: - QuizGenerationProgressFeatureTests
+
 @Suite("QuizGenerationProgressFeature")
 struct QuizGenerationProgressFeatureTests {
 
@@ -542,6 +544,8 @@ struct QuizGenerationProgressFeatureTests {
     }
 
 }
+
+// MARK: - QuizGenerationProgressHostFeature
 
 @Reducer
 private struct QuizGenerationProgressHostFeature {

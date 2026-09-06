@@ -4,8 +4,6 @@ import InfrastructureAuthentication
 
 // MARK: - SessionAvailabilityResolver
 
-/// 공유 저장소의 세션 상태 마커와 세션 기록으로 Extension이 등록을 진행할 수 있는지
-/// 판정한다. 어떤 경로로도 토큰 갱신을 시도하지 않는다.
 public struct SessionAvailabilityResolver: Sendable {
 
     // MARK: Lifecycle

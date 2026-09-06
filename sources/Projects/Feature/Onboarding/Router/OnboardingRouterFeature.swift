@@ -6,6 +6,8 @@ import Foundation
 @Reducer
 public struct OnboardingRouterFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         signIn: any SignInUseCase,
         signOut: any SignOutUseCase,
@@ -21,6 +23,8 @@ public struct OnboardingRouterFeature: Sendable {
         self.deleteMemberAccount = deleteMemberAccount
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
+
+    // MARK: Public
 
     public enum ActiveScreen: Equatable, Sendable {
         case guide(Guide)
@@ -47,6 +51,8 @@ public struct OnboardingRouterFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         public init(
             startingAt entryPoint: OnboardingEntryPoint,
             bundleVersion: String,
@@ -61,6 +67,8 @@ public struct OnboardingRouterFeature: Sendable {
             tutorial = TutorialFeature.State(bundleVersion: bundleVersion)
         }
 
+        // MARK: Public
+
         public internal(set) var activeScreen: ActiveScreen
         public var tutorial: TutorialFeature.State
         public var legalAgreement = LegalAgreementFeature.State()
@@ -68,6 +76,7 @@ public struct OnboardingRouterFeature: Sendable {
         public var careerSelection = CareerSelectionFeature.State()
         public var exit = OnboardingExitFeature.State()
         public internal(set) var transitionLog = [ScreenTransitionEvent]()
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -184,6 +193,8 @@ public struct OnboardingRouterFeature: Sendable {
         }
     }
 
+    // MARK: Private
+
     private let signIn: any SignInUseCase
     private let signOut: any SignOutUseCase
     private let policyConsent: any PolicyConsentUseCase
@@ -191,7 +202,10 @@ public struct OnboardingRouterFeature: Sendable {
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let deletesCompletedAccountOnSignIn: Bool
 
-    private func advanceAfterSignIn(needsCuration: Bool, state: inout State) -> Effect<Action> {
+    private func advanceAfterSignIn(
+        needsCuration: Bool,
+        state: inout State,
+    ) -> Effect<Action> {
         guard needsCuration else { return .send(.delegate(.mainShellRequested)) }
         state.positionSelection = PositionSelectionFeature.State()
         state.careerSelection = CareerSelectionFeature.State()

@@ -30,6 +30,20 @@ public struct BottomActionBar<Content: View>: View {
 
     // MARK: Private
 
+    private enum Constant {
+        static var topPadding: CGFloat {
+            4
+        }
+
+        static var bottomPadding: CGFloat {
+            24
+        }
+
+        static var minimumBottomInset: CGFloat {
+            24
+        }
+    }
+
     @State private var safeAreaBottomInset: CGFloat = 0
 
     private let content: Content

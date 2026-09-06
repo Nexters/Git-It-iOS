@@ -11,6 +11,8 @@ import Testing
 @Suite("ShareRegistrationFeature 실패와 중단")
 struct ShareRegistrationFeatureFailureTests {
 
+    // MARK: Internal
+
     @Test
     func `등록 실패 사유를 표시하고 등록 단계 재시도를 제공한다`() async {
         let store = Self.makeStore(error: .temporarilyUnavailable)

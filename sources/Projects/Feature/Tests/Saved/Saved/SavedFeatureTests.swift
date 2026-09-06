@@ -129,7 +129,7 @@ struct SavedFeatureTests {
                 projectID: question.projectID,
                 questionID: question.questionID,
                 bookmarked: false,
-            ),
+            )
         ])
         #expect(store.state.collection?.bookmarks.contains(where: { $0.questionID == question.questionID }) == true)
     }

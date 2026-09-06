@@ -5,7 +5,10 @@ struct HomeProjectDisplay: Equatable, Sendable {
 
     // MARK: Lifecycle
 
-    init(_ project: LearningProjectSummary, index: Int) {
+    init(
+        _ project: LearningProjectSummary,
+        index: Int,
+    ) {
         projectID = project.projectID
         title = project.repositoryName
         technologies = project.techStack.joined(separator: " · ")

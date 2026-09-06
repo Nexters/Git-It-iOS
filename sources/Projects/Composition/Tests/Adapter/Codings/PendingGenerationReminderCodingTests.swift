@@ -7,6 +7,8 @@ import Testing
 @Suite("PendingGenerationReminderCoding")
 struct PendingGenerationReminderCodingTests {
 
+    // MARK: Internal
+
     @Test
     func `기록한 프로젝트를 흡수하면 목록이 비워진다`() async throws {
         let userDefaults = try Self.makeUserDefaults()

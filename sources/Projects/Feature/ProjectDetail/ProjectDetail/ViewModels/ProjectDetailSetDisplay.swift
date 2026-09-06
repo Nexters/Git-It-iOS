@@ -3,7 +3,6 @@ import Foundation
 
 // MARK: - ProjectDetailSetDisplay
 
-/// 프로젝트 상세의 세트 항목 표시 값입니다.
 public struct ProjectDetailSetDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Lifecycle

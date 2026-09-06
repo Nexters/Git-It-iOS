@@ -2,7 +2,6 @@ import SwiftUI
 import UIComponent
 
 extension ProfileScreen {
-    /// 이번 주·이번 달·연속 학습 3열 통계 카드(Figma `1539:19226`).
     struct StatisticsCardView: View {
 
         // MARK: Internal
@@ -33,7 +32,6 @@ extension ProfileScreen {
             static let gradientEndOpacity = 0.5
         }
 
-        /// Figma "Gradient 4"(blue500 → blue500 50%)는 DesignSystem 토큰이 없어 색 토큰으로 조합한다.
         private var cardGradient: LinearGradient {
             LinearGradient(
                 colors: [
@@ -45,7 +43,10 @@ extension ProfileScreen {
             )
         }
 
-        private func column(label: String, value: String) -> some View {
+        private func column(
+            label: String,
+            value: String,
+        ) -> some View {
             VStack(spacing: Constant.columnSpacing) {
                 StyledText.caption2(label, color: .grey300, alignment: .center)
                 StyledText.subtitle2(value, color: .blue100, alignment: .center)

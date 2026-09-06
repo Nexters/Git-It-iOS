@@ -48,18 +48,15 @@ public struct SavedFeature: Sendable {
 
         // MARK: Public
 
-        /// 값이 있으면 그 프로젝트의 문제만 조회합니다.
         public let projectFilter: String?
-        /// 뒤로가기 컨트롤의 표시 여부만 결정하는 표시 값입니다.
         public let isBackControlPresented: Bool
 
         public var selectedProjectID: String?
         public var collection: BookmarkedQuestionCollection?
         public var loadStatus = LoadStatus.idle
         public var requestID = 0
-        /// 목록 조회 이후 로컬에서 뒤집은 북마크 상태입니다. 재조회 전까지는 목록에서 제거하지 않습니다.
-        public var bookmarkOverrides: [String: Bool] = [:]
-        public var bookmarkMutations: [String: BookmarkMutation] = [:]
+        public var bookmarkOverrides = [String: Bool]()
+        public var bookmarkMutations = [String: BookmarkMutation]()
 
         public var isEmpty: Bool {
             collection?.bookmarks.isEmpty ?? false
@@ -186,7 +183,10 @@ public struct SavedFeature: Sendable {
         .cancellable(id: CancelID.load, cancelInFlight: true)
     }
 
-    private func toggleBookmark(_ state: inout State, question: BookmarkedQuestion) -> Effect<Action> {
+    private func toggleBookmark(
+        _ state: inout State,
+        question: BookmarkedQuestion,
+    ) -> Effect<Action> {
         let questionID = question.questionID
         guard state.bookmarkMutations[questionID] != .committing else { return .none }
         state.bookmarkMutations[questionID] = .committing

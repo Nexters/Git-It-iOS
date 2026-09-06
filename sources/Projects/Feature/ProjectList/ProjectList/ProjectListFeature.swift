@@ -37,8 +37,6 @@ public struct ProjectListFeature: Sendable {
         case failed(LearningProjectError)
     }
 
-    /// 헤더·행 표현을 가르는 배타 화면 모드입니다. 삭제 확인 모달(`Deletion`)은
-    /// `deleting` 모드 안에서 동시에 존재할 수 있으므로 이 enum에 합치지 않습니다.
     public enum Mode: Equatable, Sendable {
         case browsing
         case menuPresented

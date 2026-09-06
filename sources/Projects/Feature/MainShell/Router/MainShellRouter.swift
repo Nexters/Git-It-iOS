@@ -16,6 +16,8 @@ public struct MainShellRouter: View {
 
     // MARK: Public
 
+    @Bindable public var store: StoreOf<MainShellRouterFeature>
+
     public var body: some View {
         TabShell(selected: selectedTab) { tab in
             switch tab {
@@ -50,10 +52,6 @@ public struct MainShellRouter: View {
             QuestionSolvingScreen(store: singleQuestionStore)
         }
     }
-
-    // MARK: Public
-
-    @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     // MARK: Private
 

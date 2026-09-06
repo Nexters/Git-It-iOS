@@ -11,6 +11,8 @@ import Testing
 @Suite("ShareRegistrationFeature 등록 단계 이동")
 struct ShareRegistrationFeatureStepTests {
 
+    // MARK: Internal
+
     @Test
     func `저장소 확인 뒤 난이도와 생성 확인 순서로 이동한다`() async {
         let store = Self.makeStore()

@@ -201,7 +201,10 @@ private actor StubRepositoryCreationStateRepository: RepositoryCreationStateRepo
         return true
     }
 
-    func attachProjectID(_ projectID: String, toGithubRepoURL githubRepoURL: String) async {
+    func attachProjectID(
+        _ projectID: String,
+        toGithubRepoURL githubRepoURL: String,
+    ) async {
         guard creatingGithubRepoURLs.contains(githubRepoURL) else { return }
         projectIDsByGithubRepoURL[githubRepoURL] = projectID
     }

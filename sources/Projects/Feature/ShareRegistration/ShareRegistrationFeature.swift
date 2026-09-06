@@ -4,8 +4,6 @@ import Foundation
 
 // MARK: - ShareRegistrationFeature
 
-/// 공유 시트로 진입한 저장소 링크를 본 앱과 같은 등록 화면들로 처리한다. 링크는 이미
-/// 전달됐으므로 입력 화면을 건너뛰고 저장소 확인부터 시작한다.
 @Reducer
 public struct ShareRegistrationFeature: Sendable {
 
@@ -33,7 +31,6 @@ public struct ShareRegistrationFeature: Sendable {
 
     // MARK: Public
 
-    /// 실패 상태에서 재시도가 어느 단계를 다시 수행하는지 나타낸다.
     public enum RetryTarget: Equatable, Sendable {
         case lookup
         case registration
@@ -70,7 +67,6 @@ public struct ShareRegistrationFeature: Sendable {
         public var quizLevelSelection = QuizLevelSelectionFeature.State()
         public var quizGenerationConfirmation = QuizGenerationConfirmationFeature.State()
 
-        /// 조회에 성공한 저장소. 등록 실패 후 재시도에서도 그대로 사용한다.
         public var repository: ExternalRepository? {
             repositoryConfirmation.repository
         }
@@ -79,7 +75,6 @@ public struct ShareRegistrationFeature: Sendable {
             quizLevelSelection.quizLevel
         }
 
-        /// 요청 중에는 닫기를 포함한 모든 동작을 막는다.
         public var isBusy: Bool {
             if case .submitting = status {
                 return true
@@ -108,10 +103,11 @@ public struct ShareRegistrationFeature: Sendable {
         case quizGenerationConfirmation(QuizGenerationConfirmationFeature.Action)
         case delegate(Delegate)
 
+        // MARK: Public
+
         @CasePathable
         public enum View: Sendable, Equatable {
             case task
-            /// 공유 항목 해석 결과. 호스트 앱이 준 항목에서 URL을 얻지 못하면 `nil`이다.
             case sharedURLResolved(String?)
             case retryTapped
             case dismissTapped
@@ -143,7 +139,6 @@ public struct ShareRegistrationFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .view(.task):
-                // 공유 항목 해석이 끝나기 전에는 검증 중 상태를 유지한다.
                 guard state.sharedURL != nil else { return .none }
                 return validate(&state)
 
@@ -165,7 +160,6 @@ public struct ShareRegistrationFeature: Sendable {
                 state.status = .quizLevelSelection
                 return .none
 
-            // 링크는 공유로 전달돼 다시 입력할 화면이 없으므로 그대로 종료한다.
             case .repositoryConfirmation(.delegate(.rejected)):
                 return dismissIfIdle(&state)
 
@@ -202,7 +196,6 @@ public struct ShareRegistrationFeature: Sendable {
 
                 case .failure(let error):
                     if error == .unauthorized {
-                        // 갱신을 시도하지 않고 로그인 안내로 전환한다.
                         state.status = .signInRequired
                         recordDiagnostic(.sessionResolved(.signInRequired))
                     } else {
@@ -233,6 +226,9 @@ public struct ShareRegistrationFeature: Sendable {
         case registration
     }
 
+    private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
+    private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
+
     private let parseRepositoryLink: any ExternalRepositoryURLParser
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
@@ -241,9 +237,6 @@ public struct ShareRegistrationFeature: Sendable {
     private let enqueueGenerationReminder: @Sendable (String) async -> Void
     private let recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void
     private let dismiss: @MainActor @Sendable () -> Void
-
-    private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
-    private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
 
     private static func registrationFailureReason(for error: LearningProjectError) -> String {
         switch error {
@@ -271,7 +264,6 @@ public struct ShareRegistrationFeature: Sendable {
         }
     }
 
-    /// 진행 중 요청은 취소하고 보관하지 않는다.
     private func dismissIfIdle(_ state: inout State) -> Effect<Action> {
         guard state.canDismiss else { return .none }
         return .merge(
@@ -288,7 +280,6 @@ public struct ShareRegistrationFeature: Sendable {
             recordDiagnostic(.sharedItemUnavailable)
             return .none
         }
-        // 네트워크 호출 전에 로컬 판정으로 GitHub 저장소 경로인지 먼저 거른다.
         guard parseRepositoryLink.location(from: sharedURL) != nil else {
             state.status = .invalidURL(reason: Self.invalidLinkReason)
             recordDiagnostic(.repositoryLinkRejected)
@@ -358,8 +349,6 @@ public struct ShareRegistrationFeature: Sendable {
         .cancellable(id: CancelID.registration, cancelInFlight: true)
     }
 
-    /// 권한이 이미 허용된 경우에만 대기 목록에 남긴다. 권한을 요청하지 않으며 기록이
-    /// 실패해도 성공 표시를 되돌리지 않는다.
     private func enqueueReminderIfAuthorized(projectID: String) -> Effect<Action> {
         .run { _ in
             guard await isNotificationAuthorized() else { return }

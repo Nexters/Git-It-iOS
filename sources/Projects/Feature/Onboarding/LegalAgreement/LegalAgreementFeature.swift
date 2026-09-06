@@ -6,21 +6,27 @@ import Foundation
 @Reducer
 public struct LegalAgreementFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(policyConsent: any PolicyConsentUseCase) {
         self.policyConsent = policyConsent
     }
 
+    // MARK: Public
+
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         public init() { }
+
+        // MARK: Public
 
         public var requiredDocuments = [PolicyDocument]()
         public var storedConsentRecords = [PolicyConsentRecord]()
         public var selectedDocumentIDs = Set<String>()
         public var presentedDocumentID: String?
-
-        var pendingNeedsCuration: Bool?
 
         public var presentedDocument: PolicyDocument? {
             guard let presentedDocumentID else { return nil }
@@ -41,6 +47,11 @@ public struct LegalAgreementFeature: Sendable {
         public var isStoredConsentValid: Bool {
             PolicyConsentRecord.isConsentValid(storedRecords: storedConsentRecords, for: requiredDocuments)
         }
+
+        // MARK: Internal
+
+        var pendingNeedsCuration: Bool?
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -48,6 +59,8 @@ public struct LegalAgreementFeature: Sendable {
         case effect(EffectEvent)
         case input(Input)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -160,6 +173,8 @@ public struct LegalAgreementFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private let policyConsent: any PolicyConsentUseCase
 

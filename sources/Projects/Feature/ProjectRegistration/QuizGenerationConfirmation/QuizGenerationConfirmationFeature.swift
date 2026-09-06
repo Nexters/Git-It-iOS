@@ -3,7 +3,11 @@ import ComposableArchitecture
 @Reducer
 public struct QuizGenerationConfirmationFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init() { }
+
+    // MARK: Public
 
     @ObservableState
     public struct State: Equatable, Sendable {
@@ -31,13 +35,13 @@ public struct QuizGenerationConfirmationFeature: Sendable {
         Reduce { _, action in
             switch action {
             case .view(.startTapped):
-                return .send(.delegate(.submitRequested))
+                .send(.delegate(.submitRequested))
 
             case .view(.backTapped):
-                return .send(.delegate(.backRequested))
+                .send(.delegate(.backRequested))
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }

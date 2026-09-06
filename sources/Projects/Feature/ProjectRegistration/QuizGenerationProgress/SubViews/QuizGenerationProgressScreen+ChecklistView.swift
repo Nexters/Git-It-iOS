@@ -17,6 +17,7 @@ extension QuizGenerationProgressScreen {
                 ForEach(Stage.allCases, id: \.self) { stage in
                     checklistRow(title: stage.title, status: status(for: stage))
                 }
+                .padding(.horizontal, Constant.rowHorizontalPadding)
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("학습 세트 생성 진행 체크리스트")
@@ -28,6 +29,7 @@ extension QuizGenerationProgressScreen {
             static let rowSpacing: CGFloat = 19
             static let itemSpacing: CGFloat = 14
             static let iconSize: CGFloat = 24
+            static let rowHorizontalPadding: CGFloat = 100
         }
 
         private func checklistRow(

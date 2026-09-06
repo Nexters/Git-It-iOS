@@ -7,8 +7,8 @@ import Testing
 struct AccessibilityContractTests {
     @Test
     func `아이콘 전용 버튼은 접근성 라벨을 생략할 수 없다`() {
-        _ = IconPlainButton(symbol: "ic-play-1", label: "학습 시작")
-        _ = IconGlassButton(symbol: "ellipsis", label: "더 보기")
+        _ = IconPlainButton(icon: .play, label: "학습 시작")
+        _ = IconGlassButton(icon: .menu, label: "더 보기")
         _ = BookmarkButton(isSaved: false, accessibilityLabel: "저장하기") { }
     }
 

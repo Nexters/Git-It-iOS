@@ -55,7 +55,6 @@ public struct ProjectDetailFeature: Sendable {
             detail?.sets.isEmpty ?? false
         }
 
-        /// 아직 모두 풀지 않은 첫 세트입니다. 없으면 시작 컨트롤을 비활성으로 둡니다.
         public var firstIncompleteSet: LearningProjectSetProgress? {
             detail?.sets.first { $0.completedCount < $0.problemCount }
         }

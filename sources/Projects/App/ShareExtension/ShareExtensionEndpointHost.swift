@@ -2,8 +2,6 @@ import Foundation
 
 // MARK: - ShareExtensionEndpointHost
 
-/// Extension 번들의 Info.plist에서 서버 호스트를 읽는다. 값의 출처는 본 앱과 같은
-/// xcconfig이며 프로세스마다 자기 번들을 읽는다.
 enum ShareExtensionEndpointHost: String {
 
     // MARK: Internal

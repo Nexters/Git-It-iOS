@@ -137,7 +137,7 @@ struct LegalAgreementFeatureTests {
     }
 
     @Test
-    func `저장된 동의 기록이 필수 문서를 모두 덮으면 유효한 동의로 판단한다`() async {
+    func `저장된 동의 기록이 필수 문서를 모두 덮으면 유효한 동의로 판단한다`() {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.storedConsentRecords = OnboardingTestFixture.validConsentRecords

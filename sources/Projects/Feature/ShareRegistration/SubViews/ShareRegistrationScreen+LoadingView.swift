@@ -4,7 +4,6 @@ import UIComponent
 
 extension ShareRegistrationScreen {
 
-    /// 저장소 확인과 등록 요청 중의 진행 표시다.
     struct LoadingView: View {
 
         // MARK: Internal

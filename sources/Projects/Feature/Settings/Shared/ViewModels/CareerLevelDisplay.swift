@@ -1,11 +1,7 @@
 import DomainMember
 import UIComponent
 
-/// 설정 흐름(프로필 배지·설정 값·개발 수준 선택)이 공유하는 연차 표시 값.
-/// 문구·순서·일러스트는 온보딩 `CareerSelectionScreen.Display`와 Figma `1535:18378`을 따른다.
 enum CareerLevelDisplay {
-
-    // MARK: Internal
 
     static let orderedLevels: [CareerLevel] = [.entry, .junior, .middle, .senior]
 
@@ -55,7 +51,6 @@ enum CareerLevelDisplay {
         }
     }
 
-    /// 미설정(`nil`)이면 FR-006a의 "선택 안 함"을 돌려준다.
     static func settingValue(for level: CareerLevel?) -> String {
         level.map(title(for:)) ?? unselectedTitle
     }

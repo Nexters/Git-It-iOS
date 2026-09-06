@@ -7,19 +7,20 @@ import UIKit
 
 // MARK: - ShareViewController
 
-/// 공유 시트 진입점이다. 조립 루트와 진단 기록을 주입해 화면을 띄우고, 종료 시 호스트
-/// 앱으로 그대로 돌아간다. 본 앱을 실행하지 않는다.
 final class ShareViewController: UIViewController {
 
     // MARK: Lifecycle
 
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    override init(
+        nibName nibNameOrNil: String?,
+        bundle nibBundleOrNil: Bundle?,
+    ) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .fullScreen
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

@@ -5,6 +5,8 @@ import Foundation
 @Reducer
 public struct ProjectRegistrationRouterFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
@@ -22,6 +24,8 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         self.waitPolicy = waitPolicy
         self.now = now
     }
+
+    // MARK: Public
 
     public enum ActiveScreen: Equatable, Sendable {
         case repositoryLinkInput
@@ -42,13 +46,14 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         public init() { }
 
         public var activeScreen = ActiveScreen.repositoryLinkInput
-        public var screenTransitions: [ScreenTransition] = []
+        public var screenTransitions = [ScreenTransition]()
 
         public var repositoryLinkInput = RepositoryLinkInputFeature.State()
         public var repositoryConfirmation = RepositoryConfirmationFeature.State()
         public var quizLevelSelection = QuizLevelSelectionFeature.State()
         public var quizGenerationConfirmation = QuizGenerationConfirmationFeature.State()
         public var quizGenerationProgress = QuizGenerationProgressFeature.State()
+
     }
 
     public enum Action: Sendable, Equatable {
@@ -144,6 +149,8 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         }
     }
 
+    // MARK: Private
+
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
     private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
@@ -152,7 +159,10 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
 
-    private func activate(_ screen: ActiveScreen, state: inout State) -> Effect<Action> {
+    private func activate(
+        _ screen: ActiveScreen,
+        state: inout State,
+    ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
         state.screenTransitions.append(ScreenTransition(from: state.activeScreen, to: screen))
         state.activeScreen = screen

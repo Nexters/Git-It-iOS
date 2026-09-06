@@ -74,8 +74,6 @@ public struct AppComposition: Sendable {
             await authentication.accessTokenProvider() != nil
         }
         bootstrap = { appDelegate in
-            // 본 앱이 실행됐다는 사실과 현재 로그인 여부를 남긴다. Share Extension은 이
-            // 마커가 없을 때만 "앱 실행 필요"로 안내한다.
             await markerCoding?.save(isSignedIn: hasStoredSession())
             pushClientBox.activate()
             appDelegate.configure(pushNotificationCallbacks)
@@ -183,8 +181,6 @@ public struct AppComposition: Sendable {
         keychainStore: KeychainStore = SharedSessionLayout.makeSharedKeychainStore(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
-        // 접근 그룹을 지정하기 전에 저장된 세션을 공유 저장소로 옮긴다. 실패해도 기존
-        // 항목을 남겨 사용자가 로그아웃되지 않는다.
         SessionKeychainMigration(
             sharedKeychainStore: keychainStore,
             legacyKeychainStore: SharedSessionLayout.makeLegacyKeychainStore(),

@@ -4,6 +4,8 @@ import Testing
 
 @testable import Feature
 
+// MARK: - RepositoryLinkInputFeatureTests
+
 @Suite("RepositoryLinkInputFeature")
 struct RepositoryLinkInputFeatureTests {
 
@@ -116,6 +118,8 @@ struct RepositoryLinkInputFeatureTests {
     }
 
 }
+
+// MARK: - RepositoryLinkInputHostFeature
 
 @Reducer
 private struct RepositoryLinkInputHostFeature {

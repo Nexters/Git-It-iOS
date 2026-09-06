@@ -12,6 +12,8 @@ import Testing
 @Suite("ShareRegistrationFeature 등록")
 struct ShareRegistrationFeatureSubmissionTests {
 
+    // MARK: Internal
+
     @Test
     func `기본 난이도로도 등록할 수 있고 선택한 난이도가 요청에 쓰인다`() async {
         let createLearningProject = SpyCreateLearningProject()
@@ -111,7 +113,6 @@ struct ShareRegistrationFeatureSubmissionTests {
         let store = Self.makeStore(
             isNotificationAuthorized: true,
             enqueueGenerationReminder: { _ in
-                // 공유 저장소를 쓸 수 없는 상황을 흉내 낸다. 기록만 건너뛴다.
             },
         )
 

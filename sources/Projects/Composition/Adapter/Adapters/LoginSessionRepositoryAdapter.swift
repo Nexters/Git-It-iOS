@@ -111,8 +111,6 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     private let sessionCoding: SessionRecordKeychainCoding
     private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?
 
-    /// Share Extension은 이 마커로 "본 앱 실행 필요"와 "로그인 필요"를 구분한다.
-    /// 기록 실패는 로그인·로그아웃 흐름을 막지 않는다.
     private func recordSharedSessionState(isSignedIn: Bool) async {
         await sharedSessionStateMarkerCoding?.save(isSignedIn: isSignedIn)
     }

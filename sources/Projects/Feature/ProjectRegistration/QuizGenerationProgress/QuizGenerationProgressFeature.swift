@@ -5,6 +5,8 @@ import Foundation
 @Reducer
 public struct QuizGenerationProgressFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         createLearningProject: any CreateLearningProjectUseCase,
         observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
@@ -20,6 +22,8 @@ public struct QuizGenerationProgressFeature: Sendable {
         self.waitPolicy = waitPolicy
         self.now = now
     }
+
+    // MARK: Public
 
     public enum RegistrationProgress: Equatable, Sendable {
         case idle
@@ -40,6 +44,7 @@ public struct QuizGenerationProgressFeature: Sendable {
 
         var repository: ExternalRepository?
         var quizLevel = QuizLevel.l1
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -47,6 +52,8 @@ public struct QuizGenerationProgressFeature: Sendable {
         case effect(EffectEvent)
         case submit(repository: ExternalRepository, quizLevel: QuizLevel)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -152,6 +159,8 @@ public struct QuizGenerationProgressFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum CancelID: Hashable {
         case registrationPipeline

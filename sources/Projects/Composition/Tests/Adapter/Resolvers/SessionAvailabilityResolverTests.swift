@@ -9,6 +9,8 @@ import Testing
 @Suite("SessionAvailabilityResolver")
 struct SessionAvailabilityResolverTests {
 
+    // MARK: Internal
+
     @Test
     func `마커가 없으면 본 앱 실행이 필요하다고 판정한다`() async throws {
         let context = try Context()

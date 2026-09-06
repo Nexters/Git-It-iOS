@@ -4,7 +4,6 @@ import Foundation
 
 // MARK: - SingleQuestionEntryFeature
 
-/// 저장한 문제 하나를 열기 위해 세트를 조회하는 화면 없는 조건부 Feature입니다.
 @Reducer
 public struct SingleQuestionEntryFeature: Sendable {
 

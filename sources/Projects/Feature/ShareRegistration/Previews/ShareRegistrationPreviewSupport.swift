@@ -26,20 +26,20 @@ enum ShareRegistrationPreviewSupport {
     // MARK: Private
 
     private struct PreviewURLParser: ExternalRepositoryURLParser {
-        func location(from url: String) -> ExternalRepositoryLocation? {
+        func location(from _: String) -> ExternalRepositoryLocation? {
             ExternalRepositoryLocation(owner: "apple", name: "swift")
         }
     }
 
     private struct PreviewFetchExternalRepository: FetchExternalRepositoryUseCase {
-        func callAsFunction(url: String) async throws -> ExternalRepository {
+        func callAsFunction(url _: String) async throws -> ExternalRepository {
             ShareRegistrationPreviewSupport.sampleRepository
         }
     }
 
     private struct PreviewCreateLearningProject: CreateLearningProjectUseCase {
         func callAsFunction(
-            githubRepoURL: String,
+            githubRepoURL _: String,
             quizLevel: QuizLevel,
         ) async throws -> ProjectRegistrationReceipt {
             ProjectRegistrationReceipt(

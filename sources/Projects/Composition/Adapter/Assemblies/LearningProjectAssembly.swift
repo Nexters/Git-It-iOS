@@ -32,7 +32,7 @@ public struct LearningProjectAssembly: Sendable {
         )
 
         let creationStateRepositoryAdapter = RepositoryCreationStateRepositoryAdapter(
-            userDefaults: sharedDefaults ?? .standard,
+            userDefaults: sharedDefaults ?? .standard
         )
         self.creationStateRepositoryAdapter = creationStateRepositoryAdapter
         startObservingRepositoryCreationState = { observeGenerationOutcomes in

@@ -8,11 +8,8 @@ enum QuizTestFixture {
     static let setID = "set-1"
     static let setLabel = "CHAPTER 1"
 
-    /// 객관식 2문제와 서술형 1문제가 섞여 있고 아무 답변도 없는 세트입니다.
     static let unansweredSet = set(answeredCount: 0)
-    /// 앞쪽 두 문제만 답변된 세트입니다.
     static let partiallyAnsweredSet = set(answeredCount: 2)
-    /// 세 문제 모두 답변된 세트입니다.
     static let fullyAnsweredSet = set(answeredCount: 3)
 
     static let essayOnlySet = LearningSet(
@@ -32,7 +29,6 @@ enum QuizTestFixture {
         questions: [],
     )
 
-    /// 출처가 없는 문제입니다.
     static let questionWithoutSources = Question(
         questionID: "question-no-source",
         prompt: "출처가 없는 문제",
@@ -42,7 +38,6 @@ enum QuizTestFixture {
         myAnswer: nil,
     )
 
-    /// 출처가 여럿인 문제입니다.
     static let questionWithManySources = Question(
         questionID: "question-many-sources",
         prompt: "출처가 여럿인 문제",
@@ -134,7 +129,6 @@ enum QuizTestFixture {
         )
     }
 
-    /// 앞에서부터 `answeredCount`개 문제에만 답변이 있는 객관식·서술형 혼합 세트를 만듭니다.
     static func set(answeredCount: Int) -> LearningSet {
         LearningSet(
             setID: setID,

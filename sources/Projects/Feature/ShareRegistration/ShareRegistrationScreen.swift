@@ -5,8 +5,6 @@ import UIComponent
 
 // MARK: - ShareRegistrationScreen
 
-/// 공유 시트에서 진입했을 때의 등록 화면이다. 본 앱의 등록 화면들을 그대로 사용하고,
-/// 링크 입력 화면만 공유로 대체한다.
 @ViewAction(for: ShareRegistrationFeature.self)
 public struct ShareRegistrationScreen: View {
 
@@ -95,8 +93,8 @@ public struct ShareRegistrationScreen: View {
 
 // MARK: ShareRegistrationScreen.Constant
 
-private extension ShareRegistrationScreen {
-    enum Constant {
+extension ShareRegistrationScreen {
+    fileprivate enum Constant {
         static let lookupMessage = "저장소 정보를 불러오는 중이에요."
         static let submittingMessage = "학습 세트 생성을 요청하고 있어요."
 

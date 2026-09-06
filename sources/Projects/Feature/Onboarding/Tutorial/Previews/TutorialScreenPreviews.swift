@@ -1,8 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
 
-private extension TutorialFeature.State {
-    static func preview(page: Int, authentication: TutorialFeature.AuthenticationStatus = .idle) -> Self {
+extension TutorialFeature.State {
+    fileprivate static func preview(
+        page: Int,
+        authentication: TutorialFeature.AuthenticationStatus = .idle,
+    ) -> Self {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
         state.page = page
         state.authentication = authentication

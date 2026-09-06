@@ -2,7 +2,6 @@ import SwiftUI
 import UIComponent
 
 extension ProfileScreen {
-    /// 아바타·이름·이메일·직군/연차 배지(Figma `1539:19210` Profile Card).
     struct ProfileHeaderView: View {
 
         // MARK: Internal
