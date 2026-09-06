@@ -97,7 +97,7 @@ public struct QuestionSolvingFeature: Sendable {
                 return draftChoiceIndex != nil
 
             case .essay:
-                return !draftEssayText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                return true
             }
         }
 
@@ -289,7 +289,6 @@ public struct QuestionSolvingFeature: Sendable {
 
         case .essay:
             let text = state.draftEssayText
-            guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .none }
             state.submission = .submitting
             return .run { send in
                 do {
