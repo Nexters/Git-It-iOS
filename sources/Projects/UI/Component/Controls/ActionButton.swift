@@ -1,5 +1,6 @@
 import DesignSystem
 import SwiftUI
+import UIKit
 
 public struct ActionButton: View {
 
@@ -107,7 +108,10 @@ public struct ActionButton: View {
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button(action: {
+            Self.hapticGenerator.impactOccurred()
+            action()
+        }) {
             ZStack {
                 content
                     .frame(maxWidth: .infinity)
@@ -265,6 +269,8 @@ public struct ActionButton: View {
         case title(String)
         case styled(StyledText)
     }
+
+    private static let hapticGenerator = UIImpactFeedbackGenerator(style: .light)
 
     private let label: Label
     private let style: Style
