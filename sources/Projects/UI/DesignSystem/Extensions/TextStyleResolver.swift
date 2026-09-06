@@ -14,14 +14,25 @@ enum TextStyleResolver {
             case .englishAlphabet:
                 .plusJakartaSans
             }
-        if let postScriptName = familyToken.postScriptNames[style.weight] {
+        return font(
+            family: familyToken,
+            style: style,
+        )
+    }
+
+    static func font(
+        family: FontFamilyToken,
+        style: TextStyleToken,
+    ) -> Font {
+        _ = FontRegistration.registerBundledFonts
+        if let postScriptName = family.postScriptNames[style.weight] {
             return Font.custom(
                 postScriptName,
                 size: style.size,
             )
         }
         return Font.custom(
-            familyToken.name,
+            family.name,
             size: style.size,
         ).weight(style.weight.swiftUIWeight)
     }
