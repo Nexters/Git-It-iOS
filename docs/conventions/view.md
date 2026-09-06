@@ -184,10 +184,9 @@ Reducer의 `State`가 소유합니다.
 |---|---|
 | 화면 배경·색 구성표·전체 영역 (스크롤 없음) | `ScreenContainer` |
 | 화면 배경·색 구성표·전체 영역 (본문이 헤더 뒤로 스크롤) | `OverlayContainer` |
-| 상단 제목과 좌우 컨트롤 | `ScreenHeader` |
-| 겹쳐 놓는 상단 헤더 (여백·scrim 포함) | `ScreenOverlayHeader` |
+| 상단 좌우 아이콘 컨트롤 | `ScreenControlBar` |
+| 상단 제목 텍스트 | `ScreenHeaderTitle` |
 | 하단 고정 액션 영역 | `BottomActionBar` |
-| 겹쳐 놓는 하단 액션 영역 (여백·배경 포함) | `ScreenOverlayFooter` |
 | 시트 표면 | `SheetSurface` |
 | 탭 구조 | `TabShell` |
 
@@ -196,14 +195,23 @@ Reducer의 `State`가 소유합니다.
 `ScreenContainer`를 씁니다. `ScrollView` 안에서는 `Spacer`가 접히므로 중앙 정렬 화면을
 `OverlayContainer`에 담지 않습니다. 두 컨테이너를 중첩하지 않습니다.
 
+**헤더와 푸터는 화면이 초기화 시점에 `OverlayContainer`의 `header:`·`footer:`
+`@ViewBuilder`에서 직접 조립합니다.** 형태별로 미리 패키징한 헤더·푸터 컴포넌트는 두지
+않습니다 — 화면마다 필요한 레이아웃(뒤로가기만 있는 컨트롤 바, 큰 제목이 붙은 헤더,
+인라인 제목 헤더 등)이 서로 달라 하나의 계약으로 묶으면 옵션 인자만 늘어나고 화면별
+실제 사용 형태를 감춥니다. `ScreenControlBar`(좌우 아이콘 컨트롤 행)와
+`ScreenHeaderTitle`(제목 텍스트)을 화면이 원하는 대로 `HStack`/`VStack`으로 조합하고,
+겹쳐 놓는 화면은 그 조합에 `.designSystemScreenMargin()`을 직접 붙입니다. 푸터도 같은
+방식으로 `BottomActionBar`에 화면 전용 콘텐츠를 담습니다.
+
 **색 구성표는 화면 루트 컨테이너가 소유합니다.** 화면에서 `preferredColorScheme(_:)`를
 다시 지정하지 않습니다. 루트 컨테이너 밖에 오버레이를 쌓아야 해서 색 구성표가 적용되지
 않는 경우에는 오버레이를 컨테이너 안으로 옮기고, 구조상 불가능하면 그 이유를 코드
 주석이 아니라 이 문서의 예외로 기록합니다.
 
 **safeArea 등 실측 기기값이 필요한 컴포넌트는 각자 `GeometryReader`로 직접 측정합니다.**
-공유 측정 타입을 화면과 컴포넌트 트리에 걸쳐 주입하지 않습니다. `ScreenOverlayHeader`,
-`BottomActionBar`가 이 방식을 따릅니다.
+공유 측정 타입을 화면과 컴포넌트 트리에 걸쳐 주입하지 않습니다. `BottomActionBar`가 이
+방식을 따릅니다.
 
 ### 4.2 화면이 소유하는 것과 소유하지 않는 것
 

@@ -61,9 +61,9 @@ Test Double을 함께 둘 수 있습니다([테스트 컨벤션 §7.1](./test.md
 파일 안에서는 `extension`으로 선언합니다.
 
 ```swift
-// Scaffolds/ScreenHeader/ScreenHeader+Style.swift
-extension ScreenHeader {
-    public enum Style { ... }
+// Controls/ScreenControlBar/ScreenControlBar+Control.swift
+extension ScreenControlBar {
+    public struct Control { ... }
 }
 ```
 

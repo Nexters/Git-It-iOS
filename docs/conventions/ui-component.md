@@ -100,12 +100,12 @@ target이 소유합니다.
 
 | 폴더 | 컴포넌트 |
 | --- | --- |
-| `Scaffolds/` | `BottomActionBar`, `OverlayContainer`, `ScreenContainer`, `ScreenHeader`, `ScreenOverlayFooter`, `ScreenOverlayHeader`, `TabShell` |
+| `Scaffolds/` | `BottomActionBar`, `OverlayContainer`, `ScreenContainer`, `TabShell` |
 | `Overlays/` | `ActionMenu`, `ConfirmationSheet`, `ModalOverlay`, `ScreenEdgeScrim`, `SheetSurface`, `WebSheet` |
-| `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
+| `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `ScreenControlBar`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
 | `CollectionItems/` | `ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `SelectionCard`, `SettingRow` |
 | `Indicators/` | `ContinuousProgressBar`, `EmptyState`, `LabeledProgressBar`, `PageIndicator`, `ProgressSegments` |
-| `Displays/` | `LabeledCard`, `LaunchLogo`, `OnboardingMockup`, `ResourceAnimation`, `ResourceImage`, `RubricView`, `SplashView`, `StyledText`, `TagBadge`, `WebContentView` |
+| `Displays/` | `LabeledCard`, `LaunchLogo`, `OnboardingMockup`, `ResourceAnimation`, `ResourceImage`, `RubricView`, `ScreenHeaderTitle`, `SplashView`, `StyledText`, `TagBadge`, `WebContentView` |
 
 ### 3.5 재분류 기준
 
@@ -148,11 +148,9 @@ target이 소유합니다.
 ```text
 UI/Component/
 └── Scaffolds/
-    └── ScreenHeader/
-        ├── ScreenHeader.swift
-        ├── ScreenHeader+Constant.swift
-        ├── ScreenHeader+Control.swift
-        └── ScreenHeader+Style.swift
+    └── BottomActionBar/
+        ├── BottomActionBar.swift
+        └── BottomActionBar+Constant.swift
 ```
 
 ### 5.2 중첩 선언
