@@ -8,8 +8,9 @@ description: sources/Projects 전체에 프로젝트 공개 Swift lint를 실행
 ## 결과
 
 `sources/Projects` 전체 lint가 종료 코드 0과 위반 0건으로 완료되게 한다. 기존
-작업 트리와 Git index를 보존하고, lint가 지목한 `sources/Projects/**/*.swift` 외의
-파일은 수정하지 않는다. Spec-Kit 산출물이나 `tasks.md` 상태에는 의존하지 않는다.
+작업 트리와 Git index를 보존하고, lint 대상인 `sources/Projects/**/*.swift`만
+수정한다. Markdown 문서(`*.md`)는 삭제·수정·포맷 대상이 아니며, Spec-Kit 산출물이나
+`tasks.md` 상태에도 의존하지 않는다.
 
 ## 실행 절차
 
@@ -26,22 +27,23 @@ description: sources/Projects 전체에 프로젝트 공개 Swift lint를 실행
 4. SwiftPM·Clang module cache의 `Operation not permitted`, 쓰기 권한 또는 network 실패로
    formatter가 시작되지 못했다면 소스 lint 실패로 분류하지 말고 동일한 명령을
    필요한 권한으로 한 번 다시 실행한다.
-5. lint 출력의 파일, 행, 열, rule을 기준으로 위반을 묶는다. 대상 파일과
+5. lint 교정 전에 `sources/Projects/**/*.swift`의 단독 `//` 주석을 제거한다.
+   `// MARK:` 주석, 코드 뒤에 붙은 주석, 문자열 리터럴 안의 `//`는 보존한다.
+   Markdown을 포함한 Swift 외 파일은 이 단계에서 변경하지 않는다.
+6. lint 출력의 파일, 행, 열, rule을 기준으로 위반을 묶는다. 대상 파일과
    주변 코드, 해당 패키지 규칙과 컨벤션을 읽고 의미·가시성·타입 설계를 바꾸지
    않는 최소 교정을 `apply_patch`로 적용한다.
-6. 첫 수동 교정으로 파일이 Git 변경 대상이 된 후에는 수정한 파일들만
-   공개 formatter에 각각의 argv로 전달해 선언 정렬 등 연쇄 위반을 정리할 수 있다.
+7. Swift 교정이 끝나면 프로젝트 공개 진입점으로 전체 Swift 포맷을 실행한다.
 
    ```sh
-   swift_format_runner=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_SWIFT_FORMAT_RUNNER)
-   "$swift_format_runner" format <lint가 보고해 수정한 Swift 파일>...
+   make format-all
    ```
 
-   `format`은 Git에서 추가되거나 수정된 Swift 파일만 처리한다. 따라서 기존
-   파일에 첫 교정을 적용하기 전에 `format`만 호출해서는 오류가 해소되지 않는다.
-7. 3번의 전체 lint를 반복한다. 종료 코드 0과 위반 0건이 동시에 확인될
+   `format-all`은 `sources/Projects`의 Swift 파일만 처리한다. 변경 파일만 포맷해야
+   할 때는 이 스킬이 아니라 `make format-changed`를 사용한다.
+8. 3번의 전체 lint를 반복한다. 종료 코드 0과 위반 0건이 동시에 확인될
    때까지 새로 드러난 스타일 위반도 같은 방식으로 교정한다.
-8. 최종 변경 Swift 파일에 `git diff --check -- <paths...>`를 실행한다. cached diff를
+9. 최종 변경 Swift 파일에 `git diff --check -- <paths...>`를 실행한다. cached diff를
    다시 저장하고 실행 전 snapshot과 `cmp`해 Git index가 변하지 않았음을 확인한다.
 
 ## 중단 조건
@@ -57,6 +59,7 @@ description: sources/Projects 전체에 프로젝트 공개 Swift lint를 실행
 
 - `tools/githooks/swift-format/core/**` 또는 `tools/swift-style/**` 내부 구현을 직접
   호출하지 않는다.
+- `*.md`를 삭제하거나 수정하거나 포맷하지 않는다.
 - `git add`, `git commit`, index 복구·초기화, 사용자 변경 되돌리기를 하지 않는다.
 - 파일 목록을 공백·개행 구분 문자열로 다시 shell argv로 분해하지 않는다.
   경로는 각 argv로 직접 전달하고, 자동 수집이 필요하면 NUL 경계를 보존한다.

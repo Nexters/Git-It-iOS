@@ -4,8 +4,9 @@
 # Swift-Style 서브모듈 포매터/린터의 공개 진입점입니다.
 #
 #   staged           : 커밋에 staged된 *.swift 파일만 포맷하고 재검증합니다.
-#   format [paths..] : 현재 변경된 Swift 파일만 포맷합니다. 경로를 지정하면 그 범위로
+#   format [paths..] : 현재 추가·수정된 Swift 파일만 포맷합니다. 경로를 지정하면 그 범위로
 #                      대상을 더 좁힙니다(기본 GIT_IT_PROJECTS_ROOT).
+#   format-all [paths..] : 지정 범위의 모든 Swift 파일을 포맷합니다(기본 GIT_IT_PROJECTS_ROOT).
 #   lint   [paths..] : 지정 경로(기본 GIT_IT_PROJECTS_ROOT)를 수정 없이 검사만 합니다.
 #                     두 동작 모두 Derived/와 .build/ 하위 생성물은 제외합니다.
 #
@@ -16,7 +17,7 @@ set -eu
 
 swift_format_main() (
 	if [ "$#" -lt 1 ]; then
-		printf '오류[common.invalid-input]: ACTION 한 개가 필요합니다\n조치: staged, format, lint 공개 명령을 사용하세요\n' >&2
+		printf '오류[common.invalid-input]: ACTION 한 개가 필요합니다\n조치: staged, format, format-all, lint 공개 명령을 사용하세요\n' >&2
 		return 2
 	fi
 
@@ -47,10 +48,10 @@ swift_format_main() (
 	"$swift_format_adapter" --ensure-fresh-cache "$swift_format_style_dir" || return 2
 
 	case "$swift_format_action" in
-	staged | format) swift_format_tool="$swift_format_style_dir/scripts/format.sh" ;;
+	staged | format | format-all) swift_format_tool="$swift_format_style_dir/scripts/format.sh" ;;
 	lint) swift_format_tool="$swift_format_style_dir/scripts/lint.sh" ;;
 	*)
-		printf '오류[common.invalid-input]: 지원하지 않는 ACTION=%s\n조치: staged, format, lint 중 하나를 사용하세요\n' "$swift_format_action" >&2
+		printf '오류[common.invalid-input]: 지원하지 않는 ACTION=%s\n조치: staged, format, format-all, lint 중 하나를 사용하세요\n' "$swift_format_action" >&2
 		return 2
 		;;
 	esac

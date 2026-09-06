@@ -84,6 +84,16 @@ actual_format_targets=$(sort "$SWIFT_STYLE_LOG")
 	exit 1
 }
 
+# format-all은 변경 여부와 관계없이 지정 범위의 모든 Swift 파일을 포맷합니다.
+: >"$SWIFT_STYLE_LOG"
+"$repository/$swift_runner_relative" format-all
+expected_all_format_targets=$(printf '%s\n%s\n%s' "$repository/$changed_relative" "$repository/$untracked_relative" "$repository/$unchanged_relative" | sort)
+actual_all_format_targets=$(sort "$SWIFT_STYLE_LOG")
+[ "$actual_all_format_targets" = "$expected_all_format_targets" ] || {
+	printf 'FAIL: format-all 대상이 전체 Swift 파일과 일치하지 않음\n' >&2
+	exit 1
+}
+
 # staged 포매터가 일부 파일을 바꾼 뒤 실패하면 전체 원본과 metadata를 복원합니다.
 first_relative="$projects_relative/App/첫 파일.swift"
 second_relative="$projects_relative/App/둘째

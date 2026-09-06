@@ -58,11 +58,11 @@ printf '%s\n' \
 	'setup|developer-tools' >"$work/expected"
 diff -u "$work/expected" "$call_log"
 
-# make format이 저장소 루트의 Projects 절대 경로를 공개 runner에 전달하는지 검증합니다.
+# 변경 파일과 전체 파일 target이 공개 runner에 서로 다른 action을 전달하는지 검증합니다.
 : >"$call_log"
-TEST_CALL_LOG=$call_log make -s -C "$repository" format
-printf 'format|%s|format|%s/sources/Projects\n' \
-	"$repository" "$repository" >"$work/expected"
+TEST_CALL_LOG=$call_log make -s -C "$repository" format-changed
+TEST_CALL_LOG=$call_log make -s -C "$repository" format-all
+printf 'format|%s|format|%s/sources/Projects\nformat|%s|format-all|%s/sources/Projects\n' "$repository" "$repository" "$repository" "$repository" >"$work/expected"
 diff -u "$work/expected" "$call_log"
 
-printf 'PASS: make init and format\n'
+printf 'PASS: make init and format targets\n'
