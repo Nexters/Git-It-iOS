@@ -48,6 +48,7 @@ struct AppRootView: View {
                             QuizRouter(store: quizStore)
                         }
                 }
+                .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
         }
     }
 
