@@ -38,21 +38,19 @@ struct LearningSetIntroScreen: View {
             )
             .designSystemScreenMargin()
         } content: {
-            VStack {
-                Spacer()
-                VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                    StyledText.subtitle3(store.label, color: .blue100)
-                    StyledText.subtitle1(store.learningSet?.title ?? "")
-                    StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
-                        .padding(.top, Constant.descriptionTopPadding)
-                }
-                Spacer()
+            VStack(alignment: .leading, spacing: Constant.textSpacing) {
+                StyledText.subtitle3(store.label, color: .blue100)
+                StyledText.subtitle1(store.learningSet?.title ?? "")
+                StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
+                    .padding(.top, Constant.descriptionTopPadding)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             .designSystemScreenMargin()
-            .padding(.top, Constant.textTopPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        } background: {
+            screenBackground
         } footer: {
             startAction
+                .designSystemScreenMargin()
         }
         .overlay {
             if case .loading = store.setLoad {
@@ -60,6 +58,11 @@ struct LearningSetIntroScreen: View {
                     .tint(Color(designSystem: .blue100))
             }
         }
+    }
+
+    private var screenBackground: some View {
+        LinearGradient(designSystem: .backgroundGradient)
+            .accessibilityHidden(true)
     }
 
     private var startAction: some View {
@@ -75,7 +78,6 @@ struct LearningSetIntroScreen: View {
                     action: { send(.startTapped) },
                 )
             }
-            .designSystemScreenMargin()
         }
     }
 

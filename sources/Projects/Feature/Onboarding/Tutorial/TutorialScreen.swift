@@ -20,9 +20,6 @@ struct TutorialScreen: View {
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .onAppear {
-                    UIScrollView.appearance().bounces = false
-                }
                 .background {
                     Color(designSystem: ColorToken.blue500).ignoresSafeArea(edges: .top)
                 }

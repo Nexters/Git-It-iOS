@@ -47,7 +47,7 @@ public struct OverlayContainer<
         ZStack(alignment: .top) {
             scrollingContent
 
-            VStack {
+            VStack(alignment: .leading) {
                 header
                     .background {
                         LinearGradient(designSystem: .overlayHeaderScrim)
@@ -85,14 +85,12 @@ public struct OverlayContainer<
                     content
                     occlusionSpacer { footer }
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .top)
                 .padding(.top, proxy.safeAreaInsets.top)
                 .background(alignment: .top) { background }
             }
+            .scrollBounceBehavior(.basedOnSize)
             .ignoresSafeArea(edges: .top)
-            .onAppear {
-                UIScrollView.appearance().bounces = false
-            }
         }
     }
 
