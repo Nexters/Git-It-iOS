@@ -35,6 +35,7 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .extendingDefault(
                     with: [
+                        "CFBundleDisplayName": "Git-It",
                         "CFBundleShortVersionString": "$(MARKETING_VERSION)",
                         "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
                         "ITSAppUsesNonExemptEncryption": false,
