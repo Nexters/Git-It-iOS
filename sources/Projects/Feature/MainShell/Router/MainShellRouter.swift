@@ -46,11 +46,7 @@ public struct MainShellRouter: View {
         } message: {
             Text("잠시 후 다시 시도해 주세요.")
         }
-        .fullScreenCover(
-            item: $store.scope(state: \.singleQuestion, action: \.singleQuestion)
-        ) { singleQuestionStore in
-            QuestionSolvingScreen(store: singleQuestionStore)
-        }
+        .overlay { singleQuestionOverlay }
     }
 
     // MARK: Private
@@ -82,6 +78,18 @@ public struct MainShellRouter: View {
                 .tint(Color(designSystem: .blue100))
         }
         .accessibilityLabel("문제를 불러오는 중")
+    }
+
+    private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {
+        store.scope(state: \.singleQuestion, action: \.singleQuestion.presented)
+    }
+
+    private var singleQuestionOverlay: some View {
+        PushedScreenOverlay(isPresented: store.singleQuestion != nil) {
+            if let singleQuestionStore {
+                QuestionSolvingScreen(store: singleQuestionStore)
+            }
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import DomainMember
 import Feature
 import Foundation
 import SwiftUI
+import UIComponent
 
 // MARK: - AppRootView
 
@@ -35,20 +36,28 @@ struct AppRootView: View {
             MainShellRouter(store: store.scope(state: \.mainShell, action: \.mainShell))
                 .fullScreenCover(
                     item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
-                ) { store in
-                    ProjectRegistrationRouter(store: store)
+                ) { projectRegistrationStore in
+                    ProjectRegistrationRouter(store: projectRegistrationStore)
                 }
                 .fullScreenCover(
                     item: $store.scope(state: \.projectDetail, action: \.projectDetail)
                 ) { projectDetailStore in
                     ProjectDetailRouter(store: projectDetailStore)
-                        .fullScreenCover(
-                            item: $store.scope(state: \.quiz, action: \.quiz)
-                        ) { quizStore in
-                            QuizRouter(store: quizStore)
-                        }
+                        .overlay { quizOverlay }
                 }
                 .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
+        }
+    }
+
+    private var quizStore: StoreOf<QuizRouterFeature>? {
+        store.scope(state: \.quiz, action: \.quiz.presented)
+    }
+
+    private var quizOverlay: some View {
+        PushedScreenOverlay(isPresented: store.quiz != nil) {
+            if let quizStore {
+                QuizRouter(store: quizStore)
+            }
         }
     }
 
