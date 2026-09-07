@@ -38,17 +38,15 @@ public struct SavedFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            projectFilter: String? = nil,
+            initialProjectFilter: String? = nil,
             isBackControlPresented: Bool = false,
         ) {
-            self.projectFilter = projectFilter
             self.isBackControlPresented = isBackControlPresented
-            selectedProjectID = projectFilter
+            selectedProjectID = initialProjectFilter
         }
 
         // MARK: Public
 
-        public let projectFilter: String?
         public let isBackControlPresented: Bool
 
         public var selectedProjectID: String?
@@ -112,7 +110,7 @@ public struct SavedFeature: Sendable {
                 return load(&state)
 
             case .view(.filterSelected(let projectID)):
-                guard state.projectFilter == nil else { return .none }
+                guard state.selectedProjectID != projectID else { return .none }
                 state.selectedProjectID = projectID
                 return load(&state)
 
@@ -169,7 +167,7 @@ public struct SavedFeature: Sendable {
     private func load(_ state: inout State) -> Effect<Action> {
         state.requestID += 1
         let currentRequestID = state.requestID
-        let projectID = state.projectFilter ?? state.selectedProjectID
+        let projectID = state.selectedProjectID
         state.loadStatus = .loading
         return .run { send in
             do {

@@ -15,7 +15,7 @@ struct ProjectDetailRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        #expect(store.state.savedQuestions.projectFilter == ProjectDetailTestFixture.projectID)
+        #expect(store.state.savedQuestions.selectedProjectID == ProjectDetailTestFixture.projectID)
         #expect(store.state.savedQuestions.isBackControlPresented)
 
         await store.send(

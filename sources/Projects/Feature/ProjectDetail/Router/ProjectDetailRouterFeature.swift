@@ -72,7 +72,7 @@ public struct ProjectDetailRouterFeature: Sendable {
         public init(projectID: String) {
             self.projectID = projectID
             projectDetail = ProjectDetailFeature.State(projectID: projectID)
-            savedQuestions = SavedFeature.State(projectFilter: projectID, isBackControlPresented: true)
+            savedQuestions = SavedFeature.State(initialProjectFilter: projectID, isBackControlPresented: true)
             singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: projectID)
         }
 
