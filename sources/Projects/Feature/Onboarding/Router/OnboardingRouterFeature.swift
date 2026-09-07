@@ -26,17 +26,17 @@ public struct OnboardingRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case guide(Guide)
         case curation(Curation)
         case curationSplash
 
-        public enum Guide: Equatable, Sendable {
+        public enum Guide: Hashable, Sendable {
             case tutorial
             case legalAgreement
         }
 
-        public enum Curation: Equatable, Sendable {
+        public enum Curation: Hashable, Sendable {
             case positionSelection
             case careerSelection
         }

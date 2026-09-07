@@ -22,32 +22,35 @@ public struct OnboardingRouter: View {
 
     // MARK: Private
 
-    @ViewBuilder
     private var content: some View {
-        switch store.activeScreen {
-        case .guide(let screen):
-            guideContent(screen)
-
-        case .curation(.positionSelection):
-            PositionSelectionScreen(
-                store: store.scope(state: \.positionSelection, action: \.positionSelection)
-            )
-
-        case .curation(.careerSelection):
-            CareerSelectionScreen(
-                store: store.scope(state: \.careerSelection, action: \.careerSelection)
-            )
-
-        case .curationSplash:
-            Self.CurationSplashView(onCompletion: { send(.curationSplashFinished) })
+        FlowNavigationStack(path: pushedScreens) {
+            guideContent
+        } destination: { screen in
+            pushedScreen(screen)
         }
     }
 
-    private func guideContent(_ screen: OnboardingRouterFeature.ActiveScreen.Guide) -> some View {
+    private var pushedScreens: [OnboardingRouterFeature.ActiveScreen] {
+        switch store.activeScreen {
+        case .guide:
+            []
+
+        case .curation(.positionSelection):
+            [.curation(.positionSelection)]
+
+        case .curation(.careerSelection):
+            [.curation(.positionSelection), .curation(.careerSelection)]
+
+        case .curationSplash:
+            [.curation(.positionSelection), .curation(.careerSelection), .curationSplash]
+        }
+    }
+
+    private var guideContent: some View {
         TutorialScreen(store: store.scope(state: \.tutorial, action: \.tutorial))
             .overlay {
                 ModalOverlay(
-                    isPresented: screen == .legalAgreement,
+                    isPresented: store.activeScreen == .guide(.legalAgreement),
                     onDismiss: { send(.legalAgreementDismissed) },
                 ) {
                     LegalAgreementScreen(
@@ -69,6 +72,27 @@ public struct OnboardingRouter: View {
                     }
                 }
             }
+    }
+
+    @ViewBuilder
+    private func pushedScreen(_ screen: OnboardingRouterFeature.ActiveScreen) -> some View {
+        switch screen {
+        case .guide:
+            EmptyView()
+
+        case .curation(.positionSelection):
+            PositionSelectionScreen(
+                store: store.scope(state: \.positionSelection, action: \.positionSelection)
+            )
+
+        case .curation(.careerSelection):
+            CareerSelectionScreen(
+                store: store.scope(state: \.careerSelection, action: \.careerSelection)
+            )
+
+        case .curationSplash:
+            Self.CurationSplashView(onCompletion: { send(.curationSplashFinished) })
+        }
     }
 
 }

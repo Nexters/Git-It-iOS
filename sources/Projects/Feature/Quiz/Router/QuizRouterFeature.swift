@@ -25,7 +25,7 @@ public struct QuizRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case learningSetIntro
         case questionSolving
         case learningCompletion

@@ -84,7 +84,7 @@ target이 소유합니다.
 
 | 폴더 | 소유하는 책임 | 소유하지 않는 것 |
 | --- | --- | --- |
-| `Scaffolds/` | 화면 배경·안전 영역·상하단 고정 영역·탭 구조 | 담기는 콘텐츠의 의미 |
+| `Scaffolds/` | 화면 배경·안전 영역·상하단 고정 영역·탭 구조·흐름 스택 | 담기는 콘텐츠의 의미 |
 | `Overlays/` | 겹쳐 뜨는 표면의 배치·표시 전환·닫기 신호 | 표면 안에 놓이는 화면 흐름 |
 | `Controls/` | 사용자 입력 수집과 조작 결과 전달 | 입력값의 업무적 해석 |
 | `CollectionItems/` | 한 항목의 요약 표시와 항목 단위 동작 | 목록의 정렬·페이지네이션 |
@@ -100,7 +100,7 @@ target이 소유합니다.
 
 | 폴더 | 컴포넌트 |
 | --- | --- |
-| `Scaffolds/` | `BottomActionBar`, `OverlayContainer`, `ScreenContainer`, `TabShell` |
+| `Scaffolds/` | `BottomActionBar`, `FlowNavigationStack`, `OverlayContainer`, `ScreenContainer`, `TabShell` |
 | `Overlays/` | `ActionMenu`, `ConfirmationSheet`, `ModalOverlay`, `ScreenEdgeScrim`, `SheetSurface`, `WebSheet` |
 | `Controls/` | `AccountActionRow`, `ActionButton`, `AppleSignInButton`, `BookmarkButton`, `Chip`, `ChoiceAnswerOption`, `IconGlassButton`, `IconPlainButton`, `LabeledTextField`, `PolicyAgreementRow`, `PressOverlayStyle`, `ScreenControlBar`, `SelectableSettingRow`, `SelectionCardList`, `TextField` |
 | `CollectionItems/` | `ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `SelectionCard`, `SettingRow` |

@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-09-03 (Router-Feature를 흐름의 필수 구성으로 확정, 흐름 이탈 판단 기준 정리)
+**최종 수정일**: 2026-09-07 (순차 흐름의 화면 전환을 `FlowNavigationStack` push로 확정)
 
 ## 목적
 
@@ -97,15 +97,21 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
 
 - Router는 화면 Feature들과 마찬가지로 **View와 Feature를 1:1 쌍으로 소유합니다.**
   Router View가 그 흐름의 **골격 컴포넌트**와 흐름 공용 sheet·alert를 소유하고, 활성
-  화면 값을 `switch`해 해당 화면을 그립니다. 각 화면의 Store는 Router State가 항상
-  보유하는 child state에서 `scope`로 얻습니다.
-- 골격 컴포넌트는 순차 흐름이면 `ScreenContainer`, 셸 흐름이면 `TabShell`입니다. 셸
-  흐름에서는 각 화면이 자신의 `ScreenContainer`를 소유하므로 Router가 이를 다시 감싸지
-  않습니다.
+  화면 값에서 해당 화면을 그립니다. 각 화면의 Store는 Router State가 항상 보유하는
+  child state에서 `scope`로 얻습니다.
+- 골격 컴포넌트는 순차 흐름이면 `FlowNavigationStack`, 셸 흐름이면 `TabShell`입니다.
+  셸 흐름에서는 각 화면이 자신의 `ScreenContainer`를 소유하므로 Router가 이를 다시
+  감싸지 않습니다. 순차 흐름의 화면들이 배경을 공유해야 하면 Router가
+  `FlowNavigationStack`을 `ScreenContainer`로 감쌉니다.
 - **활성 화면 값 타입은 Router가 소유합니다.** 순차 흐름의 계층형 enum과 셸 흐름의 탭
   enum 모두 `Router/`에 둡니다.
-- **흐름 내 화면 전환에 `NavigationStack`·`StackState`를 쓰지 않습니다.** 활성 화면
-  값을 바꾸는 것이 곧 전환입니다.
+- **순차 흐름의 화면 전환은 `FlowNavigationStack`의 push입니다.** Router View는 활성
+  화면 값에서 경로 배열을 파생시켜 전달하고, 그 경로가 곧 스택입니다. 활성 화면 값이
+  정본이므로 `StackState`와 `NavigationStack`의 쓰기 가능한 경로 `Binding`은 쓰지
+  않습니다. 활성 화면 값의 첫 화면이 스택의 루트이고, 나머지 화면은 push된 목적지로
+  그립니다.
+- `FlowNavigationStack`은 navigation bar와 시스템 뒤로가기 제스처를 감춥니다. 뒤로가기
+  입력 경로는 각 화면이 소유한 `ScreenControlBar` 하나뿐입니다.
 - **뒤로가기는 활성 화면 값을 이전 값으로 되돌리는 상태 전이입니다.** View를 pop하거나
   화면 Feature를 다시 주입해 State를 새로 만들지 않습니다. child state를 항상 보유하므로
   되돌아간 화면의 입력값은 그대로 보존됩니다.
@@ -176,7 +182,8 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
 - [ ] Router의 State가 조합하는 화면 Feature의 State를 항상 함께 보유하는가?
 - [ ] 활성 화면 값에 "완료" 같은 상위 이탈 의미의 case가 없는가? 이탈 조건이 한
       `delegate`로 드러나지 않는다면 조건부 Feature로 분리되어 있는가?
-- [ ] 흐름 내 화면 전환에 `NavigationStack`·`StackState`를 쓰지 않았는가?
+- [ ] 순차 흐름의 화면 전환이 활성 화면 값에서 파생한 `FlowNavigationStack` 경로로
+      표현되고, `StackState`나 쓰기 가능한 경로 `Binding`을 쓰지 않았는가?
 - [ ] 뒤로가기가 활성 화면 값을 되돌리는 상태 전이이고, 화면 Feature의 State를 새로
       만들지 않는가?
 - [ ] 화면 Feature가 자신의 다음·이전 화면을 알지 않고 `delegate`로만 의도를 알리는가?

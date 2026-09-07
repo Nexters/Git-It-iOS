@@ -38,12 +38,12 @@ public struct SettingsRouterFeature: Sendable {
 
         // MARK: Public
 
-        public enum ActiveScreen: Equatable, Sendable {
+        public enum ActiveScreen: Hashable, Sendable {
             case profile
             case settings(SettingsStep)
         }
 
-        public enum SettingsStep: Equatable, Sendable {
+        public enum SettingsStep: Hashable, Sendable {
             case list
             case positionSelection
             case careerLevelSelection

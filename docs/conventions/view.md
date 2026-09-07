@@ -189,6 +189,7 @@ Reducer의 `State`가 소유합니다.
 | 하단 고정 액션 영역 | `BottomActionBar` |
 | 시트 표면 | `SheetSurface` |
 | 탭 구조 | `TabShell` |
+| 순차 흐름의 화면 스택 | `FlowNavigationStack` |
 
 **화면 루트는 `ScreenContainer` 또는 `OverlayContainer` 중 하나입니다.** 본문이 헤더·푸터
 뒤로 스크롤하는 화면은 `OverlayContainer`를, 세로 중앙 정렬처럼 스크롤하지 않는 화면은

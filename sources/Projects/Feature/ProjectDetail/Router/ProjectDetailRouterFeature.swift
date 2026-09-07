@@ -29,7 +29,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case projectDetail
         case savedQuestions
         case singleQuestion

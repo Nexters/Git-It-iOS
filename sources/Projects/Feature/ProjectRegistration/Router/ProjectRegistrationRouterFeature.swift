@@ -27,7 +27,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case repositoryLinkInput
         case repositoryConfirmation
         case quizLevelSelection
