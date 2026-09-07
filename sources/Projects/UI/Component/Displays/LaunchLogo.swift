@@ -39,23 +39,6 @@ public struct LaunchLogo: View {
 
     private let onCompletion: (() -> Void)?
 
-    private var glow: some View {
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [
-                        Color(designSystem: ColorToken.blue300).opacity(Constant.glowOpacity),
-                        Color(designSystem: ColorToken.blue300).opacity(0),
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: Constant.glowSize / 2,
-                )
-            )
-            .frame(width: Constant.glowSize, height: Constant.glowSize)
-            .blur(radius: Constant.glowBlur)
-    }
-
     private func runIntroSequence() async {
         withAnimation(.easeOut(duration: Constant.fadeInSeconds)) {
             isVisible = true
