@@ -5,20 +5,8 @@ import UIComponent
 extension ProjectListScreen {
     struct EmptyProjectsView: View {
 
-        // MARK: Internal
-
         var body: some View {
             VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    Spacer(minLength: 0)
-                        .frame(height: Constant.headerControlRowHeight)
-
-                    ScreenHeaderTitle(title: "프로젝트")
-                }
-                .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
-                .designSystemScreenMargin()
-
                 Spacer(minLength: 0)
 
                 EmptyState(
@@ -31,15 +19,6 @@ extension ProjectListScreen {
 
                 Spacer(minLength: 0)
             }
-        }
-
-        // MARK: Private
-
-        private enum Constant {
-            static let headerControlRowHeight: CGFloat = 40
-            static let headerTitleSpacing: CGFloat = 16
-            static let headerBottomPadding: CGFloat = 10
-            static let headerHeight: CGFloat = 99
         }
 
     }

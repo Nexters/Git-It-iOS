@@ -19,12 +19,12 @@ public struct ProfileScreen: View {
     @Bindable public var store: StoreOf<ProfileFeature>
 
     public var body: some View {
-        OverlayContainer(content: {
+        OverlayContainer {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .top, spacing: LayoutToken.gutter) {
                     ScreenHeaderTitle(title: Constant.title)
-
-                    Spacer(minLength: 0)
+                        .frame(height: Constant.headerControlRowHeight)
+                    Spacer()
 
                     IconGlassButton.neutral(
                         icon: Constant.settingsControl.icon,
@@ -33,14 +33,12 @@ public struct ProfileScreen: View {
                         action: { send(.settingsTapped) },
                     )
                 }
-                .frame(height: Constant.headerControlRowHeight, alignment: .top)
-                .padding(.bottom, Constant.headerBottomPadding)
+                .padding(.vertical, Constant.headerBottomPadding)
                 .designSystemScreenMargin()
-
-                content
             }
-        })
-        .scrollIndicators(.hidden)
+        } content: {
+            content
+        }
         .task { await send(.task).finish() }
     }
 

@@ -54,6 +54,8 @@ extension SettingsScreen {
                     .designSystemScreenMargin()
                 }
             }
+            .toolbar(.hidden, for: .tabBar)
+
         }
 
         // MARK: Private

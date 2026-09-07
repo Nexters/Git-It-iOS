@@ -13,6 +13,7 @@ struct QuizGenerationProgressScreen: View {
 
     var body: some View {
         content
+            .frame(maxWidth: .infinity)
             .sheet(
                 isPresented: Binding(
                     get: { store.isGenerationReminderSheetPresented },

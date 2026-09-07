@@ -34,9 +34,10 @@ public struct SettingsScreen: View {
                 .frame(height: Constant.headerControlRowHeight, alignment: .top)
 
                 ScreenHeaderTitle(title: Constant.title)
+                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+
             }
             .padding(.bottom, Constant.headerBottomPadding)
-            .frame(height: Constant.headerHeight, alignment: .top)
             .designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: 10) {
@@ -106,13 +107,15 @@ public struct SettingsScreen: View {
                 }
             }
             .designSystemScreenMargin()
-            .padding(.bottom, Constant.contentBottomPadding)
+            .padding(.vertical, Constant.contentBottomPadding)
         }
         .task { await send(.task).finish() }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             send(.applicationBecameActive)
         }
+        .toolbar(.hidden, for: .tabBar)
+
     }
 
     // MARK: Private

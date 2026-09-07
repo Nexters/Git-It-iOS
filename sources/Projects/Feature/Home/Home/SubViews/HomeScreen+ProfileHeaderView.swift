@@ -48,7 +48,7 @@ extension HomeScreen {
             static let messageSpacing: CGFloat = 4
             static let failureMinHeight: CGFloat = 88
             static let headerHeight: CGFloat = 74
-            static let topPadding: CGFloat = 22
+            static let topPadding: CGFloat = 20
             static let bottomPadding: CGFloat = 10
             static let userProfileSpacing: CGFloat = 11
             static let avatarSize: CGFloat = 40

@@ -24,7 +24,6 @@ public struct HomeScreen: View {
                     display: HomeProfileDisplay(store.profileLoad),
                     onRetry: { send(.profileRetryTapped) },
                 )
-                .padding(.top, Constant.profileTopPadding)
 
                 Self.GreetingView()
                     .padding(.top, Constant.greetingTopPadding)

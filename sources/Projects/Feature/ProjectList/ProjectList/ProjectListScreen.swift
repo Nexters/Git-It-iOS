@@ -84,7 +84,41 @@ public struct ProjectListScreen: View {
 
         case (_, true):
             ScreenContainer {
-                Self.EmptyProjectsView()
+                VStack {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                            if let headerLeading {
+                                IconGlassButton.neutral(
+                                    icon: headerLeading.icon,
+                                    label: headerLeading.label,
+                                    size: .medium,
+                                    action: headerLeadingTapped,
+                                )
+                                .frame(height: Constant.headerControlRowHeight)
+
+                            }
+
+                            ScreenHeaderTitle(title: headerTitle)
+                                .frame(height: Constant.headerControlRowHeight)
+                        }
+
+                        Spacer()
+
+                        if let headerTrailing {
+                            IconGlassButton.neutral(
+                                icon: headerTrailing.icon,
+                                label: headerTrailing.label,
+                                size: .medium,
+                                action: headerTrailingTapped,
+                            )
+                            .frame(minHeight: Constant.headerControlRowHeight)
+                        }
+                    }
+                    .padding(.vertical, Constant.headerBottomPadding)
+                    .designSystemScreenMargin()
+
+                    Self.EmptyProjectsView()
+                }
             }
 
         case (_, false):
@@ -103,10 +137,13 @@ public struct ProjectListScreen: View {
                             size: .medium,
                             action: headerLeadingTapped,
                         )
+                        .frame(minHeight: Constant.headerControlRowHeight)
                     }
+
                     ScreenHeaderTitle(title: headerTitle)
-                        .frame(height: 32)
+                        .frame(minHeight: Constant.headerControlRowHeight)
                 }
+                .designSystemScreenMargin()
 
                 Spacer()
 
@@ -117,11 +154,11 @@ public struct ProjectListScreen: View {
                         size: .medium,
                         action: headerTrailingTapped,
                     )
+                    .frame(minHeight: Constant.headerControlRowHeight)
+                    .designSystemScreenMargin()
                 }
             }
             .padding(.vertical, Constant.headerBottomPadding)
-            .frame(minHeight: Constant.headerControlRowHeight)
-            .designSystemScreenMargin()
 
         } content: {
             VStack(spacing: LayoutToken.compactSpacing) {
@@ -213,6 +250,6 @@ extension ProjectListScreen {
         static let headerTitleHeight: CGFloat = 32
         static let headerTitleSpacing: CGFloat = 16
         static let headerTopPadding: CGFloat = 4
-        static let headerBottomPadding: CGFloat = 10
+        static let headerBottomPadding: CGFloat = 12
     }
 }

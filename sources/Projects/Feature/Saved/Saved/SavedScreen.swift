@@ -60,21 +60,24 @@ struct SavedScreen: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: Constant.headerBottomPadding) {
-            VStack(spacing: Constant.headerVerticalSpacing) {
-                if store.isBackControlPresented {
-                    IconGlassButton.neutral(
-                        icon: ScreenControlBar.Control.back.icon,
-                        label: ScreenControlBar.Control.back.label,
-                        size: .medium,
-                        action: { send(.backTapped) },
-                    )
-                    .frame(height: Constant.headerRowHeight)
+        VStack(spacing: Constant.headerBottomPadding) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: Constant.headerVerticalSpacing) {
+                    if store.isBackControlPresented {
+                        IconGlassButton.neutral(
+                            icon: ScreenControlBar.Control.back.icon,
+                            label: ScreenControlBar.Control.back.label,
+                            size: .medium,
+                            action: { send(.backTapped) },
+                        )
+                        .frame(height: Constant.headerRowHeight)
+                    }
+                    ScreenHeaderTitle(title: "저장한 문제")
+                        .frame(height: Constant.headerRowHeight)
                 }
-                ScreenHeaderTitle(title: "저장한 문제")
-                    .frame(height: Constant.headerTitleHeight)
+
+                Spacer()
             }
-            .designSystemScreenMargin()
 
             if isFilterPresented {
                 FilterSection(
@@ -83,10 +86,13 @@ struct SavedScreen: View {
                     count: store.collection?.totalCount ?? 0,
                     onSelect: { send(.filterSelected(projectID: $0)) },
                 )
-                .padding(.leading, 20)
             }
         }
-        .padding(.vertical, 8)
+        .designSystemScreenMargin()
+        .frame(maxWidth: .infinity)
+        .padding(.top, 12)
+        .designSystemBackground(.quizTopScrim)
+
     }
 
     private var content: some View {
