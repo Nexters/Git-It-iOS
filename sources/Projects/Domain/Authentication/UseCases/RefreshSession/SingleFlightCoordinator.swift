@@ -13,14 +13,21 @@ public actor SingleFlightCoordinator {
             return await inFlight.value
         }
 
-        let task = Task { await operation() }
+        let task = Task { [weak self] () -> SessionRefreshOutcome in
+            let outcome = await operation()
+            await self?.clearInFlight()
+            return outcome
+        }
         inFlight = task
-        defer { inFlight = nil }
         return await task.value
     }
 
     // MARK: Private
 
     private var inFlight: Task<SessionRefreshOutcome, Never>?
+
+    private func clearInFlight() {
+        inFlight = nil
+    }
 
 }
