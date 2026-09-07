@@ -103,10 +103,19 @@ extension GradientToken {
     )
 
     public static let backgroundGradient = GradientToken(
-        name: "BackgroundGradientGradient",
-        start: .init(x: 0.5, y: 0.6868),
-        end: .init(x: 0.5, y: 1.79211),
-        stops: GradientToken.gradient2.stops,
+        name: "BackgroundGradient",
+        start: .init(x: 0.5, y: 0.6),
+        end: .init(x: 0.5, y: 3.0),
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+            ),
+            Stop(
+                position: 1,
+                hex: "#A5C4F0",
+            ),
+        ],
     )
 
     public static let topEdgeScrim = GradientToken(
