@@ -206,6 +206,7 @@ public struct AppComposition: Sendable {
                 await learningProject.trackGenerationProgress.end()
             },
             transport: transport,
+            responseTimeout: memberResponseTimeout,
         )
         let externalRepository = ExternalRepositoryAssembly(
             baseURL: environment.externalRepositoryBaseURL,
@@ -249,6 +250,7 @@ public struct AppComposition: Sendable {
         case notBootstrapped
     }
 
+    private static let memberResponseTimeout = Duration.seconds(10)
     private static let deviceKeychainNamespace = KeychainNamespace("com.nexters.hytime.gitit.device")
     private static let deviceKeychainKey = "deviceID"
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "AppComposition")
