@@ -20,6 +20,10 @@ public struct RequestGenerationReminder: RequestGenerationReminderUseCase, Senda
         return outcome
     }
 
+    public func requestAuthorization() async -> NotificationAuthorizationOutcome {
+        await authorizationGateway.requestAuthorization()
+    }
+
     public func isAuthorized() async -> Bool {
         await authorizationGateway.isAuthorized()
     }

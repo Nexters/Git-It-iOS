@@ -109,9 +109,15 @@ public struct SettingsScreen: View {
             .padding(.bottom, Constant.contentBottomPadding)
         }
         .task { await send(.task).finish() }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            send(.applicationBecameActive)
+        }
     }
 
     // MARK: Private
+
+    @Environment(\.scenePhase) private var scenePhase
 
     private var rowDivider: some View {
         Rectangle()

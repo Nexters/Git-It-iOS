@@ -243,6 +243,10 @@ private enum AppRootPreviewSupport {
             .authorized
         }
 
+        func requestAuthorization() async -> NotificationAuthorizationOutcome {
+            .authorized
+        }
+
         func isAuthorized() async -> Bool {
             true
         }

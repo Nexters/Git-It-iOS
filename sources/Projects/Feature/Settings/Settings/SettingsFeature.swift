@@ -95,6 +95,7 @@ public struct SettingsFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case task
+            case applicationBecameActive
             case backTapped
             case positionRowTapped
             case careerLevelRowTapped
@@ -146,11 +147,11 @@ public struct SettingsFeature: Sendable {
                             await send(.effect(.profileLoadFinished(.failure(mapped))))
                         }
                     },
-                    .run { [requestGenerationReminder] send in
-                        let isAuthorized = await requestGenerationReminder.isAuthorized()
-                        await send(.effect(.notificationAuthorizationChecked(isAuthorized: isAuthorized)))
-                    },
+                    checkNotificationAuthorization(),
                 )
+
+            case .view(.applicationBecameActive):
+                return checkNotificationAuthorization()
 
             case .view(.backTapped):
                 return .send(.delegate(.backRequested))
@@ -162,8 +163,13 @@ public struct SettingsFeature: Sendable {
                 return .send(.delegate(.careerLevelSelectionRequested))
 
             case .view(.notificationRowTapped):
-                return .run { [openNotificationSettings] _ in
-                    await openNotificationSettings()
+                guard state.notificationStatus != .allowed else { return openNotificationSettingsEffect() }
+                return .run { [requestGenerationReminder, openNotificationSettings] send in
+                    let outcome = await requestGenerationReminder.requestAuthorization()
+                    if outcome == .previouslyDenied {
+                        await openNotificationSettings()
+                    }
+                    await send(.effect(.notificationAuthorizationChecked(isAuthorized: outcome == .authorized)))
                 }
 
             case .view(.termsTapped):
@@ -327,6 +333,19 @@ public struct SettingsFeature: Sendable {
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func openNotificationSettingsEffect() -> Effect<Action> {
+        .run { [openNotificationSettings] _ in
+            await openNotificationSettings()
+        }
+    }
+
+    private func checkNotificationAuthorization() -> Effect<Action> {
+        .run { [requestGenerationReminder] send in
+            let isAuthorized = await requestGenerationReminder.isAuthorized()
+            await send(.effect(.notificationAuthorizationChecked(isAuthorized: isAuthorized)))
+        }
+    }
 
 }
 
