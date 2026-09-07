@@ -63,8 +63,8 @@ public struct ProfileScreen: View {
         } else {
             Self.ProfileHeaderView(display: current)
                 .padding(Constant.profileCardPadding)
-
             StyledText.caption2(Constant.statisticsSectionTitle, color: .grey400)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.sectionTitleTopPadding)
                 .padding(.bottom, Constant.sectionTitleBottomPadding)
