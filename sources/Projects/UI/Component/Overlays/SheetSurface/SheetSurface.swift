@@ -3,16 +3,18 @@ import SwiftUI
 
 // MARK: - SheetSurface
 
-public struct SheetSurface<Content: View>: View {
+public struct SheetSurface<Content: View, Footer: View>: View {
 
     // MARK: Lifecycle
 
     public init(
         isScrollable: Bool = false,
         @ViewBuilder content: () -> Content,
+        @ViewBuilder footer: () -> Footer = { EmptyView() },
     ) {
         self.isScrollable = isScrollable
         self.content = content()
+        self.footer = footer()
     }
 
     // MARK: Public
@@ -44,6 +46,8 @@ public struct SheetSurface<Content: View>: View {
             } else {
                 content
             }
+
+            footer
         }
         .designSystemScreenMargin()
         .padding(.bottom, Constant.bottomPadding)
@@ -83,6 +87,7 @@ public struct SheetSurface<Content: View>: View {
 
     private let isScrollable: Bool
     private let content: Content
+    private let footer: Footer
 
 }
 
@@ -123,8 +128,9 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
                 ForEach(0..<8, id: \.self) { index in
                     StyledText.body1("정책 문서 \(index + 1)")
                 }
-                ActionButton.primary("계속하기")
             }
+        } footer: {
+            ActionButton.primary("계속하기")
         }
     }
     .frame(width: 390, height: 320)

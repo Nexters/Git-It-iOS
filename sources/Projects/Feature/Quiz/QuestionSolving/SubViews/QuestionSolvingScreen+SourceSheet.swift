@@ -25,11 +25,11 @@ extension QuestionSolvingScreen {
                         }
                     }
                     .padding(.vertical, Constant.titleToSourcesSpacing)
-
-                    ActionButton.primary("닫기", action: onClose)
-                        .padding(.top, Constant.buttonTopPadding)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            } footer: {
+                ActionButton.primary("닫기", action: onClose)
+                    .padding(.top, Constant.buttonTopPadding)
             }
         }
 
