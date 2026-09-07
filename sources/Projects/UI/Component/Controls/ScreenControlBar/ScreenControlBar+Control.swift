@@ -23,7 +23,7 @@ extension ScreenControlBar {
             label: "뒤로 가기",
         )
         public static let close = Control(
-            icon: .x,
+            icon: .close,
             label: "닫기",
         )
 

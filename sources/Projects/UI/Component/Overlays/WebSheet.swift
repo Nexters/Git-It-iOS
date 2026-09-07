@@ -27,7 +27,7 @@ public struct WebSheet: View {
 
                     Spacer(minLength: 0)
 
-                    IconGlassButton.neutral(icon: .x, label: "닫기", action: onDismiss)
+                    IconGlassButton.neutral(icon: .close, label: "닫기", action: onDismiss)
                 }
                 .padding(.bottom, LayoutToken.gutter)
 

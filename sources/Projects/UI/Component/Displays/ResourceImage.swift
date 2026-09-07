@@ -41,6 +41,7 @@ public struct ResourceImage: View {
             case chevronUp = "ic-chevron-up"
             case chevronLeftWhite = "ic-chevron-left-white"
             case chevronRightWhite = "ic-chevron-white"
+            case close = "ic-close"
             case edit = "ic-edit"
             case fileText = "ic-file-text"
             case home = "ic-home"
@@ -53,6 +54,7 @@ public struct ResourceImage: View {
             case profile = "ic-profile"
             case setting = "ic-setting"
             case settingAlert = "ic-setting-alert"
+            case settingChevron = "ic-setting-chevron"
             case settingDelete = "ic-setting-delete"
             case settingDevelop = "ic-setting-develop"
             case settingLevel = "ic-setting-level"
@@ -63,7 +65,6 @@ public struct ResourceImage: View {
             case statusDisabled = "ic-status-disabled"
             case statusLoadingDisabled = "ic-status-loading-disable"
             case user = "ic-user"
-            case x = "ic-x"
         }
 
         public enum Illust: String, Sendable, Equatable, CaseIterable {

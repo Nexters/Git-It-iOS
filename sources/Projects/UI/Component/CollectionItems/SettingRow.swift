@@ -28,7 +28,7 @@ public struct SettingRow<Content: View>: View {
                     if let value {
                         StyledText.body2(value, color: .grey400)
                     }
-                    ResourceImage(asset: .icon(.chevronRight)).designSystemForeground(.grey400)
+                    ResourceImage(asset: .icon(.settingChevron))
                         .frame(width: Constant.chevronSize, height: Constant.chevronSize)
                 }
             }
