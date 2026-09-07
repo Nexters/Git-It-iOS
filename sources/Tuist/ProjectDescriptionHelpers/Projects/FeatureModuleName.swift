@@ -38,7 +38,6 @@ extension FeatureModuleName {
                     .fromUI(.DesignSystem),
                     .fromUI(.UIComponent),
                 ],
-                buildLibraryForDistribution: false,
             )
 
         case .FeatureTests:
