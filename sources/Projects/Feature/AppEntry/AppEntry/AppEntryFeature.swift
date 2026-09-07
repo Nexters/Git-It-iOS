@@ -53,6 +53,7 @@ public struct AppEntryFeature: Sendable {
         public var requestID = 0
         public var isSplashAnimationFinished = false
         public var pendingDestination: Destination?
+        public var automaticRetryCount = 0
 
         public var isShowingRecoverableError: Bool {
             authentication == .retryableFailure
@@ -92,10 +93,12 @@ public struct AppEntryFeature: Sendable {
             switch action {
             case .view(.task):
                 guard state.authentication == .idle else { return .none }
+                state.automaticRetryCount = 0
                 return restoreSession(&state)
 
             case .view(.retryTapped):
                 guard state.authentication != .restoring else { return .none }
+                state.automaticRetryCount = 0
                 return restoreSession(&state)
 
             case .view(.splashAnimationFinished):
@@ -125,8 +128,7 @@ public struct AppEntryFeature: Sendable {
                     return decideDestination(.onboarding(startingAt: .guide), state: &state)
 
                 case .recoverableFailure:
-                    state.authentication = .retryableFailure
-                    return .none
+                    return retryAutomaticallyOrFail(&state)
                 }
 
             case .effect(.memberProfileFetchFinished(let requestID, let result)):
@@ -146,9 +148,12 @@ public struct AppEntryFeature: Sendable {
                     }
                     .cancellable(id: CancelID.cleanup, cancelInFlight: true)
 
-                case .failure:
+                case .failure(.unauthorized):
                     state.authentication = .retryableFailure
                     return .none
+
+                case .failure:
+                    return retryAutomaticallyOrFail(&state)
                 }
 
             case .effect(.localCleanupFinished(let requestID, let result)):
@@ -159,8 +164,7 @@ public struct AppEntryFeature: Sendable {
                     return decideDestination(.onboarding(startingAt: .guide), state: &state)
 
                 case .retryableFailure:
-                    state.authentication = .retryableFailure
-                    return .none
+                    return retryAutomaticallyOrFail(&state)
                 }
 
             case .delegate:
@@ -170,6 +174,10 @@ public struct AppEntryFeature: Sendable {
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static let maximumAutomaticRetryCount = 1
+    }
 
     private enum CancelID: Hashable {
         case restore
@@ -184,7 +192,6 @@ public struct AppEntryFeature: Sendable {
     private func restoreSession(_ state: inout State) -> Effect<Action> {
         state.authentication = .restoring
         state.requestID += 1
-        state.isSplashAnimationFinished = false
         state.pendingDestination = nil
         let requestID = state.requestID
         return .run { send in
@@ -192,6 +199,15 @@ public struct AppEntryFeature: Sendable {
             await send(.effect(.restoreSessionFinished(requestID: requestID, result: result)))
         }
         .cancellable(id: CancelID.restore, cancelInFlight: true)
+    }
+
+    private func retryAutomaticallyOrFail(_ state: inout State) -> Effect<Action> {
+        guard state.automaticRetryCount < Constant.maximumAutomaticRetryCount else {
+            state.authentication = .retryableFailure
+            return .none
+        }
+        state.automaticRetryCount += 1
+        return restoreSession(&state)
     }
 
     private func decideDestination(

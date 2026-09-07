@@ -48,7 +48,27 @@ struct AppEntryFeatureTests {
     }
 
     @Test
-    func `세션 복구 실패는 재시도 가능한 오류로 전환되고 재시도는 다시 복구를 시도한다`() async {
+    func `세션 복구 실패는 자동으로 1회 재시도한 뒤 재시도 가능한 오류로 전환된다`() async {
+        let restoreSession = RestoreSessionUseCaseMock(results: [.recoverableFailure])
+        let store = makeAppEntryStore(restoreSession: restoreSession)
+
+        await store.send(.view(.task)) {
+            $0.authentication = .restoring
+            $0.requestID = 1
+        }
+        await store.receive(.effect(.restoreSessionFinished(requestID: 1, result: .recoverableFailure))) {
+            $0.automaticRetryCount = 1
+            $0.requestID = 2
+        }
+        await store.receive(.effect(.restoreSessionFinished(requestID: 2, result: .recoverableFailure))) {
+            $0.authentication = .retryableFailure
+        }
+
+        #expect(await restoreSession.snapshot() == 2)
+    }
+
+    @Test
+    func `자동 재시도 중 복구에 성공하면 재시도 가능한 오류를 노출하지 않는다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.recoverableFailure, .unauthenticated])
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
@@ -57,11 +77,7 @@ struct AppEntryFeatureTests {
             $0.requestID = 1
         }
         await store.receive(.effect(.restoreSessionFinished(requestID: 1, result: .recoverableFailure))) {
-            $0.authentication = .retryableFailure
-        }
-
-        await store.send(.view(.retryTapped)) {
-            $0.authentication = .restoring
+            $0.automaticRetryCount = 1
             $0.requestID = 2
         }
         await store.receive(.effect(.restoreSessionFinished(requestID: 2, result: .unauthenticated))) {
@@ -75,6 +91,88 @@ struct AppEntryFeatureTests {
         await store.receive(.delegate(.destinationDecided(.onboarding(startingAt: .guide))))
 
         #expect(await restoreSession.snapshot() == 2)
+    }
+
+    @Test
+    func `토큰이 만료된 프로필 조회 실패는 자동 재시도 없이 재시도 가능한 오류로 전환된다`() async {
+        let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(OnboardingTestFixture.authenticatedUser)])
+        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.failure(.unauthorized)])
+        let store = makeAppEntryStore(
+            restoreSession: restoreSession,
+            fetchMemberProfile: fetchMemberProfile,
+        )
+
+        await store.send(.view(.task)) {
+            $0.authentication = .restoring
+            $0.requestID = 1
+        }
+        await store.receive(
+            .effect(.restoreSessionFinished(requestID: 1, result: .authenticated(OnboardingTestFixture.authenticatedUser)))
+        )
+        await store.receive(.effect(.memberProfileFetchFinished(requestID: 1, result: .failure(.unauthorized)))) {
+            $0.authentication = .retryableFailure
+        }
+
+        #expect(await restoreSession.snapshot() == 1)
+        #expect(await fetchMemberProfile.snapshot() == 1)
+    }
+
+    @Test
+    func `토큰 만료가 아닌 프로필 조회 실패는 자동으로 복구를 다시 시도한다`() async {
+        let profile = OnboardingTestFixture.profile(position: .ios, careerLevel: .junior)
+        let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(OnboardingTestFixture.authenticatedUser)])
+        let fetchMemberProfile = FetchMemberProfileUseCaseMock(
+            results: [.failure(.temporarilyUnavailable), .success(profile)]
+        )
+        let store = makeAppEntryStore(
+            restoreSession: restoreSession,
+            fetchMemberProfile: fetchMemberProfile,
+        )
+
+        await store.send(.view(.task)) {
+            $0.authentication = .restoring
+            $0.requestID = 1
+        }
+        await store.receive(
+            .effect(.restoreSessionFinished(requestID: 1, result: .authenticated(OnboardingTestFixture.authenticatedUser)))
+        )
+        await store.receive(
+            .effect(.memberProfileFetchFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))
+        ) {
+            $0.automaticRetryCount = 1
+            $0.requestID = 2
+        }
+        await store.receive(
+            .effect(.restoreSessionFinished(requestID: 2, result: .authenticated(OnboardingTestFixture.authenticatedUser)))
+        )
+        await store.receive(.effect(.memberProfileFetchFinished(requestID: 2, result: .success(profile)))) {
+            $0.pendingDestination = .mainShell
+        }
+        await store.send(.view(.splashAnimationFinished)) {
+            $0.isSplashAnimationFinished = true
+            $0.pendingDestination = nil
+        }
+        await store.receive(.delegate(.destinationDecided(.mainShell)))
+    }
+
+    @Test
+    func `스플래시 애니메이션이 끝난 뒤 재시도하면 자동 재시도 횟수를 초기화하고 곧바로 라우팅한다`() async {
+        let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
+        var exhaustedState = AppEntryFeature.State()
+        exhaustedState.authentication = .retryableFailure
+        exhaustedState.isSplashAnimationFinished = true
+        exhaustedState.automaticRetryCount = 1
+        let store = makeAppEntryStore(restoreSession: restoreSession, state: exhaustedState)
+
+        await store.send(.view(.retryTapped)) {
+            $0.authentication = .restoring
+            $0.automaticRetryCount = 0
+            $0.requestID = 1
+        }
+        await store.receive(.effect(.restoreSessionFinished(requestID: 1, result: .unauthenticated))) {
+            $0.authentication = .idle
+        }
+        await store.receive(.delegate(.destinationDecided(.onboarding(startingAt: .guide))))
     }
 
     @Test
@@ -133,8 +231,9 @@ struct AppEntryFeatureTests {
     }
 
     @Test
-    func `member 404 로컬 정리 실패는 재시도 가능한 오류로 유지하고 신규 가입으로 진행하지 않는다`() async {
-        let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(OnboardingTestFixture.authenticatedUser)])
+    func `member 404 로컬 정리 실패는 자동 재시도를 모두 쓴 뒤 재시도 가능한 오류로 유지한다`() async {
+        let user = OnboardingTestFixture.authenticatedUser
+        let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(user)])
         let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.failure(.memberUnavailable)])
         let signOut = SignOutUseCaseMock(results: [.retryableFailure])
         let store = makeAppEntryStore(
@@ -147,13 +246,19 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(
-            .effect(.restoreSessionFinished(requestID: 1, result: .authenticated(OnboardingTestFixture.authenticatedUser)))
-        )
+        await store.receive(.effect(.restoreSessionFinished(requestID: 1, result: .authenticated(user))))
         await store.receive(.effect(.memberProfileFetchFinished(requestID: 1, result: .failure(.memberUnavailable))))
         await store.receive(.effect(.localCleanupFinished(requestID: 1, result: .retryableFailure))) {
+            $0.automaticRetryCount = 1
+            $0.requestID = 2
+        }
+        await store.receive(.effect(.restoreSessionFinished(requestID: 2, result: .authenticated(user))))
+        await store.receive(.effect(.memberProfileFetchFinished(requestID: 2, result: .failure(.memberUnavailable))))
+        await store.receive(.effect(.localCleanupFinished(requestID: 2, result: .retryableFailure))) {
             $0.authentication = .retryableFailure
         }
+
+        #expect(await signOut.snapshot() == 2)
     }
 
     @Test

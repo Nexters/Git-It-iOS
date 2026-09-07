@@ -17,44 +17,35 @@ public struct AppEntryScreen: View {
 
     public var body: some View {
         ScreenContainer {
-            VStack(spacing: Constant.contentSpacing) {
-                Spacer()
-
-                if store.isShowingRecoverableError {
-                    Self.ErrorView(onRetry: { send(.retryTapped) })
-                } else {
-                    LaunchLogo(onCompletion: { send(.splashAnimationFinished) })
-                }
-
-                Spacer()
-            }
-            .designSystemScreenMargin()
+            LaunchLogo(onCompletion: { send(.splashAnimationFinished) })
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .designSystemScreenMargin()
+                .designSystemBackground(.backgroundGradient)
         }
-        .designSystemBackground(store.isShowingRecoverableError ? .gradient1 : Constant.backgroundGradient)
         .task { send(.task) }
+        .alert("세션을 확인하지 못했어요", isPresented: recoverableErrorBinding) {
+            Button("다시 시도") { send(.retryTapped) }
+        } message: {
+            Text("네트워크 상태를 확인한 뒤\n다시 시도해 주세요.")
+        }
     }
 
     // MARK: Private
 
     @Bindable private var store: StoreOf<AppEntryFeature>
 
+    private var recoverableErrorBinding: Binding<Bool> {
+        Binding(
+            get: { store.isShowingRecoverableError },
+            set: { isPresented in
+                guard !isPresented else { return }
+                send(.retryTapped)
+            },
+        )
+    }
+
     private func send(_ action: AppEntryFeature.Action.View) {
         store.send(.view(action))
     }
 
-}
-
-// MARK: AppEntryScreen.Constant
-
-extension AppEntryScreen {
-    fileprivate enum Constant {
-        static let contentSpacing: CGFloat = 16
-
-        static let backgroundGradient = GradientToken(
-            name: "Gradient 2 · 스플래시 화면",
-            start: .init(x: 0.5, y: 0.6868),
-            end: .init(x: 0.5, y: 1.79211),
-            stops: GradientToken.gradient2.stops,
-        )
-    }
 }
