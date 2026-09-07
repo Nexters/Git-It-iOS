@@ -33,10 +33,14 @@ public struct ModalOverlay<Content: View>: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: isPresented)
+        .animation(.easeInOut(duration: Constant.transitionDuration), value: isPresented)
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static var transitionDuration: Double { 0.25 }
+    }
 
     private let isPresented: Bool
     private let onDismiss: () -> Void
