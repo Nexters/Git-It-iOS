@@ -55,7 +55,6 @@ extension SettingsScreen {
                 }
             }
             .toolbar(.hidden, for: .tabBar)
-
         }
 
         // MARK: Private

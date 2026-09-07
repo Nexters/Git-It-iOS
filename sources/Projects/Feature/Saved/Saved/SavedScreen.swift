@@ -92,7 +92,6 @@ struct SavedScreen: View {
         .frame(maxWidth: .infinity)
         .padding(.top, 12)
         .designSystemBackground(.quizTopScrim)
-
     }
 
     private var content: some View {

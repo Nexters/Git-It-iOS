@@ -35,7 +35,6 @@ public struct SettingsScreen: View {
 
                 ScreenHeaderTitle(title: Constant.title)
                     .frame(height: Constant.headerControlRowHeight, alignment: .top)
-
             }
             .padding(.bottom, Constant.headerBottomPadding)
             .designSystemScreenMargin()
@@ -115,7 +114,6 @@ public struct SettingsScreen: View {
             send(.applicationBecameActive)
         }
         .toolbar(.hidden, for: .tabBar)
-
     }
 
     // MARK: Private

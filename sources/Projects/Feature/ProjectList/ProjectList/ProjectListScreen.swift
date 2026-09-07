@@ -95,7 +95,6 @@ public struct ProjectListScreen: View {
                                     action: headerLeadingTapped,
                                 )
                                 .frame(height: Constant.headerControlRowHeight)
-
                             }
 
                             ScreenHeaderTitle(title: headerTitle)

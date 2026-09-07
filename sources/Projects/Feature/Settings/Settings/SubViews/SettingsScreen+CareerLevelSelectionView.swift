@@ -58,7 +58,6 @@ extension SettingsScreen {
                 .padding(.top, Constant.contentTopPadding)
             }
             .toolbar(.hidden, for: .tabBar)
-
         }
 
         // MARK: Private
