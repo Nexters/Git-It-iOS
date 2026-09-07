@@ -7,7 +7,7 @@
 		<string>Default</string>
 	</array>
 	<key>aps-environment</key>
-	<string>development</string>
+	<string>$(APS_ENVIRONMENT)</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.nexters.hytime.gitit</string>

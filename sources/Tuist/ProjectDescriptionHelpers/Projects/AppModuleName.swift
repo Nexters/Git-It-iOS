@@ -9,6 +9,9 @@ enum AppModuleName: String, CaseIterable {
 }
 
 extension AppModuleName {
+
+    // MARK: Internal
+
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.App.rawValue)
         return switch self {
@@ -33,6 +36,8 @@ extension AppModuleName {
                 infoPlist: .extendingDefault(
                     with: [
                         "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+                        "ITSAppUsesNonExemptEncryption": false,
                         "UIApplicationSceneManifest": [
                             "UIApplicationSupportsMultipleScenes": false
                         ],
@@ -45,13 +50,7 @@ extension AppModuleName {
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
-                            "UIInterfaceOrientationPortrait",
-                        ],
-                        "UISupportedInterfaceOrientations~ipad": [
-                            "UIInterfaceOrientationPortrait",
-                            "UIInterfaceOrientationPortraitUpsideDown",
-                            "UIInterfaceOrientationLandscapeLeft",
-                            "UIInterfaceOrientationLandscapeRight",
+                            "UIInterfaceOrientationPortrait"
                         ],
                     ]
                 ),
@@ -75,8 +74,8 @@ extension AppModuleName {
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_PREVIEWS": "YES",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        "CURRENT_PROJECT_VERSION": "4",
-                        "MARKETING_VERSION": "1.0.0",
+                        "CURRENT_PROJECT_VERSION": .string(Self.buildVersion),
+                        "MARKETING_VERSION": .string(Self.marketingVersion),
                         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                         "SUPPORTS_MACCATALYST": "NO",
                         "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
@@ -85,11 +84,19 @@ extension AppModuleName {
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
-                        "TARGETED_DEVICE_FAMILY": "1,2",
+                        "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
-                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
-                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                        .debug(
+                            name: "Debug",
+                            settings: ["APS_ENVIRONMENT": "development"],
+                            xcconfig: "Config/debug.xcconfig",
+                        ),
+                        .release(
+                            name: "Release",
+                            settings: ["APS_ENVIRONMENT": "production"],
+                            xcconfig: "Config/release.xcconfig",
+                        ),
                     ],
                 ),
             )
@@ -135,6 +142,7 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
                 sources: ["\(sourceDirectory)/**/*.swift"],
+                resources: ["\(sourceDirectory)/PrivacyInfo.xcprivacy"],
                 entitlements: .file(path: "ShareExtension.entitlements"),
                 dependencies: [
                     .fromComposition(.CompositionShareExtension),
@@ -148,11 +156,12 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        "MARKETING_VERSION": "1.0.0",
+                        "CURRENT_PROJECT_VERSION": .string(Self.buildVersion),
+                        "MARKETING_VERSION": .string(Self.marketingVersion),
                         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
-                        "TARGETED_DEVICE_FAMILY": "1,2",
+                        "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
                         .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
@@ -162,4 +171,10 @@ extension AppModuleName {
             )
         }
     }
+
+    // MARK: Private
+
+    private static let buildVersion = "6"
+    private static let marketingVersion = "1.0.0"
+
 }
