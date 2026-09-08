@@ -244,7 +244,7 @@ public struct HomeFeature: Sendable {
             do {
                 await send(.effect(.projectsLoadFinished(
                     requestID: requestID,
-                    result: .success(try await fetchLearningProjects()),
+                    result: .success(try await fetchLearningProjects(page: LearningProjectPage.firstIndex)),
                 )))
             } catch let error as LearningProjectError {
                 await send(.effect(.projectsLoadFinished(requestID: requestID, result: .failure(error))))

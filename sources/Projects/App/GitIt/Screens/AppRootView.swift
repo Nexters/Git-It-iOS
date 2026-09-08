@@ -147,7 +147,7 @@ private enum AppRootPreviewSupport {
     }
 
     struct NoopFetchLearningProjects: FetchLearningProjectsUseCase {
-        func callAsFunction() async throws -> LearningProjectPage {
+        func callAsFunction(page _: Int) async throws -> LearningProjectPage {
             throw CancellationError()
         }
     }

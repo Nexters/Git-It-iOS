@@ -22,7 +22,7 @@ struct FetchLearningProjectsTests {
         let page = LearningProjectPage(items: [summary], hasNext: true)
         let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result == page)
     }
@@ -56,7 +56,7 @@ struct FetchLearningProjectsTests {
         let page = LearningProjectPage(items: items, hasNext: false)
         let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result.items.count == items.count)
     }
@@ -66,7 +66,7 @@ struct FetchLearningProjectsTests {
         let fetchLearningProjects = makeFetchLearningProjects(behavior: .fail(.unauthorized))
 
         await #expect(throws: LearningProjectError.unauthorized) {
-            try await fetchLearningProjects()
+            try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
         }
     }
 
@@ -100,7 +100,7 @@ struct FetchLearningProjectsTests {
             activeProjectIDs: ["creating-project"],
         )
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result.items.map(\.projectID) == ["ready-project"])
         #expect(result.hasNext == true)
@@ -111,9 +111,25 @@ struct FetchLearningProjectsTests {
         let page = LearningProjectPage(items: [], hasNext: false)
         let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result == page)
+    }
+
+    @Test
+    func `요청한 페이지를 고정된 페이지 크기와 함께 저장소에 전달한다`() async throws {
+        let page = LearningProjectPage(items: [], hasNext: false)
+        let repository = FetchLearningProjectsRepository(behavior: .succeed(page))
+        let fetchLearningProjects = FetchLearningProjects(
+            repository: repository,
+            creationStateRepository: StubRepositoryCreationStateRepository(activeProjectIDs: []),
+        )
+
+        _ = try await fetchLearningProjects(page: 2)
+
+        let request = await repository.requestSnapshot()
+        #expect(request.page == 2)
+        #expect(request.size == 20)
     }
 }
 
@@ -154,12 +170,14 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
     }
 
     func fetchProjects(
-        page _: Int,
-        size _: Int,
+        page: Int,
+        size: Int,
     ) async throws -> LearningProjectPage {
+        requestedPage = page
+        requestedSize = size
         switch behavior {
-        case .succeed(let page):
-            return page
+        case .succeed(let loaded):
+            return loaded
 
         case .fail(let error):
             throw error
@@ -174,9 +192,15 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
         throw LearningProjectError.unexpected
     }
 
+    func requestSnapshot() -> (page: Int?, size: Int?) {
+        (requestedPage, requestedSize)
+    }
+
     // MARK: Private
 
     private let behavior: Behavior
+    private var requestedPage: Int?
+    private var requestedSize: Int?
 
 }
 

@@ -4,7 +4,7 @@ import DomainMember
 import Foundation
 
 struct NoopFetchLearningProjectsUseCase: FetchLearningProjectsUseCase {
-    func callAsFunction() async throws -> LearningProjectPage {
+    func callAsFunction(page _: Int) async throws -> LearningProjectPage {
         throw CancellationError()
     }
 }

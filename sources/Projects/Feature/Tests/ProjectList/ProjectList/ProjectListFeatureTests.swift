@@ -274,7 +274,151 @@ struct ProjectListFeatureTests {
         }
     }
 
+    @Test
+    func `목록 끝에 닿으면 다음 페이지를 이어붙인다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(
+            results: [.success(Self.firstPage), .success(Self.secondPage)]
+        )
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.listBottomReached))
+        await store.receive(\.effect.projectsLoadFinished)
+
+        #expect(store.state.projects.map(\.projectID) == [
+            "project-0",
+            "project-1",
+            "project-2",
+            "project-3",
+            "project-4",
+            "project-5",
+        ])
+        #expect(store.state.pagination == .exhausted)
+        #expect(await fetchLearningProjects.requestedPageSnapshot() == [0, 1])
+    }
+
+    @Test
+    func `다음 페이지가 없으면 목록 끝에 닿아도 다시 요청하지 않는다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(
+            results: [.success(HomeTestFixture.oneProjectPage)]
+        )
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.listBottomReached))
+
+        #expect(store.state.pagination == .exhausted)
+        #expect(await fetchLearningProjects.snapshot().callCount == 1)
+    }
+
+    @Test
+    func `다음 페이지를 불러오는 중에는 같은 요청을 반복하지 않는다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(results: [.success(Self.secondPage)])
+        let store = makeStore(
+            fetchLearningProjects: fetchLearningProjects,
+            initialLoad: .loaded,
+            pagination: .loading(nextPage: 1),
+        )
+
+        await store.send(.view(.listBottomReached))
+
+        #expect(await fetchLearningProjects.snapshot().callCount == 0)
+    }
+
+    @Test
+    func `첫 조회 전에는 목록 끝에 닿아도 다음 페이지를 요청하지 않는다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(results: [.success(Self.secondPage)])
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+
+        await store.send(.view(.listBottomReached))
+
+        #expect(await fetchLearningProjects.snapshot().callCount == 0)
+    }
+
+    @Test
+    func `다음 페이지 조회에 실패하면 재시도로 같은 페이지를 다시 요청한다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(results: [
+            .success(Self.firstPage),
+            .failure(.temporarilyUnavailable),
+            .success(Self.secondPage),
+        ])
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.listBottomReached))
+        await store.receive(\.effect.projectsLoadFinished)
+
+        #expect(store.state.pagination == .failed(nextPage: 1, error: .temporarilyUnavailable))
+        #expect(store.state.projects.count == Self.firstPage.items.count)
+
+        await store.send(.view(.nextPageRetryTapped))
+        await store.receive(\.effect.projectsLoadFinished)
+
+        #expect(store.state.projects.count == Self.firstPage.items.count + Self.secondPage.items.count)
+        #expect(await fetchLearningProjects.requestedPageSnapshot() == [0, 1, 1])
+    }
+
+    @Test
+    func `새로고침하면 목록과 다음 페이지 커서를 처음부터 다시 만든다`() async {
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(results: [
+            .success(Self.firstPage),
+            .success(Self.secondPage),
+            .success(Self.firstPage),
+        ])
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.listBottomReached))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.refreshRequested))
+        await store.receive(\.effect.projectsLoadFinished)
+
+        #expect(store.state.projects.map(\.projectID) == Self.firstPage.items.map(\.projectID))
+        #expect(store.state.pagination == .idle(nextPage: 1))
+        #expect(await fetchLearningProjects.requestedPageSnapshot() == [0, 1, 0])
+    }
+
+    @Test
+    func `다음 페이지에 이미 있는 프로젝트가 오면 중복으로 추가하지 않는다`() async {
+        let overlappingPage = LearningProjectPage(
+            items: [HomeTestFixture.project(index: 3), HomeTestFixture.project(index: 4)],
+            hasNext: false,
+        )
+        let fetchLearningProjects = HomeLearningProjectsUseCaseMock(
+            results: [.success(Self.firstPage), .success(overlappingPage)]
+        )
+        let store = makeStore(fetchLearningProjects: fetchLearningProjects)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.projectsLoadFinished)
+        await store.send(.view(.listBottomReached))
+        await store.receive(\.effect.projectsLoadFinished)
+
+        #expect(store.state.projects.map(\.projectID) == [
+            "project-0",
+            "project-1",
+            "project-2",
+            "project-3",
+            "project-4",
+        ])
+    }
+
     // MARK: Private
+
+    private static let firstPage = HomeTestFixture.manyProjectsPage
+    private static let secondPage = LearningProjectPage(
+        items: [HomeTestFixture.project(index: 4), HomeTestFixture.project(index: 5)],
+        hasNext: false,
+    )
 
     private func makeStore(
         mode: ProjectListFeature.Mode = .browsing,
@@ -282,9 +426,13 @@ struct ProjectListFeatureTests {
             results: [.success(HomeTestFixture.emptyPage)]
         ),
         deleteLearningProject: StubDeleteLearningProjectUseCase = StubDeleteLearningProjectUseCase(),
+        initialLoad: ProjectListFeature.InitialLoad = .idle,
+        pagination: ProjectListFeature.Pagination = .idle(nextPage: LearningProjectPage.firstIndex),
     ) -> TestStoreOf<ProjectListFeature> {
         var state = ProjectListFeature.State()
         state.mode = mode
+        state.initialLoad = initialLoad
+        state.pagination = pagination
         return TestStore(initialState: state) {
             ProjectListFeature(
                 fetchLearningProjects: fetchLearningProjects,

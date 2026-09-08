@@ -25,9 +25,10 @@ public struct ProjectListFeature: Sendable {
 
         public var projects = [LearningProjectSummary]()
         public var initialLoad = InitialLoad.idle
+        public var pagination = Pagination.idle(nextPage: LearningProjectPage.firstIndex)
         public var mode = Mode.browsing
         public var deletion = Deletion.idle
-        public var refreshRequestID = 0
+        public var requestID = 0
     }
 
     public enum InitialLoad: Equatable, Sendable {
@@ -35,6 +36,13 @@ public struct ProjectListFeature: Sendable {
         case loading
         case loaded
         case failed(LearningProjectError)
+    }
+
+    public enum Pagination: Equatable, Sendable {
+        case idle(nextPage: Int)
+        case loading(nextPage: Int)
+        case failed(nextPage: Int, error: LearningProjectError)
+        case exhausted
     }
 
     public enum Mode: Equatable, Sendable {
@@ -67,6 +75,8 @@ public struct ProjectListFeature: Sendable {
         public enum View: Sendable, Equatable {
             case task
             case refreshRequested
+            case listBottomReached
+            case nextPageRetryTapped
             case projectRowTapped(projectID: String)
             case learningTapped(projectID: String)
             case menuTapped
@@ -80,7 +90,11 @@ public struct ProjectListFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case projectsLoadFinished(requestID: Int, result: Result<LearningProjectPage, LearningProjectError>)
+            case projectsLoadFinished(
+                requestID: Int,
+                page: Int,
+                result: Result<LearningProjectPage, LearningProjectError>,
+            )
             case deletionFinished(projectID: String, error: LearningProjectError?)
         }
 
@@ -98,19 +112,24 @@ public struct ProjectListFeature: Sendable {
             case .view(.task),
                  .view(.refreshRequested),
                  .input(.learningProjectsReloadRequested):
-                state.refreshRequestID += 1
-                let currentRequestID = state.refreshRequestID
+                state.requestID += 1
                 state.initialLoad = state.projects.isEmpty ? .loading : state.initialLoad
-                return .run { send in
-                    do {
-                        let page = try await fetchLearningProjects()
-                        await send(.effect(.projectsLoadFinished(requestID: currentRequestID, result: .success(page))))
-                    } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
-                        await send(.effect(.projectsLoadFinished(requestID: currentRequestID, result: .failure(mapped))))
-                    }
-                }
-                .cancellable(id: CancelID.load, cancelInFlight: true)
+                return .merge(
+                    .cancel(id: CancelID.nextPage),
+                    projectsLoadEffect(requestID: state.requestID, page: LearningProjectPage.firstIndex)
+                        .cancellable(id: CancelID.load, cancelInFlight: true),
+                )
+
+            case .view(.listBottomReached):
+                guard
+                    state.initialLoad == .loaded,
+                    case .idle(let nextPage) = state.pagination
+                else { return .none }
+                return startNextPageLoad(state: &state, nextPage: nextPage)
+
+            case .view(.nextPageRetryTapped):
+                guard case .failed(let nextPage, _) = state.pagination else { return .none }
+                return startNextPageLoad(state: &state, nextPage: nextPage)
 
             case .view(.projectRowTapped(let projectID)):
                 guard state.mode != .deleting else { return .none }
@@ -171,16 +190,19 @@ public struct ProjectListFeature: Sendable {
                 }
                 .cancellable(id: CancelID.deletion)
 
-            case .effect(.projectsLoadFinished(let requestID, let result)):
-                guard requestID == state.refreshRequestID else { return .none }
+            case .effect(.projectsLoadFinished(let requestID, let page, let result)):
+                guard requestID == state.requestID, isCurrentLoad(state: state, page: page) else { return .none }
                 switch result {
-                case .success(let page):
-                    state.projects = page.items
-                    state.initialLoad = .loaded
+                case .success(let loaded):
+                    applyLoadedPage(state: &state, loaded: loaded, page: page)
 
                 case .failure(let error):
-                    if state.projects.isEmpty {
-                        state.initialLoad = .failed(error)
+                    if page == LearningProjectPage.firstIndex {
+                        if state.projects.isEmpty {
+                            state.initialLoad = .failed(error)
+                        }
+                    } else {
+                        state.pagination = .failed(nextPage: page, error: error)
                     }
                 }
                 return .none
@@ -208,10 +230,69 @@ public struct ProjectListFeature: Sendable {
 
     private enum CancelID: Hashable {
         case load
+        case nextPage
         case deletion
     }
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let deleteLearningProject: any DeleteLearningProjectUseCase
+
+    private func startNextPageLoad(
+        state: inout State,
+        nextPage: Int,
+    ) -> ComposableArchitecture.Effect<Action> {
+        state.pagination = .loading(nextPage: nextPage)
+        return projectsLoadEffect(requestID: state.requestID, page: nextPage)
+            .cancellable(id: CancelID.nextPage, cancelInFlight: true)
+    }
+
+    private func projectsLoadEffect(
+        requestID: Int,
+        page: Int,
+    ) -> ComposableArchitecture.Effect<Action> {
+        let fetchLearningProjects = fetchLearningProjects
+
+        return .run { send in
+            do {
+                let loaded = try await fetchLearningProjects(page: page)
+                await send(.effect(.projectsLoadFinished(
+                    requestID: requestID,
+                    page: page,
+                    result: .success(loaded),
+                )))
+            } catch {
+                let mapped = error as? LearningProjectError ?? .unexpected
+                await send(.effect(.projectsLoadFinished(
+                    requestID: requestID,
+                    page: page,
+                    result: .failure(mapped),
+                )))
+            }
+        }
+    }
+
+    private func isCurrentLoad(
+        state: State,
+        page: Int,
+    ) -> Bool {
+        guard page != LearningProjectPage.firstIndex else { return true }
+        guard case .loading(let loadingPage) = state.pagination else { return false }
+        return loadingPage == page
+    }
+
+    private func applyLoadedPage(
+        state: inout State,
+        loaded: LearningProjectPage,
+        page: Int,
+    ) {
+        if page == LearningProjectPage.firstIndex {
+            state.projects = loaded.items
+        } else {
+            let loadedProjectIDs = Set(state.projects.map(\.projectID))
+            state.projects.append(contentsOf: loaded.items.filter { !loadedProjectIDs.contains($0.projectID) })
+        }
+        state.initialLoad = .loaded
+        state.pagination = loaded.hasNext ? .idle(nextPage: page + 1) : .exhausted
+    }
 
 }

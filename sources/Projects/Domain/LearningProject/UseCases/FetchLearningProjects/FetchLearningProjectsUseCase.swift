@@ -1,3 +1,3 @@
 public protocol FetchLearningProjectsUseCase: Sendable {
-    func callAsFunction() async throws -> LearningProjectPage
+    func callAsFunction(page: Int) async throws -> LearningProjectPage
 }

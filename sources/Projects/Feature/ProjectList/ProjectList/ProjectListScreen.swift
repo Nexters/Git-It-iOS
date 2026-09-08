@@ -160,10 +160,16 @@ public struct ProjectListScreen: View {
             .padding(.vertical, Constant.headerBottomPadding)
 
         } content: {
-            VStack(spacing: LayoutToken.compactSpacing) {
+            LazyVStack(spacing: LayoutToken.compactSpacing) {
                 ForEach(projects) { project in
                     row(project)
+                        .onAppear { rowAppeared(projectID: project.id) }
                 }
+
+                Self.NextPageFooter(
+                    pagination: store.pagination,
+                    onRetry: { send(.nextPageRetryTapped) },
+                )
             }
             .designSystemScreenMargin()
             .padding(.vertical, Constant.contentVerticalPadding)
@@ -221,6 +227,11 @@ public struct ProjectListScreen: View {
         }
         .contentShape(Rectangle())
         .onTapGesture { send(.projectRowTapped(projectID: project.id)) }
+    }
+
+    private func rowAppeared(projectID: String) {
+        guard projectID == store.projects.last?.projectID else { return }
+        send(.listBottomReached)
     }
 
     private func accessoryTapped(projectID: String) {

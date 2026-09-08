@@ -14,8 +14,9 @@ actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
 
     // MARK: Internal
 
-    func callAsFunction() async throws -> LearningProjectPage {
+    func callAsFunction(page: Int) async throws -> LearningProjectPage {
         callCount += 1
+        requestedPages.append(page)
         let result = nextResult()
         guard suspendsRequests else { return try result.get() }
 
@@ -26,6 +27,10 @@ actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
 
     func snapshot() -> (callCount: Int, pendingCount: Int) {
         (callCount, continuations.count)
+    }
+
+    func requestedPageSnapshot() -> [Int] {
+        requestedPages
     }
 
     func resumeNext() {
@@ -39,6 +44,7 @@ actor HomeLearningProjectsUseCaseMock: FetchLearningProjectsUseCase {
     private var results: [Result<LearningProjectPage, LearningProjectError>]
     private let suspendsRequests: Bool
     private var callCount = 0
+    private var requestedPages = [Int]()
     private var continuations = [(
         CheckedContinuation<LearningProjectPage, any Error>,
         Result<LearningProjectPage, LearningProjectError>,

@@ -1,4 +1,5 @@
 import DomainAuthentication
+import DomainLearningProject
 import Foundation
 import Testing
 
@@ -48,7 +49,7 @@ struct AppCompositionSharedLifetimeTests {
             transport: transport,
         )
 
-        _ = try await composition.fetchLearningProjects()
+        _ = try await composition.fetchLearningProjects(page: LearningProjectPage.firstIndex)
         _ = try await composition.fetchMemberProfile()
 
         let requests = await transport.recordedRequests
