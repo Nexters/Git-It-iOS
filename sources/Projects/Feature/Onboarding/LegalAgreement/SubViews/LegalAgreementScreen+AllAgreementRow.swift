@@ -13,7 +13,7 @@ extension LegalAgreementScreen {
         var body: some View {
             Button(action: onToggle) {
                 HStack(spacing: Constant.checkSpacing) {
-                    ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
+                    ResourceImage(asset: isSelected ? .icon(.statusCheck) : .icon(.statusDisabled))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
                     StyledText.body2(Constant.title)

@@ -33,8 +33,6 @@ public struct ResourceImage: View {
             case bookmark = "ic-bookmark"
             case bookmarkFilled = "ic-bookmark-filled"
             case cancel = "ic-cancel"
-            case checkmarkChecked = "ic-checkmark-checked"
-            case checkmarkDisable = "ic-checkmark-disable"
             case chevronDown = "ic-chevron-down"
             case chevronLeft = "ic-chevron-left"
             case chevronRight = "ic-chevron-right"
