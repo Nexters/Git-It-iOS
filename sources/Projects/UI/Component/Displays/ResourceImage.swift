@@ -38,7 +38,7 @@ public struct ResourceImage: View {
             case chevronRight = "ic-chevron-right"
             case chevronUp = "ic-chevron-up"
             case chevronLeftWhite = "ic-chevron-left-white"
-            case chevronRightWhite = "ic-chevron-white"
+            case chevronRightWhite = "ic-chevron-right-white"
             case close = "ic-close"
             case edit = "ic-edit"
             case fileText = "ic-file-text"
