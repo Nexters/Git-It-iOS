@@ -61,6 +61,7 @@ public struct ResourceImage: View {
             case star = "ic-star"
             case statusCheck = "ic-status-check"
             case statusDisabled = "ic-status-disabled"
+            case statusLoading = "ic-status-loading"
             case statusLoadingDisabled = "ic-status-loading-disable"
             case user = "ic-user"
         }
