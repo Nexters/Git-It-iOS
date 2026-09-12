@@ -48,10 +48,6 @@ public struct LegalAgreementFeature: Sendable {
             PolicyConsentRecord.isConsentValid(storedRecords: storedConsentRecords, for: requiredDocuments)
         }
 
-        // MARK: Internal
-
-        var pendingNeedsCuration: Bool?
-
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -80,12 +76,12 @@ public struct LegalAgreementFeature: Sendable {
         @CasePathable
         public enum Input: Sendable, Equatable {
             case load
-            case prepare(needsCuration: Bool)
+            case prepare
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case consentCompleted(needsCuration: Bool)
+            case consentCompleted
             case cancelled
         }
     }
@@ -110,8 +106,7 @@ public struct LegalAgreementFeature: Sendable {
                     )
                 }
 
-            case .input(.prepare(let needsCuration)):
-                state.pendingNeedsCuration = needsCuration
+            case .input(.prepare):
                 state.selectedDocumentIDs = []
                 return .none
 
@@ -142,11 +137,10 @@ public struct LegalAgreementFeature: Sendable {
             case .view(.cancelTapped):
                 state.selectedDocumentIDs = []
                 state.presentedDocumentID = nil
-                state.pendingNeedsCuration = nil
                 return .send(.delegate(.cancelled))
 
             case .view(.continueTapped):
-                guard state.canContinue, let needsCuration = state.pendingNeedsCuration else { return .none }
+                guard state.canContinue else { return .none }
                 let records = state.requiredDocuments
                     .filter { state.selectedDocumentIDs.contains($0.identifier) }
                     .map {
@@ -157,10 +151,9 @@ public struct LegalAgreementFeature: Sendable {
                         )
                     }
                 state.storedConsentRecords = records
-                state.pendingNeedsCuration = nil
                 return .run { send in
                     try? await policyConsent.saveConsentRecords(records)
-                    await send(.delegate(.consentCompleted(needsCuration: needsCuration)))
+                    await send(.delegate(.consentCompleted))
                 }
 
             case .effect(.documentsLoaded(let documents, let records)):

@@ -129,17 +129,20 @@ public struct OnboardingRouterFeature: Sendable {
             case .tutorial(.delegate(.appeared)):
                 effect = .send(.legalAgreement(.input(.load)))
 
-            case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
+            case .tutorial(.delegate(.signInRequested)):
                 if state.legalAgreement.isStoredConsentValid {
-                    effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
+                    effect = .send(.tutorial(.input(.startSignIn)))
                 } else {
                     state.activeScreen = .guide(.legalAgreement)
-                    effect = .send(.legalAgreement(.input(.prepare(needsCuration: needsCuration))))
+                    effect = .send(.legalAgreement(.input(.prepare)))
                 }
 
-            case .legalAgreement(.delegate(.consentCompleted(let needsCuration))):
-                state.activeScreen = .guide(.tutorial)
+            case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
                 effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
+
+            case .legalAgreement(.delegate(.consentCompleted)):
+                state.activeScreen = .guide(.tutorial)
+                effect = .send(.tutorial(.input(.startSignIn)))
 
             case .legalAgreement(.delegate(.cancelled)):
                 state.activeScreen = .guide(.tutorial)

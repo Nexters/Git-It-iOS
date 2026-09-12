@@ -77,11 +77,13 @@ public struct TutorialFeature: Sendable {
         @CasePathable
         public enum Input: Sendable, Equatable {
             case returnToLastPage
+            case startSignIn
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case appeared
+            case signInRequested
             case signInSucceeded(needsCuration: Bool)
         }
     }
@@ -97,6 +99,10 @@ public struct TutorialFeature: Sendable {
                 return .none
 
             case .view(.appleSignInTapped):
+                guard state.authentication != .signingIn else { return .none }
+                return .send(.delegate(.signInRequested))
+
+            case .input(.startSignIn):
                 guard state.authentication != .signingIn else { return .none }
                 return startSignIn(&state)
 
