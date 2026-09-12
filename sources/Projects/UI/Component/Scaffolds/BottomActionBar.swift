@@ -51,7 +51,7 @@ public struct BottomActionBar<Content: View>: View {
         BottomActionBar {
             ActionButton.primary("계속하기")
         }
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.grey600)
     }
     .frame(width: 390, height: 240)
     .designSystemBackground(.grey700)

@@ -19,7 +19,7 @@ public struct OverlayContainer<
         @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
     ) {
         self.init(
-            screenBackground: .screenBackground,
+            screenBackground: .grey700,
             header: header,
             content: content,
             background: background,
@@ -28,7 +28,7 @@ public struct OverlayContainer<
     }
 
     private init(
-        screenBackground: SemanticColorToken,
+        screenBackground: ColorToken,
         header: @escaping () -> Header,
         content: @escaping () -> Content,
         background: @escaping () -> Background,
@@ -71,7 +71,7 @@ public struct OverlayContainer<
 
     // MARK: Private
 
-    private let screenBackground: SemanticColorToken
+    private let screenBackground: ColorToken
     private let header: Header
     private let content: Content
     private let background: Background
@@ -107,7 +107,7 @@ public struct OverlayContainer<
 extension OverlayContainer where Background == EmptyView {
 
     public init(
-        screenBackground: SemanticColorToken = .screenBackground,
+        screenBackground: ColorToken = .grey700,
         @ViewBuilder header: @escaping () -> Header = { EmptyView() },
         @ViewBuilder content: @escaping () -> Content,
         @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },

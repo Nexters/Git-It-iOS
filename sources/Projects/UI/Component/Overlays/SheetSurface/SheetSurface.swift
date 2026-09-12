@@ -22,7 +22,7 @@ public struct SheetSurface<Content: View, Footer: View>: View {
     public var body: some View {
         VStack(spacing: 0) {
             Capsule()
-                .fill(Color(designSystem: SemanticColorToken.grabber))
+                .fill(Color(designSystem: ColorToken.grey500))
                 .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
                 .padding(.top, Constant.grabberTopPadding)
                 .padding(.bottom, Constant.grabberBottomPadding)
@@ -53,7 +53,7 @@ public struct SheetSurface<Content: View, Footer: View>: View {
         .padding(.bottom, Constant.bottomPadding)
         .background {
             UnevenRoundedRectangle(designSystemTopCorners: .extraLarge)
-                .fill(Color(designSystem: .cardBackground))
+                .fill(Color(designSystem: .grey600))
                 .designSystemEffect(.sheetElevation)
                 .ignoresSafeArea(edges: .bottom)
         }

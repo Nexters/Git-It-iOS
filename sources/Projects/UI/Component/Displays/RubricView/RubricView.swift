@@ -35,7 +35,7 @@ public struct RubricView: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
     }

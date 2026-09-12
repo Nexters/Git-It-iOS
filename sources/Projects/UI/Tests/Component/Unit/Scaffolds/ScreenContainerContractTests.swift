@@ -12,11 +12,11 @@ struct ScreenContainerContractTests {
     }
 
     @Test
-    func `배경 역할 색을 받아 생성한다`() {
+    func `배경 색 토큰을 받아 생성한다`() {
         _ = ScreenContainer {
             StyledText.body1("콘텐츠")
         }
-        _ = ScreenContainer(background: .cardBackground) {
+        _ = ScreenContainer(background: .grey600) {
             StyledText.body1("콘텐츠")
         }
     }

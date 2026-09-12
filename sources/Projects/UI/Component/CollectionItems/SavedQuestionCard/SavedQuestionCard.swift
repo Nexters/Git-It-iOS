@@ -40,7 +40,7 @@ public struct SavedQuestionCard: View {
         }
         .padding(.horizontal, Constant.contentPadding)
         .background(
-            Color(designSystem: .cardBackground),
+            Color(designSystem: .grey600),
             in: RoundedRectangle(designSystem: .large),
         )
     }

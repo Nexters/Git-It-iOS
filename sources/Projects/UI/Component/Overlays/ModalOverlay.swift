@@ -58,7 +58,7 @@ public struct ModalOverlay<Content: View>: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)
-            .designSystemBackground(.cardBackground)
+            .designSystemBackground(.grey600)
         }
     }
     .frame(width: 390, height: 700)

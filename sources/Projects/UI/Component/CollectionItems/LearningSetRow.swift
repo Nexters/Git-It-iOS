@@ -45,7 +45,7 @@ public struct LearningSetRow: View {
         .padding(.horizontal, Constant.horizontalPadding)
         .padding(.vertical, Constant.verticalPadding)
         .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)
-        .designSystemBackground(.screenBackground)
+        .designSystemBackground(.grey700)
         .designSystemCornerRadius(.large)
         .overlay {
             RoundedRectangle(designSystem: .large)

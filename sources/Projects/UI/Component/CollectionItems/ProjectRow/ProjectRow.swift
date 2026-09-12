@@ -63,7 +63,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         .padding(.horizontal, Constant.horizontalPadding)
         .padding(.bottom, Constant.bottomPadding)
         .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .top)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
     }

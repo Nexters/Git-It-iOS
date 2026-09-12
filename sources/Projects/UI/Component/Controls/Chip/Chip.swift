@@ -40,8 +40,8 @@ public struct Chip: View {
     private let isSelected: Bool
     private let onTap: () -> Void
 
-    private var backgroundColor: SemanticColorToken {
-        isSelected ? .brandAccent : .cardBackground
+    private var backgroundColor: ColorToken {
+        isSelected ? .blue100 : .grey600
     }
 
     private var labelColor: ColorToken {

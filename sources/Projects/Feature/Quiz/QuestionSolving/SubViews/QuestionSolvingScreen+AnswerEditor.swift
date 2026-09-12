@@ -34,7 +34,7 @@ extension QuestionSolvingScreen {
                 }
                 .padding(Constant.textInset)
                 .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight, alignment: .top)
-                .designSystemBackground(.cardBackground)
+                .designSystemBackground(.grey600)
                 .designSystemCornerRadius(.small)
                 .overlay {
                     RoundedRectangle(designSystem: .small)

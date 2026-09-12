@@ -9,8 +9,8 @@ public protocol TabShellItem: CaseIterable, Hashable, Identifiable, Sendable {
 
 extension TabShellItem {
 
-    public static func tabColor(isSelected: Bool) -> SemanticColorToken {
-        isSelected ? .brandAccent : .mutedText
+    public static func tabColor(isSelected: Bool) -> ColorToken {
+        isSelected ? .blue100 : .grey400
     }
 
 }

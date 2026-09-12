@@ -16,7 +16,6 @@ struct DesignTokenCatalogTests {
         let set = DesignTokenSet.current
         let counts = [
             set.colors.count,
-            set.semanticColors.count,
             set.gradients.count,
             set.fontFamilies.count,
             set.textStyles.count,
@@ -80,9 +79,8 @@ struct DesignTokenCatalogTests {
     }
 
     @Test
-    func `규격이 추가한 원시 색과 역할 색이 모두 존재한다`() {
+    func `규격이 추가한 원시 색이 모두 존재한다`() {
         let colorNames = Set(ColorToken.all.map(\.name))
-        let semanticNames = Set(SemanticColorToken.all.map(\.name))
 
         #expect(colorNames.isSuperset(of: [
             "Black25",
@@ -90,11 +88,6 @@ struct DesignTokenCatalogTests {
             "Black45",
             "Blue300Alpha10",
             "Blue300Alpha24",
-        ]))
-        #expect(semanticNames.isSuperset(of: [
-            "SelectedSurface",
-            "Grabber",
-            "DisabledText",
         ]))
     }
 

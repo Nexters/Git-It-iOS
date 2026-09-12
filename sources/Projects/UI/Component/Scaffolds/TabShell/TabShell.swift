@@ -28,9 +28,9 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                     .tag(item)
             }
         }
-        .tint(Color(designSystem: .brandAccent))
+        .tint(Color(designSystem: .blue100))
         .onAppear {
-            UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .brandAccent))
+            UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .blue100))
         }
     }
 

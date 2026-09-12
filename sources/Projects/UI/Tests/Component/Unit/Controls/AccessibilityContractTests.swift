@@ -28,9 +28,9 @@ struct AccessibilityContractTests {
     }
 
     @Test
-    func `탭 항목은 선택 여부에 따라 역할 색을 바꿔 색만으로 상태를 전달하지 않는다`() {
-        #expect(TabShellPreviewItem.tabColor(isSelected: true) == SemanticColorToken.brandAccent)
-        #expect(TabShellPreviewItem.tabColor(isSelected: false) == SemanticColorToken.mutedText)
+    func `탭 항목은 선택 여부에 따라 색 토큰을 바꾼다`() {
+        #expect(TabShellPreviewItem.tabColor(isSelected: true) == ColorToken.blue100)
+        #expect(TabShellPreviewItem.tabColor(isSelected: false) == ColorToken.grey400)
     }
 
     @Test

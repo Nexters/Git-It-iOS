@@ -6,7 +6,6 @@ public struct DesignTokenSet: Sendable {
 
     public init(
         colors: [ColorToken],
-        semanticColors: [SemanticColorToken],
         gradients: [GradientToken],
         fontFamilies: [FontFamilyToken],
         textStyles: [TextStyleToken],
@@ -17,7 +16,6 @@ public struct DesignTokenSet: Sendable {
         controlSizes: [ControlSizeToken],
     ) {
         self.colors = colors
-        self.semanticColors = semanticColors
         self.gradients = gradients
         self.fontFamilies = fontFamilies
         self.textStyles = textStyles
@@ -31,7 +29,6 @@ public struct DesignTokenSet: Sendable {
     // MARK: Public
 
     public let colors: [ColorToken]
-    public let semanticColors: [SemanticColorToken]
     public let gradients: [GradientToken]
     public let fontFamilies: [FontFamilyToken]
     public let textStyles: [TextStyleToken]
@@ -46,7 +43,6 @@ public struct DesignTokenSet: Sendable {
 extension DesignTokenSet {
     public static let current = DesignTokenSet(
         colors: ColorToken.all,
-        semanticColors: SemanticColorToken.all,
         gradients: GradientToken.all,
         fontFamilies: FontFamilyToken.all,
         textStyles: TextStyleToken.all,
@@ -74,10 +70,6 @@ extension DesignTokenSet {
         errors += Self.duplicateNameErrors(
             category: "ColorToken",
             names: colors.map(\.name),
-        )
-        errors += Self.duplicateNameErrors(
-            category: "SemanticColorToken",
-            names: semanticColors.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "GradientToken",
@@ -165,13 +157,6 @@ extension DesignTokenSet {
         }
 
         let colorNames = Set(colors.map(\.name))
-        for semanticColor in semanticColors where !colorNames.contains(semanticColor.colorToken.name) {
-            errors.append(.danglingReference(
-                category: "SemanticColorToken",
-                name: semanticColor.name,
-                reference: semanticColor.colorToken.name,
-            ))
-        }
         for border in borders where !colorNames.contains(border.colorToken.name) {
             errors.append(.danglingReference(
                 category: "BorderToken",

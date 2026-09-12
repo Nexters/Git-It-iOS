@@ -22,7 +22,7 @@ extension LegalAgreementScreen {
                 .padding(.horizontal, Constant.rowHorizontalPadding)
                 .frame(height: Constant.rowHeight)
                 .frame(maxWidth: .infinity)
-                .designSystemBackground(.raisedBackground)
+                .designSystemBackground(.grey500)
                 .designSystemCornerRadius(.medium)
                 .contentShape(Rectangle())
             }

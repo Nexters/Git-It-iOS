@@ -54,11 +54,11 @@ public struct ContinuousProgressBar: View {
         Constant.rowHeight
     }
 
-    static var trackColorToken: SemanticColorToken {
+    static var trackColorToken: ColorToken {
         Constant.trackColorToken
     }
 
-    static var fillColorToken: SemanticColorToken {
+    static var fillColorToken: ColorToken {
         Constant.fillColorToken
     }
 
@@ -73,8 +73,8 @@ public struct ContinuousProgressBar: View {
     private enum Constant {
         static let rowHeight: CGFloat = 6
         static let detailHeight: CGFloat = 10
-        static let trackColorToken = SemanticColorToken.progressTrack
-        static let fillColorToken = SemanticColorToken.progressFill
+        static let trackColorToken = ColorToken.grey500
+        static let fillColorToken = ColorToken.blue200
     }
 
     private let progress: Double

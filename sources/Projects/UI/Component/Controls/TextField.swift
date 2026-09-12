@@ -62,9 +62,9 @@ public struct TextField: View {
 
             case .filled:
                 BorderToken(
-                    name: SemanticColorToken.mutedText.name,
+                    name: ColorToken.grey400.name,
                     width: 1,
-                    colorToken: SemanticColorToken.mutedText.colorToken,
+                    colorToken: .grey400,
                 )
 
             case .error:
@@ -80,8 +80,8 @@ public struct TextField: View {
             CGFloat(borderToken.width)
         }
 
-        var backgroundColor: SemanticColorToken {
-            .cardBackground
+        var backgroundColor: ColorToken {
+            .grey600
         }
     }
 

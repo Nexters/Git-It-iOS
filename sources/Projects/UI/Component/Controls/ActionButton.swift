@@ -52,14 +52,14 @@ public struct ActionButton: View {
                 return Color(designSystem: ColorToken.clear)
 
             case .secondary:
-                return Color(designSystem: SemanticColorToken.raisedBackground)
+                return Color(designSystem: ColorToken.grey500)
 
             case .primary:
-                guard isEnabled else { return Color(designSystem: SemanticColorToken.raisedBackground) }
-                return Color(designSystem: SemanticColorToken.brandAccent)
+                guard isEnabled else { return Color(designSystem: ColorToken.grey500) }
+                return Color(designSystem: ColorToken.blue100)
 
             case .destructive:
-                guard isEnabled else { return Color(designSystem: SemanticColorToken.raisedBackground) }
+                guard isEnabled else { return Color(designSystem: ColorToken.grey500) }
                 return Color(designSystem: ColorToken.error)
             }
         }

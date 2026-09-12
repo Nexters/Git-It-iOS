@@ -25,7 +25,7 @@ public struct BookmarkButton: View {
                 .font(.system(size: Constant.glyphSize))
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
                 .frame(width: Constant.surfaceWidth, height: Constant.surfaceHeight)
-                .designSystemBackground(.raisedBackground)
+                .designSystemBackground(.grey500)
                 .designSystemCornerRadius(.large)
                 .frame(
                     minWidth: ControlSizeToken.minimumTouch.cgFloatValue,

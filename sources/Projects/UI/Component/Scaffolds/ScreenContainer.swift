@@ -6,7 +6,7 @@ public struct ScreenContainer<Content: View>: View {
     // MARK: Lifecycle
 
     public init(
-        background: SemanticColorToken = .screenBackground,
+        background: ColorToken = .grey700,
         @ViewBuilder content: @escaping () -> Content,
     ) {
         self.background = background
@@ -24,7 +24,7 @@ public struct ScreenContainer<Content: View>: View {
 
     // MARK: Private
 
-    private let background: SemanticColorToken
+    private let background: ColorToken
     private let content: () -> Content
 
 }

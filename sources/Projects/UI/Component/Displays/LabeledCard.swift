@@ -41,10 +41,10 @@ public struct LabeledCard: View {
 
         // MARK: Internal
 
-        var background: SemanticColorToken {
+        var background: ColorToken {
             switch self {
-            case .accent: .accentSurface
-            case .neutral: .cardBackground
+            case .accent: .blue500
+            case .neutral: .grey600
             }
         }
 

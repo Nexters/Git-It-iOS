@@ -48,7 +48,7 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, minHeight: style.minimumHeight, alignment: .leading)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .overlay {
             if let borderToken {
