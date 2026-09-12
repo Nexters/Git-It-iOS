@@ -4,230 +4,84 @@
 
 **작성일**: 2026-08-19
 
-**최종 수정일**: 2026-08-31 (문서 간 중복 제거와 소유 문서 정리)
+**최종 수정일**: 2026-09-13 (기존 테스트 일괄 변경 금지 조항 삭제)
 
 ## 목적
 
 이 문서는 Git It iOS의 테스트를 읽을 수 있는 동작 명세로 유지하기 위한 작성 기준입니다.
 패키지별 테스트 대상과 의존성 경계는 [아키텍처 문서](../architecture.md#5-테스트-정책)를
-함께 따릅니다. 상위 문서와의 우선순위는
-[컨벤션 공통 규칙](./README.md#상위-문서와-충돌-해소)을 따릅니다.
+함께 따릅니다. 문서 우선순위, 문서 구조와 문서 간 참조 규칙은
+[컨벤션 공통 원칙](common/README.md)이 소유합니다.
 
 ## 1. 적용 범위
 
 - `sources/Projects/<Package>/Tests/` 아래의 단위·통합·계약 테스트에 적용합니다.
 - 같은 `Tests/` 루트 아래의 UI 자동화 테스트에도 적용하되, 테스트 프레임워크 선택은
   §2.2의 예외를 따릅니다.
-- 새 테스트와 수정하는 기존 테스트는 이 문서를 준수합니다. 작업 범위와 무관한 기존
-  테스트를 컨벤션 적용만을 위해 한꺼번에 변경하지 않습니다.
 - 제품 소스의 타입·메서드·프로퍼티 이름은 [네이밍 컨벤션](./naming.md)을 따릅니다.
 
 ## 2. 테스트 프레임워크
 
+테스트 프레임워크는 하나를 기본으로 정해 두고, 그 프레임워크로 표현할 수 없는 플랫폼 기능에만 다른 것을 씁니다. 선택 기준을 사람마다 다르게 두지 않기
+위한 것입니다.
+
 ### 2.1 Swift Testing을 기본으로 사용합니다
 
-일반 테스트는 `Testing`을 import하고 `@Suite`, `@Test`, `#expect`, `#require`를
-사용합니다.
-
-```swift
-import Testing
-
-@Suite("학습 프로젝트 목록 로딩")
-struct LearningProjectListLoadingTests {
-
-    @Test
-    func `빈 페이지는 로딩 완료와 빈 상태를 함께 표현한다`() {
-        let state = LearningProjectListFeature.State(loadState: .loaded)
-
-        #expect(state.isEmpty)
-    }
-}
-```
-
-- 값과 상태 비교에는 `#expect`를 사용합니다.
-- 이후 검증에 필요한 전제 조건과 optional 해제에는 `try #require`를 사용합니다.
-- 오류 계약은 동기 코드에 `#expect(throws:)`, 비동기 코드에
-  `await #expect(throws:)`를 사용합니다.
-- 같은 입력과 기대 결과를 반복할 때는 `@Test(arguments:)`를 사용합니다.
-- 비동기 완료 횟수나 콜백을 검증할 때는 임의의 `sleep` 대신 Swift Testing의
-  `confirmation` 또는 대상이 제공하는 구조화된 동시성 완료 지점을 사용합니다.
+→ [Swift Testing을 기본으로 사용합니다](./test/swift-testing.md)
 
 ### 2.2 XCTest는 필요한 플랫폼 기능에만 사용합니다
 
-`XCUIApplication`, `XCUIElement`처럼 Swift Testing이 직접 제공하지 않는 XCTest UI
-자동화 API가 필요한 경우에만 `XCTestCase`를 사용합니다. 새 예외를 추가하면 테스트
-파일 또는 PR 설명에 Swift Testing으로 작성할 수 없는 이유를 남깁니다.
-
-- 하나의 테스트 파일에서 Swift Testing과 XCTest 선언을 섞지 않습니다.
-- Xcode가 Swift Testing 테스트를 `xctest` runner로 실행하는 것은 XCTest 작성 예외가
-  아닙니다.
-- XCTest UI 자동화에서도 §3의 한국어 동작 이름과 §4 이후의 격리·검증 규칙을 따릅니다.
+→ [XCTest는 필요한 플랫폼 기능에만 사용합니다](./test/xctest.md)
 
 ## 3. 테스트 이름
 
+테스트 이름은 그 테스트가 보장하는 동작 계약을 그대로 문장으로 드러냅니다. 실패한 테스트 이름만 읽고도 무엇이 깨졌는지 알 수 있어야 합니다.
+
 ### 3.1 테스트 함수 이름은 한국어 동작 문장으로 작성합니다
 
-Swift Testing의 테스트 함수는 backtick 식별자를 사용해 다음 순서로 작성합니다.
-
-```text
-조건 또는 사용자 행동 + 관찰 가능한 결과
-```
-
-```swift
-@Test
-func `조회 실패 뒤 재시도는 같은 입력으로 다시 조회한다`() async {
-    // ...
-}
-
-@Test
-func `삭제 실패는 목록과 삭제 모드를 유지한다`() async throws {
-    // ...
-}
-```
-
-- `testFetchProjects`, `성공한다`, `정상 동작한다`처럼 의도나 결과가 불명확한 이름을
-  사용하지 않습니다.
-- 구현 절차보다 외부에서 관찰할 수 있는 상태, 반환 값, 오류, 위임과 호출 계약을
-  이름에 드러냅니다.
-- `HTTP`, `URL`, `Protocol`, `loading`, `delegate`처럼 코드와 직접 대응해야 의미가
-  정확한 식별자·API 이름은 원문을 유지할 수 있습니다. 나머지 문장은 한국어로
-  작성합니다.
-- `@Suite`의 표시 이름은 검증 대상과 범위를 한국어로 설명합니다. 테스트 타입과
-  helper, Mock, Test Double의 Swift 식별자는 영어 이름을 유지합니다.
-
-XCTest UI 자동화는 discovery를 위한 `test` 접두어를 유지하고 나머지를 한국어로
-작성합니다.
-
-```swift
-func test_큰_액션_버튼은_상태가_바뀌어도_높이를_유지한다() {
-    // ...
-}
-```
+→ [테스트 함수 이름은 한국어 동작 문장으로 작성합니다](./test/korean-behavior-sentence.md)
 
 ### 3.2 한 테스트는 하나의 동작 계약을 설명합니다
 
-하나의 동작을 입증하는 데 필요한 여러 기대값은 한 테스트에서 함께 검증할 수 있습니다.
-서로 독립적으로 실패하거나 이름 하나로 설명할 수 없는 동작은 별도 테스트로 분리합니다.
+→ [한 테스트는 하나의 동작 계약을 설명합니다](./test/one-contract-per-test.md)
 
 ## 4. 테스트 구성
 
-테스트 본문은 준비, 실행, 검증 순서를 유지합니다. 단계 주석은 의미를 더할 때만 쓰고,
-일반적으로 빈 줄로 구분합니다.
+테스트 본문은 준비, 실행, 검증 순서를 유지합니다.
 
-```swift
-@Test
-func `삭제 확인 성공은 선택한 식별자를 한 번 전달한다`() async throws {
-    let project = try makeProject(id: "project-1")
-    let deleteProject = DeleteLearningProjectMock(
-        behavior: .result(.success(()))
-    )
-    let store = makeStore(
-        project: project,
-        isDeleteMode: true,
-        deleteLearningProject: deleteProject,
-    )
-
-    await store.send(.deleteButtonTapped(project.id)) {
-        $0.pendingDeletion = project.id
-    }
-    await store.send(.deletionConfirmed)
-    await store.receive(\.deletionResponse) {
-        $0.projects.remove(id: project.id)
-        $0.pendingDeletion = nil
-        $0.isDeleteMode = false
-    }
-
-    #expect(await deleteProject.snapshot() == [project.id])
-}
-```
-
-- 테스트 입력과 기대값은 테스트 본문에서 확인할 수 있는 결정적인 값으로 구성합니다.
-- force unwrap과 강제 타입 변환으로 테스트 전제 조건을 숨기지 않습니다.
-- 의미 있는 생성 규칙이 반복될 때만 private helper로 추출합니다.
-- 실제 시간, 실행 순서, 네트워크 상태와 공유 전역 mutable state에 결과를 의존시키지
-  않습니다.
+→ [테스트 구성](./test/structure.md)
 
 ## 5. 의존성 격리와 Test Double
 
-- Domain Use Case, Repository와 외부 기술 기능은 소유 패키지의 Protocol을 구현한
-  Test Double로 대체하고 initializer로 주입합니다.
-- 테스트를 위해 production 코드에 Service Locator, 전역 mutable container 또는
-  별도 `@Dependency` 경로를 추가하지 않습니다.
-- Test Double은 필요한 반환·실패·대기 동작과 호출 기록만 제공합니다. production
-  정책을 복제하지 않습니다.
-- 동시 접근이 가능한 호출 기록은 `actor` 등 데이터 경쟁을 막는 소유자 안에 두고,
-  검증에는 불변 snapshot을 사용합니다.
-- 실제 네트워크, Keychain, 파일 시스템 또는 영속 저장소를 사용하는 테스트는 해당
-  기술 통합이 검증 대상일 때만 별도 target 또는 명확한 Suite 경계에 둡니다.
+외부 의존성은 소유 패키지의 Protocol을 구현한 Test Double로 대체하고 initializer로 주입합니다.
+
+→ [의존성 격리와 Test Double](./test/dependency-isolation.md)
 
 ## 6. Feature와 TCA 테스트
 
-Feature 테스트는 Swift Testing 안에서 TCA의 `TestStore`를 사용하고, 초기 State와
-initializer로 주입할 Domain Use Case를 테스트 본문에서 명시합니다. 외부 의존성의 입력과
-호출 횟수는 §5의 Test Double snapshot으로 별도 검증합니다.
+Feature 테스트는 Swift Testing 안에서 TCA의 `TestStore`를 사용하고, 초기 State와 initializer로 주입할 Domain
+Use Case를 테스트 본문에서 명시합니다.
 
-`TestStore`로 무엇을 검증해야 하는지 — 상태 전이, Effect event, 취소, 늦은 응답과
-delegate 출력 — 와 Effect 취소의 production 규칙은
-[TCA Effect 컨벤션 §3](./tca/effect.md#3-테스트)이 소유합니다.
-
-패키지별 테스트 초점은 [아키텍처 문서 §5](../architecture.md#5-테스트-정책)를
-따릅니다.
+→ [Feature와 TCA 테스트](./test/feature-tca.md)
 
 ## 7. 파일과 Target 구성
 
+테스트 코드는 검증 대상과 같은 축으로 배치하고, test target과 scheme이 그 경계를 그대로 반영합니다. 어느 패키지의 무엇을 검증하는 테스트인지
+경로와 scheme에서 드러나야 합니다.
+
 ### 7.1 물리 폴더와 test target을 분리합니다
 
-- 테스트 소스의 폴더 경로는 [디렉터리·파일 컨벤션 §3.3](./directory-file.md#33-test-소스-루트)이
-  소유합니다. 패키지 루트에 `<TargetName>Tests/` 또는 `<TargetName>UITests/` 폴더를
-  나란히 만들지 않습니다.
-- Tuist test target 이름은 빌드 그래프 식별을 위해 패키지 문맥과 `Tests` 또는
-  `UITests` 접미어를 유지할 수 있습니다. 폴더 이름과 target 이름을 같게 만들 필요는
-  없습니다.
-- 각 `Target.testModule`은 실제 테스트가 있는 가장 좁은 `sourceDirectory`를 명시합니다.
-  하나의 package-wide test target이 여러 역할을 검증할 때는 `Tests`를 source root로
-  지정하고 그 아래를 역할별로 나눌 수 있습니다.
-- 같은 production 모듈에 일반 테스트와 UI 자동화 test target이 함께 있으면
-  `Tests/<Module>/Unit/`, `Tests/<Module>/UI/`처럼 서로 겹치지 않는 역할 하위 폴더로
-  분리합니다.
-
-- 테스트 파일 이름, 파일당 타입 개수와 `TestDoubles/` 배치는
-  [파일·형태 어휘 컨벤션 §2](./file-vocabulary.md#2-파일-규칙)·[§3](./file-vocabulary.md#3-패키지별-형태-어휘)을
-  따릅니다.
-- Tuist test target과 공유 scheme에는 실제 `@Test` 함수 또는 `XCTestCase` 테스트가
-  있는 target만 연결합니다. 빈 test target을 scheme에 등록하지 않습니다.
+→ [물리 폴더와 test target을 분리합니다](./test/test-folder-target.md)
 
 ### 7.2 scheme은 패키지와 그 패키지의 test target을 연결합니다
 
-- 공유 scheme은 target별로 만들지 않고 패키지마다 하나만 둡니다. scheme 이름은
-  `App`, `Composition`, `Feature`, `Domain`, `Data`, `Infrastructure`, `UI`처럼 패키지
-  이름을 사용합니다.
-- 패키지 scheme의 Build Action에는 그 패키지의 production target을, Test Action에는
-  그 production target을 검증하는 모든 test target을 연결합니다.
-- 여러 패키지의 test target을 하나의 scheme에 섞지 않습니다. 각 패키지는 자신의 공유
-  scheme에서 독립적으로 컴파일하고 실행할 수 있어야 합니다.
-- UI 자동화 test target은 별도 target과 host 구성을 유지하되 `UI` 패키지 scheme의
-  Build·Test Action에 함께 연결합니다.
-- scheme과 test target 연결의 정본은 `ProjectDescriptionHelpers`의 프로젝트 선언입니다.
-  Tuist가 생성한 `.xcscheme` 파일을 직접 수정하지 않습니다.
+→ [scheme은 패키지와 그 패키지의 test target을 연결합니다](./test/scheme.md)
 
 ## 8. 실행 결과와 기록
 
 테스트 컴파일과 테스트 실행은 서로 다른 검증 단계입니다.
 
-```sh
-project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
-"$project_build_runner" compile
-"$project_build_runner" test
-```
-
-- `compile`의 성공은 `build-for-testing`의 컴파일·링크 성공만 의미합니다.
-- 테스트 통과는 `test-without-building`에서 테스트 본문이 실행되고 결과가 성공했을 때만
-  기록합니다.
-- runner launch, preflight 또는 Simulator bootstrap 단계에서 실패해 테스트 본문에
-  진입하지 못하면 제품 동작 실패로 단정하지 않습니다. scheme·test target·host 구성과
-  Simulator 환경을 분리해 점검하고, 실행되지 않은 테스트를 통과로 기록하지 않습니다.
-- PR에는 실제 실행한 명령, 성공·실패 단계, 실행된 테스트 수와 미검증 범위를 구분해
-  기록합니다.
+→ [실행 결과와 기록](./test/execution-record.md)
 
 ## 9. 검토 체크리스트
 

@@ -4,89 +4,74 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-09-03 (화면-Feature 1:1과 흐름 Router 소유 규칙 반영)
+**최종 수정일**: 2026-09-13 (정의 단위를 화면 1:1에서 관심사로 교체하고 조합 규칙을 분리)
 
 ## 목적
 
-이 문서는 TCA(The Composable Architecture) Feature를 어떤 단위로 나누고, 언제 Child
-Feature로 분리하며, Feature가 공개하는 표면을 어디까지로 제한할지를 정의합니다.
+이 문서는 TCA(The Composable Architecture) Feature를 어떤 단위로 정의하고, 나눈
+Feature를 어떻게 조합하며, Feature가 공개하는 표면을 어디까지로 제한할지를 정의합니다.
 `State`·`Action` 설계는 [State 컨벤션](./state.md)·[Action 컨벤션](./action.md),
 Reducer·Effect 작성은 [Effect 컨벤션](./effect.md), Navigation 출력은
 [Navigation 컨벤션](./navigation.md)이 소유합니다.
 
-상위 문서와의 우선순위는
-[컨벤션 공통 규칙](../README.md#상위-문서와-충돌-해소)을 따릅니다.
+문서 우선순위, 문서 구조와 문서 간 참조 규칙은
+[컨벤션 공통 원칙](../common/README.md)이 소유합니다.
 
 ## 1. 적용 범위
 
-- `sources/Projects/Feature/**`의 Feature 단위 판단과 Child Feature 분리 여부에
-  적용합니다.
+- `sources/Projects/Feature/**`의 Feature 정의 단위 판단과 Feature 조합에 적용합니다.
 - Feature가 App 또는 부모 Feature에 공개하는 표면(Reducer, 화면, delegate)에
   적용합니다.
 - `State`·`Action` 설계, Reducer·Effect 작성과 Navigation 출력은 각 소유 문서가 적용
   범위를 갖습니다.
 
-## 2. Feature 단위
+## 2. 정의 단위 — 관심사
 
-- Feature는 SwiftUI `View` 타입이나 디자인 프레임 수가 아니라 논리적인 상태 소유자를
-  기준으로 나눕니다.
-- 하나의 사용자 기능은 `@Reducer`가 붙은 Feature 타입 하나를 중심으로 구성합니다.
-- 같은 논리 화면의 loading, loaded, empty, menu, confirmation과 오류 표현은 별도
-  Feature가 아니라 원칙적으로 하나의 Feature가 소유하는 State 변형입니다.
-- **화면(Screen)은 자신과 1:1로 대응하는 Feature 하나를 소유합니다.** 화면의 상태
-  정본이 어느 Feature에 있는지 찾아 헤매지 않게 하고, 화면 단위로 독립 검증할 수 있게
-  하기 위한 것입니다.
-- 1:1 대상은 **화면**이지 모든 `View`가 아닙니다. 한 Feature는 그 화면이 소유한
-  서브뷰를 여럿 렌더링할 수 있고([View 컨벤션 §4.3](../view.md#43-화면-전용-서브뷰)),
-  한 화면이 Child Feature를 조합할 수도 있습니다.
-- **여러 화면으로 이어지는 흐름은 화면 Feature들을 조합하는 Router-Feature가
-  소유합니다**([Navigation 컨벤션 §2.3](./navigation.md#23-router-feature와-화면-전환-소유)).
-  화면 여럿을 하나의 Feature가 직접 담지 않습니다.
-- 화면과 그 짝인 Feature는 같은 관심사 폴더에 함께 두고, 여러 화면이 공유하는
-  Presentation 보조 타입만 `Shared/`에 둡니다. 폴더 배치는
-  [디렉터리·파일 컨벤션 §4.3](../directory-file.md#43-feature-패키지의-흐름-배치)이
-  소유합니다.
+Feature 하나의 정의 단위는 하나의 관심사입니다.
 
-논리 화면이나 상태 영역이 다음 중 하나 이상을 소유하면 Feature 후보로 봅니다.
+→ [정의 단위 — 관심사](./feature/definition-unit.md)
 
-- Use Case 입력, 제출 가능 여부 또는 Navigation 목적지처럼 제품 동작을 바꾸는 상태
-- Action에 따른 상태 전이와 독립적으로 검증할 가치가 있는 불변식
-- 비동기 작업, 오류 복구, validation 또는 cancellation 수명
-- 화면 재진입 뒤 보존하거나 다른 화면·부모가 관찰해야 하는 사용자 입력과 진행 상태
+### 2.2 화면 전환 목적지
 
-누름 애니메이션, geometry 측정, 일시적인 highlight, 부모 State에서 완전히 계산되는
-표시 값이나 callback만 전달하는 행은 Feature 분리 근거가 아닙니다.
+Router가 전환 단위로 삼는 목적지는 그 상태를 소유하는 Feature 또는 Feature 조합을 가져야 합니다.
 
-## 3. Child Feature 분리
+→ [화면 전환 목적지](./feature/transition-destination.md)
 
-다음 중 하나 이상을 만족하면 Child Feature 분리를 우선 검토합니다.
+## 3. Feature 조합
 
-- 독립적인 비동기 Effect와 cancellation 수명을 가집니다.
-- 자체 오류·재시도 상태와 상태 전이 규칙을 가집니다.
-- 부모와 별도로 제시·제거되며 그 생성과 제거가 상태 수명을 결정합니다.
-- 여러 화면에서 동일한 제품 동작 단위로 재사용됩니다.
-- 부모가 하위 상태의 불변식을 계속 대신 관리해야 합니다.
+관심사로 나눈 Feature는 상위 Feature가 조합합니다.
 
-표시 값과 callback만 가지거나 부모 State에서 완전히 파생되는 하위 View는
-[UIComponent 컨벤션](../ui-component.md)의 재사용 기준을 적용합니다. 단순
-confirmation은 부모의 배타 상태나 Destination으로 표현할 수 있으며, 그 안에서 독립적인
-mutation, 실패 복구와 수명을 소유할 때 Child Feature 분리를 검토합니다.
+→ [Feature 조합](./feature/composition.md)
 
-## 4. 공개 표면
+## 4. 정의 단위의 검증 — 단위 테스트
 
-- `State`, `Action`, 목적지 상태와 cancellation ID는 해당 Feature 타입이 소유합니다.
-- Feature의 공개 표면은 App이 생성하는 Reducer와 화면, App이 해석할 delegate 또는
-  navigation intent로 제한합니다.
-- Child Feature는 부모가 조합하고, 다른 최상위 Feature의 목적지 생성과 앱 전체
-  Navigation은 App에 위임합니다.
+§2가 관심사 판단이라면 이 절은 그 판단의 검증입니다.
 
-## 5. 검토 체크리스트
+→ [정의 단위의 검증 — 단위 테스트](./feature/test-validation.md)
 
-- [ ] Feature가 View 파일이나 디자인 프레임이 아니라 고유한 상태와 수명을 기준으로
-      나뉘는가?
-- [ ] 독립적인 Effect·오류 복구·수명이 있는 하위 동작은 Child Feature 분리를 검토했는가?
+## 5. 공개 표면
+
+Feature의 공개 표면은 App이 생성하는 Reducer·화면과 App이 해석할 delegate로 제한되며,
+그 제약의 정본은 [Feature 패키지 규칙](../../package-rules/feature.md#공개-계약과-의존성)입니다.
+
+## 6. 검토 체크리스트
+
+- [ ] Feature가 화면이나 View 파일 수가 아니라 관심사 하나를 단위로 정의되었는가?
+- [ ] 관심사가 여럿인 화면이 Feature를 여럿 조합하는가? 한 Feature가 여러 관심사를
+      함께 쥐고 있지 않은가?
+- [ ] Router-Feature가 화면 전환 외의 관심사를 함께 쥐지 않고 별개 Feature로 조합하는가?
+- [ ] Router가 전환 단위로 삼는 목적지마다 그 상태를 소유하는 Feature 또는 Feature
+      조합이 있는가?
+- [ ] 화면의 Feature가 흐름의 다른 화면으로 가는 목적지 상태를 갖지 않고 `delegate`로만
+      알리는가?
+- [ ] 하위가 `delegate`로만 결과를 알리고, 상위가 하위 내부를 대신 운전하지 않는가?
+- [ ] 여러 곳에서 쓰이는 관심사를 복제하지 않고 하나의 Feature로 각 상위가 조합하는가?
+- [ ] Feature 하나의 단위 테스트에 주입하는 Test Double이 그 Feature의 관심사만큼으로
+      유지되는가?
+- [ ] 화면 Feature 테스트가 라우팅 결과가 아니라 `delegate` 방출까지만 검증하는가?
+- [ ] 지속되는 Effect를 소유한 Feature에서 그 Effect의 취소를 단위 테스트로 검증할 수
+      있는가?
 - [ ] Feature의 공개 표면이 App이 생성하는 Reducer·화면과 delegate로 제한되는가?
-- [ ] Child Feature의 목적지 생성과 앱 전체 Navigation을 App에 위임하는가?
 
 ## 관련 문서
 
@@ -96,13 +81,16 @@ mutation, 실패 복구와 수명을 소유할 때 Child Feature 분리를 검�
 - [Action 컨벤션](./action.md)
 - [Effect 컨벤션](./effect.md)
 - [Navigation 컨벤션](./navigation.md)
+- [View 컨벤션](../view.md)
 - [UIComponent 컨벤션](../ui-component.md)
+- [테스트 컨벤션](../test.md)
 - [Feature 패키지 규칙](../../package-rules/feature.md)
 
 ## 문서 변경 기준
 
-Feature 단위 판단 기준, Child Feature 분리 기준 또는 공개 표면 제약이 바뀔 때
-수정합니다. `State`·`Action` 설계가 바뀌면 이 문서가 아니라
+Feature의 정의 단위, 관심사 판별 기준, 조합 규칙, 단위 테스트 검증 기준 또는 공개 표면
+제약이 바뀔 때 수정합니다. `State`·`Action` 설계가 바뀌면 이 문서가 아니라
 [State 컨벤션](./state.md)·[Action 컨벤션](./action.md)을, Reducer·Effect 작성 방식이
-바뀌면 [Effect 컨벤션](./effect.md)을 갱신합니다. Feature 패키지의 책임이나 의존
+바뀌면 [Effect 컨벤션](./effect.md)을, Router의 전환 관심사 범위가 바뀌면
+[Navigation 컨벤션](./navigation.md)을 갱신합니다. Feature 패키지의 책임이나 의존
 방향이 바뀌면 이 문서보다 아키텍처와 Feature 패키지 규칙을 먼저 갱신합니다.
