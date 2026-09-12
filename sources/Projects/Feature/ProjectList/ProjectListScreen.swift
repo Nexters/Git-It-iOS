@@ -103,7 +103,7 @@ public struct ProjectListScreen: View {
 
                         Spacer()
 
-                        if let headerTrailing {
+                        if let headerTrailing, !store.projects.isEmpty {
                             IconGlassButton.neutral(
                                 icon: headerTrailing.icon,
                                 label: headerTrailing.label,
