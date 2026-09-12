@@ -25,7 +25,8 @@ extension QuizGenerationProgressScreen {
                         }
 
                         VStack(spacing: LayoutToken.compactSpacing) {
-                            ActionButton.primary("리마인드 알림 설정하기", action: onAccept)
+                            ActionButton.primary("리마인드 알림 설정하기", size: .large, action: onAccept)
+
                             ActionButton.text("다시 보지 않기", size: .small, action: onDecline)
                         }
                     }

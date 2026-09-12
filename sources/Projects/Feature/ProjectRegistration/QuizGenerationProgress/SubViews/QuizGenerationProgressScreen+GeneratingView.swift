@@ -17,6 +17,8 @@ extension QuizGenerationProgressScreen {
                         width: Constant.loadingGraphicSize,
                         height: Constant.loadingGraphicSize,
                     )
+                    .padding(.horizontal)
+                    .padding(.vertical, 30)
 
                 VStack(spacing: Constant.textSetSpacing) {
                     StyledText.subtitle1("학습세트를 만들고 있어요", alignment: .center)
@@ -25,11 +27,10 @@ extension QuizGenerationProgressScreen {
 
                 QuizGenerationProgressScreen.ChecklistView(progress: progress)
                     .padding(.top, Constant.checklistTopSpacing)
-                    .designSystemScreenMargin()
-                Spacer()
             }
+            .frame(maxHeight: .infinity)
+            .padding(.vertical)
             .designSystemScreenMargin()
-            .padding(.top, Constant.topSpacerMinLength)
             .safeAreaInset(edge: .bottom) {
                 ActionButton.primaryText("홈에서 기다리기", action: onWaitAtHome)
                     .designSystemScreenMargin()
