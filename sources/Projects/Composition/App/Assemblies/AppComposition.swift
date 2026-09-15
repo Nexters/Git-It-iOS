@@ -115,12 +115,16 @@ public struct AppComposition: Sendable {
             externalRepositoryBaseURL: URL,
             appVersion: String,
             osVersion: String,
+            generationReminderTitle: String,
+            generationReminderBody: String,
             policyDocuments: [PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
             self.externalRepositoryBaseURL = externalRepositoryBaseURL
             self.appVersion = appVersion
             self.osVersion = osVersion
+            self.generationReminderTitle = generationReminderTitle
+            self.generationReminderBody = generationReminderBody
             self.policyDocuments = policyDocuments
         }
 
@@ -130,6 +134,8 @@ public struct AppComposition: Sendable {
         public let externalRepositoryBaseURL: URL
         public let appVersion: String
         public let osVersion: String
+        public let generationReminderTitle: String
+        public let generationReminderBody: String
         public let policyDocuments: [PolicyDocument]
 
     }
@@ -215,7 +221,10 @@ public struct AppComposition: Sendable {
             learningProject: learningProject,
             member: member,
             externalRepository: externalRepository,
-            generationReminder: GenerationReminderAssembly(),
+            generationReminder: GenerationReminderAssembly(
+                reminderTitle: environment.generationReminderTitle,
+                reminderBody: environment.generationReminderBody,
+            ),
             keychainStore: keychainStore,
             appVersion: environment.appVersion,
             osVersion: environment.osVersion,

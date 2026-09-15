@@ -11,21 +11,27 @@ public struct GenerationReminderAssembly: Sendable {
     // MARK: Lifecycle
 
     public init(
+        reminderTitle: String,
+        reminderBody: String,
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
         pendingReminderCoding: PendingGenerationReminderCoding? = AppGroupUserDefaults.makeShared()
             .map(PendingGenerationReminderCoding.init(userDefaults:)),
     ) {
-        let coordinator = GenerationCompletionReminderCoordinator(
-            localNotificationClient: localNotificationClient,
-            pendingReminderCoding: pendingReminderCoding,
+        let scheduleGenerationReminder = ScheduleGenerationReminder(
+            scheduler: GenerationReminderSchedulerAdapter(
+                localNotificationClient: localNotificationClient,
+                title: reminderTitle,
+                body: reminderBody,
+            ),
+            pendingReminderStore: pendingReminderCoding.map(PendingGenerationReminderStoreAdapter.init(coding:)),
         )
-        self.coordinator = coordinator
+        self.scheduleGenerationReminder = scheduleGenerationReminder
         requestGenerationReminder = RequestGenerationReminder(
             authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
-            reminderRegistry: GenerationReminderRegistryAdapter(coordinator: coordinator),
+            reminderRegistry: scheduleGenerationReminder,
         )
         startObservingGenerationState = { trackGeneration in
-            await coordinator.start(trackGeneration: trackGeneration)
+            await scheduleGenerationReminder.start(trackGeneration: trackGeneration)
         }
     }
 
@@ -36,6 +42,6 @@ public struct GenerationReminderAssembly: Sendable {
 
     // MARK: Internal
 
-    let coordinator: GenerationCompletionReminderCoordinator
+    let scheduleGenerationReminder: ScheduleGenerationReminder
 
 }

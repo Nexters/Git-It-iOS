@@ -39,6 +39,8 @@ struct AppCompositionTests {
                 externalRepositoryBaseURL: try #require(URL(string: "https://api.github.com")),
                 appVersion: "1.0.0",
                 osVersion: "Version 26.0",
+                generationReminderTitle: "세트 생성 완료",
+                generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
             ),
             keychainStore: keychainStore,
             transport: transport,
@@ -60,6 +62,8 @@ struct AppCompositionTests {
                 externalRepositoryBaseURL: try #require(URL(string: "https://api.github.com")),
                 appVersion: "1.0.0",
                 osVersion: "Version 26.0",
+                generationReminderTitle: "세트 생성 완료",
+                generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
             )
         )
 

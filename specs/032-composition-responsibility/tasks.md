@@ -237,27 +237,31 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 테스트
 
-- [ ] T062 [S3] `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift`를 만들어 미등록 프로젝트 무시, 완료가 아닌 결과 무시, 권한 없음 무시, 완료+권한 있음일 때 대기 정책이 계산한 시각으로 예약, 같은 프로젝트 결과 2회 수신 시 1회만 예약을 검증한다
+- [X] T062 [S3] `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift`를 만들어 미등록 프로젝트 무시, 완료가 아닌 결과 무시, 권한 없음 무시, 완료+권한 있음일 때 대기 정책이 계산한 시각으로 예약, 같은 프로젝트 결과 2회 수신 시 1회만 예약을 검증한다
 
 ### 구현
 
-- [ ] T063 [S3] `sources/Projects/Domain/LearningProject/Contracts/GenerationReminderScheduler.swift`에 식별자와 예약 시각만 받는 예약 계약을 정의한다. 표시 문구는 인자에 두지 않는다
-- [ ] T064 [S3] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderUseCase.swift`에 정책 계약을 정의한다
-- [ ] T065 [S3] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminder.swift`에 대상 집합 관리, 완료 판정, 권한 확인, 예약 시각 계산을 구현한다. 대기 중 리마인드 흡수와 생성 상태 관측 시작도 여기서 맡는다
-- [ ] T066 [S3] `sources/Projects/Composition/Adapter/Adapters/GenerationReminderSchedulerAdapter.swift`를 만들어 T063의 계약을 `InfrastructureLocalNotification`에 잇는다. 알림 제목과 본문은 초기화 인자로 받는다
-- [ ] T067 [S3] `sources/Projects/Composition/Adapter/Assemblies/GenerationReminderAssembly.swift`가 T065의 UseCase와 T066의 Adapter를 조립하도록 바꾸고, 표시 문구를 인자로 받는다
-- [ ] T068 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 표시 문구를 `init` 인자로 받아 `GenerationReminderAssembly`에 전달하도록 바꾼다
-- [ ] T069 [S3] `sources/Projects/App/GitIt/GenerationReminderContent.swift`를 만들어 알림 제목 `세트 생성 완료`와 본문 `학습 세트 생성이 완료됐어요. 지금 확인해보세요.`를 소유하고, `sources/Projects/App/GitIt/GitItApp.swift`가 그 값을 `AppComposition`에 넘기게 한다
+- [X] T063 [S3] `sources/Projects/Domain/LearningProject/Contracts/GenerationReminderScheduler.swift`에 식별자와 예약 시각만 받는 예약 계약을 정의한다. 표시 문구는 인자에 두지 않는다
+  - **범위 보정**: 권한 확인도 같은 알림 경계라 `GenerationReminderScheduler`에 `isAuthorized()`를 함께 둔다. 대기 중 리마인드 흡수를 위해 `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminderStore.swift`와 그 Adapter `sources/Projects/Composition/Adapter/Adapters/PendingGenerationReminderStoreAdapter.swift`를 추가한다
+- [X] T064 [S3] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderUseCase.swift`에 정책 계약을 정의한다
+- [X] T065 [S3] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminder.swift`에 대상 집합 관리, 완료 판정, 권한 확인, 예약 시각 계산을 구현한다. 대기 중 리마인드 흡수와 생성 상태 관측 시작도 여기서 맡는다
+- [X] T066 [S3] `sources/Projects/Composition/Adapter/Adapters/GenerationReminderSchedulerAdapter.swift`를 만들어 T063의 계약을 `InfrastructureLocalNotification`에 잇는다. 알림 제목과 본문은 초기화 인자로 받는다
+- [X] T067 [S3] `sources/Projects/Composition/Adapter/Assemblies/GenerationReminderAssembly.swift`가 T065의 UseCase와 T066의 Adapter를 조립하도록 바꾸고, 표시 문구를 인자로 받는다
+- [X] T068 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 표시 문구를 `init` 인자로 받아 `GenerationReminderAssembly`에 전달하도록 바꾼다
+  - **범위 보정**: 알림 제목과 본문은 `AppComposition.Environment`로 받는다. 서명이 바뀌어 `AppCompositionTests`·`AppCompositionSharedLifetimeTests`·`AppCompositionPublicSurfaceTests`의 `Environment` 생성도 같은 단위에서 고쳤다
+- [X] T069 [S3] `sources/Projects/App/GitIt/GenerationReminderContent.swift`를 만들어 알림 제목 `세트 생성 완료`와 본문 `학습 세트 생성이 완료됐어요. 지금 확인해보세요.`를 소유하고, `sources/Projects/App/GitIt/GitItApp.swift`가 그 값을 `AppComposition`에 넘기게 한다
 
 ### 정리
 
-- [ ] T070 [S3] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`를 제거한다
-- [ ] T071 [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "이동 기록" 절에 적는다
+- [X] T070 [S3] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`를 제거한다
+  - **범위 보정**: `GenerationCompletionReminderCoordinator`를 참조하던 `sources/Projects/Composition/Adapter/Adapters/GenerationReminderRegistryAdapter.swift`도 함께 제거했다. `ScheduleGenerationReminder`가 `GenerationReminderRegistry`를 직접 채택해 중간 Adapter가 필요 없다
+- [X] T071 [S3] `sources/Projects/Composition/Tests/Adapter/Factories/GenerationCompletionReminderCoordinatorTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "이동 기록" 절에 적는다
 
 ### 단위 검증
 
-- [ ] T072 [no-write] [S3] `grep -rn '"[가-힣]' sources/Projects/Composition --include='*.swift' | grep -v '/Tests/' | grep -v logger` 결과가 비어 있는지 확인한다
-- [ ] T073 [no-write] [S3] `Domain`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I5를 검증한다
+- [X] T072 [no-write] [S3] `grep -rn '"[가-힣]' sources/Projects/Composition --include='*.swift' | grep -v '/Tests/' | grep -v logger` 결과가 비어 있는지 확인한다
+- [X] T073 [no-write] [S3] `Domain`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I5를 검증한다
+  - **범위 보정**: `Domain` 168건과 `Composition` 61건 모두 통과했다. Domain LearningProject는 88→94건으로 늘고 Composition은 coordinator 테스트 7건이 빠져 58→51건이 됐다. `AppTests`의 실패 19건은 I5 적용 전과 같은 suite 하나다
 
 **진행 점검**: T062~T073의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -356,6 +360,7 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 | 세션 저장 형식과 키 자리 | `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift` (신규) |
 | 대기 리마인드 키와 보관 한도 | `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift` (신규) |
 | `SessionAvailabilityResolverTests`의 판정 5케이스 | `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift` (6케이스로 확장) |
+| `GenerationCompletionReminderCoordinatorTests`의 예약 판정 7케이스 | `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift` (6케이스). 예약 시각이 과거인지 보는 케이스는 `readyDate` 계산을 검증하는 첫 케이스에 흡수했다 |
 
 ---
 

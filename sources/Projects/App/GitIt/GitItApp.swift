@@ -22,6 +22,8 @@ struct GitItApp: App {
                 externalRepositoryBaseURL: AppEndpointHost.externalRepository.url,
                 appVersion: bundleVersion,
                 osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                generationReminderTitle: GenerationReminderContent.title,
+                generationReminderBody: GenerationReminderContent.body,
                 policyDocuments: policyDocuments,
             )
         )
