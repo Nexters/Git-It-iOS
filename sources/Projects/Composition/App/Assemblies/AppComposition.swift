@@ -1,6 +1,7 @@
 import CompositionAdapter
 import DataAuthentication
 import DataExternalRepository
+import DataMember
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember
@@ -10,7 +11,6 @@ import InfrastructureNetworkClient
 import InfrastructurePushMessaging
 import InfrastructureStorage
 import Synchronization
-import os
 
 // MARK: - AppComposition
 
@@ -25,6 +25,8 @@ public struct AppComposition: Sendable {
         externalRepository: ExternalRepositoryAssembly,
         generationReminder: GenerationReminderAssembly,
         keychainStore: KeychainStore,
+        appVersion: String,
+        osVersion: String,
     ) {
         signIn = authentication.signIn
         signOut = authentication.signOut
@@ -80,22 +82,19 @@ public struct AppComposition: Sendable {
             await startObservingGenerationState(trackGeneration)
         }
 
-        let registerMemberDevice = member.registerMemberDevice
-        registerCurrentDevice = {
-            guard let pushClient = pushClientBox.client else {
-                throw PushBootstrapError.notBootstrapped
-            }
-            let token = try await pushClient.registrationToken()
-            let deviceID = AppComposition.loadOrCreateDeviceID(keychainStore: keychainStore)
-            try await registerMemberDevice(MemberDeviceInfo(
-                deviceID: deviceID,
-                deviceType: .ios,
-                appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
-                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
-                deviceToken: token,
-            ))
-            AppComposition.logger.debug("기기 등록 성공: deviceID=\(deviceID, privacy: .public)")
-        }
+        let registerCurrentDeviceUseCase = RegisterCurrentDevice(
+            registerMemberDevice: member.registerMemberDevice,
+            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
+            appVersion: appVersion,
+            osVersion: osVersion,
+            deviceTokenProvider: {
+                guard let pushClient = pushClientBox.client else {
+                    throw PushBootstrapError.notBootstrapped
+                }
+                return try await pushClient.registrationToken()
+            },
+        )
+        registerCurrentDevice = { try await registerCurrentDeviceUseCase() }
 
         deviceTokenRefreshes = {
             guard let pushClient = pushClientBox.client else {
@@ -114,10 +113,14 @@ public struct AppComposition: Sendable {
         public init(
             apiBaseURL: URL,
             externalRepositoryBaseURL: URL,
+            appVersion: String,
+            osVersion: String,
             policyDocuments: [PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
             self.externalRepositoryBaseURL = externalRepositoryBaseURL
+            self.appVersion = appVersion
+            self.osVersion = osVersion
             self.policyDocuments = policyDocuments
         }
 
@@ -125,6 +128,8 @@ public struct AppComposition: Sendable {
 
         public let apiBaseURL: URL
         public let externalRepositoryBaseURL: URL
+        public let appVersion: String
+        public let osVersion: String
         public let policyDocuments: [PolicyDocument]
 
     }
@@ -212,6 +217,8 @@ public struct AppComposition: Sendable {
             externalRepository: externalRepository,
             generationReminder: GenerationReminderAssembly(),
             keychainStore: keychainStore,
+            appVersion: environment.appVersion,
+            osVersion: environment.osVersion,
         )
     }
 
@@ -243,22 +250,5 @@ public struct AppComposition: Sendable {
     }
 
     private static let memberResponseTimeout = Duration.seconds(10)
-    private static let deviceKeychainNamespace = KeychainNamespace("com.nexters.hytime.gitit.device")
-    private static let deviceKeychainKey = "deviceID"
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "AppComposition")
-
-    private static func loadOrCreateDeviceID(keychainStore: KeychainStore) -> String {
-        if
-            let data = try? keychainStore.load(for: deviceKeychainKey, in: deviceKeychainNamespace),
-            let existing = String(data: data, encoding: .utf8)
-        {
-            return existing
-        }
-        let newDeviceID = UUID().uuidString
-        if let data = newDeviceID.data(using: .utf8) {
-            try? keychainStore.save(data, for: deviceKeychainKey, in: deviceKeychainNamespace)
-        }
-        return newDeviceID
-    }
 
 }

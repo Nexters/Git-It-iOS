@@ -129,7 +129,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -140,6 +141,9 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication)
+                ],
             )
         }
     }

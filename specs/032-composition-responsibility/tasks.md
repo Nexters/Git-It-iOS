@@ -196,24 +196,28 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 테스트
 
-- [ ] T050 [P] [S2] `sources/Projects/Domain/Tests/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceTests.swift`를 만들어 주입한 앱·OS 버전과 푸시 토큰이 등록 정보에 담기는지, deviceID 조회 실패가 어떻게 전달되는지 검증한다
-- [ ] T051 [P] [S2] `sources/Projects/Data/Tests/Member/Stores/LocalDeviceIdentifierStoreTests.swift`를 만들어 두 번 호출해도 같은 값이 나오고 저장 키가 고정 문자열과 같은지 검증한다
+- [X] T050 [P] [S2] `sources/Projects/Domain/Tests/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceTests.swift`를 만들어 주입한 앱·OS 버전과 푸시 토큰이 등록 정보에 담기는지, deviceID 조회 실패가 어떻게 전달되는지 검증한다
+- [X] T051 [P] [S2] `sources/Projects/Data/Tests/Member/Stores/LocalDeviceIdentifierStoreTests.swift`를 만들어 두 번 호출해도 같은 값이 나오고 저장 키가 고정 문자열과 같은지 검증한다
 
 ### 구현
 
-- [ ] T052 [S2] `sources/Projects/Domain/Member/Contracts/DeviceIdentifierRepository.swift`에 deviceID 발급·보관 계약을 정의한다
-- [ ] T053 [S2] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceUseCase.swift`에 기기 등록 계약을 정의한다
-- [ ] T054 [S2] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDevice.swift`에 `MemberDeviceInfo` 구성과 등록 호출을 구현한다. 앱 버전·OS 버전·푸시 토큰 제공자를 주입받는다
-- [ ] T055 [S2] `sources/Projects/Data/Member/Stores/LocalDeviceIdentifierStore.swift`에 Keychain 기반 deviceID 저장 구현과 저장 키를 둔다. 현재 `AppComposition.loadOrCreateDeviceID`가 쓰는 키와 같은 값을 쓴다
-- [ ] T056 [S2] `sources/Projects/Composition/Adapter/Adapters/DeviceIdentifierRepositoryAdapter.swift`를 만들어 T052의 계약을 T055의 구현에 잇는다
-- [ ] T057 [S2] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`에 T054의 UseCase 조립을 추가한다
-- [ ] T058 [S2] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `registerCurrentDevice` 본문을 T054 UseCase 호출로 바꾸고, `Bundle.main`·`ProcessInfo` 조회를 제거한 뒤 앱 버전·OS 버전을 `init` 인자로 받는다
-- [ ] T059 [S2] `sources/Projects/App/GitIt/GitItApp.swift`가 앱 버전과 OS 버전을 읽어 `AppComposition`에 넘기도록 호출부를 고친다
+- [X] T052 [S2] `sources/Projects/Domain/Member/Contracts/DeviceIdentifierRepository.swift`에 deviceID 발급·보관 계약을 정의한다
+- [X] T053 [S2] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceUseCase.swift`에 기기 등록 계약을 정의한다
+- [X] T054 [S2] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDevice.swift`에 `MemberDeviceInfo` 구성과 등록 호출을 구현한다. 앱 버전·OS 버전·푸시 토큰 제공자를 주입받는다
+- [X] T055 [S2] `sources/Projects/Data/Member/Stores/LocalDeviceIdentifierStore.swift`에 Keychain 기반 deviceID 저장 구현과 저장 키를 둔다. 현재 `AppComposition.loadOrCreateDeviceID`가 쓰는 키와 같은 값을 쓴다
+  - **범위 보정**: `DataMember`가 Keychain을 쓰게 되어 `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `InfrastructureAuthentication` 의존을 더했다
+- [X] T056 [S2] `sources/Projects/Composition/Adapter/Adapters/DeviceIdentifierRepositoryAdapter.swift`를 만들어 T052의 계약을 T055의 구현에 잇는다
+- [X] T057 [S2] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`에 T054의 UseCase 조립을 추가한다
+  - **범위 보정**: 푸시 토큰 제공자가 `AppComposition`의 `PushClientBox`에 묶여 있어 `MemberAssembly`는 그 값을 받을 수 없다. UseCase 조립은 토큰 제공자를 아는 `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에 두고, `MemberAssembly`는 그대로 둔다
+- [X] T058 [S2] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `registerCurrentDevice` 본문을 T054 UseCase 호출로 바꾸고, `Bundle.main`·`ProcessInfo` 조회를 제거한 뒤 앱 버전·OS 버전을 `init` 인자로 받는다
+- [X] T059 [S2] `sources/Projects/App/GitIt/GitItApp.swift`가 앱 버전과 OS 버전을 읽어 `AppComposition`에 넘기도록 호출부를 고친다
+  - **범위 보정**: 앱 버전과 OS 버전은 `AppComposition.Environment`로 받는다. 서명이 바뀌어 `AppCompositionTests`·`AppCompositionSharedLifetimeTests`·`AppCompositionPublicSurfaceTests` 세 파일의 `Environment` 생성도 같은 단위에서 고쳤다
 
 ### 단위 검증
 
-- [ ] T060 [no-write] [S2] `grep -rnE "Bundle\.main|ProcessInfo" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
-- [ ] T061 [no-write] [S2] `Domain`·`Data`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I4를 검증한다
+- [X] T060 [no-write] [S2] `grep -rnE "Bundle\.main|ProcessInfo" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
+- [X] T061 [no-write] [S2] `Domain`·`Data`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I4를 검증한다
+  - **범위 보정**: `Domain` 162건, `Data` 147건, `Composition` 68건 모두 통과했다. `AppTests`의 실패 19건은 I4 적용 전과 같은 `AppRootFeature root 전환` suite 하나다. App 타깃 컴파일은 `App` scheme `BUILD SUCCEEDED`로 확인했다
 
 **진행 점검**: T050~T061의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 

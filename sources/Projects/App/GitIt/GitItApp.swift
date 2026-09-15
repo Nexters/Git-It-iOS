@@ -15,18 +15,19 @@ struct GitItApp: App {
 
     init() {
         let policyDocuments = (try? PolicyManifestLoader.loadPolicyDocuments()) ?? []
+        let bundleVersion = AppBundleMetadata.shortVersion.value
         let composition = AppComposition.live(
             AppComposition.Environment(
                 apiBaseURL: AppEndpointHost.api.url,
                 externalRepositoryBaseURL: AppEndpointHost.externalRepository.url,
+                appVersion: bundleVersion,
+                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
                 policyDocuments: policyDocuments,
             )
         )
 
         let restoreSession = composition.restoreSession
         let deletesCompletedAccountOnSignIn = false
-
-        let bundleVersion = AppBundleMetadata.shortVersion.value
         rootStore = Store(initialState: AppRootFeature.State(bundleVersion: bundleVersion)) {
             AppRootFeature(
                 restoreSession: restoreSession,

@@ -37,6 +37,8 @@ struct AppCompositionTests {
             AppComposition.Environment(
                 apiBaseURL: try #require(URL(string: "https://api.git-it.example.com")),
                 externalRepositoryBaseURL: try #require(URL(string: "https://api.github.com")),
+                appVersion: "1.0.0",
+                osVersion: "Version 26.0",
             ),
             keychainStore: keychainStore,
             transport: transport,
@@ -56,6 +58,8 @@ struct AppCompositionTests {
             AppComposition.Environment(
                 apiBaseURL: try #require(URL(string: "https://api.git-it.example.com")),
                 externalRepositoryBaseURL: try #require(URL(string: "https://api.github.com")),
+                appVersion: "1.0.0",
+                osVersion: "Version 26.0",
             )
         )
 
