@@ -7,6 +7,7 @@
 | 문서 | 소유하는 규칙 |
 | --- | --- |
 | [공통 원칙](./common/README.md) | 문서 우선순위, 추상·구체 계층과 문서 형식, 문서 간 참조 |
+| [추상화](./abstraction.md) | 프로토콜을 두는 근거, 테스트 더블 주입 지점과 구조 기준선 |
 | [네이밍](./naming.md) | 공개 이름, 경계 값, 접두어·접미어와 외부 고정 명칭 |
 | [디렉터리·파일](./directory-file.md) | 소스 루트, 폴더 뎁스와 관심사 세그먼트, Feature 흐름 배치, 자산·매니페스트 일치 |
 | [파일·형태 어휘](./file-vocabulary.md) | 파일당 타입 개수, 파일 이름 규칙, 패키지별 형태 폴더 어휘 |
@@ -26,6 +27,10 @@
 ```text
 docs/conventions/
 ├── common/          # 모든 컨벤션에 공통으로 적용하는 원칙
+├── abstraction.md   # 인덱스 — ## 추상 원칙 + ### 링크
+├── abstraction/     # 참고 단위 — 규칙 하나당 문서 하나
+│   ├── protocol-criteria.md
+│   └── ...
 ├── naming.md        # 인덱스 — ## 추상 원칙 + ### 링크
 ├── naming/          # 참고 단위 — 규칙 하나당 문서 하나
 │   ├── responsibility-first.md

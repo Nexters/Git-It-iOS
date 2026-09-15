@@ -36,14 +36,14 @@
 
 ### 구현
 
-- [ ] T001 [S1] `docs/conventions/abstraction.md`를 인덱스로 만든다. `##`에 추상 원칙을 서술하고 `###` 아래에는 구체 명시 문서 링크만 둔다. 구조 규칙은 [컨벤션 공통 원칙](../../docs/conventions/common/document-structure.md)을 따른다
-- [ ] T002 [S1] `docs/conventions/abstraction/protocol-criteria.md`에 프로토콜 생성 기준을 작성한다 — 근거 A(패키지 경계를 넘는 계약), 근거 B(경계를 넘지 않더라도 구현을 교체하는 지점이 프로덕션에 실재), 두 근거 중 어느 것도 아니면 구체 타입 하나만 둔다는 판정 규칙
-- [ ] T003 [S1] `docs/conventions/abstraction/test-double-injection.md`에 테스트 더블 배제 규칙을 작성한다 — 테스트 더블 제공만을 근거로 프로토콜을 두지 않으며, 그 타입이 의존하는 경계 계약에 더블을 주입한다. `StubHTTPTransport`를 실례로 인용한다
-- [ ] T004 [S1] `docs/conventions/README.md`의 문서 표에 프로토콜 생성 기준 항목을 추가하고, 문서 구조 예시 블록에 `abstraction.md`와 `abstraction/`을 반영한다
+- [X] T001 [S1] `docs/conventions/abstraction.md`를 인덱스로 만든다. `##`에 추상 원칙을 서술하고 `###` 아래에는 구체 명시 문서 링크만 둔다. 구조 규칙은 [컨벤션 공통 원칙](../../docs/conventions/common/document-structure.md)을 따른다
+- [X] T002 [S1] `docs/conventions/abstraction/protocol-criteria.md`에 프로토콜 생성 기준을 작성한다 — 근거 A(패키지 경계를 넘는 계약), 근거 B(경계를 넘지 않더라도 구현을 교체하는 지점이 프로덕션에 실재), 두 근거 중 어느 것도 아니면 구체 타입 하나만 둔다는 판정 규칙
+- [X] T003 [S1] `docs/conventions/abstraction/test-double-injection.md`에 테스트 더블 배제 규칙을 작성한다 — 테스트 더블 제공만을 근거로 프로토콜을 두지 않으며, 그 타입이 의존하는 경계 계약에 더블을 주입한다. `StubHTTPTransport`를 실례로 인용한다
+- [X] T004 [S1] `docs/conventions/README.md`의 문서 표에 프로토콜 생성 기준 항목을 추가하고, 문서 구조 예시 블록에 `abstraction.md`와 `abstraction/`을 반영한다
 
 ### 단위 검증
 
-- [ ] T005 [no-write] [S1] `docs/conventions/README.md`에서 시작해 링크만 따라가 근거 A·B·배제 규칙·대안에 모두 도달할 수 있는지 확인한다
+- [X] T005 [no-write] [S1] `docs/conventions/README.md`에서 시작해 링크만 따라가 근거 A·B·배제 규칙·대안에 모두 도달할 수 있는지 확인한다
 
 **진행 점검**: T001~T005의 변경 파일을 보고하고 다음 실행 단위로 계속한다.
 
@@ -273,7 +273,7 @@
 
 - [ ] T071 [S1] `docs/conventions/abstraction/structure-baseline.md`에 프로덕션 Swift 파일 수, 프로덕션 프로토콜 수, Data 프로덕션 Contracts 파일 수의 적용 전후 값과 세는 명령을 기록한다
 - [ ] T072 [S1] `docs/conventions/abstraction/structure-baseline.md`에 남은 프로덕션 프로토콜 전부를 나열하고 각각을 근거 A 또는 B에 대응시킨다
-- [ ] T073 [S1] `docs/conventions/abstraction.md`의 `###` 링크 목록에 기준선 문서를 추가한다
+- [ ] T073 [S1] `docs/conventions/abstraction.md`에 구조 기준선 절(`##` + `###` 링크)과 기준선 갱신 체크리스트 항목을 추가한다. U1에서는 대상 문서가 없어 링크를 만들지 않았다
 
 ### 단위 검증
 
