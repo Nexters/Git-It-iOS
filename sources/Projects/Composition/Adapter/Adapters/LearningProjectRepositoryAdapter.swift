@@ -7,7 +7,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
 
     // MARK: Lifecycle
 
-    init(remote: ProjectRemote) {
+    init(remote: HTTPProjectRemote) {
         self.remote = remote
     }
 
@@ -83,7 +83,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
 
     // MARK: Private
 
-    private let remote: ProjectRemote
+    private let remote: HTTPProjectRemote
 
     private func summary(from dto: ProjectListItemDTO) -> LearningProjectSummary {
         LearningProjectSummary(

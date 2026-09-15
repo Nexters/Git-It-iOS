@@ -1,33 +1,25 @@
 import Foundation
 import Testing
+
 @testable import CompositionAdapter
 @testable import DataLearningProject
 @testable import DomainLearningProject
+@testable import InfrastructureNetworkClient
 
 // MARK: - LearningProjectRepositoryAdapterTests
 
 @Suite("LearningProjectRepositoryAdapter")
 struct LearningProjectRepositoryAdapterTests {
 
+    // MARK: Internal
+
     @Test
     func `목록 응답 DTO를 Domain 모델로 변환하고 표기를 뒤집지 않는다`() async throws {
-        let remote = StubProjectRemote(fetchProjectsResult: .success(ProjectListResponseDTO(
-            items: [
-                ProjectListItemDTO(
-                    projectID: "project-1",
-                    repositoryName: "repo",
-                    repositoryImageURL: nil,
-                    techStack: ["Swift"],
-                    currentSetLabel: "Set 1",
-                    currentSetTitle: "title",
-                    nextSetID: "set-1",
-                    nextQuestionID: "question-1",
-                    overallProgressPercent: 40,
-                )
-            ],
-            hasNext: true,
-        )))
-        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"items":[{"projectId":"project-1","repositoryName":"repo","repositoryImageUrl":null,"techStack":["Swift"],"currentSetLabel":"Set 1","currentSetTitle":"title","nextSetId":"set-1","nextQuestionId":"question-1","overallProgressPercent":40}],"hasNext":true}
+                """#)
+        ]))
 
         let page = try await adapter.fetchProjects(page: 0, size: 10)
 
@@ -38,18 +30,11 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `상세 응답 DTO를 Domain 모델로 변환한다`() async throws {
-        let remote = StubProjectRemote(fetchProjectDetailResult: .success(ProjectDetailResponseDTO(
-            projectID: "project-1",
-            repositoryURL: "https://github.com/owner/repo",
-            repositoryName: "repo",
-            repositoryImageURL: nil,
-            starCount: 3,
-            techStack: [],
-            overallProgressPercent: 40,
-            nextQuestionID: "question-1",
-            sets: [],
-        )))
-        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":[],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[]}
+                """#)
+        ]))
 
         let detail = try await adapter.fetchProjectDetail(projectID: "project-1")
 
@@ -59,33 +44,11 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `상세 응답의 세트 문제 수와 완료 수를 그대로 보존한다`() async throws {
-        let remote = StubProjectRemote(fetchProjectDetailResult: .success(ProjectDetailResponseDTO(
-            projectID: "project-1",
-            repositoryURL: "https://github.com/owner/repo",
-            repositoryName: "repo",
-            repositoryImageURL: nil,
-            starCount: 3,
-            techStack: [],
-            overallProgressPercent: 40,
-            nextQuestionID: "question-1",
-            sets: [
-                ProjectSetSummaryDTO(
-                    setID: "set-1",
-                    label: "Set 1",
-                    title: "KMP 프로젝트 구조 확인하기",
-                    problemCount: 5,
-                    completedCount: 2,
-                ),
-                ProjectSetSummaryDTO(
-                    setID: "set-2",
-                    label: "Set 2",
-                    title: "KDoc 주석 규칙 확인하기",
-                    problemCount: 3,
-                    completedCount: 0,
-                ),
-            ],
-        )))
-        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":[],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[{"setId":"set-1","label":"Set 1","title":"KMP 프로젝트 구조 확인하기","problemCount":5,"completedCount":2},{"setId":"set-2","label":"Set 2","title":"KDoc 주석 규칙 확인하기","problemCount":3,"completedCount":0}]}
+                """#)
+        ]))
 
         let detail = try await adapter.fetchProjectDetail(projectID: "project-1")
 
@@ -96,88 +59,68 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `등록 요청을 Data DTO로 위임하고 응답을 Domain 등록 결과로 변환한다`() async throws {
-        let remote = StubProjectRemote(registerProjectResult: .success(RegisterProjectResponseDTO(
-            projectID: "project-1",
-            requestStatus: "ready",
-        )))
-        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+        let transport = RecordingHTTPTransport(results: [
+            successResponse(#"{"projectId":"project-1","status":"ready"}"#)
+        ])
+        let adapter = makeAdapter(transport: transport)
 
         let registration = try await adapter.register(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
 
         #expect(registration.projectID == "project-1")
         #expect(registration.requestStatus == "ready")
         #expect(registration.quizLevel == .l1)
-        #expect(await remote.recordedRequests() == [.registerProject(githubRepoURL: "https://github.com/owner/repo")])
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.url.path == "/api/v1/projects")
+        let rawBody = try #require(request.body)
+        let body = try #require(JSONSerialization.jsonObject(with: rawBody) as? [String: String])
+        #expect(body["githubRepoUrl"] == "https://github.com/owner/repo")
     }
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let remote = StubProjectRemote(fetchProjectDetailResult: .failure(.projectUnavailable))
-        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            errorResponse(statusCode: 404, code: "PROJECT-001")
+        ]))
 
         await #expect(throws: LearningProjectError.notFound) {
             try await adapter.fetchProjectDetail(projectID: "missing")
         }
     }
 
-}
-
-// MARK: - StubProjectRemote
-
-private actor StubProjectRemote: ProjectRemote {
-
-    // MARK: Lifecycle
-
-    init(
-        registerProjectResult: Result<RegisterProjectResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus),
-        fetchProjectsResult: Result<ProjectListResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus),
-        fetchProjectDetailResult: Result<ProjectDetailResponseDTO, DataLearningProjectError> = .failure(.unexpectedStatus),
-    ) {
-        self.registerProjectResult = registerProjectResult
-        self.fetchProjectsResult = fetchProjectsResult
-        self.fetchProjectDetailResult = fetchProjectDetailResult
-    }
-
-    // MARK: Internal
-
-    enum Call: Equatable, Sendable {
-        case registerProject(githubRepoURL: String)
-        case fetchProjects
-        case fetchProjectDetail
-        case deleteProject
-    }
-
-    func registerProject(_ request: RegisterProjectRequestDTO) async throws -> RegisterProjectResponseDTO {
-        calls.append(.registerProject(githubRepoURL: request.githubRepoURL))
-        return try registerProjectResult.get()
-    }
-
-    func fetchProjects(
-        page _: Int,
-        size _: Int,
-    ) async throws -> ProjectListResponseDTO {
-        calls.append(.fetchProjects)
-        return try fetchProjectsResult.get()
-    }
-
-    func fetchProjectDetail(projectID _: String) async throws -> ProjectDetailResponseDTO {
-        calls.append(.fetchProjectDetail)
-        return try fetchProjectDetailResult.get()
-    }
-
-    func deleteProject(projectID _: String) async throws {
-        calls.append(.deleteProject)
-    }
-
-    func recordedRequests() -> [Call] {
-        calls
-    }
-
     // MARK: Private
 
-    private let registerProjectResult: Result<RegisterProjectResponseDTO, DataLearningProjectError>
-    private let fetchProjectsResult: Result<ProjectListResponseDTO, DataLearningProjectError>
-    private let fetchProjectDetailResult: Result<ProjectDetailResponseDTO, DataLearningProjectError>
-    private var calls = [Call]()
+    private func makeAdapter(transport: RecordingHTTPTransport) -> LearningProjectRepositoryAdapter {
+        LearningProjectRepositoryAdapter(remote: HTTPProjectRemote(
+            client: learningProjectClient(transport: transport),
+            accessTokenProvider: { "test-access-token" },
+        ))
+    }
+
+    private func learningProjectClient(transport: RecordingHTTPTransport) -> HTTPClient {
+        HTTPClient(
+            baseURL: URL(string: "https://api.git-it.example.com")!,
+            bodyCoding: StandardJSONBodyCoding(),
+            transport: transport,
+        )
+    }
+
+    private func successResponse(_ payload: String) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: 200,
+            headers: [:],
+            body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
+        )
+    }
+
+    private func errorResponse(
+        statusCode: Int,
+        code: String,
+    ) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
+        )
+    }
 
 }

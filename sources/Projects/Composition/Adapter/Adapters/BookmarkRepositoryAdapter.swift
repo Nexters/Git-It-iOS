@@ -7,7 +7,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
 
     // MARK: Lifecycle
 
-    init(remote: BookmarkRemote) {
+    init(remote: HTTPBookmarkRemote) {
         self.remote = remote
     }
 
@@ -57,7 +57,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
 
     // MARK: Private
 
-    private let remote: BookmarkRemote
+    private let remote: HTTPBookmarkRemote
 
     private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
         switch error {

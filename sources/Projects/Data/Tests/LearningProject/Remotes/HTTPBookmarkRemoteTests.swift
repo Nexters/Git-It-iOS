@@ -66,6 +66,27 @@ struct HTTPBookmarkRemoteTests {
         #expect(request.url.query == "projectId=project-1")
     }
 
+    @Test
+    func `북마크 목록 항목의 projectId와 setId, questionId를 모두 보존한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"""
+                    {"success":true,"data":{"totalCount":1,"availableProjects":[],"bookmarks":[{"projectId":"project-1","projectName":"repo","setId":"set-1","setLabel":"Set 1","problemNumber":1,"questionId":"question-1","question":"질문"}]},"code":null,"message":null,"errors":null}
+                    """#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        let list = try await remote.fetchBookmarks(projectID: nil)
+
+        #expect(list.totalCount == 1)
+        let item = try #require(list.bookmarks.first)
+        #expect(item.projectID == "project-1")
+        #expect(item.setID == "set-1")
+        #expect(item.questionID == "question-1")
+    }
+
 }
 
 extension HTTPBookmarkRemoteTests {

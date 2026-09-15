@@ -1,75 +1,95 @@
+import Foundation
 import Testing
 
 @testable import CompositionAdapter
 @testable import DataLearningProject
 @testable import DomainLearningProject
+@testable import InfrastructureNetworkClient
 
 // MARK: - AnswerRepositoryAdapterTests
 
 @Suite("AnswerRepositoryAdapter")
 struct AnswerRepositoryAdapterTests {
 
+    // MARK: Internal
+
     @Test
     func `객관식 응답 DTO를 Domain ChoiceAnswerResult로 변환한다`() async throws {
-        let remote = StubAnswerRemote(choiceResult: .success(SubmitChoiceAnswerResponseDTO(
-            questionID: "question-1",
-            correct: true,
-            answerIndex: 1,
-            explanation: "설명",
-        )))
-        let adapter = AnswerRepositoryAdapter(remote: remote)
+        let transport = RecordingHTTPTransport(results: [
+            successResponse(#"{"questionId":"question-1","correct":true,"answerIndex":1,"explanation":"설명"}"#)
+        ])
+        let adapter = makeAdapter(transport: transport)
 
-        let result = try await adapter.submitChoiceAnswer(projectID: "project-1", questionID: "question-1", selectedIndex: 1)
+        let result = try await adapter.submitChoiceAnswer(
+            projectID: "project-1",
+            questionID: "question-1",
+            selectedIndex: 1,
+        )
 
         #expect(result.correct)
         #expect(result.answerIndex == 1)
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/choice")
     }
 
     @Test
     func `서술형 응답 DTO를 Domain EssayAnswerResult로 변환한다`() async throws {
-        let remote = StubAnswerRemote(essayResult: .success(SubmitEssayAnswerResponseDTO(
-            questionID: "question-1",
-            explanation: "설명",
-            rubric: RubricResponseDTO(score: 90, feedback: "good"),
-        )))
-        let adapter = AnswerRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"questionId":"question-1","explanation":"설명","rubric":{"criteria":[{"text":"good","points":90}],"keyPoints":[],"fullMarkExample":"","partialExample":"","zeroExample":""}}
+                """#)
+        ]))
 
-        let result = try await adapter.submitEssayAnswer(projectID: "project-1", questionID: "question-1", text: "내 답")
+        let result = try await adapter.submitEssayAnswer(
+            projectID: "project-1",
+            questionID: "question-1",
+            text: "내 답",
+        )
 
         #expect(result.rubric.criteria == ["good"])
     }
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let remote = StubAnswerRemote(choiceResult: .failure(.questionUnavailable))
-        let adapter = AnswerRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            errorResponse(statusCode: 404, code: "QUIZ-005")
+        ]))
 
         await #expect(throws: LearningProjectError.questionUnavailable) {
             try await adapter.submitChoiceAnswer(projectID: "project-1", questionID: "missing", selectedIndex: 0)
         }
     }
 
-}
+    // MARK: Private
 
-// MARK: - StubAnswerRemote
-
-private struct StubAnswerRemote: AnswerRemote {
-    var choiceResult = Result<SubmitChoiceAnswerResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
-    var essayResult = Result<SubmitEssayAnswerResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
-
-    func submitChoiceAnswer(
-        projectID _: String,
-        questionID _: String,
-        request _: SubmitChoiceAnswerRequestDTO,
-    ) async throws -> SubmitChoiceAnswerResponseDTO {
-        try choiceResult.get()
+    private func makeAdapter(transport: RecordingHTTPTransport) -> AnswerRepositoryAdapter {
+        AnswerRepositoryAdapter(remote: HTTPAnswerRemote(
+            client: HTTPClient(
+                baseURL: URL(string: "https://api.git-it.example.com")!,
+                bodyCoding: StandardJSONBodyCoding(),
+                transport: transport,
+            ),
+            accessTokenProvider: { "test-access-token" },
+        ))
     }
 
-    func submitEssayAnswer(
-        projectID _: String,
-        questionID _: String,
-        request _: SubmitEssayAnswerRequestDTO,
-    ) async throws -> SubmitEssayAnswerResponseDTO {
-        try essayResult.get()
+    private func successResponse(_ payload: String) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: 200,
+            headers: [:],
+            body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
+        )
     }
+
+    private func errorResponse(
+        statusCode: Int,
+        code: String,
+    ) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
+        )
+    }
+
 }

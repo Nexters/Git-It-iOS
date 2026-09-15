@@ -185,37 +185,37 @@
 
 ### 테스트
 
-- [ ] T037 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPProjectRemoteTests.swift`에 `ProjectRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T038 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPAnswerRemoteTests.swift`에 `AnswerRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T039 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPBookmarkRemoteTests.swift`에 `BookmarkRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T040 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPLearningSetRemoteTests.swift`에 `LearningSetRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T041 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningProjectRepositoryAdapterTests.swift`를 `HTTPProjectRemote` + `StubHTTPTransport` 구성으로 바꾼다
-- [ ] T042 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/AnswerRepositoryAdapterTests.swift`를 `HTTPAnswerRemote` + `StubHTTPTransport` 구성으로 바꾼다
-- [ ] T043 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/BookmarkRepositoryAdapterTests.swift`를 `HTTPBookmarkRemote` + `StubHTTPTransport` 구성으로 바꾼다
-- [ ] T044 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningSetRepositoryAdapterTests.swift`를 `HTTPLearningSetRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T037 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPProjectRemoteTests.swift`에 `ProjectRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T038 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPAnswerRemoteTests.swift`에 `AnswerRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T039 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPBookmarkRemoteTests.swift`에 `BookmarkRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T040 [P] [S2] `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPLearningSetRemoteTests.swift`에 `LearningSetRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T041 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningProjectRepositoryAdapterTests.swift`를 `HTTPProjectRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T042 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/AnswerRepositoryAdapterTests.swift`를 `HTTPAnswerRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T043 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/BookmarkRepositoryAdapterTests.swift`를 `HTTPBookmarkRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T044 [P] [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LearningSetRepositoryAdapterTests.swift`를 `HTTPLearningSetRemote` + `StubHTTPTransport` 구성으로 바꾼다
 
 ### 구현
 
-- [ ] T045 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPProjectRemote.swift`가 `ProjectRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T046 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPAnswerRemote.swift`가 `AnswerRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T047 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPBookmarkRemote.swift`가 `BookmarkRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T048 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPLearningSetRemote.swift`가 `LearningSetRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T049 [S2] `sources/Projects/Composition/Adapter/Adapters/LearningProjectRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPProjectRemote`로 바꾼다
-- [ ] T050 [S2] `sources/Projects/Composition/Adapter/Adapters/AnswerRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAnswerRemote`로 바꾼다
-- [ ] T051 [S2] `sources/Projects/Composition/Adapter/Adapters/BookmarkRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPBookmarkRemote`로 바꾼다
-- [ ] T052 [S2] `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPLearningSetRemote`로 바꾼다
+- [X] T045 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPProjectRemote.swift`가 `ProjectRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T046 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPAnswerRemote.swift`가 `AnswerRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T047 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPBookmarkRemote.swift`가 `BookmarkRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T048 [P] [S2] `sources/Projects/Data/LearningProject/Remotes/HTTPLearningSetRemote.swift`가 `LearningSetRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T049 [S2] `sources/Projects/Composition/Adapter/Adapters/LearningProjectRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPProjectRemote`로 바꾼다
+- [X] T050 [S2] `sources/Projects/Composition/Adapter/Adapters/AnswerRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAnswerRemote`로 바꾼다
+- [X] T051 [S2] `sources/Projects/Composition/Adapter/Adapters/BookmarkRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPBookmarkRemote`로 바꾼다
+- [X] T052 [S2] `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPLearningSetRemote`로 바꾼다
 
 ### 정리
 
-- [ ] T053 [S2] `sources/Projects/Data/LearningProject/Contracts/ProjectRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/AnswerRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/BookmarkRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/LearningSetRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/QuizGenerationRemote.swift`를 제거한다. `Contracts/GenerationStateStore.swift`와 `Contracts/QuizGenerationOutcomeSource.swift`는 그대로 둔다
-- [ ] T054 [S2] `sources/Projects/Data/Tests/LearningProject/TestDoubles/LearningProjectRemoteProbe.swift`를 제거한다
-- [ ] T055 [S2] `sources/Projects/Data/Tests/LearningProject/Contracts/ProjectRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/AnswerRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/BookmarkRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/LearningSetRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/QuizGenerationRemoteContractTests.swift`를 제거하고, 각 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T053 [S2] `sources/Projects/Data/LearningProject/Contracts/ProjectRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/AnswerRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/BookmarkRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/LearningSetRemote.swift`, `sources/Projects/Data/LearningProject/Contracts/QuizGenerationRemote.swift`를 제거한다. `Contracts/GenerationStateStore.swift`와 `Contracts/QuizGenerationOutcomeSource.swift`는 그대로 둔다
+- [X] T054 [S2] `sources/Projects/Data/Tests/LearningProject/TestDoubles/LearningProjectRemoteProbe.swift`를 제거한다
+- [X] T055 [S2] `sources/Projects/Data/Tests/LearningProject/Contracts/ProjectRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/AnswerRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/BookmarkRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/LearningSetRemoteContractTests.swift`, `sources/Projects/Data/Tests/LearningProject/Contracts/QuizGenerationRemoteContractTests.swift`를 제거하고, 각 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다. 경로 추가: `QuizGenerationStatusResponseDTO`는 존치하므로 그 디코딩 보장을 옮길 곳으로 `sources/Projects/Data/Tests/LearningProject/DTOs/QuizGenerationStatusResponseDTOTests.swift`를 새로 만든다
 
 ### 단위 검증
 
-- [ ] T056 [no-write] [S2] `DataLearningProjectTests`와 `CompositionAdapterTests`를 실행해 I4의 패키지 범위를 검증한다
-- [ ] T057 [no-write] [S2] 전체 `build` → `compile` → `test`를 순차 실행하고 결과를 기록한다
-- [ ] T058 [no-write] [S2] Data 테스트의 검증 항목 수를 다시 측정해 T006의 기준선 이상인지 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다
+- [X] T056 [no-write] [S2] `DataLearningProjectTests`와 `CompositionAdapterTests`를 실행해 I4의 패키지 범위를 검증한다
+- [X] T057 [no-write] [S2] 전체 `build` → `compile` → `test`를 순차 실행하고 결과를 기록한다. `build` 9/9 성공, `compile` 7/7 성공, `test` 7개 중 5개 성공. 실패한 `Feature`는 `AppEntryFeatureTests`의 세 테스트(`AppEntryFeature의 재시도 가능한 오류는 authentication 값만으로 결정된다`, `세션 복구가 미인증이면 온보딩 안내부터 시작하도록 위임하고 restoreSession을 한 번만 호출한다`, `스플래시 애니메이션이 먼저 끝나도 세션 인증 완료 시점에 라우팅된다`)가 끝나지 않아 나머지 테스트를 막는다. 이 명세는 `Data`와 `Composition`만 바꾸고 `Feature`는 그 둘에 의존하지 않으므로(아키텍처 3.1) 이 정지는 이 명세의 변경과 무관하다. 해당 파일은 commit `42d175e` 이후 바뀌지 않았고 작업 트리에서도 수정되지 않았다. `AppRootFeatureTests`의 기존 실패와 같은 `AppEntryFeature` 스플래시 게이트 계열이며 별도 명세로 분리해 다룬다
+- [X] T058 [no-write] [S2] Data 테스트의 검증 항목 수를 다시 측정해 T006의 기준선 이상인지 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다
 
 **진행 점검**: T037~T058의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -307,7 +307,7 @@
 | 프로덕션 Swift 파일 수 | 497 | (T071에서 기록) |
 | 프로덕션 프로토콜 수 | 56 | (T071에서 기록) |
 | Data 프로덕션 Contracts 파일 수 | 11 | (T071에서 기록) |
-| Data 테스트 검증 항목 수 | 322 | (T058에서 기록) |
+| Data 테스트 검증 항목 수 | 322 | 327 |
 | Composition 어댑터 `case` 분기 총수 | (T059에서 기록) | (T069에서 기록) |
 
 ---
@@ -337,6 +337,13 @@
 | `MemberRemote`가 프로필 조회와 회원 탈퇴를 제공한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `프로필 조회는 GET members me 경로와 Bearer 헤더를 사용한다`, `회원 탈퇴는 DELETE members me 경로로 전송한다` |
 | 기기 정보를 `deviceType` 고정값 `ios`로 등록한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `기기 정보 등록은 deviceType을 ios 고정값으로 본문에 담는다`. 프로브가 입력 DTO만 다시 읽던 것을 실제 전송 본문 검증으로 바꿨다 |
 | 큐레이션 등록·분야 변경·수준 변경을 제공한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `큐레이션 등록은 분야와 수준을 본문에 담아 curation 경로로 전송한다`, `분야 변경은 position 경로로 전송한다`, `수준 변경은 career-level 경로로 전송한다` |
+| `ProjectRemote`의 등록·목록·상세·삭제 네 연산 | `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPProjectRemoteTests.swift` — 네 연산 각각의 경로·메서드·응답 테스트가 이미 있고, 목록 항목 디코딩을 `목록 응답의 항목과 다음 페이지 여부를 그대로 보존한다`로 보강했다 |
+| `AnswerRemote`의 객관식·서술형 제출과 `SubmitEssayAnswerResponseDTO`에 `correct` 필드가 없다는 보장 | `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPAnswerRemoteTests.swift` — 두 제출 테스트와 새 `서술형 답변 응답 타입에는 correct 필드가 없다` |
+| `BookmarkRemote`의 설정·목록 조회와 목록 항목의 `projectId`·`setId`·`questionId` 보존 | `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPBookmarkRemoteTests.swift` — 기존 설정·조회 테스트와 새 `북마크 목록 항목의 projectId와 setId, questionId를 모두 보존한다` |
+| `LearningSetRemote`의 세트 조회와 객관식 `choices`·`myAnswer` 디코딩, 서술형 `myAnswer` null 허용 | `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPLearningSetRemoteTests.swift` — `객관식 질문의 choices와 myAnswer를 응답에서 디코딩한다`, `서술형 질문의 myAnswer가 null이어도 디코딩에 실패하지 않는다`. 원래 계약 테스트가 디코더를 직접 부르던 것을 실제 응답 경로로 옮겼다 |
+| `QuizGenerationRemote`의 상태 조회·재시도 두 연산 | 제거. 프로덕션 구현이 없어 검증할 실물이 없다. 프로토콜과 프로브만 서로를 확인하고 있었다 |
+| 알려지지 않은 `status` raw value를 디코딩 실패 없이 보존한다 | `sources/Projects/Data/Tests/LearningProject/DTOs/QuizGenerationStatusResponseDTOTests.swift` — DTO는 존치하므로 보장을 DTO 테스트로 옮겼다 |
+| 409 `QUIZ-007`을 `generationRetryUnavailable`로 변환한다 | 제거. `sources/Projects/Data/Tests/LearningProject/Errors/DataLearningProjectErrorTests.swift`가 같은 매핑을 이미 검증한다 |
 
 ---
 

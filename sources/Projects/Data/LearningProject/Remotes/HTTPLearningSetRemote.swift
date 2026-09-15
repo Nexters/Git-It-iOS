@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPLearningSetRemote
 
-public struct HTTPLearningSetRemote: LearningSetRemote {
+public struct HTTPLearningSetRemote: Sendable {
 
     // MARK: Lifecycle
 

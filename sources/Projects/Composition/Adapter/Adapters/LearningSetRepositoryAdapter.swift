@@ -7,7 +7,7 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
 
     // MARK: Lifecycle
 
-    init(remote: LearningSetRemote) {
+    init(remote: HTTPLearningSetRemote) {
         self.remote = remote
     }
 
@@ -32,7 +32,7 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
 
     // MARK: Private
 
-    private let remote: LearningSetRemote
+    private let remote: HTTPLearningSetRemote
 
     private func question(from dto: QuestionResponseDTO) -> Question {
         Question(

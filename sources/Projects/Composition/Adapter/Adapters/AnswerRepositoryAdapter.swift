@@ -7,7 +7,7 @@ struct AnswerRepositoryAdapter: AnswerRepository {
 
     // MARK: Lifecycle
 
-    init(remote: AnswerRemote) {
+    init(remote: HTTPAnswerRemote) {
         self.remote = remote
     }
 
@@ -56,7 +56,7 @@ struct AnswerRepositoryAdapter: AnswerRepository {
 
     // MARK: Private
 
-    private let remote: AnswerRemote
+    private let remote: HTTPAnswerRemote
 
     private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
         switch error {

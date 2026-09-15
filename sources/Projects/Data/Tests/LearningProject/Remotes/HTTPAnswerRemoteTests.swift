@@ -28,6 +28,9 @@ struct HTTPAnswerRemoteTests {
         )
 
         #expect(result.correct)
+        #expect(result.questionID == "question-1")
+        #expect(result.answerIndex == 2)
+        #expect(result.explanation == "설명")
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/choice")
         #expect(request.headers["Authorization"] == "Bearer test-access-token")
@@ -58,6 +61,28 @@ struct HTTPAnswerRemoteTests {
         #expect(result.rubric.keyPoints == ["핵심 포인트"])
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/essay")
+    }
+
+    @Test
+    func `서술형 답변 응답 타입에는 correct 필드가 없다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"""
+                    {"success":true,"data":{"questionId":"question-1","explanation":"설명","rubric":{"criteria":[],"keyPoints":[],"fullMarkExample":"","partialExample":"","zeroExample":""}},"code":null,"message":null,"errors":null}
+                    """#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        let result = try await remote.submitEssayAnswer(
+            projectID: "project-1",
+            questionID: "question-1",
+            request: SubmitEssayAnswerRequestDTO(text: "내 답"),
+        )
+
+        let labels = Mirror(reflecting: result).children.compactMap(\.label)
+        #expect(!labels.contains("correct"))
     }
 
 }

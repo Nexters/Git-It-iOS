@@ -1,18 +1,23 @@
+import Foundation
 import Testing
 
 @testable import CompositionAdapter
 @testable import DataLearningProject
 @testable import DomainLearningProject
+@testable import InfrastructureNetworkClient
 
 // MARK: - BookmarkRepositoryAdapterTests
 
 @Suite("BookmarkRepositoryAdapter")
 struct BookmarkRepositoryAdapterTests {
 
+    // MARK: Internal
+
     @Test
     func `설정 응답 DTO를 서버가 돌려준 bool 정본으로 변환한다`() async throws {
-        let remote = StubBookmarkRemote(setResult: .success(BookmarkQuestionResponseDTO(bookmarked: true)))
-        let adapter = BookmarkRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"{"bookmarked":true}"#)
+        ]))
 
         let state = try await adapter.setBookmark(projectID: "project-1", questionID: "question-1", bookmarked: true)
 
@@ -21,17 +26,11 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 availableProjects를 필터와 무관하게 그대로 보존한다`() async throws {
-        let remote = StubBookmarkRemote(listResult: .success(BookmarkedQuestionListResponseDTO(
-            totalCount: 2,
-            availableProjects: [
-                AvailableProjectResponseDTO(projectID: "project-1", repositoryName: "repo-1"),
-                AvailableProjectResponseDTO(projectID: "project-2", repositoryName: "repo-2"),
-            ],
-            bookmarks: [
-                BookmarkedQuestionResponseDTO(projectID: "project-1", setID: "set-1", questionID: "question-1")
-            ],
-        )))
-        let adapter = BookmarkRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"totalCount":2,"availableProjects":[{"projectId":"project-1","projectName":"repo-1"},{"projectId":"project-2","projectName":"repo-2"}],"bookmarks":[{"projectId":"project-1","projectName":"repo-1","setId":"set-1","setLabel":"Set 1","problemNumber":1,"questionId":"question-1","question":"질문"}]}
+                """#)
+        ]))
 
         let collection = try await adapter.fetchBookmarkedQuestions(projectID: "project-1")
 
@@ -44,19 +43,11 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 문제 본문을 그대로 보존한다`() async throws {
-        let remote = StubBookmarkRemote(listResult: .success(BookmarkedQuestionListResponseDTO(
-            totalCount: 1,
-            availableProjects: [],
-            bookmarks: [
-                BookmarkedQuestionResponseDTO(
-                    projectID: "project-1",
-                    setID: "set-1",
-                    questionID: "question-1",
-                    question: "`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?",
-                )
-            ],
-        )))
-        let adapter = BookmarkRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"totalCount":1,"availableProjects":[],"bookmarks":[{"projectId":"project-1","projectName":"repo-1","setId":"set-1","setLabel":"Set 1","problemNumber":1,"questionId":"question-1","question":"`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?"}]}
+                """#)
+        ]))
 
         let collection = try await adapter.fetchBookmarkedQuestions(projectID: nil)
 
@@ -68,21 +59,11 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 프로젝트명·세트 라벨·문제 번호를 그대로 보존한다`() async throws {
-        let remote = StubBookmarkRemote(listResult: .success(BookmarkedQuestionListResponseDTO(
-            totalCount: 1,
-            availableProjects: [],
-            bookmarks: [
-                BookmarkedQuestionResponseDTO(
-                    projectID: "project-1",
-                    projectName: "Now in Android",
-                    setID: "set-1",
-                    setLabel: "Set 2",
-                    problemNumber: 1,
-                    questionID: "question-1",
-                )
-            ],
-        )))
-        let adapter = BookmarkRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            successResponse(#"""
+                {"totalCount":1,"availableProjects":[],"bookmarks":[{"projectId":"project-1","projectName":"Now in Android","setId":"set-1","setLabel":"Set 2","problemNumber":1,"questionId":"question-1","question":"질문"}]}
+                """#)
+        ]))
 
         let collection = try await adapter.fetchBookmarkedQuestions(projectID: nil)
 
@@ -94,31 +75,45 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let remote = StubBookmarkRemote(setResult: .failure(.unauthorized))
-        let adapter = BookmarkRepositoryAdapter(remote: remote)
+        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+            errorResponse(statusCode: 401, code: "AUTH-001")
+        ]))
 
         await #expect(throws: LearningProjectError.unauthorized) {
             try await adapter.setBookmark(projectID: "project-1", questionID: "question-1", bookmarked: true)
         }
     }
 
-}
+    // MARK: Private
 
-// MARK: - StubBookmarkRemote
-
-private struct StubBookmarkRemote: BookmarkRemote {
-    var setResult = Result<BookmarkQuestionResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
-    var listResult = Result<BookmarkedQuestionListResponseDTO, DataLearningProjectError>.failure(.unexpectedStatus)
-
-    func setBookmark(
-        projectID _: String,
-        questionID _: String,
-        request _: BookmarkQuestionRequestDTO,
-    ) async throws -> BookmarkQuestionResponseDTO {
-        try setResult.get()
+    private func makeAdapter(transport: RecordingHTTPTransport) -> BookmarkRepositoryAdapter {
+        BookmarkRepositoryAdapter(remote: HTTPBookmarkRemote(
+            client: HTTPClient(
+                baseURL: URL(string: "https://api.git-it.example.com")!,
+                bodyCoding: StandardJSONBodyCoding(),
+                transport: transport,
+            ),
+            accessTokenProvider: { "test-access-token" },
+        ))
     }
 
-    func fetchBookmarks(projectID _: String?) async throws -> BookmarkedQuestionListResponseDTO {
-        try listResult.get()
+    private func successResponse(_ payload: String) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: 200,
+            headers: [:],
+            body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
+        )
     }
+
+    private func errorResponse(
+        statusCode: Int,
+        code: String,
+    ) -> HTTPTransportResponse {
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
+        )
+    }
+
 }
