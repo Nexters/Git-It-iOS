@@ -273,13 +273,13 @@
 
 ### 구현
 
-- [ ] T071 [S1] `docs/conventions/abstraction/structure-baseline.md`에 프로덕션 Swift 파일 수, 프로덕션 프로토콜 수, Data 프로덕션 Contracts 파일 수의 적용 전후 값과 세는 명령을 기록한다
-- [ ] T072 [S1] `docs/conventions/abstraction/structure-baseline.md`에 남은 프로덕션 프로토콜 전부를 나열하고 각각을 근거 A 또는 B에 대응시킨다
-- [ ] T073 [S1] `docs/conventions/abstraction.md`에 구조 기준선 절(`##` + `###` 링크)과 기준선 갱신 체크리스트 항목을 추가한다. U1에서는 대상 문서가 없어 링크를 만들지 않았다
+- [X] T071 [S1] `docs/conventions/abstraction/structure-baseline.md`에 프로덕션 Swift 파일 수, 프로덕션 프로토콜 수, Data 프로덕션 Contracts 파일 수의 적용 전후 값과 세는 명령을 기록한다
+- [X] T072 [S1] `docs/conventions/abstraction/structure-baseline.md`에 남은 프로덕션 프로토콜 전부를 나열하고 각각을 근거 A 또는 B에 대응시킨다
+- [X] T073 [S1] `docs/conventions/abstraction.md`에 구조 기준선 절(`##` + `###` 링크)과 기준선 갱신 체크리스트 항목을 추가한다. U1에서는 대상 문서가 없어 링크를 만들지 않았다
 
 ### 단위 검증
 
-- [ ] T074 [no-write] [S1] 기준선 문서의 프로토콜 목록이 `find sources/Projects -name "*.swift" -not -path "*/Tests/*" -print0 | xargs -0 grep -nE "^[[:space:]]*(public )?protocol "` 결과와 일치하고, 근거에 대응되지 않는 항목이 없는지 확인한다
+- [X] T074 [no-write] [S1] 기준선 문서의 프로토콜 목록이 `find sources/Projects -name "*.swift" -not -path "*/Tests/*" -print0 | xargs -0 grep -nE "^[[:space:]]*(public )?protocol "` 결과와 일치하고, 근거에 대응되지 않는 항목이 없는지 확인한다
 
 **진행 점검**: T071~T074의 변경 파일과 검증 결과를 보고한다.
 
@@ -291,10 +291,10 @@
 
 **커밋 경계**: 아래 `[no-write]` 작업은 U2의 마지막 커밋 단위에 배정한다.
 
-- [ ] T075 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다
-- [ ] T076 [no-write] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다
-- [ ] T077 [no-write] [S1] [S2] [S3] [quickstart.md](./quickstart.md)의 시나리오별 검증을 모두 확인한다
-- [ ] T078 [no-write] 이 파일의 "보장 항목 대조표"가 제거된 모든 계약 테스트의 이관처 또는 제거 근거를 담고 있는지 확인한다
+- [X] T075 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다
+- [X] T076 [no-write] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다. `build` 9/9 성공, `compile` 7/7 성공. `test`는 scheme별로 실행해 `Data`·`Composition`·`Domain`·`Infrastructure`·`UI` 5개가 통과하고 `Feature`·`AppTests` 2개가 실패한다. 두 실패 모두 이 명세와 무관한 기존 문제다 — `Feature`는 T057에 적은 `AppEntryFeatureTests` 세 테스트의 정지이고, `AppTests`는 `AppRootFeatureTests`의 "root 전환" 실패로 둘 다 같은 `AppEntryFeature` 스플래시 게이트 계열이며 각각 별도 명세로 분리했다. 이 명세는 `Data`와 `Composition`만 바꾸고 `Feature`·`App`은 아키텍처 3.1에서 그 둘에 의존하지 않는다
+- [X] T077 [no-write] [S1] [S2] [S3] [quickstart.md](./quickstart.md)의 시나리오별 검증을 모두 확인한다. S1 통과 — `docs/conventions/README.md`에서 링크만 따라 근거 A·B·배제 규칙·대안·기준선에 모두 도달하고, 남은 프로덕션 프로토콜 47개가 기준선 문서에 빠짐없이 대응된다(근거 A 20, 제네릭 제약 1, UseCase 25는 별도 명세, 근거 미충족 1은 다음 점검 대상으로 명시). S2 통과 — Data 프로덕션 Contracts에 `GenerationStateStore`와 `QuizGenerationOutcomeSource`만 남고, 제거 대상 9개의 이름 참조가 없으며, Data 검증 항목 수는 327로 기준선 322를 넘는다. S3 부분 통과 — Domain의 Data 오류 타입 참조는 없다. `case` 분기 수 지표는 T069의 지표 한계로 64에서 움직이지 않는다
+- [X] T078 [no-write] 이 파일의 "보장 항목 대조표"가 제거된 모든 계약 테스트의 이관처 또는 제거 근거를 담고 있는지 확인한다
 
 ---
 
@@ -304,9 +304,9 @@
 
 | 항목 | 적용 전 | 적용 후 |
 | --- | --- | --- |
-| 프로덕션 Swift 파일 수 | 497 | (T071에서 기록) |
-| 프로덕션 프로토콜 수 | 56 | (T071에서 기록) |
-| Data 프로덕션 Contracts 파일 수 | 11 | (T071에서 기록) |
+| 프로덕션 Swift 파일 수 | 497 (계획 시점 기록) / 521 (base `51ee74f`에서 재측정) | 512 |
+| 프로덕션 프로토콜 수 | 56 | 47 |
+| Data 프로덕션 Contracts 파일 수 | 11 | 2 |
 | Data 테스트 검증 항목 수 | 322 | 327 |
 | Composition 어댑터 `case` 분기 총수 | 64 | 64 (지표 한계 — T069 참조) |
 | 어댑터 오류 재매핑 switch가 나열하는 Data 오류 case 수 | 61 | 50 |
@@ -390,7 +390,7 @@
 | `LearningSetRemote`의 세트 조회와 객관식 `choices`·`myAnswer` 디코딩, 서술형 `myAnswer` null 허용 | `sources/Projects/Data/Tests/LearningProject/Remotes/HTTPLearningSetRemoteTests.swift` — `객관식 질문의 choices와 myAnswer를 응답에서 디코딩한다`, `서술형 질문의 myAnswer가 null이어도 디코딩에 실패하지 않는다`. 원래 계약 테스트가 디코더를 직접 부르던 것을 실제 응답 경로로 옮겼다 |
 | `QuizGenerationRemote`의 상태 조회·재시도 두 연산 | 제거. 프로덕션 구현이 없어 검증할 실물이 없다. 프로토콜과 프로브만 서로를 확인하고 있었다 |
 | 알려지지 않은 `status` raw value를 디코딩 실패 없이 보존한다 | `sources/Projects/Data/Tests/LearningProject/DTOs/QuizGenerationStatusResponseDTOTests.swift` — DTO는 존치하므로 보장을 DTO 테스트로 옮겼다 |
-| 409 `QUIZ-007`을 `generationRetryUnavailable`로 변환한다 | 제거. `sources/Projects/Data/Tests/LearningProject/Errors/DataLearningProjectErrorTests.swift`가 같은 매핑을 이미 검증한다 |
+| 409 `QUIZ-007`을 `generationRetryUnavailable`로 변환한다 | 제거. 이 매핑 검증은 `sources/Projects/Data/Tests/LearningProject/Errors/DataLearningProjectErrorTests.swift`가 이미 갖고 있었고, I5에서 `generationRetryUnavailable` case 자체가 사라져 같은 테스트가 기대값을 `unexpectedStatus`로 바꿔 검증한다 |
 
 ---
 
