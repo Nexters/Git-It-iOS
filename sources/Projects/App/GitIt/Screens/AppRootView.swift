@@ -5,7 +5,6 @@ import DomainMember
 import Feature
 import Foundation
 import SwiftUI
-import UIComponent
 
 // MARK: - AppRootView
 
@@ -43,7 +42,7 @@ struct AppRootView: View {
                     item: $store.scope(state: \.projectDetail, action: \.projectDetail)
                 ) { projectDetailStore in
                     ProjectDetailRouter(store: projectDetailStore)
-                        .overlay { quizOverlay }
+                        .overlay { QuizRouterOverlay(store: quizStore) }
                 }
                 .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
         }
@@ -51,14 +50,6 @@ struct AppRootView: View {
 
     private var quizStore: StoreOf<QuizRouterFeature>? {
         store.scope(state: \.quiz, action: \.quiz.presented)
-    }
-
-    private var quizOverlay: some View {
-        PushedScreenOverlay(isPresented: store.quiz != nil) {
-            if let quizStore {
-                QuizRouter(store: quizStore)
-            }
-        }
     }
 
 }
