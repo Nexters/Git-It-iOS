@@ -114,22 +114,22 @@
 
 ### 테스트
 
-- [ ] T022 [S2] `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift`에 `ExternalRepositoryRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T023 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/ExternalRepositoryLookupAdapterTests.swift`를 `HTTPExternalRepositoryRemote` + `StubHTTPTransport` 구성으로 바꾸고, 파일 안의 `StubExternalRepositoryRemote`를 제거한다
+- [X] T022 [S2] `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift`에 `ExternalRepositoryRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T023 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/ExternalRepositoryLookupAdapterTests.swift`를 `HTTPExternalRepositoryRemote` + `StubHTTPTransport` 구성으로 바꾸고, 파일 안의 `StubExternalRepositoryRemote`를 제거한다
 
 ### 구현
 
-- [ ] T024 [S2] `sources/Projects/Data/ExternalRepository/Remotes/HTTPExternalRepositoryRemote.swift`가 `ExternalRepositoryRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T025 [S2] `sources/Projects/Composition/Adapter/Adapters/ExternalRepositoryLookupAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPExternalRepositoryRemote`로 바꾼다
+- [X] T024 [S2] `sources/Projects/Data/ExternalRepository/Remotes/HTTPExternalRepositoryRemote.swift`가 `ExternalRepositoryRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T025 [S2] `sources/Projects/Composition/Adapter/Adapters/ExternalRepositoryLookupAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPExternalRepositoryRemote`로 바꾼다
 
 ### 정리
 
-- [ ] T026 [S2] `sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift`를 제거한다
-- [ ] T027 [S2] `sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T026 [S2] `sources/Projects/Data/ExternalRepository/Contracts/ExternalRepositoryRemote.swift`를 제거한다
+- [X] T027 [S2] `sources/Projects/Data/Tests/ExternalRepository/Contracts/ExternalRepositoryRemoteContractTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
 
 ### 단위 검증
 
-- [ ] T028 [no-write] [S2] `DataExternalRepositoryTests`와 `CompositionAdapterTests`를 실행해 I2를 검증한다
+- [X] T028 [no-write] [S2] `DataExternalRepositoryTests`와 `CompositionAdapterTests`를 실행해 I2를 검증한다
 
 **진행 점검**: T022~T028의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -332,6 +332,8 @@
 | `appleLogin`이 accessToken·refreshToken·needsCuration을 담은 응답을 돌려준다 | `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift` — `Apple 로그인 요청을 idToken 본문으로 구성하고 응답을 반환한다`(needsCuration 거짓)와 `큐레이션이 필요한 응답의 needsCuration을 참으로 해석한다`(참) |
 | `verifyAccessToken`이 호출 가능한 연산이다 | `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift` — `Access Token 확인 요청에 Bearer 헤더를 포함한다` |
 | `PolicyConsentStore`의 `removeAll`이 저장된 기록을 모두 지운다 (계약 테스트 파일은 없었고 프로토콜 선언만 있었다) | `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift` — `removeAll은 저장된 모든 문서 기록을 지운다` |
+| `ExternalRepositoryRemote`가 요청을 정확히 한 번 기록하고 DTO를 손실 없이 반환한다 | `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift` — `GitHub Repository 요청 경로와 헤더를 그대로 전달한다`에서 DTO 전체 동등성과 요청 수 1을 확인한다 |
+| `offline`·`other` 실패를 성공 DTO 없이 그대로 전달한다 | `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift` — `오프라인 상태를 offline 오류로 변환한다`와 `그 외 실패를 other 오류로 변환한다`. 프로브가 되돌려주던 값을 실제 전송 실패와 404 응답에서 만든다 |
 
 ---
 
