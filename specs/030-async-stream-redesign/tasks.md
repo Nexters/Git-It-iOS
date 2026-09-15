@@ -78,18 +78,18 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 테스트
 
-- [ ] T006 [P] [S1] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProject/GenerationStateTests.swift`에 [data-model.md](./data-model.md) 2절의 불변식과 조회 규칙 테스트를 작성한다 — 같은 프로젝트 식별자 기록 1개, 같은 정규화 URL의 진행 중 기록 1개, 만료 기록 제외
-- [ ] T007 [P] [S1] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProject/GenerationRecordTests.swift`에 상태 전이와 URL 정규화 규칙 테스트를 작성한다
+- [X] T006 [P] [S1] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProject/GenerationStateTests.swift`에 [data-model.md](./data-model.md) 2절의 불변식과 조회 규칙 테스트를 작성한다 — 같은 프로젝트 식별자 기록 1개, 같은 정규화 URL의 진행 중 기록 1개, 만료 기록 제외
+- [X] T007 [P] [S1] `sources/Projects/Domain/Tests/LearningProject/Models/LearningProject/GenerationRecordTests.swift`에 상태 전이와 URL 정규화 규칙 테스트를 작성한다
 
 ### 구현
 
-- [ ] T008 [P] [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationRecord.swift`에 생성 기록 값을 정의한다 — 정규화 URL, 프로젝트 식별자, 요청 시각, 상태, 종료 시각
-- [ ] T009 [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationState.swift`에 생성 상태 스냅샷과 조회 규칙을 정의한다
-- [ ] T010 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`에 생성 상태 보존 계약을 정의한다
+- [X] T008 [P] [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationRecord.swift`에 생성 기록 값을 정의한다 — 정규화 URL, 프로젝트 식별자, 요청 시각, 상태, 종료 시각
+- [X] T009 [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationState.swift`에 생성 상태 스냅샷과 조회 규칙을 정의한다
+- [X] T010 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`에 생성 상태 보존 계약을 정의한다
 
 ### 패키지 검증
 
-- [ ] T011 [no-write] `DomainLearningProjectTests`를 실행해 U2를 검증한다
+- [X] T011 [no-write] `DomainLearningProjectTests`를 실행해 U2를 검증한다
 
 **진행 점검**: T006~T011의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
