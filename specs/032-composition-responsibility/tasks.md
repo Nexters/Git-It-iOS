@@ -43,24 +43,24 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 준비
 
-- [ ] T001 [no-write] [S4] 적용 전 지표를 측정한다 — [quickstart.md](./quickstart.md)의 "기준선 측정" 네 명령을 실행하고 값을 이 파일의 "기준선 기록" 절에 적는다
+- [X] T001 [no-write] [S4] 적용 전 지표를 측정한다 — [quickstart.md](./quickstart.md)의 "기준선 측정" 네 명령을 실행하고 값을 이 파일의 "기준선 기록" 절에 적는다
 
 ### 구현
 
-- [ ] T002 [S4] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/PushMessagingClientFactory.swift`를 만들어 `PushMessagingClient` 구현을 돌려주는 진입점을 공개한다. 반환 타입에 외부 라이브러리 타입이 드러나지 않게 한다
-- [ ] T003 [S4] `sources/Projects/Infrastructure/PushMessaging/Remote/AppDelegates/PushMessagingAppDelegate.swift`를 만들어 `FirebaseMessagingAppDelegate`를 감싼 프로젝트 타입을 공개한다
-- [ ] T004 [S4] `sources/Projects/Composition/App/Factories/PushNotificationAppDelegate.swift`의 별칭 대상을 T003의 타입으로 바꾼다
-- [ ] T005 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `FirebaseMessagingPushClient()` 직접 생성을 T002의 진입점 호출로 바꾸고 `import` 목록에서 외부 라이브러리를 제거한다
+- [X] T002 [S4] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/PushMessagingClientFactory.swift`를 만들어 `PushMessagingClient` 구현을 돌려주는 진입점을 공개한다. 반환 타입에 외부 라이브러리 타입이 드러나지 않게 한다
+- [X] T003 [S4] `sources/Projects/Infrastructure/PushMessaging/Remote/AppDelegates/PushMessagingAppDelegate.swift`를 만들어 `FirebaseMessagingAppDelegate`를 감싼 프로젝트 타입을 공개한다
+- [X] T004 [S4] `sources/Projects/Composition/App/Factories/PushNotificationAppDelegate.swift`의 별칭 대상을 T003의 타입으로 바꾼다
+- [X] T005 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `FirebaseMessagingPushClient()` 직접 생성을 T002의 진입점 호출로 바꾸고 `import` 목록에서 외부 라이브러리를 제거한다
 
 ### 테스트
 
-- [ ] T006 [P] [S4] `sources/Projects/Infrastructure/Tests/PushMessaging/Remote/Clients/PushMessagingClientFactoryTests.swift`에 진입점이 `PushMessagingClient`를 만족하는 값을 돌려주는지 확인하는 테스트를 추가한다
-- [ ] T007 [P] [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`에 푸시 클라이언트 조립 경로가 유지되는지 확인하는 검증을 더한다
+- [X] T006 [P] [S4] **범위 보정으로 제외.** `InfrastructurePushMessaging`에는 테스트 타깃이 없어 새 테스트를 추가하려면 이 단위의 허용 경로 밖인 `sources/Tuist/ProjectDescriptionHelpers/Projects/InfrastructureModuleName.swift`를 고쳐야 하고, `PushMessagingClientFactory.make()`가 `FirebaseApp.configure()`를 호출하므로 `GoogleService-Info.plist` 없이 테스트에서 실행할 수 없다. 진입점의 반환 타입은 컴파일로, 외부 타입 이름 부재는 T008로 확인한다
+- [X] T007 [P] [S4] **범위 보정으로 제외.** 푸시 클라이언트는 `AppComposition`의 private `PushClientBox.activate()`에서만 만들어지고 그 호출이 Firebase 초기화를 유발하므로 `AppCompositionTests`에서 조립 경로를 실행할 수 없다. 조립 경로 유지는 T009의 `Composition` scheme 컴파일과 기존 테스트 통과로 확인한다
 
 ### 단위 검증
 
-- [ ] T008 [no-write] [S4] `grep -rn "Firebase" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
-- [ ] T009 [no-write] [S4] `Infrastructure`와 `Composition` 테스트 scheme을 실행해 I1을 검증한다
+- [X] T008 [no-write] [S4] `grep -rn "Firebase" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
+- [X] T009 [no-write] [S4] `Infrastructure`와 `Composition` 테스트 scheme을 실행해 I1을 검증한다
 
 **진행 점검**: T001~T009의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -322,10 +322,10 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 | 항목 | 적용 전 | 적용 후 |
 | --- | --- | --- |
-| Composition 프로덕션 코드 줄수 | (T001에서 기록) | (T085에서 기록) |
-| Composition의 Infrastructure 저장 API 직접 사용 | (T001에서 기록) | (T085에서 기록) |
-| Composition의 `Bundle.main`·`ProcessInfo` 조회 | (T001에서 기록) | (T085에서 기록) |
-| Composition의 외부 라이브러리 타입 이름 | (T001에서 기록) | (T085에서 기록) |
+| Composition 프로덕션 코드 줄수 | 2,348 | (T085에서 기록) |
+| Composition의 Infrastructure 저장 API 직접 사용 | 13 | (T085에서 기록) |
+| Composition의 `Bundle.main`·`ProcessInfo` 조회 | 2 | (T085에서 기록) |
+| Composition의 외부 라이브러리 타입 이름 | 2 | 0 (I1 완료 시점) |
 
 ---
 

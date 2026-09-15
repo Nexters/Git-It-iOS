@@ -226,7 +226,7 @@ public struct AppComposition: Sendable {
         func activate() {
             storage.withLock { client in
                 guard client == nil else { return }
-                client = FirebaseMessagingPushClient()
+                client = PushMessagingClientFactory.make()
             }
         }
 
