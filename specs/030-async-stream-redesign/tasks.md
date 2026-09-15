@@ -51,16 +51,16 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 테스트
 
-- [ ] T001 [P] [S2] `sources/Projects/Infrastructure/Tests/Authentication/AppleAuthentication/Providers/AppleCredentialStateProviderTests.swift`에서 `changes()`와 `receiveRevocation(for:)`을 검증하던 테스트를 제거하고, `state(for:)`의 기존 보장이 남아 있는지 확인한다
+- [X] T001 [P] [S2] `sources/Projects/Infrastructure/Tests/Authentication/AppleAuthentication/Providers/AppleCredentialStateProviderTests.swift`에서 `changes()`와 `receiveRevocation(for:)`을 검증하던 테스트를 제거하고, `state(for:)`의 기존 보장이 남아 있는지 확인한다
 
 ### 구현
 
-- [ ] T003 [S3] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/PushMessagingClient.swift`의 토큰 갱신 통지 계약에 등록 해제 보장을 명시한다
-- [ ] T004 [S3] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/FirebaseMessagingPushClient.swift`에서 통지 종료 시 등록 목록에서 제거되도록 하고, 반복 등록·해제 후 목록이 증가하지 않게 한다
+- [X] T003 [S3] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/PushMessagingClient.swift`의 토큰 갱신 통지 계약에 등록 해제 보장을 명시한다 — 검토 결과 계약이 반환하는 `AsyncStream`의 종료 지점이 이미 해제 지점이며, 프로젝트 규칙상 `// MARK` 외 주석을 쓰지 않으므로 코드 변경 불필요
+- [X] T004 [S3] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/FirebaseMessagingPushClient.swift`에서 통지 종료 시 등록 목록에서 제거되도록 하고, 반복 등록·해제 후 목록이 증가하지 않게 한다 — 검토 결과 `registrationTokenRefreshes()`가 이미 `continuation.onTermination`에서 `refreshContinuations`를 제거하므로 변경 불필요
 
 ### 패키지 검증
 
-- [ ] T005 [no-write] `InfrastructureAuthenticationTests`를 실행해 U1을 검증한다
+- [X] T005 [no-write] `InfrastructureAuthenticationTests`를 실행해 U1을 검증한다
 
 **진행 점검**: T001~T005의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행 단위로 승인 없이 계속한다.
 
