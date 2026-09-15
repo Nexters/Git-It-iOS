@@ -10,11 +10,11 @@ public struct HomeFeature: Sendable {
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchMemberProfile: any FetchMemberProfileUseCase,
-        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        trackGeneration: any TrackGenerationUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.fetchMemberProfile = fetchMemberProfile
-        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.trackGeneration = trackGeneration
     }
 
     // MARK: Public
@@ -212,7 +212,7 @@ public struct HomeFeature: Sendable {
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let trackGeneration: any TrackGenerationUseCase
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
@@ -256,11 +256,28 @@ public struct HomeFeature: Sendable {
     }
 
     private func startGenerationOutcomeObservation() -> ComposableArchitecture.Effect<Action> {
-        let observeGenerationOutcomes = observeGenerationOutcomes
+        let trackGeneration = trackGeneration
         return .run { send in
-            for await outcome in await observeGenerationOutcomes() {
-                await send(.effect(.generationOutcomeReceived(outcome)))
+            for await generationState in await trackGeneration.states() {
+                for record in generationState.records {
+                    guard let outcome = Self.outcome(from: record) else { continue }
+                    await send(.effect(.generationOutcomeReceived(outcome)))
+                }
             }
+        }
+    }
+
+    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
+        guard let projectID = record.projectID else { return nil }
+        switch record.status {
+        case .inProgress:
+            return nil
+
+        case .completed:
+            return GenerationOutcome(projectID: projectID, status: .completed)
+
+        case .failed:
+            return GenerationOutcome(projectID: projectID, status: .failed)
         }
     }
 

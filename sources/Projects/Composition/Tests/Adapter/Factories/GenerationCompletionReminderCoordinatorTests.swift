@@ -13,16 +13,19 @@ struct GenerationCompletionReminderCoordinatorTests {
     // MARK: Internal
 
     @Test
-    func `완료 결과는 즉시 발송이 아니라 준비 완료 시각으로 예약된다`() async {
+    func `완료 기록은 즉시 발송이 아니라 준비 완료 시각으로 예약된다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: requestedAt),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
-        await emitCompleted(projectID: "project-1", coordinator: coordinator, outcomes: observeGenerationOutcomes)
+        await emitFinished(
+            projectID: "project-1",
+            status: .completed,
+            requestedAt: requestedAt,
+            coordinator: coordinator,
+            trackGeneration: trackGeneration,
+        )
 
         #expect(localNotificationClient.presentedIdentifiers().isEmpty)
         #expect(
@@ -37,15 +40,17 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     @Test
     func `준비 완료 시각이 이미 지났으면 지난 시각으로 예약해 즉시 발송된다`() async {
-        let requestedAt = Date(timeIntervalSince1970: 0)
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: requestedAt),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
-        await emitCompleted(projectID: "project-1", coordinator: coordinator, outcomes: observeGenerationOutcomes)
+        await emitFinished(
+            projectID: "project-1",
+            status: .completed,
+            requestedAt: Date(timeIntervalSince1970: 0),
+            coordinator: coordinator,
+            trackGeneration: trackGeneration,
+        )
 
         let scheduled = localNotificationClient.scheduled()
         #expect(scheduled.count == 1)
@@ -53,105 +58,93 @@ struct GenerationCompletionReminderCoordinatorTests {
     }
 
     @Test
-    func `보존된 진행 상태가 없으면 최소 대기 없이 지금 시각으로 예약한다`() async {
-        let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient, progress: nil)
-
-        let before = Date()
-        await emitCompleted(projectID: "project-1", coordinator: coordinator, outcomes: observeGenerationOutcomes)
-
-        let scheduled = localNotificationClient.scheduled()
-        #expect(scheduled.count == 1)
-        #expect((scheduled.first?.date ?? Date.distantPast) >= before)
-    }
-
-    @Test
     func `권한이 허용되지 않으면 예약도 발송도 하지 않는다`() async {
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: false)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: Date(timeIntervalSince1970: 1_000)),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
-        await emitCompleted(projectID: "project-1", coordinator: coordinator, outcomes: observeGenerationOutcomes)
+        await emitFinished(
+            projectID: "project-1",
+            status: .completed,
+            requestedAt: Date(timeIntervalSince1970: 1_000),
+            coordinator: coordinator,
+            trackGeneration: trackGeneration,
+        )
 
         #expect(localNotificationClient.scheduled().isEmpty)
         #expect(localNotificationClient.presentedIdentifiers().isEmpty)
     }
 
     @Test
-    func `등록하지 않은 projectID의 completed 이벤트는 무시된다`() async {
+    func `등록하지 않은 projectID의 완료 기록은 무시된다`() async {
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "unregistered", requestedAt: Date(timeIntervalSince1970: 1_000)),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
-        await coordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "unregistered", status: .completed))
-        await observeGenerationOutcomes.finish()
+        await coordinator.start(trackGeneration: trackGeneration)
+        await trackGeneration.emit(
+            Self.state(projectID: "unregistered", status: .completed, requestedAt: Date(timeIntervalSince1970: 1_000))
+        )
+        await trackGeneration.finish()
         await coordinator.waitUntilObservationFinished()
 
         #expect(localNotificationClient.scheduled().isEmpty)
     }
 
     @Test
-    func `등록된 projectID의 failed 이벤트는 예약 없이 등록 집합에서 제거만 한다`() async {
+    func `등록된 projectID의 실패 기록은 예약 없이 등록 집합에서 제거만 한다`() async {
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: Date(timeIntervalSince1970: 1_000)),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
-        await coordinator.register(projectID: "project-1")
-        await coordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .failed))
-        await observeGenerationOutcomes.finish()
-        await coordinator.waitUntilObservationFinished()
+        await emitFinished(
+            projectID: "project-1",
+            status: .failed,
+            requestedAt: Date(timeIntervalSince1970: 1_000),
+            coordinator: coordinator,
+            trackGeneration: trackGeneration,
+        )
 
         #expect(localNotificationClient.scheduled().isEmpty)
         #expect(localNotificationClient.presentedIdentifiers().isEmpty)
     }
 
     @Test
-    func `start가 반환한 시점에 생성 결과 구독이 이미 확립돼 있다`() async {
+    func `start가 반환한 시점에 생성 상태 구독이 이미 확립돼 있다`() async {
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: Date(timeIntervalSince1970: 1_000)),
-        )
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
 
         await coordinator.register(projectID: "project-1")
-        await coordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
+        await coordinator.start(trackGeneration: trackGeneration)
 
-        #expect(await observeGenerationOutcomes.hasEstablishedSubscription())
+        #expect(await trackGeneration.hasEstablishedSubscription())
 
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
-        await observeGenerationOutcomes.finish()
+        await trackGeneration.emit(
+            Self.state(projectID: "project-1", status: .completed, requestedAt: Date(timeIntervalSince1970: 1_000))
+        )
+        await trackGeneration.finish()
         await coordinator.waitUntilObservationFinished()
 
         #expect(localNotificationClient.scheduled().count == 1)
     }
 
     @Test
-    func `같은 projectID에 completed 이벤트가 두 번 도착해도 예약은 1회뿐이다`() async {
+    func `같은 완료 기록이 두 스냅샷에 연속으로 담겨도 예약은 1회뿐이다`() async {
         let localNotificationClient = StubNotificationAuthorizationClient(isAuthorizedResult: true)
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
-        let coordinator = makeCoordinator(
-            localNotificationClient: localNotificationClient,
-            progress: GenerationProgress(projectID: "project-1", requestedAt: Date(timeIntervalSince1970: 1_000)),
+        let trackGeneration = StubTrackGenerationUseCase()
+        let coordinator = makeCoordinator(localNotificationClient: localNotificationClient)
+        let finished = Self.state(
+            projectID: "project-1",
+            status: .completed,
+            requestedAt: Date(timeIntervalSince1970: 1_000),
         )
 
         await coordinator.register(projectID: "project-1")
-        await coordinator.start(observeGenerationOutcomes: observeGenerationOutcomes)
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
-        await observeGenerationOutcomes.finish()
+        await coordinator.start(trackGeneration: trackGeneration)
+        await trackGeneration.emit(finished)
+        await trackGeneration.emit(finished)
+        await trackGeneration.finish()
         await coordinator.waitUntilObservationFinished()
 
         #expect(localNotificationClient.scheduled().map(\.identifier) == ["generation-completed-project-1"])
@@ -159,45 +152,79 @@ struct GenerationCompletionReminderCoordinatorTests {
 
     // MARK: Private
 
+    private static func state(
+        projectID: String,
+        status: GenerationRecord.Status,
+        requestedAt: Date,
+    ) -> GenerationState {
+        GenerationState(records: [
+            GenerationRecord(
+                githubRepoURL: "https://github.com/owner/\(projectID)",
+                projectID: projectID,
+                requestedAt: requestedAt,
+                status: status,
+                finishedAt: requestedAt,
+            ),
+        ])
+    }
+
     private func makeCoordinator(
-        localNotificationClient: StubNotificationAuthorizationClient,
-        progress: GenerationProgress?,
+        localNotificationClient: StubNotificationAuthorizationClient
     ) -> GenerationCompletionReminderCoordinator {
         GenerationCompletionReminderCoordinator(
             localNotificationClient: localNotificationClient,
-            progressRepository: StubGenerationProgressRepository(stored: progress),
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
         )
     }
 
-    private func emitCompleted(
+    private func emitFinished(
         projectID: String,
+        status: GenerationRecord.Status,
+        requestedAt: Date,
         coordinator: GenerationCompletionReminderCoordinator,
-        outcomes: StubObserveGenerationOutcomesUseCase,
+        trackGeneration: StubTrackGenerationUseCase,
     ) async {
         await coordinator.register(projectID: projectID)
-        await coordinator.start(observeGenerationOutcomes: outcomes)
-        await outcomes.emit(GenerationOutcome(projectID: projectID, status: .completed))
-        await outcomes.finish()
+        await coordinator.start(trackGeneration: trackGeneration)
+        await trackGeneration.emit(Self.state(projectID: projectID, status: status, requestedAt: requestedAt))
+        await trackGeneration.finish()
         await coordinator.waitUntilObservationFinished()
     }
 
 }
 
-// MARK: - StubObserveGenerationOutcomesUseCase
+// MARK: - StubTrackGenerationUseCase
 
-private actor StubObserveGenerationOutcomesUseCase: ObserveGenerationOutcomesUseCase {
+private actor StubTrackGenerationUseCase: TrackGenerationUseCase {
 
     // MARK: Internal
 
-    func callAsFunction() async -> AsyncStream<GenerationOutcome> {
-        let (stream, continuation) = AsyncStream<GenerationOutcome>.makeStream()
+    func begin(
+        githubRepoURL _: String,
+        requestedAt _: Date,
+    ) async -> Bool {
+        true
+    }
+
+    func attachProjectID(
+        _: String,
+        toGithubRepoURL _: String,
+    ) async { }
+
+    func end(githubRepoURL _: String) async { }
+    func end(projectID _: String) async { }
+    func current() async -> GenerationState {
+        GenerationState()
+    }
+
+    func states() async -> AsyncStream<GenerationState> {
+        let (stream, continuation) = AsyncStream<GenerationState>.makeStream()
         self.continuation = continuation
         return stream
     }
 
-    func emit(_ outcome: GenerationOutcome) {
-        continuation?.yield(outcome)
+    func emit(_ state: GenerationState) {
+        continuation?.yield(state)
     }
 
     func finish() {
@@ -210,37 +237,7 @@ private actor StubObserveGenerationOutcomesUseCase: ObserveGenerationOutcomesUse
 
     // MARK: Private
 
-    private var continuation: AsyncStream<GenerationOutcome>.Continuation?
-
-}
-
-// MARK: - StubGenerationProgressRepository
-
-private actor StubGenerationProgressRepository: GenerationProgressRepository {
-
-    // MARK: Lifecycle
-
-    init(stored: GenerationProgress?) {
-        self.stored = stored
-    }
-
-    // MARK: Internal
-
-    func load() async -> GenerationProgress? {
-        stored
-    }
-
-    func save(_ progress: GenerationProgress) async {
-        stored = progress
-    }
-
-    func clear() async {
-        stored = nil
-    }
-
-    // MARK: Private
-
-    private var stored: GenerationProgress?
+    private var continuation: AsyncStream<GenerationState>.Continuation?
 
 }
 

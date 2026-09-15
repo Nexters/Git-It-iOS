@@ -69,7 +69,7 @@ struct HomeFeatureGenerationProgressTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -91,7 +91,7 @@ struct HomeFeatureGenerationProgressTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
     }

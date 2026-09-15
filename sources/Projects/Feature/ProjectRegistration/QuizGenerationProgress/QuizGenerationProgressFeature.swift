@@ -9,14 +9,14 @@ public struct QuizGenerationProgressFeature: Sendable {
 
     public init(
         createLearningProject: any CreateLearningProjectUseCase,
-        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        trackGeneration: any TrackGenerationUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
     ) {
         self.createLearningProject = createLearningProject
-        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.trackGeneration = trackGeneration
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
         self.waitPolicy = waitPolicy
@@ -136,7 +136,7 @@ public struct QuizGenerationProgressFeature: Sendable {
                     outcome.projectID == receipt.projectID
                 else { return .none }
 
-                let remaining = remainingWait(requestedAt: state.requestedAt, projectID: receipt.projectID)
+                let remaining = remainingWait(requestedAt: state.requestedAt)
                 guard remaining > 0 else {
                     return applyOutcome(outcome, receipt: receipt, state: &state)
                 }
@@ -169,7 +169,7 @@ public struct QuizGenerationProgressFeature: Sendable {
     }
 
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let trackGeneration: any TrackGenerationUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let waitPolicy: GenerationWaitPolicy
@@ -183,9 +183,7 @@ public struct QuizGenerationProgressFeature: Sendable {
         state.progress = .submitting
         state.requestedAt = now()
         state.pendingOutcome = nil
-        return .run { send in
-            let outcomes = await observeGenerationOutcomes()
-
+        return .run { [trackGeneration] send in
             let receipt: ProjectRegistrationReceipt
             do {
                 receipt = try await createLearningProject(
@@ -199,7 +197,11 @@ public struct QuizGenerationProgressFeature: Sendable {
             }
             await send(.effect(.submissionFinished(.success(receipt))))
 
-            for await outcome in outcomes where outcome.projectID == receipt.projectID {
+            for await generationState in await trackGeneration.states() {
+                guard
+                    let record = generationState.record(projectID: receipt.projectID),
+                    let outcome = Self.outcome(from: record)
+                else { continue }
                 await send(.effect(.generationOutcomeReceived(outcome)))
 
                 break
@@ -221,13 +223,23 @@ public struct QuizGenerationProgressFeature: Sendable {
         )
     }
 
-    private func remainingWait(
-        requestedAt: Date?,
-        projectID: String,
-    ) -> TimeInterval {
+    private func remainingWait(requestedAt: Date?) -> TimeInterval {
         guard let requestedAt else { return 0 }
-        let progress = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
-        return waitPolicy.readyDate(for: progress).timeIntervalSince(now())
+        return requestedAt.addingTimeInterval(waitPolicy.minimumWait).timeIntervalSince(now())
+    }
+
+    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
+        guard let projectID = record.projectID else { return nil }
+        switch record.status {
+        case .inProgress:
+            return nil
+
+        case .completed:
+            return GenerationOutcome(projectID: projectID, status: .completed)
+
+        case .failed:
+            return GenerationOutcome(projectID: projectID, status: .failed)
+        }
     }
 
     private func applyOutcome(

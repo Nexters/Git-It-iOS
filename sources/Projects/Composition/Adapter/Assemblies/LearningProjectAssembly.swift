@@ -31,22 +31,33 @@ public struct LearningProjectAssembly: Sendable {
             remote: HTTPBookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
 
-        let creationStateRepositoryAdapter = RepositoryCreationStateRepositoryAdapter(
-            userDefaults: sharedDefaults ?? .standard
+        let defaults = sharedDefaults ?? .standard
+        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
+        let trackGeneration = TrackGeneration(
+            stateRepository: GenerationStateRepositoryAdapter(
+                store: LocalGenerationStateStore(
+                    store: UserDefaultsStore(namespace: SharedSessionLayout.namespace, userDefaults: defaults),
+                    migration: GenerationStateMigration(
+                        legacyProgressStore: UserDefaultsStore(namespace: Self.legacyProgressNamespace),
+                        legacyCreationStateStore: UserDefaultsStore(
+                            namespace: SharedSessionLayout.namespace,
+                            userDefaults: defaults,
+                        ),
+                    ),
+                )
+            ),
+            outcomeRepository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
         )
-        self.creationStateRepositoryAdapter = creationStateRepositoryAdapter
-        startObservingRepositoryCreationState = { observeGenerationOutcomes in
-            await creationStateRepositoryAdapter.start(observeGenerationOutcomes: observeGenerationOutcomes)
-        }
+        self.trackGeneration = trackGeneration
 
         fetchLearningProjects = FetchLearningProjects(
             repository: projectRepository,
-            creationStateRepository: creationStateRepositoryAdapter,
+            trackGeneration: trackGeneration,
         )
         fetchLearningProjectDetail = FetchLearningProjectDetail(repository: projectRepository)
         createLearningProject = CreateLearningProject(
             repository: projectRepository,
-            creationStateRepository: creationStateRepositoryAdapter,
+            trackGeneration: trackGeneration,
         )
         deleteLearningProject = DeleteLearningProject(repository: projectRepository)
         fetchLearningSet = FetchLearningSet(repository: learningSetRepository)
@@ -55,16 +66,6 @@ public struct LearningProjectAssembly: Sendable {
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
         fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
 
-        let progressRepository = GenerationProgressRepositoryAdapter(
-            store: LocalGenerationProgressStore(store: UserDefaultsStore(namespace: Self.progressNamespace))
-        )
-        generationProgressRepository = progressRepository
-        trackGenerationProgress = TrackGenerationProgress(progressRepository: progressRepository)
-
-        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
-        observeGenerationOutcomes = ObserveGenerationOutcomes(
-            repository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource)
-        )
         ingestGenerationOutcomePayload = { rawPayload in
             await generationOutcomeSource.ingest(rawPayload: rawPayload)
         }
@@ -81,18 +82,11 @@ public struct LearningProjectAssembly: Sendable {
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
-    public let trackGenerationProgress: any TrackGenerationProgressUseCase
+    public let trackGeneration: any TrackGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
-    public let startObservingRepositoryCreationState: @Sendable (any ObserveGenerationOutcomesUseCase) async -> Void
-
-    // MARK: Internal
-
-    let generationProgressRepository: any GenerationProgressRepository
-    let creationStateRepositoryAdapter: RepositoryCreationStateRepositoryAdapter
 
     // MARK: Private
 
-    private static let progressNamespace = "com.nexters.hytime.gitit.generationProgress"
+    private static let legacyProgressNamespace = "com.nexters.hytime.gitit.generationProgress"
 
 }

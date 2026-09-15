@@ -52,7 +52,7 @@ struct HomeFeatureNavigationTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
     }

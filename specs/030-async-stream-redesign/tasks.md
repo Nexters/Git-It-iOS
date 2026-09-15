@@ -209,41 +209,41 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 구현 — Composition
 
-- [ ] T043 [S1] `sources/Projects/Composition/Adapter/Adapters/GenerationStateRepositoryAdapter.swift`를 추가해 Domain 생성 상태 보존 계약을 Data 저장 구현에 연결한다
-- [ ] T044 [S1] `sources/Projects/Composition/Adapter/Adapters/GenerationProgressRepositoryAdapter.swift`와 `sources/Projects/Composition/Adapter/Adapters/RepositoryCreationStateRepositoryAdapter.swift`를 제거한다
-- [ ] T045 [S1] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`가 생성 추적을 조립하고 `startObservingRepositoryCreationState`를 제거하도록 바꾼다
-- [ ] T046 [S1] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`가 생성 결과 관측 대신 생성 추적의 상태 관측을 사용하도록 바꾼다
-- [ ] T047 [S1] `sources/Projects/Composition/Adapter/Assemblies/GenerationReminderAssembly.swift`의 관측 시작 주입을 생성 추적 기준으로 바꾼다
-- [ ] T002 [S2] `sources/Projects/Infrastructure/Authentication/AppleAuthentication/Providers/AppleCredentialStateProvider.swift`에서 `changes()`, `receiveRevocation(for:)`, `continuations` 저장소를 제거한다. **T048과 같은 커밋 단위에 둔다** — 분리하면 Composition이 컴파일되지 않는다
-- [ ] T048 [S2] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`에서 `authorizationChanges()` 구현을 제거한다
-- [ ] T049 [S2] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`가 자격 증명 확인 UseCase를 조립하고 인증 결과 관측 조립을 제거하도록 바꾼다
-- [ ] T050 [S1] [S2] [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 노출 의존성을 교체한다 — 생성 추적 추가, 진행 정보 추적과 생성 결과 관측 제거, 자격 증명 확인 추가, 인증 결과 관측 제거, 토큰 갱신 통지의 재래핑 제거
-- [ ] T051 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 생성 추적을 사용하도록 바꾼다
-- [ ] T052 [S1] [S2] `sources/Projects/Composition/Tests/`의 조립 테스트를 새 노출 의존성 기준으로 갱신한다
+- [X] T043 [S1] `sources/Projects/Composition/Adapter/Adapters/GenerationStateRepositoryAdapter.swift`를 추가해 Domain 생성 상태 보존 계약을 Data 저장 구현에 연결한다
+- [X] T044 [S1] `sources/Projects/Composition/Adapter/Adapters/GenerationProgressRepositoryAdapter.swift`와 `sources/Projects/Composition/Adapter/Adapters/RepositoryCreationStateRepositoryAdapter.swift`를 제거한다
+- [X] T045 [S1] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`가 생성 추적을 조립하고 `startObservingRepositoryCreationState`를 제거하도록 바꾼다
+- [X] T046 [S1] `sources/Projects/Composition/Adapter/Factories/GenerationCompletionReminderCoordinator.swift`가 생성 결과 관측 대신 생성 추적의 상태 관측을 사용하도록 바꾼다
+- [X] T047 [S1] `sources/Projects/Composition/Adapter/Assemblies/GenerationReminderAssembly.swift`의 관측 시작 주입을 생성 추적 기준으로 바꾼다
+- [X] T002 [S2] `sources/Projects/Infrastructure/Authentication/AppleAuthentication/Providers/AppleCredentialStateProvider.swift`에서 `changes()`, `receiveRevocation(for:)`, `continuations` 저장소를 제거한다. **T048과 같은 커밋 단위에 둔다** — 분리하면 Composition이 컴파일되지 않는다
+- [X] T048 [S2] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`에서 `authorizationChanges()` 구현을 제거한다
+- [X] T049 [S2] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`가 자격 증명 확인 UseCase를 조립하고 인증 결과 관측 조립을 제거하도록 바꾼다
+- [X] T050 [S1] [S2] [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 노출 의존성을 교체한다 — 생성 추적 추가, 진행 정보 추적과 생성 결과 관측 제거, 자격 증명 확인 추가, 인증 결과 관측 제거, 토큰 갱신 통지의 재래핑 제거
+- [X] T051 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 생성 추적을 사용하도록 바꾼다 — 변경 불필요. 이 조립은 `LearningProjectAssembly.createLearningProject`만 노출하고, 그 UseCase가 T045에서 생성 추적을 사용하도록 바뀌면서 추적이 그대로 적용된다
+- [X] T052 [S1] [S2] `sources/Projects/Composition/Tests/`의 조립 테스트를 새 노출 의존성 기준으로 갱신한다
 
 ### 구현 — Feature
 
-- [ ] T053 [S1] `sources/Projects/Feature/Home/HomeFeature.swift`가 생성 결과 관측 대신 생성 추적의 상태 관측을 사용하도록 바꾼다
-- [ ] T054 [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeature.swift`가 상태 관측을 사용하도록 바꾸고, 생성 요청 전에 미리 관측을 시작하던 순서 의존 코드를 제거한다
-- [ ] T055 [S1] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`의 초기화 인자와 하위 전달을 생성 추적 기준으로 바꾼다
-- [ ] T056 [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 초기화 인자와 하위 전달을 생성 추적 기준으로 바꾼다
-- [ ] T057 [S1] `sources/Projects/Feature/Tests/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeatureTests.swift`를 새 관측 기준으로 갱신하고, 늦은 관측에서도 완료를 받는다는 검증을 추가한다
-- [ ] T058 [S1] `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ShareRegistrationTestSupport.swift`의 테스트 더블을 새 계약에 맞춘다
+- [X] T053 [S1] `sources/Projects/Feature/Home/HomeFeature.swift`가 생성 결과 관측 대신 생성 추적의 상태 관측을 사용하도록 바꾼다
+- [X] T054 [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeature.swift`가 상태 관측을 사용하도록 바꾸고, 생성 요청 전에 미리 관측을 시작하던 순서 의존 코드를 제거한다
+- [X] T055 [S1] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`의 초기화 인자와 하위 전달을 생성 추적 기준으로 바꾼다
+- [X] T056 [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 초기화 인자와 하위 전달을 생성 추적 기준으로 바꾼다
+- [X] T057 [S1] `sources/Projects/Feature/Tests/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeatureTests.swift`를 새 관측 기준으로 갱신하고, 늦은 관측에서도 완료를 받는다는 검증을 추가한다
+- [X] T058 [S1] `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ShareRegistrationTestSupport.swift`의 테스트 더블을 새 계약에 맞춘다
 
 ### 구현 — App
 
-- [ ] T059 [S1] [S2] [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 초기화 인자를 교체한다 — 생성 추적 추가, 진행 정보 추적과 생성 결과 관측 제거, 자격 증명 확인 추가, 인증 결과 관측 제거, 토큰 갱신 통지의 기본값 제거
-- [ ] T060 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `applicationBecameActive` 처리에 자격 증명 확인을 추가하고, 인증 결과 관측 Effect와 해당 `CancelID`를 제거한다
-- [ ] T061 [S1] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 생성 진행 복원·해제 Effect를 상태 관측 구독으로 바꾼다
-- [ ] T062 [S1] [S2] [S3] `sources/Projects/App/GitIt/GitItApp.swift`의 주입을 새 노출 의존성에 맞춘다
-- [ ] T063 [S1] [S2] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 대체 구현을 새 계약에 맞춘다
-- [ ] T064 [S1] `sources/Projects/App/ShareExtension/ShareViewController.swift`가 새 조립 결과를 사용하도록 바꾼다
-- [ ] T065 [S1] [S2] [S3] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`와 `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`를 새 계약 기준으로 갱신한다
+- [X] T059 [S1] [S2] [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 초기화 인자를 교체한다 — 생성 추적 추가, 진행 정보 추적과 생성 결과 관측 제거, 자격 증명 확인 추가, 인증 결과 관측 제거, 토큰 갱신 통지의 기본값 제거
+- [X] T060 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `applicationBecameActive` 처리에 자격 증명 확인을 추가하고, 인증 결과 관측 Effect와 해당 `CancelID`를 제거한다
+- [X] T061 [S1] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 생성 진행 복원·해제 Effect를 상태 관측 구독으로 바꾼다
+- [X] T062 [S1] [S2] [S3] `sources/Projects/App/GitIt/GitItApp.swift`의 주입을 새 노출 의존성에 맞춘다
+- [X] T063 [S1] [S2] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 대체 구현을 새 계약에 맞춘다
+- [X] T064 [S1] `sources/Projects/App/ShareExtension/ShareViewController.swift`가 새 조립 결과를 사용하도록 바꾼다 — 변경 불필요. 사용하는 노출 의존성 이름과 시그니처가 모두 그대로다
+- [ ] T065 [S1] [S2] [S3] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`와 `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`를 새 계약 기준으로 갱신한다 — 작업 트리에 갱신을 마치고 검증까지 통과했으나, 두 파일에 사용자의 기존 미커밋 변경(`AppRootTestFixture.mainShellState()` 추출)이 함께 있어 사용자 결정에 따라 이 커밋에서 제외한다. 사용자가 해당 변경을 커밋한 뒤 함께 커밋한다
 
 ### 통합 검증
 
-- [ ] T066 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다
-- [ ] T067 [no-write] 전체 `build` → `compile` → `test`를 순차 실행하고 결과를 기록한다
+- [X] T066 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다 — `tuist generate --no-open` 실행. 추적 대상 소스·문서 변경 없음
+- [X] T067 [no-write] 전체 `build` → `compile` → `test`를 순차 실행하고 결과를 기록한다 — Composition·Feature·App `build` 성공, `AllTests` `build-for-testing` 성공, `test` 실행. Domain·Data·Infrastructure·UI·Feature·Composition 전 suite 통과. App은 `AppRootFeatureTests`의 "root 전환" suite에서 9건 실패(19 issues)가 남으며, 모두 `AppEntryFeature`의 스플래시 게이트와 비-exhaustive `send`의 액션 소진 규약에서 오는 기존 실패다. 이 명세가 추가·변경한 검증은 모두 통과한다
 
 **진행 점검**: T043~T067의 변경 파일과 검증 결과를 보고한다.
 
@@ -282,6 +282,11 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 | `인증 결과` — 안전한 사용자 또는 비인증 및 복구 가능 실패만 전달한다 | 값 타입을 제거했다. 동형 값의 민감 값 비노출 보장은 `SensitiveValueExposureTests`가 `RestoreSessionResult`로 이어받는다 |
 | `SignOutResult` — AuthenticationOutcome과 케이스 집합이 다르다 | 비교 대상 타입이 사라져 대응 항목이 없다. `SignOutResult` 자체의 케이스 보장은 같은 파일의 성공·재시도 가능 실패 테스트가 유지한다 |
 | `RestoreSessionResult` — AuthenticationOutcome과 별개 타입이다 | 비교 대상 타입이 사라져 대응 항목이 없다. 전용 결과 타입 반환 보장은 `RestoreSessionTests` — 세션 복원 전용 결과 타입을 반환한다가 유지한다 |
+| `GenerationCompletionReminderCoordinator` — 보존된 진행 상태가 없으면 최소 대기 없이 지금 시각으로 예약한다 | 예약 시각을 생성 기록에서 직접 얻으므로 "기록이 없는 상태"가 성립하지 않는다. 기록이 있을 때의 예약 시각 보장은 `GenerationCompletionReminderCoordinatorTests` — 완료 기록은 즉시 발송이 아니라 준비 완료 시각으로 예약된다가 유지한다 |
+| `RepositoryCreationStateRepositoryAdapter` 전체 테스트 | 어댑터를 제거하고 Domain `TrackGeneration` + `GenerationStateRepositoryAdapter`로 대체했다. 중복 시작 거부·활성 projectID·만료 정리 보장은 `GenerationStateTests`·`TrackGenerationTests`·`LocalGenerationStateStoreTests`가 이어받는다 |
+| `LearningProjectAssembly` — push payload가 관찰 Use Case의 스트림으로 전달된다 | `LearningProjectAssemblyTests` — push 진입점으로 수신한 payload가 생성 추적 상태에 완료로 반영된다로 이관했다 |
+| `AppRootFeature` — 복원된 projectID가 학습 프로젝트 목록에 있으면 진행 상태를 해제한다 | 해제 시점이 목록 도착이 아니라 기록의 준비 완료 시각으로 바뀌었다. 해제 보장은 `AppRootFeatureTests` — 준비 완료 시각이 지난 뒤 결과가 도착하면 진행 상태를 해제한다와 보존 상한을 넘긴 진행 상태는 복원하지 않고 해제한다가 이어받는다 |
+| `AppRootFeature` — 등록 제출이 성공하면 추적을 시작하고 홈에 진행 중을 전달한다 | 추적 시작은 `CreateLearningProject`가 수행하므로 App이 더 이상 시작하지 않는다. 진행 중 전달 보장은 `AppRootFeatureTests` — 진행 중 기록이 관측되면 홈에 진행 중을 전달한다가 이어받는다 |
 
 ---
 

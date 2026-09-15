@@ -27,7 +27,7 @@ public struct AppComposition: Sendable {
         signIn = authentication.signIn
         signOut = authentication.signOut
         restoreSession = authentication.restoreSession
-        authenticationOutcomes = authentication.authenticationOutcomes
+        verifyAuthorization = authentication.verifyAuthorization
         refreshSession = authentication.refreshSession
         verifyAccessToken = authentication.verifyAccessToken
         policyConsent = authentication.policyConsent
@@ -42,8 +42,7 @@ public struct AppComposition: Sendable {
         submitEssayAnswer = learningProject.submitEssayAnswer
         setQuestionBookmark = learningProject.setQuestionBookmark
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
-        observeGenerationOutcomes = learningProject.observeGenerationOutcomes
-        trackGenerationProgress = learningProject.trackGenerationProgress
+        trackGeneration = learningProject.trackGeneration
 
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
@@ -65,9 +64,8 @@ public struct AppComposition: Sendable {
             ingestGenerationOutcomePayload: ingestGenerationOutcomePayload,
         )
 
-        let observeGenerationOutcomes = learningProject.observeGenerationOutcomes
-        let startObservingGenerationOutcomes = generationReminder.startObservingGenerationOutcomes
-        let startObservingRepositoryCreationState = learningProject.startObservingRepositoryCreationState
+        let trackGeneration = learningProject.trackGeneration
+        let startObservingGenerationState = generationReminder.startObservingGenerationState
         let markerCoding = SharedSessionLayout.makeSharedDefaults()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:))
         let hasStoredSession: @Sendable () async -> Bool = {
@@ -77,8 +75,7 @@ public struct AppComposition: Sendable {
             await markerCoding?.save(isSignedIn: hasStoredSession())
             pushClientBox.activate()
             appDelegate.configure(pushNotificationCallbacks)
-            await startObservingGenerationOutcomes(observeGenerationOutcomes)
-            await startObservingRepositoryCreationState(observeGenerationOutcomes)
+            await startObservingGenerationState(trackGeneration)
         }
 
         let registerMemberDevice = member.registerMemberDevice
@@ -102,16 +99,7 @@ public struct AppComposition: Sendable {
             guard let pushClient = pushClientBox.client else {
                 return AsyncStream { $0.finish() }
             }
-            let refreshes = pushClient.registrationTokenRefreshes()
-            return AsyncStream { continuation in
-                let task = Task {
-                    for await _ in refreshes {
-                        continuation.yield(())
-                    }
-                    continuation.finish()
-                }
-                continuation.onTermination = { _ in task.cancel() }
-            }
+            return pushClient.registrationTokenRefreshes()
         }
     }
 
@@ -142,7 +130,7 @@ public struct AppComposition: Sendable {
     public let signIn: any SignInUseCase
     public let signOut: any SignOutUseCase
     public let restoreSession: any RestoreSessionUseCase
-    public let authenticationOutcomes: any AuthenticationOutcomesUseCase
+    public let verifyAuthorization: any VerifyAuthorizationUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
@@ -166,14 +154,13 @@ public struct AppComposition: Sendable {
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
-    public let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
-    public let trackGenerationProgress: any TrackGenerationProgressUseCase
+    public let trackGeneration: any TrackGenerationUseCase
 
     public let bootstrap: @MainActor @Sendable (PushNotificationAppDelegate) async -> Void
 
     public let registerCurrentDevice: @Sendable () async throws -> Void
-    public let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
+    public let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
     public static func live(
@@ -203,7 +190,10 @@ public struct AppComposition: Sendable {
             loginSessionRepository: authentication.loginSessionRepository,
             accessTokenProvider: accessTokenProvider,
             clearLocalStateAfterAccountDeletion: {
-                await learningProject.trackGenerationProgress.end()
+                let trackGeneration = learningProject.trackGeneration
+                for record in await trackGeneration.current().records {
+                    await trackGeneration.end(githubRepoURL: record.githubRepoURL)
+                }
             },
             transport: transport,
             responseTimeout: memberResponseTimeout,
@@ -218,7 +208,7 @@ public struct AppComposition: Sendable {
             learningProject: learningProject,
             member: member,
             externalRepository: externalRepository,
-            generationReminder: GenerationReminderAssembly(learningProject: learningProject),
+            generationReminder: GenerationReminderAssembly(),
             keychainStore: keychainStore,
         )
     }

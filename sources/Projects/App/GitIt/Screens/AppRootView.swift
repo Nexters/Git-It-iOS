@@ -88,9 +88,9 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopAuthenticationOutcomes: AuthenticationOutcomesUseCase {
-        func callAsFunction() async -> AsyncStream<AuthenticationOutcome> {
-            AsyncStream { _ in }
+    struct NoopVerifyAuthorization: VerifyAuthorizationUseCase {
+        func callAsFunction() async -> AuthorizationStatus {
+            .authorized
         }
     }
 
@@ -233,12 +233,6 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopObserveGenerationOutcomes: ObserveGenerationOutcomesUseCase {
-        func callAsFunction() async -> AsyncStream<GenerationOutcome> {
-            AsyncStream { _ in }
-        }
-    }
-
     struct NoopRequestGenerationReminder: RequestGenerationReminderUseCase {
         func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
             .authorized
@@ -253,17 +247,28 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopTrackGenerationProgress: TrackGenerationProgressUseCase {
+    struct NoopTrackGeneration: TrackGenerationUseCase {
         func begin(
-            projectID _: String,
+            githubRepoURL _: String,
             requestedAt _: Date,
-        ) async { }
-
-        func current() async -> GenerationProgress? {
-            nil
+        ) async -> Bool {
+            false
         }
 
-        func end() async { }
+        func attachProjectID(
+            _: String,
+            toGithubRepoURL _: String,
+        ) async { }
+
+        func end(githubRepoURL _: String) async { }
+        func end(projectID _: String) async { }
+        func current() async -> GenerationState {
+            GenerationState()
+        }
+
+        func states() async -> AsyncStream<GenerationState> {
+            AsyncStream { $0.finish() }
+        }
     }
 
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
@@ -274,7 +279,7 @@ private enum AppRootPreviewSupport {
                 restoreSession: NoopRestoreSession(),
                 signIn: NoopSignIn(),
                 signOut: NoopSignOut(),
-                authenticationOutcomes: NoopAuthenticationOutcomes(),
+                verifyAuthorization: NoopVerifyAuthorization(),
                 fetchMemberProfile: NoopFetchMemberProfile(),
                 completeCuration: NoopCompleteCuration(),
                 policyConsent: NoopPolicyConsent(),
@@ -291,9 +296,9 @@ private enum AppRootPreviewSupport {
                 deleteMemberAccount: NoopDeleteMemberAccount(),
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
-                observeGenerationOutcomes: NoopObserveGenerationOutcomes(),
                 requestGenerationReminder: NoopRequestGenerationReminder(),
-                trackGenerationProgress: NoopTrackGenerationProgress(),
+                trackGeneration: NoopTrackGeneration(),
+                deviceTokenRefreshes: { AsyncStream { $0.finish() } },
             )
         }
     }

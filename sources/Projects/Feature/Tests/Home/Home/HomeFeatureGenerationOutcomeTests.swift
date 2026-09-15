@@ -10,7 +10,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `task는 generationOutcomeObservation이 idle일 때만 관찰 Effect를 시작하고 재호출 시 중복 구독하지 않는다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let profile = HomeMemberProfileUseCaseMock(
             results: [.success(HomeTestFixture.profileWithBoth)],
             suspendsRequests: true,
@@ -23,7 +23,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: observeGenerationOutcomes,
             )
         }
 
@@ -56,7 +56,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `generationOutcomeReceived는 로딩 중이 아니면 프로젝트 목록을 다시 조회한다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let projects = HomeLearningProjectsUseCaseMock(results: [
             .success(HomeTestFixture.oneProjectPage),
             .success(HomeTestFixture.manyProjectsPage),
@@ -68,7 +68,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: observeGenerationOutcomes,
             )
         }
 
@@ -98,7 +98,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -111,7 +111,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `조회 중 도착한 생성 결과는 폐기되지 않고 조회 완료 후 재조회로 반영된다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let projects = HomeLearningProjectsUseCaseMock(results: [
             .success(HomeTestFixture.oneProjectPage),
             .success(HomeTestFixture.manyProjectsPage),
@@ -124,7 +124,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: observeGenerationOutcomes,
             )
         }
 
@@ -149,7 +149,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `이미 반영한 프로젝트의 동일 결과가 다시 도착해도 재조회하지 않는다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
@@ -159,7 +159,7 @@ struct HomeFeatureGenerationOutcomeTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: observeGenerationOutcomes,
             )
         }
 

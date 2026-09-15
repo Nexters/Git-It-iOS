@@ -52,7 +52,7 @@ public struct AuthenticationAssembly: Sendable {
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
-        authenticationOutcomes = AuthenticationOutcomes(
+        verifyAuthorization = VerifyAuthorization(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
@@ -71,7 +71,7 @@ public struct AuthenticationAssembly: Sendable {
     public let signIn: any SignInUseCase
     public let signOut: any SignOutUseCase
     public let restoreSession: any RestoreSessionUseCase
-    public let authenticationOutcomes: any AuthenticationOutcomesUseCase
+    public let verifyAuthorization: any VerifyAuthorizationUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase

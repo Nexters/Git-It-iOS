@@ -11,12 +11,10 @@ actor GenerationCompletionReminderCoordinator {
 
     init(
         localNotificationClient: any NotificationAuthorizationClient,
-        progressRepository: any GenerationProgressRepository,
         pendingReminderCoding: PendingGenerationReminderCoding? = nil,
         waitPolicy: GenerationWaitPolicy = .standard,
     ) {
         self.localNotificationClient = localNotificationClient
-        self.progressRepository = progressRepository
         self.pendingReminderCoding = pendingReminderCoding
         self.waitPolicy = waitPolicy
     }
@@ -35,12 +33,12 @@ actor GenerationCompletionReminderCoordinator {
         }
     }
 
-    func start(observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase) async {
+    func start(trackGeneration: any TrackGenerationUseCase) async {
         await absorbPendingReminders()
-        let outcomes = await observeGenerationOutcomes()
+        let states = await trackGeneration.states()
         observationTask = Task {
-            for await outcome in outcomes {
-                await self.handle(outcome)
+            for await state in states {
+                await self.handle(state)
             }
         }
     }
@@ -54,7 +52,6 @@ actor GenerationCompletionReminderCoordinator {
     private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "GenerationCompletionReminderCoordinator")
 
     private let localNotificationClient: any NotificationAuthorizationClient
-    private let progressRepository: any GenerationProgressRepository
     private let pendingReminderCoding: PendingGenerationReminderCoding?
     private let waitPolicy: GenerationWaitPolicy
     private var registeredProjectIDs = Set<String>()
@@ -64,45 +61,44 @@ actor GenerationCompletionReminderCoordinator {
         "generation-completed-\(projectID)"
     }
 
-    private func handle(_ outcome: GenerationOutcome) async {
+    private func handle(_ state: GenerationState) async {
+        for record in state.records where record.status != .inProgress {
+            await handle(record)
+        }
+    }
+
+    private func handle(_ record: GenerationRecord) async {
+        guard let projectID = record.projectID else { return }
         Self.logger
             .debug(
-                "생성 결과 수신: projectID=\(outcome.projectID, privacy: .public) status=\(String(describing: outcome.status), privacy: .public)"
+                "생성 결과 수신: projectID=\(projectID, privacy: .public) status=\(String(describing: record.status), privacy: .public)"
             )
 
-        guard registeredProjectIDs.remove(outcome.projectID) != nil else {
-            Self.logger.debug("리마인드 미등록 프로젝트라 무시: projectID=\(outcome.projectID, privacy: .public)")
+        guard registeredProjectIDs.remove(projectID) != nil else {
+            Self.logger.debug("리마인드 미등록 프로젝트라 무시: projectID=\(projectID, privacy: .public)")
             return
         }
-        guard outcome.status == .completed else {
-            Self.logger.debug("완료가 아니므로 로컬 알림 미발송: projectID=\(outcome.projectID, privacy: .public)")
+        guard record.status == .completed else {
+            Self.logger.debug("완료가 아니므로 로컬 알림 미발송: projectID=\(projectID, privacy: .public)")
             return
         }
         guard await localNotificationClient.isAuthorized() else {
-            Self.logger.debug("알림 권한 없어 로컬 알림 미발송: projectID=\(outcome.projectID, privacy: .public)")
+            Self.logger.debug("알림 권한 없어 로컬 알림 미발송: projectID=\(projectID, privacy: .public)")
             return
         }
 
-        let readyDate = await readyDate(for: outcome.projectID)
+        let readyDate = waitPolicy.readyDate(for: record)
         Self.logger.debug(
-            "로컬 알림 예약: projectID=\(outcome.projectID, privacy: .public) readyDate=\(String(describing: readyDate), privacy: .public)"
+            "로컬 알림 예약: projectID=\(projectID, privacy: .public) readyDate=\(String(describing: readyDate), privacy: .public)"
         )
         localNotificationClient.schedule(
             LocalNotificationRequest(
-                identifier: Self.notificationIdentifier(projectID: outcome.projectID),
+                identifier: Self.notificationIdentifier(projectID: projectID),
                 title: "세트 생성 완료",
                 body: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
             ),
             at: readyDate,
         )
-    }
-
-    private func readyDate(for projectID: String) async -> Date {
-        guard
-            let progress = await progressRepository.load(),
-            progress.projectID == projectID
-        else { return Date() }
-        return waitPolicy.readyDate(for: progress)
     }
 
 }

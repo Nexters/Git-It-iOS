@@ -22,7 +22,7 @@ public struct MainShellRouterFeature: Sendable {
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
-        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        trackGeneration: any TrackGenerationUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
@@ -38,7 +38,7 @@ public struct MainShellRouterFeature: Sendable {
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
-        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.trackGeneration = trackGeneration
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
     }
@@ -98,7 +98,7 @@ public struct MainShellRouterFeature: Sendable {
             HomeFeature(
                 fetchLearningProjects: fetchLearningProjects,
                 fetchMemberProfile: fetchMemberProfile,
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: trackGeneration,
             )
         }
         Scope(state: \.projectList, action: \.projectList) {
@@ -226,7 +226,7 @@ public struct MainShellRouterFeature: Sendable {
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let trackGeneration: any TrackGenerationUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
 

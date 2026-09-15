@@ -32,7 +32,7 @@ struct GitItApp: App {
                 restoreSession: restoreSession,
                 signIn: composition.signIn,
                 signOut: composition.signOut,
-                authenticationOutcomes: composition.authenticationOutcomes,
+                verifyAuthorization: composition.verifyAuthorization,
                 fetchMemberProfile: composition.fetchMemberProfile,
                 completeCuration: composition.completeCuration,
                 policyConsent: composition.policyConsent,
@@ -49,9 +49,8 @@ struct GitItApp: App {
                 deleteMemberAccount: composition.deleteMemberAccount,
                 fetchExternalRepository: composition.fetchExternalRepository,
                 createLearningProject: composition.createLearningProject,
-                observeGenerationOutcomes: composition.observeGenerationOutcomes,
                 requestGenerationReminder: composition.requestGenerationReminder,
-                trackGenerationProgress: composition.trackGenerationProgress,
+                trackGeneration: composition.trackGeneration,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)

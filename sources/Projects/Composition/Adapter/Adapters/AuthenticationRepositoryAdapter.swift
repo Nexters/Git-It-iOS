@@ -47,20 +47,6 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
         return domainStatus(await credentialStateProvider.state(for: userID))
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
-        let changes = await credentialStateProvider.changes()
-        return AsyncStream { continuation in
-            let task = Task {
-                for await state in changes {
-                    guard !Task.isCancelled else { break }
-                    continuation.yield(domainStatus(state))
-                }
-                continuation.finish()
-            }
-            continuation.onTermination = { _ in task.cancel() }
-        }
-    }
-
     func clearAuthentication() async throws {
         do {
             try keychainStore.delete(for: Key.appleUserID.rawValue, in: namespace)

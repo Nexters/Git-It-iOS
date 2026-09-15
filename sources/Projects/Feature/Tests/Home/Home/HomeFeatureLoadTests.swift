@@ -20,7 +20,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -57,7 +57,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -82,7 +82,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -103,7 +103,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -136,7 +136,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -163,7 +163,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: projects,
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 

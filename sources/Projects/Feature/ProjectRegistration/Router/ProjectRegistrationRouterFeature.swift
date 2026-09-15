@@ -10,7 +10,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
-        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        trackGeneration: any TrackGenerationUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
         waitPolicy: GenerationWaitPolicy = .standard,
@@ -18,7 +18,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
-        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.trackGeneration = trackGeneration
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
         self.waitPolicy = waitPolicy
@@ -88,7 +88,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         Scope(state: \.quizGenerationProgress, action: \.quizGenerationProgress) {
             QuizGenerationProgressFeature(
                 createLearningProject: createLearningProject,
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: trackGeneration,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
                 waitPolicy: waitPolicy,
@@ -153,7 +153,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
 
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let trackGeneration: any TrackGenerationUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let waitPolicy: GenerationWaitPolicy

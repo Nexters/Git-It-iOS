@@ -73,14 +73,14 @@ struct ProjectRegistrationRouterFeatureTests {
     @Test
     func `생성 시작은 진행 화면으로 전환하고 확인된 저장소와 선택한 난이도로 제출을 요청한다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = .quizGenerationConfirmation
         state.repositoryConfirmation.repository = sampleRepository
         state.quizLevelSelection.quizLevel = .l2
         let store = makeProjectRegistrationRouterStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             state: state,
         )
         store.exhaustivity = .off
