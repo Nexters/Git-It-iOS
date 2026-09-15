@@ -149,23 +149,23 @@
 
 ### 테스트
 
-- [ ] T029 [S2] `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift`에 `MemberRemoteContractTests.swift`·`MemberDeviceContractTests.swift`·`MemberPreferenceContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T030 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/MemberRepositoryAdapterTests.swift`를 `HTTPMemberRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T029 [S2] `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift`에 `MemberRemoteContractTests.swift`·`MemberDeviceContractTests.swift`·`MemberPreferenceContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T030 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/MemberRepositoryAdapterTests.swift`를 `HTTPMemberRemote` + `StubHTTPTransport` 구성으로 바꾼다
 
 ### 구현
 
-- [ ] T031 [S2] `sources/Projects/Data/Member/Remotes/HTTPMemberRemote.swift`가 `MemberRemote` 채택을 떼고 공개 범위를 확인한다
-- [ ] T032 [S2] `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPMemberRemote`로 바꾼다
+- [X] T031 [S2] `sources/Projects/Data/Member/Remotes/HTTPMemberRemote.swift`가 `MemberRemote` 채택을 떼고 공개 범위를 확인한다
+- [X] T032 [S2] `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPMemberRemote`로 바꾼다
 
 ### 정리
 
-- [ ] T033 [S2] `sources/Projects/Data/Member/Contracts/MemberRemote.swift`를 제거한다
-- [ ] T034 [S2] `sources/Projects/Data/Tests/Member/TestDoubles/MemberRemoteProbe.swift`를 제거한다
-- [ ] T035 [S2] `sources/Projects/Data/Tests/Member/Contracts/MemberRemoteContractTests.swift`, `sources/Projects/Data/Tests/Member/Contracts/MemberDeviceContractTests.swift`, `sources/Projects/Data/Tests/Member/Contracts/MemberPreferenceContractTests.swift`를 제거하고, 각 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T033 [S2] `sources/Projects/Data/Member/Contracts/MemberRemote.swift`를 제거한다
+- [X] T034 [S2] `sources/Projects/Data/Tests/Member/TestDoubles/MemberRemoteProbe.swift`를 제거한다
+- [X] T035 [S2] `sources/Projects/Data/Tests/Member/Contracts/MemberRemoteContractTests.swift`, `sources/Projects/Data/Tests/Member/Contracts/MemberDeviceContractTests.swift`, `sources/Projects/Data/Tests/Member/Contracts/MemberPreferenceContractTests.swift`를 제거하고, 각 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
 
 ### 단위 검증
 
-- [ ] T036 [no-write] [S2] `DataMemberTests`와 `CompositionAdapterTests`를 실행해 I3을 검증한다
+- [X] T036 [no-write] [S2] `DataMemberTests`와 `CompositionAdapterTests`를 실행해 I3을 검증한다
 
 **진행 점검**: T029~T036의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -334,6 +334,9 @@
 | `PolicyConsentStore`의 `removeAll`이 저장된 기록을 모두 지운다 (계약 테스트 파일은 없었고 프로토콜 선언만 있었다) | `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift` — `removeAll은 저장된 모든 문서 기록을 지운다` |
 | `ExternalRepositoryRemote`가 요청을 정확히 한 번 기록하고 DTO를 손실 없이 반환한다 | `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift` — `GitHub Repository 요청 경로와 헤더를 그대로 전달한다`에서 DTO 전체 동등성과 요청 수 1을 확인한다 |
 | `offline`·`other` 실패를 성공 DTO 없이 그대로 전달한다 | `sources/Projects/Data/Tests/ExternalRepository/Remotes/HTTPExternalRepositoryRemoteTests.swift` — `오프라인 상태를 offline 오류로 변환한다`와 `그 외 실패를 other 오류로 변환한다`. 프로브가 되돌려주던 값을 실제 전송 실패와 404 응답에서 만든다 |
+| `MemberRemote`가 프로필 조회와 회원 탈퇴를 제공한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `프로필 조회는 GET members me 경로와 Bearer 헤더를 사용한다`, `회원 탈퇴는 DELETE members me 경로로 전송한다` |
+| 기기 정보를 `deviceType` 고정값 `ios`로 등록한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `기기 정보 등록은 deviceType을 ios 고정값으로 본문에 담는다`. 프로브가 입력 DTO만 다시 읽던 것을 실제 전송 본문 검증으로 바꿨다 |
+| 큐레이션 등록·분야 변경·수준 변경을 제공한다 | `sources/Projects/Data/Tests/Member/Remotes/HTTPMemberRemoteTests.swift` — `큐레이션 등록은 분야와 수준을 본문에 담아 curation 경로로 전송한다`, `분야 변경은 position 경로로 전송한다`, `수준 변경은 career-level 경로로 전송한다` |
 
 ---
 

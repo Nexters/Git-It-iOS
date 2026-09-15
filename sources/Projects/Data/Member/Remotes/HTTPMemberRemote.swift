@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPMemberRemote
 
-public struct HTTPMemberRemote: MemberRemote {
+public struct HTTPMemberRemote: Sendable {
 
     // MARK: Lifecycle
 

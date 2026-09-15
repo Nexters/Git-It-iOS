@@ -31,6 +31,96 @@ struct HTTPMemberRemoteTests {
     }
 
     @Test
+    func `기기 정보 등록은 deviceType을 ios 고정값으로 본문에 담는다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        try await remote.registerDeviceInfo(DeviceInfoRequestDTO(
+            deviceID: "device-1",
+            deviceType: "ios",
+            appVersion: "1.0.0",
+            osVersion: "18.0",
+            deviceToken: "token-abc",
+        ))
+
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.method == .post)
+        #expect(request.url.path == "/api/v1/members/me/device")
+        let rawBody = try #require(request.body)
+        let body = try #require(JSONSerialization.jsonObject(with: rawBody) as? [String: String])
+        #expect(body["deviceType"] == "ios")
+        #expect(body["deviceId"] == "device-1")
+        #expect(body["deviceToken"] == "token-abc")
+    }
+
+    @Test
+    func `큐레이션 등록은 분야와 수준을 본문에 담아 curation 경로로 전송한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        try await remote.curateMember(CurationRequestDTO(
+            position: PositionDTO(rawValue: "BACKEND"),
+            careerLevel: CareerLevelDTO(rawValue: "JUNIOR"),
+        ))
+
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.method == .post)
+        #expect(request.url.path == "/api/v1/members/me/curation")
+        let rawBody = try #require(request.body)
+        let body = try #require(JSONSerialization.jsonObject(with: rawBody) as? [String: String])
+        #expect(body["position"] == "BACKEND")
+        #expect(body["careerLevel"] == "JUNIOR")
+    }
+
+    @Test
+    func `분야 변경은 position 경로로 전송한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        try await remote.updatePosition(PositionRequestDTO(position: PositionDTO(rawValue: "FRONTEND")))
+
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.url.path == "/api/v1/members/me/position")
+        let rawBody = try #require(request.body)
+        let body = try #require(JSONSerialization.jsonObject(with: rawBody) as? [String: String])
+        #expect(body["position"] == "FRONTEND")
+    }
+
+    @Test
+    func `수준 변경은 career-level 경로로 전송한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        try await remote.updateCareerLevel(CareerLevelRequestDTO(careerLevel: CareerLevelDTO(rawValue: "SENIOR")))
+
+        let request = try #require(await transport.recordedRequests.first)
+        #expect(request.url.path == "/api/v1/members/me/career-level")
+        let rawBody = try #require(request.body)
+        let body = try #require(JSONSerialization.jsonObject(with: rawBody) as? [String: String])
+        #expect(body["careerLevel"] == "SENIOR")
+    }
+
+    @Test
     func `회원 탈퇴는 DELETE members me 경로로 전송한다`() async throws {
         let transport = StubHTTPTransport(results: [
             .response(jsonResponse(

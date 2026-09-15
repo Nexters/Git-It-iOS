@@ -7,7 +7,7 @@ struct MemberRepositoryAdapter: MemberRepository {
 
     // MARK: Lifecycle
 
-    init(remote: MemberRemote) {
+    init(remote: HTTPMemberRemote) {
         self.remote = remote
     }
 
@@ -89,7 +89,7 @@ struct MemberRepositoryAdapter: MemberRepository {
 
     // MARK: Private
 
-    private let remote: MemberRemote
+    private let remote: HTTPMemberRemote
 
     private func dtoPosition(_ position: MemberPosition) -> PositionDTO {
         switch position {
