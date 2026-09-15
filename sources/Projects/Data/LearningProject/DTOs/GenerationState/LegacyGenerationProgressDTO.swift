@@ -1,6 +1,6 @@
 import Foundation
 
-public struct GenerationProgressDTO: Codable, Equatable, Sendable {
+public struct LegacyGenerationProgressDTO: Codable, Equatable, Sendable {
 
     // MARK: Lifecycle
 

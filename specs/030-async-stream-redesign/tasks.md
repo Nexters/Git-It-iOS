@@ -107,20 +107,20 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 테스트
 
-- [ ] T012 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationStateStoreTests.swift`에 저장·불러오기 왕복과 만료 정리 테스트를 작성한다
-- [ ] T013 [S1] `sources/Projects/Data/Tests/LearningProject/Stores/GenerationStateMigrationTests.swift`에 [data-model.md](./data-model.md) 5절의 병합 규칙 이관 테스트를 작성한다 — 기존 진행 정보만 있는 경우, 기존 등록 상태만 있는 경우, 둘 다 있고 프로젝트 식별자가 겹치는 경우
+- [X] T012 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationStateStoreTests.swift`에 저장·불러오기 왕복과 만료 정리 테스트를 작성한다
+- [X] T013 [S1] `sources/Projects/Data/Tests/LearningProject/Stores/GenerationStateMigrationTests.swift`에 [data-model.md](./data-model.md) 5절의 병합 규칙 이관 테스트를 작성한다 — 기존 진행 정보만 있는 경우, 기존 등록 상태만 있는 경우, 둘 다 있고 프로젝트 식별자가 겹치는 경우
 
 ### 구현
 
-- [ ] T014 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/GenerationStateDTO.swift`에 생성 상태의 저장 표현을 정의한다
-- [ ] T015 [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationStateStore.swift`에 Data 저장 계약을 정의한다
-- [ ] T016 [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`에 단일 키 저장 구현과 기존 두 키의 1회 이관을 구현한다
-- [ ] T017 [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationProgressStore.swift`와 `sources/Projects/Data/LearningProject/Stores/LocalGenerationProgressStore.swift`를 제거한다
-- [ ] T018 [S1] `sources/Projects/Data/LearningProject/DTOs/GenerationProgressDTO.swift`를 제거한다
+- [X] T014 [P] [S1] `sources/Projects/Data/LearningProject/DTOs/GenerationStateDTO.swift`에 생성 상태의 저장 표현을 정의한다
+- [X] T015 [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationStateStore.swift`에 Data 저장 계약을 정의한다
+- [X] T016 [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`에 단일 키 저장 구현과 기존 두 키의 1회 이관을 구현한다
+- [X] T017 [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationProgressStore.swift`와 `sources/Projects/Data/LearningProject/Stores/LocalGenerationProgressStore.swift`를 제거한다
+- [X] T018 [S1] `sources/Projects/Data/LearningProject/DTOs/GenerationProgressDTO.swift`를 제거한다
 
 ### 패키지 검증
 
-- [ ] T019 [no-write] `DataLearningProjectTests`를 실행해 U3을 검증한다
+- [X] T019 [no-write] `DataLearningProjectTests`를 실행해 U3을 검증한다
 
 **진행 점검**: T012~T019의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -267,7 +267,12 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 | 제거한 보장 | 이관처 또는 제거 근거 |
 | --- | --- |
-| (T033·T041에서 작성) | |
+| `LocalGenerationProgressStore` — 저장한 진행 상태를 그대로 조회한다 | `LocalGenerationStateStoreTests` — 저장한 생성 상태를 그대로 다시 불러온다 |
+| `LocalGenerationProgressStore` — 기록한 적이 없으면 nil을 반환한다 | `LocalGenerationStateStoreTests` — 저장한 적이 없으면 빈 상태를 반환한다 |
+| `LocalGenerationProgressStore` — 다시 저장하면 이전 기록을 대체해 1건만 남는다 | `GenerationStateTests` — 같은 프로젝트 식별자를 가진 기록은 하나만 남는다 |
+| `LocalGenerationProgressStore` — 해제하면 조회 결과가 부재로 돌아간다 | `LocalGenerationStateStoreTests` — 빈 상태를 저장하면 다음 불러오기도 빈 상태다 |
+| `LocalGenerationProgressStore` — 앱을 다시 실행해도 저장한 진행 상태가 남아 있다 | `LocalGenerationStateStoreTests` — 앱을 다시 실행해도 저장한 생성 상태가 남아 있다 |
+| (T033·T041에서 계속 작성) | |
 
 ---
 
