@@ -17,13 +17,13 @@ public struct AuthenticationAssembly: Sendable {
         policyDocuments: [PolicyDocument] = [],
         keychainStore: KeychainStore = KeychainStore(),
         policyConsentStore: LocalPolicyConsentStore = LocalPolicyConsentStore(
-            store: UserDefaultsStore(namespace: "com.nexters.hytime.gitit.legalConsent")
+            store: UserDefaultsStore(namespace: PolicyConsentStorageLayout.namespace)
         ),
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
         let accessTokenProvider: @Sendable () async -> String? = {
-            (try? SessionRecordKeychainCoding(keychainStore: keychainStore).load())?.tokens.accessToken
+            (try? SessionRecordCoding(keychainStore: keychainStore).load())?.tokens.accessToken
         }
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let authenticationRemote = HTTPAuthenticationRemote(

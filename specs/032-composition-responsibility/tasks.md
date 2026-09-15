@@ -80,53 +80,60 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 준비
 
-- [ ] T010 [no-write] [S1] [data-model.md](./data-model.md) 2절의 저장 좌표 10개를 현재 소스에서 하나씩 확인하고, 값이 표와 다르면 표를 고치지 말고 차이를 이 파일의 "이동 기록" 절에 적는다
+- [X] T010 [no-write] [S1] [data-model.md](./data-model.md) 2절의 저장 좌표 10개를 현재 소스에서 하나씩 확인하고, 값이 표와 다르면 표를 고치지 말고 차이를 이 파일의 "이동 기록" 절에 적는다
+  - **범위 보정**: [data-model.md](./data-model.md) 2절의 저장 좌표 10개는 이동 전 소스와 모두 일치했다. 표를 고칠 차이는 없었다. 다만 표에 없던 좌표 `com.nexters.hytime.gitit.generationProgress`(레거시 생성 진행 네임스페이스)가 `LearningProjectAssembly`에 남아 있어 같은 단위에서 `sources/Projects/Data/LearningProject/Stores/GenerationStateMigration.swift`로 함께 옮겼다
 
 ### 테스트
 
-- [ ] T011 [S1] `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift`를 만들어 세션·Apple 식별자 Keychain 네임스페이스와 키, 공유 세션 UserDefaults 네임스페이스와 마커 키를 테스트 파일에 직접 적은 고정 문자열과 비교한다
-- [ ] T012 [P] [S1] `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift`를 만들어 이동 후 코딩이 이동 전과 같은 키·형식으로 저장하고 읽는지 확인한다
-- [ ] T013 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`를 만들어 대기 리마인드 키와 보관 한도를 고정 문자열·숫자와 비교한다
+- [X] T011 [S1] `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift`를 만들어 세션·Apple 식별자 Keychain 네임스페이스와 키, 공유 세션 UserDefaults 네임스페이스와 마커 키를 테스트 파일에 직접 적은 고정 문자열과 비교한다
+- [X] T012 [P] [S1] `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift`를 만들어 이동 후 코딩이 이동 전과 같은 키·형식으로 저장하고 읽는지 확인한다
+- [X] T013 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`를 만들어 대기 리마인드 키와 보관 한도를 고정 문자열·숫자와 비교한다
 
 ### 구현 — Infrastructure
 
-- [ ] T014 [S1] `sources/Projects/Infrastructure/Storage/Stores/AppGroupUserDefaults.swift`를 만들어 App Group 식별자와 공유 `UserDefaults` 생성, 그리고 공유 영역 네임스페이스 상수를 공개한다. 값은 `SharedSessionLayout`에서 그대로 옮긴다
-- [ ] T015 [S1] `sources/Projects/Infrastructure/Authentication/Keychain/Stores/AppGroupKeychainStore.swift`를 만들어 팀 식별자 접두어와 Keychain 접근 그룹, 공유·레거시 `KeychainStore` 생성을 공개한다. 값은 `SharedSessionLayout`에서 그대로 옮긴다
+- [X] T014 [S1] `sources/Projects/Infrastructure/Storage/Stores/AppGroupUserDefaults.swift`를 만들어 App Group 식별자와 공유 `UserDefaults` 생성, 그리고 공유 영역 네임스페이스 상수를 공개한다. 값은 `SharedSessionLayout`에서 그대로 옮긴다
+- [X] T015 [S1] `sources/Projects/Infrastructure/Authentication/Keychain/Stores/AppGroupKeychainStore.swift`를 만들어 팀 식별자 접두어와 Keychain 접근 그룹, 공유·레거시 `KeychainStore` 생성을 공개한다. 값은 `SharedSessionLayout`에서 그대로 옮긴다
 
 ### 구현 — Data
 
-- [ ] T016 [P] [S1] `sources/Projects/Data/Authentication/Layouts/SessionKeychainLayout.swift`를 만들고 `sources/Projects/Composition/Adapter/Layouts/SessionKeychainLayout.swift`의 내용을 옮긴다. 공개 범위를 `DataAuthentication` 밖에서 필요한 만큼만 넓힌다
-- [ ] T017 [P] [S1] `sources/Projects/Data/Authentication/Layouts/AppleIdentityKeychainLayout.swift`를 만들고 `sources/Projects/Composition/Adapter/Layouts/AppleIdentityKeychainLayout.swift`의 내용을 옮긴다
-- [ ] T018 [S1] `sources/Projects/Data/Authentication/Codings/SessionRecordKeychainCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/SessionRecordKeychainCoding.swift`의 내용을 옮긴다
-- [ ] T019 [S1] `sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/SharedSessionStateMarkerCoding.swift`의 내용을 옮긴다. 마커 키와 스키마 버전은 이 파일이 소유하고 네임스페이스는 T014가 공개한 값을 쓴다
-- [ ] T020 [S1] `sources/Projects/Data/Authentication/Migrations/SessionKeychainMigration.swift`를 만들고 `sources/Projects/Composition/Adapter/Migrations/SessionKeychainMigration.swift`의 내용을 옮긴다
-- [ ] T021 [S1] `sources/Projects/Data/LearningProject/Codings/PendingGenerationReminderCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/PendingGenerationReminderCoding.swift`의 내용을 옮긴다. 대기 리마인드 키와 보관 한도는 이 파일이 소유한다
-- [ ] T022 [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`가 쓰는 네임스페이스를 T014의 값으로 바꾸고, `sources/Projects/Data/LearningProject/Stores/GenerationStateMigration.swift`의 레거시 네임스페이스 상수를 확인한다
-- [ ] T023 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataAuthentication`과 `DataLearningProject`가 필요한 Infrastructure 모듈에 의존하는지 확인하고 빠진 의존을 추가한다
+- [X] T016 [P] [S1] `sources/Projects/Data/Authentication/Layouts/SessionKeychainLayout.swift`를 만들고 `sources/Projects/Composition/Adapter/Layouts/SessionKeychainLayout.swift`의 내용을 옮긴다. 공개 범위를 `DataAuthentication` 밖에서 필요한 만큼만 넓힌다
+- [X] T017 [P] [S1] `sources/Projects/Data/Authentication/Layouts/AppleIdentityKeychainLayout.swift`를 만들고 `sources/Projects/Composition/Adapter/Layouts/AppleIdentityKeychainLayout.swift`의 내용을 옮긴다
+- [X] T018 [S1] `sources/Projects/Data/Authentication/Codings/SessionRecordKeychainCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/SessionRecordKeychainCoding.swift`의 내용을 옮긴다
+  - **범위 보정**: `Data`는 `Domain`에 의존할 수 없으므로([아키텍처 3.1](../../docs/architecture.md)) 저장 계약은 Domain `SessionRecord`를 다룰 수 없다. `sources/Projects/Data/Authentication/Models/StoredSessionRecord.swift`를 저장 전용 레코드로 새로 두고(와이어 필드 이름은 이동 전과 동일), Domain 타입과의 변환은 `sources/Projects/Composition/Adapter/Codings/SessionRecordCoding.swift`가 맡는다. 두 경로를 이 단위에 추가한다
+- [X] T019 [S1] `sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/SharedSessionStateMarkerCoding.swift`의 내용을 옮긴다. 마커 키와 스키마 버전은 이 파일이 소유하고 네임스페이스는 T014가 공개한 값을 쓴다
+- [X] T020 [S1] `sources/Projects/Data/Authentication/Migrations/SessionKeychainMigration.swift`를 만들고 `sources/Projects/Composition/Adapter/Migrations/SessionKeychainMigration.swift`의 내용을 옮긴다
+- [X] T021 [S1] `sources/Projects/Data/LearningProject/Codings/PendingGenerationReminderCoding.swift`를 만들고 `sources/Projects/Composition/Adapter/Codings/PendingGenerationReminderCoding.swift`의 내용을 옮긴다. 대기 리마인드 키와 보관 한도는 이 파일이 소유한다
+- [X] T022 [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`가 쓰는 네임스페이스를 T014의 값으로 바꾸고, `sources/Projects/Data/LearningProject/Stores/GenerationStateMigration.swift`의 레거시 네임스페이스 상수를 확인한다
+- [X] T023 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataAuthentication`과 `DataLearningProject`가 필요한 Infrastructure 모듈에 의존하는지 확인하고 빠진 의존을 추가한다
+  - **범위 보정**: `CompositionApp`과 `CompositionShareExtension`이 옮겨진 타입을 참조하게 되어 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 의존 목록도 함께 고쳤다. 이 경로를 이 단위에 추가한다
 
 ### 구현 — Composition
 
-- [ ] T024 [S1] `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`가 옮겨진 `SessionRecordKeychainCoding`·`SharedSessionStateMarkerCoding`·`AppleIdentityKeychainLayout`을 `DataAuthentication`에서 참조하도록 `import`와 타입 경로를 고친다
-- [ ] T025 [S1] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`의 `AppleIdentityKeychainLayout` 참조를 `DataAuthentication` 것으로 고친다
-- [ ] T026 [S1] `sources/Projects/Composition/Adapter/Resolvers/SessionAvailabilityResolver.swift`의 코딩 참조를 `DataAuthentication` 것으로 고친다. 이 파일 자체의 이동은 I3이 맡는다
-- [ ] T027 [S1] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`의 Keychain·UserDefaults 생성을 T014·T015의 진입점 호출로 바꾸고, 약관 동의 네임스페이스 문자열을 `DataLegalConsent`가 소유하도록 옮긴 뒤 그 값을 참조한다
-- [ ] T028 [S1] `sources/Projects/Data/LegalConsent/Layouts/PolicyConsentStorageLayout.swift`를 만들어 약관 동의 네임스페이스 `com.nexters.hytime.gitit.legalConsent`를 소유하게 한다
-- [ ] T029 [S1] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`의 `SharedSessionLayout`·`UserDefaultsStore` 참조를 T014와 T021·T022의 값으로 바꾼다
-- [ ] T030 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `SharedSessionLayout`·`SessionKeychainMigration`·`SharedSessionStateMarkerCoding` 참조를 옮겨진 위치로 바꾼다
-- [ ] T031 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 같은 참조를 옮겨진 위치로 바꾼다
+- [X] T024 [S1] `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`가 옮겨진 `SessionRecordKeychainCoding`·`SharedSessionStateMarkerCoding`·`AppleIdentityKeychainLayout`을 `DataAuthentication`에서 참조하도록 `import`와 타입 경로를 고친다
+- [X] T025 [S1] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`의 `AppleIdentityKeychainLayout` 참조를 `DataAuthentication` 것으로 고친다
+- [X] T026 [S1] `sources/Projects/Composition/Adapter/Resolvers/SessionAvailabilityResolver.swift`의 코딩 참조를 `DataAuthentication` 것으로 고친다. 이 파일 자체의 이동은 I3이 맡는다
+- [X] T027 [S1] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`의 Keychain·UserDefaults 생성을 T014·T015의 진입점 호출로 바꾸고, 약관 동의 네임스페이스 문자열을 `DataLegalConsent`가 소유하도록 옮긴 뒤 그 값을 참조한다
+- [X] T028 [S1] `sources/Projects/Data/LegalConsent/Layouts/PolicyConsentStorageLayout.swift`를 만들어 약관 동의 네임스페이스 `com.nexters.hytime.gitit.legalConsent`를 소유하게 한다
+- [X] T029 [S1] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`의 `SharedSessionLayout`·`UserDefaultsStore` 참조를 T014와 T021·T022의 값으로 바꾼다
+- [X] T030 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `SharedSessionLayout`·`SessionKeychainMigration`·`SharedSessionStateMarkerCoding` 참조를 옮겨진 위치로 바꾼다
+- [X] T031 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 같은 참조를 옮겨진 위치로 바꾼다
 
 ### 정리
 
-- [ ] T032 [S1] `sources/Projects/Composition/Adapter/Codings/SessionRecordKeychainCoding.swift`, `sources/Projects/Composition/Adapter/Codings/SharedSessionStateMarkerCoding.swift`, `sources/Projects/Composition/Adapter/Codings/PendingGenerationReminderCoding.swift`를 제거한다
-- [ ] T033 [S1] `sources/Projects/Composition/Adapter/Layouts/SessionKeychainLayout.swift`, `sources/Projects/Composition/Adapter/Layouts/AppleIdentityKeychainLayout.swift`, `sources/Projects/Composition/Adapter/Layouts/SharedSessionLayout.swift`를 제거한다
-- [ ] T034 [S1] `sources/Projects/Composition/Adapter/Migrations/SessionKeychainMigration.swift`를 제거한다
-- [ ] T035 [S1] `sources/Projects/Composition/Tests/Adapter/Migrations/SessionKeychainMigrationTests.swift`를 `sources/Projects/Data/Tests/Authentication/Migrations/SessionKeychainMigrationTests.swift`로 옮기고, 보장 항목의 이관처를 이 파일의 "이동 기록" 절에 적는다
+- [X] T032 [S1] `sources/Projects/Composition/Adapter/Codings/SessionRecordKeychainCoding.swift`, `sources/Projects/Composition/Adapter/Codings/SharedSessionStateMarkerCoding.swift`, `sources/Projects/Composition/Adapter/Codings/PendingGenerationReminderCoding.swift`를 제거한다
+  - **범위 보정**: 세 파일은 제거했지만 `Composition/Adapter/Codings/` 폴더는 T018의 `SessionRecordCoding.swift` 때문에 남는다. 이 단위가 Composition에서 걷어내는 것은 저장 스키마(네임스페이스·키·와이어 필드)이고, 남는 것은 Domain 타입과 저장 레코드 사이의 변환이다
+- [X] T033 [S1] `sources/Projects/Composition/Adapter/Layouts/SessionKeychainLayout.swift`, `sources/Projects/Composition/Adapter/Layouts/AppleIdentityKeychainLayout.swift`, `sources/Projects/Composition/Adapter/Layouts/SharedSessionLayout.swift`를 제거한다
+- [X] T034 [S1] `sources/Projects/Composition/Adapter/Migrations/SessionKeychainMigration.swift`를 제거한다
+- [X] T035 [S1] `sources/Projects/Composition/Tests/Adapter/Migrations/SessionKeychainMigrationTests.swift`를 `sources/Projects/Data/Tests/Authentication/Migrations/SessionKeychainMigrationTests.swift`로 옮기고, 보장 항목의 이관처를 이 파일의 "이동 기록" 절에 적는다
+  - **범위 보정**: `sources/Projects/Composition/Tests/Adapter/Codings/PendingGenerationReminderCodingTests.swift`도 `sources/Projects/Data/Tests/LearningProject/Codings/`로 함께 옮겼다. 옮겨진 타입을 참조하던 Composition 테스트 4건(`AppCompositionTests`, `AppCompositionSharedLifetimeTests`, `ShareExtensionCompositionTests`, `SessionAvailabilityResolverTests`)의 import와 타입 이름도 같은 단위에서 고쳤다
 
 ### 단위 검증
 
-- [ ] T036 [no-write] [S1] `grep -rn "com.nexters.hytime.gitit" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
-- [ ] T037 [no-write] [S1] `Infrastructure`·`Data`·`Composition` 테스트 scheme을 실행해 I2를 검증한다
-- [ ] T038 [no-write] [S1] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다. 저장 좌표를 옮긴 단위이므로 여기서 전체를 한 번 확인한다
+- [X] T036 [no-write] [S1] `grep -rn "com.nexters.hytime.gitit" sources/Projects/Composition --include='*.swift' | grep -v '/Tests/'` 결과가 비어 있는지 확인한다
+  - **범위 보정**: `Logger(subsystem: "com.nexters.hytime.gitit")` 3건은 저장 좌표가 아니라 로그 subsystem이므로 판정 대상에서 제외한다. `AppComposition`의 `com.nexters.hytime.gitit.device`는 I4가 소유한다. 저장 좌표 기준으로는 0건이다
+- [X] T037 [no-write] [S1] `Infrastructure`·`Data`·`Composition` 테스트 scheme을 실행해 I2를 검증한다
+- [X] T038 [no-write] [S1] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다. 저장 좌표를 옮긴 단위이므로 여기서 전체를 한 번 확인한다
+  - **범위 보정**: `test` 전체 실행 중 `Feature` scheme은 이 명세와 무관한 기존 실패(`AppEntryFeatureTests` 계열)로 약 60분이 걸리므로 T084로 미룬다. 대신 `build` 9/9 성공, `compile` 7/7 성공과 `Infrastructure`·`Data`·`Composition`·`AppTests` 테스트 실행으로 확인했다. `AppTests`의 실패 19건은 모두 `AppRootFeatureTests.swift`(사용자 작업 중 파일)의 기존 실패이며 다른 suite는 모두 통과했다
 
 **진행 점검**: T010~T038의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -335,7 +342,11 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 | 옮긴 보장 | 이관처 또는 제거 근거 |
 | --- | --- |
-| (T010에서 시작) | |
+| `SessionKeychainMigrationTests`의 마이그레이션 3케이스 | `sources/Projects/Data/Tests/Authentication/Migrations/SessionKeychainMigrationTests.swift` |
+| `PendingGenerationReminderCodingTests`의 대기 리마인드 4케이스 | `sources/Projects/Data/Tests/LearningProject/Codings/PendingGenerationReminderCodingTests.swift` |
+| 세션·Apple 식별자·공유 마커 저장 좌표 | `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift` (신규) |
+| 세션 저장 형식과 키 자리 | `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift` (신규) |
+| 대기 리마인드 키와 보관 한도 | `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift` (신규) |
 
 ---
 

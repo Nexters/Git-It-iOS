@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import CompositionAdapter
+@testable import DataAuthentication
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
 
@@ -97,7 +98,7 @@ struct SessionAvailabilityResolverTests {
             accessToken: String,
             expiresAt: Date?,
         ) throws {
-            try SessionRecordKeychainCoding(keychainStore: keychainStore).save(
+            try SessionRecordCoding(keychainStore: keychainStore).save(
                 SessionRecord(
                     tokens: SessionTokens(
                         accessToken: accessToken,

@@ -9,17 +9,20 @@ public struct SharedSessionStateMarkerCoding: Sendable {
 
     public init(userDefaults: UserDefaults) {
         store = UserDefaultsStore<Marker>(
-            namespace: SharedSessionLayout.namespace,
+            namespace: AppGroupUserDefaults.sharedSessionNamespace,
             userDefaults: userDefaults,
         )
     }
 
     // MARK: Public
 
+    public static let stateMarkerKey = "stateMarker"
+    public static let markerSchemaVersion = 1
+
     public func loadSignedInState() async -> Bool? {
         guard
-            let marker = await store.value(forKey: SharedSessionLayout.stateMarkerKey),
-            marker.schemaVersion == SharedSessionLayout.markerSchemaVersion
+            let marker = await store.value(forKey: Self.stateMarkerKey),
+            marker.schemaVersion == Self.markerSchemaVersion
         else { return nil }
         return marker.isSignedIn
     }
@@ -30,11 +33,11 @@ public struct SharedSessionStateMarkerCoding: Sendable {
     ) async {
         await store.store(
             Marker(
-                schemaVersion: SharedSessionLayout.markerSchemaVersion,
+                schemaVersion: Self.markerSchemaVersion,
                 isSignedIn: isSignedIn,
                 updatedAt: updatedAt,
             ),
-            forKey: SharedSessionLayout.stateMarkerKey,
+            forKey: Self.stateMarkerKey,
         )
     }
 

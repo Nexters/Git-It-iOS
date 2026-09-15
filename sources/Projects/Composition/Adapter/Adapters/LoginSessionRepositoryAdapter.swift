@@ -2,6 +2,7 @@ import DataAuthentication
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
+import InfrastructureStorage
 
 // MARK: - LoginSessionRepositoryAdapter
 
@@ -12,13 +13,13 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     init(
         remote: HTTPAuthenticationRemote,
         keychainStore: KeychainStore,
-        sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = SharedSessionLayout.makeSharedDefaults()
+        sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = AppGroupUserDefaults.makeShared()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
     ) {
         self.remote = remote
         self.keychainStore = keychainStore
         self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding
-        sessionCoding = SessionRecordKeychainCoding(keychainStore: keychainStore)
+        sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -108,7 +109,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     private let remote: HTTPAuthenticationRemote
     private let keychainStore: KeychainStore
-    private let sessionCoding: SessionRecordKeychainCoding
+    private let sessionCoding: SessionRecordCoding
     private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?
 
     private func recordSharedSessionState(isSignedIn: Bool) async {

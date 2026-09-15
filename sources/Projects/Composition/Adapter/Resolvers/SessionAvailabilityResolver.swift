@@ -1,3 +1,4 @@
+import DataAuthentication
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
@@ -14,7 +15,7 @@ public struct SessionAvailabilityResolver: Sendable {
         now: @escaping @Sendable () -> Date = { Date() },
     ) {
         self.markerCoding = markerCoding
-        sessionCoding = SessionRecordKeychainCoding(keychainStore: keychainStore)
+        sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
         self.now = now
     }
 
@@ -41,7 +42,7 @@ public struct SessionAvailabilityResolver: Sendable {
     // MARK: Private
 
     private let markerCoding: SharedSessionStateMarkerCoding
-    private let sessionCoding: SessionRecordKeychainCoding
+    private let sessionCoding: SessionRecordCoding
     private let now: @Sendable () -> Date
 
 }

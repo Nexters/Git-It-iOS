@@ -1,9 +1,12 @@
 import CompositionAdapter
+import DataAuthentication
+import DataLearningProject
 import DomainLearningProject
 import Foundation
 import InfrastructureAuthentication
 import InfrastructureLocalNotification
 import InfrastructureNetworkClient
+import InfrastructureStorage
 
 // MARK: - ShareExtensionComposition
 
@@ -58,8 +61,8 @@ public struct ShareExtensionComposition: Sendable {
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = SharedSessionLayout.makeSharedKeychainStore(),
-        sharedDefaults: UserDefaults? = SharedSessionLayout.makeSharedDefaults(),
+        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
+        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
         transport: (any HTTPTransport)? = nil,
     ) -> ShareExtensionComposition {

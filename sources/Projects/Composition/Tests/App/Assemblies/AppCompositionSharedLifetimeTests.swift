@@ -4,6 +4,7 @@ import Foundation
 import Testing
 
 @testable import CompositionAdapter
+@testable import DataAuthentication
 @testable import CompositionApp
 @testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
@@ -14,7 +15,7 @@ struct AppCompositionSharedLifetimeTests {
     @Test
     func `LearningProject와 Member 보호 Remote가 같은 access token을 사용한다`() async throws {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordKeychainCoding(keychainStore: keychainStore).save(SessionRecord(
+        try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
             tokens: SessionTokens(
                 accessToken: "shared-access-token",
                 refreshToken: "refresh-1",

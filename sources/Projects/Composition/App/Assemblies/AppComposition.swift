@@ -1,4 +1,5 @@
 import CompositionAdapter
+import DataAuthentication
 import DataExternalRepository
 import DomainAuthentication
 import DomainLearningProject
@@ -7,8 +8,9 @@ import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
 import InfrastructurePushMessaging
-import os
+import InfrastructureStorage
 import Synchronization
+import os
 
 // MARK: - AppComposition
 
@@ -66,7 +68,7 @@ public struct AppComposition: Sendable {
 
         let trackGeneration = learningProject.trackGeneration
         let startObservingGenerationState = generationReminder.startObservingGenerationState
-        let markerCoding = SharedSessionLayout.makeSharedDefaults()
+        let markerCoding = AppGroupUserDefaults.makeShared()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:))
         let hasStoredSession: @Sendable () async -> Bool = {
             await authentication.accessTokenProvider() != nil
@@ -165,12 +167,12 @@ public struct AppComposition: Sendable {
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = SharedSessionLayout.makeSharedKeychainStore(),
+        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
         SessionKeychainMigration(
             sharedKeychainStore: keychainStore,
-            legacyKeychainStore: SharedSessionLayout.makeLegacyKeychainStore(),
+            legacyKeychainStore: AppGroupKeychainStore.makeLegacy(),
         )()
 
         let authentication = AuthenticationAssembly(

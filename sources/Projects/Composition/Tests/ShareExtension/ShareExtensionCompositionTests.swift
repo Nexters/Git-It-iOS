@@ -1,6 +1,8 @@
 import Foundation
 import Testing
 @testable import CompositionAdapter
+@testable import DataLearningProject
+@testable import DataAuthentication
 @testable import CompositionShareExtension
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
@@ -97,7 +99,7 @@ struct ShareExtensionCompositionTests {
         }
 
         func saveSession(accessToken: String) throws {
-            try SessionRecordKeychainCoding(keychainStore: keychainStore).save(
+            try SessionRecordCoding(keychainStore: keychainStore).save(
                 SessionRecord(
                     tokens: SessionTokens(
                         accessToken: accessToken,

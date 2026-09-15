@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-@testable import CompositionAdapter
-@testable import DomainAuthentication
+@testable import DataAuthentication
 @testable import InfrastructureAuthentication
 
 // MARK: - SessionKeychainMigrationTests
@@ -16,7 +15,7 @@ struct SessionKeychainMigrationTests {
         let backend = KeychainStore.InMemoryBackend()
         let shared = KeychainStore(
             backend: backend,
-            accessGroup: SharedSessionLayout.keychainAccessGroup,
+            accessGroup: AppGroupKeychainStore.accessGroup,
         )
         let legacy = KeychainStore(backend: backend)
         try SessionRecordKeychainCoding(keychainStore: legacy).save(Self.record(accessToken: "legacy-token"))
@@ -27,7 +26,7 @@ struct SessionKeychainMigrationTests {
         )()
 
         #expect(outcome == .migrated)
-        #expect(try SessionRecordKeychainCoding(keychainStore: shared).load()?.tokens.accessToken == "legacy-token")
+        #expect(try SessionRecordKeychainCoding(keychainStore: shared).load()?.accessToken == "legacy-token")
         #expect(try SessionRecordKeychainCoding(keychainStore: legacy).load() == nil)
     }
 
@@ -36,7 +35,7 @@ struct SessionKeychainMigrationTests {
         let backend = KeychainStore.InMemoryBackend()
         let shared = KeychainStore(
             backend: backend,
-            accessGroup: SharedSessionLayout.keychainAccessGroup,
+            accessGroup: AppGroupKeychainStore.accessGroup,
         )
         let legacy = KeychainStore(backend: backend)
         try SessionRecordKeychainCoding(keychainStore: shared).save(Self.record(accessToken: "shared-token"))
@@ -48,8 +47,8 @@ struct SessionKeychainMigrationTests {
         )()
 
         #expect(outcome == .alreadyMigrated)
-        #expect(try SessionRecordKeychainCoding(keychainStore: shared).load()?.tokens.accessToken == "shared-token")
-        #expect(try SessionRecordKeychainCoding(keychainStore: legacy).load()?.tokens.accessToken == "legacy-token")
+        #expect(try SessionRecordKeychainCoding(keychainStore: shared).load()?.accessToken == "shared-token")
+        #expect(try SessionRecordKeychainCoding(keychainStore: legacy).load()?.accessToken == "legacy-token")
     }
 
     @Test
@@ -57,7 +56,7 @@ struct SessionKeychainMigrationTests {
         let backend = KeychainStore.InMemoryBackend()
         let shared = KeychainStore(
             backend: backend,
-            accessGroup: SharedSessionLayout.keychainAccessGroup,
+            accessGroup: AppGroupKeychainStore.accessGroup,
         )
         let legacy = KeychainStore(backend: backend)
 
@@ -73,19 +72,15 @@ struct SessionKeychainMigrationTests {
 
     // MARK: Private
 
-    private static func record(accessToken: String) -> SessionRecord {
-        SessionRecord(
-            tokens: SessionTokens(
-                accessToken: accessToken,
-                refreshToken: "refresh",
-                accessTokenExpiresAt: nil,
-                refreshTokenExpiresAt: nil,
-            ),
-            onboarding: LocalOnboardingState(
-                needsCuration: false,
-                acceptedLegalVersions: [],
-                acceptedAt: nil,
-            ),
+    private static func record(accessToken: String) -> StoredSessionRecord {
+        StoredSessionRecord(
+            accessToken: accessToken,
+            refreshToken: "refresh",
+            accessTokenExpiresAt: nil,
+            refreshTokenExpiresAt: nil,
+            needsCuration: false,
+            acceptedLegalVersions: [],
+            acceptedAt: nil,
         )
     }
 

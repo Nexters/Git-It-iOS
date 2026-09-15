@@ -9,12 +9,15 @@ public struct PendingGenerationReminderCoding: Sendable {
 
     public init(userDefaults: UserDefaults) {
         store = UserDefaultsStore<[Entry]>(
-            namespace: SharedSessionLayout.namespace,
+            namespace: AppGroupUserDefaults.sharedSessionNamespace,
             userDefaults: userDefaults,
         )
     }
 
     // MARK: Public
+
+    public static let pendingGenerationRemindersKey = "pendingGenerationReminders"
+    public static let pendingReminderLimit = 32
 
     public func append(
         projectID: String,
@@ -28,19 +31,19 @@ public struct PendingGenerationReminderCoding: Sendable {
                 requestedAt: requestedAt,
             )
         )
-        if entries.count > SharedSessionLayout.pendingReminderLimit {
-            entries.removeFirst(entries.count - SharedSessionLayout.pendingReminderLimit)
+        if entries.count > Self.pendingReminderLimit {
+            entries.removeFirst(entries.count - Self.pendingReminderLimit)
         }
         await store.store(
             entries,
-            forKey: SharedSessionLayout.pendingGenerationRemindersKey,
+            forKey: Self.pendingGenerationRemindersKey,
         )
     }
 
     public func drainProjectIDs() async -> [String] {
         let entries = await loadEntries()
         guard !entries.isEmpty else { return [] }
-        await store.removeValue(forKey: SharedSessionLayout.pendingGenerationRemindersKey)
+        await store.removeValue(forKey: Self.pendingGenerationRemindersKey)
         return entries.map(\.projectID)
     }
 
@@ -54,7 +57,7 @@ public struct PendingGenerationReminderCoding: Sendable {
     private let store: UserDefaultsStore<[Entry]>
 
     private func loadEntries() async -> [Entry] {
-        await store.value(forKey: SharedSessionLayout.pendingGenerationRemindersKey) ?? []
+        await store.value(forKey: Self.pendingGenerationRemindersKey) ?? []
     }
 
 }

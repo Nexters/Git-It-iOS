@@ -15,6 +15,7 @@ public struct GenerationStateMigration: Sendable {
 
     // MARK: Public
 
+    public static let legacyProgressNamespace = "com.nexters.hytime.gitit.generationProgress"
     public static let legacyProgressKey = "progress"
     public static let legacyCreationStateKey = "repositoryCreationStates"
 

@@ -15,7 +15,7 @@ public struct LearningProjectAssembly: Sendable {
         accessTokenProvider: @escaping @Sendable () async -> String?,
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
-        sharedDefaults: UserDefaults? = SharedSessionLayout.makeSharedDefaults(),
+        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let projectRepository = LearningProjectRepositoryAdapter(
@@ -36,11 +36,11 @@ public struct LearningProjectAssembly: Sendable {
         let trackGeneration = TrackGeneration(
             stateRepository: GenerationStateRepositoryAdapter(
                 store: LocalGenerationStateStore(
-                    store: UserDefaultsStore(namespace: SharedSessionLayout.namespace, userDefaults: defaults),
+                    store: UserDefaultsStore(namespace: AppGroupUserDefaults.sharedSessionNamespace, userDefaults: defaults),
                     migration: GenerationStateMigration(
-                        legacyProgressStore: UserDefaultsStore(namespace: Self.legacyProgressNamespace),
+                        legacyProgressStore: UserDefaultsStore(namespace: GenerationStateMigration.legacyProgressNamespace),
                         legacyCreationStateStore: UserDefaultsStore(
-                            namespace: SharedSessionLayout.namespace,
+                            namespace: AppGroupUserDefaults.sharedSessionNamespace,
                             userDefaults: defaults,
                         ),
                     ),
@@ -84,9 +84,5 @@ public struct LearningProjectAssembly: Sendable {
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
     public let trackGeneration: any TrackGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
-
-    // MARK: Private
-
-    private static let legacyProgressNamespace = "com.nexters.hytime.gitit.generationProgress"
 
 }

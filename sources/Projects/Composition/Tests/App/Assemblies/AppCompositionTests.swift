@@ -4,6 +4,7 @@ import Foundation
 import Testing
 
 @testable import CompositionAdapter
+@testable import DataAuthentication
 @testable import CompositionApp
 @testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
@@ -14,7 +15,7 @@ struct AppCompositionTests {
     @Test
     func `completeCuration은 Member graph와 같은 공유 세션 access token으로 요청한다`() async throws {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordKeychainCoding(keychainStore: keychainStore).save(SessionRecord(
+        try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
             tokens: SessionTokens(
                 accessToken: "shared-access-token",
                 refreshToken: "refresh-1",

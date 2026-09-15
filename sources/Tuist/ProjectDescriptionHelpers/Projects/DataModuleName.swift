@@ -45,6 +45,7 @@ extension DataModuleName {
                 dependencies: [
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -55,6 +56,10 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataAuthentication.rawValue
                 ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
+                ],
             )
 
         case .DataLearningProject:

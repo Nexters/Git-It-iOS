@@ -1,6 +1,8 @@
+import DataLearningProject
 import DomainLearningProject
 import Foundation
 import InfrastructureLocalNotification
+import InfrastructureStorage
 
 // MARK: - GenerationReminderAssembly
 
@@ -10,7 +12,7 @@ public struct GenerationReminderAssembly: Sendable {
 
     public init(
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
-        pendingReminderCoding: PendingGenerationReminderCoding? = SharedSessionLayout.makeSharedDefaults()
+        pendingReminderCoding: PendingGenerationReminderCoding? = AppGroupUserDefaults.makeShared()
             .map(PendingGenerationReminderCoding.init(userDefaults:)),
     ) {
         let coordinator = GenerationCompletionReminderCoordinator(

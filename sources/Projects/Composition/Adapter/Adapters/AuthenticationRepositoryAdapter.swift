@@ -1,3 +1,4 @@
+import DataAuthentication
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication

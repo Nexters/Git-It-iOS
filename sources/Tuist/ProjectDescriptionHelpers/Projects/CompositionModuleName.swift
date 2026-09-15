@@ -66,9 +66,11 @@ extension CompositionModuleName {
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromDomain(.DomainMember),
+                    .fromData(.DataAuthentication),
                     .fromData(.DataExternalRepository),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                     .fromInfrastructure(.InfrastructurePushMessaging),
                 ],
             )
@@ -92,8 +94,11 @@ extension CompositionModuleName {
                 dependencies: [
                     .target(name: CompositionModuleName.CompositionAdapter.rawValue),
                     .fromDomain(.DomainLearningProject),
+                    .fromData(.DataAuthentication),
+                    .fromData(.DataLearningProject),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                     .fromInfrastructure(.InfrastructureLocalNotification),
                 ],
             )

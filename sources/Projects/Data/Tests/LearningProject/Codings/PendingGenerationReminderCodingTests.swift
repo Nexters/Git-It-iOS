@@ -1,6 +1,7 @@
 import Foundation
 import Testing
-@testable import CompositionAdapter
+@testable import DataLearningProject
+@testable import InfrastructureStorage
 
 // MARK: - PendingGenerationReminderCodingTests
 
@@ -36,14 +37,14 @@ struct PendingGenerationReminderCodingTests {
     func `상한을 넘으면 오래된 항목부터 버린다`() async throws {
         let userDefaults = try Self.makeUserDefaults()
         let coding = PendingGenerationReminderCoding(userDefaults: userDefaults)
-        let overflow = SharedSessionLayout.pendingReminderLimit + 2
+        let overflow = PendingGenerationReminderCoding.pendingReminderLimit + 2
 
         for index in 0 ..< overflow {
             await coding.append(projectID: "project-\(index)")
         }
 
         let drained = await coding.drainProjectIDs()
-        #expect(drained.count == SharedSessionLayout.pendingReminderLimit)
+        #expect(drained.count == PendingGenerationReminderCoding.pendingReminderLimit)
         #expect(drained.first == "project-2")
         #expect(drained.last == "project-\(overflow - 1)")
     }
@@ -53,7 +54,7 @@ struct PendingGenerationReminderCodingTests {
         let userDefaults = try Self.makeUserDefaults()
         userDefaults.set(
             Data([0xFF, 0xFE]),
-            forKey: "\(SharedSessionLayout.namespace).\(SharedSessionLayout.pendingGenerationRemindersKey)",
+            forKey: "\(AppGroupUserDefaults.sharedSessionNamespace).\(PendingGenerationReminderCoding.pendingGenerationRemindersKey)",
         )
         let coding = PendingGenerationReminderCoding(userDefaults: userDefaults)
 
