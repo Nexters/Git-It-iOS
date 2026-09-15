@@ -5,11 +5,14 @@ import Testing
 @testable import DataAuthentication
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
+@testable import InfrastructureNetworkClient
 
 // MARK: - AuthenticationRepositoryAdapterTests
 
 @Suite("AuthenticationRepositoryAdapter", .serialized)
 struct AuthenticationRepositoryAdapterTests {
+
+    // MARK: Internal
 
     @Test
     func `저장된 사용자가 없으면 재인증이 필요하다고 판정한다`() async throws {
@@ -35,7 +38,7 @@ struct AuthenticationRepositoryAdapterTests {
             keychainStore: keychainStore,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
-            remote: StubAuthenticationRemote(),
+            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
             keychainStore: keychainStore,
         )
         let restoreSession = RestoreSession(
@@ -56,10 +59,18 @@ struct AuthenticationRepositoryAdapterTests {
             for: AppleIdentityKeychainLayout.Key.appleUserID.rawValue,
             in: AppleIdentityKeychainLayout.namespace,
         )
-        let remote = StubAuthenticationRemote(appleLoginResult: .success(
-            LoginResponseDTO(accessToken: "access-1", refreshToken: "refresh-1", needsCuration: false)
-        ))
-        let loginSessionRepository = LoginSessionRepositoryAdapter(remote: remote, keychainStore: keychainStore)
+        let transport = RecordingHTTPTransport(results: [
+            jsonResponse(
+                statusCode: 200,
+                envelope: #"""
+                    {"success":true,"data":{"accessToken":"access-1","refreshToken":"refresh-1","needsCuration":false},"code":null,"message":null,"errors":null}
+                    """#,
+            )
+        ])
+        let loginSessionRepository = LoginSessionRepositoryAdapter(
+            remote: makeRemote(transport: transport),
+            keychainStore: keychainStore,
+        )
         _ = try await loginSessionRepository.start(with: AuthenticationGrant(
             id: .init(rawValue: "id-token-1"),
             method: .apple,
@@ -81,35 +92,24 @@ struct AuthenticationRepositoryAdapterTests {
         #expect(restored == nil)
     }
 
-}
-
-// MARK: - StubAuthenticationRemote
-
-private actor StubAuthenticationRemote: AuthenticationRemote {
-
-    // MARK: Lifecycle
-
-    init(
-        appleLoginResult: Result<LoginResponseDTO, DataAuthenticationError> = .failure(.unexpectedStatus),
-        verifyAccessTokenResult: Result<Void, DataAuthenticationError> = .success(()),
-    ) {
-        self.appleLoginResult = appleLoginResult
-        self.verifyAccessTokenResult = verifyAccessTokenResult
-    }
-
-    // MARK: Internal
-
-    func appleLogin(idToken _: String) async throws -> LoginResponseDTO {
-        try appleLoginResult.get()
-    }
-
-    func verifyAccessToken() async throws {
-        try verifyAccessTokenResult.get()
-    }
-
     // MARK: Private
 
-    private let appleLoginResult: Result<LoginResponseDTO, DataAuthenticationError>
-    private let verifyAccessTokenResult: Result<Void, DataAuthenticationError>
+    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPAuthenticationRemote {
+        HTTPAuthenticationRemote(
+            client: HTTPClient(
+                baseURL: URL(string: "https://api.git-it.example.com")!,
+                bodyCoding: StandardJSONBodyCoding(),
+                transport: transport,
+            ),
+            accessTokenProvider: { nil },
+        )
+    }
+
+    private func jsonResponse(
+        statusCode: Int,
+        envelope: String,
+    ) -> HTTPTransportResponse {
+        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+    }
 
 }

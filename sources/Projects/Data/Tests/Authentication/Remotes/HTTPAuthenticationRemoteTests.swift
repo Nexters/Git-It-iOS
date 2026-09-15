@@ -25,11 +25,29 @@ struct HTTPAuthenticationRemoteTests {
 
         #expect(response.accessToken == "access")
         #expect(response.refreshToken == "refresh")
+        #expect(!response.needsCuration)
         let request = await transport.recordedRequests.first
         #expect(request?.url.path == "/api/v1/auth/login/apple")
         let body = try #require(request?.body)
         let decodedBody = try #require(JSONSerialization.jsonObject(with: body) as? [String: String])
         #expect(decodedBody["idToken"] == "apple-id-token")
+    }
+
+    @Test
+    func `큐레이션이 필요한 응답의 needsCuration을 참으로 해석한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"""
+                    {"success":true,"data":{"accessToken":"access","refreshToken":"refresh","needsCuration":true},"code":null,"message":null,"errors":null}
+                    """#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        let response = try await remote.appleLogin(idToken: "apple-id-token")
+
+        #expect(response.needsCuration)
     }
 
     @Test

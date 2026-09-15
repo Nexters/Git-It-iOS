@@ -8,7 +8,7 @@ struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
 
     // MARK: Lifecycle
 
-    init(store: any PolicyConsentStore) {
+    init(store: LocalPolicyConsentStore) {
         self.store = store
     }
 
@@ -30,7 +30,7 @@ struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
 
     // MARK: Private
 
-    private let store: any PolicyConsentStore
+    private let store: LocalPolicyConsentStore
 
     private func domainRecord(from dto: PolicyConsentRecordDTO) -> PolicyConsentRecord {
         PolicyConsentRecord(

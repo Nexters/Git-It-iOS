@@ -16,7 +16,7 @@ public struct AuthenticationAssembly: Sendable {
         baseURL: URL,
         policyDocuments: [PolicyDocument] = [],
         keychainStore: KeychainStore = KeychainStore(),
-        policyConsentStore: any PolicyConsentStore = LocalPolicyConsentStore(
+        policyConsentStore: LocalPolicyConsentStore = LocalPolicyConsentStore(
             store: UserDefaultsStore(namespace: "com.nexters.hytime.gitit.legalConsent")
         ),
         transport: (any HTTPTransport)? = nil,

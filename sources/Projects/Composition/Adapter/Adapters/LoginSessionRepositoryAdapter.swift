@@ -10,7 +10,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     // MARK: Lifecycle
 
     init(
-        remote: AuthenticationRemote,
+        remote: HTTPAuthenticationRemote,
         keychainStore: KeychainStore,
         sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = SharedSessionLayout.makeSharedDefaults()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
@@ -106,7 +106,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     private typealias AppleIdentityKey = AppleIdentityKeychainLayout.Key
 
-    private let remote: AuthenticationRemote
+    private let remote: HTTPAuthenticationRemote
     private let keychainStore: KeychainStore
     private let sessionCoding: SessionRecordKeychainCoding
     private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?

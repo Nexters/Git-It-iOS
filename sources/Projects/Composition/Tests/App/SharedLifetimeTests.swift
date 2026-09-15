@@ -6,11 +6,14 @@ import Testing
 @testable import DataAuthentication
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
+@testable import InfrastructureNetworkClient
 
 // MARK: - SharedLifetimeTests
 
 @Suite("공유 수명 객체", .serialized)
 struct SharedLifetimeTests {
+
+    // MARK: Internal
 
     @Test
     func `같은 KeychainStore를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
@@ -21,7 +24,7 @@ struct SharedLifetimeTests {
             keychainStore: sharedKeychainStore,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
-            remote: StubAuthenticationRemote(),
+            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
             keychainStore: sharedKeychainStore,
         )
 
@@ -38,14 +41,17 @@ struct SharedLifetimeTests {
         try await loginSessionRepository.signOut()
     }
 
-}
+    // MARK: Private
 
-// MARK: - StubAuthenticationRemote
-
-private actor StubAuthenticationRemote: AuthenticationRemote {
-    func appleLogin(idToken _: String) async throws -> LoginResponseDTO {
-        throw DataAuthenticationError.unexpectedStatus
+    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPAuthenticationRemote {
+        HTTPAuthenticationRemote(
+            client: HTTPClient(
+                baseURL: URL(string: "https://api.git-it.example.com")!,
+                bodyCoding: StandardJSONBodyCoding(),
+                transport: transport,
+            ),
+            accessTokenProvider: { nil },
+        )
     }
 
-    func verifyAccessToken() async throws { }
 }

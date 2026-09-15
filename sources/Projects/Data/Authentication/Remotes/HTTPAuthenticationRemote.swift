@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPAuthenticationRemote
 
-public struct HTTPAuthenticationRemote: AuthenticationRemote {
+public struct HTTPAuthenticationRemote: Sendable {
 
     // MARK: Lifecycle
 

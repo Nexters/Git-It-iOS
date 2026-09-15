@@ -65,34 +65,36 @@
 
 ### 준비
 
-- [ ] T006 [no-write] [S2] Data 테스트의 검증 항목 수 기준선을 측정한다 — `find sources/Projects/Data -path "*/Tests/*" -name "*.swift" -print0 | xargs -0 grep -hE "#expect|#require" | wc -l`. 값을 이 파일의 "기준선 기록" 절에 적는다
+- [X] T006 [no-write] [S2] Data 테스트의 검증 항목 수 기준선을 측정한다 — `find sources/Projects/Data -path "*/Tests/*" -name "*.swift" -print0 | xargs -0 grep -hE "#expect|#require" | wc -l`. 값을 이 파일의 "기준선 기록" 절에 적는다
 
 ### 테스트
 
-- [ ] T007 [S2] `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift`에 `AuthenticationRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T008 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift`에 `PolicyConsentStore` 계약이 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
-- [ ] T009 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/AuthenticationRepositoryAdapterTests.swift`를 `HTTPAuthenticationRemote` + `StubHTTPTransport` 구성으로 바꾼다
-- [ ] T010 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LoginSessionRepositoryAdapterTests.swift`를 `HTTPAuthenticationRemote` + `StubHTTPTransport` 구성으로 바꾼다
-- [ ] T011 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/PolicyConsentRepositoryAdapterTests.swift`를 `LocalPolicyConsentStore` + 격리된 `UserDefaults` suite 구성으로 바꾼다
-- [ ] T012 [S2] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`에서 `AuthenticationRemote` 참조를 구체 타입 기준으로 바꾼다
+- [X] T007 [S2] `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift`에 `AuthenticationRemoteContractTests.swift`가 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T008 [P] [S2] `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift`에 `PolicyConsentStore` 계약이 보장하던 항목 중 구현 테스트에 없는 것을 추가한다
+- [X] T009 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/AuthenticationRepositoryAdapterTests.swift`를 `HTTPAuthenticationRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T010 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/LoginSessionRepositoryAdapterTests.swift`를 `HTTPAuthenticationRemote` + `StubHTTPTransport` 구성으로 바꾼다
+- [X] T011 [S2] `sources/Projects/Composition/Tests/Adapter/Adapters/PolicyConsentRepositoryAdapterTests.swift`를 `LocalPolicyConsentStore` + 격리된 `UserDefaults` suite 구성으로 바꾼다
+- [X] T012 [S2] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`에서 `AuthenticationRemote` 참조를 구체 타입 기준으로 바꾸고, 같은 target에서 쓸 전송 계층 더블 `sources/Projects/Composition/Tests/App/TestDoubles/RecordingHTTPTransport.swift`를 추가한다. 경로 추가 근거: `CompositionAppTests`의 소스 범위는 `Tests/App/**`이라 `Tests/Adapter/TestDoubles`의 같은 이름 더블이 보이지 않는다
 
 ### 구현
 
-- [ ] T013 [S2] `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`가 `AuthenticationRemote` 채택을 떼고, Composition이 받을 수 있도록 타입과 메서드의 공개 범위를 확인한다
-- [ ] T014 [P] [S2] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`가 `PolicyConsentStore` 채택을 떼고 공개 범위를 확인한다
-- [ ] T015 [S2] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAuthenticationRemote`로 바꾼다
-- [ ] T016 [S2] `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAuthenticationRemote`로 바꾼다
-- [ ] T017 [S2] `sources/Projects/Composition/Adapter/Adapters/PolicyConsentRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `LocalPolicyConsentStore`로 바꾼다
-- [ ] T018 [S2] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`의 `policyConsentStore` 인자 타입을 `LocalPolicyConsentStore`로 바꾼다
+- [X] T013 [S2] `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`가 `AuthenticationRemote` 채택을 떼고, Composition이 받을 수 있도록 타입과 메서드의 공개 범위를 확인한다
+- [X] T014 [P] [S2] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`가 `PolicyConsentStore` 채택을 떼고 공개 범위를 확인한다
+- [X] T015 [S2] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAuthenticationRemote`로 바꾼다
+- [X] T016 [S2] `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `HTTPAuthenticationRemote`로 바꾼다
+- [X] T017 [S2] `sources/Projects/Composition/Adapter/Adapters/PolicyConsentRepositoryAdapter.swift`의 초기화 인자와 저장 프로퍼티 타입을 `LocalPolicyConsentStore`로 바꾼다
+- [X] T018 [S2] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`의 `policyConsentStore` 인자 타입을 `LocalPolicyConsentStore`로 바꾼다
 
 ### 정리
 
-- [ ] T019 [S2] `sources/Projects/Data/Authentication/Contracts/AuthenticationRemote.swift`와 `sources/Projects/Data/LegalConsent/Contracts/PolicyConsentStore.swift`를 제거한다
-- [ ] T020 [S2] `sources/Projects/Data/Tests/Authentication/Contracts/AuthenticationRemoteContractTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T019 [S2] `sources/Projects/Data/Authentication/Contracts/AuthenticationRemote.swift`와 `sources/Projects/Data/LegalConsent/Contracts/PolicyConsentStore.swift`를 제거한다
+- [X] T020 [S2] `sources/Projects/Data/Tests/Authentication/Contracts/AuthenticationRemoteContractTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "보장 항목 대조표" 절에 기록한다
 
 ### 단위 검증
 
-- [ ] T021 [no-write] [S2] `DataAuthenticationTests`·`DataLegalConsentTests`와 `CompositionAdapterTests`·`CompositionAppTests`를 실행해 I1을 검증한다
+- [X] T021 [no-write] [S2] `DataAuthenticationTests`·`DataLegalConsentTests`와 `CompositionAdapterTests`·`CompositionAppTests`를 실행해 I1을 검증한다
+
+**범위 보정**: `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록이 commit `c32373e`(명세 030)의 `AppComposition` 공개 프로퍼티 변경을 반영하지 못해 실패 상태로 남아 있었다. I1의 통합 검증을 통과시키기 위해 `authenticationOutcomes`→`verifyAuthorization`, `trackGenerationProgress`→`trackGeneration`으로 고치고 `observeGenerationOutcomes`를 지웠다.
 
 **진행 점검**: T006~T021의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -305,7 +307,7 @@
 | 프로덕션 Swift 파일 수 | 497 | (T071에서 기록) |
 | 프로덕션 프로토콜 수 | 56 | (T071에서 기록) |
 | Data 프로덕션 Contracts 파일 수 | 11 | (T071에서 기록) |
-| Data 테스트 검증 항목 수 | (T006에서 기록) | (T058에서 기록) |
+| Data 테스트 검증 항목 수 | 322 | (T058에서 기록) |
 | Composition 어댑터 `case` 분기 총수 | (T059에서 기록) | (T069에서 기록) |
 
 ---
@@ -326,7 +328,10 @@
 
 | 제거한 보장 | 이관처 또는 제거 근거 |
 | --- | --- |
-| (T020에서 시작) | |
+| `AuthenticationRemote`가 Apple 로그인과 Access Token 확인 두 가지만 노출한다 | 제거. 프로브가 스스로 채택한 프로토콜의 형태만 확인했고, 구체 타입 `HTTPAuthenticationRemote`의 공개 메서드가 그 두 가지라는 사실을 컴파일러가 보장한다 |
+| `appleLogin`이 accessToken·refreshToken·needsCuration을 담은 응답을 돌려준다 | `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift` — `Apple 로그인 요청을 idToken 본문으로 구성하고 응답을 반환한다`(needsCuration 거짓)와 `큐레이션이 필요한 응답의 needsCuration을 참으로 해석한다`(참) |
+| `verifyAccessToken`이 호출 가능한 연산이다 | `sources/Projects/Data/Tests/Authentication/Remotes/HTTPAuthenticationRemoteTests.swift` — `Access Token 확인 요청에 Bearer 헤더를 포함한다` |
+| `PolicyConsentStore`의 `removeAll`이 저장된 기록을 모두 지운다 (계약 테스트 파일은 없었고 프로토콜 선언만 있었다) | `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift` — `removeAll은 저장된 모든 문서 기록을 지운다` |
 
 ---
 
