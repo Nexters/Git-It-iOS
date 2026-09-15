@@ -176,20 +176,20 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 테스트
 
-- [ ] T035 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAuthorizationTests.swift`에 세 가지 자격 증명 상태별 동작 테스트를 작성한다 — 재인증 필요 시 세션·자격 증명 정리, 인증됨 시 무변경, 일시적 확인 불가 시 무변경
-- [ ] T036 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAuthorizationTests.swift`에 세션 정리 실패가 반환 값을 바꾸지 않는다는 테스트를 추가한다
+- [X] T035 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAuthorizationTests.swift`에 세 가지 자격 증명 상태별 동작 테스트를 작성한다 — 재인증 필요 시 세션·자격 증명 정리, 인증됨 시 무변경, 일시적 확인 불가 시 무변경
+- [X] T036 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAuthorizationTests.swift`에 세션 정리 실패가 반환 값을 바꾸지 않는다는 테스트를 추가한다
 
 ### 구현
 
-- [ ] T037 [P] [S2] `sources/Projects/Domain/Authentication/UseCases/VerifyAuthorization/VerifyAuthorizationUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.2의 계약을 정의한다
-- [ ] T038 [S2] `sources/Projects/Domain/Authentication/UseCases/VerifyAuthorization/VerifyAuthorization.swift`에 구현을 작성한다. 기존 `AuthenticationOutcomes`의 무효 세션 정리 절차를 재사용하되 세션 복원은 수행하지 않는다
-- [ ] T039 [S2] `sources/Projects/Domain/Authentication/Contracts/AuthenticationRepository.swift`에서 `authorizationChanges()`를 제거한다
-- [ ] T040 [S2] `sources/Projects/Domain/Authentication/UseCases/AuthenticationOutcomes/AuthenticationOutcomesUseCase.swift`, `sources/Projects/Domain/Authentication/UseCases/AuthenticationOutcomes/AuthenticationOutcomes.swift`와 인증 결과 값 타입을 제거한다
-- [ ] T041 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/AuthenticationOutcomesTests.swift`와 `sources/Projects/Domain/Tests/Authentication/Contracts/AuthenticationRepositoryContractTests.swift`의 자격 증명 변경 관측 관련 검증을 제거하고, 각 보장 항목의 이관처를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T037 [P] [S2] `sources/Projects/Domain/Authentication/UseCases/VerifyAuthorization/VerifyAuthorizationUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.2의 계약을 정의한다
+- [X] T038 [S2] `sources/Projects/Domain/Authentication/UseCases/VerifyAuthorization/VerifyAuthorization.swift`에 구현을 작성한다. 기존 `AuthenticationOutcomes`의 무효 세션 정리 절차를 재사용하되 세션 복원은 수행하지 않는다
+- [X] T039 [S2] `sources/Projects/Domain/Authentication/Contracts/AuthenticationRepository.swift`에서 `authorizationChanges()`를 제거한다
+- [X] T040 [S2] `sources/Projects/Domain/Authentication/UseCases/AuthenticationOutcomes/AuthenticationOutcomesUseCase.swift`, `sources/Projects/Domain/Authentication/UseCases/AuthenticationOutcomes/AuthenticationOutcomes.swift`와 인증 결과 값 타입을 제거한다
+- [X] T041 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/AuthenticationOutcomesTests.swift`와 `sources/Projects/Domain/Tests/Authentication/Contracts/AuthenticationRepositoryContractTests.swift`의 자격 증명 변경 관측 관련 검증을 제거하고, 각 보장 항목의 이관처를 이 파일의 "보장 항목 대조표" 절에 기록한다. 제거한 값 타입과 계약을 참조해 컴파일되지 않는 `sources/Projects/Domain/Tests/Authentication/Models/Authentication/AuthenticationOutcomeTests.swift`, `sources/Projects/Domain/Tests/Authentication/Models/Session/SignOutResultTests.swift`, `sources/Projects/Domain/Tests/Authentication/Models/Session/RestoreSessionResultTests.swift`, `sources/Projects/Domain/Tests/Authentication/SensitiveValueExposureTests.swift`, `sources/Projects/Domain/Tests/Authentication/UseCases/RestoreSessionTests.swift`, `sources/Projects/Domain/Tests/Authentication/UseCases/SignInTests.swift`, `sources/Projects/Domain/Tests/Authentication/UseCases/SignOutTests.swift`도 함께 정리한다
 
 ### 패키지 검증
 
-- [ ] T042 [no-write] `DomainAuthenticationTests`를 실행해 U5를 검증한다
+- [X] T042 [no-write] `DomainAuthenticationTests`를 실행해 U5를 검증한다
 
 **진행 점검**: T035~T042의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -277,7 +277,11 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 | `TrackGenerationProgress` — 두 번 begin해도 마지막 요청 1건만 남는다 | 동작이 의도적으로 바뀌었다. 같은 저장소 URL의 중복 시작은 이제 덮어쓰기가 아니라 거부다 — `TrackGenerationTests` — 같은 저장소 URL로는 진행 중 생성을 두 번 시작할 수 없다 |
 | `TrackGenerationProgress` — end 이후에는 current가 nil을 반환한다 | `TrackGenerationTests` — 생성을 종료하면 활성 프로젝트에서 빠진다 |
 | `TrackGenerationProgress` — 기록된 적이 없으면 current가 nil을 반환한다 | `LocalGenerationStateStoreTests` — 저장한 적이 없으면 빈 상태를 반환한다 |
-| (T041에서 계속 작성) | |
+| `AuthenticationOutcomes` — authorization 변경을 저장 정리와 인증 결과로 수렴한다 | 연속 관측 자체를 제거했다(FR-005). 무효 세션 정리 보장은 `VerifyAuthorizationTests` — 재인증이 필요하면 세션과 자격 증명을 정리한다가 이어받고, 정리하지 않는 조건은 인증된 상태·일시적 확인 불가 두 테스트가 이어받는다 |
+| `AuthenticationRepository 계약` — 자격 증명 변경 관측을 제공한다 | 계약에서 제거했다. 남은 세 연산 보장은 `AuthenticationRepositoryContractTests` — 외부 인증과 권한 상태 및 인증 참조 정리만 제공한다가 그대로 유지한다 |
+| `인증 결과` — 안전한 사용자 또는 비인증 및 복구 가능 실패만 전달한다 | 값 타입을 제거했다. 동형 값의 민감 값 비노출 보장은 `SensitiveValueExposureTests`가 `RestoreSessionResult`로 이어받는다 |
+| `SignOutResult` — AuthenticationOutcome과 케이스 집합이 다르다 | 비교 대상 타입이 사라져 대응 항목이 없다. `SignOutResult` 자체의 케이스 보장은 같은 파일의 성공·재시도 가능 실패 테스트가 유지한다 |
+| `RestoreSessionResult` — AuthenticationOutcome과 별개 타입이다 | 비교 대상 타입이 사라져 대응 항목이 없다. 전용 결과 타입 반환 보장은 `RestoreSessionTests` — 세션 복원 전용 결과 타입을 반환한다가 유지한다 |
 
 ---
 
