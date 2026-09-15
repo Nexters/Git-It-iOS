@@ -93,6 +93,7 @@ extension CompositionModuleName {
                 sourceDirectory: sourceDirectory,
                 dependencies: [
                     .target(name: CompositionModuleName.CompositionAdapter.rawValue),
+                    .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataAuthentication),
                     .fromData(.DataLearningProject),

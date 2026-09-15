@@ -153,26 +153,30 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 테스트
 
-- [ ] T039 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift`를 만들어 마커 부재·미로그인·빈 토큰·만료된 토큰·유효한 토큰 다섯 경우의 판정을 검증한다
+- [X] T039 [S2] `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift`를 만들어 마커 부재·미로그인·빈 토큰·만료된 토큰·유효한 토큰 다섯 경우의 판정을 검증한다
 
 ### 구현
 
-- [ ] T040 [S2] `sources/Projects/Domain/Authentication/Models/SessionAvailability/SessionAvailability.swift`를 만들고 `sources/Projects/Composition/Adapter/Models/SessionAvailability.swift`의 내용을 옮긴다
-- [ ] T041 [S2] `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityUseCase.swift`에 판정 계약을 정의한다
-- [ ] T042 [S2] `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailability.swift`에 판정 규칙을 구현한다. 마커 조회와 세션 조회는 Domain 계약으로 받고, 현재 시각은 주입받는다
-- [ ] T043 [S2] `sources/Projects/Domain/Authentication/Contracts/SharedSessionMarkerRepository.swift`에 로그인 상태 마커 조회 계약을 정의한다
-- [ ] T044 [S2] `sources/Projects/Composition/Adapter/Adapters/SharedSessionMarkerRepositoryAdapter.swift`를 만들어 T043의 계약을 `DataAuthentication`의 마커 코딩에 잇는다
-- [ ] T045 [S2] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 `SessionAvailabilityResolver` 대신 T042의 UseCase를 조립하도록 바꾼다
-- [ ] T046 [S2] `sources/Projects/App/ShareExtension/ShareViewController.swift`의 `SessionAvailability` 참조를 `DomainAuthentication` 것으로 바꾼다
+- [X] T040 [S2] `sources/Projects/Domain/Authentication/Models/SessionAvailability/SessionAvailability.swift`를 만들고 `sources/Projects/Composition/Adapter/Models/SessionAvailability.swift`의 내용을 옮긴다
+  - **범위 보정**: `Domain/Authentication/Models/`는 이미 관심사 2뎁스(`Authentication`, `Consent`, `Session`)로 나뉘어 있어 새 `SessionAvailability/` 폴더 대신 기존 `Session/` 아래 `sources/Projects/Domain/Authentication/Models/Session/SessionAvailability.swift`에 두었다
+- [X] T041 [S2] `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityUseCase.swift`에 판정 계약을 정의한다
+- [X] T042 [S2] `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailability.swift`에 판정 규칙을 구현한다. 마커 조회와 세션 조회는 Domain 계약으로 받고, 현재 시각은 주입받는다
+- [X] T043 [S2] `sources/Projects/Domain/Authentication/Contracts/SharedSessionMarkerRepository.swift`에 로그인 상태 마커 조회 계약을 정의한다
+  - **범위 보정**: 마커 계약만으로는 판정에 필요한 저장 세션을 읽을 수 없고, 공유 확장에는 `LoginSessionRepository`를 조립할 HTTP 경로가 없다. 저장 세션 조회 계약 `sources/Projects/Domain/Authentication/Contracts/StoredSessionRepository.swift`를 함께 두고 그 Adapter `sources/Projects/Composition/Adapter/Adapters/StoredSessionRepositoryAdapter.swift`를 추가한다
+- [X] T044 [S2] `sources/Projects/Composition/Adapter/Adapters/SharedSessionMarkerRepositoryAdapter.swift`를 만들어 T043의 계약을 `DataAuthentication`의 마커 코딩에 잇는다
+- [X] T045 [S2] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 `SessionAvailabilityResolver` 대신 T042의 UseCase를 조립하도록 바꾼다
+  - **범위 보정**: `CompositionShareExtension`과 App `ShareExtension` 타깃이 `DomainAuthentication`을 직접 참조하게 되어 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`와 `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 의존 목록도 함께 고쳤다
+- [X] T046 [S2] `sources/Projects/App/ShareExtension/ShareViewController.swift`의 `SessionAvailability` 참조를 `DomainAuthentication` 것으로 바꾼다
 
 ### 정리
 
-- [ ] T047 [S2] `sources/Projects/Composition/Adapter/Resolvers/SessionAvailabilityResolver.swift`와 `sources/Projects/Composition/Adapter/Models/SessionAvailability.swift`를 제거한다
-- [ ] T048 [S2] `sources/Projects/Composition/Tests/Adapter/Resolvers/SessionAvailabilityResolverTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "이동 기록" 절에 적는다
+- [X] T047 [S2] `sources/Projects/Composition/Adapter/Resolvers/SessionAvailabilityResolver.swift`와 `sources/Projects/Composition/Adapter/Models/SessionAvailability.swift`를 제거한다
+- [X] T048 [S2] `sources/Projects/Composition/Tests/Adapter/Resolvers/SessionAvailabilityResolverTests.swift`를 제거하고, 보장 항목의 이관처 또는 제거 근거를 이 파일의 "이동 기록" 절에 적는다
 
 ### 단위 검증
 
-- [ ] T049 [no-write] [S2] `Domain`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I3을 검증한다
+- [X] T049 [no-write] [S2] `Domain`·`Composition` 테스트 scheme과 `AppTests`를 실행해 I3을 검증한다
+  - **범위 보정**: `Domain` 144건과 `Composition` 68건은 모두 통과했다. `AppTests`의 실패 19건은 I3 적용 전과 같은 `AppRootFeature root 전환` suite 하나이며 다른 suite는 모두 통과했다. 공유 확장 타깃 컴파일은 `App` scheme `BUILD SUCCEEDED`로 확인했다
 
 **진행 점검**: T039~T049의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -347,6 +351,7 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 | 세션·Apple 식별자·공유 마커 저장 좌표 | `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift` (신규) |
 | 세션 저장 형식과 키 자리 | `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift` (신규) |
 | 대기 리마인드 키와 보관 한도 | `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift` (신규) |
+| `SessionAvailabilityResolverTests`의 판정 5케이스 | `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift` (6케이스로 확장) |
 
 ---
 

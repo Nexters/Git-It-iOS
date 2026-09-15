@@ -149,6 +149,7 @@ extension AppModuleName {
                     .fromComposition(.CompositionShareExtension),
                     .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
+                    .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .external(.ComposableArchitecture),
                 ],

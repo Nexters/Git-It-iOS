@@ -1,6 +1,7 @@
 import CompositionAdapter
 import DataAuthentication
 import DataLearningProject
+import DomainAuthentication
 import DomainLearningProject
 import Foundation
 import InfrastructureAuthentication
@@ -69,9 +70,9 @@ public struct ShareExtensionComposition: Sendable {
         let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
         let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
             guard let markerCoding else { return .appLaunchRequired }
-            return await SessionAvailabilityResolver(
-                markerCoding: markerCoding,
-                keychainStore: keychainStore,
+            return await ResolveSessionAvailability(
+                markerRepository: SharedSessionMarkerRepositoryAdapter(markerCoding: markerCoding),
+                sessionRepository: StoredSessionRepositoryAdapter(keychainStore: keychainStore),
             )()
         }
         let accessTokenProvider: @Sendable () async -> String? = {

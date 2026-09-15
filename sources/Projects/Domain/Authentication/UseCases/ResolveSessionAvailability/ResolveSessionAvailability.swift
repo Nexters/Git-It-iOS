@@ -1,33 +1,30 @@
-import DataAuthentication
-import DomainAuthentication
 import Foundation
-import InfrastructureAuthentication
 
-// MARK: - SessionAvailabilityResolver
+// MARK: - ResolveSessionAvailability
 
-public struct SessionAvailabilityResolver: Sendable {
+public struct ResolveSessionAvailability: ResolveSessionAvailabilityUseCase {
 
     // MARK: Lifecycle
 
     public init(
-        markerCoding: SharedSessionStateMarkerCoding,
-        keychainStore: KeychainStore,
+        markerRepository: any SharedSessionMarkerRepository,
+        sessionRepository: any StoredSessionRepository,
         now: @escaping @Sendable () -> Date = { Date() },
     ) {
-        self.markerCoding = markerCoding
-        sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
+        self.markerRepository = markerRepository
+        self.sessionRepository = sessionRepository
         self.now = now
     }
 
     // MARK: Public
 
     public func callAsFunction() async -> SessionAvailability {
-        guard let isSignedIn = await markerCoding.loadSignedInState() else {
+        guard let isSignedIn = await markerRepository.signedInState() else {
             return .appLaunchRequired
         }
         guard isSignedIn else { return .signInRequired }
         guard
-            let record = try? sessionCoding.load(),
+            let record = await sessionRepository.currentSession(),
             !record.tokens.accessToken.isEmpty
         else { return .signInRequired }
         if
@@ -41,8 +38,8 @@ public struct SessionAvailabilityResolver: Sendable {
 
     // MARK: Private
 
-    private let markerCoding: SharedSessionStateMarkerCoding
-    private let sessionCoding: SessionRecordCoding
+    private let markerRepository: any SharedSessionMarkerRepository
+    private let sessionRepository: any StoredSessionRepository
     private let now: @Sendable () -> Date
 
 }
