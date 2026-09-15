@@ -138,27 +138,27 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 
 ### 테스트
 
-- [ ] T020 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`에 관측 시점 독립성 테스트를 작성한다 — 완료 통지 후 관측 시작 시 첫 값이 완료 상태, 관측 후 완료 통지 시 진행 중→완료 순서 전달, 관측자 둘이 같은 값 수신
-- [ ] T021 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`에 관측 해제 테스트를 추가한다 — 반복 등록·해제 후 내부 관측자 목록 크기가 증가하지 않는다
-- [ ] T022 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`의 중복 등록 거부 보장을 생성 추적 기준으로 옮긴다
-- [ ] T023 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`의 진행 중 항목 필터 보장을 생성 추적 기준으로 옮긴다
-- [ ] T024 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/`에 생성 상태 보존 계약과 생성 결과 수신 계약의 테스트 더블을 추가한다
+- [X] T020 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`에 관측 시점 독립성 테스트를 작성한다 — 완료 통지 후 관측 시작 시 첫 값이 완료 상태, 관측 후 완료 통지 시 진행 중→완료 순서 전달, 관측자 둘이 같은 값 수신
+- [X] T021 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`에 관측 해제 테스트를 추가한다 — 반복 등록·해제 후 내부 관측자 목록 크기가 증가하지 않는다
+- [X] T022 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`의 중복 등록 거부 보장을 생성 추적 기준으로 옮긴다
+- [X] T023 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`의 진행 중 항목 필터 보장을 생성 추적 기준으로 옮긴다
+- [X] T024 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/`에 생성 상태 보존 계약과 생성 결과 수신 계약의 테스트 더블을 추가한다
 
 ### 구현
 
-- [ ] T025 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGenerationUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.1의 연산 계약을 정의한다
-- [ ] T026 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/GenerationStateCoordinator.swift`에 상태 정본을 보유하는 actor를 구현한다 — 보존 계약에서 복원, 생성 결과 수신 반영, 만료 정리
-- [ ] T027 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGeneration.swift`에 관측 시작 시 현재 상태를 먼저 전달하는 구현과 관측 해제 처리를 구현한다
-- [ ] T028 [S1] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProject/CreateLearningProject.swift`가 등록 상태 저장소 대신 생성 추적을 사용하도록 바꾼다. 외부 시그니처는 유지한다
-- [ ] T029 [S1] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects/FetchLearningProjects.swift`가 등록 상태 저장소 대신 생성 추적을 사용하도록 바꾼다. 외부 시그니처는 유지한다
-- [ ] T030 [S1] `sources/Projects/Domain/LearningProject/Contracts/RepositoryCreationStateRepository.swift`, `sources/Projects/Domain/LearningProject/Contracts/GenerationProgressRepository.swift`, `sources/Projects/Domain/LearningProject/Models/LearningProject/RepositoryCreationState.swift`, `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationProgress.swift`를 제거한다
-- [ ] T031 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgressUseCase.swift`, `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgress.swift`, `sources/Projects/Domain/LearningProject/UseCases/ObserveGenerationOutcomes/ObserveGenerationOutcomesUseCase.swift`, `sources/Projects/Domain/LearningProject/UseCases/ObserveGenerationOutcomes/ObserveGenerationOutcomes.swift`를 제거한다
-- [ ] T032 [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationWaitPolicy.swift`의 대기·만료 판정이 생성 기록을 받도록 바꾼다. 값은 변경하지 않는다
-- [ ] T033 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationProgressTests.swift`와 `sources/Projects/Domain/Tests/LearningProject/UseCases/ObserveGenerationOutcomesTests.swift`를 제거하고, 각 보장 항목이 T020~T023 중 어디로 이관됐는지 대조표를 이 파일의 "보장 항목 대조표" 절에 기록한다
+- [X] T025 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGenerationUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.1의 연산 계약을 정의한다
+- [X] T026 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/GenerationStateCoordinator.swift`에 상태 정본을 보유하는 actor를 구현한다 — 보존 계약에서 복원, 생성 결과 수신 반영, 만료 정리
+- [X] T027 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGeneration.swift`에 관측 시작 시 현재 상태를 먼저 전달하는 구현과 관측 해제 처리를 구현한다
+- [X] T028 [S1] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProject/CreateLearningProject.swift`가 등록 상태 저장소 대신 생성 추적을 사용하도록 바꾼다. 외부 시그니처는 유지한다
+- [X] T029 [S1] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects/FetchLearningProjects.swift`가 등록 상태 저장소 대신 생성 추적을 사용하도록 바꾼다. 외부 시그니처는 유지한다
+- [X] T030 [S1] `sources/Projects/Domain/LearningProject/Contracts/RepositoryCreationStateRepository.swift`, `sources/Projects/Domain/LearningProject/Contracts/GenerationProgressRepository.swift`, `sources/Projects/Domain/LearningProject/Models/LearningProject/RepositoryCreationState.swift`, `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationProgress.swift`를 제거한다
+- [X] T031 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgressUseCase.swift`, `sources/Projects/Domain/LearningProject/UseCases/TrackGenerationProgress/TrackGenerationProgress.swift`, `sources/Projects/Domain/LearningProject/UseCases/ObserveGenerationOutcomes/ObserveGenerationOutcomesUseCase.swift`, `sources/Projects/Domain/LearningProject/UseCases/ObserveGenerationOutcomes/ObserveGenerationOutcomes.swift`를 제거한다
+- [X] T032 [S1] `sources/Projects/Domain/LearningProject/Models/LearningProject/GenerationWaitPolicy.swift`의 대기·만료 판정이 생성 기록을 받도록 바꾼다. 값은 변경하지 않는다
+- [X] T033 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationProgressTests.swift`와 `sources/Projects/Domain/Tests/LearningProject/UseCases/ObserveGenerationOutcomesTests.swift`를 제거하고, 각 보장 항목이 T020~T023 중 어디로 이관됐는지 대조표를 이 파일의 "보장 항목 대조표" 절에 기록한다
 
 ### 패키지 검증
 
-- [ ] T034 [no-write] `DomainLearningProjectTests`를 실행해 U4를 검증한다
+- [X] T034 [no-write] `DomainLearningProjectTests`를 실행해 U4를 검증한다
 
 **진행 점검**: T020~T034의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -272,7 +272,12 @@ FR-008의 문자 그대로의 형태(콜백)를 유지해야 한다면 T003을 �
 | `LocalGenerationProgressStore` — 다시 저장하면 이전 기록을 대체해 1건만 남는다 | `GenerationStateTests` — 같은 프로젝트 식별자를 가진 기록은 하나만 남는다 |
 | `LocalGenerationProgressStore` — 해제하면 조회 결과가 부재로 돌아간다 | `LocalGenerationStateStoreTests` — 빈 상태를 저장하면 다음 불러오기도 빈 상태다 |
 | `LocalGenerationProgressStore` — 앱을 다시 실행해도 저장한 진행 상태가 남아 있다 | `LocalGenerationStateStoreTests` — 앱을 다시 실행해도 저장한 생성 상태가 남아 있다 |
-| (T033·T041에서 계속 작성) | |
+| `ObserveGenerationOutcomes` — repository의 outcomes 스트림을 그대로 위임한다 | 위임 계층 자체를 제거해 대응 항목이 없다(FR-012). 생성 결과가 관측자에게 전달된다는 보장은 `TrackGenerationTests` — 관측을 먼저 시작하면 진행 중 상태를 받은 뒤 완료 상태를 이어서 받는다가 대신한다 |
+| `TrackGenerationProgress` — begin으로 기록한 진행 상태를 current가 그대로 반환한다 | `TrackGenerationTests` — 생성을 종료하면 활성 프로젝트에서 빠진다(begin 직후 current 확인 포함) |
+| `TrackGenerationProgress` — 두 번 begin해도 마지막 요청 1건만 남는다 | 동작이 의도적으로 바뀌었다. 같은 저장소 URL의 중복 시작은 이제 덮어쓰기가 아니라 거부다 — `TrackGenerationTests` — 같은 저장소 URL로는 진행 중 생성을 두 번 시작할 수 없다 |
+| `TrackGenerationProgress` — end 이후에는 current가 nil을 반환한다 | `TrackGenerationTests` — 생성을 종료하면 활성 프로젝트에서 빠진다 |
+| `TrackGenerationProgress` — 기록된 적이 없으면 current가 nil을 반환한다 | `LocalGenerationStateStoreTests` — 저장한 적이 없으면 빈 상태를 반환한다 |
+| (T041에서 계속 작성) | |
 
 ---
 

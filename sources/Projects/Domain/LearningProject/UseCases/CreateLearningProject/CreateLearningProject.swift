@@ -1,13 +1,17 @@
+import Foundation
+
 public struct CreateLearningProject: CreateLearningProjectUseCase {
 
     // MARK: Lifecycle
 
     public init(
         repository: LearningProjectRepository,
-        creationStateRepository: RepositoryCreationStateRepository,
+        trackGeneration: any TrackGenerationUseCase,
+        now: @escaping @Sendable () -> Date = Date.init,
     ) {
         self.repository = repository
-        self.creationStateRepository = creationStateRepository
+        self.trackGeneration = trackGeneration
+        self.now = now
     }
 
     // MARK: Public
@@ -16,16 +20,16 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
         githubRepoURL: String,
         quizLevel: QuizLevel,
     ) async throws -> ProjectRegistrationReceipt {
-        guard await creationStateRepository.beginCreation(githubRepoURL: githubRepoURL) else {
+        guard await trackGeneration.begin(githubRepoURL: githubRepoURL, requestedAt: now()) else {
             throw LearningProjectError.duplicateCreationInProgress
         }
 
         do {
             let receipt = try await repository.register(githubRepoURL: githubRepoURL, quizLevel: quizLevel)
-            await creationStateRepository.attachProjectID(receipt.projectID, toGithubRepoURL: githubRepoURL)
+            await trackGeneration.attachProjectID(receipt.projectID, toGithubRepoURL: githubRepoURL)
             return receipt
         } catch {
-            await creationStateRepository.endCreation(githubRepoURL: githubRepoURL)
+            await trackGeneration.end(githubRepoURL: githubRepoURL)
             throw error
         }
     }
@@ -33,6 +37,7 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
     // MARK: Private
 
     private let repository: LearningProjectRepository
-    private let creationStateRepository: RepositoryCreationStateRepository
+    private let trackGeneration: any TrackGenerationUseCase
+    private let now: @Sendable () -> Date
 
 }

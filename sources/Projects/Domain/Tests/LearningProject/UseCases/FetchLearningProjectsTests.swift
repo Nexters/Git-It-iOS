@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import DomainLearningProject
@@ -122,7 +123,7 @@ struct FetchLearningProjectsTests {
         let repository = FetchLearningProjectsRepository(behavior: .succeed(page))
         let fetchLearningProjects = FetchLearningProjects(
             repository: repository,
-            creationStateRepository: StubRepositoryCreationStateRepository(activeProjectIDs: []),
+            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: []),
         )
 
         _ = try await fetchLearningProjects(page: 2)
@@ -134,13 +135,29 @@ struct FetchLearningProjectsTests {
 }
 
 extension FetchLearningProjectsTests {
+    static func makeTrackGeneration(activeProjectIDs: Set<String>) -> TrackGeneration {
+        let records = activeProjectIDs.map { projectID in
+            GenerationRecord(
+                githubRepoURL: "https://github.com/owner/\(projectID)",
+                projectID: projectID,
+                requestedAt: Date(timeIntervalSince1970: 1_000),
+            )
+        }
+        return TrackGeneration(
+            stateRepository: StubGenerationStateRepository(stored: GenerationState(records: records)),
+            outcomeRepository: StubGenerationOutcomeRepository(),
+            waitPolicy: GenerationWaitPolicy(minimumWait: 1, retentionLimit: 100_000),
+            now: { Date(timeIntervalSince1970: 1_000) },
+        )
+    }
+
     private func makeFetchLearningProjects(
         behavior: FetchLearningProjectsRepository.Behavior,
         activeProjectIDs: Set<String> = [],
     ) -> FetchLearningProjects {
         FetchLearningProjects(
             repository: FetchLearningProjectsRepository(behavior: behavior),
-            creationStateRepository: StubRepositoryCreationStateRepository(activeProjectIDs: activeProjectIDs),
+            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: activeProjectIDs),
         )
     }
 }
@@ -201,44 +218,5 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
     private let behavior: Behavior
     private var requestedPage: Int?
     private var requestedSize: Int?
-
-}
-
-// MARK: - StubRepositoryCreationStateRepository
-
-private actor StubRepositoryCreationStateRepository: RepositoryCreationStateRepository {
-
-    // MARK: Lifecycle
-
-    init(activeProjectIDs: Set<String>) {
-        storedActiveProjectIDs = activeProjectIDs
-    }
-
-    // MARK: Internal
-
-    func isCreating(githubRepoURL _: String) async -> Bool {
-        false
-    }
-
-    func beginCreation(githubRepoURL _: String) async -> Bool {
-        true
-    }
-
-    func attachProjectID(
-        _: String,
-        toGithubRepoURL _: String,
-    ) async { }
-
-    func endCreation(githubRepoURL _: String) async { }
-
-    func endCreation(projectID _: String) async { }
-
-    func activeProjectIDs() async -> Set<String> {
-        storedActiveProjectIDs
-    }
-
-    // MARK: Private
-
-    private let storedActiveProjectIDs: Set<String>
 
 }

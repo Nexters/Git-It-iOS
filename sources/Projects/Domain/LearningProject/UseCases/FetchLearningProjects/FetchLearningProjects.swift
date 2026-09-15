@@ -4,17 +4,17 @@ public struct FetchLearningProjects: FetchLearningProjectsUseCase {
 
     public init(
         repository: LearningProjectRepository,
-        creationStateRepository: RepositoryCreationStateRepository,
+        trackGeneration: any TrackGenerationUseCase,
     ) {
         self.repository = repository
-        self.creationStateRepository = creationStateRepository
+        self.trackGeneration = trackGeneration
     }
 
     // MARK: Public
 
     public func callAsFunction(page: Int) async throws -> LearningProjectPage {
         let loaded = try await repository.fetchProjects(page: page, size: Self.pageSize)
-        let creatingProjectIDs = await creationStateRepository.activeProjectIDs()
+        let creatingProjectIDs = await trackGeneration.current().activeProjectIDs
         guard !creatingProjectIDs.isEmpty else { return loaded }
 
         return LearningProjectPage(
@@ -28,6 +28,6 @@ public struct FetchLearningProjects: FetchLearningProjectsUseCase {
     private static let pageSize = 20
 
     private let repository: LearningProjectRepository
-    private let creationStateRepository: RepositoryCreationStateRepository
+    private let trackGeneration: any TrackGenerationUseCase
 
 }
