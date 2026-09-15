@@ -150,7 +150,6 @@ struct MemberRepositoryAdapter: MemberRepository {
 
         case .temporarilyUnavailable,
              .transport,
-             .decoding,
              .unexpectedStatus:
             .temporarilyUnavailable
 

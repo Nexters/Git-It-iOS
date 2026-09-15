@@ -127,7 +127,7 @@ public struct HTTPMemberRemote: Sendable {
                 fieldErrors: envelope.errors,
             )
         } catch {
-            throw DataMemberError.decoding
+            throw DataMemberError.unexpectedStatus
         }
     }
 
@@ -145,7 +145,7 @@ public struct HTTPMemberRemote: Sendable {
             return .transport
 
         case .responseDecodingFailed:
-            return .decoding
+            return .unexpectedStatus
 
         @unknown default:
             return .unexpectedStatus

@@ -122,7 +122,7 @@ public struct HTTPAuthenticationRemote: Sendable {
                 fieldErrors: envelope.errors,
             )
         } catch {
-            throw DataAuthenticationError.decoding
+            throw DataAuthenticationError.unexpectedStatus
         }
     }
 
@@ -140,7 +140,7 @@ public struct HTTPAuthenticationRemote: Sendable {
             return .transport
 
         case .responseDecodingFailed:
-            return .decoding
+            return .unexpectedStatus
 
         @unknown default:
             return .unexpectedStatus

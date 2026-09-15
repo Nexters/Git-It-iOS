@@ -135,7 +135,6 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
         case .temporarilyUnavailable,
              .transport,
-             .decoding,
              .unexpectedStatus:
             .temporarilyUnavailable
 
@@ -152,7 +151,6 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         case .invalidRequest,
              .temporarilyUnavailable,
              .transport,
-             .decoding,
              .unexpectedStatus:
             .temporarilyUnavailable
 

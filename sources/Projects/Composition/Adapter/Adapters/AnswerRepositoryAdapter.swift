@@ -79,9 +79,7 @@ struct AnswerRepositoryAdapter: AnswerRepository {
              .transport:
             .temporarilyUnavailable
 
-        case .decoding,
-             .unexpectedStatus,
-             .generationRetryUnavailable:
+        case .unexpectedStatus:
             .unexpected
 
         @unknown default:

@@ -80,9 +80,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
              .transport:
             .temporarilyUnavailable
 
-        case .decoding,
-             .unexpectedStatus,
-             .generationRetryUnavailable:
+        case .unexpectedStatus:
             .unexpected
 
         @unknown default:

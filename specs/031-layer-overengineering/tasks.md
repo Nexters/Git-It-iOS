@@ -235,27 +235,27 @@
 
 ### 준비
 
-- [ ] T059 [no-write] [S3] 어댑터의 `case` 분기 기준선을 측정한다 — `grep -rhoE "case \.[a-zA-Z]+" sources/Projects/Composition/Adapter/Adapters/*.swift | wc -l`. 값을 이 파일의 "기준선 기록" 절에 적는다
-- [ ] T060 [no-write] [S3] 각 Data 오류 타입과 대응 Domain 오류 타입의 case를 [data-model.md](./data-model.md) 5절의 기준(항등 / 접힘 / 실제 변환 / 대응 없음)으로 분류하고, 분류 결과를 이 파일의 "오류 case 분류" 절에 기록한다. `generationRetryUnavailable`처럼 대응이 없는 case는 프로덕션 사용처를 확인해 판단한다
+- [X] T059 [no-write] [S3] 어댑터의 `case` 분기 기준선을 측정한다 — `grep -rhoE "case \.[a-zA-Z]+" sources/Projects/Composition/Adapter/Adapters/*.swift | wc -l`. 값을 이 파일의 "기준선 기록" 절에 적는다
+- [X] T060 [no-write] [S3] 각 Data 오류 타입과 대응 Domain 오류 타입의 case를 [data-model.md](./data-model.md) 5절의 기준(항등 / 접힘 / 실제 변환 / 대응 없음)으로 분류하고, 분류 결과를 이 파일의 "오류 case 분류" 절에 기록한다. `generationRetryUnavailable`처럼 대응이 없는 case는 프로덕션 사용처를 확인해 판단한다
 
 ### 구현
 
-- [ ] T061 [S3] `sources/Projects/Data/LearningProject/Errors/DataLearningProjectError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다. 서버 HTTP 상태·오류 코드에서 Data 오류로 가는 매핑은 바꾸지 않는다
-- [ ] T062 [P] [S3] `sources/Projects/Data/Authentication/Errors/DataAuthenticationError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
-- [ ] T063 [P] [S3] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
-- [ ] T064 [P] [S3] `sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
-- [ ] T065 [S3] `sources/Projects/Composition/Adapter/Adapters/LearningProjectRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/AnswerRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/BookmarkRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 오류 재매핑을 T061 결과에 맞춰 줄인다
-- [ ] T066 [S3] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/ExternalRepositoryLookupAdapter.swift`의 오류 재매핑을 T062~T064 결과에 맞춰 줄인다
+- [X] T061 [S3] `sources/Projects/Data/LearningProject/Errors/DataLearningProjectError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다. 서버 HTTP 상태·오류 코드에서 Data 오류로 가는 매핑은 바꾸지 않는다
+- [X] T062 [P] [S3] `sources/Projects/Data/Authentication/Errors/DataAuthenticationError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
+- [X] T063 [P] [S3] `sources/Projects/Data/Member/Errors/DataMemberError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
+- [X] T064 [P] [S3] `sources/Projects/Data/ExternalRepository/Errors/DataExternalRepositoryError.swift`에서 T060이 항등으로 분류한 case 구간을 정리한다
+- [X] T065 [S3] `sources/Projects/Composition/Adapter/Adapters/LearningProjectRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/AnswerRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/BookmarkRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/LearningSetRepositoryAdapter.swift`의 오류 재매핑을 T061 결과에 맞춰 줄인다
+- [X] T066 [S3] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/MemberRepositoryAdapter.swift`, `sources/Projects/Composition/Adapter/Adapters/ExternalRepositoryLookupAdapter.swift`의 오류 재매핑을 T062~T064 결과에 맞춰 줄인다
 
 ### 정리
 
-- [ ] T067 [S3] Data 오류 타입의 case 집합이 바뀐 만큼 `sources/Projects/Data/Tests/**`의 오류 관련 검증을 갱신한다. 서버 응답에서 Data 오류로 가는 매핑 검증은 그대로 유지한다
+- [X] T067 [S3] Data 오류 타입의 case 집합이 바뀐 만큼 `sources/Projects/Data/Tests/**`의 오류 관련 검증을 갱신한다. 서버 응답에서 Data 오류로 가는 매핑 검증은 그대로 유지한다
 
 ### 단위 검증
 
-- [ ] T068 [no-write] [S3] `DataAuthenticationTests`·`DataLearningProjectTests`·`DataMemberTests`·`DataExternalRepositoryTests`와 `CompositionAdapterTests`를 실행해 I5를 검증한다
-- [ ] T069 [no-write] [S3] 어댑터의 `case` 분기 총수를 다시 측정해 T059의 기준선보다 작은지 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다
-- [ ] T070 [no-write] [S3] `grep -rn "DataAuthenticationError\|DataLearningProjectError\|DataMemberError\|DataExternalRepositoryError" sources/Projects/Domain --include="*.swift"` 결과가 비어 있는지 확인한다
+- [X] T068 [no-write] [S3] `DataAuthenticationTests`·`DataLearningProjectTests`·`DataMemberTests`·`DataExternalRepositoryTests`와 `CompositionAdapterTests`를 실행해 I5를 검증한다
+- [X] T069 [no-write] [S3] 어댑터의 `case` 분기 총수를 다시 측정해 T059의 기준선보다 작은지 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다. **지표 한계**: T059가 정한 명령 `grep -rhoE "case \.[a-zA-Z]+"`는 `case`로 시작하는 줄만 세고 `case .a,` 뒤에 이어지는 `.b,` 줄은 세지 않는다. I5가 지운 `.decoding`·`.generationRetryUnavailable`은 모두 이어지는 줄에 있었으므로 이 수치는 64에서 움직이지 않는다. 실제 축소는 아래 "기준선 기록"의 두 보조 지표로 기록한다
+- [X] T070 [no-write] [S3] `grep -rn "DataAuthenticationError\|DataLearningProjectError\|DataMemberError\|DataExternalRepositoryError" sources/Projects/Domain --include="*.swift"` 결과가 비어 있는지 확인한다
 
 **진행 점검**: T059~T070의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -308,17 +308,64 @@
 | 프로덕션 프로토콜 수 | 56 | (T071에서 기록) |
 | Data 프로덕션 Contracts 파일 수 | 11 | (T071에서 기록) |
 | Data 테스트 검증 항목 수 | 322 | 327 |
-| Composition 어댑터 `case` 분기 총수 | (T059에서 기록) | (T069에서 기록) |
+| Composition 어댑터 `case` 분기 총수 | 64 | 64 (지표 한계 — T069 참조) |
+| 어댑터 오류 재매핑 switch가 나열하는 Data 오류 case 수 | 61 | 50 |
+| Data 오류 타입의 case 총수 | 25 | 21 |
 
 ---
 
 ## 오류 case 분류
 
-> T060에서 채운다. Data 오류 case를 항등 / 접힘 / 실제 변환 / 대응 없음으로 분류하고, 정리 대상인 항등 구간을 표시한다.
+> T060에서 채운다.
 
-| Data 오류 타입 | case | Domain case | 분류 | 정리 대상 |
-| --- | --- | --- | --- | --- |
-| (T060에서 작성) | | | | |
+`DataLearningProjectError` → `LearningProjectError`
+
+| Data case | Domain case | 분류 |
+| --- | --- | --- |
+| `invalidRequest` | `invalidRequest` | 항등 |
+| `unauthorized` | `unauthorized` | 항등 |
+| `temporarilyUnavailable` | `temporarilyUnavailable` | 항등 |
+| `questionUnavailable` | `questionUnavailable` | 항등 |
+| `learningSetUnavailable` | `learningSetUnavailable` | 항등 |
+| `projectUnavailable` | `notFound` | 실제 변환 — 유지 |
+| `transport` | `temporarilyUnavailable` | 접힘 — 유지 |
+| `decoding` | `unexpected` | **중복 — 제거**. 네 어댑터 모두 `unexpectedStatus`와 같은 값을 내므로 구분이 어디에도 쓰이지 않는다 |
+| `unexpectedStatus` | `unexpected` | 접힘 — 유지 |
+| `generationRetryUnavailable` | (대응 없음) | **제거**. 유일한 생산 경로였던 `QuizGenerationRemote`가 I4에서 사라졌다. 서버가 409 `QUIZ-007`을 보내도 이제 `unexpectedStatus`로 떨어지고, 어댑터가 내는 Domain 값은 그대로 `unexpected`다 |
+
+`DataAuthenticationError` → `LoginSessionError`
+
+| Data case | Domain case | 분류 |
+| --- | --- | --- |
+| `unauthorized` | `refreshRejectedOrExpired`(로그인) / `unauthorized`(토큰 확인) | 실제 변환 — 유지 |
+| `invalidRequest` | `accountUnavailable`(로그인) / `temporarilyUnavailable`(토큰 확인) | 실제 변환 — 유지 |
+| `temporarilyUnavailable` | `temporarilyUnavailable` | 항등 |
+| `transport` | `temporarilyUnavailable` | 접힘 — 유지 |
+| `decoding` | `temporarilyUnavailable` | **중복 — 제거**. 두 매핑 함수 모두 `unexpectedStatus`와 같은 값을 낸다 |
+| `unexpectedStatus` | `temporarilyUnavailable` | 접힘 — 유지 |
+
+`DataMemberError` → `MemberError`
+
+| Data case | Domain case | 분류 |
+| --- | --- | --- |
+| `invalidRequest` | `invalidRequest` | 항등 |
+| `unauthorized` | `unauthorized` | 항등 |
+| `memberUnavailable` | `memberUnavailable` | 항등 |
+| `temporarilyUnavailable` | `temporarilyUnavailable` | 항등 |
+| `transport` | `temporarilyUnavailable` | 접힘 — 유지 |
+| `decoding` | `temporarilyUnavailable` | **중복 — 제거**. `unexpectedStatus`와 같은 값을 낸다 |
+| `unexpectedStatus` | `temporarilyUnavailable` | 접힘 — 유지 |
+
+`DataExternalRepositoryError` → `ExternalRepositoryError`
+
+| Data case | Domain case | 분류 |
+| --- | --- | --- |
+| `offline` | `offline` | 항등 |
+| `other` | `other` | 항등 |
+
+두 case 모두 항등이지만 지울 수 있는 중복은 없다. Data는 Domain에 의존할 수 없으므로(아키텍처 3.1) 경계에서 이름이 같은 두 타입 사이를 잇는 `switch` 하나는 남아야 한다. `case .other`와 `@unknown default`를 합치면 분기 하나가 줄지만, 새 case가 조용히 `.other`로 떨어져 컴파일러 검사를 잃으므로 합치지 않았다.
+
+**항등이어도 Data case를 지우지 못하는 이유**: 항등으로 분류한 case는 모두 `Data*Error(from: ServerAPIError)`가 서버 HTTP 상태·오류 코드로 만들어 내는 값이다. 명세의 가정이 그 매핑을 불변으로 두었으므로 case 자체는 남는다. 실제로 지울 수 있었던 것은 어느 어댑터에서도 이웃 case와 다른 Domain 값을 내지 않는 `decoding`과, 생산 경로가 사라진 `generationRetryUnavailable`뿐이다.
 
 ---
 

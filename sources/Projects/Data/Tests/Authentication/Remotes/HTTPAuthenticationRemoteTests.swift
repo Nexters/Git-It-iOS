@@ -83,13 +83,13 @@ struct HTTPAuthenticationRemoteTests {
     }
 
     @Test
-    func `응답 디코딩 실패를 decoding 오류로 변환한다`() async throws {
+    func `응답 디코딩 실패를 unexpectedStatus 오류로 변환한다`() async throws {
         let transport = StubHTTPTransport(results: [
             .response(HTTPTransportResponse(statusCode: 200, headers: [:], body: Data("not-json".utf8)))
         ])
         let remote = makeRemote(transport: transport)
 
-        await #expect(throws: DataAuthenticationError.decoding) {
+        await #expect(throws: DataAuthenticationError.unexpectedStatus) {
             try await remote.appleLogin(idToken: "apple-id-token")
         }
     }

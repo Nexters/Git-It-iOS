@@ -129,9 +129,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
              .transport:
             .temporarilyUnavailable
 
-        case .decoding,
-             .unexpectedStatus,
-             .generationRetryUnavailable:
+        case .unexpectedStatus:
             .unexpected
 
         @unknown default:
