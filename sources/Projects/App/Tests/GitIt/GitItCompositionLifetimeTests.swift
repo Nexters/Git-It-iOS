@@ -31,7 +31,7 @@ struct GitItCompositionLifetimeTests {
     }
 
     @Test
-    func `bootstrap 이전에는 푸시 client가 없어 기기 등록이 실패한다`() async {
+    func `기동 순서 실행 이전에는 푸시 client가 없어 기기 등록이 실패한다`() async {
         let app = GitItApp()
 
         await #expect(throws: (any Error).self) {
@@ -40,7 +40,7 @@ struct GitItCompositionLifetimeTests {
     }
 
     @Test
-    func `bootstrap 이전의 등록 token 갱신 스트림은 즉시 종료돼 외부 SDK를 만들지 않는다`() async {
+    func `기동 순서 실행 이전의 등록 token 갱신 스트림은 즉시 종료돼 외부 SDK를 만들지 않는다`() async {
         let app = GitItApp()
 
         var receivedCount = 0

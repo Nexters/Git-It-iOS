@@ -80,7 +80,12 @@ struct GitItApp: App {
         WindowGroup {
             AppRootView(store: rootStore)
                 .task {
-                    await composition.bootstrap(appDelegate)
+                    await AppLaunchSequence(
+                        recordSharedSessionState: composition.recordSharedSessionState,
+                        activatePushClient: composition.activatePushClient,
+                        configureAppDelegate: { composition.configureAppDelegate(appDelegate) },
+                        startObservingGenerationState: composition.startObservingGenerationState,
+                    )()
                 }
                 .onChange(of: scenePhase) { _, newPhase in
                     guard newPhase == .active else { return }

@@ -281,19 +281,22 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 테스트
 
-- [ ] T074 [S4] `sources/Projects/App/Tests/GitIt/Launch/AppLaunchSequenceTests.swift`를 만들어 마커 저장 → 푸시 클라이언트 활성화 → AppDelegate 구성 → 생성 상태 관측 시작 순서로 호출되는지 검증한다
+- [X] T074 [S4] `sources/Projects/App/Tests/GitIt/Launch/AppLaunchSequenceTests.swift`를 만들어 마커 저장 → 푸시 클라이언트 활성화 → AppDelegate 구성 → 생성 상태 관측 시작 순서로 호출되는지 검증한다
 
 ### 구현
 
-- [ ] T075 [S4] `sources/Projects/App/GitIt/Launch/AppLaunchSequence.swift`를 만들어 기동 절차를 순서대로 실행하는 타입을 둔다
-- [ ] T076 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `bootstrap` 클로저를 제거하고 마커 저장·푸시 클라이언트 활성화·AppDelegate 구성·관측 시작을 순서 없는 개별 프로퍼티로 공개한다
-- [ ] T077 [S4] `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.bootstrap(appDelegate)` 대신 T075의 타입을 호출하도록 바꾼다
-- [ ] T078 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 공개 프로퍼티 기대 목록을 T076의 결과에 맞춰 갱신한다
+- [X] T075 [S4] `sources/Projects/App/GitIt/Launch/AppLaunchSequence.swift`를 만들어 기동 절차를 순서대로 실행하는 타입을 둔다
+- [X] T076 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `bootstrap` 클로저를 제거하고 마커 저장·푸시 클라이언트 활성화·AppDelegate 구성·관측 시작을 순서 없는 개별 프로퍼티로 공개한다
+  - **범위 보정**: `App`은 `Infrastructure`에 의존할 수 없으므로([아키텍처 3.1](../../docs/architecture.md)) AppDelegate 구성은 `PushNotificationCallbacks`를 App에 노출하지 않고 `configureAppDelegate: @MainActor @Sendable (PushNotificationAppDelegate) -> Void`로 감싸 공개한다. 나머지 세 조각은 `recordSharedSessionState`, `activatePushClient`, `startObservingGenerationState`다
+- [X] T077 [S4] `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.bootstrap(appDelegate)` 대신 T075의 타입을 호출하도록 바꾼다
+  - **범위 보정**: `sources/Projects/App/Tests/GitIt/GitItCompositionLifetimeTests.swift`의 테스트 이름 2건이 사라진 `bootstrap`을 가리키고 있어 "기동 순서 실행 이전"으로 함께 고쳤다
+- [X] T078 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 공개 프로퍼티 기대 목록을 T076의 결과에 맞춰 갱신한다
 
 ### 단위 검증
 
-- [ ] T079 [no-write] [S4] `grep -n "bootstrap" sources/Projects/Composition/App/Assemblies/AppComposition.swift` 결과가 비어 있는지 확인한다
-- [ ] T080 [no-write] [S4] `Composition` 테스트 scheme과 `AppTests`를 실행해 I6을 검증한다
+- [X] T079 [no-write] [S4] `grep -n "bootstrap" sources/Projects/Composition/App/Assemblies/AppComposition.swift` 결과가 비어 있는지 확인한다
+- [X] T080 [no-write] [S4] `Composition` 테스트 scheme과 `AppTests`를 실행해 I6을 검증한다
+  - **범위 보정**: `Composition` 61건 통과. `AppTests`는 새 `AppLaunchSequence` suite가 더해져 50→51건이 됐고 실패 19건은 I6 적용 전과 같은 `AppRootFeature root 전환` suite 하나다. App 타깃 컴파일은 `App` scheme `BUILD SUCCEEDED`로 확인했다
 
 **진행 점검**: T074~T080의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 

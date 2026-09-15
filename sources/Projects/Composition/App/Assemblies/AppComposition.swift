@@ -75,10 +75,12 @@ public struct AppComposition: Sendable {
         let hasStoredSession: @Sendable () async -> Bool = {
             await authentication.accessTokenProvider() != nil
         }
-        bootstrap = { appDelegate in
+        recordSharedSessionState = {
             await markerCoding?.save(isSignedIn: hasStoredSession())
-            pushClientBox.activate()
-            appDelegate.configure(pushNotificationCallbacks)
+        }
+        activatePushClient = { pushClientBox.activate() }
+        configureAppDelegate = { appDelegate in appDelegate.configure(pushNotificationCallbacks) }
+        self.startObservingGenerationState = {
             await startObservingGenerationState(trackGeneration)
         }
 
@@ -170,7 +172,10 @@ public struct AppComposition: Sendable {
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
     public let trackGeneration: any TrackGenerationUseCase
 
-    public let bootstrap: @MainActor @Sendable (PushNotificationAppDelegate) async -> Void
+    public let recordSharedSessionState: @Sendable () async -> Void
+    public let activatePushClient: @Sendable () -> Void
+    public let configureAppDelegate: @MainActor @Sendable (PushNotificationAppDelegate) -> Void
+    public let startObservingGenerationState: @Sendable () async -> Void
 
     public let registerCurrentDevice: @Sendable () async throws -> Void
     public let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
