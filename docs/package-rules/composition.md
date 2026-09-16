@@ -20,6 +20,27 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 - 객체 수명과 공유 범위는 Composition이 명시적으로 결정해야 합니다. 공유 수명이 필요한 Repository·세션 객체는 중복 생성해서는 안 됩니다.
 - App이 Feature에 주입할 수 있도록 Domain UseCase Protocol 타입의 실행 가능한 dependency를 공개해야 합니다. 내부 Adapter와 Infrastructure 객체는 공개 API에 노출해서는 안 됩니다.
 
+## 이동 후 남는 책임과 남지 않는 책임
+
+명세 032에서 조립 경계에 들어와 있던 책임을 소유 패키지로 되돌린 결과입니다.
+
+| 책임 | 소유 패키지 | Composition에 남는 것 |
+| --- | --- | --- |
+| 저장 네임스페이스·키·저장 형식 | `Data<기능>` | Domain 타입과 저장 레코드 사이의 변환 |
+| App Group 식별자와 Keychain 접근 그룹 | `InfrastructureStorage`, `InfrastructureAuthentication` | 진입점 호출 |
+| 세션 유효성 판정 | `DomainAuthentication` | 마커·저장 세션 계약의 Adapter |
+| 기기 등록 대상 구성 | `DomainMember` | deviceID 계약의 Adapter |
+| 리마인드 예약 정책 | `DomainLearningProject` | 알림 계약의 Adapter |
+| 알림 제목과 본문 | `App` | 조립 인자로 전달 |
+| 앱 기동 순서 | `App` | 순서 없는 개별 조각의 공개 |
+| 외부 라이브러리 타입 | `Infrastructure` | 공급자 중립 진입점 호출 |
+
+조립 시점에 객체를 생성하는 일 자체는 Composition의 책임입니다.
+[아키텍처 3.5](../architecture.md)가 정한 대로 Composition은 Data가 Infrastructure 기술
+API 위에서 소유하는 concrete 구현을 실행 환경에 맞게 선택해 객체 생성 순서와 수명을
+결정합니다. 이 명세가 걷어낸 것은 "무엇을 만들지 고르는 일"이 아니라 "무엇이 옳은지
+정하는 규칙"과 "어디에 어떤 이름으로 저장할지 정하는 스키마"입니다.
+
 ## 제약조건
 
 - 비즈니스 규칙을 Adapter 내부에 구현해서는 안 됩니다.
@@ -29,3 +50,7 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 - Feature, App 또는 UI target을 의존성으로 선언해서는 안 됩니다.
 - Feature가 Composition에 직접 접근하도록 Service Locator API를 제공해서는 안 됩니다.
 - Infrastructure의 외부 라이브러리 구체 API를 Data 구현이 아닌 Composition이 직접 사용해서는 안 됩니다.
+- 저장 네임스페이스·키·저장 형식을 Composition이 정의해서는 안 됩니다. 그 좌표는 소유 `Data<기능>` 모듈과 Infrastructure 진입점이 소유합니다.
+- 사용자에게 보이는 문구를 Composition이 가져서는 안 됩니다. 문구는 App이 조립 인자로 전달합니다.
+- 실행 순서를 강제하는 클로저를 공개해서는 안 됩니다. 조각을 공개하고 순서는 App이 정합니다.
+- 앱·OS 버전처럼 실행 환경에서 읽는 값을 Composition이 직접 조회해서는 안 됩니다. App이 전달합니다.

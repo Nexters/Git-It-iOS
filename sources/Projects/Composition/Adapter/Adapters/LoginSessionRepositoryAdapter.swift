@@ -17,9 +17,9 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
             .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
     ) {
         self.remote = remote
-        self.keychainStore = keychainStore
         self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding
         sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
+        appleIdentityStore = AppleIdentityKeychainStore(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -105,11 +105,9 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     // MARK: Private
 
-    private typealias AppleIdentityKey = AppleIdentityKeychainLayout.Key
-
     private let remote: HTTPAuthenticationRemote
-    private let keychainStore: KeychainStore
     private let sessionCoding: SessionRecordCoding
+    private let appleIdentityStore: AppleIdentityKeychainStore
     private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?
 
     private func recordSharedSessionState(isSignedIn: Bool) async {
@@ -117,13 +115,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     }
 
     private func loadAppleUserID() throws -> String? {
-        guard
-            let data = try keychainStore.load(
-                for: AppleIdentityKey.appleUserID.rawValue,
-                in: AppleIdentityKeychainLayout.namespace,
-            )
-        else { return nil }
-        return String(data: data, encoding: .utf8)
+        try appleIdentityStore.load()
     }
 
     private func domainLoginError(for error: DataAuthenticationError) -> LoginSessionError {

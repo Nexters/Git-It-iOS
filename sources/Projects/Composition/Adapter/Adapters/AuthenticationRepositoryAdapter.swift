@@ -16,7 +16,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     ) {
         self.authorizationProvider = authorizationProvider
         self.credentialStateProvider = credentialStateProvider
-        self.keychainStore = keychainStore
+        appleIdentityStore = AppleIdentityKeychainStore(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -50,7 +50,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     func clearAuthentication() async throws {
         do {
-            try keychainStore.delete(for: Key.appleUserID.rawValue, in: namespace)
+            try appleIdentityStore.delete()
         } catch is KeychainStoreError {
             throw AuthenticationError.temporarilyUnavailable
         }
@@ -58,20 +58,16 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     // MARK: Private
 
-    private typealias Key = AppleIdentityKeychainLayout.Key
-
     private let authorizationProvider: AppleAuthorizationProvider
     private let credentialStateProvider: AppleCredentialStateProvider
-    private let keychainStore: KeychainStore
-    private let namespace = AppleIdentityKeychainLayout.namespace
+    private let appleIdentityStore: AppleIdentityKeychainStore
 
     private func persistUserID(_ userID: String) throws {
-        try keychainStore.save(Data(userID.utf8), for: Key.appleUserID.rawValue, in: namespace)
+        try appleIdentityStore.save(userID)
     }
 
     private func loadUserID() throws -> String? {
-        guard let data = try keychainStore.load(for: Key.appleUserID.rawValue, in: namespace) else { return nil }
-        return String(data: data, encoding: .utf8)
+        try appleIdentityStore.load()
     }
 
     private func domainStatus(_ state: AppleCredentialState) -> AuthorizationStatus {

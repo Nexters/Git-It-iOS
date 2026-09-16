@@ -111,6 +111,7 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 - [X] T024 [S1] `sources/Projects/Composition/Adapter/Adapters/LoginSessionRepositoryAdapter.swift`가 옮겨진 `SessionRecordKeychainCoding`·`SharedSessionStateMarkerCoding`·`AppleIdentityKeychainLayout`을 `DataAuthentication`에서 참조하도록 `import`와 타입 경로를 고친다
 - [X] T025 [S1] `sources/Projects/Composition/Adapter/Adapters/AuthenticationRepositoryAdapter.swift`의 `AppleIdentityKeychainLayout` 참조를 `DataAuthentication` 것으로 고친다
+  - **범위 보정**: 좌표만 옮기고 Keychain 읽고 쓰기가 Composition Adapter에 남아 SC-002의 "직접 읽고 쓰는 지점 0개"를 충족하지 못했다. `sources/Projects/Data/Authentication/Stores/AppleIdentityKeychainStore.swift`를 추가해 접근 자체를 `DataAuthentication`으로 옮기고 `AuthenticationRepositoryAdapter`와 `LoginSessionRepositoryAdapter`가 그 타입만 쓰게 했다. T085 시점에 발견해 같은 시나리오(S1) 안에서 보정했다
 - [X] T026 [S1] `sources/Projects/Composition/Adapter/Resolvers/SessionAvailabilityResolver.swift`의 코딩 참조를 `DataAuthentication` 것으로 고친다. 이 파일 자체의 이동은 I3이 맡는다
 - [X] T027 [S1] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`의 Keychain·UserDefaults 생성을 T014·T015의 진입점 호출로 바꾸고, 약관 동의 네임스페이스 문자열을 `DataLegalConsent`가 소유하도록 옮긴 뒤 그 값을 참조한다
 - [X] T028 [S1] `sources/Projects/Data/LegalConsent/Layouts/PolicyConsentStorageLayout.swift`를 만들어 약관 동의 네임스페이스 `com.nexters.hytime.gitit.legalConsent`를 소유하게 한다
@@ -314,11 +315,11 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 ### 구현
 
-- [ ] T081 [S1] [S2] [S3] [S4] `docs/package-rules/composition.md`에 이동 후 Composition에 남는 것(Adapter와 조립)과 남지 않는 것(저장 스키마·판정 규칙·표시 문구·기동 순서·외부 라이브러리 타입)을 적고, 조립 시점의 인스턴스 생성은 허용된다는 구분을 [아키텍처 3.5](../../docs/architecture.md) 근거와 함께 명시한다
+- [X] T081 [S1] [S2] [S3] [S4] `docs/package-rules/composition.md`에 이동 후 Composition에 남는 것(Adapter와 조립)과 남지 않는 것(저장 스키마·판정 규칙·표시 문구·기동 순서·외부 라이브러리 타입)을 적고, 조립 시점의 인스턴스 생성은 허용된다는 구분을 [아키텍처 3.5](../../docs/architecture.md) 근거와 함께 명시한다
 
 ### 단위 검증
 
-- [ ] T082 [no-write] `docs/package-rules/composition.md`에서 시작해 링크만 따라가 각 책임의 새 소유 패키지에 도달할 수 있는지 확인한다
+- [X] T082 [no-write] `docs/package-rules/composition.md`에서 시작해 링크만 따라가 각 책임의 새 소유 패키지에 도달할 수 있는지 확인한다
 
 **진행 점검**: T081~T082의 변경 파일과 검증 결과를 보고한다.
 
@@ -330,11 +331,15 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 **커밋 경계**: 아래 `[no-write]` 작업은 U1의 마지막 커밋 단위에 배정한다.
 
-- [ ] T083 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다
-- [ ] T084 [no-write] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다. `Feature`와 `AppTests`의 기존 실패 목록이 늘지 않았는지로 판정한다
-- [ ] T085 [no-write] [S1] [S2] [S3] [S4] [quickstart.md](./quickstart.md)의 시나리오별 검증과 기준선 재측정을 모두 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다
-- [ ] T086 [no-write] 이 파일의 "이동 기록"이 제거된 모든 테스트 파일의 이관처 또는 제거 근거를 담고 있는지 확인한다
+- [X] T083 [no-write] `make tuist`로 workspace를 갱신하고 실행 전후 Git 상태를 비교해 추적 파일 변경이 없는지 확인한다
+  - **기록**: `make tuist` 실행 전후 `git status --short`가 동일했다. 추적 파일 변경 없음
+- [X] T084 [no-write] 전체 `build` → `compile` → `test`를 실행하고 결과를 기록한다. `Feature`와 `AppTests`의 기존 실패 목록이 늘지 않았는지로 판정한다
+  - **기록**: `build` 9/9 성공, `compile` 7/7 성공, `test` 시도 7 중 성공 5 실패 2. 실패한 `Feature`와 `AppTests`는 명세 032 시작 전 기준선(`시도=7 성공=5 실패=2`)과 같다. `Feature`는 `AppEntryFeatureTests` 계열의 기존 실패, `AppTests`는 `AppRootFeature root 전환` suite의 기존 실패 19건이며 둘 다 이 명세가 건드리지 않은 파일이다
+- [X] T085 [no-write] [S1] [S2] [S3] [S4] [quickstart.md](./quickstart.md)의 시나리오별 검증과 기준선 재측정을 모두 확인하고 값을 이 파일의 "기준선 기록" 절에 적는다
+  - **기록**: 남은 저장 API 직접 사용 5건은 모두 조립 시점의 인스턴스 생성이며 네임스페이스는 Data·Infrastructure 상수를 참조한다. [아키텍처 3.5](../../docs/architecture.md)가 허용하는 범위다
+- [X] T086 [no-write] 이 파일의 "이동 기록"이 제거된 모든 테스트 파일의 이관처 또는 제거 근거를 담고 있는지 확인한다
 - [ ] T087 [no-write] [quickstart.md](./quickstart.md)의 수동 회귀 3종(로그인 유지, 공유 확장 세션 판정, 생성 완료 리마인드)을 기존 설치 상태를 지우지 않은 기기에서 확인하고 결과를 보고한다
+  - **미완료**: 기존 설치 상태를 유지한 기기에서만 확인할 수 있어 실행 주체를 확인해야 한다(이 파일 "승인이 필요한 지점" 참조). 저장 좌표가 바뀌지 않았다는 근거는 `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift`와 `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`가 고정 문자열로 확인한다
 
 ---
 
@@ -344,10 +349,10 @@ I2가 옮기는 문자열은 한 글자도 바뀌어서는 안 된다. 값 목�
 
 | 항목 | 적용 전 | 적용 후 |
 | --- | --- | --- |
-| Composition 프로덕션 코드 줄수 | 2,348 | (T085에서 기록) |
-| Composition의 Infrastructure 저장 API 직접 사용 | 13 | (T085에서 기록) |
-| Composition의 `Bundle.main`·`ProcessInfo` 조회 | 2 | (T085에서 기록) |
-| Composition의 외부 라이브러리 타입 이름 | 2 | 0 (I1 완료 시점) |
+| Composition 프로덕션 코드 줄수 | 2,348 | 2,101 |
+| Composition의 Infrastructure 저장 API 직접 사용 | 13 | 5 |
+| Composition의 `Bundle.main`·`ProcessInfo` 조회 | 2 | 0 |
+| Composition의 외부 라이브러리 타입 이름 | 2 | 0 |
 
 ---
 
