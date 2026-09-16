@@ -22,7 +22,7 @@ struct HomeFeatureGenerationOutcomeTests {
         let store = TestStore(initialState: HomeFeature.State()) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: profile,
+                fetchMemberProfile: profile.fetchProfile,
                 trackGeneration: observeGenerationOutcomes,
             )
         }
@@ -67,7 +67,7 @@ struct HomeFeatureGenerationOutcomeTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
                 trackGeneration: observeGenerationOutcomes,
             )
         }
@@ -97,7 +97,7 @@ struct HomeFeatureGenerationOutcomeTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
                 trackGeneration: StubTrackGenerationUseCase(),
             )
         }
@@ -123,7 +123,7 @@ struct HomeFeatureGenerationOutcomeTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
                 trackGeneration: observeGenerationOutcomes,
             )
         }
@@ -158,7 +158,7 @@ struct HomeFeatureGenerationOutcomeTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
                 trackGeneration: observeGenerationOutcomes,
             )
         }

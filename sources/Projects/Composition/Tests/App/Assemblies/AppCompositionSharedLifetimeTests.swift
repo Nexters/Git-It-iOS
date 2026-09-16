@@ -55,7 +55,7 @@ struct AppCompositionSharedLifetimeTests {
         )
 
         _ = try await composition.fetchLearningProjects(page: LearningProjectPage.firstIndex)
-        _ = try await composition.fetchMemberProfile()
+        _ = try await composition.memberAccount.profile()
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 2)

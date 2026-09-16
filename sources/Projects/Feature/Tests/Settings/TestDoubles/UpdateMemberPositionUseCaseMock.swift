@@ -1,6 +1,6 @@
 import DomainMember
 
-actor UpdateMemberPositionUseCaseMock: UpdateMemberPositionUseCase {
+actor UpdateMemberPositionUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -9,6 +9,10 @@ actor UpdateMemberPositionUseCaseMock: UpdateMemberPositionUseCase {
     }
 
     // MARK: Internal
+
+    nonisolated var updatePosition: @Sendable (MemberPosition) async throws -> Void {
+        { try await self($0) }
+    }
 
     func callAsFunction(_ position: MemberPosition) async throws {
         requestedPositions.append(position)

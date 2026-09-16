@@ -13,7 +13,7 @@ import Testing
 struct AppCompositionTests {
 
     @Test
-    func `completeCuration은 Member graph와 같은 공유 세션 access token으로 요청한다`() async throws {
+    func `memberAccount 큐레이션은 Member graph와 같은 공유 세션 access token으로 요청한다`() async throws {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
         try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
             tokens: SessionTokens(
@@ -46,7 +46,7 @@ struct AppCompositionTests {
             transport: transport,
         )
 
-        try await composition.completeCuration(position: .ios, careerLevel: .junior)
+        try await composition.memberAccount.completeCuration(position: .ios, careerLevel: .junior)
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 1)
@@ -55,7 +55,7 @@ struct AppCompositionTests {
     }
 
     @Test
-    func `completeCuration 공개 property는 Domain UseCase Protocol 타입이다`() throws {
+    func `memberAccount 공개 property는 Domain UseCase Protocol 타입이다`() throws {
         let composition = AppComposition.live(
             AppComposition.Environment(
                 apiBaseURL: try #require(URL(string: "https://api.git-it.example.com")),
@@ -67,7 +67,7 @@ struct AppCompositionTests {
             )
         )
 
-        _ = composition.completeCuration as any CompleteCurationUseCase
+        _ = composition.memberAccount as any MemberAccountUseCase
     }
 
 }

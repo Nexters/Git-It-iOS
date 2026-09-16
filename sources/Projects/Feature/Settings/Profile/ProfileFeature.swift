@@ -6,7 +6,7 @@ public struct ProfileFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(fetchMemberProfile: any FetchMemberProfileUseCase) {
+    public init(fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile) {
         self.fetchMemberProfile = fetchMemberProfile
     }
 
@@ -107,7 +107,7 @@ public struct ProfileFeature: Sendable {
         case profile
     }
 
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
+    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
 
     private func startProfileLoad(
         state: inout State,

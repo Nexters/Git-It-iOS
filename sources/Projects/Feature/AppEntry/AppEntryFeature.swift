@@ -19,7 +19,7 @@ public struct AppEntryFeature: Sendable {
 
     public init(
         restoreSession: any RestoreSessionUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
+        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
         signOut: any SignOutUseCase,
     ) {
         self.restoreSession = restoreSession
@@ -186,7 +186,7 @@ public struct AppEntryFeature: Sendable {
     }
 
     private let restoreSession: any RestoreSessionUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
+    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
     private let signOut: any SignOutUseCase
 
     private func restoreSession(_ state: inout State) -> Effect<Action> {

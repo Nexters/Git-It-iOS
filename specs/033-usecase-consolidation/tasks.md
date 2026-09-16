@@ -111,46 +111,61 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 ### 테스트
 
-- [ ] T015 [S2] `sources/Projects/Domain/Tests/Member/UseCases/MemberAccountTests.swift`를 만들어 통합 계약의 네 동작과 순서 보장을 검증한다. 이관 대상은 `CompleteCurationTests`, `FetchMemberProfileTests`, `UpdateMemberCareerLevelTests`, `UpdateMemberPositionTests`의 보장 전부이며, 여기에 [data-model.md](./data-model.md) 4절의 순서 보장 규칙 네 가지를 더한다
+- [X] T015 [S2] `sources/Projects/Domain/Tests/Member/UseCases/MemberAccountTests.swift`를 만들어 통합 계약의 네 동작과 순서 보장을 검증한다. 이관 대상은 `CompleteCurationTests`, `FetchMemberProfileTests`, `UpdateMemberCareerLevelTests`, `UpdateMemberPositionTests`의 보장 전부이며, 여기에 [data-model.md](./data-model.md) 4절의 순서 보장 규칙 네 가지를 더한다
 
 ### 구현 — Domain
 
-- [ ] T016 [S2] [S3] `sources/Projects/Domain/Member/UseCases/MemberAccount/MemberAccountUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.2의 계약을 정의한다
-- [ ] T017 [S2] `sources/Projects/Domain/Member/UseCases/MemberAccount/MemberAccount.swift`에 `actor` 구현을 둔다. `MemberRepository` 하나를 받고, 변경 세 메서드는 키별로 직렬 처리한다. 키는 `"position"`, `"careerLevel"`, `"curation"`으로 통합 전과 같게 둔다
+- [X] T016 [S2] [S3] `sources/Projects/Domain/Member/UseCases/MemberAccount/MemberAccountUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.2의 계약을 정의한다
+- [X] T017 [S2] `sources/Projects/Domain/Member/UseCases/MemberAccount/MemberAccount.swift`에 `actor` 구현을 둔다. `MemberRepository` 하나를 받고, 변경 세 메서드는 키별로 직렬 처리한다. 키는 `"position"`, `"careerLevel"`, `"curation"`으로 통합 전과 같게 둔다
 
 ### 구현 — Composition
 
-- [ ] T018 [S3] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`의 공개 프로퍼티 `fetchMemberProfile`, `updateMemberPosition`, `updateMemberCareerLevel`, `completeCuration`을 `memberAccount: any MemberAccountUseCase` 하나로 바꾼다
-- [ ] T019 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 같은 네 공개 프로퍼티를 `memberAccount` 하나로 바꾼다
-- [ ] T020 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록을 T019의 결과에 맞춘다
-- [ ] T021 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `completeCuration` 사용을 `memberAccount.completeCuration(...)`으로 바꾼다
+- [X] T018 [S3] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`의 공개 프로퍼티 `fetchMemberProfile`, `updateMemberPosition`, `updateMemberCareerLevel`, `completeCuration`을 `memberAccount: any MemberAccountUseCase` 하나로 바꾼다
+- [X] T019 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 같은 네 공개 프로퍼티를 `memberAccount` 하나로 바꾼다
+- [X] T020 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록을 T019의 결과에 맞춘다
+- [X] T021 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `completeCuration` 사용을 `memberAccount.completeCuration(...)`으로 바꾼다
 
 ### 구현 — Feature
 
-- [ ] T022 [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`가 `fetchMemberProfile`·`updateMemberPosition`·`updateMemberCareerLevel` 대신 `memberAccount`를 받고, 하위 Feature에는 각각이 쓰는 동작만 전달하도록 바꾼다
-- [ ] T023 [S3] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`를 같은 방식으로 바꾼다
-- [ ] T024 [S3] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`가 `completeCuration` 대신 `memberAccount`를 받고 하위에는 필요한 동작만 전달하도록 바꾼다
-- [ ] T025 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`의 Router 생성 인자를 T022~T024에 맞춘다
-- [ ] T026 [S3] `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestSupport.swift`에 `MemberAccountUseCase` test double을 추가하고 Router 생성에 쓰이도록 바꾼다
+> **범위 보정**: 이 tasks.md를 쓸 때 말단 Feature 파급을 빠뜨렸다. 네 프로토콜이 사라지면
+> 말단 Feature의 init 타입도 바뀌므로 아래 경로가 T022~T026에 포함된다. 말단은 통합 계약
+> 대신 동작 하나를 클로저로 받아 FR-010을 유지한다.
+>
+> - `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`
+> - `sources/Projects/Feature/Settings/Profile/ProfileFeature.swift`
+> - `sources/Projects/Feature/Home/HomeFeature.swift`
+> - `sources/Projects/Feature/AppEntry/AppEntryFeature.swift`
+> - `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionFeature.swift`
+> - `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureTests.swift`
+> - `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift` (사용자 WIP 2줄 포함, 승인 받음)
+> - `sources/Projects/Feature/Tests/Settings/Profile/ProfileFeatureTests.swift`
+> - `sources/Projects/Feature/Tests/Home/**`, `sources/Projects/Feature/Tests/AppEntry/**`,
+>   `sources/Projects/Feature/Tests/Onboarding/**`의 해당 test double과 테스트
+
+- [X] T022 [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`가 `fetchMemberProfile`·`updateMemberPosition`·`updateMemberCareerLevel` 대신 `memberAccount`를 받고, 하위 Feature에는 각각이 쓰는 동작만 전달하도록 바꾼다
+- [X] T023 [S3] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`를 같은 방식으로 바꾼다
+- [X] T024 [S3] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`가 `completeCuration` 대신 `memberAccount`를 받고 하위에는 필요한 동작만 전달하도록 바꾼다
+- [X] T025 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`의 Router 생성 인자를 T022~T024에 맞춘다
+- [X] T026 [S3] `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestSupport.swift`에 `MemberAccountUseCase` test double을 추가하고 Router 생성에 쓰이도록 바꾼다
 
 ### 구현 — App
 
-- [ ] T027 [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`가 회원 관련 네 의존성 대신 `memberAccount`를 받고 하위에 전달하도록 바꾼다
-- [ ] T028 [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 Noop 조립을 T027에 맞춘다
-- [ ] T029 [S3] `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.memberAccount`를 넘기도록 바꾼다
-- [ ] T030 [S3] **승인 필요**: `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 회원 관련 test double을 `MemberAccountUseCase` 하나로 바꾼다. 두 파일에는 사용자 작업 중 변경이 있으므로 아래 "승인이 필요한 지점"의 절차를 따른다
+- [X] T027 [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`가 회원 관련 네 의존성 대신 `memberAccount`를 받고 하위에 전달하도록 바꾼다
+- [X] T028 [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 Noop 조립을 T027에 맞춘다
+- [X] T029 [S3] `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.memberAccount`를 넘기도록 바꾼다
+- [X] T030 [S3] **승인 필요**: `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 회원 관련 test double을 `MemberAccountUseCase` 하나로 바꾼다. 두 파일에는 사용자 작업 중 변경이 있으므로 아래 "승인이 필요한 지점"의 절차를 따른다
 
 ### 정리
 
-- [ ] T031 [S2] `sources/Projects/Domain/Member/UseCases/MemberMutationSerializer.swift`를 제거한다
-- [ ] T032 [S4] `sources/Projects/Domain/Member/UseCases/{FetchMemberProfile,UpdateMemberPosition,UpdateMemberCareerLevel,CompleteCuration}/` 네 폴더와 그 안의 프로토콜·구현 파일을 제거한다
-- [ ] T033 [S4] `sources/Projects/Domain/Tests/Member/UseCases/{FetchMemberProfileTests,UpdateMemberPositionTests,UpdateMemberCareerLevelTests,CompleteCurationTests}.swift`를 제거하고 이 파일의 "이관 기록"에 각 보장의 이관처를 적는다
-- [ ] T034 [S4] `sources/Projects/App/Tests/GitIt/TestDoubles/{NoopFetchMemberProfileUseCase,NoopUpdateMemberPositionUseCase,NoopCompleteCurationUseCase}.swift`와 `sources/Projects/Feature/Tests/Settings/TestDoubles/UpdateMemberPositionUseCaseMock.swift`, `sources/Projects/Feature/Tests/AppEntry/TestDoubles/FetchMemberProfileUseCaseMock.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeMemberProfileUseCaseMock.swift`, `sources/Projects/Feature/Tests/Onboarding/TestDoubles/CompleteCurationUseCaseMock.swift` 중 말단 Feature가 계속 쓰는 것은 남기고 Router·App만 쓰던 것을 제거한다. 남기고 제거한 근거를 "이관 기록"에 적는다
+- [X] T031 [S2] `sources/Projects/Domain/Member/UseCases/MemberMutationSerializer.swift`를 제거한다
+- [X] T032 [S4] `sources/Projects/Domain/Member/UseCases/{FetchMemberProfile,UpdateMemberPosition,UpdateMemberCareerLevel,CompleteCuration}/` 네 폴더와 그 안의 프로토콜·구현 파일을 제거한다
+- [X] T033 [S4] `sources/Projects/Domain/Tests/Member/UseCases/{FetchMemberProfileTests,UpdateMemberPositionTests,UpdateMemberCareerLevelTests,CompleteCurationTests}.swift`를 제거하고 이 파일의 "이관 기록"에 각 보장의 이관처를 적는다
+- [X] T034 [S4] `sources/Projects/App/Tests/GitIt/TestDoubles/{NoopFetchMemberProfileUseCase,NoopUpdateMemberPositionUseCase,NoopCompleteCurationUseCase}.swift`와 `sources/Projects/Feature/Tests/Settings/TestDoubles/UpdateMemberPositionUseCaseMock.swift`, `sources/Projects/Feature/Tests/AppEntry/TestDoubles/FetchMemberProfileUseCaseMock.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeMemberProfileUseCaseMock.swift`, `sources/Projects/Feature/Tests/Onboarding/TestDoubles/CompleteCurationUseCaseMock.swift` 중 말단 Feature가 계속 쓰는 것은 남기고 Router·App만 쓰던 것을 제거한다. 남기고 제거한 근거를 "이관 기록"에 적는다
 
 ### 단위 검증
 
-- [ ] T035 [no-write] [S2] `grep -rn "MemberMutationSerializer" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
-- [ ] T036 [no-write] [S2] [S3] `Domain`·`Composition`·`Feature` 테스트 scheme과 `AppTests`를 실행하고 `App` scheme 빌드를 확인해 I2를 검증한다
+- [X] T035 [no-write] [S2] `grep -rn "MemberMutationSerializer" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
+- [X] T036 [no-write] [S2] [S3] `Domain`·`Composition`·`Feature` 테스트 scheme과 `AppTests`를 실행하고 `App` scheme 빌드를 확인해 I2를 검증한다
 
 **진행 점검**: T015~T036의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -312,6 +327,14 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 | `VerifyAccessToken`의 만료 판정 | 제거. 프로덕션 소비자가 없었다. 세션 유효성은 `ResolveSessionAvailability`와 `RestoreSession`이 담당한다 |
 | `RegisterMemberDevice`의 단일 저장소 위임 | `RegisterCurrentDevice`가 `MemberRepository.registerDevice(_:)`를 직접 호출한다 |
 | `RegisterMemberDeviceTests`의 등록 정보 전달 검증 | `RegisterCurrentDeviceTests`의 두 검증이 같은 보장을 `MemberRepository` 스텁 기준으로 유지한다 |
+| `FetchMemberProfileTests`의 프로필·통계 무손실 전달과 memberUnavailable 전파 | `MemberAccountTests`의 같은 이름 두 검증 |
+| `UpdateMemberPositionTests`의 position 단독 요청과 실패 전파 | `MemberAccountTests`의 position 두 검증 |
+| `UpdateMemberCareerLevelTests`의 career 단독 요청 | `MemberAccountTests`의 career 검증 |
+| `CompleteCurationTests`의 정확한 제출·실패 전파·CareerLevel 4개·전 조합 단일 제출 | `MemberAccountTests`의 큐레이션 네 검증 |
+| `MemberMutationSerializer`의 키별 직렬화 | `MemberAccount` actor의 내부 상태. `MemberAccountTests`의 순서 보장 네 검증이 이어받았다 |
+| `NoopFetchMemberProfileUseCase` 외 App Noop 3개 | App `MemberAccountUseCaseMock` 하나로 통합. Router 계층만 쓰던 것이라 남기지 않았다 |
+| Feature `FetchMemberProfileUseCaseMock` 외 말단 mock 4개 | 말단 Feature가 계속 쓰므로 유지. 프로토콜 준수만 제거하고 클로저 접근자를 더했다 |
+| `MainShellUpdatePositionStub`, `MainShellUpdateCareerStub` | Router가 통합 계약을 받으므로 제거. `MemberAccountUseCaseMock`이 대체한다 |
 
 ---
 

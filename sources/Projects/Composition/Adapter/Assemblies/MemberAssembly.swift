@@ -27,10 +27,7 @@ public struct MemberAssembly: Sendable {
             loginSessionRepository: loginSessionRepository,
         )
 
-        completeCuration = CompleteCuration(repository: repository)
-        fetchMemberProfile = FetchMemberProfile(repository: repository)
-        updateMemberPosition = UpdateMemberPosition(repository: repository)
-        updateMemberCareerLevel = UpdateMemberCareerLevel(repository: repository)
+        memberAccount = MemberAccount(repository: repository)
         self.repository = repository
         deleteMemberAccount = DeleteMemberAccount(
             repository: repository,
@@ -40,10 +37,7 @@ public struct MemberAssembly: Sendable {
 
     // MARK: Public
 
-    public let completeCuration: any CompleteCurationUseCase
-    public let fetchMemberProfile: any FetchMemberProfileUseCase
-    public let updateMemberPosition: any UpdateMemberPositionUseCase
-    public let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
+    public let memberAccount: any MemberAccountUseCase
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 
     public let repository: any MemberRepository

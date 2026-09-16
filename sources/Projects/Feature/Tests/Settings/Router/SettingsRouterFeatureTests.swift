@@ -150,9 +150,7 @@ struct SettingsRouterFeatureTests {
         TestStore(initialState: state) {
             SettingsRouterFeature(
                 signOut: SignOutUseCaseMock(),
-                fetchMemberProfile: FetchMemberProfileUseCaseMock(),
-                updateMemberPosition: UpdateMemberPositionUseCaseMock(),
-                updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock(),
+                memberAccount: MemberAccountUseCaseMock(),
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
                 requestGenerationReminder: StubRequestGenerationReminderUseCase(),
             )

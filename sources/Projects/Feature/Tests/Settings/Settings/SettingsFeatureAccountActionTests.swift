@@ -156,15 +156,17 @@ struct SettingsFeatureAccountActionTests {
         state: SettingsFeature.State = SettingsFeature.State(),
         signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
         deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) -> TestStoreOf<SettingsFeature> {
         TestStore(initialState: state) {
             SettingsFeature(
                 signOut: signOut,
-                fetchMemberProfile: FetchMemberProfileUseCaseMock(),
-                updateMemberPosition: UpdateMemberPositionUseCaseMock(),
-                updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock(),
+                fetchMemberProfile: FetchMemberProfileUseCaseMock().fetchProfile,
+                updateMemberPosition: UpdateMemberPositionUseCaseMock().updatePosition,
+                updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock().updateCareerLevel,
                 deleteMemberAccount: deleteMemberAccount,
                 requestGenerationReminder: StubRequestGenerationReminderUseCase(),
+                openNotificationSettings: openNotificationSettings,
             )
         }
     }

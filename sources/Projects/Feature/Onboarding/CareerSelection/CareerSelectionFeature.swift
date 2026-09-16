@@ -6,7 +6,7 @@ public struct CareerSelectionFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(completeCuration: any CompleteCurationUseCase) {
+    public init(completeCuration: @escaping @Sendable (MemberPosition, CareerLevel) async throws -> Void) {
         self.completeCuration = completeCuration
     }
 
@@ -75,7 +75,7 @@ public struct CareerSelectionFeature: Sendable {
                 state.submission = .submitting
                 return .run { send in
                     do {
-                        try await completeCuration(position: position, careerLevel: careerLevel)
+                        try await completeCuration(position, careerLevel)
                         await send(.effect(.curationFinished(success: true)))
                     } catch {
                         await send(.effect(.curationFinished(success: false)))
@@ -103,6 +103,6 @@ public struct CareerSelectionFeature: Sendable {
         case curation
     }
 
-    private let completeCuration: any CompleteCurationUseCase
+    private let completeCuration: @Sendable (MemberPosition, CareerLevel) async throws -> Void
 
 }

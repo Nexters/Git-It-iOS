@@ -13,9 +13,9 @@ public struct SettingsFeature: Sendable {
 
     public init(
         signOut: any SignOutUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
-        updateMemberPosition: any UpdateMemberPositionUseCase,
-        updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
+        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
+        updateMemberPosition: @escaping @Sendable (MemberPosition) async throws -> Void,
+        updateMemberCareerLevel: @escaping @Sendable (CareerLevel) async throws -> Void,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void,
@@ -327,9 +327,9 @@ public struct SettingsFeature: Sendable {
     }
 
     private let signOut: any SignOutUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let updateMemberPosition: any UpdateMemberPositionUseCase
-    private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
+    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
+    private let updateMemberPosition: @Sendable (MemberPosition) async throws -> Void
+    private let updateMemberCareerLevel: @Sendable (CareerLevel) async throws -> Void
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void

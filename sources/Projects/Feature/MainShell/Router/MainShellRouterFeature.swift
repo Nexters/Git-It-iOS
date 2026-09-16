@@ -18,9 +18,7 @@ public struct MainShellRouterFeature: Sendable {
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
         signOut: any SignOutUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
-        updateMemberPosition: any UpdateMemberPositionUseCase,
-        updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
+        memberAccount: any MemberAccountUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         trackGeneration: any TrackGenerationUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
@@ -34,9 +32,7 @@ public struct MainShellRouterFeature: Sendable {
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
         self.signOut = signOut
-        self.fetchMemberProfile = fetchMemberProfile
-        self.updateMemberPosition = updateMemberPosition
-        self.updateMemberCareerLevel = updateMemberCareerLevel
+        self.memberAccount = memberAccount
         self.deleteMemberAccount = deleteMemberAccount
         self.trackGeneration = trackGeneration
         self.requestGenerationReminder = requestGenerationReminder
@@ -97,7 +93,7 @@ public struct MainShellRouterFeature: Sendable {
         Scope(state: \.home, action: \.home) {
             HomeFeature(
                 fetchLearningProjects: fetchLearningProjects,
-                fetchMemberProfile: fetchMemberProfile,
+                fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() },
                 trackGeneration: trackGeneration,
             )
         }
@@ -116,9 +112,7 @@ public struct MainShellRouterFeature: Sendable {
         Scope(state: \.settings, action: \.settings) {
             SettingsRouterFeature(
                 signOut: signOut,
-                fetchMemberProfile: fetchMemberProfile,
-                updateMemberPosition: updateMemberPosition,
-                updateMemberCareerLevel: updateMemberCareerLevel,
+                memberAccount: memberAccount,
                 deleteMemberAccount: deleteMemberAccount,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
@@ -222,9 +216,7 @@ public struct MainShellRouterFeature: Sendable {
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase
     private let signOut: any SignOutUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let updateMemberPosition: any UpdateMemberPositionUseCase
-    private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
+    private let memberAccount: any MemberAccountUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let trackGeneration: any TrackGenerationUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase

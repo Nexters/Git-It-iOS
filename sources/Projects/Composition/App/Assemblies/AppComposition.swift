@@ -34,7 +34,7 @@ public struct AppComposition: Sendable {
         verifyAuthorization = authentication.verifyAuthorization
         refreshSession = authentication.refreshSession
         policyConsent = authentication.policyConsent
-        completeCuration = member.completeCuration
+        memberAccount = member.memberAccount
 
         fetchLearningProjects = learningProject.fetchLearningProjects
         fetchLearningProjectDetail = learningProject.fetchLearningProjectDetail
@@ -47,9 +47,6 @@ public struct AppComposition: Sendable {
         fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
         trackGeneration = learningProject.trackGeneration
 
-        fetchMemberProfile = member.fetchMemberProfile
-        updateMemberPosition = member.updateMemberPosition
-        updateMemberCareerLevel = member.updateMemberCareerLevel
         deleteMemberAccount = member.deleteMemberAccount
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
@@ -146,7 +143,7 @@ public struct AppComposition: Sendable {
     public let verifyAuthorization: any VerifyAuthorizationUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let policyConsent: any PolicyConsentUseCase
-    public let completeCuration: any CompleteCurationUseCase
+    public let memberAccount: any MemberAccountUseCase
 
     public let fetchLearningProjects: any FetchLearningProjectsUseCase
     public let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
@@ -158,9 +155,6 @@ public struct AppComposition: Sendable {
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
 
-    public let fetchMemberProfile: any FetchMemberProfileUseCase
-    public let updateMemberPosition: any UpdateMemberPositionUseCase
-    public let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase

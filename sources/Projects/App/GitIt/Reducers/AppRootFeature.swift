@@ -17,8 +17,7 @@ nonisolated struct AppRootFeature: Sendable {
         signIn: any SignInUseCase,
         signOut: any SignOutUseCase,
         verifyAuthorization: any VerifyAuthorizationUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
-        completeCuration: any CompleteCurationUseCase,
+        memberAccount: any MemberAccountUseCase,
         policyConsent: any PolicyConsentUseCase,
         fetchLearningProjects: any FetchLearningProjectsUseCase,
         fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
@@ -28,8 +27,6 @@ nonisolated struct AppRootFeature: Sendable {
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
-        updateMemberPosition: any UpdateMemberPositionUseCase,
-        updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
@@ -47,8 +44,7 @@ nonisolated struct AppRootFeature: Sendable {
         self.signIn = signIn
         self.signOut = signOut
         self.verifyAuthorization = verifyAuthorization
-        self.fetchMemberProfile = fetchMemberProfile
-        self.completeCuration = completeCuration
+        self.memberAccount = memberAccount
         self.policyConsent = policyConsent
         self.fetchLearningProjects = fetchLearningProjects
         self.fetchLearningProjectDetail = fetchLearningProjectDetail
@@ -58,8 +54,6 @@ nonisolated struct AppRootFeature: Sendable {
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
-        self.updateMemberPosition = updateMemberPosition
-        self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
@@ -142,7 +136,7 @@ nonisolated struct AppRootFeature: Sendable {
         Scope(state: \.appEntry, action: \.appEntry) {
             AppEntryFeature(
                 restoreSession: restoreSession,
-                fetchMemberProfile: fetchMemberProfile,
+                fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() },
                 signOut: signOut,
             )
         }
@@ -151,7 +145,7 @@ nonisolated struct AppRootFeature: Sendable {
                 signIn: signIn,
                 signOut: signOut,
                 policyConsent: policyConsent,
-                completeCuration: completeCuration,
+                memberAccount: memberAccount,
                 deleteMemberAccount: deleteMemberAccount,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
@@ -166,9 +160,7 @@ nonisolated struct AppRootFeature: Sendable {
                 submitEssayAnswer: submitEssayAnswer,
                 setQuestionBookmark: setQuestionBookmark,
                 signOut: signOut,
-                fetchMemberProfile: fetchMemberProfile,
-                updateMemberPosition: updateMemberPosition,
-                updateMemberCareerLevel: updateMemberCareerLevel,
+                memberAccount: memberAccount,
                 deleteMemberAccount: deleteMemberAccount,
                 trackGeneration: trackGeneration,
                 requestGenerationReminder: requestGenerationReminder,
@@ -378,8 +370,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let signIn: any SignInUseCase
     private let signOut: any SignOutUseCase
     private let verifyAuthorization: any VerifyAuthorizationUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let completeCuration: any CompleteCurationUseCase
+    private let memberAccount: any MemberAccountUseCase
     private let policyConsent: any PolicyConsentUseCase
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
     private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
@@ -389,8 +380,6 @@ nonisolated struct AppRootFeature: Sendable {
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    private let updateMemberPosition: any UpdateMemberPositionUseCase
-    private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase

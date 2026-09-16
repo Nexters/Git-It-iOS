@@ -14,11 +14,11 @@ struct OnboardingRouterFeatureTests {
             requiredDocuments: OnboardingTestFixture.requiredDocuments,
             storedConsentRecords: OnboardingTestFixture.validConsentRecords,
         )
-        let completeCuration = CompleteCurationUseCaseMock(results: [.success(())])
+        let memberAccount = MemberAccountUseCaseMock(curationResults: [.success(())])
         let store = makeOnboardingRouterStore(
             signIn: signIn,
             policyConsent: policyConsent,
-            completeCuration: completeCuration,
+            memberAccount: memberAccount,
         )
         store.exhaustivity = .off
 
@@ -73,7 +73,7 @@ struct OnboardingRouterFeatureTests {
         await store.send(.view(.curationSplashFinished))
         await store.receive(.delegate(.mainShellRequested))
 
-        #expect(await completeCuration.snapshot() == [.init(position: .ios, careerLevel: .junior)])
+        #expect(await memberAccount.snapshot().curationCalls == [.init(position: .ios, careerLevel: .junior)])
     }
 
     @Test

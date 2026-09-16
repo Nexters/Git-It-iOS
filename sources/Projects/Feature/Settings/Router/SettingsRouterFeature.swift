@@ -11,17 +11,13 @@ public struct SettingsRouterFeature: Sendable {
 
     public init(
         signOut: any SignOutUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
-        updateMemberPosition: any UpdateMemberPositionUseCase,
-        updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
+        memberAccount: any MemberAccountUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
         self.signOut = signOut
-        self.fetchMemberProfile = fetchMemberProfile
-        self.updateMemberPosition = updateMemberPosition
-        self.updateMemberCareerLevel = updateMemberCareerLevel
+        self.memberAccount = memberAccount
         self.deleteMemberAccount = deleteMemberAccount
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
@@ -73,14 +69,14 @@ public struct SettingsRouterFeature: Sendable {
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.profile, action: \.profile) {
-            ProfileFeature(fetchMemberProfile: fetchMemberProfile)
+            ProfileFeature(fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() })
         }
         Scope(state: \.settings, action: \.settings) {
             SettingsFeature(
                 signOut: signOut,
-                fetchMemberProfile: fetchMemberProfile,
-                updateMemberPosition: updateMemberPosition,
-                updateMemberCareerLevel: updateMemberCareerLevel,
+                fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() },
+                updateMemberPosition: { [memberAccount] in try await memberAccount.updatePosition($0) },
+                updateMemberCareerLevel: { [memberAccount] in try await memberAccount.updateCareerLevel($0) },
                 deleteMemberAccount: deleteMemberAccount,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
@@ -150,9 +146,7 @@ public struct SettingsRouterFeature: Sendable {
     // MARK: Private
 
     private let signOut: any SignOutUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
-    private let updateMemberPosition: any UpdateMemberPositionUseCase
-    private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
+    private let memberAccount: any MemberAccountUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void

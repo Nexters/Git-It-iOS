@@ -17,8 +17,7 @@ struct AppRootFeatureTests {
     @Test
     func `launch task는 route를 즉시 바꾸지 않고 appEntry task를 전달한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.recoverableFailure])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(restoreSession: restoreSession)
         store.exhaustivity = .off
 
         #expect(store.state.route == .restoring)
@@ -27,15 +26,13 @@ struct AppRootFeatureTests {
         #expect(store.state.route == .restoring)
         #expect(store.state.appEntry.authentication == .retryableFailure)
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `미인증 세션은 route를 onboarding으로 전환하고 온보딩 안내부터 시작한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(restoreSession: restoreSession)
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -44,19 +41,16 @@ struct AppRootFeatureTests {
             $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
         }
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `인증됐지만 프로필이 미완료면 route를 onboarding으로 전환하고 큐레이션부터 시작한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(AppRootTestFixture.authenticatedUser)])
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(AppRootTestFixture.incompleteProfile)])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
+        let memberAccount = MemberAccountUseCaseMock(results: [.success(AppRootTestFixture.incompleteProfile)])
         let store = makeAppRootStore(
             restoreSession: restoreSession,
-            fetchMemberProfile: fetchMemberProfile,
-            authenticationOutcomes: authenticationOutcomes,
+            memberAccount: memberAccount,
         )
         store.exhaustivity = .off
 
@@ -66,19 +60,16 @@ struct AppRootFeatureTests {
             $0.onboarding = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
         }
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `인증됐고 프로필이 완료면 route를 mainShell로 전환한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.authenticated(AppRootTestFixture.authenticatedUser)])
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(AppRootTestFixture.completeProfile)])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
+        let memberAccount = MemberAccountUseCaseMock(results: [.success(AppRootTestFixture.completeProfile)])
         let store = makeAppRootStore(
             restoreSession: restoreSession,
-            fetchMemberProfile: fetchMemberProfile,
-            authenticationOutcomes: authenticationOutcomes,
+            memberAccount: memberAccount,
         )
         store.exhaustivity = .off
 
@@ -87,15 +78,13 @@ struct AppRootFeatureTests {
             $0.route = .mainShell
         }
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `복원 가능한 실패는 route를 바꾸지 않고 재시도하면 목적지를 결정한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.recoverableFailure, .unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(restoreSession: restoreSession)
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -108,15 +97,13 @@ struct AppRootFeatureTests {
             $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
         }
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `restoring을 벗어난 뒤 반복 task는 appEntry task를 다시 전달하지 않는다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(restoreSession: restoreSession)
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -128,7 +115,6 @@ struct AppRootFeatureTests {
 
         #expect(await restoreSession.snapshot() == 1)
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
@@ -176,19 +162,18 @@ struct AppRootFeatureTests {
         #expect(loggedOutStore.state.mainShell.home == HomeFeature.State())
 
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
         var sessionState = AppRootFeature.State(bundleVersion: "1.0.0")
         sessionState.route = .mainShell
         sessionState.mainShell.selectedTab = .projects
         let sessionStore = makeAppRootStore(
             restoreSession: restoreSession,
-            authenticationOutcomes: authenticationOutcomes,
+            verifyAuthorization: VerifyAuthorizationUseCaseMock(result: .reauthenticationRequired),
             state: sessionState,
         )
         sessionStore.exhaustivity = .off
 
-        await authenticationOutcomes.emit(.unauthenticated)
-        await sessionStore.receive(.effect(.authenticationOutcomeReceived(.unauthenticated))) {
+        await sessionStore.send(.view(.applicationBecameActive))
+        await sessionStore.receive(.effect(.authorizationVerified(.reauthenticationRequired))) {
             $0.route = .onboarding
             $0.mainShell = MainShellRouterFeature.State()
         }
@@ -198,7 +183,6 @@ struct AppRootFeatureTests {
         #expect(sessionStore.state.mainShell.selectedTab == .home)
         #expect(sessionStore.state.mainShell.home == HomeFeature.State())
 
-        await authenticationOutcomes.finish()
         await sessionStore.finish()
     }
 
@@ -335,8 +319,10 @@ struct AppRootFeatureTests {
     @Test
     func `mainShell 표시 중 session invalidation은 onboarding 안내부터 다시 시작한다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(
+            restoreSession: restoreSession,
+            verifyAuthorization: VerifyAuthorizationUseCaseMock(result: .reauthenticationRequired),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -348,21 +334,22 @@ struct AppRootFeatureTests {
             $0.route = .mainShell
         }
 
-        await authenticationOutcomes.emit(.unauthenticated)
-        await store.receive(.effect(.authenticationOutcomeReceived(.unauthenticated))) {
+        await store.send(.view(.applicationBecameActive))
+        await store.receive(.effect(.authorizationVerified(.reauthenticationRequired))) {
             $0.route = .onboarding
             $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
         }
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
     @Test
     func `onboarding 표시 중 session invalidation은 route를 바꾸지 않는다`() async {
         let restoreSession = RestoreSessionUseCaseMock(results: [.unauthenticated])
-        let authenticationOutcomes = AuthenticationOutcomesUseCaseMock()
-        let store = makeAppRootStore(restoreSession: restoreSession, authenticationOutcomes: authenticationOutcomes)
+        let store = makeAppRootStore(
+            restoreSession: restoreSession,
+            verifyAuthorization: VerifyAuthorizationUseCaseMock(result: .reauthenticationRequired),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -371,12 +358,11 @@ struct AppRootFeatureTests {
             $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
         }
 
-        await authenticationOutcomes.emit(.unauthenticated)
-        await store.receive(.effect(.authenticationOutcomeReceived(.unauthenticated)))
+        await store.send(.view(.applicationBecameActive))
+        await store.receive(.effect(.authorizationVerified(.reauthenticationRequired)))
 
         #expect(store.state.route == .onboarding)
 
-        await authenticationOutcomes.finish()
         await store.finish()
     }
 
@@ -425,7 +411,7 @@ struct AppRootFeatureTests {
 
     @Test
     func `mainShell 표시 중 앱이 활성화되면 프로젝트 목록을 다시 조회한다`() async {
-        let store = makeAppRootStore(state: mainShellState())
+        let store = makeAppRootStore(state: AppRootTestFixture.mainShellState())
         store.exhaustivity = .off
 
         await store.send(.view(.applicationBecameActive))
@@ -449,7 +435,7 @@ struct AppRootFeatureTests {
 
     @Test
     func `포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다`() async {
-        let store = makeAppRootStore(state: mainShellState())
+        let store = makeAppRootStore(state: AppRootTestFixture.mainShellState())
         store.exhaustivity = .off
 
         await store.send(.view(.applicationBecameActive))
@@ -554,88 +540,77 @@ struct AppRootFeatureTests {
     }
 
     @Test
-    func `등록 제출이 성공하면 추적을 시작하고 홈에 진행 중을 전달한다`() async {
+    func `진행 중 기록이 관측되면 홈에 진행 중을 전달한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let trackGenerationProgress = TrackGenerationProgressSpy()
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationRouterFeature.State()
+        let trackGeneration = TrackGenerationUseCaseMock(keepsObservationOpen: true)
         let store = makeAppRootStore(
-            trackGenerationProgress: trackGenerationProgress,
-            waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
+            trackGeneration: trackGeneration,
+            waitPolicy: GenerationWaitPolicy(minimumWait: 60, retentionLimit: 3_600),
             now: { requestedAt },
-            state: state,
         )
         store.exhaustivity = .off
 
-        await store
-            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self
-                    .receipt)))))))
-            {
-                $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
-                $0.mainShell.home.isGenerationInProgress = true
-            }
+        await store.send(.view(.task))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await trackGeneration.emit(Self.inProgressState(requestedAt: requestedAt))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
 
-        #expect(await trackGenerationProgress.beganCount == 1)
+        #expect(store.state.generationRecord == Self.inProgressRecord(requestedAt: requestedAt))
+        #expect(store.state.mainShell.home.isGenerationInProgress)
 
-        await store.skipReceivedActions()
+        await store.send(.mainShell(.delegate(.loggedOut)))
+        await trackGeneration.finish()
         await store.finish()
     }
 
     @Test
     func `결과가 확정되어도 준비 완료 시각까지는 진행 중을 유지한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationRouterFeature.State()
+        let trackGeneration = TrackGenerationUseCaseMock(keepsObservationOpen: true)
         let store = makeAppRootStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 60, retentionLimit: 3_600),
             now: { requestedAt },
-            state: state,
         )
         store.exhaustivity = .off
 
-        await store
-            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await store.send(.view(.task))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await trackGeneration.emit(Self.completedState(requestedAt: requestedAt))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
 
-        #expect(store.state.generationProgress?.projectID == "project-1")
+        #expect(store.state.generationRecord?.projectID == "project-1")
+        #expect(store.state.mainShell.home.isGenerationInProgress)
 
         await store.send(.mainShell(.delegate(.loggedOut)))
-        await observeGenerationOutcomes.finish()
-        await store.skipReceivedActions()
+        await trackGeneration.finish()
         await store.finish()
     }
 
     @Test
     func `준비 완료 시각이 지난 뒤 결과가 도착하면 진행 상태를 해제한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let trackGenerationProgress = TrackGenerationProgressSpy()
-        let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationRouterFeature.State()
+        let trackGeneration = TrackGenerationUseCaseMock(keepsObservationOpen: true)
         let store = makeAppRootStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
-            trackGenerationProgress: trackGenerationProgress,
+            trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 0, retentionLimit: 3_600),
             now: { requestedAt },
-            state: state,
         )
         store.exhaustivity = .off
 
-        await store
-            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
-        await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
+        await store.send(.view(.task))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await trackGeneration.emit(Self.inProgressState(requestedAt: requestedAt))
 
-        await store.receive(.effect(.generationProgressReleased(projectID: "project-1")), timeout: .seconds(5)) {
-            $0.generationProgress = nil
+        await store.receive(
+            .effect(.generationReleased(githubRepoURL: Self.githubRepoURL)),
+            timeout: .seconds(5),
+        ) {
+            $0.generationRecord = nil
         }
-        #expect(await trackGenerationProgress.endedCount == 1)
+        #expect(await trackGeneration.endedGithubRepoURLs == [Self.githubRepoURL])
 
-        await observeGenerationOutcomes.finish()
+        await trackGeneration.finish()
         await store.skipReceivedActions()
         await store.finish()
     }
@@ -643,100 +618,69 @@ struct AppRootFeatureTests {
     @Test
     func `앱 시작 시 보존된 진행 상태를 복원해 홈에 진행 중을 전달한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+        let trackGeneration = TrackGenerationUseCaseMock(stored: Self.inProgressState(requestedAt: requestedAt), keepsObservationOpen: true)
         let store = makeAppRootStore(
-            trackGenerationProgress: TrackGenerationProgressSpy(stored: restored),
+            trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
             now: { requestedAt.addingTimeInterval(10) },
         )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(.effect(.generationProgressRestored(restored))) {
-            $0.generationProgress = restored
-            $0.isGenerationProgressRestored = true
-            $0.mainShell.home.isGenerationInProgress = true
-        }
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+
+        #expect(store.state.generationRecord == Self.inProgressRecord(requestedAt: requestedAt))
+        #expect(store.state.mainShell.home.isGenerationInProgress)
 
         await store.send(.mainShell(.delegate(.loggedOut)))
-        await store.skipReceivedActions()
+        await trackGeneration.finish()
         await store.finish()
     }
 
     @Test
     func `보존 상한을 넘긴 진행 상태는 복원하지 않고 해제한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
-        let trackGenerationProgress = TrackGenerationProgressSpy(stored: restored)
+        let trackGeneration = TrackGenerationUseCaseMock(stored: Self.inProgressState(requestedAt: requestedAt), keepsObservationOpen: true)
         let store = makeAppRootStore(
-            trackGenerationProgress: trackGenerationProgress,
+            trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
             now: { requestedAt.addingTimeInterval(3_601) },
         )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(.effect(.generationProgressRestored(restored)))
+        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
 
-        #expect(store.state.generationProgress == nil)
+        #expect(store.state.generationRecord == nil)
         #expect(store.state.mainShell.home.isGenerationInProgress == false)
+        #expect(await trackGeneration.endedGithubRepoURLs == [Self.githubRepoURL])
 
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `복원된 projectID가 학습 프로젝트 목록에 있으면 진행 상태를 해제한다`() async {
-        let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let restored = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        state.generationProgress = restored
-        state.isGenerationProgressRestored = true
-        let store = makeAppRootStore(
-            waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
-            now: { requestedAt.addingTimeInterval(301) },
-            state: state,
-        )
-        store.exhaustivity = .off
-
-        await store.send(.mainShell(.home(.effect(.projectsLoadFinished(
-            requestID: 1,
-            result: .success(Self.pageContainingProject),
-        )))))
-        await store.receive(.effect(.generationProgressReleased(projectID: "project-1"))) {
-            $0.generationProgress = nil
-            $0.isGenerationProgressRestored = false
-        }
-
+        await trackGeneration.finish()
         await store.skipReceivedActions()
         await store.finish()
     }
 
     // MARK: Private
 
-    private static let receipt = ProjectRegistrationReceipt(
-        projectID: "project-1",
-        requestStatus: "IN_PROGRESS",
-        quizLevel: .l1,
-    )
+    private static let githubRepoURL = "https://github.com/owner/repo"
 
-    private static let pageContainingProject = LearningProjectPage(
-        items: [
-            LearningProjectSummary(
-                projectID: "project-1",
-                repositoryName: "repo",
-                repositoryImageURL: nil,
-                techStack: ["Swift"],
-                currentSetLabel: "Set 1",
-                currentSetTitle: "제목",
-                nextSetID: nil,
-                nextQuestionID: nil,
-                overallProgressPercent: 0,
-            )
-        ],
-        hasNext: false,
-    )
+    private static func inProgressRecord(requestedAt: Date) -> GenerationRecord {
+        GenerationRecord(
+            githubRepoURL: githubRepoURL,
+            projectID: "project-1",
+            requestedAt: requestedAt,
+        )
+    }
+
+    private static func inProgressState(requestedAt: Date) -> GenerationState {
+        GenerationState(records: [inProgressRecord(requestedAt: requestedAt)])
+    }
+
+    private static func completedState(requestedAt: Date) -> GenerationState {
+        GenerationState(records: [
+            inProgressRecord(requestedAt: requestedAt).finishing(status: .completed, at: requestedAt),
+        ])
+    }
 
 }
 
@@ -749,7 +693,7 @@ struct AppRootLearningFlowTests {
 
     @Test
     func `프로젝트 상세 요청은 상세 흐름을 표시한다`() async {
-        let store = makeAppRootStore(state: mainShellState())
+        let store = makeAppRootStore(state: AppRootTestFixture.mainShellState())
         store.exhaustivity = .off
 
         await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
@@ -825,14 +769,8 @@ struct AppRootLearningFlowTests {
 
     // MARK: Private
 
-    private func mainShellState() -> AppRootFeature.State {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .mainShell
-        return state
-    }
-
     private func presentedDetailState() -> AppRootFeature.State {
-        var state = mainShellState()
+        var state = AppRootTestFixture.mainShellState()
         state.projectDetail = ProjectDetailRouterFeature.State(projectID: "project-1")
         return state
     }

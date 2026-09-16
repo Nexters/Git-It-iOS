@@ -9,7 +9,7 @@ public struct HomeFeature: Sendable {
 
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
-        fetchMemberProfile: any FetchMemberProfileUseCase,
+        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
         trackGeneration: any TrackGenerationUseCase,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
@@ -211,7 +211,7 @@ public struct HomeFeature: Sendable {
     }
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let fetchMemberProfile: any FetchMemberProfileUseCase
+    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
     private let trackGeneration: any TrackGenerationUseCase
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {

@@ -249,9 +249,9 @@ struct SettingsFeatureTests {
         TestStore(initialState: state) {
             SettingsFeature(
                 signOut: SignOutUseCaseMock(),
-                fetchMemberProfile: fetchMemberProfile,
-                updateMemberPosition: updateMemberPosition,
-                updateMemberCareerLevel: updateMemberCareerLevel,
+                fetchMemberProfile: fetchMemberProfile.fetchProfile,
+                updateMemberPosition: updateMemberPosition.updatePosition,
+                updateMemberCareerLevel: updateMemberCareerLevel.updateCareerLevel,
                 deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,

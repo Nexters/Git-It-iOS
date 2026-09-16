@@ -12,14 +12,14 @@ public struct OnboardingRouterFeature: Sendable {
         signIn: any SignInUseCase,
         signOut: any SignOutUseCase,
         policyConsent: any PolicyConsentUseCase,
-        completeCuration: any CompleteCurationUseCase,
+        memberAccount: any MemberAccountUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
         deletesCompletedAccountOnSignIn: Bool = false,
     ) {
         self.signIn = signIn
         self.signOut = signOut
         self.policyConsent = policyConsent
-        self.completeCuration = completeCuration
+        self.memberAccount = memberAccount
         self.deleteMemberAccount = deleteMemberAccount
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
@@ -116,7 +116,9 @@ public struct OnboardingRouterFeature: Sendable {
             PositionSelectionFeature(signOut: signOut)
         }
         Scope(state: \.careerSelection, action: \.careerSelection) {
-            CareerSelectionFeature(completeCuration: completeCuration)
+            CareerSelectionFeature(completeCuration: { [memberAccount] in
+                try await memberAccount.completeCuration(position: $0, careerLevel: $1)
+            })
         }
         Scope(state: \.exit, action: \.exit) {
             OnboardingExitFeature()
@@ -201,7 +203,7 @@ public struct OnboardingRouterFeature: Sendable {
     private let signIn: any SignInUseCase
     private let signOut: any SignOutUseCase
     private let policyConsent: any PolicyConsentUseCase
-    private let completeCuration: any CompleteCurationUseCase
+    private let memberAccount: any MemberAccountUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
     private let deletesCompletedAccountOnSignIn: Bool
 

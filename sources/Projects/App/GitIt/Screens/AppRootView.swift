@@ -94,8 +94,8 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopFetchMemberProfile: FetchMemberProfileUseCase {
-        func callAsFunction() async throws -> MemberProfile {
+    struct NoopMemberAccount: MemberAccountUseCase {
+        func profile() async throws -> MemberProfile {
             MemberProfile(
                 name: "미리보기",
                 email: "preview@example.com",
@@ -109,10 +109,16 @@ private enum AppRootPreviewSupport {
                 ),
             )
         }
-    }
 
-    struct NoopCompleteCuration: CompleteCurationUseCase {
-        func callAsFunction(
+        func updatePosition(_: MemberPosition) async throws {
+            throw CancellationError()
+        }
+
+        func updateCareerLevel(_: CareerLevel) async throws {
+            throw CancellationError()
+        }
+
+        func completeCuration(
             position _: MemberPosition,
             careerLevel _: CareerLevel,
         ) async throws { }
@@ -200,18 +206,6 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopUpdateMemberPosition: UpdateMemberPositionUseCase {
-        func callAsFunction(_: MemberPosition) async throws {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopUpdateMemberCareerLevel: UpdateMemberCareerLevelUseCase {
-        func callAsFunction(_: CareerLevel) async throws {
-            throw CancellationError()
-        }
-    }
-
     struct NoopDeleteMemberAccount: DeleteMemberAccountUseCase {
         func callAsFunction() async throws {
             throw CancellationError()
@@ -280,8 +274,7 @@ private enum AppRootPreviewSupport {
                 signIn: NoopSignIn(),
                 signOut: NoopSignOut(),
                 verifyAuthorization: NoopVerifyAuthorization(),
-                fetchMemberProfile: NoopFetchMemberProfile(),
-                completeCuration: NoopCompleteCuration(),
+                memberAccount: NoopMemberAccount(),
                 policyConsent: NoopPolicyConsent(),
                 fetchLearningProjects: NoopFetchLearningProjects(),
                 fetchLearningProjectDetail: NoopFetchLearningProjectDetail(),
@@ -291,8 +284,6 @@ private enum AppRootPreviewSupport {
                 submitChoiceAnswer: NoopSubmitChoiceAnswer(),
                 submitEssayAnswer: NoopSubmitEssayAnswer(),
                 setQuestionBookmark: NoopSetQuestionBookmark(),
-                updateMemberPosition: NoopUpdateMemberPosition(),
-                updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
