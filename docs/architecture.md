@@ -22,7 +22,7 @@ Feature는 TCA를 이용해 사용자 기능의 상태와 상호작용을 표현
 | Composition | Domain↔Data Adapter 구현, 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
 | Feature | TCA 기반 상태 관리, 사용자 상호작용, 화면 구성과 Presentation 흐름 |
 | Domain | 비즈니스 모델, 정책, 비즈니스 로직과 외부 기능에 대한 Domain 계약 |
-| Data | 데이터 획득·저장·캐시·동기화와 Data 소유 모델·DTO, 외부 기술 기능에 대한 Data 계약 |
+| Data | 데이터 획득·저장·캐시·동기화의 실행 역할과 Data 소유 모델·DTO |
 | Infrastructure | 외부 라이브러리·프레임워크·플랫폼 기능을 프로젝트 내부 기술 API로 변환 |
 | UI | 여러 Feature가 공유하는 디자인 시스템과 재사용 가능한 UI 구성요소 |
 
@@ -40,15 +40,15 @@ Feature는 사용자가 인지하는 기능의 Presentation 경계입니다. TCA
 
 ### Domain
 
-Domain은 프로젝트의 비즈니스 언어와 규칙을 표현하는 핵심 경계입니다. 도메인 모델, Value Object, 정책, Use Case와 비즈니스 기능이 요구하는 외부 기능 계약을 소유합니다.
+Domain은 프로젝트의 비즈니스 언어와 규칙을 표현하는 핵심 경계입니다. 도메인 모델, Value Object, 정책, Use Case와 비즈니스 기능이 요구하는 외부 기능 계약을 소유합니다. Domain의 공개 선언은 비즈니스 로직의 관심사를 기준으로 정의하며, Data의 형태나 특정 API에 의존하지 않고 사용자·서비스 관점의 역할을 표현합니다. 계약 접미어와 연산 이름의 판정 기준은 [D-ARCH-004](#9-아키텍처-결정-기록)가 소유합니다.
 
 ### Data
 
-Data는 데이터의 획득, 저장, 캐시와 동기화를 담당하는 데이터 경계입니다. 서비스 API와 DTO, Data 모델과 데이터 처리 정책을 자신의 언어로 표현하고 필요한 외부 기술 기능의 계약을 소유합니다.
+Data는 데이터의 획득, 저장, 캐시와 동기화를 담당하는 데이터 경계입니다. 서비스 API와 DTO, Data 모델과 데이터 처리 정책을 자신의 언어로 표현합니다. Data의 공개 선언(타입·프로토콜·연산·initializer·프로퍼티 이름과 시그니처)은 HTTP, Keychain, UserDefaults, URLSession 같은 기술이나 라이브러리·프레임워크에 종속된 형태로 정의하지 않고 실행하는 역할만 표현합니다. 기술은 Infrastructure가 모두 담당하며, Data는 내부 구현에서 Infrastructure를 사용하더라도 그 기술을 Data 밖으로 노출하지 않습니다. 판정 기준은 [D-ARCH-004](#9-아키텍처-결정-기록)가 소유합니다.
 
 ### Infrastructure
 
-Infrastructure는 외부 라이브러리, 플랫폼 기능과 기술 API를 프로젝트가 소유한 범용 기술 API로 변환하는 기술 경계입니다. 외부 기술의 타입과 오류를 프로젝트 내부 기술 타입과 오류로 변환합니다.
+Infrastructure는 외부 라이브러리, 플랫폼 기능과 기술 API를 프로젝트가 소유한 범용 기술 API로 변환하는 기술 경계입니다. 외부 기술의 타입과 오류를 프로젝트 내부 기술 타입과 오류로 변환합니다. 프로젝트가 사용하는 기술은 모두 이 경계가 담당하며, 기술·플랫폼·공급자 명칭은 이 경계의 공개 API에만 둡니다.
 
 ### UI
 
@@ -148,19 +148,12 @@ Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
 
 #### Data ↔ Infrastructure
 
-Data는 네트워크, 저장소와 같은 외부 기술 기능에 필요한 계약을 Data의 언어로 정의하고, 그 계약의 concrete 구현을 Infrastructure 기술 API 위에서 직접 소유합니다. 이 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당합니다.
+Data는 획득·저장 같은 실행 역할을 자신의 언어로 정의한 concrete 타입으로 소유하고, 그 내부 구현에서만 Infrastructure 기술 API를 사용합니다. 이 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당하며, 기술 이름은 Data 공개 선언에 나타나지 않습니다. Data 안에 프로토콜을 둘지는 [추상화 컨벤션](./conventions/abstraction.md)의 근거를 따릅니다.
 
 ```swift
-public protocol UserRemote: Sendable {
-    func user(id: String) async throws -> UserResponseDTO
-}
-
-public struct HTTPUserRemote: UserRemote {
+public struct UserRemote: Sendable {
+    // 생성 인자는 Composition 조립에서 주입한다
     private let client: HTTPClient
-
-    public init(client: HTTPClient) {
-        self.client = client
-    }
 
     public func user(id: String) async throws -> UserResponseDTO {
         // Data 소유 요청 값을 HTTPRequest로 변환해 client.send를 호출하고,
@@ -171,15 +164,12 @@ public struct HTTPUserRemote: UserRemote {
 
 ```text
 Data UserRemote
-      ↑
-      │ implements
-Data HTTPUserRemote
-      │ delegates
+      │ 내부 구현에서 사용
       ↓
 Infrastructure HTTPClient
 ```
 
-`HTTPUserRemote`는 Data 계약의 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
+`UserRemote`는 Data 소유 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
 
 ### 3.4 Navigation과 화면 흐름
 
@@ -344,6 +334,40 @@ UI → Feature
   알지 않습니다.
 - Data↔Infrastructure 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당합니다
   (`Data → Infrastructure` 허용).
+
+### D-ARCH-004 — Domain·Data·Infrastructure 관심사 경계
+
+`specs/035-domain-data-infra-design-review/spec.md`(FR-017·FR-020과 명확화 1~6)가 확정한
+결정입니다. 이 문서의 2장과 3.3이 원칙을 반영하며,
+[Domain](./package-rules/domain.md) · [Data](./package-rules/data.md) ·
+[Infrastructure](./package-rules/infrastructure.md) 패키지 규칙과
+[네이밍 컨벤션 4장](./conventions/naming.md#4-패키지-문맥)은 이 기록을 참조하고 판정 기준을
+다시 서술하지 않습니다.
+
+- Data의 공개 선언(타입·프로토콜·연산·initializer·프로퍼티 이름과 시그니처)은 HTTP,
+  Keychain, UserDefaults, URLSession 같은 기술이나 라이브러리·프레임워크에 종속된 형태로
+  정의하지 않고 실행하는 역할만 표현합니다. 기술은 Infrastructure가 모두 담당하며, Data는
+  내부 구현에서 Infrastructure를 사용하더라도 그 기술을 Data 밖으로 노출하지 않습니다.
+- Domain의 공개 선언은 비즈니스 로직의 관심사를 기준으로 정의하며, Data의 형태나 특정
+  API에 의존하지 않고 사용자·서비스 관점의 역할을 표현합니다.
+- Domain 계약 이름에서 `Repository`는 외부 기능 계약의 역할 어휘로 허용합니다. `Store`,
+  `Registry`, `Gateway`, `Parser`처럼 저장 매체·형식·접근 방식을 드러내는 접미어와
+  `load`/`save`처럼 저장소 연산을 그대로 드러내는 연산 이름은 허용하지 않습니다. 연산 이름
+  변경이 계약 시그니처(인자·반환 타입)를 바꾸지 않으면 rename으로 처리합니다.
+- Data 공개 타입·프로토콜 이름의 전송·저장 기술 용어(HTTP, Keychain, UserDefaults,
+  URLSession)는 위반입니다. 외부 서비스·공급자 이름(GitHub, Apple)은 그 서비스가 해당
+  선언의 역할 대상일 때만 허용합니다. 외부 고정 명칭 보존은 직렬화 key·서버 필드·플랫폼
+  API 값에만 적용합니다.
+- Domain과 Data 사이의 관심사 중복 객체는 (1) 책임과 연산이 완전히 1:1로 대응, (2) Domain에
+  비즈니스 로직이 없고 Data 구현을 그대로 감쌈, (3) 이름과 필드가 완전히 같음 중 하나라도
+  해당하면 기록 대상이며, 제거·병합은 별도 명세가 다룹니다.
+- 위반 중 이름만 바꾸면 원칙을 충족하는 항목은 rename으로 해소합니다. 기술 타입의
+  Infrastructure 이동·제거, 공개 API에서 Infrastructure 타입 숨기기, Data target 사이 반복
+  타입 정리처럼 선언의 구성이나 시그니처를 바꿔야 하는 항목은 후속 설계 변경으로
+  기록합니다. 현행 Data 공개 initializer가 `HTTPClient`·`KeychainStore`·`UserDefaultsStore`를
+  인자로 받는 사실은 [설계 점검 결과](./review/domain-data-infra-design-review.md)의
+  DS-06으로 이관 중입니다.
+- Infrastructure 공개 이름은 직접 감싸는 기술·플랫폼·공급자 명칭을 보존합니다.
 
 ## 문서 변경 기준
 

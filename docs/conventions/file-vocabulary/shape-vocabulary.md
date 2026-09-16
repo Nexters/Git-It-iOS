@@ -22,6 +22,9 @@
 | | `Sources/` | 외부에서 주입되는 프로세스 내 데이터 소스 구현 |
 | | `Stores/` | 로컬 저장 계약 구현 |
 | | `Parsers/` | 외부 입력 문자열을 내부 모델로 해석하는 구현 |
+| | `Codings/` | 저장 형식 인코딩·디코딩 |
+| | `Layouts/` | 저장소 key 배치 |
+| | `Migrations/` | 저장 형식 이전 |
 | | `Models/` | Data 내부 모델 |
 | | `Errors/` | Data 오류 타입 |
 | `Infrastructure/<능력>/[<하위 능력>/]` | `Clients/` | 기술 능력의 공개 진입 타입 |

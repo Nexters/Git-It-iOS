@@ -125,7 +125,7 @@ rename하지 않고 U1에서 `OK-*`로 기록한다. Composition Adapter 파일 
 
 ### 구현
 
-- [ ] T005 [S2] `docs/architecture.md` 2장 Domain·Data·Infrastructure 설명에 FR-017 원칙을
+- [X] T005 [S2] `docs/architecture.md` 2장 Domain·Data·Infrastructure 설명에 FR-017 원칙을
       정본으로 서술하고, 3.3 "Data ↔ Infrastructure"의 `UserRemote`/`HTTPUserRemote` 예시를
       기술 이름 없는 예시로 바꾼다. 새 예시는 `UserRemote` 구조체가 `private let client: HTTPClient`를
       내부에서만 사용하는 형태로 쓰고 공개 initializer 시그니처는 예시에 넣지 않는다(생성 인자는
@@ -134,33 +134,33 @@ rename하지 않고 U1에서 `OK-*`로 기록한다. Composition Adapter 파일 
       명확화 1~6의 판정 기준(`Repository` 허용, `Store`·`Registry`·`Gateway`·`Parser`·`load`/`save`
       비허용, 외부 서비스명 허용 조건)을 이 문서에만 기록하고, 현행 Data 공개 initializer의
       Infrastructure 인자는 점검 결과 DS-06으로 이관 중임을 한 문장으로 적는다(DOC-02).
-- [ ] T006 [P] [S2] `docs/package-rules/infrastructure.md` 설명 2문단과 정책 5항의
+- [X] T006 [P] [S2] `docs/package-rules/infrastructure.md` 설명 2문단과 정책 5항의
       "Composition Adapter" 서술을 "Data 내부 구현이 사용"으로 고치고(DOC-01), 정책 2항 뒤에
       능력 묶음 target(`InfrastructureAuthentication`)이 현행이며 분리는 점검 결과 DS-07의
       후속임을 명시한다(DOC-05). 정책 1항이 D-ARCH-004를 참조하게 한다.
-- [ ] T007 [P] [S2] `docs/package-rules/data.md` 설명 2문단과 정책 5항을 FR-017에 맞게
+- [X] T007 [P] [S2] `docs/package-rules/data.md` 설명 2문단과 정책 5항을 FR-017에 맞게
       재서술한다: Data 공개 선언은 실행 역할만 표현하고 기술은 내부 구현에서만 사용하며 밖으로
       노출하지 않는다. D-ARCH-004를 참조한다(DOC-03).
-- [ ] T008 [P] [S2] `docs/package-rules/domain.md` 정책 1항에 D-ARCH-004 참조 링크를 추가한다.
+- [X] T008 [P] [S2] `docs/package-rules/domain.md` 정책 1항에 D-ARCH-004 참조 링크를 추가한다.
       FR-020 접미어·연산 판정 기준은 재서술하지 않고 D-ARCH-004를 가리키는 한 문장으로만
       둔다(FR-018 정본 단일화).
-- [ ] T009 [P] [S2] `docs/conventions/naming.md` 4장 표의 Data 행 "필요한 기술 계약"을 "실행
+- [X] T009 [P] [S2] `docs/conventions/naming.md` 4장 표의 Data 행 "필요한 기술 계약"을 "실행
       역할, DTO"로, 노출하지 않는 문맥에 "전송·저장 기술 용어"를 추가하고 D-ARCH-004를
       참조한다(DOC-06). 7장 외부 고정 명칭 절 아래에는 서비스명 허용 기준의 정본이 D-ARCH-004임을
       가리키는 한 문장만 두고 기준을 재서술하지 않는다.
-- [ ] T010 [P] [S2] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에
+- [X] T010 [P] [S2] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에
       `Codings/`(저장 형식 인코딩·디코딩), `Layouts/`(저장소 key 배치), `Migrations/`(저장 형식
       이전)를 추가한다(DOC-08).
-- [ ] T011 [P] [S2] `sources/Projects/Domain/Authentication/README.md`에서 `AuthenticationOutcome`
+- [X] T011 [P] [S2] `sources/Projects/Domain/Authentication/README.md`에서 `AuthenticationOutcome`
       설명을 제거하고 공개 모델·계약 목록을 현재 코드(`AuthenticatedUser`, `AuthorizationStatus`,
       계약 5개)와 일치시킨다(DOC-04). RN-17·18의 새 이름은 U3에서 반영하므로 여기서는 옛 이름을
       유지한다.
-- [ ] T012 [S2] `docs/review/domain-data-infra-design-review.md` 2.1 표에서 DOC-01~06·08의 상태를
+- [X] T012 [S2] `docs/review/domain-data-infra-design-review.md` 2.1 표에서 DOC-01~06·08의 상태를
       `해소`로 바꾼다.
 
 ### 정리와 패키지 검증
 
-- [ ] T013 [no-write] [S2] quickstart 시나리오 2의 `grep` 명령을 실행하고, 아키텍처 2장·3.3·9장,
+- [X] T013 [no-write] [S2] quickstart 시나리오 2의 `grep` 명령을 실행하고, 아키텍처 2장·3.3·9장,
       패키지 규칙 3개, 네이밍 4장 표가 FR-017과 같은 결론인지 읽어 확인한다. 수정한 문서의
       상대 링크 대상이 존재하는지 `grep -o '](\.\./[^)]*)'`로 확인한다.
 
