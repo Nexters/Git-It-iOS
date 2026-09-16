@@ -136,7 +136,7 @@ struct LearningSetRepositoryAdapterTests {
     }
 
     private func makeAdapter(transport: RecordingHTTPTransport) -> LearningSetRepositoryAdapter {
-        LearningSetRepositoryAdapter(remote: HTTPLearningSetRemote(
+        LearningSetRepositoryAdapter(remote: LearningSetRemote(
             client: HTTPClient(
                 baseURL: URL(string: "https://api.git-it.example.com")!,
                 bodyCoding: StandardJSONBodyCoding(),

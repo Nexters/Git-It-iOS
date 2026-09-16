@@ -7,7 +7,7 @@ struct MemberRepositoryAdapter: MemberRepository {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPMemberRemote) {
+    init(remote: MemberRemote) {
         self.remote = remote
     }
 
@@ -22,7 +22,7 @@ struct MemberRepositoryAdapter: MemberRepository {
                 position: dtoPosition(position),
                 careerLevel: dtoCareerLevel(careerLevel),
             ))
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
@@ -44,7 +44,7 @@ struct MemberRepositoryAdapter: MemberRepository {
                     },
                 ),
             )
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
@@ -52,7 +52,7 @@ struct MemberRepositoryAdapter: MemberRepository {
     func updatePosition(_ position: MemberPosition) async throws {
         do {
             try await remote.updatePosition(PositionRequestDTO(position: dtoPosition(position)))
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
@@ -60,7 +60,7 @@ struct MemberRepositoryAdapter: MemberRepository {
     func updateCareerLevel(_ careerLevel: CareerLevel) async throws {
         do {
             try await remote.updateCareerLevel(CareerLevelRequestDTO(careerLevel: dtoCareerLevel(careerLevel)))
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
@@ -74,7 +74,7 @@ struct MemberRepositoryAdapter: MemberRepository {
                 osVersion: device.osVersion,
                 deviceToken: device.deviceToken,
             ))
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
@@ -82,14 +82,14 @@ struct MemberRepositoryAdapter: MemberRepository {
     func deleteAccount() async throws {
         do {
             try await remote.withdrawMember()
-        } catch let error as DataMemberError {
+        } catch let error as MemberServiceError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPMemberRemote
+    private let remote: MemberRemote
 
     private func dtoPosition(_ position: MemberPosition) -> PositionDTO {
         switch position {
@@ -137,7 +137,7 @@ struct MemberRepositoryAdapter: MemberRepository {
         "ios"
     }
 
-    private func domainError(for error: DataMemberError) -> MemberError {
+    private func domainError(for error: MemberServiceError) -> MemberError {
         switch error {
         case .invalidRequest:
             .invalidRequest

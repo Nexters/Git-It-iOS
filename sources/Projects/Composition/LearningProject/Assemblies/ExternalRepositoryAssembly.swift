@@ -16,7 +16,7 @@ public struct ExternalRepositoryAssembly: Sendable {
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
-        let lookup = ExternalRepositoryLookupAdapter(remote: HTTPExternalRepositoryRemote(client: client))
+        let lookup = ExternalRepositoryLookupAdapter(remote: ExternalRepositoryRemote(client: client))
 
         let locator = ExternalRepositoryLocatorAdapter(parser: GitHubRepositoryURLParser())
         self.locator = locator

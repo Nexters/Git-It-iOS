@@ -10,7 +10,7 @@ struct SessionRecordCoding: Sendable {
     // MARK: Lifecycle
 
     init(keychainStore: KeychainStore) {
-        coding = SessionRecordKeychainCoding(keychainStore: keychainStore)
+        coding = SessionRecordStorageCoding(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -50,6 +50,6 @@ struct SessionRecordCoding: Sendable {
 
     // MARK: Private
 
-    private let coding: SessionRecordKeychainCoding
+    private let coding: SessionRecordStorageCoding
 
 }

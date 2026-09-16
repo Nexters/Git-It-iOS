@@ -63,7 +63,7 @@ struct AnswerRepositoryAdapterTests {
     // MARK: Private
 
     private func makeAdapter(transport: RecordingHTTPTransport) -> AnswerRepositoryAdapter {
-        AnswerRepositoryAdapter(remote: HTTPAnswerRemote(
+        AnswerRepositoryAdapter(remote: AnswerRemote(
             client: HTTPClient(
                 baseURL: URL(string: "https://api.git-it.example.com")!,
                 bodyCoding: StandardJSONBodyCoding(),

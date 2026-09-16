@@ -43,5 +43,5 @@ Data의 구체 타입을 직접 받는 것은 아키텍처가 허용하는 방�
 | --- | --- | --- |
 | `HTTPTransport` | 둔다 | 근거 A — Infrastructure가 소유하고 Data가 사용한다 |
 | `LearningProjectRepository` | 둔다 | 근거 A — Domain이 소유하고 Composition이 채택한다 |
-| `HTTPProjectRemote` | 두지 않는다 | Data 안에서만 쓰이고 구현이 하나다. Composition은 이 구체 타입을 직접 받는다 |
+| `ProjectRemote` | 두지 않는다 | Data 안에서만 쓰이고 구현이 하나다. Composition은 이 구체 타입을 직접 받는다 |
 | `LocalPolicyConsentStore` | 두지 않는다 | 같음 |

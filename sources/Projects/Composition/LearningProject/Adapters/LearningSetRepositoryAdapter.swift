@@ -7,7 +7,7 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPLearningSetRemote) {
+    init(remote: LearningSetRemote) {
         self.remote = remote
     }
 
@@ -25,14 +25,14 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
                 description: response.description,
                 questions: response.questions.map(question(from:)),
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPLearningSetRemote
+    private let remote: LearningSetRemote
 
     private func question(from dto: QuestionResponseDTO) -> Question {
         Question(
@@ -71,7 +71,7 @@ struct LearningSetRepositoryAdapter: LearningSetRepository {
         }
     }
 
-    private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
+    private func domainError(for error: LearningProjectServiceError) -> LearningProjectError {
         switch error {
         case .invalidRequest:
             .invalidRequest

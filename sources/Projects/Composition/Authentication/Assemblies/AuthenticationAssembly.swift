@@ -28,7 +28,7 @@ public struct AuthenticationAssembly: Sendable {
             (try? SessionRecordCoding(keychainStore: keychainStore).load())?.tokens.accessToken
         }
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
-        let authenticationRemote = HTTPAuthenticationRemote(
+        let authenticationRemote = AuthenticationRemote(
             client: client,
             accessTokenProvider: accessTokenProvider,
         )
@@ -88,7 +88,7 @@ public struct AuthenticationAssembly: Sendable {
     public let recordSharedSessionState: @Sendable () async -> Void
 
     public static func migrateSessionKeychain(sharedKeychainStore: KeychainStore) {
-        SessionKeychainMigration(
+        SessionStorageMigration(
             sharedKeychainStore: sharedKeychainStore,
             legacyKeychainStore: AppGroupKeychainStore.makeLegacy(),
         )()

@@ -19,8 +19,8 @@ struct LoginSessionRepositoryAdapterTests {
         let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
         try keychainStore.save(
             Data("apple-user-1".utf8),
-            for: AppleIdentityKeychainLayout.Key.appleUserID.rawValue,
-            in: AppleIdentityKeychainLayout.namespace,
+            for: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
+            in: AppleIdentityStorageLayout.namespace,
         )
         let transport = RecordingHTTPTransport(results: [
             jsonResponse(
@@ -105,8 +105,8 @@ struct LoginSessionRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPAuthenticationRemote {
-        HTTPAuthenticationRemote(
+    private func makeRemote(transport: RecordingHTTPTransport) -> AuthenticationRemote {
+        AuthenticationRemote(
             client: HTTPClient(
                 baseURL: URL(string: "https://api.git-it.example.com")!,
                 bodyCoding: StandardJSONBodyCoding(),

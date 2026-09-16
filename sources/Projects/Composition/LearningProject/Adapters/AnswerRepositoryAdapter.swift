@@ -7,7 +7,7 @@ struct AnswerRepositoryAdapter: AnswerRepository {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPAnswerRemote) {
+    init(remote: AnswerRemote) {
         self.remote = remote
     }
 
@@ -29,7 +29,7 @@ struct AnswerRepositoryAdapter: AnswerRepository {
                 answerIndex: response.answerIndex,
                 explanation: response.explanation,
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
@@ -49,16 +49,16 @@ struct AnswerRepositoryAdapter: AnswerRepository {
                 explanation: response.explanation,
                 rubric: Rubric(criteria: [response.rubric.feedback]),
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPAnswerRemote
+    private let remote: AnswerRemote
 
-    private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
+    private func domainError(for error: LearningProjectServiceError) -> LearningProjectError {
         switch error {
         case .invalidRequest:
             .invalidRequest

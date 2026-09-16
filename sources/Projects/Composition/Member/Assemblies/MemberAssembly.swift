@@ -22,7 +22,7 @@ public struct MemberAssembly: Sendable {
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let baseRepository = MemberRepositoryAdapter(
-            remote: HTTPMemberRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: MemberRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
         let repository = CurationRepositoryAdapter(
             remote: baseRepository,

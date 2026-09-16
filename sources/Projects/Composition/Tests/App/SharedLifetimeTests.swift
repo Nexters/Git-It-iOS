@@ -43,8 +43,8 @@ struct SharedLifetimeTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPAuthenticationRemote {
-        HTTPAuthenticationRemote(
+    private func makeRemote(transport: RecordingHTTPTransport) -> AuthenticationRemote {
+        AuthenticationRemote(
             client: HTTPClient(
                 baseURL: URL(string: "https://api.git-it.example.com")!,
                 bodyCoding: StandardJSONBodyCoding(),

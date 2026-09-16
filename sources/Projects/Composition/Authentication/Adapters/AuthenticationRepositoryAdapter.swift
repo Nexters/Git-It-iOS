@@ -16,7 +16,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     ) {
         self.authorizationProvider = authorizationProvider
         self.credentialStateProvider = credentialStateProvider
-        appleIdentityStore = AppleIdentityKeychainStore(keychainStore: keychainStore)
+        appleIdentityStore = AppleIdentityStore(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -60,7 +60,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     private let authorizationProvider: AppleAuthorizationProvider
     private let credentialStateProvider: AppleCredentialStateProvider
-    private let appleIdentityStore: AppleIdentityKeychainStore
+    private let appleIdentityStore: AppleIdentityStore
 
     private func persistUserID(_ userID: String) throws {
         try appleIdentityStore.save(userID)

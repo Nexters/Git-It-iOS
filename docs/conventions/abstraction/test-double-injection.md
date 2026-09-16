@@ -24,15 +24,15 @@
 
 ## 예시
 
-`HTTPProjectRemote`의 동작을 검증할 때 `ProjectRemote` 프로토콜과 그 스텁을 만들지
+`ProjectRemote`의 동작을 검증할 때 별도의 remote 프로토콜과 그 스텁을 만들지
 않고, `StubHTTPTransport`를 주입합니다.
 
 ```swift
 let transport = StubHTTPTransport(responses: [...])
-let remote = HTTPProjectRemote(client: HTTPClient(transport: transport), accessTokenProvider: { nil })
+let remote = ProjectRemote(client: HTTPClient(transport: transport), accessTokenProvider: { nil })
 ```
 
-이 구성은 요청 경로·헤더·본문과 응답 디코딩까지 함께 검증합니다. `ProjectRemote` 스텁은
+이 구성은 요청 경로·헤더·본문과 응답 디코딩까지 함께 검증합니다. 그런 프로토콜 스텁은
 그중 어느 것도 검증하지 못합니다.
 
 Composition Adapter 테스트도 같은 구성을 씁니다. 어댑터가 받는 Data 구체 타입을 실제로

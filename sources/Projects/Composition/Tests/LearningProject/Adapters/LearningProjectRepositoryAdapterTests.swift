@@ -90,7 +90,7 @@ struct LearningProjectRepositoryAdapterTests {
     // MARK: Private
 
     private func makeAdapter(transport: RecordingHTTPTransport) -> LearningProjectRepositoryAdapter {
-        LearningProjectRepositoryAdapter(remote: HTTPProjectRemote(
+        LearningProjectRepositoryAdapter(remote: ProjectRemote(
             client: learningProjectClient(transport: transport),
             accessTokenProvider: { "test-access-token" },
         ))

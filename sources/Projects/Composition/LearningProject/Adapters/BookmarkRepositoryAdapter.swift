@@ -7,7 +7,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPBookmarkRemote) {
+    init(remote: BookmarkRemote) {
         self.remote = remote
     }
 
@@ -25,7 +25,7 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
                 request: BookmarkQuestionRequestDTO(bookmarked: bookmarked),
             )
             return BookmarkState(bookmarked: response.bookmarked)
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
@@ -50,16 +50,16 @@ struct BookmarkRepositoryAdapter: BookmarkRepository {
                     )
                 },
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPBookmarkRemote
+    private let remote: BookmarkRemote
 
-    private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
+    private func domainError(for error: LearningProjectServiceError) -> LearningProjectError {
         switch error {
         case .invalidRequest:
             .invalidRequest

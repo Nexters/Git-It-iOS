@@ -8,7 +8,7 @@ Submission ID `723df8fb-ed8b-4eb9-8caa-e4ee5f9e14a4` (1.0.0 build 7)에 대한 A
 
 | 주장 | 근거 |
 | --- | --- |
-| 모든 콘텐츠가 계정 귀속 서버 데이터다 | `LearningProjectHTTPExecutor`가 project·set·answer·bookmark 전 요청에 `AuthorizedRequestHeaders` 부착 |
+| 모든 콘텐츠가 계정 귀속 서버 데이터다 | `LearningProjectRequestExecutor`가 project·set·answer·bookmark 전 요청에 `AuthorizedRequestHeaders` 부착 |
 | 편집자 콘텐츠·공개 카탈로그가 없다 | 조회 가능한 목록은 `FetchLearningProjectsUseCase` 결과뿐이며 사용자가 등록한 저장소에서만 생성 |
 | 퀴즈는 사용자별로 생성된다 | `CreateLearningProjectUseCase` → 서버 생성 → `ObserveGenerationOutcomesUseCase`로 해당 계정에만 전달 |
 | 추가 개인정보 입력 폼이 없다 | 로그인은 `com.apple.developer.applesignin` 전용, 아이디/비밀번호 폼 없음 |

@@ -7,7 +7,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPProjectRemote) {
+    init(remote: ProjectRemote) {
         self.remote = remote
     }
 
@@ -26,7 +26,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                 requestStatus: response.requestStatus,
                 quizLevel: quizLevel,
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
@@ -41,7 +41,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                 items: response.items.map(summary(from:)),
                 hasNext: response.hasNext,
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
@@ -68,7 +68,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                     )
                 },
             )
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
@@ -76,14 +76,14 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
     func deleteProject(projectID: String) async throws {
         do {
             try await remote.deleteProject(projectID: projectID)
-        } catch let error as DataLearningProjectError {
+        } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPProjectRemote
+    private let remote: ProjectRemote
 
     private func summary(from dto: ProjectListItemDTO) -> LearningProjectSummary {
         LearningProjectSummary(
@@ -108,7 +108,7 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
         }
     }
 
-    private func domainError(for error: DataLearningProjectError) -> LearningProjectError {
+    private func domainError(for error: LearningProjectServiceError) -> LearningProjectError {
         switch error {
         case .invalidRequest:
             .invalidRequest

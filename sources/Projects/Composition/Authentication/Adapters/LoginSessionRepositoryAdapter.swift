@@ -11,7 +11,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     // MARK: Lifecycle
 
     init(
-        remote: HTTPAuthenticationRemote,
+        remote: AuthenticationRemote,
         keychainStore: KeychainStore,
         sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = AppGroupUserDefaults.makeShared()
             .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
@@ -19,7 +19,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         self.remote = remote
         self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding
         sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
-        appleIdentityStore = AppleIdentityKeychainStore(keychainStore: keychainStore)
+        appleIdentityStore = AppleIdentityStore(keychainStore: keychainStore)
     }
 
     // MARK: Internal
@@ -43,7 +43,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
             await recordSharedSessionState(isSignedIn: true)
             guard let userID = try loadAppleUserID() else { throw LoginSessionError.temporarilyUnavailable }
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
-        } catch let error as DataAuthenticationError {
+        } catch let error as AuthenticationServiceError {
             throw domainLoginError(for: error)
         } catch is KeychainStoreError {
             throw LoginSessionError.temporarilyUnavailable
@@ -98,16 +98,16 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     func verifyAccessToken() async throws {
         do {
             try await remote.verifyAccessToken()
-        } catch let error as DataAuthenticationError {
+        } catch let error as AuthenticationServiceError {
             throw domainVerifyError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPAuthenticationRemote
+    private let remote: AuthenticationRemote
     private let sessionCoding: SessionRecordCoding
-    private let appleIdentityStore: AppleIdentityKeychainStore
+    private let appleIdentityStore: AppleIdentityStore
     private let sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding?
 
     private func recordSharedSessionState(isSignedIn: Bool) async {
@@ -118,7 +118,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         try appleIdentityStore.load()
     }
 
-    private func domainLoginError(for error: DataAuthenticationError) -> LoginSessionError {
+    private func domainLoginError(for error: AuthenticationServiceError) -> LoginSessionError {
         switch error {
         case .unauthorized:
             .refreshRejectedOrExpired
@@ -136,7 +136,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         }
     }
 
-    private func domainVerifyError(for error: DataAuthenticationError) -> LoginSessionError {
+    private func domainVerifyError(for error: AuthenticationServiceError) -> LoginSessionError {
         switch error {
         case .unauthorized:
             .unauthorized

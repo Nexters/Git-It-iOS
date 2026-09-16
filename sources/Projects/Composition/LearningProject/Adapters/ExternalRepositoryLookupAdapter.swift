@@ -7,7 +7,7 @@ struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPExternalRepositoryRemote) {
+    init(remote: ExternalRepositoryRemote) {
         self.remote = remote
     }
 
@@ -27,16 +27,16 @@ struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
                 starCount: response.starCount,
                 techStack: response.topics,
             )
-        } catch let error as DataExternalRepositoryError {
+        } catch let error as ExternalRepositoryFetchError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPExternalRepositoryRemote
+    private let remote: ExternalRepositoryRemote
 
-    private func domainError(for error: DataExternalRepositoryError) -> ExternalRepositoryError {
+    private func domainError(for error: ExternalRepositoryFetchError) -> ExternalRepositoryError {
         switch error {
         case .offline:
             .offline

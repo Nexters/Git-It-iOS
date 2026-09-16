@@ -290,7 +290,7 @@ key·저장 key 문자열 diff 0건.
 
 ### 구현 — Data
 
-- [ ] T027 [P] [S3] RN-01~04: `sources/Projects/Data/Authentication/Errors/DataAuthenticationError.swift`
+- [X] T027 [P] [S3] RN-01~04: `sources/Projects/Data/Authentication/Errors/DataAuthenticationError.swift`
       → `sources/Projects/Data/Authentication/Errors/AuthenticationServiceError.swift`,
       `sources/Projects/Data/Member/Errors/DataMemberError.swift` →
       `sources/Projects/Data/Member/Errors/MemberServiceError.swift`,
@@ -300,14 +300,14 @@ key·저장 key 문자열 diff 0건.
       `sources/Projects/Data/ExternalRepository/Errors/ExternalRepositoryFetchError.swift`로 파일과
       타입 이름을 바꾼다. case와 `init(from:)`은
       불변.
-- [ ] T028 [P] [S3] RN-05·06·08: `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`
+- [X] T028 [P] [S3] RN-05·06·08: `sources/Projects/Data/Authentication/Remotes/HTTPAuthenticationRemote.swift`
       → `sources/Projects/Data/Authentication/Remotes/AuthenticationRemote.swift`,
       `sources/Projects/Data/ExternalRepository/Remotes/HTTPExternalRepositoryRemote.swift` →
       `sources/Projects/Data/ExternalRepository/Remotes/ExternalRepositoryRemote.swift`,
       `sources/Projects/Data/Member/Remotes/HTTPMemberRemote.swift` →
       `sources/Projects/Data/Member/Remotes/MemberRemote.swift`로 파일과 타입 이름을 바꾼다. `init(client: HTTPClient, …)` 시그니처
       불변.
-- [ ] T029 [P] [S3] RN-07·09: `sources/Projects/Data/LearningProject/Remotes/HTTPAnswerRemote.swift`
+- [X] T029 [P] [S3] RN-07·09: `sources/Projects/Data/LearningProject/Remotes/HTTPAnswerRemote.swift`
       → `sources/Projects/Data/LearningProject/Remotes/AnswerRemote.swift`,
       `sources/Projects/Data/LearningProject/Remotes/HTTPBookmarkRemote.swift` →
       `sources/Projects/Data/LearningProject/Remotes/BookmarkRemote.swift`,
@@ -318,7 +318,7 @@ key·저장 key 문자열 diff 0건.
       `sources/Projects/Data/LearningProject/Remotes/LearningProjectHTTPExecutor.swift` →
       `sources/Projects/Data/LearningProject/Remotes/LearningProjectRequestExecutor.swift`로 파일과
       타입 이름을 바꾸고 상호 참조를 갱신한다.
-- [ ] T030 [P] [S3] RN-10: `sources/Projects/Data/Authentication/Codings/SessionRecordKeychainCoding.swift`
+- [X] T030 [P] [S3] RN-10: `sources/Projects/Data/Authentication/Codings/SessionRecordKeychainCoding.swift`
       → `sources/Projects/Data/Authentication/Codings/SessionRecordStorageCoding.swift`,
       `sources/Projects/Data/Authentication/Migrations/SessionKeychainMigration.swift` →
       `sources/Projects/Data/Authentication/Migrations/SessionStorageMigration.swift`,
@@ -330,10 +330,10 @@ key·저장 key 문자열 diff 0건.
       `sources/Projects/Data/Authentication/Stores/AppleIdentityStore.swift`로 파일과 타입 이름을
       바꾼다. `Key` enum의 rawValue와 namespace
       문자열은 한 글자도 바꾸지 않는다.
-- [ ] T031 [S3] Data 내부 참조 갱신: T027~T030의 새 이름을 Data 프로덕션 파일 안에서 서로
+- [X] T031 [S3] Data 내부 참조 갱신: T027~T030의 새 이름을 Data 프로덕션 파일 안에서 서로
       참조하는 곳(`Remotes/*.swift`의 오류 변환, `Migrations`·`Codings`·`Stores`의 Layout 참조)에
       반영한다. 대상은 T027~T030에 열거한 파일로 한정한다.
-- [ ] T032 [S3] Data 테스트 치환: 아래 파일에서 파일 이름과 참조를 치환한다. 기대값 문자열은
+- [X] T032 [S3] Data 테스트 치환: 아래 파일에서 파일 이름과 참조를 치환한다. 기대값 문자열은
       바꾸지 않는다.
       - `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordKeychainCodingTests.swift`
         → `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordStorageCodingTests.swift`
@@ -369,7 +369,7 @@ key·저장 key 문자열 diff 0건.
 
 ### 구현 — Composition
 
-- [ ] T033 [S3] Composition 참조 갱신: `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`,
+- [X] T033 [S3] Composition 참조 갱신: `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`,
       `sources/Projects/Composition/Authentication/Adapters/LoginSessionRepositoryAdapter.swift`,
       `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`,
       `sources/Projects/Composition/Authentication/Codings/SessionRecordCoding.swift`,
@@ -383,7 +383,7 @@ key·저장 key 문자열 diff 0건.
       `sources/Projects/Composition/Member/Adapters/MemberRepositoryAdapter.swift`,
       `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`의 Data 타입 참조를
       새 이름으로 바꾼다.
-- [ ] T034 [S3] Composition 테스트 치환: `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`,
+- [X] T034 [S3] Composition 테스트 치환: `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`,
       `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`,
       `sources/Projects/Composition/Tests/Authentication/Adapters/LoginSessionRepositoryAdapterTests.swift`,
       `sources/Projects/Composition/Tests/LearningProject/Adapters/AnswerRepositoryAdapterTests.swift`,
@@ -396,16 +396,16 @@ key·저장 key 문자열 diff 0건.
 
 ### 정리와 통합 검증
 
-- [ ] T035 [P] [S3] `docs/conventions/abstraction/protocol-criteria.md` 46행,
+- [X] T035 [P] [S3] `docs/conventions/abstraction/protocol-criteria.md` 46행,
       `docs/conventions/abstraction/test-double-injection.md` 27·32행의 `HTTPProjectRemote`를
       `ProjectRemote`로, `docs/release/guideline-5-1-1-appeal.md` 11행의
       `LearningProjectHTTPExecutor`를 `LearningProjectRequestExecutor`로 바꾼다.
       `test-double-injection.md` 27행은 단순 치환하면 "`ProjectRemote`의 동작을 검증할 때
       `ProjectRemote` 프로토콜과 그 스텁을 만들지"처럼 구조체와 가상 프로토콜 이름이 같아지므로,
       가상 프로토콜을 "별도의 remote 프로토콜"처럼 이름 없이 서술하도록 문장을 다시 쓴다.
-- [ ] T036 [P] [S3] `docs/review/domain-data-infra-design-review.md` 2.2 표의 RN-01~10 상태를
+- [X] T036 [P] [S3] `docs/review/domain-data-infra-design-review.md` 2.2 표의 RN-01~10 상태를
       `해소`로 바꾼다.
-- [ ] T037 [no-write] [S3] quickstart 시나리오 3의 옛 이름 `git grep`(Data 그룹)과 저장·전송 값
+- [X] T037 [no-write] [S3] quickstart 시나리오 3의 옛 이름 `git grep`(Data 그룹)과 저장·전송 값
       `git diff` 명령을 실행해 옛 이름 0건, key 문자열 변경 0건을 확인하고, Data·Composition
       테스트 scheme의 `compile`·`test` 실행을 사용자에게 요청해 결과를 기록한다.
 

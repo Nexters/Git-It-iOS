@@ -87,7 +87,7 @@ struct BookmarkRepositoryAdapterTests {
     // MARK: Private
 
     private func makeAdapter(transport: RecordingHTTPTransport) -> BookmarkRepositoryAdapter {
-        BookmarkRepositoryAdapter(remote: HTTPBookmarkRemote(
+        BookmarkRepositoryAdapter(remote: BookmarkRemote(
             client: HTTPClient(
                 baseURL: URL(string: "https://api.git-it.example.com")!,
                 bodyCoding: StandardJSONBodyCoding(),

@@ -20,16 +20,16 @@ public struct LearningProjectAssembly: Sendable {
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let projectRepository = LearningProjectRepositoryAdapter(
-            remote: HTTPProjectRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: ProjectRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
         let learningSetRepository = LearningSetRepositoryAdapter(
-            remote: HTTPLearningSetRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: LearningSetRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
         let answerRepository = AnswerRepositoryAdapter(
-            remote: HTTPAnswerRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: AnswerRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
         let bookmarkRepository = BookmarkRepositoryAdapter(
-            remote: HTTPBookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: BookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
 
         let defaults = sharedDefaults ?? .standard

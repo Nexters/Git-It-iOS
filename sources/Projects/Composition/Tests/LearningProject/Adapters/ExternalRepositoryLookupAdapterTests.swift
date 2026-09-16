@@ -51,8 +51,8 @@ struct ExternalRepositoryLookupAdapterTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPExternalRepositoryRemote {
-        HTTPExternalRepositoryRemote(client: HTTPClient(
+    private func makeRemote(transport: RecordingHTTPTransport) -> ExternalRepositoryRemote {
+        ExternalRepositoryRemote(client: HTTPClient(
             baseURL: URL(string: "https://api.github.com")!,
             bodyCoding: StandardJSONBodyCoding(),
             transport: transport,
