@@ -126,19 +126,19 @@
 
 ### 테스트
 
-- [ ] T025 [P] [S3] `tools/githooks/hook-management/tests/test-pre-commit.sh`의 stub 단계 목록과 기대 실행 순서에 `package-dependencies`를 `design-rules`와 `build` 사이에 추가한다
-- [ ] T026 [P] [S3] `tools/ci/tests/test-gate-evaluate.sh`에 workflow가 `needs.package-dependencies.result`를 evaluator에 전달하는지 확인하는 검사를 추가한다
+- [X] T025 [P] [S3] `tools/githooks/hook-management/tests/test-pre-commit.sh`의 stub 단계 목록과 기대 실행 순서에 `package-dependencies`를 `design-rules`와 `build` 사이에 추가한다
+- [X] T026 [P] [S3] `tools/ci/tests/test-gate-evaluate.sh`에 workflow가 `needs.package-dependencies.result`를 evaluator에 전달하는지 확인하는 검사를 추가한다
 
 ### 구현
 
-- [ ] T027 [P] [S3] `tools/githooks/pre-commit.d/package-dependencies.sh`를 `tools/githooks/pre-commit.d/design-rules.sh`와 같은 모양으로 만들어 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 실행한다. 실행 권한을 준다
-- [ ] T028 [S3] `tools/githooks/pre-commit`의 단계 이름 허용 `case`와 고정 순서 `for` 목록에 `package-dependencies`를 `design-rules` 다음에 추가하고 순서 설명 주석을 갱신한다
-- [ ] T029 [P] [S3] `tools/githooks/pre-commit.d/enabled`의 순서 설명과 단계 설명에 `package-dependencies`를 추가하고 목록에는 주석 처리된 `# package-dependencies`로 둔다
-- [ ] T030 [P] [S3] `.github/workflows/ci.yml`에 `package-dependencies` job(`needs: changes`, 검증 변수 조건만, `ubuntu-latest`, 경로 로드 후 `"$GIT_IT_PACKAGE_DEPENDENCY_RUNNER"` 실행)을 추가하고 `gate` job의 `needs`와 `gate-evaluate.sh` 인자에 결과를 추가한다
+- [X] T027 [P] [S3] `tools/githooks/pre-commit.d/package-dependencies.sh`를 `tools/githooks/pre-commit.d/design-rules.sh`와 같은 모양으로 만들어 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 실행한다. 실행 권한을 준다
+- [X] T028 [S3] `tools/githooks/pre-commit`의 단계 이름 허용 `case`와 고정 순서 `for` 목록에 `package-dependencies`를 `design-rules` 다음에 추가하고 순서 설명 주석을 갱신한다
+- [X] T029 [P] [S3] `tools/githooks/pre-commit.d/enabled`의 순서 설명과 단계 설명에 `package-dependencies`를 추가하고 목록에는 주석 처리된 `# package-dependencies`로 둔다
+- [X] T030 [P] [S3] `.github/workflows/ci.yml`에 `package-dependencies` job(`needs: changes`, 검증 변수 조건만, `ubuntu-latest`, 경로 로드 후 `"$GIT_IT_PACKAGE_DEPENDENCY_RUNNER"` 실행)을 추가하고 `gate` job의 `needs`와 `gate-evaluate.sh` 인자에 결과를 추가한다
 
 ### 단위 검증
 
-- [ ] T031 [no-write] [S3] `tools/githooks/hook-management/tests/test-pre-commit.sh`, `tools/ci/tests/test-gate-evaluate.sh`, `./tools/script-verification/bin/run.sh`가 성공하는지 확인한다
+- [X] T031 [no-write] [S3] `tools/githooks/hook-management/tests/test-pre-commit.sh`, `tools/ci/tests/test-gate-evaluate.sh`, `./tools/script-verification/bin/run.sh`가 성공하는지 확인한다
 
 **진행 점검**: T025~T031의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -279,6 +279,8 @@
 - **T012**: 실측 위반 6건, 저장소 전체 실행 0.3초 안팎.
 - **T018**: 사용자가 doc-registry 관련 미커밋 변경을 직접 스태시했고, 남은 `tools/script-tests/core/tests.sh`·`tools/script-verification/config/verification.conf`의 같은 변경도 스태시하라고 지시했다(`stash@{0}` "doc-registry 등록 잔여"). 다섯 파일이 HEAD와 같아진 뒤 이 명세의 줄만 추가했다.
 - **T024**: `repository-paths.sh GIT_IT_PACKAGE_DEPENDENCY_RUNNER`와 `script-verification/bin/run.sh`는 성공. `script-tests/bin/run.sh`는 `tools/repository-paths/tests/test-no-hardcoded-paths.sh` 하나가 실패한다. 원인은 `d9e7517`에서 커밋된 `.agents/skills/fix-project-swift-lint/agents/openai.yaml`의 `sources/Projects` 문구이며 이 명세의 변경과 무관한 기존 실패다. 나머지 셸 회귀는 통과했다.
+- **T030**: CI job을 `ubuntu-latest`가 아니라 `macos-26`에서 실행한다. 공개 경로 판독기 `repository-paths.sh`가 `/usr/bin/plutil`을 쓰므로 경로 적재 단계가 macOS를 요구한다([research.md](./research.md) 7절의 러너 결정 보정). 도구 본체는 여전히 `rg` 없이 POSIX 도구만 쓴다. 새 job은 기존 `test_job` 범위 검사와 겹치지 않도록 `script-quality`와 `swift-lint` 사이에 두었다.
+- **T029**: `enabled`의 주석 처리된 단계 목록에 `# package-dependencies`를 `# swift-format` 다음에 추가했다.
 
 ---
 
