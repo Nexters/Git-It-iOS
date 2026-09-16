@@ -35,28 +35,28 @@
 
 ### 준비
 
-- [ ] T001 [no-write] 적용 전 지표를 측정해 이 파일의 "기준선 기록" 절에 적는다 — Composition target별 의존 수([quickstart.md](./quickstart.md) 4.1 명령), `sources/Projects/Composition/Adapter` 아래 Swift 파일 수, `tools/githooks/pre-commit.d/enabled`의 활성 단계 수
+- [X] T001 [no-write] 적용 전 지표를 측정해 이 파일의 "기준선 기록" 절에 적는다 — Composition target별 의존 수([quickstart.md](./quickstart.md) 4.1 명령), `sources/Projects/Composition/Adapter` 아래 Swift 파일 수, `tools/githooks/pre-commit.d/enabled`의 활성 단계 수
 
 ### 테스트
 
-- [ ] T002 [S1] [S2] `tools/package-dependencies/tests/test-package-dependencies.sh`를 만든다. `mktemp -d`에 fixture 저장소(아키텍처 문서, switch·배열 형식이 섞인 `<패키지>ModuleName.swift` 7개, `repository-paths.json`, Swift 소스)를 만들고 `GIT_IT_PATHS_FILE`과 `PACKAGE_DEPENDENCIES_CONFIG_DIR`로 주입해 `bin/run.sh`를 실행한다. [research.md](./research.md) 6절의 12개 경우를 종료 코드와 규칙 이름으로 확인한다. 실행 권한을 준다
+- [X] T002 [S1] [S2] `tools/package-dependencies/tests/test-package-dependencies.sh`를 만든다. `mktemp -d`에 fixture 저장소(아키텍처 문서, switch·배열 형식이 섞인 `<패키지>ModuleName.swift` 7개, `repository-paths.json`, Swift 소스)를 만들고 `GIT_IT_PATHS_FILE`과 `PACKAGE_DEPENDENCIES_CONFIG_DIR`로 주입해 `bin/run.sh`를 실행한다. [research.md](./research.md) 6절의 12개 경우를 종료 코드와 규칙 이름으로 확인한다. 실행 권한을 준다
 
 ### 구현
 
-- [ ] T003 [P] [S2] `tools/package-dependencies/config/allowed-dependencies`를 [research.md](./research.md) 1절 형식으로 만든다. 값은 아키텍처 3.1 표와 같다
-- [ ] T004 [P] [S1] `tools/package-dependencies/config/source-roots`를 만든다. 현재 target 41개 각각의 `<target> <GIT_IT_PROJECTS_ROOT 기준 루트>` 한 줄 (예: `GitItTests App/Tests/GitIt`, `Feature Feature`, `FeatureTests Feature/Tests`, `UIComponentTests UI/Tests/Component/Unit`)
-- [ ] T005 [P] [S1] `tools/package-dependencies/core/rules-policy.sh`에 argv만 받는 순수 정책을 만든다 — 패키지 조합 허용 판정, 규칙·오류 종류별 이유와 조치 문장([contracts/README.md](./contracts/README.md) 2절)
-- [ ] T006 [P] [S2] `tools/package-dependencies/core/architecture-table.sh`에 3.1 표를 읽어 `패키지<TAB>정렬된 허용 목록` 레코드를 쓰는 adapter를 만든다. 제목·머리행·행이 없으면 `table-unreadable`
-- [ ] T007 [P] [S1] `tools/package-dependencies/core/manifest.sh`에 모듈 목록, target 블록(switch·배열 형식), `.from`·`.target`·`productionTarget` 선언을 줄 번호와 함께 레코드로 쓰는 adapter를 만든다([research.md](./research.md) 2절)
-- [ ] T008 [P] [S1] `tools/package-dependencies/core/imports.sh`에 대상 Swift 파일을 한 번의 `find … -exec awk … {} +`로 읽어 내부 import 후보를 `경로<TAB>줄<TAB>모듈`로 쓰는 adapter를 만든다. 블록 주석(중첩)·여러 줄 문자열·줄 주석을 건너뛰고 속성·종류 키워드를 허용한다([research.md](./research.md) 4절)
-- [ ] T009 [S1] [S2] `tools/package-dependencies/core/run.sh`에 유스케이스를 만든다 — 설정 검증 → 표 대응 → manifest 일관성 → source root 일관성 → import 판정 → 정렬 보고([data-model.md](./data-model.md) 1.8·1.9절)
-- [ ] T010 [S1] `tools/package-dependencies/bin/run.sh`에 공개 진입점을 만든다 — 인자 검증, `repository-paths.sh --absolute`로 경로 키 3개 해석, `PACKAGE_DEPENDENCIES_CONFIG_DIR` 기본값, 임시 디렉터리와 trap, core source. 실행 권한을 준다
+- [X] T003 [P] [S2] `tools/package-dependencies/config/allowed-dependencies`를 [research.md](./research.md) 1절 형식으로 만든다. 값은 아키텍처 3.1 표와 같다
+- [X] T004 [P] [S1] `tools/package-dependencies/config/source-roots`를 만든다. 현재 target 41개 각각의 `<target> <GIT_IT_PROJECTS_ROOT 기준 루트>` 한 줄 (예: `GitItTests App/Tests/GitIt`, `Feature Feature`, `FeatureTests Feature/Tests`, `UIComponentTests UI/Tests/Component/Unit`)
+- [X] T005 [P] [S1] `tools/package-dependencies/core/rules-policy.sh`에 argv만 받는 순수 정책을 만든다 — 패키지 조합 허용 판정, 규칙·오류 종류별 이유와 조치 문장([contracts/README.md](./contracts/README.md) 2절)
+- [X] T006 [P] [S2] `tools/package-dependencies/core/architecture-table.sh`에 3.1 표를 읽어 `패키지<TAB>정렬된 허용 목록` 레코드를 쓰는 adapter를 만든다. 제목·머리행·행이 없으면 `table-unreadable`
+- [X] T007 [P] [S1] `tools/package-dependencies/core/manifest.sh`에 모듈 목록, target 블록(switch·배열 형식), `.from`·`.target`·`productionTarget` 선언을 줄 번호와 함께 레코드로 쓰는 adapter를 만든다([research.md](./research.md) 2절)
+- [X] T008 [P] [S1] `tools/package-dependencies/core/imports.sh`에 대상 Swift 파일을 한 번의 `find … -exec awk … {} +`로 읽어 내부 import 후보를 `경로<TAB>줄<TAB>모듈`로 쓰는 adapter를 만든다. 블록 주석(중첩)·여러 줄 문자열·줄 주석을 건너뛰고 속성·종류 키워드를 허용한다([research.md](./research.md) 4절)
+- [X] T009 [S1] [S2] `tools/package-dependencies/core/run.sh`에 유스케이스를 만든다 — 설정 검증 → 표 대응 → manifest 일관성 → source root 일관성 → import 판정 → 정렬 보고([data-model.md](./data-model.md) 1.8·1.9절)
+- [X] T010 [S1] `tools/package-dependencies/bin/run.sh`에 공개 진입점을 만든다 — 인자 검증, `repository-paths.sh --absolute`로 경로 키 3개 해석, `PACKAGE_DEPENDENCIES_CONFIG_DIR` 기본값, 임시 디렉터리와 trap, core source. 실행 권한을 준다
 
 ### 단위 검증
 
-- [ ] T011 [no-write] [S1] [S2] `tools/package-dependencies/tests/test-package-dependencies.sh`가 종료 0인지 확인한다
-- [ ] T012 [no-write] [S1] `tools/package-dependencies/bin/run.sh`를 저장소에서 실행해 종료 1과 `[import-undeclared]` 6건(research 4절 목록)만 보고되는지, 실행 시간이 5초 이하인지 확인한다
-- [ ] T013 [no-write] `tools/script-verification/.build`의 ShellCheck·shfmt를 `tools/script-verification/config/verification.conf`의 옵션으로 `tools/package-dependencies`에 직접 실행해 통과를 확인한다. 도구가 없으면 `tools/script-verification/bin/prepare-tools.sh`를 먼저 실행한다
+- [X] T011 [no-write] [S1] [S2] `tools/package-dependencies/tests/test-package-dependencies.sh`가 종료 0인지 확인한다
+- [X] T012 [no-write] [S1] `tools/package-dependencies/bin/run.sh`를 저장소에서 실행해 종료 1과 `[import-undeclared]` 6건(research 4절 목록)만 보고되는지, 실행 시간이 5초 이하인지 확인한다
+- [X] T013 [no-write] `tools/script-verification/.build`의 ShellCheck·shfmt를 `tools/script-verification/config/verification.conf`의 옵션으로 `tools/package-dependencies`에 직접 실행해 통과를 확인한다. 도구가 없으면 `tools/script-verification/bin/prepare-tools.sh`를 먼저 실행한다
 
 **진행 점검**: T001~T013의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -261,18 +261,22 @@
 
 | 지표 | 적용 전 | 적용 후 |
 | --- | --- | --- |
-| `CompositionAdapter` 의존 | | |
-| `CompositionApp` 의존 | | |
-| `CompositionShareExtension` 의존 | | |
-| Composition target 의존 최댓값 | | |
-| `Composition/Adapter` 아래 Swift 파일 | | |
-| 도구 위반 수 | | |
-| 활성 pre-commit 단계 | | |
+| `CompositionAdapter` 의존 | 12 | |
+| `CompositionApp` 의존 | 9 | |
+| `CompositionShareExtension` 의존 | 8 | |
+| Composition target 의존 최댓값 | 12 | |
+| `Composition/Adapter` 아래 Swift 파일 | 26 | |
+| 도구 위반 수 | 6 (U1 도입 직후) | |
+| 활성 pre-commit 단계 | 0 | |
 | `Composition` scheme 테스트 합계 | | |
 
 ## 범위 보정 기록
 
 구현 중 tasks.md에 없던 파일을 고쳐야 했다면 작업 ID 아래에 경로와 이유를 적는다.
+
+- **T005·T009**: 판정 로직을 `tools/package-dependencies/core/judge.sh`로 분리했다. 판정은 수집 레코드 파일 여러 개를 읽으므로 argv만 받는 순수 정책(`rules-policy.sh`)에 둘 수 없고, 유스케이스(`run.sh`)에 두면 수집 순서와 판정이 섞인다. `rules-policy.sh`는 패키지 목록, 허용 판정, 조치 문장만 소유한다. 허용 의존성 설정 판독은 표 판독과 같은 레코드를 만들므로 `architecture-table.sh`에 함께 두었다.
+- **T002**: 회귀 경우를 research 6절의 12개에서 14개로 늘렸다(source root 누락, 인자 거부 추가).
+- **T012**: 실측 위반 6건, 저장소 전체 실행 0.3초 안팎.
 
 ---
 
