@@ -4,16 +4,16 @@ public struct FetchExternalRepository: FetchExternalRepositoryUseCase {
 
     public init(
         lookup: any ExternalRepositoryLookup,
-        urlParser: any ExternalRepositoryURLParser,
+        locator: any ExternalRepositoryLocator,
     ) {
         self.lookup = lookup
-        self.urlParser = urlParser
+        self.locator = locator
     }
 
     // MARK: Public
 
     public func callAsFunction(url: String) async throws -> ExternalRepository {
-        guard let location = urlParser.location(from: url)
+        guard let location = locator.location(from: url)
         else {
             throw ExternalRepositoryError.invalidURLFormat
         }
@@ -24,6 +24,6 @@ public struct FetchExternalRepository: FetchExternalRepositoryUseCase {
     // MARK: Private
 
     private let lookup: any ExternalRepositoryLookup
-    private let urlParser: any ExternalRepositoryURLParser
+    private let locator: any ExternalRepositoryLocator
 
 }

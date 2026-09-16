@@ -105,7 +105,7 @@ struct ScheduleGenerationReminderTests {
         let scheduler = SpyGenerationReminderScheduler(isAuthorizedResult: true)
         let schedule = ScheduleGenerationReminder(
             scheduler: scheduler,
-            pendingReminderStore: StubPendingGenerationReminderStore(projectIDs: ["project-1"]),
+            pendingReminders: StubPendingGenerationReminders(projectIDs: ["project-1"]),
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
         )
         let trackGeneration = StubTrackGenerationUseCase()
@@ -197,9 +197,9 @@ private actor SpyGenerationReminderScheduler: GenerationReminderScheduler {
 
 }
 
-// MARK: - StubPendingGenerationReminderStore
+// MARK: - StubPendingGenerationReminders
 
-private struct StubPendingGenerationReminderStore: PendingGenerationReminderStore {
+private struct StubPendingGenerationReminders: PendingGenerationReminders {
     let projectIDs: [String]
 
     func drainProjectIDs() async -> [String] {

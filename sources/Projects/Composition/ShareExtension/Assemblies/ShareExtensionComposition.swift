@@ -21,7 +21,7 @@ public struct ShareExtensionComposition: Sendable {
         localNotificationClient: any NotificationAuthorizationClient,
         enqueueGenerationReminder: @escaping @Sendable (String) async -> Void,
     ) {
-        parseRepositoryLink = externalRepository.urlParser
+        parseRepositoryLink = externalRepository.locator
         fetchExternalRepository = externalRepository.fetchExternalRepository
         createLearningProject = learningProject.createLearningProject
         self.resolveSessionAvailability = resolveSessionAvailability
@@ -50,7 +50,7 @@ public struct ShareExtensionComposition: Sendable {
 
     }
 
-    public let parseRepositoryLink: any ExternalRepositoryURLParser
+    public let parseRepositoryLink: any ExternalRepositoryLocator
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
     public let createLearningProject: any CreateLearningProjectUseCase
     public let resolveSessionAvailability: @Sendable () async -> SessionAvailability

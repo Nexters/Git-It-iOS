@@ -20,10 +20,10 @@ struct FetchExternalRepositoryTests {
             techStack: ["Swift"],
         )
         let lookup = FetchExternalRepositoryLookup(behavior: .succeed(expected))
-        let parser = StubExternalRepositoryURLParser(
+        let parser = StubExternalRepositoryLocator(
             location: ExternalRepositoryLocation(owner: "owner", name: "repo")
         )
-        let fetchExternalRepository = FetchExternalRepository(lookup: lookup, urlParser: parser)
+        let fetchExternalRepository = FetchExternalRepository(lookup: lookup, locator: parser)
 
         let result = try await fetchExternalRepository(url: "https://github.com/owner/repo")
 
@@ -46,7 +46,7 @@ struct FetchExternalRepositoryTests {
         ))
         let fetchExternalRepository = FetchExternalRepository(
             lookup: lookup,
-            urlParser: StubExternalRepositoryURLParser(location: nil),
+            locator: StubExternalRepositoryLocator(location: nil),
         )
 
         await #expect(throws: ExternalRepositoryError.invalidURLFormat) {
@@ -59,7 +59,7 @@ struct FetchExternalRepositoryTests {
     func `오프라인 오류를 그대로 전파한다`() async throws {
         let fetchExternalRepository = FetchExternalRepository(
             lookup: FetchExternalRepositoryLookup(behavior: .fail(.offline)),
-            urlParser: Self.matchingParser,
+            locator: Self.matchingParser,
         )
 
         await #expect(throws: ExternalRepositoryError.offline) {
@@ -71,7 +71,7 @@ struct FetchExternalRepositoryTests {
     func `그 밖의 오류를 그대로 전파한다`() async throws {
         let fetchExternalRepository = FetchExternalRepository(
             lookup: FetchExternalRepositoryLookup(behavior: .fail(.other)),
-            urlParser: Self.matchingParser,
+            locator: Self.matchingParser,
         )
 
         await #expect(throws: ExternalRepositoryError.other) {
@@ -81,8 +81,8 @@ struct FetchExternalRepositoryTests {
 
     // MARK: Private
 
-    private static var matchingParser: StubExternalRepositoryURLParser {
-        StubExternalRepositoryURLParser(location: ExternalRepositoryLocation(owner: "owner", name: "repo"))
+    private static var matchingParser: StubExternalRepositoryLocator {
+        StubExternalRepositoryLocator(location: ExternalRepositoryLocation(owner: "owner", name: "repo"))
     }
 
 }

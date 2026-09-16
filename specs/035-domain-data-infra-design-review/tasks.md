@@ -187,7 +187,7 @@ Feature 순으로 한 단위에서 처리한다.
 
 ### 구현 — Domain
 
-- [ ] T014 [S3] RN-12·13·14·15: `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminderStore.swift`
+- [X] T014 [S3] RN-12·13·14·15: `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminderStore.swift`
       → `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminders.swift`,
       `sources/Projects/Domain/LearningProject/Contracts/GenerationReminderRegistry.swift` →
       `sources/Projects/Domain/LearningProject/Contracts/GenerationReminderRegistration.swift`,
@@ -196,14 +196,14 @@ Feature 순으로 한 단위에서 처리한다.
       `sources/Projects/Domain/LearningProject/Contracts/ExternalRepositoryURLParser.swift` →
       `sources/Projects/Domain/LearningProject/Contracts/ExternalRepositoryLocator.swift`로 파일과
       프로토콜 이름을 바꾼다. 메서드 시그니처는 그대로 둔다.
-- [ ] T015 [S3] RN-16: `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`의
+- [X] T015 [S3] RN-16: `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`의
       `load()`를 `currentState()`, `save(_:)`를 `record(_:)`로 바꾼다(반환·인자 타입 불변).
-- [ ] T016 [P] [S3] RN-17·18: `sources/Projects/Domain/Authentication/Contracts/StoredSessionRepository.swift`
+- [X] T016 [P] [S3] RN-17·18: `sources/Projects/Domain/Authentication/Contracts/StoredSessionRepository.swift`
       → `sources/Projects/Domain/Authentication/Contracts/CurrentSessionRepository.swift`,
       `sources/Projects/Domain/Authentication/Contracts/SharedSessionMarkerRepository.swift` →
       `sources/Projects/Domain/Authentication/Contracts/SharedSignInStateRepository.swift`로 파일과
       프로토콜 이름을 바꾼다.
-- [ ] T017 [S3] Domain 참조 갱신: `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailability.swift`,
+- [X] T017 [S3] Domain 참조 갱신: `sources/Projects/Domain/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailability.swift`,
       `sources/Projects/Domain/LearningProject/UseCases/FetchExternalRepository/FetchExternalRepository.swift`,
       `sources/Projects/Domain/LearningProject/UseCases/RequestGenerationReminder/RequestGenerationReminder.swift`,
       `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminder.swift`,
@@ -211,7 +211,7 @@ Feature 순으로 한 단위에서 처리한다.
       `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/GenerationStateCoordinator.swift`,
       `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGeneration.swift`의
       타입·메서드 참조와 프로퍼티 이름을 새 이름으로 바꾼다.
-- [ ] T018 [S3] Domain 테스트 치환: `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift`,
+- [X] T018 [S3] Domain 테스트 치환: `sources/Projects/Domain/Tests/Authentication/UseCases/ResolveSessionAvailability/ResolveSessionAvailabilityTests.swift`,
       `sources/Projects/Domain/Tests/LearningProject/LearningProjectLifecycleTests.swift`,
       `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubExternalRepositoryURLParser.swift`
       → `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubExternalRepositoryLocator.swift`,
@@ -223,12 +223,12 @@ Feature 순으로 한 단위에서 처리한다.
       `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift`,
       `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`에서
       이름만 치환한다.
-- [ ] T019 [S3] `sources/Projects/Domain/Authentication/README.md`의 계약 목록에 RN-17·18 새
+- [X] T019 [S3] `sources/Projects/Domain/Authentication/README.md`의 계약 목록에 RN-17·18 새
       이름을 반영한다.
 
 ### 구현 — Composition
 
-- [ ] T020 [S3] Adapter 파일·타입 rename: `sources/Projects/Composition/Authentication/Adapters/StoredSessionRepositoryAdapter.swift`
+- [X] T020 [S3] Adapter 파일·타입 rename: `sources/Projects/Composition/Authentication/Adapters/StoredSessionRepositoryAdapter.swift`
       → `sources/Projects/Composition/Authentication/Adapters/CurrentSessionRepositoryAdapter.swift`,
       `sources/Projects/Composition/Authentication/Adapters/SharedSessionMarkerRepositoryAdapter.swift` →
       `sources/Projects/Composition/Authentication/Adapters/SharedSignInStateRepositoryAdapter.swift`,
@@ -239,10 +239,10 @@ Feature 순으로 한 단위에서 처리한다.
       `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationReminderStoreAdapter.swift` →
       `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRemindersAdapter.swift`.
       채택 프로토콜 이름을 새 이름으로 바꾼다.
-- [ ] T021 [S3] `sources/Projects/Composition/LearningProject/Adapters/GenerationStateRepositoryAdapter.swift`의
+- [X] T021 [S3] `sources/Projects/Composition/LearningProject/Adapters/GenerationStateRepositoryAdapter.swift`의
       `load()`/`save(_:)` 구현 이름을 `currentState()`/`record(_:)`로 바꾼다(내부 `store.load/save`
       호출은 Data 계약이므로 유지).
-- [ ] T022 [S3] Assembly 참조 갱신: `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`,
+- [X] T022 [S3] Assembly 참조 갱신: `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`,
       `sources/Projects/Composition/LearningProject/Assemblies/ExternalRepositoryAssembly.swift`,
       `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`,
       `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`,
@@ -251,20 +251,20 @@ Feature 순으로 한 단위에서 처리한다.
 
 ### 구현 — Feature
 
-- [ ] T023 [S3] `sources/Projects/Feature/ShareRegistration/ShareRegistrationFeature.swift`,
+- [X] T023 [S3] `sources/Projects/Feature/ShareRegistration/ShareRegistrationFeature.swift`,
       `sources/Projects/Feature/ShareRegistration/Previews/ShareRegistrationPreviewSupport.swift`,
       `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ShareRegistrationTestSupport.swift`의
       `ExternalRepositoryURLParser` 참조를 `ExternalRepositoryLocator`로 바꾼다.
 
 ### 정리와 통합 검증
 
-- [ ] T024 [S3] `docs/conventions/abstraction/structure-baseline.md` 3.1 표의 Domain
+- [X] T024 [S3] `docs/conventions/abstraction/structure-baseline.md` 3.1 표의 Domain
       LearningProject 행에서 RN-12~15 이름을 새 이름으로 바꾸고(DOC-07 일부), 표에 빠져 있는
       Domain Authentication 계약 2개를 새 이름 `CurrentSessionRepository`·`SharedSignInStateRepository`로
       그 행에 추가한다(DOC-09). 표의 프로토콜 수 합계 47과 2절의 세는 명령 결과는 바뀌지 않는다.
-- [ ] T025 [S3] `docs/review/domain-data-infra-design-review.md` 2.2 표의 RN-12~18 상태와 2.1
+- [X] T025 [S3] `docs/review/domain-data-infra-design-review.md` 2.2 표의 RN-12~18 상태와 2.1
       표의 DOC-09 상태를 `해소`로 바꾼다.
-- [ ] T026 [no-write] [S3] `git grep -nE 'PendingGenerationReminderStore|GenerationReminderRegistry|NotificationAuthorizationGateway|ExternalRepositoryURLParser|StoredSessionRepository|SharedSessionMarkerRepository' -- sources docs ':!docs/spec-kit' ':!docs/retrospective' ':!docs/review/*-requirements.md'`
+- [X] T026 [no-write] [S3] `git grep -nE 'PendingGenerationReminderStore|GenerationReminderRegistry|NotificationAuthorizationGateway|ExternalRepositoryURLParser|StoredSessionRepository|SharedSessionMarkerRepository' -- sources docs ':!docs/spec-kit' ':!docs/retrospective' ':!docs/review/*-requirements.md'`
       가 점검 결과 문서 `docs/review/domain-data-infra-design-review.md`의 옛 이름 열 외 0건인지
       확인하고(quickstart 시나리오 3과 같은 제외 경로), Domain·Composition·Feature 테스트
       scheme의 `compile`·`test` 실행을 사용자에게 요청해 결과를 기록한다.

@@ -63,7 +63,7 @@ struct ResolveSessionAvailabilityTests {
 
     // MARK: Private
 
-    private struct StubMarkerRepository: SharedSessionMarkerRepository {
+    private struct StubMarkerRepository: SharedSignInStateRepository {
         let state: Bool?
 
         func signedInState() async -> Bool? {
@@ -71,7 +71,7 @@ struct ResolveSessionAvailabilityTests {
         }
     }
 
-    private struct StubSessionRepository: StoredSessionRepository {
+    private struct StubSessionRepository: CurrentSessionRepository {
         let session: SessionRecord?
 
         func currentSession() async -> SessionRecord? {
@@ -85,7 +85,7 @@ struct ResolveSessionAvailabilityTests {
         now: Date = Date(timeIntervalSince1970: 0),
     ) -> ResolveSessionAvailability {
         ResolveSessionAvailability(
-            markerRepository: StubMarkerRepository(state: signedInState),
+            signInStateRepository: StubMarkerRepository(state: signedInState),
             sessionRepository: StubSessionRepository(session: session),
             now: { now },
         )

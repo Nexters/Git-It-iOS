@@ -7,11 +7,11 @@ public struct ResolveSessionAvailability: ResolveSessionAvailabilityUseCase {
     // MARK: Lifecycle
 
     public init(
-        markerRepository: any SharedSessionMarkerRepository,
-        sessionRepository: any StoredSessionRepository,
+        signInStateRepository: any SharedSignInStateRepository,
+        sessionRepository: any CurrentSessionRepository,
         now: @escaping @Sendable () -> Date = { Date() },
     ) {
-        self.markerRepository = markerRepository
+        self.signInStateRepository = signInStateRepository
         self.sessionRepository = sessionRepository
         self.now = now
     }
@@ -19,7 +19,7 @@ public struct ResolveSessionAvailability: ResolveSessionAvailabilityUseCase {
     // MARK: Public
 
     public func callAsFunction() async -> SessionAvailability {
-        guard let isSignedIn = await markerRepository.signedInState() else {
+        guard let isSignedIn = await signInStateRepository.signedInState() else {
             return .appLaunchRequired
         }
         guard isSignedIn else { return .signInRequired }
@@ -38,8 +38,8 @@ public struct ResolveSessionAvailability: ResolveSessionAvailabilityUseCase {
 
     // MARK: Private
 
-    private let markerRepository: any SharedSessionMarkerRepository
-    private let sessionRepository: any StoredSessionRepository
+    private let signInStateRepository: any SharedSignInStateRepository
+    private let sessionRepository: any CurrentSessionRepository
     private let now: @Sendable () -> Date
 
 }

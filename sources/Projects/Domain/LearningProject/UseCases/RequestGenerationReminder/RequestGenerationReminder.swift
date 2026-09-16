@@ -3,34 +3,34 @@ public struct RequestGenerationReminder: RequestGenerationReminderUseCase, Senda
     // MARK: Lifecycle
 
     public init(
-        authorizationGateway: any NotificationAuthorizationGateway,
-        reminderRegistry: any GenerationReminderRegistry,
+        notificationAuthorization: any NotificationAuthorization,
+        reminderRegistration: any GenerationReminderRegistration,
     ) {
-        self.authorizationGateway = authorizationGateway
-        self.reminderRegistry = reminderRegistry
+        self.notificationAuthorization = notificationAuthorization
+        self.reminderRegistration = reminderRegistration
     }
 
     // MARK: Public
 
     public func callAsFunction(projectID: String) async -> NotificationAuthorizationOutcome {
-        let outcome = await authorizationGateway.requestAuthorization()
+        let outcome = await notificationAuthorization.requestAuthorization()
         if outcome == .authorized {
-            await reminderRegistry.register(projectID: projectID)
+            await reminderRegistration.register(projectID: projectID)
         }
         return outcome
     }
 
     public func requestAuthorization() async -> NotificationAuthorizationOutcome {
-        await authorizationGateway.requestAuthorization()
+        await notificationAuthorization.requestAuthorization()
     }
 
     public func isAuthorized() async -> Bool {
-        await authorizationGateway.isAuthorized()
+        await notificationAuthorization.isAuthorized()
     }
 
     // MARK: Private
 
-    private let authorizationGateway: any NotificationAuthorizationGateway
-    private let reminderRegistry: any GenerationReminderRegistry
+    private let notificationAuthorization: any NotificationAuthorization
+    private let reminderRegistration: any GenerationReminderRegistration
 
 }

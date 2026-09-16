@@ -12,11 +12,11 @@ actor StubGenerationStateRepository: GenerationStateRepository {
 
     private(set) var saveCount = 0
 
-    func load() async -> GenerationState {
+    func currentState() async -> GenerationState {
         stored
     }
 
-    func save(_ state: GenerationState) async {
+    func record(_ state: GenerationState) async {
         saveCount += 1
         stored = state
     }

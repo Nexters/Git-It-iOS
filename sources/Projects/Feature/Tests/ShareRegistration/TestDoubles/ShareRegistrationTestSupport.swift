@@ -4,7 +4,7 @@ import Synchronization
 
 // MARK: - StubRepositoryURLParser
 
-struct StubRepositoryURLParser: ExternalRepositoryURLParser {
+struct StubRepositoryURLParser: ExternalRepositoryLocator {
 
     // MARK: Lifecycle
 

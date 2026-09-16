@@ -25,7 +25,7 @@ enum ShareRegistrationPreviewSupport {
 
     // MARK: Private
 
-    private struct PreviewURLParser: ExternalRepositoryURLParser {
+    private struct PreviewURLParser: ExternalRepositoryLocator {
         func location(from _: String) -> ExternalRepositoryLocation? {
             ExternalRepositoryLocation(owner: "apple", name: "swift")
         }

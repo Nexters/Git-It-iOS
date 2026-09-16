@@ -17,8 +17,8 @@ public struct SessionAvailabilityAssembly: Sendable {
         let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
             guard let markerCoding else { return .appLaunchRequired }
             return await ResolveSessionAvailability(
-                markerRepository: SharedSessionMarkerRepositoryAdapter(markerCoding: markerCoding),
-                sessionRepository: StoredSessionRepositoryAdapter(keychainStore: keychainStore),
+                signInStateRepository: SharedSignInStateRepositoryAdapter(markerCoding: markerCoding),
+                sessionRepository: CurrentSessionRepositoryAdapter(keychainStore: keychainStore),
             )()
         }
         self.resolveSessionAvailability = resolveSessionAvailability

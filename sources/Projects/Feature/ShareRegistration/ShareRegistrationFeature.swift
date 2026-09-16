@@ -10,7 +10,7 @@ public struct ShareRegistrationFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        parseRepositoryLink: any ExternalRepositoryURLParser,
+        parseRepositoryLink: any ExternalRepositoryLocator,
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
         resolveSession: @escaping @Sendable () async -> ShareRegistrationSessionState,
@@ -229,7 +229,7 @@ public struct ShareRegistrationFeature: Sendable {
     private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
     private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
 
-    private let parseRepositoryLink: any ExternalRepositoryURLParser
+    private let parseRepositoryLink: any ExternalRepositoryLocator
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
     private let resolveSession: @Sendable () async -> ShareRegistrationSessionState

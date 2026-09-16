@@ -1,9 +1,9 @@
 import DomainAuthentication
 import InfrastructureAuthentication
 
-// MARK: - StoredSessionRepositoryAdapter
+// MARK: - CurrentSessionRepositoryAdapter
 
-public struct StoredSessionRepositoryAdapter: StoredSessionRepository {
+public struct CurrentSessionRepositoryAdapter: CurrentSessionRepository {
 
     // MARK: Lifecycle
 

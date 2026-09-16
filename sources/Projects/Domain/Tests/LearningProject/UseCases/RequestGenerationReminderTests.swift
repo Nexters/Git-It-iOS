@@ -8,11 +8,11 @@ import Testing
 struct RequestGenerationReminderTests {
     @Test
     func `권한이 허용되면 리마인드 대상으로 등록하고 결과를 그대로 반환한다`() async {
-        let gateway = StubNotificationAuthorizationGateway(scriptedOutcome: .authorized)
-        let registry = StubGenerationReminderRegistry()
+        let gateway = StubNotificationAuthorization(scriptedOutcome: .authorized)
+        let registry = StubGenerationReminderRegistration()
         let requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: gateway,
-            reminderRegistry: registry,
+            notificationAuthorization: gateway,
+            reminderRegistration: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -23,11 +23,11 @@ struct RequestGenerationReminderTests {
 
     @Test
     func `권한을 방금 거부하면 리마인드 대상으로 등록하지 않는다`() async {
-        let gateway = StubNotificationAuthorizationGateway(scriptedOutcome: .declined)
-        let registry = StubGenerationReminderRegistry()
+        let gateway = StubNotificationAuthorization(scriptedOutcome: .declined)
+        let registry = StubGenerationReminderRegistration()
         let requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: gateway,
-            reminderRegistry: registry,
+            notificationAuthorization: gateway,
+            reminderRegistration: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -38,11 +38,11 @@ struct RequestGenerationReminderTests {
 
     @Test
     func `권한이 이미 거부된 상태면 리마인드 대상으로 등록하지 않는다`() async {
-        let gateway = StubNotificationAuthorizationGateway(scriptedOutcome: .previouslyDenied)
-        let registry = StubGenerationReminderRegistry()
+        let gateway = StubNotificationAuthorization(scriptedOutcome: .previouslyDenied)
+        let registry = StubGenerationReminderRegistration()
         let requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: gateway,
-            reminderRegistry: registry,
+            notificationAuthorization: gateway,
+            reminderRegistration: registry,
         )
 
         let outcome = await requestGenerationReminder(projectID: "project-1")
@@ -53,11 +53,11 @@ struct RequestGenerationReminderTests {
 
     @Test
     func `isAuthorized는 gateway의 현재 권한 상태를 그대로 반환한다`() async {
-        let gateway = StubNotificationAuthorizationGateway(scriptedOutcome: .authorized, isAuthorizedResult: true)
-        let registry = StubGenerationReminderRegistry()
+        let gateway = StubNotificationAuthorization(scriptedOutcome: .authorized, isAuthorizedResult: true)
+        let registry = StubGenerationReminderRegistration()
         let requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: gateway,
-            reminderRegistry: registry,
+            notificationAuthorization: gateway,
+            reminderRegistration: registry,
         )
 
         let isAuthorized = await requestGenerationReminder.isAuthorized()
@@ -66,9 +66,9 @@ struct RequestGenerationReminderTests {
     }
 }
 
-// MARK: - StubNotificationAuthorizationGateway
+// MARK: - StubNotificationAuthorization
 
-private struct StubNotificationAuthorizationGateway: NotificationAuthorizationGateway {
+private struct StubNotificationAuthorization: NotificationAuthorization {
 
     let scriptedOutcome: NotificationAuthorizationOutcome
     var isAuthorizedResult = false
@@ -83,9 +83,9 @@ private struct StubNotificationAuthorizationGateway: NotificationAuthorizationGa
 
 }
 
-// MARK: - StubGenerationReminderRegistry
+// MARK: - StubGenerationReminderRegistration
 
-private actor StubGenerationReminderRegistry: GenerationReminderRegistry {
+private actor StubGenerationReminderRegistration: GenerationReminderRegistration {
 
     private(set) var registeredProjectIDs = [String]()
 

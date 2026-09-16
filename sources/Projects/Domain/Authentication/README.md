@@ -39,8 +39,8 @@
 - 세션을 refresh하고 access token을 검증합니다.
 
 `PolicyConsentRepository`는 저장된 정책 동의 기록을 조회·저장·삭제합니다.
-`StoredSessionRepository`는 저장된 세션 기록을 조회하고,
-`SharedSessionMarkerRepository`는 공유된 로그인 상태를 조회합니다.
+`CurrentSessionRepository`는 저장된 세션 기록을 조회하고,
+`SharedSignInStateRepository`는 공유된 로그인 상태를 조회합니다.
 
 다섯 계약은 모두 `Sendable`이며 외부 인증과 Git It 세션의 책임을 서로 분리합니다.
 

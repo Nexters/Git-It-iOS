@@ -14,11 +14,11 @@ struct GenerationStateRepositoryAdapter: GenerationStateRepository {
 
     // MARK: Internal
 
-    func load() async -> GenerationState {
+    func currentState() async -> GenerationState {
         GenerationState(records: await store.load().records.compactMap(record(from:)))
     }
 
-    func save(_ state: GenerationState) async {
+    func record(_ state: GenerationState) async {
         await store.save(GenerationStateDTO(records: state.records.map(dto(from:))))
     }
 

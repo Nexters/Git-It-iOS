@@ -1,9 +1,9 @@
 import DataAuthentication
 import DomainAuthentication
 
-// MARK: - SharedSessionMarkerRepositoryAdapter
+// MARK: - SharedSignInStateRepositoryAdapter
 
-public struct SharedSessionMarkerRepositoryAdapter: SharedSessionMarkerRepository {
+public struct SharedSignInStateRepositoryAdapter: SharedSignInStateRepository {
 
     // MARK: Lifecycle
 

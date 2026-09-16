@@ -18,16 +18,16 @@ public struct ExternalRepositoryAssembly: Sendable {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let lookup = ExternalRepositoryLookupAdapter(remote: HTTPExternalRepositoryRemote(client: client))
 
-        let urlParser = ExternalRepositoryURLParserAdapter(parser: GitHubRepositoryURLParser())
-        self.urlParser = urlParser
+        let locator = ExternalRepositoryLocatorAdapter(parser: GitHubRepositoryURLParser())
+        self.locator = locator
 
-        fetchExternalRepository = FetchExternalRepository(lookup: lookup, urlParser: urlParser)
+        fetchExternalRepository = FetchExternalRepository(lookup: lookup, locator: locator)
     }
 
     // MARK: Public
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase
 
-    public let urlParser: any ExternalRepositoryURLParser
+    public let locator: any ExternalRepositoryLocator
 
 }

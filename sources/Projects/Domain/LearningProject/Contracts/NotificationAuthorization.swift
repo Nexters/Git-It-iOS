@@ -1,4 +1,4 @@
-public protocol NotificationAuthorizationGateway: Sendable {
+public protocol NotificationAuthorization: Sendable {
     func requestAuthorization() async -> NotificationAuthorizationOutcome
     func isAuthorized() async -> Bool
 }

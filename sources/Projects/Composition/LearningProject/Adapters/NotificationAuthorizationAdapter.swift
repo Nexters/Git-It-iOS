@@ -2,9 +2,9 @@ import DomainLearningProject
 import InfrastructureLocalNotification
 import os
 
-// MARK: - NotificationAuthorizationGatewayAdapter
+// MARK: - NotificationAuthorizationAdapter
 
-struct NotificationAuthorizationGatewayAdapter: NotificationAuthorizationGateway {
+struct NotificationAuthorizationAdapter: NotificationAuthorization {
 
     // MARK: Internal
 
@@ -27,6 +27,6 @@ struct NotificationAuthorizationGatewayAdapter: NotificationAuthorizationGateway
 
     // MARK: Private
 
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "NotificationAuthorizationGatewayAdapter")
+    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "NotificationAuthorizationAdapter")
 
 }

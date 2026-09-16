@@ -23,7 +23,7 @@ struct LearningProjectLifecycleTests {
         )
         let fetchExternalRepository = FetchExternalRepository(
             lookup: LifecycleExternalRepositoryLookup(repository: externalRepository),
-            urlParser: LifecycleExternalRepositoryURLParser(),
+            locator: LifecycleExternalRepositoryLocator(),
         )
         let createLearningProject = CreateLearningProject(
             repository: LifecycleLearningProjectRepository(registration: registration),
@@ -64,9 +64,9 @@ struct LearningProjectLifecycleTests {
     }
 }
 
-// MARK: - LifecycleExternalRepositoryURLParser
+// MARK: - LifecycleExternalRepositoryLocator
 
-private struct LifecycleExternalRepositoryURLParser: ExternalRepositoryURLParser {
+private struct LifecycleExternalRepositoryLocator: ExternalRepositoryLocator {
     func location(from _: String) -> ExternalRepositoryLocation? {
         ExternalRepositoryLocation(owner: "owner", name: "repo")
     }

@@ -1,5 +1,5 @@
 public protocol GenerationStateRepository: Sendable {
-    func load() async -> GenerationState
+    func currentState() async -> GenerationState
 
-    func save(_ state: GenerationState) async
+    func record(_ state: GenerationState) async
 }

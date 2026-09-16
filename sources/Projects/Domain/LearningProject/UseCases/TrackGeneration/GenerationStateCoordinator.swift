@@ -89,7 +89,7 @@ actor GenerationStateCoordinator {
     }
 
     private func start() async {
-        state = await stateRepository.load()
+        state = await stateRepository.currentState()
         let outcomes = await outcomeRepository.outcomes()
         observationTask = Task { [weak self] in
             for await outcome in outcomes {
@@ -115,7 +115,7 @@ actor GenerationStateCoordinator {
 
     private func update(_ next: GenerationState) async {
         state = next
-        await stateRepository.save(next)
+        await stateRepository.record(next)
         for continuation in observers.values {
             continuation.yield(next)
         }

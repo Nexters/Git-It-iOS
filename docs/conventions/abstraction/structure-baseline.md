@@ -48,8 +48,8 @@ git ls-files 'sources/Projects/**/*.swift' | grep -v '/Tests/' \
 
 | 소유 패키지 | 프로토콜 | 채택 위치 |
 | --- | --- | --- |
-| Domain Authentication | `AuthenticationRepository`, `LoginSessionRepository`, `PolicyConsentRepository` | Composition Adapter |
-| Domain LearningProject | `AnswerRepository`, `BookmarkRepository`, `ExternalRepositoryLookup`, `ExternalRepositoryURLParser`, `GenerationOutcomeRepository`, `GenerationReminderRegistry`, `GenerationStateRepository`, `LearningProjectRepository`, `LearningSetRepository`, `NotificationAuthorizationGateway` | Composition Adapter |
+| Domain Authentication | `AuthenticationRepository`, `LoginSessionRepository`, `PolicyConsentRepository`, `CurrentSessionRepository`, `SharedSignInStateRepository` | Composition Adapter |
+| Domain LearningProject | `AnswerRepository`, `BookmarkRepository`, `ExternalRepositoryLookup`, `ExternalRepositoryLocator`, `GenerationOutcomeRepository`, `GenerationReminderRegistration`, `GenerationStateRepository`, `LearningProjectRepository`, `LearningSetRepository`, `NotificationAuthorization` | Composition Adapter |
 | Domain Member | `MemberRepository` | Composition Adapter |
 | Data LearningProject | `GenerationStateStore`, `QuizGenerationOutcomeSource` | Data 내부 구현과 Composition |
 | Infrastructure | `HTTPTransport`, `HTTPBodyCoding`, `NotificationAuthorizationClient`, `PushMessagingClient` | Data·Composition |

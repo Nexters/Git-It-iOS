@@ -1,9 +1,9 @@
 import DataLearningProject
 import DomainLearningProject
 
-// MARK: - PendingGenerationReminderStoreAdapter
+// MARK: - PendingGenerationRemindersAdapter
 
-struct PendingGenerationReminderStoreAdapter: PendingGenerationReminderStore {
+struct PendingGenerationRemindersAdapter: PendingGenerationReminders {
 
     // MARK: Lifecycle
 

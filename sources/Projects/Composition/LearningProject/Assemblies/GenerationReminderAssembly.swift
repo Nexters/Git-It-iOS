@@ -23,12 +23,12 @@ public struct GenerationReminderAssembly: Sendable {
                 title: reminderTitle,
                 body: reminderBody,
             ),
-            pendingReminderStore: pendingReminderCoding.map(PendingGenerationReminderStoreAdapter.init(coding:)),
+            pendingReminders: pendingReminderCoding.map(PendingGenerationRemindersAdapter.init(coding:)),
         )
         self.scheduleGenerationReminder = scheduleGenerationReminder
         requestGenerationReminder = RequestGenerationReminder(
-            authorizationGateway: NotificationAuthorizationGatewayAdapter(localNotificationClient: localNotificationClient),
-            reminderRegistry: scheduleGenerationReminder,
+            notificationAuthorization: NotificationAuthorizationAdapter(localNotificationClient: localNotificationClient),
+            reminderRegistration: scheduleGenerationReminder,
         )
         startObservingGenerationState = { trackGeneration in
             await scheduleGenerationReminder.start(trackGeneration: trackGeneration)

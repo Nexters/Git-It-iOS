@@ -1,9 +1,9 @@
 import DataExternalRepository
 import DomainLearningProject
 
-// MARK: - ExternalRepositoryURLParserAdapter
+// MARK: - ExternalRepositoryLocatorAdapter
 
-struct ExternalRepositoryURLParserAdapter: DomainLearningProject.ExternalRepositoryURLParser {
+struct ExternalRepositoryLocatorAdapter: DomainLearningProject.ExternalRepositoryLocator {
 
     // MARK: Lifecycle
 

@@ -2,9 +2,9 @@ import Synchronization
 
 @testable import DomainLearningProject
 
-// MARK: - StubExternalRepositoryURLParser
+// MARK: - StubExternalRepositoryLocator
 
-final class StubExternalRepositoryURLParser: ExternalRepositoryURLParser {
+final class StubExternalRepositoryLocator: ExternalRepositoryLocator {
 
     // MARK: Lifecycle
 
