@@ -10,14 +10,12 @@ public struct QuizRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningSet: any FetchLearningSetUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
     ) {
-        self.fetchLearningSet = fetchLearningSet
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -124,8 +122,8 @@ public struct QuizRouterFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Scope(state: \.learningSetIntro, action: \.learningSetIntro) {
             LearningSetIntroFeature(
-                fetchLearningSet: fetchLearningSet,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) },
+                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
             )
         }
         Scope(state: \.learningCompletion, action: \.learningCompletion) {
@@ -201,8 +199,7 @@ public struct QuizRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let fetchLearningSet: any FetchLearningSetUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

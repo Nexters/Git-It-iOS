@@ -10,7 +10,7 @@ public struct SavedFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        fetchBookmarkedQuestions: @escaping @Sendable (String?) async throws -> BookmarkedQuestionCollection,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
     ) {
         self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
@@ -161,7 +161,7 @@ public struct SavedFeature: Sendable {
         case bookmarkToggle(String)
     }
 
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let fetchBookmarkedQuestions: @Sendable (String?) async throws -> BookmarkedQuestionCollection
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase
 
     private func load(_ state: inout State) -> Effect<Action> {
@@ -171,7 +171,7 @@ public struct SavedFeature: Sendable {
         state.loadStatus = .loading
         return .run { send in
             do {
-                let collection = try await fetchBookmarkedQuestions(projectID: projectID)
+                let collection = try await fetchBookmarkedQuestions(projectID)
                 await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .success(collection))))
             } catch {
                 let mapped = error as? LearningProjectError ?? .unexpected

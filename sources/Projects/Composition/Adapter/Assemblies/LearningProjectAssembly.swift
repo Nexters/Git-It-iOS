@@ -54,17 +54,18 @@ public struct LearningProjectAssembly: Sendable {
             repository: projectRepository,
             trackGeneration: trackGeneration,
         )
-        fetchLearningProjectDetail = FetchLearningProjectDetail(repository: projectRepository)
         createLearningProject = CreateLearningProject(
             repository: projectRepository,
             trackGeneration: trackGeneration,
         )
-        deleteLearningProject = DeleteLearningProject(repository: projectRepository)
-        fetchLearningSet = FetchLearningSet(repository: learningSetRepository)
+        learningLibrary = LearningLibrary(
+            projectRepository: projectRepository,
+            learningSetRepository: learningSetRepository,
+            bookmarkRepository: bookmarkRepository,
+        )
         submitChoiceAnswer = SubmitChoiceAnswer(repository: answerRepository)
         submitEssayAnswer = SubmitEssayAnswer(repository: answerRepository)
         setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
-        fetchBookmarkedQuestions = FetchBookmarkedQuestions(repository: bookmarkRepository)
 
         ingestGenerationOutcomePayload = { rawPayload in
             await generationOutcomeSource.ingest(rawPayload: rawPayload)
@@ -74,14 +75,11 @@ public struct LearningProjectAssembly: Sendable {
     // MARK: Public
 
     public let fetchLearningProjects: any FetchLearningProjectsUseCase
-    public let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
     public let createLearningProject: any CreateLearningProjectUseCase
-    public let deleteLearningProject: any DeleteLearningProjectUseCase
-    public let fetchLearningSet: any FetchLearningSetUseCase
+    public let learningLibrary: any LearningLibraryUseCase
     public let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
     public let trackGeneration: any TrackGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 

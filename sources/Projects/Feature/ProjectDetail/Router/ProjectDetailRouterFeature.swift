@@ -10,18 +10,12 @@ public struct ProjectDetailRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
-        fetchLearningSet: any FetchLearningSetUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
     ) {
-        self.fetchLearningProjectDetail = fetchLearningProjectDetail
-        self.deleteLearningProject = deleteLearningProject
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
-        self.fetchLearningSet = fetchLearningSet
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -113,18 +107,18 @@ public struct ProjectDetailRouterFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Scope(state: \.projectDetail, action: \.projectDetail) {
             ProjectDetailFeature(
-                fetchLearningProjectDetail: fetchLearningProjectDetail,
-                deleteLearningProject: deleteLearningProject,
+                fetchLearningProjectDetail: { [learningLibrary] in try await learningLibrary.project(id: $0) },
+                deleteLearningProject: { [learningLibrary] in try await learningLibrary.deleteProject(id: $0) },
             )
         }
         Scope(state: \.savedQuestions, action: \.savedQuestions) {
             SavedFeature(
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
                 setQuestionBookmark: setQuestionBookmark,
             )
         }
         Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)
+            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) })
         }
         Reduce { state, action in
             switch action {
@@ -193,10 +187,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

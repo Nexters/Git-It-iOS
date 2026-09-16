@@ -218,42 +218,43 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 ### 테스트
 
-- [ ] T042 [S3] `sources/Projects/Domain/Tests/LearningProject/UseCases/LearningLibraryTests.swift`를 만들어 네 동작이 각각 대응하는 저장소 메서드를 같은 인자로 호출하고 결과를 그대로 돌려주는지 검증한다. 이관 대상은 `DeleteLearningProjectTests`, `FetchBookmarkedQuestionsTests`, `FetchLearningProjectDetailTests`, `FetchLearningSetTests`의 보장 전부다
+- [X] T042 [S3] `sources/Projects/Domain/Tests/LearningProject/UseCases/LearningLibraryTests.swift`를 만들어 네 동작이 각각 대응하는 저장소 메서드를 같은 인자로 호출하고 결과를 그대로 돌려주는지 검증한다. 이관 대상은 `DeleteLearningProjectTests`, `FetchBookmarkedQuestionsTests`, `FetchLearningProjectDetailTests`, `FetchLearningSetTests`의 보장 전부다
 
 ### 구현 — Domain
 
-- [ ] T043 [S3] `sources/Projects/Domain/LearningProject/UseCases/LearningLibrary/LearningLibraryUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.1의 계약을 정의한다
-- [ ] T044 [S3] `sources/Projects/Domain/LearningProject/UseCases/LearningLibrary/LearningLibrary.swift`에 구현을 둔다. `LearningProjectRepository`, `LearningSetRepository`, `BookmarkRepository` 셋을 받고 각 메서드는 대응 저장소 메서드를 그대로 호출한다
+- [X] T043 [S3] `sources/Projects/Domain/LearningProject/UseCases/LearningLibrary/LearningLibraryUseCase.swift`에 [contracts/README.md](./contracts/README.md) 1.1의 계약을 정의한다
+- [X] T044 [S3] `sources/Projects/Domain/LearningProject/UseCases/LearningLibrary/LearningLibrary.swift`에 구현을 둔다. `LearningProjectRepository`, `LearningSetRepository`, `BookmarkRepository` 셋을 받고 각 메서드는 대응 저장소 메서드를 그대로 호출한다
 
 ### 구현 — Composition
 
-- [ ] T045 [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`의 공개 프로퍼티 `fetchLearningProjectDetail`, `deleteLearningProject`, `fetchLearningSet`, `fetchBookmarkedQuestions`를 `learningLibrary: any LearningLibraryUseCase` 하나로 바꾼다
-- [ ] T046 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 같은 네 공개 프로퍼티를 `learningLibrary` 하나로 바꾼다
-- [ ] T047 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록을 T046의 결과에 맞추고, `sources/Projects/Composition/Tests/Adapter/Assemblies/LearningProjectAssemblyTests.swift`의 참조를 T045에 맞춘다
+- [X] T045 [S3] `sources/Projects/Composition/Adapter/Assemblies/LearningProjectAssembly.swift`의 공개 프로퍼티 `fetchLearningProjectDetail`, `deleteLearningProject`, `fetchLearningSet`, `fetchBookmarkedQuestions`를 `learningLibrary: any LearningLibraryUseCase` 하나로 바꾼다
+- [X] T046 [S3] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 같은 네 공개 프로퍼티를 `learningLibrary` 하나로 바꾼다
+- [X] T047 [S3] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록을 T046의 결과에 맞추고, `sources/Projects/Composition/Tests/Adapter/Assemblies/LearningProjectAssemblyTests.swift`의 참조를 T045에 맞춘다
 
 ### 구현 — Feature
 
-- [ ] T048 [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`가 `deleteLearningProject`·`fetchBookmarkedQuestions`·`fetchLearningSet` 대신 `learningLibrary`를 받고, 하위에는 각각이 쓰는 동작만 전달하도록 바꾼다
-- [ ] T049 [S3] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`를 같은 방식으로 바꾼다
-- [ ] T050 [S3] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`를 같은 방식으로 바꾼다
-- [ ] T051 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/ProjectDetail/Router/ProjectDetailRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`의 Router 생성 인자를 T048~T050에 맞춘다
+- [X] T048 [S3] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`가 `deleteLearningProject`·`fetchBookmarkedQuestions`·`fetchLearningSet` 대신 `learningLibrary`를 받고, 하위에는 각각이 쓰는 동작만 전달하도록 바꾼다
+- [X] T049 [S3] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`를 같은 방식으로 바꾼다
+- [X] T050 [S3] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`를 같은 방식으로 바꾼다
+- [X] T051 [S3] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/ProjectDetail/Router/ProjectDetailRouterFeatureTests.swift`, `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`의 Router 생성 인자를 T048~T050에 맞춘다
 
 ### 구현 — App
 
-- [ ] T052 [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`가 학습 자료 관련 네 의존성 대신 `learningLibrary`를 받고 하위에 전달하도록 바꾼다
-- [ ] T053 [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 Noop 조립을 T052에 맞추고, `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.learningLibrary`를 넘기도록 바꾼다
-- [ ] T054 [S3] **승인 필요**: `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 학습 자료 관련 test double을 `LearningLibraryUseCase` 하나로 바꾼다. 아래 "승인이 필요한 지점"의 절차를 따른다
+- [X] T052 [S3] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`가 학습 자료 관련 네 의존성 대신 `learningLibrary`를 받고 하위에 전달하도록 바꾼다
+- [X] T053 [S3] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 Noop 조립을 T052에 맞추고, `sources/Projects/App/GitIt/GitItApp.swift`가 `composition.learningLibrary`를 넘기도록 바꾼다
+- [X] T054 [S3] **승인 필요**: `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 학습 자료 관련 test double을 `LearningLibraryUseCase` 하나로 바꾼다. 아래 "승인이 필요한 지점"의 절차를 따른다
 
 ### 정리
 
-- [ ] T055 [S4] `sources/Projects/Domain/LearningProject/UseCases/{FetchLearningProjectDetail,DeleteLearningProject,FetchLearningSet,FetchBookmarkedQuestions}/` 네 폴더와 그 안의 프로토콜·구현 파일을 제거한다
-- [ ] T056 [S4] `sources/Projects/Domain/Tests/LearningProject/UseCases/{DeleteLearningProjectTests,FetchBookmarkedQuestionsTests,FetchLearningProjectDetailTests,FetchLearningSetTests}.swift`를 제거하고 이 파일의 "이관 기록"에 각 보장의 이관처를 적는다
-- [ ] T057 [S4] `sources/Projects/App/Tests/GitIt/TestDoubles/NoopDeleteLearningProjectUseCase.swift`와 `sources/Projects/Feature/Tests/{ProjectDetail/TestDoubles/StubDeleteLearningProjectUseCase,Quiz/TestDoubles/StubFetchLearningSetUseCase}.swift` 중 말단 Feature가 계속 쓰는 것은 남기고 Router·App만 쓰던 것을 제거한다. 근거를 "이관 기록"에 적는다
+- [X] T055 [S4] `sources/Projects/Domain/LearningProject/UseCases/{FetchLearningProjectDetail,DeleteLearningProject,FetchLearningSet,FetchBookmarkedQuestions}/` 네 폴더와 그 안의 프로토콜·구현 파일을 제거한다
+- [X] T056 [S4] `sources/Projects/Domain/Tests/LearningProject/UseCases/{DeleteLearningProjectTests,FetchBookmarkedQuestionsTests,FetchLearningProjectDetailTests,FetchLearningSetTests}.swift`를 제거하고 이 파일의 "이관 기록"에 각 보장의 이관처를 적는다
+  - **범위 보정**: 구현 중 `sources/Projects/Domain/Tests/LearningProject/LearningProjectLifecycleTests.swift`가 `DeleteLearningProject`와 `FetchLearningProjectDetail`을 직접 생성하는 것을 발견해 이 작업에 포함했다. I4의 소유 경로 "대응 테스트" 안이다
+- [X] T057 [S4] `sources/Projects/App/Tests/GitIt/TestDoubles/NoopDeleteLearningProjectUseCase.swift`와 `sources/Projects/Feature/Tests/{ProjectDetail/TestDoubles/StubDeleteLearningProjectUseCase,Quiz/TestDoubles/StubFetchLearningSetUseCase}.swift` 중 말단 Feature가 계속 쓰는 것은 남기고 Router·App만 쓰던 것을 제거한다. 근거를 "이관 기록"에 적는다
 
 ### 단위 검증
 
-- [ ] T058 [no-write] [S4] [quickstart.md](./quickstart.md) 시나리오 4의 grep 두 개가 모두 비어 있는지 확인한다
-- [ ] T059 [no-write] [S3] `Domain`·`Composition`·`Feature` 테스트 scheme과 `AppTests`를 실행하고 `App` scheme 빌드를 확인해 I4를 검증한다
+- [X] T058 [no-write] [S4] [quickstart.md](./quickstart.md) 시나리오 4의 grep 두 개가 모두 비어 있는지 확인한다
+- [X] T059 [no-write] [S3] `Domain`·`Composition`·`Feature` 테스트 scheme과 `AppTests`를 실행하고 `App` scheme 빌드를 확인해 I4를 검증한다
 
 **진행 점검**: T042~T059의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -271,11 +272,11 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 ### 구현
 
-- [ ] T060 [S1] [S4] `docs/package-rules/domain.md`에 통합 후 남은 UseCase 목록과 각 항목이 T002의 어느 조건을 충족하는지, 그리고 두 통합 계약(`LearningLibrary`, `MemberAccount`)이 무엇을 담는지 적는다
+- [X] T060 [S1] [S4] `docs/package-rules/domain.md`에 통합 후 남은 UseCase 목록과 각 항목이 T002의 어느 조건을 충족하는지, 그리고 두 통합 계약(`LearningLibrary`, `MemberAccount`)이 무엇을 담는지 적는다
 
 ### 단위 검증
 
-- [ ] T061 [no-write] `docs/package-rules/domain.md`의 목록이 실제 소스의 UseCase 프로토콜 목록과 일치하는지 확인한다
+- [X] T061 [no-write] `docs/package-rules/domain.md`의 목록이 실제 소스의 UseCase 프로토콜 목록과 일치하는지 확인한다
 
 **진행 점검**: T060~T061의 변경 파일과 검증 결과를 보고한다.
 
@@ -301,10 +302,10 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 | 항목 | 적용 전 | 적용 후 | 명세 목표 |
 | --- | --- | --- | --- |
-| 프로덕션 UseCase 파일 수 | 60 | (T064에서 기록) | 46 이하 |
-| UseCase 프로토콜 수 | 28 | (T064에서 기록) | 22 이하 |
-| `MainShellRouterFeature` Domain 의존성 | 14 | (T064에서 기록) | 11 이하 |
-| `AppComposition` Domain 의존성 | 25 | (T064에서 기록) | 19 이하 |
+| 프로덕션 UseCase 파일 수 | 60 | 42 | 46 이하 |
+| UseCase 프로토콜 수 | 28 | 20 | 22 이하 |
+| `MainShellRouterFeature` Domain 의존성 | 14 | 10 | 11 이하 |
+| `AppComposition` Domain 의존성 | 25 | 17 | 19 이하 |
 
 ---
 
@@ -336,6 +337,13 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 | Feature `FetchMemberProfileUseCaseMock` 외 말단 mock 4개 | 말단 Feature가 계속 쓰므로 유지. 프로토콜 준수만 제거하고 클로저 접근자를 더했다 |
 | `MainShellUpdatePositionStub`, `MainShellUpdateCareerStub` | Router가 통합 계약을 받으므로 제거. `MemberAccountUseCaseMock`이 대체한다 |
 | `QuestionMutationSerializer`의 questionID별 직렬화 | `SetQuestionBookmark` actor의 내부 상태. `SetQuestionBookmarkTests`의 순서 보장 네 검증이 이어받았다 |
+| `FetchLearningProjectDetailTests`의 다음 세트 판정 3종과 미존재 전파 | `LearningLibraryTests`의 같은 이름 네 검증 |
+| `DeleteLearningProjectTests`의 성공 완료와 미존재 전파 | `LearningLibraryTests`의 삭제 두 검증 |
+| `FetchLearningSetTests`의 문제 순서·형식 보존, myAnswer 비노출, 미존재 전파 | `LearningLibraryTests`의 세트 세 검증 |
+| `FetchBookmarkedQuestionsTests`의 availableProjects 유지와 route 식별자 보존 | `LearningLibraryTests`의 북마크 두 검증 |
+| App `NoopDeleteLearningProjectUseCase` 외 Noop 3개 | App `NoopLearningLibraryUseCase` 하나로 통합. Router 계층만 쓰던 것이라 남기지 않았다 |
+| Feature `StubFetchLearningSetUseCase` 외 stub 3개 | 말단 Feature가 계속 쓰므로 유지. 프로토콜 준수만 제거하고 클로저 접근자를 더했다 |
+| `MainShellDeleteProjectStub`, `MainShellBookmarksStub` | Router가 통합 계약을 받으므로 제거. `LearningLibraryUseCaseMock`이 대체한다 |
 
 ---
 

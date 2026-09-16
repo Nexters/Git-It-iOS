@@ -149,29 +149,23 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopDeleteLearningProject: DeleteLearningProjectUseCase {
-        func callAsFunction(projectID _: String) async throws {
+    struct NoopLearningLibrary: LearningLibraryUseCase {
+        func project(id _: String) async throws -> LearningProjectDetail {
             throw CancellationError()
         }
-    }
 
-    struct NoopFetchBookmarkedQuestions: FetchBookmarkedQuestionsUseCase {
-        func callAsFunction(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        func deleteProject(id _: String) async throws {
             throw CancellationError()
         }
-    }
 
-    struct NoopFetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
-        func callAsFunction(projectID _: String) async throws -> LearningProjectDetail {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopFetchLearningSet: FetchLearningSetUseCase {
-        func callAsFunction(
+        func learningSet(
             projectID _: String,
             setID _: String,
         ) async throws -> LearningSet {
+            throw CancellationError()
+        }
+
+        func bookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
             throw CancellationError()
         }
     }
@@ -277,10 +271,7 @@ private enum AppRootPreviewSupport {
                 memberAccount: NoopMemberAccount(),
                 policyConsent: NoopPolicyConsent(),
                 fetchLearningProjects: NoopFetchLearningProjects(),
-                fetchLearningProjectDetail: NoopFetchLearningProjectDetail(),
-                deleteLearningProject: NoopDeleteLearningProject(),
-                fetchBookmarkedQuestions: NoopFetchBookmarkedQuestions(),
-                fetchLearningSet: NoopFetchLearningSet(),
+                learningLibrary: NoopLearningLibrary(),
                 submitChoiceAnswer: NoopSubmitChoiceAnswer(),
                 submitEssayAnswer: NoopSubmitEssayAnswer(),
                 setQuestionBookmark: NoopSetQuestionBookmark(),

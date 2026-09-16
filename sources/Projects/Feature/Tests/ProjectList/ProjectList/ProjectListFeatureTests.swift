@@ -436,7 +436,7 @@ struct ProjectListFeatureTests {
         return TestStore(initialState: state) {
             ProjectListFeature(
                 fetchLearningProjects: fetchLearningProjects,
-                deleteLearningProject: deleteLearningProject,
+                deleteLearningProject: deleteLearningProject.deleteProject,
             )
         }
     }

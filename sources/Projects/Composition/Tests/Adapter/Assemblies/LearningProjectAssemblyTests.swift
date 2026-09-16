@@ -14,14 +14,11 @@ struct LearningProjectAssemblyTests {
         )
 
         _ = assembly.fetchLearningProjects as any FetchLearningProjectsUseCase
-        _ = assembly.fetchLearningProjectDetail as any FetchLearningProjectDetailUseCase
+        _ = assembly.learningLibrary as any LearningLibraryUseCase
         _ = assembly.createLearningProject as any CreateLearningProjectUseCase
-        _ = assembly.deleteLearningProject as any DeleteLearningProjectUseCase
-        _ = assembly.fetchLearningSet as any FetchLearningSetUseCase
         _ = assembly.submitChoiceAnswer as any SubmitChoiceAnswerUseCase
         _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
         _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
-        _ = assembly.fetchBookmarkedQuestions as any FetchBookmarkedQuestionsUseCase
         _ = assembly.trackGeneration as any TrackGenerationUseCase
     }
 

@@ -162,15 +162,10 @@ struct ProjectDetailRouterFeatureTests {
             initialState: ProjectDetailRouterFeature.State(projectID: ProjectDetailTestFixture.projectID)
         ) {
             ProjectDetailRouterFeature(
-                fetchLearningProjectDetail: StubFetchLearningProjectDetailUseCase(
-                    results: [.success(ProjectDetailTestFixture.mixedProgressDetail)]
-                ),
-                deleteLearningProject: StubDeleteLearningProjectUseCase(),
-                fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase(
-                    results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
-                ),
-                fetchLearningSet: StubFetchLearningSetUseCase(
-                    results: [.success(QuizTestFixture.unansweredSet)]
+                learningLibrary: LearningLibraryUseCaseMock(
+                    detailResults: [.success(ProjectDetailTestFixture.mixedProgressDetail)],
+                    setResults: [.success(QuizTestFixture.unansweredSet)],
+                    bookmarkResults: [.success(ProjectDetailTestFixture.savedQuestionCollection)],
                 ),
                 submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
                 submitEssayAnswer: StubSubmitEssayAnswerUseCase(),

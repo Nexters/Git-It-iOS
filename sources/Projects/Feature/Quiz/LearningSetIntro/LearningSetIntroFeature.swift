@@ -10,8 +10,8 @@ public struct LearningSetIntroFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningSet: any FetchLearningSetUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        fetchLearningSet: @escaping @Sendable (String, String) async throws -> LearningSet,
+        fetchBookmarkedQuestions: @escaping @Sendable (String?) async throws -> BookmarkedQuestionCollection,
     ) {
         self.fetchLearningSet = fetchLearningSet
         self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
@@ -178,8 +178,8 @@ public struct LearningSetIntroFeature: Sendable {
         case bookmarkLoad
     }
 
-    private let fetchLearningSet: any FetchLearningSetUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let fetchLearningSet: @Sendable (String, String) async throws -> LearningSet
+    private let fetchBookmarkedQuestions: @Sendable (String?) async throws -> BookmarkedQuestionCollection
 
     private func startEffect(
         set: LearningSet,
@@ -201,7 +201,7 @@ public struct LearningSetIntroFeature: Sendable {
         let setID = state.setID
         return .run { send in
             do {
-                let set = try await fetchLearningSet(projectID: projectID, setID: setID)
+                let set = try await fetchLearningSet(projectID, setID)
                 await send(.effect(.setLoadFinished(requestID: requestID, result: .success(set))))
             } catch {
                 let mapped = error as? LearningProjectError ?? .unexpected
@@ -216,7 +216,7 @@ public struct LearningSetIntroFeature: Sendable {
         let projectID = state.projectID
         return .run { send in
             do {
-                let collection = try await fetchBookmarkedQuestions(projectID: projectID)
+                let collection = try await fetchBookmarkedQuestions(projectID)
                 await send(.effect(.bookmarksLoadFinished(.success(collection))))
             } catch {
                 let mapped = error as? LearningProjectError ?? .unexpected

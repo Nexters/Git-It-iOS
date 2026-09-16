@@ -148,8 +148,8 @@ struct ProjectDetailFeatureTests {
     ) -> TestStoreOf<ProjectDetailFeature> {
         TestStore(initialState: state) {
             ProjectDetailFeature(
-                fetchLearningProjectDetail: fetchLearningProjectDetail,
-                deleteLearningProject: deleteLearningProject,
+                fetchLearningProjectDetail: fetchLearningProjectDetail.fetchDetail,
+                deleteLearningProject: deleteLearningProject.deleteProject,
             )
         }
     }

@@ -11,7 +11,7 @@ public struct ProjectListFeature: Sendable {
 
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
+        deleteLearningProject: @escaping @Sendable (String) async throws -> Void,
     ) {
         self.fetchLearningProjects = fetchLearningProjects
         self.deleteLearningProject = deleteLearningProject
@@ -181,7 +181,7 @@ public struct ProjectListFeature: Sendable {
                 state.deletion = .committing(projectID: projectID)
                 return .run { send in
                     do {
-                        try await deleteLearningProject(projectID: projectID)
+                        try await deleteLearningProject(projectID)
                         await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
                     } catch {
                         let mapped = error as? LearningProjectError ?? .unexpected
@@ -235,7 +235,7 @@ public struct ProjectListFeature: Sendable {
     }
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
+    private let deleteLearningProject: @Sendable (String) async throws -> Void
 
     private func startNextPageLoad(
         state: inout State,

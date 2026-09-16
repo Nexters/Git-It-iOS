@@ -64,22 +64,26 @@ struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
     }
 }
 
-// MARK: - NoopFetchLearningProjectDetailUseCase
+// MARK: - NoopLearningLibraryUseCase
 
-struct NoopFetchLearningProjectDetailUseCase: FetchLearningProjectDetailUseCase {
-    func callAsFunction(projectID: String) async throws -> LearningProjectDetail {
-        AppRootTestFixture.projectDetail(projectID: projectID)
+struct NoopLearningLibraryUseCase: LearningLibraryUseCase {
+    func project(id: String) async throws -> LearningProjectDetail {
+        AppRootTestFixture.projectDetail(projectID: id)
     }
-}
 
-// MARK: - NoopFetchLearningSetUseCase
+    func deleteProject(id _: String) async throws {
+        throw CancellationError()
+    }
 
-struct NoopFetchLearningSetUseCase: FetchLearningSetUseCase {
-    func callAsFunction(
+    func learningSet(
         projectID _: String,
         setID: String,
     ) async throws -> LearningSet {
         AppRootTestFixture.learningSet(setID: setID)
+    }
+
+    func bookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        throw CancellationError()
     }
 }
 
@@ -219,10 +223,7 @@ func makeAppRootStore(
             memberAccount: memberAccount,
             policyConsent: NoopPolicyConsentUseCase(),
             fetchLearningProjects: NoopFetchLearningProjectsUseCase(),
-            fetchLearningProjectDetail: NoopFetchLearningProjectDetailUseCase(),
-            deleteLearningProject: NoopDeleteLearningProjectUseCase(),
-            fetchBookmarkedQuestions: NoopFetchBookmarkedQuestionsUseCase(),
-            fetchLearningSet: NoopFetchLearningSetUseCase(),
+            learningLibrary: NoopLearningLibraryUseCase(),
             submitChoiceAnswer: NoopSubmitChoiceAnswerUseCase(),
             submitEssayAnswer: NoopSubmitEssayAnswerUseCase(),
             setQuestionBookmark: NoopSetQuestionBookmarkUseCase(),

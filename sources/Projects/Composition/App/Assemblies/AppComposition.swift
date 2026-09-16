@@ -37,14 +37,11 @@ public struct AppComposition: Sendable {
         memberAccount = member.memberAccount
 
         fetchLearningProjects = learningProject.fetchLearningProjects
-        fetchLearningProjectDetail = learningProject.fetchLearningProjectDetail
+        learningLibrary = learningProject.learningLibrary
         createLearningProject = learningProject.createLearningProject
-        deleteLearningProject = learningProject.deleteLearningProject
-        fetchLearningSet = learningProject.fetchLearningSet
         submitChoiceAnswer = learningProject.submitChoiceAnswer
         submitEssayAnswer = learningProject.submitEssayAnswer
         setQuestionBookmark = learningProject.setQuestionBookmark
-        fetchBookmarkedQuestions = learningProject.fetchBookmarkedQuestions
         trackGeneration = learningProject.trackGeneration
 
         deleteMemberAccount = member.deleteMemberAccount
@@ -146,14 +143,11 @@ public struct AppComposition: Sendable {
     public let memberAccount: any MemberAccountUseCase
 
     public let fetchLearningProjects: any FetchLearningProjectsUseCase
-    public let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
+    public let learningLibrary: any LearningLibraryUseCase
     public let createLearningProject: any CreateLearningProjectUseCase
-    public let deleteLearningProject: any DeleteLearningProjectUseCase
-    public let fetchLearningSet: any FetchLearningSetUseCase
     public let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    public let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
 
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 

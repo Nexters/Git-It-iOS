@@ -11,9 +11,7 @@ public struct MainShellRouterFeature: Sendable {
 
     public init(
         fetchLearningProjects: any FetchLearningProjectsUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
-        fetchLearningSet: any FetchLearningSetUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
@@ -25,9 +23,7 @@ public struct MainShellRouterFeature: Sendable {
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
         self.fetchLearningProjects = fetchLearningProjects
-        self.deleteLearningProject = deleteLearningProject
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
-        self.fetchLearningSet = fetchLearningSet
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -100,12 +96,12 @@ public struct MainShellRouterFeature: Sendable {
         Scope(state: \.projectList, action: \.projectList) {
             ProjectListFeature(
                 fetchLearningProjects: fetchLearningProjects,
-                deleteLearningProject: deleteLearningProject,
+                deleteLearningProject: { [learningLibrary] in try await learningLibrary.deleteProject(id: $0) },
             )
         }
         Scope(state: \.saved, action: \.saved) {
             SavedFeature(
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
                 setQuestionBookmark: setQuestionBookmark,
             )
         }
@@ -195,7 +191,7 @@ public struct MainShellRouterFeature: Sendable {
             }
         }
         .ifLet(\.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)
+            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) })
         }
         .ifLet(\.$singleQuestion, action: \.singleQuestion) {
             QuestionSolvingFeature(
@@ -209,9 +205,7 @@ public struct MainShellRouterFeature: Sendable {
     // MARK: Private
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

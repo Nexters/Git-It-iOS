@@ -153,9 +153,7 @@ struct MainShellRouterFeatureTests {
         TestStore(initialState: state) {
             MainShellRouterFeature(
                 fetchLearningProjects: projects,
-                deleteLearningProject: MainShellDeleteProjectStub(),
-                fetchBookmarkedQuestions: MainShellBookmarksStub(),
-                fetchLearningSet: StubFetchLearningSetUseCase(),
+                learningLibrary: LearningLibraryUseCaseMock(),
                 submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
                 submitEssayAnswer: StubSubmitEssayAnswerUseCase(),
                 setQuestionBookmark: StubSetQuestionBookmarkUseCase(),
@@ -168,18 +166,4 @@ struct MainShellRouterFeatureTests {
         }
     }
 
-}
-
-// MARK: - MainShellDeleteProjectStub
-
-private struct MainShellDeleteProjectStub: DeleteLearningProjectUseCase {
-    func callAsFunction(projectID _: String) async throws { }
-}
-
-// MARK: - MainShellBookmarksStub
-
-private struct MainShellBookmarksStub: FetchBookmarkedQuestionsUseCase {
-    func callAsFunction(projectID _: String?) async throws -> BookmarkedQuestionCollection {
-        .init(totalCount: 0, availableProjects: [], bookmarks: [])
-    }
 }

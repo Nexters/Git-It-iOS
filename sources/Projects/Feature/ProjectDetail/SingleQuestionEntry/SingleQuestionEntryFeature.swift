@@ -9,7 +9,7 @@ public struct SingleQuestionEntryFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(fetchLearningSet: any FetchLearningSetUseCase) {
+    public init(fetchLearningSet: @escaping @Sendable (String, String) async throws -> LearningSet) {
         self.fetchLearningSet = fetchLearningSet
     }
 
@@ -83,7 +83,7 @@ public struct SingleQuestionEntryFeature: Sendable {
                 let projectID = state.projectID
                 return .run { send in
                     do {
-                        let set = try await fetchLearningSet(projectID: projectID, setID: setID)
+                        let set = try await fetchLearningSet(projectID, setID)
                         await send(.effect(.setLoadFinished(questionID: questionID, result: .success(set))))
                     } catch {
                         let mapped = error as? LearningProjectError ?? .unexpected
@@ -128,6 +128,6 @@ public struct SingleQuestionEntryFeature: Sendable {
         case load
     }
 
-    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let fetchLearningSet: @Sendable (String, String) async throws -> LearningSet
 
 }

@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor StubFetchLearningSetUseCase: FetchLearningSetUseCase {
+actor StubFetchLearningSetUseCase {
 
     // MARK: Lifecycle
 
@@ -12,6 +12,10 @@ actor StubFetchLearningSetUseCase: FetchLearningSetUseCase {
 
     private(set) var callCount = 0
     private(set) var requestedSetIDs = [String]()
+
+    nonisolated var fetchSet: @Sendable (String, String) async throws -> LearningSet {
+        { try await self(projectID: $0, setID: $1) }
+    }
 
     func callAsFunction(
         projectID _: String,

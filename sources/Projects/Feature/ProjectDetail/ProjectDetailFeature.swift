@@ -10,8 +10,8 @@ public struct ProjectDetailFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
+        fetchLearningProjectDetail: @escaping @Sendable (String) async throws -> LearningProjectDetail,
+        deleteLearningProject: @escaping @Sendable (String) async throws -> Void,
     ) {
         self.fetchLearningProjectDetail = fetchLearningProjectDetail
         self.deleteLearningProject = deleteLearningProject
@@ -171,7 +171,7 @@ public struct ProjectDetailFeature: Sendable {
                 let projectID = state.projectID
                 return .run { send in
                     do {
-                        try await deleteLearningProject(projectID: projectID)
+                        try await deleteLearningProject(projectID)
                         await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
                     } catch {
                         let mapped = error as? LearningProjectError ?? .unexpected
@@ -216,8 +216,8 @@ public struct ProjectDetailFeature: Sendable {
         case delete
     }
 
-    private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
+    private let fetchLearningProjectDetail: @Sendable (String) async throws -> LearningProjectDetail
+    private let deleteLearningProject: @Sendable (String) async throws -> Void
 
     private func load(_ state: inout State) -> Effect<Action> {
         state.requestID += 1
@@ -226,7 +226,7 @@ public struct ProjectDetailFeature: Sendable {
         let projectID = state.projectID
         return .run { send in
             do {
-                let detail = try await fetchLearningProjectDetail(projectID: projectID)
+                let detail = try await fetchLearningProjectDetail(projectID)
                 await send(.effect(.detailLoadFinished(requestID: currentRequestID, result: .success(detail))))
             } catch {
                 let mapped = error as? LearningProjectError ?? .unexpected

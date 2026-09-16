@@ -20,10 +20,7 @@ nonisolated struct AppRootFeature: Sendable {
         memberAccount: any MemberAccountUseCase,
         policyConsent: any PolicyConsentUseCase,
         fetchLearningProjects: any FetchLearningProjectsUseCase,
-        fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
-        fetchLearningSet: any FetchLearningSetUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
@@ -47,10 +44,7 @@ nonisolated struct AppRootFeature: Sendable {
         self.memberAccount = memberAccount
         self.policyConsent = policyConsent
         self.fetchLearningProjects = fetchLearningProjects
-        self.fetchLearningProjectDetail = fetchLearningProjectDetail
-        self.deleteLearningProject = deleteLearningProject
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
-        self.fetchLearningSet = fetchLearningSet
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -153,9 +147,7 @@ nonisolated struct AppRootFeature: Sendable {
         Scope(state: \.mainShell, action: \.mainShell) {
             MainShellRouterFeature(
                 fetchLearningProjects: fetchLearningProjects,
-                deleteLearningProject: deleteLearningProject,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
-                fetchLearningSet: fetchLearningSet,
+                learningLibrary: learningLibrary,
                 submitChoiceAnswer: submitChoiceAnswer,
                 submitEssayAnswer: submitEssayAnswer,
                 setQuestionBookmark: setQuestionBookmark,
@@ -337,10 +329,7 @@ nonisolated struct AppRootFeature: Sendable {
         }
         .ifLet(\.$projectDetail, action: \.projectDetail) {
             ProjectDetailRouterFeature(
-                fetchLearningProjectDetail: fetchLearningProjectDetail,
-                deleteLearningProject: deleteLearningProject,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
-                fetchLearningSet: fetchLearningSet,
+                learningLibrary: learningLibrary,
                 submitChoiceAnswer: submitChoiceAnswer,
                 submitEssayAnswer: submitEssayAnswer,
                 setQuestionBookmark: setQuestionBookmark,
@@ -348,8 +337,7 @@ nonisolated struct AppRootFeature: Sendable {
         }
         .ifLet(\.$quiz, action: \.quiz) {
             QuizRouterFeature(
-                fetchLearningSet: fetchLearningSet,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                learningLibrary: learningLibrary,
                 submitChoiceAnswer: submitChoiceAnswer,
                 submitEssayAnswer: submitEssayAnswer,
                 setQuestionBookmark: setQuestionBookmark,
@@ -373,10 +361,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let memberAccount: any MemberAccountUseCase
     private let policyConsent: any PolicyConsentUseCase
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

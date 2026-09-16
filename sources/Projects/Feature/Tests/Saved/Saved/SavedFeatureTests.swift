@@ -172,7 +172,7 @@ struct SavedFeatureTests {
     ) -> TestStoreOf<SavedFeature> {
         TestStore(initialState: state) {
             SavedFeature(
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions.fetchBookmarks,
                 setQuestionBookmark: setQuestionBookmark,
             )
         }
