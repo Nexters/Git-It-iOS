@@ -98,19 +98,19 @@
 
 ### 승인
 
-- [ ] T018 [no-write] **승인 필요**: 아래 T019~T023의 다섯 파일에 사용자 미커밋 변경이 있음을 보고하고 "승인이 필요한 지점"의 선택지 중 하나를 확인받는다. 확인 전에는 다섯 파일을 수정하지 않는다
+- [X] T018 [no-write] **승인 필요**: 아래 T019~T023의 다섯 파일에 사용자 미커밋 변경이 있음을 보고하고 "승인이 필요한 지점"의 선택지 중 하나를 확인받는다. 확인 전에는 다섯 파일을 수정하지 않는다
 
 ### 구현
 
-- [ ] T019 [S3] `tools/repository-paths/repository-paths.json`에 `"GIT_IT_PACKAGE_DEPENDENCY_RUNNER": "tools/package-dependencies/bin/run.sh"`를 추가한다
-- [ ] T020 [S3] `tools/repository-paths/bin/repository-paths.sh`의 `repository_paths_keys` 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
-- [ ] T021 [S3] `tools/repository-paths/tests/test-no-hardcoded-paths.sh`의 검사 키 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
-- [ ] T022 [S3] `tools/script-tests/core/tests.sh`의 환경 격리 `unset` 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
-- [ ] T023 [S3] `tools/script-verification/config/verification.conf`의 `VERIFICATION_SCRIPT_TARGETS`에 `tools/package-dependencies`를 추가한다
+- [X] T019 [S3] `tools/repository-paths/repository-paths.json`에 `"GIT_IT_PACKAGE_DEPENDENCY_RUNNER": "tools/package-dependencies/bin/run.sh"`를 추가한다
+- [X] T020 [S3] `tools/repository-paths/bin/repository-paths.sh`의 `repository_paths_keys` 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
+- [X] T021 [S3] `tools/repository-paths/tests/test-no-hardcoded-paths.sh`의 검사 키 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
+- [X] T022 [S3] `tools/script-tests/core/tests.sh`의 환경 격리 `unset` 목록에 `GIT_IT_PACKAGE_DEPENDENCY_RUNNER`를 추가한다
+- [X] T023 [S3] `tools/script-verification/config/verification.conf`의 `VERIFICATION_SCRIPT_TARGETS`에 `tools/package-dependencies`를 추가한다
 
 ### 단위 검증
 
-- [ ] T024 [no-write] [S3] `./tools/repository-paths/bin/repository-paths.sh GIT_IT_PACKAGE_DEPENDENCY_RUNNER`, `./tools/script-tests/bin/run.sh`, `./tools/script-verification/bin/run.sh`가 모두 성공하는지 확인한다
+- [X] T024 [no-write] [S3] `./tools/repository-paths/bin/repository-paths.sh GIT_IT_PACKAGE_DEPENDENCY_RUNNER`, `./tools/script-tests/bin/run.sh`, `./tools/script-verification/bin/run.sh`가 모두 성공하는지 확인한다
 
 **진행 점검**: T018~T024의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -277,6 +277,8 @@
 - **T005·T009**: 판정 로직을 `tools/package-dependencies/core/judge.sh`로 분리했다. 판정은 수집 레코드 파일 여러 개를 읽으므로 argv만 받는 순수 정책(`rules-policy.sh`)에 둘 수 없고, 유스케이스(`run.sh`)에 두면 수집 순서와 판정이 섞인다. `rules-policy.sh`는 패키지 목록, 허용 판정, 조치 문장만 소유한다. 허용 의존성 설정 판독은 표 판독과 같은 레코드를 만들므로 `architecture-table.sh`에 함께 두었다.
 - **T002**: 회귀 경우를 research 6절의 12개에서 14개로 늘렸다(source root 누락, 인자 거부 추가).
 - **T012**: 실측 위반 6건, 저장소 전체 실행 0.3초 안팎.
+- **T018**: 사용자가 doc-registry 관련 미커밋 변경을 직접 스태시했고, 남은 `tools/script-tests/core/tests.sh`·`tools/script-verification/config/verification.conf`의 같은 변경도 스태시하라고 지시했다(`stash@{0}` "doc-registry 등록 잔여"). 다섯 파일이 HEAD와 같아진 뒤 이 명세의 줄만 추가했다.
+- **T024**: `repository-paths.sh GIT_IT_PACKAGE_DEPENDENCY_RUNNER`와 `script-verification/bin/run.sh`는 성공. `script-tests/bin/run.sh`는 `tools/repository-paths/tests/test-no-hardcoded-paths.sh` 하나가 실패한다. 원인은 `d9e7517`에서 커밋된 `.agents/skills/fix-project-swift-lint/agents/openai.yaml`의 `sources/Projects` 문구이며 이 명세의 변경과 무관한 기존 실패다. 나머지 셸 회귀는 통과했다.
 
 ---
 
