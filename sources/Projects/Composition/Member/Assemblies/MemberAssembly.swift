@@ -3,6 +3,7 @@ import DataMember
 import DomainAuthentication
 import DomainMember
 import Foundation
+import InfrastructureAuthentication
 import InfrastructureNetworkClient
 
 // MARK: - MemberAssembly
@@ -41,6 +42,24 @@ public struct MemberAssembly: Sendable {
     public let memberAccount: any MemberAccountUseCase
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 
-    public let repository: any MemberRepository
+    public func makeRegisterCurrentDevice(
+        keychainStore: KeychainStore,
+        appVersion: String,
+        osVersion: String,
+        deviceTokenProvider: @escaping @Sendable () async throws -> String,
+    ) -> @Sendable () async throws -> Void {
+        let registerCurrentDevice = RegisterCurrentDevice(
+            repository: repository,
+            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
+            appVersion: appVersion,
+            osVersion: osVersion,
+            deviceTokenProvider: deviceTokenProvider,
+        )
+        return { try await registerCurrentDevice() }
+    }
+
+    // MARK: Private
+
+    private let repository: any MemberRepository
 
 }

@@ -20,6 +20,7 @@ public struct AuthenticationAssembly: Sendable {
         policyConsentStore: LocalPolicyConsentStore = LocalPolicyConsentStore(
             store: UserDefaultsStore(namespace: PolicyConsentStorageLayout.namespace)
         ),
+        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
@@ -64,6 +65,11 @@ public struct AuthenticationAssembly: Sendable {
         )
         self.loginSessionRepository = loginSessionRepository
         self.accessTokenProvider = accessTokenProvider
+
+        let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
+        recordSharedSessionState = {
+            await markerCoding?.save(isSignedIn: accessTokenProvider() != nil)
+        }
     }
 
     // MARK: Public
@@ -78,5 +84,14 @@ public struct AuthenticationAssembly: Sendable {
     public let accessTokenProvider: @Sendable () async -> String?
 
     public let loginSessionRepository: any LoginSessionRepository
+
+    public let recordSharedSessionState: @Sendable () async -> Void
+
+    public static func migrateSessionKeychain(sharedKeychainStore: KeychainStore) {
+        SessionKeychainMigration(
+            sharedKeychainStore: sharedKeychainStore,
+            legacyKeychainStore: AppGroupKeychainStore.makeLegacy(),
+        )()
+    }
 
 }

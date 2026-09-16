@@ -40,6 +40,13 @@ public struct GenerationReminderAssembly: Sendable {
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
     public let startObservingGenerationState: @Sendable (any TrackGenerationUseCase) async -> Void
 
+    public static func makePendingReminderEnqueue(sharedDefaults: UserDefaults?) -> @Sendable (String) async -> Void {
+        let pendingReminderCoding = sharedDefaults.map(PendingGenerationReminderCoding.init(userDefaults:))
+        return { projectID in
+            await pendingReminderCoding?.append(projectID: projectID)
+        }
+    }
+
     // MARK: Internal
 
     let scheduleGenerationReminder: ScheduleGenerationReminder

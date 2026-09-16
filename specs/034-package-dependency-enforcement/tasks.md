@@ -203,25 +203,25 @@
 
 ### 구현 — 축 조립
 
-- [ ] T050 [P] [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`에 `static func migrateSessionKeychain(sharedKeychainStore:)`와 `init`의 `sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared()` 인자, 공개 `recordSharedSessionState`를 추가한다([data-model.md](./data-model.md) 3절)
-- [ ] T051 [P] [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`를 만든다 — `init(keychainStore:sharedDefaults:)`, `resolveSessionAvailability`, `accessTokenProvider`. 동작은 현재 `ShareExtensionComposition.live`의 두 closure와 같다
-- [ ] T052 [P] [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`에 `makeRegisterCurrentDevice(keychainStore:appVersion:osVersion:deviceTokenProvider:)`를 추가하고 공개 `repository`를 내부 저장으로 바꾼다
-- [ ] T053 [P] [S4] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`에 `static func makePendingReminderEnqueue(sharedDefaults:)`를 추가한다
+- [X] T050 [P] [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`에 `static func migrateSessionKeychain(sharedKeychainStore:)`와 `init`의 `sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared()` 인자, 공개 `recordSharedSessionState`를 추가한다([data-model.md](./data-model.md) 3절)
+- [X] T051 [P] [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`를 만든다 — `init(keychainStore:sharedDefaults:)`, `resolveSessionAvailability`, `accessTokenProvider`. 동작은 현재 `ShareExtensionComposition.live`의 두 closure와 같다
+- [X] T052 [P] [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`에 `makeRegisterCurrentDevice(keychainStore:appVersion:osVersion:deviceTokenProvider:)`를 추가하고 공개 `repository`를 내부 저장으로 바꾼다
+- [X] T053 [P] [S4] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`에 `static func makePendingReminderEnqueue(sharedDefaults:)`를 추가한다
 
 ### 구현 — 조립 루트
 
-- [ ] T054 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 T050·T052 API를 쓰도록 바꾸고 `import DataAuthentication`, `import DataExternalRepository`, `import InfrastructureStorage`를 지운다. 키체인 마이그레이션은 `live` 첫 호출로 유지한다
-- [ ] T055 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 T051·T053 API를 쓰도록 바꾸고 `import DataAuthentication`, `import DataLearningProject`를 지운다. `live(…)` 서명은 유지한다
-- [ ] T056 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `CompositionApp`의 `DataAuthentication`, `DataExternalRepository`, `InfrastructureStorage` 선언과 `CompositionShareExtension`의 `DataAuthentication`, `DataLearningProject` 선언을 지우고, `CompositionAppTests`에 `.fromData(.DataAuthentication)`, `CompositionShareExtensionTests`에 `.fromData(.DataAuthentication)`·`.fromData(.DataLearningProject)`를 추가 선언한다
+- [X] T054 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 T050·T052 API를 쓰도록 바꾸고 `import DataAuthentication`, `import DataExternalRepository`, `import InfrastructureStorage`를 지운다. 키체인 마이그레이션은 `live` 첫 호출로 유지한다
+- [X] T055 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 T051·T053 API를 쓰도록 바꾸고 `import DataAuthentication`, `import DataLearningProject`를 지운다. `live(…)` 서명은 유지한다
+- [X] T056 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `CompositionApp`의 `DataAuthentication`, `DataExternalRepository`, `InfrastructureStorage` 선언과 `CompositionShareExtension`의 `DataAuthentication`, `DataLearningProject` 선언을 지우고, `CompositionAppTests`에 `.fromData(.DataAuthentication)`, `CompositionShareExtensionTests`에 `.fromData(.DataAuthentication)`·`.fromData(.DataLearningProject)`를 추가 선언한다
 
 ### 구현 — 테스트
 
-- [ ] T057 [S4] 루트 API 변경으로 compile되지 않는 테스트만 고친다. 대상은 `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`, `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`, `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`로 한정하고, 검증 의도와 기대값은 바꾸지 않는다
+- [X] T057 [S4] 루트 API 변경으로 compile되지 않는 테스트만 고친다. 대상은 `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`, `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`, `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`로 한정하고, 검증 의도와 기대값은 바꾸지 않는다
 
 ### 단위 검증
 
-- [ ] T058 [no-write] [S4] [quickstart.md](./quickstart.md) 4.1 명령으로 모든 Composition target 의존 수 6 이하와 `CompositionShared`의 Domain·Data 선언 0을 확인하고, 도구 위반 0을 확인한다
-- [ ] T059 [no-write] [S4] `sources`에서 `tuist generate --no-open` 후 `App`·`Composition` scheme 빌드와 `Composition` scheme 테스트를 실행해 T049와 같은 테스트 합계가 통과하는지 확인한다
+- [X] T058 [no-write] [S4] [quickstart.md](./quickstart.md) 4.1 명령으로 모든 Composition target 의존 수 6 이하와 `CompositionShared`의 Domain·Data 선언 0을 확인하고, 도구 위반 0을 확인한다
+- [X] T059 [no-write] [S4] `sources`에서 `tuist generate --no-open` 후 `App`·`Composition` scheme 빌드와 `Composition` scheme 테스트를 실행해 T049와 같은 테스트 합계가 통과하는지 확인한다
 
 **진행 점검**: T050~T059의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -283,6 +283,8 @@
 - **T029**: `enabled`의 주석 처리된 단계 목록에 `# package-dependencies`를 `# swift-format` 다음에 추가했다.
 - **T046**: `AppCompositionPublicSurfaceTests.swift`는 축 target 타입을 쓰지 않아 `CompositionAdapter` import를 지우기만 했고, 나머지 네 파일은 `SessionRecordCoding`·Authentication Adapter만 쓰므로 `CompositionAuthentication`으로 바꿨다. 이동·수정한 테스트 파일에 이전 빌드의 FormatSwift 정규화 결과(import 정렬, 한 줄 `if` 전개)가 있어 plan의 기준선 규칙대로 이 단위에 포함했다. 비어 남은 `Composition/Adapter/`의 추적되지 않는 `.DS_Store`는 디렉터리와 함께 지웠다.
 - **I5 커밋 분리 사고**: staging 명령이 이동 전 경로 때문에 실패했는데 뒤이은 `git commit`이 실행돼, `4212760`에는 `git mv`로 미리 stage된 순수 이름 변경 41개만 들어갔다. 이 커밋은 단독으로 빌드되지 않는다. amend·reset을 쓰지 않는 규칙에 따라 manifest, import, 접근 수준, 새 test double, `source-roots`, 이 기록을 바로 다음 커밋에 담았다. 두 커밋을 합친 상태에서 T048·T049 검증을 통과했다.
+- **T056**: `CompositionShareExtensionTests`의 추가 선언에서 production이 이미 선언한 `DomainAuthentication`을 빼고 `DataAuthentication`·`DataLearningProject`를 넣었다. 추가 선언 수는 2다.
+- **T057**: 루트 공개 API(`live(…)` 서명, 공개 프로퍼티)가 바뀌지 않아 테스트 수정이 필요 없었다. `Composition` scheme 61개가 그대로 통과했다.
 - **T002 재수정**: U3에서 `test-no-hardcoded-paths.sh`의 검사 키에 이 도구가 들어가자, 회귀 fixture가 쓰던 `docs/architecture.md`·`sources/Projects`·`sources/Tuist` 경로 문자열이 중앙 JSON 값의 복제로 판정됐다. fixture 디렉터리 이름을 `architecture-rules.md`·`packages`·`manifest-root`로 바꿨다. 이 검사의 남은 실패는 `openai.yaml` 기존 실패뿐이다.
 
 ---

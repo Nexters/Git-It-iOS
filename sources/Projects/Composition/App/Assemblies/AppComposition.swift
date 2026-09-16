@@ -1,8 +1,6 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import CompositionMember
-import DataAuthentication
-import DataExternalRepository
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember
@@ -10,7 +8,6 @@ import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
 import InfrastructurePushMessaging
-import InfrastructureStorage
 import Synchronization
 
 // MARK: - AppComposition
@@ -63,23 +60,15 @@ public struct AppComposition: Sendable {
 
         let trackGeneration = learningProject.trackGeneration
         let startObservingGenerationState = generationReminder.startObservingGenerationState
-        let markerCoding = AppGroupUserDefaults.makeShared()
-            .map(SharedSessionStateMarkerCoding.init(userDefaults:))
-        let hasStoredSession: @Sendable () async -> Bool = {
-            await authentication.accessTokenProvider() != nil
-        }
-        recordSharedSessionState = {
-            await markerCoding?.save(isSignedIn: hasStoredSession())
-        }
+        recordSharedSessionState = authentication.recordSharedSessionState
         activatePushClient = { pushClientBox.activate() }
         configureAppDelegate = { appDelegate in appDelegate.configure(pushNotificationCallbacks) }
         self.startObservingGenerationState = {
             await startObservingGenerationState(trackGeneration)
         }
 
-        let registerCurrentDeviceUseCase = RegisterCurrentDevice(
-            repository: member.repository,
-            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
+        registerCurrentDevice = member.makeRegisterCurrentDevice(
+            keychainStore: keychainStore,
             appVersion: appVersion,
             osVersion: osVersion,
             deviceTokenProvider: {
@@ -89,7 +78,6 @@ public struct AppComposition: Sendable {
                 return try await pushClient.registrationToken()
             },
         )
-        registerCurrentDevice = { try await registerCurrentDeviceUseCase() }
 
         deviceTokenRefreshes = {
             guard let pushClient = pushClientBox.client else {
@@ -171,10 +159,7 @@ public struct AppComposition: Sendable {
         keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
-        SessionKeychainMigration(
-            sharedKeychainStore: keychainStore,
-            legacyKeychainStore: AppGroupKeychainStore.makeLegacy(),
-        )()
+        AuthenticationAssembly.migrateSessionKeychain(sharedKeychainStore: keychainStore)
 
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,

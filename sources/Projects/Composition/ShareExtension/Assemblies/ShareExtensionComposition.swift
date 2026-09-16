@@ -1,7 +1,5 @@
 import CompositionAuthentication
 import CompositionLearningProject
-import DataAuthentication
-import DataLearningProject
 import DomainAuthentication
 import DomainLearningProject
 import Foundation
@@ -21,16 +19,14 @@ public struct ShareExtensionComposition: Sendable {
         learningProject: LearningProjectAssembly,
         resolveSessionAvailability: @escaping @Sendable () async -> SessionAvailability,
         localNotificationClient: any NotificationAuthorizationClient,
-        pendingReminderCoding: PendingGenerationReminderCoding?,
+        enqueueGenerationReminder: @escaping @Sendable (String) async -> Void,
     ) {
         parseRepositoryLink = externalRepository.urlParser
         fetchExternalRepository = externalRepository.fetchExternalRepository
         createLearningProject = learningProject.createLearningProject
         self.resolveSessionAvailability = resolveSessionAvailability
         isNotificationAuthorized = { await localNotificationClient.isAuthorized() }
-        enqueueGenerationReminder = { projectID in
-            await pendingReminderCoding?.append(projectID: projectID)
-        }
+        self.enqueueGenerationReminder = enqueueGenerationReminder
     }
 
     // MARK: Public
@@ -68,18 +64,10 @@ public struct ShareExtensionComposition: Sendable {
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
         transport: (any HTTPTransport)? = nil,
     ) -> ShareExtensionComposition {
-        let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
-        let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
-            guard let markerCoding else { return .appLaunchRequired }
-            return await ResolveSessionAvailability(
-                markerRepository: SharedSessionMarkerRepositoryAdapter(markerCoding: markerCoding),
-                sessionRepository: StoredSessionRepositoryAdapter(keychainStore: keychainStore),
-            )()
-        }
-        let accessTokenProvider: @Sendable () async -> String? = {
-            guard case .available(let accessToken) = await resolveSessionAvailability() else { return nil }
-            return accessToken
-        }
+        let sessionAvailability = SessionAvailabilityAssembly(
+            keychainStore: keychainStore,
+            sharedDefaults: sharedDefaults,
+        )
 
         return ShareExtensionComposition(
             externalRepository: ExternalRepositoryAssembly(
@@ -88,12 +76,12 @@ public struct ShareExtensionComposition: Sendable {
             ),
             learningProject: LearningProjectAssembly(
                 baseURL: environment.apiBaseURL,
-                accessTokenProvider: accessTokenProvider,
+                accessTokenProvider: sessionAvailability.accessTokenProvider,
                 transport: transport,
             ),
-            resolveSessionAvailability: resolveSessionAvailability,
+            resolveSessionAvailability: sessionAvailability.resolveSessionAvailability,
             localNotificationClient: localNotificationClient,
-            pendingReminderCoding: sharedDefaults.map(PendingGenerationReminderCoding.init(userDefaults:)),
+            enqueueGenerationReminder: GenerationReminderAssembly.makePendingReminderEnqueue(sharedDefaults: sharedDefaults),
         )
     }
 

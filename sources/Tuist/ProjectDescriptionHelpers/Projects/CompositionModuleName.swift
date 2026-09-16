@@ -129,11 +129,8 @@ extension CompositionModuleName {
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromDomain(.DomainMember),
-                    .fromData(.DataAuthentication),
-                    .fromData(.DataExternalRepository),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureStorage),
                     .fromInfrastructure(.InfrastructurePushMessaging),
                 ],
             )
@@ -149,6 +146,7 @@ extension CompositionModuleName {
                     .target(name: CompositionModuleName.CompositionAuthentication.rawValue),
                     .target(name: CompositionModuleName.CompositionLearningProject.rawValue),
                     .target(name: CompositionModuleName.CompositionMember.rawValue),
+                    .fromData(.DataAuthentication),
                 ],
             )
 
@@ -161,8 +159,6 @@ extension CompositionModuleName {
                     .target(name: CompositionModuleName.CompositionLearningProject.rawValue),
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
-                    .fromData(.DataAuthentication),
-                    .fromData(.DataLearningProject),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
                     .fromInfrastructure(.InfrastructureStorage),
@@ -180,7 +176,8 @@ extension CompositionModuleName {
                 additionalDependencies: [
                     .target(name: CompositionModuleName.CompositionAuthentication.rawValue),
                     .target(name: CompositionModuleName.CompositionLearningProject.rawValue),
-                    .fromDomain(.DomainAuthentication),
+                    .fromData(.DataAuthentication),
+                    .fromData(.DataLearningProject),
                 ],
             )
         }
