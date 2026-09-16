@@ -66,6 +66,8 @@ extension AppModuleName {
                     .fromComposition(.CompositionApp),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainMember),
                 ],
                 settings: .settings(
                     base: [

@@ -1,7 +1,6 @@
 import CompositionAdapter
 import DataAuthentication
 import DataExternalRepository
-import DataMember
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember

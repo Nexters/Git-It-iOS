@@ -76,13 +76,13 @@
 
 ### 구현
 
-- [ ] T014 [P] [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitIt` target 의존성에 `.fromDomain(.DomainLearningProject)`와 `.fromDomain(.DomainMember)`를 추가한다
-- [ ] T015 [P] [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 쓰이지 않는 `import DataMember`를 지운다
+- [X] T014 [P] [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/AppModuleName.swift`의 `GitIt` target 의존성에 `.fromDomain(.DomainLearningProject)`와 `.fromDomain(.DomainMember)`를 추가한다
+- [X] T015 [P] [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 쓰이지 않는 `import DataMember`를 지운다
 
 ### 단위 검증
 
-- [ ] T016 [no-write] [S1] `tools/package-dependencies/bin/run.sh`가 종료 0과 `위반=0`을 출력하는지 확인한다
-- [ ] T017 [no-write] `sources`에서 `tuist generate --no-open` 후 `App`·`Composition` scheme을 iPhone 17 Pro 시뮬레이터 대상으로 빌드해 성공을 확인한다
+- [X] T016 [no-write] [S1] `tools/package-dependencies/bin/run.sh`가 종료 0과 `위반=0`을 출력하는지 확인한다
+- [X] T017 [no-write] `sources`에서 `tuist generate --no-open` 후 `App`·`Composition` scheme을 iPhone 17 Pro 시뮬레이터 대상으로 빌드해 성공을 확인한다
 
 **진행 점검**: T014~T017의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
