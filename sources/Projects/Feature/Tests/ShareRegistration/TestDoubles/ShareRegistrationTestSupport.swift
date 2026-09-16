@@ -42,15 +42,21 @@ struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
 
     // MARK: Private
 
-    private struct ResultBox: Sendable {
+    private final class ResultBox: Sendable {
+
+        // MARK: Lifecycle
 
         init(_ value: Result<ExternalRepository, any Error>) {
             storage = Mutex(value)
         }
 
+        // MARK: Internal
+
         func resolve() throws -> ExternalRepository {
             try storage.withLock { try $0.get() }
         }
+
+        // MARK: Private
 
         private let storage: Mutex<Result<ExternalRepository, any Error>>
 
