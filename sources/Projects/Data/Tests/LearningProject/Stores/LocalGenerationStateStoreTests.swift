@@ -7,6 +7,31 @@ import Testing
 @Suite("LocalGenerationStateStore")
 struct LocalGenerationStateStoreTests {
 
+    static func makeStore(defaults: UserDefaults? = nil) -> UserDefaultsStore<GenerationStateDTO> {
+        UserDefaultsStore(namespace: "test.generationState", userDefaults: defaults ?? makeDefaults())
+    }
+
+    static func makeDefaults() -> UserDefaults {
+        let suiteName = "test.generationState.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        return defaults
+    }
+
+    static func record(
+        projectID: String?,
+        githubRepoURL: String = "https://github.com/owner/repo",
+        requestedAt: Date = Date(timeIntervalSince1970: 1_000),
+    ) -> GenerationRecordDTO {
+        GenerationRecordDTO(
+            githubRepoURL: githubRepoURL,
+            projectID: projectID,
+            requestedAt: requestedAt,
+            status: "inProgress",
+            finishedAt: nil,
+        )
+    }
+
     @Test
     func `저장한 생성 상태를 그대로 다시 불러온다`() async {
         let store = LocalGenerationStateStore(store: Self.makeStore())
@@ -41,33 +66,6 @@ struct LocalGenerationStateStoreTests {
 
         let relaunched = LocalGenerationStateStore(store: Self.makeStore(defaults: defaults))
         #expect(await relaunched.load() == state)
-    }
-
-    // MARK: Internal
-
-    static func makeStore(defaults: UserDefaults? = nil) -> UserDefaultsStore<GenerationStateDTO> {
-        UserDefaultsStore(namespace: "test.generationState", userDefaults: defaults ?? makeDefaults())
-    }
-
-    static func makeDefaults() -> UserDefaults {
-        let suiteName = "test.generationState.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suiteName)!
-        defaults.removePersistentDomain(forName: suiteName)
-        return defaults
-    }
-
-    static func record(
-        projectID: String?,
-        githubRepoURL: String = "https://github.com/owner/repo",
-        requestedAt: Date = Date(timeIntervalSince1970: 1_000),
-    ) -> GenerationRecordDTO {
-        GenerationRecordDTO(
-            githubRepoURL: githubRepoURL,
-            projectID: projectID,
-            requestedAt: requestedAt,
-            status: "inProgress",
-            finishedAt: nil,
-        )
     }
 
 }

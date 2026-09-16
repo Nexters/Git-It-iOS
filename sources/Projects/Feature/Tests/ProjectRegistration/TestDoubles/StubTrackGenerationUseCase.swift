@@ -59,7 +59,7 @@ actor StubTrackGenerationUseCase: TrackGenerationUseCase {
                 requestedAt: requestedAt,
                 status: outcome.status == .completed ? .completed : .failed,
                 finishedAt: Date(),
-            ),
+            )
         ])
         yieldCurrent()
     }

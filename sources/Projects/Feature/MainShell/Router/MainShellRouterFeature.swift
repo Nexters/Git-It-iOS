@@ -191,7 +191,10 @@ public struct MainShellRouterFeature: Sendable {
             }
         }
         .ifLet(\.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) })
+            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(
+                projectID: $0,
+                setID: $1,
+            ) })
         }
         .ifLet(\.$singleQuestion, action: \.singleQuestion) {
             QuestionSolvingFeature(

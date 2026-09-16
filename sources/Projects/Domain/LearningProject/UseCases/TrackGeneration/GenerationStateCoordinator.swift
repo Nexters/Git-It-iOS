@@ -83,7 +83,7 @@ actor GenerationStateCoordinator {
 
     private func ensureStarted() async {
         if startTask == nil {
-            startTask = Task { [self] in await self.start() }
+            startTask = Task { [self] in await start() }
         }
         await startTask?.value
     }

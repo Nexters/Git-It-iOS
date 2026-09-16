@@ -121,12 +121,17 @@ struct CreateLearningProjectTests {
 }
 
 extension CreateLearningProjectTests {
+
+    // MARK: Internal
+
     static func makeTrackGeneration() -> TrackGeneration {
         TrackGeneration(
             stateRepository: StubGenerationStateRepository(),
             outcomeRepository: StubGenerationOutcomeRepository(),
         )
     }
+
+    // MARK: Private
 
     private func makeCreateLearningProject(
         behavior: CreateLearningProjectRepository.Behavior
@@ -136,6 +141,7 @@ extension CreateLearningProjectTests {
             trackGeneration: Self.makeTrackGeneration(),
         )
     }
+
 }
 
 // MARK: - CreateLearningProjectRepository

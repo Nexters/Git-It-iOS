@@ -39,7 +39,9 @@ public struct ModalOverlay<Content: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var transitionDuration: Double { 0.25 }
+        static var transitionDuration: Double {
+            0.25
+        }
     }
 
     private let isPresented: Bool

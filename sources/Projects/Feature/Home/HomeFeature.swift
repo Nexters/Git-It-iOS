@@ -214,6 +214,20 @@ public struct HomeFeature: Sendable {
     private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
     private let trackGeneration: any TrackGenerationUseCase
 
+    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
+        guard let projectID = record.projectID else { return nil }
+        switch record.status {
+        case .inProgress:
+            return nil
+
+        case .completed:
+            return GenerationOutcome(projectID: projectID, status: .completed)
+
+        case .failed:
+            return GenerationOutcome(projectID: projectID, status: .failed)
+        }
+    }
+
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
         state.profileLoad = .loading
@@ -264,20 +278,6 @@ public struct HomeFeature: Sendable {
                     await send(.effect(.generationOutcomeReceived(outcome)))
                 }
             }
-        }
-    }
-
-    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
-        guard let projectID = record.projectID else { return nil }
-        switch record.status {
-        case .inProgress:
-            return nil
-
-        case .completed:
-            return GenerationOutcome(projectID: projectID, status: .completed)
-
-        case .failed:
-            return GenerationOutcome(projectID: projectID, status: .failed)
         }
     }
 

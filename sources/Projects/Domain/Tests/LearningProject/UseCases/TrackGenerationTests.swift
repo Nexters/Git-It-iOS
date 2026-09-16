@@ -6,6 +6,8 @@ import Testing
 @Suite("TrackGeneration")
 struct TrackGenerationTests {
 
+    // MARK: Internal
+
     @Test
     func `완료 통지가 먼저 도착해도 그 뒤에 시작한 관측이 첫 값으로 완료 상태를 받는다`() async {
         let outcomes = StubGenerationOutcomeRepository()
@@ -74,7 +76,7 @@ struct TrackGenerationTests {
     @Test
     func `보존한 상태를 다시 불러와 복원한다`() async {
         let stored = GenerationState(records: [
-            GenerationRecord(githubRepoURL: Self.url, projectID: "p1", requestedAt: Self.requestedAt),
+            GenerationRecord(githubRepoURL: Self.url, projectID: "p1", requestedAt: Self.requestedAt)
         ])
         let trackGeneration = Self.makeTrackGeneration(
             stateRepository: StubGenerationStateRepository(stored: stored)

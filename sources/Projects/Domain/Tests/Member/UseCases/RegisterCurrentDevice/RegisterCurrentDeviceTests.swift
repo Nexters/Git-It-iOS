@@ -58,15 +58,18 @@ struct RegisterCurrentDeviceTests {
             registeredDevice = device
         }
 
-        func completeCuration(position: MemberPosition, careerLevel: CareerLevel) async throws { }
+        func completeCuration(
+            position _: MemberPosition,
+            careerLevel _: CareerLevel,
+        ) async throws { }
 
         func fetchProfile() async throws -> MemberProfile {
             throw SampleError.tokenUnavailable
         }
 
-        func updatePosition(_ position: MemberPosition) async throws { }
+        func updatePosition(_: MemberPosition) async throws { }
 
-        func updateCareerLevel(_ careerLevel: CareerLevel) async throws { }
+        func updateCareerLevel(_: CareerLevel) async throws { }
 
         func deleteAccount() async throws { }
     }
@@ -74,7 +77,9 @@ struct RegisterCurrentDeviceTests {
     private struct StubDeviceIdentifierRepository: DeviceIdentifierRepository {
         let deviceID: String
 
-        func currentDeviceID() async -> String { deviceID }
+        func currentDeviceID() async -> String {
+            deviceID
+        }
     }
 
 }

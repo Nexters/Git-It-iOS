@@ -118,7 +118,10 @@ public struct ProjectDetailRouterFeature: Sendable {
             )
         }
         Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) })
+            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(
+                projectID: $0,
+                setID: $1,
+            ) })
         }
         Reduce { state, action in
             switch action {

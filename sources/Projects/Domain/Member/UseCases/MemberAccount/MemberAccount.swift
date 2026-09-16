@@ -42,7 +42,9 @@ public actor MemberAccount: MemberAccountUseCase {
 
     // MARK: Internal
 
-    var pendingKeyCount: Int { inFlight.count }
+    var pendingKeyCount: Int {
+        inFlight.count
+    }
 
     // MARK: Private
 

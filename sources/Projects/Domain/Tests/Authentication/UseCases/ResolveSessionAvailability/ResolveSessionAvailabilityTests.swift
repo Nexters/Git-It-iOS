@@ -66,13 +66,17 @@ struct ResolveSessionAvailabilityTests {
     private struct StubMarkerRepository: SharedSessionMarkerRepository {
         let state: Bool?
 
-        func signedInState() async -> Bool? { state }
+        func signedInState() async -> Bool? {
+            state
+        }
     }
 
     private struct StubSessionRepository: StoredSessionRepository {
         let session: SessionRecord?
 
-        func currentSession() async -> SessionRecord? { session }
+        func currentSession() async -> SessionRecord? {
+            session
+        }
     }
 
     private static func make(

@@ -618,7 +618,10 @@ struct AppRootFeatureTests {
     @Test
     func `앱 시작 시 보존된 진행 상태를 복원해 홈에 진행 중을 전달한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let trackGeneration = TrackGenerationUseCaseMock(stored: Self.inProgressState(requestedAt: requestedAt), keepsObservationOpen: true)
+        let trackGeneration = TrackGenerationUseCaseMock(
+            stored: Self.inProgressState(requestedAt: requestedAt),
+            keepsObservationOpen: true,
+        )
         let store = makeAppRootStore(
             trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
@@ -640,7 +643,10 @@ struct AppRootFeatureTests {
     @Test
     func `보존 상한을 넘긴 진행 상태는 복원하지 않고 해제한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let trackGeneration = TrackGenerationUseCaseMock(stored: Self.inProgressState(requestedAt: requestedAt), keepsObservationOpen: true)
+        let trackGeneration = TrackGenerationUseCaseMock(
+            stored: Self.inProgressState(requestedAt: requestedAt),
+            keepsObservationOpen: true,
+        )
         let store = makeAppRootStore(
             trackGeneration: trackGeneration,
             waitPolicy: GenerationWaitPolicy(minimumWait: 300, retentionLimit: 3_600),
@@ -678,7 +684,7 @@ struct AppRootFeatureTests {
 
     private static func completedState(requestedAt: Date) -> GenerationState {
         GenerationState(records: [
-            inProgressRecord(requestedAt: requestedAt).finishing(status: .completed, at: requestedAt),
+            inProgressRecord(requestedAt: requestedAt).finishing(status: .completed, at: requestedAt)
         ])
     }
 

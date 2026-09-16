@@ -4,5 +4,8 @@ import Foundation
 
 public protocol GenerationReminderScheduler: Sendable {
     func isAuthorized() async -> Bool
-    func schedule(identifier: String, at date: Date) async
+    func schedule(
+        identifier: String,
+        at date: Date,
+    ) async
 }

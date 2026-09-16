@@ -6,6 +6,8 @@ import Testing
 @Suite("GenerationRecord")
 struct GenerationRecordTests {
 
+    // MARK: Internal
+
     @Test
     func `저장소 URL의 공백과 대소문자와 후행 슬래시를 제거해 정규화한다`() {
         #expect(GenerationRecord.normalizedURL("  https://GitHub.com/Owner/Repo//  ") == "https://github.com/owner/repo")

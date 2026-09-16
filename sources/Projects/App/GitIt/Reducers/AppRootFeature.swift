@@ -213,7 +213,7 @@ nonisolated struct AppRootFeature: Sendable {
                 var effects: [Effect<Action>] = [
                     .run { [verifyAuthorization] send in
                         await send(.effect(.authorizationVerified(verifyAuthorization())))
-                    },
+                    }
                 ]
                 if state.route == .mainShell {
                     effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))

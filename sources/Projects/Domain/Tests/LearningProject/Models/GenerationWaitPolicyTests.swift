@@ -16,7 +16,11 @@ struct GenerationWaitPolicyTests {
     @Test
     func `대기 만료 시각은 요청 시각에 최소 대기 시간을 더한 값이다`() {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
-        let progress = GenerationRecord(githubRepoURL: "https://github.com/owner/repo", projectID: "project-1", requestedAt: requestedAt)
+        let progress = GenerationRecord(
+            githubRepoURL: "https://github.com/owner/repo",
+            projectID: "project-1",
+            requestedAt: requestedAt,
+        )
 
         let readyDate = GenerationWaitPolicy.standard.readyDate(for: progress)
 
@@ -26,7 +30,11 @@ struct GenerationWaitPolicyTests {
     @Test
     func `보존 상한을 넘기지 않은 진행 상태는 만료로 판정하지 않는다`() {
         let requestedAt = Date(timeIntervalSince1970: 0)
-        let progress = GenerationRecord(githubRepoURL: "https://github.com/owner/repo", projectID: "project-1", requestedAt: requestedAt)
+        let progress = GenerationRecord(
+            githubRepoURL: "https://github.com/owner/repo",
+            projectID: "project-1",
+            requestedAt: requestedAt,
+        )
 
         let isExpired = GenerationWaitPolicy.standard.isExpired(
             progress,
@@ -39,7 +47,11 @@ struct GenerationWaitPolicyTests {
     @Test
     func `보존 상한을 넘긴 진행 상태는 만료로 판정한다`() {
         let requestedAt = Date(timeIntervalSince1970: 0)
-        let progress = GenerationRecord(githubRepoURL: "https://github.com/owner/repo", projectID: "project-1", requestedAt: requestedAt)
+        let progress = GenerationRecord(
+            githubRepoURL: "https://github.com/owner/repo",
+            projectID: "project-1",
+            requestedAt: requestedAt,
+        )
 
         let isExpired = GenerationWaitPolicy.standard.isExpired(
             progress,

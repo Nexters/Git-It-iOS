@@ -6,6 +6,9 @@ import Testing
 
 @Suite("SetQuestionBookmark")
 struct SetQuestionBookmarkTests {
+
+    // MARK: Internal
+
     @Test
     func `desired bool을 정확히 전송한다`() async throws {
         let repository = SetQuestionBookmarkRepository()
@@ -52,7 +55,10 @@ struct SetQuestionBookmarkTests {
 
         _ = try await (first.value, second.value)
 
-        #expect(await repository.requestLog == [Request(questionID: "q1", bookmarked: true), Request(questionID: "q1", bookmarked: false)])
+        #expect(await repository.requestLog == [
+            Request(questionID: "q1", bookmarked: true),
+            Request(questionID: "q1", bookmarked: false),
+        ])
     }
 
     @Test
@@ -100,11 +106,14 @@ struct SetQuestionBookmarkTests {
         #expect(await setQuestionBookmark.pendingKeyCount == 0)
     }
 
+    // MARK: Private
+
     private static func yieldUntilQueued() async {
         for _ in 0 ..< 100 {
             await Task.yield()
         }
     }
+
 }
 
 // MARK: - Request

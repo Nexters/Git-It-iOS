@@ -30,7 +30,9 @@ public struct PushedScreenOverlay<Content: View>: View {
     // MARK: Private
 
     private enum Constant {
-        static var transitionDuration: Double { 0.3 }
+        static var transitionDuration: Double {
+            0.3
+        }
     }
 
     private let isPresented: Bool

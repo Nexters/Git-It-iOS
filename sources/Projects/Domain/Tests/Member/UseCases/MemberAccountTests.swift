@@ -180,12 +180,6 @@ struct MemberAccountTests {
 
     // MARK: Private
 
-    private static func yieldUntilQueued() async {
-        for _ in 0 ..< 100 {
-            await Task.yield()
-        }
-    }
-
     private actor Gate {
 
         // MARK: Internal
@@ -308,6 +302,12 @@ struct MemberAccountTests {
         private let curationBehavior: Behavior
         private let positionGate: Gate?
 
+    }
+
+    private static func yieldUntilQueued() async {
+        for _ in 0 ..< 100 {
+            await Task.yield()
+        }
     }
 
 }

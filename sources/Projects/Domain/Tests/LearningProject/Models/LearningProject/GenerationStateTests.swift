@@ -6,6 +6,8 @@ import Testing
 @Suite("GenerationState")
 struct GenerationStateTests {
 
+    // MARK: Internal
+
     @Test
     func `같은 정규화 URL의 진행 중 기록은 하나만 시작할 수 있다`() {
         let started = GenerationState().beginning(githubRepoURL: Self.url, requestedAt: Self.requestedAt)
@@ -51,7 +53,7 @@ struct GenerationStateTests {
             .beginning(githubRepoURL: Self.otherURL, requestedAt: Self.requestedAt)?
             .attachingProjectID("p1", toGithubRepoURL: Self.url)
             .attachingProjectID("p1", toGithubRepoURL: Self.otherURL)
-        #expect(state?.records.filter { $0.projectID == "p1" }.count == 1)
+        #expect(state?.records.count(where: { $0.projectID == "p1" }) == 1)
         #expect(state?.record(projectID: "p1")?.githubRepoURL == Self.otherURL)
     }
 

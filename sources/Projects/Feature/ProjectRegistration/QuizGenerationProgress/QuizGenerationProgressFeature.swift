@@ -175,6 +175,20 @@ public struct QuizGenerationProgressFeature: Sendable {
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
 
+    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
+        guard let projectID = record.projectID else { return nil }
+        switch record.status {
+        case .inProgress:
+            return nil
+
+        case .completed:
+            return GenerationOutcome(projectID: projectID, status: .completed)
+
+        case .failed:
+            return GenerationOutcome(projectID: projectID, status: .failed)
+        }
+    }
+
     private func submit(
         repository: ExternalRepository,
         quizLevel: QuizLevel,
@@ -226,20 +240,6 @@ public struct QuizGenerationProgressFeature: Sendable {
     private func remainingWait(requestedAt: Date?) -> TimeInterval {
         guard let requestedAt else { return 0 }
         return requestedAt.addingTimeInterval(waitPolicy.minimumWait).timeIntervalSince(now())
-    }
-
-    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
-        guard let projectID = record.projectID else { return nil }
-        switch record.status {
-        case .inProgress:
-            return nil
-
-        case .completed:
-            return GenerationOutcome(projectID: projectID, status: .completed)
-
-        case .failed:
-            return GenerationOutcome(projectID: projectID, status: .failed)
-        }
     }
 
     private func applyOutcome(

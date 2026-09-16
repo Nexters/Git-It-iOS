@@ -135,6 +135,9 @@ struct FetchLearningProjectsTests {
 }
 
 extension FetchLearningProjectsTests {
+
+    // MARK: Internal
+
     static func makeTrackGeneration(activeProjectIDs: Set<String>) -> TrackGeneration {
         let records = activeProjectIDs.map { projectID in
             GenerationRecord(
@@ -151,6 +154,8 @@ extension FetchLearningProjectsTests {
         )
     }
 
+    // MARK: Private
+
     private func makeFetchLearningProjects(
         behavior: FetchLearningProjectsRepository.Behavior,
         activeProjectIDs: Set<String> = [],
@@ -160,6 +165,7 @@ extension FetchLearningProjectsTests {
             trackGeneration: Self.makeTrackGeneration(activeProjectIDs: activeProjectIDs),
         )
     }
+
 }
 
 // MARK: - FetchLearningProjectsRepository

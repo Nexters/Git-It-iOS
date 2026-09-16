@@ -27,7 +27,7 @@ struct ScheduleGenerationReminderTests {
             SpyGenerationReminderScheduler.Scheduled(
                 identifier: "generation-completed-project-1",
                 date: requestedAt.addingTimeInterval(300),
-            ),
+            )
         ])
     }
 
@@ -141,7 +141,7 @@ struct ScheduleGenerationReminderTests {
                 requestedAt: requestedAt,
                 status: status,
                 finishedAt: requestedAt,
-            ),
+            )
         ])
     }
 
@@ -202,7 +202,9 @@ private actor SpyGenerationReminderScheduler: GenerationReminderScheduler {
 private struct StubPendingGenerationReminderStore: PendingGenerationReminderStore {
     let projectIDs: [String]
 
-    func drainProjectIDs() async -> [String] { projectIDs }
+    func drainProjectIDs() async -> [String] {
+        projectIDs
+    }
 }
 
 // MARK: - StubTrackGenerationUseCase

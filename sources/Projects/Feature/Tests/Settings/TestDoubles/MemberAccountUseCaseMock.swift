@@ -58,7 +58,7 @@ actor MemberAccountUseCaseMock: MemberAccountUseCase {
         profileCallCount: Int,
         positions: [MemberPosition],
         careerLevels: [CareerLevel],
-        curationCalls: [CurationCall]
+        curationCalls: [CurationCall],
     ) {
         (profileCallCount, requestedPositions, requestedCareerLevels, curationCalls)
     }

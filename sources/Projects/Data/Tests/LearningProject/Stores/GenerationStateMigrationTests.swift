@@ -7,6 +7,8 @@ import Testing
 @Suite("GenerationStateMigration")
 struct GenerationStateMigrationTests {
 
+    // MARK: Internal
+
     @Test
     func `레거시 값이 없으면 이관하지 않는다`() async {
         let migration = GenerationStateMigration(
