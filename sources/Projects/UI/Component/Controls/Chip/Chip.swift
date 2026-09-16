@@ -53,7 +53,7 @@ public struct Chip: View {
 // MARK: Chip.Constant
 
 extension Chip {
-    fileprivate enum Constant {
+    enum Constant {
         static let height: CGFloat = 36
         static let horizontalPadding: CGFloat = 8
         static let labelLineLimit = 1
