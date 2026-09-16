@@ -511,7 +511,7 @@ U1 점검(문서) → U2 문서 교정 → U3 Domain rename(Domain+Composition+F
 
 **소유 경로**: `sources/Projects/Infrastructure/Authentication/README.md`
 
-- [ ] T042 [S2] `sources/Projects/Infrastructure/Authentication/README.md` 교정 per S2/AC2, SC-003
+- [X] T042 [S2] `sources/Projects/Infrastructure/Authentication/README.md` 교정 per S2/AC2, SC-003
       (partial): 33행의 "`changes()`는 revoked 상태를 전달하는 `AsyncStream`을 제공합니다" 항목을
       코드의 실제 API로 바꾼다(`map(_:)`이 platform 상태를 `AppleCredentialState`로 변환하고
       `state(for:)`가 Apple user ID로 현재 상태를 조회한다). 검증 근거(78~82행)의 경로 5건을
