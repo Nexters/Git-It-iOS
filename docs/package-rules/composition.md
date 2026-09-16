@@ -20,6 +20,33 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 - 객체 수명과 공유 범위는 Composition이 명시적으로 결정해야 합니다. 공유 수명이 필요한 Repository·세션 객체는 중복 생성해서는 안 됩니다.
 - App이 Feature에 주입할 수 있도록 Domain UseCase Protocol 타입의 실행 가능한 dependency를 공개해야 합니다. 내부 Adapter와 Infrastructure 객체는 공개 API에 노출해서는 안 됩니다.
 
+## Target 구성
+
+명세 034에서 단일 `CompositionAdapter`(다른 패키지 모듈 12개 의존)를 Domain 축으로 나눈
+결과입니다. "의존 수"는 target manifest 블록의 `.from<패키지>(…)` 선언 수이며 같은 패키지
+`.target`, `.external`, `.sdk`는 세지 않습니다.
+
+| Target | 소속 축 | 의존 수 | 담는 것 |
+| --- | --- | --- | --- |
+| `CompositionShared` | 공용 | 1 | 여러 축의 조립이 공유하는 HTTP 클라이언트 구성 |
+| `CompositionAuthentication` | Authentication | 6 | 인증·세션·정책 동의 Adapter, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
+| `CompositionLearningProject` | LearningProject | 6 | 학습 자료·생성 추적·외부 저장소·생성 리마인드 Adapter와 조립 |
+| `CompositionMember` | Member | 5 | 회원·큐레이션·기기 식별자 Adapter, `MemberAssembly` |
+| `CompositionApp` | 앱 조립 루트 | 6 | 축 조립을 묶어 App에 Domain UseCase를 공개 |
+| `CompositionShareExtension` | 공유 확장 조립 루트 | 6 | 공유 확장이 쓰는 축 조립만 묶어 공개 |
+
+- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 모듈**의 축에 둡니다. 외부
+  저장소 조회와 생성 리마인드는 계약이 `DomainLearningProject`에 있으므로 LearningProject
+  축입니다.
+- 공용 target은 둘 이상의 축이 같은 의미로 쓰는 조립 요소만 담고 Domain·Data 모듈에
+  의존해서는 안 됩니다.
+- 모든 Composition target은 다른 패키지 모듈 의존 수가 6개를 넘어서는 안 됩니다. 조립
+  루트가 Data 타입을 직접 만들어야 한다면 그 생성을 해당 축 조립 API로 옮깁니다.
+- 조립 루트는 실제로 사용하는 축 target만 참조합니다.
+- 패키지 간 허용 방향과 target manifest에 선언하지 않은 모듈 import는
+  `tools/package-dependencies`가 검사합니다. target을 추가하거나 이름을 바꾸면
+  `tools/package-dependencies/config/source-roots`도 함께 갱신합니다.
+
 ## 이동 후 남는 책임과 남지 않는 책임
 
 명세 032에서 조립 경계에 들어와 있던 책임을 소유 패키지로 되돌린 결과입니다.

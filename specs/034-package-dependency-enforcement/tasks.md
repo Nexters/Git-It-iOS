@@ -237,11 +237,11 @@
 
 ### 구현
 
-- [ ] T060 [S4] `docs/package-rules/composition.md`에 "Target 구성" 절을 추가한다 — production target 5개와 축, 소속 판단 기준(구현하는 Domain 계약의 모듈), 공용 target의 Domain·Data 의존 금지, target별 다른 패키지 모듈 의존 6개 이하 규칙, `tools/package-dependencies`가 표를 강제한다는 안내
+- [X] T060 [S4] `docs/package-rules/composition.md`에 "Target 구성" 절을 추가한다 — production target 5개와 축, 소속 판단 기준(구현하는 Domain 계약의 모듈), 공용 target의 Domain·Data 의존 금지, target별 다른 패키지 모듈 의존 6개 이하 규칙, `tools/package-dependencies`가 표를 강제한다는 안내
 
 ### 단위 검증
 
-- [ ] T061 [no-write] [S4] T060의 target 표를 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`와 대조하고 문서 링크가 존재하는 경로를 가리키는지 확인한다
+- [X] T061 [no-write] [S4] T060의 target 표를 `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`와 대조하고 문서 링크가 존재하는 경로를 가리키는지 확인한다
 
 **진행 점검**: T060~T061의 변경 파일과 검증 결과를 보고하고 전체 완료 검증으로 계속한다.
 
@@ -249,11 +249,11 @@
 
 ## 전체 완료 검증
 
-- [ ] T062 [no-write] `time tools/package-dependencies/bin/run.sh`가 5초 이하, 위반 0인지 확인한다(SC-001·SC-004)
+- [X] T062 [no-write] `time tools/package-dependencies/bin/run.sh`가 5초 이하, 위반 0인지 확인한다(SC-001·SC-004)
 - [ ] T063 [no-write] `./tools/script-tests/bin/run.sh`와 `./tools/script-verification/bin/run.sh`가 성공하는지 확인한다
 - [ ] T064 [no-write] `sources`에서 `tuist generate --no-open` 후 `GIT_IT_PROJECT_BUILD_RUNNER build`로 전체 공유 scheme Debug 빌드 성공과 `AllTests` scheme의 분할 target 목록을 확인한다(SC-008)
 - [ ] T065 [no-write] `AppTests`와 `Composition` scheme 테스트의 성공·실패 목록이 명세 시작 전과 같은지 확인한다(SC-009). `AppTests`의 기존 실패 `AppRootFeature root 전환` 19건은 기준선이다
-- [ ] T066 [no-write] "기준선 기록"의 지표를 다시 재고 [research.md](./research.md) 10절 예상값과 대조한다
+- [X] T066 [no-write] "기준선 기록"의 지표를 다시 재고 [research.md](./research.md) 10절 예상값과 대조한다
 
 ---
 
@@ -261,13 +261,13 @@
 
 | 지표 | 적용 전 | 적용 후 |
 | --- | --- | --- |
-| `CompositionAdapter` 의존 | 12 | |
-| `CompositionApp` 의존 | 9 | |
-| `CompositionShareExtension` 의존 | 8 | |
-| Composition target 의존 최댓값 | 12 | |
-| `Composition/Adapter` 아래 Swift 파일 | 26 | |
-| 도구 위반 수 | 6 (U1 도입 직후) | |
-| 활성 pre-commit 단계 | 0 | |
+| `CompositionAdapter` 의존 | 12 | 제거 |
+| `CompositionApp` 의존 | 9 | 6 |
+| `CompositionShareExtension` 의존 | 8 | 6 |
+| Composition target 의존 최댓값 | 12 | 6 |
+| `Composition/Adapter` 아래 Swift 파일 | 26 | 0 |
+| 도구 위반 수 | 6 (U1 도입 직후) | 0 (target 46, 파일 783, 0.2초) |
+| 활성 pre-commit 단계 | 0 | 0 (`package-dependencies` 등록, 비활성) |
 | `Composition` scheme 테스트 합계 | 61 (정적 `@Test` 51+5+5) | 61 (I5 뒤 15+28+8+5+5) |
 
 ## 범위 보정 기록
@@ -285,6 +285,7 @@
 - **I5 커밋 분리 사고**: staging 명령이 이동 전 경로 때문에 실패했는데 뒤이은 `git commit`이 실행돼, `4212760`에는 `git mv`로 미리 stage된 순수 이름 변경 41개만 들어갔다. 이 커밋은 단독으로 빌드되지 않는다. amend·reset을 쓰지 않는 규칙에 따라 manifest, import, 접근 수준, 새 test double, `source-roots`, 이 기록을 바로 다음 커밋에 담았다. 두 커밋을 합친 상태에서 T048·T049 검증을 통과했다.
 - **T056**: `CompositionShareExtensionTests`의 추가 선언에서 production이 이미 선언한 `DomainAuthentication`을 빼고 `DataAuthentication`·`DataLearningProject`를 넣었다. 추가 선언 수는 2다.
 - **T057**: 루트 공개 API(`live(…)` 서명, 공개 프로퍼티)가 바뀌지 않아 테스트 수정이 필요 없었다. `Composition` scheme 61개가 그대로 통과했다.
+- **전체 완료 검증**: 사용자 지시("검증은 스킵하고 이어서 진행")에 따라 장시간 검증 T064(전체 공유 scheme 빌드)와 T065(`AppTests` 기준선 비교)는 실행하지 않았다. 대신 I5·U6에서 `App` scheme 빌드와 `Composition` scheme 테스트를 실행했다. T063은 U3·U4에서 실행한 결과로 갈음하며 `openai.yaml` 기존 실패 1건이 남아 있다. 필수 `after_implement` swift-format hook은 작업 트리에 이 명세와 무관한 Swift 변경(사용자 변경과 이전 빌드의 포맷 결과)이 있어 실행하지 않았다. 이 명세의 Swift 파일은 빌드 시 FormatSwift 플러그인이 정규화했다.
 - **T002 재수정**: U3에서 `test-no-hardcoded-paths.sh`의 검사 키에 이 도구가 들어가자, 회귀 fixture가 쓰던 `docs/architecture.md`·`sources/Projects`·`sources/Tuist` 경로 문자열이 중앙 JSON 값의 복제로 판정됐다. fixture 디렉터리 이름을 `architecture-rules.md`·`packages`·`manifest-root`로 바꿨다. 이 검사의 남은 실패는 `openai.yaml` 기존 실패뿐이다.
 
 ---
