@@ -31,7 +31,7 @@ public struct MemberAssembly: Sendable {
         fetchMemberProfile = FetchMemberProfile(repository: repository)
         updateMemberPosition = UpdateMemberPosition(repository: repository)
         updateMemberCareerLevel = UpdateMemberCareerLevel(repository: repository)
-        registerMemberDevice = RegisterMemberDevice(repository: repository)
+        self.repository = repository
         deleteMemberAccount = DeleteMemberAccount(
             repository: repository,
             clearLocalState: clearLocalStateAfterAccountDeletion,
@@ -44,7 +44,8 @@ public struct MemberAssembly: Sendable {
     public let fetchMemberProfile: any FetchMemberProfileUseCase
     public let updateMemberPosition: any UpdateMemberPositionUseCase
     public let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
-    public let registerMemberDevice: any RegisterMemberDeviceUseCase
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
+
+    public let repository: any MemberRepository
 
 }

@@ -57,7 +57,6 @@ public struct AuthenticationAssembly: Sendable {
             loginSessionRepository: loginSessionRepository,
         )
         refreshSession = RefreshSession(loginSessionRepository: loginSessionRepository)
-        verifyAccessToken = VerifyAccessToken(loginSessionRepository: loginSessionRepository)
         policyConsent = PolicyConsent(
             manifestDocuments: policyDocuments,
             policyConsentRepository: PolicyConsentRepositoryAdapter(store: policyConsentStore),
@@ -73,7 +72,6 @@ public struct AuthenticationAssembly: Sendable {
     public let restoreSession: any RestoreSessionUseCase
     public let verifyAuthorization: any VerifyAuthorizationUseCase
     public let refreshSession: any RefreshSessionUseCase
-    public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
 
     public let accessTokenProvider: @Sendable () async -> String?

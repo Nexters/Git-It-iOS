@@ -33,7 +33,6 @@ public struct AppComposition: Sendable {
         restoreSession = authentication.restoreSession
         verifyAuthorization = authentication.verifyAuthorization
         refreshSession = authentication.refreshSession
-        verifyAccessToken = authentication.verifyAccessToken
         policyConsent = authentication.policyConsent
         completeCuration = member.completeCuration
 
@@ -51,7 +50,6 @@ public struct AppComposition: Sendable {
         fetchMemberProfile = member.fetchMemberProfile
         updateMemberPosition = member.updateMemberPosition
         updateMemberCareerLevel = member.updateMemberCareerLevel
-        registerMemberDevice = member.registerMemberDevice
         deleteMemberAccount = member.deleteMemberAccount
 
         fetchExternalRepository = externalRepository.fetchExternalRepository
@@ -85,7 +83,7 @@ public struct AppComposition: Sendable {
         }
 
         let registerCurrentDeviceUseCase = RegisterCurrentDevice(
-            registerMemberDevice: member.registerMemberDevice,
+            repository: member.repository,
             deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
             appVersion: appVersion,
             osVersion: osVersion,
@@ -147,7 +145,6 @@ public struct AppComposition: Sendable {
     public let restoreSession: any RestoreSessionUseCase
     public let verifyAuthorization: any VerifyAuthorizationUseCase
     public let refreshSession: any RefreshSessionUseCase
-    public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
     public let completeCuration: any CompleteCurationUseCase
 
@@ -164,7 +161,6 @@ public struct AppComposition: Sendable {
     public let fetchMemberProfile: any FetchMemberProfileUseCase
     public let updateMemberPosition: any UpdateMemberPositionUseCase
     public let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
-    public let registerMemberDevice: any RegisterMemberDeviceUseCase
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 
     public let fetchExternalRepository: any FetchExternalRepositoryUseCase

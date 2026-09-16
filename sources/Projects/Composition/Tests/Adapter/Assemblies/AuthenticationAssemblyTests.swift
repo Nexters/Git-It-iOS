@@ -16,7 +16,6 @@ struct AuthenticationAssemblyTests {
         _ = assembly.restoreSession as any RestoreSessionUseCase
         _ = assembly.verifyAuthorization as any VerifyAuthorizationUseCase
         _ = assembly.refreshSession as any RefreshSessionUseCase
-        _ = assembly.verifyAccessToken as any VerifyAccessTokenUseCase
     }
 
     @Test

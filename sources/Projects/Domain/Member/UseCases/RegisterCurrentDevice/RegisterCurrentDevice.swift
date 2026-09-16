@@ -5,13 +5,13 @@ public struct RegisterCurrentDevice: RegisterCurrentDeviceUseCase {
     // MARK: Lifecycle
 
     public init(
-        registerMemberDevice: any RegisterMemberDeviceUseCase,
+        repository: any MemberRepository,
         deviceIdentifierRepository: any DeviceIdentifierRepository,
         appVersion: String,
         osVersion: String,
         deviceTokenProvider: @escaping @Sendable () async throws -> String,
     ) {
-        self.registerMemberDevice = registerMemberDevice
+        self.repository = repository
         self.deviceIdentifierRepository = deviceIdentifierRepository
         self.appVersion = appVersion
         self.osVersion = osVersion
@@ -23,7 +23,7 @@ public struct RegisterCurrentDevice: RegisterCurrentDeviceUseCase {
     public func callAsFunction() async throws {
         let deviceToken = try await deviceTokenProvider()
         let deviceID = await deviceIdentifierRepository.currentDeviceID()
-        try await registerMemberDevice(MemberDeviceInfo(
+        try await repository.registerDevice(MemberDeviceInfo(
             deviceID: deviceID,
             deviceType: .ios,
             appVersion: appVersion,
@@ -34,7 +34,7 @@ public struct RegisterCurrentDevice: RegisterCurrentDeviceUseCase {
 
     // MARK: Private
 
-    private let registerMemberDevice: any RegisterMemberDeviceUseCase
+    private let repository: any MemberRepository
     private let deviceIdentifierRepository: any DeviceIdentifierRepository
     private let appVersion: String
     private let osVersion: String

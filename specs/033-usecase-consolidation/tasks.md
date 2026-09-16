@@ -74,23 +74,24 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 ### 구현
 
-- [ ] T004 [S4] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDevice.swift`가 `RegisterMemberDeviceUseCase` 대신 `MemberRepository`를 받아 `registerDevice(_:)`를 직접 호출하도록 바꾼다
-- [ ] T005 [S4] `sources/Projects/Domain/Tests/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceTests.swift`의 test double을 `MemberRepository` 스텁으로 바꾸고 기존 두 검증(주입한 앱·OS 버전과 토큰이 등록 정보에 담긴다, 토큰 실패 시 등록하지 않는다)을 유지한다
-- [ ] T006 [S4] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`에서 `registerMemberDevice` 공개 프로퍼티를 제거하고, 필요하면 `memberRepository`를 조립이 넘길 수 있게 공개한다
-- [ ] T007 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `RegisterCurrentDevice` 조립을 T004의 서명에 맞추고 `registerMemberDevice` 공개 프로퍼티를 제거한다
-- [ ] T008 [S4] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`에서 `verifyAccessToken` 공개 프로퍼티와 `VerifyAccessToken` 생성을 제거한다
-- [ ] T009 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `verifyAccessToken` 공개 프로퍼티를 제거한다
-- [ ] T010 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록에서 `verifyAccessToken`과 `registerMemberDevice`를 제거한다
+- [X] T004 [S4] `sources/Projects/Domain/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDevice.swift`가 `RegisterMemberDeviceUseCase` 대신 `MemberRepository`를 받아 `registerDevice(_:)`를 직접 호출하도록 바꾼다
+- [X] T005 [S4] `sources/Projects/Domain/Tests/Member/UseCases/RegisterCurrentDevice/RegisterCurrentDeviceTests.swift`의 test double을 `MemberRepository` 스텁으로 바꾸고 기존 두 검증(주입한 앱·OS 버전과 토큰이 등록 정보에 담긴다, 토큰 실패 시 등록하지 않는다)을 유지한다
+- [X] T006 [S4] `sources/Projects/Composition/Adapter/Assemblies/MemberAssembly.swift`에서 `registerMemberDevice` 공개 프로퍼티를 제거하고, 필요하면 `memberRepository`를 조립이 넘길 수 있게 공개한다
+- [X] T007 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `RegisterCurrentDevice` 조립을 T004의 서명에 맞추고 `registerMemberDevice` 공개 프로퍼티를 제거한다
+- [X] T008 [S4] `sources/Projects/Composition/Adapter/Assemblies/AuthenticationAssembly.swift`에서 `verifyAccessToken` 공개 프로퍼티와 `VerifyAccessToken` 생성을 제거한다
+- [X] T009 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에서 `verifyAccessToken` 공개 프로퍼티를 제거한다
+- [X] T010 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 목록에서 `verifyAccessToken`과 `registerMemberDevice`를 제거하고, `sources/Projects/Composition/Tests/Adapter/Assemblies/AuthenticationAssemblyTests.swift`의 `verifyAccessToken` 타입 확인 줄을 제거한다
+  - **범위 보정**: 구현 중 `AuthenticationAssemblyTests.swift`가 `verifyAccessToken`을 직접 참조하는 것을 발견해 정확한 경로를 이 작업에 추가했다. I1의 소유 경로 "대응 테스트" 안이다
 
 ### 정리
 
-- [ ] T011 [S4] `sources/Projects/Domain/Authentication/UseCases/VerifyAccessToken/VerifyAccessTokenUseCase.swift`, `sources/Projects/Domain/Authentication/UseCases/VerifyAccessToken/VerifyAccessToken.swift`, `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAccessTokenTests.swift`를 제거하고, 이 파일의 "이관 기록"에 보장 항목의 이관처 또는 제거 근거를 적는다
-- [ ] T012 [S4] `sources/Projects/Domain/Member/UseCases/RegisterMemberDevice/RegisterMemberDeviceUseCase.swift`, `sources/Projects/Domain/Member/UseCases/RegisterMemberDevice/RegisterMemberDevice.swift`, `sources/Projects/Domain/Tests/Member/UseCases/RegisterMemberDeviceTests.swift`를 제거하고 같은 절에 이관처를 적는다
+- [X] T011 [S4] `sources/Projects/Domain/Authentication/UseCases/VerifyAccessToken/VerifyAccessTokenUseCase.swift`, `sources/Projects/Domain/Authentication/UseCases/VerifyAccessToken/VerifyAccessToken.swift`, `sources/Projects/Domain/Tests/Authentication/UseCases/VerifyAccessTokenTests.swift`를 제거하고, 이 파일의 "이관 기록"에 보장 항목의 이관처 또는 제거 근거를 적는다
+- [X] T012 [S4] `sources/Projects/Domain/Member/UseCases/RegisterMemberDevice/RegisterMemberDeviceUseCase.swift`, `sources/Projects/Domain/Member/UseCases/RegisterMemberDevice/RegisterMemberDevice.swift`, `sources/Projects/Domain/Tests/Member/UseCases/RegisterMemberDeviceTests.swift`를 제거하고 같은 절에 이관처를 적는다
 
 ### 단위 검증
 
-- [ ] T013 [no-write] [S4] `grep -rn "VerifyAccessTokenUseCase\|RegisterMemberDeviceUseCase" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
-- [ ] T014 [no-write] [S4] `Domain`과 `Composition` 테스트 scheme을 실행해 I1을 검증한다
+- [X] T013 [no-write] [S4] `grep -rn "VerifyAccessTokenUseCase\|RegisterMemberDeviceUseCase" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
+- [X] T014 [no-write] [S4] `Domain`과 `Composition` 테스트 scheme을 실행해 I1을 검증한다
 
 **진행 점검**: T004~T014의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -308,7 +309,9 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 | 옮긴 보장 | 이관처 또는 제거 근거 |
 | --- | --- |
-| (T011에서 시작) | |
+| `VerifyAccessToken`의 만료 판정 | 제거. 프로덕션 소비자가 없었다. 세션 유효성은 `ResolveSessionAvailability`와 `RestoreSession`이 담당한다 |
+| `RegisterMemberDevice`의 단일 저장소 위임 | `RegisterCurrentDevice`가 `MemberRepository.registerDevice(_:)`를 직접 호출한다 |
+| `RegisterMemberDeviceTests`의 등록 정보 전달 검증 | `RegisterCurrentDeviceTests`의 두 검증이 같은 보장을 `MemberRepository` 스텁 기준으로 유지한다 |
 
 ---
 

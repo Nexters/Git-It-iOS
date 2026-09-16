@@ -11,9 +11,9 @@ struct RegisterCurrentDeviceTests {
 
     @Test
     func `주입한 앱 버전과 OS 버전과 푸시 토큰을 등록 정보에 담는다`() async throws {
-        let spy = SpyRegisterMemberDevice()
+        let spy = SpyMemberRepository()
         let register = RegisterCurrentDevice(
-            registerMemberDevice: spy,
+            repository: spy,
             deviceIdentifierRepository: StubDeviceIdentifierRepository(deviceID: "device-1"),
             appVersion: "1.2.3",
             osVersion: "Version 26.0",
@@ -22,7 +22,7 @@ struct RegisterCurrentDeviceTests {
 
         try await register()
 
-        let device = try #require(await spy.recorded)
+        let device = try #require(await spy.registeredDevice)
         #expect(device.deviceID == "device-1")
         #expect(device.deviceType == .ios)
         #expect(device.appVersion == "1.2.3")
@@ -32,9 +32,9 @@ struct RegisterCurrentDeviceTests {
 
     @Test
     func `푸시 토큰을 받지 못하면 등록을 시도하지 않고 오류를 그대로 전달한다`() async {
-        let spy = SpyRegisterMemberDevice()
+        let spy = SpyMemberRepository()
         let register = RegisterCurrentDevice(
-            registerMemberDevice: spy,
+            repository: spy,
             deviceIdentifierRepository: StubDeviceIdentifierRepository(deviceID: "device-1"),
             appVersion: "1.2.3",
             osVersion: "Version 26.0",
@@ -42,7 +42,7 @@ struct RegisterCurrentDeviceTests {
         )
 
         await #expect(throws: SampleError.tokenUnavailable) { try await register() }
-        #expect(await spy.recorded == nil)
+        #expect(await spy.registeredDevice == nil)
     }
 
     // MARK: Private
@@ -51,12 +51,24 @@ struct RegisterCurrentDeviceTests {
         case tokenUnavailable
     }
 
-    private actor SpyRegisterMemberDevice: RegisterMemberDeviceUseCase {
-        var recorded: MemberDeviceInfo?
+    private actor SpyMemberRepository: MemberRepository {
+        var registeredDevice: MemberDeviceInfo?
 
-        func callAsFunction(_ device: MemberDeviceInfo) async throws {
-            recorded = device
+        func registerDevice(_ device: MemberDeviceInfo) async throws {
+            registeredDevice = device
         }
+
+        func completeCuration(position: MemberPosition, careerLevel: CareerLevel) async throws { }
+
+        func fetchProfile() async throws -> MemberProfile {
+            throw SampleError.tokenUnavailable
+        }
+
+        func updatePosition(_ position: MemberPosition) async throws { }
+
+        func updateCareerLevel(_ careerLevel: CareerLevel) async throws { }
+
+        func deleteAccount() async throws { }
     }
 
     private struct StubDeviceIdentifierRepository: DeviceIdentifierRepository {
