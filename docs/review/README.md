@@ -37,6 +37,7 @@
 ## 그 밖의 점검 문서
 
 - [Domain UseCase 의도 점검표](./domain-usecase-review.md) — UseCase 26개의 책임·기능·테스트가 의도와 일치하는지 판정하는 체크리스트
+- [Domain·Data·Infrastructure 설계 점검 결과](./domain-data-infra-design-review.md) — 세 패키지를 규칙 문서와 명세 035의 패키지 관심사 원칙에 대조한 발견 항목(문서 교정·rename·후속 설계 변경·위반 아님)
 
 ## 관련 문서
 
