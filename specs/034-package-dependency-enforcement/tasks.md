@@ -281,6 +281,7 @@
 - **T024**: `repository-paths.sh GIT_IT_PACKAGE_DEPENDENCY_RUNNER`와 `script-verification/bin/run.sh`는 성공. `script-tests/bin/run.sh`는 `tools/repository-paths/tests/test-no-hardcoded-paths.sh` 하나가 실패한다. 원인은 `d9e7517`에서 커밋된 `.agents/skills/fix-project-swift-lint/agents/openai.yaml`의 `sources/Projects` 문구이며 이 명세의 변경과 무관한 기존 실패다. 나머지 셸 회귀는 통과했다.
 - **T030**: CI job을 `ubuntu-latest`가 아니라 `macos-26`에서 실행한다. 공개 경로 판독기 `repository-paths.sh`가 `/usr/bin/plutil`을 쓰므로 경로 적재 단계가 macOS를 요구한다([research.md](./research.md) 7절의 러너 결정 보정). 도구 본체는 여전히 `rg` 없이 POSIX 도구만 쓴다. 새 job은 기존 `test_job` 범위 검사와 겹치지 않도록 `script-quality`와 `swift-lint` 사이에 두었다.
 - **T029**: `enabled`의 주석 처리된 단계 목록에 `# package-dependencies`를 `# swift-format` 다음에 추가했다.
+- **T002 재수정**: U3에서 `test-no-hardcoded-paths.sh`의 검사 키에 이 도구가 들어가자, 회귀 fixture가 쓰던 `docs/architecture.md`·`sources/Projects`·`sources/Tuist` 경로 문자열이 중앙 JSON 값의 복제로 판정됐다. fixture 디렉터리 이름을 `architecture-rules.md`·`packages`·`manifest-root`로 바꿨다. 이 검사의 남은 실패는 `openai.yaml` 기존 실패뿐이다.
 
 ---
 

@@ -18,10 +18,10 @@ write_file() {
 # 모든 규칙을 통과하는 최소 저장소를 새로 만듭니다.
 make_fixture() {
 	rm -rf "$fixture"
-	manifests="$fixture/sources/Tuist/ProjectDescriptionHelpers/Projects"
-	projects="$fixture/sources/Projects"
+	manifests="$fixture/manifest-root/ProjectDescriptionHelpers/Projects"
+	projects="$fixture/packages"
 
-	write_file "$fixture/docs/architecture.md" '# 아키텍처
+	write_file "$fixture/architecture-rules.md" '# 아키텍처
 
 ### 3.1 프로젝트 내부 패키지 의존성
 
@@ -254,9 +254,9 @@ import UIComponent'
 # fixture 경로를 주입해 검사를 실행하고 종료 코드를 기록합니다.
 run_check() {
 	config_dir=${1:-$fixture/config}
-	if GIT_IT_PROJECTS_ROOT="$fixture/sources/Projects" \
-		GIT_IT_TUIST_ROOT="$fixture/sources/Tuist" \
-		GIT_IT_ARCHITECTURE_PATH="$fixture/docs/architecture.md" \
+	if GIT_IT_PROJECTS_ROOT="$fixture/packages" \
+		GIT_IT_TUIST_ROOT="$fixture/manifest-root" \
+		GIT_IT_ARCHITECTURE_PATH="$fixture/architecture-rules.md" \
 		PACKAGE_DEPENDENCIES_CONFIG_DIR="$config_dir" \
 		"$runner" >"$work/out" 2>"$work/err"; then
 		status=0
@@ -322,8 +322,8 @@ expect '표 불일치' 1 '[table-mismatch] UI: 표 없음 / 설정 Domain'
 
 # 6. 표 형식이 깨지면 통과가 아니라 입력 오류다.
 make_fixture
-sed 's/| 허용 의존성 |/| 의존성 |/' "$fixture/docs/architecture.md" >"$work/edited"
-mv "$work/edited" "$fixture/docs/architecture.md"
+sed 's/| 허용 의존성 |/| 의존성 |/' "$fixture/architecture-rules.md" >"$work/edited"
+mv "$work/edited" "$fixture/architecture-rules.md"
 run_check
 expect '표 형식' 2 'package-dependencies.table-unreadable'
 
