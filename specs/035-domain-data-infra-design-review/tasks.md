@@ -421,7 +421,7 @@ key·저장 key 문자열 diff 0건.
 
 **관련 변경 시나리오**: S1, S2, S3
 
-- [ ] T038 [S1] `docs/review/domain-data-infra-design-review.md` 머리부 상태를 `완료`로 바꾸고
+- [X] T038 [S1] `docs/review/domain-data-infra-design-review.md` 머리부 상태를 `완료`로 바꾸고
       2.5 검증 결과 표에 SC-001~SC-010의 확인 방법을 적는다(결과 열은 T039~T041 뒤 기입).
 
 ## 전체 완료 검증
@@ -498,3 +498,65 @@ U1 점검(문서) → U2 문서 교정 → U3 Domain rename(Domain+Composition+F
 - 확정 rename 표의 새 이름이 구현 중 기존 이름과 충돌하면 중단하고 표를 갱신한다.
 - `HTTPMethod`(DS-05)·`APIResponseDTO` 계열(DS-04)·`ExternalRepositoryLocation`(DS-01)은 이번에
   건드리지 않는다.
+
+## 단계 6: 수렴
+
+`/speckit-converge`가 2026-09-17에 추가한 단계다. 점검 문서의 DOC-10·DOC-11을 소유하는 작업이
+없어 SC-002·SC-003이 부분 충족에 머물렀다. 이 단계는 U5의 T038(점검 문서 머리부·2.5 확인 방법)
+뒤에 실행하며, 아래 `전체 수렴 완료 검증`은 기존 T039~T041과 함께 마지막 실행 단위의
+`FINALIZATION_TASKS`로 매핑한다. 세 작업 패키지는 서로 다른 파일만 바꾸므로 분리 가능하고,
+코드 변경이 없어 통합 검증은 문서 대조와 기존 전체 검증으로 충분하다.
+
+### 작업 패키지: Infrastructure
+
+**소유 경로**: `sources/Projects/Infrastructure/Authentication/README.md`
+
+- [ ] T042 [S2] `sources/Projects/Infrastructure/Authentication/README.md` 교정 per S2/AC2, SC-003
+      (partial): 33행의 "`changes()`는 revoked 상태를 전달하는 `AsyncStream`을 제공합니다" 항목을
+      코드의 실제 API로 바꾼다(`map(_:)`이 platform 상태를 `AppleCredentialState`로 변환하고
+      `state(for:)`가 Apple user ID로 현재 상태를 조회한다). 검증 근거(78~82행)의 경로 5건을
+      실제 파일로 고친다: `Tests/Authentication/AppleAuthentication/Providers/AppleAuthorizationProviderTests.swift`,
+      `Tests/Authentication/AppleAuthentication/Providers/AppleCredentialStateProviderTests.swift`,
+      `Tests/Authentication/Keychain/Stores/KeychainStoreTests.swift`,
+      `Tests/Authentication/RandomGenerator/Providers/SecureRandomGeneratorTests.swift`,
+      `Tests/Authentication/SensitiveValueExposureTests.swift`. 79행 항목 이름의 "stream"은
+      "credential 상태 변환과 조회"로 바꾼다. 그 밖의 문장은 유지한다.
+
+### 작업 패키지: 문서
+
+**소유 경로**: `docs/conventions/abstraction/structure-baseline.md`,
+`docs/review/domain-data-infra-design-review.md`
+
+- [ ] T043 [S1] `docs/conventions/abstraction/structure-baseline.md` 3.1 정정 per SC-002, FR-012
+      (partial): 제목 "근거 A — 패키지 경계를 넘는 계약 (20개)"를 "(25개)"로 바꾸고, Domain
+      LearningProject 행에 `GenerationReminderScheduler`·`PendingGenerationReminders`를, Domain
+      Member 행에 `DeviceIdentifierRepository`를 추가한다. `GenerationReminderRegistration`은
+      LearningProject 행에서 빼고 별도 행 `| Domain LearningProject | \`GenerationReminderRegistration\` |
+      Domain \`ScheduleGenerationReminderUseCase\`가 상속(Composition 채택자 없음, 존치 재검토는
+      점검 문서 DS-12) |`로 둔다. 1절 수치(47)와 2절 명령은 바꾸지 않는다.
+- [ ] T044 [S1] `docs/conventions/abstraction/structure-baseline.md` 3.3 정정 per SC-002
+      (partial): 제목의 "(25개)"를 "(20개)"로 바꾸고 목록을 코드와 같게 쓴다. Domain
+      Authentication 7개(`PolicyConsentUseCase`, `RefreshSessionUseCase`,
+      `ResolveSessionAvailabilityUseCase`, `RestoreSessionUseCase`, `SignInUseCase`,
+      `SignOutUseCase`, `VerifyAuthorizationUseCase`), Domain LearningProject
+      10개(`CreateLearningProjectUseCase`, `FetchExternalRepositoryUseCase`,
+      `FetchLearningProjectsUseCase`, `LearningLibraryUseCase`, `RequestGenerationReminderUseCase`,
+      `ScheduleGenerationReminderUseCase`, `SetQuestionBookmarkUseCase`, `SubmitChoiceAnswerUseCase`,
+      `SubmitEssayAnswerUseCase`, `TrackGenerationUseCase`), Domain Member
+      3개(`DeleteMemberAccountUseCase`, `MemberAccountUseCase`, `RegisterCurrentDeviceUseCase`).
+      아래 설명 문단은 유지한다.
+- [ ] T045 [S1] `docs/review/domain-data-infra-design-review.md` 갱신 per SC-002, S1/AC2
+      (partial): 2.1 표 DOC-10·DOC-11의 상태를 `해소`로 바꾸고, 불일치 열 끝의 "후속 작업으로
+      남긴다" 문장을 T042~T044로 교정했다는 문장으로 바꾼다. 2.5 표 SC-002 결과를 "충족(DOC
+      11·RN 23 모두 해소)"로, SC-003 결과를 README 3개 모두 코드와 일치로 갱신한다. ID는
+      재번호하지 않는다.
+
+### 전체 수렴 완료 검증
+
+- [ ] T046 [no-write] 생성된 Xcode 프로젝트가 rename 전 경로를 참조하므로 `make tuist`로
+      workspace를 재생성한 뒤(실행 전후 `git status --short` 동일 확인) `"$build" build &&
+      "$build" compile && "$build" test`를 실행하고 결과를 점검 문서 2.5 표 SC-004 행에
+      기록한다 per SC-004 (partial). 기록은 T045 범위의 같은 파일이다.
+- [ ] T047 [no-write] 수용 시나리오 2-2(README 3개의 타입·경로를 코드와 대조), 2.1·2.2 표의
+      `미해소` 0건, quickstart 시나리오 1~3 명령을 다시 실행해 SC-002·SC-003·SC-010 결과를 2.5
+      표에 확정한다 per S2/AC2, SC-002, SC-003 (partial).
