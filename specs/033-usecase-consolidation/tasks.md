@@ -185,20 +185,20 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 
 ### 테스트
 
-- [ ] T037 [S2] `sources/Projects/Domain/Tests/LearningProject/UseCases/SetQuestionBookmarkTests.swift`에 [data-model.md](./data-model.md) 4절의 순서 보장 규칙 네 가지를 `questionID` 기준으로 검증하는 테스트를 더한다
+- [X] T037 [S2] `sources/Projects/Domain/Tests/LearningProject/UseCases/SetQuestionBookmarkTests.swift`에 [data-model.md](./data-model.md) 4절의 순서 보장 규칙 네 가지를 `questionID` 기준으로 검증하는 테스트를 더한다
 
 ### 구현
 
-- [ ] T038 [S2] `sources/Projects/Domain/LearningProject/UseCases/SetQuestionBookmark/SetQuestionBookmark.swift`를 `actor`로 바꾸고 `questionID`별 진행 중 작업 추적을 내부 상태로 둔다. 생성자에서 `serializer` 인자를 제거한다
+- [X] T038 [S2] `sources/Projects/Domain/LearningProject/UseCases/SetQuestionBookmark/SetQuestionBookmark.swift`를 `actor`로 바꾸고 `questionID`별 진행 중 작업 추적을 내부 상태로 둔다. 생성자에서 `serializer` 인자를 제거한다
 
 ### 정리
 
-- [ ] T039 [S2] `sources/Projects/Domain/LearningProject/UseCases/SetQuestionBookmark/QuestionMutationSerializer.swift`를 제거한다
+- [X] T039 [S2] `sources/Projects/Domain/LearningProject/UseCases/SetQuestionBookmark/QuestionMutationSerializer.swift`를 제거한다
 
 ### 단위 검증
 
-- [ ] T040 [no-write] [S2] `grep -rn "QuestionMutationSerializer" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
-- [ ] T041 [no-write] [S2] `Domain` 테스트 scheme을 실행해 I3을 검증한다
+- [X] T040 [no-write] [S2] `grep -rn "QuestionMutationSerializer" sources/Projects --include='*.swift'` 결과가 비어 있는지 확인한다
+- [X] T041 [no-write] [S2] `Domain` 테스트 scheme을 실행해 I3을 검증한다
 
 **진행 점검**: T037~T041의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 계속한다.
 
@@ -335,6 +335,7 @@ I2와 I4는 아래 두 파일을 함께 고쳐야 한다. 두 파일에는 이 �
 | `NoopFetchMemberProfileUseCase` 외 App Noop 3개 | App `MemberAccountUseCaseMock` 하나로 통합. Router 계층만 쓰던 것이라 남기지 않았다 |
 | Feature `FetchMemberProfileUseCaseMock` 외 말단 mock 4개 | 말단 Feature가 계속 쓰므로 유지. 프로토콜 준수만 제거하고 클로저 접근자를 더했다 |
 | `MainShellUpdatePositionStub`, `MainShellUpdateCareerStub` | Router가 통합 계약을 받으므로 제거. `MemberAccountUseCaseMock`이 대체한다 |
+| `QuestionMutationSerializer`의 questionID별 직렬화 | `SetQuestionBookmark` actor의 내부 상태. `SetQuestionBookmarkTests`의 순서 보장 네 검증이 이어받았다 |
 
 ---
 

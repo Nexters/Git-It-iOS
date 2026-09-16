@@ -2,16 +2,12 @@ import Foundation
 
 // MARK: - SetQuestionBookmark
 
-public struct SetQuestionBookmark: SetQuestionBookmarkUseCase {
+public actor SetQuestionBookmark: SetQuestionBookmarkUseCase {
 
     // MARK: Lifecycle
 
-    public init(
-        repository: BookmarkRepository,
-        serializer: QuestionMutationSerializer = QuestionMutationSerializer(),
-    ) {
+    public init(repository: any BookmarkRepository) {
         self.repository = repository
-        self.serializer = serializer
     }
 
     // MARK: Public
@@ -21,7 +17,8 @@ public struct SetQuestionBookmark: SetQuestionBookmarkUseCase {
         questionID: String,
         bookmarked: Bool,
     ) async throws -> BookmarkState {
-        try await serializer.run(key: questionID) {
+        let repository = repository
+        return try await serialize(key: questionID) {
             try await repository.setBookmark(
                 projectID: projectID,
                 questionID: questionID,
@@ -30,9 +27,41 @@ public struct SetQuestionBookmark: SetQuestionBookmarkUseCase {
         }
     }
 
+    // MARK: Internal
+
+    var pendingKeyCount: Int { inFlight.count }
+
     // MARK: Private
 
-    private let repository: BookmarkRepository
-    private let serializer: QuestionMutationSerializer
+    private struct PendingMutation {
+        let token: UUID
+        let awaitCompletion: @Sendable () async -> Void
+    }
+
+    private let repository: any BookmarkRepository
+
+    private var inFlight = [String: PendingMutation]()
+
+    private func serialize<Value: Sendable>(
+        key: String,
+        _ operation: @escaping @Sendable () async throws -> Value,
+    ) async throws -> Value {
+        let token = UUID()
+        let previous = inFlight[key]
+
+        let task = Task<Value, Error> {
+            await previous?.awaitCompletion()
+            return try await operation()
+        }
+        inFlight[key] = PendingMutation(token: token, awaitCompletion: { _ = try? await task.value })
+
+        defer {
+            if inFlight[key]?.token == token {
+                inFlight[key] = nil
+            }
+        }
+
+        return try await task.value
+    }
 
 }
