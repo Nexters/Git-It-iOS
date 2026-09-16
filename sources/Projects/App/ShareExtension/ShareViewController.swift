@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import CompositionAdapter
 import CompositionShareExtension
 import DomainAuthentication
 import Feature

@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-@testable import CompositionAdapter
-@testable import DataLearningProject
-@testable import DataAuthentication
+@testable import CompositionAuthentication
 @testable import CompositionShareExtension
+@testable import DataAuthentication
+@testable import DataLearningProject
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
 @testable import InfrastructureLocalNotification

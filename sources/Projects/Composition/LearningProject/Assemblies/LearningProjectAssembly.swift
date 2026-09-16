@@ -1,3 +1,4 @@
+import CompositionShared
 import DataLearningProject
 import DomainLearningProject
 import Foundation

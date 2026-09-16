@@ -1,3 +1,4 @@
+import CompositionShared
 import DataExternalRepository
 import DomainLearningProject
 import Foundation

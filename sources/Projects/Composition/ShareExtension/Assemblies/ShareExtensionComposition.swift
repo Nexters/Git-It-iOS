@@ -1,4 +1,5 @@
-import CompositionAdapter
+import CompositionAuthentication
+import CompositionLearningProject
 import DataAuthentication
 import DataLearningProject
 import DomainAuthentication

@@ -3,9 +3,9 @@ import DomainLearningProject
 import Foundation
 import Testing
 
-@testable import CompositionAdapter
-@testable import DataAuthentication
 @testable import CompositionApp
+@testable import CompositionAuthentication
+@testable import DataAuthentication
 @testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
 

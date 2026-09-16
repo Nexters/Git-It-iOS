@@ -1,7 +1,7 @@
 import Foundation
 import InfrastructureNetworkClient
 
-func makeHTTPClient(
+public func makeHTTPClient(
     baseURL: URL,
     responseTimeout: Duration,
     transport: (any HTTPTransport)?,

@@ -149,7 +149,6 @@ extension AppModuleName {
                 entitlements: .file(path: "ShareExtension.entitlements"),
                 dependencies: [
                     .fromComposition(.CompositionShareExtension),
-                    .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),

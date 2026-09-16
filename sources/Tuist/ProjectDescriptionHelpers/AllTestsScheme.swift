@@ -20,7 +20,15 @@ extension ProjectName {
     private static var allTestTargets: [TargetReference] {
         [
             .project(path: ProjectName.App.projectPath, target: AppModuleName.GitItTests.rawValue),
-            .project(path: ProjectName.Composition.projectPath, target: CompositionModuleName.CompositionAdapterTests.rawValue),
+            .project(
+                path: ProjectName.Composition.projectPath,
+                target: CompositionModuleName.CompositionAuthenticationTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Composition.projectPath,
+                target: CompositionModuleName.CompositionLearningProjectTests.rawValue,
+            ),
+            .project(path: ProjectName.Composition.projectPath, target: CompositionModuleName.CompositionMemberTests.rawValue),
             .project(path: ProjectName.Feature.projectPath, target: FeatureModuleName.FeatureTests.rawValue),
             .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainAuthenticationTests.rawValue),
             .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainLearningProjectTests.rawValue),

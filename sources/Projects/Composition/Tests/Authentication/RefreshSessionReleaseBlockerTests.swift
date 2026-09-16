@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import CompositionAdapter
+@testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DomainAuthentication
 

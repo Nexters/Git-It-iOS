@@ -1,4 +1,6 @@
-import CompositionAdapter
+import CompositionAuthentication
+import CompositionLearningProject
+import CompositionMember
 import DataAuthentication
 import DataExternalRepository
 import DomainAuthentication

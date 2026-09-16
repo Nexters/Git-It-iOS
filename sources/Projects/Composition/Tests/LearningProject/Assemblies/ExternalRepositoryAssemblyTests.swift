@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import CompositionAdapter
+@testable import CompositionLearningProject
 @testable import DataExternalRepository
 @testable import DomainLearningProject
 

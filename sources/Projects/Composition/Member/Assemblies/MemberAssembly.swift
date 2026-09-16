@@ -1,3 +1,4 @@
+import CompositionShared
 import DataMember
 import DomainAuthentication
 import DomainMember

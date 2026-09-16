@@ -1,3 +1,4 @@
+import CompositionShared
 import DataAuthentication
 import DataLegalConsent
 import DomainAuthentication

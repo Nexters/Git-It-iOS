@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import CompositionAdapter
+@testable import CompositionLearningProject
 @testable import DataLearningProject
 @testable import DomainLearningProject
 
@@ -42,7 +42,9 @@ struct LearningProjectAssemblyTests {
         var status: GenerationRecord.Status?
         while let state = await iterator.next() {
             status = state.record(projectID: "project-1")?.status
-            if status == .completed { break }
+            if status == .completed {
+                break
+            }
         }
         #expect(status == .completed)
     }
