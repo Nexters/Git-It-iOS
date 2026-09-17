@@ -6,5 +6,5 @@
 sources/Projects/<패키지>/<역할>/
 ```
 
-`DomainAuthentication` target의 소스 루트는 `Domain/Authentication/`, `UIComponent`
+`DomainAccount` target의 소스 루트는 `Domain/Account/`, `UIComponent`
 target의 소스 루트는 `UI/Component/`입니다.

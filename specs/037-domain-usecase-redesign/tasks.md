@@ -289,10 +289,10 @@ import하지 않는다.
 
 **목표**: 새 Domain 타깃 구성과 `DomainIdentifier` 예외 규칙을 규칙 문서에 기록한다(FR-008).
 
-- [ ] T128 [P] [S1] `docs/package-rules/domain.md`의 "통합 후 남은 UseCase" 절을 관심사 UseCase 7개·타깃 구성표·`DomainIdentifier` 규칙(식별자 `typealias`만, 관심사 타깃이 import할 수 있는 유일한 Domain 타깃)으로 교체하고, 제약조건에 타깃 간 import 금지를 추가한다
-- [ ] T129 [P] [S1] `docs/package-rules/composition.md`의 "Target 구성"과 "이동 후 남는 책임과 남지 않는 책임" 표의 Domain 타깃 이름을 새 이름으로 바꾸고 `RequestCredentialProvider` 연결 책임을 추가한다
-- [ ] T130 [P] [S1] `docs/conventions/directory-file/production-source-root.md`의 예시를 `DomainAccount` → `Domain/Account/`로 바꾼다
-- [ ] T131 [no-write] 세 문서의 링크와 표 형식을 확인하고 결과를 보고한다
+- [X] T128 [P] [S1] `docs/package-rules/domain.md`의 "통합 후 남은 UseCase" 절을 관심사 UseCase 7개·타깃 구성표·`DomainIdentifier` 규칙(식별자 `typealias`만, 관심사 타깃이 import할 수 있는 유일한 Domain 타깃)으로 교체하고, 제약조건에 타깃 간 import 금지를 추가한다
+- [X] T129 [P] [S1] `docs/package-rules/composition.md`의 "Target 구성"과 "이동 후 남는 책임과 남지 않는 책임" 표의 Domain 타깃 이름을 새 이름으로 바꾸고 `RequestCredentialProvider` 연결 책임을 추가한다
+- [X] T130 [P] [S1] `docs/conventions/directory-file/production-source-root.md`의 예시를 `DomainAccount` → `Domain/Account/`로 바꾼다
+- [X] T131 [no-write] 세 문서의 링크와 표 형식을 확인하고 결과를 보고한다
 
 ---
 
@@ -361,3 +361,30 @@ import하지 않는다.
 
 - [ ] T149 [no-write] `grep -rln "import DomainAuthentication\|import DomainLearningProject\|import DomainMember" sources/Projects/Feature sources/Projects/App`가 0줄이고 `./tools/package-dependencies/bin/run.sh`가 통과함을 확인한다
 - [ ] T150 [no-write] 프로젝트 `build`·`compile`·`test` 실행기와 변경 시나리오 S2·S3·S5 수용 기준 재확인을 사용자 확인 항목으로 보고한다
+
+---
+
+## 단계 9: 수렴
+
+**목표**: 옛 Domain UseCase 어휘로 남은 Feature·App 테스트 대역 파일과 타입 이름을 새 관심사 어휘로 바꿔
+[quickstart.md](./quickstart.md) 1절 마지막 구조 검증(SC-007)을 통과시킨다.
+
+**분리 불가 근거**: 파일 이름과 타입 이름, 참조 테스트가 같은 커밋에서 함께 바뀌어야 테스트 타깃이 compile된다.
+
+### 작업 패키지: Feature
+
+- [ ] T151 [S5] `sources/Projects/Feature/Tests/AppEntry/TestDoubles/RestoreSessionUseCaseMock.swift`와 `sources/Projects/Feature/Tests/AppEntry/TestDoubles/FetchMemberProfileUseCaseMock.swift`의 파일·타입 이름을 새 관심사 어휘(Account·UserInfo)로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T152 [S5] `sources/Projects/Feature/Tests/Onboarding/TestDoubles/` 의 `SignInUseCaseMock.swift`, `SignOutUseCaseMock.swift`, `DeleteMemberAccountUseCaseMock.swift`, `PolicyConsentUseCaseMock.swift`, `CompleteCurationUseCaseMock.swift` 파일·타입 이름을 새 관심사 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T153 [S5] `sources/Projects/Feature/Tests/Settings/TestDoubles/` 의 `MemberAccountUseCaseMock.swift`, `UpdateMemberPositionUseCaseMock.swift`, `UpdateMemberCareerLevelUseCaseMock.swift` 파일·타입 이름을 새 관심사 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T154 [S5] `sources/Projects/Feature/Tests/Quiz/TestDoubles/` 의 `LearningLibraryUseCaseMock.swift`, `StubFetchLearningSetUseCase.swift`, `StubFetchBookmarkedQuestionsUseCase.swift`, `StubSetQuestionBookmarkUseCase.swift`, `StubSubmitChoiceAnswerUseCase.swift`, `StubSubmitEssayAnswerUseCase.swift` 파일·타입 이름을 QuizDetail 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T155 [S2] `sources/Projects/Feature/Tests/Home/TestDoubles/` 의 `HomeLearningProjectsUseCaseMock.swift`, `HomeMemberProfileUseCaseMock.swift`와 `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/` 의 `StubDeleteLearningProjectUseCase.swift`, `StubFetchLearningProjectDetailUseCase.swift` 파일·타입 이름을 Project·UserInfo 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T156 [S3] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/` 의 `StubCreateLearningProjectUseCase.swift`, `StubFetchExternalRepositoryUseCase.swift`, `StubRequestGenerationReminderUseCase.swift`, `StubTrackGenerationUseCase.swift` 파일·타입 이름을 ProjectGeneration·ExternalRepository·AppSetting 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+- [ ] T157 [S3] `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ShareRegistrationTestSupport.swift`의 `StubFetchExternalRepository`·`SpyCreateLearningProject` 타입 이름을 새 어휘로 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+
+### 작업 패키지: App
+
+- [ ] T158 [S1] `sources/Projects/App/Tests/GitIt/TestDoubles/` 의 `RestoreSessionUseCaseMock.swift`, `SignOutUseCaseMock.swift`, `VerifyAuthorizationUseCaseMock.swift`, `NoopFetchLearningProjectsUseCase.swift`, `TrackGenerationUseCaseMock.swift`, `NoopFetchExternalRepositoryUseCase.swift`, `NoopPolicyConsentUseCase.swift`, `NoopSignInUseCase.swift`, `NoopCreateLearningProjectUseCase.swift`, `NoopDeleteMemberAccountUseCase.swift`의 파일 이름을 각 파일이 담은 타입 이름과 일치하게 바꾸고 참조 테스트를 맞춘다 (contradicts, SC-007)
+
+### 전체 수렴 완료 검증
+
+- [ ] T159 [no-write] [quickstart.md](./quickstart.md) 1절 구조 검증 5개를 다시 실행해 Domain UseCase 옛 이름이 `sources/Projects/Feature`·`sources/Projects/App`·`sources/Projects/Composition`·`sources/Tuist`에 남지 않음을 확인하고, Data 계층 wire DTO 이름은 이 기능의 rename 범위가 아님을 근거와 함께 보고한다

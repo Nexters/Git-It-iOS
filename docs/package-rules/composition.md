@@ -28,15 +28,17 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 
 | Target | 소속 축 | 의존 수 | 담는 것 |
 | --- | --- | --- | --- |
-| `CompositionAuthentication` | Authentication | 4 | 인증·세션·정책 동의 Adapter, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
-| `CompositionLearningProject` | LearningProject | 5 | 학습 자료·생성 추적·외부 저장소·생성 리마인드 Adapter와 조립 |
-| `CompositionMember` | Member | 4 | 회원·큐레이션·기기 식별자 Adapter, `MemberAssembly` |
-| `CompositionApp` | 앱 조립 루트 | 5 | 축 조립을 묶어 App에 Domain UseCase를 공개 |
+| `CompositionAuthentication` | Account | 4 | 인증·로그인·정책 동의 Adapter, `RequestCredentialProvider` 연결, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
+| `CompositionLearningProject` | Project·QuizDetail·ProjectGeneration·ExternalRepository | 5 | 프로젝트·퀴즈·생성·외부 저장소 Adapter와 조립 |
+| `CompositionMember` | UserInfo·AppSetting | 4 | 사용자 정보·기기 식별자 Adapter |
+| `CompositionApp` | 앱 조립 루트 | 5 | 축 조립과 `ConcernUseCaseAssembly`를 묶어 App에 관심사 UseCase 7개를 공개 |
 | `CompositionShareExtension` | 공유 확장 조립 루트 | 5 | 공유 확장이 쓰는 축 조립만 묶어 공개 |
 
-- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 모듈**의 축에 둡니다. 외부
-  저장소 조회와 생성 리마인드는 계약이 `DomainLearningProject`에 있으므로 LearningProject
-  축입니다.
+- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 관심사 타깃**의 축에 둡니다. 외부
+  저장소 조회는 계약이 `DomainExternalRepository`에, 생성 리마인드는 `DomainProjectGeneration`에
+  있으므로 둘 다 LearningProject 축입니다.
+- 요청 인증 정보는 `RequestCredentialProvider` 하나를 만들어 모든 Remote의 인증 헤더 공급과
+  `AccountUseCase`의 로그인 무효화 신호에 연결합니다. 이 연결은 Account 축이 소유합니다.
 - 공용 target은 둘 이상의 축이 같은 의미로 쓰는 조립 요소만 담고 Domain·Data 모듈에
   의존해서는 안 됩니다.
 - 모든 Composition target은 다른 패키지 모듈 의존 수가 6개를 넘어서는 안 됩니다. 조립
@@ -54,9 +56,9 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 | --- | --- | --- |
 | 저장 네임스페이스·키·저장 형식 | `Data<기능>` | Domain 타입과 저장 레코드 사이의 변환 |
 | App Group 식별자와 Keychain 접근 그룹 | `InfrastructureStorage`, `InfrastructureAuthentication` (Data 생성 진입점이 사용) | `StorageFactory` 위치(`.appGroup`/`.device`) 선택 |
-| 세션 유효성 판정 | `DomainAuthentication` | 마커·저장 세션 계약의 Adapter |
-| 기기 등록 대상 구성 | `DomainMember` | deviceID 계약의 Adapter |
-| 리마인드 예약 정책 | `DomainLearningProject` | 알림 계약의 Adapter |
+| 로그인 가용성 판정 | `DomainAccount` | 공유 표시·로그인 기록 계약의 Adapter |
+| 기기 등록 대상 구성 | `DomainAppSetting` | deviceID 계약의 Adapter |
+| 리마인드 예약 정책 | `DomainProjectGeneration` | 알림 계약의 Adapter |
 | 알림 제목과 본문 | `App` | 조립 인자로 전달 |
 | 앱 기동 순서 | `App` | 순서 없는 개별 조각의 공개 |
 | 외부 라이브러리 타입 | `Infrastructure` (Data 내부 구현만 사용) | Data 생성 진입점 호출 |
