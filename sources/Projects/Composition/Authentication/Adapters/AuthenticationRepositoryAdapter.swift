@@ -2,7 +2,6 @@ import DataAuthentication
 import DataShared
 import DomainAuthentication
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - AuthenticationRepositoryAdapter
 
@@ -11,12 +10,10 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     // MARK: Lifecycle
 
     init(
-        authorizationProvider: AppleAuthorizationProvider,
-        credentialStateProvider: AppleCredentialStateProvider,
+        appleSignInSource: AppleSignInSource,
         secureStorage: any SecureValueStorage,
     ) {
-        self.authorizationProvider = authorizationProvider
-        self.credentialStateProvider = credentialStateProvider
+        self.appleSignInSource = appleSignInSource
         appleIdentityStore = AppleIdentityStore(storage: secureStorage)
     }
 
@@ -26,16 +23,10 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
         switch method {
         case .apple:
             do {
-                let credential = try await authorizationProvider.authorize()
-                guard
-                    let tokenData = credential.identityToken,
-                    let idToken = String(data: tokenData, encoding: .utf8)
-                else {
-                    throw AuthenticationError.temporarilyUnavailable
-                }
+                let credential = try await appleSignInSource.authorize()
                 try? persistUserID(credential.userID)
-                return AuthenticationGrant(id: .init(rawValue: idToken), method: .apple)
-            } catch let error as AppleAuthorizationError {
+                return AuthenticationGrant(id: .init(rawValue: credential.identityToken), method: .apple)
+            } catch let error as AppleSignInError {
                 throw domainError(for: error)
             }
 
@@ -46,7 +37,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     func authorizationStatus() async throws -> AuthorizationStatus {
         guard let userID = try? loadUserID() else { return .reauthenticationRequired }
-        return domainStatus(await credentialStateProvider.state(for: userID))
+        return domainStatus(await appleSignInSource.state(forUserID: userID))
     }
 
     func clearAuthentication() async throws {
@@ -59,8 +50,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
 
     // MARK: Private
 
-    private let authorizationProvider: AppleAuthorizationProvider
-    private let credentialStateProvider: AppleCredentialStateProvider
+    private let appleSignInSource: AppleSignInSource
     private let appleIdentityStore: AppleIdentityStore
 
     private func persistUserID(_ userID: String) throws {
@@ -71,36 +61,25 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
         try appleIdentityStore.load()
     }
 
-    private func domainStatus(_ state: AppleCredentialState) -> AuthorizationStatus {
+    private func domainStatus(_ state: AppleSignInState) -> AuthorizationStatus {
         switch state {
         case .authorized:
             .authorized
 
-        case .revoked,
-             .notFound,
-             .transferred:
+        case .reauthenticationRequired:
             .reauthenticationRequired
 
         case .temporarilyUnavailable:
             .temporarilyUnavailable
-
-        @unknown default:
-            .temporarilyUnavailable
         }
     }
 
-    private func domainError(for error: AppleAuthorizationError) -> AuthenticationError {
+    private func domainError(for error: AppleSignInError) -> AuthenticationError {
         switch error {
         case .cancelled:
             .cancelled
 
-        case .invalidCallback,
-             .expiredAttempt,
-             .missingCredential,
-             .unavailable:
-            .temporarilyUnavailable
-
-        @unknown default:
+        case .unavailable:
             .temporarilyUnavailable
         }
     }

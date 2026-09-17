@@ -1,11 +1,11 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import DataAuthentication
+import DataNotification
 import DataShared
 import DomainAuthentication
 import DomainLearningProject
 import Foundation
-import InfrastructureLocalNotification
 
 // MARK: - ShareExtensionComposition
 
@@ -17,14 +17,14 @@ public struct ShareExtensionComposition: Sendable {
         externalRepository: ExternalRepositoryAssembly,
         learningProject: LearningProjectAssembly,
         resolveSessionAvailability: @escaping @Sendable () async -> SessionAvailability,
-        localNotificationClient: any NotificationAuthorizationClient,
+        reminderNotifier: any LocalReminderNotifier,
         enqueueGenerationReminder: @escaping @Sendable (String) async -> Void,
     ) {
         parseRepositoryLink = externalRepository.locator
         fetchExternalRepository = externalRepository.fetchExternalRepository
         createLearningProject = learningProject.createLearningProject
         self.resolveSessionAvailability = resolveSessionAvailability
-        isNotificationAuthorized = { await localNotificationClient.isAuthorized() }
+        isNotificationAuthorized = { await reminderNotifier.isAuthorized() }
         self.enqueueGenerationReminder = enqueueGenerationReminder
     }
 
@@ -63,7 +63,7 @@ public struct ShareExtensionComposition: Sendable {
             namespace: SessionStorageLayout.sharedSessionNamespace,
             location: .appGroup,
         ),
-        localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
+        reminderNotifier: (any LocalReminderNotifier)? = nil,
         transport: (any RequestTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
@@ -86,7 +86,7 @@ public struct ShareExtensionComposition: Sendable {
             ),
             learningProject: learningProject,
             resolveSessionAvailability: sessionAvailability.resolveSessionAvailability,
-            localNotificationClient: localNotificationClient,
+            reminderNotifier: reminderNotifier ?? NotificationFactory.localReminderNotifier(),
             enqueueGenerationReminder: { projectID in
                 await pendingGenerations.enqueueReminder(projectID: projectID)
             },

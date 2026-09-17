@@ -39,6 +39,8 @@ DataLegalConsent Data/LegalConsent
 DataLegalConsentTests Data/Tests/LegalConsent
 DataMember Data/Member
 DataMemberTests Data/Tests/Member
+DataNotification Data/Notification
+DataNotificationTests Data/Tests/Notification
 DataShared Data/Shared
 DataSharedTests Data/Tests/Shared
 

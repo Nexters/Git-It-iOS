@@ -1,6 +1,6 @@
+import DataNotification
 import DomainLearningProject
 import Foundation
-import InfrastructureLocalNotification
 
 // MARK: - GenerationReminderSchedulerAdapter
 
@@ -9,11 +9,11 @@ struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
     // MARK: Lifecycle
 
     init(
-        localNotificationClient: any NotificationAuthorizationClient,
+        reminderNotifier: any LocalReminderNotifier,
         title: String,
         body: String,
     ) {
-        self.localNotificationClient = localNotificationClient
+        self.reminderNotifier = reminderNotifier
         self.title = title
         self.body = body
     }
@@ -21,15 +21,15 @@ struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
     // MARK: Internal
 
     func isAuthorized() async -> Bool {
-        await localNotificationClient.isAuthorized()
+        await reminderNotifier.isAuthorized()
     }
 
     func schedule(
         identifier: String,
         at date: Date,
     ) async {
-        localNotificationClient.schedule(
-            LocalNotificationRequest(
+        await reminderNotifier.schedule(
+            ReminderNotification(
                 identifier: identifier,
                 title: title,
                 body: body,
@@ -40,7 +40,7 @@ struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
 
     // MARK: Private
 
-    private let localNotificationClient: any NotificationAuthorizationClient
+    private let reminderNotifier: any LocalReminderNotifier
     private let title: String
     private let body: String
 

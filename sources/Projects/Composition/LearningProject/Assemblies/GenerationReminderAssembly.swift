@@ -1,6 +1,6 @@
+import DataNotification
 import DomainLearningProject
 import Foundation
-import InfrastructureLocalNotification
 
 // MARK: - GenerationReminderAssembly
 
@@ -11,12 +11,13 @@ public struct GenerationReminderAssembly: Sendable {
     public init(
         reminderTitle: String,
         reminderBody: String,
-        localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
+        reminderNotifier: (any LocalReminderNotifier)? = nil,
         pendingGenerations: (any PendingGenerationRepository)? = nil,
     ) {
+        let reminderNotifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
         let scheduleGenerationReminder = ScheduleGenerationReminder(
             scheduler: GenerationReminderSchedulerAdapter(
-                localNotificationClient: localNotificationClient,
+                reminderNotifier: reminderNotifier,
                 title: reminderTitle,
                 body: reminderBody,
             ),
@@ -24,7 +25,7 @@ public struct GenerationReminderAssembly: Sendable {
         )
         self.scheduleGenerationReminder = scheduleGenerationReminder
         requestGenerationReminder = RequestGenerationReminder(
-            notificationAuthorization: NotificationAuthorizationAdapter(localNotificationClient: localNotificationClient),
+            notificationAuthorization: NotificationAuthorizationAdapter(reminderNotifier: reminderNotifier),
             reminderRegistration: scheduleGenerationReminder,
         )
         startObservingGenerationState = { trackGeneration in

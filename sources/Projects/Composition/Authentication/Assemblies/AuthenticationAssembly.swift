@@ -3,7 +3,6 @@ import DataLegalConsent
 import DataShared
 import DomainAuthentication
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - AuthenticationAssembly
 
@@ -43,8 +42,7 @@ public struct AuthenticationAssembly: Sendable {
             accessTokenProvider: accessTokenProvider,
         )
         let authenticationRepository = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
+            appleSignInSource: AppleSignInSource(),
             secureStorage: appleIdentityStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(

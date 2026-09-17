@@ -6,7 +6,6 @@ import Testing
 @testable import DataAuthentication
 @testable import DataShared
 @testable import DomainAuthentication
-@testable import InfrastructureAuthentication
 
 // MARK: - SharedLifetimeTests
 
@@ -19,8 +18,7 @@ struct SharedLifetimeTests {
     func `같은 보안 저장소를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
         let sharedSecureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
+            appleSignInSource: AppleSignInSource(),
             secureStorage: sharedSecureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(

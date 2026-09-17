@@ -4,9 +4,8 @@ import Testing
 @testable import CompositionShareExtension
 @testable import DataAuthentication
 @testable import DataLearningProject
+@testable import DataNotification
 @testable import DomainAuthentication
-@testable import InfrastructureAuthentication
-@testable import InfrastructureLocalNotification
 
 // MARK: - ShareExtensionCompositionTests
 
@@ -36,7 +35,7 @@ struct ShareExtensionCompositionTests {
         let context = try Context(isNotificationAuthorized: true)
 
         #expect(await context.composition.isNotificationAuthorized() == true)
-        #expect(context.localNotificationClient.authorizationRequestCount == 0)
+        #expect(context.reminderNotifier.authorizationRequestCount == 0)
     }
 
     @Test
@@ -57,7 +56,7 @@ struct ShareExtensionCompositionTests {
             try Context.environment(),
             secureStorage: InMemorySecureValueStorage(),
             sharedStorage: nil,
-            localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
+            reminderNotifier: SpyLocalReminderNotifier(isAuthorized: false),
         )
 
         #expect(await composition.resolveSessionAvailability() == .appLaunchRequired)
@@ -74,13 +73,13 @@ struct ShareExtensionCompositionTests {
             let sharedStorage = InMemoryKeyValueStorage()
             self.sharedStorage = sharedStorage
             markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
-            let localNotificationClient = SpyNotificationAuthorizationClient(isAuthorized: isNotificationAuthorized)
-            self.localNotificationClient = localNotificationClient
+            let reminderNotifier = SpyLocalReminderNotifier(isAuthorized: isNotificationAuthorized)
+            self.reminderNotifier = reminderNotifier
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
                 secureStorage: secureStorage,
                 sharedStorage: sharedStorage,
-                localNotificationClient: localNotificationClient,
+                reminderNotifier: reminderNotifier,
             )
         }
 
@@ -89,7 +88,7 @@ struct ShareExtensionCompositionTests {
         let sharedStorage: InMemoryKeyValueStorage
         let secureStorage: InMemorySecureValueStorage
         let markerCoding: SharedSessionStateMarkerCoding
-        let localNotificationClient: SpyNotificationAuthorizationClient
+        let reminderNotifier: SpyLocalReminderNotifier
         let composition: ShareExtensionComposition
 
         static func environment() throws -> ShareExtensionComposition.Environment {

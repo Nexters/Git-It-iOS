@@ -13,6 +13,8 @@ enum DataModuleName: String, CaseIterable {
     case DataLegalConsentTests
     case DataMember
     case DataMemberTests
+    case DataNotification
+    case DataNotificationTests
     case DataShared
     case DataSharedTests
 }
@@ -27,6 +29,7 @@ extension DataModuleName {
             .DataLearningProject,
             .DataLegalConsent,
             .DataMember,
+            .DataNotification,
             .DataShared:
             directoryName
         case
@@ -35,6 +38,7 @@ extension DataModuleName {
             .DataLearningProjectTests,
             .DataLegalConsentTests,
             .DataMemberTests,
+            .DataNotificationTests,
             .DataSharedTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
@@ -159,6 +163,30 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
+            )
+
+        case .DataNotification:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureLocalNotification),
+                    .fromInfrastructure(.InfrastructurePushMessaging),
+                ],
+            )
+
+        case .DataNotificationTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                productionTarget: .target(
+                    name: DataModuleName.DataNotification.rawValue
+                ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureLocalNotification)
+                ],
             )
 
         case .DataShared:

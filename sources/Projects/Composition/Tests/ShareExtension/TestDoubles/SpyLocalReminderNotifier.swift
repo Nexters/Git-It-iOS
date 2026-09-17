@@ -1,10 +1,10 @@
+import DataNotification
 import Foundation
-import InfrastructureLocalNotification
 import Synchronization
 
-// MARK: - SpyNotificationAuthorizationClient
+// MARK: - SpyLocalReminderNotifier
 
-final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient, Sendable {
+final class SpyLocalReminderNotifier: LocalReminderNotifier, Sendable {
 
     // MARK: Lifecycle
 
@@ -22,7 +22,7 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
         counts.withLock { $0.scheduledIdentifiers }
     }
 
-    func requestAuthorization() async -> NotificationAuthorizationStatus {
+    func requestAuthorization() async -> ReminderAuthorizationStatus {
         counts.withLock { $0.authorizationRequests += 1 }
         return authorized ? .authorized : .declined
     }
@@ -31,18 +31,14 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
         authorized
     }
 
-    func present(_ request: LocalNotificationRequest) {
-        counts.withLock { $0.scheduledIdentifiers.append(request.identifier) }
-    }
-
     func schedule(
-        _ request: LocalNotificationRequest,
+        _ reminder: ReminderNotification,
         at _: Date,
-    ) {
-        counts.withLock { $0.scheduledIdentifiers.append(request.identifier) }
+    ) async {
+        counts.withLock { $0.scheduledIdentifiers.append(reminder.identifier) }
     }
 
-    func cancel(identifier: String) {
+    func cancel(identifier: String) async {
         counts.withLock { state in
             state.scheduledIdentifiers.removeAll { $0 == identifier }
         }

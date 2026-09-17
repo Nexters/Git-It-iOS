@@ -5,7 +5,6 @@ import Testing
 @testable import DataAuthentication
 @testable import DataShared
 @testable import DomainAuthentication
-@testable import InfrastructureAuthentication
 
 // MARK: - AuthenticationRepositoryAdapterTests
 
@@ -18,8 +17,7 @@ struct AuthenticationRepositoryAdapterTests {
     func `저장된 사용자가 없으면 재인증이 필요하다고 판정한다`() async throws {
         let secureStorage = InMemorySecureValueStorage()
         let adapter = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
+            appleSignInSource: AppleSignInSource(),
             secureStorage: secureStorage,
         )
         try await adapter.clearAuthentication()
@@ -33,8 +31,7 @@ struct AuthenticationRepositoryAdapterTests {
     func `저장된 세션이 없으면 RestoreSessionResult가 unauthenticated다`() async {
         let secureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
+            appleSignInSource: AppleSignInSource(),
             secureStorage: secureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
@@ -77,8 +74,7 @@ struct AuthenticationRepositoryAdapterTests {
             method: .apple,
         ))
         let authenticationRepository = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
+            appleSignInSource: AppleSignInSource(),
             secureStorage: secureStorage,
         )
         let signOut = SignOut(

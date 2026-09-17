@@ -422,54 +422,54 @@ Assembly·typealias가 같은 단위에서 Data 타입으로 바뀌어야 compil
 
 ### 준비와 기반
 
-- [ ] T189 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataNotification`(소스 `Notification`, 의존 `InfrastructureLocalNotification`, `InfrastructurePushMessaging`, `packageName: "GitItData"`)과 `DataNotificationTests`(소스 `Tests/Notification`)를 추가한다
-- [ ] T190 [S4] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`에 `DataNotificationTests`를 추가한다
-- [ ] T191 [S4] `tools/package-dependencies/config/source-roots`에 `DataNotification Data/Notification`, `DataNotificationTests Data/Tests/Notification` 행을 추가한다
-- [ ] T192 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 `CompositionLearningProject`, `CompositionApp`, `CompositionShareExtension`에 `DataNotification` 의존을 추가한다
-- [ ] T193 [S4] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에 `Clients/`(Data 내부 기술 능력 실제 구현)와 `AppDelegates/`(앱 델리게이트 위임 타입) 형태를 추가한다
+- [X] T189 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataNotification`(소스 `Notification`, 의존 `InfrastructureLocalNotification`, `InfrastructurePushMessaging`, `packageName: "GitItData"`)과 `DataNotificationTests`(소스 `Tests/Notification`)를 추가한다
+- [X] T190 [S4] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`에 `DataNotificationTests`를 추가한다
+- [X] T191 [S4] `tools/package-dependencies/config/source-roots`에 `DataNotification Data/Notification`, `DataNotificationTests Data/Tests/Notification` 행을 추가한다
+- [X] T192 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 `CompositionLearningProject`, `CompositionApp`, `CompositionShareExtension`에 `DataNotification` 의존을 추가한다
+- [X] T193 [S4] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에 `Clients/`(Data 내부 기술 능력 실제 구현)와 `AppDelegates/`(앱 델리게이트 위임 타입) 형태를 추가한다
 
 ### 테스트
 
-- [ ] T194 [P] [S4] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에 Infrastructure `NotificationAuthorizationClient` 스파이 더블을 추가한다(현재 `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyNotificationAuthorizationClient.swift` 동작 이관)
-- [ ] T195 [S4] `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에 권한 상태 3종 변환, `isAuthorized`, 예약 요청의 식별자·제목·본문·시각 전달, 취소 위임을 T194 더블로 검증하는 테스트를 작성한다
+- [X] T194 [P] [S4] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에 Infrastructure `NotificationAuthorizationClient` 스파이 더블을 추가한다(현재 `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyNotificationAuthorizationClient.swift` 동작 이관)
+- [X] T195 [S4] `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에 권한 상태 3종 변환, `isAuthorized`, 예약 요청의 식별자·제목·본문·시각 전달, 취소 위임을 T194 더블로 검증하는 테스트를 작성한다
 
 ### Data 구현
 
-- [ ] T196 [P] [S4] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에 `public protocol LocalReminderNotifier`를 정의한다(연산은 `sources/Projects/Composition/LearningProject/Adapters/GenerationReminderSchedulerAdapter.swift`·`NotificationAuthorizationAdapter.swift`와 `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 쓰는 것만)
-- [ ] T197 [P] [S4] `sources/Projects/Data/Notification/Models/ReminderAuthorizationStatus.swift`에 `public enum ReminderAuthorizationStatus { authorized, declined, previouslyDenied }`를 정의한다
-- [ ] T198 [P] [S4] `sources/Projects/Data/Notification/Models/ReminderNotification.swift`에 `public struct ReminderNotification(identifier:title:body:)`를 정의한다
-- [ ] T199 [S4] `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에 Infrastructure `NotificationAuthorizationClient`를 감싸는 `internal` 구현을 추가한다
-- [ ] T200 [P] [S4] `sources/Projects/Data/Notification/Contracts/RemoteMessageReceiver.swift`에 `public protocol RemoteMessageReceiver`(`registrationToken()`, `registrationTokenRefreshes()`, `setDeviceToken(_:)`)를 정의한다(연산은 `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `PushClientBox` 사용처와 대조해 확정)
-- [ ] T201 [S4] `sources/Projects/Data/Notification/Clients/RemoteMessageClient.swift`에 Infrastructure `PushMessagingClientFactory.make()`와 `PushMessagingClient`를 감싸는 `internal` 구현을 추가한다
-- [ ] T202 [P] [S4] `sources/Projects/Data/Notification/Models/NotificationAppCallbacks.swift`에 `public struct NotificationAppCallbacks(forwardDeviceToken:ingestRemoteMessagePayload:)`를 정의한다
-- [ ] T203 [S4] `sources/Projects/Data/Notification/AppDelegates/NotificationAppDelegate.swift`에 Infrastructure `PushMessagingAppDelegate`를 내부에 두고 `UIApplicationDelegate` 콜백 3개와 `configure(_: NotificationAppCallbacks)`를 위임하는 `public final class NotificationAppDelegate`를 추가한다(`import UIKit`)
-- [ ] T204 [S4] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`에 `public enum NotificationFactory`(`localReminderNotifier()`, `remoteMessageReceiver()`)를 추가한다
-- [ ] T205 [S4] `sources/Projects/Data/Authentication/Sources/AppleSignInSource.swift`에 Infrastructure `AppleAuthorizationProvider`·`AppleCredentialStateProvider`를 내부에서 만들고 Data 모델로 결과를 돌려주는 `public actor AppleSignInSource`(연산은 `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 `authorize()`·자격 상태 조회 사용처와 대조해 확정)를 추가한다
-- [ ] T206 [P] [S4] `sources/Projects/Data/Authentication/Models/AppleSignInCredential.swift`에 사용자 식별자와 identity token을 가진 `public struct AppleSignInCredential`을 정의한다
-- [ ] T207 [P] [S4] `sources/Projects/Data/Authentication/Models/AppleSignInState.swift`에 Composition이 쓰는 자격 상태 case만 가진 `public enum AppleSignInState`를 정의한다
-- [ ] T208 [P] [S4] `sources/Projects/Data/Authentication/Errors/AppleSignInError.swift`에 Composition의 현재 `AppleAuthorizationError` 변환 분기와 같은 결과를 낼 수 있는 case를 가진 `public enum AppleSignInError`를 정의한다
-- [ ] T209 [S4] `sources/Projects/Data/Tests/Authentication/Sources/AppleSignInSourceTests.swift`에 Infrastructure 오류·상태가 T207·T208로 변환되는지 검증하는 테스트를 작성한다(실제 Apple 인증 호출이 필요한 사례는 제외)
+- [X] T196 [P] [S4] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에 `public protocol LocalReminderNotifier`를 정의한다(연산은 `sources/Projects/Composition/LearningProject/Adapters/GenerationReminderSchedulerAdapter.swift`·`NotificationAuthorizationAdapter.swift`와 `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 쓰는 것만)
+- [X] T197 [P] [S4] `sources/Projects/Data/Notification/Models/ReminderAuthorizationStatus.swift`에 `public enum ReminderAuthorizationStatus { authorized, declined, previouslyDenied }`를 정의한다
+- [X] T198 [P] [S4] `sources/Projects/Data/Notification/Models/ReminderNotification.swift`에 `public struct ReminderNotification(identifier:title:body:)`를 정의한다
+- [X] T199 [S4] `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에 Infrastructure `NotificationAuthorizationClient`를 감싸는 `internal` 구현을 추가한다
+- [X] T200 [P] [S4] `sources/Projects/Data/Notification/Contracts/RemoteMessageReceiver.swift`에 `public protocol RemoteMessageReceiver`(`registrationToken()`, `registrationTokenRefreshes()`, `setDeviceToken(_:)`)를 정의한다(연산은 `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `PushClientBox` 사용처와 대조해 확정)
+- [X] T201 [S4] `sources/Projects/Data/Notification/Clients/RemoteMessageClient.swift`에 Infrastructure `PushMessagingClientFactory.make()`와 `PushMessagingClient`를 감싸는 `internal` 구현을 추가한다
+- [X] T202 [P] [S4] `sources/Projects/Data/Notification/Models/NotificationAppCallbacks.swift`에 `public struct NotificationAppCallbacks(forwardDeviceToken:ingestRemoteMessagePayload:)`를 정의한다
+- [X] T203 [S4] `sources/Projects/Data/Notification/AppDelegates/NotificationAppDelegate.swift`에 Infrastructure `PushMessagingAppDelegate`를 내부에 두고 `UIApplicationDelegate` 콜백 3개와 `configure(_: NotificationAppCallbacks)`를 위임하는 `public final class NotificationAppDelegate`를 추가한다(`import UIKit`)
+- [X] T204 [S4] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`에 `public enum NotificationFactory`(`localReminderNotifier()`, `remoteMessageReceiver()`)를 추가한다
+- [X] T205 [S4] `sources/Projects/Data/Authentication/Sources/AppleSignInSource.swift`에 Infrastructure `AppleAuthorizationProvider`·`AppleCredentialStateProvider`를 내부에서 만들고 Data 모델로 결과를 돌려주는 `public actor AppleSignInSource`(연산은 `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 `authorize()`·자격 상태 조회 사용처와 대조해 확정)를 추가한다
+- [X] T206 [P] [S4] `sources/Projects/Data/Authentication/Models/AppleSignInCredential.swift`에 사용자 식별자와 identity token을 가진 `public struct AppleSignInCredential`을 정의한다
+- [X] T207 [P] [S4] `sources/Projects/Data/Authentication/Models/AppleSignInState.swift`에 Composition이 쓰는 자격 상태 case만 가진 `public enum AppleSignInState`를 정의한다
+- [X] T208 [P] [S4] `sources/Projects/Data/Authentication/Errors/AppleSignInError.swift`에 Composition의 현재 `AppleAuthorizationError` 변환 분기와 같은 결과를 낼 수 있는 case를 가진 `public enum AppleSignInError`를 정의한다
+- [X] T209 [S4] `sources/Projects/Data/Tests/Authentication/Sources/AppleSignInSourceTests.swift`에 Infrastructure 오류·상태가 T207·T208로 변환되는지 검증하는 테스트를 작성한다(실제 Apple 인증 호출이 필요한 사례는 제외)
 
 ### Composition 구현
 
-- [ ] T210 [S4] `sources/Projects/Composition/LearningProject/Adapters/GenerationReminderSchedulerAdapter.swift`를 `any LocalReminderNotifier`와 `ReminderNotification`으로 바꾼다
-- [ ] T211 [S4] `sources/Projects/Composition/LearningProject/Adapters/NotificationAuthorizationAdapter.swift`를 `any LocalReminderNotifier`와 `ReminderAuthorizationStatus`로 바꾸고 Domain `NotificationAuthorizationOutcome` 변환 결과를 유지한다
-- [ ] T212 [S4] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`의 `localNotificationClient` 인자를 `reminderNotifier: (any LocalReminderNotifier)?`(nil이면 `NotificationFactory.localReminderNotifier()`)로 바꾼다
-- [ ] T213 [S4] `sources/Projects/Composition/App/Factories/PushNotificationAppDelegate.swift`의 typealias 대상을 `DataNotification.NotificationAppDelegate`로 바꾼다
-- [ ] T214 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `PushNotificationCallbacks`·`PushMessagingClient`·`PushMessagingClientFactory` 사용을 `NotificationAppCallbacks`·`any RemoteMessageReceiver`·`NotificationFactory`로 바꾸고 `configureAppDelegate`·`deviceTokenRefreshes`·`registerCurrentDevice` 동작을 유지한다
-- [ ] T215 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `localNotificationClient` 인자를 `reminderNotifier: (any LocalReminderNotifier)?`로 바꾼다
-- [ ] T216 [S4] `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 Apple 제공자·`AppleAuthorizationError`·`AppleCredentialState` 사용을 `AppleSignInSource`·`AppleSignInError`·`AppleSignInState`로 바꾸고 Domain 오류 결과를 유지한다
-- [ ] T217 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`에서 `AppleAuthorizationProvider()`·`AppleCredentialStateProvider()` 생성을 `AppleSignInSource()`로 바꾼다
-- [ ] T218 [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyLocalReminderNotifier.swift`에 `LocalReminderNotifier` 스파이 더블을 추가하고 `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyNotificationAuthorizationClient.swift`를 삭제한다
-- [ ] T219 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `localNotificationClient:` 준비를 T218 더블과 `reminderNotifier:`로 바꾼다
-- [ ] T220 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 Apple 제공자 생성을 `AppleSignInSource()`로 바꾼다
-- [ ] T221 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 Apple 제공자 생성을 `AppleSignInSource()`로 바꾸고 기대값을 유지한다
-- [ ] T222 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 공개 표면 기대값을 T214 변경과 대조해 이름이 바뀐 공개 멤버가 있으면 갱신한다
-- [ ] T223 [S4] `sources/Projects/Data/Tests/Authentication/SensitiveValueExposureTests.swift`가 새 Data 공개 타입(`AppleSignInCredential`)의 민감값 노출 규칙을 포함하는지 확인하고 필요하면 사례를 추가한다
+- [X] T210 [S4] `sources/Projects/Composition/LearningProject/Adapters/GenerationReminderSchedulerAdapter.swift`를 `any LocalReminderNotifier`와 `ReminderNotification`으로 바꾼다
+- [X] T211 [S4] `sources/Projects/Composition/LearningProject/Adapters/NotificationAuthorizationAdapter.swift`를 `any LocalReminderNotifier`와 `ReminderAuthorizationStatus`로 바꾸고 Domain `NotificationAuthorizationOutcome` 변환 결과를 유지한다
+- [X] T212 [S4] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`의 `localNotificationClient` 인자를 `reminderNotifier: (any LocalReminderNotifier)?`(nil이면 `NotificationFactory.localReminderNotifier()`)로 바꾼다
+- [X] T213 [S4] `sources/Projects/Composition/App/Factories/PushNotificationAppDelegate.swift`의 typealias 대상을 `DataNotification.NotificationAppDelegate`로 바꾼다
+- [X] T214 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `PushNotificationCallbacks`·`PushMessagingClient`·`PushMessagingClientFactory` 사용을 `NotificationAppCallbacks`·`any RemoteMessageReceiver`·`NotificationFactory`로 바꾸고 `configureAppDelegate`·`deviceTokenRefreshes`·`registerCurrentDevice` 동작을 유지한다
+- [X] T215 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `localNotificationClient` 인자를 `reminderNotifier: (any LocalReminderNotifier)?`로 바꾼다
+- [X] T216 [S4] `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 Apple 제공자·`AppleAuthorizationError`·`AppleCredentialState` 사용을 `AppleSignInSource`·`AppleSignInError`·`AppleSignInState`로 바꾸고 Domain 오류 결과를 유지한다
+- [X] T217 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`에서 `AppleAuthorizationProvider()`·`AppleCredentialStateProvider()` 생성을 `AppleSignInSource()`로 바꾼다
+- [X] T218 [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyLocalReminderNotifier.swift`에 `LocalReminderNotifier` 스파이 더블을 추가하고 `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyNotificationAuthorizationClient.swift`를 삭제한다
+- [X] T219 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `localNotificationClient:` 준비를 T218 더블과 `reminderNotifier:`로 바꾼다
+- [X] T220 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 Apple 제공자 생성을 `AppleSignInSource()`로 바꾼다
+- [X] T221 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 Apple 제공자 생성을 `AppleSignInSource()`로 바꾸고 기대값을 유지한다
+- [X] T222 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 공개 표면 기대값을 T214 변경과 대조해 이름이 바뀐 공개 멤버가 있으면 갱신한다
+- [X] T223 [S4] `sources/Projects/Data/Tests/Authentication/SensitiveValueExposureTests.swift`가 새 Data 공개 타입(`AppleSignInCredential`)의 민감값 노출 규칙을 포함하는지 확인하고 필요하면 사례를 추가한다
 
 ### 정리와 단위 검증
 
-- [ ] T224 [no-write] [S4] `git grep -lE '^\s*(@testable\s+)?import\s+Infrastructure' -- sources/Projects ':!sources/Projects/Data' ':!sources/Projects/Infrastructure'`가 0건이고 `sources/Projects/App/GitIt/GitItApp.swift` diff가 없는지 확인하며 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
+- [X] T224 [no-write] [S4] `git grep -lE '^\s*(@testable\s+)?import\s+Infrastructure' -- sources/Projects ':!sources/Projects/Data' ':!sources/Projects/Infrastructure'`가 0건이고 `sources/Projects/App/GitIt/GitItApp.swift` diff가 없는지 확인하며 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U8로 진행한다.
 

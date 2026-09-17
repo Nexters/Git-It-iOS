@@ -1,13 +1,12 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import CompositionMember
+import DataNotification
 import DataShared
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Foundation
-import InfrastructureAuthentication
-import InfrastructurePushMessaging
 import Synchronization
 
 // MARK: - AppComposition
@@ -53,16 +52,16 @@ public struct AppComposition: Sendable {
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
         }
         self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
-        let pushNotificationCallbacks = PushNotificationCallbacks(
-            forwardAPNsToken: { token in pushClientBox.client?.setAPNsToken(token) },
-            ingestGenerationOutcomePayload: ingestGenerationOutcomePayload,
+        let notificationAppCallbacks = NotificationAppCallbacks(
+            forwardDeviceToken: { token in pushClientBox.client?.setDeviceToken(token) },
+            ingestRemoteMessagePayload: ingestGenerationOutcomePayload,
         )
 
         let trackGeneration = learningProject.trackGeneration
         let startObservingGenerationState = generationReminder.startObservingGenerationState
         recordSharedSessionState = authentication.recordSharedSessionState
         activatePushClient = { pushClientBox.activate() }
-        configureAppDelegate = { appDelegate in appDelegate.configure(pushNotificationCallbacks) }
+        configureAppDelegate = { appDelegate in appDelegate.configure(notificationAppCallbacks) }
         self.startObservingGenerationState = {
             await startObservingGenerationState(trackGeneration)
         }
@@ -211,20 +210,20 @@ public struct AppComposition: Sendable {
 
         // MARK: Internal
 
-        var client: (any PushMessagingClient)? {
+        var client: (any RemoteMessageReceiver)? {
             storage.withLock { $0 }
         }
 
         func activate() {
             storage.withLock { client in
                 guard client == nil else { return }
-                client = PushMessagingClientFactory.make()
+                client = NotificationFactory.remoteMessageReceiver()
             }
         }
 
         // MARK: Private
 
-        private let storage = Mutex<(any PushMessagingClient)?>(nil)
+        private let storage = Mutex<(any RemoteMessageReceiver)?>(nil)
 
     }
 

@@ -1,5 +1,5 @@
+import DataNotification
 import DomainLearningProject
-import InfrastructureLocalNotification
 import os
 
 // MARK: - NotificationAuthorizationAdapter
@@ -8,11 +8,11 @@ struct NotificationAuthorizationAdapter: NotificationAuthorization {
 
     // MARK: Internal
 
-    let localNotificationClient: any NotificationAuthorizationClient
+    let reminderNotifier: any LocalReminderNotifier
 
     func requestAuthorization() async -> NotificationAuthorizationOutcome {
         let outcome: NotificationAuthorizationOutcome =
-            switch await localNotificationClient.requestAuthorization() {
+            switch await reminderNotifier.requestAuthorization() {
             case .authorized: .authorized
             case .declined: .declined
             case .previouslyDenied: .previouslyDenied
@@ -22,7 +22,7 @@ struct NotificationAuthorizationAdapter: NotificationAuthorization {
     }
 
     func isAuthorized() async -> Bool {
-        await localNotificationClient.isAuthorized()
+        await reminderNotifier.isAuthorized()
     }
 
     // MARK: Private
