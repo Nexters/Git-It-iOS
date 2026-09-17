@@ -31,8 +31,8 @@ struct ShareRegistrationDiagnosticLog: Sendable {
         case .repositoryLinkRejected:
             "repositoryLinkRejected"
 
-        case .sessionResolved(let state):
-            "sessionResolved(\(state))"
+        case .signInAvailabilityResolved(let availability):
+            "signInAvailabilityResolved(\(availability))"
 
         case .repositoryLookupFailed(let reason):
             "repositoryLookupFailed(\(reason))"
@@ -42,9 +42,6 @@ struct ShareRegistrationDiagnosticLog: Sendable {
 
         case .registrationSucceeded:
             "registrationSucceeded"
-
-        case .generationReminderEnqueued:
-            "generationReminderEnqueued"
         }
     }
 

@@ -196,7 +196,7 @@ public struct ShareRegistrationFeature: Sendable {
                 case .failure(let error):
                     if error == .unauthorized {
                         state.status = .signInRequired
-                        recordDiagnostic(.sessionResolved(.signInRequired))
+                        recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
                     } else {
                         state.status = .failed(
                             reason: Self.registrationFailureReason(for: error),
@@ -234,14 +234,6 @@ public struct ShareRegistrationFeature: Sendable {
     private let signInAvailability: @Sendable () async -> SignInAvailability
     private let recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void
     private let dismiss: @MainActor @Sendable () -> Void
-
-    private static func sessionState(from availability: SignInAvailability) -> ShareRegistrationSessionState {
-        switch availability {
-        case .signedIn: .available
-        case .signInRequired: .signInRequired
-        case .appLaunchRequired: .appLaunchRequired
-        }
-    }
 
     private static func registrationFailureReason(for error: ProjectGenerationError) -> String {
         switch error {
@@ -292,9 +284,9 @@ public struct ShareRegistrationFeature: Sendable {
         }
 
         return .run { send in
-            let session = Self.sessionState(from: await signInAvailability())
-            recordDiagnostic(.sessionResolved(session))
-            switch session {
+            let availability = await signInAvailability()
+            recordDiagnostic(.signInAvailabilityResolved(availability))
+            switch availability {
             case .signInRequired:
                 await send(.effect(.validationFinished(.signInRequired)))
                 return
@@ -303,7 +295,7 @@ public struct ShareRegistrationFeature: Sendable {
                 await send(.effect(.validationFinished(.appLaunchRequired)))
                 return
 
-            case .available:
+            case .signedIn:
                 break
             }
 
@@ -321,9 +313,6 @@ public struct ShareRegistrationFeature: Sendable {
                         retry: .lookup,
                     ))))
                 }
-            } catch let error as ProjectGenerationError where error == .unauthorized {
-                recordDiagnostic(.sessionResolved(.signInRequired))
-                await send(.effect(.validationFinished(.signInRequired)))
             } catch {
                 recordDiagnostic(.repositoryLookupFailed(reason: String(describing: error)))
                 await send(.effect(.validationFinished(.failed(
@@ -340,11 +329,11 @@ public struct ShareRegistrationFeature: Sendable {
         state.status = .submitting
         let quizLevel = state.quizLevel
         return .run { send in
-            let session = Self.sessionState(from: await signInAvailability())
-            guard session == .available else {
-                recordDiagnostic(.sessionResolved(session))
+            let availability = await signInAvailability()
+            guard availability == .signedIn else {
+                recordDiagnostic(.signInAvailabilityResolved(availability))
                 await send(.effect(.validationFinished(
-                    session == .signInRequired ? .signInRequired : .appLaunchRequired
+                    availability == .signInRequired ? .signInRequired : .appLaunchRequired
                 )))
                 return
             }

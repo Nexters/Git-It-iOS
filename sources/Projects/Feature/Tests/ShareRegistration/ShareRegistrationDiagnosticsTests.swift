@@ -50,7 +50,7 @@ struct ShareRegistrationDiagnosticsTests {
             $0.status = .appLaunchRequired
         }
 
-        #expect(recorder.events == [.sessionResolved(.appLaunchRequired)])
+        #expect(recorder.events == [.signInAvailabilityResolved(.appLaunchRequired)])
     }
 
     @Test
@@ -65,7 +65,7 @@ struct ShareRegistrationDiagnosticsTests {
         await store.send(.view(.task))
         await store.skipReceivedActions()
 
-        #expect(recorder.events.contains(.sessionResolved(.available)))
+        #expect(recorder.events.contains(.signInAvailabilityResolved(.signedIn)))
         #expect(recorder.events.contains { event in
             if case .repositoryLookupFailed = event {
                 return true
