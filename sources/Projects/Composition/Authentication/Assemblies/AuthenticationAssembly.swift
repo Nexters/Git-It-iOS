@@ -87,11 +87,4 @@ public struct AuthenticationAssembly: Sendable {
 
     public let recordSharedSessionState: @Sendable () async -> Void
 
-    public static func migrateSessionKeychain(sharedKeychainStore: KeychainStore) {
-        SessionStorageMigration(
-            sharedKeychainStore: sharedKeychainStore,
-            legacyKeychainStore: AppGroupKeychainStore.makeLegacy(),
-        )()
-    }
-
 }

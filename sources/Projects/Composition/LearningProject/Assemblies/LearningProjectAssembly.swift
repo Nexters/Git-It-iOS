@@ -37,14 +37,7 @@ public struct LearningProjectAssembly: Sendable {
         let trackGeneration = TrackGeneration(
             stateRepository: GenerationStateRepositoryAdapter(
                 store: LocalGenerationStateStore(
-                    store: UserDefaultsStore(namespace: AppGroupUserDefaults.sharedSessionNamespace, userDefaults: defaults),
-                    migration: GenerationStateMigration(
-                        legacyProgressStore: UserDefaultsStore(namespace: GenerationStateMigration.legacyProgressNamespace),
-                        legacyCreationStateStore: UserDefaultsStore(
-                            namespace: AppGroupUserDefaults.sharedSessionNamespace,
-                            userDefaults: defaults,
-                        ),
-                    ),
+                    store: UserDefaultsStore(namespace: AppGroupUserDefaults.sharedSessionNamespace, userDefaults: defaults)
                 )
             ),
             outcomeRepository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),

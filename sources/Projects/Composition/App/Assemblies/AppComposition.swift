@@ -159,8 +159,6 @@ public struct AppComposition: Sendable {
         keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
-        AuthenticationAssembly.migrateSessionKeychain(sharedKeychainStore: keychainStore)
-
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,
             policyDocuments: environment.policyDocuments,
