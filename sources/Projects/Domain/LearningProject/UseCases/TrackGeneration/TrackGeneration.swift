@@ -5,15 +5,14 @@ public struct TrackGeneration: TrackGenerationUseCase, Sendable {
     // MARK: Lifecycle
 
     public init(
-        stateRepository: any GenerationStateRepository,
+        pendingGenerations: any PendingGenerationRepository,
         outcomeRepository: any GenerationOutcomeRepository,
-        waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = Date.init,
     ) {
+        self.pendingGenerations = pendingGenerations
         coordinator = GenerationStateCoordinator(
-            stateRepository: stateRepository,
+            pendingGenerations: pendingGenerations,
             outcomeRepository: outcomeRepository,
-            waitPolicy: waitPolicy,
             now: now,
         )
     }
@@ -24,34 +23,41 @@ public struct TrackGeneration: TrackGenerationUseCase, Sendable {
         githubRepoURL: String,
         requestedAt: Date,
     ) async -> Bool {
-        await coordinator.begin(githubRepoURL: githubRepoURL, requestedAt: requestedAt)
+        await coordinator.ensureStarted()
+        return await pendingGenerations.beginGeneration(githubRepoURL: githubRepoURL, requestedAt: requestedAt)
     }
 
     public func attachProjectID(
         _ projectID: String,
         toGithubRepoURL githubRepoURL: String,
     ) async {
-        await coordinator.attachProjectID(projectID, toGithubRepoURL: githubRepoURL)
+        await coordinator.ensureStarted()
+        await pendingGenerations.attachProjectID(projectID, toGithubRepoURL: githubRepoURL)
     }
 
     public func end(githubRepoURL: String) async {
-        await coordinator.end(githubRepoURL: githubRepoURL)
+        await coordinator.ensureStarted()
+        await pendingGenerations.releaseGeneration(githubRepoURL: githubRepoURL)
     }
 
     public func end(projectID: String) async {
-        await coordinator.end(projectID: projectID)
+        await coordinator.ensureStarted()
+        await pendingGenerations.releaseGeneration(projectID: projectID)
     }
 
     public func current() async -> GenerationState {
-        await coordinator.current()
+        await coordinator.ensureStarted()
+        return await pendingGenerations.pendingState()
     }
 
     public func states() async -> AsyncStream<GenerationState> {
-        await coordinator.states()
+        await coordinator.ensureStarted()
+        return await pendingGenerations.pendingStateChanges()
     }
 
-    // MARK: Internal
+    // MARK: Private
 
-    let coordinator: GenerationStateCoordinator
+    private let pendingGenerations: any PendingGenerationRepository
+    private let coordinator: GenerationStateCoordinator
 
 }

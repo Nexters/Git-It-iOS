@@ -8,11 +8,11 @@ public actor ScheduleGenerationReminder: ScheduleGenerationReminderUseCase {
 
     public init(
         scheduler: any GenerationReminderScheduler,
-        pendingReminders: (any PendingGenerationReminders)? = nil,
+        pendingGenerations: (any PendingGenerationRepository)? = nil,
         waitPolicy: GenerationWaitPolicy = .standard,
     ) {
         self.scheduler = scheduler
-        self.pendingReminders = pendingReminders
+        self.pendingGenerations = pendingGenerations
         self.waitPolicy = waitPolicy
     }
 
@@ -23,8 +23,8 @@ public actor ScheduleGenerationReminder: ScheduleGenerationReminderUseCase {
     }
 
     public func absorbPendingReminders() async {
-        guard let pendingReminders else { return }
-        for projectID in await pendingReminders.drainProjectIDs() {
+        guard let pendingGenerations else { return }
+        for projectID in await pendingGenerations.drainReminderProjectIDs() {
             await register(projectID: projectID)
         }
     }
@@ -46,7 +46,7 @@ public actor ScheduleGenerationReminder: ScheduleGenerationReminderUseCase {
     // MARK: Private
 
     private let scheduler: any GenerationReminderScheduler
-    private let pendingReminders: (any PendingGenerationReminders)?
+    private let pendingGenerations: (any PendingGenerationRepository)?
     private let waitPolicy: GenerationWaitPolicy
     private var registeredProjectIDs = Set<String>()
     private var observationTask: Task<Void, Never>?

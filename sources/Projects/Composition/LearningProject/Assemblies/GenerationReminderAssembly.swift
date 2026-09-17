@@ -1,8 +1,6 @@
-import DataLearningProject
 import DomainLearningProject
 import Foundation
 import InfrastructureLocalNotification
-import InfrastructureStorage
 
 // MARK: - GenerationReminderAssembly
 
@@ -14,8 +12,7 @@ public struct GenerationReminderAssembly: Sendable {
         reminderTitle: String,
         reminderBody: String,
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
-        pendingReminderCoding: PendingGenerationReminderCoding? = AppGroupUserDefaults.makeShared()
-            .map(PendingGenerationReminderCoding.init(userDefaults:)),
+        pendingGenerations: (any PendingGenerationRepository)? = nil,
     ) {
         let scheduleGenerationReminder = ScheduleGenerationReminder(
             scheduler: GenerationReminderSchedulerAdapter(
@@ -23,7 +20,7 @@ public struct GenerationReminderAssembly: Sendable {
                 title: reminderTitle,
                 body: reminderBody,
             ),
-            pendingReminders: pendingReminderCoding.map(PendingGenerationRemindersAdapter.init(coding:)),
+            pendingGenerations: pendingGenerations,
         )
         self.scheduleGenerationReminder = scheduleGenerationReminder
         requestGenerationReminder = RequestGenerationReminder(
@@ -39,13 +36,6 @@ public struct GenerationReminderAssembly: Sendable {
 
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
     public let startObservingGenerationState: @Sendable (any TrackGenerationUseCase) async -> Void
-
-    public static func makePendingReminderEnqueue(sharedDefaults: UserDefaults?) -> @Sendable (String) async -> Void {
-        let pendingReminderCoding = sharedDefaults.map(PendingGenerationReminderCoding.init(userDefaults:))
-        return { projectID in
-            await pendingReminderCoding?.append(projectID: projectID)
-        }
-    }
 
     // MARK: Internal
 

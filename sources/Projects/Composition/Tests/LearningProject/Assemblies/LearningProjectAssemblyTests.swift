@@ -20,6 +20,7 @@ struct LearningProjectAssemblyTests {
         _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
         _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
         _ = assembly.trackGeneration as any TrackGenerationUseCase
+        _ = assembly.pendingGenerations as any PendingGenerationRepository
     }
 
     @Test
@@ -27,7 +28,7 @@ struct LearningProjectAssemblyTests {
         let assembly = LearningProjectAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
             accessTokenProvider: { nil },
-            sharedDefaults: try #require(UserDefaults(suiteName: UUID().uuidString)),
+            sharedStorage: InMemoryKeyValueStorage(),
         )
         let trackGeneration = assembly.trackGeneration
         let githubRepoURL = "https://github.com/owner/repo"

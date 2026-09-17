@@ -27,10 +27,7 @@ struct LearningProjectLifecycleTests {
         )
         let createLearningProject = CreateLearningProject(
             repository: LifecycleLearningProjectRepository(registration: registration),
-            trackGeneration: TrackGeneration(
-                stateRepository: StubGenerationStateRepository(),
-                outcomeRepository: StubGenerationOutcomeRepository(),
-            ),
+            pendingGenerations: StubPendingGenerationRepository(),
         )
 
         let fetchedRepository = try await fetchExternalRepository(url: "https://github.com/owner/repo")

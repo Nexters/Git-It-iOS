@@ -83,7 +83,6 @@ extension CompositionModuleName {
                     .fromData(.DataExternalRepository),
                     .fromData(.DataShared),
                     .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureStorage),
                     .fromInfrastructure(.InfrastructureLocalNotification),
                 ],
             )
@@ -167,7 +166,6 @@ extension CompositionModuleName {
                     .fromData(.DataShared),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureStorage),
                     .fromInfrastructure(.InfrastructureLocalNotification),
                 ],
             )

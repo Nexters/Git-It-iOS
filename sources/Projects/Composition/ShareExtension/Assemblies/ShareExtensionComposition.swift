@@ -8,7 +8,6 @@ import Foundation
 import InfrastructureAuthentication
 import InfrastructureLocalNotification
 import InfrastructureNetworkClient
-import InfrastructureStorage
 
 // MARK: - ShareExtensionComposition
 
@@ -66,7 +65,6 @@ public struct ShareExtensionComposition: Sendable {
             namespace: SessionStorageLayout.sharedSessionNamespace,
             location: .appGroup,
         ),
-        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
         transport: (any HTTPTransport)? = nil,
     ) -> ShareExtensionComposition {
@@ -75,19 +73,25 @@ public struct ShareExtensionComposition: Sendable {
             sharedStorage: sharedStorage,
         )
 
+        let learningProject = LearningProjectAssembly(
+            baseURL: environment.apiBaseURL,
+            accessTokenProvider: sessionAvailability.accessTokenProvider,
+            transport: transport,
+            sharedStorage: sharedStorage,
+        )
+        let pendingGenerations = learningProject.pendingGenerations
+
         return ShareExtensionComposition(
             externalRepository: ExternalRepositoryAssembly(
                 baseURL: environment.externalRepositoryBaseURL,
                 transport: transport,
             ),
-            learningProject: LearningProjectAssembly(
-                baseURL: environment.apiBaseURL,
-                accessTokenProvider: sessionAvailability.accessTokenProvider,
-                transport: transport,
-            ),
+            learningProject: learningProject,
             resolveSessionAvailability: sessionAvailability.resolveSessionAvailability,
             localNotificationClient: localNotificationClient,
-            enqueueGenerationReminder: GenerationReminderAssembly.makePendingReminderEnqueue(sharedDefaults: sharedDefaults),
+            enqueueGenerationReminder: { projectID in
+                await pendingGenerations.enqueueReminder(projectID: projectID)
+            },
         )
     }
 

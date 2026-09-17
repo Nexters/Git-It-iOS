@@ -208,62 +208,62 @@ compile된다.
 
 ### Domain 테스트
 
-- [ ] T070 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubPendingGenerationRepository.swift`에 `PendingGenerationRepository`를 `GenerationState` 모델 전이로 구현하는 actor 테스트 더블(초기 상태 주입, 기록 스냅샷, 상태 변화 스트림, 알림 대기 목록)을 추가한다
-- [ ] T071 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`를 `pendingGenerations:` 주입으로 바꾸고, 대기 중 URL 요청 시 서버 등록 미호출·중복 오류, 서버 등록 실패 시 대기 해제, 다른 URL 동시 요청 허용 사례를 유지·보강한다
-- [ ] T072 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`를 `pendingGenerations:` 주입으로 바꾸고 생성 중 프로젝트 제외, `hasNext` 유지, 끝난 생성은 제외하지 않음 사례를 검증한다
-- [ ] T073 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`를 T070 더블 기반으로 바꾸고 연산 위임, 생성 결과 반영(`finishGeneration`), 결과 관찰을 여러 번 호출해도 한 번만 시작, 관찰자 전달 사례를 검증한다
-- [ ] T074 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift`의 private `StubPendingGenerationReminders`를 T070 더블로 바꾸고 알림 대기 흡수 사례를 유지한다
-- [ ] T075 [S1] `sources/Projects/Domain/Tests/LearningProject/LearningProjectLifecycleTests.swift`의 `TrackGeneration` 조립을 T070 더블로 바꾼다
-- [ ] T076 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubGenerationStateRepository.swift`를 삭제한다
+- [X] T070 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubPendingGenerationRepository.swift`에 `PendingGenerationRepository`를 `GenerationState` 모델 전이로 구현하는 actor 테스트 더블(초기 상태 주입, 기록 스냅샷, 상태 변화 스트림, 알림 대기 목록)을 추가한다
+- [X] T071 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/CreateLearningProjectTests.swift`를 `pendingGenerations:` 주입으로 바꾸고, 대기 중 URL 요청 시 서버 등록 미호출·중복 오류, 서버 등록 실패 시 대기 해제, 다른 URL 동시 요청 허용 사례를 유지·보강한다
+- [X] T072 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/FetchLearningProjectsTests.swift`를 `pendingGenerations:` 주입으로 바꾸고 생성 중 프로젝트 제외, `hasNext` 유지, 끝난 생성은 제외하지 않음 사례를 검증한다
+- [X] T073 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/TrackGenerationTests.swift`를 T070 더블 기반으로 바꾸고 연산 위임, 생성 결과 반영(`finishGeneration`), 결과 관찰을 여러 번 호출해도 한 번만 시작, 관찰자 전달 사례를 검증한다
+- [X] T074 [S1] `sources/Projects/Domain/Tests/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminderTests.swift`의 private `StubPendingGenerationReminders`를 T070 더블로 바꾸고 알림 대기 흡수 사례를 유지한다
+- [X] T075 [S1] `sources/Projects/Domain/Tests/LearningProject/LearningProjectLifecycleTests.swift`의 `TrackGeneration` 조립을 T070 더블로 바꾼다
+- [X] T076 [S1] `sources/Projects/Domain/Tests/LearningProject/TestDoubles/StubGenerationStateRepository.swift`를 삭제한다
 
 ### Domain 구현
 
-- [ ] T077 [S1] `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationRepository.swift`에 계약 문서 1장의 `public protocol PendingGenerationRepository`(9개 연산)를 정의한다
-- [ ] T078 [S1] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProject/CreateLearningProject.swift`를 `init(repository:pendingGenerations:now:)`로 바꾸고 `beginGeneration`·`attachProjectID`·`releaseGeneration(githubRepoURL:)`를 사용한다
-- [ ] T079 [S1] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects/FetchLearningProjects.swift`를 `init(repository:pendingGenerations:)`로 바꾸고 `pendingState().activeProjectIDs`로 제외한다
-- [ ] T080 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/GenerationStateCoordinator.swift`를 상태 보관·관찰자 관리 없이 생성 결과 관찰을 한 번만 시작해 `finishGeneration`으로 반영하는 actor로 축소한다
-- [ ] T081 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGeneration.swift`를 `init(pendingGenerations:outcomeRepository:now:)`로 바꾸고 `TrackGenerationUseCase` 6개 연산을 계약 문서 2장 대응표대로 위임한다
-- [ ] T082 [S1] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminder.swift`의 `pendingReminders: (any PendingGenerationReminders)?`를 `pendingGenerations: (any PendingGenerationRepository)?`로 바꾸고 `drainReminderProjectIDs()`를 사용한다
-- [ ] T083 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`를 삭제한다
-- [ ] T084 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminders.swift`를 삭제한다
+- [X] T077 [S1] `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationRepository.swift`에 계약 문서 1장의 `public protocol PendingGenerationRepository`(9개 연산)를 정의한다
+- [X] T078 [S1] `sources/Projects/Domain/LearningProject/UseCases/CreateLearningProject/CreateLearningProject.swift`를 `init(repository:pendingGenerations:now:)`로 바꾸고 `beginGeneration`·`attachProjectID`·`releaseGeneration(githubRepoURL:)`를 사용한다
+- [X] T079 [S1] `sources/Projects/Domain/LearningProject/UseCases/FetchLearningProjects/FetchLearningProjects.swift`를 `init(repository:pendingGenerations:)`로 바꾸고 `pendingState().activeProjectIDs`로 제외한다
+- [X] T080 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/GenerationStateCoordinator.swift`를 상태 보관·관찰자 관리 없이 생성 결과 관찰을 한 번만 시작해 `finishGeneration`으로 반영하는 actor로 축소한다
+- [X] T081 [S1] `sources/Projects/Domain/LearningProject/UseCases/TrackGeneration/TrackGeneration.swift`를 `init(pendingGenerations:outcomeRepository:now:)`로 바꾸고 `TrackGenerationUseCase` 6개 연산을 계약 문서 2장 대응표대로 위임한다
+- [X] T082 [S1] `sources/Projects/Domain/LearningProject/UseCases/ScheduleGenerationReminder/ScheduleGenerationReminder.swift`의 `pendingReminders: (any PendingGenerationReminders)?`를 `pendingGenerations: (any PendingGenerationRepository)?`로 바꾸고 `drainReminderProjectIDs()`를 사용한다
+- [X] T083 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/GenerationStateRepository.swift`를 삭제한다
+- [X] T084 [P] [S1] `sources/Projects/Domain/LearningProject/Contracts/PendingGenerationReminders.swift`를 삭제한다
 
 ### Data 테스트
 
-- [ ] T085 [S1] `sources/Projects/Data/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복 in-memory 테스트 더블을 추가한다
-- [ ] T086 [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`에 상태 조회·`modifyState` 기록과 `nil` 무기록, 구독 직후 현재 상태 전달과 기록마다 전달, 구독 종료 후 미전달, 알림 대기 중복 무시·상한 32·흡수 후 비움·손상된 값 빈 목록, 저장소 사용 불가 시 빈 상태 사례를 작성한다
-- [ ] T087 [S1] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`의 대상 상수를 `LocalPendingGenerationStore`의 namespace·key(`generationState`, `pendingGenerationReminders`)·상한 32로 바꾸고 문자열 기대값을 유지한다
-- [ ] T088 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Codings/PendingGenerationReminderCodingTests.swift`를 삭제한다(사례는 T086로 이동)
-- [ ] T089 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationStateStoreTests.swift`를 삭제한다(사례는 T086로 이동)
+- [X] T085 [S1] `sources/Projects/Data/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복 in-memory 테스트 더블을 추가한다
+- [X] T086 [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`에 상태 조회·`modifyState` 기록과 `nil` 무기록, 구독 직후 현재 상태 전달과 기록마다 전달, 구독 종료 후 미전달, 알림 대기 중복 무시·상한 32·흡수 후 비움·손상된 값 빈 목록, 저장소 사용 불가 시 빈 상태 사례를 작성한다
+- [X] T087 [S1] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`의 대상 상수를 `LocalPendingGenerationStore`의 namespace·key(`generationState`, `pendingGenerationReminders`)·상한 32로 바꾸고 문자열 기대값을 유지한다
+- [X] T088 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Codings/PendingGenerationReminderCodingTests.swift`를 삭제한다(사례는 T086로 이동)
+- [X] T089 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalGenerationStateStoreTests.swift`를 삭제한다(사례는 T086로 이동)
 
 ### Data 구현
 
-- [ ] T090 [S1] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에 계약 문서 3장의 `public actor LocalPendingGenerationStore`를 구현한다(구독자 등록·해제는 `Mutex`로 스트림 생성 시점에 동기 처리, 알림 대기 항목 JSON 필드 `projectID`·`requestedAt` 유지)
-- [ ] T091 [P] [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`를 삭제한다
-- [ ] T092 [P] [S1] `sources/Projects/Data/LearningProject/Codings/PendingGenerationReminderCoding.swift`를 삭제한다
-- [ ] T093 [P] [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationStateStore.swift`를 삭제한다
-- [ ] T094 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataLearningProject`·`DataLearningProjectTests`의 `InfrastructureStorage` 의존을 `git grep -n 'import InfrastructureStorage' -- sources/Projects/Data/LearningProject sources/Projects/Data/Tests/LearningProject` 결과가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
+- [X] T090 [S1] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에 계약 문서 3장의 `public actor LocalPendingGenerationStore`를 구현한다(구독자 등록·해제는 `Mutex`로 스트림 생성 시점에 동기 처리, 알림 대기 항목 JSON 필드 `projectID`·`requestedAt` 유지)
+- [X] T091 [P] [S1] `sources/Projects/Data/LearningProject/Stores/LocalGenerationStateStore.swift`를 삭제한다
+- [X] T092 [P] [S1] `sources/Projects/Data/LearningProject/Codings/PendingGenerationReminderCoding.swift`를 삭제한다
+- [X] T093 [P] [S1] `sources/Projects/Data/LearningProject/Contracts/GenerationStateStore.swift`를 삭제한다
+- [X] T094 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataLearningProject`·`DataLearningProjectTests`의 `InfrastructureStorage` 의존을 `git grep -n 'import InfrastructureStorage' -- sources/Projects/Data/LearningProject sources/Projects/Data/Tests/LearningProject` 결과가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
 
 ### Composition 테스트
 
-- [ ] T095 [S1] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
-- [ ] T096 [S1] `sources/Projects/Composition/Tests/LearningProject/Adapters/PendingGenerationRepositoryAdapterTests.swift`에 같은 저장소를 공유하는 두 Adapter 사이의 기록·조회·알림 대기 흡수, 같은 URL 동시 `beginGeneration` 중 하나만 `true`, 만료 기록 정리 뒤 재시작 허용, 상태 변화 스트림의 모델 변환 사례를 작성한다
-- [ ] T097 [S1] `sources/Projects/Composition/Tests/LearningProject/Assemblies/LearningProjectAssemblyTests.swift`를 새 조립에 맞추고 생성 결과 push 수신 후 `trackGeneration.states()`에 완료 상태가 전달되는 사례를 유지한다
-- [ ] T098 [S1] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 "등록한 프로젝트를 본 앱이 흡수할 대기 목록에 남긴다" 사례를 `enqueueGenerationReminder` 후 같은 저장소의 `PendingGenerationRepository.drainReminderProjectIDs()` 확인으로 바꾼다
+- [X] T095 [S1] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T096 [S1] `sources/Projects/Composition/Tests/LearningProject/Adapters/PendingGenerationRepositoryAdapterTests.swift`에 같은 저장소를 공유하는 두 Adapter 사이의 기록·조회·알림 대기 흡수, 같은 URL 동시 `beginGeneration` 중 하나만 `true`, 만료 기록 정리 뒤 재시작 허용, 상태 변화 스트림의 모델 변환 사례를 작성한다
+- [X] T097 [S1] `sources/Projects/Composition/Tests/LearningProject/Assemblies/LearningProjectAssemblyTests.swift`를 새 조립에 맞추고 생성 결과 push 수신 후 `trackGeneration.states()`에 완료 상태가 전달되는 사례를 유지한다
+- [X] T098 [S1] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 "등록한 프로젝트를 본 앱이 흡수할 대기 목록에 남긴다" 사례를 `enqueueGenerationReminder` 후 같은 저장소의 `PendingGenerationRepository.drainReminderProjectIDs()` 확인으로 바꾼다
 
 ### Composition 구현
 
-- [ ] T099 [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRepositoryAdapter.swift`에 `PendingGenerationRepository`를 채택하는 Adapter(`init(store:waitPolicy:now:)`, DTO↔모델 변환·만료 정리·Domain 모델 전이 호출만 수행)를 추가한다
-- [ ] T100 [P] [S1] `sources/Projects/Composition/LearningProject/Adapters/GenerationStateRepositoryAdapter.swift`를 삭제한다
-- [ ] T101 [P] [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRemindersAdapter.swift`를 삭제한다
-- [ ] T102 [S1] `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`에서 `sharedDefaults` 인자를 `sharedStorage: (any KeyValueStorage)?`로 바꾸고, 프로세스당 `LocalPendingGenerationStore`·`PendingGenerationRepositoryAdapter` 1개를 만들어 `TrackGeneration`·`CreateLearningProject`·`FetchLearningProjects`에 공유하며 `public let pendingGenerations: any PendingGenerationRepository`로 노출한다(`.standard` 대체 저장 제거)
-- [ ] T103 [S1] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`에서 `pendingReminderCoding` 인자와 `makePendingReminderEnqueue(sharedDefaults:)`를 제거하고 `pendingGenerations: (any PendingGenerationRepository)?`를 받아 `ScheduleGenerationReminder`에 전달한다
-- [ ] T104 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 `learningProject.pendingGenerations`를 `GenerationReminderAssembly`에 전달하도록 바꾼다
-- [ ] T105 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `enqueueGenerationReminder`를 Share Extension용 `learningProject.pendingGenerations.enqueueReminder(projectID:)`에 연결하고 `sharedDefaults` 인자를 제거한다(공개 프로퍼티 이름·타입 유지)
-- [ ] T106 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `CompositionLearningProject`·`CompositionShareExtension`의 `InfrastructureStorage` 의존을 해당 소스의 `import InfrastructureStorage`가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
+- [X] T099 [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRepositoryAdapter.swift`에 `PendingGenerationRepository`를 채택하는 Adapter(`init(store:waitPolicy:now:)`, DTO↔모델 변환·만료 정리·Domain 모델 전이 호출만 수행)를 추가한다
+- [X] T100 [P] [S1] `sources/Projects/Composition/LearningProject/Adapters/GenerationStateRepositoryAdapter.swift`를 삭제한다
+- [X] T101 [P] [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRemindersAdapter.swift`를 삭제한다
+- [X] T102 [S1] `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`에서 `sharedDefaults` 인자를 `sharedStorage: (any KeyValueStorage)?`로 바꾸고, 프로세스당 `LocalPendingGenerationStore`·`PendingGenerationRepositoryAdapter` 1개를 만들어 `TrackGeneration`·`CreateLearningProject`·`FetchLearningProjects`에 공유하며 `public let pendingGenerations: any PendingGenerationRepository`로 노출한다(`.standard` 대체 저장 제거)
+- [X] T103 [S1] `sources/Projects/Composition/LearningProject/Assemblies/GenerationReminderAssembly.swift`에서 `pendingReminderCoding` 인자와 `makePendingReminderEnqueue(sharedDefaults:)`를 제거하고 `pendingGenerations: (any PendingGenerationRepository)?`를 받아 `ScheduleGenerationReminder`에 전달한다
+- [X] T104 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`가 `learningProject.pendingGenerations`를 `GenerationReminderAssembly`에 전달하도록 바꾼다
+- [X] T105 [S1] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `enqueueGenerationReminder`를 Share Extension용 `learningProject.pendingGenerations.enqueueReminder(projectID:)`에 연결하고 `sharedDefaults` 인자를 제거한다(공개 프로퍼티 이름·타입 유지)
+- [X] T106 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 `CompositionLearningProject`·`CompositionShareExtension`의 `InfrastructureStorage` 의존을 해당 소스의 `import InfrastructureStorage`가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
 
 ### 정리와 단위 검증
 
-- [ ] T107 [no-write] [S1] quickstart 시나리오 1의 grep 3개가 0건인지 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과(Domain·Data·Composition·App 테스트)를 기록한다
+- [X] T107 [no-write] [S1] quickstart 시나리오 1의 grep 3개가 0건인지 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과(Domain·Data·Composition·App 테스트)를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U5로 진행한다.
 

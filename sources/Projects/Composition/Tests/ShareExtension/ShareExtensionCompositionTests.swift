@@ -45,8 +45,10 @@ struct ShareExtensionCompositionTests {
 
         await context.composition.enqueueGenerationReminder("project-1")
 
-        let coding = PendingGenerationReminderCoding(userDefaults: context.userDefaults)
-        #expect(await coding.drainProjectIDs() == ["project-1"])
+        let pendingGenerations = PendingGenerationRepositoryAdapter(
+            store: LocalPendingGenerationStore(storage: context.sharedStorage)
+        )
+        #expect(await pendingGenerations.drainReminderProjectIDs() == ["project-1"])
     }
 
     @Test
@@ -55,7 +57,6 @@ struct ShareExtensionCompositionTests {
             try Context.environment(),
             keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
             sharedStorage: nil,
-            sharedDefaults: nil,
             localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
         )
 
@@ -69,11 +70,9 @@ struct ShareExtensionCompositionTests {
         // MARK: Lifecycle
 
         init(isNotificationAuthorized: Bool = false) throws {
-            userDefaults = try #require(
-                UserDefaults(suiteName: "ShareExtensionCompositionTests.\(UUID().uuidString)")
-            )
             keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
             let sharedStorage = InMemoryKeyValueStorage()
+            self.sharedStorage = sharedStorage
             markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
             let localNotificationClient = SpyNotificationAuthorizationClient(isAuthorized: isNotificationAuthorized)
             self.localNotificationClient = localNotificationClient
@@ -81,14 +80,13 @@ struct ShareExtensionCompositionTests {
                 try Self.environment(),
                 keychainStore: keychainStore,
                 sharedStorage: sharedStorage,
-                sharedDefaults: userDefaults,
                 localNotificationClient: localNotificationClient,
             )
         }
 
         // MARK: Internal
 
-        let userDefaults: UserDefaults
+        let sharedStorage: InMemoryKeyValueStorage
         let keychainStore: KeychainStore
         let markerCoding: SharedSessionStateMarkerCoding
         let localNotificationClient: SpyNotificationAuthorizationClient

@@ -1,9 +1,9 @@
 import CompositionShared
 import DataLearningProject
+import DataShared
 import DomainLearningProject
 import Foundation
 import InfrastructureNetworkClient
-import InfrastructureStorage
 
 // MARK: - LearningProjectAssembly
 
@@ -16,7 +16,7 @@ public struct LearningProjectAssembly: Sendable {
         accessTokenProvider: @escaping @Sendable () async -> String?,
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
-        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
+        sharedStorage: (any KeyValueStorage)? = nil,
     ) {
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let projectRepository = LearningProjectRepositoryAdapter(
@@ -32,25 +32,28 @@ public struct LearningProjectAssembly: Sendable {
             remote: BookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
         )
 
-        let defaults = sharedDefaults ?? .standard
-        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
-        let trackGeneration = TrackGeneration(
-            stateRepository: GenerationStateRepositoryAdapter(
-                store: LocalGenerationStateStore(
-                    store: UserDefaultsStore(namespace: AppGroupUserDefaults.sharedSessionNamespace, userDefaults: defaults)
+        let pendingGenerations = PendingGenerationRepositoryAdapter(
+            store: LocalPendingGenerationStore(
+                storage: sharedStorage ?? StorageFactory.keyValueStorage(
+                    namespace: LocalPendingGenerationStore.namespace,
+                    location: .appGroup,
                 )
-            ),
+            )
+        )
+        self.pendingGenerations = pendingGenerations
+        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
+        trackGeneration = TrackGeneration(
+            pendingGenerations: pendingGenerations,
             outcomeRepository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
         )
-        self.trackGeneration = trackGeneration
 
         fetchLearningProjects = FetchLearningProjects(
             repository: projectRepository,
-            trackGeneration: trackGeneration,
+            pendingGenerations: pendingGenerations,
         )
         createLearningProject = CreateLearningProject(
             repository: projectRepository,
-            trackGeneration: trackGeneration,
+            pendingGenerations: pendingGenerations,
         )
         learningLibrary = LearningLibrary(
             projectRepository: projectRepository,
@@ -75,6 +78,7 @@ public struct LearningProjectAssembly: Sendable {
     public let submitEssayAnswer: any SubmitEssayAnswerUseCase
     public let setQuestionBookmark: any SetQuestionBookmarkUseCase
     public let trackGeneration: any TrackGenerationUseCase
+    public let pendingGenerations: any PendingGenerationRepository
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
 }

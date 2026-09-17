@@ -70,10 +70,10 @@ struct CreateLearningProjectTests {
     func `동일 레포지토리에 대한 생성이 이미 진행 중이면 서버 요청 없이 중복 생성 오류를 던진다`() async throws {
         let registration = ProjectRegistrationReceipt(projectID: "project-1", requestStatus: "READY", quizLevel: .l1)
         let repository = CreateLearningProjectRepository(behavior: .succeed(registration))
-        let trackGeneration = Self.makeTrackGeneration()
+        let pendingGenerations = StubPendingGenerationRepository()
         let createLearningProject = CreateLearningProject(
             repository: repository,
-            trackGeneration: trackGeneration,
+            pendingGenerations: pendingGenerations,
         )
 
         _ = try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
@@ -89,10 +89,10 @@ struct CreateLearningProjectTests {
     func `서로 다른 레포지토리는 동시에 생성 요청할 수 있다`() async throws {
         let registration = ProjectRegistrationReceipt(projectID: "project-1", requestStatus: "READY", quizLevel: .l1)
         let repository = CreateLearningProjectRepository(behavior: .succeed(registration))
-        let trackGeneration = Self.makeTrackGeneration()
+        let pendingGenerations = StubPendingGenerationRepository()
         let createLearningProject = CreateLearningProject(
             repository: repository,
-            trackGeneration: trackGeneration,
+            pendingGenerations: pendingGenerations,
         )
 
         _ = try await createLearningProject(githubRepoURL: "https://github.com/owner/repo-a", quizLevel: .l1)
@@ -105,31 +105,22 @@ struct CreateLearningProjectTests {
     @Test
     func `서버 등록이 실패하면 생성 중 상태를 해제해 재시도를 허용한다`() async throws {
         let repository = CreateLearningProjectRepository(behavior: .fail(.temporarilyUnavailable))
-        let trackGeneration = Self.makeTrackGeneration()
+        let pendingGenerations = StubPendingGenerationRepository()
         let createLearningProject = CreateLearningProject(
             repository: repository,
-            trackGeneration: trackGeneration,
+            pendingGenerations: pendingGenerations,
         )
 
         await #expect(throws: LearningProjectError.temporarilyUnavailable) {
             try await createLearningProject(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
         }
 
-        let stillCreating = await trackGeneration.current().isCreating(githubRepoURL: "https://github.com/owner/repo")
+        let stillCreating = await pendingGenerations.pendingState().isCreating(githubRepoURL: "https://github.com/owner/repo")
         #expect(stillCreating == false)
     }
 }
 
 extension CreateLearningProjectTests {
-
-    // MARK: Internal
-
-    static func makeTrackGeneration() -> TrackGeneration {
-        TrackGeneration(
-            stateRepository: StubGenerationStateRepository(),
-            outcomeRepository: StubGenerationOutcomeRepository(),
-        )
-    }
 
     // MARK: Private
 
@@ -138,7 +129,7 @@ extension CreateLearningProjectTests {
     ) -> CreateLearningProject {
         CreateLearningProject(
             repository: CreateLearningProjectRepository(behavior: behavior),
-            trackGeneration: Self.makeTrackGeneration(),
+            pendingGenerations: StubPendingGenerationRepository(),
         )
     }
 

@@ -6,11 +6,11 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
 
     public init(
         repository: LearningProjectRepository,
-        trackGeneration: any TrackGenerationUseCase,
+        pendingGenerations: any PendingGenerationRepository,
         now: @escaping @Sendable () -> Date = Date.init,
     ) {
         self.repository = repository
-        self.trackGeneration = trackGeneration
+        self.pendingGenerations = pendingGenerations
         self.now = now
     }
 
@@ -20,16 +20,16 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
         githubRepoURL: String,
         quizLevel: QuizLevel,
     ) async throws -> ProjectRegistrationReceipt {
-        guard await trackGeneration.begin(githubRepoURL: githubRepoURL, requestedAt: now()) else {
+        guard await pendingGenerations.beginGeneration(githubRepoURL: githubRepoURL, requestedAt: now()) else {
             throw LearningProjectError.duplicateCreationInProgress
         }
 
         do {
             let receipt = try await repository.register(githubRepoURL: githubRepoURL, quizLevel: quizLevel)
-            await trackGeneration.attachProjectID(receipt.projectID, toGithubRepoURL: githubRepoURL)
+            await pendingGenerations.attachProjectID(receipt.projectID, toGithubRepoURL: githubRepoURL)
             return receipt
         } catch {
-            await trackGeneration.end(githubRepoURL: githubRepoURL)
+            await pendingGenerations.releaseGeneration(githubRepoURL: githubRepoURL)
             throw error
         }
     }
@@ -37,7 +37,7 @@ public struct CreateLearningProject: CreateLearningProjectUseCase {
     // MARK: Private
 
     private let repository: LearningProjectRepository
-    private let trackGeneration: any TrackGenerationUseCase
+    private let pendingGenerations: any PendingGenerationRepository
     private let now: @Sendable () -> Date
 
 }

@@ -108,6 +108,39 @@ struct FetchLearningProjectsTests {
     }
 
     @Test
+    func `생성이 끝난 프로젝트는 결과 목록에서 제외하지 않는다`() async throws {
+        let finishedItem = LearningProjectSummary(
+            projectID: "finished-project",
+            repositoryName: "repo-finished",
+            repositoryImageURL: nil,
+            techStack: [],
+            currentSetLabel: "Set 1",
+            currentSetTitle: "title",
+            nextSetID: "set-1",
+            nextQuestionID: "question-1",
+            overallProgressPercent: 0,
+        )
+        let page = LearningProjectPage(items: [finishedItem], hasNext: false)
+        let pendingGenerations = StubPendingGenerationRepository(state: GenerationState(records: [
+            GenerationRecord(
+                githubRepoURL: "https://github.com/owner/finished",
+                projectID: "finished-project",
+                requestedAt: Date(timeIntervalSince1970: 1_000),
+                status: .completed,
+                finishedAt: Date(timeIntervalSince1970: 2_000),
+            )
+        ]))
+        let fetchLearningProjects = FetchLearningProjects(
+            repository: FetchLearningProjectsRepository(behavior: .succeed(page)),
+            pendingGenerations: pendingGenerations,
+        )
+
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
+
+        #expect(result.items.map(\.projectID) == ["finished-project"])
+    }
+
+    @Test
     func `생성 중인 레포지토리가 없으면 서버 응답을 그대로 반환한다`() async throws {
         let page = LearningProjectPage(items: [], hasNext: false)
         let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
@@ -123,7 +156,7 @@ struct FetchLearningProjectsTests {
         let repository = FetchLearningProjectsRepository(behavior: .succeed(page))
         let fetchLearningProjects = FetchLearningProjects(
             repository: repository,
-            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: []),
+            pendingGenerations: Self.makePendingGenerations(activeProjectIDs: []),
         )
 
         _ = try await fetchLearningProjects(page: 2)
@@ -138,7 +171,7 @@ extension FetchLearningProjectsTests {
 
     // MARK: Internal
 
-    static func makeTrackGeneration(activeProjectIDs: Set<String>) -> TrackGeneration {
+    static func makePendingGenerations(activeProjectIDs: Set<String>) -> StubPendingGenerationRepository {
         let records = activeProjectIDs.map { projectID in
             GenerationRecord(
                 githubRepoURL: "https://github.com/owner/\(projectID)",
@@ -146,12 +179,7 @@ extension FetchLearningProjectsTests {
                 requestedAt: Date(timeIntervalSince1970: 1_000),
             )
         }
-        return TrackGeneration(
-            stateRepository: StubGenerationStateRepository(stored: GenerationState(records: records)),
-            outcomeRepository: StubGenerationOutcomeRepository(),
-            waitPolicy: GenerationWaitPolicy(minimumWait: 1, retentionLimit: 100_000),
-            now: { Date(timeIntervalSince1970: 1_000) },
-        )
+        return StubPendingGenerationRepository(state: GenerationState(records: records))
     }
 
     // MARK: Private
@@ -162,7 +190,7 @@ extension FetchLearningProjectsTests {
     ) -> FetchLearningProjects {
         FetchLearningProjects(
             repository: FetchLearningProjectsRepository(behavior: behavior),
-            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: activeProjectIDs),
+            pendingGenerations: Self.makePendingGenerations(activeProjectIDs: activeProjectIDs),
         )
     }
 

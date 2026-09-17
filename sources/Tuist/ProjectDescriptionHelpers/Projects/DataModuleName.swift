@@ -74,7 +74,6 @@ extension DataModuleName {
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -105,8 +104,7 @@ extension DataModuleName {
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureStorage),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureNetworkClient)
                 ],
             )
 

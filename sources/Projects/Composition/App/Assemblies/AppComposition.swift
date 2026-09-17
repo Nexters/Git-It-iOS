@@ -197,6 +197,7 @@ public struct AppComposition: Sendable {
             generationReminder: GenerationReminderAssembly(
                 reminderTitle: environment.generationReminderTitle,
                 reminderBody: environment.generationReminderBody,
+                pendingGenerations: learningProject.pendingGenerations,
             ),
             keychainStore: keychainStore,
             appVersion: environment.appVersion,
