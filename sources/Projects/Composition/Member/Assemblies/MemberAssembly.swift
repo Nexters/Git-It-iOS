@@ -1,10 +1,8 @@
-import CompositionShared
 import DataMember
 import DataShared
 import DomainAuthentication
 import DomainMember
 import Foundation
-import InfrastructureNetworkClient
 
 // MARK: - MemberAssembly
 
@@ -17,12 +15,16 @@ public struct MemberAssembly: Sendable {
         loginSessionRepository: any LoginSessionRepository,
         accessTokenProvider: @escaping @Sendable () async -> String?,
         clearLocalStateAfterAccountDeletion: @escaping @Sendable () async -> Void = { },
-        transport: (any HTTPTransport)? = nil,
-        responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        transport: (any RequestTransport)? = nil,
+        responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
     ) {
-        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let baseRepository = MemberRepositoryAdapter(
-            remote: MemberRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: MemberRemote(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+                accessTokenProvider: accessTokenProvider,
+            )
         )
         let repository = CurationRepositoryAdapter(
             remote: baseRepository,

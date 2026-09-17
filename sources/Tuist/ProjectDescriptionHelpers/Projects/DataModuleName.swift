@@ -40,12 +40,15 @@ extension DataModuleName {
         }
     }
 
+    static let packageName = "GitItData"
+
     var target: Target {
         switch self {
         case .DataAuthentication:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
@@ -58,6 +61,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataAuthentication.rawValue
                 ),
@@ -71,6 +75,7 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
@@ -81,6 +86,7 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
@@ -91,6 +97,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataExternalRepository.rawValue
                 ),
@@ -100,6 +107,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
@@ -112,6 +120,7 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureStorage),
@@ -122,6 +131,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataLegalConsent.rawValue
                 ),
@@ -134,6 +144,7 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
@@ -144,6 +155,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
@@ -153,8 +165,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
@@ -163,11 +177,13 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataShared.rawValue
                 ),
                 additionalDependencies: [
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureStorage),
                 ],
             )

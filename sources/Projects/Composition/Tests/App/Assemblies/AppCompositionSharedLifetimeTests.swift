@@ -6,8 +6,8 @@ import Testing
 @testable import CompositionApp
 @testable import CompositionAuthentication
 @testable import DataAuthentication
+@testable import DataShared
 @testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
 
 @Suite("AppComposition 공유 세션 수명")
 struct AppCompositionSharedLifetimeTests {
@@ -25,16 +25,14 @@ struct AppCompositionSharedLifetimeTests {
             onboarding: LocalOnboardingState(needsCuration: false, acceptedLegalVersions: [], acceptedAt: nil),
         ))
 
-        let transport = RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let transport = RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}"#
                     .utf8),
             ),
-            HTTPTransportResponse(
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"""
                     {"success":true,"data":{"name":"홍길동","email":"a@b.com","position":"BACKEND","careerLevel":"JUNIOR","thisWeekSolvedCount":0,"thisMonthSolvedCount":0,"streakDays":0,"weeklyChart":[]},"code":null,"message":null,"errors":null}
                     """#.utf8),
@@ -59,8 +57,8 @@ struct AppCompositionSharedLifetimeTests {
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 2)
-        #expect(requests[0].headers["Authorization"] == "Bearer shared-access-token")
-        #expect(requests[1].headers["Authorization"] == "Bearer shared-access-token")
+        #expect(requests[0].headerFields["authorization"] == "Bearer shared-access-token")
+        #expect(requests[1].headerFields["authorization"] == "Bearer shared-access-token")
     }
 
 }

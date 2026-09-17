@@ -1,11 +1,9 @@
-import CompositionShared
 import DataAuthentication
 import DataLegalConsent
 import DataShared
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
-import InfrastructureNetworkClient
 
 // MARK: - AuthenticationAssembly
 
@@ -24,8 +22,8 @@ public struct AuthenticationAssembly: Sendable {
             namespace: SessionStorageLayout.sharedSessionNamespace,
             location: .appGroup,
         ),
-        transport: (any HTTPTransport)? = nil,
-        responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        transport: (any RequestTransport)? = nil,
+        responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
     ) {
         let sessionStorage = secureStorage ?? StorageFactory.secureValueStorage(
             namespace: SessionStorageLayout.namespace,
@@ -38,9 +36,10 @@ public struct AuthenticationAssembly: Sendable {
         let accessTokenProvider: @Sendable () async -> String? = {
             (try? SessionRecordCoding(secureStorage: sessionStorage).load())?.tokens.accessToken
         }
-        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let authenticationRemote = AuthenticationRemote(
-            client: client,
+            baseURL: baseURL,
+            transport: transport,
+            responseTimeout: responseTimeout,
             accessTokenProvider: accessTokenProvider,
         )
         let authenticationRepository = AuthenticationRepositoryAdapter(

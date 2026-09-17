@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataLearningProject
+@testable import DataShared
 @testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
 
 // MARK: - LearningProjectRepositoryAdapterTests
 
@@ -15,7 +15,7 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `목록 응답 DTO를 Domain 모델로 변환하고 표기를 뒤집지 않는다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"items":[{"projectId":"project-1","repositoryName":"repo","repositoryImageUrl":null,"techStack":["Swift"],"currentSetLabel":"Set 1","currentSetTitle":"title","nextSetId":"set-1","nextQuestionId":"question-1","overallProgressPercent":40}],"hasNext":true}
                 """#)
@@ -30,7 +30,7 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `상세 응답 DTO를 Domain 모델로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":[],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[]}
                 """#)
@@ -44,7 +44,7 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `상세 응답의 세트 문제 수와 완료 수를 그대로 보존한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"projectId":"project-1","repositoryUrl":"https://github.com/owner/repo","repositoryName":"repo","repositoryImageUrl":null,"starCount":3,"techStack":[],"overallProgressPercent":40,"nextQuestionId":"question-1","sets":[{"setId":"set-1","label":"Set 1","title":"KMP 프로젝트 구조 확인하기","problemCount":5,"completedCount":2},{"setId":"set-2","label":"Set 2","title":"KDoc 주석 규칙 확인하기","problemCount":3,"completedCount":0}]}
                 """#)
@@ -59,7 +59,7 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `등록 요청을 Data DTO로 위임하고 응답을 Domain 등록 결과로 변환한다`() async throws {
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             successResponse(#"{"projectId":"project-1","status":"ready"}"#)
         ])
         let adapter = makeAdapter(transport: transport)
@@ -78,7 +78,7 @@ struct LearningProjectRepositoryAdapterTests {
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             errorResponse(statusCode: 404, code: "PROJECT-001")
         ]))
 
@@ -89,25 +89,18 @@ struct LearningProjectRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeAdapter(transport: RecordingHTTPTransport) -> LearningProjectRepositoryAdapter {
+    private func makeAdapter(transport: RecordingRequestTransport) -> LearningProjectRepositoryAdapter {
         LearningProjectRepositoryAdapter(remote: ProjectRemote(
-            client: learningProjectClient(transport: transport),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
+            transport: transport,
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { "test-access-token" },
         ))
     }
 
-    private func learningProjectClient(transport: RecordingHTTPTransport) -> HTTPClient {
-        HTTPClient(
-            baseURL: URL(string: "https://api.git-it.example.com")!,
-            bodyCoding: StandardJSONBodyCoding(),
-            transport: transport,
-        )
-    }
-
-    private func successResponse(_ payload: String) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    private func successResponse(_ payload: String) -> TransportResponse {
+        TransportResponse(
             statusCode: 200,
-            headers: [:],
             body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
         )
     }
@@ -115,10 +108,9 @@ struct LearningProjectRepositoryAdapterTests {
     private func errorResponse(
         statusCode: Int,
         code: String,
-    ) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    ) -> TransportResponse {
+        TransportResponse(
             statusCode: statusCode,
-            headers: [:],
             body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
         )
     }

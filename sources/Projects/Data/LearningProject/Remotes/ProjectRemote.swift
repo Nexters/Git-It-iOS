@@ -1,3 +1,4 @@
+import DataShared
 import Foundation
 import InfrastructureNetworkClient
 
@@ -8,6 +9,22 @@ public struct ProjectRemote: Sendable {
     // MARK: Lifecycle
 
     public init(
+        baseURL: URL,
+        transport: (any RequestTransport)?,
+        responseTimeout: Duration,
+        accessTokenProvider: @escaping @Sendable () async -> String?,
+    ) {
+        self.init(
+            client: RequestClientFactory.makeClient(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+            ),
+            accessTokenProvider: accessTokenProvider,
+        )
+    }
+
+    init(
         client: HTTPClient,
         accessTokenProvider: @escaping @Sendable () async -> String?,
     ) {

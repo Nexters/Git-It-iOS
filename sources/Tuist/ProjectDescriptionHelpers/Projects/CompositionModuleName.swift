@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - CompositionModuleName
 
 enum CompositionModuleName: String, CaseIterable {
-    case CompositionShared
     case CompositionAuthentication
     case CompositionAuthenticationTests
     case CompositionLearningProject
@@ -20,8 +19,7 @@ extension CompositionModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Composition.rawValue)
         return switch self {
-        case .CompositionShared,
-             .CompositionAuthentication,
+        case .CompositionAuthentication,
              .CompositionLearningProject,
              .CompositionMember,
              .CompositionApp,
@@ -38,21 +36,11 @@ extension CompositionModuleName {
 
     var target: Target {
         switch self {
-        case .CompositionShared:
-            .module(
-                name: rawValue,
-                sourceDirectory: sourceDirectory,
-                dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
-                ],
-            )
-
         case .CompositionAuthentication:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
                     .fromDomain(.DomainAuthentication),
                     .fromData(.DataAuthentication),
                     .fromData(.DataLegalConsent),
@@ -77,7 +65,6 @@ extension CompositionModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
                     .fromDomain(.DomainLearningProject),
                     .fromData(.DataLearningProject),
                     .fromData(.DataExternalRepository),
@@ -101,7 +88,6 @@ extension CompositionModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainMember),
                     .fromData(.DataMember),

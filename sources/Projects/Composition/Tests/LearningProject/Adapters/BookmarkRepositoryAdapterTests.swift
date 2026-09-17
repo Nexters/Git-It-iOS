@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataLearningProject
+@testable import DataShared
 @testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
 
 // MARK: - BookmarkRepositoryAdapterTests
 
@@ -15,7 +15,7 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `설정 응답 DTO를 서버가 돌려준 bool 정본으로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"{"bookmarked":true}"#)
         ]))
 
@@ -26,7 +26,7 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 availableProjects를 필터와 무관하게 그대로 보존한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"totalCount":2,"availableProjects":[{"projectId":"project-1","projectName":"repo-1"},{"projectId":"project-2","projectName":"repo-2"}],"bookmarks":[{"projectId":"project-1","projectName":"repo-1","setId":"set-1","setLabel":"Set 1","problemNumber":1,"questionId":"question-1","question":"질문"}]}
                 """#)
@@ -43,7 +43,7 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 문제 본문을 그대로 보존한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"totalCount":1,"availableProjects":[],"bookmarks":[{"projectId":"project-1","projectName":"repo-1","setId":"set-1","setLabel":"Set 1","problemNumber":1,"questionId":"question-1","question":"`androidApp`과 `desktopApp`이 공통으로 쓰는 코드는 어디에 있나요?"}]}
                 """#)
@@ -59,7 +59,7 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `목록 응답의 프로젝트명·세트 라벨·문제 번호를 그대로 보존한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"totalCount":1,"availableProjects":[],"bookmarks":[{"projectId":"project-1","projectName":"Now in Android","setId":"set-1","setLabel":"Set 2","problemNumber":1,"questionId":"question-1","question":"질문"}]}
                 """#)
@@ -75,7 +75,7 @@ struct BookmarkRepositoryAdapterTests {
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             errorResponse(statusCode: 401, code: "AUTH-001")
         ]))
 
@@ -86,21 +86,18 @@ struct BookmarkRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeAdapter(transport: RecordingHTTPTransport) -> BookmarkRepositoryAdapter {
+    private func makeAdapter(transport: RecordingRequestTransport) -> BookmarkRepositoryAdapter {
         BookmarkRepositoryAdapter(remote: BookmarkRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { "test-access-token" },
         ))
     }
 
-    private func successResponse(_ payload: String) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    private func successResponse(_ payload: String) -> TransportResponse {
+        TransportResponse(
             statusCode: 200,
-            headers: [:],
             body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
         )
     }
@@ -108,10 +105,9 @@ struct BookmarkRepositoryAdapterTests {
     private func errorResponse(
         statusCode: Int,
         code: String,
-    ) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    ) -> TransportResponse {
+        TransportResponse(
             statusCode: statusCode,
-            headers: [:],
             body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
         )
     }

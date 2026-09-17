@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataExternalRepository
+@testable import DataShared
 @testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
 
 // MARK: - ExternalRepositoryLookupAdapterTests
 
@@ -15,10 +15,9 @@ struct ExternalRepositoryLookupAdapterTests {
 
     @Test
     func `GitHub 응답 DTO를 Domain 모델로 변환한다`() async throws {
-        let transport = RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let transport = RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"""
                     {"html_url":"https://github.com/facebook/react","name":"react","owner":{"login":"facebook","avatar_url":"https://avatar"},"stargazers_count":10,"topics":["swift"]}
                     """#.utf8),
@@ -41,7 +40,7 @@ struct ExternalRepositoryLookupAdapterTests {
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
         let adapter = ExternalRepositoryLookupAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: []))
+            remote: makeRemote(transport: RecordingRequestTransport(results: []))
         )
 
         await #expect(throws: ExternalRepositoryError.offline) {
@@ -51,12 +50,12 @@ struct ExternalRepositoryLookupAdapterTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> ExternalRepositoryRemote {
-        ExternalRepositoryRemote(client: HTTPClient(
+    private func makeRemote(transport: RecordingRequestTransport) -> ExternalRepositoryRemote {
+        ExternalRepositoryRemote(
             baseURL: URL(string: "https://api.github.com")!,
-            bodyCoding: StandardJSONBodyCoding(),
             transport: transport,
-        ))
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+        )
     }
 
 }

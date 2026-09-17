@@ -1,9 +1,7 @@
-import CompositionShared
 import DataLearningProject
 import DataShared
 import DomainLearningProject
 import Foundation
-import InfrastructureNetworkClient
 
 // MARK: - LearningProjectAssembly
 
@@ -14,22 +12,41 @@ public struct LearningProjectAssembly: Sendable {
     public init(
         baseURL: URL,
         accessTokenProvider: @escaping @Sendable () async -> String?,
-        transport: (any HTTPTransport)? = nil,
-        responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        transport: (any RequestTransport)? = nil,
+        responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         sharedStorage: (any KeyValueStorage)? = nil,
     ) {
-        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let projectRepository = LearningProjectRepositoryAdapter(
-            remote: ProjectRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: ProjectRemote(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+                accessTokenProvider: accessTokenProvider,
+            )
         )
         let learningSetRepository = LearningSetRepositoryAdapter(
-            remote: LearningSetRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: LearningSetRemote(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+                accessTokenProvider: accessTokenProvider,
+            )
         )
         let answerRepository = AnswerRepositoryAdapter(
-            remote: AnswerRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: AnswerRemote(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+                accessTokenProvider: accessTokenProvider,
+            )
         )
         let bookmarkRepository = BookmarkRepositoryAdapter(
-            remote: BookmarkRemote(client: client, accessTokenProvider: accessTokenProvider)
+            remote: BookmarkRemote(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+                accessTokenProvider: accessTokenProvider,
+            )
         )
 
         let pendingGenerations = PendingGenerationRepositoryAdapter(

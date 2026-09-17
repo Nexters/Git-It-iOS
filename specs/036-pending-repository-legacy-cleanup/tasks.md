@@ -351,58 +351,58 @@ target 제거가 함께 바뀌어야 compile·검사가 통과한다.
 
 ### 준비와 기반
 
-- [ ] T146 [S4] `sources/Tuist/ProjectDescriptionHelpers/Target+Module.swift`의 `module`에 선택 인자 `packageName: String?`을 추가하고 값이 있으면 `OTHER_SWIFT_FLAGS`에 `-package-name <값>`을 설정한다(Data target 간 Infrastructure 타입을 주고받는 `package` 접근 수준용)
-- [ ] T147 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`의 모든 Data 프로덕션·테스트 target에 `packageName: "GitItData"`를 지정하고 `DataShared`·`DataSharedTests`에 `InfrastructureNetworkClient` 의존을 추가한다
+- [X] T146 [S4] `sources/Tuist/ProjectDescriptionHelpers/Target+Module.swift`의 `module`에 선택 인자 `packageName: String?`을 추가하고 값이 있으면 `OTHER_SWIFT_FLAGS`에 `-package-name <값>`을 설정한다(Data target 간 Infrastructure 타입을 주고받는 `package` 접근 수준용)
+- [X] T147 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`의 모든 Data 프로덕션·테스트 target에 `packageName: "GitItData"`를 지정하고 `DataShared`·`DataSharedTests`에 `InfrastructureNetworkClient` 의존을 추가한다
 
 ### 테스트
 
-- [ ] T148 [S4] `sources/Projects/Data/Tests/Shared/Remotes/RequestTransportBridgeTests.swift`에 주입된 `RequestTransport` 더블이 받은 `TransportRequest`의 URL·헤더·본문, 응답 상태 코드·본문 전달, `RequestTransportError` → `HTTPClientError` 변환(`cancelled`, `timedOut`, `connectionFailed`)을 검증하는 테스트를 작성한다
+- [X] T148 [S4] `sources/Projects/Data/Tests/Shared/Remotes/RequestTransportBridgeTests.swift`에 주입된 `RequestTransport` 더블이 받은 `TransportRequest`의 URL·헤더·본문, 응답 상태 코드·본문 전달, `RequestTransportError` → `HTTPClientError` 변환(`cancelled`, `timedOut`, `connectionFailed`)을 검증하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T149 [P] [S4] `sources/Projects/Data/Shared/Contracts/RequestTransport.swift`에 `public protocol RequestTransport`를 정의한다
-- [ ] T150 [P] [S4] `sources/Projects/Data/Shared/Models/TransportRequest.swift`에 `public struct TransportRequest`(`url`, `headerFields`, `body`, method 없음)를 정의한다
-- [ ] T151 [P] [S4] `sources/Projects/Data/Shared/Models/TransportResponse.swift`에 `public struct TransportResponse`(`init(statusCode:headerFields:body:)`)를 정의한다
-- [ ] T152 [P] [S4] `sources/Projects/Data/Shared/Errors/RequestTransportError.swift`에 `public enum RequestTransportError`를 정의한다
-- [ ] T153 [S4] `sources/Projects/Data/Shared/Remotes/RequestTransportBridge.swift`에 `RequestTransport`를 Infrastructure `HTTPTransport`로 연결하는 `package` 구현을 추가한다
-- [ ] T154 [S4] `sources/Projects/Data/Shared/Factories/RequestClientFactory.swift`에 `public static let defaultResponseTimeout: Duration`과 `package static func makeClient(baseURL:transport:responseTimeout:) -> HTTPClient`(transport가 nil이면 `URLSessionTransport`, 있으면 T153)를 추가한다
-- [ ] T155 [S4] `sources/Projects/Data/Authentication/Remotes/AuthenticationRemote.swift`의 공개 init을 `init(baseURL:transport:responseTimeout:accessTokenProvider:)`로 바꾸고 기존 `init(client:accessTokenProvider:)`는 `internal`로 유지한다
-- [ ] T156 [P] [S4] `sources/Projects/Data/ExternalRepository/Remotes/ExternalRepositoryRemote.swift`를 T155와 같은 방식(`init(baseURL:transport:responseTimeout:)`, internal `init(client:)`)으로 바꾼다
-- [ ] T157 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/ProjectRemote.swift`를 T155와 같은 방식으로 바꾼다
-- [ ] T158 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/LearningSetRemote.swift`를 T155와 같은 방식으로 바꾼다
-- [ ] T159 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/AnswerRemote.swift`를 T155와 같은 방식으로 바꾼다
-- [ ] T160 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/BookmarkRemote.swift`를 T155와 같은 방식으로 바꾼다
-- [ ] T161 [P] [S4] `sources/Projects/Data/Member/Remotes/MemberRemote.swift`를 T155와 같은 방식으로 바꾼다
-- [ ] T162 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `transport: (any HTTPTransport)?`, `responseTimeout = HTTPClient.defaultResponseTimeout`, `makeHTTPClient` 사용을 `(any RequestTransport)?`, `RequestClientFactory.defaultResponseTimeout`, Remote 새 init으로 바꾸고 `import CompositionShared`를 제거한다
-- [ ] T163 [S4] `sources/Projects/Composition/LearningProject/Assemblies/ExternalRepositoryAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
-- [ ] T164 [S4] `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
-- [ ] T165 [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
-- [ ] T166 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `transport: (any HTTPTransport)?`를 `(any RequestTransport)?`로 바꾼다
-- [ ] T167 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `transport: (any HTTPTransport)?`를 `(any RequestTransport)?`로 바꾼다
-- [ ] T168 [S4] `sources/Projects/Composition/Shared/Factories/HTTPClientFactory.swift`를 삭제한다
-- [ ] T169 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 소스가 없어진 `CompositionShared` target과 모든 target의 `CompositionShared` 의존을 제거한다
-- [ ] T170 [S4] `tools/package-dependencies/config/source-roots`에서 `CompositionShared Composition/Shared` 행을 제거한다
-- [ ] T171 [no-write] [S4] `git grep -l 'import CompositionShared' -- sources/Projects`가 0건인지 확인한다(현재 사용처 `AuthenticationAssembly.swift`, `ExternalRepositoryAssembly.swift`, `LearningProjectAssembly.swift`, `MemberAssembly.swift`의 import는 T162~T165에서 함께 제거)
-- [ ] T172 [S4] `docs/package-rules/composition.md`의 `CompositionShared` 행(현재 31행)을 제거한다
-- [ ] T173 [P] [S4] `sources/Projects/Composition/Tests/App/TestDoubles/RecordingRequestTransport.swift`에 경로별 응답 스크립트와 요청 기록(`url`, `body`)을 가진 `actor RecordingRequestTransport: RequestTransport`를 추가하고 같은 폴더의 `RecordingHTTPTransport.swift`를 삭제한다
-- [ ] T174 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
-- [ ] T175 [P] [S4] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
-- [ ] T176 [P] [S4] `sources/Projects/Composition/Tests/Member/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
-- [ ] T177 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `HTTPTransportResponse`·transport 준비를 T173 더블과 `TransportResponse`로 바꾼다
-- [ ] T178 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionSharedLifetimeTests.swift`를 T177와 같은 방식으로 바꾼다
-- [ ] T179 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 `HTTPClient`·`StandardJSONBodyCoding` 조립을 Remote 새 init과 T173 더블로 바꾼다
-- [ ] T180 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 `HTTPClient`·`HTTPTransportResponse` 준비를 T174 더블로 바꾼다
-- [ ] T181 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/LoginSessionRepositoryAdapterTests.swift`를 T180과 같은 방식으로 바꾼다
-- [ ] T182 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/AnswerRepositoryAdapterTests.swift`를 T175 더블로 바꾼다(method 단언이 있으면 같은 기대값을 `sources/Projects/Data/Tests/LearningProject/Remotes/AnswerRemoteTests.swift`에서 이미 검증하는지 확인하고 없으면 그 파일에 추가)
-- [ ] T183 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/BookmarkRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `BookmarkRemoteTests.swift`)
-- [ ] T184 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/ExternalRepositoryLookupAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `sources/Projects/Data/Tests/ExternalRepository/Remotes/ExternalRepositoryRemoteTests.swift`)
-- [ ] T185 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/LearningProjectRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `ProjectRemoteTests.swift`)
-- [ ] T186 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/LearningSetRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `LearningSetRemoteTests.swift`)
-- [ ] T187 [S4] `sources/Projects/Composition/Tests/Member/Adapters/MemberRepositoryAdapterTests.swift`를 T176 더블로 바꾼다(대응 Data 테스트 `sources/Projects/Data/Tests/Member/Remotes/MemberRemoteTests.swift`)
+- [X] T149 [P] [S4] `sources/Projects/Data/Shared/Contracts/RequestTransport.swift`에 `public protocol RequestTransport`를 정의한다
+- [X] T150 [P] [S4] `sources/Projects/Data/Shared/Models/TransportRequest.swift`에 `public struct TransportRequest`(`url`, `headerFields`, `body`, method 없음)를 정의한다
+- [X] T151 [P] [S4] `sources/Projects/Data/Shared/Models/TransportResponse.swift`에 `public struct TransportResponse`(`init(statusCode:headerFields:body:)`)를 정의한다
+- [X] T152 [P] [S4] `sources/Projects/Data/Shared/Errors/RequestTransportError.swift`에 `public enum RequestTransportError`를 정의한다
+- [X] T153 [S4] `sources/Projects/Data/Shared/Remotes/RequestTransportBridge.swift`에 `RequestTransport`를 Infrastructure `HTTPTransport`로 연결하는 `package` 구현을 추가한다
+- [X] T154 [S4] `sources/Projects/Data/Shared/Factories/RequestClientFactory.swift`에 `public static let defaultResponseTimeout: Duration`과 `package static func makeClient(baseURL:transport:responseTimeout:) -> HTTPClient`(transport가 nil이면 `URLSessionTransport`, 있으면 T153)를 추가한다
+- [X] T155 [S4] `sources/Projects/Data/Authentication/Remotes/AuthenticationRemote.swift`의 공개 init을 `init(baseURL:transport:responseTimeout:accessTokenProvider:)`로 바꾸고 기존 `init(client:accessTokenProvider:)`는 `internal`로 유지한다
+- [X] T156 [P] [S4] `sources/Projects/Data/ExternalRepository/Remotes/ExternalRepositoryRemote.swift`를 T155와 같은 방식(`init(baseURL:transport:responseTimeout:)`, internal `init(client:)`)으로 바꾼다
+- [X] T157 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/ProjectRemote.swift`를 T155와 같은 방식으로 바꾼다
+- [X] T158 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/LearningSetRemote.swift`를 T155와 같은 방식으로 바꾼다
+- [X] T159 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/AnswerRemote.swift`를 T155와 같은 방식으로 바꾼다
+- [X] T160 [P] [S4] `sources/Projects/Data/LearningProject/Remotes/BookmarkRemote.swift`를 T155와 같은 방식으로 바꾼다
+- [X] T161 [P] [S4] `sources/Projects/Data/Member/Remotes/MemberRemote.swift`를 T155와 같은 방식으로 바꾼다
+- [X] T162 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `transport: (any HTTPTransport)?`, `responseTimeout = HTTPClient.defaultResponseTimeout`, `makeHTTPClient` 사용을 `(any RequestTransport)?`, `RequestClientFactory.defaultResponseTimeout`, Remote 새 init으로 바꾸고 `import CompositionShared`를 제거한다
+- [X] T163 [S4] `sources/Projects/Composition/LearningProject/Assemblies/ExternalRepositoryAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
+- [X] T164 [S4] `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
+- [X] T165 [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`를 T162와 같은 방식으로 바꾸고 `import CompositionShared`를 제거한다
+- [X] T166 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `transport: (any HTTPTransport)?`를 `(any RequestTransport)?`로 바꾼다
+- [X] T167 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `transport: (any HTTPTransport)?`를 `(any RequestTransport)?`로 바꾼다
+- [X] T168 [S4] `sources/Projects/Composition/Shared/Factories/HTTPClientFactory.swift`를 삭제한다
+- [X] T169 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 소스가 없어진 `CompositionShared` target과 모든 target의 `CompositionShared` 의존을 제거한다
+- [X] T170 [S4] `tools/package-dependencies/config/source-roots`에서 `CompositionShared Composition/Shared` 행을 제거한다
+- [X] T171 [no-write] [S4] `git grep -l 'import CompositionShared' -- sources/Projects`가 0건인지 확인한다(현재 사용처 `AuthenticationAssembly.swift`, `ExternalRepositoryAssembly.swift`, `LearningProjectAssembly.swift`, `MemberAssembly.swift`의 import는 T162~T165에서 함께 제거)
+- [X] T172 [S4] `docs/package-rules/composition.md`의 `CompositionShared` 행(현재 31행)을 제거한다
+- [X] T173 [P] [S4] `sources/Projects/Composition/Tests/App/TestDoubles/RecordingRequestTransport.swift`에 경로별 응답 스크립트와 요청 기록(`url`, `body`)을 가진 `actor RecordingRequestTransport: RequestTransport`를 추가하고 같은 폴더의 `RecordingHTTPTransport.swift`를 삭제한다
+- [X] T174 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
+- [X] T175 [P] [S4] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
+- [X] T176 [P] [S4] `sources/Projects/Composition/Tests/Member/TestDoubles/RecordingRequestTransport.swift`를 T173과 같게 추가하고 `RecordingHTTPTransport.swift`를 삭제한다
+- [X] T177 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `HTTPTransportResponse`·transport 준비를 T173 더블과 `TransportResponse`로 바꾼다
+- [X] T178 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionSharedLifetimeTests.swift`를 T177와 같은 방식으로 바꾼다
+- [X] T179 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 `HTTPClient`·`StandardJSONBodyCoding` 조립을 Remote 새 init과 T173 더블로 바꾼다
+- [X] T180 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 `HTTPClient`·`HTTPTransportResponse` 준비를 T174 더블로 바꾼다
+- [X] T181 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/LoginSessionRepositoryAdapterTests.swift`를 T180과 같은 방식으로 바꾼다
+- [X] T182 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/AnswerRepositoryAdapterTests.swift`를 T175 더블로 바꾼다(method 단언이 있으면 같은 기대값을 `sources/Projects/Data/Tests/LearningProject/Remotes/AnswerRemoteTests.swift`에서 이미 검증하는지 확인하고 없으면 그 파일에 추가)
+- [X] T183 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/BookmarkRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `BookmarkRemoteTests.swift`)
+- [X] T184 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/ExternalRepositoryLookupAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `sources/Projects/Data/Tests/ExternalRepository/Remotes/ExternalRepositoryRemoteTests.swift`)
+- [X] T185 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/LearningProjectRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `ProjectRemoteTests.swift`)
+- [X] T186 [S4] `sources/Projects/Composition/Tests/LearningProject/Adapters/LearningSetRepositoryAdapterTests.swift`를 T182와 같은 방식으로 바꾼다(대응 Data 테스트 `LearningSetRemoteTests.swift`)
+- [X] T187 [S4] `sources/Projects/Composition/Tests/Member/Adapters/MemberRepositoryAdapterTests.swift`를 T176 더블로 바꾼다(대응 Data 테스트 `sources/Projects/Data/Tests/Member/Remotes/MemberRemoteTests.swift`)
 
 ### 정리와 단위 검증
 
-- [ ] T188 [no-write] [S4] `git grep -nE 'HTTPClient|HTTPTransport|StandardJSONBodyCoding|makeHTTPClient|CompositionShared' -- sources/Projects/Composition sources/Tuist tools/package-dependencies/config`가 0건, Data Remote 테스트 기대값 diff 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0을 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
+- [X] T188 [no-write] [S4] `git grep -nE 'HTTPClient|HTTPTransport|StandardJSONBodyCoding|makeHTTPClient|CompositionShared' -- sources/Projects/Composition sources/Tuist tools/package-dependencies/config`가 0건, Data Remote 테스트 기대값 diff 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0을 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U7로 진행한다.
 

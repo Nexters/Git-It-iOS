@@ -4,9 +4,9 @@ import Testing
 @testable import CompositionApp
 @testable import CompositionAuthentication
 @testable import DataAuthentication
+@testable import DataShared
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
 
 // MARK: - SharedLifetimeTests
 
@@ -24,7 +24,7 @@ struct SharedLifetimeTests {
             secureStorage: sharedSecureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
+            remote: makeRemote(transport: RecordingRequestTransport(results: [])),
             sessionStorage: sharedSecureStorage,
             appleIdentityStorage: sharedSecureStorage,
         )
@@ -44,13 +44,11 @@ struct SharedLifetimeTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> AuthenticationRemote {
+    private func makeRemote(transport: RecordingRequestTransport) -> AuthenticationRemote {
         AuthenticationRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { nil },
         )
     }

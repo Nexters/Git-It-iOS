@@ -3,9 +3,9 @@ import Testing
 
 @testable import CompositionAuthentication
 @testable import DataAuthentication
+@testable import DataShared
 @testable import DomainAuthentication
 @testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
 
 // MARK: - AuthenticationRepositoryAdapterTests
 
@@ -38,7 +38,7 @@ struct AuthenticationRepositoryAdapterTests {
             secureStorage: secureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
+            remote: makeRemote(transport: RecordingRequestTransport(results: [])),
             sessionStorage: secureStorage,
             appleIdentityStorage: secureStorage,
         )
@@ -59,7 +59,7 @@ struct AuthenticationRepositoryAdapterTests {
             Data("apple-user-1".utf8),
             forKey: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
         )
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             jsonResponse(
                 statusCode: 200,
                 envelope: #"""
@@ -95,13 +95,11 @@ struct AuthenticationRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> AuthenticationRemote {
+    private func makeRemote(transport: RecordingRequestTransport) -> AuthenticationRemote {
         AuthenticationRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { nil },
         )
     }
@@ -109,8 +107,8 @@ struct AuthenticationRepositoryAdapterTests {
     private func jsonResponse(
         statusCode: Int,
         envelope: String,
-    ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+    ) -> TransportResponse {
+        TransportResponse(statusCode: statusCode, body: Data(envelope.utf8))
     }
 
 }

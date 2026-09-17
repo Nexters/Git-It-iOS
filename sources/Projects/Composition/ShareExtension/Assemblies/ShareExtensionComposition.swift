@@ -6,7 +6,6 @@ import DomainAuthentication
 import DomainLearningProject
 import Foundation
 import InfrastructureLocalNotification
-import InfrastructureNetworkClient
 
 // MARK: - ShareExtensionComposition
 
@@ -65,7 +64,7 @@ public struct ShareExtensionComposition: Sendable {
             location: .appGroup,
         ),
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
-        transport: (any HTTPTransport)? = nil,
+        transport: (any RequestTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
             secureStorage: secureStorage,

@@ -1,3 +1,5 @@
+import DataShared
+import Foundation
 import InfrastructureNetworkClient
 
 // MARK: - ExternalRepositoryRemote
@@ -6,7 +8,21 @@ public struct ExternalRepositoryRemote: Sendable {
 
     // MARK: Lifecycle
 
-    public init(client: HTTPClient) {
+    public init(
+        baseURL: URL,
+        transport: (any RequestTransport)?,
+        responseTimeout: Duration,
+    ) {
+        self.init(
+            client: RequestClientFactory.makeClient(
+                baseURL: baseURL,
+                transport: transport,
+                responseTimeout: responseTimeout,
+            )
+        )
+    }
+
+    init(client: HTTPClient) {
         self.client = client
     }
 

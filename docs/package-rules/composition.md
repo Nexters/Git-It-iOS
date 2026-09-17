@@ -28,7 +28,6 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 
 | Target | 소속 축 | 의존 수 | 담는 것 |
 | --- | --- | --- | --- |
-| `CompositionShared` | 공용 | 1 | 여러 축의 조립이 공유하는 HTTP 클라이언트 구성 |
 | `CompositionAuthentication` | Authentication | 6 | 인증·세션·정책 동의 Adapter, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
 | `CompositionLearningProject` | LearningProject | 6 | 학습 자료·생성 추적·외부 저장소·생성 리마인드 Adapter와 조립 |
 | `CompositionMember` | Member | 5 | 회원·큐레이션·기기 식별자 Adapter, `MemberAssembly` |

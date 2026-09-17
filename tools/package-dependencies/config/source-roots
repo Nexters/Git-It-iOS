@@ -8,7 +8,6 @@ GitIt App/GitIt
 GitItTests App/Tests/GitIt
 ShareExtension App/ShareExtension
 
-CompositionShared Composition/Shared
 CompositionAuthentication Composition/Authentication
 CompositionAuthenticationTests Composition/Tests/Authentication
 CompositionLearningProject Composition/LearningProject

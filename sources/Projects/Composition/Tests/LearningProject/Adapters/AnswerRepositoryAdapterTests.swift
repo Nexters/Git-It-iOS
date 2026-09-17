@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataLearningProject
+@testable import DataShared
 @testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
 
 // MARK: - AnswerRepositoryAdapterTests
 
@@ -15,7 +15,7 @@ struct AnswerRepositoryAdapterTests {
 
     @Test
     func `객관식 응답 DTO를 Domain ChoiceAnswerResult로 변환한다`() async throws {
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             successResponse(#"{"questionId":"question-1","correct":true,"answerIndex":1,"explanation":"설명"}"#)
         ])
         let adapter = makeAdapter(transport: transport)
@@ -34,7 +34,7 @@ struct AnswerRepositoryAdapterTests {
 
     @Test
     func `서술형 응답 DTO를 Domain EssayAnswerResult로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             successResponse(#"""
                 {"questionId":"question-1","explanation":"설명","rubric":{"criteria":[{"text":"good","points":90}],"keyPoints":[],"fullMarkExample":"","partialExample":"","zeroExample":""}}
                 """#)
@@ -51,7 +51,7 @@ struct AnswerRepositoryAdapterTests {
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
             errorResponse(statusCode: 404, code: "QUIZ-005")
         ]))
 
@@ -62,21 +62,18 @@ struct AnswerRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeAdapter(transport: RecordingHTTPTransport) -> AnswerRepositoryAdapter {
+    private func makeAdapter(transport: RecordingRequestTransport) -> AnswerRepositoryAdapter {
         AnswerRepositoryAdapter(remote: AnswerRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { "test-access-token" },
         ))
     }
 
-    private func successResponse(_ payload: String) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    private func successResponse(_ payload: String) -> TransportResponse {
+        TransportResponse(
             statusCode: 200,
-            headers: [:],
             body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
         )
     }
@@ -84,10 +81,9 @@ struct AnswerRepositoryAdapterTests {
     private func errorResponse(
         statusCode: Int,
         code: String,
-    ) -> HTTPTransportResponse {
-        HTTPTransportResponse(
+    ) -> TransportResponse {
+        TransportResponse(
             statusCode: statusCode,
-            headers: [:],
             body: Data(#"{"success":false,"data":null,"code":"\#(code)","message":"error","errors":null}"#.utf8),
         )
     }

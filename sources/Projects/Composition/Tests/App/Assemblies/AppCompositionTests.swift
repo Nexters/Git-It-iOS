@@ -6,8 +6,8 @@ import Testing
 @testable import CompositionApp
 @testable import CompositionAuthentication
 @testable import DataAuthentication
+@testable import DataShared
 @testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
 
 @Suite("AppComposition")
 struct AppCompositionTests {
@@ -25,10 +25,9 @@ struct AppCompositionTests {
             onboarding: LocalOnboardingState(needsCuration: true, acceptedLegalVersions: [], acceptedAt: nil),
         ))
 
-        let transport = RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let transport = RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#.utf8),
             )
         ])
@@ -50,7 +49,7 @@ struct AppCompositionTests {
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 1)
-        #expect(requests[0].headers["Authorization"] == "Bearer shared-access-token")
+        #expect(requests[0].headerFields["authorization"] == "Bearer shared-access-token")
         #expect(requests[0].url.path == "/api/v1/members/me/curation")
     }
 

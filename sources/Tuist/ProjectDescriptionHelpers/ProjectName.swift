@@ -65,7 +65,6 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        CompositionModuleName.CompositionShared.rawValue,
                         CompositionModuleName.CompositionAuthentication.rawValue,
                         CompositionModuleName.CompositionLearningProject.rawValue,
                         CompositionModuleName.CompositionMember.rawValue,

@@ -7,7 +7,6 @@ import DomainLearningProject
 import DomainMember
 import Foundation
 import InfrastructureAuthentication
-import InfrastructureNetworkClient
 import InfrastructurePushMessaging
 import Synchronization
 
@@ -158,7 +157,7 @@ public struct AppComposition: Sendable {
     public static func live(
         _ environment: Environment,
         secureStorage: (any SecureValueStorage)? = nil,
-        transport: (any HTTPTransport)? = nil,
+        transport: (any RequestTransport)? = nil,
     ) -> AppComposition {
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,

@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionAuthentication
 @testable import DataAuthentication
+@testable import DataShared
 @testable import DomainAuthentication
-@testable import InfrastructureNetworkClient
 
 // MARK: - LoginSessionRepositoryAdapterTests
 
@@ -20,7 +20,7 @@ struct LoginSessionRepositoryAdapterTests {
             Data("apple-user-1".utf8),
             forKey: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
         )
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             jsonResponse(
                 statusCode: 200,
                 envelope: #"""
@@ -52,7 +52,7 @@ struct LoginSessionRepositoryAdapterTests {
     func `저장된 세션이 없으면 restore가 nil을 반환한다`() async throws {
         let secureStorage = InMemorySecureValueStorage()
         let adapter = LoginSessionRepositoryAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
+            remote: makeRemote(transport: RecordingRequestTransport(results: [])),
             sessionStorage: secureStorage,
             appleIdentityStorage: secureStorage,
         )
@@ -66,7 +66,7 @@ struct LoginSessionRepositoryAdapterTests {
     @Test
     func `서버 인증 실패를 Domain 오류로 변환한다`() async throws {
         let secureStorage = InMemorySecureValueStorage()
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             jsonResponse(
                 statusCode: 401,
                 envelope: #"{"success":false,"data":null,"code":null,"message":"unauthorized","errors":null}"#,
@@ -86,7 +86,7 @@ struct LoginSessionRepositoryAdapterTests {
     @Test
     func `Access Token 확인 실패를 unauthorized로 변환한다`() async throws {
         let secureStorage = InMemorySecureValueStorage()
-        let transport = RecordingHTTPTransport(results: [
+        let transport = RecordingRequestTransport(results: [
             jsonResponse(
                 statusCode: 401,
                 envelope: #"{"success":false,"data":null,"code":null,"message":"unauthorized","errors":null}"#,
@@ -107,13 +107,11 @@ struct LoginSessionRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> AuthenticationRemote {
+    private func makeRemote(transport: RecordingRequestTransport) -> AuthenticationRemote {
         AuthenticationRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { "stored-access-token" },
         )
     }
@@ -121,8 +119,8 @@ struct LoginSessionRepositoryAdapterTests {
     private func jsonResponse(
         statusCode: Int,
         envelope: String,
-    ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+    ) -> TransportResponse {
+        TransportResponse(statusCode: statusCode, body: Data(envelope.utf8))
     }
 
 }

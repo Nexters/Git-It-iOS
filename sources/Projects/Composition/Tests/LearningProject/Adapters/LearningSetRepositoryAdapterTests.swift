@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataLearningProject
+@testable import DataShared
 @testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
 
 // MARK: - LearningSetRepositoryAdapterTests
 
@@ -97,10 +97,9 @@ struct LearningSetRepositoryAdapterTests {
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async throws {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 404,
-                headers: [:],
                 body: Data(#"{"success":false,"data":null,"code":"QUIZ-006","message":"error","errors":null}"#.utf8),
             )
         ]))
@@ -125,23 +124,20 @@ struct LearningSetRepositoryAdapterTests {
         """#
 
     private func fetchSet(payload: String) async throws -> LearningSet {
-        let adapter = makeAdapter(transport: RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let adapter = makeAdapter(transport: RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
             )
         ]))
         return try await adapter.fetchSet(projectID: "project-1", setID: "set-1")
     }
 
-    private func makeAdapter(transport: RecordingHTTPTransport) -> LearningSetRepositoryAdapter {
+    private func makeAdapter(transport: RecordingRequestTransport) -> LearningSetRepositoryAdapter {
         LearningSetRepositoryAdapter(remote: LearningSetRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
+            baseURL: URL(string: "https://api.git-it.example.com")!,
                 transport: transport,
-            ),
+                responseTimeout: RequestClientFactory.defaultResponseTimeout,
             accessTokenProvider: { "test-access-token" },
         ))
     }
