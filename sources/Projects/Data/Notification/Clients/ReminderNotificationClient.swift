@@ -25,6 +25,14 @@ struct ReminderNotificationClient: LocalReminderNotifier {
         await authorizationClient.isAuthorized()
     }
 
+    func authorizationSetting() async -> ReminderAuthorizationSetting {
+        switch await authorizationClient.authorizationSetting() {
+        case .notDetermined: .notDetermined
+        case .authorized: .authorized
+        case .denied: .denied
+        }
+    }
+
     func schedule(
         _ reminder: ReminderNotification,
         at date: Date,

@@ -31,6 +31,10 @@ final class SpyLocalReminderNotifier: LocalReminderNotifier, Sendable {
         authorized
     }
 
+    func authorizationSetting() async -> ReminderAuthorizationSetting {
+        authorized ? .authorized : .denied
+    }
+
     func schedule(
         _ reminder: ReminderNotification,
         at _: Date,

@@ -142,13 +142,13 @@ description: "관심사별 Domain UseCase 재설계와 호출부 전환 작업 �
 **분리 불가 근거**: `NotificationAuthorizationClient`와 `LocalReminderNotifier`에 요구사항을 추가하면 각 패키지의 준수 타입
 (`SpyNotificationAuthorizationClient`, `ReminderNotificationClient`, `SpyLocalReminderNotifier`)이 같은 커밋에서 바뀌어야 compile된다.
 
-- [ ] T048 [P] [S5] `sources/Projects/Infrastructure/LocalNotification/Models/NotificationAuthorizationSetting.swift`를 만든다
-- [ ] T049 [S5] `sources/Projects/Infrastructure/LocalNotification/Clients/NotificationAuthorizationClient.swift`에 `authorizationSetting()` 요구사항을 추가하고 `sources/Projects/Infrastructure/LocalNotification/Clients/LocalNotificationAuthorizationClient.swift`에 integration-surface §1 매핑으로 구현한다
-- [ ] T050 [P] [S5] `sources/Projects/Data/Notification/Models/ReminderAuthorizationSetting.swift`를 만든다
-- [ ] T051 [S5] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에 `authorizationSetting()`을 추가하고 `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에서 Infrastructure 값을 매핑한다
-- [ ] T052 [S5] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에 설정 조회를 추가하고 `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에 세 값 매핑 테스트를 추가한다
-- [ ] T053 [S5] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyLocalReminderNotifier.swift`에 `authorizationSetting()`을 추가한다
-- [ ] T054 [no-write] 변경 파일을 보고하고 Infrastructure·Data·Composition 테스트 scheme compile을 사용자 확인 항목으로 남긴다
+- [X] T048 [P] [S5] `sources/Projects/Infrastructure/LocalNotification/Models/NotificationAuthorizationSetting.swift`를 만든다
+- [X] T049 [S5] `sources/Projects/Infrastructure/LocalNotification/Clients/NotificationAuthorizationClient.swift`에 `authorizationSetting()` 요구사항을 추가하고 `sources/Projects/Infrastructure/LocalNotification/Clients/LocalNotificationAuthorizationClient.swift`에 integration-surface §1 매핑으로 구현한다
+- [X] T050 [P] [S5] `sources/Projects/Data/Notification/Models/ReminderAuthorizationSetting.swift`를 만든다
+- [X] T051 [S5] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에 `authorizationSetting()`을 추가하고 `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에서 Infrastructure 값을 매핑한다
+- [X] T052 [S5] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에 설정 조회를 추가하고 `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에 세 값 매핑 테스트를 추가한다
+- [X] T053 [S5] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/SpyLocalReminderNotifier.swift`에 `authorizationSetting()`을 추가한다
+- [X] T054 [no-write] 변경 파일을 보고하고 Infrastructure·Data·Composition 테스트 scheme compile을 사용자 확인 항목으로 남긴다
 
 ---
 

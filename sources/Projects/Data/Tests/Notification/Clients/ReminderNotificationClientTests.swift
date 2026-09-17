@@ -27,6 +27,24 @@ struct ReminderNotificationClientTests {
         #expect(authorizationClient.authorizationRequestCount == 1)
     }
 
+    @Test(arguments: [
+        (NotificationAuthorizationSetting.notDetermined, ReminderAuthorizationSetting.notDetermined),
+        (.authorized, .authorized),
+        (.denied, .denied),
+    ])
+    func `권한을 요청하지 않고 현재 알림 권한 설정을 변환한다`(
+        setting: NotificationAuthorizationSetting,
+        expected: ReminderAuthorizationSetting,
+    ) async {
+        let authorizationClient = SpyNotificationAuthorizationClient(setting: setting)
+        let client = ReminderNotificationClient(authorizationClient: authorizationClient)
+
+        let result = await client.authorizationSetting()
+
+        #expect(result == expected)
+        #expect(authorizationClient.authorizationRequestCount == 0)
+    }
+
     @Test(arguments: [true, false])
     func `권한 허용 여부를 그대로 전달한다`(isAuthorized: Bool) async {
         let client = ReminderNotificationClient(

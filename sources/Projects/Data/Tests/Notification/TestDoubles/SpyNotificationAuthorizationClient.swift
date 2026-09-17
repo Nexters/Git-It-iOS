@@ -11,9 +11,11 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
     init(
         status: NotificationAuthorizationStatus = .authorized,
         isAuthorized: Bool = true,
+        setting: NotificationAuthorizationSetting = .authorized,
     ) {
         self.status = status
         authorized = isAuthorized
+        self.setting = setting
     }
 
     // MARK: Internal
@@ -48,6 +50,10 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
         authorized
     }
 
+    func authorizationSetting() async -> NotificationAuthorizationSetting {
+        setting
+    }
+
     func present(_ request: LocalNotificationRequest) {
         state.withLock { $0.presentedRequests.append(request) }
     }
@@ -74,6 +80,7 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
 
     private let status: NotificationAuthorizationStatus
     private let authorized: Bool
+    private let setting: NotificationAuthorizationSetting
     private let state = Mutex(State())
 
 }
