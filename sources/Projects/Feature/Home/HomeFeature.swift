@@ -49,16 +49,10 @@ public struct HomeFeature: Sendable {
             }
         }
 
-        public enum GenerationOutcomeObservation: Equatable, Sendable {
-            case idle
-            case observing
-        }
-
         public var profileLoad = ProfileLoad.idle
         public var projectLoad = ProjectLoad.idle
         public var profileRequestID = 0
         public var projectRequestID = 0
-        public var generationOutcomeObservation = GenerationOutcomeObservation.idle
 
         public var isProjectRefreshPending = false
 
@@ -119,10 +113,7 @@ public struct HomeFeature: Sendable {
                 if state.projectLoad == .idle {
                     effects.append(startProjectLoad(state: &state))
                 }
-                if state.generationOutcomeObservation == .idle {
-                    state.generationOutcomeObservation = .observing
-                    effects.append(startGenerationOutcomeObservation())
-                }
+                effects.append(startGenerationOutcomeObservation())
                 return .merge(effects)
 
             case .input(.learningProjectsReloadRequested):
@@ -208,6 +199,7 @@ public struct HomeFeature: Sendable {
     private enum CancelID {
         case profile
         case projects
+        case generationOutcomes
     }
 
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
@@ -279,6 +271,7 @@ public struct HomeFeature: Sendable {
                 }
             }
         }
+        .cancellable(id: CancelID.generationOutcomes, cancelInFlight: true)
     }
 
 }

@@ -524,16 +524,16 @@ Assembly·typealias가 같은 단위에서 Data 타입으로 바뀌어야 compil
 
 ### 테스트
 
-- [ ] T232 [S5] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/StubTrackGenerationUseCase.swift`가 구독 종료를 반영한 현재 구독 수와 구독 직후 저장된 상태 전달을 제공하는지 확인하고, 없으면 `activeSubscriptionCount()`와 `store(_: GenerationState)` 보조 연산을 추가한다(기존 연산 동작 유지)
-- [ ] T233 [S5] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift`의 12행 테스트를 `task가 다시 전달되면 이전 생성 결과 관찰을 대체해 하나만 유지한다`로 바꾸고, `화면을 벗어났다 돌아오면 생성 결과 관찰을 다시 시작해 결과를 반영한다`, `화면을 벗어난 동안 끝난 생성 결과를 돌아왔을 때 반영한다` 테스트를 추가해 현재 구현에서 실패하는지 확인한다
+- [X] T232 [S5] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/StubTrackGenerationUseCase.swift`가 구독 종료를 반영한 현재 구독 수와 구독 직후 저장된 상태 전달을 제공하는지 확인하고, 없으면 `activeSubscriptionCount()`와 `store(_: GenerationState)` 보조 연산을 추가한다(기존 연산 동작 유지)
+- [X] T233 [S5] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift`의 12행 테스트를 `task가 다시 전달되면 이전 생성 결과 관찰을 대체해 하나만 유지한다`로 바꾸고, `화면을 벗어났다 돌아오면 생성 결과 관찰을 다시 시작해 결과를 반영한다`, `화면을 벗어난 동안 끝난 생성 결과를 돌아왔을 때 반영한다` 테스트를 추가해 현재 구현에서 실패하는지 확인한다
 
 ### 구현
 
-- [ ] T234 [S5] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `State.GenerationOutcomeObservation`과 `generationOutcomeObservation` 프로퍼티·조건 분기를 제거하고, `CancelID.generationOutcomes`를 추가해 `.view(.task)`마다 `startGenerationOutcomeObservation()`을 `.cancellable(id: CancelID.generationOutcomes, cancelInFlight: true)`로 시작한다
+- [X] T234 [S5] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `State.GenerationOutcomeObservation`과 `generationOutcomeObservation` 프로퍼티·조건 분기를 제거하고, `CancelID.generationOutcomes`를 추가해 `.view(.task)`마다 `startGenerationOutcomeObservation()`을 `.cancellable(id: CancelID.generationOutcomes, cancelInFlight: true)`로 시작한다
 
 ### 정리와 단위 검증
 
-- [ ] T235 [no-write] [S5] `git grep -n 'generationOutcomeObservation' -- sources/Projects/Feature`가 0건이고 `HomeFeatureLoadTests.swift`의 "복귀 task는 재조회하지 않는다" 기대값이 바뀌지 않았는지 확인하며 사용자 Feature `test` 결과를 기록한다
+- [X] T235 [no-write] [S5] `git grep -n 'generationOutcomeObservation' -- sources/Projects/Feature`가 0건이고 `HomeFeatureLoadTests.swift`의 "복귀 task는 재조회하지 않는다" 기대값이 바뀌지 않았는지 확인하며 사용자 Feature `test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U10으로 진행한다.
 

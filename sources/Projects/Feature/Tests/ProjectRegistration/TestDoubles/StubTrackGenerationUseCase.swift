@@ -41,7 +41,11 @@ actor StubTrackGenerationUseCase: TrackGenerationUseCase {
 
     func states() async -> AsyncStream<GenerationState> {
         let (stream, continuation) = AsyncStream<GenerationState>.makeStream()
-        self.continuation = continuation
+        let subscriptionID = UUID()
+        continuations[subscriptionID] = continuation
+        continuation.onTermination = { _ in
+            Task { await self.removeSubscription(subscriptionID) }
+        }
         subscriptionCount += 1
         continuation.yield(state)
         return stream
@@ -64,26 +68,43 @@ actor StubTrackGenerationUseCase: TrackGenerationUseCase {
         yieldCurrent()
     }
 
+    func store(_ state: GenerationState) {
+        self.state = state
+        yieldCurrent()
+    }
+
     func finish() {
-        continuation?.finish()
+        for continuation in continuations.values {
+            continuation.finish()
+        }
     }
 
     func hasEstablishedSubscription() -> Bool {
-        continuation != nil
+        subscriptionCount > 0
     }
 
     func establishedSubscriptionCount() -> Int {
         subscriptionCount
     }
 
+    func activeSubscriptionCount() -> Int {
+        continuations.count
+    }
+
     // MARK: Private
 
     private var state = GenerationState()
-    private var continuation: AsyncStream<GenerationState>.Continuation?
+    private var continuations = [UUID: AsyncStream<GenerationState>.Continuation]()
     private var subscriptionCount = 0
 
     private func yieldCurrent() {
-        continuation?.yield(state)
+        for continuation in continuations.values {
+            continuation.yield(state)
+        }
+    }
+
+    private func removeSubscription(_ subscriptionID: UUID) {
+        continuations[subscriptionID] = nil
     }
 
 }

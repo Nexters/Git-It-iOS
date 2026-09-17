@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DomainLearningProject
+import Foundation
 import Testing
 
 @testable import Feature
@@ -9,7 +10,7 @@ import Testing
 struct HomeFeatureGenerationOutcomeTests {
 
     @Test
-    func `task는 generationOutcomeObservation이 idle일 때만 관찰 Effect를 시작하고 재호출 시 중복 구독하지 않는다`() async {
+    func `task가 다시 전달되면 이전 생성 결과 관찰을 대체해 하나만 유지한다`() async {
         let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let profile = HomeMemberProfileUseCaseMock(
             results: [.success(HomeTestFixture.profileWithBoth)],
@@ -32,7 +33,6 @@ struct HomeFeatureGenerationOutcomeTests {
             $0.projectLoad = .loading
             $0.profileRequestID = 1
             $0.projectRequestID = 1
-            $0.generationOutcomeObservation = .observing
         }
         while await profile.snapshot().pendingCount == 0 { await Task.yield() }
         await profile.resumeNext()
@@ -46,9 +46,91 @@ struct HomeFeatureGenerationOutcomeTests {
         }
 
         await store.send(.view(.task))
+        while await observeGenerationOutcomes.establishedSubscriptionCount() < 2 { await Task.yield() }
+        while await observeGenerationOutcomes.activeSubscriptionCount() != 1 { await Task.yield() }
 
+        #expect(await observeGenerationOutcomes.activeSubscriptionCount() == 1)
         #expect(await profile.snapshot().callCount == 1)
         #expect(await projects.snapshot().callCount == 1)
+
+        await observeGenerationOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `화면을 벗어났다 돌아오면 생성 결과 관찰을 다시 시작해 결과를 반영한다`() async {
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
+        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
+        let store = TestStore(initialState: Self.loadedState()) {
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: observeGenerationOutcomes,
+            )
+        }
+
+        let firstTask = await store.send(.view(.task))
+        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
+        await firstTask.cancel()
+        while await observeGenerationOutcomes.activeSubscriptionCount() != 0 { await Task.yield() }
+
+        await store.send(.view(.task))
+        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
+        await observeGenerationOutcomes.emit(
+            GenerationOutcome(projectID: "project-1", status: .completed)
+        )
+        await store.receive(
+            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
+        ) {
+            $0.appliedOutcomeProjectIDs = ["project-1"]
+            $0.projectRequestID = 1
+        }
+        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
+            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
+        }
+
+        await observeGenerationOutcomes.finish()
+        await store.finish()
+    }
+
+    @Test
+    func `화면을 벗어난 동안 끝난 생성 결과를 돌아왔을 때 반영한다`() async {
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
+        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
+        let store = TestStore(initialState: Self.loadedState()) {
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: observeGenerationOutcomes,
+            )
+        }
+
+        let firstTask = await store.send(.view(.task))
+        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
+        await firstTask.cancel()
+        while await observeGenerationOutcomes.activeSubscriptionCount() != 0 { await Task.yield() }
+        await observeGenerationOutcomes.store(
+            GenerationState(records: [
+                GenerationRecord(
+                    githubRepoURL: "https://github.com/owner/project-1",
+                    projectID: "project-1",
+                    requestedAt: Date(timeIntervalSince1970: 1_800_000_000),
+                    status: .completed,
+                    finishedAt: Date(timeIntervalSince1970: 1_800_000_600),
+                )
+            ])
+        )
+
+        await store.send(.view(.task))
+        await store.receive(
+            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
+        ) {
+            $0.appliedOutcomeProjectIDs = ["project-1"]
+            $0.projectRequestID = 1
+        }
+        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
+            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
+        }
 
         await observeGenerationOutcomes.finish()
         await store.finish()
@@ -63,7 +145,6 @@ struct HomeFeatureGenerationOutcomeTests {
         ])
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        state.generationOutcomeObservation = .observing
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
@@ -119,7 +200,6 @@ struct HomeFeatureGenerationOutcomeTests {
         var state = HomeFeature.State()
         state.projectLoad = .loading
         state.projectRequestID = 1
-        state.generationOutcomeObservation = .observing
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
@@ -154,7 +234,6 @@ struct HomeFeatureGenerationOutcomeTests {
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         state.appliedOutcomeProjectIDs = ["project-1"]
-        state.generationOutcomeObservation = .observing
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
@@ -169,6 +248,15 @@ struct HomeFeatureGenerationOutcomeTests {
 
         await observeGenerationOutcomes.finish()
         await store.finish()
+    }
+
+    // MARK: Private
+
+    private static func loadedState() -> HomeFeature.State {
+        var state = HomeFeature.State()
+        state.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
+        return state
     }
 
 }
