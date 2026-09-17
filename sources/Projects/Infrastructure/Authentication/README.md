@@ -71,8 +71,10 @@ scope를 표현합니다. Apple 프레임워크 타입은 provider 구현 안에
 - Keychain에 저장하는 세션·인증 참조의 직렬화 정책
 - Feature 화면 상태 및 앱의 로그인 흐름
 
-이 동작들은 Composition, Domain, Feature, App이 각각 구현되고 해당 타겟의 테스트가
-추가된 뒤 그 경계의 문서에서 다룹니다.
+이 타겟의 공개 API를 사용하는 프로젝트 패키지는 Data뿐입니다. 세션 교환, 저장 직렬화와
+Apple 로그인 결과 변환은 Data 내부 구현(`AppleSignInSource`, `LocalSecureValueStorage` 등)이,
+Domain 모델 변환은 Composition Adapter가, 화면 상태와 로그인 흐름은 Feature와 App이 각 경계의
+테스트와 문서에서 다룹니다.
 
 ## 검증 근거
 

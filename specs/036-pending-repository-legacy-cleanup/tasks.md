@@ -550,20 +550,20 @@ Assembly·typealias가 같은 단위에서 Data 타입으로 바뀌어야 compil
 
 ### 구현
 
-- [ ] T236 [S4] `docs/architecture.md`의 패키지 책임 설명(현재 11행·22행·35행), 3.3 Data↔Infrastructure 예시(현재 149~172행), 6장 외부 기술 사용 표(현재 265행), 9장 D-ARCH-004 후속 작업 설명(현재 364~369행)을 Data 역할 계약·생성 진입점 구조로 교정한다
-- [ ] T237 [P] [S4] `docs/package-rules/composition.md`의 Infrastructure 객체 조립·진입점 호출·구현 선택 설명(현재 9·19·21·57·63·66~69·79~80행)을 Data 생성 진입점과 Data 계약 주입으로 교정한다
-- [ ] T238 [P] [S4] `docs/package-rules/data.md`에 Data가 기술 능력 역할 계약과 생성 진입점을 소유하고 target 간 Infrastructure 타입은 `package` 접근 수준으로만 주고받는다는 규칙을 추가한다(현재 11·19·21행 주변)
-- [ ] T239 [P] [S4] `docs/package-rules/infrastructure.md`에 Infrastructure 공개 API의 프로젝트 내 소비자가 Data뿐임을 명시한다(현재 11·20행)
-- [ ] T240 [P] [S4] `docs/package-rules/app.md`의 허용 의존성 설명(현재 22행)에 Infrastructure 직접 의존 금지를 명시한다
-- [ ] T241 [P] [S4] `docs/conventions/abstraction/protocol-criteria.md`에 "Composition이 Infrastructure에 의존할 수 없어 Data가 기술 능력 계약을 소유하고 Composition·테스트가 대체 구현을 주입한다"는 근거와 예시(`KeyValueStorage`, `SecureValueStorage`, `RequestTransport`, `LocalReminderNotifier`, `RemoteMessageReceiver`)를 추가한다
-- [ ] T242 [P] [S4] `docs/conventions/abstraction/test-double-injection.md`의 원칙(현재 5~6행), 주입 대상 표(현재 18~23행), 예시(현재 31~40행)를 Data 계약 주입 기준으로 교정한다
-- [ ] T243 [P] [S1] `docs/conventions/abstraction/structure-baseline.md`의 지표 표와 3.1 목록(현재 45~59행)에서 `GenerationStateRepository`·`PendingGenerationReminders`·`GenerationStateStore`를 제거하고 `PendingGenerationRepository`와 Data 역할 계약 5개를 추가해 개수를 다시 센다
-- [ ] T244 [P] [S1] `docs/review/domain-data-infra-design-review.md`의 DS-02·DS-03·DS-05·DS-06·DS-09·DS-11 처리 결과와 이관 코드·`HTTPMethod` 관련 설명을 이 기능 결과로 갱신한다
-- [ ] T245 [P] [S4] `sources/Projects/Infrastructure/Authentication/README.md`에서 Composition을 소비자로 설명하는 문장이 있으면 Data 내부 구현 소비로 교정한다
+- [X] T236 [S4] `docs/architecture.md`의 패키지 책임 설명(현재 11행·22행·35행), 3.3 Data↔Infrastructure 예시(현재 149~172행), 6장 외부 기술 사용 표(현재 265행), 9장 D-ARCH-004 후속 작업 설명(현재 364~369행)을 Data 역할 계약·생성 진입점 구조로 교정한다
+- [X] T237 [P] [S4] `docs/package-rules/composition.md`의 Infrastructure 객체 조립·진입점 호출·구현 선택 설명(현재 9·19·21·57·63·66~69·79~80행)을 Data 생성 진입점과 Data 계약 주입으로 교정한다
+- [X] T238 [P] [S4] `docs/package-rules/data.md`에 Data가 기술 능력 역할 계약과 생성 진입점을 소유하고 target 간 Infrastructure 타입은 `package` 접근 수준으로만 주고받는다는 규칙을 추가한다(현재 11·19·21행 주변)
+- [X] T239 [P] [S4] `docs/package-rules/infrastructure.md`에 Infrastructure 공개 API의 프로젝트 내 소비자가 Data뿐임을 명시한다(현재 11·20행)
+- [X] T240 [P] [S4] `docs/package-rules/app.md`의 허용 의존성 설명(현재 22행)에 Infrastructure 직접 의존 금지를 명시한다
+- [X] T241 [P] [S4] `docs/conventions/abstraction/protocol-criteria.md`에 "Composition이 Infrastructure에 의존할 수 없어 Data가 기술 능력 계약을 소유하고 Composition·테스트가 대체 구현을 주입한다"는 근거와 예시(`KeyValueStorage`, `SecureValueStorage`, `RequestTransport`, `LocalReminderNotifier`, `RemoteMessageReceiver`)를 추가한다
+- [X] T242 [P] [S4] `docs/conventions/abstraction/test-double-injection.md`의 원칙(현재 5~6행), 주입 대상 표(현재 18~23행), 예시(현재 31~40행)를 Data 계약 주입 기준으로 교정한다
+- [X] T243 [P] [S1] `docs/conventions/abstraction/structure-baseline.md`의 지표 표와 3.1 목록(현재 45~59행)에서 `GenerationStateRepository`·`PendingGenerationReminders`·`GenerationStateStore`를 제거하고 `PendingGenerationRepository`와 Data 역할 계약 5개를 추가해 개수를 다시 센다
+- [X] T244 [P] [S1] `docs/review/domain-data-infra-design-review.md`의 DS-02·DS-03·DS-05·DS-06·DS-09·DS-11 처리 결과와 이관 코드·`HTTPMethod` 관련 설명을 이 기능 결과로 갱신한다
+- [X] T245 [P] [S4] `sources/Projects/Infrastructure/Authentication/README.md`에서 Composition을 소비자로 설명하는 문장이 있으면 Data 내부 구현 소비로 교정한다
 
 ### 정리와 단위 검증
 
-- [ ] T246 [no-write] `git grep -nE 'Composition[^\n]*Infrastructure 객체|GenerationStateRepository|PendingGenerationReminders\b|GenerationStateStore\b|HTTPUserRemote|makeHTTPClient' -- docs/architecture.md docs/package-rules docs/conventions`가 이 기능이 교정한 설명 기준 0건인지 확인한다
+- [X] T246 [no-write] `git grep -nE 'Composition[^\n]*Infrastructure 객체|GenerationStateRepository|PendingGenerationReminders\b|GenerationStateStore\b|HTTPUserRemote|makeHTTPClient' -- docs/architecture.md docs/package-rules docs/conventions`가 이 기능이 교정한 설명 기준 0건인지 확인한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 전체 완료 검증으로 진행한다.
 
@@ -578,12 +578,12 @@ Assembly·typealias가 같은 단위에서 Data 타입으로 바뀌어야 compil
 마친 뒤 그 단위를 최종 commit한다. 이미 파일 변경 단위가 모두 commit된 단순 재개에서는 `tasks.md` 완료 표시를 위한 별도
 최종 검증 단위를 둔다. 읽기 전용 전체 검증은 반복 승인 없이 같은 실행에서 이어서 수행한다.
 
-- [ ] T247 [no-write] [S1] quickstart 시나리오 1 전체를 실행하고 계약 문서 5장의 테스트 파일이 모두 존재하는지 확인한다
-- [ ] T248 [no-write] [S2] quickstart 시나리오 2를 실행한다
-- [ ] T249 [no-write] [S3] quickstart 시나리오 3을 실행한다
-- [ ] T250 [no-write] [S4] quickstart 시나리오 4의 1~4를 실행한다
-- [ ] T251 [no-write] [S5] quickstart 시나리오 5를 실행한다
-- [ ] T252 [no-write] `make tuist` 전후 Git 상태를 비교하고, 사용자가 실행한 `build`·`compile`·`test`와 `./tools/script-verification/bin/run.sh` 결과를 기록한다(결과가 없으면 미검증으로 보고)
+- [X] T247 [no-write] [S1] quickstart 시나리오 1 전체를 실행하고 계약 문서 5장의 테스트 파일이 모두 존재하는지 확인한다
+- [X] T248 [no-write] [S2] quickstart 시나리오 2를 실행한다
+- [X] T249 [no-write] [S3] quickstart 시나리오 3을 실행한다
+- [X] T250 [no-write] [S4] quickstart 시나리오 4의 1~4를 실행한다
+- [X] T251 [no-write] [S5] quickstart 시나리오 5를 실행한다
+- [X] T252 [no-write] `make tuist` 전후 Git 상태를 비교하고, 사용자가 실행한 `build`·`compile`·`test`와 `./tools/script-verification/bin/run.sh` 결과를 기록한다(결과가 없으면 미검증으로 보고)
 
 ## 의존성과 실행 순서
 
