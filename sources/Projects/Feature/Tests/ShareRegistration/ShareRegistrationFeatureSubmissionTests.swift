@@ -17,7 +17,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `기본 난이도로도 등록할 수 있고 선택한 난이도가 요청에 쓰인다`() async {
-        let projectGeneration = SpyCreateLearningProject()
+        let projectGeneration = ProjectGenerationUseCaseSpy()
         let store = Self.makeStore(projectGeneration: projectGeneration)
 
         #expect(store.state.quizLevel == .l1)
@@ -37,7 +37,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `요청 중에는 추가 등록 실행을 받지 않는다`() async {
-        let projectGeneration = SpyCreateLearningProject(suspendsUntilResumed: true)
+        let projectGeneration = ProjectGenerationUseCaseSpy(suspendsUntilResumed: true)
         let store = Self.makeStore(projectGeneration: projectGeneration)
 
         await store.send(.quizGenerationConfirmation(.delegate(.submitRequested))) {
@@ -55,7 +55,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `등록 응답이 인증 오류면 갱신 없이 로그인 필요 상태가 된다`() async {
-        let store = Self.makeStore(projectGeneration: SpyCreateLearningProject(error: .unauthorized))
+        let store = Self.makeStore(projectGeneration: ProjectGenerationUseCaseSpy(error: .unauthorized))
 
         await store.send(.quizGenerationConfirmation(.delegate(.submitRequested))) {
             $0.status = .submitting
@@ -67,7 +67,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `이미 등록 중인 저장소면 재시도 가능한 실패로 남긴다`() async {
-        let store = Self.makeStore(projectGeneration: SpyCreateLearningProject(error: .duplicateRequest))
+        let store = Self.makeStore(projectGeneration: ProjectGenerationUseCaseSpy(error: .duplicateRequest))
 
         await store.send(.quizGenerationConfirmation(.delegate(.submitRequested))) {
             $0.status = .submitting
@@ -79,7 +79,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `제출 시점에 로그인이 필요하면 등록을 요청하지 않는다`() async {
-        let projectGeneration = SpyCreateLearningProject()
+        let projectGeneration = ProjectGenerationUseCaseSpy()
         let store = Self.makeStore(
             projectGeneration: projectGeneration,
             availability: .signInRequired,
@@ -97,7 +97,7 @@ struct ShareRegistrationFeatureSubmissionTests {
 
     @Test
     func `제출 시점에 앱 실행이 필요하면 앱 실행 필요 상태가 된다`() async {
-        let projectGeneration = SpyCreateLearningProject()
+        let projectGeneration = ProjectGenerationUseCaseSpy()
         let store = Self.makeStore(
             projectGeneration: projectGeneration,
             availability: .appLaunchRequired,
@@ -116,7 +116,7 @@ struct ShareRegistrationFeatureSubmissionTests {
     // MARK: Private
 
     private static func makeStore(
-        projectGeneration: SpyCreateLearningProject = SpyCreateLearningProject(),
+        projectGeneration: ProjectGenerationUseCaseSpy = ProjectGenerationUseCaseSpy(),
         availability: SignInAvailability = .signedIn,
     ) -> TestStoreOf<ShareRegistrationFeature> {
         var state = ShareRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL)
@@ -125,7 +125,7 @@ struct ShareRegistrationFeatureSubmissionTests {
         return TestStore(initialState: state) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
-                externalRepository: StubFetchExternalRepository(
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
                 projectGeneration: projectGeneration,

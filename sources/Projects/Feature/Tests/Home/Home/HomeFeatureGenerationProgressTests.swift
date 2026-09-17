@@ -61,7 +61,7 @@ struct HomeFeatureGenerationProgressTests {
 
     @Test
     func `진행 중에도 프로필 재시도 조회는 그대로 수행된다`() async {
-        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
         state.profileLoad = .failed(.temporarilyUnavailable)
@@ -83,7 +83,7 @@ struct HomeFeatureGenerationProgressTests {
 
     @Test
     func `진행 중에도 프로젝트 갱신 재시도는 그대로 수행된다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
         state.projectLoad = .failed(.temporarilyUnavailable)
@@ -101,8 +101,8 @@ struct HomeFeatureGenerationProgressTests {
     // MARK: Private
 
     private func makeStore(
-        projects: HomeLearningProjectsUseCaseMock = HomeLearningProjectsUseCaseMock(),
-        profile: HomeMemberProfileUseCaseMock = HomeMemberProfileUseCaseMock(
+        projects: ProjectUseCaseMock = ProjectUseCaseMock(),
+        profile: UserInfoUseCaseSuspendableProfileMock = UserInfoUseCaseSuspendableProfileMock(
             results: [.success(HomeTestFixture.profileWithBoth)]
         ),
         state: HomeFeature.State = .init(),

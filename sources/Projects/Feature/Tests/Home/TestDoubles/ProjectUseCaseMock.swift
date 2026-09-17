@@ -2,7 +2,7 @@ import DomainIdentifier
 import DomainProject
 import Foundation
 
-actor HomeLearningProjectsUseCaseMock: ProjectUseCase {
+actor ProjectUseCaseMock: ProjectUseCase {
 
     // MARK: Lifecycle
 

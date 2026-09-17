@@ -1,7 +1,7 @@
 import DomainIdentifier
 import DomainProject
 
-actor StubFetchLearningProjectDetailUseCase: ProjectUseCase {
+actor ProjectUseCaseDetailStub: ProjectUseCase {
 
     // MARK: Lifecycle
 

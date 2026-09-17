@@ -26,9 +26,9 @@ struct StubRepositoryURLParser: ExternalRepositoryLocator {
 
 }
 
-// MARK: - StubFetchExternalRepository
+// MARK: - ExternalRepositoryUseCaseFixedResultStub
 
-struct StubFetchExternalRepository: ExternalRepositoryUseCase {
+struct ExternalRepositoryUseCaseFixedResultStub: ExternalRepositoryUseCase {
 
     // MARK: Lifecycle
 
@@ -68,9 +68,9 @@ struct StubFetchExternalRepository: ExternalRepositoryUseCase {
 
 }
 
-// MARK: - SpyCreateLearningProject
+// MARK: - ProjectGenerationUseCaseSpy
 
-final class SpyCreateLearningProject: ProjectGenerationUseCase, Sendable {
+final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
 
     // MARK: Lifecycle
 

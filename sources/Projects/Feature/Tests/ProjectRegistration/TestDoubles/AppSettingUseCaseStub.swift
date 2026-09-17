@@ -1,6 +1,6 @@
 import DomainAppSetting
 
-actor StubRequestGenerationReminderUseCase: AppSettingUseCase {
+actor AppSettingUseCaseStub: AppSettingUseCase {
 
     // MARK: Lifecycle
 

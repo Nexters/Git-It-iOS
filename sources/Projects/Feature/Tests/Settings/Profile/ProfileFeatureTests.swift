@@ -11,7 +11,7 @@ struct ProfileFeatureTests {
 
     @Test
     func `최초 task는 로딩을 세우고 받은 프로필을 노출한다`() async {
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(SettingsTestFixture.curatedProfile)])
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(fetchMemberProfile: fetchMemberProfile)
 
         await store.send(.view(.task)) {
@@ -33,7 +33,7 @@ struct ProfileFeatureTests {
         let updated = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
         let store = makeStore(
             state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
-            fetchMemberProfile: FetchMemberProfileUseCaseMock(results: [.success(updated)]),
+            fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.success(updated)]),
         )
 
         await store.send(.view(.task)) {
@@ -48,7 +48,7 @@ struct ProfileFeatureTests {
     func `갱신 실패는 이미 보여 주던 프로필을 그대로 유지한다`() async {
         let store = makeStore(
             state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
-            fetchMemberProfile: FetchMemberProfileUseCaseMock(results: [.failure(.temporarilyUnavailable)]),
+            fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.failure(.temporarilyUnavailable)]),
         )
 
         await store.send(.view(.task)) {
@@ -64,7 +64,7 @@ struct ProfileFeatureTests {
 
     @Test
     func `최초 조회 실패는 실패 상태를 남기고 재시도로 다시 조회한다`() async {
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [
             .failure(.temporarilyUnavailable),
             .success(SettingsTestFixture.curatedProfile),
         ])
@@ -97,7 +97,7 @@ struct ProfileFeatureTests {
 
     @Test
     func `실패 상태가 아니면 재시도는 조회하지 않는다`() async {
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(SettingsTestFixture.curatedProfile)])
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(
             state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
             fetchMemberProfile: fetchMemberProfile,
@@ -110,7 +110,7 @@ struct ProfileFeatureTests {
 
     @Test
     func `조회 중인 동안 다시 들어온 task는 조회를 새로 시작하지 않는다`() async {
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(SettingsTestFixture.curatedProfile)])
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         var initialState = makeState(profileLoad: .loading)
         initialState.profileRequestID = 1
         let store = makeStore(state: initialState, fetchMemberProfile: fetchMemberProfile)
@@ -150,7 +150,7 @@ struct ProfileFeatureTests {
 
     private func makeStore(
         state: ProfileFeature.State = ProfileFeature.State(),
-        fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
+        fetchMemberProfile: UserInfoUseCaseProfileMock = UserInfoUseCaseProfileMock(),
     ) -> TestStoreOf<ProfileFeature> {
         TestStore(initialState: state) {
             ProfileFeature(profile: fetchMemberProfile.profile)

@@ -1,6 +1,6 @@
 import DomainQuizDetail
 
-actor StubFetchBookmarkedQuestionsUseCase {
+actor QuizDetailUseCaseBookmarkListStub {
 
     // MARK: Lifecycle
 

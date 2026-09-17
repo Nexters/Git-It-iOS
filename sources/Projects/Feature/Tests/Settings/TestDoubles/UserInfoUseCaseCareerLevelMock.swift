@@ -1,6 +1,6 @@
 import DomainUserInfo
 
-actor UpdateMemberCareerLevelUseCaseMock {
+actor UserInfoUseCaseCareerLevelMock {
 
     // MARK: Lifecycle
 

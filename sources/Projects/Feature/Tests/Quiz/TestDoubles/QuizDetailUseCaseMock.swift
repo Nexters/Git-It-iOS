@@ -1,7 +1,7 @@
 import DomainIdentifier
 import DomainQuizDetail
 
-actor LearningLibraryUseCaseMock: QuizDetailUseCase {
+actor QuizDetailUseCaseMock: QuizDetailUseCase {
 
     // MARK: Lifecycle
 

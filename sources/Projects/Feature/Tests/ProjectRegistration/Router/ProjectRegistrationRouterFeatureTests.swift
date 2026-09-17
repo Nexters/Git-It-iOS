@@ -71,8 +71,8 @@ struct ProjectRegistrationRouterFeatureTests {
 
     @Test
     func `생성 시작은 진행 화면으로 전환하고 확인된 저장소와 선택한 난이도로 제출을 요청한다`() async {
-        let generationStates = StubTrackGenerationUseCase()
-        let projectGeneration = StubCreateLearningProjectUseCase(
+        let generationStates = ProjectGenerationStateStreamStub()
+        let projectGeneration = ProjectGenerationUseCaseStub(
             results: [.success(sampleReceipt)],
             generationStates: generationStates,
         )
@@ -103,7 +103,7 @@ struct ProjectRegistrationRouterFeatureTests {
 
     @Test
     func `확인된 저장소가 없으면 생성 시작이 아무 효과도 내지 않는다`() async {
-        let projectGeneration = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
+        let projectGeneration = ProjectGenerationUseCaseStub(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = .quizGenerationConfirmation
         let store = makeProjectRegistrationRouterStore(projectGeneration: projectGeneration, state: state)

@@ -11,11 +11,11 @@ struct HomeFeatureLoadTests {
 
     @Test
     func `최초 task는 프로필을 한 번만 조회하고 복귀 task는 갱신만 다시 요청한다`() async {
-        let profile = HomeMemberProfileUseCaseMock(
+        let profile = UserInfoUseCaseSuspendableProfileMock(
             results: [.success(HomeTestFixture.profileWithBoth)],
             suspendsRequests: true,
         )
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects, profile: profile)
         store.exhaustivity = .off
 
@@ -44,8 +44,8 @@ struct HomeFeatureLoadTests {
 
     @Test
     func `프로필 재시도는 프로젝트를 보존하고 프로필만 조회한다`() async {
-        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.profileLoad = .failed(.temporarilyUnavailable)
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
@@ -82,11 +82,11 @@ struct HomeFeatureLoadTests {
 
     @Test
     func `프로젝트 갱신 실패는 성공한 프로필을 보존하고 독립 실패 상태가 된다`() async {
-        let profile = HomeMemberProfileUseCaseMock(
+        let profile = UserInfoUseCaseSuspendableProfileMock(
             results: [.success(HomeTestFixture.profileWithBoth)],
             suspendsRequests: true,
         )
-        let projects = HomeLearningProjectsUseCaseMock(
+        let projects = ProjectUseCaseMock(
             refreshResults: [.failure(.temporarilyUnavailable)],
             suspendsRefresh: true,
         )
@@ -114,8 +114,8 @@ struct HomeFeatureLoadTests {
 
     @Test
     func `프로젝트 재시도는 프로필을 보존하고 갱신만 다시 요청한다`() async {
-        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         state.projectLoad = .failed(.temporarilyUnavailable)
@@ -134,7 +134,7 @@ struct HomeFeatureLoadTests {
 
     @Test
     func `실패 상태가 아니면 프로젝트 재시도는 아무 효과도 내지 않는다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects, state: state)
@@ -148,8 +148,8 @@ struct HomeFeatureLoadTests {
     // MARK: Private
 
     private func makeStore(
-        projects: HomeLearningProjectsUseCaseMock = HomeLearningProjectsUseCaseMock(),
-        profile: HomeMemberProfileUseCaseMock = HomeMemberProfileUseCaseMock(
+        projects: ProjectUseCaseMock = ProjectUseCaseMock(),
+        profile: UserInfoUseCaseSuspendableProfileMock = UserInfoUseCaseSuspendableProfileMock(
             results: [.success(HomeTestFixture.profileWithBoth)]
         ),
         state: HomeFeature.State = HomeFeature.State(),

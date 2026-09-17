@@ -27,7 +27,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다`() async {
-        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount)])
+        let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -47,7 +47,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다`() async {
-        let signIn = SignInUseCaseMock(results: [.retryableFailure])
+        let signIn = AccountUseCaseSignInMock(results: [.retryableFailure])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -67,7 +67,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `Apple 인증 취소는 재시도 오류와 구분되는 cancelled 상태로 남는다`() async {
-        let signIn = SignInUseCaseMock(results: [.cancelled])
+        let signIn = AccountUseCaseSignInMock(results: [.cancelled])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -85,7 +85,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `현재 requestID와 다른 로그인 응답은 상태를 바꾸지 않는다`() async {
-        let signIn = SignInUseCaseMock(results: [.cancelled])
+        let signIn = AccountUseCaseSignInMock(results: [.cancelled])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -103,7 +103,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `Apple 로그인 탭은 곧바로 로그인하지 않고 signInRequested를 위임한다`() async {
-        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount)])
+        let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -127,11 +127,11 @@ struct TutorialFeatureTests {
 
     @Test
     func `deletesCompletedAccountOnSignIn이 true면 needsCuration false 응답을 받은 뒤 회원탈퇴하고 자동으로 재로그인한다`() async {
-        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount), .signedIn(uncuratedAccount)])
-        let deleteMemberAccount = DeleteMemberAccountUseCaseMock()
+        let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount), .signedIn(uncuratedAccount)])
+        let accountWithdrawal = AccountUseCaseWithdrawalMock()
         let store = makeTutorialStore(
             signIn: signIn,
-            deleteMemberAccount: deleteMemberAccount,
+            accountWithdrawal: accountWithdrawal,
             deletesCompletedAccountOnSignIn: true,
         )
 
@@ -152,16 +152,16 @@ struct TutorialFeatureTests {
         await store.receive(.delegate(.signInSucceeded(needsCuration: true)))
 
         #expect(await signIn.snapshot() == [.apple, .apple])
-        #expect(await deleteMemberAccount.snapshot() == 1)
+        #expect(await accountWithdrawal.snapshot() == 1)
     }
 
     @Test
     func `deletesCompletedAccountOnSignIn이 true여도 재시도가 다시 needsCuration false를 받으면 더 이상 반복하지 않는다`() async {
-        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount), .signedIn(curatedAccount)])
-        let deleteMemberAccount = DeleteMemberAccountUseCaseMock()
+        let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount), .signedIn(curatedAccount)])
+        let accountWithdrawal = AccountUseCaseWithdrawalMock()
         let store = makeTutorialStore(
             signIn: signIn,
-            deleteMemberAccount: deleteMemberAccount,
+            accountWithdrawal: accountWithdrawal,
             deletesCompletedAccountOnSignIn: true,
         )
 
@@ -182,7 +182,7 @@ struct TutorialFeatureTests {
         await store.receive(.delegate(.signInSucceeded(needsCuration: false)))
 
         #expect(await signIn.snapshot() == [.apple, .apple])
-        #expect(await deleteMemberAccount.snapshot() == 1)
+        #expect(await accountWithdrawal.snapshot() == 1)
     }
 
     // MARK: Private

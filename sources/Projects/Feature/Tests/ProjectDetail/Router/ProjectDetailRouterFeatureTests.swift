@@ -161,10 +161,10 @@ struct ProjectDetailRouterFeatureTests {
             initialState: ProjectDetailRouterFeature.State(projectID: ProjectDetailTestFixture.projectID)
         ) {
             ProjectDetailRouterFeature(
-                project: StubFetchLearningProjectDetailUseCase(
+                project: ProjectUseCaseDetailStub(
                     results: [.success(ProjectDetailTestFixture.mixedProgressDetail)]
                 ),
-                quizDetail: LearningLibraryUseCaseMock(
+                quizDetail: QuizDetailUseCaseMock(
                     quizSetResults: [.success(QuizTestFixture.unansweredSet)],
                     bookmarkListResults: [.success(ProjectDetailTestFixture.savedQuizList)],
                 ),

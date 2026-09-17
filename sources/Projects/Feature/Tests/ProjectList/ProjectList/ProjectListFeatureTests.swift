@@ -11,7 +11,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `진입하면 스트림이 준 목록으로 채운다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.manyProjectsPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.manyProjectsPage)
         let store = makeStore(projects: projects)
         store.exhaustivity = .off
 
@@ -28,7 +28,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `갱신에 실패하면 실패 상태를 남긴다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(refreshResults: [.failure(.temporarilyUnavailable)])
+        let projects = ProjectUseCaseMock(refreshResults: [.failure(.temporarilyUnavailable)])
         let store = makeStore(projects: projects)
         store.exhaustivity = .off
 
@@ -126,7 +126,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `목록 모드에서는 삭제 확인이 시작되지 않는다`() async {
-        let deleteProject = StubDeleteLearningProjectUseCase()
+        let deleteProject = ProjectUseCaseDeletionStub()
         let store = makeStore(deleteProject: deleteProject)
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
@@ -143,7 +143,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `삭제를 확인하기 전에는 삭제를 요청하지 않는다`() async {
-        let deleteProject = StubDeleteLearningProjectUseCase()
+        let deleteProject = ProjectUseCaseDeletionStub()
         let store = makeStore(deleteProject: deleteProject, state: state(mode: .deleting))
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0"))) {
@@ -168,7 +168,7 @@ struct ProjectListFeatureTests {
     @Test
     func `삭제에 성공하면 목록에서 그 프로젝트를 지운다`() async {
         let store = makeStore(
-            deleteProject: StubDeleteLearningProjectUseCase(),
+            deleteProject: ProjectUseCaseDeletionStub(),
             state: loadedState(mode: .deleting),
         )
         store.exhaustivity = .off
@@ -186,7 +186,7 @@ struct ProjectListFeatureTests {
     @Test
     func `이미 사라진 프로젝트는 삭제 실패로 남기지 않는다`() async {
         let store = makeStore(
-            deleteProject: StubDeleteLearningProjectUseCase(results: [.failure(.notFound)]),
+            deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.notFound)]),
             state: loadedState(mode: .deleting),
         )
         store.exhaustivity = .off
@@ -202,7 +202,7 @@ struct ProjectListFeatureTests {
     @Test
     func `마지막 프로젝트를 지우면 삭제 모드를 벗어난다`() async {
         let store = makeStore(
-            deleteProject: StubDeleteLearningProjectUseCase(),
+            deleteProject: ProjectUseCaseDeletionStub(),
             state: loadedState(mode: .deleting),
         )
         store.exhaustivity = .off
@@ -220,7 +220,7 @@ struct ProjectListFeatureTests {
     @Test
     func `삭제 실패는 목록과 삭제 모드를 유지한다`() async {
         let store = makeStore(
-            deleteProject: StubDeleteLearningProjectUseCase(results: [.failure(.temporarilyUnavailable)]),
+            deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.temporarilyUnavailable)]),
             state: loadedState(mode: .deleting),
         )
         store.exhaustivity = .off
@@ -237,7 +237,7 @@ struct ProjectListFeatureTests {
     @Test
     func `삭제 실패 후에도 뒤로 가면 목록 모드로 돌아온다`() async {
         let store = makeStore(
-            deleteProject: StubDeleteLearningProjectUseCase(results: [.failure(.temporarilyUnavailable)]),
+            deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.temporarilyUnavailable)]),
             state: loadedState(mode: .deleting),
         )
         store.exhaustivity = .off
@@ -254,7 +254,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `목록 끝에 닿으면 다음 페이지를 한 번 요청한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock()
+        let projects = ProjectUseCaseMock()
         let store = makeStore(projects: projects, state: loadedState())
         store.exhaustivity = .off
 
@@ -267,7 +267,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `다음 페이지가 없으면 목록 끝에 닿아도 요청하지 않는다`() async {
-        let projects = HomeLearningProjectsUseCaseMock()
+        let projects = ProjectUseCaseMock()
         let store = makeStore(projects: projects, state: loadedState(list: HomeTestFixture.oneProjectPage))
 
         await store.send(.view(.listBottomReached))
@@ -278,7 +278,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `다음 페이지를 불러오는 중에는 같은 요청을 반복하지 않는다`() async {
-        let projects = HomeLearningProjectsUseCaseMock()
+        let projects = ProjectUseCaseMock()
         var state = loadedState()
         state.pagination = .loading
         let store = makeStore(projects: projects, state: state)
@@ -290,7 +290,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `첫 조회 전에는 목록 끝에 닿아도 다음 페이지를 요청하지 않는다`() async {
-        let projects = HomeLearningProjectsUseCaseMock()
+        let projects = ProjectUseCaseMock()
         let store = makeStore(projects: projects)
 
         await store.send(.view(.listBottomReached))
@@ -300,7 +300,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `다음 페이지 조회에 실패하면 재시도로 다시 요청한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(
+        let projects = ProjectUseCaseMock(
             nextPageResults: [.failure(.temporarilyUnavailable), .success(())]
         )
         let store = makeStore(projects: projects, state: loadedState())
@@ -319,7 +319,7 @@ struct ProjectListFeatureTests {
 
     @Test
     func `새로고침 입력은 목록 갱신을 다시 요청한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock()
+        let projects = ProjectUseCaseMock()
         let store = makeStore(projects: projects, state: loadedState())
         store.exhaustivity = .off
 
@@ -352,8 +352,8 @@ struct ProjectListFeatureTests {
     }
 
     private func makeStore(
-        projects: HomeLearningProjectsUseCaseMock = HomeLearningProjectsUseCaseMock(),
-        deleteProject: StubDeleteLearningProjectUseCase = StubDeleteLearningProjectUseCase(),
+        projects: ProjectUseCaseMock = ProjectUseCaseMock(),
+        deleteProject: ProjectUseCaseDeletionStub = ProjectUseCaseDeletionStub(),
         state: ProjectListFeature.State = ProjectListFeature.State(),
     ) -> TestStoreOf<ProjectListFeature> {
         TestStore(initialState: state) {

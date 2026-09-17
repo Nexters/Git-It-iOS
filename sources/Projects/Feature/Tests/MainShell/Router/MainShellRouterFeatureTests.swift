@@ -21,8 +21,8 @@ struct MainShellRouterFeatureTests {
 
     @Test
     func `탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다`() async {
-        let userInfo = MemberAccountUseCaseMock()
-        let projects = HomeLearningProjectsUseCaseMock()
+        let userInfo = UserInfoUseCaseMock()
+        let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State()
         state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
@@ -146,13 +146,13 @@ struct MainShellRouterFeatureTests {
 
     private func makeStore(
         state: MainShellRouterFeature.State = .init(),
-        projects: HomeLearningProjectsUseCaseMock = .init(),
-        userInfo: MemberAccountUseCaseMock = .init(),
+        projects: ProjectUseCaseMock = .init(),
+        userInfo: UserInfoUseCaseMock = .init(),
     ) -> TestStoreOf<MainShellRouterFeature> {
         TestStore(initialState: state) {
             MainShellRouterFeature(
                 project: projects,
-                quizDetail: LearningLibraryUseCaseMock(),
+                quizDetail: QuizDetailUseCaseMock(),
                 account: MainShellAccountUseCaseStub(),
                 userInfo: userInfo,
                 appSetting: MainShellAppSettingUseCaseStub(),

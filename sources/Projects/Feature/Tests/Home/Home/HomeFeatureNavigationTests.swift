@@ -69,8 +69,8 @@ struct HomeFeatureNavigationTests {
     // MARK: Private
 
     private func makeStore(state: HomeFeature.State = .init()) -> TestStoreOf<HomeFeature> {
-        let projects = HomeLearningProjectsUseCaseMock()
-        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let projects = ProjectUseCaseMock()
+        let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         return TestStore(initialState: state) {
             HomeFeature(
                 projects: { await projects.projects() },

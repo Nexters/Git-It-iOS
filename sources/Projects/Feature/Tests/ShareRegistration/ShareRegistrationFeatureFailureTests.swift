@@ -34,7 +34,7 @@ struct ShareRegistrationFeatureFailureTests {
 
     @Test
     func `재시도는 등록 단계부터 다시 수행한다`() async {
-        let projectGeneration = SpyCreateLearningProject(error: .temporarilyUnavailable)
+        let projectGeneration = ProjectGenerationUseCaseSpy(error: .temporarilyUnavailable)
         let store = Self.makeStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
@@ -73,7 +73,7 @@ struct ShareRegistrationFeatureFailureTests {
 
     private static func makeStore(
         error: ProjectGenerationError? = nil,
-        projectGeneration: SpyCreateLearningProject? = nil,
+        projectGeneration: ProjectGenerationUseCaseSpy? = nil,
     ) -> TestStoreOf<ShareRegistrationFeature> {
         var state = ShareRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL)
         state.repositoryConfirmation.repository = ShareRegistrationTestSupport.repository
@@ -81,10 +81,10 @@ struct ShareRegistrationFeatureFailureTests {
         return TestStore(initialState: state) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
-                externalRepository: StubFetchExternalRepository(
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                projectGeneration: projectGeneration ?? SpyCreateLearningProject(error: error),
+                projectGeneration: projectGeneration ?? ProjectGenerationUseCaseSpy(error: error),
                 signInAvailability: { .signedIn },
             )
         }

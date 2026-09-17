@@ -1,7 +1,7 @@
 import DomainUserInfo
 import Foundation
 
-actor FetchMemberProfileUseCaseMock {
+actor UserInfoUseCaseProfileMock {
 
     // MARK: Lifecycle
 

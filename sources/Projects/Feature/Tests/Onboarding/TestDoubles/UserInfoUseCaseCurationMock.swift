@@ -1,7 +1,7 @@
 import DomainUserInfo
 import Foundation
 
-actor CompleteCurationUseCaseMock {
+actor UserInfoUseCaseCurationMock {
 
     // MARK: Lifecycle
 

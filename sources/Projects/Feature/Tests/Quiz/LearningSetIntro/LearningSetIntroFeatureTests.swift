@@ -11,8 +11,8 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `진입하면 세트와 북마크를 각각 한 번씩 조회한다`() async {
-        let fetchQuizSet = StubFetchLearningSetUseCase(results: [.success(QuizTestFixture.unansweredSet)])
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+        let fetchQuizSet = QuizDetailUseCaseQuizSetStub(results: [.success(QuizTestFixture.unansweredSet)])
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(
             results: [.success(QuizTestFixture.bookmarkList)]
         )
         let store = makeStore(
@@ -33,7 +33,7 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `북마크 조회는 현재 프로젝트 필터로 요청한다`() async {
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(
             results: [.success(QuizTestFixture.bookmarkList)]
         )
         let store = makeStore(fetchBookmarks: fetchBookmarks)
@@ -49,8 +49,8 @@ struct LearningSetIntroFeatureTests {
     @Test
     func `북마크 조회가 실패해도 세트 조회 상태와 시작 가능 여부는 영향받지 않는다`() async {
         let store = makeStore(
-            fetchQuizSet: StubFetchLearningSetUseCase(results: [.success(QuizTestFixture.unansweredSet)]),
-            fetchBookmarks: StubFetchBookmarkedQuestionsUseCase(results: [.failure(.notFound)]),
+            fetchQuizSet: QuizDetailUseCaseQuizSetStub(results: [.success(QuizTestFixture.unansweredSet)]),
+            fetchBookmarks: QuizDetailUseCaseBookmarkListStub(results: [.failure(.notFound)]),
         )
         store.exhaustivity = .off
 
@@ -66,7 +66,7 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `세트 조회가 실패하면 오류 의미를 보존하고 재시도로 다시 조회한다`() async {
-        let fetchQuizSet = StubFetchLearningSetUseCase(results: [
+        let fetchQuizSet = QuizDetailUseCaseQuizSetStub(results: [
             .failure(.temporarilyUnavailable),
             .success(QuizTestFixture.unansweredSet),
         ])
@@ -141,10 +141,10 @@ struct LearningSetIntroFeatureTests {
     // MARK: Private
 
     private func makeStore(
-        fetchQuizSet: StubFetchLearningSetUseCase = StubFetchLearningSetUseCase(
+        fetchQuizSet: QuizDetailUseCaseQuizSetStub = QuizDetailUseCaseQuizSetStub(
             results: [.success(QuizTestFixture.unansweredSet)]
         ),
-        fetchBookmarks: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
+        fetchBookmarks: QuizDetailUseCaseBookmarkListStub = QuizDetailUseCaseBookmarkListStub(
             results: [.success(QuizTestFixture.bookmarkList)]
         ),
         state: LearningSetIntroFeature.State = LearningSetIntroFeature.State(

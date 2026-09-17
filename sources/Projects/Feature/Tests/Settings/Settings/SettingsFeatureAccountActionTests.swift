@@ -11,7 +11,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `로그아웃 성공은 대기 상태로 되돌리고 signedOut delegate를 올린다`() async {
-        let signOut = SignOutUseCaseMock(results: [.signedOut])
+        let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
         let store = makeStore(signOut: signOut)
 
         await store.send(.view(.signOutTapped)) {
@@ -27,7 +27,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `로그아웃이 실패해도 같은 화면에서 다시 로그아웃할 수 있다`() async {
-        let signOut = SignOutUseCaseMock(results: [.retryableFailure, .signedOut])
+        let signOut = AccountUseCaseSignOutMock(results: [.retryableFailure, .signedOut])
         let store = makeStore(signOut: signOut)
 
         await store.send(.view(.signOutTapped)) {
@@ -50,8 +50,8 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `진행 중인 계정 작업은 새 로그아웃·삭제 요청으로 덮이지 않는다`() async {
-        let signOut = SignOutUseCaseMock()
-        let withdraw = DeleteMemberAccountUseCaseMock()
+        let signOut = AccountUseCaseSignOutMock()
+        let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(
             state: makeState(accountAction: .signingOut),
             signOut: signOut,
@@ -67,7 +67,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `계정 삭제 탭은 확인 단계로 바꾸고 확인 요청 delegate를 올린다`() async {
-        let withdraw = DeleteMemberAccountUseCaseMock()
+        let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(withdraw: withdraw)
 
         await store.send(.view(.deleteAccountTapped)) {
@@ -90,7 +90,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `확인 단계를 거치지 않은 삭제 확인은 계정을 삭제하지 않는다`() async {
-        let withdraw = DeleteMemberAccountUseCaseMock()
+        let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(withdraw: withdraw)
 
         await store.send(.view(.deleteAccountConfirmed))
@@ -100,7 +100,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `삭제 성공은 대기 상태로 되돌리고 accountDeleted delegate를 올린다`() async {
-        let withdraw = DeleteMemberAccountUseCaseMock()
+        let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(
             state: makeState(accountAction: .confirmingDeletion),
             withdraw: withdraw,
@@ -119,7 +119,7 @@ struct SettingsFeatureAccountActionTests {
 
     @Test
     func `삭제가 실패해도 확인 화면에서 다시 삭제를 진행할 수 있다`() async {
-        let withdraw = DeleteMemberAccountUseCaseMock(shouldThrow: true)
+        let withdraw = AccountUseCaseWithdrawalMock(shouldThrow: true)
         let store = makeStore(
             state: makeState(accountAction: .confirmingDeletion),
             withdraw: withdraw,
@@ -154,15 +154,15 @@ struct SettingsFeatureAccountActionTests {
 
     private func makeStore(
         state: SettingsFeature.State = SettingsFeature.State(),
-        signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-        withdraw: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+        signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
+        withdraw: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     ) -> TestStoreOf<SettingsFeature> {
         TestStore(initialState: state) {
             SettingsFeature(
                 signOut: signOut.signOut,
-                profile: FetchMemberProfileUseCaseMock().profile,
-                updatePosition: UpdateMemberPositionUseCaseMock().updatePosition,
-                updateCareerLevel: UpdateMemberCareerLevelUseCaseMock().updateCareerLevel,
+                profile: UserInfoUseCaseProfileMock().profile,
+                updatePosition: UserInfoUseCasePositionMock().updatePosition,
+                updateCareerLevel: UserInfoUseCaseCareerLevelMock().updateCareerLevel,
                 withdraw: withdraw.withdraw,
                 notificationAuthorization: { .denied },
                 requestNotificationAuthorization: { .denied },

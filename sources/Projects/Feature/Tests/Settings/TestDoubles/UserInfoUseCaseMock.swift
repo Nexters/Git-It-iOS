@@ -1,6 +1,6 @@
 import DomainUserInfo
 
-actor MemberAccountUseCaseMock: UserInfoUseCase {
+actor UserInfoUseCaseMock: UserInfoUseCase {
 
     // MARK: Lifecycle
 

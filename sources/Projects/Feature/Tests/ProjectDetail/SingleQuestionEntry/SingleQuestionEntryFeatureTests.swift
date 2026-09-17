@@ -38,7 +38,7 @@ struct SingleQuestionEntryFeatureTests {
     @Test
     func `세트 조회가 실패하면 오류를 보존하고 준비 실패를 알린다`() async {
         let store = makeStore(
-            fetchQuizSet: StubFetchLearningSetUseCase(results: [.failure(.temporarilyUnavailable)])
+            fetchQuizSet: QuizDetailUseCaseQuizSetStub(results: [.failure(.temporarilyUnavailable)])
         )
         store.exhaustivity = .off
 
@@ -50,7 +50,7 @@ struct SingleQuestionEntryFeatureTests {
 
     @Test
     func `준비 중에는 같은 입력을 무시한다`() async {
-        let fetchQuizSet = StubFetchLearningSetUseCase(results: [.success(QuizTestFixture.unansweredSet)])
+        let fetchQuizSet = QuizDetailUseCaseQuizSetStub(results: [.success(QuizTestFixture.unansweredSet)])
         var state = SingleQuestionEntryFeature.State(projectID: ProjectDetailTestFixture.projectID)
         state.preparation = .loading(questionID: "quiz-0")
         let store = makeStore(fetchQuizSet: fetchQuizSet, state: state)
@@ -76,7 +76,7 @@ struct SingleQuestionEntryFeatureTests {
     // MARK: Private
 
     private func makeStore(
-        fetchQuizSet: StubFetchLearningSetUseCase = StubFetchLearningSetUseCase(
+        fetchQuizSet: QuizDetailUseCaseQuizSetStub = QuizDetailUseCaseQuizSetStub(
             results: [.success(QuizTestFixture.unansweredSet)]
         ),
         state: SingleQuestionEntryFeature.State = SingleQuestionEntryFeature.State(

@@ -1,7 +1,7 @@
 import DomainExternalRepository
 import DomainIdentifier
 
-actor StubFetchExternalRepositoryUseCase: ExternalRepositoryUseCase {
+actor ExternalRepositoryUseCaseStub: ExternalRepositoryUseCase {
 
     // MARK: Lifecycle
 

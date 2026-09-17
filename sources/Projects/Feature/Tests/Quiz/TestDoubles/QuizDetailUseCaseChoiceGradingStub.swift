@@ -1,6 +1,6 @@
 import DomainQuizDetail
 
-actor StubSubmitChoiceAnswerUseCase {
+actor QuizDetailUseCaseChoiceGradingStub {
 
     // MARK: Lifecycle
 

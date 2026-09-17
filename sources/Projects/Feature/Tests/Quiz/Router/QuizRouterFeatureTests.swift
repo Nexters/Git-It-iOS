@@ -138,7 +138,7 @@ struct QuizRouterFeatureTests {
             )
         ) {
             QuizRouterFeature(
-                quizDetail: LearningLibraryUseCaseMock(
+                quizDetail: QuizDetailUseCaseMock(
                     quizSetResults: [.success(QuizTestFixture.unansweredSet)],
                     bookmarkListResults: [.success(QuizTestFixture.bookmarkList)],
                 )

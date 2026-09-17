@@ -5,9 +5,9 @@ import Foundation
 @testable import Feature
 
 func makeAppEntryStore(
-    restoreSession: RestoreSessionUseCaseMock = RestoreSessionUseCaseMock(),
-    fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
+    restoreSession: AccountUseCaseRestorationMock = AccountUseCaseRestorationMock(),
+    fetchMemberProfile: UserInfoUseCaseProfileMock = UserInfoUseCaseProfileMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
     state: AppEntryFeature.State = AppEntryFeature.State(),
 ) -> TestStoreOf<AppEntryFeature> {
     TestStore(initialState: state) {
@@ -20,22 +20,22 @@ func makeAppEntryStore(
 }
 
 func makeTutorialStore(
-    signIn: SignInUseCaseMock = SignInUseCaseMock(),
-    deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+    signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
+    accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: TutorialFeature.State = TutorialFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<TutorialFeature> {
     TestStore(initialState: state) {
         TutorialFeature(
             signIn: signIn.signIn,
-            withdraw: deleteMemberAccount.withdraw,
+            withdraw: accountWithdrawal.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }
 }
 
 func makeLegalAgreementStore(
-    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
+    policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
     state: LegalAgreementFeature.State = LegalAgreementFeature.State(),
 ) -> TestStoreOf<LegalAgreementFeature> {
     TestStore(initialState: state) {
@@ -47,7 +47,7 @@ func makeLegalAgreementStore(
 }
 
 func makePositionSelectionStore(
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
     state: PositionSelectionFeature.State = PositionSelectionFeature.State(),
 ) -> TestStoreOf<PositionSelectionFeature> {
     TestStore(initialState: state) {
@@ -56,7 +56,7 @@ func makePositionSelectionStore(
 }
 
 func makeCareerSelectionStore(
-    completeCuration: CompleteCurationUseCaseMock = CompleteCurationUseCaseMock(),
+    completeCuration: UserInfoUseCaseCurationMock = UserInfoUseCaseCurationMock(),
     state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
 ) -> TestStoreOf<CareerSelectionFeature> {
     TestStore(initialState: state) {
@@ -73,11 +73,11 @@ func makeOnboardingExitStore(
 }
 
 func makeOnboardingRouterStore(
-    signIn: SignInUseCaseMock = SignInUseCaseMock(),
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
-    memberAccount: MemberAccountUseCaseMock = MemberAccountUseCaseMock(),
-    deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+    signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
+    policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
+    userInfo: UserInfoUseCaseMock = UserInfoUseCaseMock(),
+    accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: OnboardingRouterFeature.State = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0"),
 ) -> TestStoreOf<OnboardingRouterFeature> {
@@ -87,8 +87,8 @@ func makeOnboardingRouterStore(
             signOut: signOut.signOut,
             policyConsentStatus: policyConsent.policyConsentStatus,
             consent: policyConsent.consent,
-            updateCuration: { try await memberAccount.updateCuration($0) },
-            withdraw: deleteMemberAccount.withdraw,
+            updateCuration: { try await userInfo.updateCuration($0) },
+            withdraw: accountWithdrawal.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }

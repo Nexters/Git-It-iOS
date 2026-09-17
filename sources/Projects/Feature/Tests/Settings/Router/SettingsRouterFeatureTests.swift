@@ -140,7 +140,7 @@ struct SettingsRouterFeatureTests {
         TestStore(initialState: state) {
             SettingsRouterFeature(
                 account: SettingsRouterAccountUseCaseStub(),
-                userInfo: MemberAccountUseCaseMock(),
+                userInfo: UserInfoUseCaseMock(),
                 appSetting: SettingsRouterAppSettingUseCaseStub(),
             )
         }

@@ -1,7 +1,7 @@
 import DomainAccount
 import Foundation
 
-actor DeleteMemberAccountUseCaseMock {
+actor AccountUseCaseWithdrawalMock {
 
     // MARK: Lifecycle
 

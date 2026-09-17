@@ -11,7 +11,7 @@ struct SavedFeatureTests {
 
     @Test
     func `프로젝트 필터가 있으면 그 프로젝트로만 조회한다`() async {
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(
             results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
@@ -35,7 +35,7 @@ struct SavedFeatureTests {
 
     @Test
     func `프로젝트에서 진입해도 다른 프로젝트 필터로 바꿔 다시 조회한다`() async {
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(
             results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
@@ -59,7 +59,7 @@ struct SavedFeatureTests {
 
     @Test
     func `이미 선택된 필터를 다시 누르면 조회하지 않는다`() async {
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(
             results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
@@ -74,7 +74,7 @@ struct SavedFeatureTests {
 
     @Test
     func `목록을 표시하는 동안 세트 조회를 하지 않는다`() async {
-        let fetchQuizSet = StubFetchLearningSetUseCase()
+        let fetchQuizSet = QuizDetailUseCaseQuizSetStub()
         let store = makeStore()
         store.exhaustivity = .off
 
@@ -87,7 +87,7 @@ struct SavedFeatureTests {
     @Test
     func `저장한 문제가 없으면 빈 상태로 표시한다`() async {
         let store = makeStore(
-            fetchBookmarks: StubFetchBookmarkedQuestionsUseCase(
+            fetchBookmarks: QuizDetailUseCaseBookmarkListStub(
                 results: [.success(ProjectDetailTestFixture.emptyQuizList)]
             )
         )
@@ -101,7 +101,7 @@ struct SavedFeatureTests {
 
     @Test
     func `조회에 실패하면 오류를 남기고 재시도로 다시 조회한다`() async {
-        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(results: [
+        let fetchBookmarks = QuizDetailUseCaseBookmarkListStub(results: [
             .failure(.temporarilyUnavailable),
             .success(ProjectDetailTestFixture.savedQuizList),
         ])
@@ -136,7 +136,7 @@ struct SavedFeatureTests {
     @Test
     func `북마크를 해제하면 목록에서 제거하지 않고 상태만 갱신한다`() async {
         let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
-        let setBookmark = StubSetQuestionBookmarkUseCase(
+        let setBookmark = QuizDetailUseCaseBookmarkStub(
             results: [.success(QuizBookmarkState(quizID: bookmark.quizID, isBookmarked: false))]
         )
         let store = makeStore(setBookmark: setBookmark)
@@ -152,7 +152,7 @@ struct SavedFeatureTests {
         }
 
         #expect(await setBookmark.invocations == [
-            StubSetQuestionBookmarkUseCase.Invocation(
+            QuizDetailUseCaseBookmarkStub.Invocation(
                 quizID: bookmark.quizID,
                 projectID: bookmark.projectID,
                 isBookmarked: false,
@@ -164,10 +164,10 @@ struct SavedFeatureTests {
     // MARK: Private
 
     private func makeStore(
-        fetchBookmarks: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
+        fetchBookmarks: QuizDetailUseCaseBookmarkListStub = QuizDetailUseCaseBookmarkListStub(
             results: [.success(ProjectDetailTestFixture.savedQuizList)]
         ),
-        setBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
+        setBookmark: QuizDetailUseCaseBookmarkStub = QuizDetailUseCaseBookmarkStub(),
         state: SavedFeature.State = SavedFeature.State(
             initialProjectFilter: ProjectDetailTestFixture.projectID,
             isBackControlPresented: true,

@@ -73,10 +73,10 @@ struct ShareRegistrationFeatureStepTests {
         return TestStore(initialState: initialState) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
-                externalRepository: StubFetchExternalRepository(
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                projectGeneration: SpyCreateLearningProject(),
+                projectGeneration: ProjectGenerationUseCaseSpy(),
                 signInAvailability: { .signedIn },
             )
         }

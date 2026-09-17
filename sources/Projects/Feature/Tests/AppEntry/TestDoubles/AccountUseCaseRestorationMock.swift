@@ -1,7 +1,7 @@
 import DomainAccount
 import Foundation
 
-actor RestoreSessionUseCaseMock {
+actor AccountUseCaseRestorationMock {
 
     // MARK: Lifecycle
 

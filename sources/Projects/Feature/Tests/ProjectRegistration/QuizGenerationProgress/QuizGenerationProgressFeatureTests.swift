@@ -12,8 +12,8 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `submit은 canonicalURL과 선택한 난이도로 정확히 한 번 생성을 요청한다`() async {
-        let generationStates = StubTrackGenerationUseCase()
-        let projectGeneration = StubCreateLearningProjectUseCase(
+        let generationStates = ProjectGenerationStateStreamStub()
+        let projectGeneration = ProjectGenerationUseCaseStub(
             results: [.success(sampleReceipt)],
             generationStates: generationStates,
         )
@@ -34,7 +34,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `제출에 실패하면 failed로 전이한다`() async {
-        let projectGeneration = StubCreateLearningProjectUseCase(results: [.failure(.temporarilyUnavailable)])
+        let projectGeneration = ProjectGenerationUseCaseStub(results: [.failure(.temporarilyUnavailable)])
         let store = makeQuizGenerationProgressStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
@@ -46,8 +46,8 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `retryTapped는 동일 입력으로 재제출한다`() async {
-        let generationStates = StubTrackGenerationUseCase()
-        let projectGeneration = StubCreateLearningProjectUseCase(
+        let generationStates = ProjectGenerationStateStreamStub()
+        let projectGeneration = ProjectGenerationUseCaseStub(
             results: [.failure(.temporarilyUnavailable), .success(sampleReceipt)],
             generationStates: generationStates,
         )
@@ -71,7 +71,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `failed가 아닌 상태의 retryTapped는 재제출하지 않는다`() async {
-        let projectGeneration = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
+        let projectGeneration = ProjectGenerationUseCaseStub(results: [.success(sampleReceipt)])
         let store = makeQuizGenerationProgressStore(
             projectGeneration: projectGeneration,
             state: awaitingState(),
@@ -84,7 +84,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록을 알린다`() async {
-        let appSetting = StubRequestGenerationReminderUseCase(statuses: [.authorized])
+        let appSetting = AppSettingUseCaseStub(statuses: [.authorized])
         let store = makeQuizGenerationProgressStore(appSetting: appSetting, state: awaitingState())
         store.exhaustivity = .off
 
@@ -98,7 +98,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `알림 권한이 없으면 리마인드 시트를 연다`() async {
-        let appSetting = StubRequestGenerationReminderUseCase(statuses: [.notDetermined])
+        let appSetting = AppSettingUseCaseStub(statuses: [.notDetermined])
         let store = makeQuizGenerationProgressStore(appSetting: appSetting, state: awaitingState())
         store.exhaustivity = .off
 
@@ -110,7 +110,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `알림 수락은 권한을 요청하고 리마인드 사용을 알린 뒤 등록을 알린다`() async {
-        let appSetting = StubRequestGenerationReminderUseCase(
+        let appSetting = AppSettingUseCaseStub(
             statuses: [.notDetermined],
             requestedStatuses: [.authorized],
         )
@@ -137,7 +137,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `권한 요청이 거부되면 설정 화면을 정확히 한 번 안내한다`() async {
-        let appSetting = StubRequestGenerationReminderUseCase(
+        let appSetting = AppSettingUseCaseStub(
             statuses: [.denied],
             requestedStatuses: [.denied],
         )

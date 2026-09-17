@@ -1,7 +1,7 @@
 import DomainIdentifier
 import DomainQuizDetail
 
-actor StubFetchLearningSetUseCase {
+actor QuizDetailUseCaseQuizSetStub {
 
     // MARK: Lifecycle
 

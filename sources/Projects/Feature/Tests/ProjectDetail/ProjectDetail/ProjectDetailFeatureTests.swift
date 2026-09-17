@@ -82,7 +82,7 @@ struct ProjectDetailFeatureTests {
 
     @Test
     func `삭제는 확인 단계를 거치고 취소하면 아무 것도 삭제하지 않는다`() async {
-        let deleteProject = StubDeleteLearningProjectUseCase()
+        let deleteProject = ProjectUseCaseDeletionStub()
         let store = loadedStore(deleteProject: deleteProject)
 
         await store.send(.view(.deleteTapped)) { $0.deletion = .confirming }
@@ -93,7 +93,7 @@ struct ProjectDetailFeatureTests {
 
     @Test
     func `삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다`() async {
-        let deleteProject = StubDeleteLearningProjectUseCase(results: [.success(())])
+        let deleteProject = ProjectUseCaseDeletionStub(results: [.success(())])
         let store = loadedStore(deleteProject: deleteProject)
         store.exhaustivity = .off
 
@@ -109,7 +109,7 @@ struct ProjectDetailFeatureTests {
     @Test
     func `삭제에 실패하면 오류를 남기고 삭제 완료를 알리지 않는다`() async {
         let store = loadedStore(
-            deleteProject: StubDeleteLearningProjectUseCase(results: [.failure(.temporarilyUnavailable)])
+            deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.temporarilyUnavailable)])
         )
         store.exhaustivity = .off
 
@@ -122,7 +122,7 @@ struct ProjectDetailFeatureTests {
 
     @Test
     func `갱신 요청은 상세를 다시 조회해 서버 값을 그대로 반영한다`() async {
-        let projectDetail = StubFetchLearningProjectDetailUseCase(results: [
+        let projectDetail = ProjectUseCaseDetailStub(results: [
             .success(ProjectDetailTestFixture.mixedProgressDetail),
             .success(ProjectDetailTestFixture.completedDetail),
         ])
@@ -142,7 +142,7 @@ struct ProjectDetailFeatureTests {
     @Test
     func `조회에 실패하면 오류 의미를 보존한다`() async {
         let store = makeStore(
-            projectDetail: StubFetchLearningProjectDetailUseCase(results: [.failure(.temporarilyUnavailable)])
+            projectDetail: ProjectUseCaseDetailStub(results: [.failure(.temporarilyUnavailable)])
         )
         store.exhaustivity = .off
 
@@ -156,7 +156,7 @@ struct ProjectDetailFeatureTests {
 
     private func loadedStore(
         detail: ProjectDetail = ProjectDetailTestFixture.mixedProgressDetail,
-        deleteProject: StubDeleteLearningProjectUseCase = StubDeleteLearningProjectUseCase(),
+        deleteProject: ProjectUseCaseDeletionStub = ProjectUseCaseDeletionStub(),
     ) -> TestStoreOf<ProjectDetailFeature> {
         var state = ProjectDetailFeature.State(projectID: ProjectDetailTestFixture.projectID)
         state.detail = detail
@@ -165,10 +165,10 @@ struct ProjectDetailFeatureTests {
     }
 
     private func makeStore(
-        projectDetail: StubFetchLearningProjectDetailUseCase = StubFetchLearningProjectDetailUseCase(
+        projectDetail: ProjectUseCaseDetailStub = ProjectUseCaseDetailStub(
             results: [.success(ProjectDetailTestFixture.mixedProgressDetail)]
         ),
-        deleteProject: StubDeleteLearningProjectUseCase = StubDeleteLearningProjectUseCase(),
+        deleteProject: ProjectUseCaseDeletionStub = ProjectUseCaseDeletionStub(),
         state: ProjectDetailFeature.State = ProjectDetailFeature.State(
             projectID: ProjectDetailTestFixture.projectID
         ),

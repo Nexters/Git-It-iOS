@@ -14,7 +14,7 @@ struct SettingsFeatureTests {
 
     @Test
     func `task는 프로필을 조회해 설정 값의 근거로 남긴다`() async {
-        let fetchMemberProfile = FetchMemberProfileUseCaseMock(results: [.success(SettingsTestFixture.curatedProfile)])
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(fetchMemberProfile: fetchMemberProfile)
 
         await store.send(.view(.task)) {
@@ -34,7 +34,7 @@ struct SettingsFeatureTests {
     @Test
     func `프로필 조회 실패는 값 없이 실패 상태만 남긴다`() async {
         let store = makeStore(
-            fetchMemberProfile: FetchMemberProfileUseCaseMock(results: [.failure(.temporarilyUnavailable)])
+            fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.failure(.temporarilyUnavailable)])
         )
 
         await store.send(.view(.task)) {
@@ -145,7 +145,7 @@ struct SettingsFeatureTests {
 
     @Test
     func `직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다`() async {
-        let updateMemberPosition = UpdateMemberPositionUseCaseMock()
+        let updateMemberPosition = UserInfoUseCasePositionMock()
         let store = makeStore(
             state: makeState(profile: SettingsTestFixture.curatedProfile),
             updateMemberPosition: updateMemberPosition,
@@ -164,7 +164,7 @@ struct SettingsFeatureTests {
 
     @Test
     func `연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다`() async {
-        let updateMemberCareerLevel = UpdateMemberCareerLevelUseCaseMock()
+        let updateMemberCareerLevel = UserInfoUseCaseCareerLevelMock()
         let store = makeStore(
             state: makeState(profile: SettingsTestFixture.curatedProfile),
             updateMemberCareerLevel: updateMemberCareerLevel,
@@ -185,7 +185,7 @@ struct SettingsFeatureTests {
     func `저장 실패는 실패 상태를 남기고 이전 프로필을 그대로 둔다`() async {
         let store = makeStore(
             state: makeState(profile: SettingsTestFixture.curatedProfile),
-            updateMemberPosition: UpdateMemberPositionUseCaseMock(errors: [.temporarilyUnavailable]),
+            updateMemberPosition: UserInfoUseCasePositionMock(errors: [.temporarilyUnavailable]),
         )
 
         await store.send(.view(.positionSelected(.ios))) {
@@ -200,7 +200,7 @@ struct SettingsFeatureTests {
 
     @Test
     func `저장 중에는 같은 항목의 선택을 다시 보내지 않는다`() async {
-        let updateMemberPosition = UpdateMemberPositionUseCaseMock()
+        let updateMemberPosition = UserInfoUseCasePositionMock()
         var state = makeState(profile: SettingsTestFixture.curatedProfile)
         state.positionMutation = .committing
         let store = makeStore(state: state, updateMemberPosition: updateMemberPosition)
@@ -248,20 +248,20 @@ struct SettingsFeatureTests {
 
     private func makeStore(
         state: SettingsFeature.State = SettingsFeature.State(),
-        fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
-        updateMemberPosition: UpdateMemberPositionUseCaseMock = UpdateMemberPositionUseCaseMock(),
-        updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock = UpdateMemberCareerLevelUseCaseMock(),
+        fetchMemberProfile: UserInfoUseCaseProfileMock = UserInfoUseCaseProfileMock(),
+        updateMemberPosition: UserInfoUseCasePositionMock = UserInfoUseCasePositionMock(),
+        updateMemberCareerLevel: UserInfoUseCaseCareerLevelMock = UserInfoUseCaseCareerLevelMock(),
         notificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus = { .denied },
         requestNotificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus = { .denied },
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) -> TestStoreOf<SettingsFeature> {
         TestStore(initialState: state) {
             SettingsFeature(
-                signOut: SignOutUseCaseMock().signOut,
+                signOut: AccountUseCaseSignOutMock().signOut,
                 profile: fetchMemberProfile.profile,
                 updatePosition: updateMemberPosition.updatePosition,
                 updateCareerLevel: updateMemberCareerLevel.updateCareerLevel,
-                withdraw: DeleteMemberAccountUseCaseMock().withdraw,
+                withdraw: AccountUseCaseWithdrawalMock().withdraw,
                 notificationAuthorization: notificationAuthorization,
                 requestNotificationAuthorization: requestNotificationAuthorization,
                 openNotificationSettings: openNotificationSettings,

@@ -1,12 +1,12 @@
 import DomainProjectGeneration
 
-actor StubCreateLearningProjectUseCase: ProjectGenerationUseCase {
+actor ProjectGenerationUseCaseStub: ProjectGenerationUseCase {
 
     // MARK: Lifecycle
 
     init(
         results: [Result<ProjectGenerationReceipt, ProjectGenerationError>] = [.failure(.unexpected)],
-        generationStates: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
+        generationStates: ProjectGenerationStateStreamStub = ProjectGenerationStateStreamStub(),
         suspendsRequests: Bool = false,
     ) {
         self.results = results
@@ -43,7 +43,7 @@ actor StubCreateLearningProjectUseCase: ProjectGenerationUseCase {
     // MARK: Private
 
     private var results: [Result<ProjectGenerationReceipt, ProjectGenerationError>]
-    private let generationStates: StubTrackGenerationUseCase
+    private let generationStates: ProjectGenerationStateStreamStub
     private let suspendsRequests: Bool
     private var requests = [ProjectGenerationRequest]()
     private var continuations = [(

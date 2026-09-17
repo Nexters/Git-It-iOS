@@ -1,6 +1,6 @@
 import DomainUserInfo
 
-actor HomeMemberProfileUseCaseMock {
+actor UserInfoUseCaseSuspendableProfileMock {
 
     // MARK: Lifecycle
 

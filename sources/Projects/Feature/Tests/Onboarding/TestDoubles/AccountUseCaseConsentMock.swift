@@ -1,7 +1,7 @@
 import DomainAccount
 import Foundation
 
-actor PolicyConsentUseCaseMock {
+actor AccountUseCaseConsentMock {
 
     // MARK: Lifecycle
 

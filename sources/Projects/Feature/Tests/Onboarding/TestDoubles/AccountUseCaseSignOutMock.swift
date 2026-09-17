@@ -1,7 +1,7 @@
 import DomainAccount
 import Foundation
 
-actor SignOutUseCaseMock {
+actor AccountUseCaseSignOutMock {
 
     // MARK: Lifecycle
 

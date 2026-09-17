@@ -12,7 +12,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `task는 프로젝트 스트림을 구독하고 갱신을 한 번 요청한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects)
         store.exhaustivity = .off
 
@@ -30,7 +30,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `스트림이 다시 방출하면 최신 목록으로 갈아끼운다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects)
         store.exhaustivity = .off
 
@@ -95,7 +95,7 @@ struct HomeFeatureGenerationOutcomeTests {
 
     @Test
     func `목록 재조회 입력은 갱신을 다시 요청한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects, state: state)
@@ -112,8 +112,8 @@ struct HomeFeatureGenerationOutcomeTests {
     // MARK: Private
 
     private func makeStore(
-        projects: HomeLearningProjectsUseCaseMock = HomeLearningProjectsUseCaseMock(),
-        profile: HomeMemberProfileUseCaseMock = HomeMemberProfileUseCaseMock(
+        projects: ProjectUseCaseMock = ProjectUseCaseMock(),
+        profile: UserInfoUseCaseSuspendableProfileMock = UserInfoUseCaseSuspendableProfileMock(
             results: [.success(HomeTestFixture.profileWithBoth)]
         ),
         state: HomeFeature.State = HomeFeature.State(),

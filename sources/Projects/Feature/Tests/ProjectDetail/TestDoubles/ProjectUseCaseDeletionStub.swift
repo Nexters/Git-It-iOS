@@ -1,7 +1,7 @@
 import DomainIdentifier
 import DomainProject
 
-actor StubDeleteLearningProjectUseCase {
+actor ProjectUseCaseDeletionStub {
 
     // MARK: Lifecycle
 

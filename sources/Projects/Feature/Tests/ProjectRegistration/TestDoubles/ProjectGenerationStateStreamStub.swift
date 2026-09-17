@@ -2,7 +2,7 @@ import DomainIdentifier
 import DomainProjectGeneration
 import Foundation
 
-actor StubTrackGenerationUseCase {
+actor ProjectGenerationStateStreamStub {
 
     // MARK: Internal
 

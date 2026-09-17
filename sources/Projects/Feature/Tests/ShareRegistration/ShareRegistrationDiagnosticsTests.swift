@@ -124,8 +124,8 @@ struct ShareRegistrationDiagnosticsTests {
         TestStore(initialState: ShareRegistrationFeature.State(sharedURL: sharedURL)) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: location),
-                externalRepository: StubFetchExternalRepository(result: lookupResult),
-                projectGeneration: SpyCreateLearningProject(),
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(result: lookupResult),
+                projectGeneration: ProjectGenerationUseCaseSpy(),
                 signInAvailability: { availability },
                 recordDiagnostic: { recorder.record($0) },
             )

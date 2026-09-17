@@ -39,7 +39,7 @@ struct PositionSelectionFeatureTests {
     func `뒤로 가기는 sign-out 성공 시 exitRequested를 위임한다`() async {
         var state = PositionSelectionFeature.State()
         state.position = .ios
-        let signOut = SignOutUseCaseMock(results: [.signedOut])
+        let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
         let store = makePositionSelectionStore(signOut: signOut, state: state)
 
         await store.send(.view(.backTapped)) {
@@ -55,7 +55,7 @@ struct PositionSelectionFeatureTests {
 
     @Test
     func `뒤로 가기는 sign-out 실패 시 오류를 유지하고 재시도할 수 있다`() async {
-        let signOut = SignOutUseCaseMock(results: [.retryableFailure, .signedOut])
+        let signOut = AccountUseCaseSignOutMock(results: [.retryableFailure, .signedOut])
         let store = makePositionSelectionStore(signOut: signOut)
 
         await store.send(.view(.backTapped)) {

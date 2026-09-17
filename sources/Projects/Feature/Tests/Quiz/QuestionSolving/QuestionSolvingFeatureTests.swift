@@ -20,7 +20,7 @@ struct QuestionSolvingFeatureTests {
 
     @Test
     func `선택하지 않으면 제출하지 않는다`() async {
-        let gradeChoiceAnswer = StubSubmitChoiceAnswerUseCase()
+        let gradeChoiceAnswer = QuizDetailUseCaseChoiceGradingStub()
         let store = makeStore(gradeChoiceAnswer: gradeChoiceAnswer)
 
         await store.send(.view(.submitAnswerTapped))
@@ -30,7 +30,7 @@ struct QuestionSolvingFeatureTests {
 
     @Test(arguments: ["", "   \n "])
     func `비어 있거나 공백만 있는 서술형도 제출한다`(draftEssayText: String) async {
-        let gradeEssayAnswer = StubSubmitEssayAnswerUseCase(results: [.success(QuizTestFixture.essayGrading)])
+        let gradeEssayAnswer = QuizDetailUseCaseEssayGradingStub(results: [.success(QuizTestFixture.essayGrading)])
         let store = makeStore(
             gradeEssayAnswer: gradeEssayAnswer,
             state: essayState(draftEssayText: draftEssayText),
@@ -56,7 +56,7 @@ struct QuestionSolvingFeatureTests {
 
     @Test
     func `제출 중에는 제출과 진행과 뒤로가기 입력을 모두 무시한다`() async {
-        let gradeChoiceAnswer = StubSubmitChoiceAnswerUseCase(
+        let gradeChoiceAnswer = QuizDetailUseCaseChoiceGradingStub(
             results: [.success(QuizTestFixture.correctChoiceGrading)]
         )
         var state = choiceState()
@@ -74,7 +74,7 @@ struct QuestionSolvingFeatureTests {
     @Test
     func `제출에 실패하면 오류를 남기고 작성 중이던 답안을 보존한다`() async {
         let store = makeStore(
-            gradeEssayAnswer: StubSubmitEssayAnswerUseCase(results: [.failure(.temporarilyUnavailable)]),
+            gradeEssayAnswer: QuizDetailUseCaseEssayGradingStub(results: [.failure(.temporarilyUnavailable)]),
             state: essayState(draftEssayText: "작성한 답안"),
         )
         store.exhaustivity = .off
@@ -91,7 +91,7 @@ struct QuestionSolvingFeatureTests {
         var state = choiceState()
         state.draftChoiceIndex = 1
         let store = makeStore(
-            gradeChoiceAnswer: StubSubmitChoiceAnswerUseCase(
+            gradeChoiceAnswer: QuizDetailUseCaseChoiceGradingStub(
                 results: [.success(QuizTestFixture.correctChoiceGrading)]
             ),
             state: state,
@@ -111,7 +111,7 @@ struct QuestionSolvingFeatureTests {
     func `서술형 제출 결과는 정답 여부를 전달하지 않는다`() async {
         let state = essayState(draftEssayText: "작성한 답안")
         let store = makeStore(
-            gradeEssayAnswer: StubSubmitEssayAnswerUseCase(results: [.success(QuizTestFixture.essayGrading)]),
+            gradeEssayAnswer: QuizDetailUseCaseEssayGradingStub(results: [.success(QuizTestFixture.essayGrading)]),
             state: state,
         )
         store.exhaustivity = .off
@@ -159,7 +159,7 @@ struct QuestionSolvingFeatureTests {
     func `북마크는 반영 중 재입력을 무시하고 같은 문제의 결과만 반영한다`() async {
         let state = choiceState()
         let quizID = state.question.id
-        let setBookmark = StubSetQuestionBookmarkUseCase(
+        let setBookmark = QuizDetailUseCaseBookmarkStub(
             results: [.success(QuizBookmarkState(quizID: quizID, isBookmarked: true))]
         )
         let store = makeStore(setBookmark: setBookmark, state: state)
@@ -217,9 +217,9 @@ struct QuestionSolvingFeatureTests {
     }
 
     private func makeStore(
-        gradeChoiceAnswer: StubSubmitChoiceAnswerUseCase = StubSubmitChoiceAnswerUseCase(),
-        gradeEssayAnswer: StubSubmitEssayAnswerUseCase = StubSubmitEssayAnswerUseCase(),
-        setBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
+        gradeChoiceAnswer: QuizDetailUseCaseChoiceGradingStub = QuizDetailUseCaseChoiceGradingStub(),
+        gradeEssayAnswer: QuizDetailUseCaseEssayGradingStub = QuizDetailUseCaseEssayGradingStub(),
+        setBookmark: QuizDetailUseCaseBookmarkStub = QuizDetailUseCaseBookmarkStub(),
         state: QuestionSolvingFeature.State? = nil,
     ) -> TestStoreOf<QuestionSolvingFeature> {
         TestStore(initialState: state ?? choiceState()) {

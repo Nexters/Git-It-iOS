@@ -23,7 +23,7 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `validateTapped 성공은 validation을 validated로 전이하고 repositoryValidated를 위임한다`() async {
-        let externalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
+        let externalRepository = ExternalRepositoryUseCaseStub(results: [.success(sampleRepository)])
         let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.repositoryURLChanged("https://github.com/owner/repo"))) {
@@ -43,7 +43,7 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `validateTapped 실패는 validation을 failed로 전이한다`() async {
-        let externalRepository = StubFetchExternalRepositoryUseCase(results: [.failure(.invalidURLFormat)])
+        let externalRepository = ExternalRepositoryUseCaseStub(results: [.failure(.invalidURLFormat)])
         let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.repositoryURLChanged("https://github.com/owner/repo"))) {
@@ -61,7 +61,7 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `빈 URL에서 validateTapped는 아무 효과도 내지 않는다`() async {
-        let externalRepository = StubFetchExternalRepositoryUseCase()
+        let externalRepository = ExternalRepositoryUseCaseStub()
         let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.validateTapped))
@@ -98,7 +98,7 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `State가 폐기되면 진행 중이던 검증 Effect가 취소되고 이후 이벤트를 받지 않는다`() async {
-        let externalRepository = StubFetchExternalRepositoryUseCase(suspendsRequests: true)
+        let externalRepository = ExternalRepositoryUseCaseStub(suspendsRequests: true)
         var childState = RepositoryLinkInputFeature.State()
         childState.repositoryURLInput = "https://github.com/owner/repo"
         let store = TestStore(initialState: RepositoryLinkInputHostFeature.State(child: childState)) {
@@ -133,7 +133,7 @@ private struct RepositoryLinkInputHostFeature {
         case child(PresentationAction<RepositoryLinkInputFeature.Action>)
     }
 
-    let externalRepository: StubFetchExternalRepositoryUseCase
+    let externalRepository: ExternalRepositoryUseCaseStub
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }

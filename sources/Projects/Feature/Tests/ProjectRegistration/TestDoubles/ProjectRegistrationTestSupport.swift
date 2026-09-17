@@ -19,7 +19,7 @@ let sampleReceipt = ProjectGenerationReceipt(
 )
 
 func makeRepositoryLinkInputStore(
-    externalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
+    externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
     state: RepositoryLinkInputFeature.State = RepositoryLinkInputFeature.State(),
 ) -> TestStoreOf<RepositoryLinkInputFeature> {
     TestStore(initialState: state) {
@@ -34,8 +34,8 @@ func makeQuizLevelSelectionStore(
 }
 
 func makeQuizGenerationProgressStore(
-    projectGeneration: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    appSetting: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(),
+    projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),
+    appSetting: AppSettingUseCaseStub = AppSettingUseCaseStub(),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
     state: QuizGenerationProgressFeature.State = QuizGenerationProgressFeature.State(),
 ) -> TestStoreOf<QuizGenerationProgressFeature> {
@@ -51,9 +51,9 @@ func makeQuizGenerationProgressStore(
 }
 
 func makeProjectRegistrationRouterStore(
-    externalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
-    projectGeneration: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    appSetting: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(),
+    externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
+    projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),
+    appSetting: AppSettingUseCaseStub = AppSettingUseCaseStub(),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
     state: ProjectRegistrationRouterFeature.State = ProjectRegistrationRouterFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationRouterFeature> {
