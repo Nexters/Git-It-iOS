@@ -1,32 +1,36 @@
 import DataNotification
-import DomainLearningProject
-import os
+import DomainAppSetting
 
 // MARK: - NotificationAuthorizationAdapter
 
-struct NotificationAuthorizationAdapter: NotificationAuthorization {
+public struct NotificationAuthorizationAdapter: NotificationAuthorization {
 
-    // MARK: Internal
+    // MARK: Lifecycle
 
-    let reminderNotifier: any LocalReminderNotifier
-
-    func requestAuthorization() async -> NotificationAuthorizationOutcome {
-        let outcome: NotificationAuthorizationOutcome =
-            switch await reminderNotifier.requestAuthorization() {
-            case .authorized: .authorized
-            case .declined: .declined
-            case .previouslyDenied: .previouslyDenied
-            }
-        Self.logger.debug("알림 권한 요청 결과: \(String(describing: outcome), privacy: .public)")
-        return outcome
+    public init(reminderNotifier: any LocalReminderNotifier) {
+        self.reminderNotifier = reminderNotifier
     }
 
-    func isAuthorized() async -> Bool {
-        await reminderNotifier.isAuthorized()
+    // MARK: Public
+
+    public func status() async -> NotificationAuthorizationStatus {
+        switch await reminderNotifier.authorizationSetting() {
+        case .notDetermined: .notDetermined
+        case .authorized: .authorized
+        case .denied: .denied
+        }
+    }
+
+    public func requestAuthorization() async -> NotificationAuthorizationStatus {
+        switch await reminderNotifier.requestAuthorization() {
+        case .authorized: .authorized
+        case .declined,
+             .previouslyDenied: .denied
+        }
     }
 
     // MARK: Private
 
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "NotificationAuthorizationAdapter")
+    private let reminderNotifier: any LocalReminderNotifier
 
 }

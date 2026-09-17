@@ -2,20 +2,21 @@ import Foundation
 import Testing
 @testable import CompositionLearningProject
 @testable import DataLearningProject
-@testable import DomainLearningProject
+@testable import DomainProjectGeneration
 
 // MARK: - GenerationOutcomeRepositoryAdapterTests
 
 @Suite("GenerationOutcomeRepositoryAdapter")
 struct GenerationOutcomeRepositoryAdapterTests {
 
+    // MARK: Internal
+
     @Test
     func `Data DTO를 Domain 모델로 변환해 순서대로 전달한다`() async {
-        let source = StubQuizGenerationOutcomeSource(dtos: [
+        let adapter = GenerationOutcomeRepositoryAdapter(source: StubOutcomeSource(dtos: [
             QuizGenerationOutcomeDTO(projectID: "project-1", status: .completed),
             QuizGenerationOutcomeDTO(projectID: "project-2", status: .failed),
-        ])
-        let adapter = GenerationOutcomeRepositoryAdapter(source: source)
+        ]))
 
         var received = [GenerationOutcome]()
         for await outcome in await adapter.outcomes() {
@@ -28,21 +29,21 @@ struct GenerationOutcomeRepositoryAdapterTests {
         ])
     }
 
-}
+    // MARK: Private
 
-// MARK: - StubQuizGenerationOutcomeSource
+    private struct StubOutcomeSource: QuizGenerationOutcomeSource {
 
-private struct StubQuizGenerationOutcomeSource: QuizGenerationOutcomeSource {
+        let dtos: [QuizGenerationOutcomeDTO]
 
-    let dtos: [QuizGenerationOutcomeDTO]
-
-    func outcomes() -> AsyncStream<QuizGenerationOutcomeDTO> {
-        AsyncStream { continuation in
-            for dto in dtos {
-                continuation.yield(dto)
+        func outcomes() -> AsyncStream<QuizGenerationOutcomeDTO> {
+            AsyncStream { continuation in
+                for dto in dtos {
+                    continuation.yield(dto)
+                }
+                continuation.finish()
             }
-            continuation.finish()
         }
+
     }
 
 }

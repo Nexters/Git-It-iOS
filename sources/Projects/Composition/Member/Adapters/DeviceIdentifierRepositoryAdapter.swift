@@ -1,6 +1,6 @@
 import DataMember
 import DataShared
-import DomainMember
+import DomainAppSetting
 
 // MARK: - DeviceIdentifierRepositoryAdapter
 
@@ -14,7 +14,7 @@ public struct DeviceIdentifierRepositoryAdapter: DeviceIdentifierRepository {
 
     // MARK: Public
 
-    public func currentDeviceID() async -> String {
+    public func currentDeviceID() async -> DeviceID {
         store.loadOrCreate()
     }
 

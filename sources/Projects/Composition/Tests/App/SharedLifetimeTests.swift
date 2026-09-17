@@ -1,11 +1,10 @@
 import Foundation
 import Testing
 
-@testable import CompositionApp
 @testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DataShared
-@testable import DomainAuthentication
+@testable import DomainAccount
 
 // MARK: - SharedLifetimeTests
 
@@ -15,29 +14,31 @@ struct SharedLifetimeTests {
     // MARK: Internal
 
     @Test
-    func `같은 보안 저장소를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
+    func `같은 보안 저장소를 공유해도 Authentication과 SignIn의 저장 값이 서로 섞이지 않는다`() async throws {
         let sharedSecureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
             appleSignInSource: AppleSignInSource(),
             secureStorage: sharedSecureStorage,
         )
-        let loginSessionRepository = LoginSessionRepositoryAdapter(
+        let signInRepository = SignInRepositoryAdapter(
             remote: makeRemote(transport: RecordingRequestTransport(results: [])),
             sessionStorage: sharedSecureStorage,
             appleIdentityStorage: sharedSecureStorage,
+            requestCredentialProvider: RequestCredentialProvider(secureStorage: sharedSecureStorage),
+            sharedSessionStateMarkerCoding: nil,
         )
 
         try await authenticationRepository.clearAuthentication()
-        try await loginSessionRepository.signOut()
+        try await signInRepository.signOut()
 
-        let restoredBeforeLogin = try await loginSessionRepository.restore()
-        let statusBeforeLogin = try await authenticationRepository.authorizationStatus()
+        let restoredBeforeSignIn = try await signInRepository.restore()
+        let statusBeforeSignIn = try await authenticationRepository.authorizationStatus()
 
-        #expect(restoredBeforeLogin == nil)
-        #expect(statusBeforeLogin == .reauthenticationRequired)
+        #expect(restoredBeforeSignIn == nil)
+        #expect(statusBeforeSignIn == .reauthenticationRequired)
 
         try await authenticationRepository.clearAuthentication()
-        try await loginSessionRepository.signOut()
+        try await signInRepository.signOut()
     }
 
     // MARK: Private

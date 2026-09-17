@@ -3,54 +3,39 @@ import Foundation
 import Testing
 @testable import CompositionLearningProject
 @testable import DataLearningProject
-@testable import DomainLearningProject
+@testable import DomainProjectGeneration
 
 struct LearningProjectAssemblyTests {
 
-    @Test
-    func `live 그래프 생성이 성공하고 노출 property가 모두 UseCase Protocol 타입이다`() throws {
-        let assembly = LearningProjectAssembly(
-            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            credential: { .signedOut },
-            credentialRejected: { },
-        )
+    // MARK: Internal
 
-        _ = assembly.fetchLearningProjects as any FetchLearningProjectsUseCase
-        _ = assembly.learningLibrary as any LearningLibraryUseCase
-        _ = assembly.createLearningProject as any CreateLearningProjectUseCase
-        _ = assembly.submitChoiceAnswer as any SubmitChoiceAnswerUseCase
-        _ = assembly.submitEssayAnswer as any SubmitEssayAnswerUseCase
-        _ = assembly.setQuestionBookmark as any SetQuestionBookmarkUseCase
-        _ = assembly.trackGeneration as any TrackGenerationUseCase
-        _ = assembly.pendingGenerations as any PendingGenerationRepository
+    @Test
+    func `live 그래프 생성이 성공하고 노출 property가 UseCase Protocol 타입이다`() throws {
+        let assembly = try Self.makeAssembly()
+
+        _ = assembly.projectGeneration as any ProjectGenerationUseCase
     }
 
     @Test
-    func `push 진입점으로 수신한 payload가 생성 추적 상태에 완료로 반영된다`() async throws {
-        let assembly = LearningProjectAssembly(
+    func `요청이 없으면 생성 상태에 진행 중 기록이 없다`() async throws {
+        let assembly = try Self.makeAssembly()
+
+        var iterator = await assembly.projectGeneration.states().makeAsyncIterator()
+        let state = await iterator.next()
+
+        #expect(state?.requests.isEmpty == true)
+        #expect(state?.preparingProjectIDs.isEmpty == true)
+    }
+
+    // MARK: Private
+
+    private static func makeAssembly() throws -> LearningProjectAssembly {
+        LearningProjectAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
             credential: { .signedOut },
             credentialRejected: { },
             sharedStorage: InMemoryKeyValueStorage(),
         )
-        let trackGeneration = assembly.trackGeneration
-        let githubRepoURL = "https://github.com/owner/repo"
-        _ = await trackGeneration.begin(githubRepoURL: githubRepoURL, requestedAt: Date())
-        await trackGeneration.attachProjectID("project-1", toGithubRepoURL: githubRepoURL)
-
-        var iterator = await trackGeneration.states().makeAsyncIterator()
-        _ = await iterator.next()
-
-        await assembly.ingestGenerationOutcomePayload(["projectId": "project-1", "status": "completed"])
-
-        var status: GenerationRecord.Status?
-        while let state = await iterator.next() {
-            status = state.record(projectID: "project-1")?.status
-            if status == .completed {
-                break
-            }
-        }
-        #expect(status == .completed)
     }
 
 }

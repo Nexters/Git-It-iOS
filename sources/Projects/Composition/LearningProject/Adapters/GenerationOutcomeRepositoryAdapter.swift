@@ -1,19 +1,19 @@
 import DataLearningProject
-import DomainLearningProject
+import DomainProjectGeneration
 
 // MARK: - GenerationOutcomeRepositoryAdapter
 
-struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
+public struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
 
     // MARK: Lifecycle
 
-    init(source: any QuizGenerationOutcomeSource) {
+    public init(source: any QuizGenerationOutcomeSource) {
         self.source = source
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func outcomes() async -> AsyncStream<GenerationOutcome> {
+    public func outcomes() async -> AsyncStream<GenerationOutcome> {
         let dtoStream = source.outcomes()
         return AsyncStream { continuation in
             let task = Task {

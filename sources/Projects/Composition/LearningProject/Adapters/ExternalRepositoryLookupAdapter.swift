@@ -1,25 +1,25 @@
 import DataExternalRepository
-import DomainLearningProject
+import DomainExternalRepository
 
 // MARK: - ExternalRepositoryLookupAdapter
 
-struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
+public struct ExternalRepositoryLookupAdapter: DomainExternalRepository.ExternalRepositoryLookup {
 
     // MARK: Lifecycle
 
-    init(remote: ExternalRepositoryRemote) {
+    public init(remote: ExternalRepositoryRemote) {
         self.remote = remote
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func repository(
+    public func repository(
         owner: String,
         name: String,
-    ) async throws -> ExternalRepository {
+    ) async throws -> DomainExternalRepository.ExternalRepository {
         do {
             let response = try await remote.repository(GitHubRepositoryRequest(owner: owner, repository: name))
-            return ExternalRepository(
+            return DomainExternalRepository.ExternalRepository(
                 canonicalURL: response.htmlURL,
                 ownerName: response.ownerLogin,
                 repositoryName: response.repositoryName,

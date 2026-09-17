@@ -24,30 +24,6 @@ struct AppCompositionPublicSurfaceTests {
         let labels = Set(Mirror(reflecting: composition).children.compactMap(\.label))
 
         let expected: Set = [
-            "signIn",
-            "signOut",
-            "restoreSession",
-            "verifyAuthorization",
-            "refreshSession",
-            "policyConsent",
-            "memberAccount",
-            "fetchLearningProjects",
-            "learningLibrary",
-            "createLearningProject",
-            "submitChoiceAnswer",
-            "submitEssayAnswer",
-            "setQuestionBookmark",
-            "deleteMemberAccount",
-            "fetchExternalRepository",
-            "requestGenerationReminder",
-            "trackGeneration",
-            "recordSharedSessionState",
-            "activatePushClient",
-            "configureAppDelegate",
-            "startObservingGenerationState",
-            "registerCurrentDevice",
-            "deviceTokenRefreshes",
-            "ingestGenerationOutcomePayload",
             "account",
             "userInfo",
             "appSetting",
@@ -55,6 +31,11 @@ struct AppCompositionPublicSurfaceTests {
             "quizDetail",
             "project",
             "projectGeneration",
+            "recordSharedSessionState",
+            "activatePushClient",
+            "configureAppDelegate",
+            "deviceTokenRefreshes",
+            "ingestGenerationOutcomePayload",
         ]
 
         #expect(labels == expected)

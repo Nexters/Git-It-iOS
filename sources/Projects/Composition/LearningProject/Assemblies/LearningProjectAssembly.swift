@@ -1,6 +1,7 @@
 import DataLearningProject
+import DataNotification
 import DataShared
-import DomainLearningProject
+import DomainProjectGeneration
 import Foundation
 
 // MARK: - LearningProjectAssembly
@@ -13,78 +14,41 @@ public struct LearningProjectAssembly: Sendable {
         baseURL: URL,
         credential: @escaping @Sendable () async -> RequestCredential,
         credentialRejected: @escaping @Sendable () async -> Void,
+        reminderContent: GenerationReminderContent = GenerationReminderContent(),
+        reminderNotifier: (any LocalReminderNotifier)? = nil,
+        generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
+        signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         sharedStorage: (any KeyValueStorage)? = nil,
     ) {
-        let projectRepository = LearningProjectRepositoryAdapter(
-            remote: ProjectRemote(
+        let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
+        projectGeneration = ProjectGeneration(
+            repository: ProjectGenerationRepositoryAdapter(remote: ProjectRemote(
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
                 credential: credential,
                 credentialRejected: credentialRejected,
-            )
-        )
-        let learningSetRepository = LearningSetRepositoryAdapter(
-            remote: LearningSetRemote(
-                baseURL: baseURL,
-                transport: transport,
-                responseTimeout: responseTimeout,
-                credential: credential,
-                credentialRejected: credentialRejected,
-            )
-        )
-        let answerRepository = AnswerRepositoryAdapter(
-            remote: AnswerRemote(
-                baseURL: baseURL,
-                transport: transport,
-                responseTimeout: responseTimeout,
-                credential: credential,
-                credentialRejected: credentialRejected,
-            )
-        )
-        let bookmarkRepository = BookmarkRepositoryAdapter(
-            remote: BookmarkRemote(
-                baseURL: baseURL,
-                transport: transport,
-                responseTimeout: responseTimeout,
-                credential: credential,
-                credentialRejected: credentialRejected,
-            )
-        )
-
-        let pendingGenerations = PendingGenerationRepositoryAdapter(
-            store: LocalPendingGenerationStore(
-                storage: sharedStorage ?? StorageFactory.keyValueStorage(
-                    namespace: LocalPendingGenerationStore.namespace,
-                    location: .appGroup,
+            )),
+            pendingGenerations: PendingGenerationRepositoryAdapter(
+                store: LocalPendingGenerationStore(
+                    storage: sharedStorage ?? StorageFactory.keyValueStorage(
+                        namespace: LocalPendingGenerationStore.namespace,
+                        location: .appGroup,
+                    )
                 )
-            )
+            ),
+            outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
+            reminderScheduler: GenerationReminderSchedulerAdapter(
+                reminderNotifier: notifier,
+                completedTitle: reminderContent.completedTitle,
+                completedBody: reminderContent.completedBody,
+                failedTitle: reminderContent.failedTitle,
+                failedBody: reminderContent.failedBody,
+            ),
+            signedOutEvents: signedOutEvents,
         )
-        self.pendingGenerations = pendingGenerations
-        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
-        trackGeneration = TrackGeneration(
-            pendingGenerations: pendingGenerations,
-            outcomeRepository: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
-        )
-
-        fetchLearningProjects = FetchLearningProjects(
-            repository: projectRepository,
-            pendingGenerations: pendingGenerations,
-        )
-        createLearningProject = CreateLearningProject(
-            repository: projectRepository,
-            pendingGenerations: pendingGenerations,
-        )
-        learningLibrary = LearningLibrary(
-            projectRepository: projectRepository,
-            learningSetRepository: learningSetRepository,
-            bookmarkRepository: bookmarkRepository,
-        )
-        submitChoiceAnswer = SubmitChoiceAnswer(repository: answerRepository)
-        submitEssayAnswer = SubmitEssayAnswer(repository: answerRepository)
-        setQuestionBookmark = SetQuestionBookmark(repository: bookmarkRepository)
 
         ingestGenerationOutcomePayload = { rawPayload in
             await generationOutcomeSource.ingest(rawPayload: rawPayload)
@@ -93,14 +57,32 @@ public struct LearningProjectAssembly: Sendable {
 
     // MARK: Public
 
-    public let fetchLearningProjects: any FetchLearningProjectsUseCase
-    public let createLearningProject: any CreateLearningProjectUseCase
-    public let learningLibrary: any LearningLibraryUseCase
-    public let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    public let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    public let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    public let trackGeneration: any TrackGenerationUseCase
-    public let pendingGenerations: any PendingGenerationRepository
+    public struct GenerationReminderContent: Sendable {
+
+        // MARK: Lifecycle
+
+        public init(
+            completedTitle: String = "",
+            completedBody: String = "",
+            failedTitle: String = "",
+            failedBody: String = "",
+        ) {
+            self.completedTitle = completedTitle
+            self.completedBody = completedBody
+            self.failedTitle = failedTitle
+            self.failedBody = failedBody
+        }
+
+        // MARK: Public
+
+        public let completedTitle: String
+        public let completedBody: String
+        public let failedTitle: String
+        public let failedBody: String
+
+    }
+
+    public let projectGeneration: any ProjectGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
 }

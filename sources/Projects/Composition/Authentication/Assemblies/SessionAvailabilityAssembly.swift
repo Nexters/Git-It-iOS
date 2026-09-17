@@ -1,6 +1,6 @@
 import DataAuthentication
 import DataShared
-import DomainAuthentication
+import DomainAccount
 import Foundation
 
 // MARK: - SessionAvailabilityAssembly
@@ -17,21 +17,20 @@ public struct SessionAvailabilityAssembly: Sendable {
             namespace: SessionStorageLayout.namespace,
             location: .appGroup,
         )
+        let requestCredentialProvider = RequestCredentialProvider(secureStorage: sessionStorage)
+        self.requestCredentialProvider = requestCredentialProvider
+
         let markerCoding = sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:))
-        let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
-            guard let markerCoding else { return .appLaunchRequired }
-            return await ResolveSessionAvailability(
-                signInStateRepository: SharedSignInStateRepositoryAdapter(markerCoding: markerCoding),
-                sessionRepository: CurrentSessionRepositoryAdapter(secureStorage: sessionStorage),
-            )()
+        signInAvailability = {
+            guard let isSignedIn = await markerCoding?.loadSignedInState() else { return .appLaunchRequired }
+            guard isSignedIn, await requestCredentialProvider.credential() != .signedOut else { return .signInRequired }
+            return .signedIn
         }
-        self.resolveSessionAvailability = resolveSessionAvailability
-        requestCredentialProvider = RequestCredentialProvider(secureStorage: sessionStorage)
     }
 
     // MARK: Public
 
-    public let resolveSessionAvailability: @Sendable () async -> SessionAvailability
     public let requestCredentialProvider: RequestCredentialProvider
+    public let signInAvailability: @Sendable () async -> SignInAvailability
 
 }

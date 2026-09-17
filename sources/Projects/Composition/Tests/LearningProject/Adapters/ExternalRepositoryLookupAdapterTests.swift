@@ -4,7 +4,7 @@ import Testing
 @testable import CompositionLearningProject
 @testable import DataExternalRepository
 @testable import DataShared
-@testable import DomainLearningProject
+@testable import DomainExternalRepository
 
 // MARK: - ExternalRepositoryLookupAdapterTests
 
@@ -23,7 +23,7 @@ struct ExternalRepositoryLookupAdapterTests {
                     """#.utf8),
             )
         ])
-        let adapter = ExternalRepositoryLookupAdapter(remote: makeRemote(transport: transport))
+        let adapter = ExternalRepositoryLookupAdapter(remote: Self.makeRemote(transport: transport))
 
         let repository = try await adapter.repository(owner: "facebook", name: "react")
 
@@ -38,19 +38,19 @@ struct ExternalRepositoryLookupAdapterTests {
     }
 
     @Test
-    func `Data 오류를 Domain 오류로 변환한다`() async throws {
+    func `Data 오류를 Domain 오류로 변환한다`() async {
         let adapter = ExternalRepositoryLookupAdapter(
-            remote: makeRemote(transport: RecordingRequestTransport(results: []))
+            remote: Self.makeRemote(transport: RecordingRequestTransport(results: []))
         )
 
         await #expect(throws: ExternalRepositoryError.offline) {
-            try await adapter.repository(owner: "facebook", name: "react")
+            _ = try await adapter.repository(owner: "facebook", name: "react")
         }
     }
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingRequestTransport) -> ExternalRepositoryRemote {
+    private static func makeRemote(transport: RecordingRequestTransport) -> ExternalRepositoryRemote {
         ExternalRepositoryRemote(
             baseURL: URL(string: "https://api.github.com")!,
             transport: transport,

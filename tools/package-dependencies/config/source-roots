@@ -22,12 +22,6 @@ CompositionShareExtensionTests Composition/Tests/ShareExtension
 Feature Feature
 FeatureTests Feature/Tests
 
-DomainAuthentication Domain/Authentication
-DomainAuthenticationTests Domain/Tests/Authentication
-DomainLearningProject Domain/LearningProject
-DomainLearningProjectTests Domain/Tests/LearningProject
-DomainMember Domain/Member
-DomainMemberTests Domain/Tests/Member
 DomainIdentifier Domain/Identifier
 DomainIdentifierTests Domain/Tests/Identifier
 DomainAccount Domain/Account

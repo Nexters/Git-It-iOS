@@ -1,14 +1,15 @@
 import DataLearningProject
-import DomainLearningProject
+import DomainIdentifier
+import DomainProjectGeneration
 import Foundation
 
 // MARK: - PendingGenerationRepositoryAdapter
 
-struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
+public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
 
     // MARK: Lifecycle
 
-    init(
+    public init(
         store: LocalPendingGenerationStore,
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = Date.init,
@@ -18,13 +19,13 @@ struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         self.now = now
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func pendingState() async -> GenerationState {
+    public func pendingState() async -> GenerationState {
         Self.purged(Self.state(from: await store.state()), waitPolicy: waitPolicy, now: now())
     }
 
-    func pendingStateChanges() async -> AsyncStream<GenerationState> {
+    public func pendingStateChanges() async -> AsyncStream<GenerationState> {
         let changes = await store.stateChanges()
         let waitPolicy = waitPolicy
         let now = now
@@ -41,41 +42,45 @@ struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         }
     }
 
-    func beginGeneration(
-        githubRepoURL: String,
+    public func beginGeneration(
+        repositoryURL: ExternalRepositoryURL,
         requestedAt: Date,
     ) async -> Bool {
-        await modify { $0.beginning(githubRepoURL: githubRepoURL, requestedAt: requestedAt) }
+        await modify { $0.beginning(repositoryURL: repositoryURL, requestedAt: requestedAt) }
     }
 
-    func attachProjectID(
-        _ projectID: String,
-        toGithubRepoURL githubRepoURL: String,
+    public func attachProjectID(
+        _ projectID: ProjectID,
+        toRepositoryURL repositoryURL: ExternalRepositoryURL,
     ) async {
-        await modify { $0.attachingProjectID(projectID, toGithubRepoURL: githubRepoURL) }
+        await modify { $0.attachingProjectID(projectID, toRepositoryURL: repositoryURL) }
     }
 
-    func finishGeneration(
-        projectID: String,
+    public func finishGeneration(
+        projectID: ProjectID,
         status: GenerationRecord.Status,
         finishedAt: Date,
     ) async {
         await modify { $0.finishing(projectID: projectID, status: status, at: finishedAt) }
     }
 
-    func releaseGeneration(githubRepoURL: String) async {
-        await modify { $0.removing(githubRepoURL: githubRepoURL) }
+    public func releaseGeneration(repositoryURL: ExternalRepositoryURL) async {
+        await modify { $0.removing(repositoryURL: repositoryURL) }
     }
 
-    func releaseGeneration(projectID: String) async {
+    public func releaseGeneration(projectID: ProjectID) async {
         await modify { $0.removing(projectID: projectID) }
     }
 
-    func enqueueReminder(projectID: String) async {
+    public func releaseAll() async {
+        await modify { _ in GenerationState() }
+    }
+
+    public func enqueueReminder(projectID: ProjectID) async {
         await store.appendReminder(projectID: projectID, requestedAt: now())
     }
 
-    func drainReminderProjectIDs() async -> [String] {
+    public func drainReminderProjectIDs() async -> [ProjectID] {
         await store.drainReminderProjectIDs()
     }
 
@@ -108,7 +113,7 @@ struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
     private static func record(from dto: GenerationRecordDTO) -> GenerationRecord? {
         guard let status = status(from: dto.status) else { return nil }
         return GenerationRecord(
-            githubRepoURL: dto.githubRepoURL,
+            repositoryURL: dto.githubRepoURL,
             projectID: dto.projectID,
             requestedAt: dto.requestedAt,
             status: status,
@@ -134,7 +139,7 @@ struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
 
     private static func dto(from record: GenerationRecord) -> GenerationRecordDTO {
         GenerationRecordDTO(
-            githubRepoURL: record.githubRepoURL,
+            githubRepoURL: record.repositoryURL,
             projectID: record.projectID,
             requestedAt: record.requestedAt,
             status: rawValue(from: record.status),

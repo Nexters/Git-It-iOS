@@ -1,10 +1,7 @@
-import DomainAuthentication
-import DomainLearningProject
 import Foundation
 import Testing
 
 @testable import CompositionApp
-@testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DataShared
 
@@ -12,16 +9,16 @@ import Testing
 struct AppCompositionSharedLifetimeTests {
 
     @Test
-    func `LearningProject와 Member 보호 Remote가 같은 access token을 사용한다`() async throws {
+    func `Project와 UserInfo 보호 Remote가 같은 access token을 사용한다`() async throws {
         let secureStorage = InMemorySecureValueStorage()
-        try SessionRecordCoding(secureStorage: secureStorage).save(SessionRecord(
-            tokens: SessionTokens(
-                accessToken: "shared-access-token",
-                refreshToken: "refresh-1",
-                accessTokenExpiresAt: nil,
-                refreshTokenExpiresAt: nil,
-            ),
-            onboarding: LocalOnboardingState(needsCuration: false, acceptedLegalVersions: [], acceptedAt: nil),
+        try SessionRecordStorageCoding(storage: secureStorage).save(StoredSessionRecord(
+            accessToken: "shared-access-token",
+            refreshToken: "refresh-1",
+            accessTokenExpiresAt: nil,
+            refreshTokenExpiresAt: nil,
+            needsCuration: false,
+            acceptedLegalVersions: [],
+            acceptedAt: nil,
         ))
 
         let transport = RecordingRequestTransport(results: [
@@ -46,13 +43,15 @@ struct AppCompositionSharedLifetimeTests {
                 osVersion: "Version 26.0",
                 generationReminderTitle: "세트 생성 완료",
                 generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
+                generationFailureReminderTitle: "세트 생성 실패",
+                generationFailureReminderBody: "학습 세트를 만들지 못했어요. 다시 시도해주세요.",
             ),
             secureStorage: secureStorage,
             transport: transport,
         )
 
-        _ = try await composition.fetchLearningProjects(page: LearningProjectPage.firstIndex)
-        _ = try await composition.memberAccount.profile()
+        try await composition.project.refresh()
+        _ = try await composition.userInfo.detail()
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 2)

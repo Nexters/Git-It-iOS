@@ -70,7 +70,7 @@ public struct ConcernUseCaseAssembly: Sendable {
             credentialRejected: credentialRejected,
         )
         let account = Account(
-            authenticationRepository: AccountAuthenticationRepositoryAdapter(
+            authenticationRepository: AuthenticationRepositoryAdapter(
                 appleSignInSource: AppleSignInSource(),
                 secureStorage: appleIdentityStorage,
             ),
@@ -87,7 +87,7 @@ public struct ConcernUseCaseAssembly: Sendable {
                 sharedSessionStateMarkerCoding: sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:)),
             ),
             withdrawalRepository: WithdrawalRepositoryAdapter(remote: memberRemote),
-            policyConsentRepository: AccountPolicyConsentRepositoryAdapter(
+            policyConsentRepository: PolicyConsentRepositoryAdapter(
                 store: LocalPolicyConsentStore(
                     storage: StorageFactory.keyValueStorage(
                         namespace: PolicyConsentStorageLayout.namespace,
@@ -105,9 +105,9 @@ public struct ConcernUseCaseAssembly: Sendable {
         )
         let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
         appSetting = AppSetting(
-            notificationAuthorization: AppSettingNotificationAuthorizationAdapter(reminderNotifier: notifier),
+            notificationAuthorization: NotificationAuthorizationAdapter(reminderNotifier: notifier),
             deviceRegistrationRepository: DeviceRegistrationRepositoryAdapter(remote: memberRemote),
-            deviceIdentifierRepository: AppSettingDeviceIdentifierRepositoryAdapter(
+            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(
                 secureStorage: secureStorage ?? StorageFactory.secureValueStorage(
                     namespace: SessionStorageLayout.namespace,
                     location: .appGroup,
@@ -151,7 +151,7 @@ public struct ConcernUseCaseAssembly: Sendable {
         }
         let projectGeneration = ProjectGeneration(
             repository: ProjectGenerationRepositoryAdapter(remote: projectRemote),
-            pendingGenerations: ProjectGenerationPendingRepositoryAdapter(
+            pendingGenerations: PendingGenerationRepositoryAdapter(
                 store: LocalPendingGenerationStore(
                     storage: sharedStorage ?? StorageFactory.keyValueStorage(
                         namespace: LocalPendingGenerationStore.namespace,
@@ -159,8 +159,8 @@ public struct ConcernUseCaseAssembly: Sendable {
                     )
                 )
             ),
-            outcomes: ProjectGenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
-            reminderScheduler: ProjectGenerationReminderSchedulerAdapter(
+            outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
+            reminderScheduler: GenerationReminderSchedulerAdapter(
                 reminderNotifier: notifier,
                 completedTitle: generationReminder.completedTitle,
                 completedBody: generationReminder.completedBody,
@@ -221,14 +221,14 @@ public struct ConcernUseCaseAssembly: Sendable {
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
     ) -> any ExternalRepositoryUseCase {
         ExternalRepositoryResolver(
-            lookup: ResolverExternalRepositoryLookupAdapter(
+            lookup: ExternalRepositoryLookupAdapter(
                 remote: ExternalRepositoryRemote(
                     baseURL: baseURL,
                     transport: transport,
                     responseTimeout: responseTimeout,
                 )
             ),
-            locator: ResolverExternalRepositoryLocatorAdapter(parser: GitHubRepositoryURLParser()),
+            locator: ExternalRepositoryLocatorAdapter(parser: GitHubRepositoryURLParser()),
         )
     }
 

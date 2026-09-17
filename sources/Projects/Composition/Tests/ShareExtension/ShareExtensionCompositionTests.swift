@@ -1,12 +1,12 @@
 import Foundation
 import Testing
 @testable import CompositionAuthentication
+@testable import CompositionLearningProject
 @testable import CompositionShareExtension
 @testable import DataAuthentication
 @testable import DataLearningProject
 @testable import DataNotification
 @testable import DomainAccount
-@testable import DomainAuthentication
 @testable import DomainProjectGeneration
 
 // MARK: - ShareExtensionCompositionTests
@@ -20,36 +20,16 @@ struct ShareExtensionCompositionTests {
     func `마커가 없으면 앱 실행 필요로 판정한다`() async throws {
         let context = try Context()
 
-        #expect(await context.composition.resolveSessionAvailability() == .appLaunchRequired)
+        #expect(await context.composition.signInAvailability() == .appLaunchRequired)
     }
 
     @Test
-    func `저장된 세션이 있으면 갱신 없이 접근 토큰을 사용한다`() async throws {
+    func `저장된 세션이 있으면 로그인된 상태로 판정한다`() async throws {
         let context = try Context()
         await context.markerCoding.save(isSignedIn: true)
         try context.saveSession(accessToken: "shared-token")
 
-        #expect(await context.composition.resolveSessionAvailability() == .available(accessToken: "shared-token"))
-    }
-
-    @Test
-    func `알림 권한 상태를 조회만 하고 요청하지 않는다`() async throws {
-        let context = try Context(isNotificationAuthorized: true)
-
-        #expect(await context.composition.isNotificationAuthorized() == true)
-        #expect(context.reminderNotifier.authorizationRequestCount == 0)
-    }
-
-    @Test
-    func `등록한 프로젝트를 본 앱이 흡수할 대기 목록에 남긴다`() async throws {
-        let context = try Context()
-
-        await context.composition.enqueueGenerationReminder("project-1")
-
-        let pendingGenerations = PendingGenerationRepositoryAdapter(
-            store: LocalPendingGenerationStore(storage: context.sharedStorage)
-        )
-        #expect(await pendingGenerations.drainReminderProjectIDs() == ["project-1"])
+        #expect(await context.composition.signInAvailability() == .signedIn)
     }
 
     @Test
@@ -73,7 +53,7 @@ struct ShareExtensionCompositionTests {
             )
         }
 
-        let pendingGenerations = ProjectGenerationPendingRepositoryAdapter(
+        let pendingGenerations = PendingGenerationRepositoryAdapter(
             store: LocalPendingGenerationStore(storage: context.sharedStorage)
         )
         #expect(await pendingGenerations.pendingState().records.isEmpty)
@@ -89,7 +69,7 @@ struct ShareExtensionCompositionTests {
             reminderNotifier: SpyLocalReminderNotifier(isAuthorized: false),
         )
 
-        #expect(await composition.resolveSessionAvailability() == .appLaunchRequired)
+        #expect(await composition.signInAvailability() == .appLaunchRequired)
     }
 
     // MARK: Private
@@ -98,12 +78,12 @@ struct ShareExtensionCompositionTests {
 
         // MARK: Lifecycle
 
-        init(isNotificationAuthorized: Bool = false) throws {
+        init() throws {
             secureStorage = InMemorySecureValueStorage()
             let sharedStorage = InMemoryKeyValueStorage()
             self.sharedStorage = sharedStorage
             markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
-            let reminderNotifier = SpyLocalReminderNotifier(isAuthorized: isNotificationAuthorized)
+            let reminderNotifier = SpyLocalReminderNotifier(isAuthorized: false)
             self.reminderNotifier = reminderNotifier
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
@@ -132,19 +112,15 @@ struct ShareExtensionCompositionTests {
             accessToken: String,
             accessTokenExpiresAt: Date? = nil,
         ) throws {
-            try SessionRecordCoding(secureStorage: secureStorage).save(
-                SessionRecord(
-                    tokens: SessionTokens(
-                        accessToken: accessToken,
-                        refreshToken: "refresh",
-                        accessTokenExpiresAt: accessTokenExpiresAt,
-                        refreshTokenExpiresAt: nil,
-                    ),
-                    onboarding: LocalOnboardingState(
-                        needsCuration: false,
-                        acceptedLegalVersions: [],
-                        acceptedAt: nil,
-                    ),
+            try SessionRecordStorageCoding(storage: secureStorage).save(
+                StoredSessionRecord(
+                    accessToken: accessToken,
+                    refreshToken: "refresh",
+                    accessTokenExpiresAt: accessTokenExpiresAt,
+                    refreshTokenExpiresAt: nil,
+                    needsCuration: false,
+                    acceptedLegalVersions: [],
+                    acceptedAt: nil,
                 )
             )
         }

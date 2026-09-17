@@ -95,9 +95,6 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        DomainModuleName.DomainAuthentication.rawValue,
-                        DomainModuleName.DomainLearningProject.rawValue,
-                        DomainModuleName.DomainMember.rawValue,
                         DomainModuleName.DomainIdentifier.rawValue,
                         DomainModuleName.DomainAccount.rawValue,
                         DomainModuleName.DomainUserInfo.rawValue,
@@ -108,9 +105,6 @@ extension ProjectName {
                         DomainModuleName.DomainProjectGeneration.rawValue,
                     ],
                     testTargets: [
-                        DomainModuleName.DomainAuthenticationTests.rawValue,
-                        DomainModuleName.DomainLearningProjectTests.rawValue,
-                        DomainModuleName.DomainMemberTests.rawValue,
                         DomainModuleName.DomainIdentifierTests.rawValue,
                         DomainModuleName.DomainAccountTests.rawValue,
                         DomainModuleName.DomainUserInfoTests.rawValue,

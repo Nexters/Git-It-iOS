@@ -1,15 +1,15 @@
 import DataAuthentication
 import DataShared
-import DomainAuthentication
+import DomainAccount
 import Foundation
 
 // MARK: - AuthenticationRepositoryAdapter
 
-actor AuthenticationRepositoryAdapter: AuthenticationRepository {
+public actor AuthenticationRepositoryAdapter: DomainAccount.AuthenticationRepository {
 
     // MARK: Lifecycle
 
-    init(
+    public init(
         appleSignInSource: AppleSignInSource,
         secureStorage: any SecureValueStorage,
     ) {
@@ -17,34 +17,34 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
         appleIdentityStore = AppleIdentityStore(storage: secureStorage)
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func authenticate(using method: AuthenticationMethod) async throws -> AuthenticationGrant {
+    public func authenticate(using method: SignInMethod) async throws -> AuthenticationGrant {
         switch method {
         case .apple:
             do {
                 let credential = try await appleSignInSource.authorize()
-                try? persistUserID(credential.userID)
-                return AuthenticationGrant(id: .init(rawValue: credential.identityToken), method: .apple)
+                try? appleIdentityStore.save(credential.userID)
+                return AuthenticationGrant(id: credential.identityToken, method: .apple)
             } catch let error as AppleSignInError {
                 throw domainError(for: error)
             }
 
         @unknown default:
-            throw AuthenticationError.temporarilyUnavailable
+            throw AccountError.temporarilyUnavailable
         }
     }
 
-    func authorizationStatus() async throws -> AuthorizationStatus {
-        guard let userID = try? loadUserID() else { return .reauthenticationRequired }
-        return domainStatus(await appleSignInSource.state(forUserID: userID))
+    public func authorizationStatus() async throws -> SignInVerification {
+        guard let userID = try? appleIdentityStore.load() else { return .reauthenticationRequired }
+        return verification(for: await appleSignInSource.state(forUserID: userID))
     }
 
-    func clearAuthentication() async throws {
+    public func clearAuthentication() async throws {
         do {
             try appleIdentityStore.delete()
         } catch is SecureValueStorageError {
-            throw AuthenticationError.temporarilyUnavailable
+            throw AccountError.temporarilyUnavailable
         }
     }
 
@@ -53,18 +53,10 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     private let appleSignInSource: AppleSignInSource
     private let appleIdentityStore: AppleIdentityStore
 
-    private func persistUserID(_ userID: String) throws {
-        try appleIdentityStore.save(userID)
-    }
-
-    private func loadUserID() throws -> String? {
-        try appleIdentityStore.load()
-    }
-
-    private func domainStatus(_ state: AppleSignInState) -> AuthorizationStatus {
+    private func verification(for state: AppleSignInState) -> SignInVerification {
         switch state {
         case .authorized:
-            .authorized
+            .valid
 
         case .reauthenticationRequired:
             .reauthenticationRequired
@@ -74,10 +66,10 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
         }
     }
 
-    private func domainError(for error: AppleSignInError) -> AuthenticationError {
+    private func domainError(for error: AppleSignInError) -> AccountError {
         switch error {
         case .cancelled:
-            .cancelled
+            .signInCancelled
 
         case .unavailable:
             .temporarilyUnavailable

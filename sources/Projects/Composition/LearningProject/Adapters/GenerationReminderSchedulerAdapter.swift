@@ -1,38 +1,42 @@
 import DataNotification
-import DomainLearningProject
+import DomainProjectGeneration
 import Foundation
 
 // MARK: - GenerationReminderSchedulerAdapter
 
-struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
+public struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
 
     // MARK: Lifecycle
 
-    init(
+    public init(
         reminderNotifier: any LocalReminderNotifier,
-        title: String,
-        body: String,
+        completedTitle: String,
+        completedBody: String,
+        failedTitle: String,
+        failedBody: String,
     ) {
         self.reminderNotifier = reminderNotifier
-        self.title = title
-        self.body = body
+        self.completedTitle = completedTitle
+        self.completedBody = completedBody
+        self.failedTitle = failedTitle
+        self.failedBody = failedBody
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func isAuthorized() async -> Bool {
+    public func isAuthorized() async -> Bool {
         await reminderNotifier.isAuthorized()
     }
 
-    func schedule(
-        identifier: String,
+    public func schedule(
+        _ reminder: GenerationReminder,
         at date: Date,
     ) async {
         await reminderNotifier.schedule(
             ReminderNotification(
-                identifier: identifier,
-                title: title,
-                body: body,
+                identifier: identifier(for: reminder),
+                title: title(for: reminder.kind),
+                body: body(for: reminder.kind),
             ),
             at: date,
         )
@@ -41,7 +45,33 @@ struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
     // MARK: Private
 
     private let reminderNotifier: any LocalReminderNotifier
-    private let title: String
-    private let body: String
+    private let completedTitle: String
+    private let completedBody: String
+    private let failedTitle: String
+    private let failedBody: String
+
+    private func identifier(for reminder: GenerationReminder) -> String {
+        switch reminder.kind {
+        case .completed: "generation-completed-\(reminder.projectID)"
+        case .failed: "generation-failed-\(reminder.projectID)"
+        @unknown default: "generation-completed-\(reminder.projectID)"
+        }
+    }
+
+    private func title(for kind: GenerationReminder.Kind) -> String {
+        switch kind {
+        case .completed: completedTitle
+        case .failed: failedTitle
+        @unknown default: completedTitle
+        }
+    }
+
+    private func body(for kind: GenerationReminder.Kind) -> String {
+        switch kind {
+        case .completed: completedBody
+        case .failed: failedBody
+        @unknown default: completedBody
+        }
+    }
 
 }

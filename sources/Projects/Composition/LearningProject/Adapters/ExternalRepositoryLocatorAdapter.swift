@@ -1,21 +1,22 @@
 import DataExternalRepository
-import DomainLearningProject
+import DomainExternalRepository
+import DomainIdentifier
 
 // MARK: - ExternalRepositoryLocatorAdapter
 
-struct ExternalRepositoryLocatorAdapter: DomainLearningProject.ExternalRepositoryLocator {
+public struct ExternalRepositoryLocatorAdapter: DomainExternalRepository.ExternalRepositoryLocator {
 
     // MARK: Lifecycle
 
-    init(parser: GitHubRepositoryURLParser) {
+    public init(parser: GitHubRepositoryURLParser) {
         self.parser = parser
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func location(from url: String) -> DomainLearningProject.ExternalRepositoryLocation? {
+    public func location(from url: ExternalRepositoryURL) -> DomainExternalRepository.ExternalRepositoryLocation? {
         parser.location(from: url).map {
-            DomainLearningProject.ExternalRepositoryLocation(owner: $0.owner, name: $0.name)
+            DomainExternalRepository.ExternalRepositoryLocation(owner: $0.owner, name: $0.name)
         }
     }
 
