@@ -489,19 +489,19 @@ Assembly·typealias가 같은 단위에서 Data 타입으로 바뀌어야 compil
 
 ### 테스트
 
-- [ ] T225 [S4] `tools/package-dependencies/tests/test-package-dependencies.sh`의 fixture 규칙 복사(현재 31행·42행)를 `Composition: Domain Data`로 바꾸고, 정상 fixture의 Composition Infrastructure import(현재 238~240행)와 `.fromInfrastructure` 선언(현재 105행)을 제거하며, Composition Swift 파일의 Infrastructure import가 `import-package` 위반·manifest `.fromInfrastructure`가 `manifest-package` 위반으로 보고되는 회귀 사례를 추가한다
+- [X] T225 [S4] `tools/package-dependencies/tests/test-package-dependencies.sh`의 fixture 규칙 복사(현재 31행·42행)를 `Composition: Domain Data`로 바꾸고, 정상 fixture의 Composition Infrastructure import(현재 238~240행)와 `.fromInfrastructure` 선언(현재 105행)을 제거하며, Composition Swift 파일의 Infrastructure import가 `import-package` 위반·manifest `.fromInfrastructure`가 `manifest-package` 위반으로 보고되는 회귀 사례를 추가한다
 
 ### 구현
 
-- [ ] T226 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 남은 모든 `.fromInfrastructure(...)` 의존을 제거한다
-- [ ] T227 [S4] `tools/package-dependencies/config/allowed-dependencies`의 `Composition: Domain Data Infrastructure`를 `Composition: Domain Data`로 바꾼다
-- [ ] T228 [S4] `docs/architecture.md` 3.1 의존 표의 Composition 행을 `Domain, Data`로 바꾸고 7.1 금지 의존성 목록에 `Composition → Infrastructure`와 `App → Infrastructure`를 추가한다
-- [ ] T229 [S4] `docs/assets/package-dependency-graph.dot`에서 `Composition -> Infrastructure` 간선을 제거한다
-- [ ] T230 [S4] `docs/assets/package-dependency-graph.svg`를 T229 `.dot`에서 다시 생성한다(`dot` 명령이 없으면 파일을 바꾸지 않고 미갱신 사실을 진행 보고와 PR 기록 대상으로 남긴다)
+- [X] T226 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`에서 남은 모든 `.fromInfrastructure(...)` 의존을 제거한다
+- [X] T227 [S4] `tools/package-dependencies/config/allowed-dependencies`의 `Composition: Domain Data Infrastructure`를 `Composition: Domain Data`로 바꾼다
+- [X] T228 [S4] `docs/architecture.md` 3.1 의존 표의 Composition 행을 `Domain, Data`로 바꾸고 7.1 금지 의존성 목록에 `Composition → Infrastructure`와 `App → Infrastructure`를 추가한다
+- [X] T229 [S4] `docs/assets/package-dependency-graph.dot`에서 `Composition -> Infrastructure` 간선을 제거한다
+- [X] T230 [S4] `docs/assets/package-dependency-graph.svg`를 T229 `.dot`에서 다시 생성한다(`dot` 명령이 없으면 파일을 바꾸지 않고 미갱신 사실을 진행 보고와 PR 기록 대상으로 남긴다)
 
 ### 정리와 단위 검증
 
-- [ ] T231 [no-write] [S4] quickstart 시나리오 4-1의 manifest grep 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0, `./tools/script-tests/bin/run.sh`와 `./tools/script-verification/bin/run.sh` 통과를 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build` 결과를 기록한다
+- [X] T231 [no-write] [S4] quickstart 시나리오 4-1의 manifest grep 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0, `./tools/script-tests/bin/run.sh`와 `./tools/script-verification/bin/run.sh` 통과를 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U9로 진행한다.
 

@@ -63,7 +63,7 @@ UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구
 | 패키지 | 허용 의존성 |
 |---|---|
 | App | Feature, Composition, Domain |
-| Composition | Domain, Data, Infrastructure |
+| Composition | Domain, Data |
 | Feature | Domain, UI |
 | Domain | — |
 | Data | Infrastructure |
@@ -288,6 +288,10 @@ Data → UI
 Feature → Data
 Feature → Infrastructure
 Feature → Composition
+
+App → Infrastructure
+
+Composition → Infrastructure
 
 Infrastructure → Domain
 Infrastructure → Data

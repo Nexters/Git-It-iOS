@@ -12,54 +12,54 @@
 <!-- App -->
 <g id="node1" class="node">
 <title>App</title>
-<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M643,-285.52C643,-285.52 487,-285.52 487,-285.52 481,-285.52 475,-279.52 475,-273.52 475,-273.52 475,-245.68 475,-245.68 475,-239.68 481,-233.68 487,-233.68 487,-233.68 643,-233.68 643,-233.68 649,-233.68 655,-239.68 655,-245.68 655,-245.68 655,-273.52 655,-273.52 655,-279.52 649,-285.52 643,-285.52"/>
-<text xml:space="preserve" text-anchor="start" x="551.12" y="-258.85" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">App</text>
-<text xml:space="preserve" text-anchor="start" x="511" y="-248.6" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Coordination · Navigation</text>
+<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M413,-285.52C413,-285.52 257,-285.52 257,-285.52 251,-285.52 245,-279.52 245,-273.52 245,-273.52 245,-245.68 245,-245.68 245,-239.68 251,-233.68 257,-233.68 257,-233.68 413,-233.68 413,-233.68 419,-233.68 425,-239.68 425,-245.68 425,-245.68 425,-273.52 425,-273.52 425,-279.52 419,-285.52 413,-285.52"/>
+<text xml:space="preserve" text-anchor="start" x="321.12" y="-258.85" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">App</text>
+<text xml:space="preserve" text-anchor="start" x="281" y="-248.6" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Coordination · Navigation</text>
 </g>
 <!-- Composition -->
 <g id="node2" class="node">
 <title>Composition</title>
-<path fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" d="M427,-168.68C427,-168.68 271,-168.68 271,-168.68 265,-168.68 259,-162.68 259,-156.68 259,-156.68 259,-128.84 259,-128.84 259,-122.84 265,-116.84 271,-116.84 271,-116.84 427,-116.84 427,-116.84 433,-116.84 439,-122.84 439,-128.84 439,-128.84 439,-156.68 439,-156.68 439,-162.68 433,-168.68 427,-168.68"/>
-<text xml:space="preserve" text-anchor="start" x="307" y="-142.01" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Composition</text>
-<text xml:space="preserve" text-anchor="start" x="311.88" y="-131.76" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Adapters · Wiring</text>
+<path fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" d="M225,-168.68C225,-168.68 69,-168.68 69,-168.68 63,-168.68 57,-162.68 57,-156.68 57,-156.68 57,-128.84 57,-128.84 57,-122.84 63,-116.84 69,-116.84 69,-116.84 225,-116.84 225,-116.84 231,-116.84 237,-122.84 237,-128.84 237,-128.84 237,-156.68 237,-156.68 237,-162.68 231,-168.68 225,-168.68"/>
+<text xml:space="preserve" text-anchor="start" x="105" y="-142.01" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Composition</text>
+<text xml:space="preserve" text-anchor="start" x="109.88" y="-131.76" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Adapters · Wiring</text>
 </g>
 <!-- App&#45;&gt;Composition -->
 <g id="edge2" class="edge">
 <title>App&#45;&gt;Composition</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M482.5,-233.03C482.5,-200.88 482.5,-151 482.5,-151 482.5,-151 449.14,-151 449.14,-151"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="449.14,-148.38 441.64,-151 449.14,-153.63 449.14,-148.38"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M290,-232.96C290,-196.09 290,-134 290,-134 290,-134 247.18,-134 247.18,-134"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="247.18,-131.38 239.68,-134 247.18,-136.63 247.18,-131.38"/>
 </g>
 <!-- Feature -->
 <g id="node3" class="node">
 <title>Feature</title>
-<path fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" d="M831,-168.68C831,-168.68 675,-168.68 675,-168.68 669,-168.68 663,-162.68 663,-156.68 663,-156.68 663,-128.84 663,-128.84 663,-122.84 669,-116.84 675,-116.84 675,-116.84 831,-116.84 831,-116.84 837,-116.84 843,-122.84 843,-128.84 843,-128.84 843,-156.68 843,-156.68 843,-162.68 837,-168.68 831,-168.68"/>
-<text xml:space="preserve" text-anchor="start" x="726.75" y="-142.01" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Feature</text>
-<text xml:space="preserve" text-anchor="start" x="712.88" y="-131.76" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">TCA · Presentation</text>
+<path fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" d="M601,-168.68C601,-168.68 445,-168.68 445,-168.68 439,-168.68 433,-162.68 433,-156.68 433,-156.68 433,-128.84 433,-128.84 433,-122.84 439,-116.84 445,-116.84 445,-116.84 601,-116.84 601,-116.84 607,-116.84 613,-122.84 613,-128.84 613,-128.84 613,-156.68 613,-156.68 613,-162.68 607,-168.68 601,-168.68"/>
+<text xml:space="preserve" text-anchor="start" x="496.75" y="-142.01" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Feature</text>
+<text xml:space="preserve" text-anchor="start" x="482.88" y="-131.76" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">TCA · Presentation</text>
 </g>
 <!-- App&#45;&gt;Feature -->
 <g id="edge1" class="edge">
 <title>App&#45;&gt;Feature</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M600,-232.96C600,-196.09 600,-134 600,-134 600,-134 653.05,-134 653.05,-134"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="653.05,-136.63 660.55,-134 653.05,-131.38 653.05,-136.63"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M380,-233.03C380,-200.88 380,-151 380,-151 380,-151 422.82,-151 422.82,-151"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="422.82,-153.63 430.32,-151 422.82,-148.38 422.82,-153.63"/>
 </g>
 <!-- Domain -->
 <g id="node4" class="node">
 <title>Domain</title>
-<path fill="#d1fae5" stroke="#059669" stroke-width="1.5" d="M658,-51.84C658,-51.84 502,-51.84 502,-51.84 496,-51.84 490,-45.84 490,-39.84 490,-39.84 490,-12 490,-12 490,-6 496,0 502,0 502,0 658,0 658,0 664,0 670,-6 670,-12 670,-12 670,-39.84 670,-39.84 670,-45.84 664,-51.84 658,-51.84"/>
-<text xml:space="preserve" text-anchor="start" x="554.5" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Domain</text>
-<text xml:space="preserve" text-anchor="start" x="548.12" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Business Rules</text>
+<path fill="#d1fae5" stroke="#059669" stroke-width="1.5" d="M413,-51.84C413,-51.84 257,-51.84 257,-51.84 251,-51.84 245,-45.84 245,-39.84 245,-39.84 245,-12 245,-12 245,-6 251,0 257,0 257,0 413,0 413,0 419,0 425,-6 425,-12 425,-12 425,-39.84 425,-39.84 425,-45.84 419,-51.84 413,-51.84"/>
+<text xml:space="preserve" text-anchor="start" x="309.5" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Domain</text>
+<text xml:space="preserve" text-anchor="start" x="303.12" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Business Rules</text>
 </g>
 <!-- App&#45;&gt;Domain -->
 <g id="edge3" class="edge">
 <title>App&#45;&gt;Domain</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M545,-233.25C545,-233.25 545,-62.15 545,-62.15"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="547.63,-62.15 545,-54.65 542.38,-62.15 547.63,-62.15"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M335,-233.25C335,-233.25 335,-62.15 335,-62.15"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="337.63,-62.15 335,-54.65 332.38,-62.15 337.63,-62.15"/>
 </g>
 <!-- Composition&#45;&gt;Domain -->
 <g id="edge6" class="edge">
 <title>Composition&#45;&gt;Domain</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M432,-116.27C432,-81.82 432,-26 432,-26 432,-26 480.03,-26 480.03,-26"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="480.03,-28.63 487.53,-26 480.03,-23.38 480.03,-28.63"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M208.5,-116.27C208.5,-81.82 208.5,-26 208.5,-26 208.5,-26 234.79,-26 234.79,-26"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="234.79,-28.63 242.29,-26 234.79,-23.38 234.79,-28.63"/>
 </g>
 <!-- Data -->
 <g id="node5" class="node">
@@ -71,40 +71,34 @@
 <!-- Composition&#45;&gt;Data -->
 <g id="edge7" class="edge">
 <title>Composition&#45;&gt;Data</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M258.41,-143C183.73,-143 90,-143 90,-143 90,-143 90,-62.11 90,-62.11"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="92.63,-62.11 90,-54.61 87.38,-62.11 92.63,-62.11"/>
-</g>
-<!-- Infrastructure -->
-<g id="node6" class="node">
-<title>Infrastructure</title>
-<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M413,-51.84C413,-51.84 257,-51.84 257,-51.84 251,-51.84 245,-45.84 245,-39.84 245,-39.84 245,-12 245,-12 245,-6 251,0 257,0 257,0 413,0 413,0 419,0 425,-6 425,-12 425,-12 425,-39.84 425,-39.84 425,-45.84 419,-51.84 413,-51.84"/>
-<text xml:space="preserve" text-anchor="start" x="288.12" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Infrastructure</text>
-<text xml:space="preserve" text-anchor="start" x="302.75" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Technology API</text>
-</g>
-<!-- Composition&#45;&gt;Infrastructure -->
-<g id="edge8" class="edge">
-<title>Composition&#45;&gt;Infrastructure</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M342,-116.25C342,-116.25 342,-61.95 342,-61.95"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="344.63,-61.95 342,-54.45 339.38,-61.95 344.63,-61.95"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M118.5,-116.25C118.5,-116.25 118.5,-61.95 118.5,-61.95"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="121.13,-61.95 118.5,-54.45 115.88,-61.95 121.13,-61.95"/>
 </g>
 <!-- Feature&#45;&gt;Domain -->
 <g id="edge4" class="edge">
 <title>Feature&#45;&gt;Domain</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M666.5,-116.25C666.5,-116.25 666.5,-61.95 666.5,-61.95"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="669.13,-61.95 666.5,-54.45 663.88,-61.95 669.13,-61.95"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M461.5,-116.27C461.5,-81.82 461.5,-26 461.5,-26 461.5,-26 435.21,-26 435.21,-26"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="435.21,-23.38 427.71,-26 435.21,-28.63 435.21,-23.38"/>
 </g>
 <!-- UI -->
 <g id="node7" class="node">
 <title>UI</title>
-<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M903,-51.84C903,-51.84 747,-51.84 747,-51.84 741,-51.84 735,-45.84 735,-39.84 735,-39.84 735,-12 735,-12 735,-6 741,0 747,0 747,0 903,0 903,0 909,0 915,-6 915,-12 915,-12 915,-39.84 915,-39.84 915,-45.84 909,-51.84 903,-51.84"/>
-<text xml:space="preserve" text-anchor="start" x="817.5" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">UI</text>
-<text xml:space="preserve" text-anchor="start" x="793.12" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Design System</text>
+<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M658,-51.84C658,-51.84 502,-51.84 502,-51.84 496,-51.84 490,-45.84 490,-39.84 490,-39.84 490,-12 490,-12 490,-6 496,0 502,0 502,0 658,0 658,0 664,0 670,-6 670,-12 670,-12 670,-39.84 670,-39.84 670,-45.84 664,-51.84 658,-51.84"/>
+<text xml:space="preserve" text-anchor="start" x="572.5" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">UI</text>
+<text xml:space="preserve" text-anchor="start" x="548.12" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Design System</text>
 </g>
 <!-- Feature&#45;&gt;UI -->
 <g id="edge5" class="edge">
 <title>Feature&#45;&gt;UI</title>
-<path fill="none" stroke="#475569" stroke-width="1.4" d="M789,-116.25C789,-116.25 789,-61.95 789,-61.95"/>
-<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="791.63,-61.95 789,-54.45 786.38,-61.95 791.63,-61.95"/>
+<path fill="none" stroke="#475569" stroke-width="1.4" d="M551.5,-116.25C551.5,-116.25 551.5,-61.95 551.5,-61.95"/>
+<polygon fill="#475569" stroke="#475569" stroke-width="1.4" points="554.13,-61.95 551.5,-54.45 548.88,-61.95 554.13,-61.95"/>
+</g>
+<!-- Infrastructure -->
+<g id="node6" class="node">
+<title>Infrastructure</title>
+<path fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" d="M903,-51.84C903,-51.84 747,-51.84 747,-51.84 741,-51.84 735,-45.84 735,-39.84 735,-39.84 735,-12 735,-12 735,-6 741,0 747,0 747,0 903,0 903,0 909,0 915,-6 915,-12 915,-12 915,-39.84 915,-39.84 915,-45.84 909,-51.84 903,-51.84"/>
+<text xml:space="preserve" text-anchor="start" x="778.12" y="-25.17" font-family="Apple SD Gothic Neo" font-weight="bold" font-size="15.00" fill="#0f172a">Infrastructure</text>
+<text xml:space="preserve" text-anchor="start" x="792.75" y="-14.92" font-family="Apple SD Gothic Neo" font-size="10.00" fill="#0f172a">Technology API</text>
 </g>
 </g>
 </svg>

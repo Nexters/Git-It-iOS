@@ -7,7 +7,6 @@ import Testing
 @testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DataShared
-@testable import InfrastructureAuthentication
 
 @Suite("AppComposition")
 struct AppCompositionTests {

@@ -45,9 +45,6 @@ extension CompositionModuleName {
                     .fromData(.DataAuthentication),
                     .fromData(.DataLegalConsent),
                     .fromData(.DataShared),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -70,8 +67,6 @@ extension CompositionModuleName {
                     .fromData(.DataExternalRepository),
                     .fromData(.DataNotification),
                     .fromData(.DataShared),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureLocalNotification),
                 ],
             )
 
@@ -93,8 +88,6 @@ extension CompositionModuleName {
                     .fromDomain(.DomainMember),
                     .fromData(.DataMember),
                     .fromData(.DataShared),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -120,9 +113,6 @@ extension CompositionModuleName {
                     .fromDomain(.DomainMember),
                     .fromData(.DataNotification),
                     .fromData(.DataShared),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructurePushMessaging),
                 ],
             )
 
@@ -153,9 +143,6 @@ extension CompositionModuleName {
                     .fromData(.DataAuthentication),
                     .fromData(.DataNotification),
                     .fromData(.DataShared),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureLocalNotification),
                 ],
             )
 

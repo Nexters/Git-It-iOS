@@ -7,7 +7,6 @@ import Testing
 @testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DataShared
-@testable import InfrastructureAuthentication
 
 @Suite("AppComposition 공유 세션 수명")
 struct AppCompositionSharedLifetimeTests {
