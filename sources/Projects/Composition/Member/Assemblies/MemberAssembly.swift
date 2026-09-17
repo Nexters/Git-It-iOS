@@ -1,9 +1,9 @@
 import CompositionShared
 import DataMember
+import DataShared
 import DomainAuthentication
 import DomainMember
 import Foundation
-import InfrastructureAuthentication
 import InfrastructureNetworkClient
 
 // MARK: - MemberAssembly
@@ -43,14 +43,19 @@ public struct MemberAssembly: Sendable {
     public let deleteMemberAccount: any DeleteMemberAccountUseCase
 
     public func makeRegisterCurrentDevice(
-        keychainStore: KeychainStore,
+        secureStorage: (any SecureValueStorage)?,
         appVersion: String,
         osVersion: String,
         deviceTokenProvider: @escaping @Sendable () async throws -> String,
     ) -> @Sendable () async throws -> Void {
         let registerCurrentDevice = RegisterCurrentDevice(
             repository: repository,
-            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
+            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(
+                secureStorage: secureStorage ?? StorageFactory.secureValueStorage(
+                    namespace: LocalDeviceIdentifierStore.namespace,
+                    location: .appGroup,
+                )
+            ),
             appVersion: appVersion,
             osVersion: osVersion,
             deviceTokenProvider: deviceTokenProvider,

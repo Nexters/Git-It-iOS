@@ -5,7 +5,6 @@ import DataShared
 import DomainAuthentication
 import DomainLearningProject
 import Foundation
-import InfrastructureAuthentication
 import InfrastructureLocalNotification
 import InfrastructureNetworkClient
 
@@ -60,7 +59,7 @@ public struct ShareExtensionComposition: Sendable {
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
+        secureStorage: (any SecureValueStorage)? = nil,
         sharedStorage: (any KeyValueStorage)? = StorageFactory.keyValueStorage(
             namespace: SessionStorageLayout.sharedSessionNamespace,
             location: .appGroup,
@@ -69,7 +68,7 @@ public struct ShareExtensionComposition: Sendable {
         transport: (any HTTPTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             sharedStorage: sharedStorage,
         )
 

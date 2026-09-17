@@ -3,7 +3,6 @@ import Testing
 @testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DomainAuthentication
-@testable import InfrastructureAuthentication
 
 struct AuthenticationAssemblyTests {
 
@@ -22,7 +21,7 @@ struct AuthenticationAssemblyTests {
     func `저장된 세션이 없으면 restoreSession이 RestoreSessionResult unauthenticated를 반환한다`() async throws {
         let assembly = AuthenticationAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            secureStorage: InMemorySecureValueStorage(),
         )
 
         let result = await assembly.restoreSession()
@@ -34,7 +33,7 @@ struct AuthenticationAssemblyTests {
     func `저장된 세션이 없어도 signOut은 SignOutResult success를 반환한다`() async throws {
         let assembly = AuthenticationAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            secureStorage: InMemorySecureValueStorage(),
         )
 
         let result = await assembly.signOut()

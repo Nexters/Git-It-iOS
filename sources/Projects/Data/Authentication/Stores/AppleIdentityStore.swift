@@ -1,5 +1,5 @@
+import DataShared
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - AppleIdentityStore
 
@@ -7,29 +7,28 @@ public struct AppleIdentityStore: Sendable {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        self.keychainStore = keychainStore
+    public init(storage: any SecureValueStorage) {
+        self.storage = storage
     }
 
     // MARK: Public
 
     public func load() throws -> String? {
-        guard let data = try keychainStore.load(for: key, in: namespace) else { return nil }
+        guard let data = try storage.data(forKey: key) else { return nil }
         return String(data: data, encoding: .utf8)
     }
 
     public func save(_ userID: String) throws {
-        try keychainStore.save(Data(userID.utf8), for: key, in: namespace)
+        try storage.setData(Data(userID.utf8), forKey: key)
     }
 
     public func delete() throws {
-        try keychainStore.delete(for: key, in: namespace)
+        try storage.removeData(forKey: key)
     }
 
     // MARK: Private
 
-    private let keychainStore: KeychainStore
+    private let storage: any SecureValueStorage
     private let key = AppleIdentityStorageLayout.Key.appleUserID.rawValue
-    private let namespace = AppleIdentityStorageLayout.namespace
 
 }

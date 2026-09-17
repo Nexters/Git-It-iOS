@@ -1,4 +1,5 @@
 import DataAuthentication
+import DataShared
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
@@ -12,11 +13,11 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     init(
         authorizationProvider: AppleAuthorizationProvider,
         credentialStateProvider: AppleCredentialStateProvider,
-        keychainStore: KeychainStore,
+        secureStorage: any SecureValueStorage,
     ) {
         self.authorizationProvider = authorizationProvider
         self.credentialStateProvider = credentialStateProvider
-        appleIdentityStore = AppleIdentityStore(keychainStore: keychainStore)
+        appleIdentityStore = AppleIdentityStore(storage: secureStorage)
     }
 
     // MARK: Internal
@@ -51,7 +52,7 @@ actor AuthenticationRepositoryAdapter: AuthenticationRepository {
     func clearAuthentication() async throws {
         do {
             try appleIdentityStore.delete()
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw AuthenticationError.temporarilyUnavailable
         }
     }

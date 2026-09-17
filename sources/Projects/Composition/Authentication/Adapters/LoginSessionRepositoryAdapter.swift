@@ -2,7 +2,6 @@ import DataAuthentication
 import DataShared
 import DomainAuthentication
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - LoginSessionRepositoryAdapter
 
@@ -12,15 +11,16 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
 
     init(
         remote: AuthenticationRemote,
-        keychainStore: KeychainStore,
+        sessionStorage: any SecureValueStorage,
+        appleIdentityStorage: any SecureValueStorage,
         sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = SharedSessionStateMarkerCoding(
             storage: StorageFactory.keyValueStorage(namespace: SessionStorageLayout.sharedSessionNamespace, location: .appGroup)
         ),
     ) {
         self.remote = remote
         self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding
-        sessionCoding = SessionRecordCoding(keychainStore: keychainStore)
-        appleIdentityStore = AppleIdentityStore(keychainStore: keychainStore)
+        sessionCoding = SessionRecordCoding(secureStorage: sessionStorage)
+        appleIdentityStore = AppleIdentityStore(storage: appleIdentityStorage)
     }
 
     // MARK: Internal
@@ -46,7 +46,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
         } catch let error as AuthenticationServiceError {
             throw domainLoginError(for: error)
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
@@ -55,7 +55,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         do {
             guard try sessionCoding.load() != nil, let userID = try loadAppleUserID() else { return nil }
             return AuthenticatedUser(id: userID, availability: .available, displayName: nil)
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
@@ -64,7 +64,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         do {
             try sessionCoding.delete()
             await recordSharedSessionState(isSignedIn: false)
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
@@ -78,7 +78,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
             let onboarding = try sessionCoding.load()?.onboarding
                 ?? LocalOnboardingState(needsCuration: false, acceptedLegalVersions: [], acceptedAt: nil)
             try sessionCoding.save(SessionRecord(tokens: tokens, onboarding: onboarding))
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }
@@ -87,7 +87,7 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
         do {
             guard let existing = try sessionCoding.load() else { throw LoginSessionError.temporarilyUnavailable }
             try sessionCoding.save(SessionRecord(tokens: existing.tokens, onboarding: onboarding))
-        } catch is KeychainStoreError {
+        } catch is SecureValueStorageError {
             throw LoginSessionError.temporarilyUnavailable
         }
     }

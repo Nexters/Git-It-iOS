@@ -1,5 +1,3 @@
-import InfrastructureAuthentication
-
 // MARK: - AppleIdentityStorageLayout
 
 public enum AppleIdentityStorageLayout {
@@ -10,6 +8,6 @@ public enum AppleIdentityStorageLayout {
         case appleUserID
     }
 
-    public static let namespace = KeychainNamespace("com.nexters.hytime.gitit.authentication")
+    public static let namespace = "com.nexters.hytime.gitit.authentication"
 
 }

@@ -1,6 +1,6 @@
 import DataMember
+import DataShared
 import DomainMember
-import InfrastructureAuthentication
 
 // MARK: - DeviceIdentifierRepositoryAdapter
 
@@ -8,8 +8,8 @@ public struct DeviceIdentifierRepositoryAdapter: DeviceIdentifierRepository {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        store = LocalDeviceIdentifierStore(keychainStore: keychainStore)
+    public init(secureStorage: any SecureValueStorage) {
+        store = LocalDeviceIdentifierStore(storage: secureStorage)
     }
 
     // MARK: Public

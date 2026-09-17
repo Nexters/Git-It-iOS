@@ -1,4 +1,5 @@
 import Foundation
+import InfrastructureAuthentication
 import InfrastructureStorage
 
 // MARK: - StorageFactory
@@ -14,6 +15,13 @@ public enum StorageFactory {
         keyValueStorage(namespace: namespace, userDefaults: userDefaults(for: location))
     }
 
+    public static func secureValueStorage(
+        namespace: String,
+        location: StorageLocation,
+    ) -> any SecureValueStorage {
+        LocalSecureValueStorage(namespace: namespace, keychainStore: keychainStore(for: location))
+    }
+
     // MARK: Internal
 
     static func keyValueStorage(
@@ -25,6 +33,15 @@ public enum StorageFactory {
     }
 
     // MARK: Private
+
+    private static func keychainStore(for location: StorageLocation) -> KeychainStore {
+        switch location {
+        case .appGroup:
+            AppGroupKeychainStore.makeShared()
+        case .device:
+            KeychainStore()
+        }
+    }
 
     private static func userDefaults(for location: StorageLocation) -> UserDefaults? {
         switch location {

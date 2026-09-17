@@ -1,6 +1,7 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import CompositionMember
+import DataShared
 import DomainAuthentication
 import DomainLearningProject
 import DomainMember
@@ -22,7 +23,7 @@ public struct AppComposition: Sendable {
         member: MemberAssembly,
         externalRepository: ExternalRepositoryAssembly,
         generationReminder: GenerationReminderAssembly,
-        keychainStore: KeychainStore,
+        secureStorage: (any SecureValueStorage)?,
         appVersion: String,
         osVersion: String,
     ) {
@@ -68,7 +69,7 @@ public struct AppComposition: Sendable {
         }
 
         registerCurrentDevice = member.makeRegisterCurrentDevice(
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             appVersion: appVersion,
             osVersion: osVersion,
             deviceTokenProvider: {
@@ -156,13 +157,13 @@ public struct AppComposition: Sendable {
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
+        secureStorage: (any SecureValueStorage)? = nil,
         transport: (any HTTPTransport)? = nil,
     ) -> AppComposition {
         let authentication = AuthenticationAssembly(
             baseURL: environment.apiBaseURL,
             policyDocuments: environment.policyDocuments,
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             transport: transport,
         )
         let accessTokenProvider = authentication.accessTokenProvider
@@ -199,7 +200,7 @@ public struct AppComposition: Sendable {
                 reminderBody: environment.generationReminderBody,
                 pendingGenerations: learningProject.pendingGenerations,
             ),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             appVersion: environment.appVersion,
             osVersion: environment.osVersion,
         )

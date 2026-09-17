@@ -1,7 +1,7 @@
 import DataAuthentication
+import DataShared
 import DomainAuthentication
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - SessionRecordCoding
 
@@ -9,8 +9,8 @@ struct SessionRecordCoding: Sendable {
 
     // MARK: Lifecycle
 
-    init(keychainStore: KeychainStore) {
-        coding = SessionRecordStorageCoding(keychainStore: keychainStore)
+    init(secureStorage: any SecureValueStorage) {
+        coding = SessionRecordStorageCoding(storage: secureStorage)
     }
 
     // MARK: Internal

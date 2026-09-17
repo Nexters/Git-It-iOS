@@ -1,5 +1,5 @@
+import DataShared
 import DomainAuthentication
-import InfrastructureAuthentication
 
 // MARK: - CurrentSessionRepositoryAdapter
 
@@ -7,8 +7,8 @@ public struct CurrentSessionRepositoryAdapter: CurrentSessionRepository {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        coding = SessionRecordCoding(keychainStore: keychainStore)
+    public init(secureStorage: any SecureValueStorage) {
+        coding = SessionRecordCoding(secureStorage: secureStorage)
     }
 
     // MARK: Public

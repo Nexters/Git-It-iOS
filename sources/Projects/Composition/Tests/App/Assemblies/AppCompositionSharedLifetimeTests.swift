@@ -14,8 +14,8 @@ struct AppCompositionSharedLifetimeTests {
 
     @Test
     func `LearningProject와 Member 보호 Remote가 같은 access token을 사용한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
+        let secureStorage = InMemorySecureValueStorage()
+        try SessionRecordCoding(secureStorage: secureStorage).save(SessionRecord(
             tokens: SessionTokens(
                 accessToken: "shared-access-token",
                 refreshToken: "refresh-1",
@@ -50,7 +50,7 @@ struct AppCompositionSharedLifetimeTests {
                 generationReminderTitle: "세트 생성 완료",
                 generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
             ),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             transport: transport,
         )
 

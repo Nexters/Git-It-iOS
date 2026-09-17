@@ -16,16 +16,17 @@ struct SharedLifetimeTests {
     // MARK: Internal
 
     @Test
-    func `같은 KeychainStore를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
-        let sharedKeychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+    func `같은 보안 저장소를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
+        let sharedSecureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
             credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: sharedKeychainStore,
+            secureStorage: sharedSecureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
-            keychainStore: sharedKeychainStore,
+            sessionStorage: sharedSecureStorage,
+            appleIdentityStorage: sharedSecureStorage,
         )
 
         try await authenticationRepository.clearAuthentication()

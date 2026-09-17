@@ -16,7 +16,7 @@ public struct AuthenticationAssembly: Sendable {
     public init(
         baseURL: URL,
         policyDocuments: [PolicyDocument] = [],
-        keychainStore: KeychainStore = KeychainStore(),
+        secureStorage: (any SecureValueStorage)? = nil,
         policyConsentStore: LocalPolicyConsentStore = LocalPolicyConsentStore(
             storage: StorageFactory.keyValueStorage(namespace: PolicyConsentStorageLayout.namespace, location: .device)
         ),
@@ -27,8 +27,16 @@ public struct AuthenticationAssembly: Sendable {
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
+        let sessionStorage = secureStorage ?? StorageFactory.secureValueStorage(
+            namespace: SessionStorageLayout.namespace,
+            location: .appGroup,
+        )
+        let appleIdentityStorage = secureStorage ?? StorageFactory.secureValueStorage(
+            namespace: AppleIdentityStorageLayout.namespace,
+            location: .appGroup,
+        )
         let accessTokenProvider: @Sendable () async -> String? = {
-            (try? SessionRecordCoding(keychainStore: keychainStore).load())?.tokens.accessToken
+            (try? SessionRecordCoding(secureStorage: sessionStorage).load())?.tokens.accessToken
         }
         let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
         let authenticationRemote = AuthenticationRemote(
@@ -38,11 +46,12 @@ public struct AuthenticationAssembly: Sendable {
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
             credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: keychainStore,
+            secureStorage: appleIdentityStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: authenticationRemote,
-            keychainStore: keychainStore,
+            sessionStorage: sessionStorage,
+            appleIdentityStorage: appleIdentityStorage,
         )
 
         signIn = SignIn(

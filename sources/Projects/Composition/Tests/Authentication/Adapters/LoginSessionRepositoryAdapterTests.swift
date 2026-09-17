@@ -4,7 +4,6 @@ import Testing
 @testable import CompositionAuthentication
 @testable import DataAuthentication
 @testable import DomainAuthentication
-@testable import InfrastructureAuthentication
 @testable import InfrastructureNetworkClient
 
 // MARK: - LoginSessionRepositoryAdapterTests
@@ -16,11 +15,10 @@ struct LoginSessionRepositoryAdapterTests {
 
     @Test
     func `로그인 응답을 저장하고 Apple 안정 식별자 기반 사용자를 반환한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try keychainStore.save(
+        let secureStorage = InMemorySecureValueStorage()
+        try secureStorage.setData(
             Data("apple-user-1".utf8),
-            for: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
-            in: AppleIdentityStorageLayout.namespace,
+            forKey: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
         )
         let transport = RecordingHTTPTransport(results: [
             jsonResponse(
@@ -32,7 +30,8 @@ struct LoginSessionRepositoryAdapterTests {
         ])
         let adapter = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: transport),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
 
         let grant = AuthenticationGrant(id: .init(rawValue: "id-token-1"), method: .apple)
@@ -51,10 +50,11 @@ struct LoginSessionRepositoryAdapterTests {
 
     @Test
     func `저장된 세션이 없으면 restore가 nil을 반환한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        let secureStorage = InMemorySecureValueStorage()
         let adapter = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
         try await adapter.signOut()
 
@@ -65,7 +65,7 @@ struct LoginSessionRepositoryAdapterTests {
 
     @Test
     func `서버 인증 실패를 Domain 오류로 변환한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        let secureStorage = InMemorySecureValueStorage()
         let transport = RecordingHTTPTransport(results: [
             jsonResponse(
                 statusCode: 401,
@@ -74,7 +74,8 @@ struct LoginSessionRepositoryAdapterTests {
         ])
         let adapter = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: transport),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
 
         await #expect(throws: LoginSessionError.refreshRejectedOrExpired) {
@@ -84,7 +85,7 @@ struct LoginSessionRepositoryAdapterTests {
 
     @Test
     func `Access Token 확인 실패를 unauthorized로 변환한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        let secureStorage = InMemorySecureValueStorage()
         let transport = RecordingHTTPTransport(results: [
             jsonResponse(
                 statusCode: 401,
@@ -93,7 +94,8 @@ struct LoginSessionRepositoryAdapterTests {
         ])
         let adapter = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: transport),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
 
         await #expect(throws: LoginSessionError.unauthorized) {

@@ -284,53 +284,53 @@ compile된다.
 
 ### 준비와 기반
 
-- [ ] T108 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataShared`·`DataSharedTests`에 `InfrastructureAuthentication` 의존을 추가한다
+- [X] T108 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataShared`·`DataSharedTests`에 `InfrastructureAuthentication` 의존을 추가한다
 
 ### 테스트
 
-- [ ] T109 [P] [S4] `sources/Projects/Data/Tests/Shared/Stores/LocalSecureValueStorageTests.swift`에 `@testable import InfrastructureAuthentication`의 `KeychainStore.InMemoryBackend`로 namespace·key 저장·조회·삭제와 `KeychainStoreError` → `SecureValueStorageError` 변환을 검증하는 테스트를 작성한다
-- [ ] T110 [P] [S4] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블(오류 주입 가능)을 추가한다
-- [ ] T111 [P] [S4] `sources/Projects/Data/Tests/Member/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T109 [P] [S4] `sources/Projects/Data/Tests/Shared/Stores/LocalSecureValueStorageTests.swift`에 `@testable import InfrastructureAuthentication`의 `KeychainStore.InMemoryBackend`로 namespace·key 저장·조회·삭제와 `KeychainStoreError` → `SecureValueStorageError` 변환을 검증하는 테스트를 작성한다
+- [X] T110 [P] [S4] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블(오류 주입 가능)을 추가한다
+- [X] T111 [P] [S4] `sources/Projects/Data/Tests/Member/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
 
 ### 구현
 
-- [ ] T112 [S4] `sources/Projects/Data/Shared/Errors/SecureValueStorageError.swift`에 `public enum SecureValueStorageError`를 정의한다. case는 Infrastructure `KeychainStoreError` case와 `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`·`LoginSessionRepositoryAdapter.swift`의 현재 오류 변환을 대조해 Domain 오류 결과가 같아지도록 확정한다
-- [ ] T113 [S4] `sources/Projects/Data/Shared/Contracts/SecureValueStorage.swift`에 `public protocol SecureValueStorage`(`data(forKey:)`, `setData(_:forKey:)`, `removeData(forKey:)`)를 정의한다
-- [ ] T114 [S4] `sources/Projects/Data/Shared/Stores/LocalSecureValueStorage.swift`에 Infrastructure `KeychainStore`와 `KeychainNamespace`를 감싸는 `internal` 실제 구현을 추가한다
-- [ ] T115 [S4] `sources/Projects/Data/Shared/Factories/StorageFactory.swift`에 `secureValueStorage(namespace:location:)`를 추가한다(`.appGroup`은 `AppGroupKeychainStore.makeShared()`, `.device`는 `KeychainStore()`)
-- [ ] T116 [S4] `sources/Projects/Data/Authentication/Layouts/SessionStorageLayout.swift`와 `sources/Projects/Data/Authentication/Layouts/AppleIdentityStorageLayout.swift`의 `namespace`를 `KeychainNamespace`에서 같은 값의 `String`으로 바꾼다
-- [ ] T117 [S4] `sources/Projects/Data/Authentication/Codings/SessionRecordStorageCoding.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 key `sessionRecord`·JSON 형식을 유지한다
-- [ ] T118 [S4] `sources/Projects/Data/Authentication/Stores/AppleIdentityStore.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 key `appleUserID`·UTF-8 형식을 유지한다
-- [ ] T119 [S4] `sources/Projects/Data/Member/Stores/LocalDeviceIdentifierStore.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 `namespace`를 `String`으로, key `deviceID`·UTF-8 형식을 유지한다
-- [ ] T120 [S4] `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordStorageCodingTests.swift`를 T110 더블 주입으로 바꾸고 기대값을 유지한다
-- [ ] T121 [S4] `sources/Projects/Data/Tests/Authentication/Stores/AppleIdentityStoreTests.swift`에 T110 더블을 주입해 사용자 식별자 저장·조회·삭제, key `appleUserID`에 UTF-8 바이트로 저장, 저장소 오류가 호출자에게 전파되는지 검증하는 테스트를 작성한다
-- [ ] T122 [S4] `sources/Projects/Data/Tests/Member/Stores/LocalDeviceIdentifierStoreTests.swift`를 T111 더블 주입으로 바꾸고 기대값을 유지한다
-- [ ] T123 [S4] `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift`의 namespace 단언을 `String` 비교로 바꾸고 문자열 기대값을 유지한다
-- [ ] T124 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataMember`·`DataMemberTests`의 `InfrastructureAuthentication` 의존을 해당 소스의 import가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
-- [ ] T125 [S4] `sources/Projects/Composition/Authentication/Codings/SessionRecordCoding.swift`를 `any SecureValueStorage` 주입으로 바꾼다
-- [ ] T126 [S4] `sources/Projects/Composition/Authentication/Adapters/CurrentSessionRepositoryAdapter.swift`를 `init(secureStorage: any SecureValueStorage)`로 바꾼다
-- [ ] T127 [S4] `sources/Projects/Composition/Authentication/Adapters/LoginSessionRepositoryAdapter.swift`의 `KeychainStore`·`KeychainStoreError`를 `any SecureValueStorage`·`SecureValueStorageError`로 바꾸고 Domain 오류 변환 결과를 유지한다
-- [ ] T128 [S4] `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 `keychainStore` 인자와 `KeychainStoreError` 처리를 `any SecureValueStorage`·`SecureValueStorageError`로 바꾼다(Apple 제공자는 U7에서 전환)
-- [ ] T129 [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`를 `init(secureStorage:sharedStorage:)`로 바꾼다
-- [ ] T130 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `keychainStore: KeychainStore = KeychainStore()`를 `secureStorage: (any SecureValueStorage)?`(nil이면 `StorageFactory`)로 바꾼다
-- [ ] T131 [S4] `sources/Projects/Composition/Member/Adapters/DeviceIdentifierRepositoryAdapter.swift`를 `init(secureStorage: any SecureValueStorage)`로 바꾼다
-- [ ] T132 [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`의 `makeRegisterCurrentDevice(keychainStore:...)`를 `secureStorage:`로 바꾼다
-- [ ] T133 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `live(_:keychainStore:transport:)`와 내부 `keychainStore` 전달을 `secureStorage: (any SecureValueStorage)?`로 바꾼다
-- [ ] T134 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `keychainStore` 인자를 `secureStorage: (any SecureValueStorage)?`로 바꾼다
-- [ ] T135 [P] [S4] `sources/Projects/Composition/Tests/App/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
-- [ ] T136 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블(오류 주입 가능)을 추가한다
-- [ ] T137 [P] [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
-- [ ] T138 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `KeychainStore(backend:)` 준비를 T135 더블로 바꾼다
-- [ ] T139 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionSharedLifetimeTests.swift`의 `KeychainStore(backend:)` 준비를 T135 더블로 바꾼다
-- [ ] T140 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 `KeychainStore` 준비를 T135 더블로 바꾼다
-- [ ] T141 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾸고 Domain 오류 기대값을 유지한다
-- [ ] T142 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/LoginSessionRepositoryAdapterTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾸고 Domain 오류 기대값을 유지한다
-- [ ] T143 [S4] `sources/Projects/Composition/Tests/Authentication/Assemblies/AuthenticationAssemblyTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾼다
-- [ ] T144 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `KeychainStore` 준비를 T137 더블로 바꾼다
+- [X] T112 [S4] `sources/Projects/Data/Shared/Errors/SecureValueStorageError.swift`에 `public enum SecureValueStorageError`를 정의한다. case는 Infrastructure `KeychainStoreError` case와 `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`·`LoginSessionRepositoryAdapter.swift`의 현재 오류 변환을 대조해 Domain 오류 결과가 같아지도록 확정한다
+- [X] T113 [S4] `sources/Projects/Data/Shared/Contracts/SecureValueStorage.swift`에 `public protocol SecureValueStorage`(`data(forKey:)`, `setData(_:forKey:)`, `removeData(forKey:)`)를 정의한다
+- [X] T114 [S4] `sources/Projects/Data/Shared/Stores/LocalSecureValueStorage.swift`에 Infrastructure `KeychainStore`와 `KeychainNamespace`를 감싸는 `internal` 실제 구현을 추가한다
+- [X] T115 [S4] `sources/Projects/Data/Shared/Factories/StorageFactory.swift`에 `secureValueStorage(namespace:location:)`를 추가한다(`.appGroup`은 `AppGroupKeychainStore.makeShared()`, `.device`는 `KeychainStore()`)
+- [X] T116 [S4] `sources/Projects/Data/Authentication/Layouts/SessionStorageLayout.swift`와 `sources/Projects/Data/Authentication/Layouts/AppleIdentityStorageLayout.swift`의 `namespace`를 `KeychainNamespace`에서 같은 값의 `String`으로 바꾼다
+- [X] T117 [S4] `sources/Projects/Data/Authentication/Codings/SessionRecordStorageCoding.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 key `sessionRecord`·JSON 형식을 유지한다
+- [X] T118 [S4] `sources/Projects/Data/Authentication/Stores/AppleIdentityStore.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 key `appleUserID`·UTF-8 형식을 유지한다
+- [X] T119 [S4] `sources/Projects/Data/Member/Stores/LocalDeviceIdentifierStore.swift`를 `init(storage: any SecureValueStorage)`로 바꾸고 `namespace`를 `String`으로, key `deviceID`·UTF-8 형식을 유지한다
+- [X] T120 [S4] `sources/Projects/Data/Tests/Authentication/Codings/SessionRecordStorageCodingTests.swift`를 T110 더블 주입으로 바꾸고 기대값을 유지한다
+- [X] T121 [S4] `sources/Projects/Data/Tests/Authentication/Stores/AppleIdentityStoreTests.swift`에 T110 더블을 주입해 사용자 식별자 저장·조회·삭제, key `appleUserID`에 UTF-8 바이트로 저장, 저장소 오류가 호출자에게 전파되는지 검증하는 테스트를 작성한다
+- [X] T122 [S4] `sources/Projects/Data/Tests/Member/Stores/LocalDeviceIdentifierStoreTests.swift`를 T111 더블 주입으로 바꾸고 기대값을 유지한다
+- [X] T123 [S4] `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift`의 namespace 단언을 `String` 비교로 바꾸고 문자열 기대값을 유지한다
+- [X] T124 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에서 `DataMember`·`DataMemberTests`의 `InfrastructureAuthentication` 의존을 해당 소스의 import가 0건일 때 제거한다. 0건이 아니면 의존을 유지하고 남은 import 경로를 진행 보고에 기록한다
+- [X] T125 [S4] `sources/Projects/Composition/Authentication/Codings/SessionRecordCoding.swift`를 `any SecureValueStorage` 주입으로 바꾼다
+- [X] T126 [S4] `sources/Projects/Composition/Authentication/Adapters/CurrentSessionRepositoryAdapter.swift`를 `init(secureStorage: any SecureValueStorage)`로 바꾼다
+- [X] T127 [S4] `sources/Projects/Composition/Authentication/Adapters/LoginSessionRepositoryAdapter.swift`의 `KeychainStore`·`KeychainStoreError`를 `any SecureValueStorage`·`SecureValueStorageError`로 바꾸고 Domain 오류 변환 결과를 유지한다
+- [X] T128 [S4] `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`의 `keychainStore` 인자와 `KeychainStoreError` 처리를 `any SecureValueStorage`·`SecureValueStorageError`로 바꾼다(Apple 제공자는 U7에서 전환)
+- [X] T129 [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`를 `init(secureStorage:sharedStorage:)`로 바꾼다
+- [X] T130 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `keychainStore: KeychainStore = KeychainStore()`를 `secureStorage: (any SecureValueStorage)?`(nil이면 `StorageFactory`)로 바꾼다
+- [X] T131 [S4] `sources/Projects/Composition/Member/Adapters/DeviceIdentifierRepositoryAdapter.swift`를 `init(secureStorage: any SecureValueStorage)`로 바꾼다
+- [X] T132 [S4] `sources/Projects/Composition/Member/Assemblies/MemberAssembly.swift`의 `makeRegisterCurrentDevice(keychainStore:...)`를 `secureStorage:`로 바꾼다
+- [X] T133 [S4] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`의 `live(_:keychainStore:transport:)`와 내부 `keychainStore` 전달을 `secureStorage: (any SecureValueStorage)?`로 바꾼다
+- [X] T134 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`의 `keychainStore` 인자를 `secureStorage: (any SecureValueStorage)?`로 바꾼다
+- [X] T135 [P] [S4] `sources/Projects/Composition/Tests/App/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T136 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블(오류 주입 가능)을 추가한다
+- [X] T137 [P] [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemorySecureValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T138 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`의 `KeychainStore(backend:)` 준비를 T135 더블로 바꾼다
+- [X] T139 [S4] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionSharedLifetimeTests.swift`의 `KeychainStore(backend:)` 준비를 T135 더블로 바꾼다
+- [X] T140 [S4] `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`의 `KeychainStore` 준비를 T135 더블로 바꾼다
+- [X] T141 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/AuthenticationRepositoryAdapterTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾸고 Domain 오류 기대값을 유지한다
+- [X] T142 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/LoginSessionRepositoryAdapterTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾸고 Domain 오류 기대값을 유지한다
+- [X] T143 [S4] `sources/Projects/Composition/Tests/Authentication/Assemblies/AuthenticationAssemblyTests.swift`의 `KeychainStore` 준비를 T136 더블로 바꾼다
+- [X] T144 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `KeychainStore` 준비를 T137 더블로 바꾼다
 
 ### 정리와 단위 검증
 
-- [ ] T145 [no-write] [S4] `git grep -nE 'KeychainStore|KeychainNamespace|AppGroupKeychainStore' -- sources/Projects/Composition`이 0건인지 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
+- [X] T145 [no-write] [S4] `git grep -nE 'KeychainStore|KeychainNamespace|AppGroupKeychainStore' -- sources/Projects/Composition`이 0건인지 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U6으로 진행한다.
 

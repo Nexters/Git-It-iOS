@@ -55,7 +55,7 @@ struct ShareExtensionCompositionTests {
     func `공유 저장소를 사용할 수 없으면 앱 실행 필요로 판정한다`() async throws {
         let composition = ShareExtensionComposition.live(
             try Context.environment(),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            secureStorage: InMemorySecureValueStorage(),
             sharedStorage: nil,
             localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
         )
@@ -70,7 +70,7 @@ struct ShareExtensionCompositionTests {
         // MARK: Lifecycle
 
         init(isNotificationAuthorized: Bool = false) throws {
-            keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+            secureStorage = InMemorySecureValueStorage()
             let sharedStorage = InMemoryKeyValueStorage()
             self.sharedStorage = sharedStorage
             markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
@@ -78,7 +78,7 @@ struct ShareExtensionCompositionTests {
             self.localNotificationClient = localNotificationClient
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
-                keychainStore: keychainStore,
+                secureStorage: secureStorage,
                 sharedStorage: sharedStorage,
                 localNotificationClient: localNotificationClient,
             )
@@ -87,7 +87,7 @@ struct ShareExtensionCompositionTests {
         // MARK: Internal
 
         let sharedStorage: InMemoryKeyValueStorage
-        let keychainStore: KeychainStore
+        let secureStorage: InMemorySecureValueStorage
         let markerCoding: SharedSessionStateMarkerCoding
         let localNotificationClient: SpyNotificationAuthorizationClient
         let composition: ShareExtensionComposition
@@ -100,7 +100,7 @@ struct ShareExtensionCompositionTests {
         }
 
         func saveSession(accessToken: String) throws {
-            try SessionRecordCoding(keychainStore: keychainStore).save(
+            try SessionRecordCoding(secureStorage: secureStorage).save(
                 SessionRecord(
                     tokens: SessionTokens(
                         accessToken: accessToken,

@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 @testable import DataAuthentication
-@testable import InfrastructureAuthentication
 
 // MARK: - SessionRecordStorageCodingTests
 
@@ -12,8 +11,7 @@ struct SessionRecordStorageCodingTests {
 
     @Test
     func `저장한 세션을 같은 값으로 다시 읽는다`() throws {
-        let store = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        let coding = SessionRecordStorageCoding(keychainStore: store)
+        let coding = SessionRecordStorageCoding(storage: InMemorySecureValueStorage())
 
         try coding.save(Self.record)
 
@@ -21,26 +19,19 @@ struct SessionRecordStorageCodingTests {
     }
 
     @Test
-    func `세션은 기존 네임스페이스와 키 자리에 저장된다`() throws {
-        let store = KeychainStore(backend: KeychainStore.InMemoryBackend())
+    func `세션은 기존 키 자리에 저장된다`() throws {
+        let storage = InMemorySecureValueStorage()
 
-        try SessionRecordStorageCoding(keychainStore: store).save(Self.record)
+        try SessionRecordStorageCoding(storage: storage).save(Self.record)
 
-        let stored = try store.load(
-            for: "sessionRecord",
-            in: KeychainNamespace("com.nexters.hytime.gitit.session"),
-        )
-        #expect(stored != nil)
+        #expect(storage.storedData(forKey: "sessionRecord") != nil)
     }
 
     @Test
     func `저장 형식은 기존 필드 이름을 그대로 쓴다`() throws {
-        let store = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordStorageCoding(keychainStore: store).save(Self.record)
-        let stored = try #require(try store.load(
-            for: "sessionRecord",
-            in: KeychainNamespace("com.nexters.hytime.gitit.session"),
-        ))
+        let storage = InMemorySecureValueStorage()
+        try SessionRecordStorageCoding(storage: storage).save(Self.record)
+        let stored = try #require(storage.storedData(forKey: "sessionRecord"))
 
         let json = try #require(JSONSerialization.jsonObject(with: stored) as? [String: Any])
 
@@ -52,8 +43,7 @@ struct SessionRecordStorageCodingTests {
 
     @Test
     func `삭제한 뒤에는 세션을 읽을 수 없다`() throws {
-        let store = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        let coding = SessionRecordStorageCoding(keychainStore: store)
+        let coding = SessionRecordStorageCoding(storage: InMemorySecureValueStorage())
         try coding.save(Self.record)
 
         try coding.delete()

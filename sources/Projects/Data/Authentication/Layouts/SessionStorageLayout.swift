@@ -1,5 +1,3 @@
-import InfrastructureAuthentication
-
 // MARK: - SessionStorageLayout
 
 public enum SessionStorageLayout {
@@ -10,7 +8,7 @@ public enum SessionStorageLayout {
         case sessionRecord
     }
 
-    public static let namespace = KeychainNamespace("com.nexters.hytime.gitit.session")
+    public static let namespace = "com.nexters.hytime.gitit.session"
 
     public static let sharedSessionNamespace = "com.nexters.hytime.gitit.sharedSession"
 

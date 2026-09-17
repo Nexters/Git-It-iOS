@@ -16,11 +16,11 @@ struct AuthenticationRepositoryAdapterTests {
 
     @Test
     func `저장된 사용자가 없으면 재인증이 필요하다고 판정한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        let secureStorage = InMemorySecureValueStorage()
         let adapter = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
             credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
         )
         try await adapter.clearAuthentication()
 
@@ -31,15 +31,16 @@ struct AuthenticationRepositoryAdapterTests {
 
     @Test
     func `저장된 세션이 없으면 RestoreSessionResult가 unauthenticated다`() async {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+        let secureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
             credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
         )
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
         let restoreSession = RestoreSession(
             authenticationRepository: authenticationRepository,
@@ -53,11 +54,10 @@ struct AuthenticationRepositoryAdapterTests {
 
     @Test
     func `로그인 세션과 로컬 인증 정리가 모두 성공하면 SignOutResult가 success다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try keychainStore.save(
+        let secureStorage = InMemorySecureValueStorage()
+        try secureStorage.setData(
             Data("apple-user-1".utf8),
-            for: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
-            in: AppleIdentityStorageLayout.namespace,
+            forKey: AppleIdentityStorageLayout.Key.appleUserID.rawValue,
         )
         let transport = RecordingHTTPTransport(results: [
             jsonResponse(
@@ -69,7 +69,8 @@ struct AuthenticationRepositoryAdapterTests {
         ])
         let loginSessionRepository = LoginSessionRepositoryAdapter(
             remote: makeRemote(transport: transport),
-            keychainStore: keychainStore,
+            sessionStorage: secureStorage,
+            appleIdentityStorage: secureStorage,
         )
         _ = try await loginSessionRepository.start(with: AuthenticationGrant(
             id: .init(rawValue: "id-token-1"),
@@ -78,7 +79,7 @@ struct AuthenticationRepositoryAdapterTests {
         let authenticationRepository = AuthenticationRepositoryAdapter(
             authorizationProvider: AppleAuthorizationProvider(),
             credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
         )
         let signOut = SignOut(
             authenticationRepository: authenticationRepository,

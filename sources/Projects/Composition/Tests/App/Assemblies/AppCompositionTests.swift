@@ -14,8 +14,8 @@ struct AppCompositionTests {
 
     @Test
     func `memberAccount 큐레이션은 Member graph와 같은 공유 세션 access token으로 요청한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
+        let secureStorage = InMemorySecureValueStorage()
+        try SessionRecordCoding(secureStorage: secureStorage).save(SessionRecord(
             tokens: SessionTokens(
                 accessToken: "shared-access-token",
                 refreshToken: "refresh-1",
@@ -42,7 +42,7 @@ struct AppCompositionTests {
                 generationReminderTitle: "세트 생성 완료",
                 generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
             ),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             transport: transport,
         )
 

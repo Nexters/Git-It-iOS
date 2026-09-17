@@ -137,7 +137,6 @@ extension DataModuleName {
                 dependencies: [
                     .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -148,9 +147,6 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
-                additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureAuthentication)
-                ],
             )
 
         case .DataShared:
@@ -158,7 +154,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureStorage)
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -170,7 +167,8 @@ extension DataModuleName {
                     name: DataModuleName.DataShared.rawValue
                 ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureStorage)
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
         }

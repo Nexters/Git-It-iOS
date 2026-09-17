@@ -1,5 +1,5 @@
+import DataShared
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - SessionRecordStorageCoding
 
@@ -7,30 +7,29 @@ public struct SessionRecordStorageCoding: Sendable {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        self.keychainStore = keychainStore
+    public init(storage: any SecureValueStorage) {
+        self.storage = storage
     }
 
     // MARK: Public
 
     public func load() throws -> StoredSessionRecord? {
-        guard let data = try keychainStore.load(for: key, in: namespace) else { return nil }
+        guard let data = try storage.data(forKey: key) else { return nil }
         return try JSONDecoder().decode(StoredSessionRecord.self, from: data)
     }
 
     public func save(_ record: StoredSessionRecord) throws {
         let data = try JSONEncoder().encode(record)
-        try keychainStore.save(data, for: key, in: namespace)
+        try storage.setData(data, forKey: key)
     }
 
     public func delete() throws {
-        try keychainStore.delete(for: key, in: namespace)
+        try storage.removeData(forKey: key)
     }
 
     // MARK: Private
 
-    private let keychainStore: KeychainStore
+    private let storage: any SecureValueStorage
     private let key = SessionStorageLayout.Key.sessionRecord.rawValue
-    private let namespace = SessionStorageLayout.namespace
 
 }
