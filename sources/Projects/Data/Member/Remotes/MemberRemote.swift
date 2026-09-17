@@ -76,21 +76,8 @@ public struct MemberRemote: Sendable {
     }
 
     private func httpRequest(for endpoint: MemberEndpoint) async -> HTTPRequest {
-        var headers = HTTPHeaders()
-        if let accessToken = await accessTokenProvider() {
-            for (name, value) in endpoint.headers(accessToken: accessToken) {
-                headers[name] = value
-            }
-        }
-        return HTTPRequest(method: httpMethod(for: endpoint.method), path: endpoint.path, headers: headers)
-    }
-
-    private func httpMethod(for method: MemberEndpoint.Method) -> InfrastructureNetworkClient.HTTPMethod {
-        switch method {
-        case .get: .get
-        case .post: .post
-        case .delete: .delete
-        }
+        let headers = await accessTokenProvider().map { endpoint.headers(accessToken: $0) } ?? HTTPHeaders()
+        return HTTPRequest(method: endpoint.transportMethod, path: endpoint.path, headers: headers)
     }
 
     private func payload<Payload: Decodable & Sendable>(

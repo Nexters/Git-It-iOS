@@ -10,7 +10,6 @@ struct GitHubRepositoryRequestTests {
 
         #expect(request.scheme == "https")
         #expect(request.host == "api.github.com")
-        #expect(request.method == "GET")
         #expect(request.path == "/repos/facebook/react")
         #expect(request.headers == [
             "Accept": "application/vnd.github+json",

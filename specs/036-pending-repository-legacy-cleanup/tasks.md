@@ -98,38 +98,38 @@ compile된다.
 
 ### 구현
 
-- [ ] T015 [S3] `sources/Projects/Data/LearningProject/Endpoints/LearningProjectRequest.swift`에서 `method` 공개 프로퍼티와 `init(method:path:queryItems:)`의 Data `HTTPMethod` 인자를 제거하고, `internal let transportMethod: InfrastructureNetworkClient.HTTPMethod`와 이를 받는 `internal init`으로 바꾼다(`path`, `queryItems` 공개 유지)
-- [ ] T016 [S3] `sources/Projects/Data/LearningProject/Endpoints/ProjectEndpoint.swift`가 `LearningProjectRequest`의 internal init으로 같은 method·경로·query를 만들게 수정한다
-- [ ] T017 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/LearningSetEndpoint.swift`를 T015 init으로 수정한다
-- [ ] T018 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/AnswerEndpoint.swift`를 T015 init으로 수정한다
-- [ ] T019 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/BookmarkEndpoint.swift`를 T015 init으로 수정한다
-- [ ] T020 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/QuizGenerationEndpoint.swift`를 T015 init으로 수정한다
-- [ ] T021 [S3] `sources/Projects/Data/LearningProject/Endpoints/AuthorizedRequestHeaders.swift`를 `internal`로 내리고 `fieldValues` 대신 `internal var headers: HTTPHeaders`를 제공한다(헤더 이름·값 불변)
-- [ ] T022 [S3] `sources/Projects/Data/LearningProject/Remotes/LearningProjectRequestExecutor.swift`에서 `httpMethod(for:)` 변환 함수를 제거하고 `request.transportMethod`와 `AuthorizedRequestHeaders.headers`를 그대로 사용한다
-- [ ] T023 [S3] `sources/Projects/Data/LearningProject/Remotes/ProjectRemote.swift`의 인라인 `LearningProjectRequest(...)` 생성을 T015 init으로 수정한다
-- [ ] T024 [S3] `sources/Projects/Data/LearningProject/Models/HTTPMethod.swift`를 삭제한다
-- [ ] T025 [S3] `sources/Projects/Data/Authentication/Endpoints/AuthenticationEndpoint.swift`에서 중첩 `public enum Method`, `public let method`, `public func headers(accessToken:)`를 제거하고 `internal let transportMethod: InfrastructureNetworkClient.HTTPMethod`와 `internal func headers(accessToken:) -> HTTPHeaders`로 바꾼다(`appleLogin`·`verifyAccessToken` 경로와 헤더 값 불변)
-- [ ] T026 [S3] `sources/Projects/Data/Authentication/Remotes/AuthenticationRemote.swift`에서 method 삼항 변환과 헤더 dictionary 복사를 제거하고 T025 internal 멤버를 사용한다
-- [ ] T027 [S3] `sources/Projects/Data/Member/Endpoints/MemberEndpoint.swift`에서 중첩 `public enum Method`, `public let method`, `public func headers(accessToken:)`를 T025와 같은 internal 멤버로 바꾼다(6개 endpoint 경로·method 불변)
-- [ ] T028 [S3] `sources/Projects/Data/Member/Remotes/MemberRemote.swift`에서 `httpMethod(for:)`를 제거하고 T027 internal 멤버를 사용한다
-- [ ] T029 [S3] `sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift`에서 `public let method: String`을 제거한다(`scheme`, `host`, `path`, `headers` 유지)
-- [ ] T030 [S3] `sources/Projects/Data/ExternalRepository/Remotes/ExternalRepositoryRemote.swift`가 T029 변경 뒤에도 `.get`과 같은 헤더로 요청을 만드는지 맞춘다
+- [X] T015 [S3] `sources/Projects/Data/LearningProject/Endpoints/LearningProjectRequest.swift`에서 `method` 공개 프로퍼티와 `init(method:path:queryItems:)`의 Data `HTTPMethod` 인자를 제거하고, `internal let transportMethod: InfrastructureNetworkClient.HTTPMethod`와 이를 받는 `internal init`으로 바꾼다(`path`, `queryItems` 공개 유지)
+- [X] T016 [S3] `sources/Projects/Data/LearningProject/Endpoints/ProjectEndpoint.swift`가 `LearningProjectRequest`의 internal init으로 같은 method·경로·query를 만들게 수정한다
+- [X] T017 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/LearningSetEndpoint.swift`를 T015 init으로 수정한다
+- [X] T018 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/AnswerEndpoint.swift`를 T015 init으로 수정한다
+- [X] T019 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/BookmarkEndpoint.swift`를 T015 init으로 수정한다
+- [X] T020 [P] [S3] `sources/Projects/Data/LearningProject/Endpoints/QuizGenerationEndpoint.swift`를 T015 init으로 수정한다
+- [X] T021 [S3] `sources/Projects/Data/LearningProject/Endpoints/AuthorizedRequestHeaders.swift`를 `internal`로 내리고 `fieldValues` 대신 `internal var headers: HTTPHeaders`를 제공한다(헤더 이름·값 불변)
+- [X] T022 [S3] `sources/Projects/Data/LearningProject/Remotes/LearningProjectRequestExecutor.swift`에서 `httpMethod(for:)` 변환 함수를 제거하고 `request.transportMethod`와 `AuthorizedRequestHeaders.headers`를 그대로 사용한다
+- [X] T023 [S3] `sources/Projects/Data/LearningProject/Remotes/ProjectRemote.swift`의 인라인 `LearningProjectRequest(...)` 생성을 T015 init으로 수정한다
+- [X] T024 [S3] `sources/Projects/Data/LearningProject/Models/HTTPMethod.swift`를 삭제한다
+- [X] T025 [S3] `sources/Projects/Data/Authentication/Endpoints/AuthenticationEndpoint.swift`에서 중첩 `public enum Method`, `public let method`, `public func headers(accessToken:)`를 제거하고 `internal let transportMethod: InfrastructureNetworkClient.HTTPMethod`와 `internal func headers(accessToken:) -> HTTPHeaders`로 바꾼다(`appleLogin`·`verifyAccessToken` 경로와 헤더 값 불변)
+- [X] T026 [S3] `sources/Projects/Data/Authentication/Remotes/AuthenticationRemote.swift`에서 method 삼항 변환과 헤더 dictionary 복사를 제거하고 T025 internal 멤버를 사용한다
+- [X] T027 [S3] `sources/Projects/Data/Member/Endpoints/MemberEndpoint.swift`에서 중첩 `public enum Method`, `public let method`, `public func headers(accessToken:)`를 T025와 같은 internal 멤버로 바꾼다(6개 endpoint 경로·method 불변)
+- [X] T028 [S3] `sources/Projects/Data/Member/Remotes/MemberRemote.swift`에서 `httpMethod(for:)`를 제거하고 T027 internal 멤버를 사용한다
+- [X] T029 [S3] `sources/Projects/Data/ExternalRepository/Requests/GitHubRepositoryRequest.swift`에서 `public let method: String`을 제거한다(`scheme`, `host`, `path`, `headers` 유지)
+- [X] T030 [S3] `sources/Projects/Data/ExternalRepository/Remotes/ExternalRepositoryRemote.swift`가 T029 변경 뒤에도 `.get`과 같은 헤더로 요청을 만드는지 맞춘다
 
 ### 테스트 정리
 
-- [ ] T031 [P] [S3] `sources/Projects/Data/Tests/Authentication/Endpoints/AuthenticationEndpointTests.swift`의 method·헤더 단언을 `@testable` internal 멤버(`transportMethod`, `headers(accessToken:)`) 단언으로 바꾸고 기대값은 유지한다
-- [ ] T032 [P] [S3] `sources/Projects/Data/Tests/Member/Endpoints/MemberEndpointTests.swift`를 T031과 같은 방식으로 바꾼다
-- [ ] T033 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/ProjectEndpointTests.swift`의 `request.method` 단언을 `request.transportMethod` 단언으로 바꾼다
-- [ ] T034 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/LearningSetEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
-- [ ] T035 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/AnswerEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
-- [ ] T036 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/BookmarkEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
-- [ ] T037 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/QuizGenerationEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
-- [ ] T038 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/AuthorizedRequestHeadersTests.swift`를 `headers` 단언으로 바꾸고 이름·값 기대값을 유지한다
-- [ ] T039 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift`에서 `method` 단언을 제거한다(GET 전송은 `ExternalRepositoryRemoteTests.swift`의 기록 요청 단언으로 유지되는지 확인)
+- [X] T031 [P] [S3] `sources/Projects/Data/Tests/Authentication/Endpoints/AuthenticationEndpointTests.swift`의 method·헤더 단언을 `@testable` internal 멤버(`transportMethod`, `headers(accessToken:)`) 단언으로 바꾸고 기대값은 유지한다
+- [X] T032 [P] [S3] `sources/Projects/Data/Tests/Member/Endpoints/MemberEndpointTests.swift`를 T031과 같은 방식으로 바꾼다
+- [X] T033 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/ProjectEndpointTests.swift`의 `request.method` 단언을 `request.transportMethod` 단언으로 바꾼다
+- [X] T034 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/LearningSetEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
+- [X] T035 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/AnswerEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
+- [X] T036 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/BookmarkEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
+- [X] T037 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/QuizGenerationEndpointTests.swift`를 T033과 같은 방식으로 바꾼다
+- [X] T038 [P] [S3] `sources/Projects/Data/Tests/LearningProject/Endpoints/AuthorizedRequestHeadersTests.swift`를 `headers` 단언으로 바꾸고 이름·값 기대값을 유지한다
+- [X] T039 [P] [S3] `sources/Projects/Data/Tests/ExternalRepository/Requests/GitHubRepositoryRequestTests.swift`에서 `method` 단언을 제거한다(GET 전송은 `ExternalRepositoryRemoteTests.swift`의 기록 요청 단언으로 유지되는지 확인)
 
 ### 정리와 단위 검증
 
-- [ ] T040 [no-write] [S3] quickstart 시나리오 3의 grep 0건과 `git diff`에서 Remote 테스트의 경로·method·query·헤더 기대값 변경 0건을 확인하고 사용자 Data `test` 결과를 기록한다
+- [X] T040 [no-write] [S3] quickstart 시나리오 3의 grep 0건과 `git diff`에서 Remote 테스트의 경로·method·query·헤더 기대값 변경 0건을 확인하고 사용자 Data `test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U3으로 진행한다.
 

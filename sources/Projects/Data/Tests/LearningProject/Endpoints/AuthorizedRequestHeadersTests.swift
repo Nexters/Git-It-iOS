@@ -9,9 +9,9 @@ struct AuthorizedRequestHeadersTests {
     func `Bearer 인증과 JSON 헤더를 조립한다`() {
         let headers = AuthorizedRequestHeaders(accessToken: "token-123")
 
-        #expect(headers.fieldValues["Authorization"] == "Bearer token-123")
-        #expect(headers.fieldValues["Accept"] == "application/json")
-        #expect(headers.fieldValues["Content-Type"] == "application/json")
+        #expect(headers.headers["Authorization"] == "Bearer token-123")
+        #expect(headers.headers["Accept"] == "application/json")
+        #expect(headers.headers["Content-Type"] == "application/json")
     }
 
     @Test

@@ -1,19 +1,30 @@
+import InfrastructureNetworkClient
+
 // MARK: - LearningProjectRequest
 
 public struct LearningProjectRequest: Equatable, Sendable {
-    public init(
+
+    // MARK: Lifecycle
+
+    init(
         method: HTTPMethod,
         path: String,
         queryItems: [String: String] = [:],
     ) {
-        self.method = method
+        transportMethod = method
         self.path = path
         self.queryItems = queryItems
     }
 
-    public let method: HTTPMethod
+    // MARK: Public
+
     public let path: String
     public let queryItems: [String: String]
+
+    // MARK: Internal
+
+    let transportMethod: HTTPMethod
+
 }
 
 extension LearningProjectRequest {

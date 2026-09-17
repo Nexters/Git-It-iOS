@@ -43,7 +43,7 @@ struct LearningProjectRequestExecutor: Sendable {
 
     private func httpRequest(for request: LearningProjectRequest) async -> HTTPRequest {
         HTTPRequest(
-            method: httpMethod(for: request.method),
+            method: request.transportMethod,
             path: request.path,
             queryItems: request.queryItems.map { HTTPRequest.QueryItem(name: $0.key, value: $0.value) },
             headers: await authorizedHeaders(),
@@ -52,19 +52,7 @@ struct LearningProjectRequestExecutor: Sendable {
 
     private func authorizedHeaders() async -> HTTPHeaders {
         guard let accessToken = await accessTokenProvider() else { return [:] }
-        var headers = HTTPHeaders()
-        for (name, value) in AuthorizedRequestHeaders(accessToken: accessToken).fieldValues {
-            headers[name] = value
-        }
-        return headers
-    }
-
-    private func httpMethod(for method: HTTPMethod) -> InfrastructureNetworkClient.HTTPMethod {
-        switch method {
-        case .get: .get
-        case .post: .post
-        case .delete: .delete
-        }
+        return AuthorizedRequestHeaders(accessToken: accessToken).headers
     }
 
     private func payload<Payload: Decodable & Sendable>(

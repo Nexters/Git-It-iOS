@@ -77,14 +77,10 @@ public struct AuthenticationRemote: Sendable {
         for endpoint: AuthenticationEndpoint,
         accessToken: String?,
     ) -> HTTPRequest {
-        var headers = HTTPHeaders()
-        for (name, value) in endpoint.headers(accessToken: accessToken) {
-            headers[name] = value
-        }
-        return HTTPRequest(
-            method: endpoint.method == .get ? .get : .post,
+        HTTPRequest(
+            method: endpoint.transportMethod,
             path: endpoint.path,
-            headers: headers,
+            headers: endpoint.headers(accessToken: accessToken),
         )
     }
 

@@ -1,25 +1,37 @@
+import InfrastructureNetworkClient
+
 public struct AuthenticationEndpoint: Equatable, Sendable {
 
-    public enum Method: String, Equatable, Sendable {
-        case get = "GET"
-        case post = "POST"
+    // MARK: Lifecycle
+
+    private init(
+        transportMethod: HTTPMethod,
+        path: String,
+    ) {
+        self.transportMethod = transportMethod
+        self.path = path
     }
 
+    // MARK: Public
+
     public static let appleLogin = Self(
-        method: .post,
+        transportMethod: .post,
         path: "/api/v1/auth/login/apple",
     )
 
     public static let verifyAccessToken = Self(
-        method: .get,
+        transportMethod: .get,
         path: "/api/v1/auth/token",
     )
 
-    public let method: Method
     public let path: String
 
-    public func headers(accessToken: String?) -> [String: String] {
-        var headers = [
+    // MARK: Internal
+
+    let transportMethod: HTTPMethod
+
+    func headers(accessToken: String?) -> HTTPHeaders {
+        var headers: HTTPHeaders = [
             "Accept": "application/json",
             "Content-Type": "application/json",
         ]

@@ -1,11 +1,13 @@
-public struct AuthorizedRequestHeaders: Equatable, Sendable {
-    public init(accessToken: String) {
-        fieldValues = [
+import InfrastructureNetworkClient
+
+struct AuthorizedRequestHeaders: Equatable, Sendable {
+    init(accessToken: String) {
+        headers = [
             "Authorization": "Bearer \(accessToken)",
             "Accept": "application/json",
             "Content-Type": "application/json",
         ]
     }
 
-    public let fieldValues: [String: String]
+    let headers: HTTPHeaders
 }
