@@ -1,8 +1,8 @@
 import DataAuthentication
+import DataShared
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
-import InfrastructureStorage
 
 // MARK: - LoginSessionRepositoryAdapter
 
@@ -13,8 +13,9 @@ struct LoginSessionRepositoryAdapter: LoginSessionRepository {
     init(
         remote: AuthenticationRemote,
         keychainStore: KeychainStore,
-        sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = AppGroupUserDefaults.makeShared()
-            .map(SharedSessionStateMarkerCoding.init(userDefaults:)),
+        sharedSessionStateMarkerCoding: SharedSessionStateMarkerCoding? = SharedSessionStateMarkerCoding(
+            storage: StorageFactory.keyValueStorage(namespace: SessionStorageLayout.sharedSessionNamespace, location: .appGroup)
+        ),
     ) {
         self.remote = remote
         self.sharedSessionStateMarkerCoding = sharedSessionStateMarkerCoding

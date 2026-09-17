@@ -38,6 +38,7 @@ extension ProjectName {
             .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataLearningProjectTests.rawValue),
             .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataLegalConsentTests.rawValue),
             .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataMemberTests.rawValue),
+            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataSharedTests.rawValue),
             .project(
                 path: ProjectName.Infrastructure.projectPath,
                 target: InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,

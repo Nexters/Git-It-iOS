@@ -1,5 +1,7 @@
 import CompositionAuthentication
 import CompositionLearningProject
+import DataAuthentication
+import DataShared
 import DomainAuthentication
 import DomainLearningProject
 import Foundation
@@ -60,13 +62,17 @@ public struct ShareExtensionComposition: Sendable {
     public static func live(
         _ environment: Environment,
         keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
+        sharedStorage: (any KeyValueStorage)? = StorageFactory.keyValueStorage(
+            namespace: SessionStorageLayout.sharedSessionNamespace,
+            location: .appGroup,
+        ),
         sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
         localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
         transport: (any HTTPTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
             keychainStore: keychainStore,
-            sharedDefaults: sharedDefaults,
+            sharedStorage: sharedStorage,
         )
 
         return ShareExtensionComposition(

@@ -151,44 +151,44 @@ compile된다.
 
 ### 준비와 기반
 
-- [ ] T041 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataShared`(소스 `Shared`, 의존 `InfrastructureStorage`)와 `DataSharedTests`(소스 `Tests/Shared`, 의존 `DataShared`, `InfrastructureStorage`) target을 추가하고 `DataAuthentication`, `DataExternalRepository`, `DataLearningProject`, `DataLegalConsent`, `DataMember`에 `DataShared` 의존을 추가한다
-- [ ] T042 [S4] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`에 `DataSharedTests`를 추가한다
-- [ ] T043 [S4] `tools/package-dependencies/config/source-roots`에 `DataShared Data/Shared`, `DataSharedTests Data/Tests/Shared` 행을 추가한다
-- [ ] T044 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 `CompositionAuthentication`, `CompositionLearningProject`, `CompositionMember`, `CompositionApp`, `CompositionShareExtension`에 `DataShared` 의존을 추가한다
-- [ ] T045 [S4] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에 `Factories/`(기술 능력 구현 선택과 생성 진입점) 형태를 추가한다
+- [X] T041 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/DataModuleName.swift`에 `DataShared`(소스 `Shared`, 의존 `InfrastructureStorage`)와 `DataSharedTests`(소스 `Tests/Shared`, 의존 `DataShared`, `InfrastructureStorage`) target을 추가하고 `DataAuthentication`, `DataExternalRepository`, `DataLearningProject`, `DataLegalConsent`, `DataMember`에 `DataShared` 의존을 추가한다
+- [X] T042 [S4] `sources/Tuist/ProjectDescriptionHelpers/AllTestsScheme.swift`에 `DataSharedTests`를 추가한다
+- [X] T043 [S4] `tools/package-dependencies/config/source-roots`에 `DataShared Data/Shared`, `DataSharedTests Data/Tests/Shared` 행을 추가한다
+- [X] T044 [S4] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 `CompositionAuthentication`, `CompositionLearningProject`, `CompositionMember`, `CompositionApp`, `CompositionShareExtension`에 `DataShared` 의존을 추가한다
+- [X] T045 [S4] `docs/conventions/file-vocabulary/shape-vocabulary.md` Data 행에 `Factories/`(기술 능력 구현 선택과 생성 진입점) 형태를 추가한다
 
 ### 테스트
 
-- [ ] T046 [P] [S4] `sources/Projects/Data/Tests/Shared/Stores/LocalKeyValueStorageTests.swift`에 실제 구현이 `"<namespace>.<key>"` 키에 JSON으로 저장·조회·삭제하고 `removeAllValues()`가 같은 namespace 값만 지우는지 격리된 `UserDefaults(suiteName:)`로 검증하는 테스트를 작성한다
-- [ ] T047 [P] [S4] `sources/Projects/Data/Tests/Shared/Factories/StorageFactoryTests.swift`에 App Group 저장소를 만들 수 없을 때 `.appGroup` 저장소가 기록을 무시하고 조회에 `nil`을 돌려주는지 검증하는 테스트를 작성한다
+- [X] T046 [P] [S4] `sources/Projects/Data/Tests/Shared/Stores/LocalKeyValueStorageTests.swift`에 실제 구현이 `"<namespace>.<key>"` 키에 JSON으로 저장·조회·삭제하고 `removeAllValues()`가 같은 namespace 값만 지우는지 격리된 `UserDefaults(suiteName:)`로 검증하는 테스트를 작성한다
+- [X] T047 [P] [S4] `sources/Projects/Data/Tests/Shared/Factories/StorageFactoryTests.swift`에 App Group 저장소를 만들 수 없을 때 `.appGroup` 저장소가 기록을 무시하고 조회에 `nil`을 돌려주는지 검증하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T048 [P] [S4] `sources/Projects/Data/Shared/Contracts/KeyValueStorage.swift`에 `public protocol KeyValueStorage`(`value(_:forKey:)`, `setValue(_:forKey:)`, `removeValue(forKey:)`, `removeAllValues()`)를 정의한다
-- [ ] T049 [P] [S4] `sources/Projects/Data/Shared/Models/StorageLocation.swift`에 `public enum StorageLocation { case appGroup, device }`를 정의한다
-- [ ] T050 [S4] `sources/Projects/Data/Shared/Stores/LocalKeyValueStorage.swift`에 Infrastructure `UserDefaultsStore`를 감싸는 `internal` 실제 구현을 추가한다
-- [ ] T051 [S4] `sources/Projects/Data/Shared/Stores/UnavailableKeyValueStorage.swift`에 기록을 무시하고 조회에 `nil`을 돌려주는 `internal` 구현을 추가한다
-- [ ] T052 [S4] `sources/Projects/Data/Shared/Factories/StorageFactory.swift`에 `public enum StorageFactory`와 `keyValueStorage(namespace:location:) -> any KeyValueStorage`를 추가한다(`.appGroup`은 `AppGroupUserDefaults.makeShared()`, 실패 시 T051)
-- [ ] T053 [S4] `sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift`의 `init(userDefaults: UserDefaults)`를 `init(storage: any KeyValueStorage)`로 바꾸고 key `stateMarker`·schemaVersion 1 형식을 유지한다
-- [ ] T054 [S4] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`의 `init(store: UserDefaultsStore<[PolicyConsentRecordDTO]>)`를 `init(storage: any KeyValueStorage)`로 바꾸고 key `records` 형식을 유지한다
-- [ ] T055 [S4] `sources/Projects/Data/Tests/LegalConsent/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복을 수행하는 in-memory 테스트 더블을 추가한다
-- [ ] T056 [S4] `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift`가 T055 더블을 주입하도록 바꾸고 기대값을 유지한다
-- [ ] T057 [S4] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복을 수행하는 in-memory 테스트 더블을 추가한다
-- [ ] T058 [S4] `sources/Projects/Data/Tests/Authentication/Codings/SharedSessionStateMarkerCodingTests.swift`에 T057 더블을 주입해 로그인 상태 저장 후 조회, 저장값이 없을 때 `nil`, schemaVersion이 1이 아닌 값은 `nil`, 저장 key가 `stateMarker`인지 검증하는 테스트를 작성한다
-- [ ] T059 [S4] `sources/Projects/Data/Authentication/Layouts/SessionStorageLayout.swift`에 공유 세션 namespace 문자열 상수 `sharedSessionNamespace = "com.nexters.hytime.gitit.sharedSession"`을 추가하고 `SharedSessionStateMarkerCoding.swift`가 이를 쓰도록 한다(T060의 Composition 참조 대상)
-- [ ] T060 [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`에서 `SharedSessionStateMarkerCoding`을 `StorageFactory.keyValueStorage(namespace: SessionStorageLayout.sharedSessionNamespace, location: .appGroup)` 또는 주입된 `any KeyValueStorage`로 만들도록 바꾼다(`sharedDefaults: UserDefaults?` 인자를 `sharedStorage: (any KeyValueStorage)?`로 교체, namespace는 T059 Data 상수를 참조)
-- [ ] T061 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `policyConsentStore` 기본값과 `sharedDefaults` 인자를 `StorageFactory`·`any KeyValueStorage` 기반으로 바꾼다
-- [ ] T062 [S4] `sources/Projects/Composition/Authentication/Adapters/LoginSessionRepositoryAdapter.swift`의 `AppGroupUserDefaults.makeShared()` 기본값을 `any KeyValueStorage` 주입으로 바꾼다
-- [ ] T063 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 `SessionAvailabilityAssembly`에 `sharedStorage`를 전달하도록 바꾼다(`sharedDefaults` 인자는 U4 T105에서 제거될 때까지 완료 알림 대기 기록에만 사용)
-- [ ] T064 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
-- [ ] T065 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/PolicyConsentRepositoryAdapterTests.swift`가 `UserDefaultsStore` 대신 T064 더블로 `LocalPolicyConsentStore`를 만들도록 바꾼다
-- [ ] T066 [S4] `sources/Projects/Composition/Tests/Authentication/Assemblies/AuthenticationAssemblyTests.swift`의 조립 인자를 T061 시그니처에 맞춘다
-- [ ] T067 [P] [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
-- [ ] T068 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `sharedDefaults` 준비를 공유 로그인 상태에 한해 T067 더블로 바꾼다
+- [X] T048 [P] [S4] `sources/Projects/Data/Shared/Contracts/KeyValueStorage.swift`에 `public protocol KeyValueStorage`(`value(_:forKey:)`, `setValue(_:forKey:)`, `removeValue(forKey:)`, `removeAllValues()`)를 정의한다
+- [X] T049 [P] [S4] `sources/Projects/Data/Shared/Models/StorageLocation.swift`에 `public enum StorageLocation { case appGroup, device }`를 정의한다
+- [X] T050 [S4] `sources/Projects/Data/Shared/Stores/LocalKeyValueStorage.swift`에 Infrastructure `UserDefaultsStore`를 감싸는 `internal` 실제 구현을 추가한다
+- [X] T051 [S4] `sources/Projects/Data/Shared/Stores/UnavailableKeyValueStorage.swift`에 기록을 무시하고 조회에 `nil`을 돌려주는 `internal` 구현을 추가한다
+- [X] T052 [S4] `sources/Projects/Data/Shared/Factories/StorageFactory.swift`에 `public enum StorageFactory`와 `keyValueStorage(namespace:location:) -> any KeyValueStorage`를 추가한다(`.appGroup`은 `AppGroupUserDefaults.makeShared()`, 실패 시 T051)
+- [X] T053 [S4] `sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift`의 `init(userDefaults: UserDefaults)`를 `init(storage: any KeyValueStorage)`로 바꾸고 key `stateMarker`·schemaVersion 1 형식을 유지한다
+- [X] T054 [S4] `sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`의 `init(store: UserDefaultsStore<[PolicyConsentRecordDTO]>)`를 `init(storage: any KeyValueStorage)`로 바꾸고 key `records` 형식을 유지한다
+- [X] T055 [S4] `sources/Projects/Data/Tests/LegalConsent/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복을 수행하는 in-memory 테스트 더블을 추가한다
+- [X] T056 [S4] `sources/Projects/Data/Tests/LegalConsent/Stores/LocalPolicyConsentStoreTests.swift`가 T055 더블을 주입하도록 바꾸고 기대값을 유지한다
+- [X] T057 [S4] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 JSON 왕복을 수행하는 in-memory 테스트 더블을 추가한다
+- [X] T058 [S4] `sources/Projects/Data/Tests/Authentication/Codings/SharedSessionStateMarkerCodingTests.swift`에 T057 더블을 주입해 로그인 상태 저장 후 조회, 저장값이 없을 때 `nil`, schemaVersion이 1이 아닌 값은 `nil`, 저장 key가 `stateMarker`인지 검증하는 테스트를 작성한다
+- [X] T059 [S4] `sources/Projects/Data/Authentication/Layouts/SessionStorageLayout.swift`에 공유 세션 namespace 문자열 상수 `sharedSessionNamespace = "com.nexters.hytime.gitit.sharedSession"`을 추가하고 `SharedSessionStateMarkerCoding.swift`가 이를 쓰도록 한다(T060의 Composition 참조 대상)
+- [X] T060 [S4] `sources/Projects/Composition/Authentication/Assemblies/SessionAvailabilityAssembly.swift`에서 `SharedSessionStateMarkerCoding`을 `StorageFactory.keyValueStorage(namespace: SessionStorageLayout.sharedSessionNamespace, location: .appGroup)` 또는 주입된 `any KeyValueStorage`로 만들도록 바꾼다(`sharedDefaults: UserDefaults?` 인자를 `sharedStorage: (any KeyValueStorage)?`로 교체, namespace는 T059 Data 상수를 참조)
+- [X] T061 [S4] `sources/Projects/Composition/Authentication/Assemblies/AuthenticationAssembly.swift`의 `policyConsentStore` 기본값과 `sharedDefaults` 인자를 `StorageFactory`·`any KeyValueStorage` 기반으로 바꾼다
+- [X] T062 [S4] `sources/Projects/Composition/Authentication/Adapters/LoginSessionRepositoryAdapter.swift`의 `AppGroupUserDefaults.makeShared()` 기본값을 `any KeyValueStorage` 주입으로 바꾼다
+- [X] T063 [S4] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`가 `SessionAvailabilityAssembly`에 `sharedStorage`를 전달하도록 바꾼다(`sharedDefaults` 인자는 U4 T105에서 제거될 때까지 완료 알림 대기 기록에만 사용)
+- [X] T064 [P] [S4] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T065 [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/PolicyConsentRepositoryAdapterTests.swift`가 `UserDefaultsStore` 대신 T064 더블로 `LocalPolicyConsentStore`를 만들도록 바꾼다
+- [X] T066 [S4] `sources/Projects/Composition/Tests/Authentication/Assemblies/AuthenticationAssemblyTests.swift`의 조립 인자를 T061 시그니처에 맞춘다
+- [X] T067 [P] [S4] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemoryKeyValueStorage.swift`에 in-memory 테스트 더블을 추가한다
+- [X] T068 [S4] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`의 `sharedDefaults` 준비를 공유 로그인 상태에 한해 T067 더블로 바꾼다
 
 ### 정리와 단위 검증
 
-- [ ] T069 [no-write] [S4] `git grep -nE '^\s*public\b.*\b(UserDefaults|UserDefaultsStore)\b' -- sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`가 0건, `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift` 기대값 diff 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0을 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
+- [X] T069 [no-write] [S4] `git grep -nE '^\s*public\b.*\b(UserDefaults|UserDefaultsStore)\b' -- sources/Projects/Data/Authentication/Codings/SharedSessionStateMarkerCoding.swift sources/Projects/Data/LegalConsent/Stores/LocalPolicyConsentStore.swift`가 0건, `sources/Projects/Data/Tests/Authentication/Layouts/SessionStorageCoordinateTests.swift` 기대값 diff 0건, `tools/package-dependencies/bin/run.sh` 종료 코드 0을 확인하고 `make tuist` 전후 Git 상태 비교와 사용자 `build`·`test` 결과를 기록한다
 
 **진행 점검**: 변경 파일과 검증 결과를 보고하고 U4로 진행한다.
 

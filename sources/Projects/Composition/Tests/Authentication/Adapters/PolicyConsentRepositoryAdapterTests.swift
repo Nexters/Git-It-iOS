@@ -4,7 +4,6 @@ import Testing
 @testable import CompositionAuthentication
 @testable import DataLegalConsent
 @testable import DomainAuthentication
-@testable import InfrastructureStorage
 
 // MARK: - PolicyConsentRepositoryAdapterTests
 
@@ -15,8 +14,7 @@ struct PolicyConsentRepositoryAdapterTests {
 
     @Test
     func `저장한 동의 기록을 Domain 타입으로 손실 없이 다시 조회한다`() async throws {
-        let (adapter, suiteName, userDefaults) = try makeAdapter()
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let adapter = makeAdapter()
         let acceptedAt = Date()
         let records = [
             PolicyConsentRecord(documentIdentifier: "privacy-policy", version: "1", acceptedAt: acceptedAt),
@@ -32,8 +30,7 @@ struct PolicyConsentRepositoryAdapterTests {
 
     @Test
     func `logout에 해당하는 별도 호출이 없어도 저장한 동의 기록이 그대로 유지된다`() async throws {
-        let (adapter, suiteName, userDefaults) = try makeAdapter()
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let adapter = makeAdapter()
         try await adapter.saveConsentRecords([
             PolicyConsentRecord(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
         ])
@@ -45,8 +42,7 @@ struct PolicyConsentRepositoryAdapterTests {
 
     @Test
     func `clearConsentRecords는 저장된 모든 동의 기록을 지운다`() async throws {
-        let (adapter, suiteName, userDefaults) = try makeAdapter()
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let adapter = makeAdapter()
         try await adapter.saveConsentRecords([
             PolicyConsentRecord(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date()),
             PolicyConsentRecord(documentIdentifier: "terms-of-service", version: "1", acceptedAt: Date()),
@@ -60,13 +56,8 @@ struct PolicyConsentRepositoryAdapterTests {
 
     // MARK: Private
 
-    private func makeAdapter() throws -> (PolicyConsentRepositoryAdapter, String, UserDefaults) {
-        let suiteName = "policy-consent-\(UUID().uuidString)"
-        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
-        let store = LocalPolicyConsentStore(
-            store: UserDefaultsStore(namespace: "legal-consent", userDefaults: userDefaults)
-        )
-        return (PolicyConsentRepositoryAdapter(store: store), suiteName, userDefaults)
+    private func makeAdapter() -> PolicyConsentRepositoryAdapter {
+        PolicyConsentRepositoryAdapter(store: LocalPolicyConsentStore(storage: InMemoryKeyValueStorage()))
     }
 
 }

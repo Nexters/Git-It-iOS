@@ -1,11 +1,11 @@
 import CompositionShared
 import DataAuthentication
 import DataLegalConsent
+import DataShared
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
 import InfrastructureNetworkClient
-import InfrastructureStorage
 
 // MARK: - AuthenticationAssembly
 
@@ -18,9 +18,12 @@ public struct AuthenticationAssembly: Sendable {
         policyDocuments: [PolicyDocument] = [],
         keychainStore: KeychainStore = KeychainStore(),
         policyConsentStore: LocalPolicyConsentStore = LocalPolicyConsentStore(
-            store: UserDefaultsStore(namespace: PolicyConsentStorageLayout.namespace)
+            storage: StorageFactory.keyValueStorage(namespace: PolicyConsentStorageLayout.namespace, location: .device)
         ),
-        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
+        sharedStorage: (any KeyValueStorage)? = StorageFactory.keyValueStorage(
+            namespace: SessionStorageLayout.sharedSessionNamespace,
+            location: .appGroup,
+        ),
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
@@ -66,7 +69,7 @@ public struct AuthenticationAssembly: Sendable {
         self.loginSessionRepository = loginSessionRepository
         self.accessTokenProvider = accessTokenProvider
 
-        let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
+        let markerCoding = sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:))
         recordSharedSessionState = {
             await markerCoding?.save(isSignedIn: accessTokenProvider() != nil)
         }

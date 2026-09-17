@@ -12,4 +12,6 @@ public enum SessionStorageLayout {
 
     public static let namespace = KeychainNamespace("com.nexters.hytime.gitit.session")
 
+    public static let sharedSessionNamespace = "com.nexters.hytime.gitit.sharedSession"
+
 }

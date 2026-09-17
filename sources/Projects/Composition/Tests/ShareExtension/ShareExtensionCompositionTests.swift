@@ -54,6 +54,7 @@ struct ShareExtensionCompositionTests {
         let composition = ShareExtensionComposition.live(
             try Context.environment(),
             keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            sharedStorage: nil,
             sharedDefaults: nil,
             localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
         )
@@ -72,12 +73,14 @@ struct ShareExtensionCompositionTests {
                 UserDefaults(suiteName: "ShareExtensionCompositionTests.\(UUID().uuidString)")
             )
             keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-            markerCoding = SharedSessionStateMarkerCoding(userDefaults: userDefaults)
+            let sharedStorage = InMemoryKeyValueStorage()
+            markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
             let localNotificationClient = SpyNotificationAuthorizationClient(isAuthorized: isNotificationAuthorized)
             self.localNotificationClient = localNotificationClient
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
                 keychainStore: keychainStore,
+                sharedStorage: sharedStorage,
                 sharedDefaults: userDefaults,
                 localNotificationClient: localNotificationClient,
             )

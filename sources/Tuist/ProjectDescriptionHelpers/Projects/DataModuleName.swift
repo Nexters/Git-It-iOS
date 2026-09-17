@@ -13,6 +13,8 @@ enum DataModuleName: String, CaseIterable {
     case DataLegalConsentTests
     case DataMember
     case DataMemberTests
+    case DataShared
+    case DataSharedTests
 }
 
 extension DataModuleName {
@@ -24,14 +26,16 @@ extension DataModuleName {
             .DataExternalRepository,
             .DataLearningProject,
             .DataLegalConsent,
-            .DataMember:
+            .DataMember,
+            .DataShared:
             directoryName
         case
             .DataAuthenticationTests,
             .DataExternalRepositoryTests,
             .DataLearningProjectTests,
             .DataLegalConsentTests,
-            .DataMemberTests:
+            .DataMemberTests,
+            .DataSharedTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -43,6 +47,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
                     .fromInfrastructure(.InfrastructureStorage),
@@ -67,6 +72,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureStorage),
                 ],
@@ -77,7 +83,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .target(name: DataModuleName.DataShared.rawValue),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 
@@ -108,7 +115,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureStorage)
+                    .target(name: DataModuleName.DataShared.rawValue),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -129,6 +137,7 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
                 ],
@@ -143,6 +152,27 @@ extension DataModuleName {
                 ),
                 additionalDependencies: [
                     .fromInfrastructure(.InfrastructureAuthentication)
+                ],
+            )
+
+        case .DataShared:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureStorage)
+                ],
+            )
+
+        case .DataSharedTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DataModuleName.DataShared.rawValue
+                ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureStorage)
                 ],
             )
         }

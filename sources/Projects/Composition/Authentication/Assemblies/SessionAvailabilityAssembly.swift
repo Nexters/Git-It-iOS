@@ -1,4 +1,5 @@
 import DataAuthentication
+import DataShared
 import DomainAuthentication
 import Foundation
 import InfrastructureAuthentication
@@ -11,9 +12,9 @@ public struct SessionAvailabilityAssembly: Sendable {
 
     public init(
         keychainStore: KeychainStore,
-        sharedDefaults: UserDefaults?,
+        sharedStorage: (any KeyValueStorage)?,
     ) {
-        let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
+        let markerCoding = sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:))
         let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
             guard let markerCoding else { return .appLaunchRequired }
             return await ResolveSessionAvailability(
