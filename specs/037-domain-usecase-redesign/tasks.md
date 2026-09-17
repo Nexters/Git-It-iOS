@@ -189,25 +189,25 @@ Composition 테스트가 같은 커밋에서 바뀌어야 compile된다.
 **분리 불가 근거**: Composition 모듈의 새 Domain 타깃 import는 매니페스트 `.fromDomain` 선언과 같은 커밋이어야 compile되고
 의존성 검사가 통과한다.
 
-- [ ] T070 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 각 Composition 타깃에 integration-surface §3 표의 새 Domain 의존을 추가한다(옛 의존 유지)
-- [ ] T071 [S4] `sources/Projects/Composition/Authentication/Adapters/SignInRepositoryAdapter.swift`를 만든다(`DomainAccount.SignInRepository`: 로그인 시작·복원·로컬 로그아웃·공유 표시·`hasUsableCredential()`은 `RequestCredentialProvider.credential()`이 `available`인지)
-- [ ] T072 [S4] `sources/Projects/Composition/Authentication/Adapters/AccountAuthenticationRepositoryAdapter.swift`를 만든다(`DomainAccount.AuthenticationRepository`, 취소는 `AccountError.signInCancelled`)
-- [ ] T073 [S5] `sources/Projects/Composition/Authentication/Adapters/AccountPolicyConsentRepositoryAdapter.swift`를 만든다(`DomainAccount.PolicyConsentRepository`)
-- [ ] T074 [S5] `sources/Projects/Composition/Member/Adapters/WithdrawalRepositoryAdapter.swift`, `sources/Projects/Composition/Member/Adapters/UserInfoRepositoryAdapter.swift`(큐레이션 완료 시 저장 기록 `needsCuration = false`, research R-07), `sources/Projects/Composition/Member/Adapters/DeviceRegistrationRepositoryAdapter.swift`, `sources/Projects/Composition/Member/Adapters/AppSettingDeviceIdentifierRepositoryAdapter.swift`를 만든다
-- [ ] T075 [S5] `sources/Projects/Composition/LearningProject/Adapters/AppSettingNotificationAuthorizationAdapter.swift`를 만든다(설정 조회와 요청 결과 매핑)
-- [ ] T076 [S5] `sources/Projects/Composition/LearningProject/Adapters/QuizSetRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/QuizAnswerRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/QuizBookmarkRepositoryAdapter.swift`를 만든다(data-model §5의 `Quiz` 변환 포함)
-- [ ] T077 [S2] `sources/Projects/Composition/LearningProject/Adapters/ProjectRepositoryAdapter.swift`를 만든다(data-model §6의 요약·상세 변환)
-- [ ] T078 [S3] `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationPendingRepositoryAdapter.swift`(`releaseAll()` 포함), `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationOutcomeRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationReminderSchedulerAdapter.swift`(종류별 제목·본문)를 만든다
-- [ ] T079 [S5] `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLocatorAdapter.swift`와 `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLookupAdapter.swift`를 만든다(`DomainExternalRepository` 계약)
-- [ ] T080 [S1] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`를 만들어 integration-surface §3 조립 규칙대로 관심사 UseCase 7개를 앱 수명 인스턴스로 만든다(`signedOutEvents`·`preparingProjectIDs` 변환 포함)
-- [ ] T081 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에 `account`, `userInfo`, `appSetting`, `externalRepository`, `quizDetail`, `project`, `projectGeneration` 속성과 `Environment.generationFailureReminderTitle`·`generationFailureReminderBody`를 추가한다
-- [ ] T082 [S3] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`에 `externalRepository`, `projectGeneration`, `signInAvailability`를 추가한다(빈 로그아웃·무효 신호)
-- [ ] T083 [S1] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 속성 목록에 새 속성 7개를 추가한다
-- [ ] T084 [P] [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/SignInRepositoryAdapterTests.swift`에 로그인 시작 시 `needsCuration` 전달, 로컬 로그아웃 시 기록·공유 표시 정리, 만료 기록의 `hasUsableCredential() == false`를 검증한다
-- [ ] T085 [P] [S5] `sources/Projects/Composition/Tests/Member/Adapters/UserInfoRepositoryAdapterTests.swift`에 큐레이션 완료 후 저장 기록 `needsCuration == false`, 한쪽만 선택된 프로필의 `curation == nil`을 검증한다
-- [ ] T086 [P] [S2] `sources/Projects/Composition/Tests/LearningProject/Adapters/ProjectRepositoryAdapterTests.swift`에 요약·상세 변환(`next`, `quizCount`)을 검증한다
-- [ ] T087 [P] [S3] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`에 확장 앱 `projectGeneration.request` 후 알림 대상이 대기열에 남고 상태 관찰이 시작되지 않음, `signInAvailability()`가 만료 기록에서 `signInRequired`임을 추가 검증한다
-- [ ] T088 [no-write] `./tools/package-dependencies/bin/run.sh`가 통과하고 변경 파일과 Composition 테스트 실행을 사용자 확인 항목으로 보고한다
+- [X] T070 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/CompositionModuleName.swift`의 각 Composition 타깃에 integration-surface §3 표의 새 Domain 의존을 추가한다(옛 의존 유지)
+- [X] T071 [S4] `sources/Projects/Composition/Authentication/Adapters/SignInRepositoryAdapter.swift`를 만든다(`DomainAccount.SignInRepository`: 로그인 시작·복원·로컬 로그아웃·공유 표시·`hasUsableCredential()`은 `RequestCredentialProvider.credential()`이 `available`인지)
+- [X] T072 [S4] `sources/Projects/Composition/Authentication/Adapters/AccountAuthenticationRepositoryAdapter.swift`를 만든다(`DomainAccount.AuthenticationRepository`, 취소는 `AccountError.signInCancelled`)
+- [X] T073 [S5] `sources/Projects/Composition/Authentication/Adapters/AccountPolicyConsentRepositoryAdapter.swift`를 만든다(`DomainAccount.PolicyConsentRepository`)
+- [X] T074 [S5] `sources/Projects/Composition/Member/Adapters/WithdrawalRepositoryAdapter.swift`, `sources/Projects/Composition/Member/Adapters/UserInfoRepositoryAdapter.swift`(큐레이션 완료 시 저장 기록 `needsCuration = false`, research R-07), `sources/Projects/Composition/Member/Adapters/DeviceRegistrationRepositoryAdapter.swift`, `sources/Projects/Composition/Member/Adapters/AppSettingDeviceIdentifierRepositoryAdapter.swift`를 만든다
+- [X] T075 [S5] `sources/Projects/Composition/LearningProject/Adapters/AppSettingNotificationAuthorizationAdapter.swift`를 만든다(설정 조회와 요청 결과 매핑)
+- [X] T076 [S5] `sources/Projects/Composition/LearningProject/Adapters/QuizSetRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/QuizAnswerRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/QuizBookmarkRepositoryAdapter.swift`를 만든다(data-model §5의 `Quiz` 변환 포함)
+- [X] T077 [S2] `sources/Projects/Composition/LearningProject/Adapters/ProjectRepositoryAdapter.swift`를 만든다(data-model §6의 요약·상세 변환)
+- [X] T078 [S3] `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationPendingRepositoryAdapter.swift`(`releaseAll()` 포함), `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationOutcomeRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationReminderSchedulerAdapter.swift`(종류별 제목·본문)를 만든다
+- [X] T079 [S5] `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLocatorAdapter.swift`와 `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLookupAdapter.swift`를 만든다(`DomainExternalRepository` 계약)
+- [X] T080 [S1] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`를 만들어 integration-surface §3 조립 규칙대로 관심사 UseCase 7개를 앱 수명 인스턴스로 만든다(`signedOutEvents`·`preparingProjectIDs` 변환 포함)
+- [X] T081 [S1] `sources/Projects/Composition/App/Assemblies/AppComposition.swift`에 `account`, `userInfo`, `appSetting`, `externalRepository`, `quizDetail`, `project`, `projectGeneration` 속성과 `Environment.generationFailureReminderTitle`·`generationFailureReminderBody`를 추가한다
+- [X] T082 [S3] `sources/Projects/Composition/ShareExtension/Assemblies/ShareExtensionComposition.swift`에 `externalRepository`, `projectGeneration`, `signInAvailability`를 추가한다(빈 로그아웃·무효 신호)
+- [X] T083 [S1] `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`의 기대 속성 목록에 새 속성 7개를 추가한다
+- [X] T084 [P] [S4] `sources/Projects/Composition/Tests/Authentication/Adapters/SignInRepositoryAdapterTests.swift`에 로그인 시작 시 `needsCuration` 전달, 로컬 로그아웃 시 기록·공유 표시 정리, 만료 기록의 `hasUsableCredential() == false`를 검증한다
+- [X] T085 [P] [S5] `sources/Projects/Composition/Tests/Member/Adapters/UserInfoRepositoryAdapterTests.swift`에 큐레이션 완료 후 저장 기록 `needsCuration == false`, 한쪽만 선택된 프로필의 `curation == nil`을 검증한다
+- [X] T086 [P] [S2] `sources/Projects/Composition/Tests/LearningProject/Adapters/ProjectRepositoryAdapterTests.swift`에 요약·상세 변환(`next`, `quizCount`)을 검증한다
+- [X] T087 [P] [S3] `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`에 확장 앱 `projectGeneration.request` 후 알림 대상이 대기열에 남고 상태 관찰이 시작되지 않음, `signInAvailability()`가 만료 기록에서 `signInRequired`임을 추가 검증한다
+- [X] T088 [no-write] `./tools/package-dependencies/bin/run.sh`가 통과하고 변경 파일과 Composition 테스트 실행을 사용자 확인 항목으로 보고한다
 
 ---
 

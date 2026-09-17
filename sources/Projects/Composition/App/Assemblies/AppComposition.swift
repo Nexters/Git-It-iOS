@@ -4,9 +4,17 @@ import CompositionMember
 import DataAuthentication
 import DataNotification
 import DataShared
+import DomainAccount
+import DomainAppSetting
 import DomainAuthentication
+import DomainExternalRepository
+import DomainIdentifier
 import DomainLearningProject
 import DomainMember
+import DomainProject
+import DomainProjectGeneration
+import DomainQuizDetail
+import DomainUserInfo
 import Foundation
 import Synchronization
 
@@ -20,11 +28,13 @@ public struct AppComposition: Sendable {
         authentication: AuthenticationAssembly,
         learningProject: LearningProjectAssembly,
         member: MemberAssembly,
-        externalRepository: ExternalRepositoryAssembly,
+        externalRepositoryAssembly: ExternalRepositoryAssembly,
         generationReminder: GenerationReminderAssembly,
         secureStorage: (any SecureValueStorage)?,
         appVersion: String,
         osVersion: String,
+        makeConcerns: (PushQuizGenerationOutcomeSource, @escaping @Sendable () async throws -> DeviceToken)
+            -> ConcernUseCaseAssembly,
     ) {
         signIn = authentication.signIn
         signOut = authentication.signOut
@@ -44,13 +54,29 @@ public struct AppComposition: Sendable {
 
         deleteMemberAccount = member.deleteMemberAccount
 
-        fetchExternalRepository = externalRepository.fetchExternalRepository
+        fetchExternalRepository = externalRepositoryAssembly.fetchExternalRepository
 
         requestGenerationReminder = generationReminder.requestGenerationReminder
 
         let pushClientBox = PushClientBox()
+        let deviceToken: @Sendable () async throws -> DeviceToken = {
+            guard let pushClient = pushClientBox.client else {
+                throw PushBootstrapError.notBootstrapped
+            }
+            return try await pushClient.registrationToken()
+        }
+        let concernOutcomeSource = PushQuizGenerationOutcomeSource()
+        let concerns = makeConcerns(concernOutcomeSource, deviceToken)
+        account = concerns.account
+        userInfo = concerns.userInfo
+        appSetting = concerns.appSetting
+        externalRepository = concerns.externalRepository
+        quizDetail = concerns.quizDetail
+        project = concerns.project
+        projectGeneration = concerns.projectGeneration
         let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
             await learningProject.ingestGenerationOutcomePayload(rawPayload)
+            await concernOutcomeSource.ingest(rawPayload: rawPayload)
         }
         self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
         let notificationAppCallbacks = NotificationAppCallbacks(
@@ -71,12 +97,7 @@ public struct AppComposition: Sendable {
             secureStorage: secureStorage,
             appVersion: appVersion,
             osVersion: osVersion,
-            deviceTokenProvider: {
-                guard let pushClient = pushClientBox.client else {
-                    throw PushBootstrapError.notBootstrapped
-                }
-                return try await pushClient.registrationToken()
-            },
+            deviceTokenProvider: deviceToken,
         )
 
         deviceTokenRefreshes = {
@@ -100,7 +121,9 @@ public struct AppComposition: Sendable {
             osVersion: String,
             generationReminderTitle: String,
             generationReminderBody: String,
-            policyDocuments: [PolicyDocument] = [],
+            generationFailureReminderTitle: String,
+            generationFailureReminderBody: String,
+            policyDocuments: [DomainAuthentication.PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
             self.externalRepositoryBaseURL = externalRepositoryBaseURL
@@ -108,6 +131,8 @@ public struct AppComposition: Sendable {
             self.osVersion = osVersion
             self.generationReminderTitle = generationReminderTitle
             self.generationReminderBody = generationReminderBody
+            self.generationFailureReminderTitle = generationFailureReminderTitle
+            self.generationFailureReminderBody = generationFailureReminderBody
             self.policyDocuments = policyDocuments
         }
 
@@ -119,7 +144,9 @@ public struct AppComposition: Sendable {
         public let osVersion: String
         public let generationReminderTitle: String
         public let generationReminderBody: String
-        public let policyDocuments: [PolicyDocument]
+        public let generationFailureReminderTitle: String
+        public let generationFailureReminderBody: String
+        public let policyDocuments: [DomainAuthentication.PolicyDocument]
 
     }
 
@@ -144,6 +171,14 @@ public struct AppComposition: Sendable {
 
     public let requestGenerationReminder: any RequestGenerationReminderUseCase
     public let trackGeneration: any TrackGenerationUseCase
+
+    public let account: any AccountUseCase
+    public let userInfo: any UserInfoUseCase
+    public let appSetting: any AppSettingUseCase
+    public let quizDetail: any QuizDetailUseCase
+    public let project: any ProjectUseCase
+    public let projectGeneration: any ProjectGenerationUseCase
+    public let externalRepository: any ExternalRepositoryUseCase
 
     public let recordSharedSessionState: @Sendable () async -> Void
     public let activatePushClient: @Sendable () -> Void
@@ -197,11 +232,12 @@ public struct AppComposition: Sendable {
             transport: transport,
         )
 
+        let requestCredentialProvider = authentication.requestCredentialProvider
         return AppComposition(
             authentication: authentication,
             learningProject: learningProject,
             member: member,
-            externalRepository: externalRepository,
+            externalRepositoryAssembly: externalRepository,
             generationReminder: GenerationReminderAssembly(
                 reminderTitle: environment.generationReminderTitle,
                 reminderBody: environment.generationReminderBody,
@@ -210,6 +246,31 @@ public struct AppComposition: Sendable {
             secureStorage: secureStorage,
             appVersion: environment.appVersion,
             osVersion: environment.osVersion,
+            makeConcerns: { generationOutcomeSource, deviceToken in
+                ConcernUseCaseAssembly(
+                    apiBaseURL: environment.apiBaseURL,
+                    externalRepositoryBaseURL: environment.externalRepositoryBaseURL,
+                    policyDocuments: environment.policyDocuments.map(Self.policyDocument(from:)),
+                    appVersion: environment.appVersion,
+                    osVersion: environment.osVersion,
+                    generationReminder: ConcernUseCaseAssembly.GenerationReminderContent(
+                        completedTitle: environment.generationReminderTitle,
+                        completedBody: environment.generationReminderBody,
+                        failedTitle: environment.generationFailureReminderTitle,
+                        failedBody: environment.generationFailureReminderBody,
+                    ),
+                    requestCredentialProvider: requestCredentialProvider,
+                    secureStorage: secureStorage,
+                    sharedStorage: StorageFactory.keyValueStorage(
+                        namespace: SessionStorageLayout.sharedSessionNamespace,
+                        location: .appGroup,
+                    ),
+                    generationOutcomeSource: generationOutcomeSource,
+                    transport: transport,
+                    memberResponseTimeout: memberResponseTimeout,
+                    deviceToken: deviceToken,
+                )
+            },
         )
     }
 
@@ -241,5 +302,17 @@ public struct AppComposition: Sendable {
     }
 
     private static let memberResponseTimeout = Duration.seconds(10)
+
+    private static func policyDocument(
+        from document: DomainAuthentication.PolicyDocument
+    ) -> DomainAccount.PolicyDocument {
+        DomainAccount.PolicyDocument(
+            id: document.identifier,
+            displayName: document.displayName,
+            version: document.version,
+            approvedURL: document.approvedURL,
+            isRequired: document.isRequired,
+        )
+    }
 
 }

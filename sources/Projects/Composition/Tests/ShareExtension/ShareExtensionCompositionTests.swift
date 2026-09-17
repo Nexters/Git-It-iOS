@@ -5,7 +5,9 @@ import Testing
 @testable import DataAuthentication
 @testable import DataLearningProject
 @testable import DataNotification
+@testable import DomainAccount
 @testable import DomainAuthentication
+@testable import DomainProjectGeneration
 
 // MARK: - ShareExtensionCompositionTests
 
@@ -48,6 +50,34 @@ struct ShareExtensionCompositionTests {
             store: LocalPendingGenerationStore(storage: context.sharedStorage)
         )
         #expect(await pendingGenerations.drainReminderProjectIDs() == ["project-1"])
+    }
+
+    @Test
+    func `만료된 로그인 기록이면 로그인이 필요하다고 판정한다`() async throws {
+        let context = try Context()
+        await context.markerCoding.save(isSignedIn: true)
+        try context.saveSession(accessToken: "expired-token", accessTokenExpiresAt: Date(timeIntervalSince1970: 0))
+
+        #expect(await context.composition.signInAvailability() == .signInRequired)
+    }
+
+    @Test
+    func `생성 요청이 실패하면 진행 중 기록과 알림 대기열을 남기지 않는다`() async throws {
+        let context = try Context()
+        await context.markerCoding.save(isSignedIn: true)
+        try context.saveSession(accessToken: "shared-token")
+
+        await #expect(throws: (any Error).self) {
+            _ = try await context.composition.projectGeneration.request(
+                ProjectGenerationRequest(repositoryURL: "https://github.com/owner/repo", quizLevel: .l2)
+            )
+        }
+
+        let pendingGenerations = ProjectGenerationPendingRepositoryAdapter(
+            store: LocalPendingGenerationStore(storage: context.sharedStorage)
+        )
+        #expect(await pendingGenerations.pendingState().records.isEmpty)
+        #expect(await pendingGenerations.drainReminderProjectIDs().isEmpty)
     }
 
     @Test
@@ -98,13 +128,16 @@ struct ShareExtensionCompositionTests {
             )
         }
 
-        func saveSession(accessToken: String) throws {
+        func saveSession(
+            accessToken: String,
+            accessTokenExpiresAt: Date? = nil,
+        ) throws {
             try SessionRecordCoding(secureStorage: secureStorage).save(
                 SessionRecord(
                     tokens: SessionTokens(
                         accessToken: accessToken,
                         refreshToken: "refresh",
-                        accessTokenExpiresAt: nil,
+                        accessTokenExpiresAt: accessTokenExpiresAt,
                         refreshTokenExpiresAt: nil,
                     ),
                     onboarding: LocalOnboardingState(
