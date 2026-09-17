@@ -11,7 +11,8 @@ public struct LearningProjectAssembly: Sendable {
 
     public init(
         baseURL: URL,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         sharedStorage: (any KeyValueStorage)? = nil,
@@ -21,7 +22,8 @@ public struct LearningProjectAssembly: Sendable {
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
-                accessTokenProvider: accessTokenProvider,
+                credential: credential,
+                credentialRejected: credentialRejected,
             )
         )
         let learningSetRepository = LearningSetRepositoryAdapter(
@@ -29,7 +31,8 @@ public struct LearningProjectAssembly: Sendable {
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
-                accessTokenProvider: accessTokenProvider,
+                credential: credential,
+                credentialRejected: credentialRejected,
             )
         )
         let answerRepository = AnswerRepositoryAdapter(
@@ -37,7 +40,8 @@ public struct LearningProjectAssembly: Sendable {
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
-                accessTokenProvider: accessTokenProvider,
+                credential: credential,
+                credentialRejected: credentialRejected,
             )
         )
         let bookmarkRepository = BookmarkRepositoryAdapter(
@@ -45,7 +49,8 @@ public struct LearningProjectAssembly: Sendable {
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
-                accessTokenProvider: accessTokenProvider,
+                credential: credential,
+                credentialRejected: credentialRejected,
             )
         )
 

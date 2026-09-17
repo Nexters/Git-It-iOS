@@ -12,7 +12,8 @@ public struct MemberRemote: Sendable {
         baseURL: URL,
         transport: (any RequestTransport)?,
         responseTimeout: Duration,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
     ) {
         self.init(
             client: RequestClientFactory.makeClient(
@@ -20,16 +21,19 @@ public struct MemberRemote: Sendable {
                 transport: transport,
                 responseTimeout: responseTimeout,
             ),
-            accessTokenProvider: accessTokenProvider,
+            credential: credential,
+            credentialRejected: credentialRejected,
         )
     }
 
     init(
         client: HTTPClient,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
     ) {
         self.client = client
-        self.accessTokenProvider = accessTokenProvider
+        self.credential = credential
+        self.credentialRejected = credentialRejected
     }
 
     // MARK: Public
@@ -61,15 +65,19 @@ public struct MemberRemote: Sendable {
     // MARK: Private
 
     private let client: HTTPClient
-    private let accessTokenProvider: @Sendable () async -> String?
+    private let credential: @Sendable () async -> RequestCredential
+    private let credentialRejected: @Sendable () async -> Void
 
     private func send<Payload: Decodable & Sendable>(
         _ endpoint: MemberEndpoint,
         expecting _: Payload.Type,
     ) async throws -> Payload {
         do {
-            let response = try await client.send(await httpRequest(for: endpoint), expecting: APIResponseDTO<Payload>.self)
-            return try payload(from: response)
+            let response = try await client.send(
+                try await httpRequest(for: endpoint),
+                expecting: APIResponseDTO<Payload>.self,
+            )
+            return try await payload(from: response)
         } catch let error as HTTPClientError {
             throw try dataError(for: error)
         }
@@ -82,24 +90,33 @@ public struct MemberRemote: Sendable {
     ) async throws -> Payload {
         do {
             let response = try await client.send(
-                await httpRequest(for: endpoint),
+                try await httpRequest(for: endpoint),
                 body: body,
                 expecting: APIResponseDTO<Payload>.self,
             )
-            return try payload(from: response)
+            return try await payload(from: response)
         } catch let error as HTTPClientError {
             throw try dataError(for: error)
         }
     }
 
-    private func httpRequest(for endpoint: MemberEndpoint) async -> HTTPRequest {
-        let headers = await accessTokenProvider().map { endpoint.headers(accessToken: $0) } ?? HTTPHeaders()
-        return HTTPRequest(method: endpoint.transportMethod, path: endpoint.path, headers: headers)
+    private func httpRequest(for endpoint: MemberEndpoint) async throws -> HTTPRequest {
+        switch await credential() {
+        case .available(let accessToken):
+            return HTTPRequest(
+                method: endpoint.transportMethod,
+                path: endpoint.path,
+                headers: endpoint.headers(accessToken: accessToken),
+            )
+
+        case .signedOut:
+            throw MemberServiceError.unauthorized
+        }
     }
 
     private func payload<Payload: Decodable & Sendable>(
         from response: HTTPResponse<APIResponseDTO<Payload>>
-    ) throws -> Payload {
+    ) async throws -> Payload {
         switch response.body {
         case .decoded(let envelope):
             if let payload = envelope.data {
@@ -111,7 +128,11 @@ public struct MemberRemote: Sendable {
             throw MemberServiceError.unexpectedStatus
 
         case .raw(let data):
-            throw MemberServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            let error = MemberServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            if error == .unauthorized {
+                await credentialRejected()
+            }
+            throw error
 
         @unknown default:
             throw MemberServiceError.unexpectedStatus

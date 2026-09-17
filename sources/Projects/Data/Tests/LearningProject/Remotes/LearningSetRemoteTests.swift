@@ -94,7 +94,11 @@ extension LearningSetRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return LearningSetRemote(client: client, accessTokenProvider: { "test-access-token" })
+        return LearningSetRemote(
+            client: client,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
+        )
     }
 
     private func jsonResponse(

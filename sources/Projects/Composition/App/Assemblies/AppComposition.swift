@@ -1,6 +1,7 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import CompositionMember
+import DataAuthentication
 import DataNotification
 import DataShared
 import DomainAuthentication
@@ -164,16 +165,24 @@ public struct AppComposition: Sendable {
             secureStorage: secureStorage,
             transport: transport,
         )
-        let accessTokenProvider = authentication.accessTokenProvider
+        let requestCredentialProvider = authentication.requestCredentialProvider
+        let credential: @Sendable () async -> RequestCredential = {
+            await requestCredentialProvider.credential()
+        }
+        let credentialRejected: @Sendable () async -> Void = {
+            await requestCredentialProvider.credentialRejected()
+        }
         let learningProject = LearningProjectAssembly(
             baseURL: environment.apiBaseURL,
-            accessTokenProvider: accessTokenProvider,
+            credential: credential,
+            credentialRejected: credentialRejected,
             transport: transport,
         )
         let member = MemberAssembly(
             baseURL: environment.apiBaseURL,
             loginSessionRepository: authentication.loginSessionRepository,
-            accessTokenProvider: accessTokenProvider,
+            credential: credential,
+            credentialRejected: credentialRejected,
             clearLocalStateAfterAccountDeletion: {
                 let trackGeneration = learningProject.trackGeneration
                 for record in await trackGeneration.current().records {

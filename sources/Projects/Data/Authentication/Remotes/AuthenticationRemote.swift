@@ -12,7 +12,7 @@ public struct AuthenticationRemote: Sendable {
         baseURL: URL,
         transport: (any RequestTransport)?,
         responseTimeout: Duration,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
     ) {
         self.init(
             client: RequestClientFactory.makeClient(
@@ -20,16 +20,16 @@ public struct AuthenticationRemote: Sendable {
                 transport: transport,
                 responseTimeout: responseTimeout,
             ),
-            accessTokenProvider: accessTokenProvider,
+            credential: credential,
         )
     }
 
     init(
         client: HTTPClient,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
     ) {
         self.client = client
-        self.accessTokenProvider = accessTokenProvider
+        self.credential = credential
     }
 
     // MARK: Public
@@ -44,9 +44,12 @@ public struct AuthenticationRemote: Sendable {
     }
 
     public func verifyAccessToken() async throws {
+        guard case .available(let accessToken) = await credential() else {
+            throw AuthenticationServiceError.unauthorized
+        }
         _ = try await send(
             .verifyAccessToken,
-            accessToken: await accessTokenProvider(),
+            accessToken: accessToken,
             expecting: EmptyResponseData.self,
         )
     }
@@ -54,7 +57,7 @@ public struct AuthenticationRemote: Sendable {
     // MARK: Private
 
     private let client: HTTPClient
-    private let accessTokenProvider: @Sendable () async -> String?
+    private let credential: @Sendable () async -> RequestCredential
 
     private func send<Payload: Decodable & Sendable>(
         _ endpoint: AuthenticationEndpoint,

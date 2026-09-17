@@ -116,7 +116,10 @@ extension AuthenticationRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return AuthenticationRemote(client: client, accessTokenProvider: { accessToken })
+        return AuthenticationRemote(
+            client: client,
+            credential: { accessToken.map { .available($0) } ?? .signedOut },
+        )
     }
 
     private func jsonResponse(

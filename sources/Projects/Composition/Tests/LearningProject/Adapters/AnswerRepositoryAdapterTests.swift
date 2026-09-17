@@ -65,9 +65,10 @@ struct AnswerRepositoryAdapterTests {
     private func makeAdapter(transport: RecordingRequestTransport) -> AnswerRepositoryAdapter {
         AnswerRepositoryAdapter(remote: AnswerRemote(
             baseURL: URL(string: "https://api.git-it.example.com")!,
-                transport: transport,
-                responseTimeout: RequestClientFactory.defaultResponseTimeout,
-            accessTokenProvider: { "test-access-token" },
+            transport: transport,
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
         ))
     }
 

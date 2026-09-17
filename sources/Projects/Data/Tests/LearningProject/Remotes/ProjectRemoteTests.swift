@@ -158,7 +158,11 @@ extension ProjectRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return ProjectRemote(client: client, accessTokenProvider: { "test-access-token" })
+        return ProjectRemote(
+            client: client,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
+        )
     }
 
     private func jsonResponse(

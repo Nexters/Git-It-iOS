@@ -26,15 +26,12 @@ public struct SessionAvailabilityAssembly: Sendable {
             )()
         }
         self.resolveSessionAvailability = resolveSessionAvailability
-        accessTokenProvider = {
-            guard case .available(let accessToken) = await resolveSessionAvailability() else { return nil }
-            return accessToken
-        }
+        requestCredentialProvider = RequestCredentialProvider(secureStorage: sessionStorage)
     }
 
     // MARK: Public
 
     public let resolveSessionAvailability: @Sendable () async -> SessionAvailability
-    public let accessTokenProvider: @Sendable () async -> String?
+    public let requestCredentialProvider: RequestCredentialProvider
 
 }

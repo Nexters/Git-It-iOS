@@ -1,3 +1,4 @@
+import DataShared
 import Foundation
 import InfrastructureNetworkClient
 
@@ -8,15 +9,16 @@ struct LearningProjectRequestExecutor: Sendable {
     // MARK: Internal
 
     let client: HTTPClient
-    let accessTokenProvider: @Sendable () async -> String?
+    let credential: @Sendable () async -> RequestCredential
+    let credentialRejected: @Sendable () async -> Void
 
     func send<Payload: Decodable & Sendable>(
         _ request: LearningProjectRequest,
         expecting _: Payload.Type,
     ) async throws -> Payload {
         do {
-            let response = try await client.send(await httpRequest(for: request), expecting: APIResponseDTO<Payload>.self)
-            return try payload(from: response)
+            let response = try await client.send(try await httpRequest(for: request), expecting: APIResponseDTO<Payload>.self)
+            return try await payload(from: response)
         } catch let error as HTTPClientError {
             throw try dataError(for: error)
         }
@@ -29,11 +31,11 @@ struct LearningProjectRequestExecutor: Sendable {
     ) async throws -> Payload {
         do {
             let response = try await client.send(
-                await httpRequest(for: request),
+                try await httpRequest(for: request),
                 body: body,
                 expecting: APIResponseDTO<Payload>.self,
             )
-            return try payload(from: response)
+            return try await payload(from: response)
         } catch let error as HTTPClientError {
             throw try dataError(for: error)
         }
@@ -41,23 +43,28 @@ struct LearningProjectRequestExecutor: Sendable {
 
     // MARK: Private
 
-    private func httpRequest(for request: LearningProjectRequest) async -> HTTPRequest {
-        HTTPRequest(
+    private func httpRequest(for request: LearningProjectRequest) async throws -> HTTPRequest {
+        try await HTTPRequest(
             method: request.transportMethod,
             path: request.path,
             queryItems: request.queryItems.map { HTTPRequest.QueryItem(name: $0.key, value: $0.value) },
-            headers: await authorizedHeaders(),
+            headers: authorizedHeaders(),
         )
     }
 
-    private func authorizedHeaders() async -> HTTPHeaders {
-        guard let accessToken = await accessTokenProvider() else { return [:] }
-        return AuthorizedRequestHeaders(accessToken: accessToken).headers
+    private func authorizedHeaders() async throws -> HTTPHeaders {
+        switch await credential() {
+        case .available(let accessToken):
+            return AuthorizedRequestHeaders(accessToken: accessToken).headers
+
+        case .signedOut:
+            throw LearningProjectServiceError.unauthorized
+        }
     }
 
     private func payload<Payload: Decodable & Sendable>(
         from response: HTTPResponse<APIResponseDTO<Payload>>
-    ) throws -> Payload {
+    ) async throws -> Payload {
         switch response.body {
         case .decoded(let envelope):
             if let payload = envelope.data {
@@ -69,7 +76,11 @@ struct LearningProjectRequestExecutor: Sendable {
             throw LearningProjectServiceError.unexpectedStatus
 
         case .raw(let data):
-            throw LearningProjectServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            let error = LearningProjectServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            if error == .unauthorized {
+                await credentialRejected()
+            }
+            throw error
 
         @unknown default:
             throw LearningProjectServiceError.unexpectedStatus

@@ -161,7 +161,11 @@ extension MemberRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return MemberRemote(client: client, accessTokenProvider: { "test-access-token" })
+        return MemberRemote(
+            client: client,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
+        )
     }
 
     private func jsonResponse(

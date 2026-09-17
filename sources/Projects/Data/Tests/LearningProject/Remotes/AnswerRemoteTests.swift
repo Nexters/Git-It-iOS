@@ -94,7 +94,11 @@ extension AnswerRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return AnswerRemote(client: client, accessTokenProvider: { "test-access-token" })
+        return AnswerRemote(
+            client: client,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
+        )
     }
 
     private func jsonResponse(

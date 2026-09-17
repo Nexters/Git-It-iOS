@@ -71,9 +71,11 @@ public struct ShareExtensionComposition: Sendable {
             sharedStorage: sharedStorage,
         )
 
+        let requestCredentialProvider = sessionAvailability.requestCredentialProvider
         let learningProject = LearningProjectAssembly(
             baseURL: environment.apiBaseURL,
-            accessTokenProvider: sessionAvailability.accessTokenProvider,
+            credential: { await requestCredentialProvider.credential() },
+            credentialRejected: { await requestCredentialProvider.credentialRejected() },
             transport: transport,
             sharedStorage: sharedStorage,
         )

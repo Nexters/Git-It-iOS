@@ -13,7 +13,8 @@ public struct MemberAssembly: Sendable {
     public init(
         baseURL: URL,
         loginSessionRepository: any LoginSessionRepository,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
         clearLocalStateAfterAccountDeletion: @escaping @Sendable () async -> Void = { },
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
@@ -23,7 +24,8 @@ public struct MemberAssembly: Sendable {
                 baseURL: baseURL,
                 transport: transport,
                 responseTimeout: responseTimeout,
-                accessTokenProvider: accessTokenProvider,
+                credential: credential,
+                credentialRejected: credentialRejected,
             )
         )
         let repository = CurationRepositoryAdapter(

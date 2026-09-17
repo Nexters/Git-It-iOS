@@ -32,14 +32,12 @@ public struct AuthenticationAssembly: Sendable {
             namespace: AppleIdentityStorageLayout.namespace,
             location: .appGroup,
         )
-        let accessTokenProvider: @Sendable () async -> String? = {
-            (try? SessionRecordCoding(secureStorage: sessionStorage).load())?.tokens.accessToken
-        }
+        let requestCredentialProvider = RequestCredentialProvider(secureStorage: sessionStorage)
         let authenticationRemote = AuthenticationRemote(
             baseURL: baseURL,
             transport: transport,
             responseTimeout: responseTimeout,
-            accessTokenProvider: accessTokenProvider,
+            credential: { await requestCredentialProvider.credential() },
         )
         let authenticationRepository = AuthenticationRepositoryAdapter(
             appleSignInSource: AppleSignInSource(),
@@ -73,11 +71,11 @@ public struct AuthenticationAssembly: Sendable {
             policyConsentRepository: PolicyConsentRepositoryAdapter(store: policyConsentStore),
         )
         self.loginSessionRepository = loginSessionRepository
-        self.accessTokenProvider = accessTokenProvider
+        self.requestCredentialProvider = requestCredentialProvider
 
         let markerCoding = sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:))
         recordSharedSessionState = {
-            await markerCoding?.save(isSignedIn: accessTokenProvider() != nil)
+            await markerCoding?.save(isSignedIn: requestCredentialProvider.credential() != .signedOut)
         }
     }
 
@@ -90,7 +88,7 @@ public struct AuthenticationAssembly: Sendable {
     public let refreshSession: any RefreshSessionUseCase
     public let policyConsent: any PolicyConsentUseCase
 
-    public let accessTokenProvider: @Sendable () async -> String?
+    public let requestCredentialProvider: RequestCredentialProvider
 
     public let loginSessionRepository: any LoginSessionRepository
 

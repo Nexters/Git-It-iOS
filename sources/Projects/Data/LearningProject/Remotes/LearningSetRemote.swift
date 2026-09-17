@@ -12,7 +12,8 @@ public struct LearningSetRemote: Sendable {
         baseURL: URL,
         transport: (any RequestTransport)?,
         responseTimeout: Duration,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
     ) {
         self.init(
             client: RequestClientFactory.makeClient(
@@ -20,15 +21,21 @@ public struct LearningSetRemote: Sendable {
                 transport: transport,
                 responseTimeout: responseTimeout,
             ),
-            accessTokenProvider: accessTokenProvider,
+            credential: credential,
+            credentialRejected: credentialRejected,
         )
     }
 
     init(
         client: HTTPClient,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
     ) {
-        executor = LearningProjectRequestExecutor(client: client, accessTokenProvider: accessTokenProvider)
+        executor = LearningProjectRequestExecutor(
+            client: client,
+            credential: credential,
+            credentialRejected: credentialRejected,
+        )
     }
 
     // MARK: Public

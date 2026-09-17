@@ -94,7 +94,8 @@ struct LearningProjectRepositoryAdapterTests {
             baseURL: URL(string: "https://api.git-it.example.com")!,
             transport: transport,
             responseTimeout: RequestClientFactory.defaultResponseTimeout,
-            accessTokenProvider: { "test-access-token" },
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
         ))
     }
 

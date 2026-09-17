@@ -1,3 +1,4 @@
+import DataShared
 import Foundation
 import Testing
 @testable import CompositionLearningProject
@@ -10,7 +11,8 @@ struct LearningProjectAssemblyTests {
     func `live 그래프 생성이 성공하고 노출 property가 모두 UseCase Protocol 타입이다`() throws {
         let assembly = LearningProjectAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            accessTokenProvider: { nil },
+            credential: { .signedOut },
+            credentialRejected: { },
         )
 
         _ = assembly.fetchLearningProjects as any FetchLearningProjectsUseCase
@@ -27,7 +29,8 @@ struct LearningProjectAssemblyTests {
     func `push 진입점으로 수신한 payload가 생성 추적 상태에 완료로 반영된다`() async throws {
         let assembly = LearningProjectAssembly(
             baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            accessTokenProvider: { nil },
+            credential: { .signedOut },
+            credentialRejected: { },
             sharedStorage: InMemoryKeyValueStorage(),
         )
         let trackGeneration = assembly.trackGeneration

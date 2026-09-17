@@ -96,7 +96,11 @@ extension BookmarkRemoteTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        return BookmarkRemote(client: client, accessTokenProvider: { "test-access-token" })
+        return BookmarkRemote(
+            client: client,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
+        )
     }
 
     private func jsonResponse(

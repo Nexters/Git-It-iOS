@@ -1,5 +1,6 @@
 import Foundation
 import InfrastructureNetworkClient
+import Synchronization
 import Testing
 
 @testable import DataLearningProject
@@ -11,7 +12,7 @@ struct ProjectRemoteAuthorizationTests {
 
     @Test
     func `같은 Remote로 보낸 두 요청이 요청 시점의 최신 access token을 각각 반영한다`() async throws {
-        var currentToken = "first-token"
+        let currentToken = Mutex("first-token")
         let transport = StubHTTPTransport(results: [
             .response(
                 jsonResponse(#"{"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}"#)
@@ -25,10 +26,14 @@ struct ProjectRemoteAuthorizationTests {
             bodyCoding: JSONBodyCoding(),
             transport: transport,
         )
-        let remote = ProjectRemote(client: client, accessTokenProvider: { currentToken })
+        let remote = ProjectRemote(
+            client: client,
+            credential: { .available(currentToken.withLock { $0 }) },
+            credentialRejected: { },
+        )
 
         _ = try await remote.fetchProjects(page: 0, size: 10)
-        currentToken = "second-token"
+        currentToken.withLock { $0 = "second-token" }
         _ = try await remote.fetchProjects(page: 0, size: 10)
 
         let requests = await transport.recordedRequests

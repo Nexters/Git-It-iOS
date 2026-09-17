@@ -94,9 +94,9 @@ struct AuthenticationRepositoryAdapterTests {
     private func makeRemote(transport: RecordingRequestTransport) -> AuthenticationRemote {
         AuthenticationRemote(
             baseURL: URL(string: "https://api.git-it.example.com")!,
-                transport: transport,
-                responseTimeout: RequestClientFactory.defaultResponseTimeout,
-            accessTokenProvider: { nil },
+            transport: transport,
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+            credential: { .signedOut },
         )
     }
 

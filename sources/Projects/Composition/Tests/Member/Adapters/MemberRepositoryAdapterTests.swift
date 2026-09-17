@@ -124,9 +124,10 @@ struct MemberRepositoryAdapterTests {
     private func makeAdapter(transport: RecordingRequestTransport) -> MemberRepositoryAdapter {
         MemberRepositoryAdapter(remote: MemberRemote(
             baseURL: URL(string: "https://api.git-it.example.com")!,
-                transport: transport,
-                responseTimeout: RequestClientFactory.defaultResponseTimeout,
-            accessTokenProvider: { "test-access-token" },
+            transport: transport,
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+            credential: { .available("test-access-token") },
+            credentialRejected: { },
         ))
     }
 
