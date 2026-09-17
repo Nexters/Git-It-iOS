@@ -281,7 +281,7 @@ import하지 않는다.
 - [X] T124 [S1] 남은 Composition 테스트를 새 표면에 맞춘다: `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionPublicSurfaceTests.swift`, `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionTests.swift`, `sources/Projects/Composition/Tests/App/Assemblies/AppCompositionSharedLifetimeTests.swift`, `sources/Projects/Composition/Tests/App/SharedLifetimeTests.swift`, `sources/Projects/Composition/Tests/Authentication/Assemblies/AuthenticationAssemblyTests.swift`, `sources/Projects/Composition/Tests/LearningProject/Assemblies/LearningProjectAssemblyTests.swift`, `sources/Projects/Composition/Tests/LearningProject/Assemblies/ExternalRepositoryAssemblyTests.swift`, `sources/Projects/Composition/Tests/ShareExtension/ShareExtensionCompositionTests.swift`
 - [X] T125 [S1] 옛 이름 접미사로 만든 새 어댑터 이름을 정리한다: `sources/Projects/Composition/Authentication/Adapters/AccountAuthenticationRepositoryAdapter.swift` → `sources/Projects/Composition/Authentication/Adapters/AuthenticationRepositoryAdapter.swift`, `sources/Projects/Composition/Authentication/Adapters/AccountPolicyConsentRepositoryAdapter.swift` → `sources/Projects/Composition/Authentication/Adapters/PolicyConsentRepositoryAdapter.swift`, `sources/Projects/Composition/Member/Adapters/AppSettingDeviceIdentifierRepositoryAdapter.swift` → `sources/Projects/Composition/Member/Adapters/DeviceIdentifierRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/AppSettingNotificationAuthorizationAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/NotificationAuthorizationAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLocatorAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/ExternalRepositoryLocatorAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ResolverExternalRepositoryLookupAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/ExternalRepositoryLookupAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationOutcomeRepositoryAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/GenerationOutcomeRepositoryAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationReminderSchedulerAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/GenerationReminderSchedulerAdapter.swift`, `sources/Projects/Composition/LearningProject/Adapters/ProjectGenerationPendingRepositoryAdapter.swift` → `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRepositoryAdapter.swift` 및 대응 테스트 `sources/Projects/Composition/Tests/LearningProject/Adapters/ResolverExternalRepositoryLookupAdapterTests.swift` → `sources/Projects/Composition/Tests/LearningProject/Adapters/ExternalRepositoryLookupAdapterTests.swift`, `sources/Projects/Composition/Tests/LearningProject/Adapters/ProjectGenerationOutcomeRepositoryAdapterTests.swift` → `sources/Projects/Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift`, `sources/Projects/Composition/Tests/LearningProject/Adapters/ProjectGenerationPendingRepositoryAdapterTests.swift` → `sources/Projects/Composition/Tests/LearningProject/Adapters/PendingGenerationRepositoryAdapterTests.swift` (타입 이름 포함, 동작 변경 없음)
 - [X] T126 [S1] `sources/Projects/Domain/Authentication/README.md`를 삭제한다(T116 디렉터리 정리)
-- [ ] T127 [no-write] [quickstart.md](./quickstart.md) 1절의 구조 검증 명령 5개가 모두 기대 결과를 내고 `./tools/package-dependencies/bin/run.sh`가 통과함을 확인한 뒤 변경 파일과 전체 테스트 실행을 사용자 확인 항목으로 보고한다
+- [X] T127 [no-write] [quickstart.md](./quickstart.md) 1절의 구조 검증 명령 5개가 모두 기대 결과를 내고 `./tools/package-dependencies/bin/run.sh`가 통과함을 확인한 뒤 변경 파일과 전체 테스트 실행을 사용자 확인 항목으로 보고한다
 
 ---
 
@@ -298,10 +298,10 @@ import하지 않는다.
 
 ## 전체 검증
 
-- [ ] T132 [no-write] `make tuist` 전후 `git status --porcelain`을 비교해 추적 파일 변경이 없음을 확인한다
-- [ ] T133 [no-write] [quickstart.md](./quickstart.md) 1절 구조 검증 전체를 다시 실행해 SC-001·002·004·007을 확인한다
-- [ ] T134 [no-write] 명세 수용 시나리오 S2–S4 각각에 대응하는 테스트 파일(T014, T015, T037, T044, T057, T063, T096, T114)이 존재함을 확인해 SC-005 추적표를 보고한다
-- [ ] T135 [no-write] 프로젝트 `build`·`compile`·`test` 실행기와 quickstart 4절 수동 확인을 사용자 확인 항목으로 보고한다(SC-006)
+- [X] T132 [no-write] `make tuist` 전후 `git status --porcelain`을 비교해 추적 파일 변경이 없음을 확인한다
+- [X] T133 [no-write] [quickstart.md](./quickstart.md) 1절 구조 검증 전체를 다시 실행해 SC-001·002·004·007을 확인한다
+- [X] T134 [no-write] 명세 수용 시나리오 S2–S4 각각에 대응하는 테스트 파일(T014, T015, T037, T044, T057, T063, T096, T114)이 존재함을 확인해 SC-005 추적표를 보고한다
+- [X] T135 [no-write] 프로젝트 `build`·`compile`·`test` 실행기와 quickstart 4절 수동 확인을 사용자 확인 항목으로 보고한다(SC-006)
 
 ## 의존성과 시나리오 완료 순서
 
@@ -359,8 +359,8 @@ import하지 않는다.
 
 ### 전체 수렴 완료 검증
 
-- [ ] T149 [no-write] `grep -rln "import DomainAuthentication\|import DomainLearningProject\|import DomainMember" sources/Projects/Feature sources/Projects/App`가 0줄이고 `./tools/package-dependencies/bin/run.sh`가 통과함을 확인한다
-- [ ] T150 [no-write] 프로젝트 `build`·`compile`·`test` 실행기와 변경 시나리오 S2·S3·S5 수용 기준 재확인을 사용자 확인 항목으로 보고한다
+- [X] T149 [no-write] `grep -rln "import DomainAuthentication\|import DomainLearningProject\|import DomainMember" sources/Projects/Feature sources/Projects/App`가 0줄이고 `./tools/package-dependencies/bin/run.sh`가 통과함을 확인한다
+- [X] T150 [no-write] 프로젝트 `build`·`compile`·`test` 실행기와 변경 시나리오 S2·S3·S5 수용 기준 재확인을 사용자 확인 항목으로 보고한다
 
 ---
 
@@ -387,4 +387,4 @@ import하지 않는다.
 
 ### 전체 수렴 완료 검증
 
-- [ ] T159 [no-write] [quickstart.md](./quickstart.md) 1절 구조 검증 5개를 다시 실행해 Domain UseCase 옛 이름이 `sources/Projects/Feature`·`sources/Projects/App`·`sources/Projects/Composition`·`sources/Tuist`에 남지 않음을 확인하고, Data 계층 wire DTO 이름은 이 기능의 rename 범위가 아님을 근거와 함께 보고한다
+- [X] T159 [no-write] [quickstart.md](./quickstart.md) 1절 구조 검증 5개를 다시 실행해 Domain UseCase 옛 이름이 `sources/Projects/Feature`·`sources/Projects/App`·`sources/Projects/Composition`·`sources/Tuist`에 남지 않음을 확인하고, Data 계층 wire DTO 이름은 이 기능의 rename 범위가 아님을 근거와 함께 보고한다
