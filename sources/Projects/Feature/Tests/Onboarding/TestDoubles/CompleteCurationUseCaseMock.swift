@@ -1,44 +1,35 @@
-import DomainAuthentication
-import DomainMember
+import DomainUserInfo
 import Foundation
 
 actor CompleteCurationUseCaseMock {
 
     // MARK: Lifecycle
 
-    init(results: [Result<Void, MemberError>] = [.success(())]) {
+    init(results: [Result<Void, UserInfoError>] = [.success(())]) {
         self.results = results
     }
 
     // MARK: Internal
 
-    struct Call: Equatable {
-        let position: MemberPosition
-        let careerLevel: CareerLevel
+    nonisolated var updateCuration: @Sendable (Curation) async throws -> Void {
+        { try await self($0) }
     }
 
-    nonisolated var complete: @Sendable (MemberPosition, CareerLevel) async throws -> Void {
-        { try await self(position: $0, careerLevel: $1) }
-    }
-
-    func callAsFunction(
-        position: MemberPosition,
-        careerLevel: CareerLevel,
-    ) async throws {
-        calls.append(Call(position: position, careerLevel: careerLevel))
+    func callAsFunction(_ curation: Curation) async throws {
+        calls.append(curation)
         try nextResult().get()
     }
 
-    func snapshot() -> [Call] {
+    func snapshot() -> [Curation] {
         calls
     }
 
     // MARK: Private
 
-    private var results: [Result<Void, MemberError>]
-    private var calls = [Call]()
+    private var results: [Result<Void, UserInfoError>]
+    private var calls = [Curation]()
 
-    private func nextResult() -> Result<Void, MemberError> {
+    private func nextResult() -> Result<Void, UserInfoError> {
         guard !results.isEmpty else { return .success(()) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

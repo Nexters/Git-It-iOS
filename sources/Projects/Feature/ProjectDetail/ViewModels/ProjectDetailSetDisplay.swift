@@ -1,4 +1,5 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
 import Foundation
 
 // MARK: - ProjectDetailSetDisplay
@@ -8,7 +9,7 @@ public struct ProjectDetailSetDisplay: Equatable, Sendable, Identifiable {
     // MARK: Lifecycle
 
     public init(
-        id: String,
+        id: QuizSetID,
         label: String,
         title: String,
         questionCount: Int,
@@ -23,7 +24,7 @@ public struct ProjectDetailSetDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Public
 
-    public let id: String
+    public let id: QuizSetID
     public let label: String
     public let title: String
     public let questionCount: Int
@@ -33,13 +34,13 @@ public struct ProjectDetailSetDisplay: Equatable, Sendable, Identifiable {
         questionCount > 0 && completedCount >= questionCount
     }
 
-    public static func list(sets: [LearningProjectSetProgress]) -> [Self] {
+    public static func list(sets: [ProjectSetProgress]) -> [Self] {
         sets.map {
             Self(
                 id: $0.setID,
                 label: $0.label,
                 title: $0.title,
-                questionCount: $0.problemCount,
+                questionCount: $0.quizCount,
                 completedCount: $0.completedCount,
             )
         }

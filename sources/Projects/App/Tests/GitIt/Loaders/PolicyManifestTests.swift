@@ -1,3 +1,4 @@
+import DomainAccount
 import Testing
 
 @testable import GitIt
@@ -11,13 +12,13 @@ struct PolicyManifestTests {
 
         #expect(documents.count == 2)
 
-        let privacyPolicy = try #require(documents.first { $0.identifier == "privacy-policy" })
+        let privacyPolicy = try #require(documents.first { $0.id == "privacy-policy" })
         #expect(privacyPolicy.version == "1")
         #expect(privacyPolicy.isRequired)
         #expect(privacyPolicy.approvedURL.scheme == "https")
         #expect(!privacyPolicy.displayName.isEmpty)
 
-        let termsOfService = try #require(documents.first { $0.identifier == "terms-of-service" })
+        let termsOfService = try #require(documents.first { $0.id == "terms-of-service" })
         #expect(termsOfService.version == "1")
         #expect(termsOfService.isRequired)
         #expect(termsOfService.approvedURL.scheme == "https")

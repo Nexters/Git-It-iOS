@@ -1,63 +1,93 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 
-actor LearningLibraryUseCaseMock: LearningLibraryUseCase {
+actor LearningLibraryUseCaseMock: QuizDetailUseCase {
 
     // MARK: Lifecycle
 
     init(
-        detailResults: [Result<LearningProjectDetail, LearningProjectError>] = [.failure(.unexpected)],
-        deleteResults: [Result<Void, LearningProjectError>] = [.success(())],
-        setResults: [Result<LearningSet, LearningProjectError>] = [.failure(.unexpected)],
-        bookmarkResults: [Result<BookmarkedQuestionCollection, LearningProjectError>] = [.failure(.unexpected)],
+        quizSetResults: [Result<QuizSet, QuizDetailError>] = [.failure(.unexpected)],
+        choiceGradingResults: [Result<ChoiceGrading, QuizDetailError>] = [.failure(.unexpected)],
+        essayGradingResults: [Result<EssayGrading, QuizDetailError>] = [.failure(.unexpected)],
+        bookmarkStateResults: [Result<QuizBookmarkState, QuizDetailError>] = [.failure(.unexpected)],
+        bookmarkListResults: [Result<QuizBookmarkList, QuizDetailError>] = [.failure(.unexpected)],
     ) {
-        self.detailResults = detailResults
-        self.deleteResults = deleteResults
-        self.setResults = setResults
-        self.bookmarkResults = bookmarkResults
+        self.quizSetResults = quizSetResults
+        self.choiceGradingResults = choiceGradingResults
+        self.essayGradingResults = essayGradingResults
+        self.bookmarkStateResults = bookmarkStateResults
+        self.bookmarkListResults = bookmarkListResults
     }
 
     // MARK: Internal
 
-    private(set) var requestedProjectIDs = [String]()
-    private(set) var deletedProjectIDs = [String]()
-    private(set) var requestedSetIDs = [String]()
-    private(set) var requestedBookmarkProjectIDs = [String?]()
-
-    func project(id: String) async throws -> LearningProjectDetail {
-        requestedProjectIDs.append(id)
-        return try Self.next(&detailResults, fallback: .failure(.unexpected)).get()
+    struct BookmarkInvocation: Equatable, Sendable {
+        let quizID: QuizID
+        let projectID: ProjectID
+        let isBookmarked: Bool
     }
 
-    func deleteProject(id: String) async throws {
-        deletedProjectIDs.append(id)
-        try Self.next(&deleteResults, fallback: .failure(.unexpected)).get()
-    }
+    private(set) var requestedSetIDs = [QuizSetID]()
+    private(set) var requestedBookmarkFilters = [QuizBookmarkFilter]()
+    private(set) var choiceAnswers = [ChoiceAnswer]()
+    private(set) var essayAnswers = [EssayAnswer]()
+    private(set) var bookmarkInvocations = [BookmarkInvocation]()
 
-    func learningSet(
-        projectID _: String,
-        setID: String,
-    ) async throws -> LearningSet {
+    func quizSet(
+        _ setID: QuizSetID,
+        in _: ProjectID,
+    ) async throws -> QuizSet {
         requestedSetIDs.append(setID)
-        return try Self.next(&setResults, fallback: .failure(.unexpected)).get()
+        return try Self.next(&quizSetResults).get()
     }
 
-    func bookmarkedQuestions(projectID: String?) async throws -> BookmarkedQuestionCollection {
-        requestedBookmarkProjectIDs.append(projectID)
-        return try Self.next(&bookmarkResults, fallback: .failure(.unexpected)).get()
+    func grade(_ answer: ChoiceAnswer) async throws -> ChoiceGrading {
+        choiceAnswers.append(answer)
+        return try Self.next(&choiceGradingResults).get()
+    }
+
+    func grade(_ answer: EssayAnswer) async throws -> EssayGrading {
+        essayAnswers.append(answer)
+        return try Self.next(&essayGradingResults).get()
+    }
+
+    func bookmark(
+        _ quizID: QuizID,
+        in projectID: ProjectID,
+    ) async throws -> QuizBookmarkState {
+        bookmarkInvocations.append(
+            BookmarkInvocation(quizID: quizID, projectID: projectID, isBookmarked: true)
+        )
+        return try Self.next(&bookmarkStateResults).get()
+    }
+
+    func unbookmark(
+        _ quizID: QuizID,
+        in projectID: ProjectID,
+    ) async throws -> QuizBookmarkState {
+        bookmarkInvocations.append(
+            BookmarkInvocation(quizID: quizID, projectID: projectID, isBookmarked: false)
+        )
+        return try Self.next(&bookmarkStateResults).get()
+    }
+
+    func bookmarks(_ filter: QuizBookmarkFilter) async throws -> QuizBookmarkList {
+        requestedBookmarkFilters.append(filter)
+        return try Self.next(&bookmarkListResults).get()
     }
 
     // MARK: Private
 
-    private var detailResults: [Result<LearningProjectDetail, LearningProjectError>]
-    private var deleteResults: [Result<Void, LearningProjectError>]
-    private var setResults: [Result<LearningSet, LearningProjectError>]
-    private var bookmarkResults: [Result<BookmarkedQuestionCollection, LearningProjectError>]
+    private var quizSetResults: [Result<QuizSet, QuizDetailError>]
+    private var choiceGradingResults: [Result<ChoiceGrading, QuizDetailError>]
+    private var essayGradingResults: [Result<EssayGrading, QuizDetailError>]
+    private var bookmarkStateResults: [Result<QuizBookmarkState, QuizDetailError>]
+    private var bookmarkListResults: [Result<QuizBookmarkList, QuizDetailError>]
 
     private static func next<Value>(
-        _ results: inout [Result<Value, LearningProjectError>],
-        fallback: Result<Value, LearningProjectError>,
-    ) -> Result<Value, LearningProjectError> {
-        guard !results.isEmpty else { return fallback }
+        _ results: inout [Result<Value, QuizDetailError>]
+    ) -> Result<Value, QuizDetailError> {
+        guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }
 

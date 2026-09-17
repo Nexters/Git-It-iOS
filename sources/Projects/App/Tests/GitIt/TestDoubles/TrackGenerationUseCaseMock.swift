@@ -1,12 +1,12 @@
-import DomainLearningProject
+import DomainProjectGeneration
 import Foundation
 
-actor TrackGenerationUseCaseMock: TrackGenerationUseCase {
+actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
 
     // MARK: Lifecycle
 
     init(
-        stored: GenerationState = GenerationState(),
+        stored: ProjectGenerationState = ProjectGenerationState(requests: [], preparingProjectIDs: []),
         keepsObservationOpen: Bool = false,
     ) {
         state = stored
@@ -15,45 +15,15 @@ actor TrackGenerationUseCaseMock: TrackGenerationUseCase {
 
     // MARK: Internal
 
-    private(set) var endedGithubRepoURLs = [String]()
+    private(set) var requests = [ProjectGenerationRequest]()
 
-    func begin(
-        githubRepoURL: String,
-        requestedAt: Date,
-    ) async -> Bool {
-        guard let next = state.beginning(githubRepoURL: githubRepoURL, requestedAt: requestedAt) else {
-            return false
-        }
-        state = next
-        yieldCurrent()
-        return true
+    func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
+        requests.append(request)
+        throw ProjectGenerationError.temporarilyUnavailable
     }
 
-    func attachProjectID(
-        _ projectID: String,
-        toGithubRepoURL githubRepoURL: String,
-    ) async {
-        state = state.attachingProjectID(projectID, toGithubRepoURL: githubRepoURL)
-        yieldCurrent()
-    }
-
-    func end(githubRepoURL: String) async {
-        endedGithubRepoURLs.append(githubRepoURL)
-        state = state.removing(githubRepoURL: githubRepoURL)
-        yieldCurrent()
-    }
-
-    func end(projectID: String) async {
-        state = state.removing(projectID: projectID)
-        yieldCurrent()
-    }
-
-    func current() async -> GenerationState {
-        state
-    }
-
-    func states() async -> AsyncStream<GenerationState> {
-        let (stream, continuation) = AsyncStream<GenerationState>.makeStream()
+    func states() async -> AsyncStream<ProjectGenerationState> {
+        let (stream, continuation) = AsyncStream<ProjectGenerationState>.makeStream()
         self.continuation = continuation
         continuation.yield(state)
         if !keepsObservationOpen {
@@ -62,9 +32,9 @@ actor TrackGenerationUseCaseMock: TrackGenerationUseCase {
         return stream
     }
 
-    func emit(_ next: GenerationState) {
+    func emit(_ next: ProjectGenerationState) {
         state = next
-        yieldCurrent()
+        continuation?.yield(state)
     }
 
     func finish() {
@@ -74,11 +44,7 @@ actor TrackGenerationUseCaseMock: TrackGenerationUseCase {
     // MARK: Private
 
     private let keepsObservationOpen: Bool
-    private var state: GenerationState
-    private var continuation: AsyncStream<GenerationState>.Continuation?
-
-    private func yieldCurrent() {
-        continuation?.yield(state)
-    }
+    private var state: ProjectGenerationState
+    private var continuation: AsyncStream<ProjectGenerationState>.Continuation?
 
 }

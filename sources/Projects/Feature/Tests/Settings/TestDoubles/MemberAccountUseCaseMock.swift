@@ -1,14 +1,14 @@
-import DomainMember
+import DomainUserInfo
 
-actor MemberAccountUseCaseMock: MemberAccountUseCase {
+actor MemberAccountUseCaseMock: UserInfoUseCase {
 
     // MARK: Lifecycle
 
     init(
-        profileResults: [Result<MemberProfile, MemberError>] = [.failure(.temporarilyUnavailable)],
-        positionErrors: [MemberError?] = [nil],
-        careerLevelErrors: [MemberError?] = [nil],
-        curationResults: [Result<Void, MemberError>] = [.success(())],
+        profileResults: [Result<UserProfile, UserInfoError>] = [.failure(.temporarilyUnavailable)],
+        positionErrors: [UserInfoError?] = [nil],
+        careerLevelErrors: [UserInfoError?] = [nil],
+        curationResults: [Result<Void, UserInfoError>] = [.success(())],
     ) {
         self.profileResults = profileResults
         self.positionErrors = positionErrors
@@ -18,16 +18,19 @@ actor MemberAccountUseCaseMock: MemberAccountUseCase {
 
     // MARK: Internal
 
-    struct CurationCall: Equatable {
-        let position: MemberPosition
-        let careerLevel: CareerLevel
+    func detail() async throws -> UserDetail {
+        try nextProfile().detail
     }
 
-    func profile() async throws -> MemberProfile {
-        profileCallCount += 1
-        guard !profileResults.isEmpty else { throw MemberError.temporarilyUnavailable }
-        let result = profileResults.count > 1 ? profileResults.removeFirst() : profileResults[0]
-        return try result.get()
+    func curation() async throws -> Curation? {
+        try nextProfile().curation
+    }
+
+    func updateCuration(_ curation: Curation) async throws {
+        curations.append(curation)
+        guard !curationResults.isEmpty else { return }
+        let result = curationResults.count > 1 ? curationResults.removeFirst() : curationResults[0]
+        try result.get()
     }
 
     func updatePosition(_ position: MemberPosition) async throws {
@@ -44,38 +47,35 @@ actor MemberAccountUseCaseMock: MemberAccountUseCase {
         }
     }
 
-    func completeCuration(
-        position: MemberPosition,
-        careerLevel: CareerLevel,
-    ) async throws {
-        curationCalls.append(CurationCall(position: position, careerLevel: careerLevel))
-        guard !curationResults.isEmpty else { return }
-        let result = curationResults.count > 1 ? curationResults.removeFirst() : curationResults[0]
-        try result.get()
-    }
-
     func snapshot() -> (
         profileCallCount: Int,
         positions: [MemberPosition],
         careerLevels: [CareerLevel],
-        curationCalls: [CurationCall],
+        curations: [Curation],
     ) {
-        (profileCallCount, requestedPositions, requestedCareerLevels, curationCalls)
+        (profileCallCount, requestedPositions, requestedCareerLevels, curations)
     }
 
     // MARK: Private
 
-    private var profileResults: [Result<MemberProfile, MemberError>]
-    private var positionErrors: [MemberError?]
-    private var careerLevelErrors: [MemberError?]
-    private var curationResults: [Result<Void, MemberError>]
+    private var profileResults: [Result<UserProfile, UserInfoError>]
+    private var positionErrors: [UserInfoError?]
+    private var careerLevelErrors: [UserInfoError?]
+    private var curationResults: [Result<Void, UserInfoError>]
 
     private var profileCallCount = 0
     private var requestedPositions = [MemberPosition]()
     private var requestedCareerLevels = [CareerLevel]()
-    private var curationCalls = [CurationCall]()
+    private var curations = [Curation]()
 
-    private func next(_ errors: inout [MemberError?]) -> MemberError? {
+    private func nextProfile() throws -> UserProfile {
+        profileCallCount += 1
+        guard !profileResults.isEmpty else { throw UserInfoError.temporarilyUnavailable }
+        let result = profileResults.count > 1 ? profileResults.removeFirst() : profileResults[0]
+        return try result.get()
+    }
+
+    private func next(_ errors: inout [UserInfoError?]) -> UserInfoError? {
         guard !errors.isEmpty else { return nil }
         return errors.count > 1 ? errors.removeFirst() : errors[0]
     }

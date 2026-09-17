@@ -1,4 +1,6 @@
-import DomainLearningProject
+import DomainExternalRepository
+import DomainIdentifier
+import DomainProjectGeneration
 import Foundation
 import Synchronization
 
@@ -14,7 +16,7 @@ struct StubRepositoryURLParser: ExternalRepositoryLocator {
 
     // MARK: Internal
 
-    func location(from _: String) -> ExternalRepositoryLocation? {
+    func location(from _: ExternalRepositoryURL) -> ExternalRepositoryLocation? {
         location
     }
 
@@ -26,7 +28,7 @@ struct StubRepositoryURLParser: ExternalRepositoryLocator {
 
 // MARK: - StubFetchExternalRepository
 
-struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
+struct StubFetchExternalRepository: ExternalRepositoryUseCase {
 
     // MARK: Lifecycle
 
@@ -36,7 +38,7 @@ struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
 
     // MARK: Internal
 
-    func callAsFunction(url _: String) async throws -> ExternalRepository {
+    func repository(at _: ExternalRepositoryURL) async throws -> ExternalRepository {
         try result.resolve()
     }
 
@@ -68,13 +70,13 @@ struct StubFetchExternalRepository: FetchExternalRepositoryUseCase {
 
 // MARK: - SpyCreateLearningProject
 
-final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
+final class SpyCreateLearningProject: ProjectGenerationUseCase, Sendable {
 
     // MARK: Lifecycle
 
     init(
-        projectID: String = "project-1",
-        error: LearningProjectError? = nil,
+        projectID: ProjectID = "project-1",
+        error: ProjectGenerationError? = nil,
         suspendsUntilResumed: Bool = false,
     ) {
         self.projectID = projectID
@@ -96,13 +98,10 @@ final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
         gate.continuation.finish()
     }
 
-    func callAsFunction(
-        githubRepoURL _: String,
-        quizLevel: QuizLevel,
-    ) async throws -> ProjectRegistrationReceipt {
+    func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
         calls.withLock { state in
             state.count += 1
-            state.last = quizLevel
+            state.last = request.quizLevel
         }
         if suspendsUntilResumed {
             for await _ in gate.stream { }
@@ -110,11 +109,11 @@ final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
         if let error {
             throw error
         }
-        return ProjectRegistrationReceipt(
-            projectID: projectID,
-            requestStatus: "accepted",
-            quizLevel: quizLevel,
-        )
+        return ProjectGenerationReceipt(projectID: projectID, quizLevel: request.quizLevel)
+    }
+
+    func states() async -> AsyncStream<ProjectGenerationState> {
+        AsyncStream { $0.finish() }
     }
 
     // MARK: Private
@@ -124,8 +123,8 @@ final class SpyCreateLearningProject: CreateLearningProjectUseCase, Sendable {
         var last: QuizLevel?
     }
 
-    private let projectID: String
-    private let error: LearningProjectError?
+    private let projectID: ProjectID
+    private let error: ProjectGenerationError?
     private let suspendsUntilResumed: Bool
     private let gate = AsyncStream.makeStream(of: Void.self)
     private let calls = Mutex(Calls())

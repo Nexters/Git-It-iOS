@@ -1,33 +1,33 @@
-import DomainLearningProject
+import DomainQuizDetail
 
 actor StubFetchBookmarkedQuestionsUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [Result<BookmarkedQuestionCollection, LearningProjectError>] = [.failure(.unexpected)]) {
+    init(results: [Result<QuizBookmarkList, QuizDetailError>] = [.failure(.unexpected)]) {
         self.results = results
     }
 
     // MARK: Internal
 
     private(set) var callCount = 0
-    private(set) var requestedProjectIDs = [String?]()
+    private(set) var requestedFilters = [QuizBookmarkFilter]()
 
-    nonisolated var fetchBookmarks: @Sendable (String?) async throws -> BookmarkedQuestionCollection {
-        { try await self(projectID: $0) }
+    nonisolated var fetchBookmarks: @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList {
+        { try await self(filter: $0) }
     }
 
-    func callAsFunction(projectID: String?) async throws -> BookmarkedQuestionCollection {
+    func callAsFunction(filter: QuizBookmarkFilter) async throws -> QuizBookmarkList {
         callCount += 1
-        requestedProjectIDs.append(projectID)
+        requestedFilters.append(filter)
         return try nextResult().get()
     }
 
     // MARK: Private
 
-    private var results: [Result<BookmarkedQuestionCollection, LearningProjectError>]
+    private var results: [Result<QuizBookmarkList, QuizDetailError>]
 
-    private func nextResult() -> Result<BookmarkedQuestionCollection, LearningProjectError> {
+    private func nextResult() -> Result<QuizBookmarkList, QuizDetailError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

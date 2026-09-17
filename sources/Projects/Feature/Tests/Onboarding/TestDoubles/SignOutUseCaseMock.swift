@@ -1,16 +1,19 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Foundation
 
-actor SignOutUseCaseMock: SignOutUseCase {
+actor SignOutUseCaseMock {
 
     // MARK: Lifecycle
 
-    init(results: [SignOutResult] = [.success]) {
+    init(results: [SignOutResult] = [.signedOut]) {
         self.results = results
     }
 
     // MARK: Internal
+
+    nonisolated var signOut: @Sendable () async -> SignOutResult {
+        { await self() }
+    }
 
     func callAsFunction() async -> SignOutResult {
         callCount += 1
@@ -27,7 +30,7 @@ actor SignOutUseCaseMock: SignOutUseCase {
     private var callCount = 0
 
     private func nextResult() -> SignOutResult {
-        guard !results.isEmpty else { return .success }
+        guard !results.isEmpty else { return .signedOut }
         return results.count > 1 ? results.removeFirst() : results[0]
     }
 

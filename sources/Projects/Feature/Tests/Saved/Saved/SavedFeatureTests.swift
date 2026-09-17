@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainQuizDetail
 import Testing
 
 @testable import Feature
@@ -11,11 +11,11 @@ struct SavedFeatureTests {
 
     @Test
     func `프로젝트 필터가 있으면 그 프로젝트로만 조회한다`() async {
-        let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(
-            results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
+        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+            results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
-            fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+            fetchBookmarks: fetchBookmarks,
             state: SavedFeature.State(
                 initialProjectFilter: ProjectDetailTestFixture.projectID,
                 isBackControlPresented: true,
@@ -26,17 +26,20 @@ struct SavedFeatureTests {
         await store.send(.view(.task))
         await store.receive(\.effect.bookmarksLoadFinished)
 
-        #expect(await fetchBookmarkedQuestions.requestedProjectIDs == [ProjectDetailTestFixture.projectID])
-        #expect(store.state.collection?.bookmarks.allSatisfy { $0.projectID == ProjectDetailTestFixture.projectID } == true)
+        #expect(await fetchBookmarks.requestedFilters == [.project(ProjectDetailTestFixture.projectID)])
+        #expect(
+            store.state.collection?.bookmarks
+                .allSatisfy { $0.projectID == ProjectDetailTestFixture.projectID } == true
+        )
     }
 
     @Test
     func `프로젝트에서 진입해도 다른 프로젝트 필터로 바꿔 다시 조회한다`() async {
-        let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(
-            results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
+        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+            results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
-            fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+            fetchBookmarks: fetchBookmarks,
             state: SavedFeature.State(initialProjectFilter: ProjectDetailTestFixture.projectID),
         )
         store.exhaustivity = .off
@@ -51,41 +54,41 @@ struct SavedFeatureTests {
         }
         await store.receive(\.effect.bookmarksLoadFinished)
 
-        #expect(await fetchBookmarkedQuestions.requestedProjectIDs == ["project-2", nil])
+        #expect(await fetchBookmarks.requestedFilters == [.project("project-2"), .all])
     }
 
     @Test
     func `이미 선택된 필터를 다시 누르면 조회하지 않는다`() async {
-        let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(
-            results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
+        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(
+            results: [.success(ProjectDetailTestFixture.savedQuizList)]
         )
         let store = makeStore(
-            fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+            fetchBookmarks: fetchBookmarks,
             state: SavedFeature.State(initialProjectFilter: ProjectDetailTestFixture.projectID),
         )
 
         await store.send(.view(.filterSelected(projectID: ProjectDetailTestFixture.projectID)))
 
-        #expect(await fetchBookmarkedQuestions.callCount == 0)
+        #expect(await fetchBookmarks.callCount == 0)
     }
 
     @Test
     func `목록을 표시하는 동안 세트 조회를 하지 않는다`() async {
-        let fetchLearningSet = StubFetchLearningSetUseCase()
+        let fetchQuizSet = StubFetchLearningSetUseCase()
         let store = makeStore()
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.receive(\.effect.bookmarksLoadFinished)
 
-        #expect(await fetchLearningSet.callCount == 0)
+        #expect(await fetchQuizSet.callCount == 0)
     }
 
     @Test
     func `저장한 문제가 없으면 빈 상태로 표시한다`() async {
         let store = makeStore(
-            fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase(
-                results: [.success(ProjectDetailTestFixture.emptyQuestionCollection)]
+            fetchBookmarks: StubFetchBookmarkedQuestionsUseCase(
+                results: [.success(ProjectDetailTestFixture.emptyQuizList)]
             )
         )
         store.exhaustivity = .off
@@ -98,11 +101,11 @@ struct SavedFeatureTests {
 
     @Test
     func `조회에 실패하면 오류를 남기고 재시도로 다시 조회한다`() async {
-        let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(results: [
+        let fetchBookmarks = StubFetchBookmarkedQuestionsUseCase(results: [
             .failure(.temporarilyUnavailable),
-            .success(ProjectDetailTestFixture.savedQuestionCollection),
+            .success(ProjectDetailTestFixture.savedQuizList),
         ])
-        let store = makeStore(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+        let store = makeStore(fetchBookmarks: fetchBookmarks)
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -116,11 +119,11 @@ struct SavedFeatureTests {
 
     @Test
     func `문제 풀기 입력만 진입 의도를 만든다`() async {
-        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
         let store = makeStore()
 
-        await store.send(.view(.solveTapped(question)))
-        await store.receive(.delegate(.questionSelected(question)))
+        await store.send(.view(.solveTapped(bookmark)))
+        await store.receive(.delegate(.questionSelected(bookmark)))
     }
 
     @Test
@@ -132,39 +135,39 @@ struct SavedFeatureTests {
 
     @Test
     func `북마크를 해제하면 목록에서 제거하지 않고 상태만 갱신한다`() async {
-        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
-        let setQuestionBookmark = StubSetQuestionBookmarkUseCase(
-            results: [.success(BookmarkState(bookmarked: false))]
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
+        let setBookmark = StubSetQuestionBookmarkUseCase(
+            results: [.success(QuizBookmarkState(quizID: bookmark.quizID, isBookmarked: false))]
         )
-        let store = makeStore(setQuestionBookmark: setQuestionBookmark)
+        let store = makeStore(setBookmark: setBookmark)
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.receive(\.effect.bookmarksLoadFinished)
 
-        await store.send(.view(.bookmarkToggleTapped(question)))
+        await store.send(.view(.bookmarkToggleTapped(bookmark)))
         await store.receive(\.effect.bookmarkToggleFinished) {
-            $0.bookmarkOverrides[question.questionID] = false
-            $0.bookmarkMutations[question.questionID] = .idle
+            $0.bookmarkOverrides[bookmark.quizID] = false
+            $0.bookmarkMutations[bookmark.quizID] = .idle
         }
 
-        #expect(await setQuestionBookmark.invocations == [
+        #expect(await setBookmark.invocations == [
             StubSetQuestionBookmarkUseCase.Invocation(
-                projectID: question.projectID,
-                questionID: question.questionID,
-                bookmarked: false,
+                quizID: bookmark.quizID,
+                projectID: bookmark.projectID,
+                isBookmarked: false,
             )
         ])
-        #expect(store.state.collection?.bookmarks.contains(where: { $0.questionID == question.questionID }) == true)
+        #expect(store.state.collection?.bookmarks.contains(where: { $0.quizID == bookmark.quizID }) == true)
     }
 
     // MARK: Private
 
     private func makeStore(
-        fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
-            results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
+        fetchBookmarks: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
+            results: [.success(ProjectDetailTestFixture.savedQuizList)]
         ),
-        setQuestionBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
+        setBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
         state: SavedFeature.State = SavedFeature.State(
             initialProjectFilter: ProjectDetailTestFixture.projectID,
             isBackControlPresented: true,
@@ -172,8 +175,8 @@ struct SavedFeatureTests {
     ) -> TestStoreOf<SavedFeature> {
         TestStore(initialState: state) {
             SavedFeature(
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions.fetchBookmarks,
-                setQuestionBookmark: setQuestionBookmark,
+                fetchBookmarks: fetchBookmarks.fetchBookmarks,
+                setBookmark: setBookmark.setBookmark,
             )
         }
     }

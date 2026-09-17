@@ -1,14 +1,14 @@
 import ComposableArchitecture
-import DomainLearningProject
-import Foundation
+import DomainExternalRepository
+import DomainIdentifier
 
 @Reducer
 public struct RepositoryLinkInputFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(fetchExternalRepository: any FetchExternalRepositoryUseCase) {
-        self.fetchExternalRepository = fetchExternalRepository
+    public init(repository: @escaping @Sendable (ExternalRepositoryURL) async throws -> ExternalRepository) {
+        self.repository = repository
     }
 
     // MARK: Public
@@ -114,7 +114,7 @@ public struct RepositoryLinkInputFeature: Sendable {
         case validation
     }
 
-    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
+    private let repository: @Sendable (ExternalRepositoryURL) async throws -> ExternalRepository
 
     private func startValidation(_ state: inout State) -> Effect<Action> {
         guard !state.repositoryURLInput.isEmpty else { return .none }
@@ -124,8 +124,8 @@ public struct RepositoryLinkInputFeature: Sendable {
         let url = state.repositoryURLInput
         return .run { send in
             do {
-                let repository = try await fetchExternalRepository(url: url)
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
+                let resolved = try await repository(url)
+                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(resolved))))
             } catch {
                 let mapped = error as? ExternalRepositoryError ?? .other
                 await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))

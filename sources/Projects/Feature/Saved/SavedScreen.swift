@@ -81,7 +81,7 @@ struct SavedScreen: View {
 
             if isFilterPresented {
                 FilterSection(
-                    projects: store.collection?.availableProjects ?? [],
+                    projects: store.collection?.projects ?? [],
                     selectedProjectID: store.selectedProjectID,
                     count: store.collection?.totalCount ?? 0,
                     onSelect: { send(.filterSelected(projectID: $0)) },
@@ -122,13 +122,13 @@ struct SavedScreen: View {
     }
 
     private func solve(questionID: String) {
-        guard let question = store.collection?.bookmarks.first(where: { $0.questionID == questionID })
+        guard let question = store.collection?.bookmarks.first(where: { $0.quizID == questionID })
         else { return }
         send(.solveTapped(question))
     }
 
     private func toggleBookmark(questionID: String) {
-        guard let question = store.collection?.bookmarks.first(where: { $0.questionID == questionID })
+        guard let question = store.collection?.bookmarks.first(where: { $0.quizID == questionID })
         else { return }
         send(.bookmarkToggleTapped(question))
     }

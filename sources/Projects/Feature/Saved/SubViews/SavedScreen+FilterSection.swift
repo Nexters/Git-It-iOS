@@ -1,5 +1,6 @@
 import DesignSystem
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import SwiftUI
 import UIComponent
 
@@ -8,10 +9,10 @@ extension SavedScreen {
 
         // MARK: Internal
 
-        let projects: [BookmarkedProject]
-        let selectedProjectID: String?
+        let projects: [QuizBookmarkProject]
+        let selectedProjectID: ProjectID?
         let count: Int
-        let onSelect: (String?) -> Void
+        let onSelect: (ProjectID?) -> Void
 
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {

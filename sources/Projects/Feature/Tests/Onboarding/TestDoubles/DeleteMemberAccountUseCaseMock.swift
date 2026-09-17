@@ -1,7 +1,7 @@
-import DomainMember
+import DomainAccount
 import Foundation
 
-actor DeleteMemberAccountUseCaseMock: DeleteMemberAccountUseCase {
+actor DeleteMemberAccountUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -11,10 +11,14 @@ actor DeleteMemberAccountUseCaseMock: DeleteMemberAccountUseCase {
 
     // MARK: Internal
 
+    nonisolated var withdraw: @Sendable () async throws -> Void {
+        { try await self() }
+    }
+
     func callAsFunction() async throws {
         callCount += 1
         if shouldThrow {
-            throw MemberError.temporarilyUnavailable
+            throw AccountError.withdrawalUnavailable
         }
     }
 

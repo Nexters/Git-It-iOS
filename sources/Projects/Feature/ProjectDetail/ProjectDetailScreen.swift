@@ -46,7 +46,7 @@ struct ProjectDetailScreen: View {
         .overlay {
             ModalOverlay(isPresented: isDeletionConfirmationPresented, onDismiss: { send(.deletionCancelled) }) {
                 ConfirmationSheet(
-                    imageURL: store.detail?.repositoryImageURL,
+                    imageURL: store.detail?.repository.imageURL,
                     title: "프로젝트를 삭제할까요?",
                     message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
                     confirmTitle: "삭제",
@@ -82,11 +82,11 @@ struct ProjectDetailScreen: View {
         } content: {
             VStack(alignment: .leading, spacing: 0) {
                 RepositorySummaryView(
-                    repositoryName: store.detail?.repositoryName ?? "",
-                    repositoryImageURL: store.detail?.repositoryImageURL,
-                    starCount: store.detail?.starCount ?? 0,
-                    techStack: store.detail?.techStack ?? [],
-                    overallProgressPercent: store.detail?.overallProgressPercent ?? 0,
+                    repositoryName: store.detail?.repository.name ?? "",
+                    repositoryImageURL: store.detail?.repository.imageURL,
+                    starCount: store.detail?.repository.starCount ?? 0,
+                    techStack: store.detail?.repository.techStack ?? [],
+                    overallProgressPercent: store.detail?.progressPercent ?? 0,
                     isResumeEnabled: store.isResumeEnabled,
                     onResumeTap: { send(.resumeTapped) },
                 )

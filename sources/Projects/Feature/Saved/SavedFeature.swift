@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
 // MARK: - SavedFeature
@@ -10,11 +11,11 @@ public struct SavedFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchBookmarkedQuestions: @escaping @Sendable (String?) async throws -> BookmarkedQuestionCollection,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
+        fetchBookmarks: @escaping @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList,
+        setBookmark: @escaping @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState,
     ) {
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
-        self.setQuestionBookmark = setQuestionBookmark
+        self.fetchBookmarks = fetchBookmarks
+        self.setBookmark = setBookmark
     }
 
     // MARK: Public
@@ -23,13 +24,13 @@ public struct SavedFeature: Sendable {
         case idle
         case loading
         case loaded
-        case failed(LearningProjectError)
+        case failed(QuizDetailError)
     }
 
     public enum BookmarkMutation: Equatable, Sendable {
         case idle
         case committing
-        case failed(LearningProjectError)
+        case failed(QuizDetailError)
     }
 
     @ObservableState
@@ -38,7 +39,7 @@ public struct SavedFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            initialProjectFilter: String? = nil,
+            initialProjectFilter: ProjectID? = nil,
             isBackControlPresented: Bool = false,
         ) {
             self.isBackControlPresented = isBackControlPresented
@@ -49,18 +50,18 @@ public struct SavedFeature: Sendable {
 
         public let isBackControlPresented: Bool
 
-        public var selectedProjectID: String?
-        public var collection: BookmarkedQuestionCollection?
+        public var selectedProjectID: ProjectID?
+        public var collection: QuizBookmarkList?
         public var loadStatus = LoadStatus.idle
         public var requestID = 0
-        public var bookmarkOverrides = [String: Bool]()
-        public var bookmarkMutations = [String: BookmarkMutation]()
+        public var bookmarkOverrides = [QuizID: Bool]()
+        public var bookmarkMutations = [QuizID: BookmarkMutation]()
 
         public var isEmpty: Bool {
             collection?.bookmarks.isEmpty ?? false
         }
 
-        public func isBookmarked(questionID: String) -> Bool {
+        public func isBookmarked(questionID: QuizID) -> Bool {
             bookmarkOverrides[questionID] ?? true
         }
 
@@ -77,9 +78,9 @@ public struct SavedFeature: Sendable {
         public enum View: Sendable, Equatable {
             case task
             case retryTapped
-            case filterSelected(projectID: String?)
-            case solveTapped(BookmarkedQuestion)
-            case bookmarkToggleTapped(BookmarkedQuestion)
+            case filterSelected(projectID: ProjectID?)
+            case solveTapped(QuizBookmark)
+            case bookmarkToggleTapped(QuizBookmark)
             case backTapped
         }
 
@@ -87,17 +88,17 @@ public struct SavedFeature: Sendable {
         public enum EffectEvent: Sendable, Equatable {
             case bookmarksLoadFinished(
                 requestID: Int,
-                result: Result<BookmarkedQuestionCollection, LearningProjectError>,
+                result: Result<QuizBookmarkList, QuizDetailError>,
             )
             case bookmarkToggleFinished(
-                questionID: String,
-                result: Result<BookmarkState, LearningProjectError>,
+                questionID: QuizID,
+                result: Result<QuizBookmarkState, QuizDetailError>,
             )
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case questionSelected(BookmarkedQuestion)
+            case questionSelected(QuizBookmark)
             case backRequested
         }
     }
@@ -114,11 +115,11 @@ public struct SavedFeature: Sendable {
                 state.selectedProjectID = projectID
                 return load(&state)
 
-            case .view(.solveTapped(let question)):
-                return .send(.delegate(.questionSelected(question)))
+            case .view(.solveTapped(let bookmark)):
+                return .send(.delegate(.questionSelected(bookmark)))
 
-            case .view(.bookmarkToggleTapped(let question)):
-                return toggleBookmark(&state, question: question)
+            case .view(.bookmarkToggleTapped(let bookmark)):
+                return toggleBookmark(&state, bookmark: bookmark)
 
             case .view(.backTapped):
                 guard state.isBackControlPresented else { return .none }
@@ -127,8 +128,8 @@ public struct SavedFeature: Sendable {
             case .effect(.bookmarksLoadFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
                 switch result {
-                case .success(let collection):
-                    state.collection = collection
+                case .success(let list):
+                    state.collection = list
                     state.loadStatus = .loaded
                     state.bookmarkOverrides = [:]
 
@@ -140,7 +141,7 @@ public struct SavedFeature: Sendable {
             case .effect(.bookmarkToggleFinished(let questionID, let result)):
                 switch result {
                 case .success(let bookmarkState):
-                    state.bookmarkOverrides[questionID] = bookmarkState.bookmarked
+                    state.bookmarkOverrides[questionID] = bookmarkState.isBookmarked
                     state.bookmarkMutations[questionID] = .idle
 
                 case .failure(let error):
@@ -158,23 +159,23 @@ public struct SavedFeature: Sendable {
 
     private enum CancelID: Hashable {
         case load
-        case bookmarkToggle(String)
+        case bookmarkToggle(QuizID)
     }
 
-    private let fetchBookmarkedQuestions: @Sendable (String?) async throws -> BookmarkedQuestionCollection
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
+    private let fetchBookmarks: @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList
+    private let setBookmark: @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState
 
     private func load(_ state: inout State) -> Effect<Action> {
         state.requestID += 1
         let currentRequestID = state.requestID
-        let projectID = state.selectedProjectID
+        let filter = state.selectedProjectID.map(QuizBookmarkFilter.project) ?? .all
         state.loadStatus = .loading
         return .run { send in
             do {
-                let collection = try await fetchBookmarkedQuestions(projectID)
-                await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .success(collection))))
+                let list = try await fetchBookmarks(filter)
+                await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .success(list))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? QuizDetailError ?? .unexpected
                 await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .failure(mapped))))
             }
         }
@@ -183,23 +184,19 @@ public struct SavedFeature: Sendable {
 
     private func toggleBookmark(
         _ state: inout State,
-        question: BookmarkedQuestion,
+        bookmark: QuizBookmark,
     ) -> Effect<Action> {
-        let questionID = question.questionID
+        let questionID = bookmark.quizID
         guard state.bookmarkMutations[questionID] != .committing else { return .none }
         state.bookmarkMutations[questionID] = .committing
-        let projectID = question.projectID
+        let projectID = bookmark.projectID
         let bookmarked = !state.isBookmarked(questionID: questionID)
         return .run { send in
             do {
-                let result = try await setQuestionBookmark(
-                    projectID: projectID,
-                    questionID: questionID,
-                    bookmarked: bookmarked,
-                )
-                await send(.effect(.bookmarkToggleFinished(questionID: questionID, result: .success(result))))
+                let bookmarkState = try await setBookmark(questionID, projectID, bookmarked)
+                await send(.effect(.bookmarkToggleFinished(questionID: questionID, result: .success(bookmarkState))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? QuizDetailError ?? .unexpected
                 await send(.effect(.bookmarkToggleFinished(questionID: questionID, result: .failure(mapped))))
             }
         }

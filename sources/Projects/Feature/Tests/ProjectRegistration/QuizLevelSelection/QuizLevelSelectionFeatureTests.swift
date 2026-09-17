@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainProjectGeneration
 import Testing
 
 @testable import Feature

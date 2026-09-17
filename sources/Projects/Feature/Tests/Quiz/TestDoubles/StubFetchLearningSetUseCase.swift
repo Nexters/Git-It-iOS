@@ -1,26 +1,27 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 
 actor StubFetchLearningSetUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [Result<LearningSet, LearningProjectError>] = [.failure(.unexpected)]) {
+    init(results: [Result<QuizSet, QuizDetailError>] = [.failure(.unexpected)]) {
         self.results = results
     }
 
     // MARK: Internal
 
     private(set) var callCount = 0
-    private(set) var requestedSetIDs = [String]()
+    private(set) var requestedSetIDs = [QuizSetID]()
 
-    nonisolated var fetchSet: @Sendable (String, String) async throws -> LearningSet {
-        { try await self(projectID: $0, setID: $1) }
+    nonisolated var fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet {
+        { try await self(setID: $0, projectID: $1) }
     }
 
     func callAsFunction(
-        projectID _: String,
-        setID: String,
-    ) async throws -> LearningSet {
+        setID: QuizSetID,
+        projectID _: ProjectID,
+    ) async throws -> QuizSet {
         callCount += 1
         requestedSetIDs.append(setID)
         return try nextResult().get()
@@ -28,9 +29,9 @@ actor StubFetchLearningSetUseCase {
 
     // MARK: Private
 
-    private var results: [Result<LearningSet, LearningProjectError>]
+    private var results: [Result<QuizSet, QuizDetailError>]
 
-    private func nextResult() -> Result<LearningSet, LearningProjectError> {
+    private func nextResult() -> Result<QuizSet, QuizDetailError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

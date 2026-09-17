@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainExternalRepository
 import Testing
 
 @testable import Feature
@@ -23,8 +23,8 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `validateTapped 성공은 validation을 validated로 전이하고 repositoryValidated를 위임한다`() async {
-        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
-        let store = makeRepositoryLinkInputStore(fetchExternalRepository: fetchExternalRepository)
+        let externalRepository = StubFetchExternalRepositoryUseCase(results: [.success(sampleRepository)])
+        let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.repositoryURLChanged("https://github.com/owner/repo"))) {
             $0.repositoryURLInput = "https://github.com/owner/repo"
@@ -38,13 +38,13 @@ struct RepositoryLinkInputFeatureTests {
         }
         await store.receive(.delegate(.repositoryValidated(sampleRepository)))
 
-        #expect(await fetchExternalRepository.snapshot().callCount == 1)
+        #expect(await externalRepository.snapshot().callCount == 1)
     }
 
     @Test
     func `validateTapped 실패는 validation을 failed로 전이한다`() async {
-        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(results: [.failure(.invalidURLFormat)])
-        let store = makeRepositoryLinkInputStore(fetchExternalRepository: fetchExternalRepository)
+        let externalRepository = StubFetchExternalRepositoryUseCase(results: [.failure(.invalidURLFormat)])
+        let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.repositoryURLChanged("https://github.com/owner/repo"))) {
             $0.repositoryURLInput = "https://github.com/owner/repo"
@@ -61,12 +61,12 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `빈 URL에서 validateTapped는 아무 효과도 내지 않는다`() async {
-        let fetchExternalRepository = StubFetchExternalRepositoryUseCase()
-        let store = makeRepositoryLinkInputStore(fetchExternalRepository: fetchExternalRepository)
+        let externalRepository = StubFetchExternalRepositoryUseCase()
+        let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.validateTapped))
 
-        #expect(await fetchExternalRepository.snapshot().callCount == 0)
+        #expect(await externalRepository.snapshot().callCount == 0)
     }
 
     @Test
@@ -98,11 +98,11 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `State가 폐기되면 진행 중이던 검증 Effect가 취소되고 이후 이벤트를 받지 않는다`() async {
-        let fetchExternalRepository = StubFetchExternalRepositoryUseCase(suspendsRequests: true)
+        let externalRepository = StubFetchExternalRepositoryUseCase(suspendsRequests: true)
         var childState = RepositoryLinkInputFeature.State()
         childState.repositoryURLInput = "https://github.com/owner/repo"
         let store = TestStore(initialState: RepositoryLinkInputHostFeature.State(child: childState)) {
-            RepositoryLinkInputHostFeature(fetchExternalRepository: fetchExternalRepository)
+            RepositoryLinkInputHostFeature(externalRepository: externalRepository)
         }
 
         await store.send(.child(.presented(.view(.validateTapped)))) {
@@ -112,7 +112,7 @@ struct RepositoryLinkInputFeatureTests {
         await store.send(.child(.dismiss)) {
             $0.child = nil
         }
-        await fetchExternalRepository.resumeOldest()
+        await externalRepository.resumeOldest()
 
         await store.finish()
     }
@@ -133,12 +133,14 @@ private struct RepositoryLinkInputHostFeature {
         case child(PresentationAction<RepositoryLinkInputFeature.Action>)
     }
 
-    let fetchExternalRepository: any FetchExternalRepositoryUseCase
+    let externalRepository: StubFetchExternalRepositoryUseCase
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
             .ifLet(\.$child, action: \.child) {
-                RepositoryLinkInputFeature(fetchExternalRepository: fetchExternalRepository)
+                RepositoryLinkInputFeature(repository: { [externalRepository] in
+                    try await externalRepository.repository(at: $0)
+                })
             }
     }
 

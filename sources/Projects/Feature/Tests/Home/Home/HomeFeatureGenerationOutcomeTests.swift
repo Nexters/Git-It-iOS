@@ -1,262 +1,130 @@
 import ComposableArchitecture
-import DomainLearningProject
-import Foundation
+import DomainProject
 import Testing
 
 @testable import Feature
 
 @MainActor
-@Suite("HomeFeature 학습 세트 생성 결과 관찰")
+@Suite("HomeFeature 프로젝트 스트림 구독과 갱신")
 struct HomeFeatureGenerationOutcomeTests {
 
+    // MARK: Internal
+
     @Test
-    func `task가 다시 전달되면 이전 생성 결과 관찰을 대체해 하나만 유지한다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let profile = HomeMemberProfileUseCaseMock(
-            results: [.success(HomeTestFixture.profileWithBoth)],
-            suspendsRequests: true,
-        )
-        let projects = HomeLearningProjectsUseCaseMock(
-            results: [.success(HomeTestFixture.oneProjectPage)],
-            suspendsRequests: true,
-        )
-        let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: profile.fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+    func `task는 프로젝트 스트림을 구독하고 갱신을 한 번 요청한다`() async {
+        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let store = makeStore(projects: projects)
+        store.exhaustivity = .off
 
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
-            $0.projectLoad = .loading
-            $0.profileRequestID = 1
-            $0.projectRequestID = 1
-        }
-        while await profile.snapshot().pendingCount == 0 { await Task.yield() }
-        await profile.resumeNext()
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))) {
-            $0.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
-        }
-        while await projects.snapshot().pendingCount == 0 { await Task.yield() }
-        await projects.resumeNext()
-        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.oneProjectPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        }
+        let task = await store.send(.view(.task))
+        await store.receive(\.effect.projectsReceived)
 
-        await store.send(.view(.task))
-        while await observeGenerationOutcomes.establishedSubscriptionCount() < 2 { await Task.yield() }
-        while await observeGenerationOutcomes.activeSubscriptionCount() != 1 { await Task.yield() }
+        #expect(store.state.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
+        while await projects.snapshot().refreshCallCount == 0 { await Task.yield() }
+        #expect(await projects.snapshot().refreshCallCount == 1)
+        #expect(await projects.activeSubscriptionCount() == 1)
 
-        #expect(await observeGenerationOutcomes.activeSubscriptionCount() == 1)
-        #expect(await profile.snapshot().callCount == 1)
-        #expect(await projects.snapshot().callCount == 1)
-
-        await observeGenerationOutcomes.finish()
-        await store.finish()
+        await projects.finish()
+        await task.cancel()
     }
 
     @Test
-    func `화면을 벗어났다 돌아오면 생성 결과 관찰을 다시 시작해 결과를 반영한다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
-        let store = TestStore(initialState: Self.loadedState()) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+    func `스트림이 다시 방출하면 최신 목록으로 갈아끼운다`() async {
+        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        let store = makeStore(projects: projects)
+        store.exhaustivity = .off
 
-        let firstTask = await store.send(.view(.task))
-        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
-        await firstTask.cancel()
-        while await observeGenerationOutcomes.activeSubscriptionCount() != 0 { await Task.yield() }
+        let task = await store.send(.view(.task))
+        await store.receive(\.effect.projectsReceived)
 
-        await store.send(.view(.task))
-        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
-        await observeGenerationOutcomes.emit(
-            GenerationOutcome(projectID: "project-1", status: .completed)
-        )
-        await store.receive(
-            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
-        ) {
-            $0.appliedOutcomeProjectIDs = ["project-1"]
-            $0.projectRequestID = 1
-        }
-        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
-        }
+        await projects.emit(HomeTestFixture.manyProjectsPage)
+        await store.receive(\.effect.projectsReceived)
 
-        await observeGenerationOutcomes.finish()
-        await store.finish()
+        #expect(store.state.projectLoad == .loaded(HomeTestFixture.manyProjectsPage))
+
+        await projects.finish()
+        await task.cancel()
     }
 
     @Test
-    func `화면을 벗어난 동안 끝난 생성 결과를 돌아왔을 때 반영한다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
-        let store = TestStore(initialState: Self.loadedState()) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+    func `아직 적재되지 않은 목록은 표시 상태로 반영하지 않는다`() async {
+        let store = makeStore()
 
-        let firstTask = await store.send(.view(.task))
-        while await observeGenerationOutcomes.activeSubscriptionCount() == 0 { await Task.yield() }
-        await firstTask.cancel()
-        while await observeGenerationOutcomes.activeSubscriptionCount() != 0 { await Task.yield() }
-        await observeGenerationOutcomes.store(
-            GenerationState(records: [
-                GenerationRecord(
-                    githubRepoURL: "https://github.com/owner/project-1",
-                    projectID: "project-1",
-                    requestedAt: Date(timeIntervalSince1970: 1_800_000_000),
-                    status: .completed,
-                    finishedAt: Date(timeIntervalSince1970: 1_800_000_600),
-                )
-            ])
-        )
+        await store.send(.effect(.projectsReceived(
+            ProjectList(summaries: [], hasNextPage: false, isLoaded: false)
+        )))
 
-        await store.send(.view(.task))
-        await store.receive(
-            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
-        ) {
-            $0.appliedOutcomeProjectIDs = ["project-1"]
-            $0.projectRequestID = 1
-        }
-        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
-        }
-
-        await observeGenerationOutcomes.finish()
-        await store.finish()
+        #expect(store.state.projectLoad == .idle)
     }
 
     @Test
-    func `generationOutcomeReceived는 로딩 중이 아니면 프로젝트 목록을 다시 조회한다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let projects = HomeLearningProjectsUseCaseMock(results: [
-            .success(HomeTestFixture.oneProjectPage),
-            .success(HomeTestFixture.manyProjectsPage),
-        ])
+    func `갱신에 실패해도 이미 적재된 목록을 오류로 덮지 않는다`() async {
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        let store = TestStore(initialState: state) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+        state.projectRequestID = 1
+        let store = makeStore(state: state)
 
-        await observeGenerationOutcomes.emit(
-            GenerationOutcome(projectID: "project-1", status: .completed)
-        )
-        await store.receive(
-            .effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))
-        ) {
-            $0.appliedOutcomeProjectIDs = ["project-1"]
-            $0.projectRequestID = 1
-        }
-        await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.manyProjectsPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
-        }
+        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable)))
 
-        await observeGenerationOutcomes.finish()
-        await store.finish()
+        #expect(store.state.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
     }
 
     @Test
-    func `learningProjectsReloadRequested는 조회 중이면 즉시 재조회하지 않고 갱신을 예약한다`() async {
-        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.oneProjectPage)])
-        var state = HomeFeature.State()
-        state.projectLoad = .loading
-        let store = TestStore(initialState: state) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: StubTrackGenerationUseCase(),
-            )
-        }
-
-        await store.send(.input(.learningProjectsReloadRequested)) {
-            $0.isProjectRefreshPending = true
-        }
-
-        #expect(await projects.snapshot().callCount == 0)
-    }
-
-    @Test
-    func `조회 중 도착한 생성 결과는 폐기되지 않고 조회 완료 후 재조회로 반영된다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let projects = HomeLearningProjectsUseCaseMock(results: [
-            .success(HomeTestFixture.oneProjectPage),
-            .success(HomeTestFixture.manyProjectsPage),
-        ])
+    func `적재 전 갱신 실패는 오류 의미를 보존한다`() async {
         var state = HomeFeature.State()
         state.projectLoad = .loading
         state.projectRequestID = 1
-        let store = TestStore(initialState: state) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+        let store = makeStore(state: state)
 
-        await store.send(.effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))) {
-            $0.appliedOutcomeProjectIDs = ["project-1"]
-            $0.isProjectRefreshPending = true
+        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable))) {
+            $0.projectLoad = .failed(.temporarilyUnavailable)
         }
-        #expect(await projects.snapshot().callCount == 0)
-
-        await store.send(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.oneProjectPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-            $0.isProjectRefreshPending = false
-            $0.projectRequestID = 2
-        }
-        await store.receive(.effect(.projectsLoadFinished(requestID: 2, result: .success(HomeTestFixture.manyProjectsPage)))) {
-            $0.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
-        }
-
-        await observeGenerationOutcomes.finish()
-        await store.finish()
     }
 
     @Test
-    func `이미 반영한 프로젝트의 동일 결과가 다시 도착해도 재조회하지 않는다`() async {
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
-        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.manyProjectsPage)])
+    func `지난 요청의 갱신 결과는 반영하지 않는다`() async {
+        var state = HomeFeature.State()
+        state.projectLoad = .loading
+        state.projectRequestID = 2
+        let store = makeStore(state: state)
+
+        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable)))
+
+        #expect(store.state.projectLoad == .loading)
+    }
+
+    @Test
+    func `목록 재조회 입력은 갱신을 다시 요청한다`() async {
+        let projects = HomeLearningProjectsUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        state.appliedOutcomeProjectIDs = ["project-1"]
-        let store = TestStore(initialState: state) {
-            HomeFeature(
-                fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: observeGenerationOutcomes,
-            )
-        }
+        let store = makeStore(projects: projects, state: state)
+        store.exhaustivity = .off
 
-        await store.send(.effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed))))
+        await store.send(.input(.learningProjectsReloadRequested))
+        await store.receive(\.effect.refreshFinished)
 
-        #expect(await projects.snapshot().callCount == 0)
-
-        await observeGenerationOutcomes.finish()
-        await store.finish()
+        #expect(store.state.projectRequestID == 1)
+        #expect(store.state.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
+        #expect(await projects.snapshot().refreshCallCount == 1)
     }
 
     // MARK: Private
 
-    private static func loadedState() -> HomeFeature.State {
-        var state = HomeFeature.State()
-        state.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
-        state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        return state
+    private func makeStore(
+        projects: HomeLearningProjectsUseCaseMock = HomeLearningProjectsUseCaseMock(),
+        profile: HomeMemberProfileUseCaseMock = HomeMemberProfileUseCaseMock(
+            results: [.success(HomeTestFixture.profileWithBoth)]
+        ),
+        state: HomeFeature.State = HomeFeature.State(),
+    ) -> TestStoreOf<HomeFeature> {
+        TestStore(initialState: state) {
+            HomeFeature(
+                projects: { await projects.projects() },
+                refreshProjects: { try await projects.refresh() },
+                profile: profile.fetchProfile,
+            )
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 import Testing
 
 @testable import Feature
@@ -38,7 +38,7 @@ struct CareerSelectionFeatureTests {
         }
         await store.receive(.delegate(.curationSucceeded))
 
-        #expect(await completeCuration.snapshot() == [.init(position: .ios, careerLevel: .junior)])
+        #expect(await completeCuration.snapshot() == [Curation(position: .ios, careerLevel: .junior)])
     }
 
     @Test

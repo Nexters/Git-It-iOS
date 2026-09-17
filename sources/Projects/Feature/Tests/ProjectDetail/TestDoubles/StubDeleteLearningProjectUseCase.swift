@@ -1,23 +1,24 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
 
 actor StubDeleteLearningProjectUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [Result<Void, LearningProjectError>] = [.success(())]) {
+    init(results: [Result<Void, ProjectError>] = [.success(())]) {
         self.results = results
     }
 
     // MARK: Internal
 
     private(set) var callCount = 0
-    private(set) var requestedProjectIDs = [String]()
+    private(set) var requestedProjectIDs = [ProjectID]()
 
-    nonisolated var deleteProject: @Sendable (String) async throws -> Void {
+    nonisolated var deleteProject: @Sendable (ProjectID) async throws -> Void {
         { try await self(projectID: $0) }
     }
 
-    func callAsFunction(projectID: String) async throws {
+    func callAsFunction(projectID: ProjectID) async throws {
         callCount += 1
         requestedProjectIDs.append(projectID)
         try nextResult().get()
@@ -25,9 +26,9 @@ actor StubDeleteLearningProjectUseCase {
 
     // MARK: Private
 
-    private var results: [Result<Void, LearningProjectError>]
+    private var results: [Result<Void, ProjectError>]
 
-    private func nextResult() -> Result<Void, LearningProjectError> {
+    private func nextResult() -> Result<Void, ProjectError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

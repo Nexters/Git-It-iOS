@@ -1,39 +1,44 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 
-actor StubSetQuestionBookmarkUseCase: SetQuestionBookmarkUseCase {
+actor StubSetQuestionBookmarkUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [Result<BookmarkState, LearningProjectError>] = [.failure(.unexpected)]) {
+    init(results: [Result<QuizBookmarkState, QuizDetailError>] = [.failure(.unexpected)]) {
         self.results = results
     }
 
     // MARK: Internal
 
     struct Invocation: Equatable, Sendable {
-        let projectID: String
-        let questionID: String
-        let bookmarked: Bool
+        let quizID: QuizID
+        let projectID: ProjectID
+        let isBookmarked: Bool
     }
 
     private(set) var invocations = [Invocation]()
 
+    nonisolated var setBookmark: @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState {
+        { try await self(quizID: $0, projectID: $1, isBookmarked: $2) }
+    }
+
     func callAsFunction(
-        projectID: String,
-        questionID: String,
-        bookmarked: Bool,
-    ) async throws -> BookmarkState {
+        quizID: QuizID,
+        projectID: ProjectID,
+        isBookmarked: Bool,
+    ) async throws -> QuizBookmarkState {
         invocations.append(
-            Invocation(projectID: projectID, questionID: questionID, bookmarked: bookmarked)
+            Invocation(quizID: quizID, projectID: projectID, isBookmarked: isBookmarked)
         )
         return try nextResult().get()
     }
 
     // MARK: Private
 
-    private var results: [Result<BookmarkState, LearningProjectError>]
+    private var results: [Result<QuizBookmarkState, QuizDetailError>]
 
-    private func nextResult() -> Result<BookmarkState, LearningProjectError> {
+    private func nextResult() -> Result<QuizBookmarkState, QuizDetailError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

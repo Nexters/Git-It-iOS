@@ -1,6 +1,7 @@
 import ComposableArchitecture
-import DomainLearningProject
-import Foundation
+import DomainAppSetting
+import DomainExternalRepository
+import DomainProjectGeneration
 
 @Reducer
 public struct ProjectRegistrationRouterFeature: Sendable {
@@ -8,21 +9,15 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchExternalRepository: any FetchExternalRepositoryUseCase,
-        createLearningProject: any CreateLearningProjectUseCase,
-        trackGeneration: any TrackGenerationUseCase,
-        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        externalRepository: any ExternalRepositoryUseCase,
+        projectGeneration: any ProjectGenerationUseCase,
+        appSetting: any AppSettingUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
-        waitPolicy: GenerationWaitPolicy = .standard,
-        now: @escaping @Sendable () -> Date = { Date() },
     ) {
-        self.fetchExternalRepository = fetchExternalRepository
-        self.createLearningProject = createLearningProject
-        self.trackGeneration = trackGeneration
-        self.requestGenerationReminder = requestGenerationReminder
+        self.externalRepository = externalRepository
+        self.projectGeneration = projectGeneration
+        self.appSetting = appSetting
         self.openNotificationSettings = openNotificationSettings
-        self.waitPolicy = waitPolicy
-        self.now = now
     }
 
     // MARK: Public
@@ -66,7 +61,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case projectRegistered(ProjectRegistrationReceipt)
+            case projectRegistered(ProjectGenerationReceipt)
             case generationReminderPreferenceSelected(isEnabled: Bool)
             case dismissRequested
         }
@@ -74,7 +69,9 @@ public struct ProjectRegistrationRouterFeature: Sendable {
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.repositoryLinkInput, action: \.repositoryLinkInput) {
-            RepositoryLinkInputFeature(fetchExternalRepository: fetchExternalRepository)
+            RepositoryLinkInputFeature(
+                repository: { [externalRepository] in try await externalRepository.repository(at: $0) }
+            )
         }
         Scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation) {
             RepositoryConfirmationFeature()
@@ -87,12 +84,13 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         }
         Scope(state: \.quizGenerationProgress, action: \.quizGenerationProgress) {
             QuizGenerationProgressFeature(
-                createLearningProject: createLearningProject,
-                trackGeneration: trackGeneration,
-                requestGenerationReminder: requestGenerationReminder,
+                requestGeneration: { [projectGeneration] in try await projectGeneration.request($0) },
+                generationStates: { [projectGeneration] in await projectGeneration.states() },
+                notificationAuthorization: { [appSetting] in await appSetting.notificationAuthorization() },
+                requestNotificationAuthorization: { [appSetting] in
+                    await appSetting.requestNotificationAuthorization()
+                },
                 openNotificationSettings: openNotificationSettings,
-                waitPolicy: waitPolicy,
-                now: now,
             )
         }
         Reduce { state, action in
@@ -151,13 +149,10 @@ public struct ProjectRegistrationRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
-    private let createLearningProject: any CreateLearningProjectUseCase
-    private let trackGeneration: any TrackGenerationUseCase
-    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let externalRepository: any ExternalRepositoryUseCase
+    private let projectGeneration: any ProjectGenerationUseCase
+    private let appSetting: any AppSettingUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
-    private let waitPolicy: GenerationWaitPolicy
-    private let now: @Sendable () -> Date
 
     private func activate(
         _ screen: ActiveScreen,

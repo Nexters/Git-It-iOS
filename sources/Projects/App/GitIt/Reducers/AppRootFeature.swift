@@ -1,7 +1,12 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainAccount
+import DomainAppSetting
+import DomainExternalRepository
+import DomainIdentifier
+import DomainProject
+import DomainProjectGeneration
+import DomainQuizDetail
+import DomainUserInfo
 import Feature
 import Foundation
 
@@ -13,51 +18,27 @@ nonisolated struct AppRootFeature: Sendable {
     // MARK: Lifecycle
 
     init(
-        restoreSession: any RestoreSessionUseCase,
-        signIn: any SignInUseCase,
-        signOut: any SignOutUseCase,
-        verifyAuthorization: any VerifyAuthorizationUseCase,
-        memberAccount: any MemberAccountUseCase,
-        policyConsent: any PolicyConsentUseCase,
-        fetchLearningProjects: any FetchLearningProjectsUseCase,
-        learningLibrary: any LearningLibraryUseCase,
-        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
-        submitEssayAnswer: any SubmitEssayAnswerUseCase,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
-        deleteMemberAccount: any DeleteMemberAccountUseCase,
-        fetchExternalRepository: any FetchExternalRepositoryUseCase,
-        createLearningProject: any CreateLearningProjectUseCase,
-        requestGenerationReminder: any RequestGenerationReminderUseCase,
-        trackGeneration: any TrackGenerationUseCase,
-        waitPolicy: GenerationWaitPolicy = .standard,
-        now: @escaping @Sendable () -> Date = { Date() },
+        account: any AccountUseCase,
+        userInfo: any UserInfoUseCase,
+        appSetting: any AppSettingUseCase,
+        externalRepository: any ExternalRepositoryUseCase,
+        quizDetail: any QuizDetailUseCase,
+        project: any ProjectUseCase,
+        projectGeneration: any ProjectGenerationUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
         openExternalURL: @escaping @Sendable (URL) async -> Void = { _ in },
-        registerCurrentDevice: @escaping @Sendable () async throws -> Void = { },
         deviceTokenRefreshes: @escaping @Sendable () -> AsyncStream<String>,
         deletesCompletedAccountOnSignIn: Bool = false,
     ) {
-        self.restoreSession = restoreSession
-        self.signIn = signIn
-        self.signOut = signOut
-        self.verifyAuthorization = verifyAuthorization
-        self.memberAccount = memberAccount
-        self.policyConsent = policyConsent
-        self.fetchLearningProjects = fetchLearningProjects
-        self.learningLibrary = learningLibrary
-        self.submitChoiceAnswer = submitChoiceAnswer
-        self.submitEssayAnswer = submitEssayAnswer
-        self.setQuestionBookmark = setQuestionBookmark
-        self.deleteMemberAccount = deleteMemberAccount
-        self.fetchExternalRepository = fetchExternalRepository
-        self.createLearningProject = createLearningProject
-        self.requestGenerationReminder = requestGenerationReminder
-        self.trackGeneration = trackGeneration
-        self.waitPolicy = waitPolicy
-        self.now = now
+        self.account = account
+        self.userInfo = userInfo
+        self.appSetting = appSetting
+        self.externalRepository = externalRepository
+        self.quizDetail = quizDetail
+        self.project = project
+        self.projectGeneration = projectGeneration
         self.openNotificationSettings = openNotificationSettings
         self.openExternalURL = openExternalURL
-        self.registerCurrentDevice = registerCurrentDevice
         self.deviceTokenRefreshes = deviceTokenRefreshes
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
@@ -90,8 +71,6 @@ nonisolated struct AppRootFeature: Sendable {
         var mainShell = MainShellRouterFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
 
-        var generationRecord: GenerationRecord?
-
         @Presents var projectRegistration: ProjectRegistrationRouterFeature.State?
         @Presents var projectDetail: ProjectDetailRouterFeature.State?
         @Presents var quiz: QuizRouterFeature.State?
@@ -117,45 +96,40 @@ nonisolated struct AppRootFeature: Sendable {
 
         @CasePathable
         enum EffectEvent: Sendable, Equatable {
-            case authorizationVerified(AuthorizationStatus)
+            case signInVerified(SignInVerification)
             case deviceRegistrationSucceeded
             case deviceRegistrationFailed
-            case deviceTokenRefreshed
-            case generationStateChanged(GenerationState)
-            case generationReleased(githubRepoURL: String)
+            case deviceTokenRefreshed(String)
+            case generationStateChanged(ProjectGenerationState)
         }
     }
 
     var body: some ReducerOf<Self> {
         Scope(state: \.appEntry, action: \.appEntry) {
             AppEntryFeature(
-                restoreSession: restoreSession,
-                fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() },
-                signOut: signOut,
+                restoreSignIn: { [account] in await account.restoreSignIn() },
+                curation: { [userInfo] in try await userInfo.curation() },
+                signOut: { [account] in await account.signOut() },
             )
         }
         Scope(state: \.onboarding, action: \.onboarding) {
             OnboardingRouterFeature(
-                signIn: signIn,
-                signOut: signOut,
-                policyConsent: policyConsent,
-                memberAccount: memberAccount,
-                deleteMemberAccount: deleteMemberAccount,
+                signIn: { [account] in await account.signIn(with: $0) },
+                signOut: { [account] in await account.signOut() },
+                policyConsentStatus: { [account] in try await account.policyConsentStatus() },
+                consent: { [account] in try await account.consent(to: $0) },
+                updateCuration: { [userInfo] in try await userInfo.updateCuration($0) },
+                withdraw: { [account] in try await account.withdraw() },
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
         }
         Scope(state: \.mainShell, action: \.mainShell) {
             MainShellRouterFeature(
-                fetchLearningProjects: fetchLearningProjects,
-                learningLibrary: learningLibrary,
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
-                signOut: signOut,
-                memberAccount: memberAccount,
-                deleteMemberAccount: deleteMemberAccount,
-                trackGeneration: trackGeneration,
-                requestGenerationReminder: requestGenerationReminder,
+                project: project,
+                quizDetail: quizDetail,
+                account: account,
+                userInfo: userInfo,
+                appSetting: appSetting,
                 openNotificationSettings: openNotificationSettings,
             )
         }
@@ -166,13 +140,13 @@ nonisolated struct AppRootFeature: Sendable {
                 return .merge(
                     .send(.appEntry(.view(.task))),
                     .run { send in
-                        for await _ in deviceTokenRefreshes() {
-                            await send(.effect(.deviceTokenRefreshed))
+                        for await token in deviceTokenRefreshes() {
+                            await send(.effect(.deviceTokenRefreshed(token)))
                         }
                     }
                     .cancellable(id: CancelID.deviceTokenRefreshes),
-                    .run { [trackGeneration] send in
-                        for await generationState in await trackGeneration.states() {
+                    .run { [projectGeneration] send in
+                        for await generationState in await projectGeneration.states() {
                             await send(.effect(.generationStateChanged(generationState)))
                         }
                     }
@@ -195,11 +169,11 @@ nonisolated struct AppRootFeature: Sendable {
             case .appEntry:
                 return .none
 
-            case .effect(.authorizationVerified(.reauthenticationRequired)):
+            case .effect(.signInVerified(.reauthenticationRequired)):
                 guard state.route == .mainShell else { return .none }
                 return returnToOnboarding(&state)
 
-            case .effect(.authorizationVerified):
+            case .effect(.signInVerified):
                 return .none
 
             case .onboarding(.delegate(.mainShellRequested)):
@@ -211,8 +185,8 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .view(.applicationBecameActive):
                 var effects: [Effect<Action>] = [
-                    .run { [verifyAuthorization] send in
-                        await send(.effect(.authorizationVerified(verifyAuthorization())))
+                    .run { [account] send in
+                        await send(.effect(.signInVerified(account.verifySignIn())))
                     }
                 ]
                 if state.route == .mainShell {
@@ -223,9 +197,12 @@ nonisolated struct AppRootFeature: Sendable {
                 }
                 return .merge(effects)
 
-            case .effect(.deviceTokenRefreshed):
+            case .effect(.deviceTokenRefreshed(let token)):
                 guard state.route == .mainShell else { return .none }
-                return registerDeviceIfNeeded(&state)
+                return .merge(
+                    .run { [appSetting] _ in try? await appSetting.updateDeviceToken(token) },
+                    registerDeviceIfNeeded(&state),
+                )
 
             case .effect(.deviceRegistrationSucceeded):
                 state.deviceRegistration = .registered
@@ -244,12 +221,12 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
-                guard let project = loadedProject(projectID: projectID, state: state) else { return .none }
+                guard let summary = loadedProject(projectID: projectID, state: state) else { return .none }
                 state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 state.quiz = QuizRouterFeature.State(
                     projectID: projectID,
                     setID: nextSetID,
-                    setLabel: project.currentSetLabel,
+                    setLabel: summary.currentSet.label,
                     autoStartsLearning: true,
                 )
                 return .none
@@ -271,17 +248,17 @@ nonisolated struct AppRootFeature: Sendable {
                 state.projectDetail = nil
                 return .none
 
-            case .quiz(.presented(.delegate(.progressInvalidated(let projectID)))):
-                guard state.projectDetail?.projectID == projectID else { return .none }
-                return .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
-
             case .quiz(.presented(.delegate(.dismissRequested(let projectID)))):
                 state.quiz = nil
+                let refreshProjects = Effect<Action>.run { [project] _ in try? await project.refresh() }
                 guard state.projectDetail?.projectID == projectID else {
                     state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
-                    return .none
+                    return refreshProjects
                 }
-                return .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
+                return .merge(
+                    refreshProjects,
+                    .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested))))),
+                )
 
             case .projectDetail,
                  .quiz:
@@ -289,15 +266,6 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .effect(.generationStateChanged(let generationState)):
                 return applyGenerationState(generationState, state: &state)
-
-            case .effect(.generationReleased(let githubRepoURL)):
-                guard state.generationRecord?.githubRepoURL == githubRepoURL else { return .none }
-                state.generationRecord = nil
-                state.mainShell.home.isGenerationInProgress = false
-                return .merge(
-                    .cancel(id: CancelID.generationRelease),
-                    .run { [trackGeneration] _ in await trackGeneration.end(githubRepoURL: githubRepoURL) },
-                )
 
             case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
                 state.projectRegistration = nil
@@ -320,28 +288,17 @@ nonisolated struct AppRootFeature: Sendable {
         }
         .ifLet(\.$projectRegistration, action: \.projectRegistration) {
             ProjectRegistrationRouterFeature(
-                fetchExternalRepository: fetchExternalRepository,
-                createLearningProject: createLearningProject,
-                trackGeneration: trackGeneration,
-                requestGenerationReminder: requestGenerationReminder,
+                externalRepository: externalRepository,
+                projectGeneration: projectGeneration,
+                appSetting: appSetting,
                 openNotificationSettings: openNotificationSettings,
             )
         }
         .ifLet(\.$projectDetail, action: \.projectDetail) {
-            ProjectDetailRouterFeature(
-                learningLibrary: learningLibrary,
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
-            )
+            ProjectDetailRouterFeature(project: project, quizDetail: quizDetail)
         }
         .ifLet(\.$quiz, action: \.quiz) {
-            QuizRouterFeature(
-                learningLibrary: learningLibrary,
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
-            )
+            QuizRouterFeature(quizDetail: quizDetail)
         }
     }
 
@@ -351,52 +308,39 @@ nonisolated struct AppRootFeature: Sendable {
         case deviceRegistration
         case deviceTokenRefreshes
         case generationObservation
-        case generationRelease
     }
 
-    private let restoreSession: any RestoreSessionUseCase
-    private let signIn: any SignInUseCase
-    private let signOut: any SignOutUseCase
-    private let verifyAuthorization: any VerifyAuthorizationUseCase
-    private let memberAccount: any MemberAccountUseCase
-    private let policyConsent: any PolicyConsentUseCase
-    private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let learningLibrary: any LearningLibraryUseCase
-    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
-    private let createLearningProject: any CreateLearningProjectUseCase
-    private let requestGenerationReminder: any RequestGenerationReminderUseCase
-    private let trackGeneration: any TrackGenerationUseCase
-    private let waitPolicy: GenerationWaitPolicy
-    private let now: @Sendable () -> Date
+    private let account: any AccountUseCase
+    private let userInfo: any UserInfoUseCase
+    private let appSetting: any AppSettingUseCase
+    private let externalRepository: any ExternalRepositoryUseCase
+    private let quizDetail: any QuizDetailUseCase
+    private let project: any ProjectUseCase
+    private let projectGeneration: any ProjectGenerationUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let openExternalURL: @Sendable (URL) async -> Void
-    private let registerCurrentDevice: @Sendable () async throws -> Void
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
     private let deletesCompletedAccountOnSignIn: Bool
 
     private func loadedProject(
-        projectID: String,
+        projectID: ProjectID,
         state: State,
-    ) -> LearningProjectSummary? {
+    ) -> ProjectSummary? {
         if
-            case .loaded(let page) = state.mainShell.home.projectLoad,
-            let project = page.items.first(where: { $0.projectID == projectID })
+            case .loaded(let list) = state.mainShell.home.projectLoad,
+            let summary = list.summaries.first(where: { $0.id == projectID })
         {
-            return project
+            return summary
         }
-        return state.mainShell.projectList.projects.first { $0.projectID == projectID }
+        return state.mainShell.projectList.projects.first { $0.id == projectID }
     }
 
     private func registerDeviceIfNeeded(_ state: inout State) -> Effect<Action> {
         guard state.deviceRegistration != .registering else { return .none }
         state.deviceRegistration = .registering
-        return .run { send in
+        return .run { [appSetting] send in
             do {
-                try await registerCurrentDevice()
+                try await appSetting.registerDevice()
                 await send(.effect(.deviceRegistrationSucceeded))
             } catch {
                 await send(.effect(.deviceRegistrationFailed))
@@ -406,46 +350,22 @@ nonisolated struct AppRootFeature: Sendable {
     }
 
     private func applyGenerationState(
-        _ generationState: GenerationState,
+        _ generationState: ProjectGenerationState,
         state: inout State,
     ) -> Effect<Action> {
-        let reference = now()
-        let expired = generationState.records.filter { waitPolicy.isExpired($0, now: reference) }
-        let endExpired: Effect<Action> = expired.isEmpty
-            ? .none
-            : .run { [trackGeneration] _ in
-                for record in expired {
-                    await trackGeneration.end(githubRepoURL: record.githubRepoURL)
-                }
+        let isGenerationInProgress = generationState.requests.contains { request in
+            switch request.phase {
+            case .inProgress,
+                 .preparing:
+                true
+
+            case .ready,
+                 .failed:
+                false
             }
-
-        let waiting = generationState.records.first { record in
-            guard !waitPolicy.isExpired(record, now: reference) else { return false }
-            return record.status == .inProgress || waitPolicy.readyDate(for: record) > reference
         }
-
-        guard let waiting else {
-            guard state.generationRecord != nil else { return endExpired }
-            state.generationRecord = nil
-            state.mainShell.home.isGenerationInProgress = false
-            return .merge(.cancel(id: CancelID.generationRelease), endExpired)
-        }
-
-        guard state.generationRecord != waiting else { return endExpired }
-        state.generationRecord = waiting
-        state.mainShell.home.isGenerationInProgress = true
-        return .merge(releaseGeneration(waiting), endExpired)
-    }
-
-    private func releaseGeneration(_ record: GenerationRecord) -> Effect<Action> {
-        .run { [waitPolicy, now] send in
-            let remaining = waitPolicy.readyDate(for: record).timeIntervalSince(now())
-            if remaining > 0 {
-                try? await Task.sleep(for: .seconds(remaining))
-            }
-            await send(.effect(.generationReleased(githubRepoURL: record.githubRepoURL)))
-        }
-        .cancellable(id: CancelID.generationRelease, cancelInFlight: true)
+        guard state.mainShell.home.isGenerationInProgress != isGenerationInProgress else { return .none }
+        return .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: isGenerationInProgress)))))
     }
 
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
@@ -456,12 +376,8 @@ nonisolated struct AppRootFeature: Sendable {
         state.projectDetail = nil
         state.quiz = nil
         state.deviceRegistration = .idle
-        state.generationRecord = nil
         state.route = .onboarding
-        return .merge(
-            .cancel(id: CancelID.deviceRegistration),
-            .cancel(id: CancelID.generationRelease),
-        )
+        return .cancel(id: CancelID.deviceRegistration)
     }
 
 }

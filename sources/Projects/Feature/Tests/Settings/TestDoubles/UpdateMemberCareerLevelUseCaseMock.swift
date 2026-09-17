@@ -1,10 +1,10 @@
-import DomainMember
+import DomainUserInfo
 
 actor UpdateMemberCareerLevelUseCaseMock {
 
     // MARK: Lifecycle
 
-    init(errors: [MemberError?] = [nil]) {
+    init(errors: [UserInfoError?] = [nil]) {
         self.errors = errors
     }
 
@@ -27,10 +27,10 @@ actor UpdateMemberCareerLevelUseCaseMock {
 
     // MARK: Private
 
-    private var errors: [MemberError?]
+    private var errors: [UserInfoError?]
     private var requestedCareerLevels = [CareerLevel]()
 
-    private func nextError() -> MemberError? {
+    private func nextError() -> UserInfoError? {
         guard !errors.isEmpty else { return nil }
         return errors.count > 1 ? errors.removeFirst() : errors[0]
     }

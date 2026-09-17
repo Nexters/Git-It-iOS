@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
 // MARK: - LearningSetIntroFeature
@@ -10,11 +11,11 @@ public struct LearningSetIntroFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningSet: @escaping @Sendable (String, String) async throws -> LearningSet,
-        fetchBookmarkedQuestions: @escaping @Sendable (String?) async throws -> BookmarkedQuestionCollection,
+        fetchQuizSet: @escaping @Sendable (QuizSetID, ProjectID) async throws -> QuizSet,
+        fetchBookmarks: @escaping @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList,
     ) {
-        self.fetchLearningSet = fetchLearningSet
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
+        self.fetchQuizSet = fetchQuizSet
+        self.fetchBookmarks = fetchBookmarks
     }
 
     // MARK: Public
@@ -22,15 +23,15 @@ public struct LearningSetIntroFeature: Sendable {
     public enum SetLoad: Equatable, Sendable {
         case idle
         case loading(requestID: Int)
-        case loaded(LearningSet)
-        case failed(LearningProjectError)
+        case loaded(QuizSet)
+        case failed(QuizDetailError)
     }
 
     public enum BookmarkLoad: Equatable, Sendable {
         case idle
         case loading
-        case loaded(Set<String>)
-        case failed(LearningProjectError)
+        case loaded(Set<QuizID>)
+        case failed(QuizDetailError)
     }
 
     @ObservableState
@@ -39,8 +40,8 @@ public struct LearningSetIntroFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            projectID: String,
-            setID: String,
+            projectID: ProjectID,
+            setID: QuizSetID,
             label: String,
             autoStartsOnLoad: Bool = false,
         ) {
@@ -52,8 +53,8 @@ public struct LearningSetIntroFeature: Sendable {
 
         // MARK: Public
 
-        public let projectID: String
-        public let setID: String
+        public let projectID: ProjectID
+        public let setID: QuizSetID
         public let label: String
         public var autoStartsOnLoad: Bool
 
@@ -62,12 +63,12 @@ public struct LearningSetIntroFeature: Sendable {
         public var isEmptySetReported = false
         public var loadRequestID = 0
 
-        public var learningSet: LearningSet? {
+        public var learningSet: QuizSet? {
             guard case .loaded(let set) = setLoad else { return nil }
             return set
         }
 
-        public var bookmarkedQuestionIDs: Set<String> {
+        public var bookmarkedQuestionIDs: Set<QuizID> {
             guard case .loaded(let identifiers) = bookmarkLoad else { return [] }
             return identifiers
         }
@@ -101,16 +102,16 @@ public struct LearningSetIntroFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case setLoadFinished(requestID: Int, result: Result<LearningSet, LearningProjectError>)
-            case bookmarksLoadFinished(Result<BookmarkedQuestionCollection, LearningProjectError>)
+            case setLoadFinished(requestID: Int, result: Result<QuizSet, QuizDetailError>)
+            case bookmarksLoadFinished(Result<QuizBookmarkList, QuizDetailError>)
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case startRequested(
-                set: LearningSet,
+                set: QuizSet,
                 resumption: LearningSetResumption,
-                bookmarkedQuestionIDs: Set<String>,
+                bookmarkedQuestionIDs: Set<QuizID>,
             )
             case backRequested
         }
@@ -157,8 +158,8 @@ public struct LearningSetIntroFeature: Sendable {
 
             case .effect(.bookmarksLoadFinished(let result)):
                 switch result {
-                case .success(let collection):
-                    state.bookmarkLoad = .loaded(Set(collection.bookmarks.map(\.questionID)))
+                case .success(let list):
+                    state.bookmarkLoad = .loaded(Set(list.bookmarks.map(\.quizID)))
 
                 case .failure(let error):
                     state.bookmarkLoad = .failed(error)
@@ -178,11 +179,11 @@ public struct LearningSetIntroFeature: Sendable {
         case bookmarkLoad
     }
 
-    private let fetchLearningSet: @Sendable (String, String) async throws -> LearningSet
-    private let fetchBookmarkedQuestions: @Sendable (String?) async throws -> BookmarkedQuestionCollection
+    private let fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet
+    private let fetchBookmarks: @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList
 
     private func startEffect(
-        set: LearningSet,
+        set: QuizSet,
         state: State,
     ) -> Effect<Action> {
         .send(.delegate(.startRequested(
@@ -201,10 +202,10 @@ public struct LearningSetIntroFeature: Sendable {
         let setID = state.setID
         return .run { send in
             do {
-                let set = try await fetchLearningSet(projectID, setID)
+                let set = try await fetchQuizSet(setID, projectID)
                 await send(.effect(.setLoadFinished(requestID: requestID, result: .success(set))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? QuizDetailError ?? .unexpected
                 await send(.effect(.setLoadFinished(requestID: requestID, result: .failure(mapped))))
             }
         }
@@ -213,13 +214,13 @@ public struct LearningSetIntroFeature: Sendable {
 
     private func loadBookmarks(_ state: inout State) -> Effect<Action> {
         state.bookmarkLoad = .loading
-        let projectID = state.projectID
+        let filter = QuizBookmarkFilter.project(state.projectID)
         return .run { send in
             do {
-                let collection = try await fetchBookmarkedQuestions(projectID)
-                await send(.effect(.bookmarksLoadFinished(.success(collection))))
+                let list = try await fetchBookmarks(filter)
+                await send(.effect(.bookmarksLoadFinished(.success(list))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? QuizDetailError ?? .unexpected
                 await send(.effect(.bookmarksLoadFinished(.failure(mapped))))
             }
         }

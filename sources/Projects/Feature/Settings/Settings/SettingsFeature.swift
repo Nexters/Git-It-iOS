@@ -1,7 +1,7 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainAccount
+import DomainAppSetting
+import DomainUserInfo
 import Foundation
 
 // MARK: - SettingsFeature
@@ -12,20 +12,22 @@ public struct SettingsFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        signOut: any SignOutUseCase,
-        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
-        updateMemberPosition: @escaping @Sendable (MemberPosition) async throws -> Void,
-        updateMemberCareerLevel: @escaping @Sendable (CareerLevel) async throws -> Void,
-        deleteMemberAccount: any DeleteMemberAccountUseCase,
-        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        signOut: @escaping @Sendable () async -> SignOutResult,
+        profile: @escaping @Sendable () async throws -> UserProfile,
+        updatePosition: @escaping @Sendable (MemberPosition) async throws -> Void,
+        updateCareerLevel: @escaping @Sendable (CareerLevel) async throws -> Void,
+        withdraw: @escaping @Sendable () async throws -> Void,
+        notificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus,
+        requestNotificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void,
     ) {
         self.signOut = signOut
-        self.fetchMemberProfile = fetchMemberProfile
-        self.updateMemberPosition = updateMemberPosition
-        self.updateMemberCareerLevel = updateMemberCareerLevel
-        self.deleteMemberAccount = deleteMemberAccount
-        self.requestGenerationReminder = requestGenerationReminder
+        self.profile = profile
+        self.updatePosition = updatePosition
+        self.updateCareerLevel = updateCareerLevel
+        self.withdraw = withdraw
+        self.notificationAuthorization = notificationAuthorization
+        self.requestNotificationAuthorization = requestNotificationAuthorization
         self.openNotificationSettings = openNotificationSettings
     }
 
@@ -35,7 +37,7 @@ public struct SettingsFeature: Sendable {
     public struct State: Equatable, Sendable {
         public init() { }
 
-        public var profile: MemberProfile?
+        public var profile: UserProfile?
         public var profileLoad = ProfileLoad.idle
         public var positionMutation = MutationStatus.idle
         public var careerLevelMutation = MutationStatus.idle
@@ -47,13 +49,13 @@ public struct SettingsFeature: Sendable {
         case idle
         case loading
         case loaded
-        case failed(MemberError)
+        case failed(UserInfoError)
     }
 
     public enum MutationStatus: Equatable, Sendable {
         case idle
         case committing
-        case failed(MemberError)
+        case failed(UserInfoError)
     }
 
     public enum AccountAction: Equatable, Sendable {
@@ -61,7 +63,7 @@ public struct SettingsFeature: Sendable {
         case signingOut
         case confirmingDeletion
         case deletingAccount
-        case failed(MemberError)
+        case failed(UserInfoError)
 
         // MARK: Fileprivate
 
@@ -111,12 +113,12 @@ public struct SettingsFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case profileLoadFinished(Result<MemberProfile, MemberError>)
-            case notificationAuthorizationChecked(isAuthorized: Bool)
-            case positionUpdateFinished(MemberPosition, MemberError?)
-            case careerLevelUpdateFinished(CareerLevel, MemberError?)
+            case profileLoadFinished(Result<UserProfile, UserInfoError>)
+            case notificationAuthorizationChecked(NotificationAuthorizationStatus)
+            case positionUpdateFinished(MemberPosition, UserInfoError?)
+            case careerLevelUpdateFinished(CareerLevel, UserInfoError?)
             case signOutFinished(SignOutResult)
-            case deleteAccountFinished(MemberError?)
+            case deleteAccountFinished(UserInfoError?)
         }
 
         @CasePathable
@@ -140,10 +142,10 @@ public struct SettingsFeature: Sendable {
                 return .merge(
                     .run { send in
                         do {
-                            let profile = try await fetchMemberProfile()
+                            let profile = try await profile()
                             await send(.effect(.profileLoadFinished(.success(profile))))
                         } catch {
-                            let mapped = error as? MemberError ?? .temporarilyUnavailable
+                            let mapped = error as? UserInfoError ?? .temporarilyUnavailable
                             await send(.effect(.profileLoadFinished(.failure(mapped))))
                         }
                     },
@@ -163,13 +165,16 @@ public struct SettingsFeature: Sendable {
                 return .send(.delegate(.careerLevelSelectionRequested))
 
             case .view(.notificationRowTapped):
-                guard state.notificationStatus != .allowed else { return openNotificationSettingsEffect() }
-                return .run { [requestGenerationReminder, openNotificationSettings] send in
-                    let outcome = await requestGenerationReminder.requestAuthorization()
-                    if outcome == .previouslyDenied {
+                return .run { [notificationAuthorization, requestNotificationAuthorization, openNotificationSettings] send in
+                    switch await notificationAuthorization() {
+                    case .notDetermined:
+                        let status = await requestNotificationAuthorization()
+                        await send(.effect(.notificationAuthorizationChecked(status)))
+
+                    case .authorized,
+                         .denied:
                         await openNotificationSettings()
                     }
-                    await send(.effect(.notificationAuthorizationChecked(isAuthorized: outcome == .authorized)))
                 }
 
             case .view(.termsTapped):
@@ -181,10 +186,10 @@ public struct SettingsFeature: Sendable {
                 state.positionMutation = .committing
                 return .run { send in
                     do {
-                        try await updateMemberPosition(position)
+                        try await updatePosition(position)
                         await send(.effect(.positionUpdateFinished(position, nil)))
                     } catch {
-                        let mapped = error as? MemberError ?? .temporarilyUnavailable
+                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
                         await send(.effect(.positionUpdateFinished(position, mapped)))
                     }
                 }
@@ -195,10 +200,10 @@ public struct SettingsFeature: Sendable {
                 state.careerLevelMutation = .committing
                 return .run { send in
                     do {
-                        try await updateMemberCareerLevel(careerLevel)
+                        try await updateCareerLevel(careerLevel)
                         await send(.effect(.careerLevelUpdateFinished(careerLevel, nil)))
                     } catch {
-                        let mapped = error as? MemberError ?? .temporarilyUnavailable
+                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
                         await send(.effect(.careerLevelUpdateFinished(careerLevel, mapped)))
                     }
                 }
@@ -245,10 +250,10 @@ public struct SettingsFeature: Sendable {
                 state.accountAction = .deletingAccount
                 return .run { send in
                     do {
-                        try await deleteMemberAccount()
+                        try await withdraw()
                         await send(.effect(.deleteAccountFinished(nil)))
                     } catch {
-                        let mapped = error as? MemberError ?? .temporarilyUnavailable
+                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
                         await send(.effect(.deleteAccountFinished(mapped)))
                     }
                 }
@@ -265,8 +270,8 @@ public struct SettingsFeature: Sendable {
                 }
                 return .none
 
-            case .effect(.notificationAuthorizationChecked(let isAuthorized)):
-                state.notificationStatus = isAuthorized ? .allowed : .denied
+            case .effect(.notificationAuthorizationChecked(let status)):
+                state.notificationStatus = status == .authorized ? .allowed : .denied
                 return .none
 
             case .effect(.positionUpdateFinished(let position, nil)):
@@ -289,7 +294,7 @@ public struct SettingsFeature: Sendable {
 
             case .effect(.signOutFinished(let result)):
                 switch result {
-                case .success:
+                case .signedOut:
                     state.accountAction = .idle
                     return .send(.delegate(.signedOut))
 
@@ -326,40 +331,36 @@ public struct SettingsFeature: Sendable {
         )
     }
 
-    private let signOut: any SignOutUseCase
-    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
-    private let updateMemberPosition: @Sendable (MemberPosition) async throws -> Void
-    private let updateMemberCareerLevel: @Sendable (CareerLevel) async throws -> Void
-    private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let signOut: @Sendable () async -> SignOutResult
+    private let profile: @Sendable () async throws -> UserProfile
+    private let updatePosition: @Sendable (MemberPosition) async throws -> Void
+    private let updateCareerLevel: @Sendable (CareerLevel) async throws -> Void
+    private let withdraw: @Sendable () async throws -> Void
+    private let notificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
+    private let requestNotificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
 
-    private func openNotificationSettingsEffect() -> Effect<Action> {
-        .run { [openNotificationSettings] _ in
-            await openNotificationSettings()
-        }
-    }
-
     private func checkNotificationAuthorization() -> Effect<Action> {
-        .run { [requestGenerationReminder] send in
-            let isAuthorized = await requestGenerationReminder.isAuthorized()
-            await send(.effect(.notificationAuthorizationChecked(isAuthorized: isAuthorized)))
+        .run { [notificationAuthorization] send in
+            await send(.effect(.notificationAuthorizationChecked(notificationAuthorization())))
         }
     }
 
 }
 
-extension MemberProfile {
+extension UserProfile {
     fileprivate func replacing(
         position: MemberPosition? = nil,
         careerLevel: CareerLevel? = nil,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: name,
-            email: email,
-            position: position ?? self.position,
-            careerLevel: careerLevel ?? self.careerLevel,
-            statistics: statistics,
+    ) -> UserProfile {
+        guard let position = position ?? curation?.position,
+              let careerLevel = careerLevel ?? curation?.careerLevel
+        else {
+            return self
+        }
+        return UserProfile(
+            detail: detail,
+            curation: Curation(position: position, careerLevel: careerLevel),
         )
     }
 }

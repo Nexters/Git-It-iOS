@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 
 @Reducer
 public struct TutorialFeature: Sendable {
@@ -8,12 +7,12 @@ public struct TutorialFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        signIn: any SignInUseCase,
-        deleteMemberAccount: any DeleteMemberAccountUseCase,
+        signIn: @escaping @Sendable (SignInMethod) async -> SignInResult,
+        withdraw: @escaping @Sendable () async throws -> Void,
         deletesCompletedAccountOnSignIn: Bool = false,
     ) {
         self.signIn = signIn
-        self.deleteMemberAccount = deleteMemberAccount
+        self.withdraw = withdraw
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
 
@@ -113,13 +112,14 @@ public struct TutorialFeature: Sendable {
             case .effect(.signInFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
                 switch result {
-                case .success(_, let needsCuration):
+                case .signedIn(let account):
+                    let needsCuration = account.needsCuration
                     if deletesCompletedAccountOnSignIn, !needsCuration, !state.hasAttemptedCompletedAccountReset {
                         state.hasAttemptedCompletedAccountReset = true
                         state.requestID += 1
                         let retryRequestID = state.requestID
                         return .run { send in
-                            _ = try? await deleteMemberAccount()
+                            try? await withdraw()
                             let result = await signIn(.apple)
                             await send(.effect(.signInFinished(requestID: retryRequestID, result: result)))
                         }
@@ -153,8 +153,8 @@ public struct TutorialFeature: Sendable {
         case signIn
     }
 
-    private let signIn: any SignInUseCase
-    private let deleteMemberAccount: any DeleteMemberAccountUseCase
+    private let signIn: @Sendable (SignInMethod) async -> SignInResult
+    private let withdraw: @Sendable () async throws -> Void
     private let deletesCompletedAccountOnSignIn: Bool
 
     private func startSignIn(_ state: inout State) -> Effect<Action> {

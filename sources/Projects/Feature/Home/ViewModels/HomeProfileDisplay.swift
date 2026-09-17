@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 
 struct HomeProfileDisplay: Equatable, Sendable {
 
@@ -7,8 +7,8 @@ struct HomeProfileDisplay: Equatable, Sendable {
     init(_ profileLoad: HomeFeature.State.ProfileLoad) {
         switch profileLoad {
         case .loaded(let profile):
-            name = profile.name
-            role = Self.careerTitle(profile.careerLevel ?? .none) + " Developer"
+            name = profile.detail.name
+            role = Self.careerTitle(profile.curation?.careerLevel) + " Developer"
             isFailed = false
 
         case .failed:

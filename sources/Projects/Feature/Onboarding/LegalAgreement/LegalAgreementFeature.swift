@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Foundation
 
 @Reducer
@@ -8,8 +7,12 @@ public struct LegalAgreementFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(policyConsent: any PolicyConsentUseCase) {
-        self.policyConsent = policyConsent
+    public init(
+        policyConsentStatus: @escaping @Sendable () async throws -> PolicyConsentStatus,
+        consent: @escaping @Sendable ([PolicyDocumentID]) async throws -> Void,
+    ) {
+        self.policyConsentStatus = policyConsentStatus
+        self.consent = consent
     }
 
     // MARK: Public
@@ -24,28 +27,24 @@ public struct LegalAgreementFeature: Sendable {
         // MARK: Public
 
         public var requiredDocuments = [PolicyDocument]()
-        public var storedConsentRecords = [PolicyConsentRecord]()
-        public var selectedDocumentIDs = Set<String>()
-        public var presentedDocumentID: String?
+        public var isStoredConsentValid = false
+        public var selectedDocumentIDs = Set<PolicyDocumentID>()
+        public var presentedDocumentID: PolicyDocumentID?
 
         public var presentedDocument: PolicyDocument? {
             guard let presentedDocumentID else { return nil }
-            return requiredDocuments.first { $0.identifier == presentedDocumentID }
+            return requiredDocuments.first { $0.id == presentedDocumentID }
         }
 
         public var isAllSelected: Bool {
             guard !requiredDocuments.isEmpty else { return false }
-            return Set(requiredDocuments.map(\.identifier)).isSubset(of: selectedDocumentIDs)
+            return Set(requiredDocuments.map(\.id)).isSubset(of: selectedDocumentIDs)
         }
 
         public var canContinue: Bool {
-            let requiredIDs = Set(requiredDocuments.filter(\.isRequired).map(\.identifier))
+            let requiredIDs = Set(requiredDocuments.filter(\.isRequired).map(\.id))
             guard !requiredIDs.isEmpty else { return false }
             return requiredIDs.isSubset(of: selectedDocumentIDs)
-        }
-
-        public var isStoredConsentValid: Bool {
-            PolicyConsentRecord.isConsentValid(storedRecords: storedConsentRecords, for: requiredDocuments)
         }
 
     }
@@ -60,9 +59,9 @@ public struct LegalAgreementFeature: Sendable {
 
         @CasePathable
         public enum View: Sendable, Equatable {
-            case documentToggled(documentID: String)
+            case documentToggled(documentID: PolicyDocumentID)
             case allDocumentsToggled
-            case documentLinkTapped(documentID: String)
+            case documentLinkTapped(documentID: PolicyDocumentID)
             case documentSheetDismissed
             case cancelTapped
             case continueTapped
@@ -70,7 +69,7 @@ public struct LegalAgreementFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case documentsLoaded(requiredDocuments: [PolicyDocument], storedConsentRecords: [PolicyConsentRecord])
+            case statusLoaded(requiredDocuments: [PolicyDocument], isStoredConsentValid: Bool)
         }
 
         @CasePathable
@@ -92,15 +91,12 @@ public struct LegalAgreementFeature: Sendable {
             case .input(.load):
                 guard state.requiredDocuments.isEmpty else { return .none }
                 return .run { send in
-                    async let documents = policyConsent.requiredDocuments()
-                    async let records = policyConsent.storedConsentRecords()
-                    let loadedDocuments = (try? await documents) ?? []
-                    let loadedRecords = (try? await records) ?? []
+                    let status = try? await policyConsentStatus()
                     await send(
                         .effect(
-                            .documentsLoaded(
-                                requiredDocuments: loadedDocuments,
-                                storedConsentRecords: loadedRecords,
+                            .statusLoaded(
+                                requiredDocuments: status?.documents ?? [],
+                                isStoredConsentValid: status?.isSatisfied ?? false,
                             )
                         )
                     )
@@ -122,7 +118,7 @@ public struct LegalAgreementFeature: Sendable {
                 if state.isAllSelected {
                     state.selectedDocumentIDs.removeAll()
                 } else {
-                    state.selectedDocumentIDs = Set(state.requiredDocuments.map(\.identifier))
+                    state.selectedDocumentIDs = Set(state.requiredDocuments.map(\.id))
                 }
                 return .none
 
@@ -141,24 +137,18 @@ public struct LegalAgreementFeature: Sendable {
 
             case .view(.continueTapped):
                 guard state.canContinue else { return .none }
-                let records = state.requiredDocuments
-                    .filter { state.selectedDocumentIDs.contains($0.identifier) }
-                    .map {
-                        PolicyConsentRecord(
-                            documentIdentifier: $0.identifier,
-                            version: $0.version,
-                            acceptedAt: Date(),
-                        )
-                    }
-                state.storedConsentRecords = records
+                let documentIDs = state.requiredDocuments
+                    .map(\.id)
+                    .filter { state.selectedDocumentIDs.contains($0) }
+                state.isStoredConsentValid = true
                 return .run { send in
-                    try? await policyConsent.saveConsentRecords(records)
+                    try? await consent(documentIDs)
                     await send(.delegate(.consentCompleted))
                 }
 
-            case .effect(.documentsLoaded(let documents, let records)):
+            case .effect(.statusLoaded(let documents, let isStoredConsentValid)):
                 state.requiredDocuments = documents
-                state.storedConsentRecords = records
+                state.isStoredConsentValid = isStoredConsentValid
                 return .none
 
             case .delegate:
@@ -169,6 +159,7 @@ public struct LegalAgreementFeature: Sendable {
 
     // MARK: Private
 
-    private let policyConsent: any PolicyConsentUseCase
+    private let policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus
+    private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
 
 }

@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
 import Foundation
 
 // MARK: - ProjectDetailFeature
@@ -10,11 +11,11 @@ public struct ProjectDetailFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjectDetail: @escaping @Sendable (String) async throws -> LearningProjectDetail,
-        deleteLearningProject: @escaping @Sendable (String) async throws -> Void,
+        projectDetail: @escaping @Sendable (ProjectID) async throws -> ProjectDetail,
+        deleteProject: @escaping @Sendable (ProjectID) async throws -> Void,
     ) {
-        self.fetchLearningProjectDetail = fetchLearningProjectDetail
-        self.deleteLearningProject = deleteLearningProject
+        self.projectDetail = projectDetail
+        self.deleteProject = deleteProject
     }
 
     // MARK: Public
@@ -23,14 +24,14 @@ public struct ProjectDetailFeature: Sendable {
         case idle
         case loading
         case loaded
-        case failed(LearningProjectError)
+        case failed(ProjectError)
     }
 
     public enum Deletion: Equatable, Sendable {
         case idle
         case confirming
         case committing
-        case failed(LearningProjectError)
+        case failed(ProjectError)
     }
 
     @ObservableState
@@ -38,14 +39,14 @@ public struct ProjectDetailFeature: Sendable {
 
         // MARK: Lifecycle
 
-        public init(projectID: String) {
+        public init(projectID: ProjectID) {
             self.projectID = projectID
         }
 
         // MARK: Public
 
-        public let projectID: String
-        public var detail: LearningProjectDetail?
+        public let projectID: ProjectID
+        public var detail: ProjectDetail?
         public var loadStatus = LoadStatus.idle
         public var requestID = 0
         public var isMenuPresented = false
@@ -55,8 +56,8 @@ public struct ProjectDetailFeature: Sendable {
             detail?.sets.isEmpty ?? false
         }
 
-        public var firstIncompleteSet: LearningProjectSetProgress? {
-            detail?.sets.first { $0.completedCount < $0.problemCount }
+        public var firstIncompleteSet: ProjectSetProgress? {
+            detail?.sets.first { $0.completedCount < $0.quizCount }
         }
 
         public var isResumeEnabled: Bool {
@@ -77,7 +78,7 @@ public struct ProjectDetailFeature: Sendable {
         public enum View: Sendable, Equatable {
             case task
             case retryTapped
-            case setStartTapped(setID: String)
+            case setStartTapped(setID: QuizSetID)
             case resumeTapped
             case menuTapped
             case menuDismissed
@@ -96,16 +97,16 @@ public struct ProjectDetailFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case detailLoadFinished(requestID: Int, result: Result<LearningProjectDetail, LearningProjectError>)
-            case deletionFinished(projectID: String, error: LearningProjectError?)
+            case detailLoadFinished(requestID: Int, result: Result<ProjectDetail, ProjectError>)
+            case deletionFinished(projectID: ProjectID, error: ProjectError?)
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case setStartRequested(projectID: String, setID: String, label: String)
-            case savedQuestionsRequested(projectID: String)
+            case setStartRequested(projectID: ProjectID, setID: QuizSetID, label: String)
+            case savedQuestionsRequested(projectID: ProjectID)
             case externalURLRequested(URL)
-            case projectDeleted(projectID: String)
+            case projectDeleted(projectID: ProjectID)
             case dismissRequested
         }
     }
@@ -148,7 +149,7 @@ public struct ProjectDetailFeature: Sendable {
 
             case .view(.repositoryLinkTapped):
                 guard
-                    let repositoryURL = state.detail?.repositoryURL,
+                    let repositoryURL = state.detail?.repository.url,
                     let url = URL(string: repositoryURL)
                 else { return .none }
                 state.isMenuPresented = false
@@ -171,10 +172,10 @@ public struct ProjectDetailFeature: Sendable {
                 let projectID = state.projectID
                 return .run { send in
                     do {
-                        try await deleteLearningProject(projectID)
+                        try await deleteProject(projectID)
                         await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
                     } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
+                        let mapped = error as? ProjectError ?? .unexpected
                         await send(.effect(.deletionFinished(projectID: projectID, error: mapped)))
                     }
                 }
@@ -216,8 +217,8 @@ public struct ProjectDetailFeature: Sendable {
         case delete
     }
 
-    private let fetchLearningProjectDetail: @Sendable (String) async throws -> LearningProjectDetail
-    private let deleteLearningProject: @Sendable (String) async throws -> Void
+    private let projectDetail: @Sendable (ProjectID) async throws -> ProjectDetail
+    private let deleteProject: @Sendable (ProjectID) async throws -> Void
 
     private func load(_ state: inout State) -> Effect<Action> {
         state.requestID += 1
@@ -226,10 +227,10 @@ public struct ProjectDetailFeature: Sendable {
         let projectID = state.projectID
         return .run { send in
             do {
-                let detail = try await fetchLearningProjectDetail(projectID)
+                let detail = try await projectDetail(projectID)
                 await send(.effect(.detailLoadFinished(requestID: currentRequestID, result: .success(detail))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? ProjectError ?? .unexpected
                 await send(.effect(.detailLoadFinished(requestID: currentRequestID, result: .failure(mapped))))
             }
         }

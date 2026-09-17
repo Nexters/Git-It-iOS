@@ -1,29 +1,23 @@
-import DomainLearningProject
+import DomainProjectGeneration
 
-actor StubCreateLearningProjectUseCase: CreateLearningProjectUseCase {
+actor StubCreateLearningProjectUseCase: ProjectGenerationUseCase {
 
     // MARK: Lifecycle
 
     init(
-        results: [Result<ProjectRegistrationReceipt, LearningProjectError>] = [.failure(.unexpected)],
+        results: [Result<ProjectGenerationReceipt, ProjectGenerationError>] = [.failure(.unexpected)],
+        generationStates: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
         suspendsRequests: Bool = false,
     ) {
         self.results = results
+        self.generationStates = generationStates
         self.suspendsRequests = suspendsRequests
     }
 
     // MARK: Internal
 
-    struct Call: Equatable, Sendable {
-        let githubRepoURL: String
-        let quizLevel: QuizLevel
-    }
-
-    func callAsFunction(
-        githubRepoURL: String,
-        quizLevel: QuizLevel,
-    ) async throws -> ProjectRegistrationReceipt {
-        calls.append(Call(githubRepoURL: githubRepoURL, quizLevel: quizLevel))
+    func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
+        requests.append(request)
         let result = nextResult()
         guard suspendsRequests else { return try result.get() }
 
@@ -32,8 +26,12 @@ actor StubCreateLearningProjectUseCase: CreateLearningProjectUseCase {
         }
     }
 
-    func recordedCalls() -> [Call] {
-        calls
+    func states() async -> AsyncStream<ProjectGenerationState> {
+        await generationStates.states()
+    }
+
+    func recordedRequests() -> [ProjectGenerationRequest] {
+        requests
     }
 
     func resumeOldest() {
@@ -44,15 +42,16 @@ actor StubCreateLearningProjectUseCase: CreateLearningProjectUseCase {
 
     // MARK: Private
 
-    private var results: [Result<ProjectRegistrationReceipt, LearningProjectError>]
+    private var results: [Result<ProjectGenerationReceipt, ProjectGenerationError>]
+    private let generationStates: StubTrackGenerationUseCase
     private let suspendsRequests: Bool
-    private var calls = [Call]()
+    private var requests = [ProjectGenerationRequest]()
     private var continuations = [(
-        CheckedContinuation<ProjectRegistrationReceipt, any Error>,
-        Result<ProjectRegistrationReceipt, LearningProjectError>,
+        CheckedContinuation<ProjectGenerationReceipt, any Error>,
+        Result<ProjectGenerationReceipt, ProjectGenerationError>,
     )]()
 
-    private func nextResult() -> Result<ProjectRegistrationReceipt, LearningProjectError> {
+    private func nextResult() -> Result<ProjectGenerationReceipt, ProjectGenerationError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

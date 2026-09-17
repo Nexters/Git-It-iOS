@@ -1,48 +1,50 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainProject
 import SwiftUI
 import UIComponent
 
-private func previewDetail(sets: [LearningProjectSetProgress]) -> LearningProjectDetail {
-    LearningProjectDetail(
-        projectID: "project-1",
-        repositoryURL: "https://github.com/owner/repo",
-        repositoryName: "owner/repo",
-        repositoryImageURL: nil,
-        starCount: 1_284,
-        techStack: ["Swift", "SwiftUI"],
-        overallProgressPercent: 45,
-        nextQuestionID: nil,
+private func previewDetail(sets: [ProjectSetProgress]) -> ProjectDetail {
+    ProjectDetail(
+        id: "project-1",
+        repository: ProjectRepositoryInfo(
+            url: "https://github.com/owner/repo",
+            name: "owner/repo",
+            imageURL: nil,
+            starCount: 1_284,
+            techStack: ["Swift", "SwiftUI"],
+        ),
+        progressPercent: 45,
         sets: sets,
+        next: nil,
     )
 }
 
 private let previewSets = [
-    LearningProjectSetProgress(
+    ProjectSetProgress(
         setID: "set-0",
         label: "CHAPTER 1",
         title: "모듈 경계와 의존성",
-        problemCount: 5,
+        quizCount: 5,
         completedCount: 5,
     ),
-    LearningProjectSetProgress(
+    ProjectSetProgress(
         setID: "set-1",
         label: "CHAPTER 2",
         title: "상태 관리와 Effect",
-        problemCount: 4,
+        quizCount: 4,
         completedCount: 2,
     ),
-    LearningProjectSetProgress(
+    ProjectSetProgress(
         setID: "set-2",
         label: "CHAPTER 3",
         title: "테스트 전략",
-        problemCount: 3,
+        quizCount: 3,
         completedCount: 0,
     ),
 ]
 
 private func previewState(
-    detail: LearningProjectDetail? = previewDetail(sets: previewSets),
+    detail: ProjectDetail? = previewDetail(sets: previewSets),
     loadStatus: ProjectDetailFeature.LoadStatus = .loaded,
     isMenuPresented: Bool = false,
     deletion: ProjectDetailFeature.Deletion = .idle,

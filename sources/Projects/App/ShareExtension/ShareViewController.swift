@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import CompositionShareExtension
-import DomainAuthentication
+import DomainAccount
 import Feature
 import SwiftUI
 import UIKit
@@ -34,11 +34,9 @@ final class ShareViewController: UIViewController {
         let store = Store(initialState: ShareRegistrationFeature.State()) {
             ShareRegistrationFeature(
                 parseRepositoryLink: composition.parseRepositoryLink,
-                fetchExternalRepository: composition.fetchExternalRepository,
-                createLearningProject: composition.createLearningProject,
-                resolveSession: { await Self.sessionState(composition.resolveSessionAvailability) },
-                isNotificationAuthorized: composition.isNotificationAuthorized,
-                enqueueGenerationReminder: composition.enqueueGenerationReminder,
+                externalRepository: composition.externalRepository,
+                projectGeneration: composition.projectGeneration,
+                signInAvailability: composition.signInAvailability,
                 recordDiagnostic: { diagnosticLog.record($0) },
                 dismiss: { [weak self] in self?.completeRequest() },
             )
@@ -74,21 +72,6 @@ final class ShareViewController: UIViewController {
     private let urlResolver = SharedItemURLResolver()
 
     private var store: StoreOf<ShareRegistrationFeature>?
-
-    private static func sessionState(
-        _ resolve: @Sendable () async -> SessionAvailability
-    ) async -> ShareRegistrationSessionState {
-        switch await resolve() {
-        case .available:
-            .available
-
-        case .signInRequired:
-            .signInRequired
-
-        case .appLaunchRequired:
-            .appLaunchRequired
-        }
-    }
 
     private func loadSharedURL(store: StoreOf<ShareRegistrationFeature>) {
         let attachments = (extensionContext?.inputItems as? [NSExtensionItem] ?? [])

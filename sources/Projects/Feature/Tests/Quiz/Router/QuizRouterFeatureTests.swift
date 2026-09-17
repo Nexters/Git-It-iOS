@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainLearningProject
 import Testing
 
 @testable import Feature
@@ -17,12 +16,12 @@ struct QuizRouterFeatureTests {
         await store.send(.learningSetIntro(.delegate(.startRequested(
             set: QuizTestFixture.partiallyAnsweredSet,
             resumption: LearningSetResumption(set: QuizTestFixture.partiallyAnsweredSet),
-            bookmarkedQuestionIDs: ["question-0"],
+            bookmarkedQuestionIDs: ["quiz-0"],
         ))))
 
         #expect(store.state.activeScreen == .questionSolving)
         #expect(store.state.currentQuestionIndex == 2)
-        #expect(store.state.questionSolving?.question.questionID == "question-2")
+        #expect(store.state.questionSolving?.question.id == "quiz-2")
         #expect(store.state.screenTransitions.map(\.cause) == [.startRequested])
         #expect(store.state.screenTransitions.map(\.from) == [.learningSetIntro])
         #expect(store.state.screenTransitions.map(\.to) == [.questionSolving])
@@ -69,7 +68,7 @@ struct QuizRouterFeatureTests {
 
         #expect(store.state.activeScreen == .questionSolving)
         #expect(store.state.currentQuestionIndex == 1)
-        #expect(store.state.questionSolving?.question.questionID == "question-1")
+        #expect(store.state.questionSolving?.question.id == "quiz-1")
         #expect(store.state.questionSolving?.draftChoiceIndex == nil)
         #expect(store.state.questionSolving?.submission == .editing)
         #expect(store.state.screenTransitions.map(\.cause) == [.startRequested])
@@ -94,17 +93,16 @@ struct QuizRouterFeatureTests {
     }
 
     @Test
-    func `객관식 채점 결과는 세션 정답 수에 누적되고 상위에 진행 갱신을 알린다`() async {
+    func `객관식 채점 결과만 세션 정답 수에 누적된다`() async {
         let store = makeStore()
         store.exhaustivity = .off
         await startFirstQuestion(store)
 
-        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "question-0", choiceCorrect: true))))
-        await store.receive(.delegate(.progressInvalidated(projectID: QuizTestFixture.projectID)))
+        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "quiz-0", choiceCorrect: true))))
 
         #expect(store.state.sessionCorrectChoiceCount == 1)
 
-        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "question-2", choiceCorrect: nil))))
+        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "quiz-2", choiceCorrect: nil))))
         #expect(store.state.sessionCorrectChoiceCount == 1)
     }
 
@@ -140,13 +138,10 @@ struct QuizRouterFeatureTests {
             )
         ) {
             QuizRouterFeature(
-                learningLibrary: LearningLibraryUseCaseMock(
-                    setResults: [.success(QuizTestFixture.unansweredSet)],
-                    bookmarkResults: [.success(QuizTestFixture.bookmarkCollection)],
-                ),
-                submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
-                submitEssayAnswer: StubSubmitEssayAnswerUseCase(),
-                setQuestionBookmark: StubSetQuestionBookmarkUseCase(),
+                quizDetail: LearningLibraryUseCaseMock(
+                    quizSetResults: [.success(QuizTestFixture.unansweredSet)],
+                    bookmarkListResults: [.success(QuizTestFixture.bookmarkList)],
+                )
             )
         }
     }

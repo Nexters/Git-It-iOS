@@ -1,5 +1,7 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainAccount
+import DomainExternalRepository
+import DomainProjectGeneration
 import Foundation
 import Testing
 
@@ -34,7 +36,7 @@ struct ShareRegistrationFeatureValidationTests {
 
     @Test
     func `세션 마커가 없으면 앱 실행 필요 상태가 된다`() async {
-        let store = Self.makeStore(session: .appLaunchRequired)
+        let store = Self.makeStore(availability: .appLaunchRequired)
 
         await store.send(.view(.task))
         await store.receive(\.effect.validationFinished) {
@@ -44,7 +46,7 @@ struct ShareRegistrationFeatureValidationTests {
 
     @Test
     func `세션이 없으면 갱신 없이 로그인 필요 상태가 된다`() async {
-        let store = Self.makeStore(session: .signInRequired)
+        let store = Self.makeStore(availability: .signInRequired)
 
         await store.send(.view(.task))
         await store.receive(\.effect.validationFinished) {
@@ -54,7 +56,7 @@ struct ShareRegistrationFeatureValidationTests {
 
     @Test
     func `조회가 인증 오류로 실패하면 로그인 필요 상태가 된다`() async {
-        let store = Self.makeStore(lookupResult: .failure(LearningProjectError.unauthorized))
+        let store = Self.makeStore(lookupResult: .failure(ProjectGenerationError.unauthorized))
 
         await store.send(.view(.task))
         await store.receive(\.effect.validationFinished) {
@@ -88,15 +90,15 @@ struct ShareRegistrationFeatureValidationTests {
     private static func makeStore(
         sharedURL: String? = ShareRegistrationTestSupport.sharedURL,
         location: ExternalRepositoryLocation? = ShareRegistrationTestSupport.location,
-        session: ShareRegistrationSessionState = .available,
+        availability: SignInAvailability = .signedIn,
         lookupResult: Result<ExternalRepository, any Error> = .success(ShareRegistrationTestSupport.repository),
     ) -> TestStoreOf<ShareRegistrationFeature> {
         TestStore(initialState: ShareRegistrationFeature.State(sharedURL: sharedURL)) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: location),
-                fetchExternalRepository: StubFetchExternalRepository(result: lookupResult),
-                createLearningProject: SpyCreateLearningProject(),
-                resolveSession: { session },
+                externalRepository: StubFetchExternalRepository(result: lookupResult),
+                projectGeneration: SpyCreateLearningProject(),
+                signInAvailability: { availability },
             )
         }
     }

@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainProjectGeneration
 
 extension QuizLevel {
     var identifier: String {

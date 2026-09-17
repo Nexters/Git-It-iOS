@@ -1,35 +1,37 @@
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainUserInfo
 import Foundation
 
-actor SignOutUseCaseMock: SignOutUseCase {
+actor UserInfoUseCaseMock: UserInfoUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [SignOutResult] = [.success]) {
-        self.results = results
+    init(curations: [Result<Curation?, UserInfoError>] = [.success(AppRootTestFixture.curation)]) {
+        self.curations = curations
     }
 
     // MARK: Internal
 
-    func callAsFunction() async -> SignOutResult {
-        callCount += 1
-        return nextResult()
+    private(set) var curationCallCount = 0
+
+    func detail() async throws -> UserDetail {
+        AppRootTestFixture.userDetail
     }
 
-    func snapshot() -> Int {
-        callCount
+    func curation() async throws -> Curation? {
+        curationCallCount += 1
+        guard !curations.isEmpty else { return nil }
+        let next = curations.count > 1 ? curations.removeFirst() : curations[0]
+        return try next.get()
     }
+
+    func updateCuration(_: Curation) async throws { }
+
+    func updatePosition(_: MemberPosition) async throws { }
+
+    func updateCareerLevel(_: CareerLevel) async throws { }
 
     // MARK: Private
 
-    private var results: [SignOutResult]
-    private var callCount = 0
-
-    private func nextResult() -> SignOutResult {
-        guard !results.isEmpty else { return .success }
-        return results.count > 1 ? results.removeFirst() : results[0]
-    }
+    private var curations: [Result<Curation?, UserInfoError>]
 
 }

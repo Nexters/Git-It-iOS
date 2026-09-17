@@ -1,11 +1,12 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Testing
 
 @testable import Feature
 
 @Suite("TutorialFeature")
 struct TutorialFeatureTests {
+
+    // MARK: Internal
 
     @Test
     func `tutorial 페이지 변경은 현재 페이지 값만 갱신한다`() async {
@@ -26,7 +27,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다`() async {
-        let signIn = SignInUseCaseMock(results: [.success(OnboardingTestFixture.authenticatedUser, needsCuration: false)])
+        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount)])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -36,14 +37,7 @@ struct TutorialFeatureTests {
             $0.authentication = .signingIn
             $0.requestID = 1
         }
-        await store.receive(
-            .effect(
-                .signInFinished(
-                    requestID: 1,
-                    result: .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-                )
-            )
-        ) {
+        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.signInSucceeded(needsCuration: false)))
@@ -109,7 +103,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `Apple 로그인 탭은 곧바로 로그인하지 않고 signInRequested를 위임한다`() async {
-        let signIn = SignInUseCaseMock(results: [.success(OnboardingTestFixture.authenticatedUser, needsCuration: false)])
+        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount)])
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -133,10 +127,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `deletesCompletedAccountOnSignIn이 true면 needsCuration false 응답을 받은 뒤 회원탈퇴하고 자동으로 재로그인한다`() async {
-        let signIn = SignInUseCaseMock(results: [
-            .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-            .success(OnboardingTestFixture.authenticatedUser, needsCuration: true),
-        ])
+        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount), .signedIn(uncuratedAccount)])
         let deleteMemberAccount = DeleteMemberAccountUseCaseMock()
         let store = makeTutorialStore(
             signIn: signIn,
@@ -151,25 +142,11 @@ struct TutorialFeatureTests {
             $0.authentication = .signingIn
             $0.requestID = 1
         }
-        await store.receive(
-            .effect(
-                .signInFinished(
-                    requestID: 1,
-                    result: .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-                )
-            )
-        ) {
+        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
             $0.hasAttemptedCompletedAccountReset = true
             $0.requestID = 2
         }
-        await store.receive(
-            .effect(
-                .signInFinished(
-                    requestID: 2,
-                    result: .success(OnboardingTestFixture.authenticatedUser, needsCuration: true),
-                )
-            )
-        ) {
+        await store.receive(.effect(.signInFinished(requestID: 2, result: .signedIn(uncuratedAccount)))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.signInSucceeded(needsCuration: true)))
@@ -180,10 +157,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `deletesCompletedAccountOnSignIn이 true여도 재시도가 다시 needsCuration false를 받으면 더 이상 반복하지 않는다`() async {
-        let signIn = SignInUseCaseMock(results: [
-            .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-            .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-        ])
+        let signIn = SignInUseCaseMock(results: [.signedIn(curatedAccount), .signedIn(curatedAccount)])
         let deleteMemberAccount = DeleteMemberAccountUseCaseMock()
         let store = makeTutorialStore(
             signIn: signIn,
@@ -198,25 +172,11 @@ struct TutorialFeatureTests {
             $0.authentication = .signingIn
             $0.requestID = 1
         }
-        await store.receive(
-            .effect(
-                .signInFinished(
-                    requestID: 1,
-                    result: .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-                )
-            )
-        ) {
+        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
             $0.hasAttemptedCompletedAccountReset = true
             $0.requestID = 2
         }
-        await store.receive(
-            .effect(
-                .signInFinished(
-                    requestID: 2,
-                    result: .success(OnboardingTestFixture.authenticatedUser, needsCuration: false),
-                )
-            )
-        ) {
+        await store.receive(.effect(.signInFinished(requestID: 2, result: .signedIn(curatedAccount)))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.signInSucceeded(needsCuration: false)))
@@ -224,5 +184,10 @@ struct TutorialFeatureTests {
         #expect(await signIn.snapshot() == [.apple, .apple])
         #expect(await deleteMemberAccount.snapshot() == 1)
     }
+
+    // MARK: Private
+
+    private let curatedAccount = OnboardingTestFixture.signedInAccount(needsCuration: false)
+    private let uncuratedAccount = OnboardingTestFixture.signedInAccount(needsCuration: true)
 
 }

@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 import Foundation
 @testable import Feature
 
@@ -12,9 +12,9 @@ func makeAppEntryStore(
 ) -> TestStoreOf<AppEntryFeature> {
     TestStore(initialState: state) {
         AppEntryFeature(
-            restoreSession: restoreSession,
-            fetchMemberProfile: fetchMemberProfile.fetchProfile,
-            signOut: signOut,
+            restoreSignIn: restoreSession.restoreSignIn,
+            curation: fetchMemberProfile.curation,
+            signOut: signOut.signOut,
         )
     }
 }
@@ -27,8 +27,8 @@ func makeTutorialStore(
 ) -> TestStoreOf<TutorialFeature> {
     TestStore(initialState: state) {
         TutorialFeature(
-            signIn: signIn,
-            deleteMemberAccount: deleteMemberAccount,
+            signIn: signIn.signIn,
+            withdraw: deleteMemberAccount.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }
@@ -39,7 +39,10 @@ func makeLegalAgreementStore(
     state: LegalAgreementFeature.State = LegalAgreementFeature.State(),
 ) -> TestStoreOf<LegalAgreementFeature> {
     TestStore(initialState: state) {
-        LegalAgreementFeature(policyConsent: policyConsent)
+        LegalAgreementFeature(
+            policyConsentStatus: policyConsent.policyConsentStatus,
+            consent: policyConsent.consent,
+        )
     }
 }
 
@@ -48,7 +51,7 @@ func makePositionSelectionStore(
     state: PositionSelectionFeature.State = PositionSelectionFeature.State(),
 ) -> TestStoreOf<PositionSelectionFeature> {
     TestStore(initialState: state) {
-        PositionSelectionFeature(signOut: signOut)
+        PositionSelectionFeature(signOut: signOut.signOut)
     }
 }
 
@@ -57,7 +60,7 @@ func makeCareerSelectionStore(
     state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
 ) -> TestStoreOf<CareerSelectionFeature> {
     TestStore(initialState: state) {
-        CareerSelectionFeature(completeCuration: completeCuration.complete)
+        CareerSelectionFeature(updateCuration: completeCuration.updateCuration)
     }
 }
 
@@ -80,11 +83,12 @@ func makeOnboardingRouterStore(
 ) -> TestStoreOf<OnboardingRouterFeature> {
     TestStore(initialState: state) {
         OnboardingRouterFeature(
-            signIn: signIn,
-            signOut: signOut,
-            policyConsent: policyConsent,
-            memberAccount: memberAccount,
-            deleteMemberAccount: deleteMemberAccount,
+            signIn: signIn.signIn,
+            signOut: signOut.signOut,
+            policyConsentStatus: policyConsent.policyConsentStatus,
+            consent: policyConsent.consent,
+            updateCuration: { try await memberAccount.updateCuration($0) },
+            withdraw: deleteMemberAccount.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }

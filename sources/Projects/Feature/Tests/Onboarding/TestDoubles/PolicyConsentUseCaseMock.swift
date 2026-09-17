@@ -1,59 +1,41 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Foundation
 
-actor PolicyConsentUseCaseMock: PolicyConsentUseCase {
+actor PolicyConsentUseCaseMock {
 
     // MARK: Lifecycle
 
-    init(
-        requiredDocuments: [PolicyDocument] = [],
-        storedConsentRecords: [PolicyConsentRecord] = [],
-    ) {
-        requiredDocumentsResult = requiredDocuments
-        storedConsentRecordsResult = storedConsentRecords
+    init(status: PolicyConsentStatus = PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)) {
+        self.status = status
     }
 
     // MARK: Internal
 
-    func requiredDocuments() async throws -> [PolicyDocument] {
-        requiredDocumentsCallCount += 1
-        return requiredDocumentsResult
+    nonisolated var policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus {
+        { await self.loadStatus() }
     }
 
-    func storedConsentRecords() async throws -> [PolicyConsentRecord] {
-        storedConsentRecordsResult
+    nonisolated var consent: @Sendable ([PolicyDocumentID]) async throws -> Void {
+        { await self.recordConsent($0) }
     }
 
-    func saveConsentRecords(_ records: [PolicyConsentRecord]) async throws {
-        savedRecords.append(records)
-        storedConsentRecordsResult = records
+    func loadStatus() -> PolicyConsentStatus {
+        statusCallCount += 1
+        return status
     }
 
-    func clearConsentRecords() async throws {
-        clearCallCount += 1
-        storedConsentRecordsResult = []
+    func recordConsent(_ documentIDs: [PolicyDocumentID]) {
+        consentedDocumentIDs.append(documentIDs)
     }
 
-    nonisolated func isConsentValid(
-        storedRecords: [PolicyConsentRecord],
-        for requiredDocuments: [PolicyDocument],
-    ) -> Bool {
-        PolicyConsentRecord.isConsentValid(storedRecords: storedRecords, for: requiredDocuments)
-    }
-
-    func snapshot() -> (requiredDocumentsCallCount: Int, savedRecords: [[PolicyConsentRecord]], clearCallCount: Int) {
-        (requiredDocumentsCallCount, savedRecords, clearCallCount)
+    func snapshot() -> (statusCallCount: Int, consentedDocumentIDs: [[PolicyDocumentID]]) {
+        (statusCallCount, consentedDocumentIDs)
     }
 
     // MARK: Private
 
-    private let requiredDocumentsResult: [PolicyDocument]
-    private var storedConsentRecordsResult: [PolicyConsentRecord]
-    private var requiredDocumentsCallCount = 0
-    private var savedRecords = [[PolicyConsentRecord]]()
-    private var clearCallCount = 0
+    private let status: PolicyConsentStatus
+    private var statusCallCount = 0
+    private var consentedDocumentIDs = [[PolicyDocumentID]]()
 
 }
-
-// MARK: - Test Fixtures

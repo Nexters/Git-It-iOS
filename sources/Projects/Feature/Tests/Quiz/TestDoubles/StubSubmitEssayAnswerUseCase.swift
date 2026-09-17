@@ -1,37 +1,31 @@
-import DomainLearningProject
+import DomainQuizDetail
 
-actor StubSubmitEssayAnswerUseCase: SubmitEssayAnswerUseCase {
+actor StubSubmitEssayAnswerUseCase {
 
     // MARK: Lifecycle
 
-    init(results: [Result<EssayAnswerResult, LearningProjectError>] = [.failure(.unexpected)]) {
+    init(results: [Result<EssayGrading, QuizDetailError>] = [.failure(.unexpected)]) {
         self.results = results
     }
 
     // MARK: Internal
 
-    struct Invocation: Equatable, Sendable {
-        let projectID: String
-        let questionID: String
-        let text: String
+    private(set) var invocations = [EssayAnswer]()
+
+    nonisolated var gradeEssayAnswer: @Sendable (EssayAnswer) async throws -> EssayGrading {
+        { try await self(answer: $0) }
     }
 
-    private(set) var invocations = [Invocation]()
-
-    func callAsFunction(
-        projectID: String,
-        questionID: String,
-        text: String,
-    ) async throws -> EssayAnswerResult {
-        invocations.append(Invocation(projectID: projectID, questionID: questionID, text: text))
+    func callAsFunction(answer: EssayAnswer) async throws -> EssayGrading {
+        invocations.append(answer)
         return try nextResult().get()
     }
 
     // MARK: Private
 
-    private var results: [Result<EssayAnswerResult, LearningProjectError>]
+    private var results: [Result<EssayGrading, QuizDetailError>]
 
-    private func nextResult() -> Result<EssayAnswerResult, LearningProjectError> {
+    private func nextResult() -> Result<EssayGrading, QuizDetailError> {
         guard !results.isEmpty else { return .failure(.unexpected) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

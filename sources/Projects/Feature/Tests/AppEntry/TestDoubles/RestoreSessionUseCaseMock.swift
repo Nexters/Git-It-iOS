@@ -1,18 +1,21 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Foundation
 
-actor RestoreSessionUseCaseMock: RestoreSessionUseCase {
+actor RestoreSessionUseCaseMock {
 
     // MARK: Lifecycle
 
-    init(results: [RestoreSessionResult] = [.unauthenticated]) {
+    init(results: [SignInRestoration] = [.signedOut]) {
         self.results = results
     }
 
     // MARK: Internal
 
-    func callAsFunction() async -> RestoreSessionResult {
+    nonisolated var restoreSignIn: @Sendable () async -> SignInRestoration {
+        { await self() }
+    }
+
+    func callAsFunction() async -> SignInRestoration {
         callCount += 1
         return nextResult()
     }
@@ -23,11 +26,11 @@ actor RestoreSessionUseCaseMock: RestoreSessionUseCase {
 
     // MARK: Private
 
-    private var results: [RestoreSessionResult]
+    private var results: [SignInRestoration]
     private var callCount = 0
 
-    private func nextResult() -> RestoreSessionResult {
-        guard !results.isEmpty else { return .recoverableFailure }
+    private func nextResult() -> SignInRestoration {
+        guard !results.isEmpty else { return .temporarilyUnavailable }
         return results.count > 1 ? results.removeFirst() : results[0]
     }
 

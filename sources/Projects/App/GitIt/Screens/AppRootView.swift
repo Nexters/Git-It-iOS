@@ -1,7 +1,12 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainAccount
+import DomainAppSetting
+import DomainExternalRepository
+import DomainIdentifier
+import DomainProject
+import DomainProjectGeneration
+import DomainQuizDetail
+import DomainUserInfo
 import Feature
 import Foundation
 import SwiftUI
@@ -70,37 +75,47 @@ struct AppRootView: View {
 
 private enum AppRootPreviewSupport {
 
-    struct NoopRestoreSession: RestoreSessionUseCase {
-        func callAsFunction() async -> RestoreSessionResult {
-            .unauthenticated
-        }
-    }
-
-    struct NoopSignIn: SignInUseCase {
-        func callAsFunction(_: AuthenticationMethod) async -> SignInResult {
+    struct NoopAccount: AccountUseCase {
+        func signIn(with _: SignInMethod) async -> SignInResult {
             .retryableFailure
         }
-    }
 
-    struct NoopSignOut: SignOutUseCase {
-        func callAsFunction() async -> SignOutResult {
-            .success
+        func signOut() async -> SignOutResult {
+            .signedOut
+        }
+
+        func signInStates() async -> AsyncStream<SignInState> {
+            AsyncStream { $0.finish() }
+        }
+
+        func restoreSignIn() async -> SignInRestoration {
+            .signedOut
+        }
+
+        func verifySignIn() async -> SignInVerification {
+            .valid
+        }
+
+        func signInAvailability() async -> SignInAvailability {
+            .signInRequired
+        }
+
+        func policyConsentStatus() async throws -> PolicyConsentStatus {
+            PolicyConsentStatus(documents: [], consents: [], isSatisfied: true)
+        }
+
+        func consent(to _: [PolicyDocumentID]) async throws { }
+
+        func withdraw() async throws {
+            throw CancellationError()
         }
     }
 
-    struct NoopVerifyAuthorization: VerifyAuthorizationUseCase {
-        func callAsFunction() async -> AuthorizationStatus {
-            .authorized
-        }
-    }
-
-    struct NoopMemberAccount: MemberAccountUseCase {
-        func profile() async throws -> MemberProfile {
-            MemberProfile(
+    struct NoopUserInfo: UserInfoUseCase {
+        func detail() async throws -> UserDetail {
+            UserDetail(
                 name: "미리보기",
                 email: "preview@example.com",
-                position: nil,
-                careerLevel: nil,
                 statistics: LearningStatistics(
                     thisWeekSolvedCount: 0,
                     thisMonthSolvedCount: 0,
@@ -110,6 +125,14 @@ private enum AppRootPreviewSupport {
             )
         }
 
+        func curation() async throws -> Curation? {
+            nil
+        }
+
+        func updateCuration(_: Curation) async throws {
+            throw CancellationError()
+        }
+
         func updatePosition(_: MemberPosition) async throws {
             throw CancellationError()
         }
@@ -117,144 +140,91 @@ private enum AppRootPreviewSupport {
         func updateCareerLevel(_: CareerLevel) async throws {
             throw CancellationError()
         }
-
-        func completeCuration(
-            position _: MemberPosition,
-            careerLevel _: CareerLevel,
-        ) async throws { }
     }
 
-    struct NoopPolicyConsent: PolicyConsentUseCase {
-        func requiredDocuments() async throws -> [PolicyDocument] {
-            []
+    struct NoopAppSetting: AppSettingUseCase {
+        func notificationAuthorization() async -> NotificationAuthorizationStatus {
+            .notDetermined
         }
 
-        func storedConsentRecords() async throws -> [PolicyConsentRecord] {
-            []
+        func requestNotificationAuthorization() async -> NotificationAuthorizationStatus {
+            .denied
         }
 
-        func saveConsentRecords(_: [PolicyConsentRecord]) async throws { }
-        func clearConsentRecords() async throws { }
-        func isConsentValid(
-            storedRecords _: [PolicyConsentRecord],
-            for _: [PolicyDocument],
-        ) -> Bool {
-            false
-        }
+        func registerDevice() async throws { }
+
+        func updateDeviceToken(_: DeviceToken) async throws { }
     }
 
-    struct NoopFetchLearningProjects: FetchLearningProjectsUseCase {
-        func callAsFunction(page _: Int) async throws -> LearningProjectPage {
+    struct NoopExternalRepository: ExternalRepositoryUseCase {
+        func repository(at _: ExternalRepositoryURL) async throws -> ExternalRepository {
             throw CancellationError()
         }
     }
 
-    struct NoopLearningLibrary: LearningLibraryUseCase {
-        func project(id _: String) async throws -> LearningProjectDetail {
+    struct NoopQuizDetail: QuizDetailUseCase {
+        func quizSet(
+            _: QuizSetID,
+            in _: ProjectID,
+        ) async throws -> QuizSet {
             throw CancellationError()
         }
 
-        func deleteProject(id _: String) async throws {
+        func grade(_: ChoiceAnswer) async throws -> ChoiceGrading {
             throw CancellationError()
         }
 
-        func learningSet(
-            projectID _: String,
-            setID _: String,
-        ) async throws -> LearningSet {
+        func grade(_: EssayAnswer) async throws -> EssayGrading {
             throw CancellationError()
         }
 
-        func bookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        func bookmark(
+            _: QuizID,
+            in _: ProjectID,
+        ) async throws -> QuizBookmarkState {
             throw CancellationError()
         }
-    }
 
-    struct NoopSubmitChoiceAnswer: SubmitChoiceAnswerUseCase {
-        func callAsFunction(
-            projectID _: String,
-            questionID _: String,
-            selectedIndex _: Int,
-        ) async throws -> ChoiceAnswerResult {
+        func unbookmark(
+            _: QuizID,
+            in _: ProjectID,
+        ) async throws -> QuizBookmarkState {
             throw CancellationError()
         }
-    }
 
-    struct NoopSubmitEssayAnswer: SubmitEssayAnswerUseCase {
-        func callAsFunction(
-            projectID _: String,
-            questionID _: String,
-            text _: String,
-        ) async throws -> EssayAnswerResult {
+        func bookmarks(_: QuizBookmarkFilter) async throws -> QuizBookmarkList {
             throw CancellationError()
         }
     }
 
-    struct NoopSetQuestionBookmark: SetQuestionBookmarkUseCase {
-        func callAsFunction(
-            projectID _: String,
-            questionID _: String,
-            bookmarked _: Bool,
-        ) async throws -> BookmarkState {
+    struct NoopProject: ProjectUseCase {
+        func projects() async -> AsyncStream<ProjectList> {
+            AsyncStream { $0.finish() }
+        }
+
+        func refresh() async throws {
+            throw CancellationError()
+        }
+
+        func requestNextPage() async throws {
+            throw CancellationError()
+        }
+
+        func detail(of _: ProjectID) async throws -> ProjectDetail {
+            throw CancellationError()
+        }
+
+        func delete(_: ProjectID) async throws {
             throw CancellationError()
         }
     }
 
-    struct NoopDeleteMemberAccount: DeleteMemberAccountUseCase {
-        func callAsFunction() async throws {
+    struct NoopProjectGeneration: ProjectGenerationUseCase {
+        func request(_: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
             throw CancellationError()
         }
-    }
 
-    struct NoopFetchExternalRepository: FetchExternalRepositoryUseCase {
-        func callAsFunction(url _: String) async throws -> ExternalRepository {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopCreateLearningProject: CreateLearningProjectUseCase {
-        func callAsFunction(
-            githubRepoURL _: String,
-            quizLevel _: QuizLevel,
-        ) async throws -> ProjectRegistrationReceipt {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopRequestGenerationReminder: RequestGenerationReminderUseCase {
-        func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
-            .authorized
-        }
-
-        func requestAuthorization() async -> NotificationAuthorizationOutcome {
-            .authorized
-        }
-
-        func isAuthorized() async -> Bool {
-            true
-        }
-    }
-
-    struct NoopTrackGeneration: TrackGenerationUseCase {
-        func begin(
-            githubRepoURL _: String,
-            requestedAt _: Date,
-        ) async -> Bool {
-            false
-        }
-
-        func attachProjectID(
-            _: String,
-            toGithubRepoURL _: String,
-        ) async { }
-
-        func end(githubRepoURL _: String) async { }
-        func end(projectID _: String) async { }
-        func current() async -> GenerationState {
-            GenerationState()
-        }
-
-        func states() async -> AsyncStream<GenerationState> {
+        func states() async -> AsyncStream<ProjectGenerationState> {
             AsyncStream { $0.finish() }
         }
     }
@@ -264,22 +234,13 @@ private enum AppRootPreviewSupport {
         state.route = route
         return Store(initialState: state) {
             AppRootFeature(
-                restoreSession: NoopRestoreSession(),
-                signIn: NoopSignIn(),
-                signOut: NoopSignOut(),
-                verifyAuthorization: NoopVerifyAuthorization(),
-                memberAccount: NoopMemberAccount(),
-                policyConsent: NoopPolicyConsent(),
-                fetchLearningProjects: NoopFetchLearningProjects(),
-                learningLibrary: NoopLearningLibrary(),
-                submitChoiceAnswer: NoopSubmitChoiceAnswer(),
-                submitEssayAnswer: NoopSubmitEssayAnswer(),
-                setQuestionBookmark: NoopSetQuestionBookmark(),
-                deleteMemberAccount: NoopDeleteMemberAccount(),
-                fetchExternalRepository: NoopFetchExternalRepository(),
-                createLearningProject: NoopCreateLearningProject(),
-                requestGenerationReminder: NoopRequestGenerationReminder(),
-                trackGeneration: NoopTrackGeneration(),
+                account: NoopAccount(),
+                userInfo: NoopUserInfo(),
+                appSetting: NoopAppSetting(),
+                externalRepository: NoopExternalRepository(),
+                quizDetail: NoopQuizDetail(),
+                project: NoopProject(),
+                projectGeneration: NoopProjectGeneration(),
                 deviceTokenRefreshes: { AsyncStream { $0.finish() } },
             )
         }

@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainProject
 import Testing
 
 @testable import Feature
@@ -28,16 +28,14 @@ struct ProjectListDisplayTests {
 
     @Test
     func `세트 라벨에 숫자가 없으면 1번 세트로 둔다`() {
-        let project = LearningProjectSummary(
-            projectID: "project-x",
+        let project = ProjectSummary(
+            id: "project-x",
             repositoryName: "Repository X",
             repositoryImageURL: nil,
             techStack: [],
-            currentSetLabel: "시작하기",
-            currentSetTitle: "개요",
-            nextSetID: nil,
-            nextQuestionID: nil,
-            overallProgressPercent: 0,
+            currentSet: ProjectSetLabel(label: "시작하기", title: "개요"),
+            next: nil,
+            progressPercent: 0,
         )
 
         #expect(ProjectListDisplay.list(projects: [project]).first?.currentSet == 1)

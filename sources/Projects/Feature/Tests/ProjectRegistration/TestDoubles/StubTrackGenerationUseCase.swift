@@ -1,75 +1,43 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainProjectGeneration
 import Foundation
 
-actor StubTrackGenerationUseCase: TrackGenerationUseCase {
+actor StubTrackGenerationUseCase {
 
     // MARK: Internal
 
-    func begin(
-        githubRepoURL: String,
-        requestedAt: Date,
-    ) async -> Bool {
-        guard let next = state.beginning(githubRepoURL: githubRepoURL, requestedAt: requestedAt) else {
-            return false
-        }
-        state = next
-        yieldCurrent()
-        return true
-    }
-
-    func attachProjectID(
-        _ projectID: String,
-        toGithubRepoURL githubRepoURL: String,
-    ) async {
-        state = state.attachingProjectID(projectID, toGithubRepoURL: githubRepoURL)
-        yieldCurrent()
-    }
-
-    func end(githubRepoURL: String) async {
-        state = state.removing(githubRepoURL: githubRepoURL)
-        yieldCurrent()
-    }
-
-    func end(projectID: String) async {
-        state = state.removing(projectID: projectID)
-        yieldCurrent()
-    }
-
-    func current() async -> GenerationState {
-        state
-    }
-
-    func states() async -> AsyncStream<GenerationState> {
-        let (stream, continuation) = AsyncStream<GenerationState>.makeStream()
+    func states() async -> AsyncStream<ProjectGenerationState> {
+        let (stream, continuation) = AsyncStream<ProjectGenerationState>.makeStream()
         let subscriptionID = UUID()
         continuations[subscriptionID] = continuation
-        continuation.onTermination = { _ in
-            Task { await self.removeSubscription(subscriptionID) }
+        continuation.onTermination = { [weak self] _ in
+            Task { await self?.removeSubscription(subscriptionID) }
         }
         subscriptionCount += 1
-        continuation.yield(state)
+        continuation.yield(current)
         return stream
     }
 
-    func emit(_ outcome: GenerationOutcome) {
-        let requestedAt = state.record(projectID: outcome.projectID)?.requestedAt ?? Date()
-        let githubRepoURL = state.record(projectID: outcome.projectID)?.githubRepoURL
-            ?? "https://github.com/owner/\(outcome.projectID)"
-        let remaining = state.records.filter { $0.projectID != outcome.projectID }
-        state = GenerationState(records: remaining + [
-            GenerationRecord(
-                githubRepoURL: githubRepoURL,
-                projectID: outcome.projectID,
-                requestedAt: requestedAt,
-                status: outcome.status == .completed ? .completed : .failed,
-                finishedAt: Date(),
-            )
-        ])
+    func emit(_ state: ProjectGenerationState) {
+        current = state
         yieldCurrent()
     }
 
-    func store(_ state: GenerationState) {
-        self.state = state
+    func emit(
+        phase: ProjectGenerationPhase,
+        projectID: ProjectID,
+        repositoryURL: ExternalRepositoryURL = "https://github.com/owner/repo",
+        requestedAt: Date = Date(timeIntervalSince1970: 1_800_000_000),
+    ) {
+        current = ProjectGenerationState(
+            requests: [ProjectGenerationRequestState(
+                repositoryURL: repositoryURL,
+                projectID: projectID,
+                requestedAt: requestedAt,
+                phase: phase,
+            )],
+            preparingProjectIDs: [],
+        )
         yieldCurrent()
     }
 
@@ -77,10 +45,7 @@ actor StubTrackGenerationUseCase: TrackGenerationUseCase {
         for continuation in continuations.values {
             continuation.finish()
         }
-    }
-
-    func hasEstablishedSubscription() -> Bool {
-        subscriptionCount > 0
+        continuations.removeAll()
     }
 
     func establishedSubscriptionCount() -> Int {
@@ -93,13 +58,13 @@ actor StubTrackGenerationUseCase: TrackGenerationUseCase {
 
     // MARK: Private
 
-    private var state = GenerationState()
-    private var continuations = [UUID: AsyncStream<GenerationState>.Continuation]()
+    private var current = ProjectGenerationState(requests: [], preparingProjectIDs: [])
+    private var continuations = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var subscriptionCount = 0
 
     private func yieldCurrent() {
         for continuation in continuations.values {
-            continuation.yield(state)
+            continuation.yield(current)
         }
     }
 

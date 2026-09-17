@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainMember
+import DomainAppSetting
+import DomainUserInfo
 import Foundation
 import Testing
 
@@ -23,7 +24,7 @@ struct SettingsFeatureTests {
             $0.profile = SettingsTestFixture.curatedProfile
             $0.profileLoad = .loaded
         }
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: false))) {
+        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
             $0.notificationStatus = .denied
         }
 
@@ -42,7 +43,7 @@ struct SettingsFeatureTests {
         await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
             $0.profileLoad = .failed(.temporarilyUnavailable)
         }
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: false))) {
+        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
             $0.notificationStatus = .denied
         }
 
@@ -51,9 +52,7 @@ struct SettingsFeatureTests {
 
     @Test
     func `task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다`() async {
-        let store = makeStore(
-            requestGenerationReminder: StubRequestGenerationReminderUseCase(isAuthorizedResult: true)
-        )
+        let store = makeStore(notificationAuthorization: { .authorized })
 
         await store.send(.view(.task)) {
             $0.profileLoad = .loading
@@ -61,7 +60,7 @@ struct SettingsFeatureTests {
         await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
             $0.profileLoad = .failed(.temporarilyUnavailable)
         }
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: true))) {
+        await store.receive(.effect(.notificationAuthorizationChecked(.authorized))) {
             $0.notificationStatus = .allowed
         }
     }
@@ -70,69 +69,78 @@ struct SettingsFeatureTests {
     func `앱 설정에서 알림을 켜고 돌아오면 알림 권한 상태를 다시 조회한다`() async {
         var state = SettingsFeature.State()
         state.notificationStatus = .denied
-        let store = makeStore(
-            state: state,
-            requestGenerationReminder: StubRequestGenerationReminderUseCase(isAuthorizedResult: true),
-        )
+        let store = makeStore(state: state, notificationAuthorization: { .authorized })
 
         await store.send(.view(.applicationBecameActive))
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: true))) {
+        await store.receive(.effect(.notificationAuthorizationChecked(.authorized))) {
             $0.notificationStatus = .allowed
         }
     }
 
     @Test
-    func `알림이 켜져 있으면 알림 행 탭은 시스템 알림 설정 화면을 연다`() async {
-        var state = SettingsFeature.State()
-        state.notificationStatus = .allowed
+    func `알림이 켜져 있으면 알림 항목 탭은 시스템 알림 설정 화면을 연다`() async {
         let openedNotificationSettings = LockIsolated(0)
+        let requestedAuthorizationCount = LockIsolated(0)
         let store = makeStore(
-            state: state,
+            notificationAuthorization: { .authorized },
+            requestNotificationAuthorization: {
+                requestedAuthorizationCount.withValue { $0 += 1 }
+                return .authorized
+            },
             openNotificationSettings: { openedNotificationSettings.withValue { $0 += 1 } },
         )
 
         await store.send(.view(.notificationRowTapped))
 
         #expect(openedNotificationSettings.value == 1)
+        #expect(requestedAuthorizationCount.value == 0)
     }
 
     @Test
-    func `알림 권한을 정하지 않았으면 알림 행 탭은 시스템 권한 요청 결과로 상태를 갱신한다`() async {
+    func `알림 권한을 정하지 않았으면 알림 항목 탭은 시스템 권한을 요청하고 결과로 상태를 갱신한다`() async {
         var state = SettingsFeature.State()
         state.notificationStatus = .denied
-        let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.authorized])
         let openedNotificationSettings = LockIsolated(0)
+        let requestedAuthorizationCount = LockIsolated(0)
         let store = makeStore(
             state: state,
-            requestGenerationReminder: requestGenerationReminder,
+            notificationAuthorization: { .notDetermined },
+            requestNotificationAuthorization: {
+                requestedAuthorizationCount.withValue { $0 += 1 }
+                return .authorized
+            },
             openNotificationSettings: { openedNotificationSettings.withValue { $0 += 1 } },
         )
 
         await store.send(.view(.notificationRowTapped))
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: true))) {
+        await store.receive(.effect(.notificationAuthorizationChecked(.authorized))) {
             $0.notificationStatus = .allowed
         }
 
-        #expect(await requestGenerationReminder.authorizationRequestSnapshot() == 1)
+        #expect(requestedAuthorizationCount.value == 1)
         #expect(openedNotificationSettings.value == 0)
     }
 
     @Test
-    func `이미 거부한 알림 권한은 알림 행 탭에서 시스템 알림 설정 화면으로 이어진다`() async {
+    func `이미 거부한 알림 권한은 알림 항목 탭에서 권한을 요청하지 않고 시스템 알림 설정 화면으로 이어진다`() async {
         var state = SettingsFeature.State()
         state.notificationStatus = .denied
-        let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.previouslyDenied])
         let openedNotificationSettings = LockIsolated(0)
+        let requestedAuthorizationCount = LockIsolated(0)
         let store = makeStore(
             state: state,
-            requestGenerationReminder: requestGenerationReminder,
+            notificationAuthorization: { .denied },
+            requestNotificationAuthorization: {
+                requestedAuthorizationCount.withValue { $0 += 1 }
+                return .authorized
+            },
             openNotificationSettings: { openedNotificationSettings.withValue { $0 += 1 } },
         )
 
         await store.send(.view(.notificationRowTapped))
-        await store.receive(.effect(.notificationAuthorizationChecked(isAuthorized: false)))
 
         #expect(openedNotificationSettings.value == 1)
+        #expect(requestedAuthorizationCount.value == 0)
     }
 
     @Test
@@ -231,7 +239,7 @@ struct SettingsFeatureTests {
 
     // MARK: Private
 
-    private func makeState(profile: MemberProfile) -> SettingsFeature.State {
+    private func makeState(profile: UserProfile) -> SettingsFeature.State {
         var state = SettingsFeature.State()
         state.profile = profile
         state.profileLoad = .loaded
@@ -243,17 +251,19 @@ struct SettingsFeatureTests {
         fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
         updateMemberPosition: UpdateMemberPositionUseCaseMock = UpdateMemberPositionUseCaseMock(),
         updateMemberCareerLevel: UpdateMemberCareerLevelUseCaseMock = UpdateMemberCareerLevelUseCaseMock(),
-        requestGenerationReminder: StubRequestGenerationReminderUseCase = StubRequestGenerationReminderUseCase(),
+        notificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus = { .denied },
+        requestNotificationAuthorization: @escaping @Sendable () async -> NotificationAuthorizationStatus = { .denied },
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) -> TestStoreOf<SettingsFeature> {
         TestStore(initialState: state) {
             SettingsFeature(
-                signOut: SignOutUseCaseMock(),
-                fetchMemberProfile: fetchMemberProfile.fetchProfile,
-                updateMemberPosition: updateMemberPosition.updatePosition,
-                updateMemberCareerLevel: updateMemberCareerLevel.updateCareerLevel,
-                deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
-                requestGenerationReminder: requestGenerationReminder,
+                signOut: SignOutUseCaseMock().signOut,
+                profile: fetchMemberProfile.profile,
+                updatePosition: updateMemberPosition.updatePosition,
+                updateCareerLevel: updateMemberCareerLevel.updateCareerLevel,
+                withdraw: DeleteMemberAccountUseCaseMock().withdraw,
+                notificationAuthorization: notificationAuthorization,
+                requestNotificationAuthorization: requestNotificationAuthorization,
                 openNotificationSettings: openNotificationSettings,
             )
         }

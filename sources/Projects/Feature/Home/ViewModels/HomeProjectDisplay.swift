@@ -1,4 +1,5 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
 import UIComponent
 
 struct HomeProjectDisplay: Equatable, Sendable {
@@ -6,22 +7,22 @@ struct HomeProjectDisplay: Equatable, Sendable {
     // MARK: Lifecycle
 
     init(
-        _ project: LearningProjectSummary,
+        _ project: ProjectSummary,
         index: Int,
     ) {
-        projectID = project.projectID
+        projectID = project.id
         title = project.repositoryName
         technologies = project.techStack.joined(separator: " · ")
-        progress = Double(project.overallProgressPercent) / 100
-        currentSetLabel = project.currentSetLabel
-        setTitle = project.currentSetTitle
+        progress = Double(project.progressPercent) / 100
+        currentSetLabel = project.currentSet.label
+        setTitle = project.currentSet.title
         variant = Self.variants[index % Self.variants.count]
-        isLearningEnabled = project.nextSetID != nil && project.nextQuestionID != nil
+        isLearningEnabled = project.next?.quizID != nil
     }
 
     // MARK: Internal
 
-    let projectID: String
+    let projectID: ProjectID
     let title: String
     let technologies: String
     let progress: Double

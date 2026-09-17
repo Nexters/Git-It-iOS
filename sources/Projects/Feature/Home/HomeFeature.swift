@@ -1,6 +1,7 @@
 import ComposableArchitecture
-import DomainLearningProject
-import DomainMember
+import DomainIdentifier
+import DomainProject
+import DomainUserInfo
 
 @Reducer
 public struct HomeFeature: Sendable {
@@ -8,13 +9,13 @@ public struct HomeFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjects: any FetchLearningProjectsUseCase,
-        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
-        trackGeneration: any TrackGenerationUseCase,
+        projects: @escaping @Sendable () async -> AsyncStream<ProjectList>,
+        refreshProjects: @escaping @Sendable () async throws -> Void,
+        profile: @escaping @Sendable () async throws -> UserProfile,
     ) {
-        self.fetchLearningProjects = fetchLearningProjects
-        self.fetchMemberProfile = fetchMemberProfile
-        self.trackGeneration = trackGeneration
+        self.projects = projects
+        self.refreshProjects = refreshProjects
+        self.profile = profile
     }
 
     // MARK: Public
@@ -31,15 +32,15 @@ public struct HomeFeature: Sendable {
         public enum ProfileLoad: Equatable, Sendable {
             case idle
             case loading
-            case loaded(MemberProfile)
-            case failed(MemberError)
+            case loaded(UserProfile)
+            case failed(UserInfoError)
         }
 
         public enum ProjectLoad: Equatable, Sendable {
             case idle
             case loading
-            case loaded(LearningProjectPage)
-            case failed(LearningProjectError)
+            case loaded(ProjectList)
+            case failed(ProjectError)
 
             var isLoaded: Bool {
                 if case .loaded = self {
@@ -53,10 +54,6 @@ public struct HomeFeature: Sendable {
         public var projectLoad = ProjectLoad.idle
         public var profileRequestID = 0
         public var projectRequestID = 0
-
-        public var isProjectRefreshPending = false
-
-        public var appliedOutcomeProjectIDs = Set<String>()
 
         public var isGenerationInProgress = false
 
@@ -77,8 +74,8 @@ public struct HomeFeature: Sendable {
             case projectRetryTapped
             case projectRegistrationTapped
             case showAllProjectsTapped
-            case projectCardTapped(projectID: String)
-            case learningTapped(projectID: String)
+            case projectCardTapped(projectID: ProjectID)
+            case learningTapped(projectID: ProjectID)
         }
 
         @CasePathable
@@ -89,16 +86,16 @@ public struct HomeFeature: Sendable {
 
         @CasePathable
         public enum Effect: Equatable, Sendable {
-            case profileLoadFinished(requestID: Int, result: Result<MemberProfile, MemberError>)
-            case projectsLoadFinished(requestID: Int, result: Result<LearningProjectPage, LearningProjectError>)
-            case generationOutcomeReceived(GenerationOutcome)
+            case profileLoadFinished(requestID: Int, result: Result<UserProfile, UserInfoError>)
+            case projectsReceived(ProjectList)
+            case refreshFinished(requestID: Int, error: ProjectError?)
         }
 
         @CasePathable
         public enum Delegate: Equatable, Sendable {
             case projectRegistrationRequested
-            case projectDetailRequested(projectID: String)
-            case learningRequested(projectID: String, nextSetID: String)
+            case projectDetailRequested(projectID: ProjectID)
+            case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
         }
     }
 
@@ -110,18 +107,12 @@ public struct HomeFeature: Sendable {
                 if state.profileLoad == .idle {
                     effects.append(startProfileLoad(state: &state))
                 }
-                if state.projectLoad == .idle {
-                    effects.append(startProjectLoad(state: &state))
-                }
-                effects.append(startGenerationOutcomeObservation())
+                effects.append(observeProjects())
+                effects.append(startRefresh(state: &state))
                 return .merge(effects)
 
             case .input(.learningProjectsReloadRequested):
-                guard state.projectLoad != .loading else {
-                    state.isProjectRefreshPending = true
-                    return .none
-                }
-                return startProjectLoad(state: &state)
+                return startRefresh(state: &state)
 
             case .view(.profileRetryTapped):
                 guard case .failed = state.profileLoad else { return .none }
@@ -129,7 +120,7 @@ public struct HomeFeature: Sendable {
 
             case .view(.projectRetryTapped):
                 guard case .failed = state.projectLoad else { return .none }
-                return startProjectLoad(state: &state)
+                return startRefresh(state: &state)
 
             case .input(.generationProgressChanged(let isInProgress)):
                 state.isGenerationInProgress = isInProgress
@@ -147,13 +138,13 @@ public struct HomeFeature: Sendable {
 
             case .view(.learningTapped(let projectID)):
                 guard
-                    case .loaded(let page) = state.projectLoad,
-                    let project = page.items.first(where: { $0.projectID == projectID }),
-                    let nextSetID = project.nextSetID,
-                    project.nextQuestionID != nil
+                    case .loaded(let list) = state.projectLoad,
+                    let summary = list.summaries.first(where: { $0.id == projectID }),
+                    let next = summary.next,
+                    next.quizID != nil
                 else { return .none }
                 return .send(
-                    .delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID))
+                    .delegate(.learningRequested(projectID: projectID, nextSetID: next.setID))
                 )
 
             case .effect(.profileLoadFinished(let requestID, let result)):
@@ -164,29 +155,16 @@ public struct HomeFeature: Sendable {
                 }
                 return .none
 
-            case .effect(.projectsLoadFinished(let requestID, let result)):
+            case .effect(.projectsReceived(let list)):
+                guard list.isLoaded else { return .none }
+                state.projectLoad = .loaded(list)
+                return .none
+
+            case .effect(.refreshFinished(let requestID, let error)):
                 guard requestID == state.projectRequestID else { return .none }
-                switch result {
-                case .success(let page):
-                    state.projectLoad = .loaded(page)
-
-                case .failure(let error):
-                    if !state.projectLoad.isLoaded {
-                        state.projectLoad = .failed(error)
-                    }
-                }
-
-                guard state.isProjectRefreshPending else { return .none }
-                state.isProjectRefreshPending = false
-                return startProjectLoad(state: &state)
-
-            case .effect(.generationOutcomeReceived(let outcome)):
-                guard state.appliedOutcomeProjectIDs.insert(outcome.projectID).inserted else { return .none }
-                guard state.projectLoad != .loading else {
-                    state.isProjectRefreshPending = true
-                    return .none
-                }
-                return startProjectLoad(state: &state)
+                guard let error, !state.projectLoad.isLoaded else { return .none }
+                state.projectLoad = .failed(error)
+                return .none
 
             case .delegate:
                 return .none
@@ -199,37 +177,23 @@ public struct HomeFeature: Sendable {
     private enum CancelID {
         case profile
         case projects
-        case generationOutcomes
+        case refresh
     }
 
-    private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
-    private let trackGeneration: any TrackGenerationUseCase
-
-    private static func outcome(from record: GenerationRecord) -> GenerationOutcome? {
-        guard let projectID = record.projectID else { return nil }
-        switch record.status {
-        case .inProgress:
-            return nil
-
-        case .completed:
-            return GenerationOutcome(projectID: projectID, status: .completed)
-
-        case .failed:
-            return GenerationOutcome(projectID: projectID, status: .failed)
-        }
-    }
+    private let projects: @Sendable () async -> AsyncStream<ProjectList>
+    private let refreshProjects: @Sendable () async throws -> Void
+    private let profile: @Sendable () async throws -> UserProfile
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1
         state.profileLoad = .loading
         let requestID = state.profileRequestID
-        let fetchMemberProfile = fetchMemberProfile
+        let profile = profile
 
         return .run { send in
             do {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .success(try await fetchMemberProfile()))))
-            } catch let error as MemberError {
+                await send(.effect(.profileLoadFinished(requestID: requestID, result: .success(try await profile()))))
+            } catch let error as UserInfoError {
                 await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(error))))
             } catch {
                 await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(.temporarilyUnavailable))))
@@ -238,40 +202,34 @@ public struct HomeFeature: Sendable {
         .cancellable(id: CancelID.profile, cancelInFlight: true)
     }
 
-    private func startProjectLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.projectRequestID += 1
-        if !state.projectLoad.isLoaded {
-            state.projectLoad = .loading
-        }
-        let requestID = state.projectRequestID
-        let fetchLearningProjects = fetchLearningProjects
-
+    private func observeProjects() -> ComposableArchitecture.Effect<Action> {
+        let projects = projects
         return .run { send in
-            do {
-                await send(.effect(.projectsLoadFinished(
-                    requestID: requestID,
-                    result: .success(try await fetchLearningProjects(page: LearningProjectPage.firstIndex)),
-                )))
-            } catch let error as LearningProjectError {
-                await send(.effect(.projectsLoadFinished(requestID: requestID, result: .failure(error))))
-            } catch {
-                await send(.effect(.projectsLoadFinished(requestID: requestID, result: .failure(.unexpected))))
+            for await list in await projects() {
+                await send(.effect(.projectsReceived(list)))
             }
         }
         .cancellable(id: CancelID.projects, cancelInFlight: true)
     }
 
-    private func startGenerationOutcomeObservation() -> ComposableArchitecture.Effect<Action> {
-        let trackGeneration = trackGeneration
+    private func startRefresh(state: inout State) -> ComposableArchitecture.Effect<Action> {
+        state.projectRequestID += 1
+        if !state.projectLoad.isLoaded {
+            state.projectLoad = .loading
+        }
+        let requestID = state.projectRequestID
+        let refreshProjects = refreshProjects
+
         return .run { send in
-            for await generationState in await trackGeneration.states() {
-                for record in generationState.records {
-                    guard let outcome = Self.outcome(from: record) else { continue }
-                    await send(.effect(.generationOutcomeReceived(outcome)))
-                }
+            do {
+                try await refreshProjects()
+                await send(.effect(.refreshFinished(requestID: requestID, error: nil)))
+            } catch {
+                let mapped = error as? ProjectError ?? .unexpected
+                await send(.effect(.refreshFinished(requestID: requestID, error: mapped)))
             }
         }
-        .cancellable(id: CancelID.generationOutcomes, cancelInFlight: true)
+        .cancellable(id: CancelID.refresh, cancelInFlight: true)
     }
 
 }

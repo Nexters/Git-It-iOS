@@ -1,4 +1,5 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
 import Foundation
 
 // MARK: - ProjectListDisplay
@@ -8,7 +9,7 @@ public struct ProjectListDisplay: Equatable, Sendable, Identifiable {
     // MARK: Lifecycle
 
     public init(
-        id: String,
+        id: ProjectID,
         name: String,
         supportingText: String,
         imageURL: String?,
@@ -27,7 +28,7 @@ public struct ProjectListDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Public
 
-    public let id: String
+    public let id: ProjectID
     public let name: String
     public let supportingText: String
     public let imageURL: String?
@@ -35,16 +36,16 @@ public struct ProjectListDisplay: Equatable, Sendable, Identifiable {
     public let currentSet: Int
     public let setTitle: String
 
-    public static func list(projects: [LearningProjectSummary]) -> [Self] {
+    public static func list(projects: [ProjectSummary]) -> [Self] {
         projects.map {
             Self(
-                id: $0.projectID,
+                id: $0.id,
                 name: $0.repositoryName,
                 supportingText: $0.techStack.joined(separator: " · "),
                 imageURL: $0.repositoryImageURL,
-                progress: Double($0.overallProgressPercent) / 100,
-                currentSet: setNumber(label: $0.currentSetLabel),
-                setTitle: $0.currentSetTitle,
+                progress: Double($0.progressPercent) / 100,
+                currentSet: setNumber(label: $0.currentSet.label),
+                setTitle: $0.currentSet.title,
             )
         }
     }

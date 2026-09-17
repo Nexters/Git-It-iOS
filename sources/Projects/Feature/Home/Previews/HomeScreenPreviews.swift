@@ -1,29 +1,32 @@
 import ComposableArchitecture
-import DomainLearningProject
-import DomainMember
+import DomainProject
+import DomainUserInfo
 import SwiftUI
 
 private enum HomePreviewFixture {
-    static let profile = MemberProfile(
-        name: "프로덕션에 푸시하는 고양이",
-        email: "cat@git-it.dev",
-        position: .ios,
-        careerLevel: .junior,
-        statistics: .init(thisWeekSolvedCount: 12, thisMonthSolvedCount: 9, streakDays: 3, weeklyCounts: []),
+    static let profile = UserProfile(
+        detail: UserDetail(
+            name: "프로덕션에 푸시하는 고양이",
+            email: "cat@git-it.dev",
+            statistics: .init(thisWeekSolvedCount: 12, thisMonthSolvedCount: 9, streakDays: 3, weeklyCounts: []),
+        ),
+        curation: Curation(position: .ios, careerLevel: .junior),
     )
 
-    static func project(_ index: Int) -> LearningProjectSummary {
-        LearningProjectSummary(
-            projectID: "preview-\(index)",
+    static func project(_ index: Int) -> ProjectSummary {
+        ProjectSummary(
+            id: "preview-\(index)",
             repositoryName: ["Nexters", "Now in Android", "Git It iOS"][index % 3],
             repositoryImageURL: nil,
             techStack: ["Swift", "SwiftUI", "TCA"],
-            currentSetLabel: "Set \(index + 1)",
-            currentSetTitle: "Presentation 구조",
-            nextSetID: "set-\(index)",
-            nextQuestionID: "question-\(index)",
-            overallProgressPercent: 25 * (index + 1),
+            currentSet: ProjectSetLabel(label: "Set \(index + 1)", title: "Presentation 구조"),
+            next: ProjectNextQuiz(setID: "set-\(index)", quizID: "quiz-\(index)"),
+            progressPercent: 25 * (index + 1),
         )
+    }
+
+    static func list(_ summaries: [ProjectSummary]) -> ProjectList {
+        ProjectList(summaries: summaries, hasNextPage: false, isLoaded: true)
     }
 
     @MainActor
@@ -46,21 +49,18 @@ private enum HomePreviewFixture {
     HomeScreen(
         store: HomePreviewFixture.store(
             projectLoad: .loaded(
-                .init(
-                    items: [
-                        HomePreviewFixture.project(0),
-                        HomePreviewFixture.project(1),
-                        HomePreviewFixture.project(2),
-                    ],
-                    hasNext: false,
-                )
+                HomePreviewFixture.list([
+                    HomePreviewFixture.project(0),
+                    HomePreviewFixture.project(1),
+                    HomePreviewFixture.project(2),
+                ])
             )
         )
     )
 }
 
 #Preview("Project Absent - 1542:19610") {
-    HomeScreen(store: HomePreviewFixture.store(projectLoad: .loaded(.init(items: [], hasNext: false))))
+    HomeScreen(store: HomePreviewFixture.store(projectLoad: .loaded(HomePreviewFixture.list([]))))
 }
 
 #Preview("Loading") {
@@ -74,7 +74,7 @@ private enum HomePreviewFixture {
 #Preview("Profile Failure") {
     HomeScreen(
         store: HomePreviewFixture.store(
-            projectLoad: .loaded(.init(items: [HomePreviewFixture.project(0)], hasNext: false)),
+            projectLoad: .loaded(HomePreviewFixture.list([HomePreviewFixture.project(0)])),
             profileLoad: .failed(.temporarilyUnavailable),
         )
     )

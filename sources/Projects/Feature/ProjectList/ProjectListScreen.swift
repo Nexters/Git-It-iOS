@@ -230,7 +230,7 @@ public struct ProjectListScreen: View {
     }
 
     private func rowAppeared(projectID: String) {
-        guard projectID == store.projects.last?.projectID else { return }
+        guard projectID == store.projects.last?.id else { return }
         send(.listBottomReached)
     }
 

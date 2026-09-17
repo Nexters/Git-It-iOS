@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainQuizDetail
 import Foundation
 
 // MARK: - ChoiceOptionDisplay
@@ -69,12 +69,12 @@ public struct ChoiceOptionDisplay: Equatable, Sendable, Identifiable {
     public static func answered(
         choices: [String],
         selectedIndex: Int?,
-        result: ChoiceAnswerResult,
+        grading: ChoiceGrading,
     ) -> [Self] {
         choices.enumerated().map { index, text in
             let isSelected = index == selectedIndex
             let emphasis: Emphasis =
-                if index == result.answerIndex {
+                if index == grading.correctIndex {
                     .correct
                 } else if isSelected {
                     .incorrect

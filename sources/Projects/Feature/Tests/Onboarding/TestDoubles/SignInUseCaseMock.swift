@@ -1,8 +1,7 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
 import Foundation
 
-actor SignInUseCaseMock: SignInUseCase {
+actor SignInUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -12,19 +11,23 @@ actor SignInUseCaseMock: SignInUseCase {
 
     // MARK: Internal
 
-    func callAsFunction(_ method: AuthenticationMethod) async -> SignInResult {
+    nonisolated var signIn: @Sendable (SignInMethod) async -> SignInResult {
+        { await self($0) }
+    }
+
+    func callAsFunction(_ method: SignInMethod) async -> SignInResult {
         calls.append(method)
         return nextResult()
     }
 
-    func snapshot() -> [AuthenticationMethod] {
+    func snapshot() -> [SignInMethod] {
         calls
     }
 
     // MARK: Private
 
     private var results: [SignInResult]
-    private var calls = [AuthenticationMethod]()
+    private var calls = [SignInMethod]()
 
     private func nextResult() -> SignInResult {
         guard !results.isEmpty else { return .retryableFailure }

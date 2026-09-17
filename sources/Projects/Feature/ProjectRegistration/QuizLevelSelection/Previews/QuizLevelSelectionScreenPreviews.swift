@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainProjectGeneration
 import SwiftUI
 import UIComponent
 

@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
 // MARK: - SingleQuestionEntryFeature
@@ -9,16 +10,16 @@ public struct SingleQuestionEntryFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(fetchLearningSet: @escaping @Sendable (String, String) async throws -> LearningSet) {
-        self.fetchLearningSet = fetchLearningSet
+    public init(fetchQuizSet: @escaping @Sendable (QuizSetID, ProjectID) async throws -> QuizSet) {
+        self.fetchQuizSet = fetchQuizSet
     }
 
     // MARK: Public
 
     public enum Preparation: Equatable, Sendable {
         case idle
-        case loading(questionID: String)
-        case failed(LearningProjectError)
+        case loading(questionID: QuizID)
+        case failed(QuizDetailError)
     }
 
     @ObservableState
@@ -26,13 +27,13 @@ public struct SingleQuestionEntryFeature: Sendable {
 
         // MARK: Lifecycle
 
-        public init(projectID: String) {
+        public init(projectID: ProjectID) {
             self.projectID = projectID
         }
 
         // MARK: Public
 
-        public let projectID: String
+        public let projectID: ProjectID
         public var preparation = Preparation.idle
 
         public var isPreparing: Bool {
@@ -42,7 +43,7 @@ public struct SingleQuestionEntryFeature: Sendable {
             return false
         }
 
-        public var preparationError: LearningProjectError? {
+        public var preparationError: QuizDetailError? {
             guard case .failed(let error) = preparation else { return nil }
             return error
         }
@@ -58,19 +59,19 @@ public struct SingleQuestionEntryFeature: Sendable {
 
         @CasePathable
         public enum Input: Sendable, Equatable {
-            case questionRequested(setID: String, questionID: String)
+            case questionRequested(setID: QuizSetID, questionID: QuizID)
             case failureDismissed
         }
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case setLoadFinished(questionID: String, result: Result<LearningSet, LearningProjectError>)
+            case setLoadFinished(questionID: QuizID, result: Result<QuizSet, QuizDetailError>)
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case questionPrepared(question: Question, projectID: String)
-            case preparationFailed(LearningProjectError)
+            case questionPrepared(question: Quiz, projectID: ProjectID)
+            case preparationFailed(QuizDetailError)
         }
     }
 
@@ -83,10 +84,10 @@ public struct SingleQuestionEntryFeature: Sendable {
                 let projectID = state.projectID
                 return .run { send in
                     do {
-                        let set = try await fetchLearningSet(projectID, setID)
+                        let set = try await fetchQuizSet(setID, projectID)
                         await send(.effect(.setLoadFinished(questionID: questionID, result: .success(set))))
                     } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
+                        let mapped = error as? QuizDetailError ?? .unexpected
                         await send(.effect(.setLoadFinished(questionID: questionID, result: .failure(mapped))))
                     }
                 }
@@ -104,12 +105,12 @@ public struct SingleQuestionEntryFeature: Sendable {
 
                 switch result {
                 case .success(let set):
-                    guard let question = set.questions.first(where: { $0.questionID == questionID }) else {
-                        state.preparation = .failed(.questionUnavailable)
-                        return .send(.delegate(.preparationFailed(.questionUnavailable)))
+                    guard let quiz = set.quizzes.first(where: { $0.id == questionID }) else {
+                        state.preparation = .failed(.quizUnavailable)
+                        return .send(.delegate(.preparationFailed(.quizUnavailable)))
                     }
                     state.preparation = .idle
-                    return .send(.delegate(.questionPrepared(question: question, projectID: state.projectID)))
+                    return .send(.delegate(.questionPrepared(question: quiz, projectID: state.projectID)))
 
                 case .failure(let error):
                     state.preparation = .failed(error)
@@ -128,6 +129,6 @@ public struct SingleQuestionEntryFeature: Sendable {
         case load
     }
 
-    private let fetchLearningSet: @Sendable (String, String) async throws -> LearningSet
+    private let fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet
 
 }

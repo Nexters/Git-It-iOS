@@ -1,8 +1,9 @@
-import DomainLearningProject
+import DomainExternalRepository
+import DomainIdentifier
 import Foundation
 
-struct NoopFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
-    func callAsFunction(url _: String) async throws -> ExternalRepository {
-        throw CancellationError()
+struct NoopExternalRepositoryUseCase: ExternalRepositoryUseCase {
+    func repository(at _: ExternalRepositoryURL) async throws -> ExternalRepository {
+        throw ExternalRepositoryError.other
     }
 }

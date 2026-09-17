@@ -1,11 +1,11 @@
-import DomainMember
+import DomainUserInfo
 
 actor HomeMemberProfileUseCaseMock {
 
     // MARK: Lifecycle
 
     init(
-        results: [Result<MemberProfile, MemberError>] = [.failure(.temporarilyUnavailable)],
+        results: [Result<UserProfile, UserInfoError>] = [.failure(.temporarilyUnavailable)],
         suspendsRequests: Bool = false,
     ) {
         self.results = results
@@ -14,11 +14,11 @@ actor HomeMemberProfileUseCaseMock {
 
     // MARK: Internal
 
-    nonisolated var fetchProfile: @Sendable () async throws -> MemberProfile {
+    nonisolated var fetchProfile: @Sendable () async throws -> UserProfile {
         { try await self() }
     }
 
-    func callAsFunction() async throws -> MemberProfile {
+    func callAsFunction() async throws -> UserProfile {
         callCount += 1
         let result = nextResult()
         guard suspendsRequests else { return try result.get() }
@@ -40,12 +40,15 @@ actor HomeMemberProfileUseCaseMock {
 
     // MARK: Private
 
-    private var results: [Result<MemberProfile, MemberError>]
+    private var results: [Result<UserProfile, UserInfoError>]
     private let suspendsRequests: Bool
     private var callCount = 0
-    private var continuations = [(CheckedContinuation<MemberProfile, any Error>, Result<MemberProfile, MemberError>)]()
+    private var continuations = [(
+        CheckedContinuation<UserProfile, any Error>,
+        Result<UserProfile, UserInfoError>,
+    )]()
 
-    private func nextResult() -> Result<MemberProfile, MemberError> {
+    private func nextResult() -> Result<UserProfile, UserInfoError> {
         guard !results.isEmpty else { return .failure(.temporarilyUnavailable) }
         return results.count > 1 ? results.removeFirst() : results[0]
     }

@@ -1,4 +1,4 @@
-import DomainAuthentication
+import DomainAccount
 import Foundation
 
 // MARK: - PolicyManifestLoader
@@ -30,7 +30,7 @@ enum PolicyManifestLoader {
                 throw LoadError.invalidApprovedURL(identifier: entry.identifier)
             }
             return PolicyDocument(
-                identifier: entry.identifier,
+                id: entry.identifier,
                 displayName: entry.displayName,
                 version: entry.version,
                 approvedURL: approvedURL,

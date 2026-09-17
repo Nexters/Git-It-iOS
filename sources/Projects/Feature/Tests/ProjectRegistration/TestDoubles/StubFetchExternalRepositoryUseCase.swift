@@ -1,6 +1,7 @@
-import DomainLearningProject
+import DomainExternalRepository
+import DomainIdentifier
 
-actor StubFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
+actor StubFetchExternalRepositoryUseCase: ExternalRepositoryUseCase {
 
     // MARK: Lifecycle
 
@@ -14,8 +15,9 @@ actor StubFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
 
     // MARK: Internal
 
-    func callAsFunction(url _: String) async throws -> ExternalRepository {
+    func repository(at url: ExternalRepositoryURL) async throws -> ExternalRepository {
         callCount += 1
+        requestedURLs.append(url)
         let result = nextResult()
         guard suspendsRequests else { return try result.get() }
 
@@ -26,6 +28,10 @@ actor StubFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
 
     func snapshot() -> (callCount: Int, pendingCount: Int) {
         (callCount, continuations.count)
+    }
+
+    func requestedURLSnapshot() -> [ExternalRepositoryURL] {
+        requestedURLs
     }
 
     func resumeOldest() {
@@ -45,6 +51,7 @@ actor StubFetchExternalRepositoryUseCase: FetchExternalRepositoryUseCase {
     private var results: [Result<ExternalRepository, ExternalRepositoryError>]
     private let suspendsRequests: Bool
     private var callCount = 0
+    private var requestedURLs = [ExternalRepositoryURL]()
     private var continuations = [(
         CheckedContinuation<ExternalRepository, any Error>,
         Result<ExternalRepository, ExternalRepositoryError>,

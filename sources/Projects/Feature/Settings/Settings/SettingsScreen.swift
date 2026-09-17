@@ -42,7 +42,7 @@ public struct SettingsScreen: View {
             VStack(alignment: .leading, spacing: 10) {
                 Self.SectionView(title: Constant.learningSectionTitle) {
                     SettingRow(
-                        value: PositionDisplay.settingValue(for: store.profile?.position),
+                        value: PositionDisplay.settingValue(for: store.profile?.curation?.position),
                         content: {
                             Self.SettingRowContent(icon: .settingDevelop, title: Constant.positionTitle)
                         },
@@ -51,7 +51,7 @@ public struct SettingsScreen: View {
                         },
                     )
                     SettingRow(
-                        value: CareerLevelDisplay.settingValue(for: store.profile?.careerLevel),
+                        value: CareerLevelDisplay.settingValue(for: store.profile?.curation?.careerLevel),
                         content: {
                             Self.SettingRowContent(icon: .settingLevel, title: Constant.careerLevelTitle)
                         },

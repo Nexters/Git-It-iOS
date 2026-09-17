@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DomainProject
 import Testing
 
 @testable import Feature
@@ -33,7 +34,7 @@ struct HomeFeatureNavigationTests {
     }
 
     @Test
-    func `유효한 세 ID만 학습 delegate로 전달한다`() async {
+    func `적재된 목록에서 다음 퀴즈가 있는 프로젝트만 학습 delegate로 전달한다`() async {
         var state = HomeFeature.State()
         state.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
         let store = makeStore(state: state)
@@ -45,14 +46,36 @@ struct HomeFeatureNavigationTests {
         await store.send(.view(.learningTapped(projectID: "missing")))
     }
 
+    @Test
+    func `다음 퀴즈가 없는 프로젝트는 학습 delegate를 전달하지 않는다`() async {
+        var state = HomeFeature.State()
+        state.projectLoad = .loaded(ProjectList(
+            summaries: [HomeTestFixture.project(index: 0, hasLearningIDs: false)],
+            hasNextPage: false,
+            isLoaded: true,
+        ))
+        let store = makeStore(state: state)
+
+        await store.send(.view(.learningTapped(projectID: "project-0")))
+    }
+
+    @Test
+    func `목록이 적재되기 전에는 학습 delegate를 전달하지 않는다`() async {
+        let store = makeStore()
+
+        await store.send(.view(.learningTapped(projectID: "project-0")))
+    }
+
     // MARK: Private
 
     private func makeStore(state: HomeFeature.State = .init()) -> TestStoreOf<HomeFeature> {
-        TestStore(initialState: state) {
+        let projects = HomeLearningProjectsUseCaseMock()
+        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        return TestStore(initialState: state) {
             HomeFeature(
-                fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: StubTrackGenerationUseCase(),
+                projects: { await projects.projects() },
+                refreshProjects: { try await projects.refresh() },
+                profile: profile.fetchProfile,
             )
         }
     }

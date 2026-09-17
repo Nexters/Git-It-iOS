@@ -1,10 +1,15 @@
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
 import Foundation
 
-struct NoopSignInUseCase: SignInUseCase {
-    func callAsFunction(_: AuthenticationMethod) async -> SignInResult {
-        .retryableFailure
+actor OpenExternalURLSpy {
+
+    private(set) var openedURLs = [URL]()
+
+    var callCount: Int {
+        openedURLs.count
     }
+
+    func callAsFunction(_ url: URL) {
+        openedURLs.append(url)
+    }
+
 }

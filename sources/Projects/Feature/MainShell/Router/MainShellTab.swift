@@ -1,8 +1,3 @@
-import ComposableArchitecture
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
-import Foundation
 import UIComponent
 
 public enum MainShellTab: String, CaseIterable, Hashable, Identifiable, Sendable, TabShellItem {

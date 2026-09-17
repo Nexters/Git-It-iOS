@@ -1,23 +1,40 @@
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
-struct NoopPolicyConsentUseCase: PolicyConsentUseCase {
-    func requiredDocuments() async throws -> [PolicyDocument] {
-        []
+struct NoopQuizDetailUseCase: QuizDetailUseCase {
+
+    func quizSet(
+        _: QuizSetID,
+        in _: ProjectID,
+    ) async throws -> QuizSet {
+        throw QuizDetailError.quizSetUnavailable
     }
 
-    func storedConsentRecords() async throws -> [PolicyConsentRecord] {
-        []
+    func grade(_: ChoiceAnswer) async throws -> ChoiceGrading {
+        throw QuizDetailError.temporarilyUnavailable
     }
 
-    func saveConsentRecords(_: [PolicyConsentRecord]) async throws { }
-    func clearConsentRecords() async throws { }
-    func isConsentValid(
-        storedRecords _: [PolicyConsentRecord],
-        for _: [PolicyDocument],
-    ) -> Bool {
-        false
+    func grade(_: EssayAnswer) async throws -> EssayGrading {
+        throw QuizDetailError.temporarilyUnavailable
     }
+
+    func bookmark(
+        _: QuizID,
+        in _: ProjectID,
+    ) async throws -> QuizBookmarkState {
+        throw QuizDetailError.temporarilyUnavailable
+    }
+
+    func unbookmark(
+        _: QuizID,
+        in _: ProjectID,
+    ) async throws -> QuizBookmarkState {
+        throw QuizDetailError.temporarilyUnavailable
+    }
+
+    func bookmarks(_: QuizBookmarkFilter) async throws -> QuizBookmarkList {
+        QuizBookmarkList(totalCount: 0, projects: [], bookmarks: [])
+    }
+
 }

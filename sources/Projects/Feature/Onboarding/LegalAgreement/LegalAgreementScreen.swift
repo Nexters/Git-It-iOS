@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
-import DomainAuthentication
+import DomainAccount
 import SwiftUI
 import UIComponent
 
@@ -24,13 +24,13 @@ struct LegalAgreementScreen: View {
                 )
 
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(store.requiredDocuments, id: \.identifier) { document in
+                    ForEach(store.requiredDocuments, id: \.id) { document in
                         PolicyAgreementRow(
                             title: document.displayName,
                             isRequired: document.isRequired,
-                            isSelected: store.selectedDocumentIDs.contains(document.identifier),
-                            onToggle: { send(.documentToggled(documentID: document.identifier)) },
-                            onOpenLink: { send(.documentLinkTapped(documentID: document.identifier)) },
+                            isSelected: store.selectedDocumentIDs.contains(document.id),
+                            onToggle: { send(.documentToggled(documentID: document.id)) },
+                            onOpenLink: { send(.documentLinkTapped(documentID: document.id)) },
                         )
                         .padding(.leading, Constant.documentRowLeadingPadding)
                     }
