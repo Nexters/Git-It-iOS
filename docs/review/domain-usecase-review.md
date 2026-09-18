@@ -6,6 +6,36 @@
 
 **대상** `sources/Projects/Domain` UseCase 26개 · **근거 시점** branch `feature/screen-type-refactor`, commit `bee2388`
 
+> **현재 상태 (2026-09-17)** — 점검 도중 기준 브랜치가 `feature/pending-repository-legacy-cleanup` @ `760e1e3`으로 바뀌었고, 명세 `033-usecase-consolidation` 적용으로 UseCase 프로토콜이 **26개 → 20개**가 되었습니다. 이후 논의에서 UseCase 전체를 다시 설계하기로 했으므로 이 문서의 역할을 다음과 같이 나눕니다.
+>
+> - **이 문서** — 지금까지의 판정·결정·미결 사항의 기록 (아래 [리뷰 진행 기록](#리뷰-진행-기록))
+> - **[UseCase 재설계 문서](domain-usecase-redesign.md)** — 현재 20개 인벤토리, 결정에서 도출한 설계 원칙, 모듈별 목표 구성안과 판정 대기 질문
+>
+> 개별 섹션 1–26과 테스트 보강 갭 1·2는 `bee2388` 구조 기준이라 현재 코드와 대상 타입이 다릅니다. 새 판정은 재설계 문서에서 진행합니다.
+
+## 리뷰 진행 기록
+
+| 일자 | 점검 | 결과 | 상세 |
+| --- | --- | --- | --- |
+| 2026-09-17 | 유형 A. 위임 9개 | **결정 확인** — 위임은 모듈 능력 단위 통합 계약으로 흡수 (명세 033으로 이미 구현). 9개 모두 처리 확인 | [A](#a-위임-9개) |
+| 2026-09-17 | 유형 A 부수 점검 | 불일치 4건 — A-1 `리팩터링`, A-4 `기록수정`, A-2·A-3 **판정 대기** | [A](#a-위임-9개) |
+| 2026-09-17 | H. Generation 책임 | **개발자 결정 D1–D8** — `QuizGenerationUseCase` 단일화, 알림 권한 분리, 알림 항상 등록, `states()` 단일화, 초기화 시 만료 정리, 확장 앱 동일 구현, `QuizGenerationReceipt`, `NotificationAuthorizationOutcome` 교정 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| 2026-09-17 | H 불일치 도출 | 14건 (P1 1건: 권한 허용 시에만 알림 등록) · 미결 H-Q5–Q9 · 교정안 승인 대기 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| 2026-09-17 | 전체 재설계 착수 | D1의 "비즈니스 개념 단위 단일 UseCase" 결정을 다른 모듈에도 적용할지 판정하기 위해 재설계 문서 작성 | [재설계 문서](domain-usecase-redesign.md) |
+
+### 판정 대기 목록
+
+| ID | 질문 | 출처 |
+| --- | --- | --- |
+| A-2 | 프로젝트 삭제가 조회 성격의 `LearningLibraryUseCase`에 있는 것이 의도인가 | [A](#a-위임-9개) |
+| A-3 | `completeCuration`이 필드 수정과 다른 직렬화 키를 써서 같은 필드를 두고 동시에 실행될 수 있는 것이 의도인가 | [A](#a-위임-9개) |
+| D8 | `NotificationAuthorizationStatus` 교정안 승인 | [H](#notificationauthorizationoutcome-교정안) |
+| H-Q5 | 목록 필터가 생성 상태를 저장소에서 직접 읽는 구조를 유지할지 | [H](#미결-사항) |
+| H-Q6 | 탈퇴 시 생성 기록 전체 정리 경로 | [H](#미결-사항) |
+| H-Q7 | 대기 화면 종료 후 기록 해제가 비즈니스 규칙인지, 실행 중 만료 기록 처리 | [H](#미결-사항) |
+| H-Q8 | 알림 권한 UseCase 소속 모듈 | [H](#미결-사항) |
+| H-Q9 | 알림 예약 직전 권한 확인 제거 여부 | [H](#미결-사항) |
+
 ## 사용법
 
 1. 각 UseCase 섹션의 **기록** 블록을 읽습니다 — 카탈로그에 적힌 책임 한 문장, 계약, 테스트가 보장한다고 적힌 것.
@@ -754,9 +784,35 @@
 
 - [ ] 변환도 검증도 없는 위임 UseCase를 **전부 유지**한다 — 이유:
 - [ ] **전부 걷어내고** 호출부가 Repository 계약을 직접 쓴다 — 영향 범위:
-- [ ] 기준을 세워 일부만 남긴다 — 기준:
+- [o] 기준을 세워 일부만 남긴다 — 기준: [domain.md「UseCase 분해 기준」](../package-rules/domain.md#usecase-분해-기준) (명세 `033-usecase-consolidation`)
 
-**결정**:
+**결정** (점검일 2026-09-17, 기준 브랜치 `feature/pending-repository-legacy-cleanup` @ `760e1e3`):
+판단·조율·보상·동시성 제어가 없고 계약 하나만 호출하는 위임은 독립 UseCase로 두지 않고, 같은 모듈의 **능력 단위 통합 계약**에 메서드로 흡수한다. 이 결정은 이미 명세 033으로 구현되어 있다.
+
+**9개 처리 결과 — 결정 대비 구현 일치 확인**
+
+| 카탈로그 UseCase | 현재 처리 | 결정과 일치 |
+| --- | --- | --- |
+| `FetchLearningProjectDetail` | `LearningLibraryUseCase.project(id:)` | `[o]` |
+| `DeleteLearningProject` | `LearningLibraryUseCase.deleteProject(id:)` | `[?]` A-2 |
+| `FetchLearningSet` | `LearningLibraryUseCase.learningSet(projectID:setID:)` | `[o]` |
+| `FetchBookmarkedQuestions` | `LearningLibraryUseCase.bookmarkedQuestions(projectID:)` | `[o]` |
+| `FetchMemberProfile` | `MemberAccountUseCase.profile()` | `[o]` |
+| `CompleteCuration` | `MemberAccountUseCase.completeCuration(...)` — key `"curation"`로 직렬화 | `[?]` A-3 |
+| `VerifyAccessToken` | 제거 (프로덕션 소비자 없음) | `[o]` |
+| `RegisterMemberDevice` | `RegisterCurrentDeviceUseCase`가 등록 정보 구성까지 맡아 흡수 | `[o]` |
+| `ObserveGenerationOutcomes` | `TrackGenerationUseCase.states()`로 흡수 | `[o]` |
+
+**점검 A에서 나온 불일치**
+
+| # | 기록된 동작 | 의도(결정 문서) | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| A-1 | `RefreshSession`이 `SingleFlightCoordinator`를 **public 생성자 인자**로 받는다 (기본값 새 인스턴스). 같은 명세에서 `SetQuestionBookmark`·`MemberAccount`의 직렬화기는 내부 상태로 흡수됨 | "실행 보장은 구현 내부 상태로 두고 직렬화 전용 타입을 생성자로 주입하지 않는다" | `리팩터링` | P3 |
+| A-2 | 삭제(변경)가 `LearningLibrary` 조회 능력 계약 안에 있다 | 판정 대기 | 판정 대기 | |
+| A-3 | `completeCuration`이 `"curation"` 키로 직렬화되어 `updatePosition`·`updateCareerLevel`과 같은 필드를 두고 동시에 실행될 수 있다 | 판정 대기 | 판정 대기 | |
+| A-4 | domain.md가 `SubmitChoiceAnswer`·`SubmitEssayAnswer`의 독립 유지 근거를 "제출 결과 **판정**을 수행한다"로 적었으나, 실제로는 제출 **전 입력 검증**만 하고 채점은 서버가 한다 (명세 033 `data-model.md`도 "제출 전 사전 검증"으로 기록) | 근거는 "제출 전 입력을 검증해 요청 여부를 판단한다" | `기록수정` | P3 |
+
+**부수 발견** — 이 점검표와 카탈로그는 commit `bee2388` 기준(UseCase 26개)이고, 현재 브랜치는 명세 033 적용 후 **프로토콜 20개**다. 개별 섹션 1–26은 재작성 전까지 구조가 현재와 다르다.
 
 ## B. 사전 검증 3개
 
@@ -818,6 +874,131 @@
 
 **결정**:
 
+## H. QuizGeneration 책임 단일화 — 개발자 결정
+
+관련 개별 점검: 14 `CreateLearningProject` · 24 `TrackGenerationProgress` · 25 `ObserveGenerationOutcomes` · 26 `RequestGenerationReminder`
+기준 브랜치 `feature/pending-repository-legacy-cleanup` @ `760e1e3`
+
+### 결정 (2026-09-17)
+
+| # | 결정 |
+| --- | --- |
+| D1 | Generation 비즈니스 로직은 **`QuizGenerationUseCase` 하나**가 책임진다. 지원 범위는 요청, 상태 추적, 알림 등록 |
+| D2 | **알림 권한은 별도 UseCase**가 책임진다. `QuizGenerationUseCase`는 권한을 요청하지도 확인하지도 않는다 |
+| D3 | 알림은 요청 성공 시 `request` **내부에서 항상 등록**한다. 알림 등록을 위한 별도 공개 호출은 없다 |
+| D4 | 상태는 `states()` 하나로 제공한다. `current()`는 `states()`의 첫 값과 중복이므로 두지 않는다 |
+| D5 | 오래된 상태의 검증·정리는 UseCase 내부 책임이다. **초기화 시** 만료된 기록을 검증하고 정리한다 |
+| D6 | 확장 앱은 메인 앱과 **같은 구현**을 쓴다. 차이는 알림 설정 안내 시트를 띄우지 않는다는 화면 동작뿐이다 |
+| D7 | 요청 결과 타입 `ProjectRegistrationReceipt` → **`QuizGenerationReceipt`** |
+| D8 | `NotificationAuthorizationOutcome`은 교정한다 — [교정안](#notificationauthorizationoutcome-교정안) |
+
+### 목표 계약
+
+```swift
+public protocol QuizGenerationUseCase: Sendable {
+    func request(githubRepoURL: String, quizLevel: QuizLevel) async throws -> QuizGenerationReceipt
+    func states() async -> AsyncStream<GenerationState>
+}
+```
+
+**계약이 보장하는 것**
+
+- `request` — 같은 레포지토리가 진행 중이면 서버 요청 없이 중복 오류를 던진다. 성공하면 기록에 projectID를 연결하고 알림 대상으로 등록한 뒤 영수증을 반환한다. 실패하면 기록을 해제하고 오류를 그대로 던진다
+- `states` — 구독 즉시 **현재 상태를 첫 값으로** 방출하고 이후 변경을 방출한다 (D4의 전제)
+
+**내부 책임** (공개하지 않음)
+
+| 책임 | 현재 위치 | 목표 |
+| --- | --- | --- |
+| 기록 시작·projectID 연결·해제 | `CreateLearningProject`, `TrackGeneration` 공개 메서드 | `request` 내부 단계 |
+| 결과 수신 → 완료·실패 반영 | `GenerationStateCoordinator` | 그대로 내부, 최초 사용 시 시작 |
+| 알림 대상 보관 | `ScheduleGenerationReminder` 메모리 집합 + 확장 앱 대기열 | 한 가지 방식으로 기록 — 확장 앱과 메인 앱이 같은 구현을 쓰므로(D6) 프로세스를 넘어 유지되어야 함 |
+| 완료 시 알림 예약 | `ScheduleGenerationReminder` (Composition이 관찰 시작) | 내부, 최초 사용 시 관찰 시작 |
+| 만료 기록 정리 | `AppRootFeature`(만료 판정) + `PendingGenerationRepositoryAdapter`(purge) | 초기화 시 내부에서 검증·정리 (D5) |
+
+### NotificationAuthorizationOutcome 교정안
+
+**문제**
+
+1. **소속** — `DomainLearningProject`에 있지만 학습 프로젝트 개념이 아니다. D2로 권한 책임이 분리되면 이 모듈에 남을 이유가 없다
+2. **의미 혼합** — `declined`(방금 거부)와 `previouslyDenied`(이미 거부)는 같은 "거부" 상태를 요청 시점 기준으로 쪼갠 것이다. 호출부 2곳(`SettingsFeature`, `QuizGenerationProgressFeature`)은 `.previouslyDenied`만 검사해 설정 이동 시트를 띄운다
+3. **중복 표현** — 같은 권한을 요청 결과는 3-case enum으로, 조회는 `isAuthorized() -> Bool`로 말한다
+
+**교정안**
+
+```swift
+public enum NotificationAuthorizationStatus: Equatable, Sendable {
+    case notDetermined
+    case authorized
+    case denied
+}
+
+public protocol NotificationAuthorizationUseCase: Sendable {
+    func status() async -> NotificationAuthorizationStatus
+    func request() async -> NotificationAuthorizationStatus
+}
+```
+
+| 현재 | 교정 후 |
+| --- | --- |
+| `isAuthorized() -> Bool` | `status() == .authorized` |
+| `requestAuthorization()` → `.authorized` | `request()` → `.authorized` |
+| `requestAuthorization()` → `.declined` | `status()`가 `.notDetermined`였고 `request()` → `.denied` |
+| `requestAuthorization()` → `.previouslyDenied` | `status()`가 이미 `.denied` → 요청하지 않고 설정 이동 안내 |
+
+- [ ] 교정안 승인
+- [ ] 수정 의견:
+
+### 현재 분산 지도
+
+| 책임 | 현재 담당 | 형태 |
+| --- | --- | --- |
+| 요청 | `CreateLearningProject` | 독립 UseCase. 저장소를 **직접** 호출해 시작·연결·해제 |
+| 상태 추적 | `TrackGeneration` (+ 내부 `GenerationStateCoordinator`) | 시작·연결·해제·`current`·`states`를 **공개** |
+| 알림 권한 + 등록 | `RequestGenerationReminder` | **권한 허용일 때만** 등록 |
+| 알림 보관·예약 | `ScheduleGenerationReminder` (actor) | `TrackGeneration`을 인자로 받아 관찰 |
+| 관찰 시작 | `GenerationReminderAssembly` | **Composition**이 두 UseCase를 연결 |
+| 요청 후 알림 등록 호출 | `QuizGenerationProgressFeature` | **Feature**가 요청 성공 뒤 별도 호출 |
+| 확장 앱 알림 등록 | `ShareRegistrationFeature` + `ShareExtensionComposition` | **Feature**가 권한 확인 후, **Composition**이 저장소 대기열에 직접 기록 |
+| 만료 판정·정리 | `AppRootFeature` | **App**이 `waitPolicy.isExpired`로 판정해 `end(githubRepoURL:)` 호출 |
+| 대기 화면 종료 후 해제 | `AppRootFeature` `generationReleased` | **App**이 `end(githubRepoURL:)` 호출 |
+| 탈퇴 시 전체 정리 | `AppComposition` → `MemberAssembly` | **Composition**이 `current()`를 돌며 `end` 호출 |
+
+### 결정 대비 불일치
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| H-1 | Generation 책임이 UseCase 4개에 나뉘어 있다 | `QuizGenerationUseCase` 1개 (D1) | `리팩터링` | P2 |
+| H-2 | 요청과 추적이 같은 저장소의 시작·연결·해제를 각자 호출한다 | `request` 내부 단계 | `리팩터링` | P2 |
+| H-3 | `begin`·`attachProjectID`·`end`×2·`current`가 공개되어 있다 | 공개는 `request`·`states`뿐 (D1, D4) | `제거` | P2 |
+| H-4 | 알림 관찰 시작을 Composition이 수행한다 | 내부에서 최초 사용 시 시작 | `책임이동` | P2 |
+| H-5 | 알림은 **권한 허용일 때만** 등록된다 (`RequestGenerationReminder`, `ShareRegistrationFeature`) | 요청 성공 시 **항상** 등록 (D3) | `리팩터링` (동작 변경) | P1 |
+| H-6 | Feature가 요청 뒤 알림 등록을 따로 호출한다 | `request` 내부에서 등록 (D3) | `제거` | P2 |
+| H-7 | 확장 앱은 Feature 권한 확인 + Composition 대기열 기록이라는 **다른 경로**를 쓴다 | 메인 앱과 같은 구현, 시트만 생략 (D6) | `책임이동` | P2 |
+| H-8 | App이 만료를 판정하고 정리한다 | 초기화 시 UseCase 내부에서 정리 (D5) | `책임이동` | P2 |
+| H-9 | `current()`와 `states()`가 공존한다 | `states()`만, 첫 값으로 현재 상태 (D4) | `제거` | P3 |
+| H-10 | `ProjectRegistrationReceipt` | `QuizGenerationReceipt` (D7) | `이름변경` | P3 |
+| H-11 | 권한 요청·조회가 `RequestGenerationReminder`에 있다 | `NotificationAuthorizationUseCase` (D2) | `책임이동` | P2 |
+| H-12 | `NotificationAuthorizationOutcome`의 소속·의미 혼합·중복 표현 | 교정안 (D8) | `리팩터링` | P2 |
+| H-13 | `GenerationReminderRegistration` 연결 계약 | 불필요 | `제거` | P3 |
+| H-14 | domain.md「독립 유지 18개」에 네 UseCase가 개별 기록 | `QuizGenerationUseCase`, `NotificationAuthorizationUseCase`로 기록 | `기록수정` | P3 |
+
+### 미결 사항
+
+- [ ] **H-Q5 목록 필터** — `FetchLearningProjects`는 생성 중 목록을 저장소에서 직접 읽는다. `QuizGenerationUseCase.states()`를 쓰게 할지, Generation 책임 밖(목록 조회 판단)으로 둘지
+- [ ] **H-Q6 탈퇴 시 전체 정리** — 공개 동작이 `request`·`states`뿐이면 탈퇴 정리 경로가 사라진다. 제안: 비즈니스 판단이 없는 로컬 데이터 삭제이므로 **탈퇴 정리에 주입되는 저장소 정리**로 처리
+- [ ] **H-Q7 대기 화면 종료 후 해제** — App이 대기 화면을 닫을 때 기록을 해제한다. 이것이 비즈니스 규칙(확인한 기록은 지운다)인지 화면 규칙인지. 초기화 시에만 정리하면(D5) **앱 실행 중 만료된 기록이 대기 표시로 남을 수 있다** — `states()`가 만료 기록을 제외하고 방출할지 함께 판정
+- [ ] **H-Q8 권한 UseCase 소속 모듈** — 제안: 알림 권한은 학습 프로젝트·회원·인증 어디에도 속하지 않으므로 새 Domain target
+- [ ] **H-Q9 예약 시점 권한 확인** — 현재 예약기는 예약 직전 권한을 확인한다. D2를 엄격히 적용하면 이 확인도 없애고 OS가 미허용 알림을 표시하지 않는 동작에 맡긴다
+
+### 영향 범위
+
+- Domain: `CreateLearningProject`, `TrackGeneration`, `RequestGenerationReminder`, `ScheduleGenerationReminder`, `GenerationReminderRegistration` → `QuizGenerationUseCase` · `NotificationAuthorizationUseCase` · `NotificationAuthorizationStatus` · `QuizGenerationReceipt`, 각 테스트
+- Composition: `LearningProjectAssembly`, `GenerationReminderAssembly`, `AppComposition`, `ShareExtensionComposition`, `NotificationAuthorizationAdapter`, `PendingGenerationRepositoryAdapter`
+- Feature: `QuizGenerationProgressFeature`, `ProjectRegistrationRouterFeature`, `ShareRegistrationFeature`, `HomeFeature`, `MainShellRouterFeature`, `SettingsFeature`, `SettingsRouterFeature` 및 Test Double
+- App: `AppRootFeature`, `AppRootView` 및 Test Double
+- 문서: domain.md「통합 후 남은 UseCase」
+
 ---
 
 # 5. 테스트 보강 후보 (확정된 갭)
@@ -848,7 +1029,24 @@
 
 | # | 대상 UseCase | 불일치 요지 | 작업 구분 | 우선순위 | 상태 | 링크 |
 | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | |
+| H-1 | Generation 4개 | `QuizGenerationUseCase` 1개로 통합 | `리팩터링` | P2 | 미결 H-Q5–Q9 판정 대기 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| H-2 | `CreateLearningProject`, `TrackGeneration` | 시작·연결·해제를 `request` 내부로 | `리팩터링` | P2 | H-1에 포함 | |
+| H-3 | `TrackGeneration` | 공개 메서드를 `request`·`states`로 축소 | `제거` | P2 | H-1에 포함 | |
+| H-4 | `GenerationReminderAssembly` | 알림 관찰 시작을 UseCase 내부로 | `책임이동` | P2 | H-1에 포함 | |
+| H-5 | `RequestGenerationReminder`, `ShareRegistrationFeature` | 권한과 무관하게 요청 성공 시 항상 알림 등록 | `리팩터링` | P1 | H-Q9 판정 대기 | |
+| H-6 | `QuizGenerationProgressFeature` | 요청 뒤 별도 알림 등록 호출 제거 | `제거` | P2 | H-1에 포함 | |
+| H-7 | `ShareRegistrationFeature`, `ShareExtensionComposition` | 확장 앱을 메인 앱과 같은 구현으로, 시트만 생략 | `책임이동` | P2 | H-1에 포함 | |
+| H-8 | `AppRootFeature` | 만료 판정·정리를 초기화 시 내부로 | `책임이동` | P2 | H-Q7 판정 대기 | |
+| H-9 | `TrackGeneration` | `current()` 제거, `states()` 첫 값 보장 | `제거` | P3 | H-1에 포함 | |
+| H-10 | `ProjectRegistrationReceipt` | `QuizGenerationReceipt`로 이름 변경 | `이름변경` | P3 | | |
+| H-11 | `RequestGenerationReminder` | 권한 요청·조회를 `NotificationAuthorizationUseCase`로 | `책임이동` | P2 | H-Q8 판정 대기 | |
+| H-12 | `NotificationAuthorizationOutcome` | `NotificationAuthorizationStatus`로 교정 | `리팩터링` | P2 | 교정안 승인 대기 | |
+| H-13 | `GenerationReminderRegistration` | 연결 계약 제거 | `제거` | P3 | H-1에 포함 | |
+| H-14 | domain.md | 독립 유지 목록 갱신 | `기록수정` | P3 | 구현 후 | |
+| A-1 | `RefreshSession` | `SingleFlightCoordinator` 생성자 주입을 내부 상태로 | `리팩터링` | P3 | 재설계 Q-A3에 포함 | |
+| A-2 | `LearningLibraryUseCase` | 조회 계약 안의 프로젝트 삭제 배치 | 판정 대기 | | 재설계 Q-L1에 포함 | |
+| A-3 | `MemberAccountUseCase` | 큐레이션 완료와 필드 수정의 직렬화 키 분리 | 판정 대기 | | 재설계 Q-M1에 포함 | |
+| A-4 | domain.md | Submit 2종의 독립 유지 근거 문구 교정 | `기록수정` | P3 | | |
 
 **우선순위 기준** — P1: 사용자에게 잘못된 결과가 나가는 것 · P2: 의도한 기능이 없는 것 · P3: 구조·이름·문서
 
