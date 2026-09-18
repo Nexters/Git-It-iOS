@@ -18,7 +18,7 @@ struct RequestCredentialProviderTests {
     }
 
     @Test
-    func `저장 기록을 읽지 못하면 로그아웃 상태를 알린다`() async {
+    func `저장 기록을 읽지 못하면 로그아웃 상태를 알린다`() async throws {
         let storage = InMemorySecureValueStorage()
         try Self.store(Self.record(expiresAt: Self.now.addingTimeInterval(60)), in: storage)
         storage.fail(with: .unavailable)
