@@ -48,7 +48,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다`() async {
-        let signIn = AccountUseCaseSignInMock(results: [.retryableFailure])
+        let signIn = AccountUseCaseSignInMock(results: [.retryableFailure], suspendsRequests: true)
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -59,6 +59,7 @@ struct TutorialFeatureTests {
             $0.requestID = 1
         }
         await store.send(.view(.appleSignInTapped))
+        await signIn.resumeOldest()
         await store.receive(.effect(.signInFinished(requestID: 1, result: .retryableFailure))) {
             $0.authentication = .retryableFailure
         }
@@ -86,7 +87,7 @@ struct TutorialFeatureTests {
 
     @Test
     func `현재 requestID와 다른 로그인 응답은 상태를 바꾸지 않는다`() async {
-        let signIn = AccountUseCaseSignInMock(results: [.cancelled])
+        let signIn = AccountUseCaseSignInMock(results: [.cancelled], suspendsRequests: true)
         let store = makeTutorialStore(signIn: signIn)
 
         await store.send(.view(.appleSignInTapped))
@@ -97,6 +98,7 @@ struct TutorialFeatureTests {
             $0.requestID = 1
         }
         await store.send(.effect(.signInFinished(requestID: 999, result: .retryableFailure)))
+        await signIn.resumeOldest()
         await store.receive(.effect(.signInFinished(requestID: 1, result: .cancelled))) {
             $0.authentication = .cancelled
         }

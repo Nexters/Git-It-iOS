@@ -27,13 +27,14 @@ struct CareerSelectionFeatureTests {
         var state = CareerSelectionFeature.State()
         state.position = .ios
         state.careerLevel = .junior
-        let completeCuration = UserInfoUseCaseCurationMock(results: [.success(())])
+        let completeCuration = UserInfoUseCaseCurationMock(results: [.success(())], suspendsRequests: true)
         let store = makeCareerSelectionStore(completeCuration: completeCuration, state: state)
 
         await store.send(.view(.submitTapped)) {
             $0.submission = .submitting
         }
         await store.send(.view(.submitTapped))
+        await completeCuration.resumeOldest()
         await store.receive(.effect(.curationFinished(success: true))) {
             $0.submission = .idle
         }

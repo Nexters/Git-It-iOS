@@ -34,7 +34,7 @@ struct AppEntryFeatureTests {
 
     @Test
     func `스플래시 애니메이션이 먼저 끝나도 로그인 복구 완료 시점에 라우팅된다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut])
+        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -44,6 +44,7 @@ struct AppEntryFeatureTests {
         await store.send(.view(.splashAnimationFinished)) {
             $0.isSplashAnimationFinished = true
         }
+        await restoreSession.resumeOldest()
         await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
             $0.authentication = .idle
         }
@@ -172,7 +173,7 @@ struct AppEntryFeatureTests {
 
     @Test
     func `복구 중 재시도 탭은 무시되고 restoreSignIn을 추가로 호출하지 않는다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut])
+        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -180,6 +181,7 @@ struct AppEntryFeatureTests {
             $0.requestID = 1
         }
         await store.send(.view(.retryTapped))
+        await restoreSession.resumeOldest()
         await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
@@ -306,13 +308,15 @@ struct AppEntryFeatureTests {
 
     @Test
     func `현재 requestID와 다른 복구 응답은 상태를 바꾸지 않는다`() async {
-        let store = makeAppEntryStore(restoreSession: AccountUseCaseRestorationMock(results: [.signedOut]))
+        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
+        let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
             $0.authentication = .restoring
             $0.requestID = 1
         }
         await store.send(.effect(.restoreSignInFinished(requestID: 999, result: .signedOut)))
+        await restoreSession.resumeOldest()
         await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
@@ -326,7 +330,7 @@ struct AppEntryFeatureTests {
 
     @Test
     func `애니메이션 완료 신호가 중복으로 와도 라우팅은 한 번만 일어난다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut])
+        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -336,6 +340,7 @@ struct AppEntryFeatureTests {
         await store.send(.view(.splashAnimationFinished)) {
             $0.isSplashAnimationFinished = true
         }
+        await restoreSession.resumeOldest()
         await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
             $0.authentication = .idle
         }

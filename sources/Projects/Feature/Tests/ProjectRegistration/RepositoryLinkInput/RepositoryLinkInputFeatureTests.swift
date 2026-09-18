@@ -72,7 +72,8 @@ struct RepositoryLinkInputFeatureTests {
 
     @Test
     func `늦게 도착한 validationRequestID 불일치 응답은 최신 상태를 덮어쓰지 않는다`() async {
-        let store = makeRepositoryLinkInputStore()
+        let externalRepository = ExternalRepositoryUseCaseStub(suspendsRequests: true)
+        let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
 
         await store.send(.view(.repositoryURLChanged("https://github.com/owner/repo"))) {
             $0.repositoryURLInput = "https://github.com/owner/repo"
@@ -87,6 +88,11 @@ struct RepositoryLinkInputFeatureTests {
         await store.send(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository))))
 
         #expect(store.state.validation == .validating)
+
+        await externalRepository.resumeOldest()
+        await externalRepository.resumeOldest()
+        await store.skipReceivedActions(strict: false)
+        await store.finish()
     }
 
     @Test
