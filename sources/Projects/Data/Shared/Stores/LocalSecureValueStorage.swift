@@ -25,7 +25,10 @@ struct LocalSecureValueStorage: SecureValueStorage {
         }
     }
 
-    func setData(_ data: Data, forKey key: String) throws(SecureValueStorageError) {
+    func setData(
+        _ data: Data,
+        forKey key: String,
+    ) throws(SecureValueStorageError) {
         do {
             try keychainStore.save(data, for: key, in: namespace)
         } catch {

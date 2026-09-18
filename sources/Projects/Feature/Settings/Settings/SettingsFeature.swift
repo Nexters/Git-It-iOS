@@ -353,8 +353,9 @@ extension UserProfile {
         position: MemberPosition? = nil,
         careerLevel: CareerLevel? = nil,
     ) -> UserProfile {
-        guard let position = position ?? curation?.position,
-              let careerLevel = careerLevel ?? curation?.careerLevel
+        guard
+            let position = position ?? curation?.position,
+            let careerLevel = careerLevel ?? curation?.careerLevel
         else {
             return self
         }

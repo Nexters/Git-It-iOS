@@ -19,7 +19,10 @@ final class InMemorySecureValueStorage: SecureValueStorage {
         return values.withLock { $0[key] }
     }
 
-    func setData(_ data: Data, forKey key: String) throws(SecureValueStorageError) {
+    func setData(
+        _ data: Data,
+        forKey key: String,
+    ) throws(SecureValueStorageError) {
         try throwIfFailing()
         values.withLock { $0[key] = data }
     }

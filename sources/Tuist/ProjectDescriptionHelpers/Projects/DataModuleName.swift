@@ -20,6 +20,8 @@ enum DataModuleName: String, CaseIterable {
 }
 
 extension DataModuleName {
+    static let packageName = "GitItData"
+
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Data.rawValue)
         return switch self {
@@ -43,8 +45,6 @@ extension DataModuleName {
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
-
-    static let packageName = "GitItData"
 
     var target: Target {
         switch self {

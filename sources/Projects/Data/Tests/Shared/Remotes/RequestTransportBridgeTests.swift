@@ -55,12 +55,12 @@ struct RequestTransportBridgeTests {
     func `전송 오류를 같은 의미의 요청 오류로 바꾼다`(
         transportError: RequestTransportError,
         clientError: HTTPClientError,
-    ) async {
+    ) async throws {
         let bridge = RequestTransportBridge(transport: StubRequestTransport(result: .failure(transportError)))
 
         await #expect(throws: clientError) {
             _ = try await bridge.send(HTTPTransportRequest(
-                url: URL(string: "https://api.example.com/items")!,
+                url: try #require(URL(string: "https://api.example.com/items")),
                 method: .get,
                 headers: [:],
                 body: nil,
@@ -71,7 +71,7 @@ struct RequestTransportBridgeTests {
 
     // MARK: Private
 
-    private struct EmptyBody: Decodable, Sendable {}
+    private struct EmptyBody: Decodable, Sendable { }
 
     private static func makeClient(transport: StubRequestTransport) -> HTTPClient {
         RequestClientFactory.makeClient(

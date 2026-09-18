@@ -51,7 +51,7 @@ struct PendingGenerationRepositoryAdapterTests {
             return await group.reduce(into: [Bool]()) { $0.append($1) }
         }
 
-        #expect(results.filter { $0 }.count == 1)
+        #expect(results.count(where: { $0 }) == 1)
     }
 
     @Test

@@ -7,7 +7,7 @@ import Testing
 struct AuthenticationAssemblyTests {
 
     @Test
-    func `저장된 세션이 없으면 요청 자격이 signedOut이다`() async throws {
+    func `저장된 세션이 없으면 요청 자격이 signedOut이다`() async {
         let assembly = AuthenticationAssembly(
             secureStorage: InMemorySecureValueStorage(),
             sharedStorage: InMemoryKeyValueStorage(),
@@ -17,7 +17,7 @@ struct AuthenticationAssemblyTests {
     }
 
     @Test
-    func `저장된 세션이 없으면 공유 세션 표시를 로그아웃으로 기록한다`() async throws {
+    func `저장된 세션이 없으면 공유 세션 표시를 로그아웃으로 기록한다`() async {
         let sharedStorage = InMemoryKeyValueStorage()
         let assembly = AuthenticationAssembly(
             secureStorage: InMemorySecureValueStorage(),

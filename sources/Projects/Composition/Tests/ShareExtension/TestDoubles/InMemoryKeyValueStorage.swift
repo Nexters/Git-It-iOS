@@ -8,12 +8,18 @@ final class InMemoryKeyValueStorage: KeyValueStorage {
 
     // MARK: Internal
 
-    func value<Value: Codable & Sendable>(_: Value.Type, forKey key: String) async -> Value? {
+    func value<Value: Codable & Sendable>(
+        _: Value.Type,
+        forKey key: String,
+    ) async -> Value? {
         guard let data = values.withLock({ $0[key] }) else { return nil }
         return try? JSONDecoder().decode(Value.self, from: data)
     }
 
-    func setValue(_ value: some Codable & Sendable, forKey key: String) async {
+    func setValue(
+        _ value: some Codable & Sendable,
+        forKey key: String,
+    ) async {
         guard let data = try? JSONEncoder().encode(value) else { return }
         values.withLock { $0[key] = data }
     }

@@ -31,7 +31,10 @@ struct LearningProjectRequestExecutorTests {
     @Test
     func `응답이 401이면 인증 정보 거부를 한 번 알리고 재요청하지 않는다`() async throws {
         let transport = StubHTTPTransport(results: [
-            .response(Self.jsonResponse(statusCode: 401, envelope: #"{"success":false,"data":null,"code":"AUTH-001","message":"unauthorized","errors":null}"#))
+            .response(Self.jsonResponse(
+                statusCode: 401,
+                envelope: #"{"success":false,"data":null,"code":"AUTH-001","message":"unauthorized","errors":null}"#,
+            ))
         ])
         let rejections = Mutex(0)
         let remote = Self.makeRemote(

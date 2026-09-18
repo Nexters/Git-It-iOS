@@ -3,7 +3,7 @@ import InfrastructureStorage
 
 // MARK: - LocalKeyValueStorage
 
-struct LocalKeyValueStorage: KeyValueStorage, @unchecked Sendable {
+struct LocalKeyValueStorage: KeyValueStorage {
 
     // MARK: Lifecycle
 
@@ -17,11 +17,17 @@ struct LocalKeyValueStorage: KeyValueStorage, @unchecked Sendable {
 
     // MARK: Internal
 
-    func value<Value: Codable & Sendable>(_: Value.Type, forKey key: String) async -> Value? {
+    func value<Value: Codable & Sendable>(
+        _: Value.Type,
+        forKey key: String,
+    ) async -> Value? {
         await store(of: Value.self).value(forKey: key)
     }
 
-    func setValue<Value: Codable & Sendable>(_ value: Value, forKey key: String) async {
+    func setValue<Value: Codable & Sendable>(
+        _ value: Value,
+        forKey key: String,
+    ) async {
         await store(of: Value.self).store(value, forKey: key)
     }
 

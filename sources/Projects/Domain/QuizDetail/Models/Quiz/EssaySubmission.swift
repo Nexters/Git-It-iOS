@@ -3,7 +3,7 @@ public struct EssaySubmission: Equatable, Sendable {
     // MARK: Lifecycle
 
     public init(
-        text: String,
+        text: String
     ) {
         self.text = text
     }

@@ -2,8 +2,6 @@
 
 actor SpyAnswerRepository: AnswerRepository {
 
-    // MARK: Internal
-
     private(set) var choiceAnswers = [ChoiceAnswer]()
     private(set) var essayAnswers = [EssayAnswer]()
 

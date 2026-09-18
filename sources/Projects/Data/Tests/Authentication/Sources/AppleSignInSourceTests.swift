@@ -83,15 +83,6 @@ struct AppleSignInSourceTests {
 
     // MARK: Private
 
-    private func makeSource(
-        authorize: @escaping @Sendable () async throws -> AppleCredential
-    ) -> AppleSignInSource {
-        AppleSignInSource(
-            authorize: authorize,
-            credentialState: { _ in .authorized },
-        )
-    }
-
     private static func makeCredential(identityToken: Data?) -> AppleCredential {
         AppleCredential(
             userID: "apple-user-1",
@@ -99,6 +90,15 @@ struct AppleSignInSourceTests {
             authorizationCode: Data("code-1".utf8),
             email: nil,
             fullName: nil,
+        )
+    }
+
+    private func makeSource(
+        authorize: @escaping @Sendable () async throws -> AppleCredential
+    ) -> AppleSignInSource {
+        AppleSignInSource(
+            authorize: authorize,
+            credentialState: { _ in .authorized },
         )
     }
 

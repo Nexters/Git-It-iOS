@@ -1,6 +1,9 @@
 import ProjectDescription
 
 extension Target {
+
+    // MARK: Internal
+
     static func module(
         name: String,
         sourceDirectory: String,
@@ -31,11 +34,6 @@ extension Target {
                 ]) { current, _ in current }
             ),
         )
-    }
-
-    private static func packageNameSettings(_ packageName: String?) -> SettingsDictionary {
-        guard let packageName else { return [:] }
-        return ["OTHER_SWIFT_FLAGS": "$(inherited) -package-name \(packageName)"]
     }
 
     static func internalStaticModule(
@@ -142,4 +140,12 @@ extension Target {
             ),
         )
     }
+
+    // MARK: Private
+
+    private static func packageNameSettings(_ packageName: String?) -> SettingsDictionary {
+        guard let packageName else { return [:] }
+        return ["OTHER_SWIFT_FLAGS": "$(inherited) -package-name \(packageName)"]
+    }
+
 }

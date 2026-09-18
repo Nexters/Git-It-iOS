@@ -10,7 +10,7 @@ public struct AppSetting: AppSettingUseCase {
         osVersion: String,
         deviceToken: @escaping @Sendable () async throws -> DeviceToken,
     ) {
-        self.authorization = notificationAuthorization
+        authorization = notificationAuthorization
         self.deviceRegistrationRepository = deviceRegistrationRepository
         self.deviceIdentifierRepository = deviceIdentifierRepository
         self.appVersion = appVersion
