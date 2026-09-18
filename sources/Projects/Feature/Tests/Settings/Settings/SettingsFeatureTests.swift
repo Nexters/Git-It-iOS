@@ -20,12 +20,12 @@ struct SettingsFeatureTests {
         await store.send(.view(.task)) {
             $0.profileLoad = .loading
         }
+        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
+            $0.notificationStatus = .denied
+        }
         await store.receive(.effect(.profileLoadFinished(.success(SettingsTestFixture.curatedProfile)))) {
             $0.profile = SettingsTestFixture.curatedProfile
             $0.profileLoad = .loaded
-        }
-        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
-            $0.notificationStatus = .denied
         }
 
         #expect(await fetchMemberProfile.snapshot() == 1)
@@ -40,11 +40,11 @@ struct SettingsFeatureTests {
         await store.send(.view(.task)) {
             $0.profileLoad = .loading
         }
-        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
-            $0.profileLoad = .failed(.temporarilyUnavailable)
-        }
         await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
             $0.notificationStatus = .denied
+        }
+        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
+            $0.profileLoad = .failed(.temporarilyUnavailable)
         }
 
         #expect(store.state.profile == nil)
@@ -57,11 +57,11 @@ struct SettingsFeatureTests {
         await store.send(.view(.task)) {
             $0.profileLoad = .loading
         }
-        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
-            $0.profileLoad = .failed(.temporarilyUnavailable)
-        }
         await store.receive(.effect(.notificationAuthorizationChecked(.authorized))) {
             $0.notificationStatus = .allowed
+        }
+        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
+            $0.profileLoad = .failed(.temporarilyUnavailable)
         }
     }
 
