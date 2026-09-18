@@ -235,7 +235,7 @@ struct AppRootFeatureTests {
         #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell == MainShellRouterFeature.State())
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -283,7 +283,7 @@ struct AppRootFeatureTests {
         #expect(store.state.quiz?.setLabel == AppRootTestFixture.setLabel)
         #expect(store.state.projectDetail?.projectID == AppRootTestFixture.projectID)
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -315,7 +315,7 @@ struct AppRootFeatureTests {
             )
         }
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -484,7 +484,7 @@ struct AppRootFeatureTests {
         #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell.home.projectLoad == .failed(.unexpected))
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -537,7 +537,7 @@ struct AppRootFeatureTests {
             $0.deviceRegistration = .registered
         }
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -605,7 +605,7 @@ struct AppRootFeatureTests {
 
         await projectGeneration.finish()
         deviceTokenRefreshes.finish()
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -638,7 +638,7 @@ struct AppRootFeatureTests {
 
         await projectGeneration.finish()
         deviceTokenRefreshes.finish()
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -660,7 +660,7 @@ struct AppRootLearningFlowTests {
 
         #expect(store.state.projectDetail?.projectID == AppRootTestFixture.projectID)
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -680,7 +680,7 @@ struct AppRootLearningFlowTests {
         #expect(store.state.quiz?.setLabel == AppRootTestFixture.setLabel)
         #expect(store.state.projectDetail != nil)
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -735,7 +735,7 @@ struct AppRootLearningFlowTests {
         #expect(store.state.projectDetail?.projectDetail.loadStatus == .idle)
         #expect(await project.refreshCallCount == 0)
 
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 

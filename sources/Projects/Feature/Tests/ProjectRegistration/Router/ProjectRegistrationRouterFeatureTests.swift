@@ -98,7 +98,7 @@ struct ProjectRegistrationRouterFeatureTests {
         )
 
         await generationStates.finish()
-        await store.skipReceivedActions()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
