@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("AppEntryFeature 목적지 판단")
 struct AppEntryFeatureTests {
 

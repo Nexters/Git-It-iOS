@@ -18,6 +18,7 @@ let sampleReceipt = ProjectGenerationReceipt(
     quizLevel: .l1,
 )
 
+@MainActor
 func makeRepositoryLinkInputStore(
     externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
     state: RepositoryLinkInputFeature.State = RepositoryLinkInputFeature.State(),
@@ -27,12 +28,14 @@ func makeRepositoryLinkInputStore(
     }
 }
 
+@MainActor
 func makeQuizLevelSelectionStore(
     state: QuizLevelSelectionFeature.State = QuizLevelSelectionFeature.State()
 ) -> TestStoreOf<QuizLevelSelectionFeature> {
     TestStore(initialState: state) { QuizLevelSelectionFeature() }
 }
 
+@MainActor
 func makeQuizGenerationProgressStore(
     projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),
     appSetting: AppSettingUseCaseStub = AppSettingUseCaseStub(),
@@ -50,6 +53,7 @@ func makeQuizGenerationProgressStore(
     }
 }
 
+@MainActor
 func makeProjectRegistrationRouterStore(
     externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
     projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),

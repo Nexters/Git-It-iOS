@@ -5,6 +5,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectDetailFeature 상세 표시와 메뉴")
 struct ProjectDetailFeatureTests {
 

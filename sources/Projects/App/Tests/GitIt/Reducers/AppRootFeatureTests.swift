@@ -9,10 +9,9 @@ import Testing
 
 // MARK: - AppRootFeatureTests
 
+@MainActor
 @Suite("AppRootFeature root 전환")
 struct AppRootFeatureTests {
-
-    // MARK: Internal
 
     @Test
     func `launch task는 route를 즉시 바꾸지 않고 appEntry task를 전달한다`() async {

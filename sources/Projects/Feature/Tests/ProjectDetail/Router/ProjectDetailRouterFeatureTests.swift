@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectDetailRouterFeature 화면 전환과 위임")
 struct ProjectDetailRouterFeatureTests {
 

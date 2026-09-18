@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectRegistrationRouterFeature 화면 전환")
 struct ProjectRegistrationRouterFeatureTests {
 

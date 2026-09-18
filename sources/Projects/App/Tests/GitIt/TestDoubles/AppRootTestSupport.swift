@@ -107,6 +107,7 @@ enum AppRootTestFixture {
 
 }
 
+@MainActor
 func makeAppRootStore(
     account: AccountUseCaseMock = AccountUseCaseMock(),
     userInfo: UserInfoUseCaseMock = UserInfoUseCaseMock(),

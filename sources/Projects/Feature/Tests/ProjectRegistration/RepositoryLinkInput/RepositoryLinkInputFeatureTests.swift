@@ -6,6 +6,7 @@ import Testing
 
 // MARK: - RepositoryLinkInputFeatureTests
 
+@MainActor
 @Suite("RepositoryLinkInputFeature")
 struct RepositoryLinkInputFeatureTests {
 

@@ -4,6 +4,7 @@ import DomainUserInfo
 import Foundation
 @testable import Feature
 
+@MainActor
 func makeAppEntryStore(
     restoreSession: AccountUseCaseRestorationMock = AccountUseCaseRestorationMock(),
     fetchMemberProfile: UserInfoUseCaseProfileMock = UserInfoUseCaseProfileMock(),
@@ -19,6 +20,7 @@ func makeAppEntryStore(
     }
 }
 
+@MainActor
 func makeTutorialStore(
     signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
     accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
@@ -34,6 +36,7 @@ func makeTutorialStore(
     }
 }
 
+@MainActor
 func makeLegalAgreementStore(
     policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
     state: LegalAgreementFeature.State = LegalAgreementFeature.State(),
@@ -46,6 +49,7 @@ func makeLegalAgreementStore(
     }
 }
 
+@MainActor
 func makePositionSelectionStore(
     signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
     state: PositionSelectionFeature.State = PositionSelectionFeature.State(),
@@ -55,6 +59,7 @@ func makePositionSelectionStore(
     }
 }
 
+@MainActor
 func makeCareerSelectionStore(
     completeCuration: UserInfoUseCaseCurationMock = UserInfoUseCaseCurationMock(),
     state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
@@ -64,6 +69,7 @@ func makeCareerSelectionStore(
     }
 }
 
+@MainActor
 func makeOnboardingExitStore(
     state: OnboardingExitFeature.State = OnboardingExitFeature.State()
 ) -> TestStoreOf<OnboardingExitFeature> {
@@ -72,6 +78,7 @@ func makeOnboardingExitStore(
     }
 }
 
+@MainActor
 func makeOnboardingRouterStore(
     signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
     signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),

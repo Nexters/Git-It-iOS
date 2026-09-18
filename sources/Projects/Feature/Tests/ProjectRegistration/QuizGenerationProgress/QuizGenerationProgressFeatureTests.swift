@@ -5,6 +5,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("QuizGenerationProgressFeature 생성 요청과 대기")
 struct QuizGenerationProgressFeatureTests {
 

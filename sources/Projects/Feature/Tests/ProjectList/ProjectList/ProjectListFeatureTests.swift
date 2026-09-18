@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectListFeature 프로젝트 목록")
 struct ProjectListFeatureTests {
 

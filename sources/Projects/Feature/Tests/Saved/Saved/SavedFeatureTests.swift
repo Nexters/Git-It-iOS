@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("SavedFeature 저장한 문제 목록")
 struct SavedFeatureTests {
 

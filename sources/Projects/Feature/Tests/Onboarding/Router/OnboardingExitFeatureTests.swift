@@ -2,6 +2,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("OnboardingExitFeature")
 struct OnboardingExitFeatureTests {
 

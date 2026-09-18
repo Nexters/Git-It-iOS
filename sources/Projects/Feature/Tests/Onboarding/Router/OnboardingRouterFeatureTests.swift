@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("OnboardingRouterFeature 화면 조합과 이동 추적")
 struct OnboardingRouterFeatureTests {
 

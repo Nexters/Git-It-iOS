@@ -3,6 +3,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("CareerSelectionFeature")
 struct CareerSelectionFeatureTests {
 

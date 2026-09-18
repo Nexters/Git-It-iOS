@@ -5,6 +5,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("QuestionSolvingFeature 답안 제출과 결과")
 struct QuestionSolvingFeatureTests {
 

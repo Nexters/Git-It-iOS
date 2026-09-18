@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("PositionSelectionFeature")
 struct PositionSelectionFeatureTests {
 

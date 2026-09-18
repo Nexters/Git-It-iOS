@@ -3,6 +3,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("SingleQuestionEntryFeature 단일 문제 준비")
 struct SingleQuestionEntryFeatureTests {
 

@@ -3,6 +3,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("QuizRouterFeature 화면 전환과 완료 카운터")
 struct QuizRouterFeatureTests {
 

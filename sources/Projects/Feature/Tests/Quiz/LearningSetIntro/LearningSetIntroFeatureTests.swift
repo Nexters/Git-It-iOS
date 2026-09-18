@@ -4,6 +4,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("LearningSetIntroFeature 세트 조회와 시작")
 struct LearningSetIntroFeatureTests {
 
