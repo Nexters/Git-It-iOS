@@ -19,19 +19,31 @@ public struct MainShellRouter: View {
     @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
-        TabShell(selected: selectedTab) { tab in
+        TabShell(selected: selectedTab, isEnabled: isTabEnabled) { tab in
             switch tab {
             case .home:
                 HomeScreen(store: store.scope(state: \.home, action: \.home))
 
             case .projects:
-                ProjectListScreen(store: store.scope(state: \.projectList, action: \.projectList))
+                if store.access == .member {
+                    ProjectListScreen(store: store.scope(state: \.projectList, action: \.projectList))
+                } else {
+                    ScreenContainer { EmptyView() }
+                }
 
             case .saved:
-                SavedScreen(store: store.scope(state: \.saved, action: \.saved))
+                if store.access == .member {
+                    SavedScreen(store: store.scope(state: \.saved, action: \.saved))
+                } else {
+                    ScreenContainer { EmptyView() }
+                }
 
             case .settings:
-                SettingsRouter(store: store.scope(state: \.settings, action: \.settings))
+                if store.access == .member {
+                    SettingsRouter(store: store.scope(state: \.settings, action: \.settings))
+                } else {
+                    Self.SignInPromptView(onSignIn: { send(.signInTapped) })
+                }
             }
         }
         .overlay {
@@ -47,15 +59,65 @@ public struct MainShellRouter: View {
             Text("잠시 후 다시 시도해 주세요.")
         }
         .overlay { singleQuestionOverlay }
+        .overlay { guestLegalAgreementOverlay }
+        .overlay { guestLegalDocumentOverlay }
+        .alert("로그인하지 못했어요", isPresented: guestSignInFailureBinding) {
+            Button("확인", role: .cancel) {
+                store.send(.guestSignIn(.view(.failureDismissed)))
+            }
+        } message: {
+            Text("잠시 후 다시 시도해 주세요.")
+        }
     }
 
     // MARK: Private
+
+    private var isTabEnabled: (MainShellTab) -> Bool {
+        let access = store.access
+        return { access == .member || ($0 != .projects && $0 != .saved) }
+    }
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(
             get: { store.selectedTab },
             set: { send(.tabSelected($0)) },
         )
+    }
+
+    private var guestSignInFailureBinding: Binding<Bool> {
+        Binding(
+            get: { store.guestSignIn.isFailureAlertPresented },
+            set: { isPresented in
+                guard !isPresented else { return }
+                store.send(.guestSignIn(.view(.failureDismissed)))
+            },
+        )
+    }
+
+    private var guestLegalAgreementOverlay: some View {
+        ModalOverlay(
+            isPresented: store.guestSignIn.isLegalAgreementPresented,
+            onDismiss: { store.send(.guestSignIn(.view(.legalAgreementDismissed))) },
+        ) {
+            LegalAgreementScreen(
+                store: store.scope(state: \.guestSignIn.legalAgreement, action: \.guestSignIn.legalAgreement)
+            )
+        }
+    }
+
+    private var guestLegalDocumentOverlay: some View {
+        ModalOverlay(
+            isPresented: store.guestSignIn.legalAgreement.presentedDocument != nil,
+            onDismiss: { store.send(.guestSignIn(.view(.legalDocumentSheetDismissed))) },
+        ) {
+            if let document = store.guestSignIn.legalAgreement.presentedDocument {
+                WebSheet(
+                    title: document.displayName,
+                    url: document.approvedURL,
+                    onDismiss: { store.send(.guestSignIn(.view(.legalDocumentSheetDismissed))) },
+                )
+            }
+        }
     }
 
     private var entryFailureBinding: Binding<Bool> {

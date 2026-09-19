@@ -32,8 +32,12 @@ public struct MainShellRouterFeature: Sendable {
 
     @ObservableState
     public struct State: Equatable, Sendable {
-        public init() { }
+        public init(access: MainShellAccess = .member) {
+            self.access = access
+            home.access = access
+        }
 
+        public var access: MainShellAccess
         public var selectedTab = MainShellTab.home
         public var home = HomeFeature.State()
         public var projectList = ProjectListFeature.State()
@@ -41,6 +45,7 @@ public struct MainShellRouterFeature: Sendable {
         public var settings = SettingsRouterFeature.State()
         public var singleQuestionEntry: SingleQuestionEntryFeature.State?
         @Presents public var singleQuestion: QuestionSolvingFeature.State?
+        public var guestSignIn = GuestSignInFeature.State()
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -53,17 +58,20 @@ public struct MainShellRouterFeature: Sendable {
         case settings(SettingsRouterFeature.Action)
         case singleQuestionEntry(SingleQuestionEntryFeature.Action)
         case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
+        case guestSignIn(GuestSignInFeature.Action)
 
         // MARK: Public
 
         @CasePathable
         public enum Input: Sendable, Equatable {
             case learningProjectsReloadRequested
+            case memberAccessGranted
         }
 
         @CasePathable
         public enum View: Sendable, Equatable {
             case tabSelected(MainShellTab)
+            case signInTapped
         }
 
         @CasePathable
@@ -73,6 +81,7 @@ public struct MainShellRouterFeature: Sendable {
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
             case externalURLRequested(URL)
             case loggedOut
+            case signInSucceeded(needsCuration: Bool)
         }
     }
 
@@ -112,16 +121,45 @@ public struct MainShellRouterFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
+        Scope(state: \.guestSignIn, action: \.guestSignIn) {
+            GuestSignInFeature(
+                signIn: { [account] in await account.signIn(with: $0) },
+                policyConsentStatus: { [account] in try await account.policyConsentStatus() },
+                consent: { [account] in try await account.consent(to: $0) },
+            )
+        }
         Reduce { state, action in
             switch action {
             case .input(.learningProjectsReloadRequested):
+                guard state.access == .member else { return .none }
                 return reloadLearningProjects()
 
+            case .input(.memberAccessGranted):
+                guard state.access == .guest else { return .none }
+                state.access = .member
+                return .merge(
+                    .send(.home(.input(.accessChanged(.member)))),
+                    .send(.projectList(.input(.learningProjectsReloadRequested))),
+                )
+
             case .view(.tabSelected(let tab)):
+                guard state.access == .member else {
+                    guard tab == .home || tab == .settings else { return .none }
+                    state.selectedTab = tab
+                    return .none
+                }
                 state.selectedTab = tab
                 return reloadLearningProjects()
 
-            case .home(.view(.showAllProjectsTapped)):
+            case .view(.signInTapped),
+                 .home(.delegate(.signInRequested)):
+                guard state.access == .guest else { return .none }
+                return .send(.guestSignIn(.input(.start)))
+
+            case .guestSignIn(.delegate(.signedIn(let needsCuration))):
+                return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
+
+            case .home(.delegate(.allProjectsRequested)):
                 state.selectedTab = .projects
                 return reloadLearningProjects()
 
@@ -184,6 +222,7 @@ public struct MainShellRouterFeature: Sendable {
                  .settings,
                  .singleQuestionEntry,
                  .singleQuestion,
+                 .guestSignIn,
                  .delegate:
                 return .none
             }

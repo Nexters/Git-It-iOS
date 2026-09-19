@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainAccount
 import DomainAppSetting
 import Testing
 
@@ -42,7 +41,7 @@ struct MainShellRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        await store.send(.home(.view(.showAllProjectsTapped))) {
+        await store.send(.home(.delegate(.allProjectsRequested))) {
             $0.selectedTab = .projects
         }
         await store.finish()
@@ -161,47 +160,6 @@ struct MainShellRouterFeatureTests {
             )
         }
     }
-
-}
-
-// MARK: - MainShellAccountUseCaseStub
-
-private struct MainShellAccountUseCaseStub: AccountUseCase {
-
-    func signIn(with method: SignInMethod) async -> SignInResult {
-        _ = method
-        return .retryableFailure
-    }
-
-    func signOut() async -> SignOutResult {
-        .signedOut
-    }
-
-    func signInStates() async -> AsyncStream<SignInState> {
-        AsyncStream { $0.finish() }
-    }
-
-    func restoreSignIn() async -> SignInRestoration {
-        .signedOut
-    }
-
-    func verifySignIn() async -> SignInVerification {
-        .valid
-    }
-
-    func signInAvailability() async -> SignInAvailability {
-        .signedIn
-    }
-
-    func policyConsentStatus() async throws -> PolicyConsentStatus {
-        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
-    }
-
-    func consent(to documentIDs: [PolicyDocumentID]) async throws {
-        _ = documentIDs
-    }
-
-    func withdraw() async throws { }
 
 }
 
