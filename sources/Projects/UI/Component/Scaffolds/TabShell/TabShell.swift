@@ -8,9 +8,11 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     public init(
         selected: Binding<Item>,
+        isEnabled: @escaping (Item) -> Bool = { _ in true },
         @ViewBuilder content: @escaping (Item) -> Content,
     ) {
         _selected = selected
+        self.isEnabled = isEnabled
         self.content = content
     }
 
@@ -19,13 +21,14 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
     public var body: some View {
         TabView(selection: $selected) {
             ForEach(Item.allCases) { item in
-                content(item)
-                    .tabItem {
-                        Image(item.tabSystemImage, bundle: .module)
-                            .padding(.bottom, LayoutToken.tightSpacing)
-                        Text.designSystemStyled(item.tabTitle, style: .tabItem)
-                    }
-                    .tag(item)
+                Tab(value: item) {
+                    content(item)
+                } label: {
+                    Image(item.tabSystemImage, bundle: .module)
+                        .padding(.bottom, LayoutToken.tightSpacing)
+                    Text.designSystemStyled(item.tabTitle, style: .tabItem)
+                }
+                .disabled(!isEnabled(item))
             }
         }
         .tint(Color(designSystem: .blue100))
@@ -33,6 +36,10 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
             UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .blue100))
         }
     }
+
+    // MARK: Internal
+
+    let isEnabled: (Item) -> Bool
 
     // MARK: Private
 
@@ -44,6 +51,17 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
 #Preview("Tab Shell") {
     TabShell(selected: .constant(TabShellPreviewItem.home)) { _ in
+        ScreenContainer {
+            StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
+        }
+    }
+}
+
+#Preview("Tab Shell - disabled item") {
+    TabShell(
+        selected: .constant(TabShellPreviewItem.home),
+        isEnabled: { $0 != .saved },
+    ) { _ in
         ScreenContainer {
             StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
         }
