@@ -93,6 +93,8 @@ public struct OnboardingRouterFeature: Sendable {
         case exit(OnboardingExitFeature.Action)
         case delegate(Delegate)
 
+        // MARK: Public
+
         @CasePathable
         public enum View: Sendable, Equatable {
             case curationSplashFinished

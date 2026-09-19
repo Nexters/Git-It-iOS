@@ -8,7 +8,10 @@ enum HomeProjectSectionState: Equatable, Sendable {
 
     // MARK: Lifecycle
 
-    init(_ projectLoad: HomeFeature.State.ProjectLoad, access: MainShellAccess) {
+    init(
+        _ projectLoad: HomeFeature.State.ProjectLoad,
+        access: MainShellAccess,
+    ) {
         guard access == .member else {
             self = .signInRequired
             return

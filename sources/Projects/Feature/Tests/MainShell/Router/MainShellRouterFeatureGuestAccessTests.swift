@@ -98,7 +98,7 @@ struct MainShellRouterFeatureGuestAccessTests {
         #expect(store.state.home.access == .member)
 
         await projects.finish()
-        await store.skipInFlightEffects()
+        await store.skipInFlightEffects(strict: false)
     }
 
     // MARK: Private

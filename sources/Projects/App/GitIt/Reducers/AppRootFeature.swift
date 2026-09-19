@@ -170,7 +170,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .effect(.signInVerified(.reauthenticationRequired)):
-                guard state.route == .mainShell else { return .none }
+                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
                 return returnToOnboarding(&state)
 
             case .effect(.signInVerified):
@@ -178,12 +178,42 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .onboarding(.delegate(.mainShellRequested)):
                 state.route = .mainShell
-                return registerDeviceIfNeeded(&state)
+                guard state.mainShell.access == .guest else { return registerDeviceIfNeeded(&state) }
+                return .merge(
+                    .send(.mainShell(.input(.memberAccessGranted))),
+                    registerDeviceIfNeeded(&state),
+                )
+
+            case .onboarding(.delegate(.guestAccessRequested)):
+                state.mainShell = MainShellRouterFeature.State(access: .guest)
+                state.route = .mainShell
+                return .none
+
+            case .onboarding(.delegate(.curationAbandoned)):
+                state.route = .mainShell
+                return .none
+
+            case .mainShell(.delegate(.signInSucceeded(let needsCuration))):
+                guard needsCuration else {
+                    return .merge(
+                        .send(.mainShell(.input(.memberAccessGranted))),
+                        registerDeviceIfNeeded(&state),
+                    )
+                }
+                let bundleVersion = state.onboarding.tutorial.bundleVersion
+                state.onboarding = OnboardingRouterFeature.State(
+                    startingAt: .curation,
+                    bundleVersion: bundleVersion,
+                    curationExit: .returnToCaller,
+                )
+                state.route = .onboarding
+                return .none
 
             case .mainShell(.delegate(.loggedOut)):
                 return returnToOnboarding(&state)
 
             case .view(.applicationBecameActive):
+                guard state.mainShell.access == .member else { return .none }
                 var effects: [Effect<Action>] = [
                     .run { [account] send in
                         await send(.effect(.signInVerified(account.verifySignIn())))
@@ -198,7 +228,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return .merge(effects)
 
             case .effect(.deviceTokenRefreshed(let token)):
-                guard state.route == .mainShell else { return .none }
+                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
                 return .merge(
                     .run { [appSetting] _ in try? await appSetting.updateDeviceToken(token) },
                     registerDeviceIfNeeded(&state),

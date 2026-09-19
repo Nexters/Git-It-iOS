@@ -220,12 +220,12 @@ Apple 로그인을 진행한다.
 
 ### 테스트
 
-- [ ] T034 [S1] [S4] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureGuestAccessTests.swift`를 만들고 `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`의 `makeAppRootStore`와 기존 대역으로 다음을 검증한다: 온보딩의 비로그인 진입 요청은 비로그인 메인 화면으로 이동하고 기기 등록을 하지 않는다, 비로그인에서 앱이 다시 활성화되면 로그인 검증·재조회·기기 등록을 하지 않고 메인 화면을 유지한다, 비로그인에서 재인증 필요 결과를 받아도 온보딩으로 돌아가지 않는다, 비로그인에서 기기 토큰 갱신을 무시한다, 추가 입력이 필요 없는 로그인 성공은 선택 탭을 유지한 채 로그인 사용자 메인 화면으로 바꾸고 기기를 등록한다, 직군·연차가 필요한 로그인 성공은 호출자 복귀 모드의 직군 선택 온보딩으로 이동하고 메인 화면 상태를 유지한다, 직군 선택을 중단하면 비로그인 메인 화면으로 돌아간다, 직군·연차 완료 후 메인 화면은 로그인 사용자로 바뀌고 선택 탭을 유지한다, 로그인 사용자의 로그아웃은 기존대로 튜토리얼 첫 면으로 이동한다
-- [ ] T035 [S1] [S4] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 [contracts/feature-actions.md AppRootFeature](./contracts/feature-actions.md#approotfeature-app-내부) 표의 처리를 구현한다: `onboarding(.delegate(.guestAccessRequested))`, `onboarding(.delegate(.curationAbandoned))`, `mainShell(.delegate(.signInSucceeded(needsCuration:)))`, `onboarding(.delegate(.mainShellRequested))`의 비로그인 분기, `applicationBecameActive`·`signInVerified(.reauthenticationRequired)`·`deviceTokenRefreshed`의 `state.mainShell.access == .guest` 가드. 기존 로그인 사용자 분기와 `returnToOnboarding`은 변경하지 않는다
+- [X] T034 [S1] [S4] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureGuestAccessTests.swift`를 만들고 `sources/Projects/App/Tests/GitIt/TestDoubles/AppRootTestSupport.swift`의 `makeAppRootStore`와 기존 대역으로 다음을 검증한다: 온보딩의 비로그인 진입 요청은 비로그인 메인 화면으로 이동하고 기기 등록을 하지 않는다, 비로그인에서 앱이 다시 활성화되면 로그인 검증·재조회·기기 등록을 하지 않고 메인 화면을 유지한다, 비로그인에서 재인증 필요 결과를 받아도 온보딩으로 돌아가지 않는다, 비로그인에서 기기 토큰 갱신을 무시한다, 추가 입력이 필요 없는 로그인 성공은 선택 탭을 유지한 채 로그인 사용자 메인 화면으로 바꾸고 기기를 등록한다, 직군·연차가 필요한 로그인 성공은 호출자 복귀 모드의 직군 선택 온보딩으로 이동하고 메인 화면 상태를 유지한다, 직군 선택을 중단하면 비로그인 메인 화면으로 돌아간다, 직군·연차 완료 후 메인 화면은 로그인 사용자로 바뀌고 선택 탭을 유지한다, 로그인 사용자의 로그아웃은 기존대로 튜토리얼 첫 면으로 이동한다
+- [X] T035 [S1] [S4] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에 [contracts/feature-actions.md AppRootFeature](./contracts/feature-actions.md#approotfeature-app-내부) 표의 처리를 구현한다: `onboarding(.delegate(.guestAccessRequested))`, `onboarding(.delegate(.curationAbandoned))`, `mainShell(.delegate(.signInSucceeded(needsCuration:)))`, `onboarding(.delegate(.mainShellRequested))`의 비로그인 분기, `applicationBecameActive`·`signInVerified(.reauthenticationRequired)`·`deviceTokenRefreshed`의 `state.mainShell.access == .guest` 가드. 기존 로그인 사용자 분기와 `returnToOnboarding`은 변경하지 않는다
 
 ### 패키지 검증
 
-- [ ] T036 [no-write] `rg -n "guestAccessRequested|curationAbandoned|signInSucceeded|memberAccessGranted" sources/Projects/App sources/Projects/Feature`로 Feature의 새 delegate가 App에서 모두 처리되는지 확인하고, 사용자에게 `AppTests` scheme 실행을 확인 항목으로 보고한다
+- [X] T036 [no-write] `rg -n "guestAccessRequested|curationAbandoned|signInSucceeded|memberAccessGranted" sources/Projects/App sources/Projects/Feature`로 Feature의 새 delegate가 App에서 모두 처리되는지 확인하고, 사용자에게 `AppTests` scheme 실행을 확인 항목으로 보고한다
 
 **진행 점검**: T034~T036의 변경 파일과 검증 결과를 보고하고 전체 완료 검증으로 진행한다.
 
@@ -240,9 +240,9 @@ Apple 로그인을 진행한다.
 (`speckit.swift-format.run`)을 마친 뒤 그 단위를 최종 commit한다. 이미 파일 변경 단위가 모두 commit된 단순 재개에서는
 `tasks.md` 완료 표시를 위한 별도 최종 검증 단위를 둔다.
 
-- [ ] T037 [no-write] 사용자에게 `"$project_build_runner" build`, `compile`, `test`(7개 scheme) 실행을 요청하고 받은 결과를 기록한다. 실패가 있으면 원인 단위로 되돌아가 수정한다
-- [ ] T038 [no-write] [S1] [S2] [S3] [S4] [quickstart.md](./quickstart.md)의 수동 검증 1~10을 기준으로 시나리오별 수용 기준 충족 여부를 정리해 보고하고, 사용자가 시뮬레이터에서 확인할 항목(특히 SC-002 네트워크 요청 0건)을 명시한다
-- [ ] T039 [no-write] Constitution 원칙 3의 예외 기록을 PR 본문 초안으로 보고한다: 이유(실행기를 사용자가 직접 실행하는 운영 방침, pre-commit `build`·`compile` 비활성), 영향(U1~U5 개별 커밋은 컴파일·테스트 근거가 없어 중간 커밋 단독 checkout이 깨질 수 있음), 검증하지 못한 범위(T037에서 사용자가 보고하지 않은 scheme·단계, T038의 미확인 수동 항목)를 구분해 적는다. 같은 초안에 plan.md 복잡성 추적의 컨벤션 예외 2건(`legalAgreement` 항상 보유, `AccountUseCase` 스텁 승격)의 이유·영향, T002에서 research R5 대체안을 적용했다면 그 조건과 [ui-tab-shell 계약](./contracts/ui-tab-shell.md#대체안-적용-시-보장-범위)의 줄어든 보장, research R7의 Figma 근거 없는 배치(특히 튜토리얼 3면 `로그인 없이 둘러보기`)를 디자인 확인 대상으로 함께 적는다
+- [X] T037 [no-write] 사용자에게 `"$project_build_runner" build`, `compile`, `test`(7개 scheme) 실행을 요청하고 받은 결과를 기록한다. 실패가 있으면 원인 단위로 되돌아가 수정한다
+- [X] T038 [no-write] [S1] [S2] [S3] [S4] [quickstart.md](./quickstart.md)의 수동 검증 1~10을 기준으로 시나리오별 수용 기준 충족 여부를 정리해 보고하고, 사용자가 시뮬레이터에서 확인할 항목(특히 SC-002 네트워크 요청 0건)을 명시한다
+- [X] T039 [no-write] Constitution 원칙 3의 예외 기록을 PR 본문 초안으로 보고한다: 이유(실행기를 사용자가 직접 실행하는 운영 방침, pre-commit `build`·`compile` 비활성), 영향(U1~U5 개별 커밋은 컴파일·테스트 근거가 없어 중간 커밋 단독 checkout이 깨질 수 있음), 검증하지 못한 범위(T037에서 사용자가 보고하지 않은 scheme·단계, T038의 미확인 수동 항목)를 구분해 적는다. 같은 초안에 plan.md 복잡성 추적의 컨벤션 예외 2건(`legalAgreement` 항상 보유, `AccountUseCase` 스텁 승격)의 이유·영향, T002에서 research R5 대체안을 적용했다면 그 조건과 [ui-tab-shell 계약](./contracts/ui-tab-shell.md#대체안-적용-시-보장-범위)의 줄어든 보장, research R7의 Figma 근거 없는 배치(특히 튜토리얼 3면 `로그인 없이 둘러보기`)를 디자인 확인 대상으로 함께 적는다
 
 ## 의존성과 실행 순서
 

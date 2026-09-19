@@ -19,7 +19,8 @@ struct HomeProjectSectionStateTests {
 
     @Test
     func `항목이 있는 목록은 순서를 유지한 표시 값으로 변환한다`() {
-        guard case .loaded(let displays) = HomeProjectSectionState(.loaded(HomeTestFixture.manyProjectsPage), access: .member) else {
+        guard case .loaded(let displays) = HomeProjectSectionState(.loaded(HomeTestFixture.manyProjectsPage), access: .member)
+        else {
             Issue.record("loaded 상태가 아닙니다")
             return
         }
