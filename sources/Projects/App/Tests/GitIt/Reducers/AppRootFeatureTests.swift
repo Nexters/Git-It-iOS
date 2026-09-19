@@ -109,9 +109,9 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
+        await store.receive(\.appEntry.effect.restoreSignInFinished)
+        await store.receive(\.appEntry.effect.restoreSignInFinished)
         await store.send(.appEntry(.view(.splashAnimationFinished)))
-        await store.receive(\.appEntry.effect.restoreSignInFinished)
-        await store.receive(\.appEntry.effect.restoreSignInFinished)
 
         #expect(store.state.route == .restoring)
         #expect(store.state.appEntry.isShowingRecoverableError)

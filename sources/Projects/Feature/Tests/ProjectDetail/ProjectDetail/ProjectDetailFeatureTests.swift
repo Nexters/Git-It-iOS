@@ -94,13 +94,14 @@ struct ProjectDetailFeatureTests {
 
     @Test
     func `삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다`() async {
-        let deleteProject = ProjectUseCaseDeletionStub(results: [.success(())])
+        let deleteProject = ProjectUseCaseDeletionStub(results: [.success(())], suspendsRequests: true)
         let store = loadedStore(deleteProject: deleteProject)
         store.exhaustivity = .off
 
         await store.send(.view(.deleteTapped))
         await store.send(.view(.deletionConfirmed))
         await store.send(.view(.deletionConfirmed))
+        await deleteProject.resumeOldest()
         await store.receive(\.effect.deletionFinished)
         await store.receive(.delegate(.projectDeleted(projectID: ProjectDetailTestFixture.projectID)))
 

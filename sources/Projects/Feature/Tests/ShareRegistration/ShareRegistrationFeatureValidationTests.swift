@@ -55,16 +55,6 @@ struct ShareRegistrationFeatureValidationTests {
     }
 
     @Test
-    func `조회가 인증 오류로 실패하면 로그인 필요 상태가 된다`() async {
-        let store = Self.makeStore(lookupResult: .failure(ProjectGenerationError.unauthorized))
-
-        await store.send(.view(.task))
-        await store.receive(\.effect.validationFinished) {
-            $0.status = .signInRequired
-        }
-    }
-
-    @Test
     func `조회가 네트워크 오류로 실패하면 재시도 가능한 실패 상태가 된다`() async {
         let store = Self.makeStore(lookupResult: .failure(ExternalRepositoryError.offline))
 

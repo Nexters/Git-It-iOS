@@ -161,13 +161,15 @@ struct QuestionSolvingFeatureTests {
         let state = choiceState()
         let quizID = state.question.id
         let setBookmark = QuizDetailUseCaseBookmarkStub(
-            results: [.success(QuizBookmarkState(quizID: quizID, isBookmarked: true))]
+            results: [.success(QuizBookmarkState(quizID: quizID, isBookmarked: true))],
+            suspendsRequests: true,
         )
         let store = makeStore(setBookmark: setBookmark, state: state)
         store.exhaustivity = .off
 
         await store.send(.view(.bookmarkToggleTapped))
         await store.send(.view(.bookmarkToggleTapped))
+        await setBookmark.resumeOldest()
         await store.receive(\.effect.bookmarkFinished)
 
         #expect(await setBookmark.invocations.count == 1)

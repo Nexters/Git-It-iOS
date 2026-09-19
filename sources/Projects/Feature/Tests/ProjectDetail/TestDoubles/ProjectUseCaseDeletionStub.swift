@@ -5,8 +5,12 @@ actor ProjectUseCaseDeletionStub {
 
     // MARK: Lifecycle
 
-    init(results: [Result<Void, ProjectError>] = [.success(())]) {
+    init(
+        results: [Result<Void, ProjectError>] = [.success(())],
+        suspendsRequests: Bool = false,
+    ) {
         self.results = results
+        self.suspendsRequests = suspendsRequests
     }
 
     // MARK: Internal
@@ -21,12 +25,25 @@ actor ProjectUseCaseDeletionStub {
     func callAsFunction(projectID: ProjectID) async throws {
         callCount += 1
         requestedProjectIDs.append(projectID)
-        try nextResult().get()
+        let result = nextResult()
+        guard suspendsRequests else { return try result.get() }
+
+        return try await withCheckedThrowingContinuation { continuation in
+            continuations.append((continuation, result))
+        }
+    }
+
+    func resumeOldest() {
+        guard !continuations.isEmpty else { return }
+        let (continuation, result) = continuations.removeFirst()
+        continuation.resume(with: result)
     }
 
     // MARK: Private
 
     private var results: [Result<Void, ProjectError>]
+    private let suspendsRequests: Bool
+    private var continuations = [(CheckedContinuation<Void, any Error>, Result<Void, ProjectError>)]()
 
     private func nextResult() -> Result<Void, ProjectError> {
         guard !results.isEmpty else { return .failure(.unexpected) }

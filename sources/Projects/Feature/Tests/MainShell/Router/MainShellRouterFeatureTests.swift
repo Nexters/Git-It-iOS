@@ -110,7 +110,9 @@ struct MainShellRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
         let quiz = QuizTestFixture.unansweredSet.quizzes[0]
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
 
+        await store.send(.saved(.delegate(.questionSelected(bookmark))))
         await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
             question: quiz,
             projectID: ProjectDetailTestFixture.projectID,

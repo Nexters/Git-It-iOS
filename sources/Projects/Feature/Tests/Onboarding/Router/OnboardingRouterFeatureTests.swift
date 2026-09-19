@@ -140,7 +140,9 @@ struct OnboardingRouterFeatureTests {
     @Test
     func `로그인 취소는 화면을 바꾸지 않고 이동 이벤트를 남기지 않는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.cancelled])
-        let store = makeOnboardingRouterStore(signIn: signIn)
+        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+        state.legalAgreement.isStoredConsentValid = true
+        let store = makeOnboardingRouterStore(signIn: signIn, state: state)
         store.exhaustivity = .off
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
