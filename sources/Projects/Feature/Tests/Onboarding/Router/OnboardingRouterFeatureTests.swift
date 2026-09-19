@@ -253,6 +253,49 @@ struct OnboardingRouterFeatureTests {
         #expect(store.state.legalAgreement.presentedDocumentID == nil)
     }
 
+    @Test
+    func `튜토리얼의 비로그인 진입 요청은 약관 화면으로 이동하지 않고 guestAccessRequested로 전달한다`() async {
+        let store = makeOnboardingRouterStore()
+
+        await store.send(.tutorial(.view(.guestAccessTapped)))
+        await store.receive(.tutorial(.delegate(.guestAccessRequested)))
+        await store.receive(.delegate(.guestAccessRequested))
+
+        #expect(store.state.activeScreen == .guide(.tutorial))
+        #expect(store.state.transitionLog.isEmpty)
+    }
+
+    @Test
+    func `호출자 복귀 모드에서 포지션 선택을 나가면 튜토리얼로 가지 않고 curationAbandoned를 위임한다`() async {
+        let state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+            curationExit: .returnToCaller,
+        )
+        let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
+        let store = makeOnboardingRouterStore(signOut: signOut, state: state)
+        store.exhaustivity = .off
+
+        await store.send(.positionSelection(.view(.positionSelected(.backend))))
+        await store.send(.positionSelection(.view(.backTapped)))
+        await store.receive(.positionSelection(.effect(.signOutFinished(.signedOut))))
+        await store.receive(.positionSelection(.delegate(.exitRequested)))
+        await store.receive(.delegate(.curationAbandoned))
+
+        #expect(store.state.activeScreen == .curation(.positionSelection))
+        #expect(store.state.positionSelection.position == nil)
+        #expect(store.state.careerSelection.careerLevel == nil)
+        #expect(store.state.transitionLog.isEmpty)
+        #expect(await signOut.snapshot() == 1)
+    }
+
+    @Test
+    func `중단 목적지를 지정하지 않으면 튜토리얼 복귀 모드로 시작한다`() {
+        let state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+
+        #expect(state.curationExit == .returnToTutorial)
+    }
+
     // MARK: Private
 
     private let curatedAccount = OnboardingTestFixture.signedInAccount(needsCuration: false)

@@ -97,21 +97,21 @@ description: "비로그인(게스트) 모드 구현 작업 목록"
 
 ### 테스트
 
-- [ ] T004 [P] [S1] `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialFeatureTests.swift`에 테스트를 추가한다: 비로그인 진입을 누르면 `delegate(.guestAccessRequested)`를 보낸다, 로그인 진행 중(`authentication == .signingIn`)에는 비로그인 진입을 무시한다
-- [ ] T005 [P] [S1] [S4] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`에 테스트를 추가한다: 튜토리얼의 비로그인 진입 요청을 `delegate(.guestAccessRequested)`로 전달하고 약관 화면으로 이동하지 않는다, `curationExit`가 `.returnToCaller`이면 직군 선택 종료 시 튜토리얼로 가지 않고 `delegate(.curationAbandoned)`를 보낸다, 기본값(`.returnToTutorial`)이면 기존과 같이 튜토리얼 마지막 면으로 돌아간다
+- [X] T004 [P] [S1] `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialFeatureTests.swift`에 테스트를 추가한다: 비로그인 진입을 누르면 `delegate(.guestAccessRequested)`를 보낸다, 로그인 진행 중(`authentication == .signingIn`)에는 비로그인 진입을 무시한다
+- [X] T005 [P] [S1] [S4] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`에 테스트를 추가한다: 튜토리얼의 비로그인 진입 요청을 `delegate(.guestAccessRequested)`로 전달하고 약관 화면으로 이동하지 않는다, `curationExit`가 `.returnToCaller`이면 직군 선택 종료 시 튜토리얼로 가지 않고 `delegate(.curationAbandoned)`를 보낸다, 기본값(`.returnToTutorial`)이면 기존과 같이 튜토리얼 마지막 면으로 돌아간다
 
 ### 구현
 
-- [ ] T006 [S4] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature+CurationExit.swift`를 만들어 `extension OnboardingRouterFeature { public enum CurationExit: Equatable, Sendable { case returnToTutorial, returnToCaller } }`를 선언한다([data-model §2](./data-model.md#2-onboardingrouterfeaturecurationexit-feature-새-공개-enum))
-- [ ] T007 [S1] `sources/Projects/Feature/Onboarding/Tutorial/TutorialFeature.swift`에 `Action.View.guestAccessTapped`와 `Action.Delegate.guestAccessRequested`를 추가하고, `authentication != .signingIn`일 때만 delegate를 보내도록 구현한다
-- [ ] T008 [S1] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`에 `State.init(startingAt:bundleVersion:curationExit: CurationExit = .returnToTutorial)`와 `public let curationExit`를 추가하고, `Delegate`에 `guestAccessRequested`·`curationAbandoned`를 추가한다. `tutorial(.delegate(.guestAccessRequested))`를 전달하고, `positionSelection(.delegate(.exitRequested))`는 `curationExit == .returnToCaller`일 때 직군·연차 상태만 초기화한 뒤 `delegate(.curationAbandoned)`를 보낸다
-- [ ] T009 [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`에 `onGuestAccess: () -> Void` 입력을 추가하고 `AppleSignInButton` 아래에 `ActionButton` Text 스타일 `로그인 없이 둘러보기` 버튼을 `isHintVisible`일 때만 표시·접근 가능하게 둔다(마지막 면 외에는 `opacity(0)`·`accessibilityHidden`·`disabled`, 기존 힌트 문구와 같은 방식). 새 간격은 `LayoutToken`만 사용한다
-- [ ] T010 [S1] `sources/Projects/Feature/Onboarding/Tutorial/TutorialScreen.swift`의 `SignInSection` 생성에 `onGuestAccess: { send(.guestAccessTapped) }`를 연결한다
-- [ ] T011 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/Previews/TutorialScreenPreviews.swift`의 마지막 면 프리뷰가 비로그인 진입 버튼을 보여 주는지 확인하고, 없으면 마지막 면 프리뷰를 추가한다
+- [X] T006 [S4] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature+CurationExit.swift`를 만들어 `extension OnboardingRouterFeature { public enum CurationExit: Equatable, Sendable { case returnToTutorial, returnToCaller } }`를 선언한다([data-model §2](./data-model.md#2-onboardingrouterfeaturecurationexit-feature-새-공개-enum))
+- [X] T007 [S1] `sources/Projects/Feature/Onboarding/Tutorial/TutorialFeature.swift`에 `Action.View.guestAccessTapped`와 `Action.Delegate.guestAccessRequested`를 추가하고, `authentication != .signingIn`일 때만 delegate를 보내도록 구현한다
+- [X] T008 [S1] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`에 `State.init(startingAt:bundleVersion:curationExit: CurationExit = .returnToTutorial)`와 `public let curationExit`를 추가하고, `Delegate`에 `guestAccessRequested`·`curationAbandoned`를 추가한다. `tutorial(.delegate(.guestAccessRequested))`를 전달하고, `positionSelection(.delegate(.exitRequested))`는 `curationExit == .returnToCaller`일 때 직군·연차 상태만 초기화한 뒤 `delegate(.curationAbandoned)`를 보낸다
+- [X] T009 [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`에 `onGuestAccess: () -> Void` 입력을 추가하고 `AppleSignInButton` 아래에 `ActionButton` Text 스타일 `로그인 없이 둘러보기` 버튼을 `isHintVisible`일 때만 표시·접근 가능하게 둔다(마지막 면 외에는 `opacity(0)`·`accessibilityHidden`·`disabled`, 기존 힌트 문구와 같은 방식). 새 간격은 `LayoutToken`만 사용한다
+- [X] T010 [S1] `sources/Projects/Feature/Onboarding/Tutorial/TutorialScreen.swift`의 `SignInSection` 생성에 `onGuestAccess: { send(.guestAccessTapped) }`를 연결한다
+- [X] T011 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/Previews/TutorialScreenPreviews.swift`의 마지막 면 프리뷰가 비로그인 진입 버튼을 보여 주는지 확인하고, 없으면 마지막 면 프리뷰를 추가한다
 
 ### 패키지 검증
 
-- [ ] T012 [no-write] `rg -n "SignInSection\(|OnboardingRouterFeature.State\(" sources/Projects`로 변경한 생성자 호출부가 모두 새 인자 또는 기본값과 맞는지 확인하고, 사용자에게 `Feature` scheme의 Onboarding 테스트 실행을 확인 항목으로 보고한다
+- [X] T012 [no-write] `rg -n "SignInSection\(|OnboardingRouterFeature.State\(" sources/Projects`로 변경한 생성자 호출부가 모두 새 인자 또는 기본값과 맞는지 확인하고, 사용자에게 `Feature` scheme의 Onboarding 테스트 실행을 확인 항목으로 보고한다
 
 **진행 점검**: T004~T012의 변경 파일과 검증 결과를 보고하고 U3으로 진행한다.
 

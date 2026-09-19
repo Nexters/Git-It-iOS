@@ -12,6 +12,7 @@ extension TutorialScreen {
         let bundleVersion: String
         let isHintVisible: Bool
         let onAppleSignIn: () -> Void
+        let onGuestAccess: () -> Void
 
         var body: some View {
             VStack {
@@ -25,6 +26,11 @@ extension TutorialScreen {
 
                 AppleSignInButton(action: onAppleSignIn)
 
+                ActionButton.text(Constant.guestAccessTitle, size: .small, isEnabled: isHintVisible, action: onGuestAccess)
+                    .opacity(isHintVisible ? 1 : 0)
+                    .accessibilityHidden(!isHintVisible)
+                    .padding(.top, LayoutToken.compactSpacing)
+
                 StyledText.body2("버전 \(bundleVersion)", color: .grey500, alignment: .center)
                     .padding(.top, Constant.versionTopSpacing)
             }
@@ -36,6 +42,7 @@ extension TutorialScreen {
 
         private enum Constant {
             static let hintTitle = "3초만에 가입하기"
+            static let guestAccessTitle = "로그인 없이 둘러보기"
             static let indicatorPadding: CGFloat = 12
             static let versionTopSpacing: CGFloat = 21
             static let bottomInset: CGFloat = 29

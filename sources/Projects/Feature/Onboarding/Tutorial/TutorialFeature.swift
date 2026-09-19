@@ -66,6 +66,7 @@ public struct TutorialFeature: Sendable {
             case appeared
             case pageChanged(Int)
             case appleSignInTapped
+            case guestAccessTapped
         }
 
         @CasePathable
@@ -84,6 +85,7 @@ public struct TutorialFeature: Sendable {
             case appeared
             case signInRequested
             case signInSucceeded(needsCuration: Bool)
+            case guestAccessRequested
         }
     }
 
@@ -100,6 +102,10 @@ public struct TutorialFeature: Sendable {
             case .view(.appleSignInTapped):
                 guard state.authentication != .signingIn else { return .none }
                 return .send(.delegate(.signInRequested))
+
+            case .view(.guestAccessTapped):
+                guard state.authentication != .signingIn else { return .none }
+                return .send(.delegate(.guestAccessRequested))
 
             case .input(.startSignIn):
                 guard state.authentication != .signingIn else { return .none }

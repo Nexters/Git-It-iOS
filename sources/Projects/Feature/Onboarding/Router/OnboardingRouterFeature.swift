@@ -58,6 +58,7 @@ public struct OnboardingRouterFeature: Sendable {
         public init(
             startingAt entryPoint: OnboardingEntryPoint,
             bundleVersion: String,
+            curationExit: CurationExit = .returnToTutorial,
         ) {
             switch entryPoint {
             case .guide:
@@ -67,6 +68,7 @@ public struct OnboardingRouterFeature: Sendable {
                 activeScreen = .curation(.positionSelection)
             }
             tutorial = TutorialFeature.State(bundleVersion: bundleVersion)
+            self.curationExit = curationExit
         }
 
         // MARK: Public
@@ -77,6 +79,7 @@ public struct OnboardingRouterFeature: Sendable {
         public var positionSelection = PositionSelectionFeature.State()
         public var careerSelection = CareerSelectionFeature.State()
         public var exit = OnboardingExitFeature.State()
+        public let curationExit: CurationExit
         public internal(set) var transitionLog = [ScreenTransitionEvent]()
 
     }
@@ -100,6 +103,8 @@ public struct OnboardingRouterFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case mainShellRequested
+            case guestAccessRequested
+            case curationAbandoned
         }
     }
 
@@ -139,6 +144,9 @@ public struct OnboardingRouterFeature: Sendable {
                     effect = .send(.legalAgreement(.input(.prepare)))
                 }
 
+            case .tutorial(.delegate(.guestAccessRequested)):
+                effect = .send(.delegate(.guestAccessRequested))
+
             case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
                 effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
 
@@ -157,8 +165,14 @@ public struct OnboardingRouterFeature: Sendable {
             case .positionSelection(.delegate(.exitRequested)):
                 state.positionSelection = PositionSelectionFeature.State()
                 state.careerSelection = CareerSelectionFeature.State()
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.returnToLastPage)))
+                switch state.curationExit {
+                case .returnToTutorial:
+                    state.activeScreen = .guide(.tutorial)
+                    effect = .send(.tutorial(.input(.returnToLastPage)))
+
+                case .returnToCaller:
+                    effect = .send(.delegate(.curationAbandoned))
+                }
 
             case .careerSelection(.delegate(.backRequested)):
                 state.activeScreen = .curation(.positionSelection)

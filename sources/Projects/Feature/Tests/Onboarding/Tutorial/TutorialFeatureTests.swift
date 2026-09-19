@@ -188,6 +188,23 @@ struct TutorialFeatureTests {
         #expect(await accountWithdrawal.snapshot() == 1)
     }
 
+    @Test
+    func `비로그인 진입을 누르면 guestAccessRequested를 위임한다`() async {
+        let store = makeTutorialStore()
+
+        await store.send(.view(.guestAccessTapped))
+        await store.receive(.delegate(.guestAccessRequested))
+    }
+
+    @Test
+    func `로그인 진행 중에는 비로그인 진입을 무시한다`() async {
+        var state = TutorialFeature.State(bundleVersion: "1.0.0")
+        state.authentication = .signingIn
+        let store = makeTutorialStore(state: state)
+
+        await store.send(.view(.guestAccessTapped))
+    }
+
     // MARK: Private
 
     private let curatedAccount = OnboardingTestFixture.signedInAccount(needsCuration: false)

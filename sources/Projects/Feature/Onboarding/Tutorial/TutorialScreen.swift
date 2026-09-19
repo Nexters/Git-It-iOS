@@ -30,6 +30,7 @@ struct TutorialScreen: View {
                     bundleVersion: store.bundleVersion,
                     isHintVisible: isLastPage,
                     onAppleSignIn: { send(.appleSignInTapped) },
+                    onGuestAccess: { send(.guestAccessTapped) },
                 )
             }
         }
