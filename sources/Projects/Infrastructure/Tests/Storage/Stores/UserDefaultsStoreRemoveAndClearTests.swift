@@ -10,8 +10,8 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
-        await store.store("V", forKey: "A")
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        await store.store(Data("V".utf8), forKey: "A")
 
         await store.removeValue(forKey: "A")
 
@@ -23,9 +23,9 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
-        await store.store("V1", forKey: "A")
-        await store.store("V2", forKey: "B")
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        await store.store(Data("V1".utf8), forKey: "A")
+        await store.store(Data("V2".utf8), forKey: "B")
 
         await store.removeAll()
 
@@ -38,15 +38,15 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let storeA = UserDefaultsStore<String>(namespace: "namespaceA", userDefaults: userDefaults)
-        let storeB = UserDefaultsStore<String>(namespace: "namespaceB", userDefaults: userDefaults)
-        await storeA.store("A값", forKey: "키")
-        await storeB.store("B값", forKey: "키")
+        let storeA = UserDefaultsStore(namespace: "namespaceA", userDefaults: userDefaults)
+        let storeB = UserDefaultsStore(namespace: "namespaceB", userDefaults: userDefaults)
+        await storeA.store(Data("A값".utf8), forKey: "키")
+        await storeB.store(Data("B값".utf8), forKey: "키")
 
         await storeA.removeAll()
 
         #expect(await storeA.value(forKey: "키") == nil)
-        #expect(await storeB.value(forKey: "키") == "B값")
+        #expect(await storeB.value(forKey: "키") == Data("B값".utf8))
     }
 
     @Test
@@ -54,7 +54,7 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
 
         await store.removeValue(forKey: "존재하지-않는-키")
 
@@ -66,20 +66,20 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
 
         #expect(await store.value(forKey: "저장된-적-없는-키") == nil)
     }
 
     @Test
-    func `손상된 raw 값을 디코딩하지 못해도 오류 없이 nil이 반환된다`() async throws {
+    func `저장된 바이트를 해석하지 않고 그대로 반환한다`() async throws {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
-        userDefaults.set(Data([0xFF, 0x00, 0xAB]), forKey: "test.손상된-키")
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        userDefaults.set(Data([0xFF, 0x00, 0xAB]), forKey: "test.원시-키")
 
-        #expect(await store.value(forKey: "손상된-키") == nil)
+        #expect(await store.value(forKey: "원시-키") == Data([0xFF, 0x00, 0xAB]))
     }
 
 }

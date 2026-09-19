@@ -7,12 +7,8 @@ struct LocalKeyValueStorage: KeyValueStorage {
 
     // MARK: Lifecycle
 
-    init(
-        namespace: String,
-        userDefaults: UserDefaults,
-    ) {
-        self.namespace = namespace
-        self.userDefaults = userDefaults
+    init(store: UserDefaultsStore) {
+        self.store = store
     }
 
     // MARK: Internal
@@ -21,31 +17,28 @@ struct LocalKeyValueStorage: KeyValueStorage {
         _: Value.Type,
         forKey key: String,
     ) async -> Value? {
-        await store(of: Value.self).value(forKey: key)
+        guard let data = await store.value(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(Value.self, from: data)
     }
 
-    func setValue<Value: Codable & Sendable>(
-        _ value: Value,
+    func setValue(
+        _ value: some Codable & Sendable,
         forKey key: String,
     ) async {
-        await store(of: Value.self).store(value, forKey: key)
+        guard let data = try? JSONEncoder().encode(value) else { return }
+        await store.store(data, forKey: key)
     }
 
     func removeValue(forKey key: String) async {
-        await store(of: Data.self).removeValue(forKey: key)
+        await store.removeValue(forKey: key)
     }
 
     func removeAllValues() async {
-        await store(of: Data.self).removeAll()
+        await store.removeAll()
     }
 
     // MARK: Private
 
-    private let namespace: String
-    private let userDefaults: UserDefaults
-
-    private func store<Value: Codable & Sendable>(of _: Value.Type) -> UserDefaultsStore<Value> {
-        UserDefaultsStore(namespace: namespace, userDefaults: userDefaults)
-    }
+    private let store: UserDefaultsStore
 
 }

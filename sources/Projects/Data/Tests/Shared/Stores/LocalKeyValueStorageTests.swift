@@ -1,4 +1,5 @@
 import Foundation
+import InfrastructureStorage
 import Testing
 
 @testable import DataShared
@@ -11,12 +12,12 @@ struct LocalKeyValueStorageTests {
     // MARK: Internal
 
     @Test
-    func `namespace와 key를 이은 키에 값을 JSON으로 저장한다`() async throws {
-        let (storage, userDefaults) = try makeStorage(namespace: "test.namespace")
+    func `값을 JSON으로 인코딩해 저장소의 같은 키에 저장한다`() async throws {
+        let (storage, store) = try makeStorage(namespace: "test.namespace")
 
         await storage.setValue(Sample(name: "value", count: 3), forKey: "sample")
 
-        let data = try #require(userDefaults.data(forKey: "test.namespace.sample"))
+        let data = try #require(await store.value(forKey: "sample"))
         #expect(try JSONDecoder().decode(Sample.self, from: data) == Sample(name: "value", count: 3))
     }
 
@@ -30,6 +31,14 @@ struct LocalKeyValueStorageTests {
     }
 
     @Test
+    func `저장된 바이트를 요청한 타입으로 해석할 수 없으면 nil을 반환한다`() async throws {
+        let (storage, store) = try makeStorage(namespace: "test.namespace")
+        await store.store(Data([0xFF, 0x00, 0xAB]), forKey: "sample")
+
+        #expect(await storage.value(Sample.self, forKey: "sample") == nil)
+    }
+
+    @Test
     func `값을 삭제하면 조회 결과가 없다`() async throws {
         let (storage, _) = try makeStorage(namespace: "test.namespace")
         await storage.setValue(Sample(name: "value", count: 3), forKey: "sample")
@@ -40,9 +49,12 @@ struct LocalKeyValueStorageTests {
     }
 
     @Test
-    func `전체 삭제는 같은 namespace의 값만 지운다`() async throws {
-        let (storage, userDefaults) = try makeStorage(namespace: "test.namespace")
-        let other = LocalKeyValueStorage(namespace: "test.other", userDefaults: userDefaults)
+    func `전체 삭제는 주입된 저장소 namespace의 값만 지운다`() async throws {
+        let suiteName = "LocalKeyValueStorageTests.\(UUID().uuidString)"
+        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let storage = LocalKeyValueStorage(store: UserDefaultsStore(namespace: "test.namespace", userDefaults: userDefaults))
+        let other = LocalKeyValueStorage(store: UserDefaultsStore(namespace: "test.other", userDefaults: userDefaults))
         await storage.setValue(Sample(name: "mine", count: 1), forKey: "sample")
         await other.setValue(Sample(name: "other", count: 2), forKey: "sample")
 
@@ -59,10 +71,11 @@ struct LocalKeyValueStorageTests {
         let count: Int
     }
 
-    private func makeStorage(namespace: String) throws -> (LocalKeyValueStorage, UserDefaults) {
+    private func makeStorage(namespace: String) throws -> (LocalKeyValueStorage, UserDefaultsStore) {
         let suiteName = "LocalKeyValueStorageTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
-        return (LocalKeyValueStorage(namespace: namespace, userDefaults: userDefaults), userDefaults)
+        let store = UserDefaultsStore(namespace: namespace, userDefaults: userDefaults)
+        return (LocalKeyValueStorage(store: store), store)
     }
 
 }

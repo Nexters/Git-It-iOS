@@ -117,7 +117,7 @@ struct LocalPendingGenerationStoreTests {
     @Test
     func `저장소를 사용할 수 없으면 기록해도 빈 상태와 빈 알림 대기를 돌려준다`() async {
         let store = LocalPendingGenerationStore(
-            storage: StorageFactory.keyValueStorage(namespace: LocalPendingGenerationStore.namespace, userDefaults: nil)
+            storage: StorageFactory.keyValueStorage(store: nil)
         )
 
         await store.modifyState { _ in GenerationStateDTO(records: [Self.record(projectID: "p1")]) }
