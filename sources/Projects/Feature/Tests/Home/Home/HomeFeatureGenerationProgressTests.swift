@@ -51,6 +51,7 @@ struct HomeFeatureGenerationProgressTests {
         let store = makeStore(state: state)
 
         await store.send(.view(.showAllProjectsTapped))
+        await store.receive(.delegate(.allProjectsRequested))
         await store.send(.view(.projectCardTapped(projectID: "project-1")))
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
         await store.send(.view(.learningTapped(projectID: "project-1")))

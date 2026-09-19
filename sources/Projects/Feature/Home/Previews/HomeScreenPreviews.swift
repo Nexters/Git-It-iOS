@@ -71,6 +71,18 @@ private enum HomePreviewFixture {
     HomeScreen(store: HomePreviewFixture.store(projectLoad: .failed(.temporarilyUnavailable)))
 }
 
+#Preview("Home - guest") {
+    HomeScreen(
+        store: Store(
+            initialState: {
+                var state = HomeFeature.State()
+                state.access = .guest
+                return state
+            }()
+        ) { EmptyReducer() }
+    )
+}
+
 #Preview("Profile Failure") {
     HomeScreen(
         store: HomePreviewFixture.store(

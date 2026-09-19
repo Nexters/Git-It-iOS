@@ -57,6 +57,9 @@ public struct HomeFeature: Sendable {
 
         public var isGenerationInProgress = false
 
+        public var access = MainShellAccess.member
+        public var isSignInRequiredAlertPresented = false
+
     }
 
     public enum Action: ViewAction, Equatable, Sendable {
@@ -76,12 +79,16 @@ public struct HomeFeature: Sendable {
             case showAllProjectsTapped
             case projectCardTapped(projectID: ProjectID)
             case learningTapped(projectID: ProjectID)
+            case signInTapped
+            case signInRequiredAlertSignInTapped
+            case signInRequiredAlertDismissed
         }
 
         @CasePathable
         public enum Input: Equatable, Sendable {
             case learningProjectsReloadRequested
             case generationProgressChanged(isInProgress: Bool)
+            case accessChanged(MainShellAccess)
         }
 
         @CasePathable
@@ -96,6 +103,8 @@ public struct HomeFeature: Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: ProjectID)
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
+            case signInRequested
+            case allProjectsRequested
         }
     }
 
@@ -103,23 +112,25 @@ public struct HomeFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .view(.task):
-                var effects = [ComposableArchitecture.Effect<Action>]()
-                if state.profileLoad == .idle {
-                    effects.append(startProfileLoad(state: &state))
-                }
-                effects.append(observeProjects())
-                effects.append(startRefresh(state: &state))
-                return .merge(effects)
+                guard state.access == .member else { return .none }
+                return startAccountLoad(state: &state)
 
             case .input(.learningProjectsReloadRequested):
+                guard state.access == .member else { return .none }
                 return startRefresh(state: &state)
 
+            case .input(.accessChanged(let access)):
+                let previousAccess = state.access
+                state.access = access
+                guard previousAccess == .guest, access == .member else { return .none }
+                return startAccountLoad(state: &state)
+
             case .view(.profileRetryTapped):
-                guard case .failed = state.profileLoad else { return .none }
+                guard state.access == .member, case .failed = state.profileLoad else { return .none }
                 return startProfileLoad(state: &state)
 
             case .view(.projectRetryTapped):
-                guard case .failed = state.projectLoad else { return .none }
+                guard state.access == .member, case .failed = state.projectLoad else { return .none }
                 return startRefresh(state: &state)
 
             case .input(.generationProgressChanged(let isInProgress)):
@@ -127,10 +138,27 @@ public struct HomeFeature: Sendable {
                 return .none
 
             case .view(.projectRegistrationTapped):
+                guard state.access == .member else {
+                    state.isSignInRequiredAlertPresented = true
+                    return .none
+                }
                 guard !state.isGenerationInProgress else { return .none }
                 return .send(.delegate(.projectRegistrationRequested))
 
             case .view(.showAllProjectsTapped):
+                guard state.access == .member else { return .none }
+                return .send(.delegate(.allProjectsRequested))
+
+            case .view(.signInTapped):
+                guard state.access == .guest else { return .none }
+                return .send(.delegate(.signInRequested))
+
+            case .view(.signInRequiredAlertSignInTapped):
+                state.isSignInRequiredAlertPresented = false
+                return .send(.delegate(.signInRequested))
+
+            case .view(.signInRequiredAlertDismissed):
+                state.isSignInRequiredAlertPresented = false
                 return .none
 
             case .view(.projectCardTapped(let projectID)):
@@ -183,6 +211,16 @@ public struct HomeFeature: Sendable {
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
     private let profile: @Sendable () async throws -> UserProfile
+
+    private func startAccountLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
+        var effects = [ComposableArchitecture.Effect<Action>]()
+        if state.profileLoad == .idle {
+            effects.append(startProfileLoad(state: &state))
+        }
+        effects.append(observeProjects())
+        effects.append(startRefresh(state: &state))
+        return .merge(effects)
+    }
 
     private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         state.profileRequestID += 1

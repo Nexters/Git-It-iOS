@@ -8,6 +8,7 @@ extension HomeScreen {
         // MARK: Internal
 
         let state: HomeProjectSectionState
+        let isShowAllEnabled: Bool
 
         @Binding var cardListLeadingX: CGFloat?
 
@@ -23,13 +24,14 @@ extension HomeScreen {
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText.body2("전체 보기", color: .blue100)
+                            StyledText.body2("전체 보기", color: showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
                                 .frame(width: Constant.chevronSize, height: Constant.chevronSize)
-                                .designSystemForeground(.blue100)
+                                .designSystemForeground(showAllColor)
                         }
                     }
                     .buttonStyle(.plain)
+                    .disabled(!isShowAllEnabled)
                     .padding(8)
                     .accessibilityLabel(Constant.showAllLabel)
                 }
@@ -112,6 +114,10 @@ extension HomeScreen {
             Constant.sectionHeight(cardWidth: cardWidth)
         }
 
+        private var showAllColor: ColorToken {
+            isShowAllEnabled ? .blue100 : .grey400
+        }
+
         private var emptyProjectCards: some View {
             let shape = emptyDeckShape
 
@@ -146,6 +152,11 @@ extension HomeScreen {
             case .empty:
                 emptyProjects {
                     StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
+                }
+
+            case .signInRequired:
+                emptyProjects {
+                    StyledText.body2("로그인하면 학습 중인 레포지토리를 볼 수 있어요.", color: .purple200)
                 }
 
             case .failed:

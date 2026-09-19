@@ -29,6 +29,7 @@ struct HomeFeatureNavigationTests {
         let store = makeStore()
 
         await store.send(.view(.showAllProjectsTapped))
+        await store.receive(.delegate(.allProjectsRequested))
         await store.send(.view(.projectCardTapped(projectID: "project-1")))
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
     }

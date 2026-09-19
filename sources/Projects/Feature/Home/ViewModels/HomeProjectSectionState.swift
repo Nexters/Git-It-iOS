@@ -4,10 +4,16 @@ enum HomeProjectSectionState: Equatable, Sendable {
     case empty
     case failed
     case loaded([HomeProjectDisplay])
+    case signInRequired
 
     // MARK: Lifecycle
 
-    init(_ projectLoad: HomeFeature.State.ProjectLoad) {
+    init(_ projectLoad: HomeFeature.State.ProjectLoad, access: MainShellAccess) {
+        guard access == .member else {
+            self = .signInRequired
+            return
+        }
+
         switch projectLoad {
         case .idle,
              .loading:
