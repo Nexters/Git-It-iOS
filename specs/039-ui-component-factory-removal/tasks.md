@@ -430,10 +430,11 @@ compile 경계를 공유한다.
   `init(..., content:)`를 생성 경로로 둔다, (2) 필요한 기본값은 해당 초기화 인자에 둔다.
   원문의 "§3.1에 따라"는 문서를 옮기면 가리키는 대상이 사라지므로
   `docs/conventions/view.md` §3.1(표시 값, Binding과 콜백) 링크로 풀어서 옮긴다
-- [ ] T060 [S4] **사용자 승인 필요** — `docs/conventions/view/factory-criteria.md` 파일을
-  삭제한다. 문서 전문이 팩토리 정의 기준이며 보존할 규칙은 T059가 이미 옮긴 뒤여야 한다.
-  Constitution 원칙 5는 `/speckit-implement`에 파일 수정 권한만 부여하고 삭제를 명시하지
-  않으므로, 삭제 전에 중단하고 명시적 승인을 요청한 뒤 PR에 원칙 3 예외로 기록한다
+- [ ] T060 [S4] **사용자 승인 완료(2026-09-20)** — `docs/conventions/view/factory-criteria.md`
+  파일을 삭제한다. 문서 전문이 팩토리 정의 기준이며 보존할 규칙은 T059가 이미 옮긴 뒤여야
+  한다. Constitution 원칙 5는 `/speckit-implement`에 파일 수정 권한만 부여하고 삭제를 명시하지
+  않으므로 승인이 필요했고, 사용자가 이 세션에서 삭제를 승인했다. 구현 시 다시 중단하지 않고
+  진행하되 PR에 원칙 3 예외로 기록한다
 - [ ] T061 [S4] `docs/conventions/view.md`에서 §3.2의 제목과 링크 텍스트
   "컴포넌트의 공개 생성 경로는 두 가지입니다"를 T058의 새 제목에 맞추고, §3.3
   "팩토리를 정의하는 기준" 절과 `./view/factory-criteria.md` 링크를 삭제하며, §6 검토
@@ -503,9 +504,8 @@ compile 경계를 공유한다.
   `SelectionCard.swift`(단위 3·6), `WebSheet.swift`(단위 5·6),
   `SettingsScreen+*.swift`·`ProfileScreen*.swift`·`SavedScreen+ErrorView.swift`(단위 5·6).
 - 새 범위, 파괴적 작업, 외부 상태 변경 또는 새 제품 결정이 필요할 때만 중단하고 명시적
-  승인을 요청한다. 해당 경계는 **T060 하나**다. Constitution 원칙 5가 `/speckit-implement`에
-  파일 삭제 권한을 명시하지 않으므로, `factory-criteria.md` 삭제 전에 중단하고 승인을
-  받는다. 그 밖의 작업은 반복 승인 없이 연속 진행한다.
+  승인을 요청한다. 해당 경계는 **T060 하나**였고 2026-09-20 세션에서 사용자 승인을 받았다.
+  따라서 단위 1~7 전체를 중단 없이 연속 진행하며, 삭제 사실은 PR에 원칙 3 예외로 기록한다.
 
 ### 변경 시나리오 추적성
 
