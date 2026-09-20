@@ -15,7 +15,7 @@ struct OverlayContainerContractTests {
             StyledText.body1("본문")
         } footer: {
             BottomActionBar {
-                ActionButton.primary("계속하기")
+                ActionButton(title: "계속하기")
                     .designSystemScreenMargin()
             }
         }

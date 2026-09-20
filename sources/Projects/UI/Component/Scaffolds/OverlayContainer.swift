@@ -143,7 +143,7 @@ extension OverlayContainer where Background == EmptyView {
         .designSystemScreenMargin()
     } footer: {
         BottomActionBar {
-            ActionButton.primary("계속하기")
+            ActionButton(title: "계속하기")
                 .designSystemScreenMargin()
         }
     }

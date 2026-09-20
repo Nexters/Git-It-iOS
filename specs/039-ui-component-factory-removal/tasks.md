@@ -67,25 +67,25 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 구현
 
-- [ ] T001 [S1] `sources/Projects/UI/Component/Controls/ActionButton.swift`에서 정적 팩토리
+- [X] T001 [S1] `sources/Projects/UI/Component/Controls/ActionButton.swift`에서 정적 팩토리
   9개(`primary`, `secondary`, `destructive`, `text`, `primaryText` 계열)를 제거하고 기존
   `public init(title:...)`과 `public init(styledText:...)` 두 경로만 남긴다
-- [ ] T002 [S1] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`의
+- [X] T002 [S1] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`의
   `ActionButton` 팩토리 호출을 `style:`·`size:` 인자를 넘기는 초기화 호출로 전환한다
-- [ ] T003 [P] [S1] `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift`의
+- [X] T003 [P] [S1] `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift`의
   `ActionButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T004 [P] [S1] `sources/Projects/UI/Component/Scaffolds/BottomActionBar.swift`의
+- [X] T004 [P] [S1] `sources/Projects/UI/Component/Scaffolds/BottomActionBar.swift`의
   `ActionButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T005 [P] [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의
+- [X] T005 [P] [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의
   `ActionButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T006 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Controls/ActionButtonSizeContractTests.swift`의
+- [X] T006 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Controls/ActionButtonSizeContractTests.swift`의
   팩토리 호출을 초기화 호출로 전환하고 검증 대상 계약을 유지한다
-- [ ] T007 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/OverlayContainerContractTests.swift`의
+- [X] T007 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/OverlayContainerContractTests.swift`의
   `ActionButton` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T008 [no-write] [quickstart.md](quickstart.md)의 단위 검증 절차로 `compile`을 실행하고
+- [X] T008 [no-write] [quickstart.md](quickstart.md)의 단위 검증 절차로 `compile`을 실행하고
   `ActionButton` 잔여 팩토리 호출 grep이 0건인지 확인한다
 
 **진행 점검**: T001~T008의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행

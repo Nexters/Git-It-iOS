@@ -124,141 +124,6 @@ public struct ActionButton: View {
         )
     }
 
-    public static func primary(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .primary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func primary(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .primary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func secondary(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .secondary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func secondary(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .secondary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func destructive(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .destructive,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func destructive(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .destructive,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func text(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .text,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func text(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .text,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func primaryText(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .primaryText,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
     // MARK: Private
 
     private enum Label: Sendable, Equatable {
@@ -291,12 +156,12 @@ public struct ActionButton: View {
 
 #Preview("Action Button") {
     VStack(spacing: LayoutToken.gutter) {
-        ActionButton.primary("Primary")
-        ActionButton.secondary("Secondary")
-        ActionButton.destructive("Destructive")
-        ActionButton.text("Text")
-        ActionButton.primary("Disabled", isEnabled: false)
-        ActionButton.text("Disabled Text", isEnabled: false)
+        ActionButton(title: "Primary")
+        ActionButton(title: "Secondary", style: .secondary)
+        ActionButton(title: "Destructive", style: .destructive)
+        ActionButton(title: "Text", style: .text)
+        ActionButton(title: "Disabled", isEnabled: false)
+        ActionButton(title: "Disabled Text", style: .text, isEnabled: false)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

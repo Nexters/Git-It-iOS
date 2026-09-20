@@ -111,7 +111,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         SheetSurface {
             VStack(spacing: LayoutToken.margin) {
                 StyledText.subtitle2("알림을 받아보시겠어요?", alignment: .center)
-                ActionButton.primary("알림 받기")
+                ActionButton(title: "알림 받기")
             }
         }
     }
@@ -130,7 +130,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
                 }
             }
         } footer: {
-            ActionButton.primary("계속하기")
+            ActionButton(title: "계속하기")
         }
     }
     .frame(width: 390, height: 320)
