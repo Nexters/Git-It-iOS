@@ -30,7 +30,7 @@ extension ProjectListScreen {
 
                 Spacer(minLength: 0)
 
-                ActionButton.primary("다시 시도하기", action: onRetry)
+                FeedbackActionButton(title: "다시 시도하기", style: .primary, action: onRetry)
                     .designSystemScreenMargin()
                     .padding(.bottom, Constant.bottomButtonPadding)
             }

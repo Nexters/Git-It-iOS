@@ -28,7 +28,7 @@ extension QuestionSolvingScreen {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             } footer: {
-                ActionButton.primary("닫기", action: onClose)
+                FeedbackActionButton(title: "닫기", style: .primary, action: onClose)
                     .padding(.top, Constant.buttonTopPadding)
             }
         }

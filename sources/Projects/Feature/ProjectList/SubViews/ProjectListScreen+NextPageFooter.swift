@@ -22,7 +22,7 @@ extension ProjectListScreen {
                 VStack(spacing: Constant.textSpacing) {
                     StyledText.body2("프로젝트를 더 불러오지 못했어요", color: .grey400, alignment: .center)
 
-                    ActionButton.text("다시 시도하기", size: .small, action: onRetry)
+                    FeedbackActionButton(title: "다시 시도하기", style: .text, size: .small, action: onRetry)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Constant.verticalPadding)

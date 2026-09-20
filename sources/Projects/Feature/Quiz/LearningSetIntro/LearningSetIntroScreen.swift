@@ -72,8 +72,9 @@ struct LearningSetIntroScreen: View {
                     StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
                 }
 
-                ActionButton.primary(
-                    "시작하기",
+                FeedbackActionButton(
+                    title: "시작하기",
+                    style: .primary,
                     isEnabled: store.isStartEnabled,
                     action: { send(.startTapped) },
                 )

@@ -40,8 +40,8 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: LayoutToken.compactSpacing) {
-                ActionButton.primary("다음", action: { send(.confirmTapped) })
-                ActionButton.secondary("이 레포지토리가 아니에요", action: { send(.rejectTapped) })
+                FeedbackActionButton(title: "다음", style: .primary, action: { send(.confirmTapped) })
+                FeedbackActionButton(title: "이 레포지토리가 아니에요", style: .secondary, action: { send(.rejectTapped) })
             }
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)

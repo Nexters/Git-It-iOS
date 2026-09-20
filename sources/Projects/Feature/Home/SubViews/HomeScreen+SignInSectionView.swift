@@ -15,7 +15,7 @@ extension HomeScreen {
                     StyledText.caption1(Constant.caption, color: .grey400)
                 }
                 Spacer()
-                ActionButton.secondary(Constant.signInTitle, size: .small, action: onSignIn)
+                FeedbackActionButton(title: Constant.signInTitle, style: .secondary, size: .small, action: onSignIn)
                     .fixedSize(horizontal: true, vertical: false)
             }
             .frame(minHeight: Constant.minHeight)

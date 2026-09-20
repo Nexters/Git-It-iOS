@@ -52,8 +52,9 @@ struct PositionSelectionScreen: View {
             .padding(.top, LayoutToken.margin)
         } footer: {
             BottomActionBar {
-                ActionButton.primary(
-                    "다음",
+                FeedbackActionButton(
+                    title: "다음",
+                    style: .primary,
                     isEnabled: store.position != nil,
                     action: { send(.nextTapped) },
                 )

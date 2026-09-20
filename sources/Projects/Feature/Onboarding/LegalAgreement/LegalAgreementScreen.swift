@@ -38,10 +38,11 @@ struct LegalAgreementScreen: View {
                 .padding(.top, Constant.documentsTopSpacing)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    ActionButton.secondary("취소", action: { send(.cancelTapped) })
+                    FeedbackActionButton(title: "취소", style: .secondary, action: { send(.cancelTapped) })
 
-                    ActionButton.primary(
-                        "다음",
+                    FeedbackActionButton(
+                        title: "다음",
+                        style: .primary,
                         isEnabled: store.canContinue,
                         action: { send(.continueTapped) },
                     )

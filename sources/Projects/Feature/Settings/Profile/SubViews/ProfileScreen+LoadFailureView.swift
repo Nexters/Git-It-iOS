@@ -15,7 +15,7 @@ extension ProfileScreen {
                     StyledText.caption1(Constant.message, color: .grey400)
                 }
                 Spacer()
-                ActionButton.secondary(Constant.retryTitle, size: .small, action: onRetry)
+                FeedbackActionButton(title: Constant.retryTitle, style: .secondary, size: .small, action: onRetry)
                     .fixedSize(horizontal: true, vertical: false)
             }
             .frame(minHeight: Constant.minHeight)

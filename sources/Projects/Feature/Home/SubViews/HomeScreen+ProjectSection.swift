@@ -163,7 +163,7 @@ extension HomeScreen {
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
                         StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
-                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped)
+                        FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onProjectRetryTapped)
                     }
                     .designSystemScreenMargin()
                 }

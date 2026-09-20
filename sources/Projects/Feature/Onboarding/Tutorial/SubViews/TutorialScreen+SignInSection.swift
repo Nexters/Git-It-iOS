@@ -26,10 +26,16 @@ extension TutorialScreen {
 
                 AppleSignInButton(action: onAppleSignIn)
 
-                ActionButton.text(Constant.guestAccessTitle, size: .small, isEnabled: isHintVisible, action: onGuestAccess)
-                    .opacity(isHintVisible ? 1 : 0)
-                    .accessibilityHidden(!isHintVisible)
-                    .padding(.top, LayoutToken.compactSpacing)
+                FeedbackActionButton(
+                    title: Constant.guestAccessTitle,
+                    style: .text,
+                    size: .small,
+                    isEnabled: isHintVisible,
+                    action: onGuestAccess,
+                )
+                .opacity(isHintVisible ? 1 : 0)
+                .accessibilityHidden(!isHintVisible)
+                .padding(.top, LayoutToken.compactSpacing)
 
                 StyledText.body2("버전 \(bundleVersion)", color: .grey500, alignment: .center)
                     .padding(.top, Constant.versionTopSpacing)

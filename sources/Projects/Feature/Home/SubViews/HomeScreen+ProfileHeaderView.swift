@@ -17,7 +17,7 @@ extension HomeScreen {
                         StyledText.caption1("잠시 후 다시 시도해 주세요.", color: .grey400)
                     }
                     Spacer()
-                    ActionButton.secondary("다시 시도", size: .small, action: onRetry)
+                    FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onRetry)
                         .fixedSize(horizontal: true, vertical: false)
                 }
                 .frame(minHeight: Constant.failureMinHeight)

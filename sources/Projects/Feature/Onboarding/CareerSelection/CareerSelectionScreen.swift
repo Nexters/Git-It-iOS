@@ -56,8 +56,9 @@ struct CareerSelectionScreen: View {
                 VStack(spacing: LayoutToken.gutter) {
                     StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
 
-                    ActionButton.primary(
-                        "다음",
+                    FeedbackActionButton(
+                        title: "다음",
+                        style: .primary,
                         isEnabled: store.careerLevel != nil && store.submission != .submitting,
                         action: { send(.submitTapped) },
                     )

@@ -46,8 +46,9 @@ extension SettingsScreen {
                 .padding(.top, Constant.contentTopPadding)
             } footer: {
                 BottomActionBar {
-                    ActionButton.text(
+                    FeedbackActionButton(
                         styledText: StyledText.body1(Constant.confirmTitle, color: .error, alignment: .center),
+                        style: .text,
                         isEnabled: store.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
