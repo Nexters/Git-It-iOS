@@ -26,7 +26,7 @@ public struct ProfileScreen: View {
                         .frame(height: Constant.headerControlRowHeight)
                     Spacer()
 
-                    IconGlassButton.neutral(
+                    IconGlassButton(
                         icon: Constant.settingsControl.icon,
                         label: Constant.settingsControl.label,
                         size: .medium,

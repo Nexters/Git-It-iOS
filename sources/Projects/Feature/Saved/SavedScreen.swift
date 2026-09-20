@@ -64,7 +64,7 @@ struct SavedScreen: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: Constant.headerVerticalSpacing) {
                     if store.isBackControlPresented {
-                        IconGlassButton.neutral(
+                        IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
                             size: .medium,

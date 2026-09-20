@@ -16,7 +16,7 @@ extension SavedScreen {
                 VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
                     HStack(alignment: .top, spacing: LayoutToken.gutter) {
                         if isBackControlPresented {
-                            IconGlassButton.neutral(
+                            IconGlassButton(
                                 icon: ScreenControlBar.Control.back.icon,
                                 label: ScreenControlBar.Control.back.label,
                                 size: .medium,

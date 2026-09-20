@@ -24,7 +24,7 @@ public struct ScreenControlBar: View {
     public var body: some View {
         HStack(alignment: .top, spacing: LayoutToken.gutter) {
             if let leading {
-                IconGlassButton.neutral(
+                IconGlassButton(
                     icon: leading.icon,
                     label: leading.label,
                     size: .medium,
@@ -35,7 +35,7 @@ public struct ScreenControlBar: View {
             Spacer(minLength: 0)
 
             if let trailing {
-                IconGlassButton.neutral(
+                IconGlassButton(
                     icon: trailing.icon,
                     label: trailing.label,
                     size: .medium,

@@ -15,7 +15,7 @@ extension SettingsScreen {
             OverlayContainer {
                 VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
                     HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                        IconGlassButton.neutral(
+                        IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
                             size: .medium,

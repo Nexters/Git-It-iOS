@@ -88,7 +88,7 @@ public struct ProjectListScreen: View {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
                             if let headerLeading {
-                                IconGlassButton.neutral(
+                                IconGlassButton(
                                     icon: headerLeading.icon,
                                     label: headerLeading.label,
                                     size: .medium,
@@ -104,7 +104,7 @@ public struct ProjectListScreen: View {
                         Spacer()
 
                         if let headerTrailing, !store.projects.isEmpty {
-                            IconGlassButton.neutral(
+                            IconGlassButton(
                                 icon: headerTrailing.icon,
                                 label: headerTrailing.label,
                                 size: .medium,
@@ -130,7 +130,7 @@ public struct ProjectListScreen: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
                     if let headerLeading {
-                        IconGlassButton.neutral(
+                        IconGlassButton(
                             icon: headerLeading.icon,
                             label: headerLeading.label,
                             size: .medium,
@@ -147,7 +147,7 @@ public struct ProjectListScreen: View {
                 Spacer()
 
                 if let headerTrailing {
-                    IconGlassButton.neutral(
+                    IconGlassButton(
                         icon: headerTrailing.icon,
                         label: headerTrailing.label,
                         size: .medium,

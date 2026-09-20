@@ -131,9 +131,10 @@ public struct ProjectRow<Thumbnail: View>: View {
     @ViewBuilder
     private var accessoryButton: some View {
         if isDeleting {
-            IconGlassButton.destructive(
+            IconGlassButton(
                 icon: .minus,
                 label: "\(name) 삭제",
+                style: .destructive,
                 size: .medium,
                 action: onAccessoryTap,
             ).designSystemBackground(.clear)

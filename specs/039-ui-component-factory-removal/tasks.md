@@ -237,34 +237,34 @@ compile 경계를 공유한다.
 
 ### 구현
 
-- [ ] T026 [S1] `sources/Projects/UI/Component/Controls/IconGlassButton.swift`에서 정적 팩토리
+- [X] T026 [S1] `sources/Projects/UI/Component/Controls/IconGlassButton.swift`에서 정적 팩토리
   3개를 제거하고 `public init(icon:label:style:size:action:)`만 공개 생성 경로로 남긴다
-- [ ] T027 [S1] `sources/Projects/UI/Component/Controls/ScreenControlBar/ScreenControlBar.swift`의
+- [X] T027 [S1] `sources/Projects/UI/Component/Controls/ScreenControlBar/ScreenControlBar.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T028 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`의
+- [X] T028 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T029 [P] [S1] `sources/Projects/UI/Component/Overlays/WebSheet.swift`의
+- [X] T029 [P] [S1] `sources/Projects/UI/Component/Overlays/WebSheet.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T030 [P] [S1] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`의
+- [X] T030 [P] [S1] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T031 [P] [S1] `sources/Projects/Feature/Saved/SavedScreen.swift`의 `IconGlassButton`
+- [X] T031 [P] [S1] `sources/Projects/Feature/Saved/SavedScreen.swift`의 `IconGlassButton`
   팩토리 호출을 초기화 호출로 전환한다
-- [ ] T032 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+ErrorView.swift`의
+- [X] T032 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+ErrorView.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T033 [P] [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`의
+- [X] T033 [P] [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T034 [P] [S1] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`의
+- [X] T034 [P] [S1] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T035 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`의
+- [X] T035 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T036 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`의
+- [X] T036 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T037 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`의
+- [X] T037 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`의
   `IconGlassButton` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T038 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`을 실행하고
+- [X] T038 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`을 실행하고
   잔여 팩토리 호출 grep이 0건인지 확인한다
 
 **진행 점검**: T026~T038의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.
