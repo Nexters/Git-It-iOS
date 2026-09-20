@@ -127,21 +127,10 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 신뢰하지 않습니다. 공용 판독·검증은 `tools/spec-kit/bin/resolve-feature.sh`와
 `tools/spec-kit/bin/validate.sh`를 사용합니다.
 
-| 스킬 | 허용 수정 경로 |
-| --- | --- |
-| `speckit-specify` | 기록 파일 이름을 제외한 `specs/<feature>/**`, `.specify/feature.json` |
-| `speckit-clarify` | `specs/<feature>/spec.md`, `specs/<feature>/checklists/requirements.md` |
-| `speckit-plan` | `specs/<feature>/plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/**` |
-| `speckit-tasks` | `specs/<feature>/tasks.md` |
-| `speckit-checklist` | `specs/<feature>/checklists/**` |
-| `speckit-analyze` | 없음 (읽기 전용) |
-| `speckit-converge` | `specs/<feature>/tasks.md` 끝에 새 단계 추가만 |
-| `speckit-implement` | 활성 `tasks.md`에 명시된 파일, `tasks.md`의 완료 표시 |
-| `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈만 생성 |
-| `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
-| `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
-| `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
-| `speckit-tacit-knowledge` | `docs/spec-kit/<feature>/tacit-knowledge.md` 생성 또는 파일 끝에 새 항목 추가만 |
+각 스킬의 허용 수정 경로 정본은
+[Constitution 원칙 5 — Spec-Kit 범위](.specify/memory/constitution.md)의 표입니다. 이
+문서는 표를 복제하지 않으며, 경로를 확인하거나 넓혀야 하면 그 표를 읽고 필요한 경우
+Constitution을 개정합니다.
 
 기능 명세는 사용자에게 관찰되는 동작 변경뿐 아니라 내부 품질·구조·운영·개발 경험,
 리팩터링·스타일·의존성 갱신에도 작성할 수 있습니다. 작성 여부는 변경의 위험·범위·협업
