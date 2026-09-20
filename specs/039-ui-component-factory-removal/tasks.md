@@ -108,19 +108,19 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 구현
 
-- [ ] T009 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`에 공개 변형
+- [X] T009 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`에 공개 변형
   enum `Edge`(`top`, `bottom`)를 추가하고 `GradientToken.topEdgeScrim`·`.bottomEdgeScrim`
   선택을 이 enum이 소유하게 한다([research.md](research.md) §3의 이름 결정)
-- [ ] T010 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`에
+- [X] T010 [S2] `sources/Projects/UI/Component/Overlays/ScreenEdgeScrim.swift`에
   `public init(edge:height:)`를 추가하고 정적 팩토리 `top(height:)`·`bottom(height:)`와
   같은 파일의 `#Preview` 호출 2곳을 초기화 호출로 전환한다. 이 컴포넌트는 production
   호출부가 없고 프리뷰 2곳과 계약 테스트 2곳이 전부다
-- [ ] T011 [S2] `sources/Projects/UI/Tests/Component/Unit/Overlays/ScreenEdgeScrimContractTests.swift`의
+- [X] T011 [S2] `sources/Projects/UI/Tests/Component/Unit/Overlays/ScreenEdgeScrimContractTests.swift`의
   호출부를 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T012 [no-write] [quickstart.md](quickstart.md)의 단위 검증 절차로 `compile`과
+- [X] T012 [no-write] [quickstart.md](quickstart.md)의 단위 검증 절차로 `compile`과
   `ScreenEdgeScrim` 계약 테스트를 실행하고 프리뷰 표현이 전환 전과 같은지 확인한다
 
 **진행 점검**: T009~T012의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.
