@@ -12,8 +12,8 @@
 # 커밋해야 합니다. 여기에 적힌 단계의 스크립트가 없거나 실행 권한이 없으면
 # 건너뛰지 않고 실패합니다.
 #
-# 스크립트는 pre-commit.d/에 모두 들어와 있습니다. 현재는 커밋 검증을
-# 비활성화한 상태입니다. 재활성화할 때 필요한 단계의 주석만 풉니다.
+# 스크립트는 pre-commit.d/에 모두 들어와 있습니다. 지금은 아래 세 단계를
+# 활성화했고, 나머지는 선행 조건이 갖춰지는 대로 주석을 풉니다.
 #
 #   script-tests   셸 회귀·정적 검증
 #   swift-format   staged Swift 포맷 적용
@@ -21,9 +21,11 @@
 #   package-dependencies  아키텍처 패키지 의존성 표 검사
 #   build          모든 공유 scheme Debug 빌드
 #   compile        테스트 scheme build-for-testing
-#
-# script-tests
-# swift-format
-# package-dependencies
-# build
-# compile
+
+script-tests
+swift-format
+package-dependencies
+
+# design-rules  UI/Component의 기존 위반을 토큰·허용 목록으로 정리한 뒤 켭니다.
+# build         커밋 시간 증가를 수용할 때 켭니다.
+# compile       커밋 시간 증가를 수용할 때 켭니다.

@@ -30,10 +30,18 @@ for step in swift-format build compile; do
 	[ -x "$repository/$fixture_hooks_root/pre-commit.d/$step.sh" ]
 done
 [ ! -e "$repository/$fixture_hooks_root/pre-commit.d/test.sh" ]
-# 기본 pre-commit 검증 단계는 모두 비활성화되어 있습니다.
-if rg -q '^[[:space:]]*(script-tests|swift-format|build|compile)[[:space:]]*$' \
+# 기본 pre-commit 검증 단계는 셸 회귀, staged Swift 포맷과 패키지 의존성 검사입니다.
+for step in script-tests swift-format package-dependencies; do
+	if ! rg -q "^[[:space:]]*${step}[[:space:]]*\$" \
+		"$repository/$fixture_hooks_root/pre-commit.d/enabled"; then
+		printf 'FAIL: 기본 pre-commit 검증 단계가 비활성화됨: %s\n' "$step" >&2
+		exit 1
+	fi
+done
+# 선행 조건이 남은 단계는 기본으로 비활성화되어 있습니다.
+if rg -q '^[[:space:]]*(design-rules|build|compile)[[:space:]]*$' \
 	"$repository/$fixture_hooks_root/pre-commit.d/enabled"; then
-	printf 'FAIL: 기본 pre-commit 검증 단계가 활성화됨\n' >&2
+	printf 'FAIL: 선행 조건이 남은 pre-commit 단계가 활성화됨\n' >&2
 	exit 1
 fi
 [ "$global_before" = "$(cksum "$global_config")" ]
