@@ -187,23 +187,23 @@ compile되지 않는다.
 
 ### 구현
 
-- [ ] T019 [S1] `sources/Projects/UI/Component/Displays/LabeledCard.swift`의 `private enum Style`을
+- [X] T019 [S1] `sources/Projects/UI/Component/Displays/LabeledCard.swift`의 `private enum Style`을
   `public enum Style`로 올린다. 접근 수준만 바꾸고 `case`·토큰 매핑은 유지한다
-- [ ] T020 [S1] `sources/Projects/UI/Component/Displays/LabeledCard.swift`에
+- [X] T020 [S1] `sources/Projects/UI/Component/Displays/LabeledCard.swift`에
   `public init(label:text:style:)`을 추가하고 정적 팩토리 `accent(label:text:)`·
   `neutral(label:text:)`를 제거한 뒤 `#Preview` 호출부를 초기화 호출로 전환한다
-- [ ] T021 [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의
+- [X] T021 [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의
   `LabeledCard` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T022 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Displays/LabeledCardTests.swift`의
+- [X] T022 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Displays/LabeledCardTests.swift`의
   팩토리 호출을 초기화 호출로 전환한다
-- [ ] T023 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`의
+- [X] T023 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`의
   `LabeledCard` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T024 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+EssayResultSection.swift`의
+- [X] T024 [P] [S1] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+EssayResultSection.swift`의
   `LabeledCard` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T025 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과
+- [X] T025 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과
   `LabeledCard` 테스트를 실행하고 프리뷰 표현이 전환 전과 같은지 확인한다
 
 **진행 점검**: T019~T025의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.

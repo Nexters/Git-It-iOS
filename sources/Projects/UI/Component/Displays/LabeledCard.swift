@@ -5,37 +5,21 @@ import SwiftUI
 
 public struct LabeledCard: View {
 
+    // MARK: Lifecycle
+
+    public init(
+        label: String,
+        text: String,
+        style: Style,
+    ) {
+        self.label = label
+        self.text = text
+        self.style = style
+    }
+
     // MARK: Public
 
-    public var body: some View {
-        VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-            StyledText.caption1(label, color: .blue100)
-            StyledText.body2(text, color: style.textColor)
-        }
-        .padding(Constant.padding)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .designSystemBackground(style.background)
-        .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .combine)
-    }
-
-    public static func accent(
-        label: String,
-        text: String,
-    ) -> Self {
-        Self(label: label, text: text, style: .accent)
-    }
-
-    public static func neutral(
-        label: String,
-        text: String,
-    ) -> Self {
-        Self(label: label, text: text, style: .neutral)
-    }
-
-    // MARK: Private
-
-    private enum Style: Sendable, Equatable {
+    public enum Style: Sendable, Equatable {
         case accent
         case neutral
 
@@ -56,6 +40,20 @@ public struct LabeledCard: View {
         }
     }
 
+    public var body: some View {
+        VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+            StyledText.caption1(label, color: .blue100)
+            StyledText.body2(text, color: style.textColor)
+        }
+        .padding(Constant.padding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .designSystemBackground(style.background)
+        .designSystemCornerRadius(.large)
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: Private
+
     private enum Constant {
         static let titleSpacing: CGFloat = 8
         static let padding: CGFloat = 16
@@ -69,9 +67,9 @@ public struct LabeledCard: View {
 
 #Preview("Labeled Card") {
     VStack(spacing: LayoutToken.gutter) {
-        LabeledCard.accent(label: "AI 해설", text: "State는 값 타입 소유에 씁니다.")
-        LabeledCard.neutral(label: "나의 답안", text: "State는 값 타입을 소유할 때 사용합니다.")
-        LabeledCard.neutral(label: "AI의 답안", text: "State는 값 타입 소유에 씁니다.")
+        LabeledCard(label: "AI 해설", text: "State는 값 타입 소유에 씁니다.", style: .accent)
+        LabeledCard(label: "나의 답안", text: "State는 값 타입을 소유할 때 사용합니다.", style: .neutral)
+        LabeledCard(label: "AI의 답안", text: "State는 값 타입 소유에 씁니다.", style: .neutral)
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
