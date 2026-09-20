@@ -85,6 +85,13 @@ Load only the minimal necessary context from each artifact:
 
 - Load `.specify/memory/constitution.md` for principle validation
 
+**From convention documents (Constitution 원칙 11):**
+
+- `GIT_IT_DOCS_ROOT` 판독 결과 아래의 `docs/conventions/README.md`, 이번 기능에 해당하는 인덱스와
+  그 구체 명시 문서, 영향받는 패키지의 `docs/package-rules/<패키지>.md`, `docs/architecture.md`
+- `plan.md`의 "적용 컨벤션" 표(문서 목록과 각 문서가 부과한 제약)
+- 적재 범위는 이번 기능에 해당하는 문서로 한정하고 원문을 출력에 복사하지 않는다
+
 ### 3. Build Semantic Models
 
 Create internal representations (do not include raw artifacts in output):
@@ -118,6 +125,10 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 
 - Any requirement or plan element conflicting with a MUST principle
 - Missing mandated sections or quality gates from constitution
+- 원칙 11 근거 누락: `plan.md`에 "적용 컨벤션"이 없거나 적용 문서와 제약이 비어 있음
+- 원칙 11 위반: `tasks.md`의 파일 경로가 디렉터리·파일 또는 파일·형태 어휘 컨벤션과 어긋남,
+  새 공개 이름이 네이밍 컨벤션과 어긋남, 테스트 작업이 테스트 컨벤션의 프레임워크·배치와
+  어긋남, 작업이 `docs/package-rules/**` 또는 `docs/architecture.md`의 의존 방향을 위반함
 
 #### E. Coverage Gaps
 

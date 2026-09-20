@@ -38,9 +38,26 @@ paths for later task generation instead of modifying source, tests, or configura
 
 2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
+   Constitution 원칙 11에 따라 설계를 시작하기 전에 근거 문서도 함께 읽는다. 문서 루트는
+   공개 경로 판독기의 `GIT_IT_DOCS_ROOT`로 확인하고 구 경로 `sources/docs/**`는 사용하지
+   않는다.
+   - `docs/conventions/README.md`와 이번 변경에 해당하는 인덱스 문서, 그 인덱스가 가리키는
+     구체 명시 문서
+   - 변경 대상 패키지의 `docs/package-rules/<패키지>.md`
+   - `docs/architecture.md`(패키지 책임과 허용 의존 방향, 위상 순서의 근거)
+
+   적재 범위는 이번 변경에 해당하는 문서로 한정하고, 산출물에는 내용을 재서술하지 않고
+   저장소 상대경로로 참조한다. 이 문서들은 읽기 전용이며 이 스킬이 수정하지 않는다.
+
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
    - Fill Constitution Check section from constitution
+   - "적용 컨벤션" 표에 적용한 컨벤션·패키지 규칙 문서를 저장소 상대경로로 적고 각 문서가
+     이번 설계에 부과한 구체적인 제약을 기록한다. 적용 대상이 없다고 판단하면 그 근거를 남긴다
+   - 명세나 기존 구현 관행이 컨벤션과 충돌하면 산출물을 생성하지 말고 ERROR. 우선순위는
+     Constitution → 컨벤션·패키지 규칙 → 계획·작업이며, 어느 쪽이 옳은지 불분명하면 사용자에게 확인
+   - 컨벤션이 이번 요구를 다루지 않으면 결정과 근거를 복잡성 추적 또는 research.md에 기록하고
+     컨벤션 문서 자체는 수정하지 않는다
    - Evaluate gates (ERROR if violations unjustified)
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
    - Phase 1: Generate data-model.md, contracts/, quickstart.md
@@ -124,5 +141,6 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
 ## Done When
 
 - [ ] Plan workflow executed and design artifacts generated
+- [ ] 컨벤션·패키지 규칙·아키텍처 문서를 읽고 "적용 컨벤션"에 근거와 제약을 기록
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with branch, plan path, and generated artifacts

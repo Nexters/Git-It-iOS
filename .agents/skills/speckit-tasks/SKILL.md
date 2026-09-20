@@ -52,6 +52,11 @@ cache는 허용하되 실행 전후 Git 상태를 비교하고 추적 파일 변
    - **Required**: plan.md (tech stack, libraries, structure), spec.md (prioritized change scenarios)
    - **Optional**: data-model.md (entities), contracts/ (interface contracts), research.md (decisions), quickstart.md (test scenarios)
    - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
+   - **필수(Constitution 원칙 11)**: plan.md의 "적용 컨벤션"에 기록된 문서와 변경 대상
+     패키지의 `docs/package-rules/<패키지>.md`, `docs/architecture.md`를 읽는다. 경로·이름·
+     테스트 판단에 필요한 `docs/conventions/` 인덱스와 그 구체 명시 문서도 함께 읽는다.
+     문서 루트는 `GIT_IT_DOCS_ROOT`로 확인하고 `sources/docs/**`는 사용하지 않는다.
+     plan.md에 "적용 컨벤션"이 없으면 tasks.md를 생성하지 말고 `/speckit-plan`을 먼저 실행하도록 보고
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
@@ -72,6 +77,11 @@ cache는 허용하되 실행 전후 Git 상태를 비교하고 추적 파일 변
    - 각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위나 읽기 전용 전체
      검증을 위한 승인 게이트는 생성하지 않음. 새 범위·파괴적 작업·외부 상태 변경·새 제품
      결정처럼 새로운 권한이 필요한 경우에만 승인 작업을 둠
+   - 파일 경로는 `docs/conventions/directory-file.md`와 `file-vocabulary.md`, 새 공개 이름은
+     `docs/conventions/naming.md`, 테스트 작업은 `docs/conventions/test.md`, 패키지 책임과 의존
+     방향은 `docs/package-rules/<패키지>.md`와 `docs/architecture.md`로 확인한 값만 사용.
+     컨벤션으로 확인할 수 없는 경로나 이름은 작업으로 확정하지 말고 ERROR로 보고해 plan.md의
+     "적용 컨벤션"을 먼저 갱신하도록 안내
    - 작업은 정확한 경로와 의존성을 가진 원자적 실행 항목으로 유지하고 커밋 단위를 tasks.md에
      미리 고정하지 않음. `/speckit-implement`가 선택 실행 단위의 미완료 작업을 실행 시점에
      논리적 커밋 단위로 설계할 수 있을 만큼 각 작업 경계가 명확한지 검증
@@ -208,6 +218,7 @@ Every task MUST strictly follow this format:
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
+- [ ] 모든 파일 경로·공개 이름·테스트 작업이 컨벤션과 패키지 규칙으로 확인된 값인지 검증
 - [ ] 실행 단위가 근거 있는 의존성 순서로 배치되고 integration unit의 분리 불가 근거 확인
 - [ ] 각 작업이 부분 완료 없이 implement 시점의 논리적 커밋 단위에 배정 가능한 원자성 확인
 - [ ] 각 실행 단위 검증·결과 보고와 위험 기반 승인 조건, 마지막 `[no-write]` 전체 검증 확인

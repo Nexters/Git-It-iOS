@@ -78,6 +78,10 @@ Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --inclu
 - PLAN = FEATURE_DIR/plan.md
 - TASKS = FEATURE_DIR/tasks.md
 - CONSTITUTION = `.specify/memory/constitution.md` (if present)
+- CONVENTIONS = Constitution 원칙 11이 요구하는 근거 문서. `GIT_IT_DOCS_ROOT` 판독 결과 아래의
+  `docs/conventions/README.md`와 이번 수렴에 해당하는 인덱스·구체 명시 문서, 영향받는 패키지의
+  `docs/package-rules/<패키지>.md`, `docs/architecture.md`, 그리고 `plan.md`의 "적용 컨벤션".
+  구 경로 `sources/docs/**`는 사용하지 않는다
 If `spec.md`, `plan.md`, or `tasks.md` is missing, STOP with a clear, actionable message naming the
 prerequisite command to run (`/speckit-specify` for a missing spec, `/speckit-plan` for a missing plan,
 `/speckit-tasks` for missing tasks). Do not produce partial output.
@@ -196,7 +200,9 @@ Append to the **end** of `tasks.md`, per the append contract:
    `<gap-type>` is one of `missing`, `partial`, `contradicts`, `unrequested`.
 
    각 파일 변경 task는 부분 완료 없이 검증할 수 있는 하나의 원자적 목적과 정확한 저장소
-   상대경로 하나를 포함해야 한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
+   상대경로 하나를 포함해야 한다. 새 경로, 새로 만들거나 바꾸는 공개 이름과 테스트 배치는
+   Constitution 원칙 11에 따라 CONVENTIONS로 확인한 값만 사용한다. 컨벤션으로 확인할 수 없으면
+   그 task를 append하지 않고 근거 부족을 보고한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
    `<source-ref>`와 `<gap-type>`을 유지한 별도 task로 분리한다. Commit 제목이나 그룹은
    append하지 않으며 `/speckit-implement`가 실행 시점에 논리적 단위를 설계한다.
 
@@ -207,7 +213,8 @@ Append to the **end** of `tasks.md`, per the append contract:
    unit으로 배정하고 분리 불가 근거, 정확한 경로와 통합 검증을 기록한다.
    각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위 또는 읽기 전용 전체
    검증을 위한 승인 게이트는 추가하지 않는다. 새 권한이 필요한 경우에만 승인 작업을 append한다.
-   `## 단계 N: 수렴` 아래에 `### 작업 패키지: <PackageName>` 하위 섹션을 활성 tasks.md가
+   `## 단계 N: 수렴` 아래에 `### 실행 단위: <PackageName>` 또는
+   `### 실행 단위: <이름> (integration unit: <패키지 목록>)` 하위 섹션을 활성 tasks.md가
    확정한 의존성 위상 순서로 만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다.
    공용 파일 변경은 분리 가능한 경우 패키지별 작업으로 나누고, 불가분하면 integration unit에
    배치한다. 책임 단위나 검증을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.

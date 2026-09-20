@@ -1,32 +1,33 @@
 <!--
 Sync Impact Report
-- Version change: 6.0.0 → 7.0.0
-- Modified principles: 4. 스킬별 수정 경로 — 수정 경로 표를 단일 정본으로 지정;
-  7. 패키지 단위 구현 진행 → 위험 기반 실행 단위 — 반복 승인과 단일 패키지 강제를 제거하고
-  불가분한 다중 패키지 단위 및 선택적 기준선을 허용하되, `[no-write]` 검증이 추적 대상
-  소스·문서와 Git index를 직접 변경하지 않는다는 기준과 `make tuist`의 파생 workspace·
-  project·cache 갱신을 허용하는 예외 및 실행 전후 추적 파일 확인 의무를 유지;
-  9. Spec Kit 세션 지식 기록 — 반복되거나 재사용 가능한 사건만 영구 기록하도록 문턱 강화
+- Version change: 7.1.0 → 7.2.0
+- Modified principles: 11. 컨벤션 근거 기반 설계와 작업 생성 — 적용 스킬을
+  `/speckit-plan`·`/speckit-tasks`에서 `/speckit-converge`(새 파일 변경 작업 append)까지
+  확장하고, `/speckit-analyze`가 같은 근거 문서로 위반을 탐지하도록 검증 의무를 추가
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md;
-  ✅ .specify/templates/tasks-template.md; ✅ .specify/templates/spec-template.md (변경 불필요);
-  ✅ .specify/templates/constitution-template.md (변경 불필요)
-- Commands requiring updates: ✅ 설치된 모든 `.agents/skills/speckit-*/SKILL.md`의 기록 조건;
-  ✅ speckit-plan, speckit-tasks, speckit-converge, speckit-implement의 실행 경계
-- Runtime guidance requiring updates: ⚠ AGENTS.md의 중복 수정 경로 표는 이 Skill의 허용
-  경로 밖이므로 후속 동기화 필요; ✅ README.md 검토 완료(변경 불필요);
-  ✅ docs/architecture.md, .github/COMMIT_CONVENTION.md 검토 완료(변경 불필요)
+- Templates requiring updates: ✅ .specify/templates/constitution-template.md (실제 헌법의
+  `## 원칙`·`## 적용` 구조와 메타데이터 블록에 맞게 재작성);
+  ✅ .specify/templates/tasks-template.md (최상위 제목을 실행 단위 형식으로 통일하고
+  integration unit 예시 추가); ✅ .specify/templates/plan-template.md (변경 불필요);
+  ✅ .specify/templates/spec-template.md (변경 불필요);
+  ✅ .specify/templates/checklist-template.md (변경 불필요)
+- Commands requiring updates: ✅ .agents/skills/speckit-converge/SKILL.md;
+  ✅ .agents/skills/speckit-analyze/SKILL.md;
+  ✅ .agents/skills/speckit-clarify/SKILL.md (명세 반영 대상 섹션을 한국어 정본 제목으로 교정);
+  ✅ .agents/skills/speckit-plan/SKILL.md, speckit-tasks/SKILL.md (7.1.0에서 반영 완료)
+- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md)는 원칙 5 참조로 동기화 완료;
+  ✅ docs/conventions/**, docs/package-rules/**, docs/architecture.md 검토 완료(변경 불필요)
 - Evidence records: 없음
-- Follow-up TODO: AGENTS.md가 Constitution의 정본 표를 참조하도록 별도 사용자 지시로 동기화
+- Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 7.0.0<br>
+**버전**: 7.2.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-08-26
+**최종 수정일**: 2026-09-20
 
 ## 원칙
 
@@ -316,6 +317,37 @@ Sync Impact Report
 - 세부 적용 사례, 패키지별 어휘와 예외는 `docs/conventions/naming.md`에 기록합니다. 해당 문서가
   작성되기 전에는 이 원칙을 직접 적용합니다. 네이밍 컨벤션은 Constitution보다 우선할 수
   없으며 특정 기능의 이름을 다른 기능에 일괄 적용하는 근거로 사용할 수 없습니다.
+
+### 11. 컨벤션 근거 기반 설계와 작업 생성
+
+설계와 작업은 이 Constitution뿐 아니라 저장소가 소유한 컨벤션과 패키지 규칙을 근거로
+만들어야 합니다. 근거 문서를 읽지 않은 추정은 설계 산출물의 유효한 입력이 아닙니다.
+
+- `/speckit-plan`, `/speckit-tasks`와 `/speckit-converge`는 산출물을 생성·수정하기 전에
+  `.specify/memory/constitution.md`, 공통 컨벤션 인덱스(`docs/conventions/README.md`),
+  변경 대상 패키지의 `docs/package-rules/<패키지>.md`와 아키텍처
+  문서(`docs/architecture.md`)를 읽어야 합니다. 문서 루트는 `GIT_IT_DOCS_ROOT` 판독
+  결과를 사용하고 구 경로(`sources/docs/**`)는 사용하지 않습니다.
+- 적재 범위는 이번 변경에 해당하는 인덱스 문서와 그 인덱스가 가리키는 구체 명시 문서로
+  한정합니다. 관련 없는 컨벤션 전체를 복사하거나 산출물에 재서술하지 않고 저장소
+  상대경로 링크로 참조합니다.
+- `plan.md`는 적용한 컨벤션·패키지 규칙 문서를 저장소 상대경로로 나열하고, 각 문서가
+  이번 설계에 부과한 구체적인 제약을 명시해야 합니다. 적용 대상이 없다고 판단하면 그
+  근거를 남깁니다.
+- `tasks.md`의 파일 변경 작업 경로는 디렉터리·파일 컨벤션과 파일·형태 어휘를 따라야
+  하며, 새로 만들거나 바꾸는 공개 이름은 네이밍 컨벤션을, 테스트 작업은 테스트
+  컨벤션을 따라야 합니다. 컨벤션으로 확인할 수 없는 경로나 이름은 작업으로 확정하지
+  않습니다. 이 기준은 `/speckit-converge`가 수렴 단계에 append하는 새 파일 변경 작업에도
+  같게 적용하며, 수렴 단계는 근거 문서 없이 새 경로나 공개 이름을 확정할 수 없습니다.
+- `/speckit-analyze`는 같은 근거 문서를 읽고 이 원칙의 위반을 탐지 대상에 포함합니다.
+  `plan.md`의 적용 컨벤션 누락, 컨벤션과 어긋나는 작업 경로·공개 이름·테스트 배치는
+  Constitution 위반으로 보고하며, 읽기 전용 스킬이므로 산출물을 수정하지 않습니다.
+- 우선순위는 Constitution, 컨벤션·패키지 규칙, 계획·작업 산출물 순입니다. 명세나 기존
+  구현 관행이 컨벤션과 충돌하면 산출물을 생성하지 않고 중단한 뒤, 컨벤션을 따르거나
+  어느 쪽이 옳은지 사용자에게 확인합니다.
+- 컨벤션이 현재 요구를 다루지 않으면 `plan.md`의 복잡성 추적 또는 `research.md`에 결정과
+  근거를 기록합니다. 이 원칙이 적용되는 스킬은 컨벤션·패키지 규칙·아키텍처 문서를 수정할
+  수 없으며, 문서 갱신이 필요하면 별도 사용자 지시로 처리합니다.
 
 ## 적용
 
