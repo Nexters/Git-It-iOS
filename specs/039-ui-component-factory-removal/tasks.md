@@ -423,21 +423,21 @@ compile 경계를 공유한다.
 
 ### 구현
 
-- [ ] T058 [S4] `docs/conventions/view/component-init.md`의 제목을 "컴포넌트의 공개 생성
+- [X] T058 [S4] `docs/conventions/view/component-init.md`의 제목을 "컴포넌트의 공개 생성
   경로는 두 가지입니다"에서 단일 경로를 뜻하는 제목으로 바꾸고, "공개하는 생성 경로는 다음
   둘뿐" 규정과 정적 팩토리 항목을 제거해 초기화 메서드 하나만 공개 생성 경로로 규정한다.
   `ActionButton.primary(...)` 예시도 초기화 호출 예시로 교체한다
-- [ ] T059 [S4] `docs/conventions/view/component-init.md`에 삭제 대상 문서의 팩토리 무관
+- [X] T059 [S4] `docs/conventions/view/component-init.md`에 삭제 대상 문서의 팩토리 무관
   규칙 두 건을 옮긴다. (1) `@ViewBuilder`로 자식 View를 받는 컴포넌트는
   `init(..., content:)`를 생성 경로로 둔다, (2) 필요한 기본값은 해당 초기화 인자에 둔다.
   원문의 "§3.1에 따라"는 문서를 옮기면 가리키는 대상이 사라지므로
   `docs/conventions/view.md` §3.1(표시 값, Binding과 콜백) 링크로 풀어서 옮긴다
-- [ ] T060 [S4] **사용자 승인 완료(2026-09-20)** — `docs/conventions/view/factory-criteria.md`
+- [X] T060 [S4] **사용자 승인 완료(2026-09-20)** — `docs/conventions/view/factory-criteria.md`
   파일을 삭제한다. 문서 전문이 팩토리 정의 기준이며 보존할 규칙은 T059가 이미 옮긴 뒤여야
   한다. Constitution 원칙 5는 `/speckit-implement`에 파일 수정 권한만 부여하고 삭제를 명시하지
   않으므로 승인이 필요했고, 사용자가 이 세션에서 삭제를 승인했다. 구현 시 다시 중단하지 않고
   진행하되 PR에 원칙 3 예외로 기록한다
-- [ ] T061 [S4] `docs/conventions/view.md`에서 §3.2의 제목과 링크 텍스트
+- [X] T061 [S4] `docs/conventions/view.md`에서 §3.2의 제목과 링크 텍스트
   "컴포넌트의 공개 생성 경로는 두 가지입니다"를 T058의 새 제목에 맞추고, §3.3
   "팩토리를 정의하는 기준" 절과 `./view/factory-criteria.md` 링크를 삭제하며, §6 검토
   체크리스트의 팩토리 전제 항목 2개를 정리한다. 두 가지를 바꾸지 않는다. (1) §3 제목
@@ -446,20 +446,20 @@ compile 경계를 공유한다.
   `docs/conventions/ui-component/public-contract.md:7` 세 곳이 참조한다(FR-004b-1).
   (2) §3.4·§3.5의 절 번호 — `docs/retrospective/31-quiz-solving-flow.md`가 §3.5를 인용하므로
   재번호하지 않고 번호 공백을 남긴다(FR-004b-3)
-- [ ] T062 [P] [S4] `docs/conventions/view-tokens/typography.md`의 "`StyledText`의
+- [X] T062 [P] [S4] `docs/conventions/view-tokens/typography.md`의 "`StyledText`의
   Typography 팩토리를 사용합니다" 규정을 `StyledText` 초기화에 `TextStyleToken`을 넘기는
   규정으로 고친다
-- [ ] T063 [P] [S4] `docs/conventions/view-tokens.md` §2.4 본문과 §3 검토 체크리스트의
+- [X] T063 [P] [S4] `docs/conventions/view-tokens.md` §2.4 본문과 §3 검토 체크리스트의
   "`StyledText` Typography 팩토리" 문구를 초기화 기준으로 고친다
-- [ ] T064 [P] [S4] `docs/conventions/view-declarations/style.md`의 "호출부는 시각 변형
+- [X] T064 [P] [S4] `docs/conventions/view-declarations/style.md`의 "호출부는 시각 변형
   팩토리를 기본 선택 수단으로 사용합니다" 문장을 초기화 인자 기준으로 고친다
-- [ ] T065 [P] [S4] `docs/conventions/view/screen-init.md`에서 컴포넌트 팩토리를 전제하는
+- [X] T065 [P] [S4] `docs/conventions/view/screen-init.md`에서 컴포넌트 팩토리를 전제하는
   문구를 정리한다(FR-004d)
 
 ### 정리와 단위 검증
 
-- [ ] T066 [no-write] [quickstart.md](quickstart.md)의 컨벤션 검증 절차로 남은 6개 파일에
-  팩토리 정의를 요구·전제하는 문장이 없고(FR-004b), `factory-criteria.md`를 가리키는 링크가
+- [X] T066 [no-write] [quickstart.md](quickstart.md)의 컨벤션 검증 절차로 남은 6개 파일에
+  팩토리 정의를 요구·전제하는 문장이 없고(FR-004b, 금지 서술은 허용), `factory-criteria.md`를 가리키는 링크가
   남지 않았으며(FR-004b-2), `view.md#3-공개-생성-경로` 앵커를 참조하는 세 문서
   (`docs/package-rules/ui.md`, `docs/conventions/ui-component.md`,
   `docs/conventions/ui-component/public-contract.md`)의 링크가 모두 살아 있고(FR-004b-1),
@@ -477,16 +477,16 @@ compile 경계를 공유한다.
 **커밋 경계**: 아래 `[no-write]` 작업은 실행 단위 7의 마지막 커밋 단위에 배정한다. 모든
 검증과 필수 `after_implement` hook을 마친 뒤 그 단위를 최종 commit한다.
 
-- [ ] T067 [no-write] `project_build_runner`의 `build`·`compile`·`test`를 순서대로 실행하고
+- [X] T067 [no-write] `project_build_runner`의 `build`·`compile`·`test`를 순서대로 실행하고
   결과를 기록한다(FR-008)
-- [ ] T068 [no-write] 제거 대상 팩토리 30개의 호출과 정의가 저장소에 남지 않았는지
+- [X] T068 [no-write] 제거 대상 팩토리 30개의 호출과 정의가 저장소에 남지 않았는지
   [contracts/component-creation-api.md](contracts/component-creation-api.md)의 검증 표대로
   확인한다
-- [ ] T069 [no-write] `TabShellItem.tabColor(isSelected:)`와 `ResourceImage.resizable` 등
+- [X] T069 [no-write] `TabShellItem.tabColor(isSelected:)`와 `ResourceImage.resizable` 등
   생성 팩토리가 아닌 정적 선언이 변경되지 않았는지 확인한다(FR-009)
-- [ ] T070 [no-write] 시나리오 S1~S4의 독립 수용 기준과 SC-001~SC-007을 [spec.md](spec.md)
-  기준으로 검증한다. SC-006a는 `팩토리` 토큰 0건과 `component-init.md`의 단수 규정·초기화
-  예시 두 조건으로 판정한다
+- [X] T070 [no-write] 시나리오 S1~S4의 독립 수용 기준과 SC-001~SC-007을 [spec.md](spec.md)
+  기준으로 검증한다. SC-006a는 남은 `팩토리` 언급이 금지 서술뿐인지와 `component-init.md`의
+  단수 규정·초기화 예시 두 조건으로 판정한다
 
 ## 의존성과 실행 순서
 

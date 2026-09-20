@@ -4,7 +4,7 @@
 
 Feature 화면은 TCA `Store`를 화면 상태의 단일 정본으로 사용하므로
 `init(store: StoreOf<Feature>)`를 생성 경로로 둡니다. 화면은 컴포넌트와 달리 별도
-`ViewModel`, 시각 변형 팩토리 또는 `Style`을 정의하지 않습니다.
+`ViewModel`이나 시각 변형 `Style`을 정의하지 않습니다.
 
 ```swift
 // Home/HomeView.swift

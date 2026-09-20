@@ -61,5 +61,5 @@ public struct ActionButton: View {
 ```
 
 `Style`은 상태 wrapper가 아니며 시각 변형만 소유합니다. 호출부는
-[View 컨벤션 — 공개 생성 경로](../view/component-init.md)의 시각
-변형 팩토리를 기본 선택 수단으로 사용합니다.
+[View 컨벤션 — 공개 생성 경로](../view/component-init.md)에 따라 `Style`을 초기화
+인자로 넘겨 변형을 선택합니다.

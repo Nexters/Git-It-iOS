@@ -2,8 +2,8 @@
 
 [Git It iOS View 토큰 컨벤션](../view-tokens.md)의 규칙 문서입니다.
 
-문자열 렌더링은 `Text`를 직접 구성하지 않고 `StyledText`의 Typography 팩토리를
-사용합니다. `TextStyleToken`은 자간·행간·언어별 폰트 선택을 함께 결정하므로
+문자열 렌더링은 `Text`를 직접 구성하지 않고 `StyledText`를 초기화하면서
+`TextStyleToken`을 `style` 인자로 넘깁니다. `TextStyleToken`은 자간·행간·언어별 폰트 선택을 함께 결정하므로
 `.font(.caption2)` 같은 플랫폼 API로 대체하면 표현이 갈라집니다.
 
 **`Text` 값이 필요한 경우 예외**: `StyledText`는 View이므로 `Button` label 안에서

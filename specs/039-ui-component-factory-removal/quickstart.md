@@ -92,8 +92,9 @@ grep -n "resizable" sources/Projects/UI/Component/Displays/ResourceImage.swift
 grep -rn "팩토리" docs/conventions/
 ```
 
-**기대**: 팩토리 정의를 요구하거나 전제하는 문장이 남지 않는다(FR-004b, SC-006). 개정 대상
-문서와 삭제 대상 `view/factory-criteria.md`는 [spec.md](./spec.md)의 FR-004a가 열거한다.
+**기대**: 팩토리 정의를 요구하거나 전제하는 문장이 남지 않는다(FR-004b, SC-006). 남는 언급은
+`component-init.md`의 금지 서술 한 건뿐이다. 개정 대상 문서와 삭제 대상
+`view/factory-criteria.md`는 [spec.md](./spec.md)의 FR-004a가 열거한다.
 
 ```sh
 grep -rn "factory-criteria" docs/
@@ -120,8 +121,8 @@ grep -n "^### 3\." docs/conventions/view.md
 grep -n "init\|팩토리" docs/conventions/view/component-init.md
 ```
 
-**기대**: §4 첫 명령의 `팩토리` 0건과 함께, `component-init.md`가 공개 생성 경로를 단수로
-규정하며 호출 예시가 모두 초기화 호출이다(SC-006a).
+**기대**: §4 첫 명령의 남은 `팩토리` 언급이 금지 서술뿐이고, `component-init.md`가 공개 생성
+경로를 단수로 규정하며 호출 예시가 모두 초기화 호출이다(SC-006a).
 
 ## 5. 커밋 전
 
