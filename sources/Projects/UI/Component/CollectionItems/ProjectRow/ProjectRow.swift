@@ -53,7 +53,8 @@ public struct ProjectRow<Thumbnail: View>: View {
                 ContinuousProgressBar(progress: progress)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    TagBadge.muted("Set \(currentSet)").designSystemCornerRadius(.pill)
+                    TagBadge(text: "Set \(currentSet)", style: .muted, size: .compact)
+                        .designSystemCornerRadius(.pill)
                     StyledText.body2(setTitle, color: .grey300)
                         .lineLimit(1)
                 }

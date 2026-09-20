@@ -37,7 +37,7 @@ public struct SelectionCard<Thumbnail: View>: View {
                 HStack(spacing: Constant.badgeSpacing) {
                     StyledText.subtitle3(title)
                     if let badgeText {
-                        TagBadge.selected(badgeText)
+                        TagBadge(text: badgeText, style: .selected)
                     }
                 }
                 if let supportingText {

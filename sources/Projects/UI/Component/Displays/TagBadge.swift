@@ -71,34 +71,6 @@ public struct TagBadge: View {
             )
     }
 
-    public static func neutral(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .neutral, size: size)
-    }
-
-    public static func accent(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .accent, size: size)
-    }
-
-    public static func selected(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .selected, size: size)
-    }
-
-    public static func muted(
-        _ text: String,
-        size: Size = .compact,
-    ) -> Self {
-        Self(text: text, style: .muted, size: size)
-    }
-
     // MARK: Private
 
     private enum Constant {
@@ -115,9 +87,9 @@ public struct TagBadge: View {
 
 #Preview("Tag Badge") {
     HStack(spacing: LayoutToken.gutter) {
-        TagBadge.neutral("Neutral")
-        TagBadge.accent("Accent")
-        TagBadge.selected("Selected")
+        TagBadge(text: "Neutral")
+        TagBadge(text: "Accent", style: .accent)
+        TagBadge(text: "Selected", style: .selected)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

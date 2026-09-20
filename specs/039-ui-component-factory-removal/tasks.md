@@ -146,20 +146,20 @@ UI만 먼저 변경한 중간 상태는 빌드할 수 없으므로 두 패키지
 
 ### 구현
 
-- [ ] T013 [S1] `sources/Projects/UI/Component/Displays/TagBadge.swift`에서 정적 팩토리
+- [X] T013 [S1] `sources/Projects/UI/Component/Displays/TagBadge.swift`에서 정적 팩토리
   4개를 제거하고 `public init(text:style:size:)`만 공개 생성 경로로 남긴다
-- [ ] T014 [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`의
+- [X] T014 [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`의
   `TagBadge` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T015 [P] [S1] `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`의
+- [X] T015 [P] [S1] `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`의
   `TagBadge` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T016 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Displays/TagBadgeContractTests.swift`의
+- [X] T016 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/Displays/TagBadgeContractTests.swift`의
   팩토리 호출을 초기화 호출로 전환한다
-- [ ] T017 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+ProfileHeaderView.swift`의
+- [X] T017 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+ProfileHeaderView.swift`의
   `TagBadge` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T018 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과 `TagBadge`
+- [X] T018 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과 `TagBadge`
   계약 테스트를 실행하고 잔여 팩토리 호출 grep이 0건인지 확인한다
 
 **진행 점검**: T013~T018의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.

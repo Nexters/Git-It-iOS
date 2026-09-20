@@ -7,9 +7,9 @@ import Testing
 struct TagBadgeContractTests {
     @Test
     func `표시 값을 직접 받아 생성한다`() {
-        _ = TagBadge.neutral("완료")
-        _ = TagBadge.accent("진행 중")
-        _ = TagBadge.selected("선택됨")
+        _ = TagBadge(text: "완료")
+        _ = TagBadge(text: "진행 중", style: .accent)
+        _ = TagBadge(text: "선택됨", style: .selected)
     }
 
     @Test
@@ -36,7 +36,7 @@ struct TagBadgeContractTests {
 
     @Test
     func `표시 상태를 스스로 보관하지 않는다`() {
-        let stateProperties = Mirror(reflecting: TagBadge.neutral("완료")).children.filter {
+        let stateProperties = Mirror(reflecting: TagBadge(text: "완료")).children.filter {
             ($0.label ?? "").hasPrefix("_")
         }
 
