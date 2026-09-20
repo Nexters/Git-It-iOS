@@ -93,21 +93,35 @@ grep -rn "팩토리" docs/conventions/
 ```
 
 **기대**: 팩토리 정의를 요구하거나 전제하는 문장이 남지 않는다(FR-004b, SC-006). 개정 대상
-여섯 문서는 [spec.md](./spec.md)의 FR-004a가 열거한다.
+문서와 삭제 대상 `view/factory-criteria.md`는 [spec.md](./spec.md)의 FR-004a가 열거한다.
 
 ```sh
 grep -rn "factory-criteria" docs/
 ```
 
-**기대**: 폐기한 문서를 가리키는 링크가 남지 않는다. `docs/conventions/view.md` §3.2·§3.3과
-`docs/conventions/ui-component/public-contract.md`가 가리키는 `view.md` §3 참조를 함께 확인한다.
+**기대**: 삭제한 문서를 가리키는 링크가 남지 않는다(FR-004b-2). `docs/conventions/view.md`
+§3.3 절과 그 링크가 삭제됐는지 확인한다.
+
+```sh
+grep -rn "view\.md#3-공개-생성-경로" docs/
+grep -n "^### 3\." docs/conventions/view.md
+```
+
+**기대**: 첫 명령은 `docs/package-rules/ui.md`, `docs/conventions/ui-component.md`,
+`docs/conventions/ui-component/public-contract.md` 세 건을 그대로 반환하고, 그 앵커가 살아
+있다(FR-004b-1). 둘째 명령은 §3.1·§3.2·§3.4·§3.5를 반환한다 — §3.3만 사라지고 나머지 번호는
+그대로여야 한다(FR-004b-3).
 
 `docs/retrospective/`의 언급은 과거 기록이므로 개정 대상이 아니다.
 
 ### 4.1 문서만으로 판정 가능한지
 
-개정된 컨벤션만 읽고 새 컴포넌트의 공개 생성 경로를 설계했을 때 초기화 메서드 하나라는
-결론에 도달하는지 검토한다(SC-006a).
+```sh
+grep -n "init\|팩토리" docs/conventions/view/component-init.md
+```
+
+**기대**: §4 첫 명령의 `팩토리` 0건과 함께, `component-init.md`가 공개 생성 경로를 단수로
+규정하며 호출 예시가 모두 초기화 호출이다(SC-006a).
 
 ## 5. 커밋 전
 

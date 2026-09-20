@@ -20,8 +20,8 @@
 필요하다. 그룹 B(`LabeledCard`)는 공개 초기화 메서드가 없고 `Style`이 `private`이라 둘 다
 올려야 한다. 그룹 C(`ScreenEdgeScrim`)는 변형 타입 자체가 없어 `Edge`를 신규 정의한다.
 
-팩토리 제거는 View 컨벤션의 생성 경로 규칙과 충돌하므로, 컨벤션 여섯 문서 개정과
-`screen-init.md` 문구 정리를 같은 기능에 포함한다. 근거와 대안은
+팩토리 제거는 View 컨벤션의 생성 경로 규칙과 충돌하므로, 컨벤션 문서 개정 6건과
+`factory-criteria.md` 삭제 1건을 같은 기능에 포함한다. 근거와 대안은
 [research.md](./research.md), 공개 표면 대조는
 [contracts/component-creation-api.md](./contracts/component-creation-api.md)에 있다.
 
@@ -47,7 +47,7 @@
 들어가야 중간 상태가 compile된다(FR-006).
 
 **규모/범위**: 컴포넌트 6개, 팩토리 30개, 호출부 226곳, 영향 파일 UI 41개·Feature 51개(고유
-파일 기준), 컨벤션 문서 6개 + 문구 정리 1개.
+파일 기준), 컨벤션 문서 개정 5개 + 삭제 1개 + 문구 정리 1개.
 
 ## 헌법 점검
 
@@ -60,6 +60,11 @@
 `contracts/**`만 생성했다. 소스·컨벤션 문서는 읽기만 했고 구현 경로는 아래 실행 단위 표에
 기록했다. 통과.
 
+**파일 삭제 권한**: 원칙 5는 `/speckit-implement`에 `tasks.md`가 명시한 파일의 **수정**
+권한만 부여하고 삭제를 다루지 않는다. 단위 7의 `docs/conventions/view/factory-criteria.md`
+삭제는 이 공백에 해당하므로, 구현 시점에 사용자 승인을 받고 PR에 원칙 3 예외로 기록한다
+(FR-004a). Constitution 개정은 이 기능의 범위가 아니다.
+
 **세션 지식 기록**: 계획 과정에서 View 컨벤션 충돌을 두 차례 발견해 명세로 되돌렸다. 반복
 가능한 사건이므로 Constitution 원칙 9의 문턱을 충족할 수 있으나, 기록 여부는 전용 스킬의
 판단에 맡기고 이 계획의 작업으로 만들지 않는다.
@@ -70,8 +75,9 @@
 **커밋 단위 구현**: 아래 "실행 단위"가 컴포넌트 단위 7개를 정의한다. 각 단위는 정확한 파일과
 검증을 명시하며 단독으로 되돌릴 수 있다. 통과.
 
-**컨벤션 근거**: 아래 "적용 컨벤션" 표에 기록했다. 팩토리 규칙 충돌은 명세 FR-004a~FR-004d로
-해소됐고, 남은 기존 문서 불일치는 [research.md §7](./research.md)에 기록했다. 통과.
+**컨벤션 근거**: 아래 "적용 컨벤션" 표에 기록했다. 팩토리 규칙 충돌은 명세
+FR-004a~FR-004d와 FR-004b-1~FR-004b-3으로 해소됐고, 남은 기존 문서 불일치는
+[research.md §7](./research.md)에 기록했다. 통과.
 
 **책임 기반 네이밍**: 신규 공개 타입은 `ScreenEdgeScrim.Edge` 하나다. 소유 컴포넌트가 문맥을
 제공하므로 이름에 컴포넌트 이름을 반복하지 않았고, 배치 위치라는 책임을 드러낸다. 근거와
@@ -80,7 +86,8 @@
 **실행 단위 진행**: 변경 패키지는 UI와 Feature 둘이며 사용 방향은 `Feature → UIComponent`다.
 그룹 A 중 `ActionButton`과 그룹 C는 Feature 호출부가 0건이라 단일 패키지 단위이고, 나머지는
 불가분한 다중 패키지 integration unit이다. 컨벤션 문서는 패키지에 속하지 않으므로 마지막
-단위에 배정했다. 통과.
+단위에 배정했다. 승인 게이트는 단위 7의 파일 삭제 하나뿐이며, 원칙 5가 승인 작업을 허용하는
+"파괴적 작업"에 해당한다. 통과.
 
 ### 1단계 설계 후 재점검
 
@@ -92,9 +99,9 @@
 
 | 문서 | 이번 설계에 부과한 제약 |
 | --- | --- |
-| [docs/conventions/view.md](../../docs/conventions/view.md) | §3 공개 생성 경로가 이번 변경의 직접 대상이다. §3.3과 §6 체크리스트 2개 항목이 팩토리를 전제하므로 FR-004a에 따라 개정한다 |
-| [docs/conventions/view/component-init.md](../../docs/conventions/view/component-init.md) | 생성 경로를 "init과 팩토리 둘"로 규정하고 팩토리 호출을 정본 예시로 제시한다. 초기화 메서드 하나로 개정한다 |
-| [docs/conventions/view/factory-criteria.md](../../docs/conventions/view/factory-criteria.md) | "변형이 둘 이상일 때만 팩토리를 정의", "호출부의 기본 선택 수단은 팩토리". 문서를 폐기한다 |
+| [docs/conventions/view.md](../../docs/conventions/view.md) | §3 공개 생성 경로가 이번 변경의 직접 대상이다. §3.2 제목·링크 텍스트, §3.3 절과 링크, §6 체크리스트 2개 항목이 팩토리를 전제하므로 FR-004a에 따라 개정한다. §3 제목과 앵커는 `package-rules/ui.md`·`ui-component.md`·`ui-component/public-contract.md` 세 문서가 참조하므로 유지하고(FR-004b-1), §3.3 삭제 후 §3.4·§3.5는 재번호하지 않는다(FR-004b-3) |
+| [docs/conventions/view/component-init.md](../../docs/conventions/view/component-init.md) | 제목과 본문이 생성 경로를 "init과 팩토리 둘"로 규정하고 팩토리 호출을 정본 예시로 제시한다. 제목을 포함해 초기화 메서드 하나로 개정하고, 삭제하는 `factory-criteria.md`의 팩토리 무관 규칙 두 건을 흡수한다 |
+| [docs/conventions/view/factory-criteria.md](../../docs/conventions/view/factory-criteria.md) | "변형이 둘 이상일 때만 팩토리를 정의", "호출부의 기본 선택 수단은 팩토리". 문서 전문이 팩토리 규칙이므로 파일을 삭제하고, `@ViewBuilder` 기본 생성 경로와 기본값 배치 규칙만 `component-init.md`로 옮긴다. 삭제는 사용자 승인 사항이다 |
 | [docs/conventions/view-declarations/internal-declarations.md](../../docs/conventions/view-declarations/internal-declarations.md) | 변형 enum을 소유 컴포넌트에 중첩하고 같은 파일에 둔다. 이름에 컴포넌트 이름을 반복하지 않는다 → `ScreenEdgeScrim.Edge` |
 | [docs/conventions/view-declarations/style.md](../../docs/conventions/view-declarations/style.md) | 변형별로 갈리는 표현 값은 View의 `switch`가 아니라 변형 enum이 소유한다 → `Edge`가 `GradientToken`을 소유. 마지막 문장이 팩토리를 기본 수단으로 지정하므로 개정 대상 |
 | [docs/conventions/view-tokens.md](../../docs/conventions/view-tokens.md) | §2.4와 §3 체크리스트가 Typography 팩토리 사용을 요구한다. 개정 대상 |
@@ -139,16 +146,17 @@ sources/Projects/UI/**               # 호출부 109곳 (프리뷰·하니스 �
 sources/Projects/Feature/**          # 호출부 117곳 (프리뷰·테스트 포함, 고유 파일 51개)
 
 docs/conventions/
-├── view.md                          # §3.3 폐기, §6 체크리스트
-├── view/component-init.md
-├── view/factory-criteria.md         # 폐기
+├── view.md                          # §3.2 제목·링크, §3.3 절 삭제, §6 체크리스트
+├── view/component-init.md           # 제목 개제, 삭제 문서의 규칙 2건 흡수
+├── view/factory-criteria.md         # 파일 삭제
 ├── view/screen-init.md              # 문구 정리(FR-004d)
 ├── view-declarations/style.md       # 마지막 문장
 ├── view-tokens.md                   # §2.4, §3 체크리스트
 └── view-tokens/typography.md
 ```
 
-**구조 결정**: 새 디렉터리나 파일을 만들지 않는다. `ScreenEdgeScrim.Edge`와 `LabeledCard`의
+**구조 결정**: 새 디렉터리나 파일을 만들지 않고, 삭제하는 파일은
+`docs/conventions/view/factory-criteria.md` 하나다. `ScreenEdgeScrim.Edge`와 `LabeledCard`의
 초기화 메서드는 소유 컴포넌트 파일 안에 둔다. 변경은 기존 파일의 공개 표면과 호출부, 그리고
 컨벤션 문서에 한정된다.
 
@@ -169,7 +177,7 @@ integration unit으로 계획한다.
 | 4 | `LabeledCard` | UI + Feature | 2 | 7 / 3 | integration unit, `Style` 승격·init 신규 | `[Refactor]` |
 | 5 | `IconGlassButton` | UI + Feature | 3 | 9 / 11 | integration unit | `[Remove]` |
 | 6 | `StyledText` | UI + Feature | 10 | 65 / 101 | integration unit | `[Remove]` |
-| 7 | 컨벤션 개정 | 문서 | — | — | 패키지 밖, 문서 7건 | `[Docs]` |
+| 7 | 컨벤션 개정 | 문서 | — | — | 패키지 밖, 개정 6건 + 삭제 1건 | `[Docs]` |
 
 **분리 불가 근거**(단위 3~6): UI에서 `public static func`를 지우는 순간 Feature의 해당 호출부가
 컴파일되지 않는다. UI 변경과 Feature 호출부 수정을 다른 커밋에 두면 중간 커밋이 단독으로
@@ -180,11 +188,14 @@ compile되지 않아 SC-005를 위반한다.
 
 **단위 7의 책임 배정**: `docs/conventions/**`는 어떤 Swift 패키지에도 속하지 않는다. 이 기능이
 공개 생성 경로 규칙을 바꾸므로 그 규칙 문서의 개정 책임도 이 기능이 소유한다. 마지막 단위에
-둔 근거와 FR-004c 해석은 [research.md §6](./research.md).
+둔 근거는 [research.md §6](./research.md)이며, FR-004c가 요구하는 "같은 변경 단위"는 명세
+정정으로 브랜치 수준임이 확정됐다. FR-010의 컴포넌트 단위 커밋과 양립하도록 개정을 브랜치의
+마지막 커밋에 둔다.
 
-**진행 방식**: 단위 1부터 7까지 같은 승인된 기능 범위이므로 반복 승인 없이 연속 진행한다.
-단위 7을 마친 뒤 전체 `build`·`compile`·`test`와 필수 `after_implement` 훅을 실행하고 최종
-커밋한다.
+**진행 방식**: 단위 1부터 6까지는 같은 승인된 기능 범위이므로 반복 승인 없이 연속 진행한다.
+단위 7에는 승인 경계가 하나 있다 — `docs/conventions/view/factory-criteria.md` 삭제 작업
+앞에서 중단하고 명시적 승인을 받는다(Constitution 원칙 5의 삭제 권한 공백). 승인 후 단위 7을
+마치고 전체 `build`·`compile`·`test`와 필수 `after_implement` 훅을 실행한 뒤 최종 커밋한다.
 
 ## 기준선 실측과 명세 정정
 
