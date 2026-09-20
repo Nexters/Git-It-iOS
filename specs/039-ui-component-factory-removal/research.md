@@ -18,16 +18,20 @@
 | `TagBadge` | 4 | 9 | 2 | 0 | 4 / 1 |
 | `LabeledCard` | 2 | 7 | 3 | 0 | 3 / 2 |
 | `ScreenEdgeScrim` | 2 | 4 | 0 | 0 | 2 / 0 |
-| `StyledText` | 10 | 65 | 101 | 0 | 30 / 48 |
-| **합계** | **30** | **109** | **117** | **0** | 41 / 51 (고유) |
+| `StyledText` | 10 | 67 | 101 | 0 | 31 / 48 |
+| **합계** | **30** | **111** | **117** | **0** | 42 / 51 (고유) |
 
-**결정**: 전환 대상 호출부를 약 226곳으로 본다.
+**결정**: 전환 대상 호출부를 228곳으로 본다.
 
 **근거**: 명세의 가정은 `StyledText` 약 110곳, 합계 약 170곳으로 적었으나, 그 측정이
 `subtitle1`~`subtitle3`(합계 56곳)을 누락하고 존재하지 않는 `title*`·`label*` 패턴을 포함했다.
 팩토리별 재집계 결과는 `subtitle1` 33, `body2` 45, `caption1` 25, `body1` 20, `subtitle3` 16,
-`caption2` 10, `subtitle2` 7, `body3` 5, `headline1` 3, `headline2` 2로 `StyledText` 합계가
-166곳이다.
+`caption2` 10, `subtitle2` 7, `body3` 5, `headline1` 3, `headline2` 2로 166곳을 얻었다.
+
+구현 단계에서 이 집계가 2곳을 더 놓쳤음을 확인했다. `Indicators/EmptyState/EmptyState.swift`는
+`StyledText`와 팩토리 이름을 줄바꿈으로 나눠 호출해(`StyledText\n    .subtitle1(`) 인접 패턴을
+전제한 grep에 잡히지 않았다. 팩토리를 제거하자 compile 오류로 드러났다. 확정 수치는
+`StyledText` 168곳, 합계 228곳, 영향 파일 UI 42개다.
 
 **검토한 대안**: 명세의 수치를 그대로 쓰는 안은 작업량 추정을 33% 과소평가하므로 기각했다.
 명세의 해당 가정은 `/speckit-clarify`로 정정할 대상이다.
@@ -96,7 +100,7 @@ Feature·App 호출부 수정"을 한 단위로 묶으라고 했으나, App은 �
 - [View 내부 선언 컨벤션 — `Style`](../../docs/conventions/view-declarations/style.md)의 예시가
   이미 `ActionButton(title:style:isEnabled:action:)` 형태를 정본으로 보여준다. 개정 대상이 아닌
   이 예시와 코드가 어긋나지 않는다.
-- 전환을 기계적 치환으로 유지해 226곳의 검토 부담을 낮춘다.
+- 전환을 기계적 치환으로 유지해 228곳의 검토 부담을 낮춘다.
 
 **검토한 대안**: 첫 인자를 레이블 없이 받는 `StyledText(_ text: String, style:)`은 팩토리의
 호출 감각(`StyledText.body2("x")`)에 가깝지만, 기존 `public init`을 쓰던 호출부까지 함께
@@ -129,7 +133,7 @@ Feature·App 호출부 수정"을 한 단위로 묶으라고 했으나, App은 �
 **검토한 대안**:
 - 컨벤션 개정을 첫 단위로 두는 안: 이후 다섯 단위 동안 코드가 개정된 규칙을 위반한 상태가
   된다. 리팩터링 진행 중이라는 점은 같지만, 리뷰 시 위반과 미전환을 구분하기 어렵다.
-- 마지막 코드 단위(`StyledText`)에 문서를 합치는 안: 166곳 전환과 문서 6건이 한 커밋에 들어가
+- 마지막 코드 단위(`StyledText`)에 문서를 합치는 안: 168곳 전환과 문서 6건이 한 커밋에 들어가
   검토가 어려워진다.
 
 **해소된 쟁점**: 초안의 FR-004c는 "같은 변경 단위"를 커밋으로 읽을 여지가 있었고, 그

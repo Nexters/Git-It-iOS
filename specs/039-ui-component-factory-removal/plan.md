@@ -12,8 +12,8 @@
 
 여섯 UIComponent(`ActionButton`, `IconGlassButton`, `TagBadge`, `LabeledCard`,
 `ScreenEdgeScrim`, `StyledText`)의 정적 팩토리 30개를 제거하고, 변형 축을 enum 파라미터로 받는
-초기화 메서드 하나로 공개 생성 경로를 통일한다. 기준선 실측 결과 호출부는 UI 109곳, Feature
-117곳으로 합계 226곳이며 App에는 없다.
+초기화 메서드 하나로 공개 생성 경로를 통일한다. 호출부는 UI 111곳, Feature 117곳으로 합계
+228곳이며 App에는 없다.
 
 컴포넌트는 출발 상태가 세 갈래다. 그룹 A(`ActionButton`, `IconGlassButton`, `TagBadge`,
 `StyledText`)는 공개 초기화 메서드와 공개 변형 enum을 이미 갖고 있어 제거와 호출부 전환만
@@ -46,7 +46,7 @@
 **제약 조건**: 화면 표현 불변(FR-005). UI 공개 API 제거와 Feature 호출부 수정이 같은 커밋에
 들어가야 중간 상태가 compile된다(FR-006).
 
-**규모/범위**: 컴포넌트 6개, 팩토리 30개, 호출부 226곳, 영향 파일 UI 41개·Feature 51개(고유
+**규모/범위**: 컴포넌트 6개, 팩토리 30개, 호출부 228곳, 영향 파일 UI 42개·Feature 51개(고유
 파일 기준), 컨벤션 문서 개정 5개 + 삭제 1개 + 문구 정리 1개.
 
 ## 헌법 점검
@@ -142,7 +142,7 @@ sources/Projects/UI/Component/
 └── Overlays/
     └── ScreenEdgeScrim.swift       # 팩토리 2개 제거, Edge 신규, init 신규
 
-sources/Projects/UI/**               # 호출부 109곳 (프리뷰·하니스 포함, 고유 파일 41개)
+sources/Projects/UI/**               # 호출부 111곳 (프리뷰·하니스 포함, 고유 파일 42개)
 sources/Projects/Feature/**          # 호출부 117곳 (프리뷰·테스트 포함, 고유 파일 51개)
 
 docs/conventions/
@@ -176,7 +176,7 @@ integration unit으로 계획한다.
 | 3 | `TagBadge` | UI + Feature | 4 | 9 / 2 | integration unit | `[Remove]` |
 | 4 | `LabeledCard` | UI + Feature | 2 | 7 / 3 | integration unit, `Style` 승격·init 신규 | `[Refactor]` |
 | 5 | `IconGlassButton` | UI + Feature | 3 | 9 / 11 | integration unit | `[Remove]` |
-| 6 | `StyledText` | UI + Feature | 10 | 65 / 101 | integration unit | `[Remove]` |
+| 6 | `StyledText` | UI + Feature | 10 | 67 / 101 | integration unit | `[Remove]` |
 | 7 | 컨벤션 개정 | 문서 | — | — | 패키지 밖, 개정 6건 + 삭제 1건 | `[Docs]` |
 
 **분리 불가 근거**(단위 3~6): UI에서 `public static func`를 지우는 순간 Feature의 해당 호출부가
@@ -204,7 +204,8 @@ compile되지 않아 SC-005를 위반한다.
 
 | 정정 전 | 정정 후 | 영향 |
 | --- | --- | --- |
-| `StyledText` 호출 약 110곳, 합계 약 170곳 | `StyledText` 166곳, 합계 226곳 | 단위 6의 작업량이 초기 추정의 1.5배 |
+| `StyledText` 호출 약 110곳, 합계 약 170곳 | `StyledText` 168곳, 합계 228곳 | 단위 6의 작업량이 초기 추정의 1.5배 |
+| `StyledText` 166곳, 합계 226곳(계획 단계 실측) | `StyledText` 168곳, 합계 228곳 | 구현 단계에서 줄바꿈 호출 2곳을 추가로 발견([research.md §1](./research.md)) |
 | 네 컴포넌트가 이미 변형 enum과 초기화 메서드를 갖는다 | `LabeledCard`는 `public init`이 없고 `Style`이 `private` | 단위 4가 공개 계약 신설 단위(FR-001a 신설) |
 
 근거는 [research.md §1](./research.md)과 [§2](./research.md)에 있다.
