@@ -24,7 +24,7 @@ public struct SettingRow<Content: View>: View {
             HStack {
                 content
                 Spacer()
-                HStack(spacing: 6) {
+                HStack(spacing: LayoutToken.iconSpacing) {
                     if let value {
                         StyledText.body2(value, color: .grey400)
                     }

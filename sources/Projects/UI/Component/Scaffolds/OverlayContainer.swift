@@ -56,7 +56,7 @@ public struct OverlayContainer<
 
                 Spacer()
                 footer
-                    .padding(.top, 12)
+                    .padding(.top, LayoutToken.gutter)
                     .background {
                         LinearGradient(designSystem: .overlayFooterScrim)
                             .ignoresSafeArea(edges: .bottom)

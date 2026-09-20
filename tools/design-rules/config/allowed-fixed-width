@@ -18,3 +18,9 @@ sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift �
 sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift 2열 카드 폭은 gridColumn2에서 유도하고 재생 버튼만 원형 44 히트 영역
 sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift 썸네일 종횡비
 sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift 썸네일 종횡비
+sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift 썸네일 정사각 종횡비
+sources/Projects/UI/Component/Controls/BookmarkButton.swift 아이콘 정사각 표면과 44 히트 영역
+sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift 셰브론 아이콘 정사각과 탭 영역, 같은 크기의 예약 공간
+sources/Projects/UI/Component/CollectionItems/SettingRow.swift 셰브론 아이콘 정사각
+sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift 원형 재생 버튼 표면과 터치 영역
+sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift 북마크 아이콘 정사각과 44 히트 영역

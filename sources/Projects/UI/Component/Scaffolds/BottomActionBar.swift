@@ -19,7 +19,7 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .padding(.bottom, max(safeAreaBottomInset, Constant.minimumBottomInset))
+            .padding(.bottom, Constant.minimumBottomInset)
     }
 
     // MARK: Private
@@ -29,16 +29,10 @@ public struct BottomActionBar<Content: View>: View {
             4
         }
 
-        static var bottomPadding: CGFloat {
-            24
-        }
-
         static var minimumBottomInset: CGFloat {
             24
         }
     }
-
-    @State private var safeAreaBottomInset: CGFloat = 0
 
     private let content: Content
 
