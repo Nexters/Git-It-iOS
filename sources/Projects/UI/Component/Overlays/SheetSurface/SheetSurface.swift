@@ -110,7 +110,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
 
         SheetSurface {
             VStack(spacing: LayoutToken.margin) {
-                StyledText.subtitle2("알림을 받아보시겠어요?", alignment: .center)
+                StyledText(text: "알림을 받아보시겠어요?", style: .subtitle2, alignment: .center)
                 ActionButton(title: "알림 받기")
             }
         }
@@ -126,7 +126,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         SheetSurface(isScrollable: true) {
             VStack(spacing: LayoutToken.margin) {
                 ForEach(0..<8, id: \.self) { index in
-                    StyledText.body1("정책 문서 \(index + 1)")
+                    StyledText(text: "정책 문서 \(index + 1)", style: .body1)
                 }
             }
         } footer: {

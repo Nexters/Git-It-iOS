@@ -21,7 +21,7 @@ public struct Chip: View {
 
     public var body: some View {
         Button(action: onTap) {
-            StyledText.body2(label, color: labelColor)
+            StyledText(text: label, style: .body2, color: labelColor)
                 .lineLimit(Constant.labelLineLimit)
                 .padding(.horizontal, Constant.horizontalPadding)
                 .frame(height: Constant.height)

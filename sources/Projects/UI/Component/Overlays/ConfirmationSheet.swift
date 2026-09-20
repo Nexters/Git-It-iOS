@@ -33,8 +33,8 @@ public struct ConfirmationSheet: View {
                     .padding(.top, Constant.thumbnailTopPadding)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText.subtitle1(title, alignment: .center)
-                    StyledText.body2(message, color: .grey400, alignment: .center)
+                    StyledText(text: title, style: .subtitle1, alignment: .center)
+                    StyledText(text: message, style: .body2, color: .grey400, alignment: .center)
                 }
                 .padding(.top, Constant.textSetTopPadding)
 

@@ -34,7 +34,7 @@ extension SettingsScreen {
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.careerLevelMutation {
-                        StyledText.caption1(Constant.failureMessage, color: .error, alignment: .center)
+                        StyledText(text: Constant.failureMessage, style: .caption1, color: .error, alignment: .center)
                     }
 
                     SelectionCardList(

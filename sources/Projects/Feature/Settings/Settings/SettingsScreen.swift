@@ -83,7 +83,7 @@ public struct SettingsScreen: View {
                             HStack(spacing: 10) {
                                 ResourceImage(asset: .icon(.settingLogout))
                                     .frame(width: 16, height: 16)
-                                StyledText.body2(Constant.signOutTitle, color: .error)
+                                StyledText(text: Constant.signOutTitle, style: .body2, color: .error)
                             }
                         },
                         onTap: {
@@ -92,7 +92,7 @@ public struct SettingsScreen: View {
                     )
                     SettingRow(
                         content: {
-                            StyledText.body2(Constant.deleteAccountTitle, color: .grey400)
+                            StyledText(text: Constant.deleteAccountTitle, style: .body2, color: .grey400)
                         },
                         onTap: {
                             send(.deleteAccountTapped)
@@ -101,7 +101,7 @@ public struct SettingsScreen: View {
                 }
 
                 if let failureMessage {
-                    StyledText.caption1(failureMessage, color: .error)
+                    StyledText(text: failureMessage, style: .caption1, color: .error)
                         .padding(.top, Constant.failureTopPadding)
                 }
             }

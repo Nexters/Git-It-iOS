@@ -22,7 +22,7 @@ public struct SelectableSettingRow: View {
     public var body: some View {
         Button(action: onTap) {
             HStack(spacing: LayoutToken.compactSpacing) {
-                StyledText.body1(title)
+                StyledText(text: title, style: .body1)
 
                 Spacer(minLength: Constant.minimumTrailingSpacing)
 

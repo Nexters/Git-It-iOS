@@ -16,7 +16,7 @@ extension QuestionSolvingScreen {
                     TagBadge(text: "문제 \(questionNumber)", style: .accent)
                 }
 
-                StyledText.subtitle3(prompt)
+                StyledText(text: prompt, style: .subtitle3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)

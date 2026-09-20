@@ -20,8 +20,8 @@ extension QuizGenerationProgressScreen {
                             .frame(width: Constant.bellSize, height: Constant.bellSize)
 
                         VStack(spacing: Constant.textSetSpacing) {
-                            StyledText.subtitle1("세트 생성이 완료되면\n리마인드 알림을 보내드려요.", alignment: .center)
-                            StyledText.caption1("프로필 설정페이지에서 언제든 설정할 수 있어요.", color: .grey400, alignment: .center)
+                            StyledText(text: "세트 생성이 완료되면\n리마인드 알림을 보내드려요.", style: .subtitle1, alignment: .center)
+                            StyledText(text: "프로필 설정페이지에서 언제든 설정할 수 있어요.", style: .caption1, color: .grey400, alignment: .center)
                         }
 
                         VStack(spacing: LayoutToken.compactSpacing) {

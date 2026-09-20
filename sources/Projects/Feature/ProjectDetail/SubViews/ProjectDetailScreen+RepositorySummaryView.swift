@@ -23,7 +23,7 @@ extension ProjectDetailScreen {
                 VStack(alignment: .leading, spacing: Constant.contentSpacing) {
                     HStack(alignment: .top, spacing: LayoutToken.gutter) {
                         VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                            StyledText.headline2(repositoryName)
+                            StyledText(text: repositoryName, style: .headline2)
                             metaRow
                         }
 
@@ -83,7 +83,7 @@ extension ProjectDetailScreen {
                 HStack(spacing: Constant.starSpacing) {
                     ResourceImage(asset: .icon(.star))
                         .frame(width: Constant.starSize, height: Constant.starSize)
-                    StyledText.caption1(formattedStarCount, color: .blue100)
+                    StyledText(text: formattedStarCount, style: .caption1, color: .blue100)
                 }
 
                 if !techStack.isEmpty {
@@ -91,7 +91,7 @@ extension ProjectDetailScreen {
                         .fill(Color(designSystem: .grey500))
                         .frame(width: 1, height: Constant.dividerHeight)
 
-                    StyledText.caption1(techStack.joined(separator: " · "), color: .blue100)
+                    StyledText(text: techStack.joined(separator: " · "), style: .caption1, color: .blue100)
                         .lineLimit(1)
                 }
             }

@@ -26,7 +26,7 @@ public struct SettingRow<Content: View>: View {
                 Spacer()
                 HStack(spacing: LayoutToken.iconSpacing) {
                     if let value {
-                        StyledText.body2(value, color: .grey400)
+                        StyledText(text: value, style: .body2, color: .grey400)
                     }
                     ResourceImage(asset: .icon(.settingChevron))
                         .frame(width: Constant.chevronSize, height: Constant.chevronSize)

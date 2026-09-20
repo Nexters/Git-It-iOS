@@ -20,7 +20,7 @@ public struct RubricView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: LayoutToken.gutter) {
             if let overallFeedback {
-                StyledText.body1(overallFeedback)
+                StyledText(text: overallFeedback, style: .body1)
             }
 
             VStack(alignment: .leading, spacing: LayoutToken.compactSpacing) {
@@ -28,7 +28,7 @@ public struct RubricView: View {
                     HStack(alignment: .top, spacing: LayoutToken.compactSpacing) {
                         Image(systemName: "checkmark.circle")
                             .designSystemForeground(.blue100)
-                        StyledText.body2(criterion, color: .grey300)
+                        StyledText(text: criterion, style: .body2, color: .grey300)
                     }
                 }
             }

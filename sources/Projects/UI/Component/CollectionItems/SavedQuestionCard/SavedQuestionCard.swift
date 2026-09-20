@@ -27,9 +27,9 @@ public struct SavedQuestionCard: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            StyledText.body2(metadata, color: .grey300)
+            StyledText(text: metadata, style: .body2, color: .grey300)
                 .padding(.top, LayoutToken.cardTopPadding)
-            StyledText.subtitle3(prompt)
+            StyledText(text: prompt, style: .subtitle3)
                 .padding(.top, Constant.promptTopPadding)
             HStack(spacing: Constant.actionRowSpacing) {
                 bookmarkButton
@@ -77,7 +77,7 @@ public struct SavedQuestionCard: View {
 
     private var actionButton: some View {
         Button(action: onActionTap) {
-            StyledText.body2(actionTitle, color: .grey700, alignment: .center)
+            StyledText(text: actionTitle, style: .body2, color: .grey700, alignment: .center)
                 .frame(height: Constant.actionHeight)
                 .frame(maxWidth: .infinity)
                 .designSystemBackground(.blue100)

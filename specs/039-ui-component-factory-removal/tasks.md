@@ -273,13 +273,13 @@ compile 경계를 공유한다.
 
 ## 실행 단위 6: StyledText (integration unit: UI, Feature)
 
-**목표**: `StyledText`의 Typography 팩토리 10개를 제거하고, 호출 166곳을
+**목표**: `StyledText`의 Typography 팩토리 10개를 제거하고, 호출 168곳을
 `StyledText(text:style:color:alignment:)` 초기화와 `TextStyleToken` 인자로 전환한다.
 
 **분리 불가 근거**: `StyledText`는 UI 내부 컴포넌트 30개와 Feature 화면 48개가 함께 쓰는
 가장 넓은 공개 표면이다. 팩토리를 제거하면 두 패키지가 동시에 compile되지 않는다.
 
-**소유 경로**: 아래 T039~T056이 명시하는 UI 30개 파일과 Feature 48개 파일.
+**소유 경로**: 아래 T039~T056이 명시하는 UI 31개 파일과 Feature 48개 파일.
 
 **관련 변경 시나리오**: S3
 
@@ -288,15 +288,15 @@ compile 경계를 공유한다.
 
 ### 구현 — UI 패키지
 
-- [ ] T039 [S3] `sources/Projects/UI/Component/Displays/StyledText.swift`에서 Typography 팩토리
+- [X] T039 [S3] `sources/Projects/UI/Component/Displays/StyledText.swift`에서 Typography 팩토리
   10개(`headline1`, `headline2`, `subtitle1`~`subtitle3`, `body1`~`body3`, `caption1`,
   `caption2`)와 `private static func styled`를 제거하고
   `public init(text:style:color:alignment:)`만 공개 생성 경로로 남긴다
-- [ ] T040 [S3] `sources/Projects/UI/Component/Displays/ScreenHeaderTitle.swift`,
+- [X] T040 [S3] `sources/Projects/UI/Component/Displays/ScreenHeaderTitle.swift`,
   `sources/Projects/UI/Component/Displays/RubricView/RubricView.swift`,
   `sources/Projects/UI/Component/Displays/LabeledCard.swift`의 `StyledText` 팩토리 호출을
   초기화 호출로 전환한다
-- [ ] T041 [P] [S3] `sources/Projects/UI/Component/Controls/AppleSignInButton.swift`,
+- [X] T041 [P] [S3] `sources/Projects/UI/Component/Controls/AppleSignInButton.swift`,
   `sources/Projects/UI/Component/Controls/Chip/Chip.swift`,
   `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`,
   `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift`,
@@ -304,7 +304,7 @@ compile 경계를 공유한다.
   `sources/Projects/UI/Component/Controls/SelectableSettingRow/SelectableSettingRow.swift`,
   `sources/Projects/UI/Component/Controls/TextField.swift`의 `StyledText` 팩토리 호출을
   초기화 호출로 전환한다
-- [ ] T042 [P] [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`,
+- [X] T042 [P] [S3] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`,
   `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`,
   `sources/Projects/UI/Component/CollectionItems/SettingRow.swift`,
   `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`,
@@ -312,47 +312,49 @@ compile 경계를 공유한다.
   `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift`,
   `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T043 [P] [S3] `sources/Projects/UI/Component/Overlays/ActionMenu/ActionMenu.swift`,
+- [X] T043 [P] [S3] `sources/Projects/UI/Component/Overlays/ActionMenu/ActionMenu.swift`,
   `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`,
   `sources/Projects/UI/Component/Overlays/ModalOverlay.swift`,
   `sources/Projects/UI/Component/Overlays/PushedScreenOverlay.swift`,
   `sources/Projects/UI/Component/Overlays/SheetSurface/SheetSurface.swift`,
   `sources/Projects/UI/Component/Overlays/WebSheet.swift`의 `StyledText` 팩토리 호출을
   초기화 호출로 전환한다
-- [ ] T044 [P] [S3] `sources/Projects/UI/Component/Scaffolds/FlowNavigationStack.swift`,
+- [X] T044 [P] [S3] `sources/Projects/UI/Component/Scaffolds/FlowNavigationStack.swift`,
   `sources/Projects/UI/Component/Scaffolds/ScreenContainer.swift`,
   `sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift`,
-  `sources/Projects/UI/Component/Indicators/LabeledProgressBar.swift`의 `StyledText`
-  팩토리 호출을 초기화 호출로 전환한다
-- [ ] T045 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/OverlayContainerContractTests.swift`,
+  `sources/Projects/UI/Component/Indicators/LabeledProgressBar.swift`,
+  `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift`의 `StyledText`
+  팩토리 호출을 초기화 호출로 전환한다. `EmptyState`는 `StyledText`와 팩토리 이름이
+  줄바꿈으로 나뉘어 있어 기준선 실측에서 누락됐다
+- [X] T045 [P] [S3] `sources/Projects/UI/Tests/Component/Unit/Scaffolds/OverlayContainerContractTests.swift`,
   `sources/Projects/UI/Tests/Component/Unit/Scaffolds/ScreenContainerContractTests.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 구현 — Feature 패키지
 
-- [ ] T046 [P] [S3] `sources/Projects/Feature/Home/SubViews/HomeScreen+GreetingView.swift`,
+- [X] T046 [P] [S3] `sources/Projects/Feature/Home/SubViews/HomeScreen+GreetingView.swift`,
   `sources/Projects/Feature/Home/SubViews/HomeScreen+ProfileHeaderView.swift`,
   `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`,
   `sources/Projects/Feature/Home/SubViews/HomeScreen+RegistrationPanelView.swift`,
   `sources/Projects/Feature/Home/SubViews/HomeScreen+SignInSectionView.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T047 [P] [S3] `sources/Projects/Feature/MainShell/Router/SubViews/MainShellRouter+SignInPromptView.swift`의
+- [X] T047 [P] [S3] `sources/Projects/Feature/MainShell/Router/SubViews/MainShellRouter+SignInPromptView.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T048 [P] [S3] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`,
+- [X] T048 [P] [S3] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`,
   `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementScreen.swift`,
   `sources/Projects/Feature/Onboarding/LegalAgreement/SubViews/LegalAgreementScreen+AllAgreementRow.swift`,
   `sources/Projects/Feature/Onboarding/PositionSelection/PositionSelectionScreen.swift`,
   `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+PageView.swift`,
   `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T049 [P] [S3] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+ErrorView.swift`,
+- [X] T049 [P] [S3] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+ErrorView.swift`,
   `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`,
   `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T050 [P] [S3] `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+FailureView.swift`,
+- [X] T050 [P] [S3] `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+FailureView.swift`,
   `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+NextPageFooter.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T051 [P] [S3] `sources/Projects/Feature/ProjectRegistration/QuizGenerationConfirmation/QuizGenerationConfirmationScreen.swift`,
+- [X] T051 [P] [S3] `sources/Projects/Feature/ProjectRegistration/QuizGenerationConfirmation/QuizGenerationConfirmationScreen.swift`,
   `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+ChecklistView.swift`,
   `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+FailureView.swift`,
   `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+GeneratingView.swift`,
@@ -362,7 +364,7 @@ compile 경계를 공유한다.
   `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputScreen.swift`,
   `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/SubViews/RepositoryLinkInputScreen+GuideSectionView.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T052 [P] [S3] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionScreen.swift`,
+- [X] T052 [P] [S3] `sources/Projects/Feature/Quiz/LearningCompletion/LearningCompletionScreen.swift`,
   `sources/Projects/Feature/Quiz/LearningSetIntro/LearningSetIntroScreen.swift`,
   `sources/Projects/Feature/Quiz/LearningSetIntro/SubViews/LearningSetIntroScreen+ErrorView.swift`,
   `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`,
@@ -370,29 +372,29 @@ compile 경계를 공유한다.
   `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+QuestionPrompt.swift`,
   `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+SourceSheet.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T053 [P] [S3] `sources/Projects/Feature/Saved/SubViews/SavedScreen+ErrorView.swift`,
+- [X] T053 [P] [S3] `sources/Projects/Feature/Saved/SubViews/SavedScreen+ErrorView.swift`,
   `sources/Projects/Feature/Saved/SubViews/SavedScreen+FilterSection.swift`의 `StyledText`
   팩토리 호출을 초기화 호출로 전환한다
-- [ ] T054 [P] [S3] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`,
+- [X] T054 [P] [S3] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`,
   `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+LoadFailureView.swift`,
   `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+ProfileHeaderView.swift`,
   `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+StatisticsCardView.swift`,
   `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+WeeklyChartView.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T055 [P] [S3] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`,
+- [X] T055 [P] [S3] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`,
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`,
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`,
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`,
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+SectionView.swift`,
   `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+SettingRowContent.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
-- [ ] T056 [P] [S3] `sources/Projects/Feature/ShareRegistration/SubViews/ShareRegistrationScreen+GuidanceView.swift`,
+- [X] T056 [P] [S3] `sources/Projects/Feature/ShareRegistration/SubViews/ShareRegistrationScreen+GuidanceView.swift`,
   `sources/Projects/Feature/ShareRegistration/SubViews/ShareRegistrationScreen+LoadingView.swift`의
   `StyledText` 팩토리 호출을 초기화 호출로 전환한다
 
 ### 정리와 단위 검증
 
-- [ ] T057 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과 `test`를
+- [X] T057 [no-write] [quickstart.md](quickstart.md)의 통합 검증 절차로 `compile`과 `test`를
   실행하고 `StyledText.` Typography 팩토리 잔여 호출 grep이 0건인지 확인한다
 
 **진행 점검**: T039~T057의 변경 파일과 검증 결과를 보고하고 다음 실행 단위로 진행한다.
@@ -494,7 +496,7 @@ compile 경계를 공유한다.
   패키지다. 따라서 UI 안에서 닫히는 단위(1, 2)를 먼저 두고, UI 공개 API 제거가 Feature
   호출부를 동시에 깨뜨리는 integration unit(3, 4, 5, 6)을 영향 범위가 작은 순서로 잇는다.
 - integration unit 사이의 순서는 호출부 수(TagBadge 11 → LabeledCard 10 → IconGlassButton 20
-  → StyledText 166)로 정하고, 구현이 끝날 때까지 바꾸지 않는다.
+  → StyledText 168)로 정하고, 구현이 끝날 때까지 바꾸지 않는다.
 - 컨벤션 개정(단위 7)은 코드 전환이 모두 끝난 뒤 수행한다. FR-004c가 요구하는 범위는
   브랜치 수준이며, FR-010의 컴포넌트 단위 커밋과 양립하도록 단위 7을 같은 브랜치의 마지막
   커밋에 둔다. 브랜치 내부의 일시적 문서·코드 불일치는 명세가 허용한다.

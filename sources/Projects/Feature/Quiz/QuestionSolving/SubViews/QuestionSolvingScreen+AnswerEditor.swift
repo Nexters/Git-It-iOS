@@ -19,7 +19,7 @@ extension QuestionSolvingScreen {
             VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing) {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
-                        StyledText.body1(placeholder, color: .grey400)
+                        StyledText(text: placeholder, style: .body1, color: .grey400)
                             .allowsHitTesting(false)
                     }
 
@@ -44,7 +44,7 @@ extension QuestionSolvingScreen {
                         )
                 }
 
-                StyledText.caption2("\(text.count) / \(characterLimit)", color: .grey400)
+                StyledText(text: "\(text.count) / \(characterLimit)", style: .caption2, color: .grey400)
             }
         }
 

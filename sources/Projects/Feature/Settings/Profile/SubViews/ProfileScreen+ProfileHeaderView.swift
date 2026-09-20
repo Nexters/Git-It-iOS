@@ -17,8 +17,8 @@ extension ProfileScreen {
 
                 VStack(alignment: .leading, spacing: Constant.infoSpacing) {
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText.subtitle2(display.name ?? "")
-                        StyledText.caption1(display.email ?? "", color: .grey400)
+                        StyledText(text: display.name ?? "", style: .subtitle2)
+                        StyledText(text: display.email ?? "", style: .caption1, color: .grey400)
                     }
 
                     if display.hasBadges {

@@ -27,9 +27,9 @@ public struct LearningSetRow: View {
         VStack(alignment: .leading, spacing: Constant.contentSpacing) {
             HStack(alignment: .top, spacing: LayoutToken.gutter) {
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText.subtitle3(label, color: .blue100)
+                    StyledText(text: label, style: .subtitle3, color: .blue100)
 
-                    StyledText.body1(title)
+                    StyledText(text: title, style: .body1)
                         .lineLimit(1)
 
                     Spacer(minLength: 0)

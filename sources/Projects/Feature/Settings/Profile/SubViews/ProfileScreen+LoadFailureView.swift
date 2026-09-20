@@ -11,8 +11,8 @@ extension ProfileScreen {
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: Constant.messageSpacing) {
-                    StyledText.subtitle3(Constant.title)
-                    StyledText.caption1(Constant.message, color: .grey400)
+                    StyledText(text: Constant.title, style: .subtitle3)
+                    StyledText(text: Constant.message, style: .caption1, color: .grey400)
                 }
                 Spacer()
                 FeedbackActionButton(title: Constant.retryTitle, style: .secondary, size: .small, action: onRetry)

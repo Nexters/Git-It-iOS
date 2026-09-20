@@ -21,8 +21,8 @@ extension QuizGenerationProgressScreen {
                     .padding(.vertical, 30)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText.subtitle1("학습세트를 만들고 있어요", alignment: .center)
-                    StyledText.body2("약 5분의 시간이 소요돼요", color: .grey400, alignment: .center)
+                    StyledText(text: "학습세트를 만들고 있어요", style: .subtitle1, alignment: .center)
+                    StyledText(text: "약 5분의 시간이 소요돼요", style: .body2, color: .grey400, alignment: .center)
                 }
 
                 QuizGenerationProgressScreen.ChecklistView(progress: progress)

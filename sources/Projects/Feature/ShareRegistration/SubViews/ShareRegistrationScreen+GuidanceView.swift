@@ -23,8 +23,8 @@ extension ShareRegistrationScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText.subtitle1(title, alignment: .center)
-                    StyledText.body2(message, color: .grey400, alignment: .center)
+                    StyledText(text: title, style: .subtitle1, alignment: .center)
+                    StyledText(text: message, style: .body2, color: .grey400, alignment: .center)
                 }
                 .designSystemScreenMargin()
                 .accessibilityElement(children: .combine)

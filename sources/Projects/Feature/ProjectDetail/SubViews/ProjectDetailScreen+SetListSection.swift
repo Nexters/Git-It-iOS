@@ -12,7 +12,7 @@ extension ProjectDetailScreen {
 
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                StyledText.subtitle2("학습 세트")
+                StyledText(text: "학습 세트", style: .subtitle2)
 
                 cards
             }

@@ -19,7 +19,7 @@ extension TutorialScreen {
                 PageIndicator(currentPage: currentPage, totalPages: totalPages)
                     .padding(Constant.indicatorPadding)
 
-                StyledText.caption1(Constant.hintTitle, color: .grey400, alignment: .center)
+                StyledText(text: Constant.hintTitle, style: .caption1, color: .grey400, alignment: .center)
                     .opacity(isHintVisible ? 1 : 0)
                     .accessibilityHidden(!isHintVisible)
                     .padding(.bottom, LayoutToken.compactSpacing)
@@ -37,7 +37,7 @@ extension TutorialScreen {
                 .accessibilityHidden(!isHintVisible)
                 .padding(.top, LayoutToken.compactSpacing)
 
-                StyledText.body2("버전 \(bundleVersion)", color: .grey500, alignment: .center)
+                StyledText(text: "버전 \(bundleVersion)", style: .body2, color: .grey500, alignment: .center)
                     .padding(.top, Constant.versionTopSpacing)
             }
             .designSystemScreenMargin()
