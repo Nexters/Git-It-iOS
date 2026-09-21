@@ -91,7 +91,7 @@ public struct SelectionCard<Thumbnail: View>: View {
 
     private let displayModel: DisplayModel
     private let isSelected: Bool
-    private var style = SelectionCardStyle.detailed
+    private var style = Style.detailed
     private let thumbnail: Thumbnail
 
     private var borderToken: BorderToken? {
@@ -120,6 +120,30 @@ extension SelectionCard {
     }
 }
 
+// MARK: SelectionCard.Style
+
+extension SelectionCard {
+    public enum Style: Sendable, Equatable {
+        case detailed
+        case compact
+
+        // MARK: Internal
+
+        var minimumHeight: CGFloat {
+            switch self {
+            case .detailed:
+                80
+            case .compact:
+                52
+            }
+        }
+
+        var showsThumbnail: Bool {
+            self == .detailed
+        }
+    }
+}
+
 extension SelectionCard where Thumbnail == EmptyView {
     public init(
         displayModel: DisplayModel,
@@ -133,7 +157,7 @@ extension SelectionCard where Thumbnail == EmptyView {
 // MARK: StyleConfigurable
 
 extension SelectionCard: StyleConfigurable {
-    public func style(_ style: SelectionCardStyle) -> Self {
+    public func style(_ style: Style) -> Self {
         var copy = self
         copy.style = style
         return copy

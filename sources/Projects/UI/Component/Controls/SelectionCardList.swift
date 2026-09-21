@@ -45,7 +45,7 @@ public struct SelectionCardList: View {
     @Binding private var selection: String?
 
     private let items: [Item]
-    private var style = SelectionCardStyle.detailed
+    private var style = Style.detailed
 
     private func thumbnail(for illust: ResourceImage.Asset.Illust) -> some View {
         Image.resizable(.illust(illust))
@@ -67,7 +67,6 @@ public struct SelectionCardList: View {
                     thumbnail(for: illust)
                 }
             }
-            .style(style)
         } else {
             SelectionCard(
                 displayModel: .init(title: item.displayModel.title, supportingText: item.displayModel.supportingText),
@@ -81,10 +80,25 @@ public struct SelectionCardList: View {
 // MARK: StyleConfigurable
 
 extension SelectionCardList: StyleConfigurable {
-    public func style(_ style: SelectionCardStyle) -> Self {
+    public func style(_ style: Style) -> Self {
         var copy = self
         copy.style = style
         return copy
+    }
+}
+
+// MARK: SelectionCardList.Style
+
+extension SelectionCardList {
+    public enum Style: Sendable, Equatable {
+        case detailed
+        case compact
+
+        // MARK: Internal
+
+        var showsThumbnail: Bool {
+            self == .detailed
+        }
     }
 }
 
@@ -94,6 +108,43 @@ extension SelectionCardList {
     fileprivate enum Constant {
         static let itemSpacing: CGFloat = 8
         static let thumbnailOverlayOpacity = 0.2
+    }
+}
+
+// MARK: SelectionCardList.Item
+
+extension SelectionCardList {
+    public struct Item: Identifiable, Sendable, Equatable {
+        public init(
+            id: String,
+            displayModel: DisplayModel,
+        ) {
+            self.id = id
+            self.displayModel = displayModel
+        }
+
+        public let id: String
+        public let displayModel: DisplayModel
+    }
+}
+
+// MARK: - SelectionCardList.Item.DisplayModel
+
+extension SelectionCardList.Item {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            title: String,
+            supportingText: String? = nil,
+            illust: ResourceImage.Asset.Illust? = nil,
+        ) {
+            self.title = title
+            self.supportingText = supportingText
+            self.illust = illust
+        }
+
+        public let title: String
+        public let supportingText: String?
+        public let illust: ResourceImage.Asset.Illust?
     }
 }
 

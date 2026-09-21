@@ -43,7 +43,7 @@ struct StyleConfigurableTests {
     func `표시 값 모델을 받는 컴포넌트는 스타일을 선언하지 않으면 기본 스타일로 그린다`() {
         #expect(style(of: labeledCard) == LabeledCard.Style.neutral)
         #expect(style(of: homeProjectCard) == HomeProjectCard.Style.purple)
-        #expect(style(of: selectionCardList) == SelectionCardStyle.detailed)
+        #expect(style(of: selectionCardList) == SelectionCardList.Style.detailed)
     }
 
     @Test
@@ -53,8 +53,8 @@ struct StyleConfigurableTests {
         }
         let compactCard = SelectionCard(displayModel: .init(title: "Front-end"))
 
-        #expect(style(of: thumbnailCard) == SelectionCardStyle.detailed)
-        #expect(style(of: compactCard) == SelectionCardStyle.compact)
+        #expect(style(of: thumbnailCard) == .detailed)
+        #expect(style(of: compactCard) == .compact)
     }
 
     @Test
@@ -70,7 +70,7 @@ struct StyleConfigurableTests {
             Mirror(reflecting: projectCard).descendant("displayModel") as? HomeProjectCard.DisplayModel
                 == homeProjectCardModel
         )
-        #expect(style(of: list) == SelectionCardStyle.compact)
+        #expect(style(of: list) == SelectionCardList.Style.compact)
         #expect(Mirror(reflecting: list).descendant("items") as? [SelectionCardList.Item] == selectionItems)
     }
 

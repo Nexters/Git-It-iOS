@@ -22,9 +22,10 @@ Controls/
 
 파일 이름 규칙은 [파일·형태 어휘 컨벤션 — 파일 규칙](../file-vocabulary.md#2-파일-규칙)이 소유합니다.
 
-두 타입이 공유하는 보조 타입은 **이름을 소유한 타입**의 패밀리 폴더에 둡니다. 예를
-들어 `SelectionCardStyle`은 `SelectionCard`와 `SelectionCardList`가 함께 쓰더라도
-`SelectionCard/`에 둡니다.
+두 타입이 공유하는 보조 타입은 **이름을 소유한 타입**의 패밀리 폴더에 둡니다. 제네릭
+타입에 중첩한 타입은 제네릭 인자마다 다른 타입이 되어 공유할 수 없으므로, 각 타입이
+자기 보조 타입을 중첩합니다. 예를 들어 `SelectionCard.Style`과 `SelectionCardList.Style`은
+따로 둡니다.
 
 폴더 이름은 메인 타입 이름을 그대로 씁니다. Feature 패키지의 흐름 배치는 §4.3의
 별도 규칙을 따릅니다.

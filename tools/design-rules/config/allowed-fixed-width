@@ -15,7 +15,7 @@ sources/Projects/UI/Component/Controls/PolicyAgreementRow.swift 체크 아이콘
 sources/Projects/UI/Component/Controls/LabeledTextField.swift 지우기 아이콘 정사각과 44 히트 영역
 sources/Projects/UI/Component/CollectionItems/HomeProjectCard.swift 2열 카드 폭은 gridColumn2에서 유도하고 재생 버튼만 원형 44 히트 영역
 sources/Projects/UI/Component/CollectionItems/ProjectRow.swift 썸네일 종횡비
-sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift 썸네일 종횡비
+sources/Projects/UI/Component/CollectionItems/SelectionCard.swift 썸네일 종횡비
 sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift 썸네일 정사각 종횡비
 sources/Projects/UI/Component/Controls/BookmarkButton.swift 아이콘 정사각 표면과 44 히트 영역
 sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift 셰브론 아이콘 정사각과 탭 영역, 같은 크기의 예약 공간
