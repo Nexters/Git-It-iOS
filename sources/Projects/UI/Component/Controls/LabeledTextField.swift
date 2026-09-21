@@ -10,13 +10,11 @@ public struct LabeledTextField: View {
     public init(
         displayModel: DisplayModel,
         text: Binding<String>,
-        stateModel: StateModel = .init(),
         accessibilityLabel: String? = nil,
         focus: FocusState<Bool>.Binding? = nil,
     ) {
         self.displayModel = displayModel
         _text = text
-        self.stateModel = stateModel
         self.accessibilityLabel = accessibilityLabel ?? displayModel.label
         self.focus = focus
     }
@@ -36,9 +34,6 @@ public struct LabeledTextField: View {
                         text: $text,
                         prompt: Text(displayModel.placeholder).foregroundStyle(Color(designSystem: .white30)),
                     )
-                    .keyboardType(stateModel.keyboardType)
-                    .textInputAutocapitalization(stateModel.textInputAutocapitalization)
-                    .autocorrectionDisabled(stateModel.autocorrectionDisabled)
                     .designSystemForeground(.grey100)
                     .accessibilityLabel(accessibilityLabel)
                     .focused(focus ?? $unboundFocus)
@@ -65,7 +60,7 @@ public struct LabeledTextField: View {
             if let supportingText = displayModel.supportingText {
                 StyledText(text: supportingText)
                     .textStyle(.caption1)
-                    .foregroundColorToken(stateModel.isError ? .error : .grey300)
+                    .foregroundColorToken(isError ? .error : .grey300)
                     .padding(.leading, Constant.supportingTextLeadingPadding)
                     .padding(.top, Constant.supportingTextTopPadding)
             }
@@ -81,12 +76,12 @@ public struct LabeledTextField: View {
     @FocusState private var unboundFocus: Bool
 
     private let displayModel: DisplayModel
-    private let stateModel: StateModel
+    private var isError = false
     private let accessibilityLabel: String
     private let focus: FocusState<Bool>.Binding?
 
     private var accentColor: ColorToken {
-        stateModel.isError ? .error : .blue100
+        isError ? .error : .blue100
     }
 
 }
@@ -111,26 +106,13 @@ extension LabeledTextField {
     }
 }
 
-// MARK: LabeledTextField.StateModel
+// MARK: LabeledTextField 상태 선언
 
 extension LabeledTextField {
-    public struct StateModel: Sendable {
-        public init(
-            isError: Bool = false,
-            keyboardType: UIKeyboardType = .default,
-            textInputAutocapitalization: TextInputAutocapitalization = .sentences,
-            autocorrectionDisabled: Bool = false,
-        ) {
-            self.isError = isError
-            self.keyboardType = keyboardType
-            self.textInputAutocapitalization = textInputAutocapitalization
-            self.autocorrectionDisabled = autocorrectionDisabled
-        }
-
-        public let isError: Bool
-        public let keyboardType: UIKeyboardType
-        public let textInputAutocapitalization: TextInputAutocapitalization
-        public let autocorrectionDisabled: Bool
+    public func error(_ isError: Bool) -> Self {
+        var copy = self
+        copy.isError = isError
+        return copy
     }
 }
 
@@ -163,8 +145,8 @@ extension LabeledTextField {
                 supportingText: "올바른 GitHub 레포지토리 링크를 입력해 주세요.",
             ),
             text: .constant("https://github.comakjshddhaag"),
-            stateModel: .init(isError: true),
         )
+        .error(true)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

@@ -1,48 +1,64 @@
 import SwiftUI
 import Testing
+import UIKit
 
 @testable import UIComponent
 
-@Suite("LabeledTextField 계약")
+@Suite("LabeledTextField 상태 선언")
 @MainActor
 struct LabeledTextFieldTests {
 
     // MARK: Internal
 
     @Test
-    func `상태 모델을 넘기지 않으면 오류 없이 기본 키보드와 입력 보정으로 그린다`() throws {
-        let stateModel = try #require(storedStateModel(of: LabeledTextField(displayModel: displayModel, text: .constant(""))))
-
-        #expect(stateModel.isError == false)
-        #expect(stateModel.keyboardType == .default)
-        #expect(stateModel.autocorrectionDisabled == false)
+    func `오류를 선언하지 않으면 오류가 없는 상태로 그린다`() {
+        #expect(isError(of: LabeledTextField(displayModel: displayModel, text: .constant(""))) == false)
     }
 
     @Test
-    func `넘긴 상태 모델로 오류와 입력 설정을 정한다`() throws {
-        let field = LabeledTextField(
-            displayModel: displayModel,
-            text: .constant(""),
-            stateModel: .init(
-                isError: true,
-                keyboardType: .URL,
-                textInputAutocapitalization: .never,
-                autocorrectionDisabled: true,
-            ),
-        )
-        let stateModel = try #require(storedStateModel(of: field))
+    func `error로 오류를 선언하면 표시 값을 유지한 채 오류 상태로 그린다`() {
+        let field = LabeledTextField(displayModel: displayModel, text: .constant("")).error(true)
 
-        #expect(stateModel.isError)
-        #expect(stateModel.keyboardType == .URL)
-        #expect(stateModel.autocorrectionDisabled)
+        #expect(isError(of: field) == true)
+        #expect(Mirror(reflecting: field).descendant("displayModel") as? LabeledTextField.DisplayModel == displayModel)
+    }
+
+    @Test
+    func `호출부가 붙인 SwiftUI 입력 수정자는 안쪽 입력 필드에 적용된다`() throws {
+        let field = LabeledTextField(displayModel: displayModel, text: .constant(""))
+            .error(true)
+            .keyboardType(.URL)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled(true)
+        let textField = try #require(renderedTextField(of: field))
+
+        #expect(textField.keyboardType == .URL)
+        #expect(textField.autocapitalizationType == .none)
+        #expect(textField.autocorrectionType == .no)
     }
 
     // MARK: Private
 
     private let displayModel = LabeledTextField.DisplayModel(label: "링크", placeholder: "https://github.com")
 
-    private func storedStateModel(of field: LabeledTextField) -> LabeledTextField.StateModel? {
-        Mirror(reflecting: field).descendant("stateModel") as? LabeledTextField.StateModel
+    private func isError(of field: LabeledTextField) -> Bool? {
+        Mirror(reflecting: field).descendant("isError") as? Bool
+    }
+
+    private func renderedTextField(of view: some View) -> UITextField? {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 200))
+        let host = UIHostingController(rootView: view)
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        host.view.layoutIfNeeded()
+        return firstTextField(in: host.view)
+    }
+
+    private func firstTextField(in view: UIView) -> UITextField? {
+        if let textField = view as? UITextField {
+            return textField
+        }
+        return view.subviews.lazy.compactMap { firstTextField(in: $0) }.first
     }
 
 }

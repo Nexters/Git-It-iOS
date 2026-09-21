@@ -35,15 +35,13 @@ struct RepositoryLinkInputScreen: View {
                         supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
                     ),
                     text: repositoryURLInput,
-                    stateModel: .init(
-                        isError: store.isValidationFailed,
-                        keyboardType: .URL,
-                        textInputAutocapitalization: .never,
-                        autocorrectionDisabled: true,
-                    ),
                     accessibilityLabel: "GitHub 레포지토리 링크",
                     focus: $isLinkFieldFocused,
                 )
+                .error(store.isValidationFailed)
+                .keyboardType(.URL)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
             }
             .designSystemScreenMargin()
             .padding(.top, Constant.headerContentSpacing)

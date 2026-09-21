@@ -10,11 +10,9 @@ public struct ResourceAnimation: View {
 
     public init(
         asset: Asset,
-        stateModel: StateModel = .init(),
         onCompletion: ((Bool) -> Void)? = nil,
     ) {
         self.asset = asset
-        self.stateModel = stateModel
         self.onCompletion = onCompletion
     }
 
@@ -35,38 +33,42 @@ public struct ResourceAnimation: View {
 
     public var body: some View {
         LottieView(animation: asset.animation)
-            .playing(loopMode: stateModel.isLooping ? .loop : .playOnce)
-            .animationSpeed(stateModel.speed)
+            .playing(loopMode: isLooping ? .loop : .playOnce)
+            .animationSpeed(speed)
             .animationDidFinish { onCompletion?($0) }
             .resizable()
-            .aspectRatio(contentMode: stateModel.contentMode)
+            .aspectRatio(contentMode: contentMode)
     }
 
     // MARK: Private
 
     private let asset: Asset
-    private let stateModel: StateModel
+    private var isLooping = true
+    private var speed: Double = 1
+    private var contentMode = ContentMode.fit
     private let onCompletion: ((Bool) -> Void)?
 
 }
 
-// MARK: ResourceAnimation.StateModel
+// MARK: ResourceAnimation 상태 선언
 
 extension ResourceAnimation {
-    public struct StateModel: Sendable, Equatable {
-        public init(
-            isLooping: Bool = true,
-            speed: Double = 1,
-            contentMode: ContentMode = .fit,
-        ) {
-            self.isLooping = isLooping
-            self.speed = speed
-            self.contentMode = contentMode
-        }
+    public func looping(_ isLooping: Bool) -> Self {
+        var copy = self
+        copy.isLooping = isLooping
+        return copy
+    }
 
-        public let isLooping: Bool
-        public let speed: Double
-        public let contentMode: ContentMode
+    public func speed(_ speed: Double) -> Self {
+        var copy = self
+        copy.speed = speed
+        return copy
+    }
+
+    public func contentMode(_ contentMode: ContentMode) -> Self {
+        var copy = self
+        copy.contentMode = contentMode
+        return copy
     }
 }
 
@@ -75,10 +77,12 @@ extension ResourceAnimation {
         ResourceAnimation(asset: .generalLoading)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(asset: .notification, stateModel: .init(isLooping: false))
+        ResourceAnimation(asset: .notification)
+            .looping(false)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(asset: .storageEmpty, stateModel: .init(isLooping: false))
+        ResourceAnimation(asset: .storageEmpty)
+            .looping(false)
             .frame(width: 128, height: 128)
     }
     .designSystemScreenMargin()
@@ -88,10 +92,12 @@ extension ResourceAnimation {
 
 #Preview("Resource Animation 2") {
     VStack(spacing: LayoutToken.gutter) {
-        ResourceAnimation(asset: .setCreationLoading, stateModel: .init(speed: 1.5))
+        ResourceAnimation(asset: .setCreationLoading)
+            .speed(1.5)
             .frame(width: 250, height: 250)
 
-        ResourceAnimation(asset: .complete, stateModel: .init(isLooping: false))
+        ResourceAnimation(asset: .complete)
+            .looping(false)
             .frame(width: 200, height: 200)
     }
     .designSystemScreenMargin()
