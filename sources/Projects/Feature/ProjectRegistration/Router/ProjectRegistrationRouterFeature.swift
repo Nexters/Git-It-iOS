@@ -96,8 +96,10 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .repositoryLinkInput(.delegate(.repositoryValidated(let repository))):
-                state.repositoryConfirmation.repository = repository
-                return activate(.repositoryConfirmation, state: &state)
+                return .merge(
+                    .send(.repositoryConfirmation(.input(.repositoryProvided(repository)))),
+                    activate(.repositoryConfirmation, state: &state),
+                )
 
             case .repositoryLinkInput(.delegate(.dismissRequested)):
                 return .send(.delegate(.dismissRequested))
@@ -106,9 +108,11 @@ public struct ProjectRegistrationRouterFeature: Sendable {
                 return activate(.quizLevelSelection, state: &state)
 
             case .repositoryConfirmation(.delegate(.rejected)):
-                state.repositoryLinkInput.validation = .idle
-                state.repositoryConfirmation.repository = nil
-                return activate(.repositoryLinkInput, state: &state)
+                return .merge(
+                    .send(.repositoryLinkInput(.input(.validationReset))),
+                    .send(.repositoryConfirmation(.input(.cleared))),
+                    activate(.repositoryLinkInput, state: &state),
+                )
 
             case .quizLevelSelection(.delegate(.confirmed)):
                 return activate(.quizGenerationConfirmation, state: &state)

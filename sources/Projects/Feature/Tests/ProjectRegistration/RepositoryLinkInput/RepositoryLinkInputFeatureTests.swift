@@ -23,6 +23,17 @@ struct RepositoryLinkInputFeatureTests {
     }
 
     @Test
+    func `validationReset 입력은 검증 결과를 idle로 되돌린다`() async {
+        var state = RepositoryLinkInputFeature.State()
+        state.validation = .validated(sampleRepository)
+        let store = makeRepositoryLinkInputStore(state: state)
+
+        await store.send(.input(.validationReset)) {
+            $0.validation = .idle
+        }
+    }
+
+    @Test
     func `validateTapped 성공은 validation을 validated로 전이하고 repositoryValidated를 위임한다`() async {
         let externalRepository = ExternalRepositoryUseCaseStub(results: [.success(sampleRepository)])
         let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)

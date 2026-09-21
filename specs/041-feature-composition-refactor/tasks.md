@@ -360,14 +360,14 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 **독립 검증**: 각 자식의 새 input이 자식 테스트로 검증되고, Router 테스트는 input 전송을 단언한다.
 
-- [ ] T099 [P] [S3] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionFeature.swift`에 `input.positionProvided(MemberPosition)`을 추가하고 `position`의 외부 setter를 제거한다. 테스트는 `sources/Projects/Feature/Tests/Onboarding/CareerSelection/CareerSelectionFeatureTests.swift`에 추가한다
-- [ ] T100 [P] [S3] `sources/Projects/Feature/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeature.swift`에 `input.repositoryProvided(ExternalRepository)`와 `input.cleared`를 추가한다. 테스트는 `sources/Projects/Feature/Tests/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeatureTests.swift`로 새로 작성한다
-- [ ] T101 [P] [S3] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeature.swift`에 `input.validationReset`을 추가한다. 테스트는 `sources/Projects/Feature/Tests/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeatureTests.swift`에 추가한다
-- [ ] T102 [S3] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`의 `careerSelection.position = p`를 `positionProvided` input 전송으로 바꾼다
-- [ ] T103 [S3] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`의 `repositoryConfirmation.repository`·`repositoryLinkInput.validation` 직접 쓰기를 T100·T101의 input 전송으로 바꾼다. `sources/Projects/Feature/ProjectRegistration/Router/Previews/ProjectRegistrationRouterPreviews.swift`와 `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/Previews/RepositoryLinkInputScreenPreviews.swift`는 compile에 필요한 경우에만 State 구성을 맞춘다
-- [ ] T104 [S3] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`와 `sources/Projects/Feature/Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift`가 input 전송 결과를 단언하게 바꾼다
-- [ ] T105 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U9 이관 대응표를 추가한다
-- [ ] T106 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
+- [X] T099 [P] [S3] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionFeature.swift`에 `input.positionProvided(MemberPosition)`을 추가하고 `position`의 외부 setter를 제거한다. 테스트는 `sources/Projects/Feature/Tests/Onboarding/CareerSelection/CareerSelectionFeatureTests.swift`에 추가한다
+- [X] T100 [P] [S3] `sources/Projects/Feature/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeature.swift`에 `input.repositoryProvided(ExternalRepository)`와 `input.cleared`를 추가한다. 테스트는 `sources/Projects/Feature/Tests/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeatureTests.swift`로 새로 작성한다
+- [X] T101 [P] [S3] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeature.swift`에 `input.validationReset`을 추가한다. 테스트는 `sources/Projects/Feature/Tests/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeatureTests.swift`에 추가한다
+- [X] T102 [S3] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`의 `careerSelection.position = p`를 `positionProvided` input 전송으로 바꾼다
+- [X] T103 [S3] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`의 `repositoryConfirmation.repository`·`repositoryLinkInput.validation` 직접 쓰기를 T100·T101의 input 전송으로 바꾼다. `sources/Projects/Feature/ProjectRegistration/Router/Previews/ProjectRegistrationRouterPreviews.swift`와 `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/Previews/RepositoryLinkInputScreenPreviews.swift`는 compile에 필요한 경우에만 State 구성을 맞춘다
+- [X] T104 [S3] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`와 `sources/Projects/Feature/Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift`가 input 전송 결과를 단언하게 바꾼다
+- [X] T105 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U9 이관 대응표를 추가한다
+- [X] T106 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
 
 **진행 점검**: T099~T106의 변경 파일과 검증 결과를 보고하고 실행 단위 10으로 진행한다.
 

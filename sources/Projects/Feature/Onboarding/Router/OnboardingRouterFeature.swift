@@ -136,8 +136,8 @@ public struct OnboardingRouterFeature: Sendable {
                 effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
 
             case .positionSelection(.delegate(.confirmed(let position))):
-                state.careerSelection.position = position
                 state.activeScreen = .curation(.careerSelection)
+                effect = .send(.careerSelection(.input(.positionProvided(position))))
 
             case .positionSelection(.delegate(.exitRequested)):
                 state.positionSelection = PositionSelectionFeature.State()

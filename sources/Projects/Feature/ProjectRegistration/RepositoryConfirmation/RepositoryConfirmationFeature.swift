@@ -23,13 +23,22 @@ public struct RepositoryConfirmationFeature: Sendable {
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
             case confirmTapped
             case rejectTapped
             case backTapped
+        }
+
+        @CasePathable
+        public enum Input: Sendable, Equatable {
+            case repositoryProvided(ExternalRepository)
+            case cleared
         }
 
         @CasePathable
@@ -40,17 +49,25 @@ public struct RepositoryConfirmationFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+            case .input(.repositoryProvided(let repository)):
+                state.repository = repository
+                return .none
+
+            case .input(.cleared):
+                state.repository = nil
+                return .none
+
             case .view(.confirmTapped):
-                .send(.delegate(.confirmed))
+                return .send(.delegate(.confirmed))
 
             case .view(.rejectTapped),
                  .view(.backTapped):
-                .send(.delegate(.rejected))
+                return .send(.delegate(.rejected))
 
             case .delegate:
-                .none
+                return .none
             }
         }
     }

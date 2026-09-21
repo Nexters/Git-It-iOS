@@ -52,6 +52,7 @@ struct OnboardingRouterFeatureTests {
 
         await store.send(.positionSelection(.view(.nextTapped)))
         await store.receive(.positionSelection(.delegate(.confirmed(.ios))))
+        await store.receive(.careerSelection(.input(.positionProvided(.ios))))
         #expect(store.state.activeScreen == .curation(.careerSelection))
         #expect(store.state.careerSelection.position == .ios)
         #expect(store.state.transitionLog.count == 2)
@@ -107,7 +108,7 @@ struct OnboardingRouterFeatureTests {
         var state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
         state.activeScreen = .curation(.careerSelection)
         state.positionSelection.position = .backend
-        state.careerSelection.position = .backend
+        state.careerSelection = CareerSelectionFeature.State(position: .backend)
         state.careerSelection.careerLevel = .junior
         let store = makeOnboardingRouterStore(state: state)
         store.exhaustivity = .off

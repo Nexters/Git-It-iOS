@@ -15,9 +15,11 @@ struct ProjectRegistrationRouterFeatureTests {
         #expect(store.state.activeScreen == .repositoryLinkInput)
 
         await store.send(.repositoryLinkInput(.delegate(.repositoryValidated(sampleRepository)))) {
-            $0.repositoryConfirmation.repository = sampleRepository
             $0.activeScreen = .repositoryConfirmation
             $0.screenTransitions = [.init(from: .repositoryLinkInput, to: .repositoryConfirmation)]
+        }
+        await store.receive(.repositoryConfirmation(.input(.repositoryProvided(sampleRepository)))) {
+            $0.repositoryConfirmation.repository = sampleRepository
         }
     }
 
@@ -64,6 +66,8 @@ struct ProjectRegistrationRouterFeatureTests {
 
         await store.send(.repositoryConfirmation(.view(.rejectTapped)))
         await store.receive(.repositoryConfirmation(.delegate(.rejected)))
+        await store.receive(.repositoryLinkInput(.input(.validationReset)))
+        await store.receive(.repositoryConfirmation(.input(.cleared)))
 
         #expect(store.state.activeScreen == .repositoryLinkInput)
         #expect(store.state.repositoryLinkInput.validation == .idle)

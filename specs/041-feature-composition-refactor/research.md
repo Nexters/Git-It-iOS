@@ -512,6 +512,14 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다(합성 경로) | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다(수신 Action·상태 경로 `detailLoad`) | 합성 지점 검증 |
 | U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 세트 시작은 라벨만 담은 진입 의도를 만든다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 세트 시작은 라벨만 담은 진입 의도를 만든다(상태 준비 경로만 변경) | 합성 지점 검증 |
 | U8 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 풀이 중 답안을 제출하면 프로젝트 목록도 상세도 갱신하지 않는다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 풀이 중 답안을 제출하면 프로젝트 목록도 상세도 갱신하지 않는다(상태 경로 `projectDetail.projectDetail.detailLoad`) | 합성 지점 검증 |
+| U9 | (새 테스트) | Tests/Onboarding/CareerSelection/CareerSelectionFeatureTests.swift › positionProvided 입력은 제출에 쓸 직군을 저장한다 | 기능 Feature 테스트 |
+| U9 | Tests/Onboarding/CareerSelection/CareerSelectionFeatureTests.swift › career 선택은 값을 저장하고 뒤로 가기는 backRequested를 위임한다 외 2개 | Tests/Onboarding/CareerSelection/CareerSelectionFeatureTests.swift › 같은 테스트(직군을 `State(position:)`으로 구성) | 기능 Feature 테스트 |
+| U9 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 정상 완료 여정은 guide와 curation 및 splash를 거쳐 mainShell 전환을 위임하고 이동 이벤트를 남긴다 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 같은 테스트(`careerSelection.input.positionProvided` 수신 추가) | 합성 지점 검증 |
+| U9 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › career 화면에서 뒤로 가기는 positionSelection으로 되돌리고 두 선택을 모두 보존한다 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 같은 테스트(직군을 `CareerSelectionFeature.State(position:)`으로 구성) | 합성 지점 검증 |
+| U9 | (새 테스트) | Tests/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeatureTests.swift › repositoryProvided 입력은 확인할 저장소를 저장한다, cleared 입력은 확인할 저장소를 비운다, 확인 탭은 confirmed를 위임한다, 거부와 뒤로 가기는 rejected를 위임한다 | 기능 Feature 테스트 |
+| U9 | (새 테스트) | Tests/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeatureTests.swift › validationReset 입력은 검증 결과를 idle로 되돌린다 | 기능 Feature 테스트 |
+| U9 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 검증에 성공하면 저장소 확인 화면으로 전환하고 확인 대상 저장소를 넘긴다 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 같은 테스트(`repositoryConfirmation.input.repositoryProvided` 수신 단언) | 합성 지점 검증 |
+| U9 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 저장소를 거부하면 링크 입력으로 되돌리고 검증 결과를 비운다 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 같은 테스트(`validationReset`·`cleared` 수신 단언) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -549,3 +557,8 @@ Effect 이름은 자식 안에서 `authorizationChecked`로 바꿨다. `Settings
 **U8 비고**: `ProjectDetailFeature`의 `projectID`는 자식 `detailLoad.projectID`에서 파생한다. 상세 화면의
 `RepositorySummaryView`와 `ProjectDetailRouterFeature.swift`, `ProjectDetailRouterFeatureTests.swift`는
 상세 조회 상태를 직접 참조하지 않아 수정하지 않았다.
+
+**U9 비고**: `CareerSelectionFeature.State.position`은 `fileprivate(set)`으로 바꾸고 `State(position:)` 생성자를
+추가해 테스트가 초기 직군을 구성할 수 있게 했다. `RepositoryConfirmationFeature.State.repository`의 setter는
+U11 전까지 `ShareRegistrationFeature`가 쓰므로 이 단위에서 막지 않았다. T103의 두 Preview는 새 input 추가
+뒤에도 그대로 compile되어 수정하지 않았다.

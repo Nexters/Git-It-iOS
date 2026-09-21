@@ -20,16 +20,18 @@ public struct CareerSelectionFeature: Sendable {
 
     @ObservableState
     public struct State: Equatable, Sendable {
-        public init() { }
+        public init(position: MemberPosition? = nil) {
+            self.position = position
+        }
 
+        public fileprivate(set) var position: MemberPosition?
         public var careerLevel: CareerLevel?
         public var submission = Submission.idle
-
-        var position: MemberPosition?
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case effect(EffectEvent)
         case delegate(Delegate)
 
@@ -40,6 +42,11 @@ public struct CareerSelectionFeature: Sendable {
             case careerLevelSelected(CareerLevel)
             case submitTapped
             case backTapped
+        }
+
+        @CasePathable
+        public enum Input: Sendable, Equatable {
+            case positionProvided(MemberPosition)
         }
 
         @CasePathable
@@ -57,6 +64,10 @@ public struct CareerSelectionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .input(.positionProvided(let position)):
+                state.position = position
+                return .none
+
             case .view(.careerLevelSelected(let careerLevel)):
                 guard state.submission != .submitting else { return .none }
                 state.careerLevel = careerLevel
