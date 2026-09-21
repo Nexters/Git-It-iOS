@@ -23,11 +23,11 @@ public struct WebSheet: View {
         SheetSurface {
             VStack(spacing: 0) {
                 HStack(spacing: LayoutToken.gutter) {
-                    StyledText.subtitle1(title)
+                    StyledText(text: title, style: .subtitle1)
 
                     Spacer(minLength: 0)
 
-                    IconGlassButton.neutral(icon: .close, label: "닫기", action: onDismiss)
+                    IconGlassButton(icon: .close, label: "닫기", action: onDismiss)
                 }
                 .padding(.bottom, LayoutToken.gutter)
 

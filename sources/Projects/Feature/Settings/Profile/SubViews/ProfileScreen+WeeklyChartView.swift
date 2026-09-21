@@ -11,8 +11,8 @@ extension ProfileScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
                 VStack(alignment: .leading, spacing: Constant.headerSpacing) {
-                    StyledText.body3(Constant.sectionLabel, color: .grey400)
-                    StyledText.subtitle3(display.weeklyTitle)
+                    StyledText(text: Constant.sectionLabel, style: .body3, color: .grey400)
+                    StyledText(text: display.weeklyTitle, style: .subtitle3)
                 }
 
                 VStack(spacing: Constant.barsToLabelsSpacing) {
@@ -25,7 +25,7 @@ extension ProfileScreen {
 
                     HStack(spacing: Constant.barSpacing) {
                         ForEach(display.weeklyBars) { bar in
-                            StyledText.caption2(bar.dayLabel, alignment: .center)
+                            StyledText(text: bar.dayLabel, style: .caption2, alignment: .center)
                                 .frame(maxWidth: .infinity)
                         }
                     }
@@ -66,8 +66,9 @@ extension ProfileScreen {
 
         private func barColumn(_ bar: ProfileDisplay.WeeklyBar) -> some View {
             VStack(spacing: Constant.countToBarSpacing) {
-                StyledText.caption2(
-                    "\(bar.count)",
+                StyledText(
+                    text: "\(bar.count)",
+                    style: .caption2,
                     color: bar.isHighlighted ? .grey200 : .grey300,
                     alignment: .center,
                 )

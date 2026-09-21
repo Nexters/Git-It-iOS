@@ -94,33 +94,6 @@ public struct IconGlassButton: View {
         .accessibilityLabel(label)
     }
 
-    public static func neutral(
-        icon: Icon,
-        label: String,
-        size: Size = .small,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(icon: icon, label: label, style: .neutral, size: size, action: action)
-    }
-
-    public static func accent(
-        icon: Icon,
-        label: String,
-        size: Size = .small,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(icon: icon, label: label, style: .accent, size: size, action: action)
-    }
-
-    public static func destructive(
-        icon: Icon,
-        label: String,
-        size: Size = .small,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(icon: icon, label: label, style: .destructive, size: size, action: action)
-    }
-
     // MARK: Private
 
     private let icon: Icon
@@ -134,13 +107,13 @@ public struct IconGlassButton: View {
 #Preview("Icon Glass Button") {
     VStack(spacing: LayoutToken.margin) {
         HStack(spacing: LayoutToken.gutter) {
-            IconGlassButton.neutral(icon: .chevronLeft, label: "뒤로 가기")
-            IconGlassButton.accent(icon: .bookmark, label: "저장하기")
-            IconGlassButton.destructive(icon: .minus, label: "삭제하기")
+            IconGlassButton(icon: .chevronLeft, label: "뒤로 가기")
+            IconGlassButton(icon: .bookmark, label: "저장하기", style: .accent)
+            IconGlassButton(icon: .minus, label: "삭제하기", style: .destructive)
         }
         HStack(spacing: LayoutToken.gutter) {
-            IconGlassButton.neutral(icon: .chevronLeft, label: "뒤로 가기", size: .small)
-            IconGlassButton.accent(icon: .bookmark, label: "저장하기", size: .medium)
+            IconGlassButton(icon: .chevronLeft, label: "뒤로 가기", size: .small)
+            IconGlassButton(icon: .bookmark, label: "저장하기", style: .accent, size: .medium)
         }
     }
     .designSystemScreenMargin()

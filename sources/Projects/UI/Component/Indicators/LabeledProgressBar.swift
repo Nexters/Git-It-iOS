@@ -24,9 +24,9 @@ public struct LabeledProgressBar: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: Constant.labelSpacing) {
             HStack {
-                StyledText.caption1(label, color: .grey400)
+                StyledText(text: label, style: .caption1, color: .grey400)
                 Spacer(minLength: 0)
-                StyledText.caption1(valueText, color: valueColor)
+                StyledText(text: valueText, style: .caption1, color: valueColor)
             }
 
             ContinuousProgressBar(progress: progress, height: .detail)

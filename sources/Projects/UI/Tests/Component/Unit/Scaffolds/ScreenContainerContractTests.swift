@@ -14,10 +14,10 @@ struct ScreenContainerContractTests {
     @Test
     func `배경 색 토큰을 받아 생성한다`() {
         _ = ScreenContainer {
-            StyledText.body1("콘텐츠")
+            StyledText(text: "콘텐츠", style: .body1)
         }
         _ = ScreenContainer(background: .grey600) {
-            StyledText.body1("콘텐츠")
+            StyledText(text: "콘텐츠", style: .body1)
         }
     }
 }

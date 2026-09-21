@@ -21,11 +21,12 @@ struct PositionSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText.subtitle1(Constant.title, alignment: .center)
+                    StyledText(text: Constant.title, style: .subtitle1, alignment: .center)
 
                     if store.exitStatus == .failed {
-                        StyledText.caption1(
-                            "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요.",
+                        StyledText(
+                            text: "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요.",
+                            style: .caption1,
                             color: .error,
                             alignment: .center,
                         )

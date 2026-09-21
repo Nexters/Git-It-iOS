@@ -13,8 +13,8 @@ extension MainShellRouter {
             ScreenContainer {
                 VStack(spacing: LayoutToken.compactSpacing) {
                     Spacer()
-                    StyledText.subtitle1(Constant.title, alignment: .center)
-                    StyledText.body2(Constant.message, alignment: .center)
+                    StyledText(text: Constant.title, style: .subtitle1, alignment: .center)
+                    StyledText(text: Constant.message, style: .body2, alignment: .center)
                     Spacer()
                     AppleSignInButton(action: onSignIn)
                         .padding(.bottom, LayoutToken.margin)

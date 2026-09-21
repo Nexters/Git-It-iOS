@@ -52,7 +52,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 #Preview("Tab Shell") {
     TabShell(selected: .constant(TabShellPreviewItem.home)) { _ in
         ScreenContainer {
-            StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
+            StyledText(text: "선택한 탭 콘텐츠", style: .subtitle1, alignment: .center)
         }
     }
 }
@@ -63,7 +63,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
         isEnabled: { $0 != .saved },
     ) { _ in
         ScreenContainer {
-            StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
+            StyledText(text: "선택한 탭 콘텐츠", style: .subtitle1, alignment: .center)
         }
     }
 }

@@ -19,11 +19,11 @@ public struct ScreenHeaderTitle: View {
         if title != nil || subtitle != nil {
             VStack(alignment: .leading, spacing: 0) {
                 if let title {
-                    StyledText.subtitle1(title)
+                    StyledText(text: title, style: .subtitle1)
                 }
 
                 if let subtitle {
-                    StyledText.body2(subtitle, color: .white30)
+                    StyledText(text: subtitle, style: .body2, color: .white30)
                 }
             }
         }

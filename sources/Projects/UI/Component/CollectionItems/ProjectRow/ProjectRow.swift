@@ -37,9 +37,9 @@ public struct ProjectRow<Thumbnail: View>: View {
                     .designSystemCornerRadius(.small)
 
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText.subtitle2(name)
+                    StyledText(text: name, style: .subtitle2)
                         .lineLimit(2)
-                    StyledText.body3(supportingText, color: .grey400)
+                    StyledText(text: supportingText, style: .body3, color: .grey400)
                         .lineLimit(1)
                 }
                 .padding(.top, Constant.textColumnTopPadding)
@@ -53,8 +53,9 @@ public struct ProjectRow<Thumbnail: View>: View {
                 ContinuousProgressBar(progress: progress)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    TagBadge.muted("Set \(currentSet)").designSystemCornerRadius(.pill)
-                    StyledText.body2(setTitle, color: .grey300)
+                    TagBadge(text: "Set \(currentSet)", style: .muted, size: .compact)
+                        .designSystemCornerRadius(.pill)
+                    StyledText(text: setTitle, style: .body2, color: .grey300)
                         .lineLimit(1)
                 }
             }
@@ -130,9 +131,10 @@ public struct ProjectRow<Thumbnail: View>: View {
     @ViewBuilder
     private var accessoryButton: some View {
         if isDeleting {
-            IconGlassButton.destructive(
+            IconGlassButton(
                 icon: .minus,
                 label: "\(name) 삭제",
+                style: .destructive,
                 size: .medium,
                 action: onAccessoryTap,
             ).designSystemBackground(.clear)

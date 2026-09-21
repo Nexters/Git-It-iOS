@@ -12,10 +12,10 @@ extension HomeScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 5) {
-                    StyledText.caption1("프로젝트 문제 생성", color: .grey400)
+                    StyledText(text: "프로젝트 문제 생성", style: .caption1, color: .grey400)
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText.subtitle3("오픈소스를 불러오고")
-                        StyledText.subtitle3("문제로 익혀보세요")
+                        StyledText(text: "오픈소스를 불러오고", style: .subtitle3)
+                        StyledText(text: "문제로 익혀보세요", style: .subtitle3)
                     }
                 }
 
@@ -28,7 +28,7 @@ extension HomeScreen {
                         generationInProgressLabel
                     } else {
                         Button(action: onRegister) {
-                            StyledText.body2("지금 불러오기", color: .grey700)
+                            StyledText(text: "지금 불러오기", style: .body2, color: .grey700)
                                 .frame(width: 104, height: 37)
                                 .background(Color(designSystem: .blue100), in: RoundedRectangle(designSystem: .medium))
                                 .frame(minHeight: 44)
@@ -58,7 +58,7 @@ extension HomeScreen {
             HStack(spacing: Constant.progressLabelSpacing) {
                 ResourceAnimation(asset: .generalLoading)
                     .frame(width: Constant.progressIndicatorSize, height: Constant.progressIndicatorSize)
-                StyledText.body2(Constant.generationInProgressLabel, color: .grey300)
+                StyledText(text: Constant.generationInProgressLabel, style: .body2, color: .grey300)
             }
             .padding(.horizontal, Constant.progressLabelHorizontalPadding)
             .frame(height: 37)

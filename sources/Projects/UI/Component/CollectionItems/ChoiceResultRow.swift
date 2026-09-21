@@ -51,11 +51,11 @@ public struct ChoiceResultRow: View {
     public var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: LayoutToken.tightSpacing) {
-                StyledText.body1(text, color: .grey100)
+                StyledText(text: text, style: .body1, color: .grey100)
                     .lineLimit(1)
 
                 if isExpanded {
-                    StyledText.body3(explanation, color: .grey100)
+                    StyledText(text: explanation, style: .body3, color: .grey100)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -17,7 +17,7 @@ extension ShareRegistrationScreen {
                 ResourceAnimation(asset: .generalLoading, isLooping: true)
                     .frame(width: Constant.indicatorSize, height: Constant.indicatorSize)
 
-                StyledText.body2(message, color: .grey400, alignment: .center)
+                StyledText(text: message, style: .body2, color: .grey400, alignment: .center)
 
                 Spacer(minLength: 0)
             }

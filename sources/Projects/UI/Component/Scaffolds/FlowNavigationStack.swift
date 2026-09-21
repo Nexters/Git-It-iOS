@@ -41,8 +41,8 @@ public struct FlowNavigationStack<Screen: Hashable, Root: View, Destination: Vie
 
 #Preview("Flow Navigation Stack") {
     FlowNavigationStack(path: ["두 번째"]) {
-        StyledText.subtitle1("첫 번째", alignment: .center)
+        StyledText(text: "첫 번째", style: .subtitle1, alignment: .center)
     } destination: { screen in
-        StyledText.subtitle1(screen, alignment: .center)
+        StyledText(text: screen, style: .subtitle1, alignment: .center)
     }
 }

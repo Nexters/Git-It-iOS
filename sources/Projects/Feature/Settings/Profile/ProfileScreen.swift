@@ -26,7 +26,7 @@ public struct ProfileScreen: View {
                         .frame(height: Constant.headerControlRowHeight)
                     Spacer()
 
-                    IconGlassButton.neutral(
+                    IconGlassButton(
                         icon: Constant.settingsControl.icon,
                         label: Constant.settingsControl.label,
                         size: .medium,
@@ -63,7 +63,7 @@ public struct ProfileScreen: View {
         } else {
             Self.ProfileHeaderView(display: current)
                 .padding(Constant.profileCardPadding)
-            StyledText.caption2(Constant.statisticsSectionTitle, color: .grey400)
+            StyledText(text: Constant.statisticsSectionTitle, style: .caption2, color: .grey400)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.sectionTitleTopPadding)

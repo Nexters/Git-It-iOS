@@ -30,7 +30,7 @@ public struct PolicyAgreementRow: View {
                     ResourceImage(asset: isSelected ? .icon(.statusCheck) : .icon(.statusDisabled))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
-                    StyledText.body2(title)
+                    StyledText(text: title, style: .body2)
                 }
                 .contentShape(Rectangle())
             }

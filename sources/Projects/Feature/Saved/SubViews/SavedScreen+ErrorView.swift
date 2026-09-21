@@ -16,7 +16,7 @@ extension SavedScreen {
                 VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
                     HStack(alignment: .top, spacing: LayoutToken.gutter) {
                         if isBackControlPresented {
-                            IconGlassButton.neutral(
+                            IconGlassButton(
                                 icon: ScreenControlBar.Control.back.icon,
                                 label: ScreenControlBar.Control.back.label,
                                 size: .medium,
@@ -37,8 +37,8 @@ extension SavedScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText.subtitle1("저장한 문제를 불러오지 못했어요", alignment: .center)
-                    StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
+                    StyledText(text: "저장한 문제를 불러오지 못했어요", style: .subtitle1, alignment: .center)
+                    StyledText(text: "잠시 후 다시 시도해 주세요.", style: .body2, color: .grey400, alignment: .center)
                 }
 
                 Spacer(minLength: 0)

@@ -13,8 +13,8 @@ extension QuestionSolvingScreen {
 
         var body: some View {
             VStack(alignment: .leading, spacing: LayoutToken.margin) {
-                LabeledCard.neutral(label: "나의 답안", text: myAnswer)
-                LabeledCard.accent(label: "AI 해설", text: aiAnswer)
+                LabeledCard(label: "나의 답안", text: myAnswer, style: .neutral)
+                LabeledCard(label: "AI 해설", text: aiAnswer, style: .accent)
             }
         }
 

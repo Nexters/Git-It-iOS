@@ -43,7 +43,7 @@ public struct BottomActionBar<Content: View>: View {
         Spacer()
 
         BottomActionBar {
-            ActionButton.primary("계속하기")
+            ActionButton(title: "계속하기")
         }
         .designSystemBackground(.grey600)
     }

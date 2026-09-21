@@ -98,8 +98,9 @@ public struct HomeProjectCard: View {
                 )
                 .lineLimit(2)
 
-                StyledText.caption2(
-                    technologies,
+                StyledText(
+                    text: technologies,
+                    style: .caption2,
                     color: variant.technologyColor,
                 )
                 .lineLimit(2)
@@ -115,8 +116,9 @@ public struct HomeProjectCard: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: Constant.footerSpacing) {
-                StyledText.caption2(
-                    currentSetLabel,
+                StyledText(
+                    text: currentSetLabel,
+                    style: .caption2,
                     color: .grey100,
                 )
                 .padding(.horizontal, Constant.setBadgeHorizontalPadding)
@@ -126,8 +128,9 @@ public struct HomeProjectCard: View {
                     in: Capsule(),
                 )
 
-                StyledText.caption1(
-                    setTitle,
+                StyledText(
+                    text: setTitle,
+                    style: .caption1,
                     color: variant.setTitleColor,
                 )
                 .lineLimit(1)

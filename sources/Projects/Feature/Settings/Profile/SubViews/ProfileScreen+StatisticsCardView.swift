@@ -48,8 +48,8 @@ extension ProfileScreen {
             value: String,
         ) -> some View {
             VStack(spacing: Constant.columnSpacing) {
-                StyledText.caption2(label, color: .grey300, alignment: .center)
-                StyledText.subtitle2(value, color: .blue100, alignment: .center)
+                StyledText(text: label, style: .caption2, color: .grey300, alignment: .center)
+                StyledText(text: value, style: .subtitle2, color: .blue100, alignment: .center)
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .combine)

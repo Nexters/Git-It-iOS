@@ -39,9 +39,9 @@ struct LearningSetIntroScreen: View {
             .designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                StyledText.subtitle3(store.label, color: .blue100)
-                StyledText.subtitle1(store.learningSet?.title ?? "")
-                StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
+                StyledText(text: store.label, style: .subtitle3, color: .blue100)
+                StyledText(text: store.learningSet?.title ?? "", style: .subtitle1)
+                StyledText(text: store.learningSet?.description ?? "", style: .body2, color: .grey400)
                     .padding(.top, Constant.descriptionTopPadding)
             }
             .designSystemScreenMargin()
@@ -69,7 +69,7 @@ struct LearningSetIntroScreen: View {
         BottomActionBar {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
-                    StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
+                    StyledText(text: "아직 풀 수 있는 문제가 없어요.", style: .body2, color: .grey400, alignment: .center)
                 }
 
                 FeedbackActionButton(

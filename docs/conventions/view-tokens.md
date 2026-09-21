@@ -51,7 +51,7 @@
 
 ### 2.4 Typography
 
-문자열 렌더링은 `Text`를 직접 구성하지 않고 `StyledText`의 Typography 팩토리를 사용합니다.
+문자열 렌더링은 `Text`를 직접 구성하지 않고 `StyledText` 초기화에 `TextStyleToken`을 넘깁니다.
 
 → [Typography](./view-tokens/typography.md)
 
@@ -60,7 +60,7 @@
 - [ ] 토큰 밖 색상 리터럴이 없는가?
 - [ ] `extension Color`로 패키지 로컬 색상 이름을 추가하지 않았는가?
 - [ ] 여러 곳이 공유하는 수치를 토큰으로 승격했는가?
-- [ ] 문자열이 `StyledText` Typography 팩토리를 통과하는가?
+- [ ] 문자열이 `TextStyleToken`을 받는 `StyledText` 초기화를 통과하는가?
 - [ ] 한 View 안에서만 쓰는 토큰 참조가 `body`에 흩어지지 않고 `Constant`의
       `static` 멤버로 모여 있는가?
 

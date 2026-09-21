@@ -17,17 +17,17 @@ extension ProfileScreen {
 
                 VStack(alignment: .leading, spacing: Constant.infoSpacing) {
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText.subtitle2(display.name ?? "")
-                        StyledText.caption1(display.email ?? "", color: .grey400)
+                        StyledText(text: display.name ?? "", style: .subtitle2)
+                        StyledText(text: display.email ?? "", style: .caption1, color: .grey400)
                     }
 
                     if display.hasBadges {
                         HStack(spacing: Constant.badgeSpacing) {
                             if let position = display.positionBadgeText {
-                                TagBadge.accent(position, size: .compact)
+                                TagBadge(text: position, style: .accent, size: .compact)
                             }
                             if let careerLevel = display.careerLevelBadgeText {
-                                TagBadge.neutral(careerLevel, size: .compact)
+                                TagBadge(text: careerLevel, style: .neutral, size: .compact)
                             }
                         }
                     }

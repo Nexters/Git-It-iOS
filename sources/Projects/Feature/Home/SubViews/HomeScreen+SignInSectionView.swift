@@ -11,8 +11,8 @@ extension HomeScreen {
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: Constant.messageSpacing) {
-                    StyledText.subtitle3(Constant.title)
-                    StyledText.caption1(Constant.caption, color: .grey400)
+                    StyledText(text: Constant.title, style: .subtitle3)
+                    StyledText(text: Constant.caption, style: .caption1, color: .grey400)
                 }
                 Spacer()
                 FeedbackActionButton(title: Constant.signInTitle, style: .secondary, size: .small, action: onSignIn)
