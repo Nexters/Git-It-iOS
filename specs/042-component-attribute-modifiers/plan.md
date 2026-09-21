@@ -260,7 +260,7 @@ UI+Feature integration unit이다. 두 전환(시각 속성, 표시 값 모델)�
 | U6 | 모델: CollectionItems | 4 | `ChoiceResultRow`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`. `ChoiceResultRow.isExpanded`·`SavedQuestionCard.isBookmarked` 상태 `Binding` 전환과 `ChoiceResultRowTests` 단언 조정(§9) | U2, U3 |
 | U7 | 모델: Controls | 4 | `ChoiceAnswerOption`, `LabeledTextField`, `PolicyAgreementRow`, `ScreenControlBar`, `TextField`. `PolicyAgreementRow.isSelected`·`ExpansionControl.toggleable` 상태 `Binding` 전환(§9) | U2 |
 | U8 | 모델: Displays·Indicators·Overlays | 4 | `RubricView`, `ScreenHeaderTitle`, `EmptyState`, `PageIndicator`, `ProgressSegments`, `ConfirmationSheet`, `WebSheet` | U2 |
-| U9 | 상태 `Binding`: Controls·Overlays | 4 | `Chip`, `SelectableSettingRow`, `BookmarkButton`, `ModalOverlay` 상태 `Binding` 전환. `SavedQuestionCard`의 내부 `BookmarkButton` 호출, Feature 호출부의 `Binding(get:set:)` 연결, `ChipTests`·`BookmarkButtonTests` 단언 조정 | U6, U8 |
+| U9 | 상태 `Binding`: Controls·Overlays | 4 | `Chip`, `SelectableSettingRow`, `BookmarkButton`, `ModalOverlay` 상태 `Binding` 전환. Feature 호출부의 `Binding(get:set:)` 연결, `ChipTests`·`BookmarkButtonTests` 단언 조정 | U6, U8 |
 | U10 | 문서 개정과 최종 검증 | 3 | 명세 FR-016 문서와 [research.md](./research.md) §7·§9.6 추가 문서 개정. SC-001~SC-009 조회, 전체 `build`·`compile`·`test`, `after_implement` 포맷 훅 | U1~U9 |
 
 - **순서의 근거**:

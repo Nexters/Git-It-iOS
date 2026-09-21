@@ -468,10 +468,9 @@ EmptyView 경로의 `.compact`로 그려진다.
   - U6: `ChoiceResultRow`, `SavedQuestionCard`
   - U7: `PolicyAgreementRow`, `ChoiceAnswerOption.ExpansionControl`
 - 다른 단위에 없는 `Chip`, `SelectableSettingRow`, `BookmarkButton`, `ModalOverlay`는 새 단위 U9로
-  묶는다. `SavedQuestionCard.swift`는 U6(자기 초기화 메서드)과 U9(안쪽 `BookmarkButton` 호출)에서 한
-  번씩 바뀐다. 이미 확정한 U5~U8의 범위를 넓히지 않도록 U9는 U8 뒤에 둔다. U6에서는
-  `SavedQuestionCard`가 `BookmarkButton`을 부를 때 전환 전 API를 그대로 쓰고, U9에서 그 내부 호출을
-  바꾼다.
+  묶는다. 이미 확정한 U5~U8의 범위를 넓히지 않도록 U9는 U8 뒤에 둔다. `SavedQuestionCard`는
+  `BookmarkButton`을 쓰지 않고 자기 북마크 아이콘 버튼을 그리므로 U6에서 한 번만 바뀐다(구현 중
+  확인해 정정).
 - 문서 개정 단위는 U10으로 한 칸 뒤로 민다. U10에서 FR-017 규칙을 문서에 넣는다(FR-016).
 - U1(`b4b1a79`)은 상태 인자를 바꾸지 않았으므로 영향이 없다. 중단된 U2의 미커밋 테스트 파일
   (`StyleConfigurableTests.swift`, `SizeConfigurableTests.swift`)은 U2 범위 그대로이며 이 전환과

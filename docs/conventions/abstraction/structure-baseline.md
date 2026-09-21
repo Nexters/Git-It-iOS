@@ -7,7 +7,7 @@
 
 | 항목 | 적용 전 | 적용 후 | 명세 036 후 | 명세 042 후 |
 | --- | --- | --- | --- | --- |
-| 프로덕션 Swift 파일 수 | 521 | 512 | 535 | 551 |
+| 프로덕션 Swift 파일 수 | 521 | 512 | 535 | 547 |
 | 프로덕션 프로토콜 수 | 56 | 47 | 50 | 42 |
 | Data 프로덕션 Contracts 파일 수 | 11 | 2 | 6 | 6 |
 
@@ -51,10 +51,13 @@ git ls-files 'sources/Projects/**/*.swift' | grep -v '/Tests/' \
 
 | 소유 패키지 | 프로토콜 | 채택 위치 |
 | --- | --- | --- |
-| Domain Authentication | `AuthenticationRepository`, `LoginSessionRepository`, `PolicyConsentRepository`, `CurrentSessionRepository`, `SharedSignInStateRepository` | Composition Adapter |
-| Domain LearningProject | `AnswerRepository`, `BookmarkRepository`, `ExternalRepositoryLookup`, `ExternalRepositoryLocator`, `GenerationOutcomeRepository`, `GenerationReminderScheduler`, `LearningProjectRepository`, `LearningSetRepository`, `NotificationAuthorization`, `PendingGenerationRepository` | Composition Adapter |
-| Domain LearningProject | `GenerationReminderRegistration` | Domain `ScheduleGenerationReminderUseCase`가 상속(Composition 채택자 없음, 존치 재검토는 점검 문서 DS-12) |
-| Domain Member | `DeviceIdentifierRepository`, `MemberRepository` | Composition Adapter |
+| Domain Account | `AuthenticationRepository`, `PolicyConsentRepository`, `SignInRepository`, `WithdrawalRepository` | Composition Adapter |
+| Domain AppSetting | `DeviceIdentifierRepository`, `DeviceRegistrationRepository`, `NotificationAuthorization` | Composition Adapter |
+| Domain ExternalRepository | `ExternalRepositoryLocator`, `ExternalRepositoryLookup` | Composition Adapter(`ExternalRepositoryLocator`는 Feature 프리뷰 대역도 채택) |
+| Domain Project | `ProjectRepository` | Composition Adapter |
+| Domain ProjectGeneration | `GenerationOutcomeRepository`, `GenerationReminderScheduler`, `PendingGenerationRepository`, `ProjectGenerationRepository` | Composition Adapter |
+| Domain QuizDetail | `AnswerRepository`, `BookmarkRepository`, `QuizSetRepository` | Composition Adapter |
+| Domain UserInfo | `UserInfoRepository` | Composition Adapter |
 | Data LearningProject | `QuizGenerationOutcomeSource` | Data 내부 구현과 Composition |
 | Data Shared | `KeyValueStorage`, `SecureValueStorage`, `RequestTransport` | Data 내부 구현(생성 진입점), Composition·테스트가 대체 구현 주입 |
 | Data Notification | `LocalReminderNotifier`, `RemoteMessageReceiver` | Data 내부 구현(생성 진입점), Composition·테스트가 대체 구현 주입 |
@@ -75,18 +78,11 @@ git ls-files 'sources/Projects/**/*.swift' | grep -v '/Tests/' \
 | --- | --- |
 | `StyleConfigurable`, `SizeConfigurable`, `TextStyleConfigurable`, `ForegroundColorConfigurable`, `BackgroundColorConfigurable` (UI `Component/Contracts/`) | 여러 역할 폴더의 컴포넌트가 같은 이름·형태의 시각 속성 메서드를 제공하도록 강제하는 공개 API 형태 계약입니다. 근거 A·B가 아니며 [추상화 컨벤션](../abstraction.md)의 적용 범위 밖입니다 |
 
-### 3.4 UseCase 프로토콜 (20개) — 별도 명세가 판단합니다
+### 3.4 UseCase 프로토콜 (7개) — 별도 명세가 판단합니다
 
-Domain Authentication 7개(`PolicyConsentUseCase`, `RefreshSessionUseCase`,
-`ResolveSessionAvailabilityUseCase`, `RestoreSessionUseCase`, `SignInUseCase`,
-`SignOutUseCase`, `VerifyAuthorizationUseCase`), Domain LearningProject
-10개(`CreateLearningProjectUseCase`, `FetchExternalRepositoryUseCase`,
-`FetchLearningProjectsUseCase`, `LearningLibraryUseCase`,
-`RequestGenerationReminderUseCase`, `ScheduleGenerationReminderUseCase`,
-`SetQuestionBookmarkUseCase`, `SubmitChoiceAnswerUseCase`,
-`SubmitEssayAnswerUseCase`, `TrackGenerationUseCase`), Domain Member
-3개(`DeleteMemberAccountUseCase`, `MemberAccountUseCase`,
-`RegisterCurrentDeviceUseCase`)입니다.
+Domain 패키지마다 하나씩 `AccountUseCase`, `AppSettingUseCase`,
+`ExternalRepositoryUseCase`, `ProjectUseCase`, `ProjectGenerationUseCase`,
+`QuizDetailUseCase`, `UserInfoUseCase`입니다.
 
 Feature·App이 패키지 경계를 넘어 받지만 구현도 같은 Domain 패키지에 있어 의존 방향이
 뒤집히지 않습니다. 근거 A를 온전히 충족한다고 보기 어렵습니다. UseCase 계층의 존치와
