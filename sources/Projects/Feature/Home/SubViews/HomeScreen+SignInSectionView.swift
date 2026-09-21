@@ -18,7 +18,9 @@ extension HomeScreen {
                         .foregroundColorToken(.grey400)
                 }
                 Spacer()
-                FeedbackActionButton(title: Constant.signInTitle, style: .secondary, size: .small, action: onSignIn)
+                FeedbackActionButton(title: Constant.signInTitle, action: onSignIn)
+                    .style(.secondary)
+                    .size(.small)
                     .fixedSize(horizontal: true, vertical: false)
             }
             .frame(minHeight: Constant.minHeight)

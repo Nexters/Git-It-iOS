@@ -38,9 +38,10 @@ extension ShareRegistrationScreen {
 
                 VStack(spacing: LayoutToken.compactSpacing) {
                     if let retryTitle {
-                        FeedbackActionButton(title: retryTitle, style: .primary, action: onRetry)
+                        FeedbackActionButton(title: retryTitle, action: onRetry)
                     }
-                    FeedbackActionButton(title: dismissTitle, style: .secondary, action: onDismiss)
+                    FeedbackActionButton(title: dismissTitle, action: onDismiss)
+                        .style(.secondary)
                 }
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)

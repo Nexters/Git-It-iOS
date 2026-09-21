@@ -90,9 +90,9 @@ public struct ProjectListScreen: View {
                                 IconGlassButton(
                                     icon: headerLeading.icon,
                                     label: headerLeading.label,
-                                    size: .medium,
                                     action: headerLeadingTapped,
                                 )
+                                .size(.medium)
                                 .frame(height: Constant.headerControlRowHeight)
                             }
 
@@ -106,9 +106,9 @@ public struct ProjectListScreen: View {
                             IconGlassButton(
                                 icon: headerTrailing.icon,
                                 label: headerTrailing.label,
-                                size: .medium,
                                 action: headerTrailingTapped,
                             )
+                            .size(.medium)
                             .frame(minHeight: Constant.headerControlRowHeight)
                         }
                     }
@@ -132,9 +132,9 @@ public struct ProjectListScreen: View {
                         IconGlassButton(
                             icon: headerLeading.icon,
                             label: headerLeading.label,
-                            size: .medium,
                             action: headerLeadingTapped,
                         )
+                        .size(.medium)
                         .frame(minHeight: Constant.headerControlRowHeight)
                     }
 
@@ -149,9 +149,9 @@ public struct ProjectListScreen: View {
                     IconGlassButton(
                         icon: headerTrailing.icon,
                         label: headerTrailing.label,
-                        size: .medium,
                         action: headerTrailingTapped,
                     )
+                    .size(.medium)
                     .frame(minHeight: Constant.headerControlRowHeight)
                     .designSystemScreenMargin()
                 }

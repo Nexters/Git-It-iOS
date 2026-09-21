@@ -20,7 +20,9 @@ extension HomeScreen {
                             .foregroundColorToken(.grey400)
                     }
                     Spacer()
-                    FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onRetry)
+                    FeedbackActionButton(title: "다시 시도", action: onRetry)
+                        .style(.secondary)
+                        .size(.small)
                         .fixedSize(horizontal: true, vertical: false)
                 }
                 .frame(minHeight: Constant.failureMinHeight)

@@ -8,8 +8,10 @@ struct TagBadgeContractTests {
     @Test
     func `표시 값을 직접 받아 생성한다`() {
         _ = TagBadge(text: "완료")
-        _ = TagBadge(text: "진행 중", style: .accent)
-        _ = TagBadge(text: "선택됨", style: .selected)
+        _ = TagBadge(text: "진행 중")
+            .style(.accent)
+        _ = TagBadge(text: "선택됨")
+            .style(.selected)
     }
 
     @Test

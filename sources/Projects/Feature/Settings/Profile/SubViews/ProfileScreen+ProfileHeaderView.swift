@@ -27,10 +27,13 @@ extension ProfileScreen {
                     if display.hasBadges {
                         HStack(spacing: Constant.badgeSpacing) {
                             if let position = display.positionBadgeText {
-                                TagBadge(text: position, style: .accent, size: .compact)
+                                TagBadge(text: position)
+                                    .style(.accent)
+                                    .size(.compact)
                             }
                             if let careerLevel = display.careerLevelBadgeText {
-                                TagBadge(text: careerLevel, style: .neutral, size: .compact)
+                                TagBadge(text: careerLevel)
+                                    .size(.compact)
                             }
                         }
                     }

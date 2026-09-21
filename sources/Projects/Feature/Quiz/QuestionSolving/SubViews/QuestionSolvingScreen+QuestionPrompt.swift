@@ -13,7 +13,8 @@ extension QuestionSolvingScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.contentSpacing) {
                 if let questionNumber {
-                    TagBadge(text: "문제 \(questionNumber)", style: .accent)
+                    TagBadge(text: "문제 \(questionNumber)")
+                        .style(.accent)
                 }
 
                 StyledText(text: prompt)

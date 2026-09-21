@@ -67,9 +67,9 @@ struct SavedScreen: View {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.backTapped) },
                         )
+                        .size(.medium)
                         .frame(height: Constant.headerRowHeight)
                     }
                     ScreenHeaderTitle(title: "저장한 문제")

@@ -10,28 +10,20 @@ public struct FeedbackActionButton: View {
 
     public init(
         title: String,
-        style: ActionButton.Style = .primary,
-        size: ActionButton.Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .title(title)
-        self.style = style
-        self.size = size
         self.isEnabled = isEnabled
         self.action = action
     }
 
     public init(
         styledText: StyledText,
-        style: ActionButton.Style = .primary,
-        size: ActionButton.Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .styled(styledText)
-        self.style = style
-        self.size = size
         self.isEnabled = isEnabled
         self.action = action
     }
@@ -43,20 +35,20 @@ public struct FeedbackActionButton: View {
         case .title(let title):
             ActionButton(
                 title: title,
-                style: style,
-                size: size,
                 isEnabled: isEnabled,
                 action: actionWithTapFeedback,
             )
+            .style(style)
+            .size(size)
 
         case .styled(let styledText):
             ActionButton(
                 styledText: styledText,
-                style: style,
-                size: size,
                 isEnabled: isEnabled,
                 action: actionWithTapFeedback,
             )
+            .style(style)
+            .size(size)
         }
     }
 
@@ -70,8 +62,8 @@ public struct FeedbackActionButton: View {
     private static let tapFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
 
     private let label: Label
-    private let style: ActionButton.Style
-    private let size: ActionButton.Size
+    private var style = ActionButton.Style.primary
+    private var size = ActionButton.Size.large
     private let isEnabled: Bool
     private let action: () -> Void
 
@@ -80,4 +72,24 @@ public struct FeedbackActionButton: View {
         action()
     }
 
+}
+
+// MARK: StyleConfigurable
+
+extension FeedbackActionButton: StyleConfigurable {
+    public func style(_ style: ActionButton.Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// MARK: SizeConfigurable
+
+extension FeedbackActionButton: SizeConfigurable {
+    public func size(_ size: ActionButton.Size) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
 }

@@ -30,7 +30,7 @@ struct QuizGenerationConfirmationScreen: View {
 
             Spacer(minLength: 0)
 
-            FeedbackActionButton(title: "시작하기", style: .primary, action: { send(.startTapped) })
+            FeedbackActionButton(title: "시작하기", action: { send(.startTapped) })
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
         }

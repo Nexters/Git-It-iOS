@@ -18,9 +18,9 @@ extension SettingsScreen {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.backTapped) },
                         )
+                        .size(.medium)
 
                         Spacer(minLength: 0)
                     }

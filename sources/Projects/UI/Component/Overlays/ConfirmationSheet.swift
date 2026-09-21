@@ -44,8 +44,10 @@ public struct ConfirmationSheet: View {
                 .padding(.top, Constant.textSetTopPadding)
 
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    ActionButton(title: confirmTitle, style: .destructive, action: onConfirmTap)
-                    ActionButton(title: cancelTitle, style: .text, action: onCancelTap)
+                    ActionButton(title: confirmTitle, action: onConfirmTap)
+                        .style(.destructive)
+                    ActionButton(title: cancelTitle, action: onCancelTap)
+                        .style(.text)
                 }
                 .padding(.top, Constant.buttonsTopPadding)
             }

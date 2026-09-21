@@ -53,7 +53,7 @@ struct LearningCompletionScreen: View {
 
             Spacer(minLength: 0)
 
-            FeedbackActionButton(title: "확인", style: .primary, action: { send(.primaryActionTapped) })
+            FeedbackActionButton(title: "확인", action: { send(.primaryActionTapped) })
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
         }

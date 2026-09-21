@@ -52,7 +52,6 @@ struct RepositoryLinkInputScreen: View {
 
             FeedbackActionButton(
                 title: store.validateButtonTitle,
-                style: .primary,
                 isEnabled: store.canValidate,
                 action: { send(.validateTapped) },
             )

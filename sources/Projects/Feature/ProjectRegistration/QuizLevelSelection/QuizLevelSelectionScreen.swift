@@ -34,7 +34,7 @@ struct QuizLevelSelectionScreen: View {
 
             Spacer(minLength: 0)
 
-            FeedbackActionButton(title: "다음", style: .primary, action: { send(.nextTapped) })
+            FeedbackActionButton(title: "다음", action: { send(.nextTapped) })
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)
         }

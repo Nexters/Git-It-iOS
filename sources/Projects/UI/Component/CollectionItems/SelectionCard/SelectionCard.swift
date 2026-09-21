@@ -38,7 +38,8 @@ public struct SelectionCard<Thumbnail: View>: View {
                     StyledText(text: title)
                         .textStyle(.subtitle3)
                     if let badgeText {
-                        TagBadge(text: badgeText, style: .selected)
+                        TagBadge(text: badgeText)
+                            .style(.selected)
                     }
                 }
                 if let supportingText {

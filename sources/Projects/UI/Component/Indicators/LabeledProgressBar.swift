@@ -33,7 +33,8 @@ public struct LabeledProgressBar: View {
                     .foregroundColorToken(valueColor)
             }
 
-            ContinuousProgressBar(progress: progress, height: .detail)
+            ContinuousProgressBar(progress: progress)
+                .size(.detail)
         }
         .accessibilityElement(children: .combine)
     }

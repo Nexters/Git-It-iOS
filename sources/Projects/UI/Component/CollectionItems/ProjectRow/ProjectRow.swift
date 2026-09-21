@@ -56,7 +56,9 @@ public struct ProjectRow<Thumbnail: View>: View {
                 ContinuousProgressBar(progress: progress)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    TagBadge(text: "Set \(currentSet)", style: .muted, size: .compact)
+                    TagBadge(text: "Set \(currentSet)")
+                        .style(.muted)
+                        .size(.compact)
                         .designSystemCornerRadius(.pill)
                     StyledText(text: setTitle)
                         .textStyle(.body2)
@@ -139,10 +141,11 @@ public struct ProjectRow<Thumbnail: View>: View {
             IconGlassButton(
                 icon: .minus,
                 label: "\(name) 삭제",
-                style: .destructive,
-                size: .medium,
                 action: onAccessoryTap,
-            ).designSystemBackground(.clear)
+            )
+            .style(.destructive)
+            .size(.medium)
+            .designSystemBackground(.clear)
         } else {
             IconPlainButton(
                 icon: .play,

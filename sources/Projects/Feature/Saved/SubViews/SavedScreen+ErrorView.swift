@@ -19,9 +19,9 @@ extension SavedScreen {
                             IconGlassButton(
                                 icon: ScreenControlBar.Control.back.icon,
                                 label: ScreenControlBar.Control.back.label,
-                                size: .medium,
                                 action: onBack,
                             )
+                            .size(.medium)
                         }
 
                         Spacer(minLength: 0)
@@ -48,7 +48,7 @@ extension SavedScreen {
 
                 Spacer(minLength: 0)
 
-                FeedbackActionButton(title: "다시 시도하기", style: .primary, action: onRetry)
+                FeedbackActionButton(title: "다시 시도하기", action: onRetry)
                     .designSystemScreenMargin()
                     .padding(.bottom, Constant.bottomButtonPadding)
             }

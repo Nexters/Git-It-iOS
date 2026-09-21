@@ -1,18 +1,14 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - TagBadge
+
 public struct TagBadge: View {
 
     // MARK: Lifecycle
 
-    public init(
-        text: String,
-        style: Style = .neutral,
-        size: Size = .regular,
-    ) {
+    public init(text: String) {
         self.text = text
-        self.style = style
-        self.size = size
     }
 
     // MARK: Public
@@ -80,16 +76,38 @@ public struct TagBadge: View {
     }
 
     private let text: String
-    private let style: Style
-    private let size: Size
+    private var style = Style.neutral
+    private var size = Size.regular
 
+}
+
+// MARK: StyleConfigurable
+
+extension TagBadge: StyleConfigurable {
+    public func style(_ style: Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// MARK: SizeConfigurable
+
+extension TagBadge: SizeConfigurable {
+    public func size(_ size: Size) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
 }
 
 #Preview("Tag Badge") {
     HStack(spacing: LayoutToken.gutter) {
         TagBadge(text: "Neutral")
-        TagBadge(text: "Accent", style: .accent)
-        TagBadge(text: "Selected", style: .selected)
+        TagBadge(text: "Accent")
+            .style(.accent)
+        TagBadge(text: "Selected")
+            .style(.selected)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

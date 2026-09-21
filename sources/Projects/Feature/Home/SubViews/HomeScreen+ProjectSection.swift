@@ -173,7 +173,9 @@ extension HomeScreen {
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
-                        FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onProjectRetryTapped)
+                        FeedbackActionButton(title: "다시 시도", action: onProjectRetryTapped)
+                            .style(.secondary)
+                            .size(.small)
                     }
                     .designSystemScreenMargin()
                 }

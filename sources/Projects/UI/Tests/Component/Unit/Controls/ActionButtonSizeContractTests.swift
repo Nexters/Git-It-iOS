@@ -24,7 +24,10 @@ struct ActionButtonSizeContractTests {
         let styledText = StyledText(text: "서식 라벨")
             .textStyle(.subtitle2)
 
-        _ = ActionButton(title: "문자열 라벨", style: .primary, size: .medium)
-        _ = ActionButton(styledText: styledText, style: .secondary, size: .small)
+        _ = ActionButton(title: "문자열 라벨")
+            .size(.medium)
+        _ = ActionButton(styledText: styledText)
+            .style(.secondary)
+            .size(.small)
     }
 }

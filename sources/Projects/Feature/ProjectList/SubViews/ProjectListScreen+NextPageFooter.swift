@@ -25,7 +25,9 @@ extension ProjectListScreen {
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
 
-                    FeedbackActionButton(title: "다시 시도하기", style: .text, size: .small, action: onRetry)
+                    FeedbackActionButton(title: "다시 시도하기", action: onRetry)
+                        .style(.text)
+                        .size(.small)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Constant.verticalPadding)

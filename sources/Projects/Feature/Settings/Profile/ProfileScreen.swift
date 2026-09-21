@@ -29,9 +29,9 @@ public struct ProfileScreen: View {
                     IconGlassButton(
                         icon: Constant.settingsControl.icon,
                         label: Constant.settingsControl.label,
-                        size: .medium,
                         action: { send(.settingsTapped) },
                     )
+                    .size(.medium)
                 }
                 .padding(.vertical, Constant.headerBottomPadding)
                 .designSystemScreenMargin()

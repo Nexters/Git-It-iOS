@@ -18,9 +18,9 @@ extension SettingsScreen {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.deleteAccountCancelled) },
                         )
+                        .size(.medium)
 
                         Spacer(minLength: 0)
                     }
@@ -51,10 +51,10 @@ extension SettingsScreen {
                     FeedbackActionButton(
                         styledText: StyledText(text: Constant.confirmTitle)
                             .foregroundColorToken(.error),
-                        style: .text,
                         isEnabled: store.accountAction.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
+                    .style(.text)
                     .multilineTextAlignment(.center)
                     .designSystemScreenMargin()
                 }

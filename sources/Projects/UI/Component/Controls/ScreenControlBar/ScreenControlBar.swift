@@ -27,9 +27,9 @@ public struct ScreenControlBar: View {
                 IconGlassButton(
                     icon: leading.icon,
                     label: leading.label,
-                    size: .medium,
                     action: onLeadingTap,
                 )
+                .size(.medium)
             }
 
             Spacer(minLength: 0)
@@ -38,9 +38,9 @@ public struct ScreenControlBar: View {
                 IconGlassButton(
                     icon: trailing.icon,
                     label: trailing.label,
-                    size: .medium,
                     action: onTrailingTap,
                 )
+                .size(.medium)
             }
         }
         .frame(height: Constant.controlRowHeight, alignment: .top)

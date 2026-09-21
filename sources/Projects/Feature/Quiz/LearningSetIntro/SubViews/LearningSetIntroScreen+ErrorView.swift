@@ -30,7 +30,7 @@ extension LearningSetIntroScreen {
 
                 Spacer(minLength: 0)
 
-                FeedbackActionButton(title: "다시 시도하기", style: .primary, action: onRetry)
+                FeedbackActionButton(title: "다시 시도하기", action: onRetry)
                     .designSystemScreenMargin()
                     .padding(.bottom, bottomButtonPadding)
             }

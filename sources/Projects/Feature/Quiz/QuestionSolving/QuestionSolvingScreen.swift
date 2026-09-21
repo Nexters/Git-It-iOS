@@ -149,14 +149,12 @@ struct QuestionSolvingScreen: View {
         if store.answerOutcome == nil {
             FeedbackActionButton(
                 title: store.submissionError == nil ? "제출하기" : "다시 제출하기",
-                style: .primary,
                 isEnabled: store.isSubmitEnabled,
                 action: { send(.submitAnswerTapped) },
             )
         } else {
             FeedbackActionButton(
                 title: store.advanceActionTitle,
-                style: .primary,
                 action: { send(.advanceTapped) },
             )
         }

@@ -37,7 +37,8 @@ extension QuizGenerationProgressScreen {
             .padding(.vertical)
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
-                FeedbackActionButton(title: "홈에서 기다리기", style: .primaryText, action: onWaitAtHome)
+                FeedbackActionButton(title: "홈에서 기다리기", action: onWaitAtHome)
+                    .style(.primaryText)
                     .designSystemScreenMargin()
                     .padding(.vertical, Constant.bottomButtonPadding)
             }

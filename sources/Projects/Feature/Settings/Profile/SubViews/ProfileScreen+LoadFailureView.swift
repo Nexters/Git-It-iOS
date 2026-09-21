@@ -18,7 +18,9 @@ extension ProfileScreen {
                         .foregroundColorToken(.grey400)
                 }
                 Spacer()
-                FeedbackActionButton(title: Constant.retryTitle, style: .secondary, size: .small, action: onRetry)
+                FeedbackActionButton(title: Constant.retryTitle, action: onRetry)
+                    .style(.secondary)
+                    .size(.small)
                     .fixedSize(horizontal: true, vertical: false)
             }
             .frame(minHeight: Constant.minHeight)

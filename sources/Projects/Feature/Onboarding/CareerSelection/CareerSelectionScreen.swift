@@ -62,7 +62,6 @@ struct CareerSelectionScreen: View {
 
                     FeedbackActionButton(
                         title: "다음",
-                        style: .primary,
                         isEnabled: store.careerLevel != nil && store.submission != .submitting,
                         action: { send(.submitTapped) },
                     )

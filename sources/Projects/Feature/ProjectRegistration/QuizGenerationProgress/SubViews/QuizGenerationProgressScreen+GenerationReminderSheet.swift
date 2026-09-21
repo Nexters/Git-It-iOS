@@ -30,9 +30,11 @@ extension QuizGenerationProgressScreen {
                         }
 
                         VStack(spacing: LayoutToken.compactSpacing) {
-                            FeedbackActionButton(title: "리마인드 알림 설정하기", style: .primary, size: .large, action: onAccept)
+                            FeedbackActionButton(title: "리마인드 알림 설정하기", action: onAccept)
 
-                            FeedbackActionButton(title: "다시 보지 않기", style: .text, size: .small, action: onDecline)
+                            FeedbackActionButton(title: "다시 보지 않기", action: onDecline)
+                                .style(.text)
+                                .size(.small)
                         }
                     }
                     .padding(.top, Constant.contentTopPadding)

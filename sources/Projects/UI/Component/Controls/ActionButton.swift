@@ -1,34 +1,28 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - ActionButton
+
 public struct ActionButton: View {
 
     // MARK: Lifecycle
 
     public init(
         title: String,
-        style: Style = .primary,
-        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .title(title)
-        self.style = style
-        self.size = size
         self.isEnabled = isEnabled
         self.action = action
     }
 
     public init(
         styledText: StyledText,
-        style: Style = .primary,
-        size: Size = .large,
         isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .styled(styledText)
-        self.style = style
-        self.size = size
         self.isEnabled = isEnabled
         self.action = action
     }
@@ -132,8 +126,8 @@ public struct ActionButton: View {
     }
 
     private let label: Label
-    private let style: Style
-    private let size: Size
+    private var style = Style.primary
+    private var size = Size.large
     private let isEnabled: Bool
     private let action: () -> Void
 
@@ -154,14 +148,38 @@ public struct ActionButton: View {
 
 }
 
+// MARK: StyleConfigurable
+
+extension ActionButton: StyleConfigurable {
+    public func style(_ style: Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// MARK: SizeConfigurable
+
+extension ActionButton: SizeConfigurable {
+    public func size(_ size: Size) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
+}
+
 #Preview("Action Button") {
     VStack(spacing: LayoutToken.gutter) {
         ActionButton(title: "Primary")
-        ActionButton(title: "Secondary", style: .secondary)
-        ActionButton(title: "Destructive", style: .destructive)
-        ActionButton(title: "Text", style: .text)
+        ActionButton(title: "Secondary")
+            .style(.secondary)
+        ActionButton(title: "Destructive")
+            .style(.destructive)
+        ActionButton(title: "Text")
+            .style(.text)
         ActionButton(title: "Disabled", isEnabled: false)
-        ActionButton(title: "Disabled Text", style: .text, isEnabled: false)
+        ActionButton(title: "Disabled Text", isEnabled: false)
+            .style(.text)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

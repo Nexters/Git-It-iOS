@@ -31,11 +31,11 @@ extension TutorialScreen {
 
                 FeedbackActionButton(
                     title: Constant.guestAccessTitle,
-                    style: .text,
-                    size: .small,
                     isEnabled: isHintVisible,
                     action: onGuestAccess,
                 )
+                .style(.text)
+                .size(.small)
                 .opacity(isHintVisible ? 1 : 0)
                 .accessibilityHidden(!isHintVisible)
                 .padding(.top, LayoutToken.compactSpacing)
