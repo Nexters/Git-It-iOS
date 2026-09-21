@@ -15,7 +15,7 @@
 표시 모델을 View에 중첩하면 그 View의 내부 선언인 것처럼 보이지만, 실제로는 화면과
 서브뷰가 주고받는 **경계 타입**입니다. 경계 타입은 중첩 대상이 아닙니다.
 
-UIComponent가 초기화 인자로 받는 `DisplayModel`과 `StateModel`은 이 표의 대상이 아닙니다. 컴포넌트 한 곳의
+UIComponent가 초기화 인자로 받는 `DisplayModel`은 이 표의 대상이 아닙니다. 컴포넌트 한 곳의
 공개 초기화 계약이므로 `public`으로 컴포넌트에 중첩합니다([View 내부 선언 — 내부 선언](./internal-declarations.md)).
 
 **예외는 화면이 서브뷰에게 제공하는 `typealias` 하나뿐입니다.** 서브뷰가 TCA·Domain에

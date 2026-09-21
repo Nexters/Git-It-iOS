@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-22 (`Binding`이 아닌 상태·동작 설정을 묶는 `StateModel` 규칙 반영)
+**최종 수정일**: 2026-09-21 (컴포넌트 표시 값 모델 매핑과 상태 `Binding` 연결 규칙 추가)
 
 ## 설명
 
@@ -81,7 +81,7 @@ UI 내부 자산을 공개 계약에 포함하지 않습니다.
 - 재사용 가능한 UI 컴포넌트를 소유해서는 안 됩니다.
 - Feature State, Action 또는 업무 모델을 UIComponent 공개 API에 노출해서는 안 됩니다.
 - Feature State, Reducer와 State에 담기는 표시 모델(`ViewModels/` 타입)은 UI 컴포넌트의
-  `DisplayModel`·`StateModel`이나 SwiftUI `Binding`을 보유해서는 안 됩니다. 이 값들은 화면 View에서만
+  `DisplayModel`이나 SwiftUI `Binding`을 보유해서는 안 됩니다. 두 값은 화면 View에서만
   만듭니다.
 - 컴포넌트 상태 연결을 위해 `BindableAction`이나 `BindingReducer`를 도입해서는 안 됩니다.
   상태 변경은 기존 View Action을 거치며 Action·Reducer는 컴포넌트 연결 방식 때문에 바뀌지

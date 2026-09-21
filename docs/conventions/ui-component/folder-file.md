@@ -8,7 +8,7 @@
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.
 - **컴포넌트 하나는 파일 하나입니다.** 컴포넌트의 공개 계약과 렌더링 규칙을 한 파일에서
   읽을 수 있도록, 컴포넌트에 딸린 선언을 모두 `<역할 폴더>/<컴포넌트>.swift`에 둡니다.
-  - 중첩 타입(`Style`, `Size`, `DisplayModel`, `StateModel`, `Item`, `Constant` 등)을
+  - 중첩 타입(`Style`, `Size`, `DisplayModel`, `Item`, `Constant` 등)을
     `{컴포넌트}+{중첩타입}.swift`로 나누지 않습니다.
   - 중첩할 수 없어 최상위로 꺼낸 보조 타입(`TabShellItem`)과 그 컴포넌트 전용 프리뷰
     타입(`TabShellPreviewItem`)도 같은 파일의 최상위에 둡니다. 이것은
