@@ -14,7 +14,7 @@ struct PositionSelectionScreen: View {
     var body: some View {
         OverlayContainer {
             ScreenControlBar(
-                leading: .close,
+                displayModel: .init(leading: .close),
                 onLeadingTap: { send(.backTapped) },
             )
             .designSystemScreenMargin()

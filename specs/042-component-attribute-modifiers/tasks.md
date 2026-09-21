@@ -583,25 +583,25 @@ compile된다.
 
 ### 구현
 
-- [ ] T079 [P] [S4] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`를 전환한다.
+- [X] T079 [P] [S4] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`를 전환한다.
   - `DisplayModel { letter, text }`를 두고 초기화 메서드를 `init(displayModel:state:expansion:onTap:)`로 바꾼다. `state`·`onTap`은 값·콜백으로 유지한다.
   - `ExpansionControl`의 `case toggleable(isExpanded: Bool, onToggleExpand: () -> Void)`를 `case toggleable(isExpanded: Binding<Bool>)`로 바꾼다. 펼침 버튼과 접근성 동작은 `isExpanded.wrappedValue.toggle()`을 실행하고, `isExpanded` 계산 프로퍼티는 `wrappedValue`를 읽는다. `.fixed(isExpanded:)`는 유지한다.
   - `#Preview`를 `.toggleable(isExpanded: .constant(...))`로 전환한다.
-- [ ] T080 [P] [S4] `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift`에 `DisplayModel { label, placeholder, supportingText = nil }`을 둔다. 초기화 메서드를 `init(displayModel:text:isError:keyboardType:textInputAutocapitalization:autocorrectionDisabled:accessibilityLabel:focus:)`로 바꾸고 `#Preview`를 전환한다
-- [ ] T081 [P] [S4] `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`를 전환한다.
+- [X] T080 [P] [S4] `sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift`에 `DisplayModel { label, placeholder, supportingText = nil }`을 둔다. 초기화 메서드를 `init(displayModel:text:isError:keyboardType:textInputAutocapitalization:autocorrectionDisabled:accessibilityLabel:focus:)`로 바꾸고 `#Preview`를 전환한다
+- [X] T081 [P] [S4] `sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift`를 전환한다.
   - `DisplayModel { title, isRequired }`를 두고 초기화 메서드를 `init(displayModel:isSelected:onOpenLink:)`로 바꾼다.
   - `isSelected: Binding<Bool>`은 기본값(`= false`) 없이 받아 `@Binding private var`에 저장한다. `onToggle`을 제거하고 체크 영역 탭은 `isSelected.toggle()`을 실행한다. `onOpenLink`는 유지한다.
   - `#Preview`를 `isSelected: .constant(...)`로 전환한다.
-- [ ] T082 [P] [S4] `sources/Projects/UI/Component/Controls/ScreenControlBar/ScreenControlBar.swift`에 `DisplayModel { leading: Control? = .back, trailing: Control? = nil }`을 둔다. 초기화 메서드를 `init(displayModel: DisplayModel = .init(), onLeadingTap:onTrailingTap:)`로 바꾸고 `#Preview`를 전환한다
-- [ ] T083 [P] [S4] `sources/Projects/UI/Component/Controls/TextField.swift`에 `DisplayModel { placeholder, errorMessage = nil }`을 두고, 초기화 메서드를 `init(displayModel:text:isSecure:onCommit:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T084 [P] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
+- [X] T082 [P] [S4] `sources/Projects/UI/Component/Controls/ScreenControlBar/ScreenControlBar.swift`에 `DisplayModel { leading: Control? = .back, trailing: Control? = nil }`을 둔다. 초기화 메서드를 `init(displayModel: DisplayModel = .init(), onLeadingTap:onTrailingTap:)`로 바꾸고 `#Preview`를 전환한다
+- [X] T083 [P] [S4] `sources/Projects/UI/Component/Controls/TextField.swift`에 `DisplayModel { placeholder, errorMessage = nil }`을 두고, 초기화 메서드를 `init(displayModel:text:isSecure:onCommit:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T084 [P] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
   - `sources/Projects/UI/Tests/Component/Unit/Controls/ChoiceAnswerOptionTests.swift`
   - `sources/Projects/UI/Tests/Component/Unit/Controls/PolicyAgreementRowTests.swift`(`isSelected: .constant(...)`)
   - `sources/Projects/UI/Tests/Component/Unit/Controls/TextFieldTests.swift`
-- [ ] T085 [P] [S4] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift`의 `ChoiceAnswerOption` 호출을 공통 전환 규칙으로 바꾼다. `.toggleable(isExpanded:onToggleExpand:)`는 `.toggleable(isExpanded: Binding(get: { expandedOptionIDs.contains(option.id) }, set: { _ in toggleExpansion(option.id) }))`로 바꾼다
-- [ ] T086 [P] [S4] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputScreen.swift`의 `LabeledTextField` 호출을 공통 전환 규칙으로 바꾼다
-- [ ] T087 [P] [S4] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementScreen.swift`의 `PolicyAgreementRow` 호출을 공통 전환 규칙으로 바꾼다. `isSelected`는 `Binding(get: { store.selectedDocumentIDs.contains(document.id) }, set: { _ in 기존 onToggle 본문 })`으로 넘긴다
-- [ ] T088 [P] [S4] Feature에서 `leading:`·`trailing:`을 명시한 `ScreenControlBar` 호출을 `displayModel: .init(leading:trailing:)`로 바꾼다. 인자를 생략한 호출부는 바꾸지 않는다.
+- [X] T085 [P] [S4] `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift`의 `ChoiceAnswerOption` 호출을 공통 전환 규칙으로 바꾼다. `.toggleable(isExpanded:onToggleExpand:)`는 `.toggleable(isExpanded: Binding(get: { expandedOptionIDs.contains(option.id) }, set: { _ in toggleExpansion(option.id) }))`로 바꾼다
+- [X] T086 [P] [S4] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputScreen.swift`의 `LabeledTextField` 호출을 공통 전환 규칙으로 바꾼다
+- [X] T087 [P] [S4] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementScreen.swift`의 `PolicyAgreementRow` 호출을 공통 전환 규칙으로 바꾼다. `isSelected`는 `Binding(get: { store.selectedDocumentIDs.contains(document.id) }, set: { _ in 기존 onToggle 본문 })`으로 넘긴다
+- [X] T088 [P] [S4] Feature에서 `leading:`·`trailing:`을 명시한 `ScreenControlBar` 호출을 `displayModel: .init(leading:trailing:)`로 바꾼다. 인자를 생략한 호출부는 바꾸지 않는다.
   - `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`
   - `sources/Projects/Feature/Onboarding/PositionSelection/PositionSelectionScreen.swift`
   - `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`
@@ -609,7 +609,7 @@ compile된다.
 
 ### 정리와 단위 검증
 
-- [ ] T089 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄이고 `rg -n 'ScreenControlBar\([^)]*\b(leading|trailing):' sources/Projects`가 0줄인지 확인한다. §2.4의 `PolicyAgreementRow` `onToggle:`·`onToggleExpand` 패턴이 0줄이고, 약관 동의와 선택지 펼침 setter가 전환 전과 같은 동작을 실행하는지 diff로 대조한다.
+- [X] T089 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄이고 `rg -n 'ScreenControlBar\([^)]*\b(leading|trailing):' sources/Projects`가 0줄인지 확인한다. §2.4의 `PolicyAgreementRow` `onToggle:`·`onToggleExpand` 패턴이 0줄이고, 약관 동의와 선택지 펼침 setter가 전환 전과 같은 동작을 실행하는지 diff로 대조한다.
 
 **진행 점검**: T079~T089의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

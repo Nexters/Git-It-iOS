@@ -17,8 +17,7 @@ extension QuestionSolvingScreen {
             VStack(spacing: LayoutToken.compactSpacing) {
                 ForEach(options) { option in
                     ChoiceAnswerOption(
-                        letter: Self.letter(forID: option.id),
-                        text: option.text,
+                        displayModel: .init(letter: Self.letter(forID: option.id), text: option.text),
                         state: Self.optionState(emphasis: option.emphasis),
                         expansion: expansion(for: option),
                         onTap: { onSelect(option.id) },
@@ -68,8 +67,10 @@ extension QuestionSolvingScreen {
                 return .fixed(isExpanded: true)
             }
             return .toggleable(
-                isExpanded: expandedOptionIDs.contains(option.id),
-                onToggleExpand: { toggleExpansion(option.id) },
+                isExpanded: Binding(
+                    get: { expandedOptionIDs.contains(option.id) },
+                    set: { _ in toggleExpansion(option.id) },
+                )
             )
         }
 

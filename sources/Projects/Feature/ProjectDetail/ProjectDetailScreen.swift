@@ -77,7 +77,7 @@ struct ProjectDetailScreen: View {
     private var content: some View {
         OverlayContainer {
             ScreenControlBar(
-                trailing: Constant.menuControl,
+                displayModel: .init(trailing: Constant.menuControl),
                 onLeadingTap: { send(.backTapped) },
                 onTrailingTap: { send(.menuTapped) },
             )

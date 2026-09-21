@@ -1,20 +1,20 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - TextField
+
 public struct TextField: View {
 
     // MARK: Lifecycle
 
     public init(
-        placeholder: String,
+        displayModel: DisplayModel,
         text: Binding<String>,
-        errorMessage: String? = nil,
         isSecure: Bool = false,
         onCommit: @escaping () -> Void = { },
     ) {
-        self.placeholder = placeholder
+        self.displayModel = displayModel
         _text = text
-        self.errorMessage = errorMessage
         self.isSecure = isSecure
         self.onCommit = onCommit
     }
@@ -36,7 +36,7 @@ public struct TextField: View {
                         )
                 }
 
-            if let errorMessage {
+            if let errorMessage = displayModel.errorMessage {
                 StyledText(text: errorMessage)
                     .textStyle(.caption1)
                     .foregroundColorToken(.error)
@@ -99,13 +99,12 @@ public struct TextField: View {
 
     @Binding private var text: String
 
-    private let placeholder: String
-    private let errorMessage: String?
+    private let displayModel: DisplayModel
     private let isSecure: Bool
     private let onCommit: () -> Void
 
     private var state: State {
-        if errorMessage != nil {
+        if displayModel.errorMessage != nil {
             .error
         } else if isFocused {
             .active
@@ -119,9 +118,9 @@ public struct TextField: View {
     private var field: some View {
         Group {
             if isSecure {
-                SecureField(placeholder, text: $text)
+                SecureField(displayModel.placeholder, text: $text)
             } else {
-                SwiftUI.TextField(placeholder, text: $text)
+                SwiftUI.TextField(displayModel.placeholder, text: $text)
             }
         }
         .focused($isFocused)
@@ -131,20 +130,30 @@ public struct TextField: View {
 
 }
 
+// MARK: TextField.DisplayModel
+
+extension TextField {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            placeholder: String,
+            errorMessage: String? = nil,
+        ) {
+            self.placeholder = placeholder
+            self.errorMessage = errorMessage
+        }
+
+        public let placeholder: String
+        public let errorMessage: String?
+    }
+}
+
 #Preview("Text Field") {
     VStack(spacing: LayoutToken.gutter) {
+        TextField(displayModel: .init(placeholder: "닉네임을 입력해주세요"), text: .constant(""))
+        TextField(displayModel: .init(placeholder: "닉네임을 입력해주세요"), text: .constant("Git It"))
         TextField(
-            placeholder: "닉네임을 입력해주세요",
-            text: .constant(""),
-        )
-        TextField(
-            placeholder: "닉네임을 입력해주세요",
-            text: .constant("Git It"),
-        )
-        TextField(
-            placeholder: "닉네임을 입력해주세요",
+            displayModel: .init(placeholder: "닉네임을 입력해주세요", errorMessage: "이미 사용 중인 닉네임입니다"),
             text: .constant("중복 닉네임"),
-            errorMessage: "이미 사용 중인 닉네임입니다",
         )
     }
     .frame(width: 320)

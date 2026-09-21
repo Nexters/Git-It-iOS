@@ -1,4 +1,5 @@
 import DesignSystem
+import SwiftUI
 import Testing
 
 @testable import UIComponent
@@ -6,17 +7,15 @@ import Testing
 @Suite("PolicyAgreementRow 계약")
 struct PolicyAgreementRowTests {
     @Test
-    func `onToggle callback을 호출하면 그대로 전달된다`() {
-        var toggled = false
-        let onToggle: () -> Void = { toggled = true }
-        _ = PolicyAgreementRow(
-            title: "개인정보 처리방침",
-            isRequired: true,
-            onToggle: onToggle,
+    func `체크 영역을 탭하면 선택 여부 Binding을 반전한다`() {
+        var isSelected = false
+        let row = PolicyAgreementRow(
+            displayModel: .init(title: "개인정보 처리방침", isRequired: true),
+            isSelected: Binding(get: { isSelected }, set: { isSelected = $0 }),
         )
 
-        onToggle()
-        #expect(toggled)
+        row.toggle()
+        #expect(isSelected)
     }
 
     @Test
@@ -24,8 +23,8 @@ struct PolicyAgreementRowTests {
         var opened = false
         let onOpenLink: () -> Void = { opened = true }
         _ = PolicyAgreementRow(
-            title: "서비스 이용 약관",
-            isRequired: true,
+            displayModel: .init(title: "서비스 이용 약관", isRequired: true),
+            isSelected: .constant(false),
             onOpenLink: onOpenLink,
         )
 

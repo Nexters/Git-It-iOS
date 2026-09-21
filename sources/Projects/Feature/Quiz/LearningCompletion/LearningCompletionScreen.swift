@@ -23,7 +23,7 @@ struct LearningCompletionScreen: View {
     private var screen: some View {
         VStack(spacing: 0) {
             ScreenControlBar(
-                leading: .close,
+                displayModel: .init(leading: .close),
                 onLeadingTap: { send(.closeTapped) },
             )
             .designSystemScreenMargin()

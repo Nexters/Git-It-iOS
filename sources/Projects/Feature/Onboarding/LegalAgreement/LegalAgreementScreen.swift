@@ -27,10 +27,11 @@ struct LegalAgreementScreen: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(store.requiredDocuments, id: \.id) { document in
                         PolicyAgreementRow(
-                            title: document.displayName,
-                            isRequired: document.isRequired,
-                            isSelected: store.selectedDocumentIDs.contains(document.id),
-                            onToggle: { send(.documentToggled(documentID: document.id)) },
+                            displayModel: .init(title: document.displayName, isRequired: document.isRequired),
+                            isSelected: Binding(
+                                get: { store.selectedDocumentIDs.contains(document.id) },
+                                set: { _ in send(.documentToggled(documentID: document.id)) },
+                            ),
                             onOpenLink: { send(.documentLinkTapped(documentID: document.id)) },
                         )
                         .padding(.leading, Constant.documentRowLeadingPadding)

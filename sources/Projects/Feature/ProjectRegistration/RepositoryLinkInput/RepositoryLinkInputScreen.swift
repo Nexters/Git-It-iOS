@@ -29,10 +29,12 @@ struct RepositoryLinkInputScreen: View {
                     .textStyle(.subtitle1)
 
                 LabeledTextField(
-                    label: "링크",
-                    placeholder: "https://github.com",
+                    displayModel: .init(
+                        label: "링크",
+                        placeholder: "https://github.com",
+                        supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
+                    ),
                     text: repositoryURLInput,
-                    supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
                     isError: store.isValidationFailed,
                     keyboardType: .URL,
                     textInputAutocapitalization: .never,

@@ -8,10 +8,8 @@ public struct LabeledTextField: View {
     // MARK: Lifecycle
 
     public init(
-        label: String,
-        placeholder: String,
+        displayModel: DisplayModel,
         text: Binding<String>,
-        supportingText: String? = nil,
         isError: Bool = false,
         keyboardType: UIKeyboardType = .default,
         textInputAutocapitalization: TextInputAutocapitalization = .sentences,
@@ -19,15 +17,13 @@ public struct LabeledTextField: View {
         accessibilityLabel: String? = nil,
         focus: FocusState<Bool>.Binding? = nil,
     ) {
-        self.label = label
-        self.placeholder = placeholder
+        self.displayModel = displayModel
         _text = text
-        self.supportingText = supportingText
         self.isError = isError
         self.keyboardType = keyboardType
         self.textInputAutocapitalization = textInputAutocapitalization
         self.autocorrectionDisabled = autocorrectionDisabled
-        self.accessibilityLabel = accessibilityLabel ?? label
+        self.accessibilityLabel = accessibilityLabel ?? displayModel.label
         self.focus = focus
     }
 
@@ -37,14 +33,14 @@ public struct LabeledTextField: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: Constant.trailingIconSpacing) {
                 HStack(spacing: Constant.contentSpacing) {
-                    StyledText(text: label)
+                    StyledText(text: displayModel.label)
                         .textStyle(.body2)
                         .foregroundColorToken(accentColor)
 
                     SwiftUI.TextField(
                         "",
                         text: $text,
-                        prompt: Text(placeholder).foregroundStyle(Color(designSystem: .white30)),
+                        prompt: Text(displayModel.placeholder).foregroundStyle(Color(designSystem: .white30)),
                     )
                     .keyboardType(keyboardType)
                     .textInputAutocapitalization(textInputAutocapitalization)
@@ -72,7 +68,7 @@ public struct LabeledTextField: View {
                 .fill(Color(designSystem: accentColor))
                 .frame(height: Constant.underlineHeight)
 
-            if let supportingText {
+            if let supportingText = displayModel.supportingText {
                 StyledText(text: supportingText)
                     .textStyle(.caption1)
                     .foregroundColorToken(isError ? .error : .grey300)
@@ -90,9 +86,7 @@ public struct LabeledTextField: View {
 
     @FocusState private var unboundFocus: Bool
 
-    private let label: String
-    private let placeholder: String
-    private let supportingText: String?
+    private let displayModel: DisplayModel
     private let isError: Bool
     private let keyboardType: UIKeyboardType
     private let textInputAutocapitalization: TextInputAutocapitalization
@@ -104,6 +98,26 @@ public struct LabeledTextField: View {
         isError ? .error : .blue100
     }
 
+}
+
+// MARK: LabeledTextField.DisplayModel
+
+extension LabeledTextField {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            label: String,
+            placeholder: String,
+            supportingText: String? = nil,
+        ) {
+            self.label = label
+            self.placeholder = placeholder
+            self.supportingText = supportingText
+        }
+
+        public let label: String
+        public let placeholder: String
+        public let supportingText: String?
+    }
 }
 
 // MARK: LabeledTextField.Constant
@@ -123,13 +137,18 @@ extension LabeledTextField {
 
 #Preview("LabeledTextField") {
     VStack(spacing: LayoutToken.margin) {
-        LabeledTextField(label: "링크", placeholder: "https://github.com", text: .constant(""))
-        LabeledTextField(label: "링크", placeholder: "https://github.com", text: .constant("https://github.com/gitit"))
+        LabeledTextField(displayModel: .init(label: "링크", placeholder: "https://github.com"), text: .constant(""))
         LabeledTextField(
-            label: "링크",
-            placeholder: "https://github.com",
+            displayModel: .init(label: "링크", placeholder: "https://github.com"),
+            text: .constant("https://github.com/gitit"),
+        )
+        LabeledTextField(
+            displayModel: .init(
+                label: "링크",
+                placeholder: "https://github.com",
+                supportingText: "올바른 GitHub 레포지토리 링크를 입력해 주세요.",
+            ),
             text: .constant("https://github.comakjshddhaag"),
-            supportingText: "올바른 GitHub 레포지토리 링크를 입력해 주세요.",
             isError: true,
         )
     }

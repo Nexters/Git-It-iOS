@@ -14,7 +14,7 @@ struct CareerSelectionScreen: View {
     var body: some View {
         OverlayContainer {
             ScreenControlBar(
-                leading: .back,
+                displayModel: .init(leading: .back),
                 onLeadingTap: { send(.backTapped) },
             )
             .designSystemScreenMargin()

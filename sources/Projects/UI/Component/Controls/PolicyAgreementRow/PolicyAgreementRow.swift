@@ -8,16 +8,12 @@ public struct PolicyAgreementRow: View {
     // MARK: Lifecycle
 
     public init(
-        title: String,
-        isRequired: Bool,
-        isSelected: Bool = false,
-        onToggle: @escaping () -> Void = { },
+        displayModel: DisplayModel,
+        isSelected: Binding<Bool>,
         onOpenLink: @escaping () -> Void = { },
     ) {
-        self.title = title
-        self.isRequired = isRequired
-        self.isSelected = isSelected
-        self.onToggle = onToggle
+        self.displayModel = displayModel
+        _isSelected = isSelected
         self.onOpenLink = onOpenLink
     }
 
@@ -25,12 +21,12 @@ public struct PolicyAgreementRow: View {
 
     public var body: some View {
         HStack(spacing: LayoutToken.compactSpacing) {
-            Button(action: onToggle) {
+            Button(action: toggle) {
                 HStack(spacing: LayoutToken.gutter) {
                     ResourceImage(asset: isSelected ? .icon(.statusCheck) : .icon(.statusDisabled))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
-                    StyledText(text: title)
+                    StyledText(text: displayModel.title)
                         .textStyle(.body2)
                 }
                 .contentShape(Rectangle())
@@ -53,7 +49,7 @@ public struct PolicyAgreementRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(openLinkAccessibilityLabel)
-            .accessibilityIdentifier("policyAgreementRow.openLink.\(title)")
+            .accessibilityIdentifier("policyAgreementRow.openLink.\(displayModel.title)")
         }
         .frame(height: 54)
         .accessibilityElement(children: .contain)
@@ -65,21 +61,24 @@ public struct PolicyAgreementRow: View {
 
     static let minimumHitArea: CGFloat = 44
 
+    func toggle() {
+        isSelected.toggle()
+    }
+
     // MARK: Private
 
-    private let title: String
-    private let isRequired: Bool
-    private let isSelected: Bool
-    private let onToggle: () -> Void
+    @Binding private var isSelected: Bool
+
+    private let displayModel: DisplayModel
     private let onOpenLink: () -> Void
 
     private var accessibilityLabel: String {
-        let requiredText = isRequired ? "필수" : "선택"
-        return "\(requiredText), \(title)"
+        let requiredText = displayModel.isRequired ? "필수" : "선택"
+        return "\(requiredText), \(displayModel.title)"
     }
 
     private var openLinkAccessibilityLabel: String {
-        "\(title) 전문 보기"
+        "\(displayModel.title) 전문 보기"
     }
 
 }
@@ -95,11 +94,28 @@ extension PolicyAgreementRow {
     }
 }
 
+// MARK: PolicyAgreementRow.DisplayModel
+
+extension PolicyAgreementRow {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            title: String,
+            isRequired: Bool,
+        ) {
+            self.title = title
+            self.isRequired = isRequired
+        }
+
+        public let title: String
+        public let isRequired: Bool
+    }
+}
+
 #Preview("Policy Agreement Row") {
     VStack(spacing: LayoutToken.compactSpacing) {
-        PolicyAgreementRow(title: "개인정보 처리방침", isRequired: true, isSelected: true)
-        PolicyAgreementRow(title: "서비스 이용 약관", isRequired: true)
-        PolicyAgreementRow(title: "마케팅 정보 수신", isRequired: false)
+        PolicyAgreementRow(displayModel: .init(title: "개인정보 처리방침", isRequired: true), isSelected: .constant(true))
+        PolicyAgreementRow(displayModel: .init(title: "서비스 이용 약관", isRequired: true), isSelected: .constant(false))
+        PolicyAgreementRow(displayModel: .init(title: "마케팅 정보 수신", isRequired: false), isSelected: .constant(false))
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
