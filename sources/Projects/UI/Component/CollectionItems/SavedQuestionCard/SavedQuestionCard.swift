@@ -8,30 +8,24 @@ public struct SavedQuestionCard: View {
     // MARK: Lifecycle
 
     public init(
-        metadata: String,
-        prompt: String,
-        actionTitle: String,
-        isBookmarked: Bool = true,
+        displayModel: DisplayModel,
+        isBookmarked: Binding<Bool>,
         onActionTap: @escaping () -> Void = { },
-        onBookmarkTap: @escaping () -> Void = { },
     ) {
-        self.metadata = metadata
-        self.prompt = prompt
-        self.actionTitle = actionTitle
-        self.isBookmarked = isBookmarked
+        self.displayModel = displayModel
+        _isBookmarked = isBookmarked
         self.onActionTap = onActionTap
-        self.onBookmarkTap = onBookmarkTap
     }
 
     // MARK: Public
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            StyledText(text: metadata)
+            StyledText(text: displayModel.metadata)
                 .textStyle(.body2)
                 .foregroundColorToken(.grey300)
                 .padding(.top, LayoutToken.cardTopPadding)
-            StyledText(text: prompt)
+            StyledText(text: displayModel.prompt)
                 .textStyle(.subtitle3)
                 .padding(.top, Constant.promptTopPadding)
             HStack(spacing: Constant.actionRowSpacing) {
@@ -48,14 +42,18 @@ public struct SavedQuestionCard: View {
         )
     }
 
+    // MARK: Internal
+
+    func toggleBookmark() {
+        isBookmarked.toggle()
+    }
+
     // MARK: Private
 
-    private let metadata: String
-    private let prompt: String
-    private let actionTitle: String
-    private let isBookmarked: Bool
+    @Binding private var isBookmarked: Bool
+
+    private let displayModel: DisplayModel
     private let onActionTap: () -> Void
-    private let onBookmarkTap: () -> Void
 
     private var bookmarkButton: some View {
         let icon: ResourceImage.Asset.Icon = isBookmarked ? .bookmarkFilled : .bookmark
@@ -63,7 +61,7 @@ public struct SavedQuestionCard: View {
         let accessibilityLabel = isBookmarked ? "저장 해제하기" : "저장하기"
         let accessibilityTraits: AccessibilityTraits = isBookmarked ? [.isButton, .isSelected] : .isButton
 
-        return Button(action: onBookmarkTap) {
+        return Button(action: toggleBookmark) {
             ResourceImage(asset: .icon(icon), contentMode: .fit)
                 .designSystemForeground(tint)
                 .frame(width: Constant.bookmarkSize, height: Constant.bookmarkSize)
@@ -80,7 +78,7 @@ public struct SavedQuestionCard: View {
 
     private var actionButton: some View {
         Button(action: onActionTap) {
-            StyledText(text: actionTitle)
+            StyledText(text: displayModel.actionTitle)
                 .textStyle(.body2)
                 .foregroundColorToken(.grey700)
                 .multilineTextAlignment(.center)
@@ -110,19 +108,43 @@ extension SavedQuestionCard {
     }
 }
 
+// MARK: SavedQuestionCard.DisplayModel
+
+extension SavedQuestionCard {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            metadata: String,
+            prompt: String,
+            actionTitle: String,
+        ) {
+            self.metadata = metadata
+            self.prompt = prompt
+            self.actionTitle = actionTitle
+        }
+
+        public let metadata: String
+        public let prompt: String
+        public let actionTitle: String
+    }
+}
+
 #Preview("Saved Question Card") {
     VStack(spacing: LayoutToken.gutter) {
         SavedQuestionCard(
-            metadata: "Now in Android · Set 2 · 문제 1",
-            prompt: "BlueprintSetupState 클래스는 어떤 목적을 가진 객체인가?",
-            actionTitle: "문제풀기",
-            isBookmarked: true,
+            displayModel: .init(
+                metadata: "Now in Android · Set 2 · 문제 1",
+                prompt: "BlueprintSetupState 클래스는 어떤 목적을 가진 객체인가?",
+                actionTitle: "문제풀기",
+            ),
+            isBookmarked: .constant(true),
         )
         SavedQuestionCard(
-            metadata: "Now in Android · Set 2 · 문제 2",
-            prompt: "BlueprintSetupState 클래스는 어떤 목적을 가진 객체인가?",
-            actionTitle: "문제풀기",
-            isBookmarked: false,
+            displayModel: .init(
+                metadata: "Now in Android · Set 2 · 문제 2",
+                prompt: "BlueprintSetupState 클래스는 어떤 목적을 가진 객체인가?",
+                actionTitle: "문제풀기",
+            ),
+            isBookmarked: .constant(false),
         )
     }
     .frame(width: 350)

@@ -214,11 +214,13 @@ public struct ProjectListScreen: View {
 
     private func row(_ project: ProjectListDisplay) -> some View {
         ProjectRow(
-            name: project.name,
-            supportingText: project.supportingText,
-            progress: project.progress,
-            currentSet: project.currentSet,
-            setTitle: project.setTitle,
+            displayModel: .init(
+                name: project.name,
+                supportingText: project.supportingText,
+                progress: project.progress,
+                currentSet: project.currentSet,
+                setTitle: project.setTitle,
+            ),
             isDeleting: store.mode == .deleting,
             onAccessoryTap: { accessoryTapped(projectID: project.id) },
         ) {

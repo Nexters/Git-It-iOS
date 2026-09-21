@@ -41,10 +41,12 @@ extension ProjectDetailScreen {
                 VStack(alignment: .leading, spacing: Constant.cardSpacing) {
                     ForEach(sets) { set in
                         LearningSetRow(
-                            label: set.label,
-                            title: set.title,
-                            questionCount: set.questionCount,
-                            completedCount: set.completedCount,
+                            displayModel: .init(
+                                label: set.label,
+                                title: set.title,
+                                questionCount: set.questionCount,
+                                completedCount: set.completedCount,
+                            ),
                             onStart: { onStart(set.id) },
                         )
                     }

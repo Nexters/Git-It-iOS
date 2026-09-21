@@ -1,4 +1,5 @@
 import DesignSystem
+import SwiftUI
 import Testing
 
 @testable import UIComponent
@@ -6,34 +7,47 @@ import Testing
 @Suite("ChoiceResultRow 계약")
 struct ChoiceResultRowTests {
     @Test
-    func `판정과 펼침 여부를 모두 값으로 받는다`() {
+    func `판정은 값으로, 펼침 여부는 Binding으로 받는다`() {
         _ = ChoiceResultRow(
+            displayModel: .init(text: "본문", explanation: "해설"),
             judgement: .correct,
-            isExpanded: false,
-            text: "본문",
-            explanation: "해설",
-        ) { }
+            isExpanded: .constant(false),
+        )
         _ = ChoiceResultRow(
+            displayModel: .init(text: "본문", explanation: "해설"),
             judgement: .incorrect,
-            isExpanded: true,
-            text: "본문",
-            explanation: "해설",
-        ) { }
+            isExpanded: .constant(true),
+        )
     }
 
     @Test
-    func `펼침 여부를 스스로 보관하지 않는다`() {
+    func `펼침 여부를 State로 보관하지 않고 Binding으로 참조한다`() {
         let row = ChoiceResultRow(
+            displayModel: .init(text: "본문", explanation: "해설"),
             judgement: .correct,
-            isExpanded: false,
-            text: "본문",
-            explanation: "해설",
-        ) { }
-        let stateProperties = Mirror(reflecting: row).children.filter {
-            ($0.label ?? "").hasPrefix("_")
+            isExpanded: .constant(false),
+        )
+        let children = Mirror(reflecting: row).children
+        let stateProperties = children.filter {
+            String(describing: type(of: $0.value)).hasPrefix("State<")
         }
 
         #expect(stateProperties.isEmpty)
+        #expect(children.first { $0.label == "_isExpanded" }?.value is Binding<Bool>)
+    }
+
+    @Test
+    func `행을 탭하면 펼침 여부 Binding을 반전한다`() {
+        var isExpanded = false
+        let row = ChoiceResultRow(
+            displayModel: .init(text: "본문", explanation: "해설"),
+            judgement: .correct,
+            isExpanded: Binding(get: { isExpanded }, set: { isExpanded = $0 }),
+        )
+
+        row.toggle()
+
+        #expect(isExpanded)
     }
 
     @Test

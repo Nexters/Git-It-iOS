@@ -538,26 +538,26 @@ Saved)가 함께 바뀌어야 compile된다.
 
 ### 구현
 
-- [ ] T070 [P] [S4] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`를 전환한다.
+- [X] T070 [P] [S4] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`를 전환한다.
   - `DisplayModel { text, explanation }`을 두고 초기화 메서드를 `init(displayModel:judgement:isExpanded:)`로 바꾼다.
   - `isExpanded: Binding<Bool>`은 기본값 없이 받아 `@Binding private var isExpanded: Bool`에 저장한다. `onTap`을 제거하고 행 탭은 `isExpanded.toggle()`을 실행한다. `judgement`는 값 인자로 유지한다.
   - `#Preview`를 `isExpanded: .constant(...)`로 전환한다.
-- [ ] T071 [P] [S4] `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`에 `DisplayModel { label, title, questionCount, completedCount }`를 두고, 초기화 메서드를 `init(displayModel:onStart:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T072 [P] [S4] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`에 `DisplayModel { name, supportingText, progress, currentSet, setTitle }`를 두고, 초기화 메서드를 `init(displayModel:isDeleting:onAccessoryTap:thumbnail:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T073 [P] [S4] `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift`를 전환한다.
+- [X] T071 [P] [S4] `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`에 `DisplayModel { label, title, questionCount, completedCount }`를 두고, 초기화 메서드를 `init(displayModel:onStart:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T072 [P] [S4] `sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift`에 `DisplayModel { name, supportingText, progress, currentSet, setTitle }`를 두고, 초기화 메서드를 `init(displayModel:isDeleting:onAccessoryTap:thumbnail:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T073 [P] [S4] `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard/SavedQuestionCard.swift`를 전환한다.
   - `DisplayModel { metadata, prompt, actionTitle }`을 두고 초기화 메서드를 `init(displayModel:isBookmarked:onActionTap:)`로 바꾼다.
   - `isBookmarked: Binding<Bool>`은 기본값(`= true`) 없이 받아 `@Binding private var`에 저장한다. `onBookmarkTap`을 제거하고 북마크 버튼 탭은 `isBookmarked.toggle()`을 실행한다. `onActionTap`은 유지한다.
   - `#Preview`를 `isBookmarked: .constant(true)`로 전환한다.
-- [ ] T074 [P] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T074 [P] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/UI/Tests/Component/Unit/CollectionItems/ChoiceResultRowTests.swift`: 호출부를 `displayModel:`·`isExpanded: .constant(...)`로 바꾼다. "상태를 스스로 보관하지 않는다" 단언의 필터를 `_` 접두에서 `String(describing: type(of: $0.value)).hasPrefix("State<")`로 바꾼다. `_isExpanded`가 `Binding<Bool>`임을 확인하는 단언을 더하고, 테스트 이름에 `Binding`으로 받는다는 사실을 반영한다([research.md](./research.md) §9.4).
   - `sources/Projects/UI/Tests/Component/Unit/CollectionItems/LearningSetRowTests.swift`: 호출부만 바꾸고 기존 단언은 유지한다.
-- [ ] T075 [P] [S4] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`의 `LearningSetRow` 호출에서 호출 지점에 `LearningSetRow.DisplayModel`을 만들도록 바꾼다
-- [ ] T076 [P] [S4] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`의 `ProjectRow` 호출에서 호출 지점에 `ProjectRow.DisplayModel`을 만들도록 바꾼다
-- [ ] T077 [P] [S4] `sources/Projects/Feature/Saved/SavedScreen.swift`의 `SavedQuestionCard` 호출을 바꾼다. 호출 지점에 `SavedQuestionCard.DisplayModel`을 만든다. `isBookmarked`는 `Binding(get: { 전환 전 값 식 }, set: { _ in 기존 onBookmarkTap 본문 })`으로 넘긴다. 전환 전 `isBookmarked`를 생략했다면 getter는 `true`를 돌려준다
+- [X] T075 [P] [S4] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`의 `LearningSetRow` 호출에서 호출 지점에 `LearningSetRow.DisplayModel`을 만들도록 바꾼다
+- [X] T076 [P] [S4] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`의 `ProjectRow` 호출에서 호출 지점에 `ProjectRow.DisplayModel`을 만들도록 바꾼다
+- [X] T077 [P] [S4] `sources/Projects/Feature/Saved/SavedScreen.swift`의 `SavedQuestionCard` 호출을 바꾼다. 호출 지점에 `SavedQuestionCard.DisplayModel`을 만든다. `isBookmarked`는 `Binding(get: { 전환 전 값 식 }, set: { _ in 기존 onBookmarkTap 본문 })`으로 넘긴다. 전환 전 `isBookmarked`를 생략했다면 getter는 `true`를 돌려준다
 
 ### 정리와 단위 검증
 
-- [ ] T078 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄인지, 네 컴포넌트의 `public init` 첫 인자가 `displayModel`인지 확인한다. §2.4의 `ChoiceResultRow`·`SavedQuestionCard` 패턴이 0줄이고 `SavedScreen` 북마크 setter가 전환 전과 같은 View Action을 보내는지 diff로 대조한다. `ProjectListScreen`·`SavedScreen` 프리뷰가 전환 전과 같은지 확인한다.
+- [X] T078 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄인지, 네 컴포넌트의 `public init` 첫 인자가 `displayModel`인지 확인한다. §2.4의 `ChoiceResultRow`·`SavedQuestionCard` 패턴이 0줄이고 `SavedScreen` 북마크 setter가 전환 전과 같은 View Action을 보내는지 diff로 대조한다. `ProjectListScreen`·`SavedScreen` 프리뷰가 전환 전과 같은지 확인한다.
 
 **진행 점검**: T070~T078의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

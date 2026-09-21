@@ -103,12 +103,16 @@ struct SavedScreen: View {
                 )
             ) { question in
                 SavedQuestionCard(
-                    metadata: question.metadata,
-                    prompt: question.prompt,
-                    actionTitle: SavedQuestionDisplay.actionTitle,
-                    isBookmarked: question.isBookmarked,
+                    displayModel: .init(
+                        metadata: question.metadata,
+                        prompt: question.prompt,
+                        actionTitle: SavedQuestionDisplay.actionTitle,
+                    ),
+                    isBookmarked: Binding(
+                        get: { question.isBookmarked },
+                        set: { _ in toggleBookmark(questionID: question.id) },
+                    ),
                     onActionTap: { solve(questionID: question.id) },
-                    onBookmarkTap: { toggleBookmark(questionID: question.id) },
                 )
             }
         }

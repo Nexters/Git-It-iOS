@@ -14,10 +14,7 @@ struct LearningSetRowTests {
     @Test
     func `라벨과 제목과 문제 수와 완료 수를 표시 값으로 직접 받는다`() {
         _ = LearningSetRow(
-            label: "Set 1",
-            title: "아이디어 PT 핵심 내용 확인하기",
-            questionCount: 7,
-            completedCount: 3,
+            displayModel: .init(label: "Set 1", title: "아이디어 PT 핵심 내용 확인하기", questionCount: 7, completedCount: 3)
         )
     }
 

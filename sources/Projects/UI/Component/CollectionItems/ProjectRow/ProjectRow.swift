@@ -8,20 +8,12 @@ public struct ProjectRow<Thumbnail: View>: View {
     // MARK: Lifecycle
 
     public init(
-        name: String,
-        supportingText: String,
-        progress: Double,
-        currentSet: Int,
-        setTitle: String,
+        displayModel: DisplayModel,
         isDeleting: Bool = false,
         onAccessoryTap: @escaping () -> Void = { },
         @ViewBuilder thumbnail: () -> Thumbnail,
     ) {
-        self.name = name
-        self.supportingText = supportingText
-        self.progress = progress
-        self.currentSet = currentSet
-        self.setTitle = setTitle
+        self.displayModel = displayModel
         self.isDeleting = isDeleting
         self.onAccessoryTap = onAccessoryTap
         self.thumbnail = thumbnail()
@@ -37,10 +29,10 @@ public struct ProjectRow<Thumbnail: View>: View {
                     .designSystemCornerRadius(.small)
 
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText(text: name)
+                    StyledText(text: displayModel.name)
                         .textStyle(.subtitle2)
                         .lineLimit(2)
-                    StyledText(text: supportingText)
+                    StyledText(text: displayModel.supportingText)
                         .textStyle(.body3)
                         .foregroundColorToken(.grey400)
                         .lineLimit(1)
@@ -53,14 +45,14 @@ public struct ProjectRow<Thumbnail: View>: View {
             }
 
             if !isDeleting {
-                ContinuousProgressBar(progress: progress)
+                ContinuousProgressBar(progress: displayModel.progress)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    TagBadge(text: "Set \(currentSet)")
+                    TagBadge(text: "Set \(displayModel.currentSet)")
                         .style(.muted)
                         .size(.compact)
                         .designSystemCornerRadius(.pill)
-                    StyledText(text: setTitle)
+                    StyledText(text: displayModel.setTitle)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey300)
                         .lineLimit(1)
@@ -120,11 +112,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         }
     }
 
-    private let name: String
-    private let supportingText: String
-    private let progress: Double
-    private let currentSet: Int
-    private let setTitle: String
+    private let displayModel: DisplayModel
     private let isDeleting: Bool
     private let onAccessoryTap: () -> Void
     private let thumbnail: Thumbnail
@@ -140,7 +128,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         if isDeleting {
             IconGlassButton(
                 icon: .minus,
-                label: "\(name) 삭제",
+                label: "\(displayModel.name) 삭제",
                 action: onAccessoryTap,
             )
             .style(.destructive)
@@ -149,7 +137,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         } else {
             IconPlainButton(
                 icon: .play,
-                label: "\(name) 학습 시작",
+                label: "\(displayModel.name) 학습 시작",
                 action: onAccessoryTap,
             )
         }
@@ -157,25 +145,55 @@ public struct ProjectRow<Thumbnail: View>: View {
 
 }
 
+// MARK: ProjectRow.DisplayModel
+
+extension ProjectRow {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            name: String,
+            supportingText: String,
+            progress: Double,
+            currentSet: Int,
+            setTitle: String,
+        ) {
+            self.name = name
+            self.supportingText = supportingText
+            self.progress = progress
+            self.currentSet = currentSet
+            self.setTitle = setTitle
+        }
+
+        public let name: String
+        public let supportingText: String
+        public let progress: Double
+        public let currentSet: Int
+        public let setTitle: String
+    }
+}
+
 #Preview("Project Row") {
     VStack(spacing: LayoutToken.gutter) {
         ProjectRow(
-            name: "Git It iOS",
-            supportingText: "Swift · SwiftUI · TCA",
-            progress: 0.65,
-            currentSet: 2,
-            setTitle: "Presentation 구조",
+            displayModel: .init(
+                name: "Git It iOS",
+                supportingText: "Swift · SwiftUI · TCA",
+                progress: 0.65,
+                currentSet: 2,
+                setTitle: "Presentation 구조",
+            )
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .purple300))
         }
 
         ProjectRow(
-            name: "삭제할 프로젝트",
-            supportingText: "Kotlin · Compose",
-            progress: 0,
-            currentSet: 1,
-            setTitle: "기본 개념",
+            displayModel: .init(
+                name: "삭제할 프로젝트",
+                supportingText: "Kotlin · Compose",
+                progress: 0,
+                currentSet: 1,
+                setTitle: "기본 개념",
+            ),
             isDeleting: true,
         ) {
             RoundedRectangle(designSystem: .small)
