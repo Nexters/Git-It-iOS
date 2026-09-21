@@ -3,13 +3,6 @@ import DomainAccount
 import DomainUserInfo
 import Foundation
 
-// MARK: - OnboardingEntryPoint
-
-public enum OnboardingEntryPoint: Equatable, Sendable {
-    case guide
-    case curation
-}
-
 // MARK: - AppEntryFeature
 
 @Reducer
