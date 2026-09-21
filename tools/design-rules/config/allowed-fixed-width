@@ -13,8 +13,7 @@ sources/Projects/UI/Component/Displays/SplashView.swift 커서 막대는 텍스�
 sources/Projects/UI/Component/Controls/IconGlassButton.swift 아이콘 버튼 정사각 표면과 44 히트 영역
 sources/Projects/UI/Component/Controls/IconPlainButton.swift 아이콘 버튼 정사각 표면과 44 히트 영역
 sources/Projects/UI/Component/Controls/PolicyAgreementRow.swift 체크 아이콘 정사각과 44 히트 영역
-sources/Projects/UI/Component/Controls/PolicyAgreementRow/PolicyAgreementRow.swift 체크 아이콘 정사각과 44 히트 영역
-sources/Projects/UI/Component/Controls/LabeledTextField/LabeledTextField.swift 지우기 아이콘 정사각과 44 히트 영역
+sources/Projects/UI/Component/Controls/LabeledTextField.swift 지우기 아이콘 정사각과 44 히트 영역
 sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift 2열 카드 폭은 gridColumn2에서 유도하고 재생 버튼만 원형 44 히트 영역
 sources/Projects/UI/Component/CollectionItems/ProjectRow/ProjectRow.swift 썸네일 종횡비
 sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift 썸네일 종횡비
