@@ -75,7 +75,7 @@ expect_clean component-state 'UI/Component/Controls/Sample.swift' '    let isOn:
 # 5. component-margin — ScreenContainer 밖의 화면 여백 사용은 위반이다.
 expect_violation component-margin 'UI/Component/Controls/Sample.swift' '        .designSystemScreenMargin()'
 expect_clean component-margin \
-	'UI/Component/Scaffolds/ScreenContainer/ScreenContainer.swift' '        .designSystemScreenMargin()'
+	'UI/Component/Scaffolds/ScreenContainer.swift' '        .designSystemScreenMargin()'
 
 # 6. component-haptic — 햅틱 발생은 예외 없이 위반이다.
 expect_violation component-haptic 'UI/Component/Controls/Sample.swift' '        UIImpactFeedbackGenerator(style: .light).impactOccurred()'

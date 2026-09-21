@@ -126,7 +126,7 @@ grep -rn -A1 '^@Reducer' sources/Projects/Feature --include='*.swift' | grep 'pu
 
 ## 남은 소소한 정리
 
-- `sources/Projects/UI/Component/Scaffolds/TabShell/TabShell.swift:33`의
+- `sources/Projects/UI/Component/Scaffolds/TabShell.swift:38`의
   `UITabBar.appearance()`가 `.onAppear`에 있습니다. 외형 프록시는 이후 생성되는 뷰에만
   적용되므로 첫 진입에서 색이 반영되지 않을 수 있습니다. 다만 `TabShell`이 제네릭 타입이라
   일회성 `static let`을 안에 둘 수 없어(제네릭 타입은 정적 저장 프로퍼티 불가) 별도 타입이

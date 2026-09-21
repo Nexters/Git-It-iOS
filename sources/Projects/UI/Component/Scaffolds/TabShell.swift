@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 import UIKit
 
+// MARK: - TabShell
+
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
     // MARK: Lifecycle
@@ -47,6 +49,54 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
     private let content: (Item) -> Content
 
+}
+
+// MARK: - TabShellItem
+
+public protocol TabShellItem: CaseIterable, Hashable, Identifiable, Sendable {
+    var tabTitle: String { get }
+    var tabSystemImage: String { get }
+}
+
+extension TabShellItem {
+
+    public static func tabColor(isSelected: Bool) -> ColorToken {
+        isSelected ? .blue100 : .grey400
+    }
+
+}
+
+// MARK: - TabShellPreviewItem
+
+enum TabShellPreviewItem: String, TabShellItem {
+    case home
+    case project
+    case saved
+    case profile
+
+    // MARK: Internal
+
+    var id: Self {
+        self
+    }
+
+    var tabTitle: String {
+        switch self {
+        case .home: "홈"
+        case .project: "프로젝트"
+        case .saved: "저장"
+        case .profile: "마이"
+        }
+    }
+
+    var tabSystemImage: String {
+        switch self {
+        case .home: "ic-home"
+        case .project: "ic-file-text"
+        case .saved: "ic-bookmark"
+        case .profile: "ic-user"
+        }
+    }
 }
 
 #Preview("Tab Shell") {
