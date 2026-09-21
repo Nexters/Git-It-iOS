@@ -61,7 +61,7 @@ public struct SavedQuestionCard: View {
         let accessibilityLabel = isBookmarked ? "저장 해제하기" : "저장하기"
         let accessibilityTraits: AccessibilityTraits = isBookmarked ? [.isButton, .isSelected] : .isButton
 
-        return Button(action: toggleBookmark) {
+        return Button(action: { toggleBookmark() }) {
             ResourceImage(asset: .icon(icon), contentMode: .fit)
                 .designSystemForeground(tint)
                 .frame(width: Constant.bookmarkSize, height: Constant.bookmarkSize)

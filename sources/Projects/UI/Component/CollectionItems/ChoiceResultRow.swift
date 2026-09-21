@@ -45,7 +45,7 @@ public struct ChoiceResultRow: View {
     }
 
     public var body: some View {
-        Button(action: toggle) {
+        Button(action: { toggle() }) {
             VStack(alignment: .leading, spacing: LayoutToken.tightSpacing) {
                 StyledText(text: displayModel.text)
                     .lineLimit(1)

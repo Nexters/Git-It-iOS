@@ -112,7 +112,7 @@ public struct ChoiceAnswerOption: View {
         case .toggleable(let isExpanded):
             card(isExpanded: isExpanded.wrappedValue, reservesChevronSpace: true)
                 .overlay(alignment: .topTrailing) {
-                    Button(action: expansion.toggle) {
+                    Button(action: { expansion.toggle() }) {
                         ResourceImage(asset: .icon(isExpanded.wrappedValue ? .chevronUp : .chevronDown), contentMode: .fit)
                             .designSystemForeground(.blue100)
                             .frame(width: Constant.chevronIconSize, height: Constant.chevronIconSize)
@@ -127,7 +127,7 @@ public struct ChoiceAnswerOption: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(accessibilityLabel)
                 .accessibilityAddTraits(state == .selected ? .isSelected : [])
-                .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기", expansion.toggle)
+                .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기") { expansion.toggle() }
         }
     }
 
