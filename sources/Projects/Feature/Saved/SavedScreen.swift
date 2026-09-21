@@ -44,7 +44,7 @@ struct SavedScreen: View {
                             message: "아직 저장한 문제가 없네요!\n다시 확인하고 싶은 문제를 저장해 보세요.",
                         )
                     ) {
-                        ResourceAnimation(asset: .storageEmpty, isLooping: true)
+                        ResourceAnimation(asset: .storageEmpty)
                     }
                     .designSystemScreenMargin()
 

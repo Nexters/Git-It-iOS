@@ -2,21 +2,19 @@ import DesignSystem
 import Lottie
 import SwiftUI
 
+// MARK: - ResourceAnimation
+
 public struct ResourceAnimation: View {
 
     // MARK: Lifecycle
 
     public init(
         asset: Asset,
-        isLooping: Bool = true,
-        speed: Double = 1,
-        contentMode: ContentMode = .fit,
+        stateModel: StateModel = .init(),
         onCompletion: ((Bool) -> Void)? = nil,
     ) {
         self.asset = asset
-        self.isLooping = isLooping
-        self.speed = speed
-        self.contentMode = contentMode
+        self.stateModel = stateModel
         self.onCompletion = onCompletion
     }
 
@@ -37,21 +35,39 @@ public struct ResourceAnimation: View {
 
     public var body: some View {
         LottieView(animation: asset.animation)
-            .playing(loopMode: isLooping ? .loop : .playOnce)
-            .animationSpeed(speed)
+            .playing(loopMode: stateModel.isLooping ? .loop : .playOnce)
+            .animationSpeed(stateModel.speed)
             .animationDidFinish { onCompletion?($0) }
             .resizable()
-            .aspectRatio(contentMode: contentMode)
+            .aspectRatio(contentMode: stateModel.contentMode)
     }
 
     // MARK: Private
 
     private let asset: Asset
-    private let isLooping: Bool
-    private let speed: Double
-    private let contentMode: ContentMode
+    private let stateModel: StateModel
     private let onCompletion: ((Bool) -> Void)?
 
+}
+
+// MARK: ResourceAnimation.StateModel
+
+extension ResourceAnimation {
+    public struct StateModel: Sendable, Equatable {
+        public init(
+            isLooping: Bool = true,
+            speed: Double = 1,
+            contentMode: ContentMode = .fit,
+        ) {
+            self.isLooping = isLooping
+            self.speed = speed
+            self.contentMode = contentMode
+        }
+
+        public let isLooping: Bool
+        public let speed: Double
+        public let contentMode: ContentMode
+    }
 }
 
 #Preview("Resource Animation") {
@@ -59,10 +75,10 @@ public struct ResourceAnimation: View {
         ResourceAnimation(asset: .generalLoading)
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(asset: .notification, isLooping: false)
+        ResourceAnimation(asset: .notification, stateModel: .init(isLooping: false))
             .frame(width: 128, height: 128)
 
-        ResourceAnimation(asset: .storageEmpty, isLooping: false)
+        ResourceAnimation(asset: .storageEmpty, stateModel: .init(isLooping: false))
             .frame(width: 128, height: 128)
     }
     .designSystemScreenMargin()
@@ -72,10 +88,10 @@ public struct ResourceAnimation: View {
 
 #Preview("Resource Animation 2") {
     VStack(spacing: LayoutToken.gutter) {
-        ResourceAnimation(asset: .setCreationLoading, speed: 1.5)
+        ResourceAnimation(asset: .setCreationLoading, stateModel: .init(speed: 1.5))
             .frame(width: 250, height: 250)
 
-        ResourceAnimation(asset: .complete, isLooping: false)
+        ResourceAnimation(asset: .complete, stateModel: .init(isLooping: false))
             .frame(width: 200, height: 200)
     }
     .designSystemScreenMargin()

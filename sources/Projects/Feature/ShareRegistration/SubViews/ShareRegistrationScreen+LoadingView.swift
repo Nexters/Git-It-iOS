@@ -14,7 +14,7 @@ extension ShareRegistrationScreen {
             VStack(spacing: Constant.textSetSpacing) {
                 Spacer(minLength: 0)
 
-                ResourceAnimation(asset: .generalLoading, isLooping: true)
+                ResourceAnimation(asset: .generalLoading)
                     .frame(width: Constant.indicatorSize, height: Constant.indicatorSize)
 
                 StyledText(text: message)

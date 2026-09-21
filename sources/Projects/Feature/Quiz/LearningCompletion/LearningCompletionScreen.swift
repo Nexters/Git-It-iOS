@@ -31,7 +31,7 @@ struct LearningCompletionScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.contentSpacing) {
-                ResourceAnimation(asset: .complete, isLooping: false)
+                ResourceAnimation(asset: .complete, stateModel: .init(isLooping: false))
                     .frame(width: Constant.animationSize, height: Constant.animationSize)
                     .accessibilityHidden(true)
 

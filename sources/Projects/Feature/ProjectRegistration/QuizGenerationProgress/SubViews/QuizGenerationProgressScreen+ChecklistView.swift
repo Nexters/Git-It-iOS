@@ -104,7 +104,7 @@ extension QuizGenerationProgressScreen {
         var icon: some View {
             switch self {
             case .done: ResourceImage(asset: .icon(.statusCheck))
-            case .active: ResourceAnimation(asset: .generalLoading, isLooping: true)
+            case .active: ResourceAnimation(asset: .generalLoading)
             case .pending: ResourceImage(asset: .icon(.statusLoadingDisabled))
             }
         }
