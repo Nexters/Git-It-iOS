@@ -533,6 +533,36 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 객관식 채점 결과만 세션 정답 수에 누적된다(전달) | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 답안 제출은 세션에 채점 결과를 answerRecorded로 보낸다 | 합성 지점 검증 |
 | U10 | (새 테스트) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 진행 중인 세션을 다시 시작하면 현재 문제와 정답 수를 유지한다 | 기능 Feature 테스트 |
 | U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 소개 화면 뒤로가기와 완료 화면 닫기는 모두 흐름 이탈이다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 소개 화면 뒤로가기와 완료 화면 닫기는 모두 흐름 이탈이다 | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 공유 항목에 URL이 없으면 네트워크 호출 없이 오류 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 공유 항목에 URL이 없으면 네트워크 호출 없이 오류 상태가 되고 진단 이벤트를 남긴다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › GitHub 저장소 경로가 아니면 조회하지 않고 오류 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › GitHub 저장소 경로가 아니면 조회하지 않고 오류 상태가 되고 진단 이벤트를 남긴다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 세션 마커가 없으면 앱 실행 필요 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 세션 마커가 없으면 앱 실행 필요 상태가 되고 세션 판정 결과를 토큰 없이 남긴다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 세션이 없으면 갱신 없이 로그인 필요 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 세션이 없으면 갱신 없이 로그인 필요 상태가 된다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 조회가 네트워크 오류로 실패하면 재시도 가능한 실패 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 조회가 네트워크 오류로 실패하면 재시도 가능한 실패 상태가 된다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 조회에 성공하면 저장소 정보와 함께 등록 가능 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 조회에 성공하면 등록 가능 상태가 되고 repositoryResolved를 위임한다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureValidationTests.swift › 조회에 성공하면 저장소 정보와 함께 등록 가능 상태가 된다(단계·저장소 전달) | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 저장소를 확인하면 저장소 확인 단계로 두고 확인할 저장소를 넘긴다 | 합성 지점 검증 |
+| U11 | (새 테스트) | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 화면 진입은 공유 링크로 등록 검증을 시작한다, 공유 링크가 아직 없으면 화면 진입만으로 검증하지 않는다, 공유 링크를 받으면 그 링크로 등록 검증을 시작한다 | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 저장소 확인 뒤 난이도와 생성 확인 순서로 이동한다 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 같은 테스트(상태 경로 `step`) | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 뒤로 가기는 직전 단계로 되돌린다 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 같은 테스트(상태 경로 `step`) | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 이 레포지토리가 아니라고 답하면 입력 화면 대신 종료를 요청한다 | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 같은 테스트 | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 기본 난이도로도 등록할 수 있고 선택한 난이도가 요청에 쓰인다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 제출한 난이도로 등록을 요청하고 성공하면 완료 상태가 된다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 기본 난이도로도 등록할 수 있고 선택한 난이도가 요청에 쓰인다(난이도 전달) | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 생성 요청은 확인한 저장소와 선택한 난이도로 등록에 submit을 보낸다 | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 요청 중에는 추가 등록 실행을 받지 않는다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 요청 중에는 추가 등록 실행을 받지 않는다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 등록 응답이 인증 오류면 갱신 없이 로그인 필요 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 등록 응답이 인증 오류면 갱신 없이 로그인 필요 상태가 된다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 이미 등록 중인 저장소면 재시도 가능한 실패로 남긴다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 등록 실패는 사유와 등록 단계 재시도를 남긴다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 제출 시점에 로그인이 필요하면 등록을 요청하지 않는다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 제출 시점에 로그인이나 앱 실행이 필요하면 등록을 요청하지 않는다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureSubmissionTests.swift › 제출 시점에 앱 실행이 필요하면 앱 실행 필요 상태가 된다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 제출 시점에 로그인이나 앱 실행이 필요하면 등록을 요청하지 않는다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 등록 실패 사유를 표시하고 등록 단계 재시도를 제공한다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 등록 실패는 사유와 등록 단계 재시도를 남긴다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 등록 실패 사유를 표시하고 등록 단계 재시도를 제공한다(재시도·닫기 파생) | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 등록이 실패하면 재시도와 닫기를 모두 허용한다 | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 재시도는 등록 단계부터 다시 수행한다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 재시도는 실패한 등록을 같은 저장소와 난이도로 다시 수행한다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 재시도는 등록 단계부터 다시 수행한다(위임) | Tests/ShareRegistration/ShareRegistrationFeatureStepTests.swift › 재시도 탭은 등록에 retry를 보낸다 | 합성 지점 검증 |
+| U11 | (새 테스트) | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 조회 실패의 재시도는 저장소 조회를 다시 수행한다, 실패 상태가 아니면 재시도를 무시한다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 요청 중에는 닫기 동작을 받지 않는다 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 요청 중에는 닫기 동작을 받지 않는다(등록 진행 상태에서 파생) | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 등록 가능 상태에서 닫으면 진행 중 작업을 취소하고 종료를 요청한다 | Tests/ShareRegistration/ShareRegistrationFeatureFailureTests.swift › 같은 테스트(등록에 `cancel` 전달 수신 추가) | 합성 지점 검증 |
+| U11 | Tests/ShareRegistration/ShareRegistrationDiagnosticsTests.swift › 링크 판정 실패를 진단 이벤트로 남긴다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › GitHub 저장소 경로가 아니면 조회하지 않고 오류 상태가 되고 진단 이벤트를 남긴다 | 중복 제거(대체 테스트 명시) |
+| U11 | Tests/ShareRegistration/ShareRegistrationDiagnosticsTests.swift › 공유 항목이 없으면 별도의 진단 이벤트를 남긴다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 공유 항목에 URL이 없으면 네트워크 호출 없이 오류 상태가 되고 진단 이벤트를 남긴다 | 중복 제거(대체 테스트 명시) |
+| U11 | Tests/ShareRegistration/ShareRegistrationDiagnosticsTests.swift › 세션 판정 결과를 토큰 없이 남긴다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 세션 마커가 없으면 앱 실행 필요 상태가 되고 세션 판정 결과를 토큰 없이 남긴다 | 중복 제거(대체 테스트 명시) |
+| U11 | Tests/ShareRegistration/ShareRegistrationDiagnosticsTests.swift › 저장소 조회 실패와 등록 실패를 서로 다른 이벤트로 구분한다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 저장소 조회 실패와 등록 실패를 서로 다른 이벤트로 구분한다 | 기능 Feature 테스트 |
+| U11 | Tests/ShareRegistration/ShareRegistrationDiagnosticsTests.swift › 진단 이벤트 값에 토큰이나 원본 URL 전체를 담지 않는다 | Tests/ShareRegistration/SharedRepositoryRegistrationFeatureTests.swift › 진단 이벤트 값에 토큰이나 원본 URL 전체를 담지 않는다 | 기능 Feature 테스트 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -580,3 +610,10 @@ U11 전까지 `ShareRegistrationFeature`가 쓰므로 이 단위에서 막지 �
 Router는 `questionSolving != nil`로 "이미 시작한 세트"를 판정해 문제 위치와 정답 수를 유지했는데, 세션이 그
 판정을 스스로 하려면 첫 문제를 준비했는지 알아야 하기 때문이다. 이미 시작한 세트의 재진입 화면 활성화는
 Router가 계속 판정한다. 세션 필드는 모두 `fileprivate(set)`이다.
+
+**U11 비고**: `SharedRepositoryRegistrationFeature`에 contracts의 세 input 외에 `cancel`을 두었다. 기존
+`ShareRegistrationFeature`는 닫을 때 진행 중인 검증·등록 Effect를 취소했는데, 그 취소 ID가 자식으로
+옮겨졌으므로 부모가 취소를 요청할 경로가 필요하다. 등록 재시도에 쓸 저장소와 난이도는 `submission`에
+보관한다. `ShareRegistrationFeatureValidationTests.swift`, `ShareRegistrationFeatureSubmissionTests.swift`,
+`ShareRegistrationDiagnosticsTests.swift`는 모든 단언이 옮겨져 삭제했다. `ShareRegistrationTestSupport.swift`와
+Screen의 `GuidanceView`·`LoadingView`는 새 구조에서 그대로 쓰여 수정하지 않았다.

@@ -29,27 +29,15 @@ public struct ShareRegistrationScreen: View {
 
     @ViewBuilder
     private var content: some View {
-        switch store.status {
+        switch store.registration.phase {
         case .validating:
             Self.LoadingView(message: Constant.lookupMessage)
 
         case .submitting:
             Self.LoadingView(message: Constant.submittingMessage)
 
-        case .repositoryConfirmation:
-            RepositoryConfirmationScreen(
-                store: store.scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation)
-            )
-
-        case .quizLevelSelection:
-            QuizLevelSelectionScreen(
-                store: store.scope(state: \.quizLevelSelection, action: \.quizLevelSelection)
-            )
-
-        case .quizGenerationConfirmation:
-            QuizGenerationConfirmationScreen(
-                store: store.scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation)
-            )
+        case .ready:
+            stepContent
 
         case .invalidURL(let reason):
             guidance(title: Constant.invalidURLTitle, message: reason)
@@ -71,6 +59,26 @@ public struct ShareRegistrationScreen: View {
                 dismissTitle: Constant.dismissTitle,
                 onRetry: { send(.retryTapped) },
                 onDismiss: { send(.dismissTapped) },
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var stepContent: some View {
+        switch store.step {
+        case .repositoryConfirmation:
+            RepositoryConfirmationScreen(
+                store: store.scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation)
+            )
+
+        case .quizLevelSelection:
+            QuizLevelSelectionScreen(
+                store: store.scope(state: \.quizLevelSelection, action: \.quizLevelSelection)
+            )
+
+        case .quizGenerationConfirmation:
+            QuizGenerationConfirmationScreen(
+                store: store.scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation)
             )
         }
     }

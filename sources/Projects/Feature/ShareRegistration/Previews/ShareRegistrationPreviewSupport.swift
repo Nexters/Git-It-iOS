@@ -11,9 +11,13 @@ enum ShareRegistrationPreviewSupport {
 
     // MARK: Internal
 
-    static func store(status: ShareRegistrationFeature.Status) -> StoreOf<ShareRegistrationFeature> {
+    static func store(
+        phase: SharedRepositoryRegistrationFeature.State.Phase? = nil,
+        step: ShareRegistrationFeature.Step = .repositoryConfirmation,
+    ) -> StoreOf<ShareRegistrationFeature> {
         var state = ShareRegistrationFeature.State(sharedURL: "https://github.com/apple/swift")
-        state.status = status
+        state.registration.phase = phase ?? .ready(sampleRepository)
+        state.step = step
         state.repositoryConfirmation.repository = sampleRepository
         return Store(initialState: state) {
             ShareRegistrationFeature(
