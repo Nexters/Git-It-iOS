@@ -146,8 +146,7 @@ struct SettingsFeatureAccountActionTests {
 
     private func makeState(accountAction: SettingsFeature.AccountAction) -> SettingsFeature.State {
         var state = SettingsFeature.State()
-        state.profile = SettingsTestFixture.curatedProfile
-        state.profileLoad = .loaded
+        state.userProfile.load = .loaded(SettingsTestFixture.curatedProfile)
         state.accountAction = accountAction
         return state
     }

@@ -86,20 +86,16 @@ public struct SettingsRouterFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .profile(.delegate(.settingsRequested)):
-                if case .loaded(let profile) = state.profile.profileLoad {
-                    state.settings.profile = profile
-                    state.settings.profileLoad = .loaded
-                }
                 state.activeScreen = .settings(.list)
-                return .none
+                guard let profile = state.profile.profile.profile else { return .none }
+                return .send(.settings(.input(.profileProvided(profile))))
 
             case .settings(.delegate(.backRequested)):
                 switch state.activeScreen {
                 case .settings(.list):
-                    if let profile = state.settings.profile {
-                        state.profile.profileLoad = .loaded(profile)
-                    }
                     state.activeScreen = .profile
+                    guard let profile = state.settings.profile else { return .none }
+                    return .send(.profile(.profile(.input(.replace(profile)))))
 
                 case .settings(.positionSelection),
                      .settings(.careerLevelSelection),

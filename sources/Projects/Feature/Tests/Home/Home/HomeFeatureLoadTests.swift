@@ -20,21 +20,22 @@ struct HomeFeatureLoadTests {
         store.exhaustivity = .off
 
         let firstTask = await store.send(.view(.task))
+        await store.receive(\.profile.input.load)
 
-        #expect(store.state.profileLoad == .loading)
-        #expect(store.state.profileRequestID == 1)
+        #expect(store.state.profile.load == .loading)
+        #expect(store.state.profile.requestID == 1)
         #expect(store.state.projectRequestID == 1)
 
         while await profile.snapshot().pendingCount == 0 { await Task.yield() }
         await profile.resumeNext()
-        await store.receive(\.effect.profileLoadFinished)
+        await store.receive(\.profile.effect.profileLoadFinished)
 
-        #expect(store.state.profileLoad == .loaded(HomeTestFixture.profileWithBoth))
+        #expect(store.state.profile.load == .loaded(HomeTestFixture.profileWithBoth))
 
         let secondTask = await store.send(.view(.task))
 
         #expect(await profile.snapshot().callCount == 1)
-        #expect(store.state.profileRequestID == 1)
+        #expect(store.state.profile.requestID == 1)
         #expect(store.state.projectRequestID == 2)
 
         await projects.finish()
@@ -43,41 +44,28 @@ struct HomeFeatureLoadTests {
     }
 
     @Test
-    func `프로필 재시도는 프로젝트를 보존하고 프로필만 조회한다`() async {
+    func `프로필 재시도는 프로젝트를 보존하고 프로필 조회에 load만 보낸다`() async {
         let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
-        state.profileLoad = .failed(.temporarilyUnavailable)
+        state.profile.load = .failed(.temporarilyUnavailable)
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(projects: projects, profile: profile, state: state)
 
-        await store.send(.view(.profileRetryTapped)) {
-            $0.profileLoad = .loading
-            $0.profileRequestID = 1
+        await store.send(.view(.profileRetryTapped))
+        await store.receive(.profile(.input(.load))) {
+            $0.profile.load = .loading
+            $0.profile.requestID = 1
         }
         await store.receive(
-            .effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))
+            .profile(.effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth))))
         ) {
-            $0.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+            $0.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         }
 
         #expect(store.state.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
         #expect(await profile.snapshot().callCount == 1)
         #expect(await projects.snapshot().refreshCallCount == 0)
-    }
-
-    @Test
-    func `현재 request ID와 다른 응답은 상태를 바꾸지 않는다`() async {
-        var state = HomeFeature.State()
-        state.profileLoad = .loading
-        state.profileRequestID = 2
-        let store = makeStore(state: state)
-
-        await store.send(
-            .effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))
-        )
-
-        #expect(store.state.profileLoad == .loading)
     }
 
     @Test
@@ -99,13 +87,13 @@ struct HomeFeatureLoadTests {
 
         while await profile.snapshot().pendingCount == 0 { await Task.yield() }
         await profile.resumeNext()
-        await store.receive(\.effect.profileLoadFinished)
+        await store.receive(\.profile.effect.profileLoadFinished)
 
         while await projects.snapshot().pendingCount == 0 { await Task.yield() }
         await projects.resumeNext()
         await store.receive(\.effect.refreshFinished)
 
-        #expect(store.state.profileLoad == .loaded(HomeTestFixture.profileWithBoth))
+        #expect(store.state.profile.load == .loaded(HomeTestFixture.profileWithBoth))
         #expect(store.state.projectLoad == .failed(.temporarilyUnavailable))
 
         await projects.finish()
@@ -117,7 +105,7 @@ struct HomeFeatureLoadTests {
         let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
-        state.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         state.projectLoad = .failed(.temporarilyUnavailable)
         let store = makeStore(projects: projects, profile: profile, state: state)
 
@@ -127,7 +115,7 @@ struct HomeFeatureLoadTests {
         }
         await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
 
-        #expect(store.state.profileLoad == .loaded(HomeTestFixture.profileWithBoth))
+        #expect(store.state.profile.load == .loaded(HomeTestFixture.profileWithBoth))
         #expect(await profile.snapshot().callCount == 0)
         #expect(await projects.snapshot().refreshCallCount == 1)
     }

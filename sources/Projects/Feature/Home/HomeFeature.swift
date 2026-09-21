@@ -29,13 +29,6 @@ public struct HomeFeature: Sendable {
 
         // MARK: Public
 
-        public enum ProfileLoad: Equatable, Sendable {
-            case idle
-            case loading
-            case loaded(UserProfile)
-            case failed(UserInfoError)
-        }
-
         public enum ProjectLoad: Equatable, Sendable {
             case idle
             case loading
@@ -50,9 +43,8 @@ public struct HomeFeature: Sendable {
             }
         }
 
-        public var profileLoad = ProfileLoad.idle
+        public var profile = UserProfileLoadFeature.State()
         public var projectLoad = ProjectLoad.idle
-        public var profileRequestID = 0
         public var projectRequestID = 0
 
         public var isGenerationInProgress = false
@@ -67,6 +59,7 @@ public struct HomeFeature: Sendable {
         case input(Input)
         case effect(Effect)
         case delegate(Delegate)
+        case profile(UserProfileLoadFeature.Action)
 
         // MARK: Public
 
@@ -93,7 +86,6 @@ public struct HomeFeature: Sendable {
 
         @CasePathable
         public enum Effect: Equatable, Sendable {
-            case profileLoadFinished(requestID: Int, result: Result<UserProfile, UserInfoError>)
             case projectsReceived(ProjectList)
             case refreshFinished(requestID: Int, error: ProjectError?)
         }
@@ -109,6 +101,9 @@ public struct HomeFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.profile, action: \.profile) {
+            UserProfileLoadFeature(profile: profile)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
@@ -126,8 +121,8 @@ public struct HomeFeature: Sendable {
                 return startAccountLoad(state: &state)
 
             case .view(.profileRetryTapped):
-                guard state.access == .member, case .failed = state.profileLoad else { return .none }
-                return startProfileLoad(state: &state)
+                guard state.access == .member, case .failed = state.profile.load else { return .none }
+                return .send(.profile(.input(.load)))
 
             case .view(.projectRetryTapped):
                 guard state.access == .member, case .failed = state.projectLoad else { return .none }
@@ -175,14 +170,6 @@ public struct HomeFeature: Sendable {
                     .delegate(.learningRequested(projectID: projectID, nextSetID: next.setID))
                 )
 
-            case .effect(.profileLoadFinished(let requestID, let result)):
-                guard requestID == state.profileRequestID else { return .none }
-                switch result {
-                case .success(let profile): state.profileLoad = .loaded(profile)
-                case .failure(let error): state.profileLoad = .failed(error)
-                }
-                return .none
-
             case .effect(.projectsReceived(let list)):
                 guard list.isLoaded else { return .none }
                 state.projectLoad = .loaded(list)
@@ -194,7 +181,8 @@ public struct HomeFeature: Sendable {
                 state.projectLoad = .failed(error)
                 return .none
 
-            case .delegate:
+            case .profile,
+                 .delegate:
                 return .none
             }
         }
@@ -203,7 +191,6 @@ public struct HomeFeature: Sendable {
     // MARK: Private
 
     private enum CancelID {
-        case profile
         case projects
         case refresh
     }
@@ -214,30 +201,12 @@ public struct HomeFeature: Sendable {
 
     private func startAccountLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         var effects = [ComposableArchitecture.Effect<Action>]()
-        if state.profileLoad == .idle {
-            effects.append(startProfileLoad(state: &state))
+        if state.profile.load == .idle {
+            effects.append(.send(.profile(.input(.load))))
         }
         effects.append(observeProjects())
         effects.append(startRefresh(state: &state))
         return .merge(effects)
-    }
-
-    private func startProfileLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.profileRequestID += 1
-        state.profileLoad = .loading
-        let requestID = state.profileRequestID
-        let profile = profile
-
-        return .run { send in
-            do {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .success(try await profile()))))
-            } catch let error as UserInfoError {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(error))))
-            } catch {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(.temporarilyUnavailable))))
-            }
-        }
-        .cancellable(id: CancelID.profile, cancelInFlight: true)
     }
 
     private func observeProjects() -> ComposableArchitecture.Effect<Action> {

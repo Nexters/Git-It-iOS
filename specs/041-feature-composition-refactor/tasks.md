@@ -109,35 +109,35 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 테스트
 
-- [ ] T010 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift`를 작성한다. 검증 범위는 계약의 `load`·`reload`·`replace` 전이, request identity로 늦은 응답 거부, `loaded` 중 `reload` 실패 무시, `load` 실패 시 `.failed`, 비`UserInfoError`를 `.temporarilyUnavailable`로 변환하는 것이다. Test Double은 클로저로 주입한다
+- [X] T010 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift`를 작성한다. 검증 범위는 계약의 `load`·`reload`·`replace` 전이, request identity로 늦은 응답 거부, `loaded` 중 `reload` 실패 무시, `load` 실패 시 `.failed`, 비`UserInfoError`를 `.temporarilyUnavailable`로 변환하는 것이다. Test Double은 클로저로 주입한다
 
 ### 구현
 
-- [ ] T011 [S2] `sources/Projects/Feature/Shared/Reducers/UserProfileLoadFeature.swift`에 `UserProfileLoadFeature`를 구현한다. State는 `load: Load`, `requestID`, computed `profile`이다. 입력은 `input.load/reload/replace(UserProfile)`, 생성자는 `profile:`다. `Load` 중첩 타입이 파일을 나눌 만큼 크면 `UserProfileLoadFeature+Load.swift`로 분할해 타입 패밀리 폴더 `Shared/Reducers/UserProfileLoadFeature/`에 둔다
-- [ ] T012 [S2] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `profileLoad`·`profileRequestID`·프로필 Effect를 제거한다. `profile: UserProfileLoadFeature.State`를 `Scope`로 합성하고, 기존 시작·재시도 조건(research §4 I1)을 input 전송으로 옮긴다. 생성자 시그니처는 유지한다
-- [ ] T013 [P] [S2] `sources/Projects/Feature/Home/ViewModels/HomeProfileDisplay.swift`가 `UserProfileLoadFeature.State.Load`(또는 그 State)를 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
-- [ ] T014 [S2] `sources/Projects/Feature/Home/HomeScreen.swift`, `sources/Projects/Feature/Home/SubViews/HomeScreen+ProfileHeaderView.swift`, `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`의 프로필 상태 참조를 새 경로로 바꾼다. 레이아웃·컴포넌트·토큰은 바꾸지 않는다(FR-023)
-- [ ] T015 [S2] `sources/Projects/Feature/Settings/Profile/ProfileFeature.swift`를 `UserProfileLoadFeature`를 합성하는 화면 합성 Feature로 바꾼다. `task`는 `idle/failed → load`, `loaded → reload`, `retryTapped`는 `failed`일 때 `load`를 보낸다. `settingsTapped` delegate는 유지한다
-- [ ] T016 [P] [S2] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`가 새 상태 타입을 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
-- [ ] T017 [S2] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`와 `sources/Projects/Feature/Settings/Profile/Previews/ProfileScreenPreviews.swift`의 상태 참조를 새 경로로 바꾼다
-- [ ] T018 [S2] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에서 `profile`·`profileLoad` 저장 필드와 프로필 Effect를 제거한다. `UserProfileLoadFeature`를 합성하고 `task`에서 `load`를 보낸다. 직군·연차 변경 성공 시 `profile.replacing(...)` 결과를 `replace`로 전달한다. 외부 전달용 `input.profileProvided(UserProfile)`를 추가해 자식 `replace`로 넘긴다
-- [ ] T019 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`와 `sources/Projects/Feature/Settings/Settings/Previews/SettingsScreenPreviews.swift`의 프로필 참조를 새 경로로 바꾼다
-- [ ] T020 [S2] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`의 `settings.profile`·`settings.profileLoad`·`profile.profileLoad` 직접 쓰기를 제거한다. 화면 이동 시 조회 완료된 프로필을 상대 화면에 input(`settings.input.profileProvided`, `profile.profile.input.replace`)으로 전달한다(R3)
+- [X] T011 [S2] `sources/Projects/Feature/Shared/Reducers/UserProfileLoadFeature.swift`에 `UserProfileLoadFeature`를 구현한다. State는 `load: Load`, `requestID`, computed `profile`이다. 입력은 `input.load/reload/replace(UserProfile)`, 생성자는 `profile:`다. `Load` 중첩 타입이 파일을 나눌 만큼 크면 `UserProfileLoadFeature+Load.swift`로 분할해 타입 패밀리 폴더 `Shared/Reducers/UserProfileLoadFeature/`에 둔다
+- [X] T012 [S2] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `profileLoad`·`profileRequestID`·프로필 Effect를 제거한다. `profile: UserProfileLoadFeature.State`를 `Scope`로 합성하고, 기존 시작·재시도 조건(research §4 I1)을 input 전송으로 옮긴다. 생성자 시그니처는 유지한다
+- [X] T013 [P] [S2] `sources/Projects/Feature/Home/ViewModels/HomeProfileDisplay.swift`가 `UserProfileLoadFeature.State.Load`(또는 그 State)를 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
+- [X] T014 [S2] `sources/Projects/Feature/Home/HomeScreen.swift`, `sources/Projects/Feature/Home/SubViews/HomeScreen+ProfileHeaderView.swift`, `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`의 프로필 상태 참조를 새 경로로 바꾼다. 레이아웃·컴포넌트·토큰은 바꾸지 않는다(FR-023)
+- [X] T015 [S2] `sources/Projects/Feature/Settings/Profile/ProfileFeature.swift`를 `UserProfileLoadFeature`를 합성하는 화면 합성 Feature로 바꾼다. `task`는 `idle/failed → load`, `loaded → reload`, `retryTapped`는 `failed`일 때 `load`를 보낸다. `settingsTapped` delegate는 유지한다
+- [X] T016 [P] [S2] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`가 새 상태 타입을 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
+- [X] T017 [S2] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`와 `sources/Projects/Feature/Settings/Profile/Previews/ProfileScreenPreviews.swift`의 상태 참조를 새 경로로 바꾼다
+- [X] T018 [S2] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에서 `profile`·`profileLoad` 저장 필드와 프로필 Effect를 제거한다. `UserProfileLoadFeature`를 합성하고 `task`에서 `load`를 보낸다. 직군·연차 변경 성공 시 `profile.replacing(...)` 결과를 `replace`로 전달한다. 외부 전달용 `input.profileProvided(UserProfile)`를 추가해 자식 `replace`로 넘긴다
+- [X] T019 [S2] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`와 `sources/Projects/Feature/Settings/Settings/Previews/SettingsScreenPreviews.swift`의 프로필 참조를 새 경로로 바꾼다
+- [X] T020 [S2] `sources/Projects/Feature/Settings/Router/SettingsRouterFeature.swift`의 `settings.profile`·`settings.profileLoad`·`profile.profileLoad` 직접 쓰기를 제거한다. 화면 이동 시 조회 완료된 프로필을 상대 화면에 input(`settings.input.profileProvided`, `profile.profile.input.replace`)으로 전달한다(R3)
 
 ### 테스트 이관
 
-- [ ] T021 [S2] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureLoadTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGuestAccessTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationProgressTests.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에서 프로필 내부 전이 단언을 제거하고, `profile` 자식으로의 위임과 화면 고유 결과만 단언하게 바꾼다
-- [ ] T022 [P] [S2] `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProfileDisplayTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
-- [ ] T023 [S2] `sources/Projects/Feature/Tests/Settings/Profile/ProfileFeatureTests.swift`를 합성 지점 검증으로 바꾼다. 검증 범위는 `task` 분기에 따른 input 전송과 `settingsRequested`다. 옮겨진 전이 단언은 T010에 대응시킨다
-- [ ] T024 [P] [S2] `sources/Projects/Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
-- [ ] T025 [S2] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureTests.swift`, `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift`, `sources/Projects/Feature/Tests/Settings/TestDoubles/SettingsTestFixture.swift`의 프로필 상태 참조와 단언을 새 경로로 바꾼다. 변경 성공 뒤 `replace` 전달도 단언한다
-- [ ] T026 [S2] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`가 input 전달로 프로필을 동기화하는지 단언하게 바꾼다
-- [ ] T027 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의 `home.profileLoad` 참조를 새 경로로 바꾼다
-- [ ] T028 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U2 이관 대응표를 추가한다. 대상은 T021~T027에서 바꾸거나 제거한 모든 `@Test`다
+- [X] T021 [S2] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureLoadTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGuestAccessTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationProgressTests.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에서 프로필 내부 전이 단언을 제거하고, `profile` 자식으로의 위임과 화면 고유 결과만 단언하게 바꾼다
+- [X] T022 [P] [S2] `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProfileDisplayTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
+- [X] T023 [S2] `sources/Projects/Feature/Tests/Settings/Profile/ProfileFeatureTests.swift`를 합성 지점 검증으로 바꾼다. 검증 범위는 `task` 분기에 따른 input 전송과 `settingsRequested`다. 옮겨진 전이 단언은 T010에 대응시킨다
+- [X] T024 [P] [S2] `sources/Projects/Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
+- [X] T025 [S2] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureTests.swift`, `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift`, `sources/Projects/Feature/Tests/Settings/TestDoubles/SettingsTestFixture.swift`의 프로필 상태 참조와 단언을 새 경로로 바꾼다. 변경 성공 뒤 `replace` 전달도 단언한다
+- [X] T026 [S2] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`가 input 전달로 프로필을 동기화하는지 단언하게 바꾼다
+- [X] T027 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의 `home.profileLoad` 참조를 새 경로로 바꾼다
+- [X] T028 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U2 이관 대응표를 추가한다. 대상은 T021~T027에서 바꾸거나 제거한 모든 `@Test`다
 
 ### 정리와 단위 검증
 
-- [ ] T029 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. `grep -rn 'ProfileLoad\b\|profileRequestID' sources/Projects/Feature --include='*.swift' | grep -v '/Derived/'`로 `UserProfileLoadFeature` 밖에 선언이 남지 않았는지 확인한다(FR-003)
+- [X] T029 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. `grep -rn 'ProfileLoad\b\|profileRequestID' sources/Projects/Feature --include='*.swift' | grep -v '/Derived/'`로 `UserProfileLoadFeature` 밖에 선언이 남지 않았는지 확인한다(FR-003)
 
 **진행 점검**: T010~T029의 변경 파일과 검증 결과를 보고하고 실행 단위 3으로 진행한다.
 

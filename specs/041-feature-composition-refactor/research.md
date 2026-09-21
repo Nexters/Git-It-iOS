@@ -1,0 +1,385 @@
+# 조사: 기능·상태 단위 Feature 분해와 화면 Feature 합성
+
+**기능**: [spec.md](./spec.md) · **계획**: [plan.md](./plan.md)
+
+**기준 커밋**: `feature/feature-composition-refactor` HEAD (`bb6f073` 이후 작업 트리)
+
+이 문서는 시나리오 1의 산출물(FR-015)이다. 분해 기준(§1), 공용 경계의 배치(§2), 비테스트 `@Reducer`
+29개의 전수 식별과 통합·제외 판정(§3), 정본 동작 선택과 그로 인한 동작 차이(§4, FR-008),
+작업 단위(§5), 단언 이관 대응표의 자리(§6)를 담는다. 통합이 완료되면 §1·§3·§4의 확정본을
+`docs/conventions/tca/feature.md`와 `docs/conventions/tca/feature/classification.md`로
+옮긴다(FR-020). 이 문서는 확정 전의 중간 산출물이다.
+
+---
+
+## 1. 분해 기준 (FR-001, FR-017, FR-018)
+
+### 결정
+
+Feature 패키지의 모든 Reducer를 다음 세 분류 중 **정확히 하나**로 판정한다. 판정은 이름이 아니라
+State·Action·`body`의 실제 내용으로 한다.
+
+| 분류 | 판정 조건 | 소유할 수 있는 것 | 소유하지 않는 것 |
+| --- | --- | --- | --- |
+| **기능 Feature** | 자식 Feature를 합성하지 않거나 기능 Feature만 합성하고, State가 하나의 관심사([관심사 판별](../../docs/conventions/tca/feature/definition-unit.md#관심사-판별))에 속한다 | 그 관심사의 상태 유형·전이 규칙·Effect·delegate | View(FR-027), 합성한 화면에 따른 분기(FR-005), 화면 전환 목적지 |
+| **화면 합성 Feature** | 하나의 Screen에 대응하고 기능 Feature를 하나 이상 자식으로 합성한다 | 표시 범위(표시 전용 플래그·alert 표시 여부), 자식 결과에 대한 화면 고유 후속 동작, 상위로 올리는 delegate | 기능 관심사의 상태 유형(SC-008), 자식 내부 상태의 직접 변경(FR-006) |
+| **전환 계층** | [Router-Feature](../../docs/conventions/tca/navigation/router.md) 또는 Shell로서 전환 컨텍스트 하나를 소유한다 | 활성 화면 값, 이동 이벤트, 자식 State 보유·생성, 자식 delegate 해석 | 기능 관심사의 상태 유형(시나리오 3-4), 자식 내부 필드의 직접 변경 |
+
+보조 규칙은 다음과 같다.
+
+1. **관심사 하나만 가진 화면의 Feature는 기능 Feature다.** 화면이 그 Feature의 store를 직접
+   관찰한다. 감싸기만 하는 화면 합성 Feature를 새로 만들지 않는다(조합 깊이 자체가 목적이
+   아니다, [Feature 조합](../../docs/conventions/tca/feature/composition.md)).
+2. **자식을 합성하는 순간 그 Feature는 화면 합성 Feature나 전환 계층이다.** 이때 자기 화면만
+   쓰는 관심사를 함께 들고 있으면, 그 관심사를 같은 화면 폴더의 기능 Feature로 분리한다(SC-008).
+3. **화면 고유 후속 동작은 관심사가 아니다.** 자식의 결과를 받아 실행하는 한 번의 후속
+   Effect는 화면 합성 Feature에 남는다(시나리오 3-2). 예: 로그인 성공 뒤 개발용 계정 재설정.
+4. **같은 관심사의 판정 근거는 상태 모델과 전이 규칙의 동일성이다(FR-017).** 이름·화면
+   유사성이나 "load/failed/retry" 같은 패턴 유사성은 근거가 아니다. 전이 규칙의 차이가
+   재시도 조건·실패 표시 범위 같은 **정책 차이**이면 정본을 골라 통합하고 차이를 §4에
+   기록한다. 상태 모델 자체나 호출하는 Use Case가 다르면 같은 관심사로 보지 않는다.
+5. **통합 비용이 중복 유지 비용보다 크면 제외하고 사유를 남긴다(FR-016).**
+
+### 근거
+
+- [TCA 컨벤션 — 정의 단위](../../docs/conventions/tca/feature/definition-unit.md)가 이미 관심사를
+  정의 단위로 정했고, 화면 없는 Feature와 Router-Feature를 정상 형태로 인정한다. 이 기준은 그
+  규칙을 "어느 쪽으로 분류되는가"라는 판정 질문으로 바꾼 것이다.
+- 보조 규칙 1이 없으면, 관심사 하나짜리 화면(예: `CareerSelectionFeature`)마다 빈 래퍼
+  Feature가 생긴다. 이는 [테스트 검증 기준](../../docs/conventions/tca/feature/test-validation.md)의
+  "테스트가 성립하지 않는 분리" 신호에 해당한다.
+- 명세 명확화에 따라 분류는 이름이 아니라 컨벤션 문서와 디렉터리 위치로 표현한다(FR-025).
+
+### 검토한 대안
+
+- **화면마다 화면 합성 Feature를 반드시 둔다**: 관심사 하나짜리 화면에서 의미 없는 층이
+  생기고 테스트가 중복되어 기각했다.
+- **"load/failed/retry" 패턴 공용 Feature 도입**: 오류 타입·payload·도메인이 달라 제네릭
+  상태 기계가 된다. 관심사가 아니라 구현 패턴의 공유이므로 기각했다(§3의 E3).
+
+---
+
+## 2. 공용 경계의 배치 (FR-022)
+
+### 결정
+
+| 사용 범위 | 배치 | 예 |
+| --- | --- | --- |
+| 한 화면만 합성 | 그 화면 폴더 루트 (`Feature/<흐름>/<화면>/`) | `Settings/Settings/AccountActionFeature.swift` |
+| 한 전환 계층만 합성 | 그 흐름의 `Router/` | `Quiz/Router/LearningSessionFeature.swift` (선례: `Onboarding/Router/OnboardingExitFeature.swift`) |
+| 같은 흐름의 둘 이상 화면 | `Feature/<흐름>/Shared/Reducers/` | 이번 식별 결과에는 해당 없음 |
+| 둘 이상 흐름 | `Feature/Shared/Reducers/` | `UserProfileLoadFeature`, `SignInFeature/` |
+| 둘 이상 흐름이 쓰는 값 타입 | `Feature/Shared/Models/` | `MainShellAccess` |
+
+- 참조 방향은 **전환 계층 → 화면 → 공용**의 단방향이다. `Feature/Shared/**`는 흐름 디렉터리의
+  타입을 참조하지 않는다.
+- 공용 디렉터리(`Shared/Reducers/`)에는 View를 두지 않는다(FR-027, SC-015). 기능 상태를
+  렌더링하는 View는 그 기능 Feature를 합성한 화면 폴더에 남는다. 예를 들어
+  `LegalAgreementScreen`은 `Onboarding/LegalAgreement/`에 남고, `MainShellRouter` View는 전환
+  계층이므로 이를 참조할 수 있다.
+- 한 파일을 넘는 기능 Feature는 타입 패밀리 폴더를 만든다(`Feature/Shared/Reducers/SignInFeature/`,
+  [타입 패밀리 규칙](../../docs/conventions/directory-file/type-family-rules.md)).
+- 테스트는 같은 축으로 미러링한다: `Tests/Shared/Reducers/<Feature>Tests.swift`.
+- `Reducers/`는 [형태 어휘 표](../../docs/conventions/file-vocabulary/shape-vocabulary.md)에 Feature
+  패키지용으로 없다. [shape-rules](../../docs/conventions/directory-file/shape-rules.md)에 따라 같은
+  PR에서 표에 `Feature/Shared/` 행(`Views/`·`Models/`·`Reducers/`)과 `Feature/<흐름>/Shared/`의
+  `Reducers/`를 추가하고, [feature-layout](../../docs/conventions/directory-file/feature-layout.md)에
+  배치 규칙을 추가한다(단위 U1).
+
+### 근거
+
+- `Feature/Shared/`는 [관심사 세그먼트](../../docs/conventions/directory-file/concern-segment.md)
+  자리로 이미 허용되어 있고(`Feature/Shared/Views/FeedbackActionButton.swift` 선례), 그 아래는
+  형태 폴더다. Reducer는 "선언이 코드에서 맡는 종류"로 판정되는 형태이며, App 패키지가 이미
+  `Reducers/` 어휘를 쓴다.
+- 기존 관행인 "한 흐름의 화면 폴더에 두고 다른 흐름이 참조"(`ProjectDetail/SingleQuestionEntry`를
+  `MainShellRouterFeature`가 참조)는 화면 없는 Feature를 화면 폴더에 둔다는 점에서
+  [feature-layout](../../docs/conventions/directory-file/feature-layout.md)의 "화면 폴더는 Screen
+  하나와 그 Feature"와 어긋난다.
+
+### 검토한 대안
+
+- **관심사별 새 흐름 폴더(`Feature/Profile/`)**: 흐름 폴더는 화면이나 Router를 전제한다.
+  화면 없는 흐름이 늘어나 흐름의 의미가 흐려지므로 기각했다.
+- **`Feature/Shared/Features/`**: "Feature"는 패키지 이름과 겹쳐 폴더 자리에서 모호하다. App이
+  이미 쓰는 `Reducers/`로 통일했다.
+- **Feature target 분리**: 명세 가정과 FR-022가 단일 target 유지를 요구하므로 기각했다.
+
+---
+
+## 3. 전수 식별 결과 (FR-015, FR-016, FR-018)
+
+### 3.1 모수
+
+`sources/Projects/Feature`의 비테스트 소스에 있는 `@Reducer` 선언 29개를 모두 읽었다. 흐름별
+개수는 AppEntry 1, Home 1, MainShell 2, ProjectList 1, Saved 1, Settings 3, Onboarding 6,
+ProjectDetail 3, ProjectRegistration 6, Quiz 4, ShareRegistration 1이다. 최상위 `Router/`·`Presentation/`
+디렉터리는 Git이 추적하지 않는 빈 디렉터리이며 Swift 파일이 없다.
+
+### 3.2 통합 대상 관심사
+
+| ID | 관심사 | 현재 선언 위치 | 판정 | 추출 Feature와 배치 | 단위 |
+| --- | --- | --- | --- | --- | --- |
+| I1 | 사용자 프로필 조회 | `Home/HomeFeature.swift` (`profileLoad`, `profileRequestID`), `Settings/Profile/ProfileFeature.swift` (`profileLoad`, `profileRequestID`), `Settings/Settings/SettingsFeature.swift` (`profile`, `profileLoad`) | 통합. 상태 모델이 같다(`idle/loading/loaded/failed(UserInfoError)`, 같은 Use Case). 차이는 시작 조건·로드 후 실패 처리 정책뿐이다 | `Feature/Shared/Reducers/UserProfileLoadFeature.swift` | U2 |
+| I2 | 프로젝트 요약 목록 관찰·새로고침 | `Home/HomeFeature.swift` (`projectLoad`, `projectRequestID`), `ProjectList/ProjectListFeature.swift` (`projects`, `hasNextPage`, `initialLoad`, `requestID`) | 통합. 같은 `projects()` 스트림과 `refresh()`, 같은 취소 ID, 같은 오류 변환, 같은 "로드 뒤 새로고침 실패 무시" 규칙이다. 차이는 로딩 표시 조건 하나다. 페이지네이션은 ProjectList 고유 관심사로 분리한다(I2′) | `Feature/Shared/Reducers/ProjectSummaryListFeature.swift` | U3 |
+| I3 | 프로젝트 삭제 | `ProjectList/ProjectListFeature.swift` (`deletion`), `ProjectDetail/ProjectDetailFeature.swift` (`deletion`) | 통합. 같은 `delete(_:)`와 같은 `confirming → committing → failed` 흐름이다. 차이는 `.notFound` 처리와 취소·재요청 가능 상태라는 정책 차이다 | `Feature/Shared/Reducers/ProjectDeletionFeature.swift` | U4 |
+| I4 | 약관 동의를 포함한 로그인 | `MainShell/Router/GuestSignInFeature.swift` (+`+Phase`), `Onboarding/Tutorial/TutorialFeature.swift` (`authentication`, `requestID`) + `Onboarding/Router/OnboardingRouterFeature.swift` (동의 분기, `.guide(.legalAgreement)`) | 통합. 같은 `policyConsentStatus → (동의 화면) → consent → signIn(.apple)` 흐름이며 둘 다 `LegalAgreementFeature`를 쓴다. 차이는 동의 상태 적재 시점, 취소 결과 표현, 실패 표시 방식이다 | `Feature/Shared/Reducers/SignInFeature/` (`SignInFeature.swift`, `SignInFeature+Phase.swift`). 의존 Feature `LegalAgreementFeature`도 `Feature/Shared/Reducers/`로 이동 | U5 |
+
+### 3.3 화면 고유 관심사의 분리 (§1 보조 규칙 2, SC-008)
+
+위 통합으로 자식을 합성하게 되는 화면 Feature가, 자기 화면만 쓰는 관심사를 함께 들고 있는 경우다.
+
+| ID | 화면 Feature | 분리할 관심사 | 분리 Feature와 배치 | 단위 |
+| --- | --- | --- | --- | --- |
+| I2′ | `ProjectListFeature` | 다음 페이지 요청(`pagination`, `requestNextPage`) | `ProjectList/ProjectListPaginationFeature.swift` | U7 |
+| S1 | `SettingsFeature` | 직군·연차 즉시 반영(`positionMutation`, `careerLevelMutation`) | `Settings/Settings/CurationUpdateFeature.swift` | U6 |
+| S2 | `SettingsFeature` | 로그아웃·회원 탈퇴(`accountAction`) | `Settings/Settings/AccountActionFeature.swift` | U6 |
+| S3 | `SettingsFeature` | 알림 권한(`notificationStatus`) | `Settings/Settings/NotificationPermissionFeature.swift` | U6 |
+| S4 | `ProjectDetailFeature` | 프로젝트 상세 조회(`detail`, `loadStatus`, `requestID`) | `ProjectDetail/ProjectDetailLoadFeature.swift` | U8 |
+
+### 3.4 전환 계층의 기능 상태 반납 (시나리오 3-4)
+
+| ID | 전환 계층 | 반납할 상태 | 처리 | 단위 |
+| --- | --- | --- | --- | --- |
+| R1 | `QuizRouterFeature` | 학습 세션 진행(`learningSet`, `currentQuestionIndex`, `resumption`, `sessionCorrectChoiceCount`, `bookmarkedQuestionIDs`) | `Quiz/Router/LearningSessionFeature.swift`로 분리한다. Router는 세션 delegate를 받아 문항 State를 만들고 화면을 전환한다 | U10 |
+| R2 | `ShareRegistrationFeature` | 링크 검증·등록 요청(`status`의 `validating`·`invalidURL`·`signInRequired`·`appLaunchRequired`·`submitting`·`succeeded`·`failed`, `sharedURL`) | `ShareRegistration/SharedRepositoryRegistrationFeature.swift`로 분리한다. `ShareRegistrationFeature`는 단계 전환(`repositoryConfirmation`·`quizLevelSelection`·`quizGenerationConfirmation`)만 남기며, 타입 이름·파일 위치·App 호출부(`App/ShareExtension/ShareViewController.swift`)는 유지한다(사용자 결정, rename과 분리) | U11 |
+| R3 | `SettingsRouterFeature` | 자식 필드 직접 쓰기(`settings.profile`, `settings.profileLoad`, `profile.profileLoad`) | I1 추출과 함께 `UserProfileLoadFeature`의 `replace` input 전달로 바꾼다 | U2 |
+| R4 | `OnboardingRouterFeature` | 자식 필드 직접 쓰기(`careerSelection.position`), 동의 화면 활성 값(`.guide(.legalAgreement)`) | 동의 화면은 I4에서 `SignInFeature`가 소유하는 오버레이로 옮기고(U5), `careerSelection.position`은 input으로 바꾼다(U9) | U5, U9 |
+| R5 | `ProjectRegistrationRouterFeature` | 자식 필드 직접 쓰기(`repositoryConfirmation.repository`, `repositoryLinkInput.validation`) | input으로 바꾼다 | U9 |
+
+`MainShellRouterFeature.access`는 탭 선택 허용 규칙의 입력인 전환 상태로 보고 남긴다.
+`state = State()`(로그아웃 뒤 재생성)와 `@Presents`·optional 자식 State의 생성은 자식 필드
+변경이 아니라 수명 관리이므로 남긴다.
+
+### 3.5 경로 정리 (FR-022 위반 해소, 순수 이동)
+
+| ID | 대상 | 현재 위치 → 새 위치 | 이유 | 단위 |
+| --- | --- | --- | --- | --- |
+| P1 | `MainShellAccess` | `MainShell/Router/MainShellAccess.swift` → `Shared/Models/MainShellAccess.swift` | 화면인 `Home`이 전환 계층 디렉터리의 타입을 참조한다 | U1 |
+| P2 | `SingleQuestionEntryFeature` | `ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeature.swift` → `Shared/Reducers/SingleQuestionEntryFeature.swift` | 두 흐름(`MainShell`, `ProjectDetail`)의 전환 계층이 합성하는 화면 없는 기능 Feature다 | U1 |
+| P3 | `LegalAgreementFeature` | `Onboarding/LegalAgreement/LegalAgreementFeature.swift` → `Shared/Reducers/LegalAgreementFeature.swift` | I4의 `SignInFeature`(공용)가 합성한다. 공용은 흐름을 참조할 수 없다. `LegalAgreementScreen`은 제자리에 남는다 | U1 |
+
+테스트 파일도 같은 축으로 이동한다(`Tests/ProjectDetail/SingleQuestionEntry/…` →
+`Tests/Shared/Reducers/…`, `Tests/Onboarding/LegalAgreement/…` → `Tests/Shared/Reducers/…`).
+
+### 3.6 제외 판정 (FR-016)
+
+| ID | 후보 | 위치 | 제외 사유 |
+| --- | --- | --- | --- |
+| E1 | 로그아웃 | `AppEntryFeature`(복원 중 `memberUnavailable` 정리), `PositionSelectionFeature`(뒤로가기 = 이탈), `SettingsFeature`(계정 동작) | 공유하는 것은 `signOut()` 호출과 `SignOutResult` 분기뿐이다. 각각 복원 상태 기계, 온보딩 이탈 상태, 계정 동작 상태 기계 안의 한 전이이며, 상태 모델과 결과의 후속 의미가 다르다(FR-017). Settings 쪽은 S2로 분리한다 |
+| E2 | 직군·연차 선택(사용자 입력 예시 "Curation → Curation & Setting") | `Onboarding/PositionSelection`·`CareerSelection`, `SettingsFeature` | 전이 규칙이 다르다. 온보딩은 선택을 초안으로 들고 있다가 `updateCuration(Curation)` 한 번으로 제출한다. 설정은 선택 즉시 `updatePosition`·`updateCareerLevel`을 필드별로 호출한다. 호출 Use Case도 다르다. 표시 매핑(`PositionDisplay`·`CareerLevelDisplay`와 온보딩 화면의 fileprivate `Display`) 중복은 상태 관심사가 아니다. 통일하려면 View 수정이 FR-023의 허용 범위를 넘으므로 후속 과제로 남긴다 |
+| E3 | 적재·실패·재시도 패턴 | `SavedFeature.loadStatus`, `ProjectDetailFeature.loadStatus`, `LearningSetIntroFeature.setLoad` 등 | 구현 패턴이 비슷할 뿐 도메인·payload·오류 타입이 모두 다르다. 같은 관심사가 아니다(§1 보조 규칙 4) |
+| E4 | 저장소 등록 단계 오케스트레이션 | `ProjectRegistrationRouterFeature`, `ShareRegistrationFeature` | 단계 Feature 3개는 이미 공유한다. 오케스트레이션 규칙이 다르다. 거절은 입력 화면 복귀 vs 확장 닫기, 조회 전 로컬 파싱·로그인 가능 확인은 공유 확장에만 있다. 등록 뒤에는 생성 진행 관찰 vs 즉시 성공이다 |
+| E5 | 북마크 토글 | `QuestionSolvingFeature`(`isBookmarked`, `bookmarkMutation`), `SavedFeature`(`bookmarkOverrides`, `bookmarkMutations`) | 전이 규칙은 비슷하지만 상태 형태가 다르다(단일 문항 vs 문항별 map과 기본값 `true` override). 통합하면 Saved에 문항별 자식 컬렉션을 새로 도입해야 한다. 중복 유지 비용보다 크다 |
+| E6 | 단건 문항 열기 조합 | `MainShellRouterFeature`, `ProjectDetailRouterFeature` | 준비 관심사는 이미 `SingleQuestionEntryFeature` 하나로 공유한다(P2). 남은 차이는 표시 방식(`@Presents` vs 활성 화면 값)이라는 전환 계층 고유 결정이다 |
+| E7 | 조립 코드 중복 | `MainShellRouterFeature.profile(from:)`·`SettingsRouterFeature.profile(from:)`, `setBookmark` 클로저 3곳, `QuestionSolvingFeature(...)` 조립 3곳 | 상태·전이가 아니라 의존성 조립 코드의 중복이다. FR-003의 대상이 아니며, 동작을 바꾸지 않는 후속 정리로 남긴다 |
+| E8 | 알림 권한 | `QuizGenerationProgressFeature`(대기 알림 시트), `SettingsFeature`(알림 행) | 규칙이 다르다. 진행 화면은 상태를 저장하지 않고 수락 흐름에서만 요청·설정 열기를 한다. 설정은 권한 상태를 저장하고 행 탭마다 분기한다. Settings 쪽은 S3로 분리한다 |
+
+### 3.7 전체 분류 (리팩토링 완료 후 예정, SC-007)
+
+기존 29개 중 `GuestSignInFeature`는 `SignInFeature`로 대체되어 사라진다. 새 기능 Feature 11개가
+추가되어 모두 39개다.
+
+| 흐름 | Reducer | 분류 | 비고 |
+| --- | --- | --- | --- |
+| AppEntry | `AppEntryFeature` | 기능 | 진입 복원·목적지 판단. 화면이 직접 관찰 |
+| Home | `HomeFeature` | 화면 합성 | I1·I2 합성. 남는 것: `access`, 로그인 필요 alert, 생성 진행 표시, delegate |
+| MainShell | `MainShellRouterFeature` | 전환 계층 | Shell. `SignInFeature`·`SingleQuestionEntryFeature` 합성 |
+| MainShell | `GuestSignInFeature` | (제거) | I4로 대체 |
+| ProjectList | `ProjectListFeature` | 화면 합성 | I2·I3·I2′ 합성. 남는 것: `mode` |
+| ProjectList | `ProjectListPaginationFeature` | 기능 (신규) | I2′ |
+| Saved | `SavedFeature` | 기능 | E5 |
+| Settings | `ProfileFeature` | 화면 합성 | I1 합성. 남는 것: `settingsRequested` delegate |
+| Settings | `SettingsFeature` | 화면 합성 | I1·S1·S2·S3 합성. 남는 것: 약관 URL, 행 탭 delegate |
+| Settings | `CurationUpdateFeature` · `AccountActionFeature` · `NotificationPermissionFeature` | 기능 (신규) | S1·S2·S3 |
+| Settings | `SettingsRouterFeature` | 전환 계층 | R3 |
+| Onboarding | `TutorialFeature` | 화면 합성 | I4 합성. 남는 것: `page`, 개발용 계정 재설정 후속 동작 |
+| Onboarding | `PositionSelectionFeature` · `CareerSelectionFeature` · `OnboardingExitFeature` | 기능 | E1·E2 |
+| Onboarding | `OnboardingRouterFeature` | 전환 계층 | R4 |
+| ProjectDetail | `ProjectDetailFeature` | 화면 합성 | I3·S4 합성. 남는 것: `isMenuPresented`, delegate |
+| ProjectDetail | `ProjectDetailLoadFeature` | 기능 (신규) | S4 |
+| ProjectDetail | `ProjectDetailRouterFeature` | 전환 계층 | |
+| ProjectRegistration | `RepositoryLinkInputFeature` · `RepositoryConfirmationFeature` · `QuizLevelSelectionFeature` · `QuizGenerationConfirmationFeature` · `QuizGenerationProgressFeature` | 기능 | 화면이 직접 관찰 |
+| ProjectRegistration | `ProjectRegistrationRouterFeature` | 전환 계층 | R5 |
+| Quiz | `LearningSetIntroFeature` · `QuestionSolvingFeature` · `LearningCompletionFeature` | 기능 | |
+| Quiz | `QuizRouterFeature` | 전환 계층 | R1 |
+| Quiz | `LearningSessionFeature` | 기능 (신규) | R1 |
+| ShareRegistration | `ShareRegistrationFeature` | 전환 계층 | R2 |
+| ShareRegistration | `SharedRepositoryRegistrationFeature` | 기능 (신규) | R2 |
+| Shared | `UserProfileLoadFeature` · `ProjectSummaryListFeature` · `ProjectDeletionFeature` · `SignInFeature` | 기능 (신규, 공용) | I1~I4 |
+| Shared | `LegalAgreementFeature` · `SingleQuestionEntryFeature` | 기능 (이동, 공용) | P2·P3 |
+
+---
+
+## 4. 정본 동작 선택과 동작 차이 (FR-008)
+
+관심사별로 누적한다. "의도한 차이"는 SC-002가 허용하는 유일한 동작 변경이며, 통합이 끝나면
+`docs/conventions/tca/feature/classification.md`에 확정본을 옮긴다. 각 Feature의 공개 입력과
+delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태 모델은
+[data-model.md](./data-model.md)에 있다.
+
+### I1 사용자 프로필 조회
+
+- **결정**: 입력을 셋으로 나눈다.
+  - `load`: 로딩을 표시하며 다시 조회한다.
+  - `reload`: 조회 완료 상태를 유지한 채 조용히 다시 조회하고, 그 실패는 무시한다. 조회 완료
+    상태가 아니면 `load`와 같다.
+  - `replace(UserProfile)`: 외부에서 확정된 프로필로 교체한다. 진행 중인 조회를 무효화한다.
+
+  언제 어떤 입력을 보낼지는 화면이 정한다.
+  - Home: `idle`일 때만 `load`, 재시도는 `failed`일 때 `load`.
+  - Profile: `idle/failed → load`, `loaded → reload`.
+  - Settings: 진입 시 항상 `load`.
+
+  모든 결과는 request identity로 검증하고 `cancelInFlight`로 취소한다.
+- **근거**: 세 곳의 차이는 "언제 조회를 시작하는가"라는 화면 정책이다. 전이 규칙은 `load`/`reload`
+  두 입력으로 모두 표현된다. 요청 식별은
+  [요청 식별 규칙](../../docs/conventions/tca/state/request-identity.md)이 요구한다.
+- **검토한 대안**: Profile의 "task 한 번으로 분기" 규칙을 기능 Feature 안에 두는 것은 화면 정책을
+  기능 Feature로 끌어들여(FR-005) 기각했다.
+- **의도한 차이**
+  1. Settings 프로필 조회에 request identity와 취소가 생긴다. 늦게 도착한 이전 응답이 더는 상태를
+     덮어쓰지 않는다. 경합 상황에서만 관찰된다.
+  2. Settings에서 직군·연차 변경 성공 뒤 반영(`replace`)이 진행 중인 조회를 무효화한다. 기존에는
+     나중 조회 결과가 변경 결과를 덮어쓸 수 있었다.
+
+### I2 프로젝트 요약 목록
+
+- **결정**: 로딩 표시 조건을 "조회 완료 상태가 아닐 때"(Home 규칙)로 통일한다. 상태는
+  `load: idle | loading | loaded(ProjectList) | failed(ProjectError)`와 request identity로 둔다.
+  삭제 성공 뒤의 행 제거는 `projectRemoved(ProjectID)` input으로 받는다. 목록이 바뀔 때마다
+  `listUpdated(ProjectList)` delegate를 보내, 페이지네이션 재설정과 빈 목록의 삭제 모드 종료를
+  화면이 처리하게 한다.
+- **근거**: ProjectList의 `projects.isEmpty` 조건은 "로드됐지만 비어 있음"과 "아직 로드되지 않음"을
+  구분하지 못한다. [상태 형태 규칙](../../docs/conventions/tca/state/shape.md)에 맞는 쪽은 조회
+  상태 기반 조건이다.
+- **의도한 차이**
+  1. ProjectList에서 이미 로드된 빈 목록을 새로고침하면 전체 로딩 표시가 다시 나타나지 않는다.
+     빈 상태 화면이 유지된다.
+
+### I3 프로젝트 삭제
+
+- **결정**
+  - 상태는 `idle | confirming(ProjectID) | committing(ProjectID) | failed(ProjectID, ProjectError)`로 둔다.
+  - 요청은 `idle`·`failed`에서, 취소는 `confirming`·`failed`에서, 확정은 `confirming`에서만 받는다.
+  - `.notFound`는 성공으로 본다(멱등 삭제).
+  - 삭제 Effect는 중복 차단을 상태 전이로 하고 `cancelInFlight: false`다.
+  - 성공 시 `deleted(projectID:)` delegate를 보낸다.
+- **근거**: `.notFound`는 목표 상태(프로젝트 없음)가 이미 달성됐다는 뜻이다. `failed`에서 빠져나갈
+  수 없는 ProjectList의 현재 규칙은 복구 경로를 보존하라는
+  [상태 형태 규칙](../../docs/conventions/tca/state/shape.md)에 어긋난다.
+- **의도한 차이**
+  1. ProjectDetail에서 이미 삭제된 프로젝트를 삭제하면 실패 대신 삭제 완료로 처리되어 상세
+     화면이 닫힌다.
+  2. ProjectList에서 삭제 실패 뒤 취소하거나 다시 요청할 수 있다. 기존에는 `failed`에서 새 확인도
+     취소도 받지 않았다.
+  3. (차이 없음 확인) ProjectDetail의 취소는 기존에 `committing`을 제외한 모든 상태에서 `idle`로
+     돌렸다. 정본은 `confirming`·`failed`에서만 받는다. 남은 상태는 원래 `idle`이므로 관찰되는
+     결과는 같다.
+
+### I4 약관 동의를 포함한 로그인
+
+- **결정**
+  - 상태는 `phase: idle | checkingConsent | agreeingToPolicies | signingIn | cancelled | failed`,
+    자식 `legalAgreement`, request identity로 둔다.
+  - 입력은 둘이다.
+    - `prepareConsent`: 동의 상태를 미리 적재한다.
+    - `start`: `idle·cancelled·failed`에서 받는다. 동의 상태가 적재되지 않았으면 적재를 기다린
+      뒤 동의 여부를 판단한다.
+  - delegate는 셋이다: `signedIn(needsCuration:)`, `consentCancelled`, `signInCancelled`.
+  - 동의 화면 표시 여부는 `phase == .agreeingToPolicies`에서 파생한다.
+  - 기존 화면 동작은 화면 정책으로 남긴다.
+    - Onboarding의 "튜토리얼 표시 시 미리 적재"는 Tutorial이 `prepareConsent`를 보내 유지한다.
+    - Tutorial의 인라인 오류는 `cancelled·failed`, MainShell의 실패 alert는 `failed`로 표시해 유지한다.
+    - 동의 취소 뒤 마지막 페이지 복귀는 Tutorial의 후속 동작이다.
+    - 개발용 계정 재설정(`deletesCompletedAccountOnSignIn`)은 Tutorial의 화면 고유 후속 동작이다.
+      Tutorial이 `withdraw`를 소유한다(FR-004: MainShell에 `withdraw`를 강제하지 않는다).
+- **근거**: 두 흐름의 상태 전이는 같은 순서의 같은 Use Case 호출이다. 차이는 표시와 시작 시점이다.
+  동의 화면은 로그인 흐름 수명 안에서 완결되는 오버레이이므로
+  [Navigation 경계](../../docs/conventions/tca/navigation/boundary.md)에 따라 기능 Feature가
+  소유하고, Router의 활성 화면 값에서 뺀다.
+- **의도한 차이**
+  1. Onboarding에서 동의 상태 적재가 끝나기 전에 로그인을 누르면, 적재 완료를 기다린 뒤 판단한다.
+     기존에는 미적재 상태를 "동의 필요"로 보고 빈 동의 화면을 보여줄 수 있었다.
+  2. `OnboardingRouterFeature`의 이동 이벤트에서 `tutorial ↔ legalAgreement` 항목이 사라진다.
+     사용자 화면은 같은 오버레이이며 테스트에서만 관찰된다.
+  3. 개발용 계정 재설정 중 표시는 Tutorial의 재설정 진행 상태로 유지한다. 재설정 뒤 재로그인은
+     저장된 동의가 유효하므로 동의 화면을 거치지 않는다(기존과 같음).
+
+### I2′·S1~S4, R1·R2 (화면 고유 분리와 전환 계층 반납)
+
+상태 모델과 전이 규칙을 그대로 옮긴다. 의도한 동작 차이는 없다. 부모가 자식 필드를 직접 쓰던
+곳은 같은 값을 input으로 전달하도록 바꾸며, 관찰되는 결과는 같다.
+
+---
+
+## 5. 작업 단위와 순서 (FR-013)
+
+| 단위 | 내용 | 주요 파일 | 선행 |
+| --- | --- | --- | --- |
+| U1 | 경로 정리 P1~P3(순수 이동), 형태 어휘·흐름 배치 문서 갱신 | 위 §3.5, `docs/conventions/file-vocabulary/shape-vocabulary.md`, `docs/conventions/directory-file/feature-layout.md` | — |
+| U2 | I1 추출과 Home·Profile·Settings·SettingsRouter 합성 전환(R3 포함) | `Shared/Reducers/UserProfileLoadFeature.swift`, `Home/HomeFeature.swift`, `Home/ViewModels/HomeProfileDisplay.swift`, `Settings/Profile/ProfileFeature.swift`, `Settings/Profile/ViewModels/ProfileDisplay.swift`, `Settings/Settings/SettingsFeature.swift`, `Settings/Router/SettingsRouterFeature.swift`와 각 Screen·SubViews | U1 |
+| U3 | I2 추출과 Home·ProjectList 합성 전환 | `Shared/Reducers/ProjectSummaryListFeature.swift`, `Home/HomeFeature.swift`, `Home/ViewModels/HomeProjectSectionState.swift`, `ProjectList/ProjectListFeature.swift`와 Screen | U2(`HomeFeature` 직렬) |
+| U4 | I3 추출과 ProjectList·ProjectDetail 합성 전환 | `Shared/Reducers/ProjectDeletionFeature.swift`, `ProjectList/ProjectListFeature.swift`, `ProjectDetail/ProjectDetailFeature.swift`, `ProjectDetail/Router/ProjectDetailRouterFeature.swift`와 Screen | U3 |
+| U5 | I4 추출, `GuestSignInFeature` 제거, MainShell·Tutorial·OnboardingRouter 합성 전환 | `Shared/Reducers/SignInFeature/*`, `MainShell/Router/*`, `Onboarding/Tutorial/TutorialFeature.swift`, `Onboarding/Router/OnboardingRouterFeature.swift`(+`+CurationExit`), `Onboarding/Router/OnboardingRouter.swift` | U1 |
+| U6 | S1~S3 분리 | `Settings/Settings/{CurationUpdate,AccountAction,NotificationPermission}Feature.swift`, `SettingsFeature.swift`와 Screen·SubViews | U2 |
+| U7 | I2′ 분리 | `ProjectList/ProjectListPaginationFeature.swift`, `ProjectListFeature.swift`와 SubViews | U4 |
+| U8 | S4 분리 | `ProjectDetail/ProjectDetailLoadFeature.swift`, `ProjectDetailFeature.swift`와 Screen | U4 |
+| U9 | R4(잔여)·R5 input 전환 | `Onboarding/Router/OnboardingRouterFeature.swift`, `Onboarding/CareerSelection/CareerSelectionFeature.swift`, `ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`, `ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationFeature.swift`, `ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeature.swift` | U5 |
+| U10 | R1 분리 | `Quiz/Router/LearningSessionFeature.swift`, `Quiz/Router/QuizRouterFeature.swift` | U1 |
+| U11 | R2 분리 | `ShareRegistration/SharedRepositoryRegistrationFeature.swift`, `ShareRegistration/ShareRegistrationFeature.swift`, `ShareRegistration/ShareRegistrationScreen.swift` | U1 |
+| U12 | 컨벤션 문서화(시나리오 4)와 최종 검증 | `docs/conventions/tca/feature.md`, `docs/conventions/tca/feature/classification.md`, 이 문서 §6 | U2~U11 |
+
+- 단위마다 해당 테스트 파일의 이관을 포함한다. 테스트 경로는 production 축을 미러링한다
+  (`Tests/Shared/Reducers/`, `Tests/ProjectList/ProjectList/` 등).
+- 최상위 Feature 생성자는 바뀌지 않는다. 대신 App이 직접 읽는 Feature 상태 경로가 바뀌는
+  U3(`home.projectLoad`, `projectList.projects`)과 U8(`projectDetail.loadStatus`)은 Feature+App
+  integration unit이다. App의 수정 파일은 `App/GitIt/Reducers/AppRootFeature.swift`(U3)와
+  `App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`(U3·U8)이다.
+  `App/ShareExtension/ShareViewController.swift`는 변경하지 않는다.
+- 기존 흐름 루트에 파일을 두는 `ShareRegistration/`의 배치는
+  [feature-layout](../../docs/conventions/directory-file/feature-layout.md)과 다른 기존 편차다. 이번에는
+  바꾸지 않고, U11의 새 파일도 같은 자리에 둔다. 배치 정리는 rename·이동 전용 후속 과제로 남긴다.
+
+---
+
+## 6. 단언 이관 대응표 (SC-011)
+
+구현 단위마다 이관 전 화면 테스트의 각 `@Test`가 어디로 갔는지 기록한다. 이관 뒤 위치는
+**기능 Feature 테스트**, **합성 지점 검증**, **중복 제거(대체 테스트 명시)** 중 하나다. 대응표가 없는
+단위는 완료로 보지 않는다. 표는 `/speckit-implement`가 각 단위에서 채운다.
+
+| 단위 | 이관 전 테스트(파일 › 이름) | 이관 뒤 위치(파일 › 이름) | 구분 |
+| --- | --- | --- | --- |
+| U2 | Tests/Home/Home/HomeFeatureLoadTests.swift › 최초 task는 프로필을 한 번만 조회하고 복귀 task는 갱신만 다시 요청한다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 최초 task는 프로필을 한 번만 조회하고 복귀 task는 갱신만 다시 요청한다 | 합성 지점 검증 |
+| U2 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로필 재시도는 프로젝트를 보존하고 프로필만 조회한다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로필 재시도는 프로젝트를 보존하고 프로필 조회에 load만 보낸다 | 합성 지점 검증 |
+| U2 | Tests/Home/Home/HomeFeatureLoadTests.swift › 현재 request ID와 다른 응답은 상태를 바꾸지 않는다 | Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › 현재 request ID와 다른 응답은 상태를 바꾸지 않는다 | 기능 Feature 테스트 |
+| U2 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 갱신 실패는 성공한 프로필을 보존하고 독립 실패 상태가 된다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 갱신 실패는 성공한 프로필을 보존하고 독립 실패 상태가 된다 | 합성 지점 검증 |
+| U2 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 재시도는 프로필을 보존하고 갱신만 다시 요청한다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 재시도는 프로필을 보존하고 갱신만 다시 요청한다 | 합성 지점 검증 |
+| U2 | Tests/Home/Home/HomeFeatureGuestAccessTests.swift › 로그인 사용자로 바뀌면 프로필과 프로젝트 적재를 시작한다 | Tests/Home/Home/HomeFeatureGuestAccessTests.swift › 로그인 사용자로 바뀌면 프로필과 프로젝트 적재를 시작한다 | 합성 지점 검증 |
+| U2 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 프로필 재시도 조회는 그대로 수행된다 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 프로필 재시도 조회는 그대로 수행된다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 최초 task는 로딩을 세우고 받은 프로필을 노출한다 | Tests/Settings/Profile/ProfileFeatureTests.swift › 최초 task는 프로필 조회에 load를 보내 받은 프로필을 노출한다, Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › load는 로딩을 세우고 받은 프로필로 조회 완료 상태가 된다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 이미 받은 프로필이 있으면 task는 로딩을 거치지 않고 최신 값으로 바꾼다 | Tests/Settings/Profile/ProfileFeatureTests.swift › 이미 받은 프로필이 있으면 task는 로딩 없는 reload를 보낸다, Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › 조회 완료 상태의 reload는 로딩 없이 최신 프로필로 바꾼다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 갱신 실패는 이미 보여 주던 프로필을 그대로 유지한다 | Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › 조회 완료 상태의 reload 실패는 보여 주던 프로필을 유지한다 | 기능 Feature 테스트 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 최초 조회 실패는 실패 상태를 남기고 재시도로 다시 조회한다 | Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › load 실패는 실패 상태를 남긴다, Tests/Settings/Profile/ProfileFeatureTests.swift › 실패 상태의 재시도는 프로필 조회에 load를 보낸다 | 기능 Feature 테스트 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 실패 상태가 아니면 재시도는 조회하지 않는다 | Tests/Settings/Profile/ProfileFeatureTests.swift › 실패 상태가 아니면 재시도는 조회하지 않는다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 조회 중인 동안 다시 들어온 task는 조회를 새로 시작하지 않는다 | Tests/Settings/Profile/ProfileFeatureTests.swift › 조회 중인 동안 다시 들어온 task는 조회를 새로 시작하지 않는다, Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › 조회 중의 reload는 조회를 새로 시작하지 않는다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 현재 request ID와 다른 응답은 상태를 바꾸지 않는다 | Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › 현재 request ID와 다른 응답은 상태를 바꾸지 않는다 | 중복 제거(대체 테스트 명시) |
+| U2 | Tests/Settings/Profile/ProfileFeatureTests.swift › 설정 아이콘 탭은 설정 요청 delegate를 올린다 | Tests/Settings/Profile/ProfileFeatureTests.swift › 설정 아이콘 탭은 설정 요청 delegate를 올린다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 프로필을 조회해 설정 값의 근거로 남긴다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 프로필이 없으면 task는 프로필 조회에 load를 보내 설정 값의 근거로 남긴다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › 프로필 조회 실패는 값 없이 실패 상태만 남긴다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 프로필 조회 실패는 값 없이 실패 상태만 남긴다, Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › load 실패는 실패 상태를 남긴다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다 | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › 직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다(`replace` 전달 단언), Tests/Shared/Reducers/UserProfileLoadFeatureTests.swift › replace는 조회 완료 상태로 바꾸고 진행 중인 조회 결과를 무효화한다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › 연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다(`replace` 전달 단언) | 합성 지점 검증 |
+| U2 | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 실패는 실패 상태를 남기고 이전 프로필을 그대로 둔다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 실패는 실패 상태를 남기고 이전 프로필을 그대로 둔다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 아이콘을 탭하면 프로필 값을 설정에 넘기고 설정 목록으로 전환한다 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 아이콘을 탭하면 설정 목록으로 전환하고 프로필 값을 input으로 설정에 넘긴다, Tests/Settings/Settings/SettingsFeatureTests.swift › 외부에서 받은 프로필은 프로필 조회에 replace로 전달한다 | 합성 지점 검증 |
+| U2 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 목록에서 뒤로가기는 변경된 프로필을 프로필 화면에 반영하고 돌아간다 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 목록에서 뒤로가기는 프로필 화면으로 돌아가고 변경된 프로필을 input으로 반영한다 | 합성 지점 검증 |
+| U2 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다(상태 경로만 변경) | 합성 지점 검증 |
+| U2 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다(상태 경로만 변경) | 합성 지점 검증 |
+
+**U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
+조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
+그대로 유지하려고 contracts의 "task 때 `load`"를 `reload` 분기로 구체화했다. 고정 테스트는
+`SettingsFeatureTests › 이미 받은 프로필이 있으면 task는 값을 유지한 채 reload를 보낸다`다. Settings의 자식
+필드는 `userProfile`로 두고 기존 `profile`은 자식에서 파생한 computed로 남겨, U6 소유 서브뷰를 U2에서
+바꾸지 않는다.

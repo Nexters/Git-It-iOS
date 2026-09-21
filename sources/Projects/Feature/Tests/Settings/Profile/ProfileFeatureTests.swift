@@ -4,102 +4,76 @@ import Testing
 @testable import Feature
 
 @MainActor
-@Suite("ProfileFeature 프로필 조회")
+@Suite("ProfileFeature 프로필 조회 합성")
 struct ProfileFeatureTests {
 
     // MARK: Internal
 
     @Test
-    func `최초 task는 로딩을 세우고 받은 프로필을 노출한다`() async {
+    func `최초 task는 프로필 조회에 load를 보내 받은 프로필을 노출한다`() async {
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(fetchMemberProfile: fetchMemberProfile)
 
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
-            $0.profileRequestID = 1
+        await store.send(.view(.task))
+        await store.receive(.profile(.input(.load))) {
+            $0.profile.load = .loading
+            $0.profile.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(
+        await store.receive(.profile(.effect(.profileLoadFinished(
             requestID: 1,
             result: .success(SettingsTestFixture.curatedProfile),
-        ))) {
-            $0.profileLoad = .loaded(SettingsTestFixture.curatedProfile)
+        )))) {
+            $0.profile.load = .loaded(SettingsTestFixture.curatedProfile)
         }
 
         #expect(await fetchMemberProfile.snapshot() == 1)
     }
 
     @Test
-    func `이미 받은 프로필이 있으면 task는 로딩을 거치지 않고 최신 값으로 바꾼다`() async {
+    func `이미 받은 프로필이 있으면 task는 로딩 없는 reload를 보낸다`() async {
         let updated = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
         let store = makeStore(
-            state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
+            state: makeState(load: .loaded(SettingsTestFixture.curatedProfile)),
             fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.success(updated)]),
         )
 
-        await store.send(.view(.task)) {
-            $0.profileRequestID = 1
+        await store.send(.view(.task))
+        await store.receive(.profile(.input(.reload))) {
+            $0.profile.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(updated)))) {
-            $0.profileLoad = .loaded(updated)
+        await store.receive(.profile(.effect(.profileLoadFinished(requestID: 1, result: .success(updated))))) {
+            $0.profile.load = .loaded(updated)
         }
     }
 
     @Test
-    func `갱신 실패는 이미 보여 주던 프로필을 그대로 유지한다`() async {
+    func `실패 상태의 재시도는 프로필 조회에 load를 보낸다`() async {
+        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(
-            state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
-            fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.failure(.temporarilyUnavailable)]),
+            state: makeState(load: .failed(.temporarilyUnavailable)),
+            fetchMemberProfile: fetchMemberProfile,
         )
 
-        await store.send(.view(.task)) {
-            $0.profileRequestID = 1
+        await store.send(.view(.retryTapped))
+        await store.receive(.profile(.input(.load))) {
+            $0.profile.load = .loading
+            $0.profile.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(
+        await store.receive(.profile(.effect(.profileLoadFinished(
             requestID: 1,
-            result: .failure(.temporarilyUnavailable),
-        )))
-
-        #expect(store.state.profileLoad == .loaded(SettingsTestFixture.curatedProfile))
-    }
-
-    @Test
-    func `최초 조회 실패는 실패 상태를 남기고 재시도로 다시 조회한다`() async {
-        let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [
-            .failure(.temporarilyUnavailable),
-            .success(SettingsTestFixture.curatedProfile),
-        ])
-        let store = makeStore(fetchMemberProfile: fetchMemberProfile)
-
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
-            $0.profileRequestID = 1
-        }
-        await store.receive(.effect(.profileLoadFinished(
-            requestID: 1,
-            result: .failure(.temporarilyUnavailable),
-        ))) {
-            $0.profileLoad = .failed(.temporarilyUnavailable)
-        }
-
-        await store.send(.view(.retryTapped)) {
-            $0.profileLoad = .loading
-            $0.profileRequestID = 2
-        }
-        await store.receive(.effect(.profileLoadFinished(
-            requestID: 2,
             result: .success(SettingsTestFixture.curatedProfile),
-        ))) {
-            $0.profileLoad = .loaded(SettingsTestFixture.curatedProfile)
+        )))) {
+            $0.profile.load = .loaded(SettingsTestFixture.curatedProfile)
         }
 
-        #expect(await fetchMemberProfile.snapshot() == 2)
+        #expect(await fetchMemberProfile.snapshot() == 1)
     }
 
     @Test
     func `실패 상태가 아니면 재시도는 조회하지 않는다`() async {
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(
-            state: makeState(profileLoad: .loaded(SettingsTestFixture.curatedProfile)),
+            state: makeState(load: .loaded(SettingsTestFixture.curatedProfile)),
             fetchMemberProfile: fetchMemberProfile,
         )
 
@@ -111,25 +85,13 @@ struct ProfileFeatureTests {
     @Test
     func `조회 중인 동안 다시 들어온 task는 조회를 새로 시작하지 않는다`() async {
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
-        var initialState = makeState(profileLoad: .loading)
-        initialState.profileRequestID = 1
+        var initialState = makeState(load: .loading)
+        initialState.profile.requestID = 1
         let store = makeStore(state: initialState, fetchMemberProfile: fetchMemberProfile)
 
         await store.send(.view(.task))
 
         #expect(await fetchMemberProfile.snapshot() == 0)
-    }
-
-    @Test
-    func `현재 request ID와 다른 응답은 상태를 바꾸지 않는다`() async {
-        var initialState = makeState(profileLoad: .loading)
-        initialState.profileRequestID = 2
-        let store = makeStore(state: initialState)
-
-        await store.send(.effect(.profileLoadFinished(
-            requestID: 1,
-            result: .success(SettingsTestFixture.curatedProfile),
-        )))
     }
 
     @Test
@@ -142,9 +104,9 @@ struct ProfileFeatureTests {
 
     // MARK: Private
 
-    private func makeState(profileLoad: ProfileFeature.State.ProfileLoad) -> ProfileFeature.State {
+    private func makeState(load: UserProfileLoadFeature.State.Load) -> ProfileFeature.State {
         var state = ProfileFeature.State()
-        state.profileLoad = profileLoad
+        state.profile.load = load
         return state
     }
 

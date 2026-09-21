@@ -51,11 +51,11 @@ private enum ProfilePreviewFixture {
     }
 
     @MainActor
-    static func store(profileLoad: ProfileFeature.State.ProfileLoad) -> StoreOf<ProfileFeature> {
+    static func store(profileLoad: UserProfileLoadFeature.State.Load) -> StoreOf<ProfileFeature> {
         Store(
             initialState: {
                 var state = ProfileFeature.State()
-                state.profileLoad = profileLoad
+                state.profile.load = profileLoad
                 return state
             }()
         ) { EmptyReducer() }

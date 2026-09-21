@@ -39,8 +39,7 @@ private enum SettingsPreviewFixture {
         Store(
             initialState: {
                 var state = SettingsFeature.State()
-                state.profile = profile
-                state.profileLoad = profile == nil ? .failed(.temporarilyUnavailable) : .loaded
+                state.userProfile.load = profile.map { .loaded($0) } ?? .failed(.temporarilyUnavailable)
                 state.accountAction = accountAction
                 state.positionMutation = positionMutation
                 return state

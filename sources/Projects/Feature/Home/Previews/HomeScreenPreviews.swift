@@ -32,13 +32,13 @@ private enum HomePreviewFixture {
     @MainActor
     static func store(
         projectLoad: HomeFeature.State.ProjectLoad,
-        profileLoad: HomeFeature.State.ProfileLoad = .loaded(profile),
+        profileLoad: UserProfileLoadFeature.State.Load = .loaded(profile),
     ) -> StoreOf<HomeFeature> {
         Store(
             initialState: {
                 var state = HomeFeature.State()
                 state.projectLoad = projectLoad
-                state.profileLoad = profileLoad
+                state.profile.load = profileLoad
                 return state
             }()
         ) { EmptyReducer() }

@@ -13,22 +13,43 @@ struct SettingsFeatureTests {
     // MARK: Internal
 
     @Test
-    func `task는 프로필을 조회해 설정 값의 근거로 남긴다`() async {
+    func `프로필이 없으면 task는 프로필 조회에 load를 보내 설정 값의 근거로 남긴다`() async {
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         let store = makeStore(fetchMemberProfile: fetchMemberProfile)
+        store.exhaustivity = .off(showSkippedAssertions: false)
 
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
+        await store.send(.view(.task))
+        await store.receive(.userProfile(.input(.load))) {
+            $0.userProfile.load = .loading
+            $0.userProfile.requestID = 1
         }
-        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
-            $0.notificationStatus = .denied
-        }
-        await store.receive(.effect(.profileLoadFinished(.success(SettingsTestFixture.curatedProfile)))) {
-            $0.profile = SettingsTestFixture.curatedProfile
-            $0.profileLoad = .loaded
+        await store.receive(.userProfile(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(SettingsTestFixture.curatedProfile),
+        )))) {
+            $0.userProfile.load = .loaded(SettingsTestFixture.curatedProfile)
         }
 
         #expect(await fetchMemberProfile.snapshot() == 1)
+    }
+
+    @Test
+    func `이미 받은 프로필이 있으면 task는 값을 유지한 채 reload를 보낸다`() async {
+        let updated = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+        let store = makeStore(
+            state: makeState(profile: SettingsTestFixture.curatedProfile),
+            fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.success(updated)]),
+        )
+        store.exhaustivity = .off(showSkippedAssertions: false)
+
+        await store.send(.view(.task))
+        await store.receive(.userProfile(.input(.reload))) {
+            $0.userProfile.requestID = 1
+        }
+        #expect(store.state.profile == SettingsTestFixture.curatedProfile)
+        await store.receive(.userProfile(.effect(.profileLoadFinished(requestID: 1, result: .success(updated))))) {
+            $0.userProfile.load = .loaded(updated)
+        }
     }
 
     @Test
@@ -36,32 +57,38 @@ struct SettingsFeatureTests {
         let store = makeStore(
             fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.failure(.temporarilyUnavailable)])
         )
+        store.exhaustivity = .off(showSkippedAssertions: false)
 
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
-        }
-        await store.receive(.effect(.notificationAuthorizationChecked(.denied))) {
-            $0.notificationStatus = .denied
-        }
-        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
-            $0.profileLoad = .failed(.temporarilyUnavailable)
+        await store.send(.view(.task))
+        await store.receive(.userProfile(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        )))) {
+            $0.userProfile.load = .failed(.temporarilyUnavailable)
         }
 
         #expect(store.state.profile == nil)
     }
 
     @Test
+    func `외부에서 받은 프로필은 프로필 조회에 replace로 전달한다`() async {
+        let store = makeStore()
+
+        await store.send(.input(.profileProvided(SettingsTestFixture.curatedProfile)))
+        await store.receive(.userProfile(.input(.replace(SettingsTestFixture.curatedProfile)))) {
+            $0.userProfile.load = .loaded(SettingsTestFixture.curatedProfile)
+            $0.userProfile.requestID = 1
+        }
+    }
+
+    @Test
     func `task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다`() async {
         let store = makeStore(notificationAuthorization: { .authorized })
+        store.exhaustivity = .off(showSkippedAssertions: false)
 
-        await store.send(.view(.task)) {
-            $0.profileLoad = .loading
-        }
+        await store.send(.view(.task))
         await store.receive(.effect(.notificationAuthorizationChecked(.authorized))) {
             $0.notificationStatus = .allowed
-        }
-        await store.receive(.effect(.profileLoadFinished(.failure(.temporarilyUnavailable)))) {
-            $0.profileLoad = .failed(.temporarilyUnavailable)
         }
     }
 
@@ -156,7 +183,10 @@ struct SettingsFeatureTests {
         }
         await store.receive(.effect(.positionUpdateFinished(.ios, nil))) {
             $0.positionMutation = .idle
-            $0.profile = SettingsTestFixture.profile(position: .ios, careerLevel: .entry)
+        }
+        await store.receive(.userProfile(.input(.replace(SettingsTestFixture.profile(position: .ios, careerLevel: .entry))))) {
+            $0.userProfile.load = .loaded(SettingsTestFixture.profile(position: .ios, careerLevel: .entry))
+            $0.userProfile.requestID = 1
         }
 
         #expect(await updateMemberPosition.snapshot() == [.ios])
@@ -175,7 +205,12 @@ struct SettingsFeatureTests {
         }
         await store.receive(.effect(.careerLevelUpdateFinished(.senior, nil))) {
             $0.careerLevelMutation = .idle
-            $0.profile = SettingsTestFixture.profile(position: .backend, careerLevel: .senior)
+        }
+        await store.receive(
+            .userProfile(.input(.replace(SettingsTestFixture.profile(position: .backend, careerLevel: .senior))))
+        ) {
+            $0.userProfile.load = .loaded(SettingsTestFixture.profile(position: .backend, careerLevel: .senior))
+            $0.userProfile.requestID = 1
         }
 
         #expect(await updateMemberCareerLevel.snapshot() == [.senior])
@@ -241,8 +276,7 @@ struct SettingsFeatureTests {
 
     private func makeState(profile: UserProfile) -> SettingsFeature.State {
         var state = SettingsFeature.State()
-        state.profile = profile
-        state.profileLoad = .loaded
+        state.userProfile.load = .loaded(profile)
         return state
     }
 

@@ -24,7 +24,7 @@ public struct HomeScreen: View {
                     Self.SignInSectionView(onSignIn: { send(.signInTapped) })
                 } else {
                     Self.ProfileHeaderView(
-                        display: HomeProfileDisplay(store.profileLoad),
+                        display: HomeProfileDisplay(store.profile.load),
                         onRetry: { send(.profileRetryTapped) },
                     )
                 }

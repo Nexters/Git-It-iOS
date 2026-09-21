@@ -45,7 +45,7 @@ public struct ProfileScreen: View {
     // MARK: Private
 
     private var display: ProfileDisplay {
-        ProfileDisplay(store.profileLoad)
+        ProfileDisplay(store.profile.load)
     }
 
     @ViewBuilder

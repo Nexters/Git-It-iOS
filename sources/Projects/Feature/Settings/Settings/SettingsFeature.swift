@@ -37,19 +37,15 @@ public struct SettingsFeature: Sendable {
     public struct State: Equatable, Sendable {
         public init() { }
 
-        public var profile: UserProfile?
-        public var profileLoad = ProfileLoad.idle
+        public var userProfile = UserProfileLoadFeature.State()
         public var positionMutation = MutationStatus.idle
         public var careerLevelMutation = MutationStatus.idle
         public var accountAction = AccountAction.idle
         public var notificationStatus = NotificationStatus.idle
-    }
 
-    public enum ProfileLoad: Equatable, Sendable {
-        case idle
-        case loading
-        case loaded
-        case failed(UserInfoError)
+        public var profile: UserProfile? {
+            userProfile.profile
+        }
     }
 
     public enum MutationStatus: Equatable, Sendable {
@@ -89,8 +85,10 @@ public struct SettingsFeature: Sendable {
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case effect(EffectEvent)
         case delegate(Delegate)
+        case userProfile(UserProfileLoadFeature.Action)
 
         // MARK: Public
 
@@ -112,8 +110,12 @@ public struct SettingsFeature: Sendable {
         }
 
         @CasePathable
+        public enum Input: Sendable, Equatable {
+            case profileProvided(UserProfile)
+        }
+
+        @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case profileLoadFinished(Result<UserProfile, UserInfoError>)
             case notificationAuthorizationChecked(NotificationAuthorizationStatus)
             case positionUpdateFinished(MemberPosition, UserInfoError?)
             case careerLevelUpdateFinished(CareerLevel, UserInfoError?)
@@ -135,22 +137,21 @@ public struct SettingsFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.userProfile, action: \.userProfile) {
+            UserProfileLoadFeature(profile: profile)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
-                state.profileLoad = .loading
+                let profileInput: UserProfileLoadFeature.Action.Input =
+                    state.profile == nil ? .load : .reload
                 return .merge(
-                    .run { send in
-                        do {
-                            let profile = try await profile()
-                            await send(.effect(.profileLoadFinished(.success(profile))))
-                        } catch {
-                            let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                            await send(.effect(.profileLoadFinished(.failure(mapped))))
-                        }
-                    },
+                    .send(.userProfile(.input(profileInput))),
                     checkNotificationAuthorization(),
                 )
+
+            case .input(.profileProvided(let profile)):
+                return .send(.userProfile(.input(.replace(profile))))
 
             case .view(.applicationBecameActive):
                 return checkNotificationAuthorization()
@@ -259,25 +260,14 @@ public struct SettingsFeature: Sendable {
                 }
                 .cancellable(id: CancelID.accountAction)
 
-            case .effect(.profileLoadFinished(let result)):
-                switch result {
-                case .success(let profile):
-                    state.profile = profile
-                    state.profileLoad = .loaded
-
-                case .failure(let error):
-                    state.profileLoad = .failed(error)
-                }
-                return .none
-
             case .effect(.notificationAuthorizationChecked(let status)):
                 state.notificationStatus = status == .authorized ? .allowed : .denied
                 return .none
 
             case .effect(.positionUpdateFinished(let position, nil)):
                 state.positionMutation = .idle
-                state.profile = state.profile?.replacing(position: position)
-                return .none
+                guard let profile = state.profile?.replacing(position: position) else { return .none }
+                return .send(.userProfile(.input(.replace(profile))))
 
             case .effect(.positionUpdateFinished(_, .some(let error))):
                 state.positionMutation = .failed(error)
@@ -285,8 +275,8 @@ public struct SettingsFeature: Sendable {
 
             case .effect(.careerLevelUpdateFinished(let careerLevel, nil)):
                 state.careerLevelMutation = .idle
-                state.profile = state.profile?.replacing(careerLevel: careerLevel)
-                return .none
+                guard let profile = state.profile?.replacing(careerLevel: careerLevel) else { return .none }
+                return .send(.userProfile(.input(.replace(profile))))
 
             case .effect(.careerLevelUpdateFinished(_, .some(let error))):
                 state.careerLevelMutation = .failed(error)
@@ -311,7 +301,8 @@ public struct SettingsFeature: Sendable {
                 state.accountAction = .failed(error)
                 return .none
 
-            case .delegate:
+            case .userProfile,
+                 .delegate:
                 return .none
             }
         }

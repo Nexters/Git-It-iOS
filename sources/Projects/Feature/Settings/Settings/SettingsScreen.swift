@@ -140,7 +140,7 @@ public struct SettingsScreen: View {
     }
 
     private var profileFailureMessage: String? {
-        guard case .failed = store.profileLoad, store.profile == nil else { return nil }
+        guard case .failed = store.userProfile.load else { return nil }
         return Constant.profileFailureMessage
     }
 

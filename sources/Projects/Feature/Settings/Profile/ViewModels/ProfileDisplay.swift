@@ -6,7 +6,7 @@ struct ProfileDisplay: Equatable, Sendable {
     // MARK: Lifecycle
 
     init(
-        _ profileLoad: ProfileFeature.State.ProfileLoad,
+        _ profileLoad: UserProfileLoadFeature.State.Load,
         todayLabel: String = Self.currentDayLabel(),
     ) {
         let profile: UserProfile? =

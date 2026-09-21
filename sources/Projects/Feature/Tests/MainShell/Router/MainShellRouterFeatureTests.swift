@@ -23,7 +23,7 @@ struct MainShellRouterFeatureTests {
         let userInfo = UserInfoUseCaseMock()
         let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State()
-        state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(state: state, projects: projects, userInfo: userInfo)
         store.exhaustivity = .off
@@ -69,7 +69,7 @@ struct MainShellRouterFeatureTests {
     ) async {
         var state = MainShellRouterFeature.State()
         state.selectedTab = .settings
-        state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         let store = makeStore(state: state)
 
         await store.send(.settings(.delegate(delegate))) {
