@@ -56,9 +56,9 @@ struct RepositoryLinkInputScreen: View {
 
             FeedbackActionButton(
                 title: store.validateButtonTitle,
-                isEnabled: store.canValidate,
                 action: { send(.validateTapped) },
             )
+            .enabled(store.canValidate)
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)
         }

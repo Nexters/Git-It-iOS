@@ -229,11 +229,11 @@ public struct ProjectListScreen: View {
                 currentSet: project.currentSet,
                 setTitle: project.setTitle,
             ),
-            isDeleting: store.mode == .deleting,
             onAccessoryTap: { accessoryTapped(projectID: project.id) },
         ) {
             Self.Thumbnail(imageURL: project.imageURL)
         }
+        .deleting(store.mode == .deleting)
         .contentShape(Rectangle())
         .onTapGesture { send(.projectRowTapped(projectID: project.id)) }
     }

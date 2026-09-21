@@ -31,9 +31,9 @@ extension TutorialScreen {
 
                 FeedbackActionButton(
                     title: Constant.guestAccessTitle,
-                    isEnabled: isHintVisible,
                     action: onGuestAccess,
                 )
+                .enabled(isHintVisible)
                 .style(.text)
                 .size(.small)
                 .opacity(isHintVisible ? 1 : 0)

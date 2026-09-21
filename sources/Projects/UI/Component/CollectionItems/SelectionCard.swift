@@ -9,11 +9,9 @@ public struct SelectionCard<Thumbnail: View>: View {
 
     public init(
         displayModel: DisplayModel,
-        isSelected: Bool = false,
         @ViewBuilder thumbnail: () -> Thumbnail,
     ) {
         self.displayModel = displayModel
-        self.isSelected = isSelected
         self.thumbnail = thumbnail()
     }
 
@@ -90,7 +88,7 @@ public struct SelectionCard<Thumbnail: View>: View {
     }
 
     private let displayModel: DisplayModel
-    private let isSelected: Bool
+    private var isSelected = false
     private var style = Style.detailed
     private let thumbnail: Thumbnail
 
@@ -146,10 +144,9 @@ extension SelectionCard {
 
 extension SelectionCard where Thumbnail == EmptyView {
     public init(
-        displayModel: DisplayModel,
-        isSelected: Bool = false,
+        displayModel: DisplayModel
     ) {
-        self.init(displayModel: displayModel, isSelected: isSelected) { EmptyView() }
+        self.init(displayModel: displayModel) { EmptyView() }
         style = .compact
     }
 }
@@ -164,6 +161,16 @@ extension SelectionCard: StyleConfigurable {
     }
 }
 
+// MARK: SelectionCard 상태 선언
+
+extension SelectionCard {
+    public func selected(_ isSelected: Bool) -> Self {
+        var copy = self
+        copy.isSelected = isSelected
+        return copy
+    }
+}
+
 #Preview("Selection Card") {
     VStack(spacing: LayoutToken.gutter) {
         SelectionCard(
@@ -174,12 +181,12 @@ extension SelectionCard: StyleConfigurable {
         }
 
         SelectionCard(
-            displayModel: .init(title: "프로젝트 경험이 있어요", supportingText: "심화 문제와 서술형 비중 확대"),
-            isSelected: true,
+            displayModel: .init(title: "프로젝트 경험이 있어요", supportingText: "심화 문제와 서술형 비중 확대")
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .blue400))
         }
+        .selected(true)
     }
     .frame(width: 340)
     .designSystemScreenMargin()
@@ -190,7 +197,8 @@ extension SelectionCard: StyleConfigurable {
 #Preview("Selection Card - compact · 737:10372") {
     VStack(spacing: LayoutToken.compactSpacing) {
         SelectionCard(displayModel: .init(title: "Front-end"))
-        SelectionCard(displayModel: .init(title: "Back-end"), isSelected: true)
+        SelectionCard(displayModel: .init(title: "Back-end"))
+            .selected(true)
     }
     .frame(width: 340)
     .designSystemScreenMargin()

@@ -14,7 +14,7 @@ extension QuestionSolvingScreen {
         let onClose: () -> Void
 
         var body: some View {
-            SheetSurface(isScrollable: true) {
+            SheetSurface {
                 VStack(alignment: .leading, spacing: 0) {
                     StyledText(text: title)
                         .textStyle(.subtitle1)
@@ -32,6 +32,7 @@ extension QuestionSolvingScreen {
                 FeedbackActionButton(title: "닫기", action: onClose)
                     .padding(.top, Constant.buttonTopPadding)
             }
+            .scrollable(true)
         }
 
         // MARK: Private

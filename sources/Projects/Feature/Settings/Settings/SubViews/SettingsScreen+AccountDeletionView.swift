@@ -51,9 +51,9 @@ extension SettingsScreen {
                     FeedbackActionButton(
                         styledText: StyledText(text: Constant.confirmTitle)
                             .foregroundColorToken(.error),
-                        isEnabled: store.accountAction.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
+                    .enabled(store.accountAction.accountAction != .deletingAccount)
                     .style(.text)
                     .multilineTextAlignment(.center)
                     .designSystemScreenMargin()

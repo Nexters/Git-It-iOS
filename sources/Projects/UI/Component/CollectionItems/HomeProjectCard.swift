@@ -9,12 +9,10 @@ public struct HomeProjectCard: View {
 
     public init(
         displayModel: DisplayModel,
-        isLearningEnabled: Bool = true,
         onSelect: @escaping () -> Void = { },
         onStart: @escaping () -> Void = { },
     ) {
         self.displayModel = displayModel
-        self.isLearningEnabled = isLearningEnabled
         self.onSelect = onSelect
         self.onStart = onStart
     }
@@ -70,7 +68,7 @@ public struct HomeProjectCard: View {
 
     private let displayModel: DisplayModel
     private var style = Style.purple
-    private let isLearningEnabled: Bool
+    private var isLearningEnabled = true
     private let onSelect: () -> Void
     private let onStart: () -> Void
 
@@ -293,6 +291,16 @@ extension HomeProjectCard: StyleConfigurable {
     public func style(_ style: Style) -> Self {
         var copy = self
         copy.style = style
+        return copy
+    }
+}
+
+// MARK: HomeProjectCard 상태 선언
+
+extension HomeProjectCard {
+    public func learningEnabled(_ isLearningEnabled: Bool) -> Self {
+        var copy = self
+        copy.isLearningEnabled = isLearningEnabled
         return copy
     }
 }

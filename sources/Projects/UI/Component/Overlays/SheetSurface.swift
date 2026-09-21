@@ -8,11 +8,9 @@ public struct SheetSurface<Content: View, Footer: View>: View {
     // MARK: Lifecycle
 
     public init(
-        isScrollable: Bool = false,
         @ViewBuilder content: () -> Content,
         @ViewBuilder footer: () -> Footer = { EmptyView() },
     ) {
-        self.isScrollable = isScrollable
         self.content = content()
         self.footer = footer()
     }
@@ -85,10 +83,20 @@ public struct SheetSurface<Content: View, Footer: View>: View {
 
     @State private var contentHeight: CGFloat?
 
-    private let isScrollable: Bool
+    private var isScrollable = false
     private let content: Content
     private let footer: Footer
 
+}
+
+// MARK: SheetSurface 상태 선언
+
+extension SheetSurface {
+    public func scrollable(_ isScrollable: Bool) -> Self {
+        var copy = self
+        copy.isScrollable = isScrollable
+        return copy
+    }
 }
 
 // MARK: - ContentHeightPreferenceKey
@@ -125,7 +133,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
     VStack(spacing: 0) {
         Spacer()
 
-        SheetSurface(isScrollable: true) {
+        SheetSurface {
             VStack(spacing: LayoutToken.margin) {
                 ForEach(0..<8, id: \.self) { index in
                     StyledText(text: "정책 문서 \(index + 1)")
@@ -134,6 +142,7 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         } footer: {
             ActionButton(title: "계속하기")
         }
+        .scrollable(true)
     }
     .frame(width: 390, height: 320)
     .designSystemBackground(.grey700)

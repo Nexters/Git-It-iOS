@@ -158,11 +158,12 @@ public struct MainShellRouter: View {
     }
 
     private var singleQuestionOverlay: some View {
-        PushedScreenOverlay(isPresented: store.singleQuestion != nil) {
+        PushedScreenOverlay {
             if let singleQuestionStore {
                 QuestionSolvingScreen(store: singleQuestionStore)
             }
         }
+        .presented(store.singleQuestion != nil)
     }
 
 }

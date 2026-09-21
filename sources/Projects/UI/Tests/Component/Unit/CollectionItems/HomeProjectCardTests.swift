@@ -69,6 +69,11 @@ struct HomeProjectCardTests {
     }
 
     @Test
+    func `학습 가능 여부를 선언하지 않으면 학습을 시작할 수 있다`() {
+        #expect(Mirror(reflecting: makeCard()).descendant("isLearningEnabled") as? Bool == true)
+    }
+
+    @Test
     func `본문과 학습 control은 44pt 최소 터치 영역을 갖는다`() {
         #expect(HomeProjectCard.minimumTouchArea == 44)
     }
@@ -88,10 +93,10 @@ struct HomeProjectCardTests {
                 currentSetLabel: "Set 1",
                 setTitle: "Presentation 구조",
             ),
-            isLearningEnabled: isLearningEnabled,
             onSelect: onSelect,
             onStart: onStart,
         )
+        .learningEnabled(isLearningEnabled)
     }
 
 }

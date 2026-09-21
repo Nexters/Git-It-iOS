@@ -156,9 +156,9 @@ struct QuestionSolvingScreen: View {
         if store.answerOutcome == nil {
             FeedbackActionButton(
                 title: store.submissionError == nil ? "제출하기" : "다시 제출하기",
-                isEnabled: store.isSubmitEnabled,
                 action: { send(.submitAnswerTapped) },
             )
+            .enabled(store.isSubmitEnabled)
         } else {
             FeedbackActionButton(
                 title: store.advanceActionTitle,

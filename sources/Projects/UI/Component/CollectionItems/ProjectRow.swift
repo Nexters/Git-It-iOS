@@ -9,12 +9,10 @@ public struct ProjectRow<Thumbnail: View>: View {
 
     public init(
         displayModel: DisplayModel,
-        isDeleting: Bool = false,
         onAccessoryTap: @escaping () -> Void = { },
         @ViewBuilder thumbnail: () -> Thumbnail,
     ) {
         self.displayModel = displayModel
-        self.isDeleting = isDeleting
         self.onAccessoryTap = onAccessoryTap
         self.thumbnail = thumbnail()
     }
@@ -113,7 +111,7 @@ public struct ProjectRow<Thumbnail: View>: View {
     }
 
     private let displayModel: DisplayModel
-    private let isDeleting: Bool
+    private var isDeleting = false
     private let onAccessoryTap: () -> Void
     private let thumbnail: Thumbnail
 
@@ -171,6 +169,16 @@ extension ProjectRow {
     }
 }
 
+// MARK: ProjectRow 상태 선언
+
+extension ProjectRow {
+    public func deleting(_ isDeleting: Bool) -> Self {
+        var copy = self
+        copy.isDeleting = isDeleting
+        return copy
+    }
+}
+
 #Preview("Project Row") {
     VStack(spacing: LayoutToken.gutter) {
         ProjectRow(
@@ -193,12 +201,12 @@ extension ProjectRow {
                 progress: 0,
                 currentSet: 1,
                 setTitle: "기본 개념",
-            ),
-            isDeleting: true,
+            )
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .blue500))
         }
+        .deleting(true)
     }
     .frame(width: 360)
     .designSystemScreenMargin()

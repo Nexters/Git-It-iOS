@@ -7,11 +7,7 @@ public struct PushedScreenOverlay<Content: View>: View {
 
     // MARK: Lifecycle
 
-    public init(
-        isPresented: Bool,
-        @ViewBuilder content: () -> Content,
-    ) {
-        self.isPresented = isPresented
+    public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
 
@@ -35,22 +31,33 @@ public struct PushedScreenOverlay<Content: View>: View {
         }
     }
 
-    private let isPresented: Bool
+    private var isPresented = false
     private let content: Content
 
+}
+
+// MARK: PushedScreenOverlay 상태 선언
+
+extension PushedScreenOverlay {
+    public func presented(_ isPresented: Bool) -> Self {
+        var copy = self
+        copy.isPresented = isPresented
+        return copy
+    }
 }
 
 #Preview("Pushed Screen Overlay") {
     ZStack {
         Color(designSystem: .grey700)
 
-        PushedScreenOverlay(isPresented: true) {
+        PushedScreenOverlay {
             StyledText(text: "밀려 들어온 화면")
                 .textStyle(.subtitle1)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .designSystemBackground(.grey700)
         }
+        .presented(true)
     }
     .frame(width: 390, height: 700)
 }

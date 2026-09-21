@@ -9,21 +9,17 @@ public struct ActionButton: View {
 
     public init(
         title: String,
-        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .title(title)
-        self.isEnabled = isEnabled
         self.action = action
     }
 
     public init(
         styledText: StyledText,
-        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .styled(styledText)
-        self.isEnabled = isEnabled
         self.action = action
     }
 
@@ -128,7 +124,7 @@ public struct ActionButton: View {
     private let label: Label
     private var style = Style.primary
     private var size = Size.large
-    private let isEnabled: Bool
+    private var isEnabled = true
     private let action: () -> Void
 
     @ViewBuilder
@@ -168,6 +164,16 @@ extension ActionButton: SizeConfigurable {
     }
 }
 
+// MARK: ActionButton 상태 선언
+
+extension ActionButton {
+    public func enabled(_ isEnabled: Bool) -> Self {
+        var copy = self
+        copy.isEnabled = isEnabled
+        return copy
+    }
+}
+
 #Preview("Action Button") {
     VStack(spacing: LayoutToken.gutter) {
         ActionButton(title: "Primary")
@@ -177,8 +183,10 @@ extension ActionButton: SizeConfigurable {
             .style(.destructive)
         ActionButton(title: "Text")
             .style(.text)
-        ActionButton(title: "Disabled", isEnabled: false)
-        ActionButton(title: "Disabled Text", isEnabled: false)
+        ActionButton(title: "Disabled")
+            .enabled(false)
+        ActionButton(title: "Disabled Text")
+            .enabled(false)
             .style(.text)
     }
     .designSystemScreenMargin()

@@ -57,9 +57,9 @@ struct PositionSelectionScreen: View {
             BottomActionBar {
                 FeedbackActionButton(
                     title: "다음",
-                    isEnabled: store.position != nil,
                     action: { send(.nextTapped) },
                 )
+                .enabled(store.position != nil)
                 .designSystemScreenMargin()
             }
         }

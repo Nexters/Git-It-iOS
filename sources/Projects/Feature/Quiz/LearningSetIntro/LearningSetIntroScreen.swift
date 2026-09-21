@@ -82,9 +82,9 @@ struct LearningSetIntroScreen: View {
 
                 FeedbackActionButton(
                     title: "시작하기",
-                    isEnabled: store.isStartEnabled,
                     action: { send(.startTapped) },
                 )
+                .enabled(store.isStartEnabled)
             }
         }
     }

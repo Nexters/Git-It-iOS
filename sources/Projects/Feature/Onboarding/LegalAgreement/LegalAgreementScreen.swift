@@ -12,7 +12,7 @@ struct LegalAgreementScreen: View {
     @Bindable var store: StoreOf<LegalAgreementFeature>
 
     var body: some View {
-        SheetSurface(isScrollable: true) {
+        SheetSurface {
             VStack(alignment: .leading, spacing: 0) {
                 StyledText(text: "약관 동의")
                     .textStyle(.subtitle1)
@@ -45,13 +45,14 @@ struct LegalAgreementScreen: View {
 
                     FeedbackActionButton(
                         title: "다음",
-                        isEnabled: store.canContinue,
                         action: { send(.continueTapped) },
                     )
+                    .enabled(store.canContinue)
                 }
                 .padding(.top, Constant.actionsTopSpacing)
             }
         }
+        .scrollable(true)
     }
 
 }

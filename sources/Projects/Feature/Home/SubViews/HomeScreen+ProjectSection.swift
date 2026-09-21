@@ -225,10 +225,10 @@ extension HomeScreen {
                                 currentSetLabel: project.currentSetLabel,
                                 setTitle: project.setTitle,
                             ),
-                            isLearningEnabled: project.isLearningEnabled,
                             onSelect: { onProjectCardTapped(String(project.projectID)) },
                             onStart: { onLearningTapped(String(project.projectID)) },
                         )
+                        .learningEnabled(project.isLearningEnabled)
                         .style(project.style)
                         .visualEffect { content, proxy in
                             content.rotationEffect(
