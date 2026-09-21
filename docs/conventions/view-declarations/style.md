@@ -15,11 +15,9 @@
 public struct ActionButton: View {
     public init(
         title: String,
-        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         self.title = title
-        self.isEnabled = isEnabled
         self.action = action
     }
 
@@ -49,7 +47,7 @@ public struct ActionButton: View {
 
     private let title: String
     private var style = Style.primary
-    private let isEnabled: Bool
+    private var isEnabled = true
     private let action: () -> Void
 
     private enum Constant {
