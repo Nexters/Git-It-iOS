@@ -763,7 +763,7 @@ FR-016 목록과 [research.md](./research.md) §7의 추가 문서다(SC-006).
 
 ### 구현
 
-- [ ] T116 [P] [S3] `docs/conventions/view/component-init.md`(책임: UI)를 개정한다.
+- [X] T116 [P] [S3] `docs/conventions/view/component-init.md`(책임: UI)를 개정한다.
   - 시각 속성은 속성 종류별 계약의 `Self` 반환 메서드로 선언한다고 쓴다.
   - 초기화 메서드는 표시 값(2개 이상이면 `DisplayModel`)·상태·동작 설정·접근성 문구·`Binding`·콜백·자식 View만 받는다고 쓴다.
   - 모든 시각 속성은 기본값을 가지며, 기본값 선택 기준은 디자인 시스템의 중립·기본 값이라고 쓴다.
@@ -771,42 +771,42 @@ FR-016 목록과 [research.md](./research.md) §7의 추가 문서다(SC-006).
   - "시각 변형은 초기화 인자" 문장, "상태 wrapper를 추가하지 않는다" 문장, `SelectionToggle(state:)` 금지 예시를 삭제한다.
   - 인자 구분에 "컴포넌트가 스스로 바꾸는 상태는 변경 콜백 대신 기본값 없는 `Binding`"을 넣는다(FR-017).
   - 예시를 계약 문서 §5로 바꾼다. `ProjectRow(project:)` 금지는 유지한다.
-- [ ] T117 [P] [S3] `docs/conventions/view/display-value-binding-callback.md`(책임: UI)를 개정한다.
+- [X] T117 [P] [S3] `docs/conventions/view/display-value-binding-callback.md`(책임: UI)를 개정한다.
   - 표시 상태 wrapper 금지 문장을 삭제한다.
   - 표시 값 모델 규칙을 서술한다. 인자를 표시 값·상태·동작 설정·화면에 보이지 않는 문구로 구분하고, 식별자는 세지 않는다.
   - 상태는 모델에 넣지 않고 개별 인자로 둔다고 쓴다. 컴포넌트가 스스로 바꾸는 상태는 짝 콜백 없이 기본값 없는 `Binding`으로, 읽기 전용 상태는 값으로, 상태 변경과 무관한 동작은 콜백으로 받는다고 쓴다(FR-017, [research.md](./research.md) §9).
-- [ ] T118 [P] [S3] `docs/conventions/view.md`(책임: UI·Feature)를 개정한다.
+- [X] T118 [P] [S3] `docs/conventions/view.md`(책임: UI·Feature)를 개정한다.
   - §3 요약을 새 초기화 계약에 맞춘다.
   - §6 체크리스트의 wrapper 금지 항목을 두 항목으로 바꾼다: "시각 속성을 초기화 인자로 받지 않고 계약 메서드로 선언하는가", "표시 값 2개 이상을 `DisplayModel`로 받는가".
   - 최종 수정일을 갱신한다.
-- [ ] T119 [P] [S3] `docs/package-rules/ui.md`(책임: UI)의 "표시 상태를 묶는 ViewModel, State 또는 동등한 wrapper 타입을 정의해서는 안 됩니다" 제약을 삭제한다. 설명의 "표시 값·SwiftUI `Binding`·콜백 기반 컴포넌트"에 표시 값 모델·시각 속성 계약을 반영하고 최종 수정일을 갱신한다
-- [ ] T120 [P] [S3] `docs/conventions/ui-component/public-contract.md`(책임: UI)에서 "표시 상태 wrapper 금지" 언급을 삭제하고 표시 값 모델·시각 속성 계약 규칙의 소유 문서 링크로 바꾼다
-- [ ] T121 [P] [S3] `docs/conventions/view-declarations/style.md`(책임: UI)의 예시와 마지막 문단을 개정한다. `Style`을 초기화 인자로 넘긴다는 서술을 `StyleConfigurable`의 `style(_:)` 메서드로 선택한다는 서술로 바꾼다
-- [ ] T122 [P] [S3] `docs/conventions/view-declarations/internal-declarations.md`(책임: UI)를 개정한다.
+- [X] T119 [P] [S3] `docs/package-rules/ui.md`(책임: UI)의 "표시 상태를 묶는 ViewModel, State 또는 동등한 wrapper 타입을 정의해서는 안 됩니다" 제약을 삭제한다. 설명의 "표시 값·SwiftUI `Binding`·콜백 기반 컴포넌트"에 표시 값 모델·시각 속성 계약을 반영하고 최종 수정일을 갱신한다
+- [X] T120 [P] [S3] `docs/conventions/ui-component/public-contract.md`(책임: UI)에서 "표시 상태 wrapper 금지" 언급을 삭제하고 표시 값 모델·시각 속성 계약 규칙의 소유 문서 링크로 바꾼다
+- [X] T121 [P] [S3] `docs/conventions/view-declarations/style.md`(책임: UI)의 예시와 마지막 문단을 개정한다. `Style`을 초기화 인자로 넘긴다는 서술을 `StyleConfigurable`의 `style(_:)` 메서드로 선택한다는 서술로 바꾼다
+- [X] T122 [P] [S3] `docs/conventions/view-declarations/internal-declarations.md`(책임: UI)를 개정한다.
   - "표시 값과 `Binding`은 별도 타입으로 감싸지 않고" 문장을 표시 값 모델 규칙으로 바꾼다.
   - 선언 표에 `struct DisplayModel` 행(정의 조건: 표시 값 2개 이상, 접근 수준: `public`)을 추가한다.
-- [ ] T123 [P] [S3] `docs/conventions/view-declarations.md`(책임: UI)의 §2.3 요약과 체크리스트를 T121·T122 규칙에 맞춰 갱신하고 최종 수정일을 갱신한다
-- [ ] T124 [P] [S3] `docs/conventions/view-declarations/binding.md`(책임: UI)에서 "별도 상태 wrapper에 외부 값을 복제하지 않습니다" 문장을 삭제한다. 나머지 `Binding` 보존 규칙은 유지하고, 컴포넌트가 받은 상태를 `@Binding private var`로 보존한다는 예시를 보강한다([research.md](./research.md) §9.6)
-- [ ] T125 [P] [S3] `docs/conventions/view/preview.md`(책임: UI)에 한 가지를 보강한다. 컴포넌트 프리뷰가 시각 변형을 계약 메서드로 나열한다는 문장이다
-- [ ] T126 [P] [S3] `docs/package-rules/feature.md`(책임: Feature)에 두 가지를 추가한다.
+- [X] T123 [P] [S3] `docs/conventions/view-declarations.md`(책임: UI)의 §2.3 요약과 체크리스트를 T121·T122 규칙에 맞춰 갱신하고 최종 수정일을 갱신한다
+- [X] T124 [P] [S3] `docs/conventions/view-declarations/binding.md`(책임: UI)에서 "별도 상태 wrapper에 외부 값을 복제하지 않습니다" 문장을 삭제한다. 나머지 `Binding` 보존 규칙은 유지하고, 컴포넌트가 받은 상태를 `@Binding private var`로 보존한다는 예시를 보강한다([research.md](./research.md) §9.6)
+- [X] T125 [P] [S3] `docs/conventions/view/preview.md`(책임: UI)에 한 가지를 보강한다. 컴포넌트 프리뷰가 시각 변형을 계약 메서드로 나열한다는 문장이다
+- [X] T126 [P] [S3] `docs/package-rules/feature.md`(책임: Feature)에 두 가지를 추가한다.
   - Feature View가 컴포넌트 호출 지점에서 State·업무 모델을 표시 값 모델로 매핑한다.
   - Feature State·Reducer·State에 담기는 표시 모델은 UI `DisplayModel`을 보유하지 않는다.
   - 화면 View가 컴포넌트 상태 `Binding`을 `Binding(get:set:)`으로 만들고, setter는 기존 View Action을 보낸다. 컴포넌트 상태 연결에 `BindableAction`을 쓰지 않는다(FR-017).
   - 최종 수정일을 갱신한다.
-- [ ] T127 [P] [S3] `docs/conventions/ui-component/folder-file.md`(책임: UI)의 "1뎁스는 §3.2의 역할 폴더와 `Resources/`뿐" 문장에 시각 속성 계약을 두는 `Contracts/`를 추가한다
-- [ ] T128 [P] [S3] `docs/conventions/file-vocabulary/shape-vocabulary.md`(책임: UI)의 `UI/Component/` 행에 `Contracts/`(여러 역할 폴더가 채택하는 시각 속성 계약 프로토콜)를 추가한다
-- [ ] T129 [P] [S3] `docs/conventions/abstraction.md`(책임: UI)의 §1 "다루지 않습니다" 목록에 항목을 추가한다. 추가할 항목은 "여러 컴포넌트가 같은 이름·형태의 공개 메서드를 제공하도록 강제하는 UI 시각 속성 계약"이다([research.md](./research.md) §6)
-- [ ] T130 [S3] `docs/conventions/abstraction/structure-baseline.md`(책임: UI)를 갱신한다.
+- [X] T127 [P] [S3] `docs/conventions/ui-component/folder-file.md`(책임: UI)의 "1뎁스는 §3.2의 역할 폴더와 `Resources/`뿐" 문장에 시각 속성 계약을 두는 `Contracts/`를 추가한다
+- [X] T128 [P] [S3] `docs/conventions/file-vocabulary/shape-vocabulary.md`(책임: UI)의 `UI/Component/` 행에 `Contracts/`(여러 역할 폴더가 채택하는 시각 속성 계약 프로토콜)를 추가한다
+- [X] T129 [P] [S3] `docs/conventions/abstraction.md`(책임: UI)의 §1 "다루지 않습니다" 목록에 항목을 추가한다. 추가할 항목은 "여러 컴포넌트가 같은 이름·형태의 공개 메서드를 제공하도록 강제하는 UI 시각 속성 계약"이다([research.md](./research.md) §6)
+- [X] T130 [S3] `docs/conventions/abstraction/structure-baseline.md`(책임: UI)를 갱신한다.
   - §2 명령으로 프로덕션 Swift 파일 수·프로토콜 수를 다시 재 §1 표에 "명세 042 후" 열을 추가한다.
   - §3에 "UI 시각 속성 계약(5개)" 분류로 `StyleConfigurable`·`SizeConfigurable`·`TextStyleConfigurable`·`ForegroundColorConfigurable`·`BackgroundColorConfigurable`을 등재한다.
-- [ ] T131 [P] [S3] `.agents/skills/implement-figma-ui/references/component-index.md`(책임: UI)를 새 공개 계약에 맞춘다.
+- [X] T131 [P] [S3] `.agents/skills/implement-figma-ui/references/component-index.md`(책임: UI)를 새 공개 계약에 맞춘다.
   - 초기화 인자로 설명한 시각 속성(`Style`·`Size` 선택, `ActionButton.destructive` 같은 호출 표기)을 메서드 선언으로 바꾼다.
   - 표시 값 서술(`ConfirmationSheet`의 `title`/`message` 초기화 인자 등)을 `DisplayModel`로 바꾼다.
   - FR-017 대상 컴포넌트(research §9.1)의 상태·콜백 서술을 `Binding`으로 바꾼다.
 
 ### 정리와 단위 검증
 
-- [ ] T132 [no-write] [S3] [quickstart.md](./quickstart.md) §5 조회(`rg -n '표시 상태를 묶는|상태 wrapper|시각 변형은 .*초기화 인자' docs .agents/skills/implement-figma-ui/references`)가 0줄인지 확인한다. T116~T131 문서의 상호 링크가 유효한지도 확인한다. 확인 명령은 `rg -o '\]\(([^)#]+)' -r '$1'`로 추출한 상대경로의 존재 확인이다.
+- [X] T132 [no-write] [S3] [quickstart.md](./quickstart.md) §5 조회(`rg -n '표시 상태를 묶는|상태 wrapper|시각 변형은 .*초기화 인자' docs .agents/skills/implement-figma-ui/references`)가 0줄인지 확인한다. T116~T131 문서의 상호 링크가 유효한지도 확인한다. 확인 명령은 `rg -o '\]\(([^)#]+)' -r '$1'`로 추출한 상대경로의 존재 확인이다.
 
 **진행 점검**: T116~T132의 변경 파일과 검증 결과를 보고한 뒤 전체 완료 검증으로 진행한다. 이
 단위가 마지막 적용 단위이므로 전체 완료 검증과 필수 `after_implement` 훅이 끝날 때까지 이 단위의
@@ -823,13 +823,13 @@ FR-016 목록과 [research.md](./research.md) §7의 추가 문서다(SC-006).
 `after_implement` hook을 마친 뒤 그 단위를 최종 commit한다. 이미 파일 변경 단위가 모두 commit된
 단순 재개에서는 `tasks.md` 완료 표시를 위한 별도 최종 검증 단위를 둔다.
 
-- [ ] T133 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순차 실행하고 결과를 기록한다(SC-003)
-- [ ] T134 [no-write] [S1] [S2] [S4] [quickstart.md](./quickstart.md) §2.1·§2.2·§2.3·§2.4 조회를 전체 저장소에 실행한다. 각 대상 컴포넌트의 `public init`을 [contracts/component-init-contracts.md](./contracts/component-init-contracts.md) §2·§3·§3.1과 대조해 기록한다(SC-001·SC-002·SC-008·SC-009). `git diff fc9dcee --stat -- 'sources/Projects/Feature/**/*Feature.swift' sources/Projects/Feature/Tests`가 0줄인지 확인한다.
+- [X] T133 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순차 실행하고 결과를 기록한다(SC-003)
+- [X] T134 [no-write] [S1] [S2] [S4] [quickstart.md](./quickstart.md) §2.1·§2.2·§2.3·§2.4 조회를 전체 저장소에 실행한다. 각 대상 컴포넌트의 `public init`을 [contracts/component-init-contracts.md](./contracts/component-init-contracts.md) §2·§3·§3.1과 대조해 기록한다(SC-001·SC-002·SC-008·SC-009). `git diff fc9dcee --stat -- 'sources/Projects/Feature/**/*Feature.swift' sources/Projects/Feature/Tests`가 0줄인지 확인한다.
   - SC-005: 메서드 이름 `style`·`size`·`textStyle`·`foregroundColorToken`·`backgroundColorToken`이 SwiftUI `View` 인스턴스 메서드와 겹치지 않는지 Apple 개발자 문서(`DocumentationSearch` 또는 SwiftUI 인터페이스)에서 조회한다.
   - 대표 호출부(예: `StyledText(text:).textStyle(.body2)`, `ActionButton(title:).style(.secondary)`)에서 Xcode의 Jump to Definition이나 `swiftc -typecheck` 진단으로 계약 메서드가 선택되는지 확인해 기록한다.
-- [ ] T135 [no-write] [S1] [quickstart.md](./quickstart.md) §3 렌더링 동일성 대조 결과를 기록한다(SC-004). 호출부 값 대조 요약, 확인한 프리뷰 목록과 자동 비교 미검증 범위를 적는다
-- [ ] T136 [no-write] [S3] 개정 문서만 읽고 가상의 새 컴포넌트를 판정한다. 가정은 "표시 값 3개, 스타일 변형 2개, 탭으로 바뀌는 선택 상태 1개, 읽기 전용 활성 상태 1개"다. 판정할 항목은 시각 속성 선언 방식, 기본값·호출 순서 제약, `DisplayModel` 적용과 인자 구분, 상태를 `Binding`으로 받을지 값으로 받을지이며, 판정 결과를 기록한다(SC-006)
-- [ ] T137 [no-write] 변경 시나리오 S1~S4의 수용 시나리오를 [spec.md](./spec.md) 기준으로 하나씩 대조해 충족 근거를 기록한다
+- [X] T135 [no-write] [S1] [quickstart.md](./quickstart.md) §3 렌더링 동일성 대조 결과를 기록한다(SC-004). 호출부 값 대조 요약, 확인한 프리뷰 목록과 자동 비교 미검증 범위를 적는다
+- [X] T136 [no-write] [S3] 개정 문서만 읽고 가상의 새 컴포넌트를 판정한다. 가정은 "표시 값 3개, 스타일 변형 2개, 탭으로 바뀌는 선택 상태 1개, 읽기 전용 활성 상태 1개"다. 판정할 항목은 시각 속성 선언 방식, 기본값·호출 순서 제약, `DisplayModel` 적용과 인자 구분, 상태를 `Binding`으로 받을지 값으로 받을지이며, 판정 결과를 기록한다(SC-006)
+- [X] T137 [no-write] 변경 시나리오 S1~S4의 수용 시나리오를 [spec.md](./spec.md) 기준으로 하나씩 대조해 충족 근거를 기록한다
 
 ## 의존성과 실행 순서
 

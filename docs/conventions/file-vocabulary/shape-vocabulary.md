@@ -60,6 +60,7 @@
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
 | | `Resources/` | 폰트 자산 |
 | `UI/Component/` | 역할 폴더 | [UIComponent 컨벤션 — 컴포넌트 역할 분류](../ui-component.md#3-컴포넌트-역할-분류)이 소유 |
+| | `Contracts/` | 여러 역할 폴더가 채택하는 시각 속성 계약 프로토콜 |
 | | `Resources/` | 이미지·애니메이션 자산 |
 | `UI/ComponentPreviewApp/` | `Catalogs/` | 레이아웃 계약 검토 카탈로그 |
 | `App/GitIt/` | `Reducers/` · `Screens/` | 앱 루트 Feature와 화면 |
