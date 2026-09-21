@@ -429,6 +429,38 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U4 | (새 테스트, I3-1 동작 차이 고정) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 이미 사라진 프로젝트의 삭제는 성공으로 보고 deleted를 보낸다 | 기능 Feature 테스트 |
 | U4 | (새 테스트) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 확인 중이거나 삭제 중이면 request를 무시한다 | 기능 Feature 테스트 |
 | U4 | (새 테스트) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 삭제 중의 cancel은 무시한다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 약관 동의가 충족되면 바로 Apple 로그인을 시작한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의가 충족되면 바로 Apple 로그인을 시작한다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 약관 동의가 없으면 약관 단계로 가고 동의를 마친 뒤 로그인한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의를 마치면 로그인한다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 약관 동의를 취소하면 로그인 없이 대기 상태로 돌아간다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의를 취소하면 로그인 없이 대기 상태로 돌아가고 consentCancelled를 보낸다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 로그인 성공은 직군 입력 필요 여부를 signedIn으로 위임한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 로그인 성공은 직군 입력 필요 여부를 signedIn으로 위임한다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 로그인 취소는 실패 알럿 없이 대기 상태로 돌아간다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 로그인 취소는 실패 없이 취소 상태가 되고 signInCancelled를 보낸다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 재시도 가능한 실패는 실패 알럿을 띄우고 닫으면 대기 상태로 돌아간다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 재시도 가능한 실패는 실패 상태가 되고 닫으면 대기 상태로 돌아간다 | 기능 Feature 테스트 |
+| U5 | Tests/MainShell/Router/GuestSignInFeatureTests.swift › 로그인 진행 중 start를 다시 받아도 로그인 요청을 추가로 보내지 않는다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 진행 중인 흐름에서는 start를 다시 받아도 로그인 요청을 추가로 보내지 않는다 | 기능 Feature 테스트 |
+| U5 | (새 테스트) | Tests/Shared/Reducers/SignInFeatureTests.swift › prepareConsent는 동의 상태를 적재한다, 이미 적재된 동의 상태는 prepareConsent로 다시 적재하지 않는다 | 기능 Feature 테스트 |
+| U5 | (새 테스트, I4-1 동작 차이 고정) | Tests/Shared/Reducers/SignInFeatureTests.swift › 동의 상태가 적재되기 전의 start는 적재 완료를 기다린 뒤 동의 필요 여부를 판단한다 | 기능 Feature 테스트 |
+| U5 | (새 테스트) | Tests/Shared/Reducers/SignInFeatureTests.swift › 취소나 실패 뒤의 start는 로그인을 다시 시작한다 | 기능 Feature 테스트 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 현재 requestID와 다른 로그인 응답은 상태를 바꾸지 않는다 | Tests/Shared/Reducers/SignInFeatureTests.swift › request ID가 다르거나 로그인 중이 아니면 로그인 결과를 반영하지 않는다 | 기능 Feature 테스트 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 화면 진입은 appeared를 위임한다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 화면 진입은 로그인에 prepareConsent를 보낸다 | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 로그인 탭은 곧바로 로그인하지 않고 signInRequested를 위임한다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다(탭이 곧바로 로그인에 start를 보냄) | 중복 제거(대체 테스트 명시) |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다(수신 Action 경로 `signIn`) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다(수신 Action 경로 `signIn`) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 인증 취소는 재시도 오류와 구분되는 cancelled 상태로 남는다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › Apple 인증 취소는 재시도 오류와 구분되는 cancelled 상태로 남는다(상태 경로 `signIn.phase`) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › deletesCompletedAccountOnSignIn이 true면 needsCuration false 응답을 받은 뒤 회원탈퇴하고 자동으로 재로그인한다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › deletesCompletedAccountOnSignIn이 true면 needsCuration false 응답을 받은 뒤 회원탈퇴하고 자동으로 재로그인한다(`accountReset` 진행 상태 단언 추가) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › deletesCompletedAccountOnSignIn이 true여도 재시도가 다시 needsCuration false를 받으면 더 이상 반복하지 않는다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › deletesCompletedAccountOnSignIn이 true여도 재시도가 다시 needsCuration false를 받으면 더 이상 반복하지 않는다(`accountReset` 진행 상태 단언 추가) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 로그인 진행 중에는 비로그인 진입을 무시한다 | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 로그인 진행 중에는 비로그인 진입을 무시한다(상태 경로 `signIn.phase`) | 합성 지점 검증 |
+| U5 | (새 테스트) | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 계정 재설정 중에는 로그인 진행 중으로 보고 비로그인 진입을 무시한다 | 합성 지점 검증 |
+| U5 | (새 테스트) | Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 약관 동의를 취소하면 마지막 페이지로 되돌린다 | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Tutorial/TutorialAccessibilityTests.swift › TutorialFeature의 재시도 가능한 오류는 retryableFailure와 cancelled를 모두 포함한다 | Tests/Onboarding/Tutorial/TutorialAccessibilityTests.swift › TutorialFeature의 재시도 가능한 오류는 로그인 실패와 취소를 모두 포함한다 | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 정상 완료 여정은 guide와 curation 및 splash를 거쳐 mainShell 전환을 위임하고 이동 이벤트를 남긴다 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 정상 완료 여정은 guide와 curation 및 splash를 거쳐 mainShell 전환을 위임하고 이동 이벤트를 남긴다(수신 Action 경로 `tutorial.signIn`) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 저장 동의가 유효하지 않으면 로그인을 시작하지 않고 legalAgreement 화면으로 이동하며 선택을 초기화한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의를 마치면 로그인한다(동의 필요 판단과 `.agreeingToPolicies` 전이). 이동 이벤트 단언은 I4-2에 따라 삭제 | 기능 Feature 테스트 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 동의를 마치면 tutorial로 돌아와 로그인을 시작하고 needsCuration에 따라 curation으로 이동한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의를 마치면 로그인한다, Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 정상 완료 여정은 guide와 curation 및 splash를 거쳐 mainShell 전환을 위임하고 이동 이벤트를 남긴다 | 중복 제거(대체 테스트 명시) |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › legalAgreement 취소는 tutorial 마지막 페이지로 되돌린다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 약관 동의를 취소하면 로그인 없이 대기 상태로 돌아가고 consentCancelled를 보낸다, Tests/Onboarding/Tutorial/TutorialFeatureTests.swift › 약관 동의를 취소하면 마지막 페이지로 되돌린다 | 기능 Feature 테스트 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 문서 sheet 닫기 view 액션은 legalAgreement의 표시 상태를 해제한다 | Tests/Shared/Reducers/SignInFeatureTests.swift › 문서 sheet 닫기는 legalAgreement의 문서 표시를 해제한다 | 기능 Feature 테스트 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 로그인 취소는 화면을 바꾸지 않고 이동 이벤트를 남기지 않는다 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 로그인 취소는 화면을 바꾸지 않고 이동 이벤트를 남기지 않는다(상태 경로 `tutorial.signIn`) | 합성 지점 검증 |
+| U5 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 로그인 성공에서 needsCuration이 false이면 화면 전환 없이 mainShellRequested를 위임한다 | Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift › 로그인 성공에서 needsCuration이 false이면 화면 전환 없이 mainShellRequested를 위임한다(수신 Action 경로 `tutorial.signIn`) | 합성 지점 검증 |
+| U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 홈의 로그인 요청은 로그인 흐름을 시작한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 홈의 로그인 요청은 로그인 흐름을 시작한다(자식 경로 `signIn`) | 합성 지점 검증 |
+| U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 마이 탭 로그인 화면의 로그인은 로그인 흐름을 시작한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 마이 탭 로그인 화면의 로그인은 로그인 흐름을 시작한다(자식 경로 `signIn`) | 합성 지점 검증 |
+| U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 로그인 성공은 직군 입력 필요 여부와 함께 signInSucceeded를 위임한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 로그인 성공은 직군 입력 필요 여부와 함께 signInSucceeded를 위임한다(자식 경로 `signIn`) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -447,3 +479,9 @@ U3에서 상태 경로만 바꿨다.
 **U4 비고**: `ProjectDeletionFeature`도 U3과 같은 이유로 취소 ID를 인스턴스별로 만든다. research §4 I3의
 동작 차이 1은 `ProjectDetailFeatureTests › 이미 사라진 프로젝트를 삭제하면 삭제 완료를 알린다`, 동작 차이 2는
 `ProjectListFeatureTests › 삭제 실패 뒤에도 다시 삭제를 요청할 수 있다`가 고정한다.
+
+**U5 비고**: MainShell의 로그인 취소는 기존에 `idle`로 돌아갔지만 `SignInFeature`는 `cancelled`로 둔다.
+MainShell은 `failed`만 alert로 표시하고 `cancelled`에서도 `start`를 받으므로 관찰 동작은 같다. Tutorial의
+화면 본문과 `SignInSection`은 로그인 상태를 참조하지 않아 T062에서 바꿀 곳이 없고 Preview만 바꿨다.
+`OnboardingRouterPreviews.swift`와 `MainShellAccountUseCaseStub.swift`도 새 구조에서 그대로 compile되어 수정하지
+않았다. Tutorial의 `input.returnToLastPage`는 큐레이션 이탈 복귀에서 Router가 계속 쓰므로 남겼다.

@@ -4,11 +4,11 @@ import SwiftUI
 extension TutorialFeature.State {
     fileprivate static func preview(
         page: Int,
-        authentication: TutorialFeature.AuthenticationStatus = .idle,
+        signInPhase: SignInFeature.Phase = .idle,
     ) -> Self {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
         state.page = page
-        state.authentication = authentication
+        state.signIn.phase = signInPhase
         return state
     }
 }
@@ -27,6 +27,6 @@ extension TutorialFeature.State {
 
 #Preview("Tutorial - 로그인 취소") {
     TutorialScreen(
-        store: Store(initialState: .preview(page: 3, authentication: .cancelled)) { EmptyReducer() }
+        store: Store(initialState: .preview(page: 3, signInPhase: .cancelled)) { EmptyReducer() }
     )
 }

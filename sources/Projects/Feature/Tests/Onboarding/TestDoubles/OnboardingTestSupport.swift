@@ -23,6 +23,7 @@ func makeAppEntryStore(
 @MainActor
 func makeTutorialStore(
     signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
+    policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
     accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: TutorialFeature.State = TutorialFeature.State(bundleVersion: "1.0.0"),
@@ -30,6 +31,8 @@ func makeTutorialStore(
     TestStore(initialState: state) {
         TutorialFeature(
             signIn: signIn.signIn,
+            policyConsentStatus: policyConsent.policyConsentStatus,
+            consent: policyConsent.consent,
             withdraw: accountWithdrawal.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )

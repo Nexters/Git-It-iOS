@@ -1,8 +1,9 @@
 import ComposableArchitecture
 import DomainAccount
+import Foundation
 
 @Reducer
-public struct GuestSignInFeature: Sendable {
+public struct SignInFeature: Sendable {
 
     // MARK: Lifecycle
 
@@ -35,9 +36,42 @@ public struct GuestSignInFeature: Sendable {
             phase == .agreeingToPolicies
         }
 
-        public var isFailureAlertPresented: Bool {
+        public var isSigningIn: Bool {
+            phase == .signingIn
+        }
+
+        public var isFailed: Bool {
             phase == .failed
         }
+
+        public var isCancelled: Bool {
+            phase == .cancelled
+        }
+
+        public var canStart: Bool {
+            switch phase {
+            case .idle,
+                 .cancelled,
+                 .failed:
+                true
+
+            case .checkingConsent,
+                 .agreeingToPolicies,
+                 .signingIn:
+                false
+            }
+        }
+
+        public static func ==(
+            lhs: Self,
+            rhs: Self,
+        ) -> Bool {
+            lhs.phase == rhs.phase && lhs.legalAgreement == rhs.legalAgreement && lhs.requestID == rhs.requestID
+        }
+
+        // MARK: Fileprivate
+
+        fileprivate let instanceID = UUID()
 
     }
 
@@ -52,13 +86,14 @@ public struct GuestSignInFeature: Sendable {
 
         @CasePathable
         public enum View: Sendable, Equatable {
-            case failureDismissed
             case legalAgreementDismissed
             case legalDocumentSheetDismissed
+            case failureDismissed
         }
 
         @CasePathable
         public enum Input: Sendable, Equatable {
+            case prepareConsent
             case start
         }
 
@@ -70,6 +105,8 @@ public struct GuestSignInFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case signedIn(needsCuration: Bool)
+            case consentCancelled
+            case signInCancelled
         }
     }
 
@@ -79,8 +116,12 @@ public struct GuestSignInFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
+            case .input(.prepareConsent):
+                guard state.legalAgreement.requiredDocuments.isEmpty else { return .none }
+                return .send(.legalAgreement(.input(.load)))
+
             case .input(.start):
-                guard state.phase == .idle else { return .none }
+                guard state.canStart else { return .none }
                 state.phase = .checkingConsent
                 guard !state.legalAgreement.requiredDocuments.isEmpty else {
                     return .send(.legalAgreement(.input(.load)))
@@ -98,7 +139,7 @@ public struct GuestSignInFeature: Sendable {
             case .legalAgreement(.delegate(.cancelled)):
                 guard state.phase == .agreeingToPolicies else { return .none }
                 state.phase = .idle
-                return .none
+                return .send(.delegate(.consentCancelled))
 
             case .view(.legalAgreementDismissed):
                 return .send(.legalAgreement(.view(.cancelTapped)))
@@ -119,8 +160,8 @@ public struct GuestSignInFeature: Sendable {
                     return .send(.delegate(.signedIn(needsCuration: account.needsCuration)))
 
                 case .cancelled:
-                    state.phase = .idle
-                    return .none
+                    state.phase = .cancelled
+                    return .send(.delegate(.signInCancelled))
 
                 case .retryableFailure:
                     state.phase = .failed
@@ -137,7 +178,7 @@ public struct GuestSignInFeature: Sendable {
     // MARK: Private
 
     private enum CancelID: Hashable {
-        case signIn
+        case signIn(UUID)
     }
 
     private let signIn: @Sendable (SignInMethod) async -> SignInResult
@@ -156,11 +197,11 @@ public struct GuestSignInFeature: Sendable {
         state.phase = .signingIn
         state.requestID += 1
         let requestID = state.requestID
-        return .run { send in
+        return .run { [signIn] send in
             let result = await signIn(.apple)
             await send(.effect(.signInFinished(requestID: requestID, result: result)))
         }
-        .cancellable(id: CancelID.signIn, cancelInFlight: true)
+        .cancellable(id: CancelID.signIn(state.instanceID), cancelInFlight: true)
     }
 
 }

@@ -234,31 +234,31 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 테스트
 
-- [ ] T055 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/SignInFeatureTests.swift`를 작성한다. 검증 범위는 `prepareConsent`, `start`(`idle`·`cancelled`·`failed`에서만), 동의 미적재 시 적재 대기 후 판단(차이 I4-1), 동의 유효 시 즉시 로그인, 동의 필요 시 `.agreeingToPolicies`, `consentCompleted` → 로그인, `cancelled` → `consentCancelled`, 결과별 `signedIn`·`.cancelled`+`signInCancelled`·`.failed`, `failureDismissed`, requestID와 `phase == .signingIn` 동시 검증이다
+- [X] T055 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/SignInFeatureTests.swift`를 작성한다. 검증 범위는 `prepareConsent`, `start`(`idle`·`cancelled`·`failed`에서만), 동의 미적재 시 적재 대기 후 판단(차이 I4-1), 동의 유효 시 즉시 로그인, 동의 필요 시 `.agreeingToPolicies`, `consentCompleted` → 로그인, `cancelled` → `consentCancelled`, 결과별 `signedIn`·`.cancelled`+`signInCancelled`·`.failed`, `failureDismissed`, requestID와 `phase == .signingIn` 동시 검증이다
 
 ### 구현
 
-- [ ] T056 [S2] `sources/Projects/Feature/Shared/Reducers/SignInFeature/SignInFeature+Phase.swift`에 `SignInFeature.Phase`(`idle`, `checkingConsent`, `agreeingToPolicies`, `signingIn`, `cancelled`, `failed`)를 선언한다
-- [ ] T057 [S2] `sources/Projects/Feature/Shared/Reducers/SignInFeature/SignInFeature.swift`에 `SignInFeature`를 구현한다. `legalAgreement` 자식을 항상 보유하고, 생성자는 `signIn:`, `policyConsentStatus:`, `consent:`다
-- [ ] T058 [S2] `sources/Projects/Feature/MainShell/Router/GuestSignInFeature.swift`와 `sources/Projects/Feature/MainShell/Router/GuestSignInFeature+Phase.swift`를 삭제한다
-- [ ] T059 [S2] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 `guestSignIn`을 `signIn: SignInFeature.State` 합성으로 바꾼다. 비회원 `signInTapped`·Home `signInRequested` → `start`, `signedIn` → `signInSucceeded(needsCuration:)`로 연결한다. 생성자 시그니처는 유지한다
-- [ ] T060 [S2] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의 동의 오버레이·WebSheet·실패 alert가 `signIn` 자식 store를 관찰하게 바꾼다. 표현은 유지한다
-- [ ] T061 [S2] `sources/Projects/Feature/Onboarding/Tutorial/TutorialFeature.swift`에서 `authentication`·`requestID`·로그인 Effect를 제거하고 `SignInFeature`를 합성한다. 옮기는 동작은 다음과 같다. 표시 시 `prepareConsent`, `appleSignInTapped` → `page = 3`과 `start`, `consentCancelled` → 마지막 페이지. 개발용 계정 재설정은 `withdraw` 후 `start`하는 후속 동작으로 옮기고 `accountReset` 진행 상태를 둔다. `signedIn` → `signInSucceeded`. `signInRequested`·`input.startSignIn`·`input.returnToLastPage` 중 쓰이지 않게 된 Action은 제거한다
-- [ ] T062 [S2] `sources/Projects/Feature/Onboarding/Tutorial/TutorialScreen.swift`, `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`, `sources/Projects/Feature/Onboarding/Tutorial/Previews/TutorialScreenPreviews.swift`의 인라인 오류·진행 표시가 `signIn` 자식 상태(`cancelled`·`failed`·`signingIn`)와 `accountReset`을 관찰하게 바꾼다
-- [ ] T063 [S2] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`에서 `legalAgreement` 자식과 `ActiveScreen.Guide.legalAgreement` case, 동의 분기, `legalAgreementDismissed`·`legalDocumentSheetDismissed` view action을 제거한다. `tutorial.delegate.signInSucceeded` 해석은 유지한다. 생성자 시그니처는 유지하고 로그인 의존성은 Tutorial에 전달한다
-- [ ] T064 [S2] `sources/Projects/Feature/Onboarding/Router/OnboardingRouter.swift`와 `sources/Projects/Feature/Onboarding/Router/Previews/OnboardingRouterPreviews.swift`의 동의 오버레이가 `tutorial.signIn` 자식 store를 관찰하게 바꾼다
+- [X] T056 [S2] `sources/Projects/Feature/Shared/Reducers/SignInFeature/SignInFeature+Phase.swift`에 `SignInFeature.Phase`(`idle`, `checkingConsent`, `agreeingToPolicies`, `signingIn`, `cancelled`, `failed`)를 선언한다
+- [X] T057 [S2] `sources/Projects/Feature/Shared/Reducers/SignInFeature/SignInFeature.swift`에 `SignInFeature`를 구현한다. `legalAgreement` 자식을 항상 보유하고, 생성자는 `signIn:`, `policyConsentStatus:`, `consent:`다
+- [X] T058 [S2] `sources/Projects/Feature/MainShell/Router/GuestSignInFeature.swift`와 `sources/Projects/Feature/MainShell/Router/GuestSignInFeature+Phase.swift`를 삭제한다
+- [X] T059 [S2] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 `guestSignIn`을 `signIn: SignInFeature.State` 합성으로 바꾼다. 비회원 `signInTapped`·Home `signInRequested` → `start`, `signedIn` → `signInSucceeded(needsCuration:)`로 연결한다. 생성자 시그니처는 유지한다
+- [X] T060 [S2] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의 동의 오버레이·WebSheet·실패 alert가 `signIn` 자식 store를 관찰하게 바꾼다. 표현은 유지한다
+- [X] T061 [S2] `sources/Projects/Feature/Onboarding/Tutorial/TutorialFeature.swift`에서 `authentication`·`requestID`·로그인 Effect를 제거하고 `SignInFeature`를 합성한다. 옮기는 동작은 다음과 같다. 표시 시 `prepareConsent`, `appleSignInTapped` → `page = 3`과 `start`, `consentCancelled` → 마지막 페이지. 개발용 계정 재설정은 `withdraw` 후 `start`하는 후속 동작으로 옮기고 `accountReset` 진행 상태를 둔다. `signedIn` → `signInSucceeded`. `signInRequested`·`input.startSignIn`·`input.returnToLastPage` 중 쓰이지 않게 된 Action은 제거한다
+- [X] T062 [S2] `sources/Projects/Feature/Onboarding/Tutorial/TutorialScreen.swift`, `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`, `sources/Projects/Feature/Onboarding/Tutorial/Previews/TutorialScreenPreviews.swift`의 인라인 오류·진행 표시가 `signIn` 자식 상태(`cancelled`·`failed`·`signingIn`)와 `accountReset`을 관찰하게 바꾼다
+- [X] T063 [S2] `sources/Projects/Feature/Onboarding/Router/OnboardingRouterFeature.swift`에서 `legalAgreement` 자식과 `ActiveScreen.Guide.legalAgreement` case, 동의 분기, `legalAgreementDismissed`·`legalDocumentSheetDismissed` view action을 제거한다. `tutorial.delegate.signInSucceeded` 해석은 유지한다. 생성자 시그니처는 유지하고 로그인 의존성은 Tutorial에 전달한다
+- [X] T064 [S2] `sources/Projects/Feature/Onboarding/Router/OnboardingRouter.swift`와 `sources/Projects/Feature/Onboarding/Router/Previews/OnboardingRouterPreviews.swift`의 동의 오버레이가 `tutorial.signIn` 자식 store를 관찰하게 바꾼다
 
 ### 테스트 이관
 
-- [ ] T065 [S2] `sources/Projects/Feature/Tests/MainShell/Router/GuestSignInFeatureTests.swift`의 각 `@Test`를 T055에 대응시킨 뒤 파일을 삭제한다
-- [ ] T066 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift`와 `sources/Projects/Feature/Tests/MainShell/TestDoubles/MainShellAccountUseCaseStub.swift`를 `signIn` 자식으로의 시작 신호와 `signInSucceeded` 전달 검증으로 바꾼다
-- [ ] T067 [S2] `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialFeatureTests.swift`와 `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialAccessibilityTests.swift`를 합성 지점과 화면 고유 후속 동작(페이지, 계정 재설정) 검증으로 바꾼다
-- [ ] T068 [S2] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`와 `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestSupport.swift`에서 동의 화면 전환과 이동 이벤트 단언을 제거하고(차이 I4-2), 로그인 성공 delegate 해석만 남긴다
-- [ ] T069 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U5 이관 대응표를 추가한다
+- [X] T065 [S2] `sources/Projects/Feature/Tests/MainShell/Router/GuestSignInFeatureTests.swift`의 각 `@Test`를 T055에 대응시킨 뒤 파일을 삭제한다
+- [X] T066 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift`와 `sources/Projects/Feature/Tests/MainShell/TestDoubles/MainShellAccountUseCaseStub.swift`를 `signIn` 자식으로의 시작 신호와 `signInSucceeded` 전달 검증으로 바꾼다
+- [X] T067 [S2] `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialFeatureTests.swift`와 `sources/Projects/Feature/Tests/Onboarding/Tutorial/TutorialAccessibilityTests.swift`를 합성 지점과 화면 고유 후속 동작(페이지, 계정 재설정) 검증으로 바꾼다
+- [X] T068 [S2] `sources/Projects/Feature/Tests/Onboarding/Router/OnboardingRouterFeatureTests.swift`와 `sources/Projects/Feature/Tests/Onboarding/TestDoubles/OnboardingTestSupport.swift`에서 동의 화면 전환과 이동 이벤트 단언을 제거하고(차이 I4-2), 로그인 성공 delegate 해석만 남긴다
+- [X] T069 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U5 이관 대응표를 추가한다
 
 ### 정리와 단위 검증
 
-- [ ] T070 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. App test(`AppRootFeatureGuestAccessTests`)도 통과하는지, `GuestSignIn` 문자열이 소스에 남지 않았는지 grep으로 확인한다
+- [X] T070 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. App test(`AppRootFeatureGuestAccessTests`)도 통과하는지, `GuestSignIn` 문자열이 소스에 남지 않았는지 grep으로 확인한다
 
 **진행 점검**: T055~T070의 변경 파일과 검증 결과를 보고하고 실행 단위 6으로 진행한다.
 

@@ -61,9 +61,9 @@ public struct MainShellRouter: View {
         .overlay { singleQuestionOverlay }
         .overlay { guestLegalAgreementOverlay }
         .overlay { guestLegalDocumentOverlay }
-        .alert("로그인하지 못했어요", isPresented: guestSignInFailureBinding) {
+        .alert("로그인하지 못했어요", isPresented: signInFailureBinding) {
             Button("확인", role: .cancel) {
-                store.send(.guestSignIn(.view(.failureDismissed)))
+                store.send(.signIn(.view(.failureDismissed)))
             }
         } message: {
             Text("잠시 후 다시 시도해 주세요.")
@@ -84,37 +84,37 @@ public struct MainShellRouter: View {
         )
     }
 
-    private var guestSignInFailureBinding: Binding<Bool> {
+    private var signInFailureBinding: Binding<Bool> {
         Binding(
-            get: { store.guestSignIn.isFailureAlertPresented },
+            get: { store.signIn.isFailed },
             set: { isPresented in
                 guard !isPresented else { return }
-                store.send(.guestSignIn(.view(.failureDismissed)))
+                store.send(.signIn(.view(.failureDismissed)))
             },
         )
     }
 
     private var guestLegalAgreementOverlay: some View {
         ModalOverlay(
-            isPresented: store.guestSignIn.isLegalAgreementPresented,
-            onDismiss: { store.send(.guestSignIn(.view(.legalAgreementDismissed))) },
+            isPresented: store.signIn.isLegalAgreementPresented,
+            onDismiss: { store.send(.signIn(.view(.legalAgreementDismissed))) },
         ) {
             LegalAgreementScreen(
-                store: store.scope(state: \.guestSignIn.legalAgreement, action: \.guestSignIn.legalAgreement)
+                store: store.scope(state: \.signIn.legalAgreement, action: \.signIn.legalAgreement)
             )
         }
     }
 
     private var guestLegalDocumentOverlay: some View {
         ModalOverlay(
-            isPresented: store.guestSignIn.legalAgreement.presentedDocument != nil,
-            onDismiss: { store.send(.guestSignIn(.view(.legalDocumentSheetDismissed))) },
+            isPresented: store.signIn.legalAgreement.presentedDocument != nil,
+            onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
         ) {
-            if let document = store.guestSignIn.legalAgreement.presentedDocument {
+            if let document = store.signIn.legalAgreement.presentedDocument {
                 WebSheet(
                     title: document.displayName,
                     url: document.approvedURL,
-                    onDismiss: { store.send(.guestSignIn(.view(.legalDocumentSheetDismissed))) },
+                    onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
                 )
             }
         }

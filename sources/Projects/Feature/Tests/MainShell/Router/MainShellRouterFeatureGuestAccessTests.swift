@@ -52,9 +52,9 @@ struct MainShellRouterFeatureGuestAccessTests {
         store.exhaustivity = .off
 
         await store.send(.home(.delegate(.signInRequested)))
-        await store.receive(.guestSignIn(.input(.start)))
+        await store.receive(.signIn(.input(.start)))
 
-        #expect(store.state.guestSignIn.phase != .idle)
+        #expect(store.state.signIn.phase != .idle)
 
         await store.finish()
     }
@@ -65,9 +65,9 @@ struct MainShellRouterFeatureGuestAccessTests {
         store.exhaustivity = .off
 
         await store.send(.view(.signInTapped))
-        await store.receive(.guestSignIn(.input(.start)))
+        await store.receive(.signIn(.input(.start)))
 
-        #expect(store.state.guestSignIn.phase != .idle)
+        #expect(store.state.signIn.phase != .idle)
 
         await store.finish()
     }
@@ -76,7 +76,7 @@ struct MainShellRouterFeatureGuestAccessTests {
     func `로그인 성공은 직군 입력 필요 여부와 함께 signInSucceeded를 위임한다`() async {
         let store = makeStore()
 
-        await store.send(.guestSignIn(.delegate(.signedIn(needsCuration: true))))
+        await store.send(.signIn(.delegate(.signedIn(needsCuration: true))))
         await store.receive(.delegate(.signInSucceeded(needsCuration: true)))
     }
 

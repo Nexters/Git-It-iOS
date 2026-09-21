@@ -8,21 +8,23 @@ public struct TutorialFeature: Sendable {
 
     public init(
         signIn: @escaping @Sendable (SignInMethod) async -> SignInResult,
+        policyConsentStatus: @escaping @Sendable () async throws -> PolicyConsentStatus,
+        consent: @escaping @Sendable ([PolicyDocumentID]) async throws -> Void,
         withdraw: @escaping @Sendable () async throws -> Void,
         deletesCompletedAccountOnSignIn: Bool = false,
     ) {
         self.signIn = signIn
+        self.policyConsentStatus = policyConsentStatus
+        self.consent = consent
         self.withdraw = withdraw
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
 
     // MARK: Public
 
-    public enum AuthenticationStatus: Equatable, Sendable {
+    public enum AccountReset: Equatable, Sendable {
         case idle
-        case signingIn
-        case cancelled
-        case retryableFailure
+        case resetting
     }
 
     public struct PageProgress: Equatable, Sendable {
@@ -33,13 +35,17 @@ public struct TutorialFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         public init(bundleVersion: String) {
             self.bundleVersion = bundleVersion
         }
 
+        // MARK: Public
+
         public var page = 1
-        public var authentication = AuthenticationStatus.idle
-        public var requestID = 0
+        public var signIn = SignInFeature.State()
+        public var accountReset = AccountReset.idle
         public var hasAttemptedCompletedAccountReset = false
         public let bundleVersion: String
 
@@ -47,8 +53,12 @@ public struct TutorialFeature: Sendable {
             PageProgress(currentPage: page - 1, totalPages: Constant.pageCount)
         }
 
+        public var isSigningIn: Bool {
+            signIn.isSigningIn || accountReset == .resetting
+        }
+
         public var isShowingRecoverableError: Bool {
-            authentication == .retryableFailure || authentication == .cancelled
+            signIn.isFailed || signIn.isCancelled
         }
 
     }
@@ -58,6 +68,7 @@ public struct TutorialFeature: Sendable {
         case effect(EffectEvent)
         case input(Input)
         case delegate(Delegate)
+        case signIn(SignInFeature.Action)
 
         // MARK: Public
 
@@ -71,79 +82,70 @@ public struct TutorialFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case signInFinished(requestID: Int, result: SignInResult)
+            case accountResetFinished
         }
 
         @CasePathable
         public enum Input: Sendable, Equatable {
             case returnToLastPage
-            case startSignIn
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case appeared
-            case signInRequested
             case signInSucceeded(needsCuration: Bool)
             case guestAccessRequested
         }
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.signIn, action: \.signIn) {
+            SignInFeature(signIn: signIn, policyConsentStatus: policyConsentStatus, consent: consent)
+        }
         Reduce { state, action in
             switch action {
             case .view(.appeared):
-                return .send(.delegate(.appeared))
+                return .send(.signIn(.input(.prepareConsent)))
 
             case .view(.pageChanged(let page)):
                 state.page = page
                 return .none
 
             case .view(.appleSignInTapped):
-                guard state.authentication != .signingIn else { return .none }
-                return .send(.delegate(.signInRequested))
+                guard !state.isSigningIn, state.signIn.canStart else { return .none }
+                state.page = Constant.pageCount
+                return .send(.signIn(.input(.start)))
 
             case .view(.guestAccessTapped):
-                guard state.authentication != .signingIn else { return .none }
+                guard !state.isSigningIn else { return .none }
                 return .send(.delegate(.guestAccessRequested))
 
-            case .input(.startSignIn):
-                guard state.authentication != .signingIn else { return .none }
-                return startSignIn(&state)
-
-            case .input(.returnToLastPage):
+            case .input(.returnToLastPage),
+                 .signIn(.delegate(.consentCancelled)):
                 state.page = Constant.pageCount
                 return .none
 
-            case .effect(.signInFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .signedIn(let account):
-                    let needsCuration = account.needsCuration
-                    if deletesCompletedAccountOnSignIn, !needsCuration, !state.hasAttemptedCompletedAccountReset {
-                        state.hasAttemptedCompletedAccountReset = true
-                        state.requestID += 1
-                        let retryRequestID = state.requestID
-                        return .run { send in
-                            try? await withdraw()
-                            let result = await signIn(.apple)
-                            await send(.effect(.signInFinished(requestID: retryRequestID, result: result)))
-                        }
-                        .cancellable(id: CancelID.signIn, cancelInFlight: true)
-                    }
-                    state.authentication = .idle
+            case .signIn(.delegate(.signedIn(let needsCuration))):
+                guard
+                    deletesCompletedAccountOnSignIn,
+                    !needsCuration,
+                    !state.hasAttemptedCompletedAccountReset
+                else {
                     return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
-
-                case .cancelled:
-                    state.authentication = .cancelled
-                    return .none
-
-                case .retryableFailure:
-                    state.authentication = .retryableFailure
-                    return .none
                 }
+                state.hasAttemptedCompletedAccountReset = true
+                state.accountReset = .resetting
+                return .run { [withdraw] send in
+                    try? await withdraw()
+                    await send(.effect(.accountResetFinished))
+                }
+                .cancellable(id: CancelID.accountReset, cancelInFlight: true)
 
-            case .delegate:
+            case .effect(.accountResetFinished):
+                state.accountReset = .idle
+                return .send(.signIn(.input(.start)))
+
+            case .signIn,
+                 .delegate:
                 return .none
             }
         }
@@ -156,23 +158,13 @@ public struct TutorialFeature: Sendable {
     }
 
     private enum CancelID: Hashable {
-        case signIn
+        case accountReset
     }
 
     private let signIn: @Sendable (SignInMethod) async -> SignInResult
+    private let policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus
+    private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
     private let withdraw: @Sendable () async throws -> Void
     private let deletesCompletedAccountOnSignIn: Bool
-
-    private func startSignIn(_ state: inout State) -> Effect<Action> {
-        state.page = Constant.pageCount
-        state.authentication = .signingIn
-        state.requestID += 1
-        let requestID = state.requestID
-        return .run { send in
-            let result = await signIn(.apple)
-            await send(.effect(.signInFinished(requestID: requestID, result: result)))
-        }
-        .cancellable(id: CancelID.signIn, cancelInFlight: true)
-    }
 
 }

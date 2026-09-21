@@ -35,7 +35,6 @@ public struct OnboardingRouterFeature: Sendable {
 
         public enum Guide: Hashable, Sendable {
             case tutorial
-            case legalAgreement
         }
 
         public enum Curation: Hashable, Sendable {
@@ -75,7 +74,6 @@ public struct OnboardingRouterFeature: Sendable {
 
         public internal(set) var activeScreen: ActiveScreen
         public var tutorial: TutorialFeature.State
-        public var legalAgreement = LegalAgreementFeature.State()
         public var positionSelection = PositionSelectionFeature.State()
         public var careerSelection = CareerSelectionFeature.State()
         public var exit = OnboardingExitFeature.State()
@@ -87,7 +85,6 @@ public struct OnboardingRouterFeature: Sendable {
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case tutorial(TutorialFeature.Action)
-        case legalAgreement(LegalAgreementFeature.Action)
         case positionSelection(PositionSelectionFeature.Action)
         case careerSelection(CareerSelectionFeature.Action)
         case exit(OnboardingExitFeature.Action)
@@ -98,8 +95,6 @@ public struct OnboardingRouterFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case curationSplashFinished
-            case legalAgreementDismissed
-            case legalDocumentSheetDismissed
         }
 
         @CasePathable
@@ -114,12 +109,11 @@ public struct OnboardingRouterFeature: Sendable {
         Scope(state: \.tutorial, action: \.tutorial) {
             TutorialFeature(
                 signIn: signIn,
+                policyConsentStatus: policyConsentStatus,
+                consent: consent,
                 withdraw: withdraw,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
-        }
-        Scope(state: \.legalAgreement, action: \.legalAgreement) {
-            LegalAgreementFeature(policyConsentStatus: policyConsentStatus, consent: consent)
         }
         Scope(state: \.positionSelection, action: \.positionSelection) {
             PositionSelectionFeature(signOut: signOut)
@@ -135,30 +129,11 @@ public struct OnboardingRouterFeature: Sendable {
             var effect = Effect<Action>.none
 
             switch action {
-            case .tutorial(.delegate(.appeared)):
-                effect = .send(.legalAgreement(.input(.load)))
-
-            case .tutorial(.delegate(.signInRequested)):
-                if state.legalAgreement.isStoredConsentValid {
-                    effect = .send(.tutorial(.input(.startSignIn)))
-                } else {
-                    state.activeScreen = .guide(.legalAgreement)
-                    effect = .send(.legalAgreement(.input(.prepare)))
-                }
-
             case .tutorial(.delegate(.guestAccessRequested)):
                 effect = .send(.delegate(.guestAccessRequested))
 
             case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
                 effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
-
-            case .legalAgreement(.delegate(.consentCompleted)):
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.startSignIn)))
-
-            case .legalAgreement(.delegate(.cancelled)):
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.returnToLastPage)))
 
             case .positionSelection(.delegate(.confirmed(let position))):
                 state.careerSelection.position = position
@@ -185,18 +160,11 @@ public struct OnboardingRouterFeature: Sendable {
             case .exit(.delegate(.shouldExit)):
                 state.activeScreen = .curationSplash
 
-            case .view(.legalAgreementDismissed):
-                effect = .send(.legalAgreement(.view(.cancelTapped)))
-
-            case .view(.legalDocumentSheetDismissed):
-                effect = .send(.legalAgreement(.view(.documentSheetDismissed)))
-
             case .view(.curationSplashFinished):
                 guard state.activeScreen == .curationSplash else { break }
                 effect = .send(.delegate(.mainShellRequested))
 
             case .tutorial,
-                 .legalAgreement,
                  .positionSelection,
                  .careerSelection,
                  .exit,

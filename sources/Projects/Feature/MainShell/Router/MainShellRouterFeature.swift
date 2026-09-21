@@ -45,7 +45,7 @@ public struct MainShellRouterFeature: Sendable {
         public var settings = SettingsRouterFeature.State()
         public var singleQuestionEntry: SingleQuestionEntryFeature.State?
         @Presents public var singleQuestion: QuestionSolvingFeature.State?
-        public var guestSignIn = GuestSignInFeature.State()
+        public var signIn = SignInFeature.State()
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -58,7 +58,7 @@ public struct MainShellRouterFeature: Sendable {
         case settings(SettingsRouterFeature.Action)
         case singleQuestionEntry(SingleQuestionEntryFeature.Action)
         case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
-        case guestSignIn(GuestSignInFeature.Action)
+        case signIn(SignInFeature.Action)
 
         // MARK: Public
 
@@ -121,8 +121,8 @@ public struct MainShellRouterFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
-        Scope(state: \.guestSignIn, action: \.guestSignIn) {
-            GuestSignInFeature(
+        Scope(state: \.signIn, action: \.signIn) {
+            SignInFeature(
                 signIn: { [account] in await account.signIn(with: $0) },
                 policyConsentStatus: { [account] in try await account.policyConsentStatus() },
                 consent: { [account] in try await account.consent(to: $0) },
@@ -154,9 +154,9 @@ public struct MainShellRouterFeature: Sendable {
             case .view(.signInTapped),
                  .home(.delegate(.signInRequested)):
                 guard state.access == .guest else { return .none }
-                return .send(.guestSignIn(.input(.start)))
+                return .send(.signIn(.input(.start)))
 
-            case .guestSignIn(.delegate(.signedIn(let needsCuration))):
+            case .signIn(.delegate(.signedIn(let needsCuration))):
                 return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
 
             case .home(.delegate(.allProjectsRequested)):
@@ -222,7 +222,7 @@ public struct MainShellRouterFeature: Sendable {
                  .settings,
                  .singleQuestionEntry,
                  .singleQuestion,
-                 .guestSignIn,
+                 .signIn,
                  .delegate:
                 return .none
             }

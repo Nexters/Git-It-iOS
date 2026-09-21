@@ -26,20 +26,20 @@ struct OnboardingRouterFeatureTests {
         #expect(store.state.transitionLog.isEmpty)
 
         await store.send(.tutorial(.view(.appeared)))
-        await store.receive(.tutorial(.delegate(.appeared)))
-        await store.receive(.legalAgreement(.input(.load)))
-        await store.receive(.legalAgreement(.effect(.statusLoaded(
+        await store.receive(.tutorial(.signIn(.input(.prepareConsent))))
+        await store.receive(.tutorial(.signIn(.legalAgreement(.input(.load)))))
+        await store.receive(.tutorial(.signIn(.legalAgreement(.effect(.statusLoaded(
             requiredDocuments: OnboardingTestFixture.requiredDocuments,
             isStoredConsentValid: true,
-        ))))
-        #expect(store.state.legalAgreement.isStoredConsentValid)
+        ))))))
+        #expect(store.state.tutorial.signIn.legalAgreement.isStoredConsentValid)
         #expect(store.state.transitionLog.isEmpty)
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
-        await store.receive(.tutorial(.effect(.signInFinished(
+        await store.receive(.tutorial(.signIn(.effect(.signInFinished(
             requestID: 1,
             result: .signedIn(uncuratedAccount),
-        ))))
+        )))))
         await store.receive(.tutorial(.delegate(.signInSucceeded(needsCuration: true))))
 
         #expect(store.state.activeScreen == .curation(.positionSelection))
@@ -77,80 +77,20 @@ struct OnboardingRouterFeatureTests {
     }
 
     @Test
-    func `저장 동의가 유효하지 않으면 로그인을 시작하지 않고 legalAgreement 화면으로 이동하며 선택을 초기화한다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.legalAgreement.selectedDocumentIDs = [OnboardingTestFixture.privacyPolicy.id]
-        let signIn = AccountUseCaseSignInMock(results: [.signedIn(uncuratedAccount)])
-        let store = makeOnboardingRouterStore(signIn: signIn, state: state)
-        store.exhaustivity = .off
-
-        await store.send(.tutorial(.view(.appleSignInTapped)))
-        await store.receive(.tutorial(.delegate(.signInRequested)))
-        await store.receive(.legalAgreement(.input(.prepare)))
-
-        #expect(store.state.activeScreen == .guide(.legalAgreement))
-        #expect(store.state.legalAgreement.selectedDocumentIDs.isEmpty)
-        #expect(store.state.tutorial.authentication == .idle)
-        #expect(await signIn.snapshot().isEmpty)
-        #expect(store.state.transitionLog.last?.to == .guide(.legalAgreement))
-    }
-
-    @Test
-    func `동의를 마치면 tutorial로 돌아와 로그인을 시작하고 needsCuration에 따라 curation으로 이동한다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.activeScreen = .guide(.legalAgreement)
-        state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.legalAgreement.selectedDocumentIDs = Set(OnboardingTestFixture.requiredDocuments.map(\.id))
-        let signIn = AccountUseCaseSignInMock(results: [.signedIn(uncuratedAccount)])
-        let store = makeOnboardingRouterStore(signIn: signIn, state: state)
-        store.exhaustivity = .off
-
-        await store.send(.legalAgreement(.view(.continueTapped)))
-        await store.receive(.legalAgreement(.delegate(.consentCompleted)))
-        await store.receive(.tutorial(.input(.startSignIn)))
-        await store.receive(.tutorial(.effect(.signInFinished(
-            requestID: 1,
-            result: .signedIn(uncuratedAccount),
-        ))))
-        await store.receive(.tutorial(.delegate(.signInSucceeded(needsCuration: true))))
-
-        #expect(store.state.activeScreen == .curation(.positionSelection))
-    }
-
-    @Test
-    func `legalAgreement 취소는 tutorial 마지막 페이지로 되돌린다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.activeScreen = .guide(.legalAgreement)
-        state.tutorial.page = 3
-        state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        let store = makeOnboardingRouterStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.legalAgreementDismissed))
-        await store.receive(.legalAgreement(.view(.cancelTapped)))
-        await store.receive(.legalAgreement(.delegate(.cancelled)))
-        await store.receive(.tutorial(.input(.returnToLastPage)))
-
-        #expect(store.state.activeScreen == .guide(.tutorial))
-        #expect(store.state.tutorial.page == 3)
-        #expect(store.state.legalAgreement.selectedDocumentIDs.isEmpty)
-    }
-
-    @Test
     func `로그인 취소는 화면을 바꾸지 않고 이동 이벤트를 남기지 않는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.cancelled])
         var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.legalAgreement.isStoredConsentValid = true
+        state.tutorial.signIn.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
+        state.tutorial.signIn.legalAgreement.isStoredConsentValid = true
         let store = makeOnboardingRouterStore(signIn: signIn, state: state)
         store.exhaustivity = .off
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
-        await store.receive(.tutorial(.effect(.signInFinished(requestID: 1, result: .cancelled))))
+        await store.receive(.tutorial(.signIn(.effect(.signInFinished(requestID: 1, result: .cancelled)))))
 
         #expect(store.state.activeScreen == .guide(.tutorial))
         #expect(store.state.transitionLog.isEmpty)
-        #expect(store.state.tutorial.authentication == .cancelled)
+        #expect(store.state.tutorial.signIn.phase == .cancelled)
     }
 
     @Test
@@ -220,37 +160,22 @@ struct OnboardingRouterFeatureTests {
     @Test
     func `로그인 성공에서 needsCuration이 false이면 화면 전환 없이 mainShellRequested를 위임한다`() async {
         var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.legalAgreement.isStoredConsentValid = true
+        state.tutorial.signIn.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
+        state.tutorial.signIn.legalAgreement.isStoredConsentValid = true
         let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
         let store = makeOnboardingRouterStore(signIn: signIn, state: state)
         store.exhaustivity = .off
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
-        await store.receive(.tutorial(.effect(.signInFinished(
+        await store.receive(.tutorial(.signIn(.effect(.signInFinished(
             requestID: 1,
             result: .signedIn(curatedAccount),
-        ))))
+        )))))
         await store.receive(.tutorial(.delegate(.signInSucceeded(needsCuration: false))))
         await store.receive(.delegate(.mainShellRequested))
 
         #expect(store.state.activeScreen == .guide(.tutorial))
         #expect(store.state.transitionLog.isEmpty)
-    }
-
-    @Test
-    func `문서 sheet 닫기 view 액션은 legalAgreement의 표시 상태를 해제한다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
-        state.activeScreen = .guide(.legalAgreement)
-        state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.legalAgreement.presentedDocumentID = OnboardingTestFixture.privacyPolicy.id
-        let store = makeOnboardingRouterStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.legalDocumentSheetDismissed))
-        await store.receive(.legalAgreement(.view(.documentSheetDismissed)))
-
-        #expect(store.state.legalAgreement.presentedDocumentID == nil)
     }
 
     @Test

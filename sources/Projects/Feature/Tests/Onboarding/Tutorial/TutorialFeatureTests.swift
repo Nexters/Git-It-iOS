@@ -19,28 +19,29 @@ struct TutorialFeatureTests {
     }
 
     @Test
-    func `화면 진입은 appeared를 위임한다`() async {
-        let store = makeTutorialStore()
+    func `화면 진입은 로그인에 prepareConsent를 보낸다`() async {
+        let store = makeTutorialStore(state: consentCheckedState())
 
         await store.send(.view(.appeared))
-        await store.receive(.delegate(.appeared))
+        await store.receive(.signIn(.input(.prepareConsent)))
     }
 
     @Test
     func `Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
-        let store = makeTutorialStore(signIn: signIn)
+        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
-            $0.authentication = .idle
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 1
         }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+            $0.signIn.phase = .idle
+        }
+        await store.receive(.signIn(.delegate(.signedIn(needsCuration: false))))
         await store.receive(.delegate(.signInSucceeded(needsCuration: false)))
 
         #expect(await signIn.snapshot() == [.apple])
@@ -49,72 +50,54 @@ struct TutorialFeatureTests {
     @Test
     func `로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.retryableFailure], suspendsRequests: true)
-        let store = makeTutorialStore(signIn: signIn)
+        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
+        }
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 1
         }
         await store.send(.view(.appleSignInTapped))
         await signIn.resumeOldest()
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .retryableFailure))) {
-            $0.authentication = .retryableFailure
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .retryableFailure)))) {
+            $0.signIn.phase = .failed
         }
 
+        #expect(store.state.isShowingRecoverableError)
         #expect(await signIn.snapshot() == [.apple])
     }
 
     @Test
     func `Apple 인증 취소는 재시도 오류와 구분되는 cancelled 상태로 남는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.cancelled])
-        let store = makeTutorialStore(signIn: signIn)
+        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .cancelled))) {
-            $0.authentication = .cancelled
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 1
         }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .cancelled)))) {
+            $0.signIn.phase = .cancelled
+        }
+        await store.receive(.signIn(.delegate(.signInCancelled)))
+
         #expect(store.state.isShowingRecoverableError)
     }
 
     @Test
-    func `현재 requestID와 다른 로그인 응답은 상태를 바꾸지 않는다`() async {
-        let signIn = AccountUseCaseSignInMock(results: [.cancelled], suspendsRequests: true)
-        let store = makeTutorialStore(signIn: signIn)
+    func `약관 동의를 취소하면 마지막 페이지로 되돌린다`() async {
+        var state = TutorialFeature.State(bundleVersion: "1.0.0")
+        state.page = 1
+        let store = makeTutorialStore(state: state)
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.signIn(.delegate(.consentCancelled))) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
         }
-        await store.send(.effect(.signInFinished(requestID: 999, result: .retryableFailure)))
-        await signIn.resumeOldest()
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .cancelled))) {
-            $0.authentication = .cancelled
-        }
-    }
-
-    @Test
-    func `Apple 로그인 탭은 곧바로 로그인하지 않고 signInRequested를 위임한다`() async {
-        let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
-        let store = makeTutorialStore(signIn: signIn)
-
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-
-        #expect(store.state.authentication == .idle)
-        #expect(store.state.requestID == 0)
-        #expect(await signIn.snapshot().isEmpty)
     }
 
     @Test
@@ -136,22 +119,34 @@ struct TutorialFeatureTests {
             signIn: signIn,
             accountWithdrawal: accountWithdrawal,
             deletesCompletedAccountOnSignIn: true,
+            state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 1
+        }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+            $0.signIn.phase = .idle
+        }
+        await store.receive(.signIn(.delegate(.signedIn(needsCuration: false)))) {
             $0.hasAttemptedCompletedAccountReset = true
-            $0.requestID = 2
+            $0.accountReset = .resetting
         }
-        await store.receive(.effect(.signInFinished(requestID: 2, result: .signedIn(uncuratedAccount)))) {
-            $0.authentication = .idle
+        await store.receive(.effect(.accountResetFinished)) {
+            $0.accountReset = .idle
         }
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 2
+        }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 2, result: .signedIn(uncuratedAccount))))) {
+            $0.signIn.phase = .idle
+        }
+        await store.receive(.signIn(.delegate(.signedIn(needsCuration: true))))
         await store.receive(.delegate(.signInSucceeded(needsCuration: true)))
 
         #expect(await signIn.snapshot() == [.apple, .apple])
@@ -166,22 +161,34 @@ struct TutorialFeatureTests {
             signIn: signIn,
             accountWithdrawal: accountWithdrawal,
             deletesCompletedAccountOnSignIn: true,
+            state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped))
-        await store.receive(.delegate(.signInRequested))
-        await store.send(.input(.startSignIn)) {
+        await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
-            $0.authentication = .signingIn
-            $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 1
+        }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+            $0.signIn.phase = .idle
+        }
+        await store.receive(.signIn(.delegate(.signedIn(needsCuration: false)))) {
             $0.hasAttemptedCompletedAccountReset = true
-            $0.requestID = 2
+            $0.accountReset = .resetting
         }
-        await store.receive(.effect(.signInFinished(requestID: 2, result: .signedIn(curatedAccount)))) {
-            $0.authentication = .idle
+        await store.receive(.effect(.accountResetFinished)) {
+            $0.accountReset = .idle
         }
+        await store.receive(.signIn(.input(.start))) {
+            $0.signIn.phase = .signingIn
+            $0.signIn.requestID = 2
+        }
+        await store.receive(.signIn(.effect(.signInFinished(requestID: 2, result: .signedIn(curatedAccount))))) {
+            $0.signIn.phase = .idle
+        }
+        await store.receive(.signIn(.delegate(.signedIn(needsCuration: false))))
         await store.receive(.delegate(.signInSucceeded(needsCuration: false)))
 
         #expect(await signIn.snapshot() == [.apple, .apple])
@@ -199,9 +206,19 @@ struct TutorialFeatureTests {
     @Test
     func `로그인 진행 중에는 비로그인 진입을 무시한다`() async {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
-        state.authentication = .signingIn
+        state.signIn.phase = .signingIn
         let store = makeTutorialStore(state: state)
 
+        await store.send(.view(.guestAccessTapped))
+    }
+
+    @Test
+    func `계정 재설정 중에는 로그인 진행 중으로 보고 비로그인 진입을 무시한다`() async {
+        var state = TutorialFeature.State(bundleVersion: "1.0.0")
+        state.accountReset = .resetting
+        let store = makeTutorialStore(state: state)
+
+        #expect(store.state.isSigningIn)
         await store.send(.view(.guestAccessTapped))
     }
 
@@ -209,5 +226,12 @@ struct TutorialFeatureTests {
 
     private let curatedAccount = OnboardingTestFixture.signedInAccount(needsCuration: false)
     private let uncuratedAccount = OnboardingTestFixture.signedInAccount(needsCuration: true)
+
+    private func consentCheckedState() -> TutorialFeature.State {
+        var state = TutorialFeature.State(bundleVersion: "1.0.0")
+        state.signIn.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
+        state.signIn.legalAgreement.isStoredConsentValid = true
+        return state
+    }
 
 }

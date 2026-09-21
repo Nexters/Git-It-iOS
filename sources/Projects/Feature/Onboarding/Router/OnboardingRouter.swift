@@ -50,24 +50,27 @@ public struct OnboardingRouter: View {
         TutorialScreen(store: store.scope(state: \.tutorial, action: \.tutorial))
             .overlay {
                 ModalOverlay(
-                    isPresented: store.activeScreen == .guide(.legalAgreement),
-                    onDismiss: { send(.legalAgreementDismissed) },
+                    isPresented: store.tutorial.signIn.isLegalAgreementPresented,
+                    onDismiss: { store.send(.tutorial(.signIn(.view(.legalAgreementDismissed)))) },
                 ) {
                     LegalAgreementScreen(
-                        store: store.scope(state: \.legalAgreement, action: \.legalAgreement)
+                        store: store.scope(
+                            state: \.tutorial.signIn.legalAgreement,
+                            action: \.tutorial.signIn.legalAgreement,
+                        )
                     )
                 }
             }
             .overlay {
                 ModalOverlay(
-                    isPresented: store.legalAgreement.presentedDocument != nil,
-                    onDismiss: { send(.legalDocumentSheetDismissed) },
+                    isPresented: store.tutorial.signIn.legalAgreement.presentedDocument != nil,
+                    onDismiss: { store.send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed)))) },
                 ) {
-                    if let document = store.legalAgreement.presentedDocument {
+                    if let document = store.tutorial.signIn.legalAgreement.presentedDocument {
                         WebSheet(
                             title: document.displayName,
                             url: document.approvedURL,
-                            onDismiss: { send(.legalDocumentSheetDismissed) },
+                            onDismiss: { store.send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed)))) },
                         )
                     }
                 }
