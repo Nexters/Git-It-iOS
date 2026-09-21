@@ -37,17 +37,21 @@ struct CareerSelectionScreen: View {
                     items: Display.orderedLevels.map { level in
                         .init(
                             id: Display.identifier(for: level),
-                            title: Display.title(for: level),
-                            supportingText: Display.description(for: level),
-                            illust: Display.illust(for: level),
-                            isSelected: store.careerLevel == level,
+                            displayModel: .init(
+                                title: Display.title(for: level),
+                                supportingText: Display.description(for: level),
+                                illust: Display.illust(for: level),
+                            ),
                         )
                     },
-                    onSelect: { identifier in
-                        if let level = Display.level(forIdentifier: identifier) {
-                            send(.careerLevelSelected(level))
-                        }
-                    },
+                    selection: Binding(
+                        get: { store.careerLevel.map(Display.identifier(for:)) },
+                        set: { identifier in
+                            if let identifier, let level = Display.level(forIdentifier: identifier) {
+                                send(.careerLevelSelected(level))
+                            }
+                        },
+                    ),
                 )
             }
             .designSystemScreenMargin()

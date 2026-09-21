@@ -110,7 +110,8 @@ struct QuestionSolvingScreen: View {
             )
 
             if case .choice(let grading) = store.answerOutcome {
-                LabeledCard(label: "AI 해설", text: grading.explanation, style: .accent)
+                LabeledCard(displayModel: .init(label: "AI 해설", text: grading.explanation))
+                    .style(.accent)
             }
 
         case .essay:

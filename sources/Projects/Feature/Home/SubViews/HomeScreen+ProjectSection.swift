@@ -218,16 +218,18 @@ extension HomeScreen {
                 LazyHStack(spacing: Constant.cardSpacing) {
                     ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
                         HomeProjectCard(
-                            title: project.title,
-                            technologies: project.technologies,
-                            progress: project.progress,
-                            currentSetLabel: project.currentSetLabel,
-                            setTitle: project.setTitle,
-                            variant: project.variant,
+                            displayModel: .init(
+                                title: project.title,
+                                technologies: project.technologies,
+                                progress: project.progress,
+                                currentSetLabel: project.currentSetLabel,
+                                setTitle: project.setTitle,
+                            ),
                             isLearningEnabled: project.isLearningEnabled,
                             onSelect: { onProjectCardTapped(String(project.projectID)) },
                             onStart: { onLearningTapped(String(project.projectID)) },
                         )
+                        .style(project.variant)
                         .visualEffect { content, proxy in
                             content.rotationEffect(
                                 .degrees(

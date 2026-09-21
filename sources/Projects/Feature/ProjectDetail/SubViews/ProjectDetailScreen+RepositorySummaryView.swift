@@ -34,11 +34,13 @@ extension ProjectDetailScreen {
                     }
 
                     LabeledProgressBar(
-                        label: "전체 진행률",
-                        progress: Double(overallProgressPercent) / 100,
-                        valueText: "\(overallProgressPercent)%",
-                        valueColor: .blue100,
+                        displayModel: .init(
+                            label: "전체 진행률",
+                            progress: Double(overallProgressPercent) / 100,
+                            valueText: "\(overallProgressPercent)%",
+                        )
                     )
+                    .foregroundColorToken(.blue100)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

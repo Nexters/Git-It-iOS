@@ -48,7 +48,22 @@ struct ForegroundColorConfigurableTests {
         #expect(Mirror(reflecting: colored).descendant("label") as? String == "학습 시작")
     }
 
+    @Test
+    func `LabeledProgressBar 값 전경색을 선언하지 않으면 Grey400으로 그린다`() {
+        #expect(foregroundColor(of: LabeledProgressBar(displayModel: progressModel)) == ColorToken.grey400)
+    }
+
+    @Test
+    func `LabeledProgressBar 전경색 선언은 전경색만 바꾸고 표시 값 모델을 유지한다`() {
+        let colored = LabeledProgressBar(displayModel: progressModel).foregroundColorToken(.blue100)
+
+        #expect(foregroundColor(of: colored) == ColorToken.blue100)
+        #expect(Mirror(reflecting: colored).descendant("displayModel") as? LabeledProgressBar.DisplayModel == progressModel)
+    }
+
     // MARK: Private
+
+    private let progressModel = LabeledProgressBar.DisplayModel(label: "학습 진행률", progress: 0.6, valueText: "6 / 10")
 
     private func foregroundColor(of subject: some View) -> ColorToken? {
         Mirror(reflecting: subject).descendant("foregroundColor") as? ColorToken

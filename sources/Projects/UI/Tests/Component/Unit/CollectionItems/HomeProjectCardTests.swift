@@ -10,12 +10,13 @@ struct HomeProjectCardTests {
     @Test
     func `currentSetLabel은 원문을 손실 없이 유지한다`() {
         let card = HomeProjectCard(
-            title: "Git It iOS",
-            technologies: "Swift · SwiftUI",
-            progress: 0.4,
-            currentSetLabel: "Sprint Beta",
-            setTitle: "Presentation 구조",
-            variant: .purple,
+            displayModel: .init(
+                title: "Git It iOS",
+                technologies: "Swift · SwiftUI",
+                progress: 0.4,
+                currentSetLabel: "Sprint Beta",
+                setTitle: "Presentation 구조",
+            )
         )
 
         #expect(card.displayedCurrentSetLabel == "Sprint Beta")
@@ -80,12 +81,13 @@ struct HomeProjectCardTests {
         onStart: @escaping () -> Void = { },
     ) -> HomeProjectCard {
         HomeProjectCard(
-            title: "Git It iOS",
-            technologies: "Swift · SwiftUI",
-            progress: 0.4,
-            currentSetLabel: "Set 1",
-            setTitle: "Presentation 구조",
-            variant: .purple,
+            displayModel: .init(
+                title: "Git It iOS",
+                technologies: "Swift · SwiftUI",
+                progress: 0.4,
+                currentSetLabel: "Set 1",
+                setTitle: "Presentation 구조",
+            ),
             isLearningEnabled: isLearningEnabled,
             onSelect: onSelect,
             onStart: onStart,

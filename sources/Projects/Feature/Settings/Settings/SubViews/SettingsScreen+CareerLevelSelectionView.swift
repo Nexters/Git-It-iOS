@@ -44,17 +44,21 @@ extension SettingsScreen {
                         items: CareerLevelDisplay.orderedLevels.map { level in
                             .init(
                                 id: CareerLevelDisplay.identifier(for: level),
-                                title: CareerLevelDisplay.title(for: level),
-                                supportingText: CareerLevelDisplay.description(for: level),
-                                illust: CareerLevelDisplay.illust(for: level),
-                                isSelected: store.profile?.curation?.careerLevel == level,
+                                displayModel: .init(
+                                    title: CareerLevelDisplay.title(for: level),
+                                    supportingText: CareerLevelDisplay.description(for: level),
+                                    illust: CareerLevelDisplay.illust(for: level),
+                                ),
                             )
                         },
-                        onSelect: { identifier in
-                            if let level = CareerLevelDisplay.level(forIdentifier: identifier) {
-                                send(.careerLevelSelected(level))
-                            }
-                        },
+                        selection: Binding(
+                            get: { (store.profile?.curation?.careerLevel).map(CareerLevelDisplay.identifier(for:)) },
+                            set: { identifier in
+                                if let identifier, let level = CareerLevelDisplay.level(forIdentifier: identifier) {
+                                    send(.careerLevelSelected(level))
+                                }
+                            },
+                        ),
                     )
                 }
                 .designSystemScreenMargin()

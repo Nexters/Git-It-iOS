@@ -9,12 +9,10 @@ public struct SelectionCardList: View {
 
     public init(
         items: [Item],
-        style: SelectionCardStyle = .detailed,
-        onSelect: @escaping (String) -> Void = { _ in },
+        selection: Binding<String?>,
     ) {
         self.items = items
-        self.style = style
-        self.onSelect = onSelect
+        _selection = selection
     }
 
     // MARK: Public
@@ -23,7 +21,7 @@ public struct SelectionCardList: View {
         VStack(spacing: Constant.itemSpacing) {
             ForEach(items) { item in
                 Button {
-                    onSelect(item.id)
+                    select(item)
                 } label: {
                     card(for: item)
                 }
@@ -32,11 +30,22 @@ public struct SelectionCardList: View {
         }
     }
 
+    // MARK: Internal
+
+    func isSelected(_ item: Item) -> Bool {
+        selection == item.id
+    }
+
+    func select(_ item: Item) {
+        selection = item.id
+    }
+
     // MARK: Private
 
+    @Binding private var selection: String?
+
     private let items: [Item]
-    private let style: SelectionCardStyle
-    private let onSelect: (String) -> Void
+    private var style = SelectionCardStyle.detailed
 
     private func thumbnail(for illust: ResourceImage.Asset.Illust) -> some View {
         Image.resizable(.illust(illust))
@@ -51,24 +60,32 @@ public struct SelectionCardList: View {
     private func card(for item: Item) -> some View {
         if style.showsThumbnail {
             SelectionCard(
-                title: item.title,
-                supportingText: item.supportingText,
-                isSelected: item.isSelected,
-                style: style,
+                displayModel: .init(title: item.displayModel.title, supportingText: item.displayModel.supportingText),
+                isSelected: isSelected(item),
             ) {
-                if let illust = item.illust {
+                if let illust = item.displayModel.illust {
                     thumbnail(for: illust)
                 }
             }
+            .style(style)
         } else {
             SelectionCard(
-                title: item.title,
-                supportingText: item.supportingText,
-                isSelected: item.isSelected,
+                displayModel: .init(title: item.displayModel.title, supportingText: item.displayModel.supportingText),
+                isSelected: isSelected(item),
             )
         }
     }
 
+}
+
+// MARK: StyleConfigurable
+
+extension SelectionCardList: StyleConfigurable {
+    public func style(_ style: SelectionCardStyle) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
 }
 
 // MARK: SelectionCardList.Constant
@@ -81,27 +98,35 @@ extension SelectionCardList {
 }
 
 #Preview("Selection Card List") {
-    SelectionCardList(items: [
-        .init(
-            id: "concept",
-            title: "기술 개념은 알아요",
-            supportingText: "실제 코드 작동 방식을 흐름 중심으로 학습",
-            illust: .knowledgeBasic,
-        ),
-        .init(
-            id: "code",
-            title: "일부 코드를 봤어요",
-            supportingText: "구현 의도와 연결 영향까지 포함",
-            illust: .knowledgeIntermediate,
-            isSelected: true,
-        ),
-        .init(
-            id: "project",
-            title: "유사 프로젝트 경험이 있어요",
-            supportingText: "심화 문제와 서술형 비중 확대",
-            illust: .knowledgeAdvanced,
-        ),
-    ])
+    SelectionCardList(
+        items: [
+            .init(
+                id: "concept",
+                displayModel: .init(
+                    title: "기술 개념은 알아요",
+                    supportingText: "실제 코드 작동 방식을 흐름 중심으로 학습",
+                    illust: .knowledgeBasic,
+                ),
+            ),
+            .init(
+                id: "code",
+                displayModel: .init(
+                    title: "일부 코드를 봤어요",
+                    supportingText: "구현 의도와 연결 영향까지 포함",
+                    illust: .knowledgeIntermediate,
+                ),
+            ),
+            .init(
+                id: "project",
+                displayModel: .init(
+                    title: "유사 프로젝트 경험이 있어요",
+                    supportingText: "심화 문제와 서술형 비중 확대",
+                    illust: .knowledgeAdvanced,
+                ),
+            ),
+        ],
+        selection: .constant("code"),
+    )
     .frame(width: 320)
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

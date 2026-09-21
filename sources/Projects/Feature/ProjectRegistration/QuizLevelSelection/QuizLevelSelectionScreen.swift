@@ -23,11 +23,14 @@ struct QuizLevelSelectionScreen: View {
 
             SelectionCardList(
                 items: levelItems,
-                onSelect: { identifier in
-                    guard let level = Self.levels.first(where: { $0.level.identifier == identifier })?.level
-                    else { return }
-                    send(.levelSelected(level))
-                },
+                selection: Binding(
+                    get: { store.quizLevel.identifier },
+                    set: { identifier in
+                        guard let level = Self.levels.first(where: { $0.level.identifier == identifier })?.level
+                        else { return }
+                        send(.levelSelected(level))
+                    },
+                ),
             )
             .designSystemScreenMargin()
             .padding(.top, Constant.listTopPadding)
@@ -68,10 +71,7 @@ extension QuizLevelSelectionScreen {
         Self.levels.map { level, title, supportingText, illust in
             SelectionCardList.Item(
                 id: level.identifier,
-                title: title,
-                supportingText: supportingText,
-                illust: illust,
-                isSelected: store.quizLevel == level,
+                displayModel: .init(title: title, supportingText: supportingText, illust: illust),
             )
         }
     }

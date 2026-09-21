@@ -128,11 +128,7 @@ extension OverlayContainer: BackgroundColorConfigurable {
     } content: {
         VStack(spacing: LayoutToken.gutter) {
             ForEach(0..<20, id: \.self) { index in
-                LabeledCard(
-                    label: "항목 \(index)",
-                    text: "스크롤하면 헤더 뒤로 지나갑니다.",
-                    style: .neutral,
-                )
+                LabeledCard(displayModel: .init(label: "항목 \(index)", text: "스크롤하면 헤더 뒤로 지나갑니다."))
             }
         }
         .designSystemScreenMargin()

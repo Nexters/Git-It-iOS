@@ -452,63 +452,63 @@ compile된다.
 
 ### 테스트
 
-- [ ] T055 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/StyleConfigurableTests.swift`에 검증을 추가한다.
+- [X] T055 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/StyleConfigurableTests.swift`에 검증을 추가한다.
   - `LabeledCard` 기본 `.neutral`, `HomeProjectCard` 기본 `.purple`
   - `SelectionCard` 경로별 기본값: 썸네일 경로 `.detailed`, `Thumbnail == EmptyView` 경로 `.compact`
   - `SelectionCardList` 기본 `.detailed`(`selection: .constant(nil)`로 생성)
   - `style(_:)`이 `displayModel`을 유지함
-- [ ] T056 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/ForegroundColorConfigurableTests.swift`에 `LabeledProgressBar`에 대한 두 가지 검증을 추가한다. 기본 `.grey400`과, 전경색만 바뀌고 `displayModel`이 유지됨이다.
+- [X] T056 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/ForegroundColorConfigurableTests.swift`에 `LabeledProgressBar`에 대한 두 가지 검증을 추가한다. 기본 `.grey400`과, 전경색만 바뀌고 `displayModel`이 유지됨이다.
 
 ### 구현
 
-- [ ] T057 [P] [S1] [S4] `sources/Projects/UI/Component/Displays/LabeledCard.swift`를 전환한다.
+- [X] T057 [P] [S1] [S4] `sources/Projects/UI/Component/Displays/LabeledCard.swift`를 전환한다.
   - `public struct DisplayModel: Sendable, Equatable { label, text }`를 `extension LabeledCard`에 둔다.
   - 초기화 메서드를 `init(displayModel:)`로 바꾼다.
   - `private var style: Style = .neutral`을 두고 `StyleConfigurable`을 채택한다.
   - `#Preview`를 전환한다.
-- [ ] T058 [P] [S1] [S4] `sources/Projects/UI/Component/Indicators/LabeledProgressBar.swift`를 전환한다.
+- [X] T058 [P] [S1] [S4] `sources/Projects/UI/Component/Indicators/LabeledProgressBar.swift`를 전환한다.
   - `DisplayModel { label, progress, valueText }`를 둔다.
   - 초기화 메서드를 `init(displayModel:)`로 바꾼다.
   - `private var foregroundColor: ColorToken = .grey400`을 두고 `ForegroundColorConfigurable`을 채택한다.
   - `#Preview`를 전환한다.
-- [ ] T059 [S1] [S4] `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`를 전환한다.
+- [X] T059 [S1] [S4] `sources/Projects/UI/Component/CollectionItems/SelectionCard/SelectionCard.swift`를 전환한다.
   - `DisplayModel { title, supportingText = nil, badgeText = nil }`를 둔다.
   - 두 생성 경로를 `init(displayModel:isSelected:thumbnail:)`·`init(displayModel:isSelected:)`로 바꾼다.
   - `private var style: SelectionCardStyle = .detailed`를 두고, EmptyView 경로에서는 `.compact`를 대입한다.
   - `StyleConfigurable`을 채택하고 `#Preview`를 전환한다([research.md](./research.md) §4.6).
-- [ ] T060 [S4] `sources/Projects/UI/Component/Controls/SelectionCardList/SelectionCardList+Item.swift`를 전환한다.
+- [X] T060 [S4] `sources/Projects/UI/Component/Controls/SelectionCardList/SelectionCardList+Item.swift`를 전환한다.
   - `Item.DisplayModel { title, supportingText = nil, illust = nil }`을 같은 파일에 둔다.
   - 초기화 메서드를 `init(id:displayModel:)`로 바꾸고 `isSelected` 저장 프로퍼티를 제거한다(FR-017).
-- [ ] T061 [S1] [S4] `sources/Projects/UI/Component/Controls/SelectionCardList/SelectionCardList.swift`를 전환한다.
+- [X] T061 [S1] [S4] `sources/Projects/UI/Component/Controls/SelectionCardList/SelectionCardList.swift`를 전환한다.
   - 초기화 메서드를 `init(items:selection:)`로 바꾼다. `selection: Binding<String?>`은 기본값 없이 받아 `@Binding private var selection: String?`에 저장하고 `onSelect`를 제거한다.
   - `private var style: SelectionCardStyle = .detailed`를 두고 `StyleConfigurable`을 채택한다.
   - `card(for:)`에서 `SelectionCard.DisplayModel(title:supportingText:)`을 만들고 `isSelected: selection == item.id`를 값으로 넘긴다. 카드 탭은 `selection = item.id`를 쓴다. 썸네일 경로에는 `.style(style)`을 전달한다.
   - `#Preview`의 `Item` 생성과 `selection: .constant(...)`을 전환한다.
-- [ ] T062 [S1] [S4] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`를 전환한다.
+- [X] T062 [S1] [S4] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`를 전환한다.
   - `DisplayModel { title, technologies, progress, currentSetLabel, setTitle }`를 둔다.
   - 초기화 메서드를 `init(displayModel:isLearningEnabled:onSelect:onStart:)`로 바꾼다.
   - 저장 프로퍼티를 `private var style: Style = .purple`로 두고 `StyleConfigurable`을 채택한다.
   - `#Preview`를 전환한다.
-- [ ] T063 [P] [S4] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의 `#Preview` 속 `LabeledCard` 호출을 공통 전환 규칙으로 바꾼다
-- [ ] T064 [P] [S1] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
+- [X] T063 [P] [S4] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`의 `#Preview` 속 `LabeledCard` 호출을 공통 전환 규칙으로 바꾼다
+- [X] T064 [P] [S1] [S4] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
   - `sources/Projects/UI/Tests/Component/Unit/Displays/LabeledCardTests.swift`
   - `sources/Projects/UI/Tests/Component/Unit/Controls/SelectionCardListTests.swift`: `Item(id:displayModel:)`과 `selection: .constant(...)`으로 바꾼다. `Item.isSelected`를 단언하던 곳은 `selection` 값과 항목 `id` 비교로 바꾼다.
   - `sources/Projects/UI/Tests/Component/Unit/CollectionItems/HomeProjectCardTests.swift`
-- [ ] T065 [P] [S1] [S4] Feature의 `LabeledCard` 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T065 [P] [S1] [S4] Feature의 `LabeledCard` 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`
   - `sources/Projects/Feature/Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+EssayResultSection.swift`
-- [ ] T066 [P] [S4] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`의 `LabeledProgressBar` 호출을 공통 전환 규칙으로 바꾼다
-- [ ] T067 [P] [S1] [S4] Feature의 `SelectionCardList`·`SelectionCardList.Item` 생성을 공통 전환 규칙으로 바꾼다. `style: .compact`는 `.style(.compact)`로 옮긴다. `Item`의 `isSelected:` 식은 `selection: Binding(get: { 현재 선택 값의 identifier }, set: { identifier in 기존 onSelect 본문 })`의 getter로 옮긴다. setter가 `nil`을 받으면 아무 Action도 보내지 않는다.
+- [X] T066 [P] [S4] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`의 `LabeledProgressBar` 호출을 공통 전환 규칙으로 바꾼다
+- [X] T067 [P] [S1] [S4] Feature의 `SelectionCardList`·`SelectionCardList.Item` 생성을 공통 전환 규칙으로 바꾼다. `style: .compact`는 `.style(.compact)`로 옮긴다. `Item`의 `isSelected:` 식은 `selection: Binding(get: { 현재 선택 값의 identifier }, set: { identifier in 기존 onSelect 본문 })`의 getter로 옮긴다. setter가 `nil`을 받으면 아무 Action도 보내지 않는다.
   - `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`
   - `sources/Projects/Feature/Onboarding/PositionSelection/PositionSelectionScreen.swift`
   - `sources/Projects/Feature/ProjectRegistration/QuizLevelSelection/QuizLevelSelectionScreen.swift`
   - `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`
   - `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`
-- [ ] T068 [P] [S1] [S4] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`의 `HomeProjectCard` 호출에서 `HomeProjectDisplay` 값으로 `HomeProjectCard.DisplayModel`을 호출 지점에서 만들고 `variant`를 `.style(project.variant)`로 옮긴다. `HomeProjectDisplay`·`HomeProjectSectionState`는 바꾸지 않는다.
+- [X] T068 [P] [S1] [S4] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`의 `HomeProjectCard` 호출에서 `HomeProjectDisplay` 값으로 `HomeProjectCard.DisplayModel`을 호출 지점에서 만들고 `variant`를 `.style(project.variant)`로 옮긴다. `HomeProjectDisplay`·`HomeProjectSectionState`는 바꾸지 않는다.
 
 ### 정리와 단위 검증
 
-- [ ] T069 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행하고 다음을 확인한다.
+- [X] T069 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행하고 다음을 확인한다.
   - [quickstart.md](./quickstart.md) §2.1(`LabeledCard`·`LabeledProgressBar`·`SelectionCard(List)`·`HomeProjectCard` 패턴)과 §2.2(Feature State·Reducer·`ViewModels/`의 `DisplayModel` 참조) 조회가 0줄이다.
   - `LabeledCard` `.neutral` 5곳, `HomeProjectCard` `.purple` 명시가 생략되고 다른 값은 보존됐다.
   - `SelectionCardList` `.compact` 목록(PositionSelection) 프리뷰가 전환 전과 같다.

@@ -1,3 +1,4 @@
+import SwiftUI
 import Testing
 
 @testable import UIComponent
@@ -38,7 +39,68 @@ struct StyleConfigurableTests {
         #expect(style(of: glassButton) == IconGlassButton.Style.neutral)
     }
 
+    @Test
+    func `표시 값 모델을 받는 컴포넌트는 스타일을 선언하지 않으면 기본 스타일로 그린다`() {
+        #expect(style(of: labeledCard) == LabeledCard.Style.neutral)
+        #expect(style(of: homeProjectCard) == HomeProjectCard.Style.purple)
+        #expect(style(of: selectionCardList) == SelectionCardStyle.detailed)
+    }
+
+    @Test
+    func `SelectionCard는 썸네일 경로에서 detailed, 썸네일 없는 경로에서 compact가 기본 스타일이다`() {
+        let thumbnailCard = SelectionCard(displayModel: .init(title: "기술 개념은 알아요")) {
+            Rectangle()
+        }
+        let compactCard = SelectionCard(displayModel: .init(title: "Front-end"))
+
+        #expect(style(of: thumbnailCard) == SelectionCardStyle.detailed)
+        #expect(style(of: compactCard) == SelectionCardStyle.compact)
+    }
+
+    @Test
+    func `스타일 선언은 표시 값 모델을 유지한다`() {
+        let card = labeledCard.style(.accent)
+        let projectCard = homeProjectCard.style(.darkBlue)
+        let list = selectionCardList.style(.compact)
+
+        #expect(style(of: card) == LabeledCard.Style.accent)
+        #expect(Mirror(reflecting: card).descendant("displayModel") as? LabeledCard.DisplayModel == labeledCardModel)
+        #expect(style(of: projectCard) == HomeProjectCard.Style.darkBlue)
+        #expect(
+            Mirror(reflecting: projectCard).descendant("displayModel") as? HomeProjectCard.DisplayModel
+                == homeProjectCardModel
+        )
+        #expect(style(of: list) == SelectionCardStyle.compact)
+        #expect(Mirror(reflecting: list).descendant("items") as? [SelectionCardList.Item] == selectionItems)
+    }
+
     // MARK: Private
+
+    private let labeledCardModel = LabeledCard.DisplayModel(label: "AI 해설", text: "설명")
+
+    private let homeProjectCardModel = HomeProjectCard.DisplayModel(
+        title: "Git It iOS",
+        technologies: "Swift · SwiftUI",
+        progress: 0.4,
+        currentSetLabel: "Set 1",
+        setTitle: "Presentation 구조",
+    )
+
+    private let selectionItems: [SelectionCardList.Item] = [
+        .init(id: "concept", displayModel: .init(title: "기술 개념은 알아요"))
+    ]
+
+    private var labeledCard: LabeledCard {
+        LabeledCard(displayModel: labeledCardModel)
+    }
+
+    private var homeProjectCard: HomeProjectCard {
+        HomeProjectCard(displayModel: homeProjectCardModel)
+    }
+
+    private var selectionCardList: SelectionCardList {
+        SelectionCardList(items: selectionItems, selection: .constant(nil))
+    }
 
     private func style<Subject: StyleConfigurable>(of subject: Subject) -> Subject.Style? {
         Mirror(reflecting: subject).descendant("style") as? Subject.Style

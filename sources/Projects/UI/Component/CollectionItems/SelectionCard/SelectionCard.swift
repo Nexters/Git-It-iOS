@@ -8,18 +8,12 @@ public struct SelectionCard<Thumbnail: View>: View {
     // MARK: Lifecycle
 
     public init(
-        title: String,
-        supportingText: String? = nil,
-        badgeText: String? = nil,
+        displayModel: DisplayModel,
         isSelected: Bool = false,
-        style: SelectionCardStyle = .detailed,
         @ViewBuilder thumbnail: () -> Thumbnail,
     ) {
-        self.title = title
-        self.supportingText = supportingText
-        self.badgeText = badgeText
+        self.displayModel = displayModel
         self.isSelected = isSelected
-        self.style = style
         self.thumbnail = thumbnail()
     }
 
@@ -35,14 +29,14 @@ public struct SelectionCard<Thumbnail: View>: View {
 
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                 HStack(spacing: Constant.badgeSpacing) {
-                    StyledText(text: title)
+                    StyledText(text: displayModel.title)
                         .textStyle(.subtitle3)
-                    if let badgeText {
+                    if let badgeText = displayModel.badgeText {
                         TagBadge(text: badgeText)
                             .style(.selected)
                     }
                 }
-                if let supportingText {
+                if let supportingText = displayModel.supportingText {
                     StyledText(text: supportingText)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey300)
@@ -95,11 +89,9 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
     }
 
-    private let title: String
-    private let supportingText: String?
-    private let badgeText: String?
+    private let displayModel: DisplayModel
     private let isSelected: Bool
-    private let style: SelectionCardStyle
+    private var style = SelectionCardStyle.detailed
     private let thumbnail: Thumbnail
 
     private var borderToken: BorderToken? {
@@ -108,36 +100,57 @@ public struct SelectionCard<Thumbnail: View>: View {
 
 }
 
+// MARK: SelectionCard.DisplayModel
+
+extension SelectionCard {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            title: String,
+            supportingText: String? = nil,
+            badgeText: String? = nil,
+        ) {
+            self.title = title
+            self.supportingText = supportingText
+            self.badgeText = badgeText
+        }
+
+        public let title: String
+        public let supportingText: String?
+        public let badgeText: String?
+    }
+}
+
 extension SelectionCard where Thumbnail == EmptyView {
     public init(
-        title: String,
-        supportingText: String? = nil,
-        badgeText: String? = nil,
+        displayModel: DisplayModel,
         isSelected: Bool = false,
     ) {
-        self.init(
-            title: title,
-            supportingText: supportingText,
-            badgeText: badgeText,
-            isSelected: isSelected,
-            style: .compact,
-        ) { EmptyView() }
+        self.init(displayModel: displayModel, isSelected: isSelected) { EmptyView() }
+        style = .compact
+    }
+}
+
+// MARK: StyleConfigurable
+
+extension SelectionCard: StyleConfigurable {
+    public func style(_ style: SelectionCardStyle) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
     }
 }
 
 #Preview("Selection Card") {
     VStack(spacing: LayoutToken.gutter) {
         SelectionCard(
-            title: "기술 개념은 알아요",
-            supportingText: "실제 코드 흐름을 중심으로 학습",
+            displayModel: .init(title: "기술 개념은 알아요", supportingText: "실제 코드 흐름을 중심으로 학습")
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .purple300))
         }
 
         SelectionCard(
-            title: "프로젝트 경험이 있어요",
-            supportingText: "심화 문제와 서술형 비중 확대",
+            displayModel: .init(title: "프로젝트 경험이 있어요", supportingText: "심화 문제와 서술형 비중 확대"),
             isSelected: true,
         ) {
             RoundedRectangle(designSystem: .small)
@@ -152,8 +165,8 @@ extension SelectionCard where Thumbnail == EmptyView {
 
 #Preview("Selection Card - compact · 737:10372") {
     VStack(spacing: LayoutToken.compactSpacing) {
-        SelectionCard(title: "Front-end")
-        SelectionCard(title: "Back-end", isSelected: true)
+        SelectionCard(displayModel: .init(title: "Front-end"))
+        SelectionCard(displayModel: .init(title: "Back-end"), isSelected: true)
     }
     .frame(width: 340)
     .designSystemScreenMargin()

@@ -44,17 +44,19 @@ extension SettingsScreen {
                         items: PositionDisplay.orderedPositions.map { position in
                             .init(
                                 id: PositionDisplay.identifier(for: position),
-                                title: PositionDisplay.title(for: position),
-                                isSelected: store.profile?.curation?.position == position,
+                                displayModel: .init(title: PositionDisplay.title(for: position)),
                             )
                         },
-                        style: .compact,
-                        onSelect: { identifier in
-                            if let position = PositionDisplay.position(forIdentifier: identifier) {
-                                send(.positionSelected(position))
-                            }
-                        },
+                        selection: Binding(
+                            get: { (store.profile?.curation?.position).map(PositionDisplay.identifier(for:)) },
+                            set: { identifier in
+                                if let identifier, let position = PositionDisplay.position(forIdentifier: identifier) {
+                                    send(.positionSelected(position))
+                                }
+                            },
+                        ),
                     )
+                    .style(.compact)
                 }
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)

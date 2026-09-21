@@ -37,17 +37,19 @@ struct PositionSelectionScreen: View {
                     items: Display.orderedPositions.map { position in
                         .init(
                             id: Display.identifier(for: position),
-                            title: Display.title(for: position),
-                            isSelected: store.position == position,
+                            displayModel: .init(title: Display.title(for: position)),
                         )
                     },
-                    style: .compact,
-                    onSelect: { identifier in
-                        if let position = Display.position(forIdentifier: identifier) {
-                            send(.positionSelected(position))
-                        }
-                    },
+                    selection: Binding(
+                        get: { store.position.map(Display.identifier(for:)) },
+                        set: { identifier in
+                            if let identifier, let position = Display.position(forIdentifier: identifier) {
+                                send(.positionSelected(position))
+                            }
+                        },
+                    ),
                 )
+                .style(.compact)
             }
             .designSystemScreenMargin()
             .padding(.top, LayoutToken.margin)
