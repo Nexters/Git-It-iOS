@@ -37,7 +37,9 @@ public struct LabeledTextField: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: Constant.trailingIconSpacing) {
                 HStack(spacing: Constant.contentSpacing) {
-                    StyledText(text: label, style: .body2, color: accentColor)
+                    StyledText(text: label)
+                        .textStyle(.body2)
+                        .foregroundColorToken(accentColor)
 
                     SwiftUI.TextField(
                         "",
@@ -71,7 +73,9 @@ public struct LabeledTextField: View {
                 .frame(height: Constant.underlineHeight)
 
             if let supportingText {
-                StyledText(text: supportingText, style: .caption1, color: isError ? .error : .grey300)
+                StyledText(text: supportingText)
+                    .textStyle(.caption1)
+                    .foregroundColorToken(isError ? .error : .grey300)
                     .padding(.leading, Constant.supportingTextLeadingPadding)
                     .padding(.top, Constant.supportingTextTopPadding)
             }

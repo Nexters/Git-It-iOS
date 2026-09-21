@@ -42,8 +42,12 @@ public struct LabeledCard: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-            StyledText(text: label, style: .caption1, color: .blue100)
-            StyledText(text: text, style: .body2, color: style.textColor)
+            StyledText(text: label)
+                .textStyle(.caption1)
+                .foregroundColorToken(.blue100)
+            StyledText(text: text)
+                .textStyle(.body2)
+                .foregroundColorToken(style.textColor)
         }
         .padding(Constant.padding)
         .frame(maxWidth: .infinity, alignment: .leading)

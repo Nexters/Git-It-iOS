@@ -20,7 +20,10 @@ extension ProjectListScreen {
 
             case .failed:
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: "프로젝트를 더 불러오지 못했어요", style: .body2, color: .grey400, alignment: .center)
+                    StyledText(text: "프로젝트를 더 불러오지 못했어요")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
 
                     FeedbackActionButton(title: "다시 시도하기", style: .text, size: .small, action: onRetry)
                 }

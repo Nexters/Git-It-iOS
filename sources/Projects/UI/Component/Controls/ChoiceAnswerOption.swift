@@ -159,7 +159,9 @@ public struct ChoiceAnswerOption: View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: Constant.rowSpacing) {
                 HStack {
-                    StyledText(text: letter, style: .subtitle2, color: state.letterColor)
+                    StyledText(text: letter)
+                        .textStyle(.subtitle2)
+                        .foregroundColorToken(state.letterColor)
 
                     Spacer(minLength: 0)
 
@@ -169,7 +171,9 @@ public struct ChoiceAnswerOption: View {
                 }
 
                 if isExpanded {
-                    StyledText(text: text, style: .subtitle3, color: state.textColor)
+                    StyledText(text: text)
+                        .textStyle(.subtitle3)
+                        .foregroundColorToken(state.textColor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }

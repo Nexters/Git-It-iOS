@@ -45,7 +45,9 @@ public struct PushedScreenOverlay<Content: View>: View {
         Color(designSystem: .grey700)
 
         PushedScreenOverlay(isPresented: true) {
-            StyledText(text: "밀려 들어온 화면", style: .subtitle1, alignment: .center)
+            StyledText(text: "밀려 들어온 화면")
+                .textStyle(.subtitle1)
+                .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .designSystemBackground(.grey700)
         }

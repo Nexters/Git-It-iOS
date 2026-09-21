@@ -79,7 +79,9 @@ struct QuestionSolvingScreen: View {
     private var sourceButton: some View {
         Button(action: { send(.sourceTapped) }) {
             HStack(spacing: Constant.sourceButtonSpacing) {
-                StyledText(text: "출처", style: .body2, color: .blue100)
+                StyledText(text: "출처")
+                    .textStyle(.body2)
+                    .foregroundColorToken(.blue100)
 
                 ResourceImage(asset: .icon(.chevronRight), contentMode: .fit)
                     .designSystemForeground(.blue100)
@@ -161,7 +163,9 @@ struct QuestionSolvingScreen: View {
     }
 
     private var submissionFailureNotice: some View {
-        StyledText(text: Constant.submissionFailureMessage, style: .body2, color: .grey400)
+        StyledText(text: Constant.submissionFailureMessage)
+            .textStyle(.body2)
+            .foregroundColorToken(.grey400)
     }
 
     private var bottomActions: some View {

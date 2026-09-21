@@ -28,18 +28,14 @@ public struct EmptyState<Illustration: View>: View {
                 )
 
             VStack(spacing: Constant.textSpacing) {
-                StyledText(
-                    text: title,
-                    style: .subtitle1,
-                    color: .grey200,
-                    alignment: .center,
-                )
-                StyledText(
-                    text: message,
-                    style: .body2,
-                    color: .grey400,
-                    alignment: .center,
-                )
+                StyledText(text: title)
+                    .textStyle(.subtitle1)
+                    .foregroundColorToken(.grey200)
+                    .multilineTextAlignment(.center)
+                StyledText(text: message)
+                    .textStyle(.body2)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: Constant.textMaxWidth)
         }

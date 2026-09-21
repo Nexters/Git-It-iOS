@@ -11,8 +11,11 @@ extension ProfileScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
                 VStack(alignment: .leading, spacing: Constant.headerSpacing) {
-                    StyledText(text: Constant.sectionLabel, style: .body3, color: .grey400)
-                    StyledText(text: display.weeklyTitle, style: .subtitle3)
+                    StyledText(text: Constant.sectionLabel)
+                        .textStyle(.body3)
+                        .foregroundColorToken(.grey400)
+                    StyledText(text: display.weeklyTitle)
+                        .textStyle(.subtitle3)
                 }
 
                 VStack(spacing: Constant.barsToLabelsSpacing) {
@@ -25,7 +28,9 @@ extension ProfileScreen {
 
                     HStack(spacing: Constant.barSpacing) {
                         ForEach(display.weeklyBars) { bar in
-                            StyledText(text: bar.dayLabel, style: .caption2, alignment: .center)
+                            StyledText(text: bar.dayLabel)
+                                .textStyle(.caption2)
+                                .multilineTextAlignment(.center)
                                 .frame(maxWidth: .infinity)
                         }
                     }
@@ -66,13 +71,11 @@ extension ProfileScreen {
 
         private func barColumn(_ bar: ProfileDisplay.WeeklyBar) -> some View {
             VStack(spacing: Constant.countToBarSpacing) {
-                StyledText(
-                    text: "\(bar.count)",
-                    style: .caption2,
-                    color: bar.isHighlighted ? .grey200 : .grey300,
-                    alignment: .center,
-                )
-                .frame(height: Constant.labelRowHeight)
+                StyledText(text: "\(bar.count)")
+                    .textStyle(.caption2)
+                    .foregroundColorToken(bar.isHighlighted ? .grey200 : .grey300)
+                    .multilineTextAlignment(.center)
+                    .frame(height: Constant.labelRowHeight)
 
                 LinearGradient(designSystem: bar.isHighlighted ? .gradient3 : .gradient1)
                     .frame(height: barHeight(for: bar.count))

@@ -34,7 +34,10 @@ extension SettingsScreen {
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.curationUpdate.positionMutation {
-                        StyledText(text: Constant.failureMessage, style: .caption1, color: .error, alignment: .center)
+                        StyledText(text: Constant.failureMessage)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
 
                     SelectionCardList(

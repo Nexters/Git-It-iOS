@@ -22,14 +22,19 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: "이 레포지토리가 맞으면\n학습 설정을 진행할게요", style: .subtitle1, alignment: .center)
+                StyledText(text: "이 레포지토리가 맞으면\n학습 설정을 진행할게요")
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
 
                 HStack(spacing: Constant.thumbnailSpacing) {
                     Self.ThumbnailView(avatarURL: avatarURL)
 
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText(text: store.repository?.ownerName ?? "", style: .body2, color: .white70)
-                        StyledText(text: store.repository?.repositoryName ?? "", style: .subtitle3)
+                        StyledText(text: store.repository?.ownerName ?? "")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.white70)
+                        StyledText(text: store.repository?.repositoryName ?? "")
+                            .textStyle(.subtitle3)
                     }
                 }
                 .padding(.top, Constant.thumbnailTopPadding)

@@ -11,7 +11,9 @@ extension TutorialScreen {
 
         var body: some View {
             VStack(spacing: 0) {
-                StyledText(text: Constant.title(for: page), style: .subtitle1, alignment: .center)
+                StyledText(text: Constant.title(for: page))
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
                     .padding(.top, Constant.titleTopInset)
 
                 Spacer(minLength: LayoutToken.margin)

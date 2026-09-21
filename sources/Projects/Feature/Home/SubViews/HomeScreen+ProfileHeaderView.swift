@@ -13,8 +13,11 @@ extension HomeScreen {
             if display.isFailed {
                 HStack {
                     VStack(alignment: .leading, spacing: Constant.messageSpacing) {
-                        StyledText(text: "프로필을 불러오지 못했어요", style: .subtitle3)
-                        StyledText(text: "잠시 후 다시 시도해 주세요.", style: .caption1, color: .grey400)
+                        StyledText(text: "프로필을 불러오지 못했어요")
+                            .textStyle(.subtitle3)
+                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.grey400)
                     }
                     Spacer()
                     FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onRetry)
@@ -28,8 +31,11 @@ extension HomeScreen {
                         .clipShape(Circle())
 
                     VStack(alignment: .leading, spacing: 0) {
-                        StyledText(text: name, style: .subtitle3)
-                        StyledText(text: display.role, style: .body3, color: .grey400)
+                        StyledText(text: name)
+                            .textStyle(.subtitle3)
+                        StyledText(text: display.role)
+                            .textStyle(.body3)
+                            .foregroundColorToken(.grey400)
                     }
                 }
                 .accessibilityElement(children: .combine)

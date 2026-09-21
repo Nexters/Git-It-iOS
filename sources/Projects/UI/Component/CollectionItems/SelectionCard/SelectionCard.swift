@@ -35,13 +35,16 @@ public struct SelectionCard<Thumbnail: View>: View {
 
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
                 HStack(spacing: Constant.badgeSpacing) {
-                    StyledText(text: title, style: .subtitle3)
+                    StyledText(text: title)
+                        .textStyle(.subtitle3)
                     if let badgeText {
                         TagBadge(text: badgeText, style: .selected)
                     }
                 }
                 if let supportingText {
-                    StyledText(text: supportingText, style: .caption1, color: .grey300)
+                    StyledText(text: supportingText)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.grey300)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

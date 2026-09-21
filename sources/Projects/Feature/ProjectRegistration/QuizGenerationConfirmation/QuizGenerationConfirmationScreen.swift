@@ -18,8 +18,13 @@ struct QuizGenerationConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: "입력해주신 정보로\n학습 세트를 만들게요", style: .subtitle1, alignment: .center)
-                StyledText(text: "1~5분의 시간이 소요돼요", style: .body2, color: .grey400, alignment: .center)
+                StyledText(text: "입력해주신 정보로\n학습 세트를 만들게요")
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
+                StyledText(text: "1~5분의 시간이 소요돼요")
+                    .textStyle(.body2)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
             }
             .designSystemScreenMargin()
 

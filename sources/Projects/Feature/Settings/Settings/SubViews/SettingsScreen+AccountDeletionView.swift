@@ -34,11 +34,13 @@ extension SettingsScreen {
             } content: {
                 VStack(alignment: .leading, spacing: Constant.paragraphSpacing) {
                     ForEach(Constant.paragraphs, id: \.self) { paragraph in
-                        StyledText(text: paragraph, style: .body1)
+                        StyledText(text: paragraph)
                     }
 
                     if case .failed = store.accountAction.accountAction {
-                        StyledText(text: Constant.failureMessage, style: .caption1, color: .error)
+                        StyledText(text: Constant.failureMessage)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -47,11 +49,13 @@ extension SettingsScreen {
             } footer: {
                 BottomActionBar {
                     FeedbackActionButton(
-                        styledText: StyledText(text: Constant.confirmTitle, style: .body1, color: .error, alignment: .center),
+                        styledText: StyledText(text: Constant.confirmTitle)
+                            .foregroundColorToken(.error),
                         style: .text,
                         isEnabled: store.accountAction.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
+                    .multilineTextAlignment(.center)
                     .designSystemScreenMargin()
                 }
             }

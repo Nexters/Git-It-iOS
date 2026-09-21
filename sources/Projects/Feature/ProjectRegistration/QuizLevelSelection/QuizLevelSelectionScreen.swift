@@ -16,7 +16,8 @@ struct QuizLevelSelectionScreen: View {
             ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
-            StyledText(text: "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?", style: .subtitle1)
+            StyledText(text: "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?")
+                .textStyle(.subtitle1)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.titleTopPadding)
 

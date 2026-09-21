@@ -91,19 +91,15 @@ public struct HomeProjectCard: View {
     private var cardContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                StyledText(
-                    text: title,
-                    style: Constant.titleStyle,
-                    color: variant.titleColor,
-                )
-                .lineLimit(2)
+                StyledText(text: title)
+                    .textStyle(Constant.titleStyle)
+                    .foregroundColorToken(variant.titleColor)
+                    .lineLimit(2)
 
-                StyledText(
-                    text: technologies,
-                    style: .caption2,
-                    color: variant.technologyColor,
-                )
-                .lineLimit(2)
+                StyledText(text: technologies)
+                    .textStyle(.caption2)
+                    .foregroundColorToken(variant.technologyColor)
+                    .lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, Constant.headerLeadingPadding)
@@ -116,24 +112,19 @@ public struct HomeProjectCard: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: Constant.footerSpacing) {
-                StyledText(
-                    text: currentSetLabel,
-                    style: .caption2,
-                    color: .grey100,
-                )
-                .padding(.horizontal, Constant.setBadgeHorizontalPadding)
-                .frame(height: Constant.setBadgeHeight)
-                .background(
-                    Color(designSystem: variant.progressColor),
-                    in: Capsule(),
-                )
+                StyledText(text: currentSetLabel)
+                    .textStyle(.caption2)
+                    .padding(.horizontal, Constant.setBadgeHorizontalPadding)
+                    .frame(height: Constant.setBadgeHeight)
+                    .background(
+                        Color(designSystem: variant.progressColor),
+                        in: Capsule(),
+                    )
 
-                StyledText(
-                    text: setTitle,
-                    style: .caption1,
-                    color: variant.setTitleColor,
-                )
-                .lineLimit(1)
+                StyledText(text: setTitle)
+                    .textStyle(.caption1)
+                    .foregroundColorToken(variant.setTitleColor)
+                    .lineLimit(1)
             }
             .padding(.leading, LayoutToken.gutter)
             .padding(.trailing, Constant.headerTrailingPadding)

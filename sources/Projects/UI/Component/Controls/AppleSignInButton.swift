@@ -22,7 +22,8 @@ public struct AppleSignInButton: View {
                 Image(systemName: "applelogo")
                     .font(.system(size: Constant.fontSize, weight: .semibold))
                     .designSystemForeground(.black)
-                StyledText(text: "Apple로 시작하기", style: .body1, color: .black)
+                StyledText(text: "Apple로 시작하기")
+                    .foregroundColorToken(.black)
             }
         }
         .buttonStyle(.plain)

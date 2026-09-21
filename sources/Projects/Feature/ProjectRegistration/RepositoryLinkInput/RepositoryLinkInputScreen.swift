@@ -25,7 +25,8 @@ struct RepositoryLinkInputScreen: View {
             .designSystemScreenMargin()
 
             VStack(alignment: .leading, spacing: Constant.titleFieldSpacing) {
-                StyledText(text: "GitHub 레포지토리\n링크를 붙여넣어 주세요", style: .subtitle1)
+                StyledText(text: "GitHub 레포지토리\n링크를 붙여넣어 주세요")
+                    .textStyle(.subtitle1)
 
                 LabeledTextField(
                     label: "링크",

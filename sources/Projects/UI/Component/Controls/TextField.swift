@@ -37,7 +37,9 @@ public struct TextField: View {
                 }
 
             if let errorMessage {
-                StyledText(text: errorMessage, style: .caption1, color: .error)
+                StyledText(text: errorMessage)
+                    .textStyle(.caption1)
+                    .foregroundColorToken(.error)
             }
         }
     }

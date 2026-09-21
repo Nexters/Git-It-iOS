@@ -23,7 +23,8 @@ public struct WebSheet: View {
         SheetSurface {
             VStack(spacing: 0) {
                 HStack(spacing: LayoutToken.gutter) {
-                    StyledText(text: title, style: .subtitle1)
+                    StyledText(text: title)
+                        .textStyle(.subtitle1)
 
                     Spacer(minLength: 0)
 

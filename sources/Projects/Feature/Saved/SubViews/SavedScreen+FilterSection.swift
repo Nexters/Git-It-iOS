@@ -29,7 +29,9 @@ extension SavedScreen {
                     }
                 }
                 .scrollIndicators(.hidden)
-                StyledText(text: "\(count)개", style: .body2, color: .grey400)
+                StyledText(text: "\(count)개")
+                    .textStyle(.body2)
+                    .foregroundColorToken(.grey400)
             }
             .designSystemCornerRadius(.small)
         }

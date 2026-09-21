@@ -21,15 +21,15 @@ struct CareerSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText(text: Constant.title, style: .subtitle1, alignment: .center)
+                    StyledText(text: Constant.title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
 
                     if store.submission == .failed {
-                        StyledText(
-                            text: "제출에 실패했어요. 다시 시도해 주세요.",
-                            style: .caption1,
-                            color: .error,
-                            alignment: .center,
-                        )
+                        StyledText(text: "제출에 실패했어요. 다시 시도해 주세요.")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
                 }
 
@@ -55,7 +55,10 @@ struct CareerSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 VStack(spacing: LayoutToken.gutter) {
-                    StyledText(text: Constant.guidance, style: .caption1, color: .grey400, alignment: .center)
+                    StyledText(text: Constant.guidance)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
 
                     FeedbackActionButton(
                         title: "다음",

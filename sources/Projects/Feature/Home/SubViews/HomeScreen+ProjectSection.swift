@@ -20,11 +20,14 @@ extension HomeScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.sectionHeaderSpacing) {
                 HStack {
-                    StyledText(text: "학습 중인 레포지토리", style: .subtitle3)
+                    StyledText(text: "학습 중인 레포지토리")
+                        .textStyle(.subtitle3)
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText(text: "전체 보기", style: .body2, color: showAllColor)
+                            StyledText(text: "전체 보기")
+                                .textStyle(.body2)
+                                .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
                                 .frame(width: Constant.chevronSize, height: Constant.chevronSize)
                                 .designSystemForeground(showAllColor)
@@ -151,18 +154,25 @@ extension HomeScreen {
 
             case .empty:
                 emptyProjects {
-                    StyledText(text: "아직 등록된 프로젝트가 없어요.", style: .body2, color: .purple200)
+                    StyledText(text: "아직 등록된 프로젝트가 없어요.")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.purple200)
                 }
 
             case .signInRequired:
                 emptyProjects {
-                    StyledText(text: "로그인하면 학습 중인 레포지토리를 볼 수 있어요.", style: .body2, color: .purple200)
+                    StyledText(text: "로그인하면 학습 중인 레포지토리를 볼 수 있어요.")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.purple200)
                 }
 
             case .failed:
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
-                        StyledText(text: "잠시 후 다시 시도해 주세요.", style: .body2, color: .grey400, alignment: .center)
+                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.grey400)
+                            .multilineTextAlignment(.center)
                         FeedbackActionButton(title: "다시 시도", style: .secondary, size: .small, action: onProjectRetryTapped)
                     }
                     .designSystemScreenMargin()

@@ -37,9 +37,12 @@ public struct ProjectRow<Thumbnail: View>: View {
                     .designSystemCornerRadius(.small)
 
                 VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText(text: name, style: .subtitle2)
+                    StyledText(text: name)
+                        .textStyle(.subtitle2)
                         .lineLimit(2)
-                    StyledText(text: supportingText, style: .body3, color: .grey400)
+                    StyledText(text: supportingText)
+                        .textStyle(.body3)
+                        .foregroundColorToken(.grey400)
                         .lineLimit(1)
                 }
                 .padding(.top, Constant.textColumnTopPadding)
@@ -55,7 +58,9 @@ public struct ProjectRow<Thumbnail: View>: View {
                 HStack(spacing: LayoutToken.compactSpacing) {
                     TagBadge(text: "Set \(currentSet)", style: .muted, size: .compact)
                         .designSystemCornerRadius(.pill)
-                    StyledText(text: setTitle, style: .body2, color: .grey300)
+                    StyledText(text: setTitle)
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey300)
                         .lineLimit(1)
                 }
             }

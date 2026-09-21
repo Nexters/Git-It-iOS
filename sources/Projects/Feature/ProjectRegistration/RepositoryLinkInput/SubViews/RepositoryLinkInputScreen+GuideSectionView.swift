@@ -13,7 +13,9 @@ extension RepositoryLinkInputScreen {
                     isGuideExpanded.toggle()
                 } label: {
                     HStack(spacing: 0) {
-                        StyledText(text: "불러오기 방법", style: .body2, color: .blue100)
+                        StyledText(text: "불러오기 방법")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.blue100)
                         Spacer(minLength: 0)
                         ResourceImage(asset: .icon(isGuideExpanded ? .chevronUp : .chevronDown), contentMode: .fit)
                             .frame(width: Constant.chevronSize, height: Constant.chevronSize)
@@ -37,9 +39,12 @@ extension RepositoryLinkInputScreen {
                                     Circle()
                                         .fill(Color(designSystem: .grey500))
                                         .frame(width: 16, height: 16)
-                                    StyledText(text: "\(index + 1)", style: .caption2, color: .grey300)
+                                    StyledText(text: "\(index + 1)")
+                                        .textStyle(.caption2)
+                                        .foregroundColorToken(.grey300)
                                 }
-                                StyledText(text: text, style: .caption1, color: .grey100)
+                                StyledText(text: text)
+                                    .textStyle(.caption1)
                             }
                         }
                     }

@@ -16,7 +16,8 @@ extension QuestionSolvingScreen {
         var body: some View {
             SheetSurface(isScrollable: true) {
                 VStack(alignment: .leading, spacing: 0) {
-                    StyledText(text: title, style: .subtitle1)
+                    StyledText(text: title)
+                        .textStyle(.subtitle1)
                         .padding(.top, Constant.titleTopPadding)
 
                     VStack(alignment: .leading, spacing: Constant.sourceSpacing) {
@@ -54,7 +55,8 @@ extension QuestionSolvingScreen {
         private func sourceBlock(source: QuestionSourceDisplay) -> some View {
             VStack(alignment: .leading, spacing: Constant.descriptionToLinkSpacing) {
                 if let summary = source.summary {
-                    StyledText(text: summary, style: .body2)
+                    StyledText(text: summary)
+                        .textStyle(.body2)
                 }
 
                 linkChip(source: source)
@@ -83,7 +85,8 @@ extension QuestionSolvingScreen {
             showsIcon: Bool,
         ) -> some View {
             HStack(spacing: LayoutToken.compactSpacing) {
-                StyledText(text: source.linkLabel, style: .body1, color: .white70)
+                StyledText(text: source.linkLabel)
+                    .foregroundColorToken(.white70)
                     .lineLimit(1)
                     .truncationMode(.head)
                     .frame(maxWidth: .infinity, alignment: .leading)

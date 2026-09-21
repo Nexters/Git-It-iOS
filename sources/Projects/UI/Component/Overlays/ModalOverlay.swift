@@ -56,7 +56,7 @@ public struct ModalOverlay<Content: View>: View {
 
         ModalOverlay(isPresented: true) {
             VStack {
-                StyledText(text: "모달 콘텐츠", style: .body1)
+                StyledText(text: "모달 콘텐츠")
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)

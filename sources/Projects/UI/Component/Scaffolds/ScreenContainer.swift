@@ -31,7 +31,9 @@ public struct ScreenContainer<Content: View>: View {
 
 #Preview("Screen Container") {
     ScreenContainer {
-        StyledText(text: "화면 콘텐츠", style: .subtitle1, alignment: .center)
+        StyledText(text: "화면 콘텐츠")
+            .textStyle(.subtitle1)
+            .multilineTextAlignment(.center)
     }
     .frame(width: 320, height: 240)
 }

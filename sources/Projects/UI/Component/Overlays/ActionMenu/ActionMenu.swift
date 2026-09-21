@@ -23,7 +23,9 @@ public struct ActionMenu: View {
                 Button {
                     onSelect(item.id)
                 } label: {
-                    StyledText(text: item.title, style: .body2, color: item.role.titleColor)
+                    StyledText(text: item.title)
+                        .textStyle(.body2)
+                        .foregroundColorToken(item.role.titleColor)
                         .padding(.horizontal, Constant.rowHorizontalPadding)
                         .padding(.top, Constant.rowTopPadding)
                         .padding(.bottom, Constant.rowBottomPadding)

@@ -35,7 +35,9 @@ struct LearningCompletionScreen: View {
                     .frame(width: Constant.animationSize, height: Constant.animationSize)
                     .accessibilityHidden(true)
 
-                StyledText(text: "학습을 마쳤어요", style: .subtitle1, alignment: .center)
+                StyledText(text: "학습을 마쳤어요")
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
 
                 if let scoreLabel = store.scoreAccessibilityLabel {
                     scoreView
@@ -43,7 +45,9 @@ struct LearningCompletionScreen: View {
                         .accessibilityLabel(scoreLabel)
                 }
 
-                StyledText(text: Constant.message, style: .body1, color: .grey400, alignment: .center)
+                StyledText(text: Constant.message)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
             }
             .designSystemScreenMargin()
 
@@ -57,13 +61,17 @@ struct LearningCompletionScreen: View {
 
     private var scoreView: some View {
         HStack(spacing: Constant.scoreSpacing) {
-            StyledText(text: "\(store.correctChoiceCount)", style: .subtitle1, color: .blue200)
+            StyledText(text: "\(store.correctChoiceCount)")
+                .textStyle(.subtitle1)
+                .foregroundColorToken(.blue200)
 
             Rectangle()
                 .fill(Color(designSystem: .grey400))
                 .frame(width: Constant.scoreDividerWidth, height: Constant.scoreDividerHeight)
 
-            StyledText(text: "\(store.choiceQuestionCount)", style: .subtitle1, color: .grey400)
+            StyledText(text: "\(store.choiceQuestionCount)")
+                .textStyle(.subtitle1)
+                .foregroundColorToken(.grey400)
         }
     }
 

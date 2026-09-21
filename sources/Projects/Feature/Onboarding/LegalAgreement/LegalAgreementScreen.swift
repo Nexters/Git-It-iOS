@@ -14,7 +14,8 @@ struct LegalAgreementScreen: View {
     var body: some View {
         SheetSurface(isScrollable: true) {
             VStack(alignment: .leading, spacing: 0) {
-                StyledText(text: "약관 동의", style: .subtitle1)
+                StyledText(text: "약관 동의")
+                    .textStyle(.subtitle1)
                     .padding(.top, LayoutToken.gutter)
                     .padding(.bottom, Constant.titleBottomSpacing)
 

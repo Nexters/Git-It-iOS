@@ -40,7 +40,10 @@ extension QuizGenerationProgressScreen {
                         width: Constant.iconSize,
                         height: Constant.iconSize,
                     )
-                StyledText(text: title, style: .body2, color: status == .pending ? .grey400 : .grey100).lineLimit(1)
+                StyledText(text: title)
+                    .textStyle(.body2)
+                    .foregroundColorToken(status == .pending ? .grey400 : .grey100)
+                    .lineLimit(1)
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(title), \(status.accessibilityDescription)")

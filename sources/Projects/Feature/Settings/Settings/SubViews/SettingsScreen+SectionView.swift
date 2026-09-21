@@ -18,7 +18,9 @@ extension SettingsScreen {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
-                StyledText(text: title, style: .caption2, color: .grey400)
+                StyledText(text: title)
+                    .textStyle(.caption2)
+                    .foregroundColorToken(.grey400)
                 VStack(spacing: 1) {
                     rows.background(Color(designSystem: .grey600), in: Rectangle())
                 }

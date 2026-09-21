@@ -19,8 +19,13 @@ extension LearningSetIntroScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: "학습 세트를 불러오지 못했어요", style: .subtitle1, alignment: .center)
-                    StyledText(text: "잠시 후 다시 시도해 주세요.", style: .body2, color: .grey400, alignment: .center)
+                    StyledText(text: "학습 세트를 불러오지 못했어요")
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
+                    StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
                 }
 
                 Spacer(minLength: 0)
