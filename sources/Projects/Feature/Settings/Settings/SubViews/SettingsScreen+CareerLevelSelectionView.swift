@@ -33,7 +33,7 @@ extension SettingsScreen {
                 .designSystemScreenMargin()
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
-                    if case .failed = store.careerLevelMutation {
+                    if case .failed = store.curationUpdate.careerLevelMutation {
                         StyledText(text: Constant.failureMessage, style: .caption1, color: .error, alignment: .center)
                     }
 

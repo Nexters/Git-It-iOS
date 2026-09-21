@@ -127,7 +127,7 @@ public struct SettingsScreen: View {
     }
 
     private var failureMessage: String? {
-        switch store.accountAction {
+        switch store.accountAction.accountAction {
         case .failed:
             Constant.accountActionFailureMessage
 
@@ -145,7 +145,7 @@ public struct SettingsScreen: View {
     }
 
     private var notificationValue: String? {
-        switch store.notificationStatus {
+        switch store.notificationPermission.notificationStatus {
         case .idle:
             nil
 

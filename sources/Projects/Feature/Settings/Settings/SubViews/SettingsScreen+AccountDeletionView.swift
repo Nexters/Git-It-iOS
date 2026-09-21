@@ -37,7 +37,7 @@ extension SettingsScreen {
                         StyledText(text: paragraph, style: .body1)
                     }
 
-                    if case .failed = store.accountAction {
+                    if case .failed = store.accountAction.accountAction {
                         StyledText(text: Constant.failureMessage, style: .caption1, color: .error)
                     }
                 }
@@ -49,7 +49,7 @@ extension SettingsScreen {
                     FeedbackActionButton(
                         styledText: StyledText(text: Constant.confirmTitle, style: .body1, color: .error, alignment: .center),
                         style: .text,
-                        isEnabled: store.accountAction != .deletingAccount,
+                        isEnabled: store.accountAction.accountAction != .deletingAccount,
                         action: { send(.deleteAccountConfirmed) },
                     )
                     .designSystemScreenMargin()

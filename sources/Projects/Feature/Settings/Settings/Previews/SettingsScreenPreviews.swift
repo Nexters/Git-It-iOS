@@ -33,15 +33,15 @@ private enum SettingsPreviewFixture {
     @MainActor
     static func store(
         profile: UserProfile? = SettingsPreviewFixture.profile(position: .backend, careerLevel: .entry),
-        accountAction: SettingsFeature.AccountAction = .idle,
-        positionMutation: SettingsFeature.MutationStatus = .idle,
+        accountAction: AccountActionFeature.State.AccountAction = .idle,
+        positionMutation: CurationUpdateFeature.State.MutationStatus = .idle,
     ) -> StoreOf<SettingsFeature> {
         Store(
             initialState: {
                 var state = SettingsFeature.State()
                 state.userProfile.load = profile.map { .loaded($0) } ?? .failed(.temporarilyUnavailable)
-                state.accountAction = accountAction
-                state.positionMutation = positionMutation
+                state.accountAction.accountAction = accountAction
+                state.curationUpdate.positionMutation = positionMutation
                 return state
             }()
         ) { EmptyReducer() }

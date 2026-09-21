@@ -461,6 +461,31 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 홈의 로그인 요청은 로그인 흐름을 시작한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 홈의 로그인 요청은 로그인 흐름을 시작한다(자식 경로 `signIn`) | 합성 지점 검증 |
 | U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 마이 탭 로그인 화면의 로그인은 로그인 흐름을 시작한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 마이 탭 로그인 화면의 로그인은 로그인 흐름을 시작한다(자식 경로 `signIn`) | 합성 지점 검증 |
 | U5 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 로그인 성공은 직군 입력 필요 여부와 함께 signInSucceeded를 위임한다 | Tests/MainShell/Router/MainShellRouterFeatureGuestAccessTests.swift › 로그인 성공은 직군 입력 필요 여부와 함께 signInSucceeded를 위임한다(자식 경로 `signIn`) | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다 | Tests/Settings/Settings/NotificationPermissionFeatureTests.swift › refresh는 알림 권한 상태를 조회해 켜짐·꺼짐 값으로 남긴다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 알림 권한 상태를 조회해 켜짐·꺼짐 값의 근거로 남긴다(위임) | Tests/Settings/Settings/SettingsFeatureTests.swift › task는 알림 권한에 refresh를 보낸다 | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 앱 설정에서 알림을 켜고 돌아오면 알림 권한 상태를 다시 조회한다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 앱 설정에서 돌아오면 알림 권한에 refresh를 보낸다 | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 알림이 켜져 있으면 알림 항목 탭은 시스템 알림 설정 화면을 연다 | Tests/Settings/Settings/NotificationPermissionFeatureTests.swift › 알림이 켜져 있으면 rowTapped는 시스템 알림 설정 화면을 연다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 알림이 켜져 있으면 알림 항목 탭은 시스템 알림 설정 화면을 연다(위임) | Tests/Settings/Settings/SettingsFeatureTests.swift › 알림 항목 탭은 알림 권한에 rowTapped를 보낸다 | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 알림 권한을 정하지 않았으면 알림 항목 탭은 시스템 권한을 요청하고 결과로 상태를 갱신한다 | Tests/Settings/Settings/NotificationPermissionFeatureTests.swift › 알림 권한을 정하지 않았으면 rowTapped는 시스템 권한을 요청하고 결과로 상태를 갱신한다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 이미 거부한 알림 권한은 알림 항목 탭에서 권한을 요청하지 않고 시스템 알림 설정 화면으로 이어진다 | Tests/Settings/Settings/NotificationPermissionFeatureTests.swift › 이미 거부한 알림 권한은 rowTapped에서 권한을 요청하지 않고 시스템 알림 설정 화면으로 이어진다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다(수신 Action 경로 `curationUpdate`, 프로필 `replace` 연결) | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 직군 저장 성공은 직군만 바꾸고 연차와 통계를 유지한다(전이 단언) | Tests/Settings/Settings/CurationUpdateFeatureTests.swift › 직군 저장 성공은 대기 상태로 되돌리고 positionUpdated를 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다 | Tests/Settings/Settings/SettingsFeatureTests.swift › 연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다(수신 Action 경로 `curationUpdate`, 프로필 `replace` 연결) | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 연차 저장 성공은 연차만 바꾸고 직군과 통계를 유지한다(전이 단언) | Tests/Settings/Settings/CurationUpdateFeatureTests.swift › 연차 저장 성공은 대기 상태로 되돌리고 careerLevelUpdated를 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 실패는 실패 상태를 남기고 이전 프로필을 그대로 둔다 | Tests/Settings/Settings/CurationUpdateFeatureTests.swift › 저장 실패는 실패 상태를 남기고 delegate를 보내지 않는다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 실패는 실패 상태를 남기고 이전 프로필을 그대로 둔다(프로필 보존) | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 실패는 이전 프로필을 그대로 둔다 | 합성 지점 검증 |
+| U6 | Tests/Settings/Settings/SettingsFeatureTests.swift › 저장 중에는 같은 항목의 선택을 다시 보내지 않는다 | Tests/Settings/Settings/CurationUpdateFeatureTests.swift › 직군 저장 중에는 직군 선택을 다시 보내지 않는다 | 기능 Feature 테스트 |
+| U6 | (새 테스트) | Tests/Settings/Settings/CurationUpdateFeatureTests.swift › 연차 저장 중에는 연차 선택을 다시 보내지 않는다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 로그아웃 성공은 대기 상태로 되돌리고 signedOut delegate를 올린다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 로그아웃 성공은 대기 상태로 되돌리고 signedOut을 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 로그아웃이 실패해도 같은 화면에서 다시 로그아웃할 수 있다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 로그아웃이 실패해도 다시 로그아웃할 수 있다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 진행 중인 계정 작업은 새 로그아웃·삭제 요청으로 덮이지 않는다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 진행 중인 계정 작업은 새 로그아웃·삭제 요청으로 덮이지 않는다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 계정 삭제 탭은 확인 단계로 바꾸고 확인 요청 delegate를 올린다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 삭제 요청은 확인 단계로 바꾸고 deletionConfirmationRequested를 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 삭제 취소는 확인 상태를 해제하고 취소 delegate를 올린다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 삭제 취소는 확인 상태를 해제하고 deletionCancelled를 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 확인 단계를 거치지 않은 삭제 확인은 계정을 삭제하지 않는다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 확인 단계를 거치지 않은 삭제 확인은 계정을 삭제하지 않는다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 삭제 성공은 대기 상태로 되돌리고 accountDeleted delegate를 올린다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 삭제 성공은 대기 상태로 되돌리고 accountDeleted를 보낸다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 삭제가 실패해도 확인 화면에서 다시 삭제를 진행할 수 있다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 삭제가 실패해도 다시 삭제를 진행할 수 있다 | 기능 Feature 테스트 |
+| U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › (각 @Test의 view 액션 연결과 delegate 전달) | Tests/Settings/Settings/SettingsFeatureTests.swift › 계정 동작 탭은 계정 동작에 대응 input을 보낸다, 계정 동작 delegate는 기존 Settings delegate로 올린다 | 합성 지점 검증 |
+| U6 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 계정 삭제 행은 확인 화면으로, 취소는 목록으로 되돌리며 확인 상태를 해제한다 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 계정 삭제 행은 확인 화면으로, 취소는 목록으로 되돌리며 확인 상태를 해제한다(수신 Action 경로 `settings.accountAction`) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -485,3 +510,8 @@ MainShell은 `failed`만 alert로 표시하고 `cancelled`에서도 `start`를 �
 화면 본문과 `SignInSection`은 로그인 상태를 참조하지 않아 T062에서 바꿀 곳이 없고 Preview만 바꿨다.
 `OnboardingRouterPreviews.swift`와 `MainShellAccountUseCaseStub.swift`도 새 구조에서 그대로 compile되어 수정하지
 않았다. Tutorial의 `input.returnToLastPage`는 큐레이션 이탈 복귀에서 Router가 계속 쓰므로 남겼다.
+
+**U6 비고**: `SettingsFeature`의 view 액션(`positionSelected`, `signOutTapped` 등)은 그대로 두고 자식 input으로
+바꿔 보낸다. 화면 View는 상태 참조 경로만 바뀌고 액션 연결은 바뀌지 않는다(SC-012). 알림 권한 조회 결과
+Effect 이름은 자식 안에서 `authorizationChecked`로 바꿨다. `SettingsTestFixture.swift`는 새 구조에서 그대로
+쓰여 수정하지 않았다.

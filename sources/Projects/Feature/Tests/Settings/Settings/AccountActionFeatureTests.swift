@@ -4,17 +4,17 @@ import Testing
 @testable import Feature
 
 @MainActor
-@Suite("SettingsFeature 로그아웃과 계정 삭제")
-struct SettingsFeatureAccountActionTests {
+@Suite("AccountActionFeature 로그아웃과 계정 삭제")
+struct AccountActionFeatureTests {
 
     // MARK: Internal
 
     @Test
-    func `로그아웃 성공은 대기 상태로 되돌리고 signedOut delegate를 올린다`() async {
+    func `로그아웃 성공은 대기 상태로 되돌리고 signedOut을 보낸다`() async {
         let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
         let store = makeStore(signOut: signOut)
 
-        await store.send(.view(.signOutTapped)) {
+        await store.send(.input(.signOutRequested)) {
             $0.accountAction = .signingOut
         }
         await store.receive(.effect(.signOutFinished(.signedOut))) {
@@ -26,18 +26,18 @@ struct SettingsFeatureAccountActionTests {
     }
 
     @Test
-    func `로그아웃이 실패해도 같은 화면에서 다시 로그아웃할 수 있다`() async {
+    func `로그아웃이 실패해도 다시 로그아웃할 수 있다`() async {
         let signOut = AccountUseCaseSignOutMock(results: [.retryableFailure, .signedOut])
         let store = makeStore(signOut: signOut)
 
-        await store.send(.view(.signOutTapped)) {
+        await store.send(.input(.signOutRequested)) {
             $0.accountAction = .signingOut
         }
         await store.receive(.effect(.signOutFinished(.retryableFailure))) {
             $0.accountAction = .failed(.temporarilyUnavailable)
         }
 
-        await store.send(.view(.signOutTapped)) {
+        await store.send(.input(.signOutRequested)) {
             $0.accountAction = .signingOut
         }
         await store.receive(.effect(.signOutFinished(.signedOut))) {
@@ -53,39 +53,39 @@ struct SettingsFeatureAccountActionTests {
         let signOut = AccountUseCaseSignOutMock()
         let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(
-            state: makeState(accountAction: .signingOut),
+            state: AccountActionFeature.State(accountAction: .signingOut),
             signOut: signOut,
             withdraw: withdraw,
         )
 
-        await store.send(.view(.signOutTapped))
-        await store.send(.view(.deleteAccountTapped))
+        await store.send(.input(.signOutRequested))
+        await store.send(.input(.deletionRequested))
 
         #expect(await signOut.snapshot() == 0)
         #expect(await withdraw.snapshot() == 0)
     }
 
     @Test
-    func `계정 삭제 탭은 확인 단계로 바꾸고 확인 요청 delegate를 올린다`() async {
+    func `삭제 요청은 확인 단계로 바꾸고 deletionConfirmationRequested를 보낸다`() async {
         let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(withdraw: withdraw)
 
-        await store.send(.view(.deleteAccountTapped)) {
+        await store.send(.input(.deletionRequested)) {
             $0.accountAction = .confirmingDeletion
         }
-        await store.receive(.delegate(.accountDeletionRequested))
+        await store.receive(.delegate(.deletionConfirmationRequested))
 
         #expect(await withdraw.snapshot() == 0)
     }
 
     @Test
-    func `삭제 취소는 확인 상태를 해제하고 취소 delegate를 올린다`() async {
-        let store = makeStore(state: makeState(accountAction: .confirmingDeletion))
+    func `삭제 취소는 확인 상태를 해제하고 deletionCancelled를 보낸다`() async {
+        let store = makeStore(state: AccountActionFeature.State(accountAction: .confirmingDeletion))
 
-        await store.send(.view(.deleteAccountCancelled)) {
+        await store.send(.input(.deletionCancelled)) {
             $0.accountAction = .idle
         }
-        await store.receive(.delegate(.accountDeletionCancelled))
+        await store.receive(.delegate(.deletionCancelled))
     }
 
     @Test
@@ -93,20 +93,20 @@ struct SettingsFeatureAccountActionTests {
         let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(withdraw: withdraw)
 
-        await store.send(.view(.deleteAccountConfirmed))
+        await store.send(.input(.deletionConfirmed))
 
         #expect(await withdraw.snapshot() == 0)
     }
 
     @Test
-    func `삭제 성공은 대기 상태로 되돌리고 accountDeleted delegate를 올린다`() async {
+    func `삭제 성공은 대기 상태로 되돌리고 accountDeleted를 보낸다`() async {
         let withdraw = AccountUseCaseWithdrawalMock()
         let store = makeStore(
-            state: makeState(accountAction: .confirmingDeletion),
+            state: AccountActionFeature.State(accountAction: .confirmingDeletion),
             withdraw: withdraw,
         )
 
-        await store.send(.view(.deleteAccountConfirmed)) {
+        await store.send(.input(.deletionConfirmed)) {
             $0.accountAction = .deletingAccount
         }
         await store.receive(.effect(.deleteAccountFinished(nil))) {
@@ -118,21 +118,21 @@ struct SettingsFeatureAccountActionTests {
     }
 
     @Test
-    func `삭제가 실패해도 확인 화면에서 다시 삭제를 진행할 수 있다`() async {
+    func `삭제가 실패해도 다시 삭제를 진행할 수 있다`() async {
         let withdraw = AccountUseCaseWithdrawalMock(shouldThrow: true)
         let store = makeStore(
-            state: makeState(accountAction: .confirmingDeletion),
+            state: AccountActionFeature.State(accountAction: .confirmingDeletion),
             withdraw: withdraw,
         )
 
-        await store.send(.view(.deleteAccountConfirmed)) {
+        await store.send(.input(.deletionConfirmed)) {
             $0.accountAction = .deletingAccount
         }
         await store.receive(.effect(.deleteAccountFinished(.temporarilyUnavailable))) {
             $0.accountAction = .failed(.temporarilyUnavailable)
         }
 
-        await store.send(.view(.deleteAccountConfirmed)) {
+        await store.send(.input(.deletionConfirmed)) {
             $0.accountAction = .deletingAccount
         }
         await store.receive(.effect(.deleteAccountFinished(.temporarilyUnavailable))) {
@@ -144,29 +144,13 @@ struct SettingsFeatureAccountActionTests {
 
     // MARK: Private
 
-    private func makeState(accountAction: SettingsFeature.AccountAction) -> SettingsFeature.State {
-        var state = SettingsFeature.State()
-        state.userProfile.load = .loaded(SettingsTestFixture.curatedProfile)
-        state.accountAction = accountAction
-        return state
-    }
-
     private func makeStore(
-        state: SettingsFeature.State = SettingsFeature.State(),
+        state: AccountActionFeature.State = AccountActionFeature.State(),
         signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
         withdraw: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
-    ) -> TestStoreOf<SettingsFeature> {
+    ) -> TestStoreOf<AccountActionFeature> {
         TestStore(initialState: state) {
-            SettingsFeature(
-                signOut: signOut.signOut,
-                profile: UserInfoUseCaseProfileMock().profile,
-                updatePosition: UserInfoUseCasePositionMock().updatePosition,
-                updateCareerLevel: UserInfoUseCaseCareerLevelMock().updateCareerLevel,
-                withdraw: withdraw.withdraw,
-                notificationAuthorization: { .denied },
-                requestNotificationAuthorization: { .denied },
-                openNotificationSettings: { },
-            )
+            AccountActionFeature(signOut: signOut.signOut, withdraw: withdraw.withdraw)
         }
     }
 

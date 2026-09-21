@@ -276,28 +276,28 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 테스트
 
-- [ ] T071 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/CurationUpdateFeatureTests.swift`를 작성한다. 검증 범위는 직군·연차 각각의 `committing` 중 무시, 성공 시 `positionUpdated`·`careerLevelUpdated`, 실패 시 `.failed`다
-- [ ] T072 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/AccountActionFeatureTests.swift`를 작성한다. `SettingsFeatureAccountActionTests.swift`의 계정 동작 전이를 옮겨 온다
-- [ ] T073 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/NotificationPermissionFeatureTests.swift`를 작성한다. 검증 범위는 `refresh`와 `rowTapped`의 권한별 분기다
+- [X] T071 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/CurationUpdateFeatureTests.swift`를 작성한다. 검증 범위는 직군·연차 각각의 `committing` 중 무시, 성공 시 `positionUpdated`·`careerLevelUpdated`, 실패 시 `.failed`다
+- [X] T072 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/AccountActionFeatureTests.swift`를 작성한다. `SettingsFeatureAccountActionTests.swift`의 계정 동작 전이를 옮겨 온다
+- [X] T073 [P] [S3] `sources/Projects/Feature/Tests/Settings/Settings/NotificationPermissionFeatureTests.swift`를 작성한다. 검증 범위는 `refresh`와 `rowTapped`의 권한별 분기다
 
 ### 구현
 
-- [ ] T074 [P] [S3] `sources/Projects/Feature/Settings/Settings/CurationUpdateFeature.swift`에 `CurationUpdateFeature`를 구현한다(생성자 `updatePosition:`, `updateCareerLevel:`)
-- [ ] T075 [P] [S3] `sources/Projects/Feature/Settings/Settings/AccountActionFeature.swift`에 `AccountActionFeature`를 구현한다(생성자 `signOut:`, `withdraw:`)
-- [ ] T076 [P] [S3] `sources/Projects/Feature/Settings/Settings/NotificationPermissionFeature.swift`에 `NotificationPermissionFeature`를 구현한다(생성자 `notificationAuthorization:`, `requestNotificationAuthorization:`, `openNotificationSettings:`)
-- [ ] T077 [S3] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에서 `positionMutation`·`careerLevelMutation`·`accountAction`·`notificationStatus`와 관련 Effect를 제거하고 세 Feature를 합성한다. 자식 delegate를 기존 delegate로 바꿔 올리고, `CurationUpdateFeature`의 결과를 프로필 `replace`로 연결한다. 생성자 시그니처는 유지한다
-- [ ] T078 [S3] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`, `sources/Projects/Feature/Settings/Settings/Previews/SettingsScreenPreviews.swift`의 상태 참조와 액션 연결을 자식 store 스코핑으로 바꾼다
+- [X] T074 [P] [S3] `sources/Projects/Feature/Settings/Settings/CurationUpdateFeature.swift`에 `CurationUpdateFeature`를 구현한다(생성자 `updatePosition:`, `updateCareerLevel:`)
+- [X] T075 [P] [S3] `sources/Projects/Feature/Settings/Settings/AccountActionFeature.swift`에 `AccountActionFeature`를 구현한다(생성자 `signOut:`, `withdraw:`)
+- [X] T076 [P] [S3] `sources/Projects/Feature/Settings/Settings/NotificationPermissionFeature.swift`에 `NotificationPermissionFeature`를 구현한다(생성자 `notificationAuthorization:`, `requestNotificationAuthorization:`, `openNotificationSettings:`)
+- [X] T077 [S3] `sources/Projects/Feature/Settings/Settings/SettingsFeature.swift`에서 `positionMutation`·`careerLevelMutation`·`accountAction`·`notificationStatus`와 관련 Effect를 제거하고 세 Feature를 합성한다. 자식 delegate를 기존 delegate로 바꿔 올리고, `CurationUpdateFeature`의 결과를 프로필 `replace`로 연결한다. 생성자 시그니처는 유지한다
+- [X] T078 [S3] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`, `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`, `sources/Projects/Feature/Settings/Settings/Previews/SettingsScreenPreviews.swift`의 상태 참조와 액션 연결을 자식 store 스코핑으로 바꾼다
 
 ### 테스트 이관
 
-- [ ] T079 [S3] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureTests.swift`와 `sources/Projects/Feature/Tests/Settings/TestDoubles/SettingsTestFixture.swift`를 합성 지점(자식 위임, delegate 전달, 프로필 `replace` 연결) 검증으로 바꾼다
-- [ ] T080 [S3] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift`의 각 `@Test`를 T072 또는 T079에 대응시킨 뒤 파일을 삭제한다
-- [ ] T081 [S3] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`의 계정 동작 상태 참조를 새 경로로 바꾼다
-- [ ] T082 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U6 이관 대응표를 추가한다
+- [X] T079 [S3] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureTests.swift`와 `sources/Projects/Feature/Tests/Settings/TestDoubles/SettingsTestFixture.swift`를 합성 지점(자식 위임, delegate 전달, 프로필 `replace` 연결) 검증으로 바꾼다
+- [X] T080 [S3] `sources/Projects/Feature/Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift`의 각 `@Test`를 T072 또는 T079에 대응시킨 뒤 파일을 삭제한다
+- [X] T081 [S3] `sources/Projects/Feature/Tests/Settings/Router/SettingsRouterFeatureTests.swift`의 계정 동작 상태 참조를 새 경로로 바꾼다
+- [X] T082 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U6 이관 대응표를 추가한다
 
 ### 정리와 단위 검증
 
-- [ ] T083 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
+- [X] T083 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
 
 **진행 점검**: T071~T083의 변경 파일과 검증 결과를 보고하고 실행 단위 7로 진행한다.
 

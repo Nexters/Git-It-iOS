@@ -85,16 +85,20 @@ struct SettingsRouterFeatureTests {
         state.activeScreen = .settings(.list)
         let store = makeStore(state: state)
 
-        await store.send(.settings(.view(.deleteAccountTapped))) {
-            $0.settings.accountAction = .confirmingDeletion
+        await store.send(.settings(.view(.deleteAccountTapped)))
+        await store.receive(.settings(.accountAction(.input(.deletionRequested)))) {
+            $0.settings.accountAction.accountAction = .confirmingDeletion
         }
+        await store.receive(.settings(.accountAction(.delegate(.deletionConfirmationRequested))))
         await store.receive(.settings(.delegate(.accountDeletionRequested))) {
             $0.activeScreen = .settings(.accountDeletion)
         }
 
-        await store.send(.settings(.view(.deleteAccountCancelled))) {
-            $0.settings.accountAction = .idle
+        await store.send(.settings(.view(.deleteAccountCancelled)))
+        await store.receive(.settings(.accountAction(.input(.deletionCancelled)))) {
+            $0.settings.accountAction.accountAction = .idle
         }
+        await store.receive(.settings(.accountAction(.delegate(.deletionCancelled))))
         await store.receive(.settings(.delegate(.accountDeletionCancelled))) {
             $0.activeScreen = .settings(.list)
         }
