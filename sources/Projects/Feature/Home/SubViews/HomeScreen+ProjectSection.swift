@@ -229,7 +229,7 @@ extension HomeScreen {
                             onSelect: { onProjectCardTapped(String(project.projectID)) },
                             onStart: { onLearningTapped(String(project.projectID)) },
                         )
-                        .style(project.variant)
+                        .style(project.style)
                         .visualEffect { content, proxy in
                             content.rotationEffect(
                                 .degrees(

@@ -15,7 +15,7 @@ struct HomeProjectDisplayTests {
         #expect(displays[0].technologies == "Swift · SwiftUI · TCA")
         #expect(displays[0].currentSetLabel == "Sprint Beta 0")
         #expect(displays[3].progress == 1.4)
-        #expect(displays.map(\.variant) == [.purple, .lightBlue, .darkBlue, .purple])
+        #expect(displays.map(\.style) == [.purple, .lightBlue, .darkBlue, .purple])
     }
 
     @Test
