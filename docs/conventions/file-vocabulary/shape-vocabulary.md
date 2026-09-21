@@ -51,6 +51,10 @@
 | | `Previews/` | 그 화면의 프리뷰 |
 | `Feature/<흐름>/Shared/` | `Views/` | 둘 이상의 화면이 함께 쓰는 View |
 | | `Models/` | 둘 이상의 화면이 함께 쓰는 표시 모델 |
+| | `Reducers/` | 같은 흐름의 둘 이상 화면이 합성하는 기능 Feature |
+| `Feature/Shared/` | `Views/` | 둘 이상의 흐름이 함께 쓰는 View |
+| | `Models/` | 둘 이상의 흐름이 함께 쓰는 값 타입 |
+| | `Reducers/` | 둘 이상의 흐름이 합성하는 기능 Feature — View를 두지 않습니다 |
 | `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |
 | | `Layout/` | 화면 크기에서 파생하는 런타임 레이아웃 변수 |
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
