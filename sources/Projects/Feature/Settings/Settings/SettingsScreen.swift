@@ -33,7 +33,7 @@ public struct SettingsScreen: View {
                 }
                 .frame(height: Constant.headerControlRowHeight, alignment: .top)
 
-                ScreenHeaderTitle(title: Constant.title)
+                ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                     .frame(height: Constant.headerControlRowHeight, alignment: .top)
             }
             .padding(.bottom, Constant.headerBottomPadding)

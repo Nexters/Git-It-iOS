@@ -45,11 +45,13 @@ public struct ProjectListScreen: View {
                     onDismiss: { send(.deletionCancelled) },
                 ) {
                     ConfirmationSheet(
-                        imageURL: deletionTarget?.imageURL,
-                        title: "프로젝트를 삭제할까요?",
-                        message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
-                        confirmTitle: "삭제",
-                        cancelTitle: "취소",
+                        displayModel: .init(
+                            imageURL: deletionTarget?.imageURL,
+                            title: "프로젝트를 삭제할까요?",
+                            message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
+                            confirmTitle: "삭제",
+                            cancelTitle: "취소",
+                        ),
                         onConfirmTap: { send(.deletionConfirmed) },
                         onCancelTap: { send(.deletionCancelled) },
                     )
@@ -96,7 +98,7 @@ public struct ProjectListScreen: View {
                                 .frame(height: Constant.headerControlRowHeight)
                             }
 
-                            ScreenHeaderTitle(title: headerTitle)
+                            ScreenHeaderTitle(displayModel: .init(title: headerTitle))
                                 .frame(height: Constant.headerControlRowHeight)
                         }
 
@@ -138,7 +140,7 @@ public struct ProjectListScreen: View {
                         .frame(minHeight: Constant.headerControlRowHeight)
                     }
 
-                    ScreenHeaderTitle(title: headerTitle)
+                    ScreenHeaderTitle(displayModel: .init(title: headerTitle))
                         .frame(minHeight: Constant.headerControlRowHeight)
                 }
                 .designSystemScreenMargin()

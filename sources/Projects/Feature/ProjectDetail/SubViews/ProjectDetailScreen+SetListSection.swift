@@ -31,8 +31,10 @@ extension ProjectDetailScreen {
         private var cards: some View {
             if sets.isEmpty {
                 EmptyState(
-                    title: "sets = []",
-                    message: "아직 만들어진 학습 세트가 없습니다.",
+                    displayModel: .init(
+                        title: "sets = []",
+                        message: "아직 만들어진 학습 세트가 없습니다.",
+                    )
                 ) {
                     ResourceImage(asset: .illust(.levelEntry))
                 }

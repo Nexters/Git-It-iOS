@@ -21,6 +21,6 @@ struct PageIndicatorTests {
 
     @Test
     func `표시 값을 직접 받아 생성한다`() {
-        _ = PageIndicator(currentPage: 0, totalPages: 3)
+        _ = PageIndicator(displayModel: .init(currentPage: 0, totalPages: 3))
     }
 }

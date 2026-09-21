@@ -632,18 +632,18 @@ ProjectDetail, Tutorial, MainShell·Onboarding Router)가 함께 바뀌어야 co
 
 ### 구현
 
-- [ ] T090 [P] [S4] `sources/Projects/UI/Component/Displays/RubricView/RubricView.swift`에 `DisplayModel { criteria, overallFeedback = nil }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T091 [P] [S4] `sources/Projects/UI/Component/Displays/ScreenHeaderTitle.swift`에 `DisplayModel { title = nil, subtitle = nil }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T092 [P] [S4] `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift`에 `DisplayModel { title, message }`를 두고, 초기화 메서드를 `init(displayModel:illustration:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T093 [P] [S4] `sources/Projects/UI/Component/Indicators/PageIndicator.swift`에 `DisplayModel { currentPage, totalPages }`를 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T094 [P] [S4] `sources/Projects/UI/Component/Indicators/ProgressSegments.swift`에 `DisplayModel { completed, total }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T095 [P] [S4] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`에 `DisplayModel { imageURL, title, message, confirmTitle, cancelTitle }`을 두고, 초기화 메서드를 `init(displayModel:onConfirmTap:onCancelTap:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T096 [P] [S4] `sources/Projects/UI/Component/Overlays/WebSheet.swift`에 `DisplayModel { title, url }`을 두고, 초기화 메서드를 `init(displayModel:onDismiss:)`로 바꾼다. `#Preview`를 전환한다
-- [ ] T097 [P] [S4] UI 내부 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T090 [P] [S4] `sources/Projects/UI/Component/Displays/RubricView/RubricView.swift`에 `DisplayModel { criteria, overallFeedback = nil }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T091 [P] [S4] `sources/Projects/UI/Component/Displays/ScreenHeaderTitle.swift`에 `DisplayModel { title = nil, subtitle = nil }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T092 [P] [S4] `sources/Projects/UI/Component/Indicators/EmptyState/EmptyState.swift`에 `DisplayModel { title, message }`를 두고, 초기화 메서드를 `init(displayModel:illustration:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T093 [P] [S4] `sources/Projects/UI/Component/Indicators/PageIndicator.swift`에 `DisplayModel { currentPage, totalPages }`를 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T094 [P] [S4] `sources/Projects/UI/Component/Indicators/ProgressSegments.swift`에 `DisplayModel { completed, total }`을 두고, 초기화 메서드를 `init(displayModel:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T095 [P] [S4] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`에 `DisplayModel { imageURL, title, message, confirmTitle, cancelTitle }`을 두고, 초기화 메서드를 `init(displayModel:onConfirmTap:onCancelTap:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T096 [P] [S4] `sources/Projects/UI/Component/Overlays/WebSheet.swift`에 `DisplayModel { title, url }`을 두고, 초기화 메서드를 `init(displayModel:onDismiss:)`로 바꾼다. `#Preview`를 전환한다
+- [X] T097 [P] [S4] UI 내부 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`: `ProgressSegments`
   - `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`: `#Preview`의 `ScreenHeaderTitle`
-- [ ] T098 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/Indicators/PageIndicatorTests.swift`의 `PageIndicator` 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다
-- [ ] T099 [P] [S4] Feature의 `ScreenHeaderTitle` 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T098 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/Indicators/PageIndicatorTests.swift`의 `PageIndicator` 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다
+- [X] T099 [P] [S4] Feature의 `ScreenHeaderTitle` 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`
   - `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+FailureView.swift`
   - `sources/Projects/Feature/Saved/SavedScreen.swift`
@@ -653,21 +653,21 @@ ProjectDetail, Tutorial, MainShell·Onboarding Router)가 함께 바뀌어야 co
   - `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`
   - `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`
   - `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`
-- [ ] T100 [P] [S4] Feature의 `EmptyState` 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T100 [P] [S4] Feature의 `EmptyState` 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`
   - `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+EmptyProjectsView.swift`
   - `sources/Projects/Feature/Saved/SavedScreen.swift`
-- [ ] T101 [P] [S4] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`의 `PageIndicator` 호출을 공통 전환 규칙으로 바꾼다
-- [ ] T102 [P] [S4] Feature의 `ConfirmationSheet` 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T101 [P] [S4] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`의 `PageIndicator` 호출을 공통 전환 규칙으로 바꾼다
+- [X] T102 [P] [S4] Feature의 `ConfirmationSheet` 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`
   - `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`
-- [ ] T103 [P] [S4] Feature의 `WebSheet` 호출부를 공통 전환 규칙으로 바꾼다.
+- [X] T103 [P] [S4] Feature의 `WebSheet` 호출부를 공통 전환 규칙으로 바꾼다.
   - `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`
   - `sources/Projects/Feature/Onboarding/Router/OnboardingRouter.swift`
 
 ### 정리와 단위 검증
 
-- [ ] T104 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄인지, 일곱 컴포넌트의 `public init` 첫 인자가 `displayModel`인지 확인한다. `ProjectListScreen`·`SettingsScreen` 프리뷰가 전환 전과 같은지 확인한다.
+- [X] T104 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.2 조회가 0줄인지, 일곱 컴포넌트의 `public init` 첫 인자가 `displayModel`인지 확인한다. `ProjectListScreen`·`SettingsScreen` 프리뷰가 전환 전과 같은지 확인한다.
 
 **진행 점검**: T090~T104의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

@@ -112,8 +112,7 @@ public struct MainShellRouter: View {
         ) {
             if let document = store.signIn.legalAgreement.presentedDocument {
                 WebSheet(
-                    title: document.displayName,
-                    url: document.approvedURL,
+                    displayModel: .init(title: document.displayName, url: document.approvedURL),
                     onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
                 )
             }

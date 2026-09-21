@@ -15,7 +15,7 @@ extension ProjectListScreen {
                     Spacer(minLength: 0)
                         .frame(height: Constant.headerControlRowHeight)
 
-                    ScreenHeaderTitle(title: "프로젝트")
+                    ScreenHeaderTitle(displayModel: .init(title: "프로젝트"))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(height: Constant.headerHeight, alignment: .top)

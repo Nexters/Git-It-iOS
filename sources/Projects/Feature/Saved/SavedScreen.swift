@@ -39,8 +39,10 @@ struct SavedScreen: View {
                     Spacer(minLength: 0)
 
                     EmptyState(
-                        title: "Nothing saved yet.",
-                        message: "아직 저장한 문제가 없네요!\n다시 확인하고 싶은 문제를 저장해 보세요.",
+                        displayModel: .init(
+                            title: "Nothing saved yet.",
+                            message: "아직 저장한 문제가 없네요!\n다시 확인하고 싶은 문제를 저장해 보세요.",
+                        )
                     ) {
                         ResourceAnimation(asset: .storageEmpty, isLooping: true)
                     }
@@ -72,7 +74,7 @@ struct SavedScreen: View {
                         .size(.medium)
                         .frame(height: Constant.headerRowHeight)
                     }
-                    ScreenHeaderTitle(title: "저장한 문제")
+                    ScreenHeaderTitle(displayModel: .init(title: "저장한 문제"))
                         .frame(height: Constant.headerRowHeight)
                 }
 

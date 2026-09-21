@@ -120,7 +120,7 @@ extension OverlayContainer: BackgroundColorConfigurable {
             Spacer(minLength: 0)
                 .frame(height: 40)
 
-            ScreenHeaderTitle(title: "오버레이 헤더")
+            ScreenHeaderTitle(displayModel: .init(title: "오버레이 헤더"))
         }
         .padding(.bottom, 10)
         .frame(height: 99, alignment: .top)

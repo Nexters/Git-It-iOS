@@ -36,7 +36,7 @@ public struct LearningSetRow: View {
                 startButton
             }
 
-            ProgressSegments(completed: clampedCompletedCount, total: displayModel.questionCount)
+            ProgressSegments(displayModel: .init(completed: clampedCompletedCount, total: displayModel.questionCount))
         }
         .padding(.horizontal, Constant.horizontalPadding)
         .padding(.vertical, Constant.verticalPadding)

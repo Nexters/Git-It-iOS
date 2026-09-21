@@ -28,7 +28,7 @@ extension SavedScreen {
                     }
                     .frame(height: Constant.headerControlRowHeight, alignment: .top)
 
-                    ScreenHeaderTitle(title: "저장한 문제")
+                    ScreenHeaderTitle(displayModel: .init(title: "저장한 문제"))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(height: Constant.headerHeight, alignment: .top)

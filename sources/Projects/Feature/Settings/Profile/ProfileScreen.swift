@@ -22,7 +22,7 @@ public struct ProfileScreen: View {
         OverlayContainer {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                    ScreenHeaderTitle(title: Constant.title)
+                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                         .frame(height: Constant.headerControlRowHeight)
                     Spacer()
 

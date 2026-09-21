@@ -8,12 +8,10 @@ public struct WebSheet: View {
     // MARK: Lifecycle
 
     public init(
-        title: String,
-        url: URL,
+        displayModel: DisplayModel,
         onDismiss: @escaping () -> Void,
     ) {
-        self.title = title
-        self.url = url
+        self.displayModel = displayModel
         self.onDismiss = onDismiss
     }
 
@@ -23,7 +21,7 @@ public struct WebSheet: View {
         SheetSurface {
             VStack(spacing: 0) {
                 HStack(spacing: LayoutToken.gutter) {
-                    StyledText(text: title)
+                    StyledText(text: displayModel.title)
                         .textStyle(.subtitle1)
 
                     Spacer(minLength: 0)
@@ -32,7 +30,7 @@ public struct WebSheet: View {
                 }
                 .padding(.bottom, LayoutToken.gutter)
 
-                WebContentView(url: url)
+                WebContentView(url: displayModel.url)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(maxHeight: .infinity)
@@ -42,10 +40,26 @@ public struct WebSheet: View {
 
     // MARK: Private
 
-    private let title: String
-    private let url: URL
+    private let displayModel: DisplayModel
     private let onDismiss: () -> Void
 
+}
+
+// MARK: WebSheet.DisplayModel
+
+extension WebSheet {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            title: String,
+            url: URL,
+        ) {
+            self.title = title
+            self.url = url
+        }
+
+        public let title: String
+        public let url: URL
+    }
 }
 
 #Preview("Web Sheet") {
@@ -53,8 +67,7 @@ public struct WebSheet: View {
         Color(designSystem: .grey700)
 
         WebSheet(
-            title: "서비스 이용 약관",
-            url: URL(string: "https://example.com")!,
+            displayModel: .init(title: "서비스 이용 약관", url: URL(string: "https://example.com")!),
             onDismiss: { },
         )
     }

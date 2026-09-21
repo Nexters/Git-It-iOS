@@ -8,12 +8,10 @@ public struct EmptyState<Illustration: View>: View {
     // MARK: Lifecycle
 
     public init(
-        title: String,
-        message: String,
+        displayModel: DisplayModel,
         @ViewBuilder illustration: () -> Illustration,
     ) {
-        self.title = title
-        self.message = message
+        self.displayModel = displayModel
         self.illustration = illustration()
     }
 
@@ -28,11 +26,11 @@ public struct EmptyState<Illustration: View>: View {
                 )
 
             VStack(spacing: Constant.textSpacing) {
-                StyledText(text: title)
+                StyledText(text: displayModel.title)
                     .textStyle(.subtitle1)
                     .foregroundColorToken(.grey200)
                     .multilineTextAlignment(.center)
-                StyledText(text: message)
+                StyledText(text: displayModel.message)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
@@ -63,20 +61,38 @@ public struct EmptyState<Illustration: View>: View {
         }
     }
 
-    private let title: String
-    private let message: String
+    private let displayModel: DisplayModel
     private let illustration: Illustration
 
 }
 
+// MARK: EmptyState.DisplayModel
+
+extension EmptyState {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            title: String,
+            message: String,
+        ) {
+            self.title = title
+            self.message = message
+        }
+
+        public let title: String
+        public let message: String
+    }
+}
+
 #Preview("Empty State") {
     EmptyState(
-        title: "projects = []",
-        message:
-        """
-        아직 저장한 항목이 없습니다.
-        다시 확인할 내용을 저장해 보세요.
-        """,
+        displayModel: .init(
+            title: "projects = []",
+            message:
+            """
+            아직 저장한 항목이 없습니다.
+            다시 확인할 내용을 저장해 보세요.
+            """,
+        )
     ) {
         ResourceImage(asset: .illust(.levelEntry))
     }

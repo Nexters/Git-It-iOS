@@ -68,8 +68,7 @@ public struct OnboardingRouter: View {
                 ) {
                     if let document = store.tutorial.signIn.legalAgreement.presentedDocument {
                         WebSheet(
-                            title: document.displayName,
-                            url: document.approvedURL,
+                            displayModel: .init(title: document.displayName, url: document.approvedURL),
                             onDismiss: { store.send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed)))) },
                         )
                     }
