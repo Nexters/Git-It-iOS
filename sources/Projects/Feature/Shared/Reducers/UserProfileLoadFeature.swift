@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DomainUserInfo
+import Foundation
 
 @Reducer
 public struct UserProfileLoadFeature: Sendable {
@@ -37,6 +38,17 @@ public struct UserProfileLoadFeature: Sendable {
             guard case .loaded(let profile) = load else { return nil }
             return profile
         }
+
+        public static func ==(
+            lhs: Self,
+            rhs: Self,
+        ) -> Bool {
+            lhs.load == rhs.load && lhs.requestID == rhs.requestID
+        }
+
+        // MARK: Fileprivate
+
+        fileprivate let instanceID = UUID()
 
     }
 
@@ -81,7 +93,7 @@ public struct UserProfileLoadFeature: Sendable {
             case .input(.replace(let profile)):
                 state.requestID += 1
                 state.load = .loaded(profile)
-                return .cancel(id: CancelID.profile)
+                return .cancel(id: CancelID.profile(state.instanceID))
 
             case .effect(.profileLoadFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
@@ -102,8 +114,8 @@ public struct UserProfileLoadFeature: Sendable {
 
     // MARK: Private
 
-    private enum CancelID {
-        case profile
+    private enum CancelID: Hashable {
+        case profile(UUID)
     }
 
     private let profile: @Sendable () async throws -> UserProfile
@@ -128,7 +140,7 @@ public struct UserProfileLoadFeature: Sendable {
                 await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(.temporarilyUnavailable))))
             }
         }
-        .cancellable(id: CancelID.profile, cancelInFlight: true)
+        .cancellable(id: CancelID.profile(state.instanceID), cancelInFlight: true)
     }
 
 }
