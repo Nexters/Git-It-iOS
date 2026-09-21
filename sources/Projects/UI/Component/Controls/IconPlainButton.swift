@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - IconPlainButton
+
 public struct IconPlainButton: View {
 
     // MARK: Lifecycle
@@ -8,16 +10,12 @@ public struct IconPlainButton: View {
     public init(
         icon: Icon,
         label: String,
-        tintColor: ColorToken = .white,
-        backgroundColor: ColorToken = .clear,
         iconSize: CGFloat = 36,
         size: CGFloat = 36,
         action: @escaping () -> Void = { },
     ) {
         self.icon = icon
         self.label = label
-        self.tintColor = tintColor
-        self.backgroundColor = backgroundColor
         self.iconSize = iconSize
         self.size = size
         self.action = action
@@ -31,7 +29,7 @@ public struct IconPlainButton: View {
         Button(action: action) {
             ZStack {
                 ResourceImage(asset: .icon(icon))
-                    .designSystemForeground(tintColor)
+                    .designSystemForeground(foregroundColor)
                     .frame(width: iconSize, height: iconSize)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -55,23 +53,40 @@ public struct IconPlainButton: View {
 
     private let icon: Icon
     private let label: String
-    private let tintColor: ColorToken
-    private let backgroundColor: ColorToken
+    private var foregroundColor = ColorToken.white
+    private var backgroundColor = ColorToken.clear
     private let iconSize: CGFloat
     private let size: CGFloat
     private let action: () -> Void
 
 }
 
+// MARK: ForegroundColorConfigurable
+
+extension IconPlainButton: ForegroundColorConfigurable {
+    public func foregroundColorToken(_ color: ColorToken) -> Self {
+        var copy = self
+        copy.foregroundColor = color
+        return copy
+    }
+}
+
+// MARK: BackgroundColorConfigurable
+
+extension IconPlainButton: BackgroundColorConfigurable {
+    public func backgroundColorToken(_ color: ColorToken) -> Self {
+        var copy = self
+        copy.backgroundColor = color
+        return copy
+    }
+}
+
 #Preview("Icon Plain Button") {
     HStack(spacing: LayoutToken.gutter) {
         IconPlainButton(icon: .play, label: "학습 시작")
-        IconPlainButton(
-            icon: .play,
-            label: "학습 시작",
-            tintColor: .grey700,
-            backgroundColor: .blue100,
-        )
+        IconPlainButton(icon: .play, label: "학습 시작")
+            .foregroundColorToken(.grey700)
+            .backgroundColorToken(.blue100)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

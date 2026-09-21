@@ -18,23 +18,6 @@ public struct OverlayContainer<
         @ViewBuilder background: @escaping () -> Background,
         @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
     ) {
-        self.init(
-            screenBackground: .grey700,
-            header: header,
-            content: content,
-            background: background,
-            footer: footer,
-        )
-    }
-
-    private init(
-        screenBackground: ColorToken,
-        header: @escaping () -> Header,
-        content: @escaping () -> Content,
-        background: @escaping () -> Background,
-        footer: @escaping () -> Footer,
-    ) {
-        self.screenBackground = screenBackground
         self.header = header()
         self.content = content()
         self.background = background()
@@ -71,7 +54,7 @@ public struct OverlayContainer<
 
     // MARK: Private
 
-    private let screenBackground: ColorToken
+    private var screenBackground = ColorToken.grey700
     private let header: Header
     private let content: Content
     private let background: Background
@@ -107,13 +90,11 @@ public struct OverlayContainer<
 extension OverlayContainer where Background == EmptyView {
 
     public init(
-        screenBackground: ColorToken = .grey700,
         @ViewBuilder header: @escaping () -> Header = { EmptyView() },
         @ViewBuilder content: @escaping () -> Content,
         @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
     ) {
         self.init(
-            screenBackground: screenBackground,
             header: header,
             content: content,
             background: { EmptyView() },
@@ -121,6 +102,16 @@ extension OverlayContainer where Background == EmptyView {
         )
     }
 
+}
+
+// MARK: BackgroundColorConfigurable
+
+extension OverlayContainer: BackgroundColorConfigurable {
+    public func backgroundColorToken(_ color: ColorToken) -> Self {
+        var copy = self
+        copy.screenBackground = color
+        return copy
+    }
 }
 
 #Preview("Overlay Container") {

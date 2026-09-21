@@ -16,8 +16,9 @@ struct ScreenContainerContractTests {
         _ = ScreenContainer {
             StyledText(text: "콘텐츠")
         }
-        _ = ScreenContainer(background: .grey600) {
+        _ = ScreenContainer {
             StyledText(text: "콘텐츠")
         }
+        .backgroundColorToken(.grey600)
     }
 }

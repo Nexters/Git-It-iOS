@@ -367,34 +367,34 @@ UI+Feature integration unit이다.
 
 ### 테스트
 
-- [ ] T044 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/BackgroundColorConfigurableTests.swift`에 `@Suite("BackgroundColorConfigurable 계약")`을 만든다. `IconPlainButton`·`ScreenContainer`·`OverlayContainer`에 대해 세 가지를 검증한다.
+- [X] T044 [P] [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/BackgroundColorConfigurableTests.swift`에 `@Suite("BackgroundColorConfigurable 계약")`을 만든다. `IconPlainButton`·`ScreenContainer`·`OverlayContainer`에 대해 세 가지를 검증한다.
   - 기본값(`.clear`·`.grey700`·`.grey700`)
   - `backgroundColorToken(_:)`이 배경색만 바꿈
   - 마지막 선언 우선
   - `IconPlainButton`은 `foregroundColorToken(_:)`과 순서를 바꿔도 결과가 같음
-- [ ] T045 [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/ForegroundColorConfigurableTests.swift`에 `IconPlainButton`에 대한 두 가지 검증을 추가한다. 기본 전경색 `.white`와, 전경색만 바뀌고 배경색·`label`이 유지됨이다.
+- [X] T045 [S2] `sources/Projects/UI/Tests/Component/Unit/Contracts/ForegroundColorConfigurableTests.swift`에 `IconPlainButton`에 대한 두 가지 검증을 추가한다. 기본 전경색 `.white`와, 전경색만 바뀌고 배경색·`label`이 유지됨이다.
 
 ### 구현
 
-- [ ] T046 [P] [S1] `sources/Projects/UI/Component/Controls/IconPlainButton.swift`를 전환한다.
+- [X] T046 [P] [S1] `sources/Projects/UI/Component/Controls/IconPlainButton.swift`를 전환한다.
   - 초기화 메서드를 `init(icon:label:iconSize:size:action:)`로 바꾼다.
   - `private var foregroundColor: ColorToken = .white`, `private var backgroundColor: ColorToken = .clear`를 둔다.
   - `ForegroundColorConfigurable`·`BackgroundColorConfigurable`을 채택하고 `#Preview`를 전환한다.
-- [ ] T047 [P] [S1] `sources/Projects/UI/Component/Scaffolds/ScreenContainer.swift`를 전환한다.
+- [X] T047 [P] [S1] `sources/Projects/UI/Component/Scaffolds/ScreenContainer.swift`를 전환한다.
   - 초기화 메서드를 `init(content:)`로 바꾼다.
   - `private var backgroundColor: ColorToken = .grey700`을 둔다.
   - `BackgroundColorConfigurable`을 채택한다.
-- [ ] T048 [P] [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`를 전환한다.
+- [X] T048 [P] [S1] `sources/Projects/UI/Component/Scaffolds/OverlayContainer.swift`를 전환한다.
   - `where Background == EmptyView` 초기화 메서드와 비공개 공통 초기화 메서드에서 `screenBackground` 인자를 제거한다.
   - `private var screenBackground: ColorToken = .grey700`을 둔다.
   - 타입 전체에서 `BackgroundColorConfigurable`을 채택한다([research.md](./research.md) §4.5).
-- [ ] T049 [P] [S1] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
+- [X] T049 [P] [S1] UI 테스트 호출부를 공통 전환 규칙으로 바꾼다. 기존 단언은 유지한다.
   - `sources/Projects/UI/Tests/Component/Unit/Scaffolds/ScreenContainerContractTests.swift`
   - `sources/Projects/UI/Tests/Component/Unit/Scaffolds/OverlayContainerContractTests.swift`
 
 ### 정리와 단위 검증
 
-- [ ] T050 [no-write] [S1] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.1의 `IconPlainButton`·`ScreenContainer`·`OverlayContainer` 패턴이 0줄인지 확인한다. Feature 화면 프리뷰의 배경이 `.grey700`으로 유지되는지 확인한다.
+- [X] T050 [no-write] [S1] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. [quickstart.md](./quickstart.md) §2.1의 `IconPlainButton`·`ScreenContainer`·`OverlayContainer` 패턴이 0줄인지 확인한다. Feature 화면 프리뷰의 배경이 `.grey700`으로 유지되는지 확인한다.
 
 **진행 점검**: T044~T050의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

@@ -42,9 +42,10 @@ struct OverlayContainerContractTests {
 
     @Test
     func `화면 배경 토큰을 바꿔 받는다`() {
-        _ = OverlayContainer(screenBackground: .grey600, content: {
+        _ = OverlayContainer(content: {
             StyledText(text: "본문")
         })
+        .backgroundColorToken(.grey600)
     }
 
     @Test
