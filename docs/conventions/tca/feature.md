@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-09-13 (정의 단위를 화면 1:1에서 관심사로 교체하고 조합 규칙을 분리)
+**최종 수정일**: 2026-09-21 (기능·화면 합성·전환 계층 세 분류와 판정 기준 추가)
 
 ## 목적
 
@@ -30,6 +30,15 @@ Reducer·Effect 작성은 [Effect 컨벤션](./effect.md), Navigation 출력은
 Feature 하나의 정의 단위는 하나의 관심사입니다.
 
 → [정의 단위 — 관심사](./feature/definition-unit.md)
+
+Feature 패키지의 모든 Reducer는 관심사를 소유하는 기능 Feature, 기능 Feature를 합성해 화면
+하나의 표시 범위를 소유하는 화면 합성 Feature, 전환 컨텍스트를 소유하는 전환 계층 중 정확히
+하나로 분류합니다. 분류는 이름이 아니라 State·Action·`body`의 실제 내용으로 판정하며, 같은
+관심사인지는 상태 모델과 전이 규칙의 동일성으로 판정합니다.
+
+### 2.1 Feature 분류
+
+→ [Feature 분류 — 기능·화면 합성·전환 계층](./feature/classification.md)
 
 ### 2.2 화면 전환 목적지
 
@@ -72,6 +81,8 @@ Feature의 공개 표면은 App이 생성하는 Reducer·화면과 App이 해석
 - [ ] 지속되는 Effect를 소유한 Feature에서 그 Effect의 취소를 단위 테스트로 검증할 수
       있는가?
 - [ ] Feature의 공개 표면이 App이 생성하는 Reducer·화면과 delegate로 제한되는가?
+- [ ] 화면 합성 Feature가 관심사 상태를 직접 선언하지 않는가?
+- [ ] 공용 기능 Feature가 흐름을 참조하지 않는가?
 
 ## 관련 문서
 

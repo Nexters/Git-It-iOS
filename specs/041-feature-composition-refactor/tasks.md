@@ -427,8 +427,8 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 **독립 검증**: 문서만 읽고 임의 Feature의 분류와 기준 준수 여부를 판정할 수 있다(SC-009).
 
-- [ ] T121 [S4] `docs/conventions/tca/feature/classification.md`를 새로 작성한다. 내용은 세 분류와 판정 규칙(research §1), 공용 경계 배치(research §2 요약), 리팩토링 완료 시점의 전체 분류표(실제 코드 기준으로 research §3.7 확정), 제외 사유 E1~E8, 동작 차이 확정 목록(research §4, 각 항목을 고정하는 테스트 이름 포함)이다. 문서 형식은 `docs/conventions/common/document-structure.md`의 구체 명시 문서 형식을 따른다
-- [ ] T122 [S4] `docs/conventions/tca/feature.md`의 §2에 세 분류 판정 원칙을 추가하고 `###` 아래에 `feature/classification.md` 링크를 둔다. §6 검토 체크리스트에 "화면 합성 Feature가 관심사 상태를 직접 선언하지 않는가", "공용 기능 Feature가 흐름을 참조하지 않는가" 항목을 추가하고 최종 수정일을 갱신한다
+- [X] T121 [S4] `docs/conventions/tca/feature/classification.md`를 새로 작성한다. 내용은 세 분류와 판정 규칙(research §1), 공용 경계 배치(research §2 요약), 리팩토링 완료 시점의 전체 분류표(실제 코드 기준으로 research §3.7 확정), 제외 사유 E1~E8, 동작 차이 확정 목록(research §4, 각 항목을 고정하는 테스트 이름 포함)이다. 문서 형식은 `docs/conventions/common/document-structure.md`의 구체 명시 문서 형식을 따른다
+- [X] T122 [S4] `docs/conventions/tca/feature.md`의 §2에 세 분류 판정 원칙을 추가하고 `###` 아래에 `feature/classification.md` 링크를 둔다. §6 검토 체크리스트에 "화면 합성 Feature가 관심사 상태를 직접 선언하지 않는가", "공용 기능 Feature가 흐름을 참조하지 않는가" 항목을 추가하고 최종 수정일을 갱신한다
 
 **진행 점검**: T121~T122의 변경 파일을 보고하고 전체 완료 검증으로 진행한다. 이 단위는 마지막 적용 패키지의 마지막 커밋 단위이므로, 아래 전체 검증과 `after_implement` 훅까지 마친 뒤 commit한다.
 
@@ -442,15 +442,15 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 `after_implement` hook(`speckit.swift-format.run`)을 마친 뒤 그 단위를 최종 commit한다. 파일 변경
 단위가 모두 이미 commit된 단순 재개라면 `tasks.md` 완료 표시만을 위한 별도 최종 검증 단위를 둔다.
 
-- [ ] T123 [no-write] `make tuist` 후 `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 각 결과를 구분해 기록한다(SC-005)
-- [ ] T124 [no-write] [S2] `specs/041-feature-composition-refactor/quickstart.md` §2의 세 grep을 실행해 출력이 없는지 확인한다(SC-010, SC-015, FR-012, FR-026)
-- [ ] T125 [no-write] [S2] 통합 관심사 I1~I4마다 상태 유형 선언이 정확히 한 파일에만 있는지 grep으로 확인한다(SC-001, SC-003)
-- [ ] T126 [no-write] [S3] 비테스트 `@Reducer`가 39개이고 모두 `docs/conventions/tca/feature/classification.md`의 분류표에 한 번씩 나타나는지 대조한다. 화면 합성 Feature의 State에 관심사 상태 필드가 없는지 확인한다(SC-007, SC-008)
-- [ ] T127 [no-write] [S2] `specs/041-feature-composition-refactor/research.md` §6에 U2~U11의 대응표가 모두 있고 "이관 뒤 위치"가 빈 행이 없는지 확인한다(SC-011)
-- [ ] T128 [no-write] [S3] `git diff --stat develop...HEAD -- sources/Projects/Feature` 기준으로 View 파일 변경이 store 스코핑·자식 View 분리·상태 참조 경로 변경에 한정되는지, 레이아웃 값·컴포넌트·토큰 변경이 없는지 diff를 검토한다(SC-012)
-- [ ] T129 [no-write] [S4] `docs/conventions/tca/feature.md`에서 분류 문서로 가는 링크가 유효하고, 분류 문서만으로 research §1의 판정을 재현할 수 있는지 검토한다(SC-009)
-- [ ] T130 [no-write] [S3] 참조 방향을 검토한다(SC-010). 각 화면 폴더의 Swift 파일이 다른 화면 폴더의 타입이나 전환 계층(`Router/`, `MainShell/Router/`, `ShareRegistrationFeature`) 타입을 참조하지 않는지 확인한다. `Feature/Shared/**`가 전환 계층 타입을 참조하지 않는지도 확인한다. 분류표 기준으로 `grep -rn` 결과를 대조한다
-- [ ] T131 [no-write] [S2] 새 기능 Feature 11개와 이동한 2개의 생성자 파라미터를 검토한다. 각 상위 Feature가 전달하는 인자와 대조해, 상위가 자식을 위해 받은 의존성이 빠짐없이 그대로 전달되고 구현 교체·새 생성이 없는지 확인한다(FR-004, FR-024, SC-013). 기능 Feature 안에 합성한 화면이나 상위를 식별해 분기하는 코드가 없는지도 확인한다(FR-005, SC-006)
+- [X] T123 [no-write] `make tuist` 후 `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 각 결과를 구분해 기록한다(SC-005)
+- [X] T124 [no-write] [S2] `specs/041-feature-composition-refactor/quickstart.md` §2의 세 grep을 실행해 출력이 없는지 확인한다(SC-010, SC-015, FR-012, FR-026)
+- [X] T125 [no-write] [S2] 통합 관심사 I1~I4마다 상태 유형 선언이 정확히 한 파일에만 있는지 grep으로 확인한다(SC-001, SC-003)
+- [X] T126 [no-write] [S3] 비테스트 `@Reducer`가 39개이고 모두 `docs/conventions/tca/feature/classification.md`의 분류표에 한 번씩 나타나는지 대조한다. 화면 합성 Feature의 State에 관심사 상태 필드가 없는지 확인한다(SC-007, SC-008)
+- [X] T127 [no-write] [S2] `specs/041-feature-composition-refactor/research.md` §6에 U2~U11의 대응표가 모두 있고 "이관 뒤 위치"가 빈 행이 없는지 확인한다(SC-011)
+- [X] T128 [no-write] [S3] `git diff --stat develop...HEAD -- sources/Projects/Feature` 기준으로 View 파일 변경이 store 스코핑·자식 View 분리·상태 참조 경로 변경에 한정되는지, 레이아웃 값·컴포넌트·토큰 변경이 없는지 diff를 검토한다(SC-012)
+- [X] T129 [no-write] [S4] `docs/conventions/tca/feature.md`에서 분류 문서로 가는 링크가 유효하고, 분류 문서만으로 research §1의 판정을 재현할 수 있는지 검토한다(SC-009)
+- [X] T130 [no-write] [S3] 참조 방향을 검토한다(SC-010). 각 화면 폴더의 Swift 파일이 다른 화면 폴더의 타입이나 전환 계층(`Router/`, `MainShell/Router/`, `ShareRegistrationFeature`) 타입을 참조하지 않는지 확인한다. `Feature/Shared/**`가 전환 계층 타입을 참조하지 않는지도 확인한다. 분류표 기준으로 `grep -rn` 결과를 대조한다
+- [X] T131 [no-write] [S2] 새 기능 Feature 11개와 이동한 2개의 생성자 파라미터를 검토한다. 각 상위 Feature가 전달하는 인자와 대조해, 상위가 자식을 위해 받은 의존성이 빠짐없이 그대로 전달되고 구현 교체·새 생성이 없는지 확인한다(FR-004, FR-024, SC-013). 기능 Feature 안에 합성한 화면이나 상위를 식별해 분기하는 코드가 없는지도 확인한다(FR-005, SC-006)
 
 ## 의존성과 실행 순서
 
