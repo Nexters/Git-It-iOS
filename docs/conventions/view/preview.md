@@ -20,4 +20,6 @@
   소유합니다.
 - 파일 이름은 화면 타입 이름 뒤에 `Previews`를 붙입니다 —
   `RepositoryConfirmationScreenPreviews.swift`, `OnboardingRouterPreviews.swift`.
-- 프리뷰 전용 타입은 프리뷰가 필요한 컴포넌트 파일이 아니라 독립 파일에 둡니다.
+- 프리뷰 전용 타입의 자리는
+  [파일·형태 어휘 컨벤션 — 프리뷰 전용 타입](../file-vocabulary/preview-type.md)이 소유합니다.
+  UIComponent는 컴포넌트 파일 최상위에, Feature는 `Previews/`의 독립 파일에 둡니다.

@@ -64,4 +64,4 @@ extension LabeledCard {
 ```
 
 프리뷰 전용 타입은 View의 계약이 아니므로 중첩 대상이 아니며
-[View 컨벤션 — 프리뷰](../view/preview.md)에 따라 독립 파일에 둡니다.
+[View 컨벤션 — 프리뷰](../view/preview.md)이 정한 자리에 둡니다.

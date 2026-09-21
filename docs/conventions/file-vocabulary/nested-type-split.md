@@ -20,4 +20,5 @@ extension QuestionSolvingScreen {
 중첩할지 여부 자체는
 [View 내부 선언 컨벤션 — View 내부 선언](../view-declarations/internal-declarations.md)가, 화면 전용
 서브뷰를 만드는 기준은 [View 컨벤션 — 화면 전용 서브뷰](../view/screen-subview.md)이 정합니다.
-이 문서는 나눈 파일의 이름과 위치만 정합니다.
+이 문서는 나눈 파일의 이름과 위치만 정합니다. UIComponent는 중첩 타입을 파일로 나누지
+않습니다([UIComponent 컨벤션 — 폴더와 파일](../ui-component/folder-file.md)).

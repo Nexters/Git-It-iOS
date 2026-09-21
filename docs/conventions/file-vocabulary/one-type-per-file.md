@@ -12,6 +12,9 @@
 - 같은 파일의 타입에 대한 `extension`
 - `#Preview` 매크로
 
+UIComponent는 예외로, 중첩할 수 없는 보조 타입과 프리뷰 전용 타입을 컴포넌트 파일에 함께
+둡니다([UIComponent 컨벤션 — 폴더와 파일](../ui-component/folder-file.md)).
+
 테스트 파일은 `@Suite` 또는 `XCTestCase` 타입 하나와, 그 파일에서만 사용하는 `private`
 Test Double을 함께 둘 수 있습니다([테스트 컨벤션 — 파일과 Target 구성](../test.md#7-파일과-target-구성)).
 둘 이상의 파일에서 쓰는 Double은 `TestDoubles/`로 옮깁니다.
