@@ -68,7 +68,10 @@ struct ProjectDetailScreen: View {
     // MARK: Private
 
     private var isDeletionConfirmationPresented: Bool {
-        store.deletion == .confirming
+        if case .confirming = store.deletion.deletion {
+            return true
+        }
+        return false
     }
 
     private var content: some View {

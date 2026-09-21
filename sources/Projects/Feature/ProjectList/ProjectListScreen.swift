@@ -178,12 +178,12 @@ public struct ProjectListScreen: View {
     }
 
     private var deletionTarget: ProjectListDisplay? {
-        guard case .confirming(let projectID) = store.deletion else { return nil }
+        guard case .confirming(let projectID) = store.deletion.deletion else { return nil }
         return projects.first { $0.id == projectID }
     }
 
     private var isDeletionConfirmationPresented: Bool {
-        if case .confirming = store.deletion {
+        if case .confirming = store.deletion.deletion {
             return true
         }
         return false

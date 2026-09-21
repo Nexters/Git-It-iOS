@@ -122,6 +122,7 @@ struct ProjectListFeatureTests {
         await store.send(.view(.backTapped)) {
             $0.mode = .browsing
         }
+        await store.receive(.deletion(.input(.cancel)))
     }
 
     @Test
@@ -142,26 +143,41 @@ struct ProjectListFeatureTests {
     }
 
     @Test
-    func `삭제를 확인하기 전에는 삭제를 요청하지 않는다`() async {
+    func `삭제 모드의 삭제 버튼은 삭제에 request를 보내고 확인 전에는 삭제를 요청하지 않는다`() async {
         let deleteProject = ProjectUseCaseDeletionStub()
         let store = makeStore(deleteProject: deleteProject, state: state(mode: .deleting))
 
-        await store.send(.view(.deleteButtonTapped(projectID: "project-0"))) {
-            $0.deletion = .confirming(projectID: "project-0")
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
 
         #expect(await deleteProject.callCount == 0)
     }
 
     @Test
-    func `삭제를 취소하면 확인 상태를 벗어난다`() async {
+    func `삭제 취소는 삭제에 cancel을 보낸다`() async {
         let store = makeStore(state: state(mode: .deleting))
 
-        await store.send(.view(.deleteButtonTapped(projectID: "project-0"))) {
-            $0.deletion = .confirming(projectID: "project-0")
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
-        await store.send(.view(.deletionCancelled)) {
-            $0.deletion = .idle
+        await store.send(.view(.deletionCancelled))
+        await store.receive(.deletion(.input(.cancel))) {
+            $0.deletion.deletion = .idle
+        }
+    }
+
+    @Test
+    func `삭제 실패 뒤에도 다시 삭제를 요청할 수 있다`() async {
+        var state = loadedState(mode: .deleting)
+        state.deletion.deletion = .failed(projectID: "project-0", error: .temporarilyUnavailable)
+        let store = makeStore(state: state)
+
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
     }
 
@@ -175,11 +191,11 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
         await store.receive(.delegate(.projectDeleted))
 
         #expect(!store.state.projects.contains { $0.id == "project-0" })
-        #expect(store.state.deletion == .idle)
+        #expect(store.state.deletion.deletion == .idle)
         #expect(store.state.mode == .deleting)
     }
 
@@ -193,11 +209,11 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-1")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
         await store.receive(\.projectSummaries.delegate.listUpdated)
 
         #expect(!store.state.projects.contains { $0.id == "project-1" })
-        #expect(store.state.deletion == .idle)
+        #expect(store.state.deletion.deletion == .idle)
     }
 
     @Test
@@ -211,7 +227,7 @@ struct ProjectListFeatureTests {
         for projectID in store.state.projects.map(\.id) {
             await store.send(.view(.deleteButtonTapped(projectID: projectID)))
             await store.send(.view(.deletionConfirmed))
-            await store.receive(\.effect.deletionFinished)
+            await store.receive(\.deletion.effect.deletionFinished)
             await store.receive(\.projectSummaries.delegate.listUpdated)
         }
 
@@ -229,11 +245,11 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
         #expect(store.state.projects.contains { $0.id == "project-0" })
         #expect(store.state.mode == .deleting)
-        #expect(store.state.deletion == .failed(projectID: "project-0", error: .temporarilyUnavailable))
+        #expect(store.state.deletion.deletion == .failed(projectID: "project-0", error: .temporarilyUnavailable))
     }
 
     @Test
@@ -246,11 +262,13 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
         await store.send(.view(.backTapped)) {
             $0.mode = .browsing
-            $0.deletion = .idle
+        }
+        await store.receive(.deletion(.input(.cancel))) {
+            $0.deletion.deletion = .idle
         }
     }
 

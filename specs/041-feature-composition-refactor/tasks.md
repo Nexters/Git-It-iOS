@@ -198,25 +198,25 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 테스트
 
-- [ ] T045 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift`를 작성한다. 검증 범위는 `request`(`idle`·`failed`에서만), `cancel`(`confirming`·`failed`에서만), `confirm`(`confirming`에서만), 성공·`.notFound` 시 `deleted` delegate, 기타 오류 시 `.failed(id, error)`, `committing` 중 입력 무시다
+- [X] T045 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift`를 작성한다. 검증 범위는 `request`(`idle`·`failed`에서만), `cancel`(`confirming`·`failed`에서만), `confirm`(`confirming`에서만), 성공·`.notFound` 시 `deleted` delegate, 기타 오류 시 `.failed(id, error)`, `committing` 중 입력 무시다
 
 ### 구현
 
-- [ ] T046 [S2] `sources/Projects/Feature/Shared/Reducers/ProjectDeletionFeature.swift`에 `ProjectDeletionFeature`를 구현한다(생성자 `deleteProject:`)
-- [ ] T047 [S2] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `deletion`과 삭제 Effect를 제거하고 `deletion: ProjectDeletionFeature.State`를 합성한다. `mode == .deleting`일 때만 `request`를 보낸다. `deleted`를 받으면 `projectSummaries`에 `projectRemoved`를 보내고 `projectDeleted` delegate를 보낸다
-- [ ] T048 [S2] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`와 `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 삭제 상태 참조와 확인 UI 액션 연결을 자식 store 스코핑으로 바꾼다
-- [ ] T049 [S2] `sources/Projects/Feature/ProjectDetail/ProjectDetailFeature.swift`에서 `deletion`과 삭제 Effect를 제거하고 `ProjectDeletionFeature`를 합성한다. `deleteTapped`는 메뉴를 닫고 `request(projectID)`를 보내며, `deleted`를 `projectDeleted(projectID:)`로 올린다
-- [ ] T050 [S2] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`와 `sources/Projects/Feature/ProjectDetail/Previews/ProjectDetailScreenPreviews.swift`의 삭제 상태 참조를 자식 store 스코핑으로 바꾼다
+- [X] T046 [S2] `sources/Projects/Feature/Shared/Reducers/ProjectDeletionFeature.swift`에 `ProjectDeletionFeature`를 구현한다(생성자 `deleteProject:`)
+- [X] T047 [S2] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `deletion`과 삭제 Effect를 제거하고 `deletion: ProjectDeletionFeature.State`를 합성한다. `mode == .deleting`일 때만 `request`를 보낸다. `deleted`를 받으면 `projectSummaries`에 `projectRemoved`를 보내고 `projectDeleted` delegate를 보낸다
+- [X] T048 [S2] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`와 `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 삭제 상태 참조와 확인 UI 액션 연결을 자식 store 스코핑으로 바꾼다
+- [X] T049 [S2] `sources/Projects/Feature/ProjectDetail/ProjectDetailFeature.swift`에서 `deletion`과 삭제 Effect를 제거하고 `ProjectDeletionFeature`를 합성한다. `deleteTapped`는 메뉴를 닫고 `request(projectID)`를 보내며, `deleted`를 `projectDeleted(projectID:)`로 올린다
+- [X] T050 [S2] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`와 `sources/Projects/Feature/ProjectDetail/Previews/ProjectDetailScreenPreviews.swift`의 삭제 상태 참조를 자식 store 스코핑으로 바꾼다
 
 ### 테스트 이관
 
-- [ ] T051 [S2] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`의 삭제 전이 단언을 T045로 옮기고 합성 지점(모드 조건, `projectRemoved`·`projectDeleted` 전달)만 남긴다
-- [ ] T052 [S2] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift`의 삭제 전이 단언을 T045로 옮기고 합성 지점(메뉴 닫힘, `projectDeleted` 전달)만 남긴다
-- [ ] T053 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U4 이관 대응표를 추가하고, research §4 I3의 동작 차이를 고정한 테스트 이름을 함께 적는다
+- [X] T051 [S2] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`의 삭제 전이 단언을 T045로 옮기고 합성 지점(모드 조건, `projectRemoved`·`projectDeleted` 전달)만 남긴다
+- [X] T052 [S2] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift`의 삭제 전이 단언을 T045로 옮기고 합성 지점(메뉴 닫힘, `projectDeleted` 전달)만 남긴다
+- [X] T053 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U4 이관 대응표를 추가하고, research §4 I3의 동작 차이를 고정한 테스트 이름을 함께 적는다
 
 ### 정리와 단위 검증
 
-- [ ] T054 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행하고, 삭제 상태 enum 선언이 `ProjectDeletionFeature` 밖에 남지 않았는지 grep으로 확인한다
+- [X] T054 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행하고, 삭제 상태 enum 선언이 `ProjectDeletionFeature` 밖에 남지 않았는지 grep으로 확인한다
 
 **진행 점검**: T045~T054의 변경 파일과 검증 결과를 보고하고 실행 단위 5로 진행한다.
 

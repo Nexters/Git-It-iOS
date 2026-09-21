@@ -47,13 +47,13 @@ private func previewState(
     detail: ProjectDetail? = previewDetail(sets: previewSets),
     loadStatus: ProjectDetailFeature.LoadStatus = .loaded,
     isMenuPresented: Bool = false,
-    deletion: ProjectDetailFeature.Deletion = .idle,
+    deletion: ProjectDeletionFeature.State.Deletion = .idle,
 ) -> ProjectDetailFeature.State {
     var state = ProjectDetailFeature.State(projectID: "project-1")
     state.detail = detail
     state.loadStatus = loadStatus
     state.isMenuPresented = isMenuPresented
-    state.deletion = deletion
+    state.deletion.deletion = deletion
     return state
 }
 
@@ -71,7 +71,7 @@ private func previewState(
 
 #Preview("프로젝트 상세 · 삭제 확인") {
     ProjectDetailScreen(
-        store: Store(initialState: previewState(deletion: .confirming)) { EmptyReducer() }
+        store: Store(initialState: previewState(deletion: .confirming(projectID: "project-1"))) { EmptyReducer() }
     )
 }
 

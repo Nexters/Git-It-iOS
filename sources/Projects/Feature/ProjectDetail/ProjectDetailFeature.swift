@@ -27,13 +27,6 @@ public struct ProjectDetailFeature: Sendable {
         case failed(ProjectError)
     }
 
-    public enum Deletion: Equatable, Sendable {
-        case idle
-        case confirming
-        case committing
-        case failed(ProjectError)
-    }
-
     @ObservableState
     public struct State: Equatable, Sendable {
 
@@ -50,7 +43,7 @@ public struct ProjectDetailFeature: Sendable {
         public var loadStatus = LoadStatus.idle
         public var requestID = 0
         public var isMenuPresented = false
-        public var deletion = Deletion.idle
+        public var deletion = ProjectDeletionFeature.State()
 
         public var isEmpty: Bool {
             detail?.sets.isEmpty ?? false
@@ -71,6 +64,7 @@ public struct ProjectDetailFeature: Sendable {
         case input(Input)
         case effect(EffectEvent)
         case delegate(Delegate)
+        case deletion(ProjectDeletionFeature.Action)
 
         // MARK: Public
 
@@ -98,7 +92,6 @@ public struct ProjectDetailFeature: Sendable {
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case detailLoadFinished(requestID: Int, result: Result<ProjectDetail, ProjectError>)
-            case deletionFinished(projectID: ProjectID, error: ProjectError?)
         }
 
         @CasePathable
@@ -112,6 +105,9 @@ public struct ProjectDetailFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.deletion, action: \.deletion) {
+            ProjectDeletionFeature(deleteProject: deleteProject)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task),
@@ -156,30 +152,17 @@ public struct ProjectDetailFeature: Sendable {
                 return .send(.delegate(.externalURLRequested(url)))
 
             case .view(.deleteTapped):
-                guard state.deletion != .committing else { return .none }
                 state.isMenuPresented = false
-                state.deletion = .confirming
-                return .none
+                return .send(.deletion(.input(.request(state.projectID))))
 
             case .view(.deletionCancelled):
-                guard state.deletion != .committing else { return .none }
-                state.deletion = .idle
-                return .none
+                return .send(.deletion(.input(.cancel)))
 
             case .view(.deletionConfirmed):
-                guard state.deletion == .confirming else { return .none }
-                state.deletion = .committing
-                let projectID = state.projectID
-                return .run { send in
-                    do {
-                        try await deleteProject(projectID)
-                        await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
-                    } catch {
-                        let mapped = error as? ProjectError ?? .unexpected
-                        await send(.effect(.deletionFinished(projectID: projectID, error: mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.delete, cancelInFlight: false)
+                return .send(.deletion(.input(.confirm)))
+
+            case .deletion(.delegate(.deleted(let projectID))):
+                return .send(.delegate(.projectDeleted(projectID: projectID)))
 
             case .view(.backTapped):
                 return .send(.delegate(.dismissRequested))
@@ -196,15 +179,8 @@ public struct ProjectDetailFeature: Sendable {
                 }
                 return .none
 
-            case .effect(.deletionFinished(let projectID, let error)):
-                guard let error else {
-                    state.deletion = .idle
-                    return .send(.delegate(.projectDeleted(projectID: projectID)))
-                }
-                state.deletion = .failed(error)
-                return .none
-
-            case .delegate:
+            case .deletion,
+                 .delegate:
                 return .none
             }
         }
@@ -214,7 +190,6 @@ public struct ProjectDetailFeature: Sendable {
 
     private enum CancelID: Hashable {
         case load
-        case delete
     }
 
     private let projectDetail: @Sendable (ProjectID) async throws -> ProjectDetail

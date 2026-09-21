@@ -82,12 +82,17 @@ struct ProjectDetailFeatureTests {
     }
 
     @Test
-    func `삭제는 확인 단계를 거치고 취소하면 아무 것도 삭제하지 않는다`() async {
+    func `삭제는 메뉴를 닫고 삭제에 request를 보내며 취소하면 아무 것도 삭제하지 않는다`() async {
         let deleteProject = ProjectUseCaseDeletionStub()
         let store = loadedStore(deleteProject: deleteProject)
 
-        await store.send(.view(.deleteTapped)) { $0.deletion = .confirming }
-        await store.send(.view(.deletionCancelled)) { $0.deletion = .idle }
+        await store.send(.view(.menuTapped)) { $0.isMenuPresented = true }
+        await store.send(.view(.deleteTapped)) { $0.isMenuPresented = false }
+        await store.receive(.deletion(.input(.request(ProjectDetailTestFixture.projectID)))) {
+            $0.deletion.deletion = .confirming(projectID: ProjectDetailTestFixture.projectID)
+        }
+        await store.send(.view(.deletionCancelled))
+        await store.receive(.deletion(.input(.cancel))) { $0.deletion.deletion = .idle }
 
         #expect(await deleteProject.callCount == 0)
     }
@@ -102,7 +107,7 @@ struct ProjectDetailFeatureTests {
         await store.send(.view(.deletionConfirmed))
         await store.send(.view(.deletionConfirmed))
         await deleteProject.resumeOldest()
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
         await store.receive(.delegate(.projectDeleted(projectID: ProjectDetailTestFixture.projectID)))
 
         #expect(await deleteProject.callCount == 1)
@@ -117,9 +122,25 @@ struct ProjectDetailFeatureTests {
 
         await store.send(.view(.deleteTapped))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
-        #expect(store.state.deletion == .failed(.temporarilyUnavailable))
+        #expect(
+            store.state.deletion.deletion
+                == .failed(projectID: ProjectDetailTestFixture.projectID, error: .temporarilyUnavailable)
+        )
+    }
+
+    @Test
+    func `이미 사라진 프로젝트를 삭제하면 삭제 완료를 알린다`() async {
+        let store = loadedStore(deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.notFound)]))
+        store.exhaustivity = .off
+
+        await store.send(.view(.deleteTapped))
+        await store.send(.view(.deletionConfirmed))
+        await store.receive(\.deletion.effect.deletionFinished)
+        await store.receive(.delegate(.projectDeleted(projectID: ProjectDetailTestFixture.projectID)))
+
+        #expect(store.state.deletion.deletion == .idle)
     }
 
     @Test

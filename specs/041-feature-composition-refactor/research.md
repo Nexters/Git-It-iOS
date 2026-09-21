@@ -408,6 +408,27 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다(상태 경로만 변경) | 합성 지점 검증 |
 | U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다(상태 경로만 변경) | 합성 지점 검증 |
 | U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다(수신 Action 경로 `home.projectSummaries.effect.refreshFinished`) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제를 확인하기 전에는 삭제를 요청하지 않는다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 모드의 삭제 버튼은 삭제에 request를 보내고 확인 전에는 삭제를 요청하지 않는다 | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제를 확인하기 전에는 삭제를 요청하지 않는다(전이 단언) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 확인 전에는 confirm이 삭제를 요청하지 않는다 | 기능 Feature 테스트 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제를 취소하면 확인 상태를 벗어난다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 취소는 삭제에 cancel을 보낸다 | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제를 취소하면 확인 상태를 벗어난다(전이 단언) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 확인 중이거나 실패 상태의 cancel은 대기 상태로 돌린다 | 기능 Feature 테스트 |
+| U4 | (새 테스트, I3-2 동작 차이 고정) | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패 뒤에도 다시 삭제를 요청할 수 있다 | 합성 지점 검증 |
+| U4 | (새 테스트, I3-2 동작 차이 고정) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 대기나 실패 상태의 request는 삭제 확인 상태가 된다 | 기능 Feature 테스트 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제에 성공하면 목록에서 그 프로젝트를 지운다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제에 성공하면 목록에서 그 프로젝트를 지운다(수신 Action 경로 `deletion.effect.deletionFinished`) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 이미 사라진 프로젝트는 삭제 실패로 남기지 않는다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 이미 사라진 프로젝트는 삭제 실패로 남기지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 마지막 프로젝트를 지우면 삭제 모드를 벗어난다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 마지막 프로젝트를 지우면 삭제 모드를 벗어난다(상태 경로만 변경) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패는 목록과 삭제 모드를 유지한다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패는 목록과 삭제 모드를 유지한다(상태 경로만 변경) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패는 목록과 삭제 모드를 유지한다(실패 전이 단언) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 그 밖의 삭제 오류는 실패 상태로 남긴다 | 기능 Feature 테스트 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 모드에서 뒤로 가면 목록 모드로 돌아온다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 모드에서 뒤로 가면 목록 모드로 돌아온다(삭제에 cancel 전달 수신 추가) | 합성 지점 검증 |
+| U4 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패 후에도 뒤로 가면 목록 모드로 돌아온다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제 실패 후에도 뒤로 가면 목록 모드로 돌아온다(삭제에 cancel 전달 수신 추가) | 합성 지점 검증 |
+| U4 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제는 확인 단계를 거치고 취소하면 아무 것도 삭제하지 않는다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제는 메뉴를 닫고 삭제에 request를 보내며 취소하면 아무 것도 삭제하지 않는다 | 합성 지점 검증 |
+| U4 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다(상태 경로만 변경) | 합성 지점 검증 |
+| U4 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다(전이 단언) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 삭제 중에는 confirm을 다시 받지 않는다, 삭제 성공은 대기 상태로 돌리고 deleted를 보낸다 | 기능 Feature 테스트 |
+| U4 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제에 실패하면 오류를 남기고 삭제 완료를 알리지 않는다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 삭제에 실패하면 오류를 남기고 삭제 완료를 알리지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U4 | (새 테스트, I3-1 동작 차이 고정) | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 이미 사라진 프로젝트를 삭제하면 삭제 완료를 알린다 | 합성 지점 검증 |
+| U4 | (새 테스트, I3-1 동작 차이 고정) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 이미 사라진 프로젝트의 삭제는 성공으로 보고 deleted를 보낸다 | 기능 Feature 테스트 |
+| U4 | (새 테스트) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 확인 중이거나 삭제 중이면 request를 무시한다 | 기능 Feature 테스트 |
+| U4 | (새 테스트) | Tests/Shared/Reducers/ProjectDeletionFeatureTests.swift › 삭제 중의 cancel은 무시한다 | 기능 Feature 테스트 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -422,3 +443,7 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 인스턴스 식별자를 두고(동등성 비교에서 제외) 취소 ID를 인스턴스별로 만든다(FR-026). 또
 `HomeFeatureGuestAccessTests.swift`는 T038 목록에 없지만 `projectRequestID` 경로가 사라져 컴파일되지 않으므로
 U3에서 상태 경로만 바꿨다.
+
+**U4 비고**: `ProjectDeletionFeature`도 U3과 같은 이유로 취소 ID를 인스턴스별로 만든다. research §4 I3의
+동작 차이 1은 `ProjectDetailFeatureTests › 이미 사라진 프로젝트를 삭제하면 삭제 완료를 알린다`, 동작 차이 2는
+`ProjectListFeatureTests › 삭제 실패 뒤에도 다시 삭제를 요청할 수 있다`가 고정한다.

@@ -20,13 +20,13 @@ private func previewState(
     load: ProjectSummaryListFeature.State.Load? = nil,
     pagination: ProjectListFeature.Pagination = .exhausted,
     mode: ProjectListFeature.Mode = .browsing,
-    deletion: ProjectListFeature.Deletion = .idle,
+    deletion: ProjectDeletionFeature.State.Deletion = .idle,
 ) -> ProjectListFeature.State {
     var state = ProjectListFeature.State()
     state.projectSummaries.load = load ?? .loaded(ProjectList(summaries: projects, hasNextPage: false, isLoaded: true))
     state.pagination = pagination
     state.mode = mode
-    state.deletion = deletion
+    state.deletion.deletion = deletion
     return state
 }
 
