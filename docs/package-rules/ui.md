@@ -4,13 +4,13 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-21 (표시 값 모델·시각 속성 계약 반영, 표시 값 묶음 타입 금지 제약 삭제)
+**최종 수정일**: 2026-09-22 (`Binding`이 아닌 상태·동작 설정을 묶는 `StateModel` 규칙 반영)
 
 ## 설명
 
 UI는 시각 언어와 화면에서 독립된 재사용 UI 구성요소를 담당하는 표현 경계입니다.
 DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현 타입과 분리된
-컴포넌트를 제공합니다. 컴포넌트는 표시 값 모델(`DisplayModel`)·SwiftUI `Binding`·콜백을
+컴포넌트를 제공합니다. 컴포넌트는 표시 값 모델(`DisplayModel`)·상태 모델(`StateModel`)·SwiftUI `Binding`·콜백을
 초기화 인자로 받고, 스타일·크기·색 같은 시각 속성은 `StyleConfigurable` 같은 시각 속성
 계약의 메서드로 선택받습니다.
 
