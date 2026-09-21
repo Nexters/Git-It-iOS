@@ -45,11 +45,13 @@ struct ProjectListFeatureTests {
     @Test
     func `목록이 갱신되면 페이지네이션을 다시 설정한다`() async {
         var state = loadedState(list: HomeTestFixture.oneProjectPage)
-        state.pagination = .failed(.temporarilyUnavailable)
+        state.pagination.pagination = .failed(.temporarilyUnavailable)
         let store = makeStore(state: state)
 
-        await store.send(.projectSummaries(.delegate(.listUpdated(HomeTestFixture.manyProjectsPage)))) {
-            $0.pagination = .idle
+        await store.send(.projectSummaries(.delegate(.listUpdated(HomeTestFixture.manyProjectsPage))))
+        await store.receive(.pagination(.input(.listReplaced(hasNextPage: true)))) {
+            $0.pagination.hasNextPage = true
+            $0.pagination.pagination = .idle
         }
     }
 
@@ -279,9 +281,10 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
-        await store.receive(\.effect.nextPageFinished)
+        await store.receive(.pagination(.input(.nextPageRequested)))
+        await store.receive(\.pagination.effect.nextPageFinished)
 
-        #expect(store.state.pagination == .idle)
+        #expect(store.state.pagination.pagination == .idle)
         #expect(await projects.snapshot().nextPageCallCount == 1)
     }
 
@@ -292,19 +295,7 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.listBottomReached))
 
-        #expect(store.state.pagination == .exhausted)
-        #expect(await projects.snapshot().nextPageCallCount == 0)
-    }
-
-    @Test
-    func `다음 페이지를 불러오는 중에는 같은 요청을 반복하지 않는다`() async {
-        let projects = ProjectUseCaseMock()
-        var state = loadedState()
-        state.pagination = .loading
-        let store = makeStore(projects: projects, state: state)
-
-        await store.send(.view(.listBottomReached))
-
+        #expect(store.state.pagination.pagination == .exhausted)
         #expect(await projects.snapshot().nextPageCallCount == 0)
     }
 
@@ -327,13 +318,14 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
-        await store.receive(\.effect.nextPageFinished)
-        #expect(store.state.pagination == .failed(.temporarilyUnavailable))
+        await store.receive(\.pagination.effect.nextPageFinished)
+        #expect(store.state.pagination.pagination == .failed(.temporarilyUnavailable))
 
         await store.send(.view(.nextPageRetryTapped))
-        await store.receive(\.effect.nextPageFinished)
+        await store.receive(.pagination(.input(.retry)))
+        await store.receive(\.pagination.effect.nextPageFinished)
 
-        #expect(store.state.pagination == .idle)
+        #expect(store.state.pagination.pagination == .idle)
         #expect(await projects.snapshot().nextPageCallCount == 2)
     }
 
@@ -344,6 +336,7 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.refreshRequested))
+        await store.receive(.pagination(.input(.refreshStarted)))
         await store.receive(\.projectSummaries.effect.refreshFinished)
 
         #expect(store.state.projectSummaries.requestID == 1)
@@ -364,7 +357,10 @@ struct ProjectListFeatureTests {
     ) -> ProjectListFeature.State {
         var state = ProjectListFeature.State()
         state.projectSummaries.load = .loaded(list)
-        state.pagination = list.hasNextPage ? .idle : .exhausted
+        state.pagination = ProjectListPaginationFeature.State(
+            pagination: list.hasNextPage ? .idle : .exhausted,
+            hasNextPage: list.hasNextPage,
+        )
         state.mode = mode
         return state
     }

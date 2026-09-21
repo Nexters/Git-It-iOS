@@ -167,7 +167,7 @@ public struct ProjectListScreen: View {
                 }
 
                 Self.NextPageFooter(
-                    pagination: store.pagination,
+                    pagination: store.pagination.pagination,
                     onRetry: { send(.nextPageRetryTapped) },
                 )
             }

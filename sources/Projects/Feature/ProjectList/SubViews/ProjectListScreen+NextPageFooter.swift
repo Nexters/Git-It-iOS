@@ -7,7 +7,7 @@ extension ProjectListScreen {
 
         // MARK: Internal
 
-        let pagination: ProjectListFeature.Pagination
+        let pagination: ProjectListPaginationFeature.State.Pagination
         let onRetry: () -> Void
 
         var body: some View {

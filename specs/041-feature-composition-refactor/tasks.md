@@ -313,13 +313,13 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 **독립 검증**: 페이지네이션 전이가 화면 없이 검증된다.
 
-- [ ] T084 [S3] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift`를 작성한다. 검증 범위는 `nextPageRequested`(`idle`만), `retry`(`failed`만), `listReplaced(hasNextPage:)`, `refreshStarted` 취소, 결과별 `idle`·`exhausted`·`failed`다
-- [ ] T085 [S3] `sources/Projects/Feature/ProjectList/ProjectListPaginationFeature.swift`에 `ProjectListPaginationFeature`를 구현한다(생성자 `requestNextPage:`)
-- [ ] T086 [S3] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `pagination`과 다음 페이지 Effect를 제거하고 합성한다. 목록 조건(`loaded`, `hasNextPage`)은 부모가 판정한 뒤 `nextPageRequested`를 보낸다
-- [ ] T087 [S3] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`, `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+NextPageFooter.swift`, `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 페이지네이션 참조를 자식 store 스코핑으로 바꾼다
-- [ ] T088 [S3] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`의 페이지네이션 전이 단언을 T084로 옮기고 합성 지점만 남긴다
-- [ ] T089 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U7 이관 대응표를 추가한다
-- [ ] T090 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
+- [X] T084 [S3] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift`를 작성한다. 검증 범위는 `nextPageRequested`(`idle`만), `retry`(`failed`만), `listReplaced(hasNextPage:)`, `refreshStarted` 취소, 결과별 `idle`·`exhausted`·`failed`다
+- [X] T085 [S3] `sources/Projects/Feature/ProjectList/ProjectListPaginationFeature.swift`에 `ProjectListPaginationFeature`를 구현한다(생성자 `requestNextPage:`)
+- [X] T086 [S3] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `pagination`과 다음 페이지 Effect를 제거하고 합성한다. 목록 조건(`loaded`, `hasNextPage`)은 부모가 판정한 뒤 `nextPageRequested`를 보낸다
+- [X] T087 [S3] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`, `sources/Projects/Feature/ProjectList/SubViews/ProjectListScreen+NextPageFooter.swift`, `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 페이지네이션 참조를 자식 store 스코핑으로 바꾼다
+- [X] T088 [S3] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`의 페이지네이션 전이 단언을 T084로 옮기고 합성 지점만 남긴다
+- [X] T089 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U7 이관 대응표를 추가한다
+- [X] T090 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
 
 **진행 점검**: T084~T090의 변경 파일과 검증 결과를 보고하고 실행 단위 8로 진행한다.
 

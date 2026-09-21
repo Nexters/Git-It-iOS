@@ -486,6 +486,19 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › 삭제가 실패해도 확인 화면에서 다시 삭제를 진행할 수 있다 | Tests/Settings/Settings/AccountActionFeatureTests.swift › 삭제가 실패해도 다시 삭제를 진행할 수 있다 | 기능 Feature 테스트 |
 | U6 | Tests/Settings/Settings/SettingsFeatureAccountActionTests.swift › (각 @Test의 view 액션 연결과 delegate 전달) | Tests/Settings/Settings/SettingsFeatureTests.swift › 계정 동작 탭은 계정 동작에 대응 input을 보낸다, 계정 동작 delegate는 기존 Settings delegate로 올린다 | 합성 지점 검증 |
 | U6 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 계정 삭제 행은 확인 화면으로, 취소는 목록으로 되돌리며 확인 상태를 해제한다 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 계정 삭제 행은 확인 화면으로, 취소는 목록으로 되돌리며 확인 상태를 해제한다(수신 Action 경로 `settings.accountAction`) | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록이 갱신되면 페이지네이션을 다시 설정한다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록이 갱신되면 페이지네이션을 다시 설정한다(페이지네이션에 `listReplaced` 전달 수신) | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록이 갱신되면 페이지네이션을 다시 설정한다(전이 단언) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › listReplaced는 다음 페이지 여부를 저장하고 페이지네이션을 다시 설정한다 | 기능 Feature 테스트 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록 끝에 닿으면 다음 페이지를 한 번 요청한다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록 끝에 닿으면 다음 페이지를 한 번 요청한다(페이지네이션에 `nextPageRequested` 전달 수신) | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록 끝에 닿으면 다음 페이지를 한 번 요청한다(전이 단언) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 대기 상태의 nextPageRequested는 다음 페이지를 요청하고 다음 페이지 여부로 결과 상태를 정한다 | 기능 Feature 테스트 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지가 없으면 목록 끝에 닿아도 요청하지 않는다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지가 없으면 목록 끝에 닿아도 요청하지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지를 불러오는 중에는 같은 요청을 반복하지 않는다 | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 대기 상태가 아니면 nextPageRequested를 무시한다 | 기능 Feature 테스트 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 첫 조회 전에는 목록 끝에 닿아도 다음 페이지를 요청하지 않는다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 첫 조회 전에는 목록 끝에 닿아도 다음 페이지를 요청하지 않는다 | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지 조회에 실패하면 재시도로 다시 요청한다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지 조회에 실패하면 재시도로 다시 요청한다(수신 Action 경로 `pagination`) | 합성 지점 검증 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 다음 페이지 조회에 실패하면 재시도로 다시 요청한다(전이 단언) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 다음 페이지 조회 실패는 실패 상태로 남긴다, 실패 상태의 retry는 다음 페이지를 다시 요청한다 | 기능 Feature 테스트 |
+| U7 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 실패 상태가 아니면 retry를 무시한다 | 기능 Feature 테스트 |
+| U7 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › refreshStarted는 진행 중인 다음 페이지 요청을 취소한다 | 기능 Feature 테스트 |
+| U7 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 조회 중이 아닐 때 도착한 결과는 반영하지 않는다 | 기능 Feature 테스트 |
+| U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록에 refresh를 보낸다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록에 refresh를 보낸다(페이지네이션에 `refreshStarted` 전달 수신) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -515,3 +528,7 @@ MainShell은 `failed`만 alert로 표시하고 `cancelled`에서도 `start`를 �
 바꿔 보낸다. 화면 View는 상태 참조 경로만 바뀌고 액션 연결은 바뀌지 않는다(SC-012). 알림 권한 조회 결과
 Effect 이름은 자식 안에서 `authorizationChecked`로 바꿨다. `SettingsTestFixture.swift`는 새 구조에서 그대로
 쓰여 수정하지 않았다.
+
+**U7 비고**: `ProjectListPaginationFeature`는 마지막으로 받은 `hasNextPage`를 함께 보관해, 다음 페이지 조회
+성공 뒤 `idle`·`exhausted` 판정을 기존처럼 목록의 다음 페이지 여부로 한다. 목록 조건(`loaded`, `hasNextPage`)
+판정은 부모에 남긴다.

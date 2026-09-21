@@ -29,7 +29,7 @@ public struct ProjectListFeature: Sendable {
         public init() { }
 
         public var projectSummaries = ProjectSummaryListFeature.State()
-        public var pagination = Pagination.idle
+        public var pagination = ProjectListPaginationFeature.State()
         public var mode = Mode.browsing
         public var deletion = ProjectDeletionFeature.State()
 
@@ -42,13 +42,6 @@ public struct ProjectListFeature: Sendable {
         }
     }
 
-    public enum Pagination: Equatable, Sendable {
-        case idle
-        case loading
-        case failed(ProjectError)
-        case exhausted
-    }
-
     public enum Mode: Equatable, Sendable {
         case browsing
         case menuPresented
@@ -58,10 +51,10 @@ public struct ProjectListFeature: Sendable {
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case input(Input)
-        case effect(EffectEvent)
         case delegate(Delegate)
         case projectSummaries(ProjectSummaryListFeature.Action)
         case deletion(ProjectDeletionFeature.Action)
+        case pagination(ProjectListPaginationFeature.Action)
 
         // MARK: Public
 
@@ -88,11 +81,6 @@ public struct ProjectListFeature: Sendable {
         }
 
         @CasePathable
-        public enum EffectEvent: Sendable, Equatable {
-            case nextPageFinished(error: ProjectError?)
-        }
-
-        @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectSelected(projectID: ProjectID)
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
@@ -107,32 +95,33 @@ public struct ProjectListFeature: Sendable {
         Scope(state: \.deletion, action: \.deletion) {
             ProjectDeletionFeature(deleteProject: deleteProject)
         }
+        Scope(state: \.pagination, action: \.pagination) {
+            ProjectListPaginationFeature(requestNextPage: requestNextPage)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
                 return .merge(
-                    .cancel(id: CancelID.nextPage),
+                    .send(.pagination(.input(.refreshStarted))),
                     .send(.projectSummaries(.input(.start))),
                 )
 
             case .view(.refreshRequested),
                  .input(.learningProjectsReloadRequested):
                 return .merge(
-                    .cancel(id: CancelID.nextPage),
+                    .send(.pagination(.input(.refreshStarted))),
                     .send(.projectSummaries(.input(.refresh))),
                 )
 
             case .view(.listBottomReached):
                 guard
                     state.projectSummaries.load.isLoaded,
-                    state.hasNextPage,
-                    state.pagination == .idle
+                    state.hasNextPage
                 else { return .none }
-                return startNextPageLoad(state: &state)
+                return .send(.pagination(.input(.nextPageRequested)))
 
             case .view(.nextPageRetryTapped):
-                guard case .failed = state.pagination else { return .none }
-                return startNextPageLoad(state: &state)
+                return .send(.pagination(.input(.retry)))
 
             case .view(.projectRowTapped(let projectID)):
                 guard state.mode != .deleting else { return .none }
@@ -184,23 +173,14 @@ public struct ProjectListFeature: Sendable {
                 )
 
             case .projectSummaries(.delegate(.listUpdated(let list))):
-                state.pagination = list.hasNextPage ? .idle : .exhausted
                 if list.summaries.isEmpty, state.mode == .deleting {
                     state.mode = .browsing
                 }
-                return .none
-
-            case .effect(.nextPageFinished(let error)):
-                guard case .loading = state.pagination else { return .none }
-                if let error {
-                    state.pagination = .failed(error)
-                } else {
-                    state.pagination = state.hasNextPage ? .idle : .exhausted
-                }
-                return .none
+                return .send(.pagination(.input(.listReplaced(hasNextPage: list.hasNextPage))))
 
             case .projectSummaries,
                  .deletion,
+                 .pagination,
                  .delegate:
                 return .none
             }
@@ -209,29 +189,9 @@ public struct ProjectListFeature: Sendable {
 
     // MARK: Private
 
-    private enum CancelID: Hashable {
-        case nextPage
-    }
-
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
     private let requestNextPage: @Sendable () async throws -> Void
     private let deleteProject: @Sendable (ProjectID) async throws -> Void
-
-    private func startNextPageLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.pagination = .loading
-        let requestNextPage = requestNextPage
-
-        return .run { send in
-            do {
-                try await requestNextPage()
-                await send(.effect(.nextPageFinished(error: nil)))
-            } catch {
-                let mapped = error as? ProjectError ?? .unexpected
-                await send(.effect(.nextPageFinished(error: mapped)))
-            }
-        }
-        .cancellable(id: CancelID.nextPage, cancelInFlight: true)
-    }
 
 }

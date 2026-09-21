@@ -18,13 +18,13 @@ private func previewProject(index: Int) -> ProjectSummary {
 private func previewState(
     projects: [ProjectSummary] = (1...4).map(previewProject(index:)),
     load: ProjectSummaryListFeature.State.Load? = nil,
-    pagination: ProjectListFeature.Pagination = .exhausted,
+    pagination: ProjectListPaginationFeature.State.Pagination = .exhausted,
     mode: ProjectListFeature.Mode = .browsing,
     deletion: ProjectDeletionFeature.State.Deletion = .idle,
 ) -> ProjectListFeature.State {
     var state = ProjectListFeature.State()
     state.projectSummaries.load = load ?? .loaded(ProjectList(summaries: projects, hasNextPage: false, isLoaded: true))
-    state.pagination = pagination
+    state.pagination.pagination = pagination
     state.mode = mode
     state.deletion.deletion = deletion
     return state
