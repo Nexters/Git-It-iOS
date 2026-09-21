@@ -41,8 +41,14 @@ public struct ProjectListScreen: View {
             .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.mode)
             .overlay {
                 ModalOverlay(
-                    isPresented: isDeletionConfirmationPresented,
-                    onDismiss: { send(.deletionCancelled) },
+                    isPresented: Binding(
+                        get: { isDeletionConfirmationPresented },
+                        set: { isPresented in
+                            if !isPresented {
+                                send(.deletionCancelled)
+                            }
+                        },
+                    )
                 ) {
                     ConfirmationSheet(
                         displayModel: .init(

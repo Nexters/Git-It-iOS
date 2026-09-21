@@ -19,8 +19,14 @@ struct QuestionSolvingScreen: View {
             .onTapGesture { isEssayFieldFocused = false }
             .overlay {
                 ModalOverlay(
-                    isPresented: store.isSourceSheetPresented,
-                    onDismiss: { send(.sourceSheetDismissed) },
+                    isPresented: Binding(
+                        get: { store.isSourceSheetPresented },
+                        set: { isPresented in
+                            if !isPresented {
+                                send(.sourceSheetDismissed)
+                            }
+                        },
+                    )
                 ) {
                     SourceSheet(
                         questionNumber: store.questionNumber,
@@ -171,9 +177,11 @@ struct QuestionSolvingScreen: View {
         BottomActionBar {
             HStack(spacing: LayoutToken.compactSpacing) {
                 BookmarkButton(
-                    isSaved: store.isBookmarked,
+                    isSaved: Binding(
+                        get: { store.isBookmarked },
+                        set: { _ in send(.bookmarkToggleTapped) },
+                    ),
                     accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
-                    onTap: { send(.bookmarkToggleTapped) },
                 )
 
                 primaryAction

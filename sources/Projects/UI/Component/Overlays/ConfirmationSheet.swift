@@ -113,7 +113,7 @@ extension ConfirmationSheet {
     ZStack {
         Color(designSystem: .grey700)
 
-        ModalOverlay(isPresented: true) {
+        ModalOverlay(isPresented: .constant(true)) {
             ConfirmationSheet(
                 displayModel: .init(
                     imageURL: nil,

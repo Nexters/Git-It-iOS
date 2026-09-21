@@ -44,7 +44,16 @@ struct ProjectDetailScreen: View {
         }
         .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.isMenuPresented)
         .overlay {
-            ModalOverlay(isPresented: isDeletionConfirmationPresented, onDismiss: { send(.deletionCancelled) }) {
+            ModalOverlay(
+                isPresented: Binding(
+                    get: { isDeletionConfirmationPresented },
+                    set: { isPresented in
+                        if !isPresented {
+                            send(.deletionCancelled)
+                        }
+                    },
+                )
+            ) {
                 ConfirmationSheet(
                     displayModel: .init(
                         imageURL: store.detailLoad.detail?.repository.imageURL,

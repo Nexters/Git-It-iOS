@@ -8,19 +8,17 @@ public struct BookmarkButton: View {
     // MARK: Lifecycle
 
     public init(
-        isSaved: Bool,
+        isSaved: Binding<Bool>,
         accessibilityLabel: String,
-        onTap: @escaping () -> Void,
     ) {
-        self.isSaved = isSaved
+        _isSaved = isSaved
         self.accessibilityLabel = accessibilityLabel
-        self.onTap = onTap
     }
 
     // MARK: Public
 
     public var body: some View {
-        Button(action: onTap) {
+        Button(action: { toggle() }) {
             Image(systemName: symbol)
                 .font(.system(size: Constant.glyphSize))
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
@@ -44,6 +42,10 @@ public struct BookmarkButton: View {
         isSaved ? "bookmark.fill" : "bookmark"
     }
 
+    func toggle() {
+        isSaved.toggle()
+    }
+
     // MARK: Private
 
     private enum Constant {
@@ -52,9 +54,9 @@ public struct BookmarkButton: View {
         static let glyphSize: CGFloat = 16
     }
 
-    private let isSaved: Bool
+    @Binding private var isSaved: Bool
+
     private let accessibilityLabel: String
-    private let onTap: () -> Void
 
     private var symbol: String {
         Self.symbol(isSaved: isSaved)
@@ -64,8 +66,8 @@ public struct BookmarkButton: View {
 
 #Preview("Bookmark Button") {
     HStack(spacing: LayoutToken.gutter) {
-        BookmarkButton(isSaved: false, accessibilityLabel: "저장하기") { }
-        BookmarkButton(isSaved: true, accessibilityLabel: "저장 해제하기") { }
+        BookmarkButton(isSaved: .constant(false), accessibilityLabel: "저장하기")
+        BookmarkButton(isSaved: .constant(true), accessibilityLabel: "저장 해제하기")
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

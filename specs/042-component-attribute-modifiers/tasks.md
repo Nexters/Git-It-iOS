@@ -695,38 +695,38 @@ Reducer·Reducer 테스트 diff 0줄
 
 ### 테스트
 
-- [ ] T105 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/Controls/ChipTests.swift`를 전환한다.
+- [X] T105 [P] [S4] `sources/Projects/UI/Tests/Component/Unit/Controls/ChipTests.swift`를 전환한다.
   - 호출부를 `Chip(label:isSelected: .constant(...))`로 바꾼다.
   - "선택 여부를 스스로 보관하지 않는다" 단언의 필터를 `_` 접두에서 `String(describing: type(of: $0.value)).hasPrefix("State<")`로 바꾼다.
   - `_isSelected`가 `Binding<Bool>`임을 확인하는 단언을 더하고, 테스트 이름에 `Binding`으로 받는다는 사실을 반영한다([research.md](./research.md) §9.4).
-- [ ] T106 [P] [S4] `BookmarkButton` 테스트 호출부를 전환한다.
+- [X] T106 [P] [S4] `BookmarkButton` 테스트 호출부를 전환한다.
   - `sources/Projects/UI/Tests/Component/Unit/Controls/BookmarkButtonTests.swift`: `BookmarkButton(isSaved: .constant(...), accessibilityLabel:)`로 바꾸고, T105와 같은 방식으로 "저장 여부를 스스로 보관하지 않는다" 단언을 `State` 필터와 `_isSaved`의 `Binding<Bool>` 확인으로 바꾼다.
   - `sources/Projects/UI/Tests/Component/Unit/Controls/AccessibilityContractTests.swift`: `BookmarkButton` 호출부만 바꾸고 기존 단언은 유지한다.
 
 ### 구현
 
-- [ ] T107 [P] [S4] `sources/Projects/UI/Component/Controls/Chip/Chip.swift`를 전환한다.
+- [X] T107 [P] [S4] `sources/Projects/UI/Component/Controls/Chip/Chip.swift`를 전환한다.
   - 초기화 메서드를 `init(label:isSelected:)`로 바꾼다. `isSelected: Binding<Bool>`은 `@Binding private var isSelected: Bool`에 저장한다.
   - `onTap`을 제거하고 탭은 `isSelected.toggle()`을 실행한다.
   - `#Preview`를 `.constant(...)`로 전환한다.
-- [ ] T108 [P] [S4] `sources/Projects/UI/Component/Controls/SelectableSettingRow/SelectableSettingRow.swift`를 전환한다.
+- [X] T108 [P] [S4] `sources/Projects/UI/Component/Controls/SelectableSettingRow/SelectableSettingRow.swift`를 전환한다.
   - 초기화 메서드를 `init(title:isSelected:)`로 바꾼다. `isSelected`의 기본값(`= false`)을 없애고 `Binding<Bool>`로 받아 `@Binding private var`에 저장한다.
   - `onTap`을 제거하고 탭은 `isSelected.toggle()`을 실행한다.
   - `#Preview`를 `.constant(...)`로 전환한다.
-- [ ] T109 [P] [S4] `sources/Projects/UI/Component/Controls/BookmarkButton.swift`를 전환한다.
+- [X] T109 [P] [S4] `sources/Projects/UI/Component/Controls/BookmarkButton.swift`를 전환한다.
   - 초기화 메서드를 `init(isSaved:accessibilityLabel:)`로 바꾼다. `isSaved: Binding<Bool>`은 `@Binding private var`에 저장한다.
   - `onTap`을 제거하고 탭은 `isSaved.toggle()`을 실행한다.
   - `#Preview`를 `.constant(...)`로 전환한다.
-- [ ] T110 [P] [S4] `sources/Projects/UI/Component/Overlays/ModalOverlay.swift`를 전환한다.
+- [X] T110 [P] [S4] `sources/Projects/UI/Component/Overlays/ModalOverlay.swift`를 전환한다.
   - 초기화 메서드를 `init(isPresented:content:)`로 바꾼다. `isPresented: Binding<Bool>`은 `@Binding private var`에 저장한다.
   - `onDismiss`를 제거하고 scrim 탭은 `isPresented = false`를 실행한다.
   - `#Preview`를 `.constant(...)`로 전환한다.
-- [ ] T111 [P] [S4] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`의 `#Preview` 속 `ModalOverlay` 호출을 `isPresented: .constant(true)`로 바꾼다
-- [ ] T112 [P] [S4] `sources/Projects/Feature/Saved/SubViews/SavedScreen+FilterSection.swift`의 `Chip` 호출 2곳을 바꾼다. `isSelected`는 `Binding(get: { 전환 전 식 }, set: { _ in 전환 전 trailing closure 본문 })`으로 넘긴다
-- [ ] T113 [P] [S4] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`를 바꾼다.
+- [X] T111 [P] [S4] `sources/Projects/UI/Component/Overlays/ConfirmationSheet.swift`의 `#Preview` 속 `ModalOverlay` 호출을 `isPresented: .constant(true)`로 바꾼다
+- [X] T112 [P] [S4] `sources/Projects/Feature/Saved/SubViews/SavedScreen+FilterSection.swift`의 `Chip` 호출 2곳을 바꾼다. `isSelected`는 `Binding(get: { 전환 전 식 }, set: { _ in 전환 전 trailing closure 본문 })`으로 넘긴다
+- [X] T113 [P] [S4] `sources/Projects/Feature/Quiz/QuestionSolving/QuestionSolvingScreen.swift`를 바꾼다.
   - `BookmarkButton`: `isSaved: Binding(get: { store.isBookmarked }, set: { _ in send(.bookmarkToggleTapped) })`로 넘기고 `onTap`을 제거한다.
   - `ModalOverlay`: `isPresented: Binding(get: { store.isSourceSheetPresented }, set: { isPresented in if !isPresented { send(.sourceSheetDismissed) } })`로 넘기고 `onDismiss`를 제거한다.
-- [ ] T114 [P] [S4] Feature의 나머지 `ModalOverlay` 호출부를 바꾼다. 각 호출의 `isPresented` 식은 getter로 옮기고, `onDismiss` 본문은 `false`를 받을 때만 실행하는 setter로 옮긴다.
+- [X] T114 [P] [S4] Feature의 나머지 `ModalOverlay` 호출부를 바꾼다. 각 호출의 `isPresented` 식은 getter로 옮기고, `onDismiss` 본문은 `false`를 받을 때만 실행하는 setter로 옮긴다.
   - `sources/Projects/Feature/Onboarding/Router/OnboardingRouter.swift`: 2곳
   - `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`: 2곳
   - `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`: 1곳
@@ -734,7 +734,7 @@ Reducer·Reducer 테스트 diff 0줄
 
 ### 정리와 단위 검증
 
-- [ ] T115 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행하고 다음을 확인한다.
+- [X] T115 [no-write] [S4] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행하고 다음을 확인한다.
   - [quickstart.md](./quickstart.md) §2.4의 세 조회가 모두 0줄이다.
   - 네 컴포넌트의 `public init`이 [contracts/component-init-contracts.md](./contracts/component-init-contracts.md) §3.1과 같다.
   - `git diff --stat`에서 Feature `*Feature.swift`와 `Feature/Tests/**` 변경이 0줄이다.

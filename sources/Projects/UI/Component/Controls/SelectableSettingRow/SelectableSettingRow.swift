@@ -9,18 +9,16 @@ public struct SelectableSettingRow: View {
 
     public init(
         title: String,
-        isSelected: Bool = false,
-        onTap: @escaping () -> Void = { },
+        isSelected: Binding<Bool>,
     ) {
         self.title = title
-        self.isSelected = isSelected
-        self.onTap = onTap
+        _isSelected = isSelected
     }
 
     // MARK: Public
 
     public var body: some View {
-        Button(action: onTap) {
+        Button(action: { toggle() }) {
             HStack(spacing: LayoutToken.compactSpacing) {
                 StyledText(text: title)
 
@@ -40,11 +38,17 @@ public struct SelectableSettingRow: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    // MARK: Internal
+
+    func toggle() {
+        isSelected.toggle()
+    }
+
     // MARK: Private
 
+    @Binding private var isSelected: Bool
+
     private let title: String
-    private let isSelected: Bool
-    private let onTap: () -> Void
 
 }
 
@@ -60,8 +64,8 @@ extension SelectableSettingRow {
 
 #Preview("Selectable Setting Row") {
     VStack(spacing: 0) {
-        SelectableSettingRow(title: "주니어", isSelected: true)
-        SelectableSettingRow(title: "시니어")
+        SelectableSettingRow(title: "주니어", isSelected: .constant(true))
+        SelectableSettingRow(title: "시니어", isSelected: .constant(false))
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

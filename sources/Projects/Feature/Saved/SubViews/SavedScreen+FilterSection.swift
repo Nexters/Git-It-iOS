@@ -18,13 +18,21 @@ extension SavedScreen {
             VStack(alignment: .leading, spacing: 10) {
                 ScrollView(.horizontal) {
                     HStack(spacing: LayoutToken.compactSpacing) {
-                        Chip(label: Constant.allLabel, isSelected: selectedProjectID == nil) {
-                            onSelect(nil)
-                        }
+                        Chip(
+                            label: Constant.allLabel,
+                            isSelected: Binding(
+                                get: { selectedProjectID == nil },
+                                set: { _ in onSelect(nil) },
+                            ),
+                        )
                         ForEach(projects) { project in
-                            Chip(label: project.name, isSelected: selectedProjectID == project.id) {
-                                onSelect(project.id)
-                            }
+                            Chip(
+                                label: project.name,
+                                isSelected: Binding(
+                                    get: { selectedProjectID == project.id },
+                                    set: { _ in onSelect(project.id) },
+                                ),
+                            )
                         }
                     }
                 }

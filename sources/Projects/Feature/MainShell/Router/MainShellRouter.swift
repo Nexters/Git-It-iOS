@@ -96,8 +96,14 @@ public struct MainShellRouter: View {
 
     private var guestLegalAgreementOverlay: some View {
         ModalOverlay(
-            isPresented: store.signIn.isLegalAgreementPresented,
-            onDismiss: { store.send(.signIn(.view(.legalAgreementDismissed))) },
+            isPresented: Binding(
+                get: { store.signIn.isLegalAgreementPresented },
+                set: { isPresented in
+                    if !isPresented {
+                        store.send(.signIn(.view(.legalAgreementDismissed)))
+                    }
+                },
+            )
         ) {
             LegalAgreementScreen(
                 store: store.scope(state: \.signIn.legalAgreement, action: \.signIn.legalAgreement)
@@ -107,8 +113,14 @@ public struct MainShellRouter: View {
 
     private var guestLegalDocumentOverlay: some View {
         ModalOverlay(
-            isPresented: store.signIn.legalAgreement.presentedDocument != nil,
-            onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
+            isPresented: Binding(
+                get: { store.signIn.legalAgreement.presentedDocument != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        store.send(.signIn(.view(.legalDocumentSheetDismissed)))
+                    }
+                },
+            )
         ) {
             if let document = store.signIn.legalAgreement.presentedDocument {
                 WebSheet(

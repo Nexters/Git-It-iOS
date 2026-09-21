@@ -9,18 +9,16 @@ public struct Chip: View {
 
     public init(
         label: String,
-        isSelected: Bool,
-        onTap: @escaping () -> Void,
+        isSelected: Binding<Bool>,
     ) {
         self.label = label
-        self.isSelected = isSelected
-        self.onTap = onTap
+        _isSelected = isSelected
     }
 
     // MARK: Public
 
     public var body: some View {
-        Button(action: onTap) {
+        Button(action: { toggle() }) {
             StyledText(text: label)
                 .textStyle(.body2)
                 .foregroundColorToken(labelColor)
@@ -36,11 +34,17 @@ public struct Chip: View {
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
+    // MARK: Internal
+
+    func toggle() {
+        isSelected.toggle()
+    }
+
     // MARK: Private
 
+    @Binding private var isSelected: Bool
+
     private let label: String
-    private let isSelected: Bool
-    private let onTap: () -> Void
 
     private var backgroundColor: ColorToken {
         isSelected ? .blue100 : .grey600
@@ -64,9 +68,9 @@ extension Chip {
 
 #Preview("Chip") {
     HStack(spacing: LayoutToken.compactSpacing) {
-        Chip(label: "전체", isSelected: true) { }
-        Chip(label: "SwiftUI", isSelected: false) { }
-        Chip(label: "동시성", isSelected: false) { }
+        Chip(label: "전체", isSelected: .constant(true))
+        Chip(label: "SwiftUI", isSelected: .constant(false))
+        Chip(label: "동시성", isSelected: .constant(false))
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
