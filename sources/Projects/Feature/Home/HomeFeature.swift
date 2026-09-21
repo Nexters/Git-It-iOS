@@ -29,23 +29,8 @@ public struct HomeFeature: Sendable {
 
         // MARK: Public
 
-        public enum ProjectLoad: Equatable, Sendable {
-            case idle
-            case loading
-            case loaded(ProjectList)
-            case failed(ProjectError)
-
-            var isLoaded: Bool {
-                if case .loaded = self {
-                    return true
-                }
-                return false
-            }
-        }
-
         public var profile = UserProfileLoadFeature.State()
-        public var projectLoad = ProjectLoad.idle
-        public var projectRequestID = 0
+        public var projectSummaries = ProjectSummaryListFeature.State()
 
         public var isGenerationInProgress = false
 
@@ -57,9 +42,9 @@ public struct HomeFeature: Sendable {
     public enum Action: ViewAction, Equatable, Sendable {
         case view(View)
         case input(Input)
-        case effect(Effect)
         case delegate(Delegate)
         case profile(UserProfileLoadFeature.Action)
+        case projectSummaries(ProjectSummaryListFeature.Action)
 
         // MARK: Public
 
@@ -85,12 +70,6 @@ public struct HomeFeature: Sendable {
         }
 
         @CasePathable
-        public enum Effect: Equatable, Sendable {
-            case projectsReceived(ProjectList)
-            case refreshFinished(requestID: Int, error: ProjectError?)
-        }
-
-        @CasePathable
         public enum Delegate: Equatable, Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: ProjectID)
@@ -104,6 +83,9 @@ public struct HomeFeature: Sendable {
         Scope(state: \.profile, action: \.profile) {
             UserProfileLoadFeature(profile: profile)
         }
+        Scope(state: \.projectSummaries, action: \.projectSummaries) {
+            ProjectSummaryListFeature(projects: projects, refreshProjects: refreshProjects)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
@@ -112,7 +94,7 @@ public struct HomeFeature: Sendable {
 
             case .input(.learningProjectsReloadRequested):
                 guard state.access == .member else { return .none }
-                return startRefresh(state: &state)
+                return .send(.projectSummaries(.input(.refresh)))
 
             case .input(.accessChanged(let access)):
                 let previousAccess = state.access
@@ -125,8 +107,8 @@ public struct HomeFeature: Sendable {
                 return .send(.profile(.input(.load)))
 
             case .view(.projectRetryTapped):
-                guard state.access == .member, case .failed = state.projectLoad else { return .none }
-                return startRefresh(state: &state)
+                guard state.access == .member, case .failed = state.projectSummaries.load else { return .none }
+                return .send(.projectSummaries(.input(.refresh)))
 
             case .input(.generationProgressChanged(let isInProgress)):
                 state.isGenerationInProgress = isInProgress
@@ -161,7 +143,7 @@ public struct HomeFeature: Sendable {
 
             case .view(.learningTapped(let projectID)):
                 guard
-                    case .loaded(let list) = state.projectLoad,
+                    case .loaded(let list) = state.projectSummaries.load,
                     let summary = list.summaries.first(where: { $0.id == projectID }),
                     let next = summary.next,
                     next.quizID != nil
@@ -170,18 +152,8 @@ public struct HomeFeature: Sendable {
                     .delegate(.learningRequested(projectID: projectID, nextSetID: next.setID))
                 )
 
-            case .effect(.projectsReceived(let list)):
-                guard list.isLoaded else { return .none }
-                state.projectLoad = .loaded(list)
-                return .none
-
-            case .effect(.refreshFinished(let requestID, let error)):
-                guard requestID == state.projectRequestID else { return .none }
-                guard let error, !state.projectLoad.isLoaded else { return .none }
-                state.projectLoad = .failed(error)
-                return .none
-
             case .profile,
+                 .projectSummaries,
                  .delegate:
                 return .none
             }
@@ -189,11 +161,6 @@ public struct HomeFeature: Sendable {
     }
 
     // MARK: Private
-
-    private enum CancelID {
-        case projects
-        case refresh
-    }
 
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
@@ -204,39 +171,8 @@ public struct HomeFeature: Sendable {
         if state.profile.load == .idle {
             effects.append(.send(.profile(.input(.load))))
         }
-        effects.append(observeProjects())
-        effects.append(startRefresh(state: &state))
+        effects.append(.send(.projectSummaries(.input(.start))))
         return .merge(effects)
-    }
-
-    private func observeProjects() -> ComposableArchitecture.Effect<Action> {
-        let projects = projects
-        return .run { send in
-            for await list in await projects() {
-                await send(.effect(.projectsReceived(list)))
-            }
-        }
-        .cancellable(id: CancelID.projects, cancelInFlight: true)
-    }
-
-    private func startRefresh(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.projectRequestID += 1
-        if !state.projectLoad.isLoaded {
-            state.projectLoad = .loading
-        }
-        let requestID = state.projectRequestID
-        let refreshProjects = refreshProjects
-
-        return .run { send in
-            do {
-                try await refreshProjects()
-                await send(.effect(.refreshFinished(requestID: requestID, error: nil)))
-            } catch {
-                let mapped = error as? ProjectError ?? .unexpected
-                await send(.effect(.refreshFinished(requestID: requestID, error: mapped)))
-            }
-        }
-        .cancellable(id: CancelID.refresh, cancelInFlight: true)
     }
 
 }

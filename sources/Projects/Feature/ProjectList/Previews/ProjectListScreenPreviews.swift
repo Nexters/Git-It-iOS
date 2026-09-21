@@ -17,14 +17,13 @@ private func previewProject(index: Int) -> ProjectSummary {
 
 private func previewState(
     projects: [ProjectSummary] = (1...4).map(previewProject(index:)),
-    initialLoad: ProjectListFeature.InitialLoad = .loaded,
+    load: ProjectSummaryListFeature.State.Load? = nil,
     pagination: ProjectListFeature.Pagination = .exhausted,
     mode: ProjectListFeature.Mode = .browsing,
     deletion: ProjectListFeature.Deletion = .idle,
 ) -> ProjectListFeature.State {
     var state = ProjectListFeature.State()
-    state.projects = projects
-    state.initialLoad = initialLoad
+    state.projectSummaries.load = load ?? .loaded(ProjectList(summaries: projects, hasNextPage: false, isLoaded: true))
     state.pagination = pagination
     state.mode = mode
     state.deletion = deletion
@@ -54,12 +53,12 @@ private func previewStore(_ state: ProjectListFeature.State) -> StoreOf<ProjectL
 }
 
 #Preview("프로젝트 목록 · 빈 상태") {
-    ProjectListScreen(store: previewStore(previewState(projects: [], initialLoad: .loaded)))
+    ProjectListScreen(store: previewStore(previewState(projects: [])))
 }
 
 #Preview("프로젝트 목록 · 실패") {
     ProjectListScreen(
-        store: previewStore(previewState(projects: [], initialLoad: .failed(.temporarilyUnavailable)))
+        store: previewStore(previewState(projects: [], load: .failed(.temporarilyUnavailable)))
     )
 }
 

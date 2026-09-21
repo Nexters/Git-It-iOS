@@ -57,7 +57,7 @@ public struct ProjectListScreen: View {
                 }
             }
             .overlay {
-                if store.initialLoad == .loading, store.projects.isEmpty {
+                if store.projectSummaries.load == .loading, store.projects.isEmpty {
                     ProgressView()
                         .tint(Color(designSystem: .blue100))
                 }
@@ -76,7 +76,7 @@ public struct ProjectListScreen: View {
 
     @ViewBuilder
     private var screen: some View {
-        switch (store.initialLoad, store.projects.isEmpty) {
+        switch (store.projectSummaries.load, store.projects.isEmpty) {
         case (.failed, _):
             ScreenContainer {
                 Self.FailureView(onRetry: { send(.refreshRequested) })

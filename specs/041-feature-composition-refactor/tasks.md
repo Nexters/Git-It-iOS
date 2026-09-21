@@ -157,30 +157,30 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 테스트
 
-- [ ] T030 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift`를 작성한다. 검증 범위는 `start`(관찰+새로고침), `refresh`의 로딩 표시 조건(`loaded`가 아닐 때만), `list.isLoaded` 필터, `loaded` 뒤 새로고침 실패 무시, request identity, `projectRemoved`, `listUpdated` delegate 방출, 오류 변환(`.unexpected`)이다
+- [X] T030 [S2] `sources/Projects/Feature/Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift`를 작성한다. 검증 범위는 `start`(관찰+새로고침), `refresh`의 로딩 표시 조건(`loaded`가 아닐 때만), `list.isLoaded` 필터, `loaded` 뒤 새로고침 실패 무시, request identity, `projectRemoved`, `listUpdated` delegate 방출, 오류 변환(`.unexpected`)이다
 
 ### 구현
 
-- [ ] T031 [S2] `sources/Projects/Feature/Shared/Reducers/ProjectSummaryListFeature.swift`에 `ProjectSummaryListFeature`를 구현한다(State `load`, `requestID`; 생성자 `projects:`, `refreshProjects:`)
-- [ ] T032 [S2] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `projectLoad`·`projectRequestID`·관찰·새로고침 Effect를 제거한다. `projectSummaries: ProjectSummaryListFeature.State`를 합성하고, 회원 조건·재시도 조건을 input 전송으로 옮긴다. 학습 탭 조회는 자식 State에서 읽는다
-- [ ] T033 [P] [S2] `sources/Projects/Feature/Home/ViewModels/HomeProjectSectionState.swift`가 자식 상태를 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
-- [ ] T034 [S2] `sources/Projects/Feature/Home/HomeScreen.swift`, `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`, `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`의 목록 상태 참조를 새 경로로 바꾼다
-- [ ] T035 [S2] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `projects`·`hasNextPage`·`initialLoad`·`requestID` 저장 필드와 관찰·새로고침 Effect를 제거하고 `projectSummaries`를 합성한다. `projects`·`hasNextPage`는 computed로 제공한다. `listUpdated`를 받으면 페이지네이션 재설정과 빈 목록의 삭제 모드 종료를 수행하고, 새로고침 시작 시 진행 중 다음 페이지 요청을 취소한다. 페이지네이션 상태는 이 단위에서 화면에 남긴다(U7에서 분리)
-- [ ] T036 [S2] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`와 `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 상태 참조를 새 경로로 바꾼다
-- [ ] T037 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `loadedProject`가 `state.mainShell.home.projectSummaries`에서 조회 완료 목록을 읽게 바꾼다(App)
+- [X] T031 [S2] `sources/Projects/Feature/Shared/Reducers/ProjectSummaryListFeature.swift`에 `ProjectSummaryListFeature`를 구현한다(State `load`, `requestID`; 생성자 `projects:`, `refreshProjects:`)
+- [X] T032 [S2] `sources/Projects/Feature/Home/HomeFeature.swift`에서 `projectLoad`·`projectRequestID`·관찰·새로고침 Effect를 제거한다. `projectSummaries: ProjectSummaryListFeature.State`를 합성하고, 회원 조건·재시도 조건을 input 전송으로 옮긴다. 학습 탭 조회는 자식 State에서 읽는다
+- [X] T033 [P] [S2] `sources/Projects/Feature/Home/ViewModels/HomeProjectSectionState.swift`가 자식 상태를 입력으로 받게 바꾼다. 표시 결과는 바꾸지 않는다
+- [X] T034 [S2] `sources/Projects/Feature/Home/HomeScreen.swift`, `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`, `sources/Projects/Feature/Home/Previews/HomeScreenPreviews.swift`의 목록 상태 참조를 새 경로로 바꾼다
+- [X] T035 [S2] `sources/Projects/Feature/ProjectList/ProjectListFeature.swift`에서 `projects`·`hasNextPage`·`initialLoad`·`requestID` 저장 필드와 관찰·새로고침 Effect를 제거하고 `projectSummaries`를 합성한다. `projects`·`hasNextPage`는 computed로 제공한다. `listUpdated`를 받으면 페이지네이션 재설정과 빈 목록의 삭제 모드 종료를 수행하고, 새로고침 시작 시 진행 중 다음 페이지 요청을 취소한다. 페이지네이션 상태는 이 단위에서 화면에 남긴다(U7에서 분리)
+- [X] T036 [S2] `sources/Projects/Feature/ProjectList/ProjectListScreen.swift`와 `sources/Projects/Feature/ProjectList/Previews/ProjectListScreenPreviews.swift`의 상태 참조를 새 경로로 바꾼다
+- [X] T037 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `loadedProject`가 `state.mainShell.home.projectSummaries`에서 조회 완료 목록을 읽게 바꾼다(App)
 
 ### 테스트 이관
 
-- [ ] T038 [S2] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureLoadTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureNavigationTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationProgressTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에서 목록 내부 전이 단언을 제거하고 위임과 화면 고유 결과만 단언하게 바꾼다
-- [ ] T039 [P] [S2] `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProjectSectionStateTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
-- [ ] T040 [S2] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`에서 관찰·새로고침 전이 단언을 T030으로 옮기고 합성 지점 검증으로 바꾼다. 빈 목록 새로고침 동작 차이(research §4 I2-1)를 고정하는 테스트를 T030에 둔다
-- [ ] T041 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의 `home.projectLoad`·`projectList` 목록 상태 참조를 새 경로로 바꾼다
-- [ ] T042 [S2] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 `home.projectLoad` 설정·단언과 `mainShell.projectList.projects` 직접 설정을 `projectSummaries` 상태 구성으로 바꾼다(App)
-- [ ] T043 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U3 이관 대응표를 추가한다
+- [X] T038 [S2] `sources/Projects/Feature/Tests/Home/Home/HomeFeatureLoadTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureNavigationTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationProgressTests.swift`, `sources/Projects/Feature/Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift`, `sources/Projects/Feature/Tests/Home/TestDoubles/HomeTestFixture.swift`에서 목록 내부 전이 단언을 제거하고 위임과 화면 고유 결과만 단언하게 바꾼다
+- [X] T039 [P] [S2] `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProjectSectionStateTests.swift`의 입력 구성을 새 상태 타입으로 바꾼다
+- [X] T040 [S2] `sources/Projects/Feature/Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift`에서 관찰·새로고침 전이 단언을 T030으로 옮기고 합성 지점 검증으로 바꾼다. 빈 목록 새로고침 동작 차이(research §4 I2-1)를 고정하는 테스트를 T030에 둔다
+- [X] T041 [S2] `sources/Projects/Feature/Tests/MainShell/Router/MainShellRouterFeatureTests.swift`의 `home.projectLoad`·`projectList` 목록 상태 참조를 새 경로로 바꾼다
+- [X] T042 [S2] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`의 `home.projectLoad` 설정·단언과 `mainShell.projectList.projects` 직접 설정을 `projectSummaries` 상태 구성으로 바꾼다(App)
+- [X] T043 [S2] `specs/041-feature-composition-refactor/research.md` §6에 U3 이관 대응표를 추가한다
 
 ### 정리와 단위 검증
 
-- [ ] T044 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. Feature·App test가 모두 통과하고, `projectLoad`·`initialLoad` 선언이 `ProjectSummaryListFeature` 밖에 남지 않았는지 grep으로 확인한다
+- [X] T044 [no-write] [S2] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다. Feature·App test가 모두 통과하고, `projectLoad`·`initialLoad` 선언이 `ProjectSummaryListFeature` 밖에 남지 않았는지 grep으로 확인한다
 
 **진행 점검**: T030~T044의 변경 파일과 검증 결과를 보고하고 실행 단위 4로 진행한다.
 

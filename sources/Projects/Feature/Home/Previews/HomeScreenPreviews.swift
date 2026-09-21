@@ -31,13 +31,13 @@ private enum HomePreviewFixture {
 
     @MainActor
     static func store(
-        projectLoad: HomeFeature.State.ProjectLoad,
+        projectLoad: ProjectSummaryListFeature.State.Load,
         profileLoad: UserProfileLoadFeature.State.Load = .loaded(profile),
     ) -> StoreOf<HomeFeature> {
         Store(
             initialState: {
                 var state = HomeFeature.State()
-                state.projectLoad = projectLoad
+                state.projectSummaries.load = projectLoad
                 state.profile.load = profileLoad
                 return state
             }()

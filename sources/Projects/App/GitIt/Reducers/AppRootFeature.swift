@@ -357,7 +357,7 @@ nonisolated struct AppRootFeature: Sendable {
         state: State,
     ) -> ProjectSummary? {
         if
-            case .loaded(let list) = state.mainShell.home.projectLoad,
+            case .loaded(let list) = state.mainShell.home.projectSummaries.load,
             let summary = list.summaries.first(where: { $0.id == projectID })
         {
             return summary

@@ -9,7 +9,7 @@ enum HomeProjectSectionState: Equatable, Sendable {
     // MARK: Lifecycle
 
     init(
-        _ projectLoad: HomeFeature.State.ProjectLoad,
+        _ projectLoad: ProjectSummaryListFeature.State.Load,
         access: MainShellAccess,
     ) {
         guard access == .member else {

@@ -263,7 +263,9 @@ struct AppRootFeatureTests {
     func `프로젝트 목록의 학습 요청은 상세 위에 그 세트의 풀이 흐름을 연다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.mainShell.projectList.projects = [AppRootTestFixture.projectSummary()]
+        state.mainShell.projectList.projectSummaries.load = .loaded(
+            AppRootTestFixture.projectList(summaries: [AppRootTestFixture.projectSummary()])
+        )
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
@@ -291,7 +293,7 @@ struct AppRootFeatureTests {
     func `Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.mainShell.home.projectLoad = .loaded(
+        state.mainShell.home.projectSummaries.load = .loaded(
             AppRootTestFixture.projectList(summaries: [AppRootTestFixture.projectSummary()])
         )
         let store = makeAppRootStore(state: state)
@@ -465,7 +467,7 @@ struct AppRootFeatureTests {
 
         await store.send(.view(.applicationBecameActive))
 
-        #expect(store.state.mainShell.home.projectLoad == .idle)
+        #expect(store.state.mainShell.home.projectSummaries.load == .idle)
 
         await store.skipReceivedActions()
         await store.finish()
@@ -479,10 +481,10 @@ struct AppRootFeatureTests {
 
         await store.send(.view(.applicationBecameActive))
         await store.receive(.mainShell(.input(.learningProjectsReloadRequested)))
-        await store.receive(.mainShell(.home(.effect(.refreshFinished(requestID: 1, error: .unexpected)))))
+        await store.receive(.mainShell(.home(.projectSummaries(.effect(.refreshFinished(requestID: 1, error: .unexpected))))))
 
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell.home.projectLoad == .failed(.unexpected))
+        #expect(store.state.mainShell.home.projectSummaries.load == .failed(.unexpected))
 
         await store.skipReceivedActions(strict: false)
         await store.finish()

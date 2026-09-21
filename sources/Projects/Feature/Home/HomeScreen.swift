@@ -42,7 +42,7 @@ public struct HomeScreen: View {
             .padding(.bottom, Constant.projectSectionTopPadding)
 
             Self.ProjectSection(
-                state: HomeProjectSectionState(store.projectLoad, access: store.access),
+                state: HomeProjectSectionState(store.projectSummaries.load, access: store.access),
                 isShowAllEnabled: store.access == .member,
                 cardListLeadingX: $cardListLeadingX,
                 onShowAllTapped: { send(.showAllProjectsTapped) },

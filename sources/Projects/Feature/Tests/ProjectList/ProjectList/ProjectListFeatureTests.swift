@@ -17,9 +17,9 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         let task = await store.send(.view(.task))
-        await store.receive(\.effect.projectsReceived)
+        await store.receive(\.projectSummaries.effect.projectsReceived)
 
-        #expect(store.state.initialLoad == .loaded)
+        #expect(store.state.projectSummaries.load == .loaded(HomeTestFixture.manyProjectsPage))
         #expect(store.state.projects.count == HomeTestFixture.manyProjectsPage.summaries.count)
         #expect(store.state.hasNextPage)
 
@@ -34,24 +34,23 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         let task = await store.send(.view(.task))
-        await store.receive(\.effect.refreshFinished)
+        await store.receive(\.projectSummaries.effect.refreshFinished)
 
-        #expect(store.state.initialLoad == .failed(.temporarilyUnavailable))
+        #expect(store.state.projectSummaries.load == .failed(.temporarilyUnavailable))
 
         await projects.finish()
         await task.cancel()
     }
 
     @Test
-    func `아직 적재되지 않은 목록은 반영하지 않는다`() async {
-        let store = makeStore()
+    func `목록이 갱신되면 페이지네이션을 다시 설정한다`() async {
+        var state = loadedState(list: HomeTestFixture.oneProjectPage)
+        state.pagination = .failed(.temporarilyUnavailable)
+        let store = makeStore(state: state)
 
-        await store.send(.effect(.projectsReceived(
-            ProjectList(summaries: [], hasNextPage: false, isLoaded: false)
-        )))
-
-        #expect(store.state.initialLoad == .idle)
-        #expect(store.state.projects.isEmpty)
+        await store.send(.projectSummaries(.delegate(.listUpdated(HomeTestFixture.manyProjectsPage)))) {
+            $0.pagination = .idle
+        }
     }
 
     @Test
@@ -195,6 +194,7 @@ struct ProjectListFeatureTests {
         await store.send(.view(.deleteButtonTapped(projectID: "project-1")))
         await store.send(.view(.deletionConfirmed))
         await store.receive(\.effect.deletionFinished)
+        await store.receive(\.projectSummaries.delegate.listUpdated)
 
         #expect(!store.state.projects.contains { $0.id == "project-1" })
         #expect(store.state.deletion == .idle)
@@ -212,6 +212,7 @@ struct ProjectListFeatureTests {
             await store.send(.view(.deleteButtonTapped(projectID: projectID)))
             await store.send(.view(.deletionConfirmed))
             await store.receive(\.effect.deletionFinished)
+            await store.receive(\.projectSummaries.delegate.listUpdated)
         }
 
         #expect(store.state.projects.isEmpty)
@@ -319,15 +320,15 @@ struct ProjectListFeatureTests {
     }
 
     @Test
-    func `새로고침 입력은 목록 갱신을 다시 요청한다`() async {
+    func `새로고침 입력은 목록에 refresh를 보낸다`() async {
         let projects = ProjectUseCaseMock()
         let store = makeStore(projects: projects, state: loadedState())
         store.exhaustivity = .off
 
         await store.send(.view(.refreshRequested))
-        await store.receive(\.effect.refreshFinished)
+        await store.receive(\.projectSummaries.effect.refreshFinished)
 
-        #expect(store.state.requestID == 1)
+        #expect(store.state.projectSummaries.requestID == 1)
         #expect(await projects.snapshot().refreshCallCount == 1)
     }
 
@@ -344,9 +345,7 @@ struct ProjectListFeatureTests {
         mode: ProjectListFeature.Mode = .browsing,
     ) -> ProjectListFeature.State {
         var state = ProjectListFeature.State()
-        state.projects = list.summaries
-        state.hasNextPage = list.hasNextPage
-        state.initialLoad = .loaded
+        state.projectSummaries.load = .loaded(list)
         state.pagination = list.hasNextPage ? .idle : .exhausted
         state.mode = mode
         return state

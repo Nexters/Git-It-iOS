@@ -376,6 +376,38 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U2 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 목록에서 뒤로가기는 변경된 프로필을 프로필 화면에 반영하고 돌아간다 | Tests/Settings/Router/SettingsRouterFeatureTests.swift › 설정 목록에서 뒤로가기는 프로필 화면으로 돌아가고 변경된 프로필을 input으로 반영한다 | 합성 지점 검증 |
 | U2 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다(상태 경로만 변경) | 합성 지점 검증 |
 | U2 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 로그아웃과 계정 삭제는 네 child와 Home 기본 탭을 초기화한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureLoadTests.swift › 최초 task는 프로필을 한 번만 조회하고 복귀 task는 갱신만 다시 요청한다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 최초 task는 프로필을 한 번만 조회하고 복귀 task는 갱신만 다시 요청한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로필 재시도는 프로젝트를 보존하고 프로필 조회에 load만 보낸다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로필 재시도는 프로젝트를 보존하고 프로필 조회에 load만 보낸다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 갱신 실패는 성공한 프로필을 보존하고 독립 실패 상태가 된다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 갱신 실패는 성공한 프로필을 보존하고 독립 실패 상태가 된다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 재시도는 프로필을 보존하고 갱신만 다시 요청한다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 프로젝트 재시도는 프로필을 보존하고 목록에 refresh만 보낸다 | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureLoadTests.swift › 실패 상태가 아니면 프로젝트 재시도는 아무 효과도 내지 않는다 | Tests/Home/Home/HomeFeatureLoadTests.swift › 실패 상태가 아니면 프로젝트 재시도는 아무 효과도 내지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGuestAccessTests.swift › 로그인 사용자로 바뀌면 프로필과 프로젝트 적재를 시작한다 | Tests/Home/Home/HomeFeatureGuestAccessTests.swift › 로그인 사용자로 바뀌면 프로필과 프로젝트 적재를 시작한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 카드 본문과 전체 보기 동작은 달라지지 않는다 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 카드 본문과 전체 보기 동작은 달라지지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 프로젝트 갱신 재시도는 그대로 수행된다 | Tests/Home/Home/HomeFeatureGenerationProgressTests.swift › 진행 중에도 프로젝트 갱신 재시도는 그대로 수행된다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 프로젝트 등록 CTA는 동일한 delegate를 전달한다 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 프로젝트 등록 CTA는 동일한 delegate를 전달한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 적재된 목록에서 다음 퀴즈가 있는 프로젝트만 학습 delegate로 전달한다 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 적재된 목록에서 다음 퀴즈가 있는 프로젝트만 학습 delegate로 전달한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 다음 퀴즈가 없는 프로젝트는 학습 delegate를 전달하지 않는다 | Tests/Home/Home/HomeFeatureNavigationTests.swift › 다음 퀴즈가 없는 프로젝트는 학습 delegate를 전달하지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › task는 프로젝트 스트림을 구독하고 갱신을 한 번 요청한다 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › task는 프로젝트 스트림을 구독하고 갱신을 한 번 요청한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 스트림이 다시 방출하면 최신 목록으로 갈아끼운다 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 스트림이 다시 방출하면 최신 목록으로 갈아끼운다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 아직 적재되지 않은 목록은 표시 상태로 반영하지 않는다 | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 로드되지 않은 목록 수신은 상태를 바꾸지 않는다 | 기능 Feature 테스트 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 갱신에 실패해도 이미 적재된 목록을 오류로 덮지 않는다 | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 조회 완료 뒤 새로고침 실패는 목록을 유지한다 | 기능 Feature 테스트 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 적재 전 갱신 실패는 오류 의미를 보존한다 | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 조회 완료 전 새로고침 실패는 실패 상태가 된다 | 기능 Feature 테스트 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 지난 요청의 갱신 결과는 반영하지 않는다 | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 현재 request ID와 다른 새로고침 결과는 무시한다 | 기능 Feature 테스트 |
+| U3 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 목록 재조회 입력은 갱신을 다시 요청한다 | Tests/Home/Home/HomeFeatureGenerationOutcomeTests.swift › 목록 재조회 입력은 목록에 refresh를 보낸다 | 합성 지점 검증 |
+| U3 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다 | Tests/MainShell/Router/MainShellRouterFeatureTests.swift › 탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 진입하면 스트림이 준 목록으로 채운다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 진입하면 스트림이 준 목록으로 채운다(상태 경로만 변경), Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › start는 목록 관찰을 시작하고 새로고침한다 | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 갱신에 실패하면 실패 상태를 남긴다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 갱신에 실패하면 실패 상태를 남긴다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 아직 적재되지 않은 목록은 반영하지 않는다 | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 로드되지 않은 목록 수신은 상태를 바꾸지 않는다 | 중복 제거(대체 테스트 명시) |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제에 성공하면 목록에서 그 프로젝트를 지운다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 삭제에 성공하면 목록에서 그 프로젝트를 지운다(행 제거는 `projectRemoved`로 전달), Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › projectRemoved는 해당 행을 제거하고 listUpdated를 보낸다 | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 이미 사라진 프로젝트는 삭제 실패로 남기지 않는다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 이미 사라진 프로젝트는 삭제 실패로 남기지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 마지막 프로젝트를 지우면 삭제 모드를 벗어난다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 마지막 프로젝트를 지우면 삭제 모드를 벗어난다(`listUpdated` 해석) | 합성 지점 검증 |
+| U3 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록 갱신을 다시 요청한다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록에 refresh를 보낸다 | 합성 지점 검증 |
+| U3 | (새 테스트, I2-1 동작 차이 고정) | Tests/Shared/Reducers/ProjectSummaryListFeatureTests.swift › 이미 로드된 빈 목록의 새로고침은 전체 로딩을 다시 세우지 않는다 | 기능 Feature 테스트 |
+| U3 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 목록이 갱신되면 페이지네이션을 다시 설정한다 | 합성 지점 검증 |
+| U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 프로젝트 목록의 학습 요청은 상세 위에 그 세트의 풀이 흐름을 연다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 프로젝트 목록의 학습 요청은 상세 위에 그 세트의 풀이 흐름을 연다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다(상태 경로만 변경) | 합성 지점 검증 |
+| U3 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다(수신 Action 경로 `home.projectSummaries.effect.refreshFinished`) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -383,3 +415,10 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 `SettingsFeatureTests › 이미 받은 프로필이 있으면 task는 값을 유지한 채 reload를 보낸다`다. Settings의 자식
 필드는 `userProfile`로 두고 기존 `profile`은 자식에서 파생한 computed로 남겨, U6 소유 서브뷰를 U2에서
 바꾸지 않는다.
+
+**U3 비고**: 같은 기능 Feature를 같은 navigation 경로에서 두 부모가 `Scope`로 합성하면 private
+`CancelID`가 겹쳐 한 인스턴스의 새로고침·관찰이 다른 인스턴스를 취소한다(App 테스트
+`포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다`에서 발견). `ProjectSummaryListFeature`는 State에
+인스턴스 식별자를 두고(동등성 비교에서 제외) 취소 ID를 인스턴스별로 만든다(FR-026). 또
+`HomeFeatureGuestAccessTests.swift`는 T038 목록에 없지만 `projectRequestID` 경로가 사라져 컴파일되지 않으므로
+U3에서 상태 경로만 바꿨다.

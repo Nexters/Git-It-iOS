@@ -24,7 +24,7 @@ struct MainShellRouterFeatureTests {
         let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State()
         state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
-        state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
+        state.home.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
         let store = makeStore(state: state, projects: projects, userInfo: userInfo)
         store.exhaustivity = .off
 
@@ -33,7 +33,7 @@ struct MainShellRouterFeatureTests {
         await store.finish()
 
         #expect(await projects.snapshot().refreshCallCount > 0)
-        #expect(store.state.home.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
+        #expect(store.state.home.projectSummaries.load == .loaded(HomeTestFixture.oneProjectPage))
     }
 
     @Test

@@ -82,11 +82,11 @@ struct HomeFeatureGuestAccessTests {
         let task = await store.send(.input(.accessChanged(.member)))
 
         #expect(store.state.access == .member)
-        #expect(store.state.projectRequestID == 1)
 
         await store.receive(\.profile.input.load)
-
         await store.receive(\.profile.effect.profileLoadFinished)
+
+        #expect(store.state.projectSummaries.requestID == 1)
 
         #expect(store.state.profile.load == .loaded(HomeTestFixture.profileWithBoth))
         #expect(await profile.snapshot().callCount == 1)

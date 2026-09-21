@@ -47,7 +47,7 @@ struct HomeFeatureGenerationProgressTests {
     func `진행 중에도 카드 본문과 전체 보기 동작은 달라지지 않는다`() async {
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
-        state.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
+        state.projectSummaries.load = .loaded(HomeTestFixture.manyProjectsPage)
         let store = makeStore(state: state)
 
         await store.send(.view(.showAllProjectsTapped))
@@ -88,14 +88,15 @@ struct HomeFeatureGenerationProgressTests {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
-        state.projectLoad = .failed(.temporarilyUnavailable)
+        state.projectSummaries.load = .failed(.temporarilyUnavailable)
         let store = makeStore(projects: projects, state: state)
 
-        await store.send(.view(.projectRetryTapped)) {
-            $0.projectLoad = .loading
-            $0.projectRequestID = 1
+        await store.send(.view(.projectRetryTapped))
+        await store.receive(.projectSummaries(.input(.refresh))) {
+            $0.projectSummaries.load = .loading
+            $0.projectSummaries.requestID = 1
         }
-        await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
+        await store.receive(.projectSummaries(.effect(.refreshFinished(requestID: 1, error: nil))))
 
         #expect(await projects.snapshot().refreshCallCount == 1)
     }

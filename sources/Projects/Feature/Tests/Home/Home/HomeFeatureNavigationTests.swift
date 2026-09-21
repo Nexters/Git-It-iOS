@@ -18,7 +18,7 @@ struct HomeFeatureNavigationTests {
         await store.receive(.delegate(.projectRegistrationRequested))
 
         var presentState = HomeFeature.State()
-        presentState.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
+        presentState.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
         let presentStore = makeStore(state: presentState)
         await presentStore.send(.view(.projectRegistrationTapped))
         await presentStore.receive(.delegate(.projectRegistrationRequested))
@@ -37,7 +37,7 @@ struct HomeFeatureNavigationTests {
     @Test
     func `적재된 목록에서 다음 퀴즈가 있는 프로젝트만 학습 delegate로 전달한다`() async {
         var state = HomeFeature.State()
-        state.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
+        state.projectSummaries.load = .loaded(HomeTestFixture.manyProjectsPage)
         let store = makeStore(state: state)
 
         await store.send(.view(.learningTapped(projectID: "project-1")))
@@ -50,7 +50,7 @@ struct HomeFeatureNavigationTests {
     @Test
     func `다음 퀴즈가 없는 프로젝트는 학습 delegate를 전달하지 않는다`() async {
         var state = HomeFeature.State()
-        state.projectLoad = .loaded(ProjectList(
+        state.projectSummaries.load = .loaded(ProjectList(
             summaries: [HomeTestFixture.project(index: 0, hasLearningIDs: false)],
             hasNextPage: false,
             isLoaded: true,
