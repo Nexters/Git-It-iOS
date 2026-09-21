@@ -56,8 +56,8 @@ private func previewState(
     preparation: SingleQuestionEntryFeature.Preparation = .idle,
 ) -> ProjectDetailRouterFeature.State {
     var state = ProjectDetailRouterFeature.State(projectID: "project-1")
-    state.projectDetail.detail = previewDetail
-    state.projectDetail.loadStatus = .loaded
+    state.projectDetail.detailLoad.detail = previewDetail
+    state.projectDetail.detailLoad.loadStatus = .loaded
     state.savedQuestions.collection = previewBookmarks
     state.savedQuestions.loadStatus = .loaded
     state.singleQuestion = QuestionSolvingFeature.State(

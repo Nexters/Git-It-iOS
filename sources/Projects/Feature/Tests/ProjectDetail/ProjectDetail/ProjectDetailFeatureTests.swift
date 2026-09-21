@@ -17,12 +17,26 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        let displays = ProjectDetailSetDisplay.list(sets: store.state.detail?.sets ?? [])
+        let displays = ProjectDetailSetDisplay.list(sets: store.state.detailLoad.detail?.sets ?? [])
         #expect(displays.map(\.label) == ["CHAPTER 1", "CHAPTER 2", "CHAPTER 3"])
         #expect(displays.map(\.completedCount) == [5, 2, 0])
         #expect(displays.map(\.questionCount) == [5, 4, 3])
+    }
+
+    @Test(arguments: [
+        ProjectDetailFeature.Action.view(.task),
+        .view(.retryTapped),
+        .input(.refreshRequested),
+    ])
+    func `진입·재시도·갱신 요청은 상세 조회에 load를 보낸다`(action: ProjectDetailFeature.Action) async {
+        let store = makeStore()
+        store.exhaustivity = .off
+
+        await store.send(action)
+        await store.receive(.detailLoad(.input(.load)))
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
     }
 
     @Test
@@ -41,7 +55,7 @@ struct ProjectDetailFeatureTests {
     func `저장소 시작 컨트롤은 첫 미완료 세트로 같은 의도를 만든다`() async {
         let store = loadedStore()
 
-        #expect(store.state.isResumeEnabled)
+        #expect(store.state.detailLoad.isResumeEnabled)
 
         await store.send(.view(.resumeTapped))
         await store.receive(.delegate(.setStartRequested(
@@ -55,7 +69,7 @@ struct ProjectDetailFeatureTests {
     func `미완료 세트가 없으면 시작 컨트롤이 비활성이고 입력이 아무 일도 하지 않는다`() async {
         let store = loadedStore(detail: ProjectDetailTestFixture.completedDetail)
 
-        #expect(!store.state.isResumeEnabled)
+        #expect(!store.state.detailLoad.isResumeEnabled)
 
         await store.send(.view(.resumeTapped))
     }
@@ -153,12 +167,12 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
         await store.send(.input(.refreshRequested))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        #expect(store.state.detail == ProjectDetailTestFixture.completedDetail)
+        #expect(store.state.detailLoad.detail == ProjectDetailTestFixture.completedDetail)
         #expect(await projectDetail.callCount == 2)
     }
 
@@ -170,9 +184,9 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        #expect(store.state.loadStatus == .failed(.temporarilyUnavailable))
+        #expect(store.state.detailLoad.loadStatus == .failed(.temporarilyUnavailable))
     }
 
     // MARK: Private
@@ -182,8 +196,8 @@ struct ProjectDetailFeatureTests {
         deleteProject: ProjectUseCaseDeletionStub = ProjectUseCaseDeletionStub(),
     ) -> TestStoreOf<ProjectDetailFeature> {
         var state = ProjectDetailFeature.State(projectID: ProjectDetailTestFixture.projectID)
-        state.detail = detail
-        state.loadStatus = .loaded
+        state.detailLoad.detail = detail
+        state.detailLoad.loadStatus = .loaded
         return makeStore(deleteProject: deleteProject, state: state)
     }
 

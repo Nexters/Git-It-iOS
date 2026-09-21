@@ -499,6 +499,19 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U7 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › refreshStarted는 진행 중인 다음 페이지 요청을 취소한다 | 기능 Feature 테스트 |
 | U7 | (새 테스트) | Tests/ProjectList/ProjectList/ProjectListPaginationFeatureTests.swift › 조회 중이 아닐 때 도착한 결과는 반영하지 않는다 | 기능 Feature 테스트 |
 | U7 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록에 refresh를 보낸다 | Tests/ProjectList/ProjectList/ProjectListFeatureTests.swift › 새로고침 입력은 목록에 refresh를 보낸다(페이지네이션에 `refreshStarted` 전달 수신) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 진입하면 상세를 조회하고 세트 진행 표시를 서버 값 그대로 파생한다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 진입하면 상세를 조회하고 세트 진행 표시를 서버 값 그대로 파생한다(수신 Action·상태 경로 `detailLoad`) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 진입하면 상세를 조회하고 세트 진행 표시를 서버 값 그대로 파생한다(조회 전이) | Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift › load는 조회 중으로 바꾸고 성공 결과를 상세로 남긴다 | 기능 Feature 테스트 |
+| U8 | (새 테스트) | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 진입·재시도·갱신 요청은 상세 조회에 load를 보낸다 | 합성 지점 검증 |
+| U8 | (새 테스트) | Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift › 이미 조회한 상세가 있어도 load는 무조건 조회 중으로 바꾼다 | 기능 Feature 테스트 |
+| U8 | (새 테스트) | Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift › 현재 request ID와 다른 결과는 상태를 바꾸지 않는다 | 기능 Feature 테스트 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 저장소 시작 컨트롤은 첫 미완료 세트로 같은 의도를 만든다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 저장소 시작 컨트롤은 첫 미완료 세트로 같은 의도를 만든다(상태 경로 `detailLoad`) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 미완료 세트가 없으면 시작 컨트롤이 비활성이고 입력이 아무 일도 하지 않는다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 미완료 세트가 없으면 시작 컨트롤이 비활성이고 입력이 아무 일도 하지 않는다(상태 경로 `detailLoad`) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 저장소 시작 컨트롤은 첫 미완료 세트로 같은 의도를 만든다(파생값) | Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift › 첫 미완료 세트와 시작 가능 여부는 상세에서 파생한다 | 기능 Feature 테스트 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 갱신 요청은 상세를 다시 조회해 서버 값을 그대로 반영한다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 갱신 요청은 상세를 다시 조회해 서버 값을 그대로 반영한다(수신 Action·상태 경로 `detailLoad`) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다 | 기능 Feature 테스트 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다(합성 경로) | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 조회에 실패하면 오류 의미를 보존한다(수신 Action·상태 경로 `detailLoad`) | 합성 지점 검증 |
+| U8 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 세트 시작은 라벨만 담은 진입 의도를 만든다 | Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift › 세트 시작은 라벨만 담은 진입 의도를 만든다(상태 준비 경로만 변경) | 합성 지점 검증 |
+| U8 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 풀이 중 답안을 제출하면 프로젝트 목록도 상세도 갱신하지 않는다 | App/Tests/GitIt/Reducers/AppRootFeatureTests.swift › 풀이 중 답안을 제출하면 프로젝트 목록도 상세도 갱신하지 않는다(상태 경로 `projectDetail.projectDetail.detailLoad`) | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -532,3 +545,7 @@ Effect 이름은 자식 안에서 `authorizationChecked`로 바꿨다. `Settings
 **U7 비고**: `ProjectListPaginationFeature`는 마지막으로 받은 `hasNextPage`를 함께 보관해, 다음 페이지 조회
 성공 뒤 `idle`·`exhausted` 판정을 기존처럼 목록의 다음 페이지 여부로 한다. 목록 조건(`loaded`, `hasNextPage`)
 판정은 부모에 남긴다.
+
+**U8 비고**: `ProjectDetailFeature`의 `projectID`는 자식 `detailLoad.projectID`에서 파생한다. 상세 화면의
+`RepositorySummaryView`와 `ProjectDetailRouterFeature.swift`, `ProjectDetailRouterFeatureTests.swift`는
+상세 조회 상태를 직접 참조하지 않아 수정하지 않았다.

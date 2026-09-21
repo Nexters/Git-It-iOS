@@ -733,8 +733,8 @@ struct AppRootLearningFlowTests {
         ))))))
 
         #expect(store.state.quiz != nil)
-        #expect(store.state.projectDetail?.projectDetail.requestID == 0)
-        #expect(store.state.projectDetail?.projectDetail.loadStatus == .idle)
+        #expect(store.state.projectDetail?.projectDetail.detailLoad.requestID == 0)
+        #expect(store.state.projectDetail?.projectDetail.detailLoad.loadStatus == .idle)
         #expect(await project.refreshCallCount == 0)
 
         await store.skipReceivedActions(strict: false)

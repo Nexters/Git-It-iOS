@@ -14,7 +14,7 @@ struct ProjectDetailScreen: View {
 
     var body: some View {
         Group {
-            if case .failed = store.loadStatus {
+            if case .failed = store.detailLoad.loadStatus {
                 ScreenContainer {
                     ErrorView(
                         onBack: { send(.backTapped) },
@@ -46,7 +46,7 @@ struct ProjectDetailScreen: View {
         .overlay {
             ModalOverlay(isPresented: isDeletionConfirmationPresented, onDismiss: { send(.deletionCancelled) }) {
                 ConfirmationSheet(
-                    imageURL: store.detail?.repository.imageURL,
+                    imageURL: store.detailLoad.detail?.repository.imageURL,
                     title: "프로젝트를 삭제할까요?",
                     message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
                     confirmTitle: "삭제",
@@ -57,7 +57,7 @@ struct ProjectDetailScreen: View {
             }
         }
         .overlay {
-            if store.loadStatus == .idle || store.loadStatus == .loading {
+            if store.detailLoad.loadStatus == .idle || store.detailLoad.loadStatus == .loading {
                 ProgressView()
                     .tint(Color(designSystem: .blue100))
             }
@@ -85,18 +85,18 @@ struct ProjectDetailScreen: View {
         } content: {
             VStack(alignment: .leading, spacing: 0) {
                 RepositorySummaryView(
-                    repositoryName: store.detail?.repository.name ?? "",
-                    repositoryImageURL: store.detail?.repository.imageURL,
-                    starCount: store.detail?.repository.starCount ?? 0,
-                    techStack: store.detail?.repository.techStack ?? [],
-                    overallProgressPercent: store.detail?.progressPercent ?? 0,
-                    isResumeEnabled: store.isResumeEnabled,
+                    repositoryName: store.detailLoad.detail?.repository.name ?? "",
+                    repositoryImageURL: store.detailLoad.detail?.repository.imageURL,
+                    starCount: store.detailLoad.detail?.repository.starCount ?? 0,
+                    techStack: store.detailLoad.detail?.repository.techStack ?? [],
+                    overallProgressPercent: store.detailLoad.detail?.progressPercent ?? 0,
+                    isResumeEnabled: store.detailLoad.isResumeEnabled,
                     onResumeTap: { send(.resumeTapped) },
                 )
                 .designSystemScreenMargin()
 
                 SetListSection(
-                    sets: ProjectDetailSetDisplay.list(sets: store.detail?.sets ?? []),
+                    sets: ProjectDetailSetDisplay.list(sets: store.detailLoad.detail?.sets ?? []),
                     onStart: { send(.setStartTapped(setID: $0)) },
                 )
                 .designSystemScreenMargin()

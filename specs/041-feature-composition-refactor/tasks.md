@@ -337,14 +337,14 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 **통합 검증**: 상세 조회 전이가 화면 없이 검증되고, Feature와 App test를 포함한 `compile`·`test`가 함께 통과한다.
 
-- [ ] T091 [S3] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift`를 작성한다. 검증 범위는 `load`(무조건 `.loading`), request identity, 성공·실패, 파생값 `firstIncompleteSet`·`isResumeEnabled`·`isEmpty`다
-- [ ] T092 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailLoadFeature.swift`에 `ProjectDetailLoadFeature`를 구현한다(생성자 `projectDetail:`)
-- [ ] T093 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailFeature.swift`에서 `detail`·`loadStatus`·`requestID`와 조회 Effect를 제거하고 합성한다. `task`·`retryTapped`·`refreshRequested`는 `load`를 보낸다. 생성자 시그니처는 유지한다
-- [ ] T094 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`, `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`, `sources/Projects/Feature/ProjectDetail/Previews/ProjectDetailScreenPreviews.swift`의 참조를 자식 store 스코핑으로 바꾼다
-- [ ] T095 [S3] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`와 `sources/Projects/Feature/ProjectDetail/Router/Previews/ProjectDetailRouterPreviews.swift`의 `projectDetail.detail` 등 상태 참조를 새 경로로 바꾼다
-- [ ] T096 [S3] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift`의 조회 전이 단언을 T091로 옮기고 합성 지점만 남긴다. `sources/Projects/Feature/Tests/ProjectDetail/Router/ProjectDetailRouterFeatureTests.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`(App)의 `projectDetail.loadStatus` 참조를 새 경로로 바꾼다
-- [ ] T097 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U8 이관 대응표를 추가한다
-- [ ] T098 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다(App test 포함)
+- [X] T091 [S3] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailLoadFeatureTests.swift`를 작성한다. 검증 범위는 `load`(무조건 `.loading`), request identity, 성공·실패, 파생값 `firstIncompleteSet`·`isResumeEnabled`·`isEmpty`다
+- [X] T092 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailLoadFeature.swift`에 `ProjectDetailLoadFeature`를 구현한다(생성자 `projectDetail:`)
+- [X] T093 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailFeature.swift`에서 `detail`·`loadStatus`·`requestID`와 조회 Effect를 제거하고 합성한다. `task`·`retryTapped`·`refreshRequested`는 `load`를 보낸다. 생성자 시그니처는 유지한다
+- [X] T094 [S3] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`, `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`, `sources/Projects/Feature/ProjectDetail/Previews/ProjectDetailScreenPreviews.swift`의 참조를 자식 store 스코핑으로 바꾼다
+- [X] T095 [S3] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`와 `sources/Projects/Feature/ProjectDetail/Router/Previews/ProjectDetailRouterPreviews.swift`의 `projectDetail.detail` 등 상태 참조를 새 경로로 바꾼다
+- [X] T096 [S3] `sources/Projects/Feature/Tests/ProjectDetail/ProjectDetail/ProjectDetailFeatureTests.swift`의 조회 전이 단언을 T091로 옮기고 합성 지점만 남긴다. `sources/Projects/Feature/Tests/ProjectDetail/Router/ProjectDetailRouterFeatureTests.swift`와 `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`(App)의 `projectDetail.loadStatus` 참조를 새 경로로 바꾼다
+- [X] T097 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U8 이관 대응표를 추가한다
+- [X] T098 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다(App test 포함)
 
 **진행 점검**: T091~T098의 변경 파일과 검증 결과를 보고하고 실행 단위 9로 진행한다.
 

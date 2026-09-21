@@ -45,13 +45,13 @@ private let previewSets = [
 
 private func previewState(
     detail: ProjectDetail? = previewDetail(sets: previewSets),
-    loadStatus: ProjectDetailFeature.LoadStatus = .loaded,
+    loadStatus: ProjectDetailLoadFeature.State.LoadStatus = .loaded,
     isMenuPresented: Bool = false,
     deletion: ProjectDeletionFeature.State.Deletion = .idle,
 ) -> ProjectDetailFeature.State {
     var state = ProjectDetailFeature.State(projectID: "project-1")
-    state.detail = detail
-    state.loadStatus = loadStatus
+    state.detailLoad.detail = detail
+    state.detailLoad.loadStatus = loadStatus
     state.isMenuPresented = isMenuPresented
     state.deletion.deletion = deletion
     return state
