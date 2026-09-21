@@ -53,7 +53,6 @@ public struct ProjectListScreen: View {
                         onConfirmTap: { send(.deletionConfirmed) },
                         onCancelTap: { send(.deletionCancelled) },
                     )
-                    .designSystemScreenMargin()
                 }
             }
             .overlay {
