@@ -81,17 +81,17 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 구현
 
-- [ ] T002 [P] [S2] `sources/Projects/Feature/MainShell/Router/MainShellAccess.swift`를 `sources/Projects/Feature/Shared/Models/MainShellAccess.swift`로 순수 이동한다(P1)
-- [ ] T003 [P] [S2] `sources/Projects/Feature/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeature.swift`를 `sources/Projects/Feature/Shared/Reducers/SingleQuestionEntryFeature.swift`로 순수 이동하고, 빈 `ProjectDetail/SingleQuestionEntry/` 디렉터리를 남기지 않는다(P2)
-- [ ] T004 [P] [S2] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementFeature.swift`를 `sources/Projects/Feature/Shared/Reducers/LegalAgreementFeature.swift`로 순수 이동한다. `LegalAgreementScreen`과 그 SubViews·Previews는 제자리에 둔다(P3)
-- [ ] T005 [P] [S2] `sources/Projects/Feature/Tests/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeatureTests.swift`를 `sources/Projects/Feature/Tests/Shared/Reducers/SingleQuestionEntryFeatureTests.swift`로 순수 이동한다
-- [ ] T006 [P] [S2] `sources/Projects/Feature/Tests/Onboarding/LegalAgreement/LegalAgreementFeatureTests.swift`를 `sources/Projects/Feature/Tests/Shared/Reducers/LegalAgreementFeatureTests.swift`로 순수 이동한다
+- [X] T002 [P] [S2] `sources/Projects/Feature/MainShell/Router/MainShellAccess.swift`를 `sources/Projects/Feature/Shared/Models/MainShellAccess.swift`로 순수 이동한다(P1)
+- [X] T003 [P] [S2] `sources/Projects/Feature/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeature.swift`를 `sources/Projects/Feature/Shared/Reducers/SingleQuestionEntryFeature.swift`로 순수 이동하고, 빈 `ProjectDetail/SingleQuestionEntry/` 디렉터리를 남기지 않는다(P2)
+- [X] T004 [P] [S2] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementFeature.swift`를 `sources/Projects/Feature/Shared/Reducers/LegalAgreementFeature.swift`로 순수 이동한다. `LegalAgreementScreen`과 그 SubViews·Previews는 제자리에 둔다(P3)
+- [X] T005 [P] [S2] `sources/Projects/Feature/Tests/ProjectDetail/SingleQuestionEntry/SingleQuestionEntryFeatureTests.swift`를 `sources/Projects/Feature/Tests/Shared/Reducers/SingleQuestionEntryFeatureTests.swift`로 순수 이동한다
+- [X] T006 [P] [S2] `sources/Projects/Feature/Tests/Onboarding/LegalAgreement/LegalAgreementFeatureTests.swift`를 `sources/Projects/Feature/Tests/Shared/Reducers/LegalAgreementFeatureTests.swift`로 순수 이동한다
 - [ ] T007 [P] [S2] `docs/conventions/file-vocabulary/shape-vocabulary.md`의 형태 어휘 표에 `Feature/Shared/` 행(`Views/`, `Models/`, `Reducers/` — 둘 이상 흐름이 쓰는 View·값 타입·기능 Feature)과 `Feature/<흐름>/Shared/`의 `Reducers/` 행(같은 흐름의 둘 이상 화면이 합성하는 기능 Feature)을 추가한다
 - [ ] T008 [P] [S2] `docs/conventions/directory-file/feature-layout.md`에 기능 Feature 배치 규칙을 추가한다. 규칙: 한 화면만 쓰면 화면 폴더, 한 전환 계층만 쓰면 `Router/`, 같은 흐름 여러 화면이면 `<흐름>/Shared/Reducers/`, 둘 이상 흐름이면 `Feature/Shared/Reducers/`. `Feature/Shared/**`는 흐름 디렉터리를 참조하지 않는다는 규칙도 추가한다. 또 화면 폴더의 Screen이 공용 기능 Feature를 직접 관찰할 수 있다는 규칙을 추가한다. 이때 그 화면 폴더에는 Feature 파일이 없을 수 있다(예: `Onboarding/LegalAgreement/`). 근거는 research §2다
 
 ### 정리와 단위 검증
 
-- [ ] T009 [no-write] `make tuist` 후 `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순서대로 실행한다. 이동한 두 테스트 파일의 `@Test`가 모두 통과하는지 확인한다
+- [X] T009 [no-write] `make tuist` 후 `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순서대로 실행한다. 이동한 두 테스트 파일의 `@Test`가 모두 통과하는지 확인한다
 
 **진행 점검**: T002~T009의 변경 파일과 검증 결과를 보고하고 실행 단위 2로 진행한다.
 
