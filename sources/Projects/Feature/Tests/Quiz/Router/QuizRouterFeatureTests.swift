@@ -19,9 +19,10 @@ struct QuizRouterFeatureTests {
             resumption: LearningSetResumption(set: QuizTestFixture.partiallyAnsweredSet),
             bookmarkedQuestionIDs: ["quiz-0"],
         ))))
+        await store.receive(\.session.delegate.questionReady)
 
         #expect(store.state.activeScreen == .questionSolving)
-        #expect(store.state.currentQuestionIndex == 2)
+        #expect(store.state.session.currentQuestionIndex == 2)
         #expect(store.state.questionSolving?.question.id == "quiz-2")
         #expect(store.state.screenTransitions.map(\.cause) == [.startRequested])
         #expect(store.state.screenTransitions.map(\.from) == [.learningSetIntro])
@@ -66,9 +67,10 @@ struct QuizRouterFeatureTests {
         await store.send(.questionSolving(.view(.choiceSelected(1))))
 
         await store.send(.questionSolving(.delegate(.advanceRequested)))
+        await store.receive(\.session.delegate.questionReady)
 
         #expect(store.state.activeScreen == .questionSolving)
-        #expect(store.state.currentQuestionIndex == 1)
+        #expect(store.state.session.currentQuestionIndex == 1)
         #expect(store.state.questionSolving?.question.id == "quiz-1")
         #expect(store.state.questionSolving?.draftChoiceIndex == nil)
         #expect(store.state.questionSolving?.submission == .editing)
@@ -85,7 +87,9 @@ struct QuizRouterFeatureTests {
             resumption: LearningSetResumption(set: QuizTestFixture.partiallyAnsweredSet),
             bookmarkedQuestionIDs: [],
         ))))
+        await store.receive(\.session.delegate.questionReady)
         await store.send(.questionSolving(.delegate(.advanceRequested)))
+        await store.receive(\.session.delegate.completed)
 
         #expect(store.state.activeScreen == .learningCompletion)
         #expect(store.state.learningCompletion.choiceQuestionCount == 2)
@@ -94,17 +98,15 @@ struct QuizRouterFeatureTests {
     }
 
     @Test
-    func `객관식 채점 결과만 세션 정답 수에 누적된다`() async {
+    func `답안 제출은 세션에 채점 결과를 answerRecorded로 보낸다`() async {
         let store = makeStore()
         store.exhaustivity = .off
         await startFirstQuestion(store)
 
         await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "quiz-0", choiceCorrect: true))))
+        await store.receive(.session(.input(.answerRecorded(choiceCorrect: true))))
 
-        #expect(store.state.sessionCorrectChoiceCount == 1)
-
-        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "quiz-2", choiceCorrect: nil))))
-        #expect(store.state.sessionCorrectChoiceCount == 1)
+        #expect(store.state.session.sessionCorrectChoiceCount == 1)
     }
 
     @Test
@@ -128,6 +130,7 @@ struct QuizRouterFeatureTests {
             resumption: LearningSetResumption(set: QuizTestFixture.unansweredSet),
             bookmarkedQuestionIDs: [],
         ))))
+        await store.receive(\.session.delegate.questionReady)
     }
 
     private func makeStore() -> TestStoreOf<QuizRouterFeature> {

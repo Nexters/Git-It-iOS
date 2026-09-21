@@ -520,6 +520,19 @@ delegate는 [contracts](./contracts/feature-composition-contracts.md)에, 상태
 | U9 | (새 테스트) | Tests/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeatureTests.swift › validationReset 입력은 검증 결과를 idle로 되돌린다 | 기능 Feature 테스트 |
 | U9 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 검증에 성공하면 저장소 확인 화면으로 전환하고 확인 대상 저장소를 넘긴다 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 같은 테스트(`repositoryConfirmation.input.repositoryProvided` 수신 단언) | 합성 지점 검증 |
 | U9 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 저장소를 거부하면 링크 입력으로 되돌리고 검증 결과를 비운다 | Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift › 같은 테스트(`validationReset`·`cleared` 수신 단언) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 시작하면 첫 미응답 문제로 전환하고 이동 원인을 기록한다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 같은 테스트(`session.delegate.questionReady` 수신 뒤 전환 단언, 인덱스는 `session` 경로) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 시작하면 첫 미응답 문제로 전환하고 이동 원인을 기록한다(시작 인덱스·즐겨찾기) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 시작하면 첫 미응답 문제를 준비하고 세션 정답 수를 비운다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 문제가 없는 세트는 전환하지 않고 소개 화면에 문제 없음을 알린다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 같은 테스트(수신 경로 변화 없음) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 문제가 없는 세트는 전환하지 않고 소개 화면에 문제 없음을 알린다(범위 판정) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 시작 위치에 문제가 없으면 emptySetDetected를 보낸다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 문제 화면 뒤로가기는 소개 화면을 건너뛰고 바로 흐름을 이탈한다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 같은 테스트(시작 도우미가 `questionReady` 수신) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 문제를 이동하면 활성 화면은 그대로이고 이전 문제 상태가 남지 않는다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 같은 테스트(`questionReady` 수신, 인덱스는 `session` 경로) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 문제를 이동하면 활성 화면은 그대로이고 이전 문제 상태가 남지 않는다(다음 문제 준비) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 다음 문제가 있으면 advanced는 다음 문제를 준비한다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 건너뛴 정답을 포함해 완료 카운터를 채우고 완료 화면으로 전환한다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 같은 테스트(`session.delegate.completed` 수신 뒤 전환 단언) | 합성 지점 검증 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 건너뛴 정답을 포함해 완료 카운터를 채우고 완료 화면으로 전환한다(합산) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 마지막 문제에서 advanced는 건너뛴 정답을 합산해 completed를 보낸다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 객관식 채점 결과만 세션 정답 수에 누적된다 | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 객관식 채점 결과만 세션 정답 수에 누적된다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 객관식 채점 결과만 세션 정답 수에 누적된다(전달) | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 답안 제출은 세션에 채점 결과를 answerRecorded로 보낸다 | 합성 지점 검증 |
+| U10 | (새 테스트) | Tests/Quiz/Router/LearningSessionFeatureTests.swift › 진행 중인 세션을 다시 시작하면 현재 문제와 정답 수를 유지한다 | 기능 Feature 테스트 |
+| U10 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 소개 화면 뒤로가기와 완료 화면 닫기는 모두 흐름 이탈이다 | Tests/Quiz/Router/QuizRouterFeatureTests.swift › 소개 화면 뒤로가기와 완료 화면 닫기는 모두 흐름 이탈이다 | 합성 지점 검증 |
 
 **U2 비고**: Settings의 `task`는 프로필이 없으면 `load`, 이미 있으면 `reload`를 보낸다. 기존 Settings는 재진입
 조회 중에도 받은 프로필 값을 계속 보여 주고 그 실패를 화면에 드러내지 않았으므로, 이 관찰 동작을
@@ -562,3 +575,8 @@ Effect 이름은 자식 안에서 `authorizationChecked`로 바꿨다. `Settings
 추가해 테스트가 초기 직군을 구성할 수 있게 했다. `RepositoryConfirmationFeature.State.repository`의 setter는
 U11 전까지 `ShareRegistrationFeature`가 쓰므로 이 단위에서 막지 않았다. T103의 두 Preview는 새 input 추가
 뒤에도 그대로 compile되어 수정하지 않았다.
+
+**U10 비고**: `LearningSessionFeature.State`에 data-model의 다섯 필드 외에 `isInProgress`를 두었다. 기존
+Router는 `questionSolving != nil`로 "이미 시작한 세트"를 판정해 문제 위치와 정답 수를 유지했는데, 세션이 그
+판정을 스스로 하려면 첫 문제를 준비했는지 알아야 하기 때문이다. 이미 시작한 세트의 재진입 화면 활성화는
+Router가 계속 판정한다. 세션 필드는 모두 `fileprivate(set)`이다.

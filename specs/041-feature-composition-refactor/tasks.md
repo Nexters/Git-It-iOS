@@ -383,13 +383,13 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 **독립 검증**: 세션 진행 규칙이 Router 없이 검증된다.
 
-- [ ] T107 [S3] `sources/Projects/Feature/Tests/Quiz/Router/LearningSessionFeatureTests.swift`를 작성한다. 검증 범위는 `started`(시작 인덱스·범위 밖이면 `emptySetDetected`), `answerRecorded` 누적, `advanced`(다음 문항 `questionReady`·마지막이면 `completed`와 정답 수 합산), 이미 시작한 세션의 재시작 처리다
-- [ ] T108 [S3] `sources/Projects/Feature/Quiz/Router/LearningSessionFeature.swift`에 `LearningSessionFeature`를 구현한다(의존성 없음)
-- [ ] T109 [S3] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`에서 `learningSet`·`currentQuestionIndex`·`resumption`·`sessionCorrectChoiceCount`·`bookmarkedQuestionIDs`를 제거하고 `session`을 합성한다. 세션 delegate로 `QuestionSolvingFeature.State` 생성, `learningCompletion` 구성, 화면 전환을 수행한다. 생성자 시그니처는 유지한다
-- [ ] T110 [S3] `sources/Projects/Feature/Quiz/Router/Previews/QuizRouterPreviews.swift`의 State 구성을 새 구조에 맞춘다
-- [ ] T111 [S3] `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`의 세션 진행 단언을 T107로 옮기고 전환·이동 이벤트 검증만 남긴다
-- [ ] T112 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U10 이관 대응표를 추가한다
-- [ ] T113 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
+- [X] T107 [S3] `sources/Projects/Feature/Tests/Quiz/Router/LearningSessionFeatureTests.swift`를 작성한다. 검증 범위는 `started`(시작 인덱스·범위 밖이면 `emptySetDetected`), `answerRecorded` 누적, `advanced`(다음 문항 `questionReady`·마지막이면 `completed`와 정답 수 합산), 이미 시작한 세션의 재시작 처리다
+- [X] T108 [S3] `sources/Projects/Feature/Quiz/Router/LearningSessionFeature.swift`에 `LearningSessionFeature`를 구현한다(의존성 없음)
+- [X] T109 [S3] `sources/Projects/Feature/Quiz/Router/QuizRouterFeature.swift`에서 `learningSet`·`currentQuestionIndex`·`resumption`·`sessionCorrectChoiceCount`·`bookmarkedQuestionIDs`를 제거하고 `session`을 합성한다. 세션 delegate로 `QuestionSolvingFeature.State` 생성, `learningCompletion` 구성, 화면 전환을 수행한다. 생성자 시그니처는 유지한다
+- [X] T110 [S3] `sources/Projects/Feature/Quiz/Router/Previews/QuizRouterPreviews.swift`의 State 구성을 새 구조에 맞춘다
+- [X] T111 [S3] `sources/Projects/Feature/Tests/Quiz/Router/QuizRouterFeatureTests.swift`의 세션 진행 단언을 T107로 옮기고 전환·이동 이벤트 검증만 남긴다
+- [X] T112 [S3] `specs/041-feature-composition-refactor/research.md` §6에 U10 이관 대응표를 추가한다
+- [X] T113 [no-write] [S3] `"$project_build_runner" compile` 후 `"$project_build_runner" test`를 실행한다
 
 **진행 점검**: T107~T113의 변경 파일과 검증 결과를 보고하고 실행 단위 11로 진행한다.
 
