@@ -28,11 +28,11 @@ struct HomeProjectDisplay: Equatable, Sendable {
     let progress: Double
     let currentSetLabel: String
     let setTitle: String
-    let variant: HomeProjectCard.Variant
+    let variant: HomeProjectCard.Style
     let isLearningEnabled: Bool
 
     // MARK: Private
 
-    private static let variants: [HomeProjectCard.Variant] = [.purple, .lightBlue, .darkBlue]
+    private static let variants: [HomeProjectCard.Style] = [.purple, .lightBlue, .darkBlue]
 
 }

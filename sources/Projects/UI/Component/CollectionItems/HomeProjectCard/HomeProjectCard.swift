@@ -13,7 +13,7 @@ public struct HomeProjectCard: View {
         progress: Double,
         currentSetLabel: String,
         setTitle: String,
-        variant: Variant,
+        variant: Style,
         isLearningEnabled: Bool = true,
         onSelect: @escaping () -> Void = { },
         onStart: @escaping () -> Void = { },
@@ -83,7 +83,7 @@ public struct HomeProjectCard: View {
     private let progress: Double
     private let currentSetLabel: String
     private let setTitle: String
-    private let variant: Variant
+    private let variant: Style
     private let isLearningEnabled: Bool
     private let onSelect: () -> Void
     private let onStart: () -> Void
@@ -208,10 +208,10 @@ extension HomeProjectCard {
     }
 }
 
-// MARK: HomeProjectCard.Variant
+// MARK: HomeProjectCard.Style
 
 extension HomeProjectCard {
-    public enum Variant: Sendable, Equatable {
+    public enum Style: Sendable, Equatable {
         case purple
         case lightBlue
         case darkBlue

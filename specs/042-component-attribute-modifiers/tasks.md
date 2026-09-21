@@ -419,13 +419,13 @@ UI+Feature integration unit이다.
 
 ### 구현
 
-- [ ] T051 [S1] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`에서 `public enum Variant`와 그 `// MARK:` 제목, 초기화 인자 타입, 저장 프로퍼티 타입의 이름을 `Style`로 바꾼다. 인자 이름 `variant:`와 저장 프로퍼티 이름은 이 작업에서 바꾸지 않는다.
-- [ ] T052 [P] [S1] `sources/Projects/Feature/Home/ViewModels/HomeProjectDisplay.swift`에서 `HomeProjectCard.Variant` 참조 2곳을 `HomeProjectCard.Style`로 바꾼다. 프로퍼티 이름 `variant`는 유지한다.
-- [ ] T053 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/HomeProjectCardTests.swift`에서 `HomeProjectCard.Variant` 참조를 `HomeProjectCard.Style`로 바꾼다.
+- [X] T051 [S1] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard/HomeProjectCard.swift`에서 `public enum Variant`와 그 `// MARK:` 제목, 초기화 인자 타입, 저장 프로퍼티 타입의 이름을 `Style`로 바꾼다. 인자 이름 `variant:`와 저장 프로퍼티 이름은 이 작업에서 바꾸지 않는다.
+- [X] T052 [P] [S1] `sources/Projects/Feature/Home/ViewModels/HomeProjectDisplay.swift`에서 `HomeProjectCard.Variant` 참조 2곳을 `HomeProjectCard.Style`로 바꾼다. 프로퍼티 이름 `variant`는 유지한다.
+- [X] T053 [P] [S1] `sources/Projects/UI/Tests/Component/Unit/CollectionItems/HomeProjectCardTests.swift`에서 `HomeProjectCard.Variant` 참조를 `HomeProjectCard.Style`로 바꾼다.
 
 ### 정리와 단위 검증
 
-- [ ] T054 [no-write] [S1] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. 단위 통합 검증 조회가 0줄인지 확인한다. `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProjectDisplayTests.swift`가 수정 없이 통과하는지 확인한다.
+- [X] T054 [no-write] [S1] `"$project_build_runner" compile`과 `"$project_build_runner" test`를 순차 실행한다. 단위 통합 검증 조회가 0줄인지 확인한다. `sources/Projects/Feature/Tests/Home/Home/ViewModels/HomeProjectDisplayTests.swift`가 수정 없이 통과하는지 확인한다.
 
 **진행 점검**: T051~T054의 변경 파일과 검증 결과를 보고하고 같은 기능 범위의 다음 실행
 단위로 진행한다. 새 범위나 권한이 필요하면 여기서 중단하고 명시적 승인을 요청한다.

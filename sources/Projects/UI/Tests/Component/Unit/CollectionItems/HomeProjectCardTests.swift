@@ -23,10 +23,10 @@ struct HomeProjectCardTests {
 
     @Test
     func `Domain 순서 index는 세 색 variant를 순환한다`() {
-        #expect(HomeProjectCard.Variant(index: 0) == .purple)
-        #expect(HomeProjectCard.Variant(index: 1) == .lightBlue)
-        #expect(HomeProjectCard.Variant(index: 2) == .darkBlue)
-        #expect(HomeProjectCard.Variant(index: 3) == .purple)
+        #expect(HomeProjectCard.Style(index: 0) == .purple)
+        #expect(HomeProjectCard.Style(index: 1) == .lightBlue)
+        #expect(HomeProjectCard.Style(index: 2) == .darkBlue)
+        #expect(HomeProjectCard.Style(index: 3) == .purple)
     }
 
     @Test
