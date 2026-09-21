@@ -190,7 +190,7 @@
   - [docs/conventions/view/component-init.md](../../docs/conventions/view/component-init.md) —
     제목 "컴포넌트의 공개 생성 경로는 두 가지입니다", "공개 생성 경로는 다음 둘뿐입니다"와
     팩토리 호출을 정본으로 제시한 예시
-  - [docs/conventions/view/factory-criteria.md](../../docs/conventions/view/factory-criteria.md) —
+  - `docs/conventions/view/factory-criteria.md` (삭제 완료, FR-004b-2에 따라 링크를 두지 않음) —
     문서 전문이 팩토리 정의 기준이므로 **문서를 삭제한다**. 팩토리와 무관한 두 규칙
     (`@ViewBuilder` 자식을 받는 컴포넌트의 기본 생성 경로, 기본값을 초기화 인자에 두는
     규칙)은 `component-init.md`로 옮겨 보존한다. Constitution 원칙 5는 `/speckit-implement`에
@@ -271,7 +271,9 @@
   금지 서술뿐이고, 팩토리를 정의·선택하도록 요구하거나 전제하는 문장이 0건이다.
   (2) `component-init.md`가 공개 생성 경로를 단수로 규정하고, 그 문서가 제시하는 호출
   예시가 모두 초기화 호출이다.
-- **SC-007**: 새 변형을 추가할 때 수정해야 하는 선언 지점이 컴포넌트마다 한 곳이다.
+- **SC-007**: 새 변형을 추가할 때 수정해야 하는 선언 지점이 컴포넌트마다 한 곳이다. 판정은
+  대상 컴포넌트마다 변형 축 enum에 case를 하나 더한다고 가정했을 때 수정이 필요한 선언이
+  그 enum 한 곳뿐인지 확인해 수행한다.
 
 ## 가정
 

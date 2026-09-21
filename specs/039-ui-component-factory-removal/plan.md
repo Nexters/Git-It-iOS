@@ -20,8 +20,8 @@
 필요하다. 그룹 B(`LabeledCard`)는 공개 초기화 메서드가 없고 `Style`이 `private`이라 둘 다
 올려야 한다. 그룹 C(`ScreenEdgeScrim`)는 변형 타입 자체가 없어 `Edge`를 신규 정의한다.
 
-팩토리 제거는 View 컨벤션의 생성 경로 규칙과 충돌하므로, 컨벤션 문서 개정 6건과
-`factory-criteria.md` 삭제 1건을 같은 기능에 포함한다. 근거와 대안은
+팩토리 제거는 View 컨벤션의 생성 경로 규칙과 충돌하므로, 컨벤션 문서 7건(개정 5건 +
+`screen-init.md` 문구 정리 1건 + `factory-criteria.md` 삭제 1건)을 같은 기능에 포함한다. 근거와 대안은
 [research.md](./research.md), 공개 표면 대조는
 [contracts/component-creation-api.md](./contracts/component-creation-api.md)에 있다.
 
@@ -47,7 +47,7 @@
 들어가야 중간 상태가 compile된다(FR-006).
 
 **규모/범위**: 컴포넌트 6개, 팩토리 30개, 호출부 228곳, 영향 파일 UI 42개·Feature 51개(고유
-파일 기준), 컨벤션 문서 개정 5개 + 삭제 1개 + 문구 정리 1개.
+파일 기준), 컨벤션 문서 7건(개정 5건 + 문구 정리 1건 + 삭제 1건).
 
 ## 헌법 점검
 
@@ -101,7 +101,7 @@ FR-004a~FR-004d와 FR-004b-1~FR-004b-3으로 해소됐고, 남은 기존 문서 
 | --- | --- |
 | [docs/conventions/view.md](../../docs/conventions/view.md) | §3 공개 생성 경로가 이번 변경의 직접 대상이다. §3.2 제목·링크 텍스트, §3.3 절과 링크, §6 체크리스트 2개 항목이 팩토리를 전제하므로 FR-004a에 따라 개정한다. §3 제목과 앵커는 `package-rules/ui.md`·`ui-component.md`·`ui-component/public-contract.md` 세 문서가 참조하므로 유지하고(FR-004b-1), §3.3 삭제 후 §3.4·§3.5는 재번호하지 않는다(FR-004b-3) |
 | [docs/conventions/view/component-init.md](../../docs/conventions/view/component-init.md) | 제목과 본문이 생성 경로를 "init과 팩토리 둘"로 규정하고 팩토리 호출을 정본 예시로 제시한다. 제목을 포함해 초기화 메서드 하나로 개정하고, 삭제하는 `factory-criteria.md`의 팩토리 무관 규칙 두 건을 흡수한다 |
-| [docs/conventions/view/factory-criteria.md](../../docs/conventions/view/factory-criteria.md) | "변형이 둘 이상일 때만 팩토리를 정의", "호출부의 기본 선택 수단은 팩토리". 문서 전문이 팩토리 규칙이므로 파일을 삭제하고, `@ViewBuilder` 기본 생성 경로와 기본값 배치 규칙만 `component-init.md`로 옮긴다. 삭제는 사용자 승인 사항이다 |
+| `docs/conventions/view/factory-criteria.md` (삭제 완료, FR-004b-2에 따라 링크를 두지 않음) | "변형이 둘 이상일 때만 팩토리를 정의", "호출부의 기본 선택 수단은 팩토리". 문서 전문이 팩토리 규칙이므로 파일을 삭제하고, `@ViewBuilder` 기본 생성 경로와 기본값 배치 규칙만 `component-init.md`로 옮긴다. 삭제는 사용자 승인 사항이다 |
 | [docs/conventions/view-declarations/internal-declarations.md](../../docs/conventions/view-declarations/internal-declarations.md) | 변형 enum을 소유 컴포넌트에 중첩하고 같은 파일에 둔다. 이름에 컴포넌트 이름을 반복하지 않는다 → `ScreenEdgeScrim.Edge` |
 | [docs/conventions/view-declarations/style.md](../../docs/conventions/view-declarations/style.md) | 변형별로 갈리는 표현 값은 View의 `switch`가 아니라 변형 enum이 소유한다 → `Edge`가 `GradientToken`을 소유. 마지막 문장이 팩토리를 기본 수단으로 지정하므로 개정 대상 |
 | [docs/conventions/view-tokens.md](../../docs/conventions/view-tokens.md) | §2.4와 §3 체크리스트가 Typography 팩토리 사용을 요구한다. 개정 대상 |
@@ -177,7 +177,7 @@ integration unit으로 계획한다.
 | 4 | `LabeledCard` | UI + Feature | 2 | 7 / 3 | integration unit, `Style` 승격·init 신규 | `[Refactor]` |
 | 5 | `IconGlassButton` | UI + Feature | 3 | 9 / 11 | integration unit | `[Remove]` |
 | 6 | `StyledText` | UI + Feature | 10 | 67 / 101 | integration unit | `[Remove]` |
-| 7 | 컨벤션 개정 | 문서 | — | — | 패키지 밖, 개정 6건 + 삭제 1건 | `[Docs]` |
+| 7 | 컨벤션 개정 | 문서 | — | — | 패키지 밖, 문서 7건(개정 5 + 문구 정리 1 + 삭제 1) | `[Docs]` |
 
 **분리 불가 근거**(단위 3~6): UI에서 `public static func`를 지우는 순간 Feature의 해당 호출부가
 컴파일되지 않는다. UI 변경과 Feature 호출부 수정을 다른 커밋에 두면 중간 커밋이 단독으로
