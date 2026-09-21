@@ -37,7 +37,7 @@ public struct LabeledTextField: View {
                         .textStyle(.body2)
                         .foregroundColorToken(accentColor)
 
-                    SwiftUI.TextField(
+                    TextField(
                         "",
                         text: $text,
                         prompt: Text(displayModel.placeholder).foregroundStyle(Color(designSystem: .white30)),

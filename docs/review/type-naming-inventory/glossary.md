@@ -186,7 +186,6 @@
 - `Support`: 유의어 중첩: 같은 용도에 PreviewFixture(HomePreviewFixture)도 쓴다.
 - `System`: 표기 흔들림: 같은 DesignSystem이 UI에서는 한 단어(DesignSystem 항목), Tuist에서는 System으로 분리되어 집계되었다.
 - `Target`: Xcode/Tuist 빌드 target과 이름이 겹친다.
-- `TextField`: UI의 TextField가 SwiftUI TextField와 같은 이름이라 모듈 한정 없이 쓰면 이름이 충돌할 수 있다.
 - `Thumbnail`: Thumbnail과 ThumbnailView로 View 접미어 사용이 흔들린다.
 - `Token`: 다의어: 디자인 토큰과 기기 푸시 토큰으로 나뉜다. 인증 액세스 토큰(Bearer)과도 구분해야 한다.
 - `Transition`: 대부분 ScreenTransition이지만 Onboarding만 ScreenTransitionEvent를 써 표기가 흔들린다. SwiftUI transition(애니메이션 전환)과도 이름이 겹친다.
@@ -1975,7 +1974,7 @@
   - 도메인의 로그인·북마크·생성 요청 상태와 스냅샷 (SignInState, QuizBookmarkState, ProjectGenerationState)
   - 동시성 보호를 위해 잠금 아래 묶은 내부 가변 상태 (FirebaseMessagingPushClient.State, AppleAuthorizationProvider.State, KeychainStore.InMemoryBackend.State)
   - 자격 증명 유효·철회 상태 (AppleCredentialState, AppleSignInState, AppleCredentialStateProvider.PlatformState)
-  - UI 컴포넌트의 표시 상태 (ChoiceAnswerOption.State, TextField.State, EmptyState)
+  - UI 컴포넌트의 표시 상태 (ChoiceAnswerOption.State, EmptyState)
 - 메모: 다의어가 매우 많다: TCA State, 도메인 스냅샷, 잠금 보호 내부 상태, 표시 상태가 모두 State다. Status(AuthenticationStatus, DeviceRegistrationStatus, PolicyConsentStatus)와 유의어 중첩이 있고, EmptyState는 상태가 아니라 빈 목록 안내 View다.
 
 ### `Statistics`
@@ -2095,10 +2094,9 @@
   - SwiftUI Text로 그려지는 스타일 문자열과 텍스트 스타일 토큰 (StyledText, TextStyleToken, TextStyleResolver)
 
 ### `TextField`
-- 분류: 플랫폼 · 사용 2회 · 패키지: UI
+- 분류: 플랫폼 · 사용 1회 · 패키지: UI
 - 정의: SwiftUI TextField 타입 이름(외부 고정 명칭)으로, 문자열을 입력받는 필드다.
-  - UI 패키지 고유의 텍스트 입력 컴포넌트: TextField, LabeledTextField
-- 메모: UI의 TextField가 SwiftUI TextField와 같은 이름이라 모듈 한정 없이 쓰면 이름이 충돌할 수 있다.
+  - UI 패키지 고유의 텍스트 입력 컴포넌트: LabeledTextField
 
 ### `Thumbnail`
 - 분류: 일반 · 사용 2회 · 패키지: Feature

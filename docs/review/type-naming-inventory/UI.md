@@ -136,15 +136,6 @@
 - **`IconPlainButton.Constant`** `enum` · private · [IconPlainButton.swift:52](../../../sources/Projects/UI/Component/Controls/IconPlainButton.swift#L52)  
   IconPlainButton의 minimumTouchSize(ControlSizeToken.minimumTouch) 상수를 담은 private 네임스페이스 열거형.  
   단어(단일): `Constant` 상수·불변값. 여기서는 해당 컴포넌트의 레이아웃 치수(높이·간격·크기)를 모아 둔 네임스페이스
-- **`TextField`** `struct` · public · [TextField.swift:4](../../../sources/Projects/UI/Component/Controls/TextField.swift#L4) · 채택: View  
-  placeholder와 text Binding을 받아 grey600 배경의 둥근 입력 상자를 그리는 UI 패키지 자체 텍스트 필드 View. isSecure면 SecureField를 쓰고, errorMessage·포커스·입력 유무로 State(default·active·filled·error)를 계산해 테두리를 바꾸며 onSubmit 시 onCommit을 호출한다. SwiftUI.TextField와 이름이 같아 내부에서는 SwiftUI.TextField로 구분한다.  
-  단어(단일): `TextField` 외부 고정 명칭(SwiftUI TextField)과 동일한 이름. 여기서는 문자열을 입력받는 UI 패키지 고유의 텍스트 필드 컴포넌트
-- **`TextField.State`** `enum` · internal · [TextField.swift:47](../../../sources/Projects/UI/Component/Controls/TextField.swift#L47) · 채택: Sendable, Equatable  
-  TextField의 표시 상태(default·active·filled·error)를 나타내며 borderToken에서 파생한 borderColor·borderWidth와 backgroundColor(grey600)를 제공한다.  
-  단어(단일): `State` 상태. 여기서는 텍스트 필드가 기본·활성·입력됨·오류 중 어느 표시 상태인지
-- **`TextField.Constant`** `enum` · internal · [TextField.swift:88](../../../sources/Projects/UI/Component/Controls/TextField.swift#L88)  
-  TextField의 horizontalPadding(16), surfaceHeight(52), errorSpacing(4) 상수를 모아 둔 네임스페이스 열거형.  
-  단어(단일): `Constant` 상수·불변값. 여기서는 해당 컴포넌트의 레이아웃 치수(높이·간격·크기)를 모아 둔 네임스페이스
 
 ## Component/Controls/Chip
 
