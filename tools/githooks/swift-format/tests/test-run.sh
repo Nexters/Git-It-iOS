@@ -37,11 +37,14 @@ git -C "$repository" commit -qm '기준 Swift 파일 추가'
 
 printf '%s\n' '#!/bin/sh' \
 	'printf "%s\n" "$1" >> "$SWIFT_STYLE_LOG"' \
-	>"$repository/$style_relative/scripts/lint.sh"
+	>"$repository/$style_relative/scripts/check.sh"
 printf '%s\n' '#!/bin/sh' 'exit 0' \
-	>"$repository/$style_relative/scripts/format.sh"
-chmod +x "$repository/$style_relative/scripts/lint.sh" \
-	"$repository/$style_relative/scripts/format.sh"
+	>"$repository/$style_relative/scripts/fix.sh"
+printf '%s\n' '#!/bin/sh' 'exit 0' \
+	>"$repository/$style_relative/scripts/lint.sh"
+chmod +x "$repository/$style_relative/scripts/check.sh" \
+	"$repository/$style_relative/scripts/fix.sh" \
+	"$repository/$style_relative/scripts/lint.sh"
 
 SWIFT_STYLE_LOG="$work/style.log"
 export SWIFT_STYLE_LOG
@@ -73,8 +76,8 @@ printf '%s\n' '#!/bin/sh' \
 	'for target in "$@"; do' \
 	'	printf "%s\\n" "$target" >> "$SWIFT_STYLE_LOG"' \
 	'done' \
-	>"$repository/$style_relative/scripts/format.sh"
-chmod +x "$repository/$style_relative/scripts/format.sh"
+	>"$repository/$style_relative/scripts/fix.sh"
+chmod +x "$repository/$style_relative/scripts/fix.sh"
 : >"$SWIFT_STYLE_LOG"
 "$repository/$swift_runner_relative" format
 expected_format_targets=$(printf '%s\n%s' "$repository/$changed_relative" "$repository/$untracked_relative" | sort)
@@ -93,6 +96,17 @@ actual_all_format_targets=$(sort "$SWIFT_STYLE_LOG")
 	printf 'FAIL: format-all 대상이 전체 Swift 파일과 일치하지 않음\n' >&2
 	exit 1
 }
+
+# 자동 교정 뒤 남은 수동 교정 위반은 format 실패로 보고합니다.
+printf '%s\n' '#!/bin/sh' 'exit 3' \
+	>"$repository/$style_relative/scripts/lint.sh"
+if "$repository/$swift_runner_relative" format >"$work/out" 2>"$work/err"; then
+	printf 'FAIL: 수동 교정 위반이 남았는데 format이 성공으로 반환\n' >&2
+	exit 1
+fi
+rg -q 'swift-format.formatter-failed' "$work/err"
+printf '%s\n' '#!/bin/sh' 'exit 0' \
+	>"$repository/$style_relative/scripts/lint.sh"
 
 # staged 포매터가 일부 파일을 바꾼 뒤 실패하면 전체 원본과 metadata를 복원합니다.
 first_relative="$projects_relative/App/첫 파일.swift"
@@ -121,8 +135,8 @@ printf '%s\n' '#!/bin/sh' \
 	'	chmod 600 "$target"' \
 	'	[ "$target" != "$ROLLBACK_FAIL_TARGET" ] || exit 7' \
 	'done' \
-	>"$repository/$style_relative/scripts/format.sh"
-chmod +x "$repository/$style_relative/scripts/format.sh"
+	>"$repository/$style_relative/scripts/fix.sh"
+chmod +x "$repository/$style_relative/scripts/fix.sh"
 
 if "$repository/$swift_runner_relative" staged >"$work/out" 2>"$work/err"; then
 	printf 'FAIL: 일부 파일 포매팅 실패를 성공으로 반환\n' >&2

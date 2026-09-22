@@ -10,8 +10,10 @@
 #   lint   [paths..] : 지정 경로(기본 GIT_IT_PROJECTS_ROOT)를 수정 없이 검사만 합니다.
 #                     두 동작 모두 Derived/와 .build/ 하위 생성물은 제외합니다.
 #
-# 세 동작은 GIT_IT_SWIFT_STYLE_ROOT의 도구를 호출합니다. 도구가 자기 위치를 기준으로
-# 상대경로를 해석하므로 이 진입점은 모든 대상을 절대경로로 변환해 전달합니다.
+# 세 동작은 GIT_IT_SWIFT_STYLE_ROOT의 도구를 호출합니다. 포맷 동작은 fix.sh로 자동 교정한
+# 뒤 lint.sh로 자동 교정할 수 없는 위반을 검사하고, lint는 check.sh로 전체 계층을 검사합니다.
+# 도구가 자기 위치를 기준으로 상대경로를 해석하므로 이 진입점은 모든 대상을 절대경로로
+# 변환해 전달합니다.
 
 set -eu
 
@@ -48,18 +50,24 @@ swift_format_main() (
 	"$swift_format_adapter" --ensure-fresh-cache "$swift_format_style_dir" || return 2
 
 	case "$swift_format_action" in
-	staged | format | format-all) swift_format_tool="$swift_format_style_dir/scripts/format.sh" ;;
-	lint) swift_format_tool="$swift_format_style_dir/scripts/lint.sh" ;;
+	staged | format | format-all)
+		swift_format_tool="$swift_format_style_dir/scripts/fix.sh"
+		swift_format_gate="$swift_format_style_dir/scripts/lint.sh"
+		;;
+	lint)
+		swift_format_tool="$swift_format_style_dir/scripts/check.sh"
+		swift_format_gate=""
+		;;
 	*)
 		printf '오류[common.invalid-input]: 지원하지 않는 ACTION=%s\n조치: staged, format, format-all, lint 중 하나를 사용하세요\n' "$swift_format_action" >&2
 		return 2
 		;;
 	esac
 
-	[ -x "$swift_format_tool" ] || {
+	if [ ! -x "$swift_format_tool" ] || { [ -n "$swift_format_gate" ] && [ ! -x "$swift_format_gate" ]; }; then
 		printf '오류[common.missing-tool]: Swift-Style submodule이 초기화되지 않았습니다\n조치: git submodule update --init --recursive 를 실행하세요\n' >&2
 		return 2
-	}
+	fi
 
 	# 2. 대상 목록을 NUL 경계로 임시 파일에 기록합니다(경로에 공백을 허용).
 	swift_format_work=$(mktemp -d "${TMPDIR:-/tmp}/git-it-swift-format.XXXXXX") || return 2
@@ -148,7 +156,8 @@ swift_format_main() (
 	xargs -0 -n 1 "$swift_format_adapter" --to-absolute-one "$swift_format_root" \
 		<"$swift_format_targets" >"$swift_format_absolute_targets" || return 2
 
-	if xargs -0 "$swift_format_tool" <"$swift_format_absolute_targets"; then
+	if xargs -0 "$swift_format_tool" <"$swift_format_absolute_targets" &&
+		{ [ -z "$swift_format_gate" ] || xargs -0 "$swift_format_gate" <"$swift_format_absolute_targets"; }; then
 		:
 	else
 		[ "$swift_format_action" != staged ] || swift_format_rollback || return 2
