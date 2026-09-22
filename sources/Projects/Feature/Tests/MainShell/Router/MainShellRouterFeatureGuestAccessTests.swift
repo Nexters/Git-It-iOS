@@ -104,6 +104,19 @@ struct MainShellRouterFeatureGuestAccessTests {
         await store.skipInFlightEffects(strict: false)
     }
 
+    @Test
+    func `로그인 실패 알림과 약관 화면 닫기를 로그인 흐름으로 전달한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+
+        await store.send(.view(.signInFailureDismissed))
+        await store.receive(.signIn(.view(.failureDismissed)))
+        await store.send(.view(.legalAgreementDismissed))
+        await store.receive(.signIn(.view(.legalAgreementDismissed)))
+        await store.send(.view(.legalDocumentSheetDismissed))
+        await store.receive(.signIn(.view(.legalDocumentSheetDismissed)))
+    }
+
     // MARK: Private
 
     private func makeStore(

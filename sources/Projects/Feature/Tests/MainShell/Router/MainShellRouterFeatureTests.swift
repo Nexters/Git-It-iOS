@@ -162,6 +162,17 @@ struct MainShellRouterFeatureTests {
         #expect(store.state.selectedTab == .saved)
     }
 
+    @Test
+    func `단일 문제 준비 실패 알림을 닫으면 준비 흐름에 실패 닫기를 전달한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
+
+        await store.send(.saved(.delegate(.questionSelected(bookmark))))
+        await store.send(.view(.singleQuestionFailureDismissed))
+        await store.receive(.singleQuestionEntry(.input(.failureDismissed)))
+    }
+
     // MARK: Private
 
     private func makeStore(

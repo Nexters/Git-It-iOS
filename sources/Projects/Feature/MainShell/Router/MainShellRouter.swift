@@ -74,7 +74,7 @@ public struct MainShellRouter: View {
                 "확인",
                 role: .cancel,
             ) {
-                store.send(.singleQuestionEntry(.input(.failureDismissed)))
+                send(.singleQuestionFailureDismissed)
             }
         } message: {
             Text("잠시 후 다시 시도해 주세요.")
@@ -90,7 +90,7 @@ public struct MainShellRouter: View {
                 "확인",
                 role: .cancel,
             ) {
-                store.send(.signIn(.view(.failureDismissed)))
+                send(.signInFailureDismissed)
             }
         } message: {
             Text("잠시 후 다시 시도해 주세요.")
@@ -116,7 +116,7 @@ public struct MainShellRouter: View {
             get: { store.signIn.isFailed },
             set: { isPresented in
                 guard !isPresented else { return }
-                store.send(.signIn(.view(.failureDismissed)))
+                send(.signInFailureDismissed)
             },
         )
     }
@@ -127,7 +127,7 @@ public struct MainShellRouter: View {
                 get: { store.signIn.isLegalAgreementPresented },
                 set: { isPresented in
                     if !isPresented {
-                        store.send(.signIn(.view(.legalAgreementDismissed)))
+                        send(.legalAgreementDismissed)
                     }
                 },
             )
@@ -147,7 +147,7 @@ public struct MainShellRouter: View {
                 get: { store.signIn.legalAgreement.presentedDocument != nil },
                 set: { isPresented in
                     if !isPresented {
-                        store.send(.signIn(.view(.legalDocumentSheetDismissed)))
+                        send(.legalDocumentSheetDismissed)
                     }
                 },
             )
@@ -158,7 +158,7 @@ public struct MainShellRouter: View {
                         title: document.displayName,
                         url: document.approvedURL,
                     ),
-                    onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
+                    onDismiss: { send(.legalDocumentSheetDismissed) },
                 )
             }
         }
@@ -169,7 +169,7 @@ public struct MainShellRouter: View {
             get: { store.singleQuestionEntry?.preparationError != nil },
             set: { isPresented in
                 guard !isPresented else { return }
-                store.send(.singleQuestionEntry(.input(.failureDismissed)))
+                send(.singleQuestionFailureDismissed)
             },
         )
     }

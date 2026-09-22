@@ -95,6 +95,8 @@ public struct OnboardingRouterFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case curationSplashFinished
+            case legalAgreementDismissed
+            case legalDocumentSheetDismissed
         }
 
         @CasePathable
@@ -178,6 +180,12 @@ public struct OnboardingRouterFeature: Sendable {
             case .view(.curationSplashFinished):
                 guard state.activeScreen == .curationSplash else { break }
                 effect = .send(.delegate(.mainShellRequested))
+
+            case .view(.legalAgreementDismissed):
+                effect = .send(.tutorial(.signIn(.view(.legalAgreementDismissed))))
+
+            case .view(.legalDocumentSheetDismissed):
+                effect = .send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
 
             case .tutorial,
                  .positionSelection,

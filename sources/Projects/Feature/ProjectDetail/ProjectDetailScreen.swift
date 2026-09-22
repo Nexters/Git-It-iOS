@@ -76,7 +76,7 @@ struct ProjectDetailScreen: View {
                     .tint(Color(designSystem: .blue100))
             }
         }
-        .task { await store.send(.view(.task)).finish() }
+        .task { await send(.task).finish() }
     }
 
     // MARK: Private

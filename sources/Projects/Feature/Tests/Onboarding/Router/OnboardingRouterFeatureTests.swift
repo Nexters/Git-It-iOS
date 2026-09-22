@@ -261,6 +261,19 @@ struct OnboardingRouterFeatureTests {
         #expect(state.curationExit == .returnToTutorial)
     }
 
+    @Test
+    func `약관 화면 닫기를 튜토리얼 로그인 흐름으로 전달하고 이동 이벤트를 남기지 않는다`() async {
+        let store = makeOnboardingRouterStore()
+        store.exhaustivity = .off
+
+        await store.send(.view(.legalAgreementDismissed))
+        await store.receive(.tutorial(.signIn(.view(.legalAgreementDismissed))))
+        await store.send(.view(.legalDocumentSheetDismissed))
+        await store.receive(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
+
+        #expect(store.state.transitionLog.isEmpty)
+    }
+
     // MARK: Private
 
     private let curatedAccount = OnboardingTestFixture.signedInAccount(needsCuration: false)

@@ -76,7 +76,7 @@ public struct ProjectListScreen: View {
                 store.mode == .deleting ? .hidden : .visible,
                 for: .tabBar,
             )
-            .task { await store.send(.view(.task)).finish() }
+            .task { await send(.task).finish() }
     }
 
     // MARK: Internal
@@ -193,7 +193,7 @@ public struct ProjectListScreen: View {
             .designSystemScreenMargin()
             .padding(.vertical, Constant.contentVerticalPadding)
         }
-        .refreshable { await store.send(.view(.refreshRequested)).finish() }
+        .refreshable { await send(.refreshRequested).finish() }
     }
 
     private var deletionTarget: ProjectListDisplay? {

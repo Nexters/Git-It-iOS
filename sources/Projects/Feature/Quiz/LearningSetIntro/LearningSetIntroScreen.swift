@@ -26,7 +26,7 @@ struct LearningSetIntroScreen: View {
                 content
             }
         }
-        .task { await store.send(.view(.task)).finish() }
+        .task { await send(.task).finish() }
     }
 
     // MARK: Private

@@ -57,7 +57,7 @@ public struct OnboardingRouter: View {
                     get: { store.tutorial.signIn.isLegalAgreementPresented },
                     set: { isPresented in
                         if !isPresented {
-                            store.send(.tutorial(.signIn(.view(.legalAgreementDismissed))))
+                            send(.legalAgreementDismissed)
                         }
                     },
                 )
@@ -76,7 +76,7 @@ public struct OnboardingRouter: View {
                     get: { store.tutorial.signIn.legalAgreement.presentedDocument != nil },
                     set: { isPresented in
                         if !isPresented {
-                            store.send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
+                            send(.legalDocumentSheetDismissed)
                         }
                     },
                 )
@@ -87,7 +87,7 @@ public struct OnboardingRouter: View {
                             title: document.displayName,
                             url: document.approvedURL,
                         ),
-                        onDismiss: { store.send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed)))) },
+                        onDismiss: { send(.legalDocumentSheetDismissed) },
                     )
                 }
             }

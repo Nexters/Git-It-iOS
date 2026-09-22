@@ -72,6 +72,10 @@ public struct MainShellRouterFeature: Sendable {
         public enum View: Sendable, Equatable {
             case tabSelected(MainShellTab)
             case signInTapped
+            case signInFailureDismissed
+            case legalAgreementDismissed
+            case legalDocumentSheetDismissed
+            case singleQuestionFailureDismissed
         }
 
         @CasePathable
@@ -176,6 +180,18 @@ public struct MainShellRouterFeature: Sendable {
                  .home(.delegate(.signInRequested)):
                 guard state.access == .guest else { return .none }
                 return .send(.signIn(.input(.start)))
+
+            case .view(.signInFailureDismissed):
+                return .send(.signIn(.view(.failureDismissed)))
+
+            case .view(.legalAgreementDismissed):
+                return .send(.signIn(.view(.legalAgreementDismissed)))
+
+            case .view(.legalDocumentSheetDismissed):
+                return .send(.signIn(.view(.legalDocumentSheetDismissed)))
+
+            case .view(.singleQuestionFailureDismissed):
+                return .send(.singleQuestionEntry(.input(.failureDismissed)))
 
             case .signIn(.delegate(.signedIn(let needsCuration))):
                 return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
