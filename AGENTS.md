@@ -43,7 +43,7 @@ make init
 ## 빌드·테스트
 
 ```sh
-project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
+project_build_runner=$(./.tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
 "$project_build_runner" build     # 모든 공유 scheme Debug 빌드
 "$project_build_runner" compile   # 테스트 scheme build-for-testing
 "$project_build_runner" test      # test-without-building
@@ -57,9 +57,9 @@ destination은 `platform=iOS Simulator,name=iPhone 17 Pro`이며
 셸 스크립트를 변경했다면 다음도 실행합니다.
 
 ```sh
-./tools/script-tests/bin/run.sh                  # 프로젝트 셸 회귀 테스트
-./tools/script-verification/bin/prepare-tools.sh # ShellCheck·shfmt 준비 (최초 1회)
-./tools/script-verification/bin/run.sh           # 정적 검사·회귀 테스트
+./.tools/script-tests/bin/run.sh                  # 프로젝트 셸 회귀 테스트
+./.tools/script-verification/bin/prepare-tools.sh # ShellCheck·shfmt 준비 (최초 1회)
+./.tools/script-verification/bin/run.sh           # 정적 검사·회귀 테스트
 ```
 
 pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬에서 실패를 미리 잡을 수
@@ -124,8 +124,8 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 
 기능의 canonical identity는 Git-flow branch이고 `specs/<NNN>-<slug>`의 숫자는 생성 순서일
 뿐입니다. `.specify/feature.json`은 삭제 가능한 활성 pointer이며 branch metadata와 충돌하면
-신뢰하지 않습니다. 공용 판독·검증은 `tools/spec-kit/bin/resolve-feature.sh`와
-`tools/spec-kit/bin/validate.sh`를 사용합니다.
+신뢰하지 않습니다. 공용 판독·검증은 `.tools/spec-kit/bin/resolve-feature.sh`와
+`.tools/spec-kit/bin/validate.sh`를 사용합니다.
 
 각 스킬의 허용 수정 경로 정본은
 [Constitution 원칙 5 — Spec-Kit 범위](.specify/memory/constitution.md)의 표입니다. 이
@@ -165,7 +165,7 @@ PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 ├── .agents/skills/     # 프로젝트 전용 에이전트 스킬 (Spec-Kit, 셸 스크립트)
 ├── specs/              # 기능 명세 (speckit-specify 산출물)
 ├── .github/            # CI, 커밋 컨벤션, PR 템플릿
-└── tools/
+└── .tools/
     ├── githooks/            # Git Hook 및 저장소 자동화
     ├── project-setup/       # 에이전트 링크와 개발 workspace 초기화
     ├── repository-paths/    # 저장소 공용 경로 관리

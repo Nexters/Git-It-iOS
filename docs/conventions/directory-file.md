@@ -33,7 +33,7 @@
 - 패키지 루트의 `Project.swift`와 `Config/`
 - `*.xcassets` 내부 구조와 서드파티가 배포한 폰트·리소스 폴더 구조 — 도구와 배포본이
   소유합니다(§6)
-- `docs/`, `tools/`, `.agents/`, `specs/`
+- `docs/`, `.tools/`, `.agents/`, `specs/`
 
 ## 2. 경로 구조
 

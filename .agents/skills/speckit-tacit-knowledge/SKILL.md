@@ -69,7 +69,7 @@ token과 개인정보는 원문을 기록하지 않고 `<redacted>`로 바꾼다
 
 1. `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`로 `REPO_ROOT`와
    `FEATURE_DIR`을 구하고, 활성 `specs/<feature>` 디렉터리인지 확인한다.
-   `tools/repository-paths/bin/repository-paths.sh GIT_IT_DOCS_ROOT`의 판독 결과가
+   `.tools/repository-paths/bin/repository-paths.sh GIT_IT_DOCS_ROOT`의 판독 결과가
    저장소 안의 실제 디렉터리인지 검증한 뒤
    `<docs-root>/spec-kit/<feature>/tacit-knowledge.md`를 대상으로 삼는다.
    사용자가 기능이나 파일을 지정했다면 이 결과와 일치해야 하며, 기능 디렉터리가

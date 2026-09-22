@@ -5,7 +5,7 @@
 테스트 컴파일과 테스트 실행은 서로 다른 검증 단계입니다.
 
 ```sh
-project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
+project_build_runner=$(./.tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
 "$project_build_runner" compile
 "$project_build_runner" test
 ```

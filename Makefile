@@ -1,7 +1,7 @@
 # 저장소를 새로 내려받은 뒤 필요한 초기화 명령을 한곳에서 제공합니다.
 # 정책을 다시 정의하지 않고 각 기능의 공개 bin/ 명령만 순서대로 호출합니다.
 
-PATHS_SH := ./tools/repository-paths/bin/repository-paths.sh
+PATHS_SH := ./.tools/repository-paths/bin/repository-paths.sh
 IOS_ROOT := $(shell $(PATHS_SH) GIT_IT_IOS_ROOT)
 PROJECTS_ROOT := $(shell $(PATHS_SH) GIT_IT_PROJECTS_ROOT)
 HOOKS_ROOT := $(shell $(PATHS_SH) GIT_IT_HOOKS_ROOT)
@@ -36,4 +36,4 @@ format-all: ## 패키지 소스 전체 Swift 파일을 포맷합니다
 	$(SWIFT_FORMAT_RUNNER) format-all "$$(pwd)/$(PROJECTS_ROOT)"
 
 verify-tools: ## 셸 스크립트 검증에 필요한 ShellCheck·shfmt를 준비합니다
-	./tools/script-verification/bin/prepare-tools.sh
+	./.tools/script-verification/bin/prepare-tools.sh

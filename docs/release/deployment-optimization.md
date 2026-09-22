@@ -133,6 +133,6 @@ grep -rn -A1 '^@Reducer' sources/Projects/Feature --include='*.swift' | grep 'pu
   필요합니다.
 - `Resources/Fonts` 아래에 번들되지 않는 정적 웨이트 20여 개가 남아 있습니다
   (매니페스트는 Regular·Medium·Bold만 포함). 저장소 용량만 차지합니다.
-- `tools/swift-style/swiftstyle.swiftformat`이 깨진 심볼릭 링크입니다
+- `.tools/swift-style/swiftstyle.swiftformat`이 깨진 심볼릭 링크입니다
   (`Sources/AirbnbSwiftFormatTool/` → 실제는 `Sources/SwiftStyleFormatTool/`).
   서브모듈 안이라 별도로 처리해야 합니다.

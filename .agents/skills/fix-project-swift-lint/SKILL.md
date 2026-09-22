@@ -21,7 +21,7 @@ description: sources/Projects 전체에 프로젝트 공개 Swift lint를 실행
 3. 다음 공개 명령을 그대로 실행하고 stdout, stderr, 종료 상태를 확인한다.
 
    ```sh
-   ./tools/githooks/swift-format/bin/run.sh lint "$(pwd)/sources/Projects"
+   ./.tools/githooks/swift-format/bin/run.sh lint "$(pwd)/sources/Projects"
    ```
 
 4. SwiftPM·Clang module cache의 `Operation not permitted`, 쓰기 권한 또는 network 실패로
@@ -57,7 +57,7 @@ description: sources/Projects 전체에 프로젝트 공개 Swift lint를 실행
 
 ## 금지 사항
 
-- `tools/githooks/swift-format/core/**` 또는 `tools/swift-style/**` 내부 구현을 직접
+- `.tools/githooks/swift-format/core/**` 또는 `.tools/swift-style/**` 내부 구현을 직접
   호출하지 않는다.
 - `*.md`를 삭제하거나 수정하거나 포맷하지 않는다.
 - `git add`, `git commit`, index 복구·초기화, 사용자 변경 되돌리기를 하지 않는다.

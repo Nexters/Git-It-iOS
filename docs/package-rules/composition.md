@@ -45,8 +45,8 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
   루트가 Data 타입을 직접 만들어야 한다면 그 생성을 해당 축 조립 API로 옮깁니다.
 - 조립 루트는 실제로 사용하는 축 target만 참조합니다.
 - 패키지 간 허용 방향과 target manifest에 선언하지 않은 모듈 import는
-  `tools/package-dependencies`가 검사합니다. target을 추가하거나 이름을 바꾸면
-  `tools/package-dependencies/config/source-roots`도 함께 갱신합니다.
+  `.tools/package-dependencies`가 검사합니다. target을 추가하거나 이름을 바꾸면
+  `.tools/package-dependencies/config/source-roots`도 함께 갱신합니다.
 
 ## 이동 후 남는 책임과 남지 않는 책임
 

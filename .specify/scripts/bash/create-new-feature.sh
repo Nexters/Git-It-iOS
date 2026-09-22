@@ -259,7 +259,7 @@ fi
 # Sequence belongs only to the artifact directory. The checked-out Git-flow
 # branch is the canonical feature identity and never receives the NNN prefix.
 BRANCH_NAME=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
-IDENTITY_POLICY="$REPO_ROOT/tools/spec-kit/core/identity.sh"
+IDENTITY_POLICY="$REPO_ROOT/.tools/spec-kit/core/identity.sh"
 [ -f "$IDENTITY_POLICY" ] || { echo "Error: Spec-Kit identity policy not found: $IDENTITY_POLICY" >&2; exit 1; }
 # shellcheck disable=SC1090
 source "$IDENTITY_POLICY"

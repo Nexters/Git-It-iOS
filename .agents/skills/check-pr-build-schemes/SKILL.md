@@ -30,7 +30,7 @@ description: Git-It-iOS의 PR 생성 전에 Tuist 공유 scheme, 테스트 targe
 4. 저장소 루트에서 다음 검증을 실행해 빈 테스트 target과 저장소 셸 회귀를 확인한다.
 
    ```sh
-   ./tools/script-tests/bin/run.sh
+   ./.tools/script-tests/bin/run.sh
    ```
 
 5. 사용할 Simulator를 실행 직전에 확인한다. 부팅된 유효한 기기가 있으면 그 UUID를 사용한다.
@@ -42,7 +42,7 @@ description: Git-It-iOS의 PR 생성 전에 Tuist 공유 scheme, 테스트 targe
    끼우거나 병렬 실행하지 않는다.
 
    ```sh
-   project_build_runner=$(./tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
+   project_build_runner=$(./.tools/repository-paths/bin/repository-paths.sh GIT_IT_PROJECT_BUILD_RUNNER)
    "$project_build_runner" build
    GIT_IT_TEST_DESTINATION='platform=iOS Simulator,id=<UUID>' "$project_build_runner" compile
    GIT_IT_TEST_DESTINATION='platform=iOS Simulator,id=<UUID>' "$project_build_runner" test

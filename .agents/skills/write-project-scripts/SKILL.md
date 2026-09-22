@@ -1,6 +1,6 @@
 ---
 name: write-project-scripts
-description: 프로젝트가 소유한 POSIX sh 스크립트와 Git 훅을 작성·수정·리팩터링·리뷰하고, 기능 중심 계층 구조·의존 방향·경로 안전성·rollback·진단 규칙을 적용하며 ShellCheck와 shfmt 검증을 수행한다. 프로젝트의 `tools/githooks/`, 셸 아키텍처, 스크립트 컨벤션, 검증 도구 의존성을 변경하거나 새 자동화 스크립트를 추가할 때 사용한다.
+description: 프로젝트가 소유한 POSIX sh 스크립트와 Git 훅을 작성·수정·리팩터링·리뷰하고, 기능 중심 계층 구조·의존 방향·경로 안전성·rollback·진단 규칙을 적용하며 ShellCheck와 shfmt 검증을 수행한다. 프로젝트의 `.tools/githooks/`, 셸 아키텍처, 스크립트 컨벤션, 검증 도구 의존성을 변경하거나 새 자동화 스크립트를 추가할 때 사용한다.
 ---
 
 # 프로젝트 스크립트 작성
@@ -27,7 +27,7 @@ ShellCheck·shfmt 버전, checksum, 준비 또는 복구를 변경할 때만 [�
 9. 저장소 루트에서 다음 공용 검증을 실행한다.
 
 ```sh
-./tools/script-verification/bin/run.sh
+./.tools/script-verification/bin/run.sh
 ```
 
 검증기는 프로젝트 셸과 Git 훅을 입력으로 읽어 `/bin/sh -n`, ShellCheck, shfmt를 수행하고 자체 회귀와 체크리스트를 검사한다. 다른 프로젝트 스크립트, 기능 테스트 또는 프로젝트 빌드를 실행하거나 source하지 않는다.
@@ -39,7 +39,7 @@ ShellCheck·shfmt 버전, checksum, 준비 또는 복구를 변경할 때만 [�
 검증 도구가 누락되거나 lock과 다를 때만 다음 명시적 준비 명령을 실행한다.
 
 ```sh
-./tools/script-verification/bin/prepare-tools.sh
+./.tools/script-verification/bin/prepare-tools.sh
 ```
 
 공용 검증 중에는 네트워크 접근, 자동 설치 또는 `.build/` 변경을 허용하지 않는다. `.build/`의 생성 artifact를 직접 편집하거나 Git에 추가하지 않는다.

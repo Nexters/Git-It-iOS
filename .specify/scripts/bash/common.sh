@@ -187,7 +187,7 @@ get_feature_paths() {
 
     # Canonical identity is the checked-out Git-flow branch. The shared resolver
     # uses spec metadata and treats feature.json only as a disposable hint.
-    local resolver="$repo_root/tools/spec-kit/bin/resolve-feature.sh"
+    local resolver="$repo_root/.tools/spec-kit/bin/resolve-feature.sh"
     [[ -x "$resolver" ]] || {
         echo "ERROR: Spec-Kit feature resolver not found: $resolver" >&2
         return 1
