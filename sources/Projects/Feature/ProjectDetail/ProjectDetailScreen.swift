@@ -36,7 +36,7 @@ struct ProjectDetailScreen: View {
         }
         .overlay(alignment: .topTrailing) {
             if store.isMenuPresented {
-                ActionMenu(items: Constant.menuItems, onSelect: menuItemSelected)
+                ActionMenu(items: menuItems)
                     .padding(.trailing, LayoutToken.margin)
                     .offset(y: Constant.menuTopOffset)
                     .transition(.opacity)
@@ -126,20 +126,28 @@ struct ProjectDetailScreen: View {
             .accessibilityHidden(true)
     }
 
-    private func menuItemSelected(_ id: ActionMenu.Item.ID) {
-        switch id {
-        case Constant.MenuItemID.savedQuestions:
-            send(.savedQuestionsTapped)
-
-        case Constant.MenuItemID.repositoryLink:
-            send(.repositoryLinkTapped)
-
-        case Constant.MenuItemID.delete:
-            send(.deleteTapped)
-
-        default:
-            break
-        }
+    private var menuItems: [ActionMenu.Item] {
+        [
+            .init(
+                id: Constant.MenuItemID.savedQuestions,
+                title: "저장한 문제",
+                accessibilityLabel: "저장한 문제 보기",
+                onSelect: { send(.savedQuestionsTapped) },
+            ),
+            .init(
+                id: Constant.MenuItemID.repositoryLink,
+                title: "GitHub에서 보기",
+                accessibilityLabel: "GitHub에서 보기",
+                onSelect: { send(.repositoryLinkTapped) },
+            ),
+            .init(
+                id: Constant.MenuItemID.delete,
+                title: "삭제하기",
+                role: .destructive,
+                accessibilityLabel: "프로젝트 삭제",
+                onSelect: { send(.deleteTapped) },
+            ),
+        ]
     }
 
 }
@@ -156,12 +164,6 @@ extension ProjectDetailScreen {
 
         static let summaryTopSpacing: CGFloat = 27
         static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
-
-        static let menuItems: [ActionMenu.Item] = [
-            .init(id: MenuItemID.savedQuestions, title: "저장한 문제", accessibilityLabel: "저장한 문제 보기"),
-            .init(id: MenuItemID.repositoryLink, title: "GitHub에서 보기", accessibilityLabel: "GitHub에서 보기"),
-            .init(id: MenuItemID.delete, title: "삭제하기", role: .destructive, accessibilityLabel: "프로젝트 삭제"),
-        ]
 
         static let setListTopSpacing: CGFloat = 53
         static let contentBottomPadding: CGFloat = 16

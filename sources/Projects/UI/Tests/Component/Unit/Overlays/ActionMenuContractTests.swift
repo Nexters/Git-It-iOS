@@ -18,17 +18,16 @@ struct ActionMenuContractTests {
     }
 
     @Test
-    func `표시 값과 선택 콜백을 별도 초기화 인자로 받는다`() {
-        let item = ActionMenu.Item(
-            id: "delete",
-            title: "프로젝트 삭제",
-            accessibilityLabel: "학습 프로젝트 삭제 모드 열기",
-        )
+    func `항목은 선택 동작을 스스로 소유하고 선택하면 그 동작만 실행한다`() {
+        var selectedIDs = [String]()
+        let items = ["savedQuestions", "delete"].map { id in
+            ActionMenu.Item(id: id, title: id, accessibilityLabel: id, onSelect: { selectedIDs.append(id) })
+        }
+        _ = ActionMenu(items: items)
 
-        _ = ActionMenu(
-            items: [item],
-            onSelect: { _ in },
-        )
+        items[1].onSelect()
+
+        #expect(selectedIDs == ["delete"])
     }
 
     @Test

@@ -31,7 +31,7 @@ public struct ProjectListScreen: View {
             }
             .overlay(alignment: .topTrailing) {
                 if store.mode == .menuPresented {
-                    ActionMenu(items: Constant.menuItems) { _ in send(.deletionMenuItemTapped) }
+                    ActionMenu(items: menuItems)
                         .padding(.trailing, LayoutToken.margin)
                         .offset(y: Constant.menuTopOffset)
                         .transition(.opacity)
@@ -208,6 +208,17 @@ public struct ProjectListScreen: View {
         store.mode == .deleting ? nil : Constant.menuControl
     }
 
+    private var menuItems: [ActionMenu.Item] {
+        [
+            .init(
+                id: "delete",
+                title: "프로젝트 삭제",
+                accessibilityLabel: "프로젝트 삭제 화면 열기",
+                onSelect: { send(.deletionMenuItemTapped) },
+            )
+        ]
+    }
+
     private func headerLeadingTapped() {
         if store.mode == .deleting {
             send(.backTapped)
@@ -259,10 +270,6 @@ extension ProjectListScreen {
     fileprivate enum Constant {
         static let contentVerticalPadding: CGFloat = 16
         static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
-        static let menuItems: [ActionMenu.Item] = [
-            .init(id: "delete", title: "프로젝트 삭제", accessibilityLabel: "프로젝트 삭제 화면 열기")
-        ]
-
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
         static let headerControlRowHeight: CGFloat = 40

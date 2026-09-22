@@ -7,12 +7,8 @@ public struct ActionMenu: View {
 
     // MARK: Lifecycle
 
-    public init(
-        items: [Item],
-        onSelect: @escaping (Item.ID) -> Void = { _ in },
-    ) {
+    public init(items: [Item]) {
         self.items = items
-        self.onSelect = onSelect
     }
 
     // MARK: Public
@@ -21,7 +17,7 @@ public struct ActionMenu: View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(items) { item in
                 Button {
-                    onSelect(item.id)
+                    item.onSelect()
                 } label: {
                     StyledText(text: item.title)
                         .textStyle(.body2)
@@ -70,7 +66,6 @@ public struct ActionMenu: View {
     // MARK: Private
 
     private let items: [Item]
-    private let onSelect: (Item.ID) -> Void
 
 }
 
@@ -89,7 +84,7 @@ extension ActionMenu {
 // MARK: ActionMenu.Item
 
 extension ActionMenu {
-    public struct Item: Identifiable, Sendable, Equatable {
+    public struct Item: Identifiable {
 
         // MARK: Lifecycle
 
@@ -98,11 +93,13 @@ extension ActionMenu {
             title: String,
             role: Role = .normal,
             accessibilityLabel: String,
+            onSelect: @escaping () -> Void = { },
         ) {
             self.id = id
             self.title = title
             self.role = role
             self.accessibilityLabel = accessibilityLabel
+            self.onSelect = onSelect
         }
 
         // MARK: Public
@@ -125,6 +122,7 @@ extension ActionMenu {
         public let title: String
         public let role: Role
         public let accessibilityLabel: String
+        public let onSelect: () -> Void
 
     }
 }
