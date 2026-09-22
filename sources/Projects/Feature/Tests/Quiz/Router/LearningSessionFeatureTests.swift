@@ -16,7 +16,11 @@ struct LearningSessionFeatureTests {
         let resumption = LearningSetResumption(set: set)
         let store = makeStore()
 
-        await store.send(.input(.started(set: set, resumption: resumption, bookmarkedQuestionIDs: ["quiz-2"])))
+        await store.send(.input(.started(
+            set: set,
+            resumption: resumption,
+            bookmarkedQuestionIDs: ["quiz-2"],
+        )))
         await store.receive(.delegate(.questionReady(
             question: set.quizzes[2],
             number: 3,
@@ -36,7 +40,11 @@ struct LearningSessionFeatureTests {
         let set = QuizTestFixture.emptySet
         let store = makeStore()
 
-        await store.send(.input(.started(set: set, resumption: LearningSetResumption(set: set), bookmarkedQuestionIDs: [])))
+        await store.send(.input(.started(
+            set: set,
+            resumption: LearningSetResumption(set: set),
+            bookmarkedQuestionIDs: [],
+        )))
         await store.receive(.delegate(.emptySetDetected))
 
         #expect(!store.state.isInProgress)
@@ -77,7 +85,10 @@ struct LearningSessionFeatureTests {
 
         await store.send(.input(.answerRecorded(choiceCorrect: true)))
         await store.send(.input(.advanced))
-        await store.receive(.delegate(.completed(correctChoiceCount: 2, choiceQuestionCount: 2)))
+        await store.receive(.delegate(.completed(
+            correctChoiceCount: 2,
+            choiceQuestionCount: 2,
+        )))
     }
 
     @Test
@@ -109,7 +120,11 @@ struct LearningSessionFeatureTests {
 
     private func startedStore(set: QuizSet) async -> TestStoreOf<LearningSessionFeature> {
         let store = makeStore()
-        await store.send(.input(.started(set: set, resumption: LearningSetResumption(set: set), bookmarkedQuestionIDs: [])))
+        await store.send(.input(.started(
+            set: set,
+            resumption: LearningSetResumption(set: set),
+            bookmarkedQuestionIDs: [],
+        )))
         await store.receive(\.delegate.questionReady)
         return store
     }

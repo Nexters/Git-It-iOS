@@ -37,7 +37,10 @@ struct ProjectDetailRouterFeatureTests {
         let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
         await store.send(.savedQuestions(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
+            .singleQuestionEntry(.input(.questionRequested(
+                setID: "set-0",
+                questionID: "quiz-0",
+            )))
         )
 
         #expect(store.state.activeScreen == .savedQuestions)

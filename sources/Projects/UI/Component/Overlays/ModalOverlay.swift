@@ -31,7 +31,10 @@ public struct ModalOverlay<Content: View>: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .animation(.easeInOut(duration: Constant.transitionDuration), value: isPresented)
+        .animation(
+            .easeInOut(duration: Constant.transitionDuration),
+            value: isPresented,
+        )
     }
 
     // MARK: Internal
@@ -67,5 +70,8 @@ public struct ModalOverlay<Content: View>: View {
             .designSystemBackground(.grey600)
         }
     }
-    .frame(width: 390, height: 700)
+    .frame(
+        width: 390,
+        height: 700,
+    )
 }

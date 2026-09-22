@@ -28,7 +28,10 @@ struct ProfileDisplay: Equatable, Sendable {
         thisWeekSolvedCount = statistics?.thisWeekSolvedCount ?? 0
         thisMonthSolvedCount = statistics?.thisMonthSolvedCount ?? 0
         streakDays = statistics?.streakDays ?? 0
-        weeklyBars = Self.weeklyBars(from: statistics?.weeklyCounts ?? [], todayLabel: todayLabel)
+        weeklyBars = Self.weeklyBars(
+            from: statistics?.weeklyCounts ?? [],
+            todayLabel: todayLabel,
+        )
 
         switch profileLoad {
         case .loaded:
@@ -91,7 +94,10 @@ struct ProfileDisplay: Equatable, Sendable {
     ) -> String {
         var koreanCalendar = calendar
         koreanCalendar.locale = Locale(identifier: "ko_KR")
-        let weekdayIndex = koreanCalendar.component(.weekday, from: date) - 1
+        let weekdayIndex = koreanCalendar.component(
+            .weekday,
+            from: date,
+        ) - 1
         let symbols = koreanCalendar.veryShortWeekdaySymbols
         guard symbols.indices.contains(weekdayIndex) else { return "" }
         return symbols[weekdayIndex]
@@ -104,10 +110,17 @@ struct ProfileDisplay: Equatable, Sendable {
         todayLabel: String,
     ) -> [WeeklyBar] {
         let source = counts.isEmpty
-            ? defaultDayLabels.map { WeeklyLearningCount(dayLabel: $0, count: 0) }
+            ? defaultDayLabels.map { WeeklyLearningCount(
+                dayLabel: $0,
+                count: 0,
+            ) }
             : counts
         return source.map {
-            WeeklyBar(dayLabel: $0.dayLabel, count: $0.count, isHighlighted: $0.dayLabel == todayLabel)
+            WeeklyBar(
+                dayLabel: $0.dayLabel,
+                count: $0.count,
+                isHighlighted: $0.dayLabel == todayLabel,
+            )
         }
     }
 

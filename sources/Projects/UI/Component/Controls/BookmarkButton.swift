@@ -22,7 +22,10 @@ public struct BookmarkButton: View {
             Image(systemName: symbol)
                 .font(.system(size: Constant.glyphSize))
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
-                .frame(width: Constant.surfaceWidth, height: Constant.surfaceHeight)
+                .frame(
+                    width: Constant.surfaceWidth,
+                    height: Constant.surfaceHeight,
+                )
                 .designSystemBackground(.grey500)
                 .designSystemCornerRadius(.large)
                 .frame(
@@ -66,8 +69,14 @@ public struct BookmarkButton: View {
 
 #Preview("Bookmark Button") {
     HStack(spacing: LayoutToken.gutter) {
-        BookmarkButton(isSaved: .constant(false), accessibilityLabel: "저장하기")
-        BookmarkButton(isSaved: .constant(true), accessibilityLabel: "저장 해제하기")
+        BookmarkButton(
+            isSaved: .constant(false),
+            accessibilityLabel: "저장하기",
+        )
+        BookmarkButton(
+            isSaved: .constant(true),
+            accessibilityLabel: "저장 해제하기",
+        )
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

@@ -31,10 +31,16 @@ public struct SettingRow<Content: View>: View {
                             .foregroundColorToken(.grey400)
                     }
                     ResourceImage(asset: .icon(.settingChevron))
-                        .frame(width: Constant.chevronSize, height: Constant.chevronSize)
+                        .frame(
+                            width: Constant.chevronSize,
+                            height: Constant.chevronSize,
+                        )
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: Constant.minimumHeight,
+            )
             .padding(.vertical, Constant.verticalPadding)
             .padding(.horizontal, Constant.horizontalPadding)
             .contentShape(Rectangle())

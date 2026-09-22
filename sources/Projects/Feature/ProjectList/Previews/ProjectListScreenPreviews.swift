@@ -9,8 +9,14 @@ private func previewProject(index: Int) -> ProjectSummary {
         repositoryName: "0-jerry/git-it-ios-\(index)",
         repositoryImageURL: nil,
         techStack: ["Swift", "SwiftUI", "TCA"],
-        currentSet: ProjectSetLabel(label: "CHAPTER \(index)", title: "의존성 주입과 모듈 경계"),
-        next: ProjectNextQuiz(setID: "set-\(index)", quizID: "quiz-\(index)"),
+        currentSet: ProjectSetLabel(
+            label: "CHAPTER \(index)",
+            title: "의존성 주입과 모듈 경계",
+        ),
+        next: ProjectNextQuiz(
+            setID: "set-\(index)",
+            quizID: "quiz-\(index)",
+        ),
         progressPercent: index * 20,
     )
 }
@@ -23,7 +29,11 @@ private func previewState(
     deletion: ProjectDeletionFeature.State.Deletion = .idle,
 ) -> ProjectListFeature.State {
     var state = ProjectListFeature.State()
-    state.projectSummaries.load = load ?? .loaded(ProjectList(summaries: projects, hasNextPage: false, isLoaded: true))
+    state.projectSummaries.load = load ?? .loaded(ProjectList(
+        summaries: projects,
+        hasNextPage: false,
+        isLoaded: true,
+    ))
     state.pagination.pagination = pagination
     state.mode = mode
     state.deletion.deletion = deletion
@@ -48,7 +58,10 @@ private func previewStore(_ state: ProjectListFeature.State) -> StoreOf<ProjectL
 
 #Preview("프로젝트 목록 · 삭제 확인") {
     ProjectListScreen(
-        store: previewStore(previewState(mode: .deleting, deletion: .confirming(projectID: "project-1")))
+        store: previewStore(previewState(
+            mode: .deleting,
+            deletion: .confirming(projectID: "project-1"),
+        ))
     )
 }
 
@@ -58,7 +71,10 @@ private func previewStore(_ state: ProjectListFeature.State) -> StoreOf<ProjectL
 
 #Preview("프로젝트 목록 · 실패") {
     ProjectListScreen(
-        store: previewStore(previewState(projects: [], load: .failed(.temporarilyUnavailable)))
+        store: previewStore(previewState(
+            projects: [],
+            load: .failed(.temporarilyUnavailable),
+        ))
     )
 }
 

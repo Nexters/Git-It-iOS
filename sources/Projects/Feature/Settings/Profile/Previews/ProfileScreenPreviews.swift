@@ -4,13 +4,34 @@ import SwiftUI
 
 private enum ProfilePreviewFixture {
     static let weeklyCounts = [
-        WeeklyLearningCount(dayLabel: "월", count: 3),
-        WeeklyLearningCount(dayLabel: "화", count: 0),
-        WeeklyLearningCount(dayLabel: "수", count: 5),
-        WeeklyLearningCount(dayLabel: "목", count: 2),
-        WeeklyLearningCount(dayLabel: "금", count: 0),
-        WeeklyLearningCount(dayLabel: "토", count: 1),
-        WeeklyLearningCount(dayLabel: "일", count: 0),
+        WeeklyLearningCount(
+            dayLabel: "월",
+            count: 3,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "화",
+            count: 0,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "수",
+            count: 5,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "목",
+            count: 2,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "금",
+            count: 0,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "토",
+            count: 1,
+        ),
+        WeeklyLearningCount(
+            dayLabel: "일",
+            count: 0,
+        ),
     ]
 
     static let emptyStatistics = LearningStatistics(
@@ -38,7 +59,10 @@ private enum ProfilePreviewFixture {
                 email: "kimlee@github.io",
                 statistics: statistics,
             ),
-            curation: Self.curation(position: position, careerLevel: careerLevel),
+            curation: Self.curation(
+                position: position,
+                careerLevel: careerLevel,
+            ),
         )
     }
 
@@ -47,7 +71,10 @@ private enum ProfilePreviewFixture {
         careerLevel: CareerLevel?,
     ) -> Curation? {
         guard let position, let careerLevel else { return nil }
-        return Curation(position: position, careerLevel: careerLevel)
+        return Curation(
+            position: position,
+            careerLevel: careerLevel,
+        )
     }
 
     @MainActor

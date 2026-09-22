@@ -27,17 +27,23 @@ struct MemberProfileResponseDTOTests {
             }
             """#.utf8)
 
-        let profile = try JSONDecoder().decode(MemberProfileResponseDTO.self, from: json)
+        let profile = try JSONDecoder().decode(
+            MemberProfileResponseDTO.self,
+            from: json,
+        )
 
         #expect(profile.weeklyChart.map(\.dayLabel) == ["수", "월", "화"])
     }
 
     @Test
     func `position과 careerLevel이 모두 null이면 각각 nil로 보존한다`() throws {
-        let profile = try JSONDecoder().decode(MemberProfileResponseDTO.self, from: profileJSON(
-            position: "null",
-            careerLevel: "null",
-        ))
+        let profile = try JSONDecoder().decode(
+            MemberProfileResponseDTO.self,
+            from: profileJSON(
+                position: "null",
+                careerLevel: "null",
+            ),
+        )
 
         #expect(profile.position == nil)
         #expect(profile.careerLevel == nil)
@@ -45,10 +51,13 @@ struct MemberProfileResponseDTOTests {
 
     @Test
     func `한 필드만 null이면 다른 필드 값은 그대로 보존한다`() throws {
-        let profile = try JSONDecoder().decode(MemberProfileResponseDTO.self, from: profileJSON(
-            position: #""BACKEND""#,
-            careerLevel: "null",
-        ))
+        let profile = try JSONDecoder().decode(
+            MemberProfileResponseDTO.self,
+            from: profileJSON(
+                position: #""BACKEND""#,
+                careerLevel: "null",
+            ),
+        )
 
         #expect(profile.position == "BACKEND")
         #expect(profile.careerLevel == nil)
@@ -57,10 +66,13 @@ struct MemberProfileResponseDTOTests {
     @Test
     func `미지원 non-null raw value 타입은 nil로 치환되지 않고 decoding 오류로 실패한다`() {
         #expect(throws: (any Error).self) {
-            try JSONDecoder().decode(MemberProfileResponseDTO.self, from: profileJSON(
-                position: "123",
-                careerLevel: #""JUNIOR""#,
-            ))
+            try JSONDecoder().decode(
+                MemberProfileResponseDTO.self,
+                from: profileJSON(
+                    position: "123",
+                    careerLevel: #""JUNIOR""#,
+                ),
+            )
         }
     }
 

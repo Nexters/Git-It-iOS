@@ -18,7 +18,10 @@ struct LocalKeyValueStorage: KeyValueStorage {
         forKey key: String,
     ) async -> Value? {
         guard let data = await store.value(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(Value.self, from: data)
+        return try? JSONDecoder().decode(
+            Value.self,
+            from: data,
+        )
     }
 
     func setValue(
@@ -26,7 +29,10 @@ struct LocalKeyValueStorage: KeyValueStorage {
         forKey key: String,
     ) async {
         guard let data = try? JSONEncoder().encode(value) else { return }
-        await store.store(data, forKey: key)
+        await store.store(
+            data,
+            forKey: key,
+        )
     }
 
     func removeValue(forKey key: String) async {

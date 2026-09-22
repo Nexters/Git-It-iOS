@@ -86,7 +86,10 @@ private func previewState(
 #Preview("프로젝트 상세 · 실패") {
     ProjectDetailScreen(
         store: Store(
-            initialState: previewState(detail: nil, loadStatus: .failed(.temporarilyUnavailable))
+            initialState: previewState(
+                detail: nil,
+                loadStatus: .failed(.temporarilyUnavailable),
+            )
         ) { EmptyReducer() }
     )
 }

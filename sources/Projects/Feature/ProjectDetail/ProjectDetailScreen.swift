@@ -42,7 +42,10 @@ struct ProjectDetailScreen: View {
                     .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.isMenuPresented)
+        .animation(
+            .easeInOut(duration: Constant.menuTransitionDuration),
+            value: store.isMenuPresented,
+        )
         .overlay {
             ModalOverlay(
                 isPresented: Binding(
@@ -94,7 +97,10 @@ struct ProjectDetailScreen: View {
             )
             .designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 RepositorySummaryView(
                     repositoryName: store.detailLoad.detail?.repository.name ?? "",
                     repositoryImageURL: store.detailLoad.detail?.repository.imageURL,
@@ -163,7 +169,10 @@ extension ProjectDetailScreen {
         }
 
         static let summaryTopSpacing: CGFloat = 27
-        static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
+        static let menuControl = ScreenControlBar.Control(
+            icon: .menu,
+            label: "메뉴 열기",
+        )
 
         static let setListTopSpacing: CGFloat = 53
         static let contentBottomPadding: CGFloat = 16
@@ -174,12 +183,27 @@ extension ProjectDetailScreen {
 
         static let heroGradient = GradientToken(
             name: "Gradient 1 · 프로젝트 상세",
-            start: .init(x: 0.5, y: 0),
-            end: .init(x: 0.5, y: 1),
+            start: .init(
+                x: 0.5,
+                y: 0,
+            ),
+            end: .init(
+                x: 0.5,
+                y: 1,
+            ),
             stops: [
-                GradientToken.Stop(position: 0, hex: "#56718A"),
-                GradientToken.Stop(position: 0.5, hex: "#485469"),
-                GradientToken.Stop(position: 1, hex: "#3B3749"),
+                GradientToken.Stop(
+                    position: 0,
+                    hex: "#56718A",
+                ),
+                GradientToken.Stop(
+                    position: 0.5,
+                    hex: "#485469",
+                ),
+                GradientToken.Stop(
+                    position: 1,
+                    hex: "#3B3749",
+                ),
             ],
         )
     }

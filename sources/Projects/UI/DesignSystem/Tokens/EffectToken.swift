@@ -68,12 +68,18 @@ extension EffectToken {
         layers: [
             Layer(
                 colorToken: .black45,
-                offset: Offset(x: 0, y: 4),
+                offset: Offset(
+                    x: 0,
+                    y: 4,
+                ),
                 blur: 6,
             ),
             Layer(
                 colorToken: .black35,
-                offset: Offset(x: 0, y: 4),
+                offset: Offset(
+                    x: 0,
+                    y: 4,
+                ),
                 blur: 34,
             ),
         ],
@@ -84,7 +90,10 @@ extension EffectToken {
         layers: [
             Layer(
                 colorToken: .black25,
-                offset: Offset(x: 4, y: 4),
+                offset: Offset(
+                    x: 4,
+                    y: 4,
+                ),
                 blur: 15,
                 spread: 10,
             )

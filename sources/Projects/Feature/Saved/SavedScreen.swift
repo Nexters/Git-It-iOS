@@ -64,7 +64,10 @@ struct SavedScreen: View {
     private var header: some View {
         VStack(spacing: Constant.headerBottomPadding) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: Constant.headerVerticalSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerVerticalSpacing,
+                ) {
                     if store.isBackControlPresented {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
@@ -97,7 +100,10 @@ struct SavedScreen: View {
     }
 
     private var content: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.compactSpacing) {
+        VStack(
+            alignment: .leading,
+            spacing: LayoutToken.compactSpacing,
+        ) {
             ForEach(
                 SavedQuestionDisplay.list(
                     questions: store.collection?.bookmarks ?? [],

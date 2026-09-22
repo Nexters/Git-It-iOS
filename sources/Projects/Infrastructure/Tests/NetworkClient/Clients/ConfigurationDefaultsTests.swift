@@ -17,7 +17,13 @@ struct ConfigurationDefaultsTests {
             transport: transport,
         )
 
-        _ = try await client.send(HTTPRequest(method: .get, path: "resource"), expecting: TestPayload.self)
+        _ = try await client.send(
+            HTTPRequest(
+                method: .get,
+                path: "resource",
+            ),
+            expecting: TestPayload.self,
+        )
 
         let requests = await transport.requests
         let request = try #require(requests.first)
@@ -35,7 +41,11 @@ struct ConfigurationDefaultsTests {
         )
 
         _ = try await client.send(
-            HTTPRequest(method: .get, path: "resource", responseTimeout: .seconds(2)),
+            HTTPRequest(
+                method: .get,
+                path: "resource",
+                responseTimeout: .seconds(2),
+            ),
             expecting: TestPayload.self,
         )
 
@@ -54,7 +64,10 @@ struct ConfigurationDefaultsTests {
         .init(
             statusCode: 200,
             headers: [:],
-            body: try! JSONEncoder().encode(TestPayload(id: 1, name: "응답")),
+            body: try! JSONEncoder().encode(TestPayload(
+                id: 1,
+                name: "응답",
+            )),
         )
     }
 

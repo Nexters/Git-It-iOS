@@ -14,7 +14,10 @@ public struct ActionMenu: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             ForEach(items) { item in
                 Button {
                     item.onSelect()
@@ -25,7 +28,10 @@ public struct ActionMenu: View {
                         .padding(.horizontal, Constant.rowHorizontalPadding)
                         .padding(.top, Constant.rowTopPadding)
                         .padding(.bottom, Constant.rowBottomPadding)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(
+                            maxWidth: .infinity,
+                            alignment: .leading,
+                        )
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -34,7 +40,10 @@ public struct ActionMenu: View {
             }
         }
         .padding(Constant.containerPadding)
-        .frame(width: Constant.menuWidth, alignment: .leading)
+        .frame(
+            width: Constant.menuWidth,
+            alignment: .leading,
+        )
         .glassEffect(
             .regular.tint(Color(designSystem: .white5)),
             in: RoundedRectangle(designSystem: .large),
@@ -139,7 +148,10 @@ extension ActionMenu {
     )
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .frame(
+        maxWidth: .infinity,
+        maxHeight: .infinity,
+    )
     .designSystemBackground(.grey700)
 }
 
@@ -166,6 +178,9 @@ extension ActionMenu {
     )
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .frame(
+        maxWidth: .infinity,
+        maxHeight: .infinity,
+    )
     .designSystemBackground(.grey700)
 }

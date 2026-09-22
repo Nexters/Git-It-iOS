@@ -10,13 +10,25 @@ extension ProfileScreen {
 
         var body: some View {
             HStack(spacing: 0) {
-                column(label: Constant.thisWeekLabel, value: "\(display.thisWeekSolvedCount)\(Constant.countUnit)")
-                column(label: Constant.thisMonthLabel, value: "\(display.thisMonthSolvedCount)\(Constant.countUnit)")
-                column(label: Constant.streakLabel, value: "\(display.streakDays)\(Constant.dayUnit)")
+                column(
+                    label: Constant.thisWeekLabel,
+                    value: "\(display.thisWeekSolvedCount)\(Constant.countUnit)",
+                )
+                column(
+                    label: Constant.thisMonthLabel,
+                    value: "\(display.thisMonthSolvedCount)\(Constant.countUnit)",
+                )
+                column(
+                    label: Constant.streakLabel,
+                    value: "\(display.streakDays)\(Constant.dayUnit)",
+                )
             }
             .frame(maxWidth: .infinity)
             .frame(height: Constant.height)
-            .background(cardGradient, in: RoundedRectangle(designSystem: .large))
+            .background(
+                cardGradient,
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
         // MARK: Private

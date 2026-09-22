@@ -45,9 +45,15 @@ public struct OverlayContainer<
                             .ignoresSafeArea(edges: .bottom)
                     }
             }
-            .ignoresSafeArea(.keyboard, edges: .bottom)
+            .ignoresSafeArea(
+                .keyboard,
+                edges: .bottom,
+            )
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+        )
         .background(Color(designSystem: screenBackground).ignoresSafeArea())
         .preferredColorScheme(.dark)
     }
@@ -68,7 +74,11 @@ public struct OverlayContainer<
                     content
                     occlusionSpacer { footer }
                 }
-                .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .top)
+                .frame(
+                    maxWidth: .infinity,
+                    minHeight: proxy.size.height,
+                    alignment: .top,
+                )
                 .padding(.top, proxy.safeAreaInsets.top)
                 .background(alignment: .top) { background }
             }
@@ -116,19 +126,31 @@ extension OverlayContainer: BackgroundColorConfigurable {
 
 #Preview("Overlay Container") {
     OverlayContainer {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(
+            alignment: .leading,
+            spacing: 16,
+        ) {
             Spacer(minLength: 0)
                 .frame(height: 40)
 
             ScreenHeaderTitle(displayModel: .init(title: "오버레이 헤더"))
         }
         .padding(.bottom, 10)
-        .frame(height: 99, alignment: .top)
+        .frame(
+            height: 99,
+            alignment: .top,
+        )
         .designSystemScreenMargin()
     } content: {
         VStack(spacing: LayoutToken.gutter) {
-            ForEach(0..<20, id: \.self) { index in
-                LabeledCard(displayModel: .init(label: "항목 \(index)", text: "스크롤하면 헤더 뒤로 지나갑니다."))
+            ForEach(
+                0..<20,
+                id: \.self,
+            ) { index in
+                LabeledCard(displayModel: .init(
+                    label: "항목 \(index)",
+                    text: "스크롤하면 헤더 뒤로 지나갑니다.",
+                ))
             }
         }
         .designSystemScreenMargin()

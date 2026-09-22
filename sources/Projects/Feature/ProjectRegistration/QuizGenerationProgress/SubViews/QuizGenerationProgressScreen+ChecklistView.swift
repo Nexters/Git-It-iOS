@@ -13,9 +13,18 @@ extension QuizGenerationProgressScreen {
         let progress: Double
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.rowSpacing) {
-                ForEach(Stage.allCases, id: \.self) { stage in
-                    checklistRow(title: stage.title, status: status(for: stage))
+            VStack(
+                alignment: .leading,
+                spacing: Constant.rowSpacing,
+            ) {
+                ForEach(
+                    Stage.allCases,
+                    id: \.self,
+                ) { stage in
+                    checklistRow(
+                        title: stage.title,
+                        status: status(for: stage),
+                    )
                 }
             }
             .accessibilityElement(children: .combine)

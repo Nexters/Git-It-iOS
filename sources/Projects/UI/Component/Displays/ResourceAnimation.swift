@@ -27,7 +27,10 @@ public struct ResourceAnimation: View {
         case storageEmpty = "storage-empty"
 
         var animation: LottieAnimation? {
-            .named(rawValue, bundle: .module)
+            .named(
+                rawValue,
+                bundle: .module,
+            )
         }
     }
 
@@ -75,15 +78,24 @@ extension ResourceAnimation {
 #Preview("Resource Animation") {
     VStack(spacing: LayoutToken.gutter) {
         ResourceAnimation(asset: .generalLoading)
-            .frame(width: 128, height: 128)
+            .frame(
+                width: 128,
+                height: 128,
+            )
 
         ResourceAnimation(asset: .notification)
             .looping(false)
-            .frame(width: 128, height: 128)
+            .frame(
+                width: 128,
+                height: 128,
+            )
 
         ResourceAnimation(asset: .storageEmpty)
             .looping(false)
-            .frame(width: 128, height: 128)
+            .frame(
+                width: 128,
+                height: 128,
+            )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
@@ -94,11 +106,17 @@ extension ResourceAnimation {
     VStack(spacing: LayoutToken.gutter) {
         ResourceAnimation(asset: .setCreationLoading)
             .speed(1.5)
-            .frame(width: 250, height: 250)
+            .frame(
+                width: 250,
+                height: 250,
+            )
 
         ResourceAnimation(asset: .complete)
             .looping(false)
-            .frame(width: 200, height: 200)
+            .frame(
+                width: 200,
+                height: 200,
+            )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

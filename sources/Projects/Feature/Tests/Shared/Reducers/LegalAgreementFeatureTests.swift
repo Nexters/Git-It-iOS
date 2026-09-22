@@ -46,7 +46,10 @@ struct LegalAgreementFeatureTests {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         let policyConsent = AccountUseCaseConsentMock(status: OnboardingTestFixture.pendingConsentStatus)
-        let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
+        let store = makeLegalAgreementStore(
+            policyConsent: policyConsent,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.documentToggled(documentID: OnboardingTestFixture.privacyPolicy.id)))
@@ -83,7 +86,10 @@ struct LegalAgreementFeatureTests {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         let policyConsent = AccountUseCaseConsentMock(status: OnboardingTestFixture.pendingConsentStatus)
-        let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
+        let store = makeLegalAgreementStore(
+            policyConsent: policyConsent,
+            state: state,
+        )
 
         await store.send(.view(.documentToggled(documentID: OnboardingTestFixture.privacyPolicy.id))) {
             $0.selectedDocumentIDs = [OnboardingTestFixture.privacyPolicy.id]
@@ -101,7 +107,10 @@ struct LegalAgreementFeatureTests {
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.selectedDocumentIDs = [OnboardingTestFixture.privacyPolicy.id]
         let policyConsent = AccountUseCaseConsentMock(status: OnboardingTestFixture.pendingConsentStatus)
-        let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
+        let store = makeLegalAgreementStore(
+            policyConsent: policyConsent,
+            state: state,
+        )
 
         await store.send(.view(.cancelTapped)) {
             $0.selectedDocumentIDs = []

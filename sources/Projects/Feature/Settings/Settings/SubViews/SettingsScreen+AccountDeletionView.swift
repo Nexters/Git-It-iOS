@@ -13,8 +13,14 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
@@ -24,16 +30,28 @@ extension SettingsScreen {
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
                     ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
             } content: {
-                VStack(alignment: .leading, spacing: Constant.paragraphSpacing) {
-                    ForEach(Constant.paragraphs, id: \.self) { paragraph in
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.paragraphSpacing,
+                ) {
+                    ForEach(
+                        Constant.paragraphs,
+                        id: \.self,
+                    ) { paragraph in
                         StyledText(text: paragraph)
                     }
 
@@ -43,7 +61,10 @@ extension SettingsScreen {
                             .foregroundColorToken(.error)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             } footer: {
@@ -59,7 +80,10 @@ extension SettingsScreen {
                     .designSystemScreenMargin()
                 }
             }
-            .toolbar(.hidden, for: .tabBar)
+            .toolbar(
+                .hidden,
+                for: .tabBar,
+            )
         }
 
         // MARK: Private

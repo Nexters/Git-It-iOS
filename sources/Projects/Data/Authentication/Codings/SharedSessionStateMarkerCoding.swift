@@ -18,7 +18,10 @@ public struct SharedSessionStateMarkerCoding: Sendable {
 
     public func loadSignedInState() async -> Bool? {
         guard
-            let marker = await storage.value(Marker.self, forKey: Self.stateMarkerKey),
+            let marker = await storage.value(
+                Marker.self,
+                forKey: Self.stateMarkerKey,
+            ),
             marker.schemaVersion == Self.markerSchemaVersion
         else { return nil }
         return marker.isSignedIn

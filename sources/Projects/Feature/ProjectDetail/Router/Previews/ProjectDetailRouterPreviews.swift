@@ -37,7 +37,10 @@ private let previewDetail = ProjectDetail(
 
 private let previewBookmarks = QuizBookmarkList(
     totalCount: 1,
-    projects: [QuizBookmarkProject(id: "project-1", name: "owner/repo")],
+    projects: [QuizBookmarkProject(
+        id: "project-1",
+        name: "owner/repo",
+    )],
     bookmarks: [
         QuizBookmark(
             projectID: "project-1",

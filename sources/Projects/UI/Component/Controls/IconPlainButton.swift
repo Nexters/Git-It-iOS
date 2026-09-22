@@ -30,11 +30,23 @@ public struct IconPlainButton: View {
             ZStack {
                 ResourceImage(asset: .icon(icon))
                     .designSystemForeground(foregroundColor)
-                    .frame(width: iconSize, height: iconSize)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(
+                        width: iconSize,
+                        height: iconSize,
+                    )
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                    )
             }
-            .frame(width: size, height: size)
-            .background(Color(designSystem: backgroundColor), in: Circle())
+            .frame(
+                width: size,
+                height: size,
+            )
+            .background(
+                Color(designSystem: backgroundColor),
+                in: Circle(),
+            )
             .frame(
                 width: max(size, Constant.minimumTouchSize),
                 height: max(size, Constant.minimumTouchSize),
@@ -83,10 +95,16 @@ extension IconPlainButton: BackgroundColorConfigurable {
 
 #Preview("Icon Plain Button") {
     HStack(spacing: LayoutToken.gutter) {
-        IconPlainButton(icon: .play, label: "학습 시작")
-        IconPlainButton(icon: .play, label: "학습 시작")
-            .foregroundColorToken(.grey700)
-            .backgroundColorToken(.blue100)
+        IconPlainButton(
+            icon: .play,
+            label: "학습 시작",
+        )
+        IconPlainButton(
+            icon: .play,
+            label: "학습 시작",
+        )
+        .foregroundColorToken(.grey700)
+        .backgroundColorToken(.blue100)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

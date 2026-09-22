@@ -11,7 +11,10 @@ struct SizeConfigurableTests {
     func `크기를 선언하지 않으면 컴포넌트 기본 크기로 그린다`() {
         #expect(size(of: ActionButton(title: "계속하기")) == ActionButton.Size.large)
         #expect(size(of: TagBadge(text: "완료")) == TagBadge.Size.regular)
-        #expect(size(of: IconGlassButton(icon: .bookmark, label: "저장하기")) == IconGlassButton.Size.small)
+        #expect(size(of: IconGlassButton(
+            icon: .bookmark,
+            label: "저장하기",
+        )) == IconGlassButton.Size.small)
         #expect(size(of: ContinuousProgressBar(progress: 0.5)) == ContinuousProgressBar.Height.row)
     }
 
@@ -19,7 +22,10 @@ struct SizeConfigurableTests {
     func `크기 선언은 크기만 바꾸고 스타일과 표시 값을 유지한다`() {
         let button = ActionButton(title: "계속하기").style(.secondary).size(.small)
         let badge = TagBadge(text: "완료").style(.muted).size(.compact)
-        let glassButton = IconGlassButton(icon: .bookmark, label: "저장하기").style(.accent).size(.medium)
+        let glassButton = IconGlassButton(
+            icon: .bookmark,
+            label: "저장하기",
+        ).style(.accent).size(.medium)
         let progressBar = ContinuousProgressBar(progress: 0.5).size(.detail)
 
         #expect(size(of: button) == ActionButton.Size.small)

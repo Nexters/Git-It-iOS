@@ -139,9 +139,15 @@ struct SettingsRouterFeatureTests {
 
     // MARK: Private
 
-    private let profile = SettingsTestFixture.profile(position: .backend, careerLevel: .entry)
+    private let profile = SettingsTestFixture.profile(
+        position: .backend,
+        careerLevel: .entry,
+    )
 
-    private let updatedProfile = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+    private let updatedProfile = SettingsTestFixture.profile(
+        position: .ios,
+        careerLevel: .senior,
+    )
 
     private func makeStore(
         state: SettingsRouterFeature.State = .init()
@@ -187,7 +193,11 @@ private struct SettingsRouterAccountUseCaseStub: AccountUseCase {
     }
 
     func policyConsentStatus() async throws -> PolicyConsentStatus {
-        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
+        PolicyConsentStatus(
+            documents: [],
+            consents: [],
+            isSatisfied: false,
+        )
     }
 
     func consent(to documentIDs: [PolicyDocumentID]) async throws {

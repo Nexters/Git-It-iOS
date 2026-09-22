@@ -27,6 +27,9 @@ extension TutorialFeature.State {
 
 #Preview("Tutorial - 로그인 취소") {
     TutorialScreen(
-        store: Store(initialState: .preview(page: 3, signInPhase: .cancelled)) { EmptyReducer() }
+        store: Store(initialState: .preview(
+            page: 3,
+            signInPhase: .cancelled,
+        )) { EmptyReducer() }
     )
 }

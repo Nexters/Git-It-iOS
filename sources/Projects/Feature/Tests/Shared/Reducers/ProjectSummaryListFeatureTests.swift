@@ -40,7 +40,10 @@ struct ProjectSummaryListFeatureTests {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
+        await store.receive(.effect(.refreshFinished(
+            requestID: 1,
+            error: nil,
+        )))
     }
 
     @Test
@@ -50,7 +53,10 @@ struct ProjectSummaryListFeatureTests {
         await store.send(.input(.refresh)) {
             $0.requestID = 1
         }
-        await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
+        await store.receive(.effect(.refreshFinished(
+            requestID: 1,
+            error: nil,
+        )))
 
         #expect(store.state.load == .loaded(HomeTestFixture.emptyPage))
     }
@@ -59,7 +65,11 @@ struct ProjectSummaryListFeatureTests {
     func `로드되지 않은 목록 수신은 상태를 바꾸지 않는다`() async {
         let store = makeStore(state: ProjectSummaryListFeature.State(load: .loading))
 
-        await store.send(.effect(.projectsReceived(ProjectList(summaries: [], hasNextPage: false, isLoaded: false))))
+        await store.send(.effect(.projectsReceived(ProjectList(
+            summaries: [],
+            hasNextPage: false,
+            isLoaded: false,
+        ))))
     }
 
     @Test
@@ -78,7 +88,10 @@ struct ProjectSummaryListFeatureTests {
         state.requestID = 1
         let store = makeStore(state: state)
 
-        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable)))
+        await store.send(.effect(.refreshFinished(
+            requestID: 1,
+            error: .temporarilyUnavailable,
+        )))
 
         #expect(store.state.load == .loaded(HomeTestFixture.oneProjectPage))
     }
@@ -89,7 +102,10 @@ struct ProjectSummaryListFeatureTests {
         state.requestID = 1
         let store = makeStore(state: state)
 
-        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable))) {
+        await store.send(.effect(.refreshFinished(
+            requestID: 1,
+            error: .temporarilyUnavailable,
+        ))) {
             $0.load = .failed(.temporarilyUnavailable)
         }
     }
@@ -100,7 +116,10 @@ struct ProjectSummaryListFeatureTests {
         state.requestID = 2
         let store = makeStore(state: state)
 
-        await store.send(.effect(.refreshFinished(requestID: 1, error: .temporarilyUnavailable)))
+        await store.send(.effect(.refreshFinished(
+            requestID: 1,
+            error: .temporarilyUnavailable,
+        )))
 
         #expect(store.state.load == .loading)
     }
@@ -113,7 +132,10 @@ struct ProjectSummaryListFeatureTests {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.refreshFinished(requestID: 1, error: .unexpected))) {
+        await store.receive(.effect(.refreshFinished(
+            requestID: 1,
+            error: .unexpected,
+        ))) {
             $0.load = .failed(.unexpected)
         }
     }

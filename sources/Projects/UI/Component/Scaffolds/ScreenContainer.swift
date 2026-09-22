@@ -15,7 +15,10 @@ public struct ScreenContainer<Content: View>: View {
 
     public var body: some View {
         content()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+            )
             .background(Color(designSystem: backgroundColor))
             .preferredColorScheme(.dark)
     }
@@ -43,5 +46,8 @@ extension ScreenContainer: BackgroundColorConfigurable {
             .textStyle(.subtitle1)
             .multilineTextAlignment(.center)
     }
-    .frame(width: 320, height: 240)
+    .frame(
+        width: 320,
+        height: 240,
+    )
 }

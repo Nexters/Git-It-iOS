@@ -33,7 +33,10 @@ enum ShareRegistrationPreviewSupport {
 
     private struct PreviewRepositoryLocator: ExternalRepositoryLocator {
         func location(from _: ExternalRepositoryURL) -> ExternalRepositoryLocation? {
-            ExternalRepositoryLocation(owner: "apple", name: "swift")
+            ExternalRepositoryLocation(
+                owner: "apple",
+                name: "swift",
+            )
         }
     }
 
@@ -45,7 +48,10 @@ enum ShareRegistrationPreviewSupport {
 
     private struct PreviewProjectGeneration: ProjectGenerationUseCase {
         func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
-            ProjectGenerationReceipt(projectID: "preview-project", quizLevel: request.quizLevel)
+            ProjectGenerationReceipt(
+                projectID: "preview-project",
+                quizLevel: request.quizLevel,
+            )
         }
 
         func states() async -> AsyncStream<ProjectGenerationState> {

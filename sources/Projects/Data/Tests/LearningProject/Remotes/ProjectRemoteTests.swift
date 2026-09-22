@@ -19,16 +19,28 @@ struct ProjectRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let page = try await remote.fetchProjects(page: 2, size: 30)
+        let page = try await remote.fetchProjects(
+            page: 2,
+            size: 30,
+        )
 
         #expect(page.items.isEmpty)
         #expect(!page.hasNext)
         let request = await transport.recordedRequests.first
         #expect(request?.url.path == "/api/v1/projects")
         #expect(methodName(request?.method) == "GET")
-        let queryItems = request.flatMap { URLComponents(url: $0.url, resolvingAgainstBaseURL: false)?.queryItems }
-        #expect(queryItems?.contains(URLQueryItem(name: "page", value: "2")) == true)
-        #expect(queryItems?.contains(URLQueryItem(name: "size", value: "30")) == true)
+        let queryItems = request.flatMap { URLComponents(
+            url: $0.url,
+            resolvingAgainstBaseURL: false,
+        )?.queryItems }
+        #expect(queryItems?.contains(URLQueryItem(
+            name: "page",
+            value: "2",
+        )) == true)
+        #expect(queryItems?.contains(URLQueryItem(
+            name: "size",
+            value: "30",
+        )) == true)
     }
 
     @Test
@@ -43,7 +55,10 @@ struct ProjectRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let page = try await remote.fetchProjects(page: 0, size: 20)
+        let page = try await remote.fetchProjects(
+            page: 0,
+            size: 20,
+        )
 
         #expect(page.items.count == 1)
         #expect(page.items.first?.projectID == "project-1")
@@ -86,7 +101,10 @@ struct ProjectRemoteTests {
         let remote = makeRemote(transport: transport)
 
         let response = try await remote.registerProject(
-            RegisterProjectRequestDTO(githubRepoURL: "https://github.com/owner/repo", quizLevel: .l1)
+            RegisterProjectRequestDTO(
+                githubRepoURL: "https://github.com/owner/repo",
+                quizLevel: .l1,
+            )
         )
 
         #expect(response.projectID == "project-1")
@@ -135,7 +153,10 @@ struct ProjectRemoteTests {
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: LearningProjectServiceError.transport) {
-            try await remote.fetchProjects(page: 0, size: 10)
+            try await remote.fetchProjects(
+                page: 0,
+                size: 10,
+            )
         }
     }
 
@@ -145,7 +166,10 @@ struct ProjectRemoteTests {
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: CancellationError.self) {
-            try await remote.fetchProjects(page: 0, size: 10)
+            try await remote.fetchProjects(
+                page: 0,
+                size: 10,
+            )
         }
     }
 
@@ -169,7 +193,11 @@ extension ProjectRemoteTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 
     private func methodName(_ method: InfrastructureNetworkClient.HTTPMethod?) -> String {

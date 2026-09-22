@@ -101,7 +101,10 @@ public struct ConcernUseCaseAssembly: Sendable {
         self.account = account
 
         userInfo = UserInfo(
-            repository: UserInfoRepositoryAdapter(remote: memberRemote, sessionStorage: sessionStorage)
+            repository: UserInfoRepositoryAdapter(
+                remote: memberRemote,
+                sessionStorage: sessionStorage,
+            )
         )
         let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
         appSetting = AppSetting(

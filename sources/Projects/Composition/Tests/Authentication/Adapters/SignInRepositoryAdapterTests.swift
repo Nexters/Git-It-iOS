@@ -18,7 +18,10 @@ struct SignInRepositoryAdapterTests {
         let context = try Context(results: [Self.loginResponse(needsCuration: true)])
         try context.saveAppleUserID()
 
-        let record = try await context.adapter.start(with: AuthenticationGrant(id: "id-token", method: .apple))
+        let record = try await context.adapter.start(with: AuthenticationGrant(
+            id: "id-token",
+            method: .apple,
+        ))
 
         #expect(record.account.needsCuration)
         #expect(record.account.id == "apple-user")
@@ -117,7 +120,10 @@ struct SignInRepositoryAdapterTests {
             {"success":true,"data":{"accessToken":"access-token","refreshToken":"refresh-token",\
             "needsCuration":\(needsCuration)},"code":null,"message":null,"errors":null}
             """
-        return TransportResponse(statusCode: 200, body: Data(envelope.utf8))
+        return TransportResponse(
+            statusCode: 200,
+            body: Data(envelope.utf8),
+        )
     }
 
 }

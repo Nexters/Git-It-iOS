@@ -133,7 +133,10 @@ public struct LearningSetIntroFeature: Sendable {
                     !state.autoStartsOnLoad
                 else { return .none }
                 state.autoStartsOnLoad = true
-                return startEffect(set: set, state: state)
+                return startEffect(
+                    set: set,
+                    state: state,
+                )
 
             case .view(.backTapped):
                 return .send(.delegate(.backRequested))
@@ -149,7 +152,10 @@ public struct LearningSetIntroFeature: Sendable {
                     state.setLoad = .loaded(set)
                     guard state.autoStartsOnLoad else { return .none }
                     state.autoStartsOnLoad = false
-                    return startEffect(set: set, state: state)
+                    return startEffect(
+                        set: set,
+                        state: state,
+                    )
 
                 case .failure(let error):
                     state.setLoad = .failed(error)
@@ -203,13 +209,22 @@ public struct LearningSetIntroFeature: Sendable {
         return .run { send in
             do {
                 let set = try await fetchQuizSet(setID, projectID)
-                await send(.effect(.setLoadFinished(requestID: requestID, result: .success(set))))
+                await send(.effect(.setLoadFinished(
+                    requestID: requestID,
+                    result: .success(set),
+                )))
             } catch {
                 let mapped = error as? QuizDetailError ?? .unexpected
-                await send(.effect(.setLoadFinished(requestID: requestID, result: .failure(mapped))))
+                await send(.effect(.setLoadFinished(
+                    requestID: requestID,
+                    result: .failure(mapped),
+                )))
             }
         }
-        .cancellable(id: CancelID.setLoad, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.setLoad,
+            cancelInFlight: true,
+        )
     }
 
     private func loadBookmarks(_ state: inout State) -> Effect<Action> {
@@ -224,7 +239,10 @@ public struct LearningSetIntroFeature: Sendable {
                 await send(.effect(.bookmarksLoadFinished(.failure(mapped))))
             }
         }
-        .cancellable(id: CancelID.bookmarkLoad, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.bookmarkLoad,
+            cancelInFlight: true,
+        )
     }
 
 }

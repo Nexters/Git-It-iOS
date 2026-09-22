@@ -40,14 +40,23 @@ struct ChoiceAnswerOptionTests {
 
     @Test
     func `표시 값을 직접 받아 생성한다`() {
-        _ = ChoiceAnswerOption(displayModel: .init(letter: "A", text: "State"), state: .selected)
+        _ = ChoiceAnswerOption(
+            displayModel: .init(
+                letter: "A",
+                text: "State",
+            ),
+            state: .selected,
+        )
     }
 
     @Test
     func `펼침 토글은 펼침 여부 Binding을 반전한다`() {
         var isExpanded = false
         let expansion = ChoiceAnswerOption.ExpansionControl.toggleable(
-            isExpanded: Binding(get: { isExpanded }, set: { isExpanded = $0 })
+            isExpanded: Binding(
+                get: { isExpanded },
+                set: { isExpanded = $0 },
+            )
         )
 
         expansion.toggle()

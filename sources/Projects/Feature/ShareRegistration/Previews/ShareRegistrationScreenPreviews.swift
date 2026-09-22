@@ -27,7 +27,10 @@ import SwiftUI
 #Preview("실패") {
     ShareRegistrationScreen(
         store: ShareRegistrationPreviewSupport.store(
-            phase: .failed(reason: "네트워크에 연결할 수 없어요.", retry: .registration)
+            phase: .failed(
+                reason: "네트워크에 연결할 수 없어요.",
+                retry: .registration,
+            )
         )
     )
 }

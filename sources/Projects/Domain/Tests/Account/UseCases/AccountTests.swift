@@ -110,7 +110,10 @@ struct AccountTests {
 
     @Test
     func `사용할 수 없는 계정을 복원하면 기록을 정리하고 signedOut을 반환한다`() async {
-        let record = SignInRecord(account: StubSignInRepository.account, isAccountAvailable: false)
+        let record = SignInRecord(
+            account: StubSignInRepository.account,
+            isAccountAvailable: false,
+        )
         let signInRepository = StubSignInRepository(restoreResult: .success(record))
         let account = Self.makeAccount(signInRepository: signInRepository)
 

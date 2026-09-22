@@ -10,7 +10,10 @@ struct TransportSubstitutionTests {
 
     @Test
     func `미리 정한 응답을 실제 네트워크 없이 전달한다`() async throws {
-        let expected = TestPayload(id: 3, name: "대역 응답")
+        let expected = TestPayload(
+            id: 3,
+            name: "대역 응답",
+        )
         let transport = RecordingTransport([.response(.init(
             statusCode: 200,
             headers: [:],
@@ -18,7 +21,10 @@ struct TransportSubstitutionTests {
         ))])
 
         let response = try await client(transport: transport).send(
-            HTTPRequest(method: .get, path: "resource"),
+            HTTPRequest(
+                method: .get,
+                path: "resource",
+            ),
             expecting: TestPayload.self,
         )
 
@@ -35,7 +41,10 @@ struct TransportSubstitutionTests {
 
         await #expect(throws: HTTPClientError.connectionFailed) {
             try await client(transport: transport).send(
-                HTTPRequest(method: .get, path: "resource"),
+                HTTPRequest(
+                    method: .get,
+                    path: "resource",
+                ),
                 expecting: TestPayload.self,
             )
         }
@@ -43,18 +52,27 @@ struct TransportSubstitutionTests {
 
     @Test
     func `기록된 전송 요청에서 조립 결과를 검사한다`() async throws {
-        let responseBody = TestPayload(id: 1, name: "응답")
+        let responseBody = TestPayload(
+            id: 1,
+            name: "응답",
+        )
         let expectedBody = Data("encoded request".utf8)
         let transport = RecordingTransport([.response(.init(
             statusCode: 200,
             headers: [:],
             body: try JSONEncoder().encode(responseBody),
         ))])
-        let body = TestPayload(id: 11, name: "본문")
+        let body = TestPayload(
+            id: 11,
+            name: "본문",
+        )
         let request = HTTPRequest(
             method: .patch,
             path: "items/11",
-            queryItems: [.init(name: "q", value: "a+b")],
+            queryItems: [.init(
+                name: "q",
+                value: "a+b",
+            )],
             headers: ["X-Request": "request"],
             responseTimeout: .seconds(3),
         )
@@ -85,10 +103,17 @@ struct TransportSubstitutionTests {
     @Test
     func `비성공 상태와 원형 본문도 대체 전송 수단으로 검사한다`() async throws {
         let raw = Data("service unavailable".utf8)
-        let transport = RecordingTransport([.response(.init(statusCode: 503, headers: ["Retry-After": "30"], body: raw))])
+        let transport = RecordingTransport([.response(.init(
+            statusCode: 503,
+            headers: ["Retry-After": "30"],
+            body: raw,
+        ))])
 
         let response = try await client(transport: transport).send(
-            HTTPRequest(method: .get, path: "resource"),
+            HTTPRequest(
+                method: .get,
+                path: "resource",
+            ),
             expecting: TestPayload.self,
         )
 

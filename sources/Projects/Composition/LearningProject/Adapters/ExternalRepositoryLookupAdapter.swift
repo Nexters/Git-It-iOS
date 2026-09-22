@@ -18,7 +18,10 @@ public struct ExternalRepositoryLookupAdapter: DomainExternalRepository.External
         name: String,
     ) async throws -> DomainExternalRepository.ExternalRepository {
         do {
-            let response = try await remote.repository(GitHubRepositoryRequest(owner: owner, repository: name))
+            let response = try await remote.repository(GitHubRepositoryRequest(
+                owner: owner,
+                repository: name,
+            ))
             return DomainExternalRepository.ExternalRepository(
                 canonicalURL: response.htmlURL,
                 ownerName: response.ownerLogin,

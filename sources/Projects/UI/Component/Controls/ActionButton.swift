@@ -131,11 +131,17 @@ public struct ActionButton: View {
     private var content: some View {
         switch label {
         case .title(let title):
-            Text.designSystemStyled(title, style: .body1)
-                .designSystemLineSpacing(.body1)
-                .designSystemForeground(style.titleColor(isEnabled: isEnabled))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            Text.designSystemStyled(
+                title,
+                style: .body1,
+            )
+            .designSystemLineSpacing(.body1)
+            .designSystemForeground(style.titleColor(isEnabled: isEnabled))
+            .multilineTextAlignment(.center)
+            .fixedSize(
+                horizontal: false,
+                vertical: true,
+            )
 
         case .styled(let styledText):
             styledText

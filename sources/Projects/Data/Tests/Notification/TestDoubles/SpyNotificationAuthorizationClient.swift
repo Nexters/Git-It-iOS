@@ -62,7 +62,10 @@ final class SpyNotificationAuthorizationClient: NotificationAuthorizationClient,
         _ request: LocalNotificationRequest,
         at date: Date,
     ) {
-        state.withLock { $0.scheduledRequests.append(ScheduledRequest(request: request, date: date)) }
+        state.withLock { $0.scheduledRequests.append(ScheduledRequest(
+            request: request,
+            date: date,
+        )) }
     }
 
     func cancel(identifier: String) {

@@ -46,7 +46,10 @@ public struct ProfileFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.profile, action: \.profile) {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
             UserProfileLoadFeature(profile: profile)
         }
         Reduce { state, action in

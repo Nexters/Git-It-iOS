@@ -13,7 +13,10 @@ struct LegalAgreementScreen: View {
 
     var body: some View {
         SheetSurface {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 StyledText(text: "약관 동의")
                     .textStyle(.subtitle1)
                     .padding(.top, LayoutToken.gutter)
@@ -24,10 +27,19 @@ struct LegalAgreementScreen: View {
                     onToggle: { send(.allDocumentsToggled) },
                 )
 
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(store.requiredDocuments, id: \.id) { document in
+                VStack(
+                    alignment: .leading,
+                    spacing: 0,
+                ) {
+                    ForEach(
+                        store.requiredDocuments,
+                        id: \.id,
+                    ) { document in
                         PolicyAgreementRow(
-                            displayModel: .init(title: document.displayName, isRequired: document.isRequired),
+                            displayModel: .init(
+                                title: document.displayName,
+                                isRequired: document.isRequired,
+                            ),
                             isSelected: Binding(
                                 get: { store.selectedDocumentIDs.contains(document.id) },
                                 set: { _ in send(.documentToggled(documentID: document.id)) },
@@ -40,8 +52,11 @@ struct LegalAgreementScreen: View {
                 .padding(.top, Constant.documentsTopSpacing)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    FeedbackActionButton(title: "취소", action: { send(.cancelTapped) })
-                        .style(.secondary)
+                    FeedbackActionButton(
+                        title: "취소",
+                        action: { send(.cancelTapped) },
+                    )
+                    .style(.secondary)
 
                     FeedbackActionButton(
                         title: "다음",

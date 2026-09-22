@@ -21,11 +21,20 @@ struct ProjectRepositoryAdapterTests {
                 """#)
         ])
 
-        let page = try await adapter.page(0, size: 10)
+        let page = try await adapter.page(
+            0,
+            size: 10,
+        )
 
         #expect(page.summaries.first?.id == "project-1")
-        #expect(page.summaries.first?.currentSet == ProjectSetLabel(label: "Set 1", title: "title"))
-        #expect(page.summaries.first?.next == ProjectNextQuiz(setID: "set-1", quizID: "quiz-1"))
+        #expect(page.summaries.first?.currentSet == ProjectSetLabel(
+            label: "Set 1",
+            title: "title",
+        ))
+        #expect(page.summaries.first?.next == ProjectNextQuiz(
+            setID: "set-1",
+            quizID: "quiz-1",
+        ))
         #expect(page.hasNextPage)
     }
 
@@ -37,7 +46,10 @@ struct ProjectRepositoryAdapterTests {
                 """#)
         ])
 
-        #expect(try await adapter.page(0, size: 10).summaries.first?.next == nil)
+        #expect(try await adapter.page(
+            0,
+            size: 10,
+        ).summaries.first?.next == nil)
     }
 
     @Test
@@ -58,15 +70,24 @@ struct ProjectRepositoryAdapterTests {
             techStack: ["Swift"],
         ))
         #expect(detail.sets.map(\.quizCount) == [5, 3])
-        #expect(detail.next == ProjectNextQuiz(setID: "set-2", quizID: "quiz-1"))
+        #expect(detail.next == ProjectNextQuiz(
+            setID: "set-2",
+            quizID: "quiz-1",
+        ))
     }
 
     @Test
     func `서버 401 응답을 unauthorized로 변환한다`() async {
-        let adapter = Self.makeAdapter(results: [Self.errorResponse(statusCode: 401, code: "AUTH-001")])
+        let adapter = Self.makeAdapter(results: [Self.errorResponse(
+            statusCode: 401,
+            code: "AUTH-001",
+        )])
 
         await #expect(throws: ProjectError.unauthorized) {
-            _ = try await adapter.page(0, size: 10)
+            _ = try await adapter.page(
+                0,
+                size: 10,
+            )
         }
     }
 

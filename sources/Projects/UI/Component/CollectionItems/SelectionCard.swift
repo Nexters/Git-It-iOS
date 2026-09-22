@@ -21,11 +21,17 @@ public struct SelectionCard<Thumbnail: View>: View {
         HStack(spacing: Constant.thumbnailSpacing) {
             if style.showsThumbnail {
                 thumbnail
-                    .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+                    .frame(
+                        width: Constant.thumbnailSize,
+                        height: Constant.thumbnailSize,
+                    )
                     .designSystemCornerRadius(.small)
             }
 
-            VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.titleSpacing,
+            ) {
                 HStack(spacing: Constant.badgeSpacing) {
                     StyledText(text: displayModel.title)
                         .textStyle(.subtitle3)
@@ -40,10 +46,17 @@ public struct SelectionCard<Thumbnail: View>: View {
                         .foregroundColorToken(.grey300)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
         }
         .padding(Constant.contentPadding)
-        .frame(maxWidth: .infinity, minHeight: style.minimumHeight, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: style.minimumHeight,
+            alignment: .leading,
+        )
         .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .overlay {
@@ -174,14 +187,20 @@ extension SelectionCard {
 #Preview("Selection Card") {
     VStack(spacing: LayoutToken.gutter) {
         SelectionCard(
-            displayModel: .init(title: "기술 개념은 알아요", supportingText: "실제 코드 흐름을 중심으로 학습")
+            displayModel: .init(
+                title: "기술 개념은 알아요",
+                supportingText: "실제 코드 흐름을 중심으로 학습",
+            )
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .purple300))
         }
 
         SelectionCard(
-            displayModel: .init(title: "프로젝트 경험이 있어요", supportingText: "심화 문제와 서술형 비중 확대")
+            displayModel: .init(
+                title: "프로젝트 경험이 있어요",
+                supportingText: "심화 문제와 서술형 비중 확대",
+            )
         ) {
             RoundedRectangle(designSystem: .small)
                 .fill(Color(designSystem: .blue400))

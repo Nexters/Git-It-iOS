@@ -21,12 +21,18 @@ struct QuizGenerationProgressFeatureTests {
         let store = makeQuizGenerationProgressStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
-        await store.send(.submit(repository: sampleRepository, quizLevel: .l2))
+        await store.send(.submit(
+            repository: sampleRepository,
+            quizLevel: .l2,
+        ))
         await store.receive(\.effect.submissionFinished)
 
         #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
         #expect(await projectGeneration.recordedRequests() == [
-            ProjectGenerationRequest(repositoryURL: sampleRepository.canonicalURL, quizLevel: .l2)
+            ProjectGenerationRequest(
+                repositoryURL: sampleRepository.canonicalURL,
+                quizLevel: .l2,
+            )
         ])
 
         await generationStates.finish()
@@ -39,7 +45,10 @@ struct QuizGenerationProgressFeatureTests {
         let store = makeQuizGenerationProgressStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
-        await store.send(.submit(repository: sampleRepository, quizLevel: .l1))
+        await store.send(.submit(
+            repository: sampleRepository,
+            quizLevel: .l1,
+        ))
         await store.receive(\.effect.submissionFinished)
 
         #expect(store.state.progress == .failed(.temporarilyUnavailable))
@@ -55,7 +64,10 @@ struct QuizGenerationProgressFeatureTests {
         let store = makeQuizGenerationProgressStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
-        await store.send(.submit(repository: sampleRepository, quizLevel: .l3))
+        await store.send(.submit(
+            repository: sampleRepository,
+            quizLevel: .l3,
+        ))
         await store.receive(\.effect.submissionFinished)
         #expect(store.state.progress == .failed(.temporarilyUnavailable))
 
@@ -86,7 +98,10 @@ struct QuizGenerationProgressFeatureTests {
     @Test
     func `알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록을 알린다`() async {
         let appSetting = AppSettingUseCaseStub(statuses: [.authorized])
-        let store = makeQuizGenerationProgressStore(appSetting: appSetting, state: awaitingState())
+        let store = makeQuizGenerationProgressStore(
+            appSetting: appSetting,
+            state: awaitingState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.waitAtHomeTapped))
@@ -100,7 +115,10 @@ struct QuizGenerationProgressFeatureTests {
     @Test
     func `알림 권한이 없으면 리마인드 시트를 연다`() async {
         let appSetting = AppSettingUseCaseStub(statuses: [.notDetermined])
-        let store = makeQuizGenerationProgressStore(appSetting: appSetting, state: awaitingState())
+        let store = makeQuizGenerationProgressStore(
+            appSetting: appSetting,
+            state: awaitingState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.waitAtHomeTapped))

@@ -66,10 +66,16 @@ public struct SettingsRouterFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.profile, action: \.profile) {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
             ProfileFeature(profile: { [userInfo] in try await Self.profile(from: userInfo) })
         }
-        Scope(state: \.settings, action: \.settings) {
+        Scope(
+            state: \.settings,
+            action: \.settings,
+        ) {
             SettingsFeature(
                 signOut: { [account] in await account.signOut() },
                 profile: { [userInfo] in try await Self.profile(from: userInfo) },
@@ -150,7 +156,10 @@ public struct SettingsRouterFeature: Sendable {
     private static func profile(from userInfo: any UserInfoUseCase) async throws -> UserProfile {
         async let detail = userInfo.detail()
         async let curation = userInfo.curation()
-        return try await UserProfile(detail: detail, curation: curation)
+        return try await UserProfile(
+            detail: detail,
+            curation: curation,
+        )
     }
 
 }

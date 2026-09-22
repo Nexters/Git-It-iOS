@@ -20,7 +20,10 @@ struct ProjectListPaginationFeatureTests {
     ) async {
         let projects = ProjectUseCaseMock()
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .idle, hasNextPage: hasNextPage),
+            state: ProjectListPaginationFeature.State(
+                pagination: .idle,
+                hasNextPage: hasNextPage,
+            ),
             projects: projects,
         )
 
@@ -44,7 +47,10 @@ struct ProjectListPaginationFeatureTests {
     ) async {
         let projects = ProjectUseCaseMock()
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: pagination, hasNextPage: true),
+            state: ProjectListPaginationFeature.State(
+                pagination: pagination,
+                hasNextPage: true,
+            ),
             projects: projects,
         )
 
@@ -56,7 +62,10 @@ struct ProjectListPaginationFeatureTests {
     @Test
     func `다음 페이지 조회 실패는 실패 상태로 남긴다`() async {
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .idle, hasNextPage: true),
+            state: ProjectListPaginationFeature.State(
+                pagination: .idle,
+                hasNextPage: true,
+            ),
             projects: ProjectUseCaseMock(nextPageResults: [.failure(.temporarilyUnavailable)]),
         )
 
@@ -72,7 +81,10 @@ struct ProjectListPaginationFeatureTests {
     func `실패 상태의 retry는 다음 페이지를 다시 요청한다`() async {
         let projects = ProjectUseCaseMock()
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .failed(.temporarilyUnavailable), hasNextPage: true),
+            state: ProjectListPaginationFeature.State(
+                pagination: .failed(.temporarilyUnavailable),
+                hasNextPage: true,
+            ),
             projects: projects,
         )
 
@@ -90,7 +102,10 @@ struct ProjectListPaginationFeatureTests {
     func `실패 상태가 아니면 retry를 무시한다`() async {
         let projects = ProjectUseCaseMock()
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .idle, hasNextPage: true),
+            state: ProjectListPaginationFeature.State(
+                pagination: .idle,
+                hasNextPage: true,
+            ),
             projects: projects,
         )
 
@@ -108,7 +123,10 @@ struct ProjectListPaginationFeatureTests {
         expected: ProjectListPaginationFeature.State.Pagination,
     ) async {
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .failed(.temporarilyUnavailable), hasNextPage: !hasNextPage)
+            state: ProjectListPaginationFeature.State(
+                pagination: .failed(.temporarilyUnavailable),
+                hasNextPage: !hasNextPage,
+            )
         )
 
         await store.send(.input(.listReplaced(hasNextPage: hasNextPage))) {
@@ -120,7 +138,10 @@ struct ProjectListPaginationFeatureTests {
     @Test
     func `refreshStarted는 진행 중인 다음 페이지 요청을 취소한다`() async {
         let store = TestStore(
-            initialState: ProjectListPaginationFeature.State(pagination: .idle, hasNextPage: true)
+            initialState: ProjectListPaginationFeature.State(
+                pagination: .idle,
+                hasNextPage: true,
+            )
         ) {
             ProjectListPaginationFeature(requestNextPage: { try await Task.never() })
         }
@@ -135,7 +156,10 @@ struct ProjectListPaginationFeatureTests {
     @Test
     func `조회 중이 아닐 때 도착한 결과는 반영하지 않는다`() async {
         let store = makeStore(
-            state: ProjectListPaginationFeature.State(pagination: .exhausted, hasNextPage: false)
+            state: ProjectListPaginationFeature.State(
+                pagination: .exhausted,
+                hasNextPage: false,
+            )
         )
 
         await store.send(.effect(.nextPageFinished(error: .temporarilyUnavailable)))

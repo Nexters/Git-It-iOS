@@ -15,7 +15,10 @@ public struct LaunchLogo: View {
 
     public var body: some View {
         ResourceImage(asset: .logo(.app))
-            .frame(width: Constant.logoSize, height: Constant.logoSize)
+            .frame(
+                width: Constant.logoSize,
+                height: Constant.logoSize,
+            )
             .opacity(isVisible ? 1 : 0)
             .scaleEffect(isVisible ? 1 : Constant.initialScale)
             .accessibilityHidden(true)
@@ -54,5 +57,8 @@ public struct LaunchLogo: View {
     ScreenContainer {
         LaunchLogo()
     }
-    .frame(width: 390, height: 700)
+    .frame(
+        width: 390,
+        height: 700,
+    )
 }

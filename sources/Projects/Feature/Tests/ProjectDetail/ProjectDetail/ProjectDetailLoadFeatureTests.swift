@@ -63,7 +63,10 @@ struct ProjectDetailLoadFeatureTests {
             $0.loadStatus = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.detailLoadFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))) {
+        await store.receive(.effect(.detailLoadFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        ))) {
             $0.loadStatus = .failed(.temporarilyUnavailable)
         }
     }

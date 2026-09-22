@@ -19,9 +19,16 @@ struct QuizBookmarkRepositoryAdapterTests {
             Self.successResponse(#"{"bookmarked":true}"#)
         ]))
 
-        let state = try await adapter.setBookmark("question-1", in: "project-1", isBookmarked: true)
+        let state = try await adapter.setBookmark(
+            "question-1",
+            in: "project-1",
+            isBookmarked: true,
+        )
 
-        #expect(state == QuizBookmarkState(quizID: "question-1", isBookmarked: true))
+        #expect(state == QuizBookmarkState(
+            quizID: "question-1",
+            isBookmarked: true,
+        ))
     }
 
     @Test
@@ -35,8 +42,14 @@ struct QuizBookmarkRepositoryAdapterTests {
         let list = try await adapter.bookmarks(.project("project-1"))
 
         #expect(list.projects == [
-            QuizBookmarkProject(id: "project-1", name: "repo-1"),
-            QuizBookmarkProject(id: "project-2", name: "repo-2"),
+            QuizBookmarkProject(
+                id: "project-1",
+                name: "repo-1",
+            ),
+            QuizBookmarkProject(
+                id: "project-2",
+                name: "repo-2",
+            ),
         ])
         #expect(list.totalCount == 2)
     }
@@ -82,11 +95,18 @@ struct QuizBookmarkRepositoryAdapterTests {
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async {
         let adapter = Self.makeAdapter(transport: RecordingRequestTransport(results: [
-            Self.errorResponse(statusCode: 401, code: "AUTH-001")
+            Self.errorResponse(
+                statusCode: 401,
+                code: "AUTH-001",
+            )
         ]))
 
         await #expect(throws: QuizDetailError.unauthorized) {
-            _ = try await adapter.setBookmark("question-1", in: "project-1", isBookmarked: true)
+            _ = try await adapter.setBookmark(
+                "question-1",
+                in: "project-1",
+                isBookmarked: true,
+            )
         }
     }
 

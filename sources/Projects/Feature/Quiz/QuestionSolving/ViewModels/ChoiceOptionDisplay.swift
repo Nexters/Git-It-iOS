@@ -81,7 +81,12 @@ public struct ChoiceOptionDisplay: Equatable, Sendable, Identifiable {
                 } else {
                     .neutral
                 }
-            return Self(id: index, text: text, emphasis: emphasis, isSelected: isSelected)
+            return Self(
+                id: index,
+                text: text,
+                emphasis: emphasis,
+                isSelected: isSelected,
+            )
         }
     }
 

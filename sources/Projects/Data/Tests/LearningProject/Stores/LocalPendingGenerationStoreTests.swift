@@ -79,9 +79,18 @@ struct LocalPendingGenerationStoreTests {
     func `같은 프로젝트의 알림 대기는 한 번만 기록하고 흡수하면 비워진다`() async {
         let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage())
 
-        await store.appendReminder(projectID: "project-1", requestedAt: Self.requestedAt)
-        await store.appendReminder(projectID: "project-1", requestedAt: Self.requestedAt)
-        await store.appendReminder(projectID: "project-2", requestedAt: Self.requestedAt)
+        await store.appendReminder(
+            projectID: "project-1",
+            requestedAt: Self.requestedAt,
+        )
+        await store.appendReminder(
+            projectID: "project-1",
+            requestedAt: Self.requestedAt,
+        )
+        await store.appendReminder(
+            projectID: "project-2",
+            requestedAt: Self.requestedAt,
+        )
 
         #expect(await store.drainReminderProjectIDs() == ["project-1", "project-2"])
         #expect(await store.drainReminderProjectIDs().isEmpty)
@@ -93,7 +102,10 @@ struct LocalPendingGenerationStoreTests {
         let overflow = LocalPendingGenerationStore.pendingReminderLimit + 2
 
         for index in 0 ..< overflow {
-            await store.appendReminder(projectID: "project-\(index)", requestedAt: Self.requestedAt)
+            await store.appendReminder(
+                projectID: "project-\(index)",
+                requestedAt: Self.requestedAt,
+            )
         }
 
         let drained = await store.drainReminderProjectIDs()
@@ -105,12 +117,18 @@ struct LocalPendingGenerationStoreTests {
     @Test
     func `알림 대기 저장값이 손상되면 빈 목록으로 취급하고 기록을 이어간다`() async {
         let storage = InMemoryKeyValueStorage()
-        await storage.setValue("corrupted", forKey: "pendingGenerationReminders")
+        await storage.setValue(
+            "corrupted",
+            forKey: "pendingGenerationReminders",
+        )
         let store = LocalPendingGenerationStore(storage: storage)
 
         #expect(await store.drainReminderProjectIDs().isEmpty)
 
-        await store.appendReminder(projectID: "project-1", requestedAt: Self.requestedAt)
+        await store.appendReminder(
+            projectID: "project-1",
+            requestedAt: Self.requestedAt,
+        )
         #expect(await store.drainReminderProjectIDs() == ["project-1"])
     }
 
@@ -121,7 +139,10 @@ struct LocalPendingGenerationStoreTests {
         )
 
         await store.modifyState { _ in GenerationStateDTO(records: [Self.record(projectID: "p1")]) }
-        await store.appendReminder(projectID: "project-1", requestedAt: Self.requestedAt)
+        await store.appendReminder(
+            projectID: "project-1",
+            requestedAt: Self.requestedAt,
+        )
 
         #expect(await store.state().records.isEmpty)
         #expect(await store.drainReminderProjectIDs().isEmpty)

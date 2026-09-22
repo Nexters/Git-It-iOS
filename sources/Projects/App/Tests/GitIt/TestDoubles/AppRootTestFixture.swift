@@ -16,9 +16,16 @@ enum AppRootTestFixture {
     static let quizID: QuizID = "quiz-1"
     static let setLabel = "CHAPTER 1"
 
-    static let signedInAccount = SignedInAccount(id: "member-1", displayName: "테스터", needsCuration: false)
+    static let signedInAccount = SignedInAccount(
+        id: "member-1",
+        displayName: "테스터",
+        needsCuration: false,
+    )
 
-    static let curation = Curation(position: .ios, careerLevel: .junior)
+    static let curation = Curation(
+        position: .ios,
+        careerLevel: .junior,
+    )
 
     static let userDetail = UserDetail(
         name: "테스터",
@@ -43,14 +50,24 @@ enum AppRootTestFixture {
             repositoryName: "owner/repo",
             repositoryImageURL: nil,
             techStack: ["Swift"],
-            currentSet: ProjectSetLabel(label: setLabel, title: "모듈 경계"),
-            next: ProjectNextQuiz(setID: setID, quizID: quizID),
+            currentSet: ProjectSetLabel(
+                label: setLabel,
+                title: "모듈 경계",
+            ),
+            next: ProjectNextQuiz(
+                setID: setID,
+                quizID: quizID,
+            ),
             progressPercent: 0,
         )
     }
 
     static func projectList(summaries: [ProjectSummary]) -> ProjectList {
-        ProjectList(summaries: summaries, hasNextPage: false, isLoaded: true)
+        ProjectList(
+            summaries: summaries,
+            hasNextPage: false,
+            isLoaded: true,
+        )
     }
 
     static func projectDetail(projectID: ProjectID) -> ProjectDetail {
@@ -73,7 +90,10 @@ enum AppRootTestFixture {
                     completedCount: 2,
                 )
             ],
-            next: ProjectNextQuiz(setID: setID, quizID: quizID),
+            next: ProjectNextQuiz(
+                setID: setID,
+                quizID: quizID,
+            ),
         )
     }
 
@@ -81,7 +101,10 @@ enum AppRootTestFixture {
         Quiz(
             id: quizID,
             prompt: "모듈 경계는 무엇으로 정하나요?",
-            content: .choice(options: ["책임", "파일 수"], submitted: nil),
+            content: .choice(
+                options: ["책임", "파일 수"],
+                submitted: nil,
+            ),
             sources: [],
         )
     }

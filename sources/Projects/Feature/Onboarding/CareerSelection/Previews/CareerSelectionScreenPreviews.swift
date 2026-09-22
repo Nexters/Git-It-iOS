@@ -24,6 +24,9 @@ extension CareerSelectionFeature.State {
 
 #Preview("Career Selection - 제출 실패") {
     CareerSelectionScreen(
-        store: Store(initialState: .preview(careerLevel: .junior, submission: .failed)) { EmptyReducer() }
+        store: Store(initialState: .preview(
+            careerLevel: .junior,
+            submission: .failed,
+        )) { EmptyReducer() }
     )
 }

@@ -45,7 +45,10 @@ struct RepositoryLinkInputFeatureTests {
             $0.validation = .validating
             $0.validationRequestID = 1
         }
-        await store.receive(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository)))) {
+        await store.receive(.effect(.validationFinished(
+            requestID: 1,
+            result: .success(sampleRepository),
+        ))) {
             $0.validation = .validated(sampleRepository)
         }
         await store.receive(.delegate(.repositoryValidated(sampleRepository)))
@@ -65,7 +68,10 @@ struct RepositoryLinkInputFeatureTests {
             $0.validation = .validating
             $0.validationRequestID = 1
         }
-        await store.receive(.effect(.validationFinished(requestID: 1, result: .failure(.invalidURLFormat)))) {
+        await store.receive(.effect(.validationFinished(
+            requestID: 1,
+            result: .failure(.invalidURLFormat),
+        ))) {
             $0.validation = .failed
         }
         #expect(store.state.isValidationFailed)
@@ -96,7 +102,10 @@ struct RepositoryLinkInputFeatureTests {
         await store.send(.view(.validateTapped)) {
             $0.validationRequestID = 2
         }
-        await store.send(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository))))
+        await store.send(.effect(.validationFinished(
+            requestID: 1,
+            result: .success(sampleRepository),
+        )))
 
         #expect(store.state.validation == .validating)
 
@@ -155,7 +164,10 @@ private struct RepositoryLinkInputHostFeature {
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
-            .ifLet(\.$child, action: \.child) {
+            .ifLet(
+                \.$child,
+                action: \.child,
+            ) {
                 RepositoryLinkInputFeature(repository: { [externalRepository] in
                     try await externalRepository.repository(at: $0)
                 })

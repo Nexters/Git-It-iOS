@@ -10,7 +10,10 @@ public enum ProjectEndpoint: Equatable, Sendable {
     public var request: LearningProjectRequest {
         switch self {
         case .register:
-            LearningProjectRequest(method: .post, path: LearningProjectRequest.basePath)
+            LearningProjectRequest(
+                method: .post,
+                path: LearningProjectRequest.basePath,
+            )
 
         case .list(let page, let size):
             LearningProjectRequest(
@@ -20,10 +23,16 @@ public enum ProjectEndpoint: Equatable, Sendable {
             )
 
         case .detail(let projectID):
-            LearningProjectRequest(method: .get, path: "\(LearningProjectRequest.basePath)/\(projectID)")
+            LearningProjectRequest(
+                method: .get,
+                path: "\(LearningProjectRequest.basePath)/\(projectID)",
+            )
 
         case .delete(let projectID):
-            LearningProjectRequest(method: .delete, path: "\(LearningProjectRequest.basePath)/\(projectID)")
+            LearningProjectRequest(
+                method: .delete,
+                path: "\(LearningProjectRequest.basePath)/\(projectID)",
+            )
         }
     }
 

@@ -18,7 +18,10 @@ public struct ExternalRepositoryResolver: ExternalRepositoryUseCase {
         guard let location = locator.location(from: url) else {
             throw ExternalRepositoryError.invalidURLFormat
         }
-        return try await lookup.repository(owner: location.owner, name: location.name)
+        return try await lookup.repository(
+            owner: location.owner,
+            name: location.name,
+        )
     }
 
     // MARK: Private

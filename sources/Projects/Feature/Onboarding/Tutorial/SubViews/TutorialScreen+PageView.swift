@@ -20,7 +20,10 @@ extension TutorialScreen {
 
                 OnboardingMockup(page: page)
                     .frame(width: Constant.mockupWidth)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                    )
             }
             .designSystemScreenMargin()
         }

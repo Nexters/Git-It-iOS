@@ -17,7 +17,10 @@ struct GitHubRepositoryURLParserTests {
     func `scheme·www·공백 조합이 달라도 같은 owner와 repo로 해석한다`(_ url: String) {
         let location = GitHubRepositoryURLParser().location(from: url)
 
-        #expect(location == ExternalRepositoryLocation(owner: "owner", name: "repo"))
+        #expect(location == ExternalRepositoryLocation(
+            owner: "owner",
+            name: "repo",
+        ))
     }
 
     @Test

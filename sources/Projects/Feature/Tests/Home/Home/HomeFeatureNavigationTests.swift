@@ -42,7 +42,10 @@ struct HomeFeatureNavigationTests {
 
         await store.send(.view(.learningTapped(projectID: "project-1")))
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
         await store.send(.view(.learningTapped(projectID: "missing")))
     }
@@ -51,7 +54,10 @@ struct HomeFeatureNavigationTests {
     func `다음 퀴즈가 없는 프로젝트는 학습 delegate를 전달하지 않는다`() async {
         var state = HomeFeature.State()
         state.projectSummaries.load = .loaded(ProjectList(
-            summaries: [HomeTestFixture.project(index: 0, hasLearningIDs: false)],
+            summaries: [HomeTestFixture.project(
+                index: 0,
+                hasLearningIDs: false,
+            )],
             hasNextPage: false,
             isLoaded: true,
         ))

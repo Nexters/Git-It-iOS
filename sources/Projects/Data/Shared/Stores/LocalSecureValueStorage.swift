@@ -19,7 +19,10 @@ struct LocalSecureValueStorage: SecureValueStorage {
 
     func data(forKey key: String) throws(SecureValueStorageError) -> Data? {
         do {
-            return try keychainStore.load(for: key, in: namespace)
+            return try keychainStore.load(
+                for: key,
+                in: namespace,
+            )
         } catch {
             throw .unavailable
         }
@@ -30,7 +33,11 @@ struct LocalSecureValueStorage: SecureValueStorage {
         forKey key: String,
     ) throws(SecureValueStorageError) {
         do {
-            try keychainStore.save(data, for: key, in: namespace)
+            try keychainStore.save(
+                data,
+                for: key,
+                in: namespace,
+            )
         } catch {
             throw .unavailable
         }
@@ -38,7 +45,10 @@ struct LocalSecureValueStorage: SecureValueStorage {
 
     func removeData(forKey key: String) throws(SecureValueStorageError) {
         do {
-            try keychainStore.delete(for: key, in: namespace)
+            try keychainStore.delete(
+                for: key,
+                in: namespace,
+            )
         } catch {
             throw .unavailable
         }

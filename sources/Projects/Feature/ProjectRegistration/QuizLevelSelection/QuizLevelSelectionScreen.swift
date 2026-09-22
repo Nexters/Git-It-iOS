@@ -12,7 +12,10 @@ struct QuizLevelSelectionScreen: View {
     @Bindable var store: StoreOf<QuizLevelSelectionFeature>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
@@ -37,9 +40,12 @@ struct QuizLevelSelectionScreen: View {
 
             Spacer(minLength: 0)
 
-            FeedbackActionButton(title: "다음", action: { send(.nextTapped) })
-                .designSystemScreenMargin()
-                .padding(.bottom, Constant.bottomButtonPadding)
+            FeedbackActionButton(
+                title: "다음",
+                action: { send(.nextTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomButtonPadding)
         }
     }
 
@@ -71,7 +77,11 @@ extension QuizLevelSelectionScreen {
         Self.levels.map { level, title, supportingText, illust in
             SelectionCardList.Item(
                 id: level.identifier,
-                displayModel: .init(title: title, supportingText: supportingText, illust: illust),
+                displayModel: .init(
+                    title: title,
+                    supportingText: supportingText,
+                    illust: illust,
+                ),
             )
         }
     }

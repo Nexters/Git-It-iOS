@@ -19,28 +19,43 @@ public struct MainShellRouter: View {
     @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
-        TabShell(selected: selectedTab, isEnabled: isTabEnabled) { tab in
+        TabShell(
+            selected: selectedTab,
+            isEnabled: isTabEnabled,
+        ) { tab in
             switch tab {
             case .home:
-                HomeScreen(store: store.scope(state: \.home, action: \.home))
+                HomeScreen(store: store.scope(
+                    state: \.home,
+                    action: \.home,
+                ))
 
             case .projects:
                 if store.access == .member {
-                    ProjectListScreen(store: store.scope(state: \.projectList, action: \.projectList))
+                    ProjectListScreen(store: store.scope(
+                        state: \.projectList,
+                        action: \.projectList,
+                    ))
                 } else {
                     ScreenContainer { EmptyView() }
                 }
 
             case .saved:
                 if store.access == .member {
-                    SavedScreen(store: store.scope(state: \.saved, action: \.saved))
+                    SavedScreen(store: store.scope(
+                        state: \.saved,
+                        action: \.saved,
+                    ))
                 } else {
                     ScreenContainer { EmptyView() }
                 }
 
             case .settings:
                 if store.access == .member {
-                    SettingsRouter(store: store.scope(state: \.settings, action: \.settings))
+                    SettingsRouter(store: store.scope(
+                        state: \.settings,
+                        action: \.settings,
+                    ))
                 } else {
                     Self.SignInPromptView(onSignIn: { send(.signInTapped) })
                 }
@@ -51,8 +66,14 @@ public struct MainShellRouter: View {
                 entryOverlay
             }
         }
-        .alert("문제를 불러오지 못했어요", isPresented: entryFailureBinding) {
-            Button("확인", role: .cancel) {
+        .alert(
+            "문제를 불러오지 못했어요",
+            isPresented: entryFailureBinding,
+        ) {
+            Button(
+                "확인",
+                role: .cancel,
+            ) {
                 store.send(.singleQuestionEntry(.input(.failureDismissed)))
             }
         } message: {
@@ -61,8 +82,14 @@ public struct MainShellRouter: View {
         .overlay { singleQuestionOverlay }
         .overlay { guestLegalAgreementOverlay }
         .overlay { guestLegalDocumentOverlay }
-        .alert("로그인하지 못했어요", isPresented: signInFailureBinding) {
-            Button("확인", role: .cancel) {
+        .alert(
+            "로그인하지 못했어요",
+            isPresented: signInFailureBinding,
+        ) {
+            Button(
+                "확인",
+                role: .cancel,
+            ) {
                 store.send(.signIn(.view(.failureDismissed)))
             }
         } message: {
@@ -106,7 +133,10 @@ public struct MainShellRouter: View {
             )
         ) {
             LegalAgreementScreen(
-                store: store.scope(state: \.signIn.legalAgreement, action: \.signIn.legalAgreement)
+                store: store.scope(
+                    state: \.signIn.legalAgreement,
+                    action: \.signIn.legalAgreement,
+                )
             )
         }
     }
@@ -124,7 +154,10 @@ public struct MainShellRouter: View {
         ) {
             if let document = store.signIn.legalAgreement.presentedDocument {
                 WebSheet(
-                    displayModel: .init(title: document.displayName, url: document.approvedURL),
+                    displayModel: .init(
+                        title: document.displayName,
+                        url: document.approvedURL,
+                    ),
                     onDismiss: { store.send(.signIn(.view(.legalDocumentSheetDismissed))) },
                 )
             }
@@ -154,7 +187,10 @@ public struct MainShellRouter: View {
     }
 
     private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {
-        store.scope(state: \.singleQuestion, action: \.singleQuestion.presented)
+        store.scope(
+            state: \.singleQuestion,
+            action: \.singleQuestion.presented,
+        )
     }
 
     private var singleQuestionOverlay: some View {

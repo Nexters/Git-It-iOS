@@ -17,7 +17,10 @@ struct ProjectEndpointTests {
 
     @Test
     func `프로젝트 목록은 page와 size 쿼리를 포함한다`() {
-        let request = ProjectEndpoint.list(page: 2, size: 10).request
+        let request = ProjectEndpoint.list(
+            page: 2,
+            size: 10,
+        ).request
 
         #expect(request.transportMethod == .get)
         #expect(request.path == "/api/v1/projects")

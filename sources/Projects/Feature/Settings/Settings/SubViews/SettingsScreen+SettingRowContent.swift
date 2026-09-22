@@ -24,7 +24,10 @@ extension SettingsScreen {
         var body: some View {
             HStack(spacing: Constant.iconTitleSpacing) {
                 ResourceImage(asset: .icon(icon))
-                    .frame(width: Constant.iconSize, height: Constant.iconSize)
+                    .frame(
+                        width: Constant.iconSize,
+                        height: Constant.iconSize,
+                    )
                 StyledText(text: title)
                     .textStyle(.body2)
                     .foregroundColorToken(color)

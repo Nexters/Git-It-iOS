@@ -37,7 +37,10 @@ public struct HomeProjectCard: View {
                 .padding(.trailing, Constant.startTrailingPadding)
                 .padding(.top, Constant.startTopPadding)
         }
-        .frame(width: cardWidth, height: Constant.cardHeight)
+        .frame(
+            width: cardWidth,
+            height: Constant.cardHeight,
+        )
         .background(Color(designSystem: style.cardColor))
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .contain)
@@ -73,8 +76,14 @@ public struct HomeProjectCard: View {
     private let onStart: () -> Void
 
     private var cardContent: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.titleSpacing,
+            ) {
                 StyledText(text: displayModel.title)
                     .textStyle(Constant.titleStyle)
                     .foregroundColorToken(style.titleColor)
@@ -85,7 +94,10 @@ public struct HomeProjectCard: View {
                     .foregroundColorToken(style.technologyColor)
                     .lineLimit(2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
             .padding(.leading, Constant.headerLeadingPadding)
             .padding(.trailing, Constant.headerTextTrailingReserve)
             .padding(.top, Constant.headerTopPadding)
@@ -95,7 +107,10 @@ public struct HomeProjectCard: View {
 
             Spacer(minLength: 0)
 
-            VStack(alignment: .leading, spacing: Constant.footerSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.footerSpacing,
+            ) {
                 StyledText(text: displayModel.currentSetLabel)
                     .textStyle(.caption2)
                     .padding(.horizontal, Constant.setBadgeHorizontalPadding)
@@ -114,7 +129,10 @@ public struct HomeProjectCard: View {
             .padding(.trailing, Constant.headerTrailingPadding)
             .padding(.bottom, Constant.footerBottomPadding)
         }
-        .frame(width: cardWidth, height: Constant.cardHeight)
+        .frame(
+            width: cardWidth,
+            height: Constant.cardHeight,
+        )
     }
 
     private var cardWidth: CGFloat {
@@ -124,11 +142,23 @@ public struct HomeProjectCard: View {
     private var startButton: some View {
         Button(action: start) {
             Image(systemName: "play.fill")
-                .font(.system(size: Constant.startSymbolSize, weight: .bold))
+                .font(.system(
+                    size: Constant.startSymbolSize,
+                    weight: .bold,
+                ))
                 .designSystemForeground(style.cardColor)
-                .frame(width: Constant.startSurfaceSize, height: Constant.startSurfaceSize)
-                .background(Color(designSystem: .grey100), in: Circle())
-                .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
+                .frame(
+                    width: Constant.startSurfaceSize,
+                    height: Constant.startSurfaceSize,
+                )
+                .background(
+                    Color(designSystem: .grey100),
+                    in: Circle(),
+                )
+                .frame(
+                    width: Constant.startTouchSize,
+                    height: Constant.startTouchSize,
+                )
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

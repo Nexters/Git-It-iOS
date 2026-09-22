@@ -104,7 +104,10 @@ public struct ShareRegistrationFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.registration, action: \.registration) {
+        Scope(
+            state: \.registration,
+            action: \.registration,
+        ) {
             SharedRepositoryRegistrationFeature(
                 parseRepositoryLink: parseRepositoryLink,
                 externalRepository: externalRepository,
@@ -113,13 +116,22 @@ public struct ShareRegistrationFeature: Sendable {
                 recordDiagnostic: recordDiagnostic,
             )
         }
-        Scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation) {
+        Scope(
+            state: \.repositoryConfirmation,
+            action: \.repositoryConfirmation,
+        ) {
             RepositoryConfirmationFeature()
         }
-        Scope(state: \.quizLevelSelection, action: \.quizLevelSelection) {
+        Scope(
+            state: \.quizLevelSelection,
+            action: \.quizLevelSelection,
+        ) {
             QuizLevelSelectionFeature()
         }
-        Scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation) {
+        Scope(
+            state: \.quizGenerationConfirmation,
+            action: \.quizGenerationConfirmation,
+        ) {
             QuizGenerationConfirmationFeature()
         }
         Reduce { state, action in
@@ -158,7 +170,10 @@ public struct ShareRegistrationFeature: Sendable {
 
             case .quizGenerationConfirmation(.delegate(.submitRequested)):
                 guard let repository = state.repository else { return .none }
-                return .send(.registration(.input(.submit(repository: repository, quizLevel: state.quizLevel))))
+                return .send(.registration(.input(.submit(
+                    repository: repository,
+                    quizLevel: state.quizLevel,
+                ))))
 
             case .quizGenerationConfirmation(.delegate(.backRequested)):
                 state.step = .quizLevelSelection

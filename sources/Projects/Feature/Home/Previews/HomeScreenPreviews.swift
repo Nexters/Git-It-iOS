@@ -8,9 +8,17 @@ private enum HomePreviewFixture {
         detail: UserDetail(
             name: "프로덕션에 푸시하는 고양이",
             email: "cat@git-it.dev",
-            statistics: .init(thisWeekSolvedCount: 12, thisMonthSolvedCount: 9, streakDays: 3, weeklyCounts: []),
+            statistics: .init(
+                thisWeekSolvedCount: 12,
+                thisMonthSolvedCount: 9,
+                streakDays: 3,
+                weeklyCounts: [],
+            ),
         ),
-        curation: Curation(position: .ios, careerLevel: .junior),
+        curation: Curation(
+            position: .ios,
+            careerLevel: .junior,
+        ),
     )
 
     static func project(_ index: Int) -> ProjectSummary {
@@ -19,14 +27,24 @@ private enum HomePreviewFixture {
             repositoryName: ["Nexters", "Now in Android", "Git It iOS"][index % 3],
             repositoryImageURL: nil,
             techStack: ["Swift", "SwiftUI", "TCA"],
-            currentSet: ProjectSetLabel(label: "Set \(index + 1)", title: "Presentation 구조"),
-            next: ProjectNextQuiz(setID: "set-\(index)", quizID: "quiz-\(index)"),
+            currentSet: ProjectSetLabel(
+                label: "Set \(index + 1)",
+                title: "Presentation 구조",
+            ),
+            next: ProjectNextQuiz(
+                setID: "set-\(index)",
+                quizID: "quiz-\(index)",
+            ),
             progressPercent: 25 * (index + 1),
         )
     }
 
     static func list(_ summaries: [ProjectSummary]) -> ProjectList {
-        ProjectList(summaries: summaries, hasNextPage: false, isLoaded: true)
+        ProjectList(
+            summaries: summaries,
+            hasNextPage: false,
+            isLoaded: true,
+        )
     }
 
     @MainActor

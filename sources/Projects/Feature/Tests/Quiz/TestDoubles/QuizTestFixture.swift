@@ -18,8 +18,14 @@ enum QuizTestFixture {
         title: "서술형 전용 세트",
         description: "서술형만 담긴 세트입니다.",
         quizzes: [
-            essayQuiz(index: 0, submitted: nil),
-            essayQuiz(index: 1, submitted: nil),
+            essayQuiz(
+                index: 0,
+                submitted: nil,
+            ),
+            essayQuiz(
+                index: 1,
+                submitted: nil,
+            ),
         ],
     )
 
@@ -33,14 +39,20 @@ enum QuizTestFixture {
     static let quizWithoutSources = Quiz(
         id: "quiz-no-source",
         prompt: "출처가 없는 문제",
-        content: .choice(options: choices, submitted: nil),
+        content: .choice(
+            options: choices,
+            submitted: nil,
+        ),
         sources: [],
     )
 
     static let quizWithManySources = Quiz(
         id: "quiz-many-sources",
         prompt: "출처가 여럿인 문제",
-        content: .choice(options: choices, submitted: nil),
+        content: .choice(
+            options: choices,
+            submitted: nil,
+        ),
         sources: [fileSource, referenceSource],
     )
 
@@ -81,7 +93,10 @@ enum QuizTestFixture {
 
     static let bookmarkList = QuizBookmarkList(
         totalCount: 1,
-        projects: [QuizBookmarkProject(id: projectID, name: "owner/repo")],
+        projects: [QuizBookmarkProject(
+            id: projectID,
+            name: "owner/repo",
+        )],
         bookmarks: [bookmark(index: 0)],
     )
 
@@ -92,7 +107,10 @@ enum QuizTestFixture {
         Quiz(
             id: "quiz-\(index)",
             prompt: "객관식 문제 \(index)",
-            content: .choice(options: choices, submitted: submitted),
+            content: .choice(
+                options: choices,
+                submitted: submitted,
+            ),
             sources: [fileSource],
         )
     }
@@ -134,13 +152,19 @@ enum QuizTestFixture {
                 choiceQuiz(
                     index: 0,
                     submitted: answeredCount > 0
-                        ? ChoiceSubmission(selectedIndex: 1, isCorrect: true)
+                        ? ChoiceSubmission(
+                            selectedIndex: 1,
+                            isCorrect: true,
+                        )
                         : nil,
                 ),
                 choiceQuiz(
                     index: 1,
                     submitted: answeredCount > 1
-                        ? ChoiceSubmission(selectedIndex: 0, isCorrect: false)
+                        ? ChoiceSubmission(
+                            selectedIndex: 0,
+                            isCorrect: false,
+                        )
                         : nil,
                 ),
                 essayQuiz(

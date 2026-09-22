@@ -11,14 +11,20 @@ extension ProjectListScreen {
 
         var body: some View {
             VStack(spacing: LayoutToken.margin) {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
                     Spacer(minLength: 0)
                         .frame(height: Constant.headerControlRowHeight)
 
                     ScreenHeaderTitle(displayModel: .init(title: "프로젝트"))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
 
                 Spacer(minLength: 0)
@@ -35,9 +41,12 @@ extension ProjectListScreen {
 
                 Spacer(minLength: 0)
 
-                FeedbackActionButton(title: "다시 시도하기", action: onRetry)
-                    .designSystemScreenMargin()
-                    .padding(.bottom, Constant.bottomButtonPadding)
+                FeedbackActionButton(
+                    title: "다시 시도하기",
+                    action: onRetry,
+                )
+                .designSystemScreenMargin()
+                .padding(.bottom, Constant.bottomButtonPadding)
             }
         }
 

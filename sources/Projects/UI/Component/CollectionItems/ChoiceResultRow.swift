@@ -46,7 +46,10 @@ public struct ChoiceResultRow: View {
 
     public var body: some View {
         Button(action: { toggle() }) {
-            VStack(alignment: .leading, spacing: LayoutToken.tightSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: LayoutToken.tightSpacing,
+            ) {
                 StyledText(text: displayModel.text)
                     .lineLimit(1)
 
@@ -55,9 +58,15 @@ public struct ChoiceResultRow: View {
                         .textStyle(.body3)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
             .padding(.horizontal, Constant.horizontalPadding)
-            .frame(height: height, alignment: .top)
+            .frame(
+                height: height,
+                alignment: .top,
+            )
             .padding(.top, LayoutToken.compactSpacing)
             .designSystemBackground(judgement.backgroundColor)
             .designSystemCornerRadius(.large)
@@ -99,7 +108,10 @@ public struct ChoiceResultRow: View {
     }
 
     private var accessibilityLabel: String {
-        Self.accessibilityLabel(text: displayModel.text, judgement: judgement)
+        Self.accessibilityLabel(
+            text: displayModel.text,
+            judgement: judgement,
+        )
     }
 
 }
@@ -124,13 +136,19 @@ extension ChoiceResultRow {
 #Preview("Choice Result Row") {
     VStack(spacing: LayoutToken.gutter) {
         ChoiceResultRow(
-            displayModel: .init(text: "State는 값 타입 소유에 쓴다", explanation: "뷰가 소유하는 단일 진실 원천입니다."),
+            displayModel: .init(
+                text: "State는 값 타입 소유에 쓴다",
+                explanation: "뷰가 소유하는 단일 진실 원천입니다.",
+            ),
             judgement: .correct,
             isExpanded: .constant(false),
         )
 
         ChoiceResultRow(
-            displayModel: .init(text: "Binding은 값을 소유한다", explanation: "Binding은 소유하지 않고 참조만 전달합니다."),
+            displayModel: .init(
+                text: "Binding은 값을 소유한다",
+                explanation: "Binding은 소유하지 않고 참조만 전달합니다.",
+            ),
             judgement: .incorrect,
             isExpanded: .constant(true),
         )

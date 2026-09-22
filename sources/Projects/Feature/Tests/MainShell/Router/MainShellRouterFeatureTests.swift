@@ -25,7 +25,11 @@ struct MainShellRouterFeatureTests {
         var state = MainShellRouterFeature.State()
         state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(state: state, projects: projects, userInfo: userInfo)
+        let store = makeStore(
+            state: state,
+            projects: projects,
+            userInfo: userInfo,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.tabSelected(.projects))) { $0.selectedTab = .projects }
@@ -56,10 +60,16 @@ struct MainShellRouterFeatureTests {
         await store.send(.home(.delegate(.projectDetailRequested(projectID: "project-1"))))
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
         await store.send(
-            .home(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+            .home(.delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            )))
         )
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -83,10 +93,16 @@ struct MainShellRouterFeatureTests {
         let store = makeStore()
 
         await store.send(
-            .projectList(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+            .projectList(.delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            )))
         )
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -98,7 +114,10 @@ struct MainShellRouterFeatureTests {
 
         await store.send(.saved(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
+            .singleQuestionEntry(.input(.questionRequested(
+                setID: "set-0",
+                questionID: "quiz-0",
+            )))
         )
 
         #expect(store.state.singleQuestionEntry?.projectID == bookmark.projectID)

@@ -56,7 +56,10 @@ struct HomeFeatureGenerationProgressTests {
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
         await store.send(.view(.learningTapped(projectID: "project-1")))
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -66,7 +69,10 @@ struct HomeFeatureGenerationProgressTests {
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
         state.profile.load = .failed(.temporarilyUnavailable)
-        let store = makeStore(profile: profile, state: state)
+        let store = makeStore(
+            profile: profile,
+            state: state,
+        )
 
         await store.send(.view(.profileRetryTapped))
         await store.receive(.profile(.input(.load))) {
@@ -74,7 +80,10 @@ struct HomeFeatureGenerationProgressTests {
             $0.profile.requestID = 1
         }
         await store.receive(
-            .profile(.effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth))))
+            .profile(.effect(.profileLoadFinished(
+                requestID: 1,
+                result: .success(HomeTestFixture.profileWithBoth),
+            )))
         ) {
             $0.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         }
@@ -89,14 +98,20 @@ struct HomeFeatureGenerationProgressTests {
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
         state.projectSummaries.load = .failed(.temporarilyUnavailable)
-        let store = makeStore(projects: projects, state: state)
+        let store = makeStore(
+            projects: projects,
+            state: state,
+        )
 
         await store.send(.view(.projectRetryTapped))
         await store.receive(.projectSummaries(.input(.refresh))) {
             $0.projectSummaries.load = .loading
             $0.projectSummaries.requestID = 1
         }
-        await store.receive(.projectSummaries(.effect(.refreshFinished(requestID: 1, error: nil))))
+        await store.receive(.projectSummaries(.effect(.refreshFinished(
+            requestID: 1,
+            error: nil,
+        ))))
 
         #expect(await projects.snapshot().refreshCallCount == 1)
     }

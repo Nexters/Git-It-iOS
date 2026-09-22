@@ -13,7 +13,11 @@ struct HomeFeatureGuestAccessTests {
     func `비로그인 task는 프로필과 프로젝트 요청을 보내지 않는다`() async {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
-        let store = makeStore(projects: projects, profile: profile, state: guestState())
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+            state: guestState(),
+        )
 
         await store.send(.view(.task))
 
@@ -25,7 +29,10 @@ struct HomeFeatureGuestAccessTests {
     @Test
     func `비로그인 재조회 입력은 프로젝트 요청을 보내지 않는다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: guestState())
+        let store = makeStore(
+            projects: projects,
+            state: guestState(),
+        )
 
         await store.send(.input(.learningProjectsReloadRequested))
 
@@ -76,7 +83,11 @@ struct HomeFeatureGuestAccessTests {
     func `로그인 사용자로 바뀌면 프로필과 프로젝트 적재를 시작한다`() async {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
-        let store = makeStore(projects: projects, profile: profile, state: guestState())
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+            state: guestState(),
+        )
         store.exhaustivity = .off
 
         let task = await store.send(.input(.accessChanged(.member)))

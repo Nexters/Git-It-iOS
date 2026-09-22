@@ -109,7 +109,10 @@ public struct ProjectListPaginationFeature: Sendable {
                 await send(.effect(.nextPageFinished(error: mapped)))
             }
         }
-        .cancellable(id: CancelID.nextPage, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.nextPage,
+            cancelInFlight: true,
+        )
     }
 
 }

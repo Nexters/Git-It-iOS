@@ -15,7 +15,10 @@ struct PushQuizGenerationOutcomeSourceTests {
 
         await source.ingest(rawPayload: ["projectId": "project-1", "status": "completed"])
 
-        let expected = QuizGenerationOutcomeDTO(projectID: "project-1", status: .completed)
+        let expected = QuizGenerationOutcomeDTO(
+            projectID: "project-1",
+            status: .completed,
+        )
         var iterator1 = stream1.makeAsyncIterator()
         var iterator2 = stream2.makeAsyncIterator()
         #expect(await iterator1.next() == expected)
@@ -33,7 +36,10 @@ struct PushQuizGenerationOutcomeSourceTests {
         var iterator = stream.makeAsyncIterator()
         let received = await iterator.next()
 
-        #expect(received == QuizGenerationOutcomeDTO(projectID: "project-2", status: .completed))
+        #expect(received == QuizGenerationOutcomeDTO(
+            projectID: "project-2",
+            status: .completed,
+        ))
     }
 
     @Test
@@ -53,7 +59,10 @@ struct PushQuizGenerationOutcomeSourceTests {
         var iterator2 = stream2.makeAsyncIterator()
         let received = await iterator2.next()
 
-        #expect(received == QuizGenerationOutcomeDTO(projectID: "project-1", status: .completed))
+        #expect(received == QuizGenerationOutcomeDTO(
+            projectID: "project-1",
+            status: .completed,
+        ))
     }
 
 }

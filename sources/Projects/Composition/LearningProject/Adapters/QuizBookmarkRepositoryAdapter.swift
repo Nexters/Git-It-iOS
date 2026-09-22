@@ -25,7 +25,10 @@ public struct QuizBookmarkRepositoryAdapter: BookmarkRepository {
                 questionID: quizID,
                 request: BookmarkQuestionRequestDTO(bookmarked: isBookmarked),
             )
-            return QuizBookmarkState(quizID: quizID, isBookmarked: response.bookmarked)
+            return QuizBookmarkState(
+                quizID: quizID,
+                isBookmarked: response.bookmarked,
+            )
         } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }
@@ -37,7 +40,10 @@ public struct QuizBookmarkRepositoryAdapter: BookmarkRepository {
             return QuizBookmarkList(
                 totalCount: response.totalCount,
                 projects: response.availableProjects.map {
-                    QuizBookmarkProject(id: $0.projectID, name: $0.repositoryName)
+                    QuizBookmarkProject(
+                        id: $0.projectID,
+                        name: $0.repositoryName,
+                    )
                 },
                 bookmarks: response.bookmarks.map {
                     QuizBookmark(

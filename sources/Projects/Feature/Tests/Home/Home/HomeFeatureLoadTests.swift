@@ -16,7 +16,10 @@ struct HomeFeatureLoadTests {
             suspendsRequests: true,
         )
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
-        let store = makeStore(projects: projects, profile: profile)
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+        )
         store.exhaustivity = .off
 
         let firstTask = await store.send(.view(.task))
@@ -52,7 +55,11 @@ struct HomeFeatureLoadTests {
         var state = HomeFeature.State()
         state.profile.load = .failed(.temporarilyUnavailable)
         state.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(projects: projects, profile: profile, state: state)
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+            state: state,
+        )
 
         await store.send(.view(.profileRetryTapped))
         await store.receive(.profile(.input(.load))) {
@@ -60,7 +67,10 @@ struct HomeFeatureLoadTests {
             $0.profile.requestID = 1
         }
         await store.receive(
-            .profile(.effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth))))
+            .profile(.effect(.profileLoadFinished(
+                requestID: 1,
+                result: .success(HomeTestFixture.profileWithBoth),
+            )))
         ) {
             $0.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         }
@@ -80,7 +90,10 @@ struct HomeFeatureLoadTests {
             refreshResults: [.failure(.temporarilyUnavailable)],
             suspendsRefresh: true,
         )
-        let store = makeStore(projects: projects, profile: profile)
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+        )
         store.exhaustivity = .off
 
         let task = await store.send(.view(.task))
@@ -110,14 +123,21 @@ struct HomeFeatureLoadTests {
         var state = HomeFeature.State()
         state.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         state.projectSummaries.load = .failed(.temporarilyUnavailable)
-        let store = makeStore(projects: projects, profile: profile, state: state)
+        let store = makeStore(
+            projects: projects,
+            profile: profile,
+            state: state,
+        )
 
         await store.send(.view(.projectRetryTapped))
         await store.receive(.projectSummaries(.input(.refresh))) {
             $0.projectSummaries.load = .loading
             $0.projectSummaries.requestID = 1
         }
-        await store.receive(.projectSummaries(.effect(.refreshFinished(requestID: 1, error: nil))))
+        await store.receive(.projectSummaries(.effect(.refreshFinished(
+            requestID: 1,
+            error: nil,
+        ))))
 
         #expect(store.state.profile.load == .loaded(HomeTestFixture.profileWithBoth))
         #expect(await profile.snapshot().callCount == 0)
@@ -129,7 +149,10 @@ struct HomeFeatureLoadTests {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(projects: projects, state: state)
+        let store = makeStore(
+            projects: projects,
+            state: state,
+        )
 
         await store.send(.view(.projectRetryTapped))
 

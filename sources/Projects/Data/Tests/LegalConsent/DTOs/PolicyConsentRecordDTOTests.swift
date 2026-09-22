@@ -15,7 +15,10 @@ struct PolicyConsentRecordDTOTests {
         )
 
         let data = try JSONEncoder().encode(record)
-        let decoded = try JSONDecoder().decode(PolicyConsentRecordDTO.self, from: data)
+        let decoded = try JSONDecoder().decode(
+            PolicyConsentRecordDTO.self,
+            from: data,
+        )
 
         #expect(decoded == record)
     }

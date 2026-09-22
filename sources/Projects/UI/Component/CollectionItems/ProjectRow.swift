@@ -20,13 +20,22 @@ public struct ProjectRow<Thumbnail: View>: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.gutter) {
+        VStack(
+            alignment: .leading,
+            spacing: LayoutToken.gutter,
+        ) {
             HStack(spacing: Constant.thumbnailSpacing) {
                 thumbnail
-                    .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+                    .frame(
+                        width: Constant.thumbnailSize,
+                        height: Constant.thumbnailSize,
+                    )
                     .designSystemCornerRadius(.small)
 
-                VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.titleSpacing,
+                ) {
                     StyledText(text: displayModel.name)
                         .textStyle(.subtitle2)
                         .lineLimit(2)
@@ -60,7 +69,11 @@ public struct ProjectRow<Thumbnail: View>: View {
         .padding(.top, Constant.topPadding)
         .padding(.horizontal, Constant.horizontalPadding)
         .padding(.bottom, Constant.bottomPadding)
-        .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .top)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: minimumHeight,
+            alignment: .top,
+        )
         .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)

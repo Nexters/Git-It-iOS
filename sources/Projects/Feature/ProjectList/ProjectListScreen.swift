@@ -38,7 +38,10 @@ public struct ProjectListScreen: View {
                         .padding(.top, 10)
                 }
             }
-            .animation(.easeInOut(duration: Constant.menuTransitionDuration), value: store.mode)
+            .animation(
+                .easeInOut(duration: Constant.menuTransitionDuration),
+                value: store.mode,
+            )
             .overlay {
                 ModalOverlay(
                     isPresented: Binding(
@@ -69,7 +72,10 @@ public struct ProjectListScreen: View {
                         .tint(Color(designSystem: .blue100))
                 }
             }
-            .toolbar(store.mode == .deleting ? .hidden : .visible, for: .tabBar)
+            .toolbar(
+                store.mode == .deleting ? .hidden : .visible,
+                for: .tabBar,
+            )
             .task { await store.send(.view(.task)).finish() }
     }
 
@@ -93,7 +99,10 @@ public struct ProjectListScreen: View {
             ScreenContainer {
                 VStack {
                     HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                        VStack(
+                            alignment: .leading,
+                            spacing: Constant.headerTitleSpacing,
+                        ) {
                             if let headerLeading {
                                 IconGlassButton(
                                     icon: headerLeading.icon,
@@ -135,7 +144,10 @@ public struct ProjectListScreen: View {
     private var content: some View {
         OverlayContainer {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
                     if let headerLeading {
                         IconGlassButton(
                             icon: headerLeading.icon,
@@ -269,7 +281,10 @@ public struct ProjectListScreen: View {
 extension ProjectListScreen {
     fileprivate enum Constant {
         static let contentVerticalPadding: CGFloat = 16
-        static let menuControl = ScreenControlBar.Control(icon: .menu, label: "메뉴 열기")
+        static let menuControl = ScreenControlBar.Control(
+            icon: .menu,
+            label: "메뉴 열기",
+        )
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
         static let headerControlRowHeight: CGFloat = 40

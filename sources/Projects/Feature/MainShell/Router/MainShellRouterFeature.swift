@@ -88,14 +88,20 @@ public struct MainShellRouterFeature: Sendable {
     public static let singleQuestionAdvanceActionTitle = "완료"
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.home, action: \.home) {
+        Scope(
+            state: \.home,
+            action: \.home,
+        ) {
             HomeFeature(
                 projects: { [project] in await project.projects() },
                 refreshProjects: { [project] in try await project.refresh() },
                 profile: { [userInfo] in try await Self.profile(from: userInfo) },
             )
         }
-        Scope(state: \.projectList, action: \.projectList) {
+        Scope(
+            state: \.projectList,
+            action: \.projectList,
+        ) {
             ProjectListFeature(
                 projects: { [project] in await project.projects() },
                 refreshProjects: { [project] in try await project.refresh() },
@@ -103,17 +109,29 @@ public struct MainShellRouterFeature: Sendable {
                 deleteProject: { [project] in try await project.delete($0) },
             )
         }
-        Scope(state: \.saved, action: \.saved) {
+        Scope(
+            state: \.saved,
+            action: \.saved,
+        ) {
             SavedFeature(
                 fetchBookmarks: { [quizDetail] in try await quizDetail.bookmarks($0) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
-        Scope(state: \.settings, action: \.settings) {
+        Scope(
+            state: \.settings,
+            action: \.settings,
+        ) {
             SettingsRouterFeature(
                 account: account,
                 userInfo: userInfo,
@@ -121,7 +139,10 @@ public struct MainShellRouterFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
-        Scope(state: \.signIn, action: \.signIn) {
+        Scope(
+            state: \.signIn,
+            action: \.signIn,
+        ) {
             SignInFeature(
                 signIn: { [account] in await account.signIn(with: $0) },
                 policyConsentStatus: { [account] in try await account.policyConsentStatus() },
@@ -170,7 +191,10 @@ public struct MainShellRouterFeature: Sendable {
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
             case .home(.delegate(.learningRequested(let projectID, let nextSetID))):
-                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
+                return .send(.delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: nextSetID,
+                )))
 
             case .projectList(.delegate(.projectDeleted)):
                 return .send(.home(.input(.learningProjectsReloadRequested)))
@@ -179,7 +203,10 @@ public struct MainShellRouterFeature: Sendable {
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))
 
             case .projectList(.delegate(.learningRequested(let projectID, let nextSetID))):
-                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: nextSetID)))
+                return .send(.delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: nextSetID,
+                )))
 
             case .saved(.delegate(.questionSelected(let question))):
                 state.singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: question.projectID)
@@ -227,17 +254,32 @@ public struct MainShellRouterFeature: Sendable {
                 return .none
             }
         }
-        .ifLet(\.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet($0, in: $1) })
+        .ifLet(
+            \.singleQuestionEntry,
+            action: \.singleQuestionEntry,
+        ) {
+            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet(
+                $0,
+                in: $1,
+            ) })
         }
-        .ifLet(\.$singleQuestion, action: \.singleQuestion) {
+        .ifLet(
+            \.$singleQuestion,
+            action: \.singleQuestion,
+        ) {
             QuestionSolvingFeature(
                 gradeChoiceAnswer: { [quizDetail] in try await quizDetail.grade($0) },
                 gradeEssayAnswer: { [quizDetail] in try await quizDetail.grade($0) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
@@ -255,7 +297,10 @@ public struct MainShellRouterFeature: Sendable {
     private static func profile(from userInfo: any UserInfoUseCase) async throws -> UserProfile {
         async let detail = userInfo.detail()
         async let curation = userInfo.curation()
-        return try await UserProfile(detail: detail, curation: curation)
+        return try await UserProfile(
+            detail: detail,
+            curation: curation,
+        )
     }
 
     private func reloadLearningProjects() -> ComposableArchitecture.Effect<Action> {

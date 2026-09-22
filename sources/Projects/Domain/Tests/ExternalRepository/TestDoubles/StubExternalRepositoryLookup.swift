@@ -16,7 +16,10 @@ actor StubExternalRepositoryLookup: ExternalRepositoryLookup {
         owner: String,
         name: String,
     ) async throws -> ExternalRepository {
-        requestedLocations.append(ExternalRepositoryLocation(owner: owner, name: name))
+        requestedLocations.append(ExternalRepositoryLocation(
+            owner: owner,
+            name: name,
+        ))
         return repository
     }
 

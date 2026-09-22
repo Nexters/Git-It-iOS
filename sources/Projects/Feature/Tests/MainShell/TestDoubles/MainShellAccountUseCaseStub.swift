@@ -6,7 +6,11 @@ actor MainShellAccountUseCaseStub: AccountUseCase {
 
     init(
         signInResults: [SignInResult] = [.retryableFailure],
-        consentStatus: PolicyConsentStatus = PolicyConsentStatus(documents: [], consents: [], isSatisfied: false),
+        consentStatus: PolicyConsentStatus = PolicyConsentStatus(
+            documents: [],
+            consents: [],
+            isSatisfied: false,
+        ),
     ) {
         self.signInResults = signInResults
         self.consentStatus = consentStatus

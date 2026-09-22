@@ -14,7 +14,10 @@ struct SingleQuestionEntryFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        await store.send(.input(.questionRequested(setID: "set-1", questionID: "quiz-1")))
+        await store.send(.input(.questionRequested(
+            setID: "set-1",
+            questionID: "quiz-1",
+        )))
         await store.receive(\.effect.setLoadFinished)
         await store.receive(
             .delegate(.questionPrepared(
@@ -30,7 +33,10 @@ struct SingleQuestionEntryFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        await store.send(.input(.questionRequested(setID: "set-1", questionID: "missing-quiz")))
+        await store.send(.input(.questionRequested(
+            setID: "set-1",
+            questionID: "missing-quiz",
+        )))
         await store.receive(\.effect.setLoadFinished)
         await store.receive(.delegate(.preparationFailed(.quizUnavailable)))
         #expect(store.state.preparationError == .quizUnavailable)
@@ -43,7 +49,10 @@ struct SingleQuestionEntryFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.input(.questionRequested(setID: "set-1", questionID: "quiz-0")))
+        await store.send(.input(.questionRequested(
+            setID: "set-1",
+            questionID: "quiz-0",
+        )))
         await store.receive(\.effect.setLoadFinished)
         await store.receive(.delegate(.preparationFailed(.temporarilyUnavailable)))
         #expect(store.state.preparationError == .temporarilyUnavailable)
@@ -54,9 +63,15 @@ struct SingleQuestionEntryFeatureTests {
         let fetchQuizSet = QuizDetailUseCaseQuizSetStub(results: [.success(QuizTestFixture.unansweredSet)])
         var state = SingleQuestionEntryFeature.State(projectID: ProjectDetailTestFixture.projectID)
         state.preparation = .loading(questionID: "quiz-0")
-        let store = makeStore(fetchQuizSet: fetchQuizSet, state: state)
+        let store = makeStore(
+            fetchQuizSet: fetchQuizSet,
+            state: state,
+        )
 
-        await store.send(.input(.questionRequested(setID: "set-1", questionID: "quiz-0")))
+        await store.send(.input(.questionRequested(
+            setID: "set-1",
+            questionID: "quiz-0",
+        )))
 
         #expect(await fetchQuizSet.callCount == 0)
     }
@@ -68,7 +83,10 @@ struct SingleQuestionEntryFeatureTests {
         let store = makeStore(state: state)
 
         await store.send(
-            .effect(.setLoadFinished(questionID: "quiz-1", result: .success(QuizTestFixture.unansweredSet)))
+            .effect(.setLoadFinished(
+                questionID: "quiz-1",
+                result: .success(QuizTestFixture.unansweredSet),
+            ))
         )
 
         #expect(store.state.preparation == .loading(questionID: "quiz-0"))

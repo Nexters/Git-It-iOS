@@ -36,7 +36,10 @@ struct ShareExtensionCompositionTests {
     func `만료된 로그인 기록이면 로그인이 필요하다고 판정한다`() async throws {
         let context = try Context()
         await context.markerCoding.save(isSignedIn: true)
-        try context.saveSession(accessToken: "expired-token", accessTokenExpiresAt: Date(timeIntervalSince1970: 0))
+        try context.saveSession(
+            accessToken: "expired-token",
+            accessTokenExpiresAt: Date(timeIntervalSince1970: 0),
+        )
 
         #expect(await context.composition.signInAvailability() == .signInRequired)
     }
@@ -49,7 +52,10 @@ struct ShareExtensionCompositionTests {
 
         await #expect(throws: (any Error).self) {
             _ = try await context.composition.projectGeneration.request(
-                ProjectGenerationRequest(repositoryURL: "https://github.com/owner/repo", quizLevel: .l2)
+                ProjectGenerationRequest(
+                    repositoryURL: "https://github.com/owner/repo",
+                    quizLevel: .l2,
+                )
             )
         }
 

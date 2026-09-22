@@ -6,8 +6,14 @@ import UIComponent
 private let previewCollection = QuizBookmarkList(
     totalCount: 4,
     projects: [
-        QuizBookmarkProject(id: "project-1", name: "Flask"),
-        QuizBookmarkProject(id: "project-2", name: "Now in Android"),
+        QuizBookmarkProject(
+            id: "project-1",
+            name: "Flask",
+        ),
+        QuizBookmarkProject(
+            id: "project-2",
+            name: "Now in Android",
+        ),
     ],
     bookmarks: [
         QuizBookmark(
@@ -63,7 +69,10 @@ private func previewState(
     ScreenContainer {
         SavedScreen(
             store: Store(
-                initialState: previewState(collection: previewCollection, loadStatus: .loaded)
+                initialState: previewState(
+                    collection: previewCollection,
+                    loadStatus: .loaded,
+                )
             ) { EmptyReducer() }
         )
     }
@@ -90,7 +99,10 @@ private func previewState(
     ScreenContainer {
         SavedScreen(
             store: Store(
-                initialState: previewState(collection: nil, loadStatus: .failed(.temporarilyUnavailable))
+                initialState: previewState(
+                    collection: nil,
+                    loadStatus: .failed(.temporarilyUnavailable),
+                )
             ) { EmptyReducer() }
         )
     }

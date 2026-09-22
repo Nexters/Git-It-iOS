@@ -148,7 +148,10 @@ public struct ProjectSummaryListFeature: Sendable {
                 await send(.effect(.projectsReceived(list)))
             }
         }
-        .cancellable(id: CancelID.projects(state.instanceID), cancelInFlight: true)
+        .cancellable(
+            id: CancelID.projects(state.instanceID),
+            cancelInFlight: true,
+        )
     }
 
     private func startRefresh(state: inout State) -> ComposableArchitecture.Effect<Action> {
@@ -162,13 +165,22 @@ public struct ProjectSummaryListFeature: Sendable {
         return .run { send in
             do {
                 try await refreshProjects()
-                await send(.effect(.refreshFinished(requestID: requestID, error: nil)))
+                await send(.effect(.refreshFinished(
+                    requestID: requestID,
+                    error: nil,
+                )))
             } catch {
                 let mapped = error as? ProjectError ?? .unexpected
-                await send(.effect(.refreshFinished(requestID: requestID, error: mapped)))
+                await send(.effect(.refreshFinished(
+                    requestID: requestID,
+                    error: mapped,
+                )))
             }
         }
-        .cancellable(id: CancelID.refresh(state.instanceID), cancelInFlight: true)
+        .cancellable(
+            id: CancelID.refresh(state.instanceID),
+            cancelInFlight: true,
+        )
     }
 
 }

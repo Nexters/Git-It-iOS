@@ -51,7 +51,10 @@ struct HomeFeatureGenerationOutcomeTests {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(projects: projects, state: state)
+        let store = makeStore(
+            projects: projects,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.input(.learningProjectsReloadRequested))

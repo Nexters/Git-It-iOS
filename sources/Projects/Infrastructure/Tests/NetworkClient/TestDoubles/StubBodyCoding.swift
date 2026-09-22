@@ -44,7 +44,10 @@ struct StubBodyCoding: HTTPBodyCoding {
             } else {
                 data
             }
-        return try JSONDecoder().decode(Body.self, from: payload)
+        return try JSONDecoder().decode(
+            Body.self,
+            from: payload,
+        )
     }
 
 }

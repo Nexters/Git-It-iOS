@@ -75,19 +75,28 @@ public struct UserProfileLoadFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .input(.load):
-                return startLoad(state: &state, showsLoading: true)
+                return startLoad(
+                    state: &state,
+                    showsLoading: true,
+                )
 
             case .input(.reload):
                 switch state.load {
                 case .loaded:
-                    return startLoad(state: &state, showsLoading: false)
+                    return startLoad(
+                        state: &state,
+                        showsLoading: false,
+                    )
 
                 case .loading:
                     return .none
 
                 case .idle,
                      .failed:
-                    return startLoad(state: &state, showsLoading: true)
+                    return startLoad(
+                        state: &state,
+                        showsLoading: true,
+                    )
                 }
 
             case .input(.replace(let profile)):
@@ -133,14 +142,26 @@ public struct UserProfileLoadFeature: Sendable {
 
         return .run { send in
             do {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .success(try await profile()))))
+                await send(.effect(.profileLoadFinished(
+                    requestID: requestID,
+                    result: .success(try await profile()),
+                )))
             } catch let error as UserInfoError {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(error))))
+                await send(.effect(.profileLoadFinished(
+                    requestID: requestID,
+                    result: .failure(error),
+                )))
             } catch {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(.temporarilyUnavailable))))
+                await send(.effect(.profileLoadFinished(
+                    requestID: requestID,
+                    result: .failure(.temporarilyUnavailable),
+                )))
             }
         }
-        .cancellable(id: CancelID.profile(state.instanceID), cancelInFlight: true)
+        .cancellable(
+            id: CancelID.profile(state.instanceID),
+            cancelInFlight: true,
+        )
     }
 
 }

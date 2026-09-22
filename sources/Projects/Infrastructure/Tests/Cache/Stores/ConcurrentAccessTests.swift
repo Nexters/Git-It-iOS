@@ -12,7 +12,10 @@ struct ConcurrentAccessTests {
         await withTaskGroup(of: Void.self) { group in
             for index in 0 ..< 100 {
                 group.addTask {
-                    await cache.store(index, forKey: index)
+                    await cache.store(
+                        index,
+                        forKey: index,
+                    )
                 }
             }
         }
@@ -30,7 +33,10 @@ struct ConcurrentAccessTests {
         await withTaskGroup(of: Void.self) { group in
             for candidate in candidates {
                 group.addTask {
-                    await cache.store(candidate, forKey: "key")
+                    await cache.store(
+                        candidate,
+                        forKey: "key",
+                    )
                 }
             }
         }

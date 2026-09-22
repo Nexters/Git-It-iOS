@@ -104,8 +104,14 @@ extension GradientToken {
 
     public static let backgroundGradient = GradientToken(
         name: "BackgroundGradient",
-        start: .init(x: 0.5, y: 0.6),
-        end: .init(x: 0.5, y: 3.0),
+        start: .init(
+            x: 0.5,
+            y: 0.6,
+        ),
+        end: .init(
+            x: 0.5,
+            y: 3.0,
+        ),
         stops: [
             Stop(
                 position: 0,

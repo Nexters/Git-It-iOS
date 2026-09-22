@@ -5,7 +5,11 @@ actor AccountUseCaseConsentMock {
 
     // MARK: Lifecycle
 
-    init(status: PolicyConsentStatus = PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)) {
+    init(status: PolicyConsentStatus = PolicyConsentStatus(
+        documents: [],
+        consents: [],
+        isSatisfied: false,
+    )) {
         self.status = status
     }
 

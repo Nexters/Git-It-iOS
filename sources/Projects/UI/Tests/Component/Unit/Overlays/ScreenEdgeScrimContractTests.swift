@@ -9,7 +9,13 @@ struct ScreenEdgeScrimContractTests {
     func `시각 표현은 사용자 상호작용을 가로채지 않는다`() {
         #expect(!ScreenEdgeScrim.allowsHitTesting)
 
-        _ = ScreenEdgeScrim(edge: .top, height: 70)
-        _ = ScreenEdgeScrim(edge: .bottom, height: 92)
+        _ = ScreenEdgeScrim(
+            edge: .top,
+            height: 70,
+        )
+        _ = ScreenEdgeScrim(
+            edge: .bottom,
+            height: 92,
+        )
     }
 }

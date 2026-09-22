@@ -43,7 +43,11 @@ public struct HTTPClient: Sendable {
         _ request: HTTPRequest,
         expecting _: ResponseBody.Type,
     ) async throws(HTTPClientError) -> HTTPResponse<ResponseBody> {
-        try await send(request, encodedBody: { nil }, expecting: ResponseBody.self)
+        try await send(
+            request,
+            encodedBody: { nil },
+            expecting: ResponseBody.self,
+        )
     }
 
     public func send<ResponseBody: Decodable & Sendable>(
@@ -99,7 +103,10 @@ public struct HTTPClient: Sendable {
                 return HTTPResponse(
                     statusCode: transportResponse.statusCode,
                     headers: transportResponse.headers,
-                    body: .decoded(try bodyCoding.decode(ResponseBody.self, from: transportResponse.body)),
+                    body: .decoded(try bodyCoding.decode(
+                        ResponseBody.self,
+                        from: transportResponse.body,
+                    )),
                 )
             } catch {
                 throw .responseDecodingFailed

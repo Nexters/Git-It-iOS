@@ -113,7 +113,10 @@ struct ProjectDetailFeatureTests {
 
     @Test
     func `삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다`() async {
-        let deleteProject = ProjectUseCaseDeletionStub(results: [.success(())], suspendsRequests: true)
+        let deleteProject = ProjectUseCaseDeletionStub(
+            results: [.success(())],
+            suspendsRequests: true,
+        )
         let store = loadedStore(deleteProject: deleteProject)
         store.exhaustivity = .off
 
@@ -140,7 +143,10 @@ struct ProjectDetailFeatureTests {
 
         #expect(
             store.state.deletion.deletion
-                == .failed(projectID: ProjectDetailTestFixture.projectID, error: .temporarilyUnavailable)
+                == .failed(
+                    projectID: ProjectDetailTestFixture.projectID,
+                    error: .temporarilyUnavailable,
+                )
         )
     }
 
@@ -198,7 +204,10 @@ struct ProjectDetailFeatureTests {
         var state = ProjectDetailFeature.State(projectID: ProjectDetailTestFixture.projectID)
         state.detailLoad.detail = detail
         state.detailLoad.loadStatus = .loaded
-        return makeStore(deleteProject: deleteProject, state: state)
+        return makeStore(
+            deleteProject: deleteProject,
+            state: state,
+        )
     }
 
     private func makeStore(

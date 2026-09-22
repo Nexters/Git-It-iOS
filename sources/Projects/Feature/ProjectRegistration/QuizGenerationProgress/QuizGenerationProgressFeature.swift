@@ -83,14 +83,22 @@ public struct QuizGenerationProgressFeature: Sendable {
             case .submit(let repository, let quizLevel):
                 state.repository = repository
                 state.quizLevel = quizLevel
-                return submit(repository: repository, quizLevel: quizLevel, state: &state)
+                return submit(
+                    repository: repository,
+                    quizLevel: quizLevel,
+                    state: &state,
+                )
 
             case .view(.retryTapped):
                 guard
                     case .failed = state.progress,
                     let repository = state.repository
                 else { return .none }
-                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+                return submit(
+                    repository: repository,
+                    quizLevel: state.quizLevel,
+                    state: &state,
+                )
 
             case .view(.dismissTapped):
                 return .send(.delegate(.dismissRequested))
@@ -107,7 +115,10 @@ public struct QuizGenerationProgressFeature: Sendable {
                     state.isGenerationReminderSheetPresented = true
                     return .none
                 }
-                return finishWaiting(receipt: receipt, isReminderEnabled: true)
+                return finishWaiting(
+                    receipt: receipt,
+                    isReminderEnabled: true,
+                )
 
             case .view(.generationReminderAccepted):
                 guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
@@ -117,14 +128,20 @@ public struct QuizGenerationProgressFeature: Sendable {
             case .view(.generationReminderDeclined):
                 guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
                 state.isGenerationReminderSheetPresented = false
-                return finishWaiting(receipt: receipt, isReminderEnabled: false)
+                return finishWaiting(
+                    receipt: receipt,
+                    isReminderEnabled: false,
+                )
 
             case .effect(.submissionFinished(.success(let receipt))):
                 state.progress = .awaitingOutcome(receipt)
                 return .none
 
             case .effect(.submissionFinished(.failure(let error))):
-                return transitionToFailure(error, state: &state)
+                return transitionToFailure(
+                    error,
+                    state: &state,
+                )
 
             case .effect(.generationPhaseReceived(let phase)):
                 guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
@@ -134,10 +151,16 @@ public struct QuizGenerationProgressFeature: Sendable {
                     return .none
 
                 case .ready:
-                    return finishWaiting(receipt: receipt, isReminderEnabled: nil)
+                    return finishWaiting(
+                        receipt: receipt,
+                        isReminderEnabled: nil,
+                    )
 
                 case .failed:
-                    return transitionToFailure(.unexpected, state: &state)
+                    return transitionToFailure(
+                        .unexpected,
+                        state: &state,
+                    )
                 }
 
             case .delegate:
@@ -185,7 +208,10 @@ public struct QuizGenerationProgressFeature: Sendable {
                 await send(.effect(.generationPhaseReceived(request.phase)))
             }
         }
-        .cancellable(id: CancelID.registrationPipeline, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.registrationPipeline,
+            cancelInFlight: true,
+        )
     }
 
     private func transitionToFailure(
@@ -204,7 +230,10 @@ public struct QuizGenerationProgressFeature: Sendable {
                     await openNotificationSettings()
                 }
             },
-            finishWaiting(receipt: receipt, isReminderEnabled: true),
+            finishWaiting(
+                receipt: receipt,
+                isReminderEnabled: true,
+            ),
         )
     }
 

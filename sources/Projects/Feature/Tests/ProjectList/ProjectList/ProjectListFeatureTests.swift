@@ -68,13 +68,19 @@ struct ProjectListFeatureTests {
         let store = makeStore(state: loadedState())
 
         await store.send(.view(.learningTapped(projectID: "project-1")))
-        await store.receive(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+        await store.receive(.delegate(.learningRequested(
+            projectID: "project-1",
+            nextSetID: "set-1",
+        )))
     }
 
     @Test
     func `다음 문제가 없는 프로젝트는 이어하기를 요청하지 않는다`() async {
         let list = ProjectList(
-            summaries: [HomeTestFixture.project(index: 0, hasLearningIDs: false)],
+            summaries: [HomeTestFixture.project(
+                index: 0,
+                hasLearningIDs: false,
+            )],
             hasNextPage: false,
             isLoaded: true,
         )
@@ -147,7 +153,10 @@ struct ProjectListFeatureTests {
     @Test
     func `삭제 모드의 삭제 버튼은 삭제에 request를 보내고 확인 전에는 삭제를 요청하지 않는다`() async {
         let deleteProject = ProjectUseCaseDeletionStub()
-        let store = makeStore(deleteProject: deleteProject, state: state(mode: .deleting))
+        let store = makeStore(
+            deleteProject: deleteProject,
+            state: state(mode: .deleting),
+        )
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.receive(.deletion(.input(.request("project-0")))) {
@@ -174,7 +183,10 @@ struct ProjectListFeatureTests {
     @Test
     func `삭제 실패 뒤에도 다시 삭제를 요청할 수 있다`() async {
         var state = loadedState(mode: .deleting)
-        state.deletion.deletion = .failed(projectID: "project-0", error: .temporarilyUnavailable)
+        state.deletion.deletion = .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        )
         let store = makeStore(state: state)
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
@@ -251,7 +263,10 @@ struct ProjectListFeatureTests {
 
         #expect(store.state.projects.contains { $0.id == "project-0" })
         #expect(store.state.mode == .deleting)
-        #expect(store.state.deletion.deletion == .failed(projectID: "project-0", error: .temporarilyUnavailable))
+        #expect(store.state.deletion.deletion == .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        ))
     }
 
     @Test
@@ -277,7 +292,10 @@ struct ProjectListFeatureTests {
     @Test
     func `목록 끝에 닿으면 다음 페이지를 한 번 요청한다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
@@ -291,7 +309,10 @@ struct ProjectListFeatureTests {
     @Test
     func `다음 페이지가 없으면 목록 끝에 닿아도 요청하지 않는다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState(list: HomeTestFixture.oneProjectPage))
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(list: HomeTestFixture.oneProjectPage),
+        )
 
         await store.send(.view(.listBottomReached))
 
@@ -314,7 +335,10 @@ struct ProjectListFeatureTests {
         let projects = ProjectUseCaseMock(
             nextPageResults: [.failure(.temporarilyUnavailable), .success(())]
         )
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
@@ -332,7 +356,10 @@ struct ProjectListFeatureTests {
     @Test
     func `새로고침 입력은 목록에 refresh를 보낸다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.refreshRequested))

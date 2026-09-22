@@ -31,30 +31,48 @@ struct AppRootView: View {
     private var content: some View {
         switch store.route {
         case .restoring:
-            AppEntryScreen(store: store.scope(state: \.appEntry, action: \.appEntry))
+            AppEntryScreen(store: store.scope(
+                state: \.appEntry,
+                action: \.appEntry,
+            ))
 
         case .onboarding:
-            OnboardingRouter(store: store.scope(state: \.onboarding, action: \.onboarding))
+            OnboardingRouter(store: store.scope(
+                state: \.onboarding,
+                action: \.onboarding,
+            ))
 
         case .mainShell:
-            MainShellRouter(store: store.scope(state: \.mainShell, action: \.mainShell))
-                .fullScreenCover(
-                    item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
-                ) { projectRegistrationStore in
-                    ProjectRegistrationRouter(store: projectRegistrationStore)
-                }
-                .fullScreenCover(
-                    item: $store.scope(state: \.projectDetail, action: \.projectDetail)
-                ) { projectDetailStore in
-                    ProjectDetailRouter(store: projectDetailStore)
-                        .overlay { QuizRouterOverlay(store: quizStore) }
-                }
-                .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
+            MainShellRouter(store: store.scope(
+                state: \.mainShell,
+                action: \.mainShell,
+            ))
+            .fullScreenCover(
+                item: $store.scope(
+                    state: \.projectRegistration,
+                    action: \.projectRegistration,
+                )
+            ) { projectRegistrationStore in
+                ProjectRegistrationRouter(store: projectRegistrationStore)
+            }
+            .fullScreenCover(
+                item: $store.scope(
+                    state: \.projectDetail,
+                    action: \.projectDetail,
+                )
+            ) { projectDetailStore in
+                ProjectDetailRouter(store: projectDetailStore)
+                    .overlay { QuizRouterOverlay(store: quizStore) }
+            }
+            .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
         }
     }
 
     private var quizStore: StoreOf<QuizRouterFeature>? {
-        store.scope(state: \.quiz, action: \.quiz.presented)
+        store.scope(
+            state: \.quiz,
+            action: \.quiz.presented,
+        )
     }
 
 }
@@ -101,7 +119,11 @@ private enum AppRootPreviewSupport {
         }
 
         func policyConsentStatus() async throws -> PolicyConsentStatus {
-            PolicyConsentStatus(documents: [], consents: [], isSatisfied: true)
+            PolicyConsentStatus(
+                documents: [],
+                consents: [],
+                isSatisfied: true,
+            )
         }
 
         func consent(to _: [PolicyDocumentID]) async throws { }

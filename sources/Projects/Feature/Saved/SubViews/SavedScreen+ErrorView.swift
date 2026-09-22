@@ -13,8 +13,14 @@ extension SavedScreen {
 
         var body: some View {
             VStack(spacing: LayoutToken.margin) {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
                         if isBackControlPresented {
                             IconGlassButton(
                                 icon: ScreenControlBar.Control.back.icon,
@@ -26,12 +32,18 @@ extension SavedScreen {
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
                     ScreenHeaderTitle(displayModel: .init(title: "저장한 문제"))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
 
                 Spacer(minLength: 0)
@@ -48,9 +60,12 @@ extension SavedScreen {
 
                 Spacer(minLength: 0)
 
-                FeedbackActionButton(title: "다시 시도하기", action: onRetry)
-                    .designSystemScreenMargin()
-                    .padding(.bottom, Constant.bottomButtonPadding)
+                FeedbackActionButton(
+                    title: "다시 시도하기",
+                    action: onRetry,
+                )
+                .designSystemScreenMargin()
+                .padding(.bottom, Constant.bottomButtonPadding)
             }
         }
 

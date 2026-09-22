@@ -68,9 +68,18 @@ extension Chip {
 
 #Preview("Chip") {
     HStack(spacing: LayoutToken.compactSpacing) {
-        Chip(label: "전체", isSelected: .constant(true))
-        Chip(label: "SwiftUI", isSelected: .constant(false))
-        Chip(label: "동시성", isSelected: .constant(false))
+        Chip(
+            label: "전체",
+            isSelected: .constant(true),
+        )
+        Chip(
+            label: "SwiftUI",
+            isSelected: .constant(false),
+        )
+        Chip(
+            label: "동시성",
+            isSelected: .constant(false),
+        )
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

@@ -103,7 +103,10 @@ struct QuizRouterFeatureTests {
         store.exhaustivity = .off
         await startFirstQuestion(store)
 
-        await store.send(.questionSolving(.delegate(.answerSubmitted(questionID: "quiz-0", choiceCorrect: true))))
+        await store.send(.questionSolving(.delegate(.answerSubmitted(
+            questionID: "quiz-0",
+            choiceCorrect: true,
+        ))))
         await store.receive(.session(.input(.answerRecorded(choiceCorrect: true))))
 
         #expect(store.state.session.sessionCorrectChoiceCount == 1)

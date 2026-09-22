@@ -14,17 +14,32 @@ struct ErrorClassificationTests {
         let client = client(transport: transport)
 
         await #expect(throws: expectedError) {
-            try await client.send(HTTPRequest(method: .get, path: "resource"), expecting: TestPayload.self)
+            try await client.send(
+                HTTPRequest(
+                    method: .get,
+                    path: "resource",
+                ),
+                expecting: TestPayload.self,
+            )
         }
     }
 
     @Test
     func `응답하지 않는 전송 수단은 대기 한도 초과로 끝난다`() async {
         let transport = RecordingTransport([.suspended])
-        let client = client(transport: transport, responseTimeout: .milliseconds(20))
+        let client = client(
+            transport: transport,
+            responseTimeout: .milliseconds(20),
+        )
 
         await #expect(throws: HTTPClientError.timedOut) {
-            try await client.send(HTTPRequest(method: .get, path: "resource"), expecting: TestPayload.self)
+            try await client.send(
+                HTTPRequest(
+                    method: .get,
+                    path: "resource",
+                ),
+                expecting: TestPayload.self,
+            )
         }
         let callCount = await transport.callCount
         #expect(callCount == 1)
@@ -41,8 +56,14 @@ struct ErrorClassificationTests {
 
         await #expect(throws: HTTPClientError.requestEncodingFailed) {
             try await client.send(
-                HTTPRequest(method: .post, path: "resource"),
-                body: TestPayload(id: 1, name: "본문"),
+                HTTPRequest(
+                    method: .post,
+                    path: "resource",
+                ),
+                body: TestPayload(
+                    id: 1,
+                    name: "본문",
+                ),
                 expecting: TestPayload.self,
             )
         }
@@ -60,7 +81,13 @@ struct ErrorClassificationTests {
         )
 
         await #expect(throws: HTTPClientError.invalidURL) {
-            try await client.send(HTTPRequest(method: .get, path: "resource"), expecting: TestPayload.self)
+            try await client.send(
+                HTTPRequest(
+                    method: .get,
+                    path: "resource",
+                ),
+                expecting: TestPayload.self,
+            )
         }
         let callCount = await transport.callCount
         #expect(callCount == 0)
@@ -76,7 +103,13 @@ struct ErrorClassificationTests {
         )
 
         await #expect(throws: HTTPClientError.responseDecodingFailed) {
-            try await client.send(HTTPRequest(method: .get, path: "resource"), expecting: TestPayload.self)
+            try await client.send(
+                HTTPRequest(
+                    method: .get,
+                    path: "resource",
+                ),
+                expecting: TestPayload.self,
+            )
         }
     }
 
@@ -87,7 +120,10 @@ struct ErrorClassificationTests {
 
             await #expect(throws: error) {
                 try await client(transport: transport).send(
-                    HTTPRequest(method: .get, path: "resource"),
+                    HTTPRequest(
+                        method: .get,
+                        path: "resource",
+                    ),
                     expecting: TestPayload.self,
                 )
             }
@@ -136,7 +172,11 @@ struct ErrorClassificationTests {
     }
 
     private func successResponse() -> HTTPTransportResponse {
-        .init(statusCode: 200, headers: [:], body: Data("{}".utf8))
+        .init(
+            statusCode: 200,
+            headers: [:],
+            body: Data("{}".utf8),
+        )
     }
 
 }

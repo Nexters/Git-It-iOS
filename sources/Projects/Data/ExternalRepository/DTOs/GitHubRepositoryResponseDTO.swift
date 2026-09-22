@@ -20,13 +20,34 @@ public struct GitHubRepositoryResponseDTO: Decodable, Equatable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let owner = try container.nestedContainer(keyedBy: OwnerCodingKeys.self, forKey: .owner)
-        htmlURL = try container.decode(String.self, forKey: .htmlURL)
-        ownerLogin = try owner.decode(String.self, forKey: .login)
-        repositoryName = try container.decode(String.self, forKey: .repositoryName)
-        ownerAvatarURL = try owner.decodeIfPresent(String.self, forKey: .avatarURL)
-        starCount = try container.decode(Int.self, forKey: .starCount)
-        topics = try container.decodeIfPresent([String].self, forKey: .topics) ?? []
+        let owner = try container.nestedContainer(
+            keyedBy: OwnerCodingKeys.self,
+            forKey: .owner,
+        )
+        htmlURL = try container.decode(
+            String.self,
+            forKey: .htmlURL,
+        )
+        ownerLogin = try owner.decode(
+            String.self,
+            forKey: .login,
+        )
+        repositoryName = try container.decode(
+            String.self,
+            forKey: .repositoryName,
+        )
+        ownerAvatarURL = try owner.decodeIfPresent(
+            String.self,
+            forKey: .avatarURL,
+        )
+        starCount = try container.decode(
+            Int.self,
+            forKey: .starCount,
+        )
+        topics = try container.decodeIfPresent(
+            [String].self,
+            forKey: .topics,
+        ) ?? []
     }
 
     // MARK: Public

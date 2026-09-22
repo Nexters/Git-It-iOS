@@ -19,13 +19,21 @@ package struct RequestTransportBridge: HTTPTransport {
         }
         do {
             let response = try await transport.send(
-                TransportRequest(url: request.url, headerFields: headerFields, body: request.body)
+                TransportRequest(
+                    url: request.url,
+                    headerFields: headerFields,
+                    body: request.body,
+                )
             )
             var headers = HTTPHeaders()
             for (name, value) in response.headerFields {
                 headers[name] = value
             }
-            return HTTPTransportResponse(statusCode: response.statusCode, headers: headers, body: response.body)
+            return HTTPTransportResponse(
+                statusCode: response.statusCode,
+                headers: headers,
+                body: response.body,
+            )
         } catch {
             throw Self.clientError(for: error)
         }

@@ -94,16 +94,34 @@ public struct SettingsFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.userProfile, action: \.userProfile) {
+        Scope(
+            state: \.userProfile,
+            action: \.userProfile,
+        ) {
             UserProfileLoadFeature(profile: profile)
         }
-        Scope(state: \.curationUpdate, action: \.curationUpdate) {
-            CurationUpdateFeature(updatePosition: updatePosition, updateCareerLevel: updateCareerLevel)
+        Scope(
+            state: \.curationUpdate,
+            action: \.curationUpdate,
+        ) {
+            CurationUpdateFeature(
+                updatePosition: updatePosition,
+                updateCareerLevel: updateCareerLevel,
+            )
         }
-        Scope(state: \.accountAction, action: \.accountAction) {
-            AccountActionFeature(signOut: signOut, withdraw: withdraw)
+        Scope(
+            state: \.accountAction,
+            action: \.accountAction,
+        ) {
+            AccountActionFeature(
+                signOut: signOut,
+                withdraw: withdraw,
+            )
         }
-        Scope(state: \.notificationPermission, action: \.notificationPermission) {
+        Scope(
+            state: \.notificationPermission,
+            action: \.notificationPermission,
+        ) {
             NotificationPermissionFeature(
                 notificationAuthorization: notificationAuthorization,
                 requestNotificationAuthorization: requestNotificationAuthorization,
@@ -222,7 +240,10 @@ extension UserProfile {
         }
         return UserProfile(
             detail: detail,
-            curation: Curation(position: position, careerLevel: careerLevel),
+            curation: Curation(
+                position: position,
+                careerLevel: careerLevel,
+            ),
         )
     }
 }

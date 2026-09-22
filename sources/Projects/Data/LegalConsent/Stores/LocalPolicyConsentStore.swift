@@ -11,14 +11,20 @@ public struct LocalPolicyConsentStore: Sendable {
     // MARK: Public
 
     public func records() async -> [PolicyConsentRecordDTO] {
-        await storage.value([PolicyConsentRecordDTO].self, forKey: Self.recordsKey) ?? []
+        await storage.value(
+            [PolicyConsentRecordDTO].self,
+            forKey: Self.recordsKey,
+        ) ?? []
     }
 
     public func saveRecord(_ record: PolicyConsentRecordDTO) async {
         var current = await records()
         current.removeAll { $0.documentIdentifier == record.documentIdentifier }
         current.append(record)
-        await storage.setValue(current, forKey: Self.recordsKey)
+        await storage.setValue(
+            current,
+            forKey: Self.recordsKey,
+        )
     }
 
     public func removeAll() async {

@@ -106,7 +106,10 @@ public struct OnboardingRouterFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.tutorial, action: \.tutorial) {
+        Scope(
+            state: \.tutorial,
+            action: \.tutorial,
+        ) {
             TutorialFeature(
                 signIn: signIn,
                 policyConsentStatus: policyConsentStatus,
@@ -115,13 +118,22 @@ public struct OnboardingRouterFeature: Sendable {
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
         }
-        Scope(state: \.positionSelection, action: \.positionSelection) {
+        Scope(
+            state: \.positionSelection,
+            action: \.positionSelection,
+        ) {
             PositionSelectionFeature(signOut: signOut)
         }
-        Scope(state: \.careerSelection, action: \.careerSelection) {
+        Scope(
+            state: \.careerSelection,
+            action: \.careerSelection,
+        ) {
             CareerSelectionFeature(updateCuration: updateCuration)
         }
-        Scope(state: \.exit, action: \.exit) {
+        Scope(
+            state: \.exit,
+            action: \.exit,
+        ) {
             OnboardingExitFeature()
         }
         Reduce { state, action in
@@ -133,7 +145,10 @@ public struct OnboardingRouterFeature: Sendable {
                 effect = .send(.delegate(.guestAccessRequested))
 
             case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
-                effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
+                effect = advanceAfterSignIn(
+                    needsCuration: needsCuration,
+                    state: &state,
+                )
 
             case .positionSelection(.delegate(.confirmed(let position))):
                 state.activeScreen = .curation(.careerSelection)
@@ -174,7 +189,11 @@ public struct OnboardingRouterFeature: Sendable {
 
             if state.activeScreen != before {
                 state.transitionLog.append(
-                    ScreenTransitionEvent(from: before, to: state.activeScreen, trigger: String(describing: action))
+                    ScreenTransitionEvent(
+                        from: before,
+                        to: state.activeScreen,
+                        trigger: String(describing: action),
+                    )
                 )
             }
 

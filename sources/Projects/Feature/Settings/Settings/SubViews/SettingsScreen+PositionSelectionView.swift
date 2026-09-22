@@ -13,8 +13,14 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
@@ -24,12 +30,18 @@ extension SettingsScreen {
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
                     ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
@@ -61,7 +73,10 @@ extension SettingsScreen {
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             }
-            .toolbar(.hidden, for: .tabBar)
+            .toolbar(
+                .hidden,
+                for: .tabBar,
+            )
         }
 
         // MARK: Private

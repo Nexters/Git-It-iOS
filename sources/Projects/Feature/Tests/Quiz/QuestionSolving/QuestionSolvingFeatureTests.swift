@@ -47,10 +47,16 @@ struct QuestionSolvingFeatureTests {
     @Test
     func `서술형 입력은 400자를 넘기지 않는다`() async {
         let store = makeStore(state: essayState())
-        let overflowingText = String(repeating: "가", count: 420)
+        let overflowingText = String(
+            repeating: "가",
+            count: 420,
+        )
 
         await store.send(.view(.essayTextChanged(overflowingText))) {
-            $0.draftEssayText = String(repeating: "가", count: 400)
+            $0.draftEssayText = String(
+                repeating: "가",
+                count: 400,
+            )
         }
         #expect(store.state.draftEssayText.count == QuestionSolvingFeature.essayCharacterLimit)
     }
@@ -63,7 +69,10 @@ struct QuestionSolvingFeatureTests {
         var state = choiceState()
         state.draftChoiceIndex = 1
         state.submission = .submitting
-        let store = makeStore(gradeChoiceAnswer: gradeChoiceAnswer, state: state)
+        let store = makeStore(
+            gradeChoiceAnswer: gradeChoiceAnswer,
+            state: state,
+        )
 
         await store.send(.view(.submitAnswerTapped))
         await store.send(.view(.advanceTapped))
@@ -102,7 +111,10 @@ struct QuestionSolvingFeatureTests {
         await store.send(.view(.submitAnswerTapped))
         await store.receive(\.effect.choiceAnswerFinished)
         await store.receive(
-            .delegate(.answerSubmitted(questionID: state.question.id, choiceCorrect: true))
+            .delegate(.answerSubmitted(
+                questionID: state.question.id,
+                choiceCorrect: true,
+            ))
         )
 
         #expect(store.state.submission == .answered(.choice(QuizTestFixture.correctChoiceGrading)))
@@ -120,7 +132,10 @@ struct QuestionSolvingFeatureTests {
         await store.send(.view(.submitAnswerTapped))
         await store.receive(\.effect.essayAnswerFinished)
         await store.receive(
-            .delegate(.answerSubmitted(questionID: state.question.id, choiceCorrect: nil))
+            .delegate(.answerSubmitted(
+                questionID: state.question.id,
+                choiceCorrect: nil,
+            ))
         )
     }
 
@@ -161,10 +176,16 @@ struct QuestionSolvingFeatureTests {
         let state = choiceState()
         let quizID = state.question.id
         let setBookmark = QuizDetailUseCaseBookmarkStub(
-            results: [.success(QuizBookmarkState(quizID: quizID, isBookmarked: true))],
+            results: [.success(QuizBookmarkState(
+                quizID: quizID,
+                isBookmarked: true,
+            ))],
             suspendsRequests: true,
         )
-        let store = makeStore(setBookmark: setBookmark, state: state)
+        let store = makeStore(
+            setBookmark: setBookmark,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.bookmarkToggleTapped))
@@ -178,7 +199,10 @@ struct QuestionSolvingFeatureTests {
         await store.send(
             .effect(.bookmarkFinished(
                 questionID: "other-quiz",
-                result: .success(QuizBookmarkState(quizID: "other-quiz", isBookmarked: false)),
+                result: .success(QuizBookmarkState(
+                    quizID: "other-quiz",
+                    isBookmarked: false,
+                )),
             ))
         )
         #expect(store.state.isBookmarked)
@@ -197,7 +221,10 @@ struct QuestionSolvingFeatureTests {
     // MARK: Private
 
     private func choiceState(
-        question: Quiz = QuizTestFixture.choiceQuiz(index: 0, submitted: nil),
+        question: Quiz = QuizTestFixture.choiceQuiz(
+            index: 0,
+            submitted: nil,
+        ),
         advanceActionTitle: String = "다음 문제",
     ) -> QuestionSolvingFeature.State {
         QuestionSolvingFeature.State(
@@ -211,7 +238,10 @@ struct QuestionSolvingFeatureTests {
     private func essayState(draftEssayText: String = "") -> QuestionSolvingFeature.State {
         var state = QuestionSolvingFeature.State(
             projectID: QuizTestFixture.projectID,
-            question: QuizTestFixture.essayQuiz(index: 2, submitted: nil),
+            question: QuizTestFixture.essayQuiz(
+                index: 2,
+                submitted: nil,
+            ),
             questionNumber: 3,
             advanceActionTitle: "학습 완료",
         )

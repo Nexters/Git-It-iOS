@@ -74,20 +74,32 @@ struct OnboardingRouterFeatureTests {
         await store.send(.view(.curationSplashFinished))
         await store.receive(.delegate(.mainShellRequested))
 
-        #expect(await userInfo.snapshot().curations == [Curation(position: .ios, careerLevel: .junior)])
+        #expect(await userInfo.snapshot().curations == [Curation(
+            position: .ios,
+            careerLevel: .junior,
+        )])
     }
 
     @Test
     func `로그인 취소는 화면을 바꾸지 않고 이동 이벤트를 남기지 않는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.cancelled])
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+        var state = OnboardingRouterFeature.State(
+            startingAt: .guide,
+            bundleVersion: "1.0.0",
+        )
         state.tutorial.signIn.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.tutorial.signIn.legalAgreement.isStoredConsentValid = true
-        let store = makeOnboardingRouterStore(signIn: signIn, state: state)
+        let store = makeOnboardingRouterStore(
+            signIn: signIn,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
-        await store.receive(.tutorial(.signIn(.effect(.signInFinished(requestID: 1, result: .cancelled)))))
+        await store.receive(.tutorial(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .cancelled,
+        )))))
 
         #expect(store.state.activeScreen == .guide(.tutorial))
         #expect(store.state.transitionLog.isEmpty)
@@ -96,7 +108,10 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `큐레이션 시작 지점으로 진입하면 curation positionSelection에서 시작한다`() {
-        let state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+        let state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+        )
         let store = makeOnboardingRouterStore(state: state)
 
         #expect(store.state.activeScreen == .curation(.positionSelection))
@@ -105,7 +120,10 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `career 화면에서 뒤로 가기는 positionSelection으로 되돌리고 두 선택을 모두 보존한다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+        var state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+        )
         state.activeScreen = .curation(.careerSelection)
         state.positionSelection.position = .backend
         state.careerSelection = CareerSelectionFeature.State(position: .backend)
@@ -125,9 +143,15 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `포지션 선택 화면에서 뒤로 가기는 sign-out 성공 뒤 tutorial 마지막 페이지로 되돌아가고 큐레이션 선택을 초기화한다`() async {
-        let state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+        let state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+        )
         let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
-        let store = makeOnboardingRouterStore(signOut: signOut, state: state)
+        let store = makeOnboardingRouterStore(
+            signOut: signOut,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.positionSelection(.view(.positionSelected(.backend))))
@@ -147,7 +171,10 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `포지션 값만 바뀌는 액션은 이동 이벤트를 남기지 않는다`() async {
-        let state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+        let state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+        )
         let store = makeOnboardingRouterStore(state: state)
 
         await store.send(.positionSelection(.view(.positionSelected(.ios)))) {
@@ -160,11 +187,17 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `로그인 성공에서 needsCuration이 false이면 화면 전환 없이 mainShellRequested를 위임한다`() async {
-        var state = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+        var state = OnboardingRouterFeature.State(
+            startingAt: .guide,
+            bundleVersion: "1.0.0",
+        )
         state.tutorial.signIn.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.tutorial.signIn.legalAgreement.isStoredConsentValid = true
         let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
-        let store = makeOnboardingRouterStore(signIn: signIn, state: state)
+        let store = makeOnboardingRouterStore(
+            signIn: signIn,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.tutorial(.view(.appleSignInTapped)))
@@ -199,7 +232,10 @@ struct OnboardingRouterFeatureTests {
             curationExit: .returnToCaller,
         )
         let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
-        let store = makeOnboardingRouterStore(signOut: signOut, state: state)
+        let store = makeOnboardingRouterStore(
+            signOut: signOut,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.positionSelection(.view(.positionSelected(.backend))))
@@ -217,7 +253,10 @@ struct OnboardingRouterFeatureTests {
 
     @Test
     func `중단 목적지를 지정하지 않으면 튜토리얼 복귀 모드로 시작한다`() {
-        let state = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+        let state = OnboardingRouterFeature.State(
+            startingAt: .curation,
+            bundleVersion: "1.0.0",
+        )
 
         #expect(state.curationExit == .returnToTutorial)
     }

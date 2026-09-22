@@ -10,7 +10,10 @@ struct UserInfoTests {
 
     @Test
     func `동시에 상세와 큐레이션을 조회하면 프로필 요청을 한 번만 보낸다`() async throws {
-        let repository = StubUserInfoRepository(profile: Self.profile(curation: Self.curation), holdsProfile: true)
+        let repository = StubUserInfoRepository(
+            profile: Self.profile(curation: Self.curation),
+            holdsProfile: true,
+        )
         let userInfo = UserInfo(repository: repository)
 
         async let detail = userInfo.detail()
@@ -46,7 +49,10 @@ struct UserInfoTests {
 
     @Test
     func `변경 요청은 호출 순서대로 하나씩 처리한다`() async throws {
-        let repository = StubUserInfoRepository(profile: Self.profile(curation: nil), holdsFirstUpdate: true)
+        let repository = StubUserInfoRepository(
+            profile: Self.profile(curation: nil),
+            holdsFirstUpdate: true,
+        )
         let userInfo = UserInfo(repository: repository)
 
         let position = Task { try await userInfo.updatePosition(.ios) }
@@ -78,14 +84,23 @@ struct UserInfoTests {
             thisWeekSolvedCount: 3,
             thisMonthSolvedCount: 10,
             streakDays: 2,
-            weeklyCounts: [WeeklyLearningCount(dayLabel: "월", count: 1)],
+            weeklyCounts: [WeeklyLearningCount(
+                dayLabel: "월",
+                count: 1,
+            )],
         ),
     )
 
-    private static let curation = Curation(position: .ios, careerLevel: .junior)
+    private static let curation = Curation(
+        position: .ios,
+        careerLevel: .junior,
+    )
 
     private static func profile(curation: Curation?) -> UserProfile {
-        UserProfile(detail: detail, curation: curation)
+        UserProfile(
+            detail: detail,
+            curation: curation,
+        )
     }
 
     private static func settle(until condition: @Sendable () async -> Bool) async {

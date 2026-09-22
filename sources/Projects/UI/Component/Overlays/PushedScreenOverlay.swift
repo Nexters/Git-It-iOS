@@ -20,7 +20,10 @@ public struct PushedScreenOverlay<Content: View>: View {
                     .transition(.move(edge: .trailing))
             }
         }
-        .animation(.easeInOut(duration: Constant.transitionDuration), value: isPresented)
+        .animation(
+            .easeInOut(duration: Constant.transitionDuration),
+            value: isPresented,
+        )
     }
 
     // MARK: Private
@@ -54,10 +57,16 @@ extension PushedScreenOverlay {
             StyledText(text: "밀려 들어온 화면")
                 .textStyle(.subtitle1)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                )
                 .designSystemBackground(.grey700)
         }
         .presented(true)
     }
-    .frame(width: 390, height: 700)
+    .frame(
+        width: 390,
+        height: 700,
+    )
 }

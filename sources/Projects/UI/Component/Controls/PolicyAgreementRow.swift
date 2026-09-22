@@ -25,7 +25,10 @@ public struct PolicyAgreementRow: View {
                 HStack(spacing: LayoutToken.gutter) {
                     ResourceImage(asset: isSelected ? .icon(.statusCheck) : .icon(.statusDisabled))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
-                        .frame(width: Constant.checkSize, height: Constant.checkSize)
+                        .frame(
+                            width: Constant.checkSize,
+                            height: Constant.checkSize,
+                        )
                     StyledText(text: displayModel.title)
                         .textStyle(.body2)
                 }
@@ -41,10 +44,14 @@ public struct PolicyAgreementRow: View {
             Button(action: onOpenLink) {
                 Image(systemName: "chevron.right")
                     .designSystemForeground(.grey300)
-                    .frame(width: Constant.linkSurfaceSize,
-                           height: Constant.linkSurfaceSize)
-                    .frame(width: Constant.minimumTouchSize,
-                           height: Constant.minimumTouchSize)
+                    .frame(
+                        width: Constant.linkSurfaceSize,
+                        height: Constant.linkSurfaceSize,
+                    )
+                    .frame(
+                        width: Constant.minimumTouchSize,
+                        height: Constant.minimumTouchSize,
+                    )
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -113,9 +120,27 @@ extension PolicyAgreementRow {
 
 #Preview("Policy Agreement Row") {
     VStack(spacing: LayoutToken.compactSpacing) {
-        PolicyAgreementRow(displayModel: .init(title: "개인정보 처리방침", isRequired: true), isSelected: .constant(true))
-        PolicyAgreementRow(displayModel: .init(title: "서비스 이용 약관", isRequired: true), isSelected: .constant(false))
-        PolicyAgreementRow(displayModel: .init(title: "마케팅 정보 수신", isRequired: false), isSelected: .constant(false))
+        PolicyAgreementRow(
+            displayModel: .init(
+                title: "개인정보 처리방침",
+                isRequired: true,
+            ),
+            isSelected: .constant(true),
+        )
+        PolicyAgreementRow(
+            displayModel: .init(
+                title: "서비스 이용 약관",
+                isRequired: true,
+            ),
+            isSelected: .constant(false),
+        )
+        PolicyAgreementRow(
+            displayModel: .init(
+                title: "마케팅 정보 수신",
+                isRequired: false,
+            ),
+            isSelected: .constant(false),
+        )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

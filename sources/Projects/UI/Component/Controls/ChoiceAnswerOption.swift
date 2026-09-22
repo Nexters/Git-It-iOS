@@ -104,30 +104,45 @@ public struct ChoiceAnswerOption: View {
     public var body: some View {
         switch expansion {
         case .fixed(let isExpanded):
-            card(isExpanded: isExpanded, reservesChevronSpace: false)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(accessibilityLabel)
-                .accessibilityAddTraits(state == .selected ? .isSelected : [])
+            card(
+                isExpanded: isExpanded,
+                reservesChevronSpace: false,
+            )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityAddTraits(state == .selected ? .isSelected : [])
 
         case .toggleable(let isExpanded):
-            card(isExpanded: isExpanded.wrappedValue, reservesChevronSpace: true)
-                .overlay(alignment: .topTrailing) {
-                    Button(action: { expansion.toggle() }) {
-                        ResourceImage(asset: .icon(isExpanded.wrappedValue ? .chevronUp : .chevronDown), contentMode: .fit)
-                            .designSystemForeground(.blue100)
-                            .frame(width: Constant.chevronIconSize, height: Constant.chevronIconSize)
-                            .frame(width: Constant.chevronTapSize, height: Constant.chevronTapSize)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityHidden(true)
-                    .padding(.trailing, Constant.horizontalPadding)
-                    .padding(.top, Constant.topPadding)
+            card(
+                isExpanded: isExpanded.wrappedValue,
+                reservesChevronSpace: true,
+            )
+            .overlay(alignment: .topTrailing) {
+                Button(action: { expansion.toggle() }) {
+                    ResourceImage(
+                        asset: .icon(isExpanded.wrappedValue ? .chevronUp : .chevronDown),
+                        contentMode: .fit,
+                    )
+                    .designSystemForeground(.blue100)
+                    .frame(
+                        width: Constant.chevronIconSize,
+                        height: Constant.chevronIconSize,
+                    )
+                    .frame(
+                        width: Constant.chevronTapSize,
+                        height: Constant.chevronTapSize,
+                    )
+                    .contentShape(Rectangle())
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(accessibilityLabel)
-                .accessibilityAddTraits(state == .selected ? .isSelected : [])
-                .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기") { expansion.toggle() }
+                .buttonStyle(.plain)
+                .accessibilityHidden(true)
+                .padding(.trailing, Constant.horizontalPadding)
+                .padding(.top, Constant.topPadding)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityAddTraits(state == .selected ? .isSelected : [])
+            .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기") { expansion.toggle() }
         }
     }
 
@@ -159,7 +174,10 @@ public struct ChoiceAnswerOption: View {
         reservesChevronSpace: Bool,
     ) -> some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: Constant.rowSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.rowSpacing,
+            ) {
                 HStack {
                     StyledText(text: displayModel.letter)
                         .textStyle(.subtitle2)
@@ -168,7 +186,10 @@ public struct ChoiceAnswerOption: View {
                     Spacer(minLength: 0)
 
                     if reservesChevronSpace {
-                        Color.clear.frame(width: Constant.chevronTapSize, height: Constant.chevronTapSize)
+                        Color.clear.frame(
+                            width: Constant.chevronTapSize,
+                            height: Constant.chevronTapSize,
+                        )
                     }
                 }
 
@@ -176,13 +197,19 @@ public struct ChoiceAnswerOption: View {
                     StyledText(text: displayModel.text)
                         .textStyle(.subtitle3)
                         .foregroundColorToken(state.textColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(
+                            maxWidth: .infinity,
+                            alignment: .leading,
+                        )
                 }
             }
             .padding(.horizontal, Constant.horizontalPadding)
             .padding(.top, Constant.topPadding)
             .padding(.bottom, Constant.bottomPadding)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
             .background(
                 state.fillToken.map { Color(designSystem: $0) } ?? Color(designSystem: .grey600)
             )
@@ -219,19 +246,34 @@ extension ChoiceAnswerOption {
 
 #Preview("Choice Answer Option") {
     VStack(spacing: LayoutToken.compactSpacing) {
-        ChoiceAnswerOption(displayModel: .init(letter: "A", text: "State"), state: .default)
         ChoiceAnswerOption(
-            displayModel: .init(letter: "B", text: "Binding"),
+            displayModel: .init(
+                letter: "A",
+                text: "State",
+            ),
+            state: .default,
+        )
+        ChoiceAnswerOption(
+            displayModel: .init(
+                letter: "B",
+                text: "Binding",
+            ),
             state: .selected,
             expansion: .fixed(isExpanded: true),
         )
         ChoiceAnswerOption(
-            displayModel: .init(letter: "C", text: "ObservedObject"),
+            displayModel: .init(
+                letter: "C",
+                text: "ObservedObject",
+            ),
             state: .correct,
             expansion: .toggleable(isExpanded: .constant(true)),
         )
         ChoiceAnswerOption(
-            displayModel: .init(letter: "D", text: "EnvironmentObject"),
+            displayModel: .init(
+                letter: "D",
+                text: "EnvironmentObject",
+            ),
             state: .incorrect,
             expansion: .toggleable(isExpanded: .constant(false)),
         )

@@ -26,12 +26,19 @@ public struct WebSheet: View {
 
                     Spacer(minLength: 0)
 
-                    IconGlassButton(icon: .close, label: "닫기", action: onDismiss)
+                    IconGlassButton(
+                        icon: .close,
+                        label: "닫기",
+                        action: onDismiss,
+                    )
                 }
                 .padding(.bottom, LayoutToken.gutter)
 
                 WebContentView(url: displayModel.url)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                    )
             }
             .frame(maxHeight: .infinity)
         }
@@ -67,9 +74,15 @@ extension WebSheet {
         Color(designSystem: .grey700)
 
         WebSheet(
-            displayModel: .init(title: "서비스 이용 약관", url: URL(string: "https://example.com")!),
+            displayModel: .init(
+                title: "서비스 이용 약관",
+                url: URL(string: "https://example.com")!,
+            ),
             onDismiss: { },
         )
     }
-    .frame(width: 390, height: 700)
+    .frame(
+        width: 390,
+        height: 700,
+    )
 }

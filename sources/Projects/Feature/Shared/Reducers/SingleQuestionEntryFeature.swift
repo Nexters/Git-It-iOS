@@ -85,13 +85,22 @@ public struct SingleQuestionEntryFeature: Sendable {
                 return .run { send in
                     do {
                         let set = try await fetchQuizSet(setID, projectID)
-                        await send(.effect(.setLoadFinished(questionID: questionID, result: .success(set))))
+                        await send(.effect(.setLoadFinished(
+                            questionID: questionID,
+                            result: .success(set),
+                        )))
                     } catch {
                         let mapped = error as? QuizDetailError ?? .unexpected
-                        await send(.effect(.setLoadFinished(questionID: questionID, result: .failure(mapped))))
+                        await send(.effect(.setLoadFinished(
+                            questionID: questionID,
+                            result: .failure(mapped),
+                        )))
                     }
                 }
-                .cancellable(id: CancelID.load, cancelInFlight: true)
+                .cancellable(
+                    id: CancelID.load,
+                    cancelInFlight: true,
+                )
 
             case .input(.failureDismissed):
                 state.preparation = .idle
@@ -110,7 +119,10 @@ public struct SingleQuestionEntryFeature: Sendable {
                         return .send(.delegate(.preparationFailed(.quizUnavailable)))
                     }
                     state.preparation = .idle
-                    return .send(.delegate(.questionPrepared(question: quiz, projectID: state.projectID)))
+                    return .send(.delegate(.questionPrepared(
+                        question: quiz,
+                        projectID: state.projectID,
+                    )))
 
                 case .failure(let error):
                     state.preparation = .failed(error)

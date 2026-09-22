@@ -105,7 +105,10 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
 
             case .input(.submit(let repository, let quizLevel)):
                 guard !state.isSubmitting else { return .none }
-                state.submission = Submission(repository: repository, quizLevel: quizLevel)
+                state.submission = Submission(
+                    repository: repository,
+                    quizLevel: quizLevel,
+                )
                 return submit(&state)
 
             case .input(.retry):
@@ -246,7 +249,10 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
                 ))))
             }
         }
-        .cancellable(id: CancelID.validation, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.validation,
+            cancelInFlight: true,
+        )
     }
 
     private func submit(_ state: inout State) -> Effect<Action> {
@@ -273,7 +279,10 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
                 await send(.effect(.registrationFinished(.failure(mapped))))
             }
         }
-        .cancellable(id: CancelID.registration, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.registration,
+            cancelInFlight: true,
+        )
     }
 
 }

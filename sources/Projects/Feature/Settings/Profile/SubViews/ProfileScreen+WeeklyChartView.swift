@@ -9,8 +9,14 @@ extension ProfileScreen {
         let display: ProfileDisplay
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
-                VStack(alignment: .leading, spacing: Constant.headerSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.headerToChartSpacing,
+            ) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerSpacing,
+                ) {
                     StyledText(text: Constant.sectionLabel)
                         .textStyle(.body3)
                         .foregroundColorToken(.grey400)
@@ -19,12 +25,18 @@ extension ProfileScreen {
                 }
 
                 VStack(spacing: Constant.barsToLabelsSpacing) {
-                    HStack(alignment: .bottom, spacing: Constant.barSpacing) {
+                    HStack(
+                        alignment: .bottom,
+                        spacing: Constant.barSpacing,
+                    ) {
                         ForEach(display.weeklyBars) { bar in
                             barColumn(bar)
                         }
                     }
-                    .frame(height: Constant.barsHeight, alignment: .bottom)
+                    .frame(
+                        height: Constant.barsHeight,
+                        alignment: .bottom,
+                    )
 
                     HStack(spacing: Constant.barSpacing) {
                         ForEach(display.weeklyBars) { bar in
@@ -37,13 +49,22 @@ extension ProfileScreen {
                     .frame(height: Constant.labelRowHeight)
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: Constant.chartHeight, alignment: .bottom)
+                .frame(
+                    height: Constant.chartHeight,
+                    alignment: .bottom,
+                )
             }
             .padding(.horizontal, Constant.horizontalPadding)
             .padding(.vertical, Constant.verticalPadding)
             .frame(maxWidth: .infinity)
-            .frame(height: Constant.cardHeight, alignment: .top)
-            .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+            .frame(
+                height: Constant.cardHeight,
+                alignment: .top,
+            )
+            .background(
+                Color(designSystem: .grey600),
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
         // MARK: Private

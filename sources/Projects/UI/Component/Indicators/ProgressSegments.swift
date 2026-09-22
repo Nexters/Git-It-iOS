@@ -15,7 +15,10 @@ public struct ProgressSegments: View {
 
     public var body: some View {
         HStack(spacing: Constant.segmentSpacing) {
-            ForEach(0..<displayModel.total, id: \.self) { index in
+            ForEach(
+                0..<displayModel.total,
+                id: \.self,
+            ) { index in
                 RoundedRectangle(designSystem: .micro)
                     .fill(Color(designSystem: index < displayModel.completed ? .blue100 : .grey500))
                     .frame(height: Constant.segmentHeight)
@@ -55,9 +58,18 @@ extension ProgressSegments {
 
 #Preview("Progress Segments") {
     VStack(spacing: LayoutToken.margin) {
-        ProgressSegments(displayModel: .init(completed: 0, total: 5))
-        ProgressSegments(displayModel: .init(completed: 2, total: 5))
-        ProgressSegments(displayModel: .init(completed: 5, total: 5))
+        ProgressSegments(displayModel: .init(
+            completed: 0,
+            total: 5,
+        ))
+        ProgressSegments(displayModel: .init(
+            completed: 2,
+            total: 5,
+        ))
+        ProgressSegments(displayModel: .init(
+            completed: 5,
+            total: 5,
+        ))
     }
     .frame(width: 320)
     .designSystemScreenMargin()

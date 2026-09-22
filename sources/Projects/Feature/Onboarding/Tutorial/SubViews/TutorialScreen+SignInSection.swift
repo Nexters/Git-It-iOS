@@ -16,8 +16,11 @@ extension TutorialScreen {
 
         var body: some View {
             VStack {
-                PageIndicator(displayModel: .init(currentPage: currentPage, totalPages: totalPages))
-                    .padding(Constant.indicatorPadding)
+                PageIndicator(displayModel: .init(
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                ))
+                .padding(Constant.indicatorPadding)
 
                 StyledText(text: Constant.hintTitle)
                     .textStyle(.caption1)

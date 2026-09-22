@@ -17,7 +17,10 @@ struct AppRootFeatureTests {
     func `launch task는 route를 즉시 바꾸지 않고 appEntry task를 전달한다`() async {
         let account = AccountUseCaseMock(restorations: [.temporarilyUnavailable])
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         #expect(store.state.route == .restoring)
@@ -37,14 +40,20 @@ struct AppRootFeatureTests {
     func `미인증 세션은 route를 onboarding으로 전환하고 온보딩 안내부터 시작한다`() async {
         let account = AccountUseCaseMock(restorations: [.signedOut])
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.send(.appEntry(.view(.splashAnimationFinished)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
 
         deviceTokenRefreshes.finish()
@@ -67,7 +76,10 @@ struct AppRootFeatureTests {
         await store.send(.appEntry(.view(.splashAnimationFinished)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .curation, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .curation,
+                bundleVersion: "1.0.0",
+            )
         }
 
         deviceTokenRefreshes.finish()
@@ -105,7 +117,10 @@ struct AppRootFeatureTests {
             .signedOut,
         ])
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
@@ -119,7 +134,10 @@ struct AppRootFeatureTests {
         await store.send(.appEntry(.view(.retryTapped)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
 
         deviceTokenRefreshes.finish()
@@ -130,14 +148,20 @@ struct AppRootFeatureTests {
     func `restoring을 벗어난 뒤 반복 task는 appEntry task를 다시 전달하지 않는다`() async {
         let account = AccountUseCaseMock(restorations: [.signedOut])
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.send(.appEntry(.view(.splashAnimationFinished)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
         await store.send(.view(.task))
 
@@ -171,7 +195,10 @@ struct AppRootFeatureTests {
 
         await store.send(.mainShell(.delegate(.loggedOut))) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
     }
 
@@ -341,7 +368,10 @@ struct AppRootFeatureTests {
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
-        let receipt = ProjectGenerationReceipt(projectID: AppRootTestFixture.projectID, quizLevel: .l1)
+        let receipt = ProjectGenerationReceipt(
+            projectID: AppRootTestFixture.projectID,
+            quizLevel: .l1,
+        )
         await store.send(.projectRegistration(.presented(.delegate(.projectRegistered(receipt))))) {
             $0.projectRegistration = nil
         }
@@ -353,16 +383,25 @@ struct AppRootFeatureTests {
 
     @Test
     func `mainShell 표시 중 로그인 무효화는 onboarding 안내부터 다시 시작한다`() async {
-        let account = AccountUseCaseMock(restorations: [.signedOut], verification: .reauthenticationRequired)
+        let account = AccountUseCaseMock(
+            restorations: [.signedOut],
+            verification: .reauthenticationRequired,
+        )
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.send(.appEntry(.view(.splashAnimationFinished)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
         await store.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -371,7 +410,10 @@ struct AppRootFeatureTests {
         await store.send(.view(.applicationBecameActive))
         await store.receive(.effect(.signInVerified(.reauthenticationRequired))) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
 
         deviceTokenRefreshes.finish()
@@ -381,16 +423,25 @@ struct AppRootFeatureTests {
 
     @Test
     func `onboarding 표시 중 로그인 무효화는 route를 바꾸지 않는다`() async {
-        let account = AccountUseCaseMock(restorations: [.signedOut], verification: .reauthenticationRequired)
+        let account = AccountUseCaseMock(
+            restorations: [.signedOut],
+            verification: .reauthenticationRequired,
+        )
         let deviceTokenRefreshes = DeviceTokenRefreshStream()
-        let store = makeAppRootStore(account: account, deviceTokenRefreshes: deviceTokenRefreshes)
+        let store = makeAppRootStore(
+            account: account,
+            deviceTokenRefreshes: deviceTokenRefreshes,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.task))
         await store.send(.appEntry(.view(.splashAnimationFinished)))
         await store.receive(\.appEntry.delegate.destinationDecided) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
 
         await store.send(.view(.applicationBecameActive))
@@ -476,12 +527,18 @@ struct AppRootFeatureTests {
     @Test
     func `포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다`() async {
         let project = ProjectUseCaseMock(refreshError: .unexpected)
-        let store = makeAppRootStore(project: project, state: AppRootTestFixture.mainShellState())
+        let store = makeAppRootStore(
+            project: project,
+            state: AppRootTestFixture.mainShellState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.applicationBecameActive))
         await store.receive(.mainShell(.input(.learningProjectsReloadRequested)))
-        await store.receive(.mainShell(.home(.projectSummaries(.effect(.refreshFinished(requestID: 1, error: .unexpected))))))
+        await store.receive(.mainShell(.home(.projectSummaries(.effect(.refreshFinished(
+            requestID: 1,
+            error: .unexpected,
+        ))))))
 
         #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell.home.projectSummaries.load == .failed(.unexpected))
@@ -595,12 +652,18 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await store.receive(
+            \.effect.generationStateChanged,
+            timeout: .seconds(5),
+        )
 
         await projectGeneration.emit(
             AppRootTestFixture.generationState(phase: .inProgress(readyAt: Date(timeIntervalSince1970: 2_000)))
         )
-        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await store.receive(
+            \.effect.generationStateChanged,
+            timeout: .seconds(5),
+        )
         await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true)))))
 
         #expect(store.state.mainShell.home.isGenerationInProgress)
@@ -627,13 +690,19 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await store.receive(
+            \.effect.generationStateChanged,
+            timeout: .seconds(5),
+        )
         await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: true)))))
 
         #expect(store.state.mainShell.home.isGenerationInProgress)
 
         await projectGeneration.emit(AppRootTestFixture.generationState(phase: .ready))
-        await store.receive(\.effect.generationStateChanged, timeout: .seconds(5))
+        await store.receive(
+            \.effect.generationStateChanged,
+            timeout: .seconds(5),
+        )
         await store.receive(.mainShell(.home(.input(.generationProgressChanged(isInProgress: false)))))
 
         #expect(store.state.mainShell.home.isGenerationInProgress == false)
@@ -695,7 +764,10 @@ struct AppRootLearningFlowTests {
             setID: AppRootTestFixture.setID,
             setLabel: AppRootTestFixture.setLabel,
         )
-        let store = makeAppRootStore(project: project, state: state)
+        let store = makeAppRootStore(
+            project: project,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.quiz(.presented(.delegate(.dismissRequested(projectID: AppRootTestFixture.projectID)))))
@@ -724,7 +796,10 @@ struct AppRootLearningFlowTests {
             advanceActionTitle: QuizRouterFeature.nextQuestionActionTitle,
         )
         state.quiz = quizState
-        let store = makeAppRootStore(project: project, state: state)
+        let store = makeAppRootStore(
+            project: project,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.quiz(.presented(.questionSolving(.delegate(.answerSubmitted(
@@ -744,7 +819,10 @@ struct AppRootLearningFlowTests {
     @Test
     func `외부 URL 요청은 주입된 경로를 정확히 한 번 사용한다`() async throws {
         let openExternalURL = OpenExternalURLSpy()
-        let store = makeAppRootStore(openExternalURL: openExternalURL, state: presentedDetailState())
+        let store = makeAppRootStore(
+            openExternalURL: openExternalURL,
+            state: presentedDetailState(),
+        )
         store.exhaustivity = .off
         let url = try #require(URL(string: AppRootTestFixture.repositoryURL))
 

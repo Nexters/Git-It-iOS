@@ -19,7 +19,10 @@ public struct HomeScreen: View {
 
     public var body: some View {
         OverlayContainer(content: {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 if store.access == .guest {
                     Self.SignInSectionView(onSignIn: { send(.signInTapped) })
                 } else {
@@ -42,7 +45,10 @@ public struct HomeScreen: View {
             .padding(.bottom, Constant.projectSectionTopPadding)
 
             Self.ProjectSection(
-                state: HomeProjectSectionState(store.projectSummaries.load, access: store.access),
+                state: HomeProjectSectionState(
+                    store.projectSummaries.load,
+                    access: store.access,
+                ),
                 isShowAllEnabled: store.access == .member,
                 cardListLeadingX: $cardListLeadingX,
                 onShowAllTapped: { send(.showAllProjectsTapped) },
@@ -53,9 +59,15 @@ public struct HomeScreen: View {
         })
         .scrollIndicators(.hidden)
         .task { await send(.task).finish() }
-        .alert(Constant.signInRequiredTitle, isPresented: signInRequiredAlertBinding) {
+        .alert(
+            Constant.signInRequiredTitle,
+            isPresented: signInRequiredAlertBinding,
+        ) {
             Button(Constant.signInTitle) { send(.signInRequiredAlertSignInTapped) }
-            Button(Constant.closeTitle, role: .cancel) { send(.signInRequiredAlertDismissed) }
+            Button(
+                Constant.closeTitle,
+                role: .cancel,
+            ) { send(.signInRequiredAlertDismissed) }
         } message: {
             Text(Constant.signInRequiredMessage)
         }

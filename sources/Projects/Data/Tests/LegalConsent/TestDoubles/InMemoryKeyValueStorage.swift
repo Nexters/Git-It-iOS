@@ -13,7 +13,10 @@ final class InMemoryKeyValueStorage: KeyValueStorage {
         forKey key: String,
     ) async -> Value? {
         guard let data = values.withLock({ $0[key] }) else { return nil }
-        return try? JSONDecoder().decode(Value.self, from: data)
+        return try? JSONDecoder().decode(
+            Value.self,
+            from: data,
+        )
     }
 
     func setValue(

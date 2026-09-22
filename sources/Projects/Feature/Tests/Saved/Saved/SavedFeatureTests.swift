@@ -138,7 +138,10 @@ struct SavedFeatureTests {
     func `북마크를 해제하면 목록에서 제거하지 않고 상태만 갱신한다`() async {
         let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
         let setBookmark = QuizDetailUseCaseBookmarkStub(
-            results: [.success(QuizBookmarkState(quizID: bookmark.quizID, isBookmarked: false))]
+            results: [.success(QuizBookmarkState(
+                quizID: bookmark.quizID,
+                isBookmarked: false,
+            ))]
         )
         let store = makeStore(setBookmark: setBookmark)
         store.exhaustivity = .off

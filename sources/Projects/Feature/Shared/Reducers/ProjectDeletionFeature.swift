@@ -106,13 +106,22 @@ public struct ProjectDeletionFeature: Sendable {
                 return .run { [deleteProject] send in
                     do {
                         try await deleteProject(projectID)
-                        await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
+                        await send(.effect(.deletionFinished(
+                            projectID: projectID,
+                            error: nil,
+                        )))
                     } catch {
                         let mapped = error as? ProjectError ?? .unexpected
-                        await send(.effect(.deletionFinished(projectID: projectID, error: mapped)))
+                        await send(.effect(.deletionFinished(
+                            projectID: projectID,
+                            error: mapped,
+                        )))
                     }
                 }
-                .cancellable(id: CancelID.deletion(instanceID), cancelInFlight: false)
+                .cancellable(
+                    id: CancelID.deletion(instanceID),
+                    cancelInFlight: false,
+                )
 
             case .effect(.deletionFinished(let projectID, nil)),
                  .effect(.deletionFinished(let projectID, .some(.notFound))):
@@ -120,7 +129,10 @@ public struct ProjectDeletionFeature: Sendable {
                 return .send(.delegate(.deleted(projectID: projectID)))
 
             case .effect(.deletionFinished(let projectID, .some(let error))):
-                state.deletion = .failed(projectID: projectID, error: error)
+                state.deletion = .failed(
+                    projectID: projectID,
+                    error: error,
+                )
                 return .none
 
             case .delegate:

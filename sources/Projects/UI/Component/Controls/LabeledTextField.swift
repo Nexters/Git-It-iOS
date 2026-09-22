@@ -22,7 +22,10 @@ public struct LabeledTextField: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             HStack(spacing: Constant.trailingIconSpacing) {
                 HStack(spacing: Constant.contentSpacing) {
                     StyledText(text: displayModel.label)
@@ -43,11 +46,20 @@ public struct LabeledTextField: View {
                     Button {
                         text = ""
                     } label: {
-                        ResourceImage(asset: .icon(.cancel), contentMode: .fit)
-                            .frame(width: Constant.clearIconSize, height: Constant.clearIconSize)
+                        ResourceImage(
+                            asset: .icon(.cancel),
+                            contentMode: .fit,
+                        )
+                        .frame(
+                            width: Constant.clearIconSize,
+                            height: Constant.clearIconSize,
+                        )
                     }
                     .buttonStyle(.plain)
-                    .frame(width: Constant.clearButtonTouchSize, height: Constant.clearButtonTouchSize)
+                    .frame(
+                        width: Constant.clearButtonTouchSize,
+                        height: Constant.clearButtonTouchSize,
+                    )
                     .accessibilityLabel("입력 지우기")
                 }
             }
@@ -133,9 +145,18 @@ extension LabeledTextField {
 
 #Preview("LabeledTextField") {
     VStack(spacing: LayoutToken.margin) {
-        LabeledTextField(displayModel: .init(label: "링크", placeholder: "https://github.com"), text: .constant(""))
         LabeledTextField(
-            displayModel: .init(label: "링크", placeholder: "https://github.com"),
+            displayModel: .init(
+                label: "링크",
+                placeholder: "https://github.com",
+            ),
+            text: .constant(""),
+        )
+        LabeledTextField(
+            displayModel: .init(
+                label: "링크",
+                placeholder: "https://github.com",
+            ),
             text: .constant("https://github.com/gitit"),
         )
         LabeledTextField(

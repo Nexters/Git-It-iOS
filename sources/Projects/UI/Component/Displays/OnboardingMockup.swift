@@ -14,8 +14,14 @@ public struct OnboardingMockup: View {
     // MARK: Public
 
     public var body: some View {
-        ResourceImage(asset: asset, contentMode: .fill)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ResourceImage(
+            asset: asset,
+            contentMode: .fill,
+        )
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+        )
     }
 
     // MARK: Private

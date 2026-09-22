@@ -19,7 +19,10 @@ public struct ProjectGenerationRepositoryAdapter: ProjectGenerationRepository {
                 githubRepoURL: request.repositoryURL,
                 quizLevel: dtoQuizLevel(request.quizLevel),
             ))
-            return ProjectGenerationReceipt(projectID: response.projectID, quizLevel: request.quizLevel)
+            return ProjectGenerationReceipt(
+                projectID: response.projectID,
+                quizLevel: request.quizLevel,
+            )
         } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
         }

@@ -17,7 +17,10 @@ extension QuizGenerationProgressScreen {
                 SheetSurface {
                     VStack(spacing: Constant.contentSpacing) {
                         ResourceAnimation(asset: .notification)
-                            .frame(width: Constant.bellSize, height: Constant.bellSize)
+                            .frame(
+                                width: Constant.bellSize,
+                                height: Constant.bellSize,
+                            )
 
                         VStack(spacing: Constant.textSetSpacing) {
                             StyledText(text: "세트 생성이 완료되면\n리마인드 알림을 보내드려요.")
@@ -30,11 +33,17 @@ extension QuizGenerationProgressScreen {
                         }
 
                         VStack(spacing: LayoutToken.compactSpacing) {
-                            FeedbackActionButton(title: "리마인드 알림 설정하기", action: onAccept)
+                            FeedbackActionButton(
+                                title: "리마인드 알림 설정하기",
+                                action: onAccept,
+                            )
 
-                            FeedbackActionButton(title: "다시 보지 않기", action: onDecline)
-                                .style(.text)
-                                .size(.small)
+                            FeedbackActionButton(
+                                title: "다시 보지 않기",
+                                action: onDecline,
+                            )
+                            .style(.text)
+                            .size(.small)
                         }
                     }
                     .padding(.top, Constant.contentTopPadding)

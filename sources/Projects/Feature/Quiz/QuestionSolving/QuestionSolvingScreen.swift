@@ -48,7 +48,10 @@ struct QuestionSolvingScreen: View {
                 onLeadingTap: { send(.backTapped) }
             ).designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.sectionSpacing,
+            ) {
                 QuestionPrompt(
                     questionNumber: store.questionNumber,
                     prompt: store.question.prompt,
@@ -89,16 +92,28 @@ struct QuestionSolvingScreen: View {
                     .textStyle(.body2)
                     .foregroundColorToken(.blue100)
 
-                ResourceImage(asset: .icon(.chevronRight), contentMode: .fit)
-                    .designSystemForeground(.blue100)
-                    .frame(width: Constant.sourceButtonChevronGlyphSize, height: Constant.sourceButtonChevronGlyphSize)
-                    .frame(width: Constant.sourceButtonChevronSize, height: Constant.sourceButtonChevronSize)
+                ResourceImage(
+                    asset: .icon(.chevronRight),
+                    contentMode: .fit,
+                )
+                .designSystemForeground(.blue100)
+                .frame(
+                    width: Constant.sourceButtonChevronGlyphSize,
+                    height: Constant.sourceButtonChevronGlyphSize,
+                )
+                .frame(
+                    width: Constant.sourceButtonChevronSize,
+                    height: Constant.sourceButtonChevronSize,
+                )
             }
             .padding(.leading, Constant.sourceButtonLeadingPadding)
             .padding(.trailing, Constant.sourceButtonTrailingPadding)
             .padding(.vertical, Constant.sourceButtonVerticalPadding)
         }
-        .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .small))
+        .background(
+            Color(designSystem: .grey600),
+            in: RoundedRectangle(designSystem: .small),
+        )
         .buttonStyle(.plain)
         .accessibilityLabel("출처 보기")
     }
@@ -116,8 +131,11 @@ struct QuestionSolvingScreen: View {
             )
 
             if case .choice(let grading) = store.answerOutcome {
-                LabeledCard(displayModel: .init(label: "AI 해설", text: grading.explanation))
-                    .style(.accent)
+                LabeledCard(displayModel: .init(
+                    label: "AI 해설",
+                    text: grading.explanation,
+                ))
+                .style(.accent)
             }
 
         case .essay:
@@ -142,7 +160,10 @@ struct QuestionSolvingScreen: View {
     private var choiceOptions: [ChoiceOptionDisplay] {
         guard case .choice(let choices, _) = store.question.content else { return [] }
         guard case .choice(let grading) = store.answerOutcome else {
-            return ChoiceOptionDisplay.editing(choices: choices, selectedIndex: store.draftChoiceIndex)
+            return ChoiceOptionDisplay.editing(
+                choices: choices,
+                selectedIndex: store.draftChoiceIndex,
+            )
         }
         return ChoiceOptionDisplay.answered(
             choices: choices,

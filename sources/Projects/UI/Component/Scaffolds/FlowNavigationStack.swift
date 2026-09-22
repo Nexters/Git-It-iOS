@@ -33,7 +33,10 @@ public struct FlowNavigationStack<Screen: Hashable, Root: View, Destination: Vie
 
     private func flowScreen(_ content: some View) -> some View {
         content
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(
+                .hidden,
+                for: .navigationBar,
+            )
             .navigationBarBackButtonHidden()
     }
 

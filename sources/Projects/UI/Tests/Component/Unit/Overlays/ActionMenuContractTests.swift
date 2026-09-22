@@ -21,7 +21,12 @@ struct ActionMenuContractTests {
     func `항목은 선택 동작을 스스로 소유하고 선택하면 그 동작만 실행한다`() {
         var selectedIDs = [String]()
         let items = ["savedQuestions", "delete"].map { id in
-            ActionMenu.Item(id: id, title: id, accessibilityLabel: id, onSelect: { selectedIDs.append(id) })
+            ActionMenu.Item(
+                id: id,
+                title: id,
+                accessibilityLabel: id,
+                onSelect: { selectedIDs.append(id) },
+            )
         }
         _ = ActionMenu(items: items)
 

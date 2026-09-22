@@ -26,9 +26,15 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 Tab(value: item) {
                     content(item)
                 } label: {
-                    Image(item.tabSystemImage, bundle: .module)
-                        .padding(.bottom, LayoutToken.tightSpacing)
-                    Text.designSystemStyled(item.tabTitle, style: .tabItem)
+                    Image(
+                        item.tabSystemImage,
+                        bundle: .module,
+                    )
+                    .padding(.bottom, LayoutToken.tightSpacing)
+                    Text.designSystemStyled(
+                        item.tabTitle,
+                        style: .tabItem,
+                    )
                 }
                 .disabled(!isEnabled(item))
             }

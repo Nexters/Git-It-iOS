@@ -15,7 +15,10 @@ actor QuizDetailUseCaseQuizSetStub {
     private(set) var requestedSetIDs = [QuizSetID]()
 
     nonisolated var fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet {
-        { try await self(setID: $0, projectID: $1) }
+        { try await self(
+            setID: $0,
+            projectID: $1,
+        ) }
     }
 
     func callAsFunction(

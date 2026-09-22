@@ -10,13 +10,19 @@ public enum AnswerEndpoint: Equatable, Sendable {
         case .choice(let projectID, let questionID):
             LearningProjectRequest(
                 method: .post,
-                path: "\(Self.questionPath(projectID: projectID, questionID: questionID))/answers/choice",
+                path: Self.questionPath(
+                    projectID: projectID,
+                    questionID: questionID,
+                ) + "/answers/choice",
             )
 
         case .essay(let projectID, let questionID):
             LearningProjectRequest(
                 method: .post,
-                path: "\(Self.questionPath(projectID: projectID, questionID: questionID))/answers/essay",
+                path: Self.questionPath(
+                    projectID: projectID,
+                    questionID: questionID,
+                ) + "/answers/essay",
             )
         }
     }

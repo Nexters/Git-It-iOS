@@ -15,22 +15,34 @@ extension QuestionSolvingScreen {
 
         var body: some View {
             SheetSurface {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(
+                    alignment: .leading,
+                    spacing: 0,
+                ) {
                     StyledText(text: title)
                         .textStyle(.subtitle1)
                         .padding(.top, Constant.titleTopPadding)
 
-                    VStack(alignment: .leading, spacing: Constant.sourceSpacing) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: Constant.sourceSpacing,
+                    ) {
                         ForEach(sources) { source in
                             sourceBlock(source: source)
                         }
                     }
                     .padding(.vertical, Constant.titleToSourcesSpacing)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
             } footer: {
-                FeedbackActionButton(title: "닫기", action: onClose)
-                    .padding(.top, Constant.buttonTopPadding)
+                FeedbackActionButton(
+                    title: "닫기",
+                    action: onClose,
+                )
+                .padding(.top, Constant.buttonTopPadding)
             }
             .scrollable(true)
         }
@@ -54,7 +66,10 @@ extension QuestionSolvingScreen {
         }
 
         private func sourceBlock(source: QuestionSourceDisplay) -> some View {
-            VStack(alignment: .leading, spacing: Constant.descriptionToLinkSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.descriptionToLinkSpacing,
+            ) {
                 if let summary = source.summary {
                     StyledText(text: summary)
                         .textStyle(.body2)
@@ -70,14 +85,20 @@ extension QuestionSolvingScreen {
                 Button {
                     onLinkTap(referenceURL)
                 } label: {
-                    linkChipContent(source: source, showsIcon: true)
+                    linkChipContent(
+                        source: source,
+                        showsIcon: true,
+                    )
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(source.accessibilityLabel)
                 .accessibilityAddTraits(.isLink)
             } else {
-                linkChipContent(source: source, showsIcon: false)
-                    .accessibilityLabel(source.accessibilityLabel)
+                linkChipContent(
+                    source: source,
+                    showsIcon: false,
+                )
+                .accessibilityLabel(source.accessibilityLabel)
             }
         }
 
@@ -90,17 +111,26 @@ extension QuestionSolvingScreen {
                     .foregroundColorToken(.white70)
                     .lineLimit(1)
                     .truncationMode(.head)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading,
+                    )
 
                 if showsIcon {
                     ResourceImage(asset: .icon(.link))
-                        .frame(width: Constant.linkIconSize, height: Constant.linkIconSize)
+                        .frame(
+                            width: Constant.linkIconSize,
+                            height: Constant.linkIconSize,
+                        )
                 }
             }
             .padding(.horizontal, Constant.linkHorizontalPadding)
             .padding(.vertical, Constant.linkVerticalPadding)
             .frame(maxWidth: .infinity)
-            .background(Color(designSystem: .grey500), in: RoundedRectangle(designSystem: .large))
+            .background(
+                Color(designSystem: .grey500),
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
     }

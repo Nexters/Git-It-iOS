@@ -10,8 +10,14 @@ struct PolicyAgreementRowTests {
     func `체크 영역을 탭하면 선택 여부 Binding을 반전한다`() {
         var isSelected = false
         let row = PolicyAgreementRow(
-            displayModel: .init(title: "개인정보 처리방침", isRequired: true),
-            isSelected: Binding(get: { isSelected }, set: { isSelected = $0 }),
+            displayModel: .init(
+                title: "개인정보 처리방침",
+                isRequired: true,
+            ),
+            isSelected: Binding(
+                get: { isSelected },
+                set: { isSelected = $0 },
+            ),
         )
 
         row.toggle()
@@ -23,7 +29,10 @@ struct PolicyAgreementRowTests {
         var opened = false
         let onOpenLink: () -> Void = { opened = true }
         _ = PolicyAgreementRow(
-            displayModel: .init(title: "서비스 이용 약관", isRequired: true),
+            displayModel: .init(
+                title: "서비스 이용 약관",
+                isRequired: true,
+            ),
             isSelected: .constant(false),
             onOpenLink: onOpenLink,
         )

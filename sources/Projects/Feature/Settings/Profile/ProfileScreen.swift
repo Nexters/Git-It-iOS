@@ -20,8 +20,14 @@ public struct ProfileScreen: View {
 
     public var body: some View {
         OverlayContainer {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .top, spacing: LayoutToken.gutter) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
+                HStack(
+                    alignment: .top,
+                    spacing: LayoutToken.gutter,
+                ) {
                     ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                         .frame(height: Constant.headerControlRowHeight)
                     Spacer()
@@ -66,7 +72,10 @@ public struct ProfileScreen: View {
             StyledText(text: Constant.statisticsSectionTitle)
                 .textStyle(.caption2)
                 .foregroundColorToken(.grey400)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
                 .designSystemScreenMargin()
                 .padding(.top, Constant.sectionTitleTopPadding)
                 .padding(.bottom, Constant.sectionTitleBottomPadding)
@@ -88,7 +97,10 @@ extension ProfileScreen {
     fileprivate enum Constant {
         static let title = "마이"
         static let statisticsSectionTitle = "학습 현황"
-        static let settingsControl = ScreenControlBar.Control(icon: .setting, label: "설정")
+        static let settingsControl = ScreenControlBar.Control(
+            icon: .setting,
+            label: "설정",
+        )
         static let profileCardPadding: CGFloat = 20
         static let sectionTitleTopPadding: CGFloat = 20
         static let sectionTitleBottomPadding: CGFloat = 10

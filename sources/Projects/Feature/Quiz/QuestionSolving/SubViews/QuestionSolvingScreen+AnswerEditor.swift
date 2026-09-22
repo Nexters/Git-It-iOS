@@ -16,7 +16,10 @@ extension QuestionSolvingScreen {
         let isDisabled: Bool
 
         var body: some View {
-            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing) {
+            VStack(
+                alignment: .trailing,
+                spacing: LayoutToken.compactSpacing,
+            ) {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
                         StyledText(text: placeholder)
@@ -26,7 +29,11 @@ extension QuestionSolvingScreen {
 
                     TextEditor(text: $text)
                         .scrollContentBackground(.hidden)
-                        .contentMargins(.all, 0, for: .scrollContent)
+                        .contentMargins(
+                            .all,
+                            0,
+                            for: .scrollContent,
+                        )
                         .font(Font.designSystem(Constant.textStyle))
                         .designSystemLineSpacing(Constant.textStyle)
                         .focused(isFocused)
@@ -34,7 +41,11 @@ extension QuestionSolvingScreen {
                         .disabled(isDisabled)
                 }
                 .padding(Constant.textInset)
-                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight, alignment: .top)
+                .frame(
+                    minHeight: Constant.minimumHeight,
+                    maxHeight: Constant.maximumHeight,
+                    alignment: .top,
+                )
                 .designSystemBackground(.grey600)
                 .designSystemCornerRadius(.small)
                 .overlay {

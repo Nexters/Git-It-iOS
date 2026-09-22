@@ -15,12 +15,18 @@ public struct SessionRecordStorageCoding: Sendable {
 
     public func load() throws -> StoredSessionRecord? {
         guard let data = try storage.data(forKey: key) else { return nil }
-        return try JSONDecoder().decode(StoredSessionRecord.self, from: data)
+        return try JSONDecoder().decode(
+            StoredSessionRecord.self,
+            from: data,
+        )
     }
 
     public func save(_ record: StoredSessionRecord) throws {
         let data = try JSONEncoder().encode(record)
-        try storage.setData(data, forKey: key)
+        try storage.setData(
+            data,
+            forKey: key,
+        )
     }
 
     public func delete() throws {

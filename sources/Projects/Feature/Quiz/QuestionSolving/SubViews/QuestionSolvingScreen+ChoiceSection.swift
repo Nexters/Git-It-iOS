@@ -17,7 +17,10 @@ extension QuestionSolvingScreen {
             VStack(spacing: LayoutToken.compactSpacing) {
                 ForEach(options) { option in
                     ChoiceAnswerOption(
-                        displayModel: .init(letter: Self.letter(forID: option.id), text: option.text),
+                        displayModel: .init(
+                            letter: Self.letter(forID: option.id),
+                            text: option.text,
+                        ),
                         state: Self.optionState(emphasis: option.emphasis),
                         expansion: expansion(for: option),
                         onTap: { onSelect(option.id) },

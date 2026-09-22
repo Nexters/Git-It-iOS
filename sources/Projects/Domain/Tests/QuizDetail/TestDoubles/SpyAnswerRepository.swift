@@ -7,12 +7,19 @@ actor SpyAnswerRepository: AnswerRepository {
 
     func submit(_ answer: ChoiceAnswer) async throws -> ChoiceGrading {
         choiceAnswers.append(answer)
-        return ChoiceGrading(isCorrect: true, correctIndex: answer.selectedIndex, explanation: "정답")
+        return ChoiceGrading(
+            isCorrect: true,
+            correctIndex: answer.selectedIndex,
+            explanation: "정답",
+        )
     }
 
     func submit(_ answer: EssayAnswer) async throws -> EssayGrading {
         essayAnswers.append(answer)
-        return EssayGrading(explanation: "해설", rubric: ["기준"])
+        return EssayGrading(
+            explanation: "해설",
+            rubric: ["기준"],
+        )
     }
 
 }

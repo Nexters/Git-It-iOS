@@ -108,18 +108,30 @@ public struct QuizRouterFeature: Sendable {
     public static let completeActionTitle = "학습 완료"
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.learningSetIntro, action: \.learningSetIntro) {
+        Scope(
+            state: \.learningSetIntro,
+            action: \.learningSetIntro,
+        ) {
             LearningSetIntroFeature(
                 fetchQuizSet: { [quizDetail] setID, projectID in
-                    try await quizDetail.quizSet(setID, in: projectID)
+                    try await quizDetail.quizSet(
+                        setID,
+                        in: projectID,
+                    )
                 },
                 fetchBookmarks: { [quizDetail] filter in try await quizDetail.bookmarks(filter) },
             )
         }
-        Scope(state: \.learningCompletion, action: \.learningCompletion) {
+        Scope(
+            state: \.learningCompletion,
+            action: \.learningCompletion,
+        ) {
             LearningCompletionFeature()
         }
-        Scope(state: \.session, action: \.session) {
+        Scope(
+            state: \.session,
+            action: \.session,
+        ) {
             LearningSessionFeature()
         }
         Reduce { state, action in
@@ -131,7 +143,11 @@ public struct QuizRouterFeature: Sendable {
                     bookmarkedQuestionIDs: bookmarkedQuestionIDs,
                 ))))
                 guard state.questionSolving != nil else { return started }
-                return .merge(started, activate(.questionSolving, cause: .startRequested, state: &state))
+                return .merge(started, activate(
+                    .questionSolving,
+                    cause: .startRequested,
+                    state: &state,
+                ))
 
             case .session(.delegate(.questionReady(let question, let number, let isBookmarked, let isLast))):
                 state.questionSolving = QuestionSolvingFeature.State(
@@ -141,7 +157,11 @@ public struct QuizRouterFeature: Sendable {
                     advanceActionTitle: isLast ? Self.completeActionTitle : Self.nextQuestionActionTitle,
                     isBookmarked: isBookmarked,
                 )
-                return activate(.questionSolving, cause: .startRequested, state: &state)
+                return activate(
+                    .questionSolving,
+                    cause: .startRequested,
+                    state: &state,
+                )
 
             case .session(.delegate(.emptySetDetected)):
                 return .send(.learningSetIntro(.input(.emptySetReported)))
@@ -149,7 +169,11 @@ public struct QuizRouterFeature: Sendable {
             case .session(.delegate(.completed(let correctChoiceCount, let choiceQuestionCount))):
                 state.learningCompletion.choiceQuestionCount = choiceQuestionCount
                 state.learningCompletion.correctChoiceCount = correctChoiceCount
-                return activate(.learningCompletion, cause: .advancedToCompletion, state: &state)
+                return activate(
+                    .learningCompletion,
+                    cause: .advancedToCompletion,
+                    state: &state,
+                )
 
             case .learningSetIntro(.delegate(.backRequested)):
                 return .send(.delegate(.dismissRequested(projectID: state.projectID)))
@@ -177,14 +201,23 @@ public struct QuizRouterFeature: Sendable {
                 return .none
             }
         }
-        .ifLet(\.questionSolving, action: \.questionSolving) {
+        .ifLet(
+            \.questionSolving,
+            action: \.questionSolving,
+        ) {
             QuestionSolvingFeature(
                 gradeChoiceAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
                 gradeEssayAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
@@ -201,7 +234,11 @@ public struct QuizRouterFeature: Sendable {
     ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
         state.screenTransitions.append(
-            ScreenTransition(from: state.activeScreen, to: screen, cause: cause)
+            ScreenTransition(
+                from: state.activeScreen,
+                to: screen,
+                cause: cause,
+            )
         )
         state.activeScreen = screen
         return .none

@@ -17,17 +17,26 @@ struct UserInfoRepositoryAdapterTests {
 
     @Test
     func `포지션과 경력이 모두 있으면 큐레이션을 만든다`() async throws {
-        let context = Context(results: [Self.profileResponse(position: #""IOS""#, careerLevel: #""SENIOR""#)])
+        let context = Context(results: [Self.profileResponse(
+            position: #""IOS""#,
+            careerLevel: #""SENIOR""#,
+        )])
 
         let profile = try await context.adapter.profile()
 
         #expect(profile.detail.name == "홍길동")
-        #expect(profile.curation == Curation(position: .ios, careerLevel: .senior))
+        #expect(profile.curation == Curation(
+            position: .ios,
+            careerLevel: .senior,
+        ))
     }
 
     @Test
     func `포지션과 경력 중 하나만 있으면 큐레이션은 nil이다`() async throws {
-        let context = Context(results: [Self.profileResponse(position: #""IOS""#, careerLevel: "null")])
+        let context = Context(results: [Self.profileResponse(
+            position: #""IOS""#,
+            careerLevel: "null",
+        )])
 
         #expect(try await context.adapter.profile().curation == nil)
     }
@@ -37,7 +46,10 @@ struct UserInfoRepositoryAdapterTests {
         let context = Context(results: [Self.emptyResponse()])
         try context.saveSession(needsCuration: true)
 
-        try await context.adapter.updateCuration(Curation(position: .ios, careerLevel: .junior))
+        try await context.adapter.updateCuration(Curation(
+            position: .ios,
+            careerLevel: .junior,
+        ))
 
         #expect(try context.coding.load()?.needsCuration == false)
         #expect(try context.coding.load()?.accessToken == "access-token")
@@ -117,7 +129,10 @@ struct UserInfoRepositoryAdapterTests {
             "careerLevel":\(careerLevel),"thisWeekSolvedCount":1,"thisMonthSolvedCount":2,"streakDays":3,\
             "weeklyChart":[]},"code":null,"message":null,"errors":null}
             """
-        return TransportResponse(statusCode: 200, body: Data(envelope.utf8))
+        return TransportResponse(
+            statusCode: 200,
+            body: Data(envelope.utf8),
+        )
     }
 
     private static func emptyResponse() -> TransportResponse {

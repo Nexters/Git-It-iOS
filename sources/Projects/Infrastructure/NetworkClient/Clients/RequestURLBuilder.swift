@@ -15,7 +15,10 @@ struct RequestURLBuilder {
         guard
             resolvedURL.scheme != nil,
             resolvedURL.host != nil,
-            var components = URLComponents(url: resolvedURL, resolvingAgainstBaseURL: false)
+            var components = URLComponents(
+                url: resolvedURL,
+                resolvingAgainstBaseURL: false,
+            )
         else {
             throw .invalidURL
         }

@@ -96,6 +96,9 @@ extension EmptyState {
     ) {
         ResourceImage(asset: .illust(.levelEntry))
     }
-    .frame(width: 390, height: 420)
+    .frame(
+        width: 390,
+        height: 420,
+    )
     .designSystemBackground(.grey700)
 }

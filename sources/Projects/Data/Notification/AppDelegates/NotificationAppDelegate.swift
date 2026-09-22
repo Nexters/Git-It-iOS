@@ -22,14 +22,20 @@ public final class NotificationAppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
     ) -> Bool {
-        base.application(application, didFinishLaunchingWithOptions: launchOptions)
+        base.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions,
+        )
     }
 
     public func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data,
     ) {
-        base.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+        base.application(
+            application,
+            didRegisterForRemoteNotificationsWithDeviceToken: deviceToken,
+        )
     }
 
     public func application(

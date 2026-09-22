@@ -150,7 +150,10 @@ struct AccountActionFeatureTests {
         withdraw: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     ) -> TestStoreOf<AccountActionFeature> {
         TestStore(initialState: state) {
-            AccountActionFeature(signOut: signOut.signOut, withdraw: withdraw.withdraw)
+            AccountActionFeature(
+                signOut: signOut.signOut,
+                withdraw: withdraw.withdraw,
+            )
         }
     }
 

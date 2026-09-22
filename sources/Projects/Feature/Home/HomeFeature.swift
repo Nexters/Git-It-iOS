@@ -80,11 +80,20 @@ public struct HomeFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.profile, action: \.profile) {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
             UserProfileLoadFeature(profile: profile)
         }
-        Scope(state: \.projectSummaries, action: \.projectSummaries) {
-            ProjectSummaryListFeature(projects: projects, refreshProjects: refreshProjects)
+        Scope(
+            state: \.projectSummaries,
+            action: \.projectSummaries,
+        ) {
+            ProjectSummaryListFeature(
+                projects: projects,
+                refreshProjects: refreshProjects,
+            )
         }
         Reduce { state, action in
             switch action {
@@ -149,7 +158,10 @@ public struct HomeFeature: Sendable {
                     next.quizID != nil
                 else { return .none }
                 return .send(
-                    .delegate(.learningRequested(projectID: projectID, nextSetID: next.setID))
+                    .delegate(.learningRequested(
+                        projectID: projectID,
+                        nextSetID: next.setID,
+                    ))
                 )
 
             case .profile,

@@ -12,14 +12,20 @@ struct StyleConfigurableTests {
     func `스타일을 선언하지 않으면 컴포넌트 기본 스타일로 그린다`() {
         #expect(style(of: ActionButton(title: "계속하기")) == ActionButton.Style.primary)
         #expect(style(of: TagBadge(text: "완료")) == TagBadge.Style.neutral)
-        #expect(style(of: IconGlassButton(icon: .bookmark, label: "저장하기")) == IconGlassButton.Style.neutral)
+        #expect(style(of: IconGlassButton(
+            icon: .bookmark,
+            label: "저장하기",
+        )) == IconGlassButton.Style.neutral)
     }
 
     @Test
     func `스타일 선언은 스타일만 바꾸고 표시 값과 크기를 유지한다`() {
         let button = ActionButton(title: "계속하기").size(.medium).style(.secondary)
         let badge = TagBadge(text: "완료").size(.compact).style(.accent)
-        let glassButton = IconGlassButton(icon: .bookmark, label: "저장하기").size(.medium).style(.destructive)
+        let glassButton = IconGlassButton(
+            icon: .bookmark,
+            label: "저장하기",
+        ).size(.medium).style(.destructive)
 
         #expect(style(of: button) == ActionButton.Style.secondary)
         #expect(size(of: button) == ActionButton.Size.medium)
@@ -35,7 +41,10 @@ struct StyleConfigurableTests {
     func `스타일을 두 번 선언하면 마지막 값이 남는다`() {
         #expect(style(of: ActionButton(title: "계속하기").style(.text).style(.destructive)) == ActionButton.Style.destructive)
         #expect(style(of: TagBadge(text: "완료").style(.accent).style(.muted)) == TagBadge.Style.muted)
-        let glassButton = IconGlassButton(icon: .bookmark, label: "저장하기").style(.accent).style(.neutral)
+        let glassButton = IconGlassButton(
+            icon: .bookmark,
+            label: "저장하기",
+        ).style(.accent).style(.neutral)
         #expect(style(of: glassButton) == IconGlassButton.Style.neutral)
     }
 
@@ -76,7 +85,10 @@ struct StyleConfigurableTests {
 
     // MARK: Private
 
-    private let labeledCardModel = LabeledCard.DisplayModel(label: "AI 해설", text: "설명")
+    private let labeledCardModel = LabeledCard.DisplayModel(
+        label: "AI 해설",
+        text: "설명",
+    )
 
     private let homeProjectCardModel = HomeProjectCard.DisplayModel(
         title: "Git It iOS",
@@ -87,7 +99,10 @@ struct StyleConfigurableTests {
     )
 
     private let selectionItems: [SelectionCardList.Item] = [
-        .init(id: "concept", displayModel: .init(title: "기술 개념은 알아요"))
+        .init(
+            id: "concept",
+            displayModel: .init(title: "기술 개념은 알아요"),
+        )
     ]
 
     private var labeledCard: LabeledCard {
@@ -99,7 +114,10 @@ struct StyleConfigurableTests {
     }
 
     private var selectionCardList: SelectionCardList {
-        SelectionCardList(items: selectionItems, selection: .constant(nil))
+        SelectionCardList(
+            items: selectionItems,
+            selection: .constant(nil),
+        )
     }
 
     private func style<Subject: StyleConfigurable>(of subject: Subject) -> Subject.Style? {

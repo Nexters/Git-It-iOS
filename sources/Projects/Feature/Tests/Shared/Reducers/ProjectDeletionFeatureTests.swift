@@ -12,7 +12,10 @@ struct ProjectDeletionFeatureTests {
 
     @Test(arguments: [
         ProjectDeletionFeature.State.Deletion.idle,
-        .failed(projectID: "project-0", error: .temporarilyUnavailable),
+        .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        ),
     ])
     func `대기나 실패 상태의 request는 삭제 확인 상태가 된다`(deletion: ProjectDeletionFeature.State.Deletion) async {
         let store = makeStore(state: ProjectDeletionFeature.State(deletion: deletion))
@@ -34,7 +37,10 @@ struct ProjectDeletionFeatureTests {
 
     @Test(arguments: [
         ProjectDeletionFeature.State.Deletion.confirming(projectID: "project-0"),
-        .failed(projectID: "project-0", error: .temporarilyUnavailable),
+        .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        ),
     ])
     func `확인 중이거나 실패 상태의 cancel은 대기 상태로 돌린다`(deletion: ProjectDeletionFeature.State.Deletion) async {
         let store = makeStore(state: ProjectDeletionFeature.State(deletion: deletion))
@@ -72,7 +78,10 @@ struct ProjectDeletionFeatureTests {
         await store.send(.input(.confirm)) {
             $0.deletion = .committing(projectID: "project-0")
         }
-        await store.receive(.effect(.deletionFinished(projectID: "project-0", error: nil))) {
+        await store.receive(.effect(.deletionFinished(
+            projectID: "project-0",
+            error: nil,
+        ))) {
             $0.deletion = .idle
         }
         await store.receive(.delegate(.deleted(projectID: "project-0")))
@@ -90,7 +99,10 @@ struct ProjectDeletionFeatureTests {
         await store.send(.input(.confirm)) {
             $0.deletion = .committing(projectID: "project-0")
         }
-        await store.receive(.effect(.deletionFinished(projectID: "project-0", error: .notFound))) {
+        await store.receive(.effect(.deletionFinished(
+            projectID: "project-0",
+            error: .notFound,
+        ))) {
             $0.deletion = .idle
         }
         await store.receive(.delegate(.deleted(projectID: "project-0")))
@@ -106,8 +118,14 @@ struct ProjectDeletionFeatureTests {
         await store.send(.input(.confirm)) {
             $0.deletion = .committing(projectID: "project-0")
         }
-        await store.receive(.effect(.deletionFinished(projectID: "project-0", error: .temporarilyUnavailable))) {
-            $0.deletion = .failed(projectID: "project-0", error: .temporarilyUnavailable)
+        await store.receive(.effect(.deletionFinished(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        ))) {
+            $0.deletion = .failed(
+                projectID: "project-0",
+                error: .temporarilyUnavailable,
+            )
         }
     }
 

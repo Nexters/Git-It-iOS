@@ -14,14 +14,26 @@ public struct RubricView: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.gutter) {
+        VStack(
+            alignment: .leading,
+            spacing: LayoutToken.gutter,
+        ) {
             if let overallFeedback = displayModel.overallFeedback {
                 StyledText(text: overallFeedback)
             }
 
-            VStack(alignment: .leading, spacing: LayoutToken.compactSpacing) {
-                ForEach(Array(displayModel.criteria.enumerated()), id: \.offset) { _, criterion in
-                    HStack(alignment: .top, spacing: LayoutToken.compactSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: LayoutToken.compactSpacing,
+            ) {
+                ForEach(
+                    Array(displayModel.criteria.enumerated()),
+                    id: \.offset,
+                ) { _, criterion in
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.compactSpacing,
+                    ) {
                         Image(systemName: "checkmark.circle")
                             .designSystemForeground(.blue100)
                         StyledText(text: criterion)
@@ -32,7 +44,10 @@ public struct RubricView: View {
             }
         }
         .padding(Constant.contentPadding)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            alignment: .leading,
+        )
         .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)

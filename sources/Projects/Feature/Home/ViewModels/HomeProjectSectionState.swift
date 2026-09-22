@@ -26,7 +26,10 @@ enum HomeProjectSectionState: Equatable, Sendable {
             self = .empty
 
         case .loaded(let list):
-            self = .loaded(list.summaries.enumerated().map { HomeProjectDisplay($0.element, index: $0.offset) })
+            self = .loaded(list.summaries.enumerated().map { HomeProjectDisplay(
+                $0.element,
+                index: $0.offset,
+            ) })
 
         case .failed:
             self = .failed

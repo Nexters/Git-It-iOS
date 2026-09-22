@@ -8,7 +8,10 @@ import Testing
 struct BookmarkButtonTests {
     @Test
     func `접근성 라벨을 생략할 수 없다`() {
-        _ = BookmarkButton(isSaved: .constant(false), accessibilityLabel: "저장하기")
+        _ = BookmarkButton(
+            isSaved: .constant(false),
+            accessibilityLabel: "저장하기",
+        )
     }
 
     @Test
@@ -24,7 +27,10 @@ struct BookmarkButtonTests {
 
     @Test
     func `저장 여부를 State로 보관하지 않고 Binding으로 참조한다`() {
-        let button = BookmarkButton(isSaved: .constant(true), accessibilityLabel: "저장 해제하기")
+        let button = BookmarkButton(
+            isSaved: .constant(true),
+            accessibilityLabel: "저장 해제하기",
+        )
         let children = Mirror(reflecting: button).children
         let stateProperties = children.filter {
             String(describing: type(of: $0.value)).hasPrefix("State<")
@@ -38,7 +44,10 @@ struct BookmarkButtonTests {
     func `탭하면 저장 여부 Binding을 반전한다`() {
         var isSaved = true
         let button = BookmarkButton(
-            isSaved: Binding(get: { isSaved }, set: { isSaved = $0 }),
+            isSaved: Binding(
+                get: { isSaved },
+                set: { isSaved = $0 },
+            ),
             accessibilityLabel: "저장 해제하기",
         )
 

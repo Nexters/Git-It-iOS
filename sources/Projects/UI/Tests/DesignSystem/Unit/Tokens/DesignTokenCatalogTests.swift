@@ -46,7 +46,10 @@ struct DesignTokenCatalogTests {
 
         #expect(layers.count == 1)
         #expect(layers.first?.colorToken == ColorToken.black25)
-        #expect(layers.first?.offset == EffectToken.Offset(x: 4, y: 4))
+        #expect(layers.first?.offset == EffectToken.Offset(
+            x: 4,
+            y: 4,
+        ))
         #expect(layers.first?.blur == 15)
         #expect(layers.first?.spread == 10)
     }

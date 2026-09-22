@@ -31,7 +31,10 @@ struct ProfileFeatureTests {
 
     @Test
     func `이미 받은 프로필이 있으면 task는 로딩 없는 reload를 보낸다`() async {
-        let updated = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+        let updated = SettingsTestFixture.profile(
+            position: .ios,
+            careerLevel: .senior,
+        )
         let store = makeStore(
             state: makeState(load: .loaded(SettingsTestFixture.curatedProfile)),
             fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.success(updated)]),
@@ -41,7 +44,10 @@ struct ProfileFeatureTests {
         await store.receive(.profile(.input(.reload))) {
             $0.profile.requestID = 1
         }
-        await store.receive(.profile(.effect(.profileLoadFinished(requestID: 1, result: .success(updated))))) {
+        await store.receive(.profile(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(updated),
+        )))) {
             $0.profile.load = .loaded(updated)
         }
     }
@@ -87,7 +93,10 @@ struct ProfileFeatureTests {
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(SettingsTestFixture.curatedProfile)])
         var initialState = makeState(load: .loading)
         initialState.profile.requestID = 1
-        let store = makeStore(state: initialState, fetchMemberProfile: fetchMemberProfile)
+        let store = makeStore(
+            state: initialState,
+            fetchMemberProfile: fetchMemberProfile,
+        )
 
         await store.send(.view(.task))
 

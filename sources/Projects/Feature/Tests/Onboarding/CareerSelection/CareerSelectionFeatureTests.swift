@@ -34,8 +34,14 @@ struct CareerSelectionFeatureTests {
     func `curation 제출 중 중복 제출은 무시하고 completeCuration을 한 번만 호출한다`() async {
         var state = CareerSelectionFeature.State(position: .ios)
         state.careerLevel = .junior
-        let completeCuration = UserInfoUseCaseCurationMock(results: [.success(())], suspendsRequests: true)
-        let store = makeCareerSelectionStore(completeCuration: completeCuration, state: state)
+        let completeCuration = UserInfoUseCaseCurationMock(
+            results: [.success(())],
+            suspendsRequests: true,
+        )
+        let store = makeCareerSelectionStore(
+            completeCuration: completeCuration,
+            state: state,
+        )
 
         await store.send(.view(.submitTapped)) {
             $0.submission = .submitting
@@ -47,7 +53,10 @@ struct CareerSelectionFeatureTests {
         }
         await store.receive(.delegate(.curationSucceeded))
 
-        #expect(await completeCuration.snapshot() == [Curation(position: .ios, careerLevel: .junior)])
+        #expect(await completeCuration.snapshot() == [Curation(
+            position: .ios,
+            careerLevel: .junior,
+        )])
     }
 
     @Test
@@ -55,7 +64,10 @@ struct CareerSelectionFeatureTests {
         var state = CareerSelectionFeature.State(position: .android)
         state.careerLevel = .senior
         let completeCuration = UserInfoUseCaseCurationMock(results: [.failure(.temporarilyUnavailable), .success(())])
-        let store = makeCareerSelectionStore(completeCuration: completeCuration, state: state)
+        let store = makeCareerSelectionStore(
+            completeCuration: completeCuration,
+            state: state,
+        )
 
         await store.send(.view(.submitTapped)) {
             $0.submission = .submitting

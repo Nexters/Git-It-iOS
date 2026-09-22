@@ -46,7 +46,10 @@ public struct BookmarkRemote: Sendable {
         request: BookmarkQuestionRequestDTO,
     ) async throws -> BookmarkQuestionResponseDTO {
         try await executor.send(
-            BookmarkEndpoint.set(projectID: projectID, questionID: questionID).request,
+            BookmarkEndpoint.set(
+                projectID: projectID,
+                questionID: questionID,
+            ).request,
             body: request,
             expecting: BookmarkQuestionResponseDTO.self,
         )

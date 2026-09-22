@@ -15,7 +15,10 @@ extension SavedScreen {
         let onSelect: (ProjectID?) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(
+                alignment: .leading,
+                spacing: 10,
+            ) {
                 ScrollView(.horizontal) {
                     HStack(spacing: LayoutToken.compactSpacing) {
                         Chip(

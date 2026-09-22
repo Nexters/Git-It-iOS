@@ -15,16 +15,25 @@ public struct PageIndicator: View {
 
     public var body: some View {
         HStack(spacing: Constant.dotSpacing) {
-            ForEach(0..<displayModel.totalPages, id: \.self) { index in
+            ForEach(
+                0..<displayModel.totalPages,
+                id: \.self,
+            ) { index in
                 Circle()
                     .fill(Color(designSystem: index == displayModel.currentPage ? .white : .grey500))
-                    .frame(width: Constant.dotSize, height: Constant.dotSize)
+                    .frame(
+                        width: Constant.dotSize,
+                        height: Constant.dotSize,
+                    )
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("페이지 안내")
         .accessibilityValue(
-            Self.accessibilityValue(currentPage: displayModel.currentPage, totalPages: displayModel.totalPages)
+            Self.accessibilityValue(
+                currentPage: displayModel.currentPage,
+                totalPages: displayModel.totalPages,
+            )
         )
     }
 
@@ -67,9 +76,18 @@ extension PageIndicator {
 
 #Preview("Page Indicator") {
     VStack(spacing: LayoutToken.margin) {
-        PageIndicator(displayModel: .init(currentPage: 0, totalPages: 3))
-        PageIndicator(displayModel: .init(currentPage: 1, totalPages: 3))
-        PageIndicator(displayModel: .init(currentPage: 2, totalPages: 3))
+        PageIndicator(displayModel: .init(
+            currentPage: 0,
+            totalPages: 3,
+        ))
+        PageIndicator(displayModel: .init(
+            currentPage: 1,
+            totalPages: 3,
+        ))
+        PageIndicator(displayModel: .init(
+            currentPage: 2,
+            totalPages: 3,
+        ))
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

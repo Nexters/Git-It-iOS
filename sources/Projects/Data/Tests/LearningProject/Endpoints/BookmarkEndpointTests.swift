@@ -8,7 +8,10 @@ struct BookmarkEndpointTests {
 
     @Test
     func `북마크 설정은 POST로 질문 경로를 요청한다`() {
-        let request = BookmarkEndpoint.set(projectID: "project-1", questionID: "question-1").request
+        let request = BookmarkEndpoint.set(
+            projectID: "project-1",
+            questionID: "question-1",
+        ).request
 
         #expect(request.transportMethod == .post)
         #expect(request.path == "/api/v1/projects/project-1/questions/question-1/bookmark")

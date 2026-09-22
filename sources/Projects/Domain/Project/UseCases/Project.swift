@@ -51,8 +51,14 @@ public actor Project: ProjectUseCase {
         let size = pageSize
         let epoch = epoch
         let task = Task<Void, Error> {
-            let page = try await repository.page(index, size: size)
-            self.appendPage(page, epoch: epoch)
+            let page = try await repository.page(
+                index,
+                size: size,
+            )
+            self.appendPage(
+                page,
+                epoch: epoch,
+            )
         }
         nextPageTask = task
         defer { clearNextPageTask(epoch: epoch) }
@@ -124,8 +130,14 @@ public actor Project: ProjectUseCase {
         let size = pageSize
         let epoch = epoch
         let task = Task<Void, Error> {
-            let page = try await repository.page(0, size: size)
-            self.replaceWithFirstPage(page, epoch: epoch)
+            let page = try await repository.page(
+                0,
+                size: size,
+            )
+            self.replaceWithFirstPage(
+                page,
+                epoch: epoch,
+            )
         }
         firstPageTask = task
         defer { clearFirstPageTask(epoch: epoch) }

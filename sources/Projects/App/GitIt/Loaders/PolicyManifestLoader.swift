@@ -16,12 +16,19 @@ enum PolicyManifestLoader {
         resourceName: String = AppBundleResource.policyManifest.rawValue,
         bundle: Bundle = .module,
     ) throws -> [PolicyDocument] {
-        guard let resourceURL = bundle.url(forResource: resourceName, withExtension: "json")
+        guard
+            let resourceURL = bundle.url(
+                forResource: resourceName,
+                withExtension: "json",
+            )
         else {
             throw LoadError.resourceMissing
         }
         let data = try Data(contentsOf: resourceURL)
-        let manifest = try JSONDecoder().decode(Manifest.self, from: data)
+        let manifest = try JSONDecoder().decode(
+            Manifest.self,
+            from: data,
+        )
         return try manifest.documents.map { entry in
             guard
                 let approvedURL = URL(string: entry.approvedURL),

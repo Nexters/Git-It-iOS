@@ -89,7 +89,10 @@ func makeOnboardingRouterStore(
     userInfo: UserInfoUseCaseMock = UserInfoUseCaseMock(),
     accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
-    state: OnboardingRouterFeature.State = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0"),
+    state: OnboardingRouterFeature.State = OnboardingRouterFeature.State(
+        startingAt: .guide,
+        bundleVersion: "1.0.0",
+    ),
 ) -> TestStoreOf<OnboardingRouterFeature> {
     TestStore(initialState: state) {
         OnboardingRouterFeature(

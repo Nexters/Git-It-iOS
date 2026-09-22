@@ -20,7 +20,11 @@ private let previewSet = QuizSet(
 )
 
 private func previewState(activeScreen: QuizRouterFeature.ActiveScreen) -> QuizRouterFeature.State {
-    var state = QuizRouterFeature.State(projectID: "project-1", setID: "set-1", setLabel: "CHAPTER 1")
+    var state = QuizRouterFeature.State(
+        projectID: "project-1",
+        setID: "set-1",
+        setLabel: "CHAPTER 1",
+    )
     state.learningSetIntro.setLoad = .loaded(previewSet)
     state.questionSolving = QuestionSolvingFeature.State(
         projectID: "project-1",

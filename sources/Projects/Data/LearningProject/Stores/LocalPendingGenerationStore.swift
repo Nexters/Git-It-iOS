@@ -33,7 +33,10 @@ public actor LocalPendingGenerationStore {
     ) async -> GenerationStateDTO? {
         await exclusively {
             guard let next = transform(await self.loadState()) else { return nil }
-            await self.storage.setValue(next, forKey: Self.stateKey)
+            await self.storage.setValue(
+                next,
+                forKey: Self.stateKey,
+            )
             self.broadcast(next)
             return next
         }
@@ -46,11 +49,17 @@ public actor LocalPendingGenerationStore {
         await exclusively {
             var entries = await self.loadReminderEntries()
             guard !entries.contains(where: { $0.projectID == projectID }) else { return }
-            entries.append(ReminderEntry(projectID: projectID, requestedAt: requestedAt))
+            entries.append(ReminderEntry(
+                projectID: projectID,
+                requestedAt: requestedAt,
+            ))
             if entries.count > Self.pendingReminderLimit {
                 entries.removeFirst(entries.count - Self.pendingReminderLimit)
             }
-            await self.storage.setValue(entries, forKey: Self.pendingGenerationRemindersKey)
+            await self.storage.setValue(
+                entries,
+                forKey: Self.pendingGenerationRemindersKey,
+            )
         }
     }
 
@@ -87,11 +96,17 @@ public actor LocalPendingGenerationStore {
     }
 
     private func loadState() async -> GenerationStateDTO {
-        await storage.value(GenerationStateDTO.self, forKey: Self.stateKey) ?? GenerationStateDTO(records: [])
+        await storage.value(
+            GenerationStateDTO.self,
+            forKey: Self.stateKey,
+        ) ?? GenerationStateDTO(records: [])
     }
 
     private func loadReminderEntries() async -> [ReminderEntry] {
-        await storage.value([ReminderEntry].self, forKey: Self.pendingGenerationRemindersKey) ?? []
+        await storage.value(
+            [ReminderEntry].self,
+            forKey: Self.pendingGenerationRemindersKey,
+        ) ?? []
     }
 
     private func subscribe() async -> AsyncStream<GenerationStateDTO> {

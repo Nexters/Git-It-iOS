@@ -18,7 +18,10 @@ extension HomeScreen {
         let onLearningTapped: (String) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.sectionHeaderSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.sectionHeaderSpacing,
+            ) {
                 HStack {
                     StyledText(text: "학습 중인 레포지토리")
                         .textStyle(.subtitle3)
@@ -29,7 +32,10 @@ extension HomeScreen {
                                 .textStyle(.body2)
                                 .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
-                                .frame(width: Constant.chevronSize, height: Constant.chevronSize)
+                                .frame(
+                                    width: Constant.chevronSize,
+                                    height: Constant.chevronSize,
+                                )
                                 .designSystemForeground(showAllColor)
                         }
                     }
@@ -149,7 +155,10 @@ extension HomeScreen {
 
             case .loading:
                 emptyProjects {
-                    ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
+                    ResourceAnimation(asset: .generalLoading).frame(
+                        width: 20,
+                        height: 20,
+                    )
                 }
 
             case .empty:
@@ -173,9 +182,12 @@ extension HomeScreen {
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
-                        FeedbackActionButton(title: "다시 시도", action: onProjectRetryTapped)
-                            .style(.secondary)
-                            .size(.small)
+                        FeedbackActionButton(
+                            title: "다시 시도",
+                            action: onProjectRetryTapped,
+                        )
+                        .style(.secondary)
+                        .size(.small)
                     }
                     .designSystemScreenMargin()
                 }
@@ -187,7 +199,10 @@ extension HomeScreen {
                 .fill(Color(designSystem: .blue500))
                 .overlay {
                     shape
-                        .stroke(Color(designSystem: .blue300), lineWidth: Constant.strokeWidth * 2)
+                        .stroke(
+                            Color(designSystem: .blue300),
+                            lineWidth: Constant.strokeWidth * 2,
+                        )
                         .clipShape(shape)
                 }
         }
@@ -216,7 +231,10 @@ extension HomeScreen {
 
             return ScrollView(.horizontal) {
                 LazyHStack(spacing: Constant.cardSpacing) {
-                    ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
+                    ForEach(
+                        Array(projects.enumerated()),
+                        id: \.element.projectID,
+                    ) { _, project in
                         HomeProjectCard(
                             displayModel: .init(
                                 title: project.title,
@@ -243,7 +261,10 @@ extension HomeScreen {
                 }
                 .background(alignment: .leading) {
                     Color.clear
-                        .frame(width: 0, height: 0)
+                        .frame(
+                            width: 0,
+                            height: 0,
+                        )
                         .onGeometryChange(for: CGFloat.self) { proxy in
                             proxy.frame(in: .scrollView(axis: .horizontal)).minX
                         } action: { minX in
@@ -257,7 +278,10 @@ extension HomeScreen {
             .safeAreaPadding(.leading, Constant.screenMargin)
             .safeAreaPadding(.trailing, Constant.trailingInset)
             .scrollIndicators(.hidden)
-            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
+            .scrollTargetBehavior(.viewAligned(
+                limitBehavior: .alwaysByOne,
+                anchor: .leading,
+            ))
         }
 
     }

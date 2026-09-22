@@ -21,7 +21,10 @@ public actor QuizDetail: QuizDetailUseCase {
         _ setID: QuizSetID,
         in projectID: ProjectID,
     ) async throws -> QuizSet {
-        try await quizSetRepository.quizSet(setID, in: projectID)
+        try await quizSetRepository.quizSet(
+            setID,
+            in: projectID,
+        )
     }
 
     public func grade(_ answer: ChoiceAnswer) async throws -> ChoiceGrading {
@@ -37,7 +40,11 @@ public actor QuizDetail: QuizDetailUseCase {
             throw QuizDetailError.invalidAnswer
         }
         return try await answerRepository.submit(
-            EssayAnswer(projectID: answer.projectID, quizID: answer.quizID, text: trimmed)
+            EssayAnswer(
+                projectID: answer.projectID,
+                quizID: answer.quizID,
+                text: trimmed,
+            )
         )
     }
 
@@ -45,14 +52,22 @@ public actor QuizDetail: QuizDetailUseCase {
         _ quizID: QuizID,
         in projectID: ProjectID,
     ) async throws -> QuizBookmarkState {
-        try await setBookmark(quizID, in: projectID, isBookmarked: true)
+        try await setBookmark(
+            quizID,
+            in: projectID,
+            isBookmarked: true,
+        )
     }
 
     public func unbookmark(
         _ quizID: QuizID,
         in projectID: ProjectID,
     ) async throws -> QuizBookmarkState {
-        try await setBookmark(quizID, in: projectID, isBookmarked: false)
+        try await setBookmark(
+            quizID,
+            in: projectID,
+            isBookmarked: false,
+        )
     }
 
     public func bookmarks(_ filter: QuizBookmarkFilter) async throws -> QuizBookmarkList {
@@ -91,9 +106,16 @@ public actor QuizDetail: QuizDetailUseCase {
 
         let task = Task<QuizBookmarkState, Error> {
             await previous?.awaitCompletion()
-            return try await bookmarkRepository.setBookmark(quizID, in: projectID, isBookmarked: isBookmarked)
+            return try await bookmarkRepository.setBookmark(
+                quizID,
+                in: projectID,
+                isBookmarked: isBookmarked,
+            )
         }
-        inFlight[quizID] = PendingMutation(token: token, awaitCompletion: { _ = try? await task.value })
+        inFlight[quizID] = PendingMutation(
+            token: token,
+            awaitCompletion: { _ = try? await task.value },
+        )
 
         defer {
             if inFlight[quizID]?.token == token {

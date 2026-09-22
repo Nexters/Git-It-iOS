@@ -32,7 +32,10 @@ struct LearningCompletionScreen: View {
 
             VStack(spacing: Constant.contentSpacing) {
                 ResourceAnimation(asset: .complete).looping(false)
-                    .frame(width: Constant.animationSize, height: Constant.animationSize)
+                    .frame(
+                        width: Constant.animationSize,
+                        height: Constant.animationSize,
+                    )
                     .accessibilityHidden(true)
 
                 StyledText(text: "학습을 마쳤어요")
@@ -53,9 +56,12 @@ struct LearningCompletionScreen: View {
 
             Spacer(minLength: 0)
 
-            FeedbackActionButton(title: "확인", action: { send(.primaryActionTapped) })
-                .designSystemScreenMargin()
-                .padding(.bottom, Constant.bottomButtonPadding)
+            FeedbackActionButton(
+                title: "확인",
+                action: { send(.primaryActionTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomButtonPadding)
         }
     }
 
@@ -67,7 +73,10 @@ struct LearningCompletionScreen: View {
 
             Rectangle()
                 .fill(Color(designSystem: .grey400))
-                .frame(width: Constant.scoreDividerWidth, height: Constant.scoreDividerHeight)
+                .frame(
+                    width: Constant.scoreDividerWidth,
+                    height: Constant.scoreDividerHeight,
+                )
 
             StyledText(text: "\(store.choiceQuestionCount)")
                 .textStyle(.subtitle1)

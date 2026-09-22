@@ -10,6 +10,9 @@ struct JSONBodyCoding: HTTPBodyCoding {
         _: Body.Type,
         from data: Data,
     ) throws -> Body {
-        try JSONDecoder().decode(Body.self, from: data)
+        try JSONDecoder().decode(
+            Body.self,
+            from: data,
+        )
     }
 }

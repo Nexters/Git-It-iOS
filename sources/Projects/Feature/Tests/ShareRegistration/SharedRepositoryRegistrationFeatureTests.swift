@@ -19,7 +19,10 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `공유 항목에 URL이 없으면 네트워크 호출 없이 오류 상태가 되고 진단 이벤트를 남긴다`() async {
         let recorder = Recorder()
-        let store = Self.makeStore(sharedURL: nil, recorder: recorder)
+        let store = Self.makeStore(
+            sharedURL: nil,
+            recorder: recorder,
+        )
 
         await store.send(.input(.validate(sharedURL: nil))) {
             $0.phase = .invalidURL(reason: "공유한 항목에서 링크를 찾지 못했어요.")
@@ -31,7 +34,10 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `GitHub 저장소 경로가 아니면 조회하지 않고 오류 상태가 되고 진단 이벤트를 남긴다`() async {
         let recorder = Recorder()
-        let store = Self.makeStore(location: nil, recorder: recorder)
+        let store = Self.makeStore(
+            location: nil,
+            recorder: recorder,
+        )
 
         await store.send(.input(.validate(sharedURL: ShareRegistrationTestSupport.sharedURL))) {
             $0.phase = .invalidURL(reason: "GitHub 저장소 주소가 아니에요.")
@@ -43,7 +49,10 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `세션 마커가 없으면 앱 실행 필요 상태가 되고 세션 판정 결과를 토큰 없이 남긴다`() async {
         let recorder = Recorder()
-        let store = Self.makeStore(availability: .appLaunchRequired, recorder: recorder)
+        let store = Self.makeStore(
+            availability: .appLaunchRequired,
+            recorder: recorder,
+        )
 
         await store.send(.input(.validate(sharedURL: ShareRegistrationTestSupport.sharedURL)))
         await store.receive(\.effect.validationFinished) {
@@ -69,7 +78,10 @@ struct SharedRepositoryRegistrationFeatureTests {
 
         await store.send(.input(.validate(sharedURL: ShareRegistrationTestSupport.sharedURL)))
         await store.receive(\.effect.validationFinished) {
-            $0.phase = .failed(reason: "네트워크에 연결할 수 없어요.", retry: .lookup)
+            $0.phase = .failed(
+                reason: "네트워크에 연결할 수 없어요.",
+                retry: .lookup,
+            )
         }
     }
 
@@ -128,9 +140,15 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `제출한 난이도로 등록을 요청하고 성공하면 완료 상태가 된다`() async {
         let projectGeneration = ProjectGenerationUseCaseSpy()
-        let store = Self.makeStore(projectGeneration: projectGeneration, state: Self.readyState())
+        let store = Self.makeStore(
+            projectGeneration: projectGeneration,
+            state: Self.readyState(),
+        )
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l3))) {
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l3,
+        ))) {
             $0.submission = Self.submission(quizLevel: .l3)
             $0.phase = .submitting
         }
@@ -145,13 +163,22 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `요청 중에는 추가 등록 실행을 받지 않는다`() async {
         let projectGeneration = ProjectGenerationUseCaseSpy(suspendsUntilResumed: true)
-        let store = Self.makeStore(projectGeneration: projectGeneration, state: Self.readyState())
+        let store = Self.makeStore(
+            projectGeneration: projectGeneration,
+            state: Self.readyState(),
+        )
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l1))) {
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l1,
+        ))) {
             $0.submission = Self.submission(quizLevel: .l1)
             $0.phase = .submitting
         }
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l1)))
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l1,
+        )))
 
         #expect(projectGeneration.callCount == 1)
 
@@ -168,7 +195,10 @@ struct SharedRepositoryRegistrationFeatureTests {
             state: Self.readyState(),
         )
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l1))) {
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l1,
+        ))) {
             $0.submission = Self.submission(quizLevel: .l1)
             $0.phase = .submitting
         }
@@ -190,12 +220,18 @@ struct SharedRepositoryRegistrationFeatureTests {
             state: Self.readyState(),
         )
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l1))) {
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l1,
+        ))) {
             $0.submission = Self.submission(quizLevel: .l1)
             $0.phase = .submitting
         }
         await store.receive(\.effect.registrationFinished) {
-            $0.phase = .failed(reason: reason, retry: .registration)
+            $0.phase = .failed(
+                reason: reason,
+                retry: .registration,
+            )
         }
     }
 
@@ -214,7 +250,10 @@ struct SharedRepositoryRegistrationFeatureTests {
             state: Self.readyState(),
         )
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l1))) {
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l1,
+        ))) {
             $0.submission = Self.submission(quizLevel: .l1)
             $0.phase = .submitting
         }
@@ -228,10 +267,16 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `재시도는 실패한 등록을 같은 저장소와 난이도로 다시 수행한다`() async {
         let projectGeneration = ProjectGenerationUseCaseSpy(error: .temporarilyUnavailable)
-        let store = Self.makeStore(projectGeneration: projectGeneration, state: Self.readyState())
+        let store = Self.makeStore(
+            projectGeneration: projectGeneration,
+            state: Self.readyState(),
+        )
         store.exhaustivity = .off
 
-        await store.send(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l2)))
+        await store.send(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l2,
+        )))
         await store.skipReceivedActions()
         await store.send(.input(.retry))
         await store.skipReceivedActions()
@@ -243,7 +288,10 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `조회 실패의 재시도는 저장소 조회를 다시 수행한다`() async {
         var state = SharedRepositoryRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL)
-        state.phase = .failed(reason: "네트워크에 연결할 수 없어요.", retry: .lookup)
+        state.phase = .failed(
+            reason: "네트워크에 연결할 수 없어요.",
+            retry: .lookup,
+        )
         let store = Self.makeStore(state: state)
 
         await store.send(.input(.retry)) {
@@ -258,7 +306,10 @@ struct SharedRepositoryRegistrationFeatureTests {
     @Test
     func `실패 상태가 아니면 재시도를 무시한다`() async {
         let projectGeneration = ProjectGenerationUseCaseSpy()
-        let store = Self.makeStore(projectGeneration: projectGeneration, state: Self.readyState())
+        let store = Self.makeStore(
+            projectGeneration: projectGeneration,
+            state: Self.readyState(),
+        )
 
         await store.send(.input(.retry))
 

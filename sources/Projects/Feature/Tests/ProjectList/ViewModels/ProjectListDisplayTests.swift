@@ -33,7 +33,10 @@ struct ProjectListDisplayTests {
             repositoryName: "Repository X",
             repositoryImageURL: nil,
             techStack: [],
-            currentSet: ProjectSetLabel(label: "시작하기", title: "개요"),
+            currentSet: ProjectSetLabel(
+                label: "시작하기",
+                title: "개요",
+            ),
             next: nil,
             progressPercent: 0,
         )

@@ -78,13 +78,22 @@ public struct ProjectDetailLoadFeature: Sendable {
                 return .run { [projectDetail] send in
                     do {
                         let detail = try await projectDetail(projectID)
-                        await send(.effect(.detailLoadFinished(requestID: requestID, result: .success(detail))))
+                        await send(.effect(.detailLoadFinished(
+                            requestID: requestID,
+                            result: .success(detail),
+                        )))
                     } catch {
                         let mapped = error as? ProjectError ?? .unexpected
-                        await send(.effect(.detailLoadFinished(requestID: requestID, result: .failure(mapped))))
+                        await send(.effect(.detailLoadFinished(
+                            requestID: requestID,
+                            result: .failure(mapped),
+                        )))
                     }
                 }
-                .cancellable(id: CancelID.load, cancelInFlight: true)
+                .cancellable(
+                    id: CancelID.load,
+                    cancelInFlight: true,
+                )
 
             case .effect(.detailLoadFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }

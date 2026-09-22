@@ -66,7 +66,10 @@ public struct AuthenticationRemote: Sendable {
     ) async throws -> Payload {
         do {
             let response = try await client.send(
-                httpRequest(for: endpoint, accessToken: accessToken),
+                httpRequest(
+                    for: endpoint,
+                    accessToken: accessToken,
+                ),
                 expecting: APIResponseDTO<Payload>.self,
             )
             return try payload(from: response)
@@ -83,7 +86,10 @@ public struct AuthenticationRemote: Sendable {
     ) async throws -> Payload {
         do {
             let response = try await client.send(
-                httpRequest(for: endpoint, accessToken: accessToken),
+                httpRequest(
+                    for: endpoint,
+                    accessToken: accessToken,
+                ),
                 body: body,
                 expecting: APIResponseDTO<Payload>.self,
             )
@@ -118,7 +124,10 @@ public struct AuthenticationRemote: Sendable {
             throw AuthenticationServiceError.unexpectedStatus
 
         case .raw(let data):
-            throw AuthenticationServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            throw AuthenticationServiceError(from: try serverError(
+                statusCode: response.statusCode,
+                data: data,
+            ))
 
         @unknown default:
             throw AuthenticationServiceError.unexpectedStatus
@@ -130,7 +139,10 @@ public struct AuthenticationRemote: Sendable {
         data: Data,
     ) throws -> ServerAPIError {
         do {
-            let envelope = try JSONDecoder().decode(APIResponseDTO<EmptyResponseData>.self, from: data)
+            let envelope = try JSONDecoder().decode(
+                APIResponseDTO<EmptyResponseData>.self,
+                from: data,
+            )
             return ServerAPIError(
                 httpStatus: statusCode,
                 code: envelope.code,

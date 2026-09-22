@@ -39,7 +39,12 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         repositoryURL: String,
         requestedAt: Date,
     ) async -> Bool {
-        guard let next = state.beginning(repositoryURL: repositoryURL, requestedAt: requestedAt) else { return false }
+        guard
+            let next = state.beginning(
+                repositoryURL: repositoryURL,
+                requestedAt: requestedAt,
+            )
+        else { return false }
         update(next)
         return true
     }
@@ -48,7 +53,10 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         _ projectID: String,
         toRepositoryURL repositoryURL: String,
     ) async {
-        update(state.attachingProjectID(projectID, toRepositoryURL: repositoryURL))
+        update(state.attachingProjectID(
+            projectID,
+            toRepositoryURL: repositoryURL,
+        ))
     }
 
     func finishGeneration(
@@ -57,7 +65,11 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         finishedAt: Date,
     ) async {
         finishedProjectIDs.append(projectID)
-        update(state.finishing(projectID: projectID, status: status, at: finishedAt))
+        update(state.finishing(
+            projectID: projectID,
+            status: status,
+            at: finishedAt,
+        ))
     }
 
     func releaseGeneration(repositoryURL: String) async {

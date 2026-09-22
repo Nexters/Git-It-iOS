@@ -135,13 +135,22 @@ public struct RepositoryLinkInputFeature: Sendable {
         return .run { send in
             do {
                 let resolved = try await repository(url)
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(resolved))))
+                await send(.effect(.validationFinished(
+                    requestID: currentRequestID,
+                    result: .success(resolved),
+                )))
             } catch {
                 let mapped = error as? ExternalRepositoryError ?? .other
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
+                await send(.effect(.validationFinished(
+                    requestID: currentRequestID,
+                    result: .failure(mapped),
+                )))
             }
         }
-        .cancellable(id: CancelID.validation, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.validation,
+            cancelInFlight: true,
+        )
     }
 
 }

@@ -180,13 +180,22 @@ public struct QuestionSolvingFeature: Sendable {
                 return .run { send in
                     do {
                         let bookmarkState = try await setBookmark(questionID, projectID, bookmarked)
-                        await send(.effect(.bookmarkFinished(questionID: questionID, result: .success(bookmarkState))))
+                        await send(.effect(.bookmarkFinished(
+                            questionID: questionID,
+                            result: .success(bookmarkState),
+                        )))
                     } catch {
                         let mapped = error as? QuizDetailError ?? .unexpected
-                        await send(.effect(.bookmarkFinished(questionID: questionID, result: .failure(mapped))))
+                        await send(.effect(.bookmarkFinished(
+                            questionID: questionID,
+                            result: .failure(mapped),
+                        )))
                     }
                 }
-                .cancellable(id: CancelID.bookmark, cancelInFlight: true)
+                .cancellable(
+                    id: CancelID.bookmark,
+                    cancelInFlight: true,
+                )
 
             case .view(.sourceTapped):
                 guard state.isSourceControlPresented else { return .none }
@@ -224,7 +233,10 @@ public struct QuestionSolvingFeature: Sendable {
                 switch result {
                 case .success(let grading):
                     state.submission = .answered(.essay(grading))
-                    return .send(.delegate(.answerSubmitted(questionID: questionID, choiceCorrect: nil)))
+                    return .send(.delegate(.answerSubmitted(
+                        questionID: questionID,
+                        choiceCorrect: nil,
+                    )))
 
                 case .failure(let error):
                     state.submission = .failed(error)
@@ -277,13 +289,22 @@ public struct QuestionSolvingFeature: Sendable {
             return .run { send in
                 do {
                     let grading = try await gradeChoiceAnswer(answer)
-                    await send(.effect(.choiceAnswerFinished(questionID: questionID, result: .success(grading))))
+                    await send(.effect(.choiceAnswerFinished(
+                        questionID: questionID,
+                        result: .success(grading),
+                    )))
                 } catch {
                     let mapped = error as? QuizDetailError ?? .unexpected
-                    await send(.effect(.choiceAnswerFinished(questionID: questionID, result: .failure(mapped))))
+                    await send(.effect(.choiceAnswerFinished(
+                        questionID: questionID,
+                        result: .failure(mapped),
+                    )))
                 }
             }
-            .cancellable(id: CancelID.submit, cancelInFlight: true)
+            .cancellable(
+                id: CancelID.submit,
+                cancelInFlight: true,
+            )
 
         case .essay:
             state.submission = .submitting
@@ -295,13 +316,22 @@ public struct QuestionSolvingFeature: Sendable {
             return .run { send in
                 do {
                     let grading = try await gradeEssayAnswer(answer)
-                    await send(.effect(.essayAnswerFinished(questionID: questionID, result: .success(grading))))
+                    await send(.effect(.essayAnswerFinished(
+                        questionID: questionID,
+                        result: .success(grading),
+                    )))
                 } catch {
                     let mapped = error as? QuizDetailError ?? .unexpected
-                    await send(.effect(.essayAnswerFinished(questionID: questionID, result: .failure(mapped))))
+                    await send(.effect(.essayAnswerFinished(
+                        questionID: questionID,
+                        result: .failure(mapped),
+                    )))
                 }
             }
-            .cancellable(id: CancelID.submit, cancelInFlight: true)
+            .cancellable(
+                id: CancelID.submit,
+                cancelInFlight: true,
+            )
         }
     }
 

@@ -20,7 +20,10 @@ struct UserProfileLoadFeatureTests {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(profile)))) {
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(profile),
+        ))) {
             $0.load = .loaded(profile)
         }
 
@@ -35,7 +38,10 @@ struct UserProfileLoadFeatureTests {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))) {
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        ))) {
             $0.load = .failed(.temporarilyUnavailable)
         }
 
@@ -50,7 +56,10 @@ struct UserProfileLoadFeatureTests {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))) {
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        ))) {
             $0.load = .failed(.temporarilyUnavailable)
         }
     }
@@ -58,12 +67,18 @@ struct UserProfileLoadFeatureTests {
     @Test
     func `조회 완료 상태의 reload는 로딩 없이 최신 프로필로 바꾼다`() async {
         let updatedProfile = updatedProfile
-        let store = makeStore(state: UserProfileLoadFeature.State(load: .loaded(profile)), profile: { updatedProfile })
+        let store = makeStore(
+            state: UserProfileLoadFeature.State(load: .loaded(profile)),
+            profile: { updatedProfile },
+        )
 
         await store.send(.input(.reload)) {
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(updatedProfile)))) {
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(updatedProfile),
+        ))) {
             $0.load = .loaded(updatedProfile)
         }
     }
@@ -78,7 +93,10 @@ struct UserProfileLoadFeatureTests {
         await store.send(.input(.reload)) {
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .failure(.temporarilyUnavailable))))
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        )))
 
         #expect(store.state.load == .loaded(profile))
     }
@@ -89,10 +107,13 @@ struct UserProfileLoadFeatureTests {
         let callCount = LockIsolated(0)
         var state = UserProfileLoadFeature.State(load: .loading)
         state.requestID = 1
-        let store = makeStore(state: state, profile: {
-            callCount.withValue { $0 += 1 }
-            return profile
-        })
+        let store = makeStore(
+            state: state,
+            profile: {
+                callCount.withValue { $0 += 1 }
+                return profile
+            },
+        )
 
         await store.send(.input(.reload))
 
@@ -105,13 +126,19 @@ struct UserProfileLoadFeatureTests {
     ])
     func `조회 완료가 아닌 상태의 reload는 load와 같이 로딩을 세운다`(load: UserProfileLoadFeature.State.Load) async {
         let profile = profile
-        let store = makeStore(state: UserProfileLoadFeature.State(load: load), profile: { profile })
+        let store = makeStore(
+            state: UserProfileLoadFeature.State(load: load),
+            profile: { profile },
+        )
 
         await store.send(.input(.reload)) {
             $0.load = .loading
             $0.requestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(profile)))) {
+        await store.receive(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(profile),
+        ))) {
             $0.load = .loaded(profile)
         }
     }
@@ -126,7 +153,10 @@ struct UserProfileLoadFeatureTests {
             $0.load = .loaded(updatedProfile)
             $0.requestID = 2
         }
-        await store.send(.effect(.profileLoadFinished(requestID: 1, result: .success(profile))))
+        await store.send(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(profile),
+        )))
 
         #expect(store.state.load == .loaded(updatedProfile))
     }
@@ -137,7 +167,10 @@ struct UserProfileLoadFeatureTests {
         state.requestID = 2
         let store = makeStore(state: state)
 
-        await store.send(.effect(.profileLoadFinished(requestID: 1, result: .success(profile))))
+        await store.send(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(profile),
+        )))
 
         #expect(store.state.load == .loading)
     }
@@ -145,7 +178,10 @@ struct UserProfileLoadFeatureTests {
     // MARK: Private
 
     private let profile = SettingsTestFixture.curatedProfile
-    private let updatedProfile = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+    private let updatedProfile = SettingsTestFixture.profile(
+        position: .ios,
+        careerLevel: .senior,
+    )
 
     private func makeStore(
         state: UserProfileLoadFeature.State = UserProfileLoadFeature.State(),

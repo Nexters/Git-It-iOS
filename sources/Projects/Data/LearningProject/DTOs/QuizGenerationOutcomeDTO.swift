@@ -16,7 +16,10 @@ public struct QuizGenerationOutcomeDTO: Equatable, Sendable {
             let statusValue = rawPayload["status"],
             let status = RawStatus(rawValue: statusValue)
         else { return nil }
-        self.init(projectID: projectID, status: status)
+        self.init(
+            projectID: projectID,
+            status: status,
+        )
     }
 
     // MARK: Public

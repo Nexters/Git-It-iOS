@@ -30,7 +30,11 @@ public struct SelectableSettingRow: View {
                 }
             }
             .padding(.horizontal, Constant.horizontalPadding)
-            .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: Constant.minimumHeight,
+                alignment: .leading,
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -64,8 +68,14 @@ extension SelectableSettingRow {
 
 #Preview("Selectable Setting Row") {
     VStack(spacing: 0) {
-        SelectableSettingRow(title: "주니어", isSelected: .constant(true))
-        SelectableSettingRow(title: "시니어", isSelected: .constant(false))
+        SelectableSettingRow(
+            title: "주니어",
+            isSelected: .constant(true),
+        )
+        SelectableSettingRow(
+            title: "시니어",
+            isSelected: .constant(false),
+        )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

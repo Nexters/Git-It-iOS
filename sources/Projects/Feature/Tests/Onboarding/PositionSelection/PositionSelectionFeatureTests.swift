@@ -41,7 +41,10 @@ struct PositionSelectionFeatureTests {
         var state = PositionSelectionFeature.State()
         state.position = .ios
         let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
-        let store = makePositionSelectionStore(signOut: signOut, state: state)
+        let store = makePositionSelectionStore(
+            signOut: signOut,
+            state: state,
+        )
 
         await store.send(.view(.backTapped)) {
             $0.exitStatus = .inProgress

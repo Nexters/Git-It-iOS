@@ -7,9 +7,18 @@ import Testing
 struct AccessibilityContractTests {
     @Test
     func `아이콘 전용 버튼은 접근성 라벨을 생략할 수 없다`() {
-        _ = IconPlainButton(icon: .play, label: "학습 시작")
-        _ = IconGlassButton(icon: .menu, label: "더 보기")
-        _ = BookmarkButton(isSaved: .constant(false), accessibilityLabel: "저장하기")
+        _ = IconPlainButton(
+            icon: .play,
+            label: "학습 시작",
+        )
+        _ = IconGlassButton(
+            icon: .menu,
+            label: "더 보기",
+        )
+        _ = BookmarkButton(
+            isSaved: .constant(false),
+            accessibilityLabel: "저장하기",
+        )
     }
 
     @Test
@@ -35,8 +44,14 @@ struct AccessibilityContractTests {
 
     @Test
     func `판정 결과는 접근성 라벨에 문자로도 실린다`() {
-        #expect(ChoiceResultRow.accessibilityLabel(text: "본문", judgement: .correct).hasSuffix("정답"))
-        #expect(ChoiceResultRow.accessibilityLabel(text: "본문", judgement: .incorrect).hasSuffix("오답"))
+        #expect(ChoiceResultRow.accessibilityLabel(
+            text: "본문",
+            judgement: .correct,
+        ).hasSuffix("정답"))
+        #expect(ChoiceResultRow.accessibilityLabel(
+            text: "본문",
+            judgement: .incorrect,
+        ).hasSuffix("오답"))
         #expect(ChoiceAnswerOption.State.correct.accessibilitySuffix == "정답")
         #expect(ChoiceAnswerOption.State.incorrect.accessibilitySuffix == "오답")
     }

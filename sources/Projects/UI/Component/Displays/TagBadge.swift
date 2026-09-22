@@ -55,16 +55,19 @@ public struct TagBadge: View {
     }
 
     public var body: some View {
-        Text.designSystemStyled(text, style: size.textStyle)
-            .designSystemLineSpacing(size.textStyle)
-            .designSystemForeground(style.textColor)
-            .padding(.horizontal, Constant.horizontalPadding)
-            .padding(.top, Constant.topPadding)
-            .padding(.bottom, Constant.bottomPadding)
-            .background(
-                Color(designSystem: style.backgroundColor),
-                in: RoundedRectangle(designSystem: .small),
-            )
+        Text.designSystemStyled(
+            text,
+            style: size.textStyle,
+        )
+        .designSystemLineSpacing(size.textStyle)
+        .designSystemForeground(style.textColor)
+        .padding(.horizontal, Constant.horizontalPadding)
+        .padding(.top, Constant.topPadding)
+        .padding(.bottom, Constant.bottomPadding)
+        .background(
+            Color(designSystem: style.backgroundColor),
+            in: RoundedRectangle(designSystem: .small),
+        )
     }
 
     // MARK: Private

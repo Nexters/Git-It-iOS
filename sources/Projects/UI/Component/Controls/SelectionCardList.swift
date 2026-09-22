@@ -60,7 +60,10 @@ public struct SelectionCardList: View {
     private func card(for item: Item) -> some View {
         if style.showsThumbnail {
             SelectionCard(
-                displayModel: .init(title: item.displayModel.title, supportingText: item.displayModel.supportingText)
+                displayModel: .init(
+                    title: item.displayModel.title,
+                    supportingText: item.displayModel.supportingText,
+                )
             ) {
                 if let illust = item.displayModel.illust {
                     thumbnail(for: illust)
@@ -69,7 +72,10 @@ public struct SelectionCardList: View {
             .selected(isSelected(item))
         } else {
             SelectionCard(
-                displayModel: .init(title: item.displayModel.title, supportingText: item.displayModel.supportingText)
+                displayModel: .init(
+                    title: item.displayModel.title,
+                    supportingText: item.displayModel.supportingText,
+                )
             )
             .selected(isSelected(item))
         }

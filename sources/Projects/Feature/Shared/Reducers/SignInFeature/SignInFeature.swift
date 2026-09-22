@@ -111,8 +111,14 @@ public struct SignInFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.legalAgreement, action: \.legalAgreement) {
-            LegalAgreementFeature(policyConsentStatus: policyConsentStatus, consent: consent)
+        Scope(
+            state: \.legalAgreement,
+            action: \.legalAgreement,
+        ) {
+            LegalAgreementFeature(
+                policyConsentStatus: policyConsentStatus,
+                consent: consent,
+            )
         }
         Reduce { state, action in
             switch action {
@@ -199,9 +205,15 @@ public struct SignInFeature: Sendable {
         let requestID = state.requestID
         return .run { [signIn] send in
             let result = await signIn(.apple)
-            await send(.effect(.signInFinished(requestID: requestID, result: result)))
+            await send(.effect(.signInFinished(
+                requestID: requestID,
+                result: result,
+            )))
         }
-        .cancellable(id: CancelID.signIn(state.instanceID), cancelInFlight: true)
+        .cancellable(
+            id: CancelID.signIn(state.instanceID),
+            cancelInFlight: true,
+        )
     }
 
 }

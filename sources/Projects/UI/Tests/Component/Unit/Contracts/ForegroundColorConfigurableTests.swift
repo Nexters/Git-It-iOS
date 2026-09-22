@@ -34,12 +34,18 @@ struct ForegroundColorConfigurableTests {
 
     @Test
     func `IconPlainButton 전경색을 선언하지 않으면 White로 그린다`() {
-        #expect(foregroundColor(of: IconPlainButton(icon: .play, label: "학습 시작")) == ColorToken.white)
+        #expect(foregroundColor(of: IconPlainButton(
+            icon: .play,
+            label: "학습 시작",
+        )) == ColorToken.white)
     }
 
     @Test
     func `IconPlainButton 전경색 선언은 전경색만 바꾸고 배경색과 레이블을 유지한다`() {
-        let original = IconPlainButton(icon: .play, label: "학습 시작").backgroundColorToken(.blue100)
+        let original = IconPlainButton(
+            icon: .play,
+            label: "학습 시작",
+        ).backgroundColorToken(.blue100)
 
         let colored = original.foregroundColorToken(.grey700)
 
@@ -63,7 +69,11 @@ struct ForegroundColorConfigurableTests {
 
     // MARK: Private
 
-    private let progressModel = LabeledProgressBar.DisplayModel(label: "학습 진행률", progress: 0.6, valueText: "6 / 10")
+    private let progressModel = LabeledProgressBar.DisplayModel(
+        label: "학습 진행률",
+        progress: 0.6,
+        valueText: "6 / 10",
+    )
 
     private func foregroundColor(of subject: some View) -> ColorToken? {
         Mirror(reflecting: subject).descendant("foregroundColor") as? ColorToken

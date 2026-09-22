@@ -86,7 +86,10 @@ public struct CareerSelectionFeature: Sendable {
                 state.submission = .submitting
                 return .run { send in
                     do {
-                        try await updateCuration(Curation(position: position, careerLevel: careerLevel))
+                        try await updateCuration(Curation(
+                            position: position,
+                            careerLevel: careerLevel,
+                        ))
                         await send(.effect(.curationFinished(success: true)))
                     } catch {
                         await send(.effect(.curationFinished(success: false)))

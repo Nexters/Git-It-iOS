@@ -25,7 +25,10 @@ struct ExternalRepositoryLookupAdapterTests {
         ])
         let adapter = ExternalRepositoryLookupAdapter(remote: Self.makeRemote(transport: transport))
 
-        let repository = try await adapter.repository(owner: "facebook", name: "react")
+        let repository = try await adapter.repository(
+            owner: "facebook",
+            name: "react",
+        )
 
         #expect(repository.canonicalURL == "https://github.com/facebook/react")
         #expect(repository.ownerName == "facebook")
@@ -44,7 +47,10 @@ struct ExternalRepositoryLookupAdapterTests {
         )
 
         await #expect(throws: ExternalRepositoryError.offline) {
-            _ = try await adapter.repository(owner: "facebook", name: "react")
+            _ = try await adapter.repository(
+                owner: "facebook",
+                name: "react",
+            )
         }
     }
 

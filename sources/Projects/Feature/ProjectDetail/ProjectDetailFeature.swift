@@ -82,10 +82,16 @@ public struct ProjectDetailFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.detailLoad, action: \.detailLoad) {
+        Scope(
+            state: \.detailLoad,
+            action: \.detailLoad,
+        ) {
             ProjectDetailLoadFeature(projectDetail: projectDetail)
         }
-        Scope(state: \.deletion, action: \.deletion) {
+        Scope(
+            state: \.deletion,
+            action: \.deletion,
+        ) {
             ProjectDeletionFeature(deleteProject: deleteProject)
         }
         Reduce { state, action in

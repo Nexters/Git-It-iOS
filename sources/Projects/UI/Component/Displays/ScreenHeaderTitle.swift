@@ -15,7 +15,10 @@ public struct ScreenHeaderTitle: View {
 
     public var body: some View {
         if displayModel.title != nil || displayModel.subtitle != nil {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 if let title = displayModel.title {
                     StyledText(text: title)
                         .textStyle(.subtitle1)
@@ -54,9 +57,15 @@ extension ScreenHeaderTitle {
 }
 
 #Preview("Screen Header Title") {
-    VStack(alignment: .leading, spacing: LayoutToken.margin) {
+    VStack(
+        alignment: .leading,
+        spacing: LayoutToken.margin,
+    ) {
         ScreenHeaderTitle(displayModel: .init(title: "제목만 있는 헤더"))
-        ScreenHeaderTitle(displayModel: .init(title: "제목과 보조 설명", subtitle: "보조 설명입니다."))
+        ScreenHeaderTitle(displayModel: .init(
+            title: "제목과 보조 설명",
+            subtitle: "보조 설명입니다.",
+        ))
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

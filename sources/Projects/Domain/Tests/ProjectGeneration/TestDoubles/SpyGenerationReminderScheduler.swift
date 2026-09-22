@@ -27,7 +27,10 @@ actor SpyGenerationReminderScheduler: GenerationReminderScheduler {
         _ reminder: GenerationReminder,
         at date: Date,
     ) async {
-        scheduledReminders.append(ScheduledReminder(reminder: reminder, date: date))
+        scheduledReminders.append(ScheduledReminder(
+            reminder: reminder,
+            date: date,
+        ))
     }
 
     // MARK: Private

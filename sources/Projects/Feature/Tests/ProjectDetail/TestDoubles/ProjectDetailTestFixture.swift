@@ -10,21 +10,44 @@ enum ProjectDetailTestFixture {
     static let repositoryURL = "https://github.com/owner/repo"
 
     static let mixedProgressDetail = detail(sets: [
-        setProgress(index: 0, quizCount: 5, completedCount: 5),
-        setProgress(index: 1, quizCount: 4, completedCount: 2),
-        setProgress(index: 2, quizCount: 3, completedCount: 0),
+        setProgress(
+            index: 0,
+            quizCount: 5,
+            completedCount: 5,
+        ),
+        setProgress(
+            index: 1,
+            quizCount: 4,
+            completedCount: 2,
+        ),
+        setProgress(
+            index: 2,
+            quizCount: 3,
+            completedCount: 0,
+        ),
     ])
 
     static let completedDetail = detail(sets: [
-        setProgress(index: 0, quizCount: 5, completedCount: 5),
-        setProgress(index: 1, quizCount: 4, completedCount: 4),
+        setProgress(
+            index: 0,
+            quizCount: 5,
+            completedCount: 5,
+        ),
+        setProgress(
+            index: 1,
+            quizCount: 4,
+            completedCount: 4,
+        ),
     ])
 
     static let emptyDetail = detail(sets: [])
 
     static let savedQuizList = QuizBookmarkList(
         totalCount: 2,
-        projects: [QuizBookmarkProject(id: projectID, name: "owner/repo")],
+        projects: [QuizBookmarkProject(
+            id: projectID,
+            name: "owner/repo",
+        )],
         bookmarks: [
             QuizBookmark(
                 projectID: projectID,
@@ -49,7 +72,10 @@ enum ProjectDetailTestFixture {
 
     static let otherProjectQuizList = QuizBookmarkList(
         totalCount: 1,
-        projects: [QuizBookmarkProject(id: "project-2", name: "다른 프로젝트")],
+        projects: [QuizBookmarkProject(
+            id: "project-2",
+            name: "다른 프로젝트",
+        )],
         bookmarks: [
             QuizBookmark(
                 projectID: "project-2",
@@ -111,7 +137,10 @@ enum ProjectDetailTestFixture {
     private static func nextQuiz(sets: [ProjectSetProgress]) -> ProjectNextQuiz? {
         let target = sets.first { $0.completedCount < $0.quizCount } ?? sets.first
         guard let target else { return nil }
-        return ProjectNextQuiz(setID: target.setID, quizID: nil)
+        return ProjectNextQuiz(
+            setID: target.setID,
+            quizID: nil,
+        )
     }
 
 }

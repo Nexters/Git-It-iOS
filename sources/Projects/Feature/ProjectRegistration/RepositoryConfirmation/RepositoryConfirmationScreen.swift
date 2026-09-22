@@ -29,7 +29,10 @@ struct RepositoryConfirmationScreen: View {
                 HStack(spacing: Constant.thumbnailSpacing) {
                     Self.ThumbnailView(avatarURL: avatarURL)
 
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: 0,
+                    ) {
                         StyledText(text: store.repository?.ownerName ?? "")
                             .textStyle(.body2)
                             .foregroundColorToken(.white70)
@@ -45,9 +48,15 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: LayoutToken.compactSpacing) {
-                FeedbackActionButton(title: "다음", action: { send(.confirmTapped) })
-                FeedbackActionButton(title: "이 레포지토리가 아니에요", action: { send(.rejectTapped) })
-                    .style(.secondary)
+                FeedbackActionButton(
+                    title: "다음",
+                    action: { send(.confirmTapped) },
+                )
+                FeedbackActionButton(
+                    title: "이 레포지토리가 아니에요",
+                    action: { send(.rejectTapped) },
+                )
+                .style(.secondary)
             }
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)

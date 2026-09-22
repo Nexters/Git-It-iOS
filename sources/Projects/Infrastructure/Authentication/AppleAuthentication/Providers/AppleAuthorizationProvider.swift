@@ -127,9 +127,15 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
                 state: attempt.state,
                 attemptID: attempt.id,
             )
-            resumePendingContinuation(attemptID: attempt.id, with: .success(result))
+            resumePendingContinuation(
+                attemptID: attempt.id,
+                with: .success(result),
+            )
         } catch {
-            resumePendingContinuation(attemptID: attempt.id, with: .failure(error))
+            resumePendingContinuation(
+                attemptID: attempt.id,
+                with: .failure(error),
+            )
         }
     }
 
@@ -140,14 +146,20 @@ extension AppleAuthorizationProvider: ASAuthorizationControllerDelegate {
         guard let attempt = state.withLock({ $0.currentAttempt }) else { return }
         if (error as? ASAuthorizationError)?.code == .canceled {
             try? cancel(attemptID: attempt.id)
-            resumePendingContinuation(attemptID: attempt.id, with: .failure(AppleAuthorizationError.cancelled))
+            resumePendingContinuation(
+                attemptID: attempt.id,
+                with: .failure(AppleAuthorizationError.cancelled),
+            )
         } else {
             state.withLock { protectedState in
                 if protectedState.currentAttempt?.id == attempt.id {
                     protectedState.currentAttempt = nil
                 }
             }
-            resumePendingContinuation(attemptID: attempt.id, with: .failure(AppleAuthorizationError.unavailable))
+            resumePendingContinuation(
+                attemptID: attempt.id,
+                with: .failure(AppleAuthorizationError.unavailable),
+            )
         }
     }
 }

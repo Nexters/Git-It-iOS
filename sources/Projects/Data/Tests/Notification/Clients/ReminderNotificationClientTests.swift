@@ -63,13 +63,21 @@ struct ReminderNotificationClientTests {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
 
         await client.schedule(
-            ReminderNotification(identifier: "reminder-1", title: "생성 완료", body: "학습을 시작하세요"),
+            ReminderNotification(
+                identifier: "reminder-1",
+                title: "생성 완료",
+                body: "학습을 시작하세요",
+            ),
             at: date,
         )
 
         #expect(authorizationClient.scheduledRequests == [
             SpyNotificationAuthorizationClient.ScheduledRequest(
-                request: LocalNotificationRequest(identifier: "reminder-1", title: "생성 완료", body: "학습을 시작하세요"),
+                request: LocalNotificationRequest(
+                    identifier: "reminder-1",
+                    title: "생성 완료",
+                    body: "학습을 시작하세요",
+                ),
                 date: date,
             )
         ])

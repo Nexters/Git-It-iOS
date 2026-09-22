@@ -42,7 +42,10 @@ public struct ProjectRemote: Sendable {
 
     public func registerProject(_ request: RegisterProjectRequestDTO) async throws -> RegisterProjectResponseDTO {
         try await executor.send(
-            LearningProjectRequest(method: .post, path: LearningProjectRequest.basePath),
+            LearningProjectRequest(
+                method: .post,
+                path: LearningProjectRequest.basePath,
+            ),
             body: request,
             expecting: RegisterProjectResponseDTO.self,
         )
@@ -64,14 +67,20 @@ public struct ProjectRemote: Sendable {
 
     public func fetchProjectDetail(projectID: String) async throws -> ProjectDetailResponseDTO {
         try await executor.send(
-            LearningProjectRequest(method: .get, path: "\(LearningProjectRequest.basePath)/\(projectID)"),
+            LearningProjectRequest(
+                method: .get,
+                path: "\(LearningProjectRequest.basePath)/\(projectID)",
+            ),
             expecting: ProjectDetailResponseDTO.self,
         )
     }
 
     public func deleteProject(projectID: String) async throws {
         _ = try await executor.send(
-            LearningProjectRequest(method: .delete, path: "\(LearningProjectRequest.basePath)/\(projectID)"),
+            LearningProjectRequest(
+                method: .delete,
+                path: "\(LearningProjectRequest.basePath)/\(projectID)",
+            ),
             expecting: EmptyResponseData.self,
         )
     }

@@ -19,7 +19,10 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
         }
@@ -34,7 +37,10 @@ struct AppEntryFeatureTests {
 
     @Test
     func `스플래시 애니메이션이 먼저 끝나도 로그인 복구 완료 시점에 라우팅된다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
+        let restoreSession = AccountUseCaseRestorationMock(
+            results: [.signedOut],
+            suspendsRequests: true,
+        )
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -45,7 +51,10 @@ struct AppEntryFeatureTests {
             $0.isSplashAnimationFinished = true
         }
         await restoreSession.resumeOldest()
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.destinationDecided(.onboarding(startingAt: .guide))))
@@ -60,11 +69,17 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .temporarilyUnavailable))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .temporarilyUnavailable,
+        ))) {
             $0.automaticRetryCount = 1
             $0.requestID = 2
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 2, result: .temporarilyUnavailable))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 2,
+            result: .temporarilyUnavailable,
+        ))) {
             $0.authentication = .retryableFailure
         }
 
@@ -80,11 +95,17 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .temporarilyUnavailable))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .temporarilyUnavailable,
+        ))) {
             $0.automaticRetryCount = 1
             $0.requestID = 2
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 2, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 2,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
         }
@@ -110,8 +131,14 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .failure(.unauthorized)))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .failure(.unauthorized),
+        ))) {
             $0.authentication = .retryableFailure
         }
 
@@ -121,7 +148,10 @@ struct AppEntryFeatureTests {
 
     @Test
     func `인증 만료가 아닌 큐레이션 조회 실패는 자동으로 복구를 다시 시도한다`() async {
-        let profile = OnboardingTestFixture.profile(position: .ios, careerLevel: .junior)
+        let profile = OnboardingTestFixture.profile(
+            position: .ios,
+            careerLevel: .junior,
+        )
         let restoreSession = AccountUseCaseRestorationMock(results: [.signedIn(signedInAccount)])
         let fetchMemberProfile = UserInfoUseCaseProfileMock(
             results: [.failure(.temporarilyUnavailable), .success(profile)]
@@ -135,13 +165,25 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .failure(.temporarilyUnavailable),
+        ))) {
             $0.automaticRetryCount = 1
             $0.requestID = 2
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 2, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 2, result: .success(profile.curation)))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 2,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 2,
+            result: .success(profile.curation),
+        ))) {
             $0.pendingDestination = .mainShell
         }
         await store.send(.view(.splashAnimationFinished)) {
@@ -158,14 +200,20 @@ struct AppEntryFeatureTests {
         exhaustedState.authentication = .retryableFailure
         exhaustedState.isSplashAnimationFinished = true
         exhaustedState.automaticRetryCount = 1
-        let store = makeAppEntryStore(restoreSession: restoreSession, state: exhaustedState)
+        let store = makeAppEntryStore(
+            restoreSession: restoreSession,
+            state: exhaustedState,
+        )
 
         await store.send(.view(.retryTapped)) {
             $0.authentication = .restoring
             $0.automaticRetryCount = 0
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.destinationDecided(.onboarding(startingAt: .guide))))
@@ -173,7 +221,10 @@ struct AppEntryFeatureTests {
 
     @Test
     func `복구 중 재시도 탭은 무시되고 restoreSignIn을 추가로 호출하지 않는다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
+        let restoreSession = AccountUseCaseRestorationMock(
+            results: [.signedOut],
+            suspendsRequests: true,
+        )
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -182,7 +233,10 @@ struct AppEntryFeatureTests {
         }
         await store.send(.view(.retryTapped))
         await restoreSession.resumeOldest()
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
         }
@@ -210,9 +264,18 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .failure(.memberUnavailable))))
-        await store.receive(.effect(.localCleanupFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .failure(.memberUnavailable),
+        )))
+        await store.receive(.effect(.localCleanupFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
         }
@@ -240,15 +303,33 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .failure(.memberUnavailable))))
-        await store.receive(.effect(.localCleanupFinished(requestID: 1, result: .retryableFailure))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .failure(.memberUnavailable),
+        )))
+        await store.receive(.effect(.localCleanupFinished(
+            requestID: 1,
+            result: .retryableFailure,
+        ))) {
             $0.automaticRetryCount = 1
             $0.requestID = 2
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 2, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 2, result: .failure(.memberUnavailable))))
-        await store.receive(.effect(.localCleanupFinished(requestID: 2, result: .retryableFailure))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 2,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 2,
+            result: .failure(.memberUnavailable),
+        )))
+        await store.receive(.effect(.localCleanupFinished(
+            requestID: 2,
+            result: .retryableFailure,
+        ))) {
             $0.authentication = .retryableFailure
         }
 
@@ -259,7 +340,10 @@ struct AppEntryFeatureTests {
     func `큐레이션이 없는 사용자 정보는 큐레이션부터 시작하도록 위임한다`() async {
         let restoreSession = AccountUseCaseRestorationMock(results: [.signedIn(signedInAccount)])
         let fetchMemberProfile = UserInfoUseCaseProfileMock(
-            results: [.success(OnboardingTestFixture.profile(position: .ios, careerLevel: nil))]
+            results: [.success(OnboardingTestFixture.profile(
+                position: .ios,
+                careerLevel: nil,
+            ))]
         )
         let store = makeAppEntryStore(
             restoreSession: restoreSession,
@@ -270,8 +354,14 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .success(nil)))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .success(nil),
+        ))) {
             $0.pendingDestination = .onboarding(startingAt: .curation)
         }
         await store.send(.view(.splashAnimationFinished)) {
@@ -284,7 +374,10 @@ struct AppEntryFeatureTests {
     @Test
     func `큐레이션이 있는 사용자 정보는 MainShell로 시작하도록 위임한다`() async {
         let restoreSession = AccountUseCaseRestorationMock(results: [.signedIn(signedInAccount)])
-        let profile = OnboardingTestFixture.profile(position: .ios, careerLevel: .junior)
+        let profile = OnboardingTestFixture.profile(
+            position: .ios,
+            careerLevel: .junior,
+        )
         let fetchMemberProfile = UserInfoUseCaseProfileMock(results: [.success(profile)])
         let store = makeAppEntryStore(
             restoreSession: restoreSession,
@@ -295,8 +388,14 @@ struct AppEntryFeatureTests {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedIn(signedInAccount))))
-        await store.receive(.effect(.curationFetchFinished(requestID: 1, result: .success(profile.curation)))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedIn(signedInAccount),
+        )))
+        await store.receive(.effect(.curationFetchFinished(
+            requestID: 1,
+            result: .success(profile.curation),
+        ))) {
             $0.pendingDestination = .mainShell
         }
         await store.send(.view(.splashAnimationFinished)) {
@@ -308,16 +407,25 @@ struct AppEntryFeatureTests {
 
     @Test
     func `현재 requestID와 다른 복구 응답은 상태를 바꾸지 않는다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
+        let restoreSession = AccountUseCaseRestorationMock(
+            results: [.signedOut],
+            suspendsRequests: true,
+        )
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
             $0.authentication = .restoring
             $0.requestID = 1
         }
-        await store.send(.effect(.restoreSignInFinished(requestID: 999, result: .signedOut)))
+        await store.send(.effect(.restoreSignInFinished(
+            requestID: 999,
+            result: .signedOut,
+        )))
         await restoreSession.resumeOldest()
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
             $0.pendingDestination = .onboarding(startingAt: .guide)
         }
@@ -330,7 +438,10 @@ struct AppEntryFeatureTests {
 
     @Test
     func `애니메이션 완료 신호가 중복으로 와도 라우팅은 한 번만 일어난다`() async {
-        let restoreSession = AccountUseCaseRestorationMock(results: [.signedOut], suspendsRequests: true)
+        let restoreSession = AccountUseCaseRestorationMock(
+            results: [.signedOut],
+            suspendsRequests: true,
+        )
         let store = makeAppEntryStore(restoreSession: restoreSession)
 
         await store.send(.view(.task)) {
@@ -341,7 +452,10 @@ struct AppEntryFeatureTests {
             $0.isSplashAnimationFinished = true
         }
         await restoreSession.resumeOldest()
-        await store.receive(.effect(.restoreSignInFinished(requestID: 1, result: .signedOut))) {
+        await store.receive(.effect(.restoreSignInFinished(
+            requestID: 1,
+            result: .signedOut,
+        ))) {
             $0.authentication = .idle
         }
         await store.receive(.delegate(.destinationDecided(.onboarding(startingAt: .guide))))

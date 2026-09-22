@@ -107,7 +107,10 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         var pendingPayload: [String: String]?
     }
 
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "FirebaseMessagingAppDelegate")
+    private static let logger = Logger(
+        subsystem: "com.nexters.hytime.gitit",
+        category: "FirebaseMessagingAppDelegate",
+    )
 
     private let state = Mutex(State())
 

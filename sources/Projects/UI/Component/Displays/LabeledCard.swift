@@ -35,7 +35,10 @@ public struct LabeledCard: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+        VStack(
+            alignment: .leading,
+            spacing: Constant.titleSpacing,
+        ) {
             StyledText(text: displayModel.label)
                 .textStyle(.caption1)
                 .foregroundColorToken(.blue100)
@@ -44,7 +47,10 @@ public struct LabeledCard: View {
                 .foregroundColorToken(style.textColor)
         }
         .padding(Constant.padding)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            alignment: .leading,
+        )
         .designSystemBackground(style.background)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
@@ -91,10 +97,19 @@ extension LabeledCard: StyleConfigurable {
 
 #Preview("Labeled Card") {
     VStack(spacing: LayoutToken.gutter) {
-        LabeledCard(displayModel: .init(label: "AI 해설", text: "State는 값 타입 소유에 씁니다."))
-            .style(.accent)
-        LabeledCard(displayModel: .init(label: "나의 답안", text: "State는 값 타입을 소유할 때 사용합니다."))
-        LabeledCard(displayModel: .init(label: "AI의 답안", text: "State는 값 타입 소유에 씁니다."))
+        LabeledCard(displayModel: .init(
+            label: "AI 해설",
+            text: "State는 값 타입 소유에 씁니다.",
+        ))
+        .style(.accent)
+        LabeledCard(displayModel: .init(
+            label: "나의 답안",
+            text: "State는 값 타입을 소유할 때 사용합니다.",
+        ))
+        LabeledCard(displayModel: .init(
+            label: "AI의 답안",
+            text: "State는 값 타입 소유에 씁니다.",
+        ))
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

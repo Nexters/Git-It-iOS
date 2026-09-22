@@ -14,7 +14,10 @@ public struct LabeledProgressBar: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Constant.labelSpacing) {
+        VStack(
+            alignment: .leading,
+            spacing: Constant.labelSpacing,
+        ) {
             HStack {
                 StyledText(text: displayModel.label)
                     .textStyle(.caption1)
@@ -73,9 +76,13 @@ extension LabeledProgressBar: ForegroundColorConfigurable {
 }
 
 #Preview("Labeled Progress Bar") {
-    LabeledProgressBar(displayModel: .init(label: "학습 진행률", progress: 0.6, valueText: "6 / 10"))
-        .frame(width: 320)
-        .designSystemScreenMargin()
-        .padding(.vertical, LayoutToken.margin)
-        .designSystemBackground(.grey700)
+    LabeledProgressBar(displayModel: .init(
+        label: "학습 진행률",
+        progress: 0.6,
+        valueText: "6 / 10",
+    ))
+    .frame(width: 320)
+    .designSystemScreenMargin()
+    .padding(.vertical, LayoutToken.margin)
+    .designSystemBackground(.grey700)
 }

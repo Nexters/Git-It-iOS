@@ -15,7 +15,10 @@ struct AppRootFeatureGuestAccessTests {
         let appSetting = AppSettingUseCaseMock()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .onboarding
-        let store = makeAppRootStore(appSetting: appSetting, state: state)
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: state,
+        )
 
         await store.send(.onboarding(.delegate(.guestAccessRequested))) {
             $0.mainShell = MainShellRouterFeature.State(access: .guest)
@@ -33,7 +36,12 @@ struct AppRootFeatureGuestAccessTests {
         let project = ProjectUseCaseMock()
         var state = guestMainShellState()
         state.deviceRegistration = .failed
-        let store = makeAppRootStore(account: account, appSetting: appSetting, project: project, state: state)
+        let store = makeAppRootStore(
+            account: account,
+            appSetting: appSetting,
+            project: project,
+            state: state,
+        )
 
         await store.send(.view(.applicationBecameActive))
 
@@ -56,7 +64,10 @@ struct AppRootFeatureGuestAccessTests {
     @Test
     func `비로그인에서 기기 토큰 갱신을 무시한다`() async {
         let appSetting = AppSettingUseCaseMock()
-        let store = makeAppRootStore(appSetting: appSetting, state: guestMainShellState())
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: guestMainShellState(),
+        )
 
         await store.send(.effect(.deviceTokenRefreshed("device-token")))
 
@@ -69,7 +80,10 @@ struct AppRootFeatureGuestAccessTests {
         let appSetting = AppSettingUseCaseMock()
         var state = guestMainShellState()
         state.mainShell.selectedTab = .settings
-        let store = makeAppRootStore(appSetting: appSetting, state: state)
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.mainShell(.delegate(.signInSucceeded(needsCuration: false)))) {
@@ -92,7 +106,10 @@ struct AppRootFeatureGuestAccessTests {
         let appSetting = AppSettingUseCaseMock()
         var state = guestMainShellState()
         state.mainShell.selectedTab = .settings
-        let store = makeAppRootStore(appSetting: appSetting, state: state)
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: state,
+        )
 
         await store.send(.mainShell(.delegate(.signInSucceeded(needsCuration: true)))) {
             $0.onboarding = OnboardingRouterFeature.State(
@@ -137,7 +154,10 @@ struct AppRootFeatureGuestAccessTests {
             bundleVersion: "1.0.0",
             curationExit: .returnToCaller,
         )
-        let store = makeAppRootStore(appSetting: appSetting, state: state)
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.onboarding(.delegate(.mainShellRequested))) {
@@ -162,7 +182,10 @@ struct AppRootFeatureGuestAccessTests {
 
         await store.send(.mainShell(.delegate(.loggedOut))) {
             $0.route = .onboarding
-            $0.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0")
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
         }
 
         #expect(store.state.onboarding.activeScreen == .guide(.tutorial))

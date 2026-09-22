@@ -15,7 +15,10 @@ final class ShareViewController: UIViewController {
         nibName nibNameOrNil: String?,
         bundle nibBundleOrNil: Bundle?,
     ) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        super.init(
+            nibName: nibNameOrNil,
+            bundle: nibBundleOrNil,
+        )
         modalPresentationStyle = .fullScreen
     }
 

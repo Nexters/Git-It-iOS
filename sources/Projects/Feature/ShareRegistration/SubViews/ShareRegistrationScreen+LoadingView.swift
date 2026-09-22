@@ -15,7 +15,10 @@ extension ShareRegistrationScreen {
                 Spacer(minLength: 0)
 
                 ResourceAnimation(asset: .generalLoading)
-                    .frame(width: Constant.indicatorSize, height: Constant.indicatorSize)
+                    .frame(
+                        width: Constant.indicatorSize,
+                        height: Constant.indicatorSize,
+                    )
 
                 StyledText(text: message)
                     .textStyle(.body2)

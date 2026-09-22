@@ -64,7 +64,10 @@ struct GitHubRepositoryResponseDTOTests {
     // MARK: Private
 
     private func decode(_ fixture: String) throws -> GitHubRepositoryResponseDTO {
-        try JSONDecoder().decode(GitHubRepositoryResponseDTO.self, from: Data(fixture.utf8))
+        try JSONDecoder().decode(
+            GitHubRepositoryResponseDTO.self,
+            from: Data(fixture.utf8),
+        )
     }
 
 }

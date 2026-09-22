@@ -38,7 +38,10 @@ struct LearningSetIntroScreen: View {
             )
             .designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: Constant.textSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.textSpacing,
+            ) {
                 StyledText(text: store.label)
                     .textStyle(.subtitle3)
                     .foregroundColorToken(.blue100)
@@ -50,7 +53,11 @@ struct LearningSetIntroScreen: View {
                     .padding(.top, Constant.descriptionTopPadding)
             }
             .designSystemScreenMargin()
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: .leading,
+            )
         } background: {
             screenBackground
         } footer: {

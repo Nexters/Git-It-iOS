@@ -10,10 +10,16 @@ struct TutorialAccessibilityTests {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
 
         state.page = 1
-        #expect(state.pageProgress == .init(currentPage: 0, totalPages: 3))
+        #expect(state.pageProgress == .init(
+            currentPage: 0,
+            totalPages: 3,
+        ))
 
         state.page = 3
-        #expect(state.pageProgress == .init(currentPage: 2, totalPages: 3))
+        #expect(state.pageProgress == .init(
+            currentPage: 2,
+            totalPages: 3,
+        ))
     }
 
     @Test

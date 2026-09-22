@@ -50,7 +50,10 @@ public struct TutorialFeature: Sendable {
         public let bundleVersion: String
 
         public var pageProgress: PageProgress {
-            PageProgress(currentPage: page - 1, totalPages: Constant.pageCount)
+            PageProgress(
+                currentPage: page - 1,
+                totalPages: Constant.pageCount,
+            )
         }
 
         public var isSigningIn: Bool {
@@ -98,8 +101,15 @@ public struct TutorialFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.signIn, action: \.signIn) {
-            SignInFeature(signIn: signIn, policyConsentStatus: policyConsentStatus, consent: consent)
+        Scope(
+            state: \.signIn,
+            action: \.signIn,
+        ) {
+            SignInFeature(
+                signIn: signIn,
+                policyConsentStatus: policyConsentStatus,
+                consent: consent,
+            )
         }
         Reduce { state, action in
             switch action {
@@ -138,7 +148,10 @@ public struct TutorialFeature: Sendable {
                     try? await withdraw()
                     await send(.effect(.accountResetFinished))
                 }
-                .cancellable(id: CancelID.accountReset, cancelInFlight: true)
+                .cancellable(
+                    id: CancelID.accountReset,
+                    cancelInFlight: true,
+                )
 
             case .effect(.accountResetFinished):
                 state.accountReset = .idle

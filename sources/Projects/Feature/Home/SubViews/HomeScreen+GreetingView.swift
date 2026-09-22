@@ -4,7 +4,10 @@ import UIComponent
 extension HomeScreen {
     struct GreetingView: View {
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 StyledText(text: "Hello World")
                     .textStyle(.headline1)
                     .foregroundColorToken(.grey400)

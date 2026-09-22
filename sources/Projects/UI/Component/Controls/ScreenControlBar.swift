@@ -20,7 +20,10 @@ public struct ScreenControlBar: View {
     // MARK: Public
 
     public var body: some View {
-        HStack(alignment: .top, spacing: LayoutToken.gutter) {
+        HStack(
+            alignment: .top,
+            spacing: LayoutToken.gutter,
+        ) {
             if let leading = displayModel.leading {
                 IconGlassButton(
                     icon: leading.icon,
@@ -41,7 +44,10 @@ public struct ScreenControlBar: View {
                 .size(.medium)
             }
         }
-        .frame(height: Constant.controlRowHeight, alignment: .top)
+        .frame(
+            height: Constant.controlRowHeight,
+            alignment: .top,
+        )
         .padding(.bottom, Constant.bottomPadding)
     }
 
@@ -116,8 +122,17 @@ extension ScreenControlBar {
 #Preview("Screen Control Bar") {
     VStack(spacing: LayoutToken.margin) {
         ScreenControlBar()
-        ScreenControlBar(displayModel: .init(trailing: .init(icon: .menu, label: "더 보기")))
-        ScreenControlBar(displayModel: .init(leading: .close, trailing: .init(icon: .setting, label: "설정 열기")))
+        ScreenControlBar(displayModel: .init(trailing: .init(
+            icon: .menu,
+            label: "더 보기",
+        )))
+        ScreenControlBar(displayModel: .init(
+            leading: .close,
+            trailing: .init(
+                icon: .setting,
+                label: "설정 열기",
+            ),
+        ))
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

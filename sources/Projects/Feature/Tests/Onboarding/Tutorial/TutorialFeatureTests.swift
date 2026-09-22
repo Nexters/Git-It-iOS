@@ -29,7 +29,10 @@ struct TutorialFeatureTests {
     @Test
     func `Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
-        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
+        let store = makeTutorialStore(
+            signIn: signIn,
+            state: consentCheckedState(),
+        )
 
         await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
@@ -38,7 +41,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        )))) {
             $0.signIn.phase = .idle
         }
         await store.receive(.signIn(.delegate(.signedIn(needsCuration: false))))
@@ -49,8 +55,14 @@ struct TutorialFeatureTests {
 
     @Test
     func `로그인 진행 중 중복 탭은 추가 로그인 호출을 만들지 않는다`() async {
-        let signIn = AccountUseCaseSignInMock(results: [.retryableFailure], suspendsRequests: true)
-        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
+        let signIn = AccountUseCaseSignInMock(
+            results: [.retryableFailure],
+            suspendsRequests: true,
+        )
+        let store = makeTutorialStore(
+            signIn: signIn,
+            state: consentCheckedState(),
+        )
 
         await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
@@ -61,7 +73,10 @@ struct TutorialFeatureTests {
         }
         await store.send(.view(.appleSignInTapped))
         await signIn.resumeOldest()
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .retryableFailure)))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .retryableFailure,
+        )))) {
             $0.signIn.phase = .failed
         }
 
@@ -72,7 +87,10 @@ struct TutorialFeatureTests {
     @Test
     func `Apple 인증 취소는 재시도 오류와 구분되는 cancelled 상태로 남는다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.cancelled])
-        let store = makeTutorialStore(signIn: signIn, state: consentCheckedState())
+        let store = makeTutorialStore(
+            signIn: signIn,
+            state: consentCheckedState(),
+        )
 
         await store.send(.view(.appleSignInTapped)) {
             $0.page = 3
@@ -81,7 +99,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .cancelled)))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .cancelled,
+        )))) {
             $0.signIn.phase = .cancelled
         }
         await store.receive(.signIn(.delegate(.signInCancelled)))
@@ -129,7 +150,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        )))) {
             $0.signIn.phase = .idle
         }
         await store.receive(.signIn(.delegate(.signedIn(needsCuration: false)))) {
@@ -143,7 +167,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 2
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 2, result: .signedIn(uncuratedAccount))))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 2,
+            result: .signedIn(uncuratedAccount),
+        )))) {
             $0.signIn.phase = .idle
         }
         await store.receive(.signIn(.delegate(.signedIn(needsCuration: true))))
@@ -171,7 +198,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        )))) {
             $0.signIn.phase = .idle
         }
         await store.receive(.signIn(.delegate(.signedIn(needsCuration: false)))) {
@@ -185,7 +215,10 @@ struct TutorialFeatureTests {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 2
         }
-        await store.receive(.signIn(.effect(.signInFinished(requestID: 2, result: .signedIn(curatedAccount))))) {
+        await store.receive(.signIn(.effect(.signInFinished(
+            requestID: 2,
+            result: .signedIn(curatedAccount),
+        )))) {
             $0.signIn.phase = .idle
         }
         await store.receive(.signIn(.delegate(.signedIn(needsCuration: false))))

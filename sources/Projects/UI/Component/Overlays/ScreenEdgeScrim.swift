@@ -55,9 +55,15 @@ public struct ScreenEdgeScrim: View {
 
 #Preview("Screen Edge Scrim") {
     VStack(spacing: LayoutToken.margin) {
-        ScreenEdgeScrim(edge: .top, height: 70)
+        ScreenEdgeScrim(
+            edge: .top,
+            height: 70,
+        )
 
-        ScreenEdgeScrim(edge: .bottom, height: 92)
+        ScreenEdgeScrim(
+            edge: .bottom,
+            height: 92,
+        )
     }
     .frame(width: 360)
     .designSystemBackground(.grey700)

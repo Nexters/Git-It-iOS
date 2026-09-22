@@ -30,7 +30,10 @@ struct SignInFeatureTests {
 
     @Test
     func `이미 적재된 동의 상태는 prepareConsent로 다시 적재하지 않는다`() async {
-        let store = makeStore(account: MainShellAccountUseCaseStub(), state: consentCheckedState())
+        let store = makeStore(
+            account: MainShellAccountUseCaseStub(),
+            state: consentCheckedState(),
+        )
 
         await store.send(.input(.prepareConsent))
     }
@@ -56,7 +59,10 @@ struct SignInFeatureTests {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        ))) {
             $0.phase = .idle
         }
         await store.receive(.delegate(.signedIn(needsCuration: false)))
@@ -95,7 +101,10 @@ struct SignInFeatureTests {
         var state = SignInFeature.State()
         state.phase = .agreeingToPolicies
         state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        let store = makeStore(account: account, state: state)
+        let store = makeStore(
+            account: account,
+            state: state,
+        )
         let documentIDs = Set(OnboardingTestFixture.requiredDocuments.map(\.id))
 
         await store.send(.legalAgreement(.view(.allDocumentsToggled))) {
@@ -108,7 +117,10 @@ struct SignInFeatureTests {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        ))) {
             $0.phase = .idle
         }
         await store.receive(.delegate(.signedIn(needsCuration: false)))
@@ -122,7 +134,10 @@ struct SignInFeatureTests {
         var state = SignInFeature.State()
         state.phase = .agreeingToPolicies
         state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        let store = makeStore(account: account, state: state)
+        let store = makeStore(
+            account: account,
+            state: state,
+        )
 
         await store.send(.view(.legalAgreementDismissed))
         await store.receive(.legalAgreement(.view(.cancelTapped)))
@@ -140,7 +155,10 @@ struct SignInFeatureTests {
         state.phase = .agreeingToPolicies
         state.legalAgreement.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.legalAgreement.presentedDocumentID = OnboardingTestFixture.privacyPolicy.id
-        let store = makeStore(account: MainShellAccountUseCaseStub(), state: state)
+        let store = makeStore(
+            account: MainShellAccountUseCaseStub(),
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.legalDocumentSheetDismissed))
@@ -153,13 +171,19 @@ struct SignInFeatureTests {
     @Test
     func `로그인 성공은 직군 입력 필요 여부를 signedIn으로 위임한다`() async {
         let account = MainShellAccountUseCaseStub(signInResults: [.signedIn(uncuratedAccount)])
-        let store = makeStore(account: account, state: consentCheckedState())
+        let store = makeStore(
+            account: account,
+            state: consentCheckedState(),
+        )
 
         await store.send(.input(.start)) {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(uncuratedAccount)))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(uncuratedAccount),
+        ))) {
             $0.phase = .idle
         }
         await store.receive(.delegate(.signedIn(needsCuration: true)))
@@ -168,13 +192,19 @@ struct SignInFeatureTests {
     @Test
     func `로그인 취소는 실패 없이 취소 상태가 되고 signInCancelled를 보낸다`() async {
         let account = MainShellAccountUseCaseStub(signInResults: [.cancelled])
-        let store = makeStore(account: account, state: consentCheckedState())
+        let store = makeStore(
+            account: account,
+            state: consentCheckedState(),
+        )
 
         await store.send(.input(.start)) {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .cancelled))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .cancelled,
+        ))) {
             $0.phase = .cancelled
         }
         await store.receive(.delegate(.signInCancelled))
@@ -186,13 +216,19 @@ struct SignInFeatureTests {
     @Test
     func `재시도 가능한 실패는 실패 상태가 되고 닫으면 대기 상태로 돌아간다`() async {
         let account = MainShellAccountUseCaseStub(signInResults: [.retryableFailure])
-        let store = makeStore(account: account, state: consentCheckedState())
+        let store = makeStore(
+            account: account,
+            state: consentCheckedState(),
+        )
 
         await store.send(.input(.start)) {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .retryableFailure))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .retryableFailure,
+        ))) {
             $0.phase = .failed
         }
 
@@ -208,13 +244,19 @@ struct SignInFeatureTests {
         let account = MainShellAccountUseCaseStub(signInResults: [.signedIn(curatedAccount)])
         var state = consentCheckedState()
         state.phase = phase
-        let store = makeStore(account: account, state: state)
+        let store = makeStore(
+            account: account,
+            state: state,
+        )
 
         await store.send(.input(.start)) {
             $0.phase = .signingIn
             $0.requestID = 1
         }
-        await store.receive(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount)))) {
+        await store.receive(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        ))) {
             $0.phase = .idle
         }
         await store.receive(.delegate(.signedIn(needsCuration: false)))
@@ -226,7 +268,10 @@ struct SignInFeatureTests {
         var state = consentCheckedState()
         state.phase = phase
         state.requestID = 1
-        let store = makeStore(account: account, state: state)
+        let store = makeStore(
+            account: account,
+            state: state,
+        )
 
         await store.send(.input(.start))
 
@@ -238,17 +283,29 @@ struct SignInFeatureTests {
         var state = consentCheckedState()
         state.phase = .signingIn
         state.requestID = 2
-        let store = makeStore(account: MainShellAccountUseCaseStub(), state: state)
+        let store = makeStore(
+            account: MainShellAccountUseCaseStub(),
+            state: state,
+        )
 
-        await store.send(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))
+        await store.send(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        )))
 
         #expect(store.state.phase == .signingIn)
 
         var idleState = consentCheckedState()
         idleState.requestID = 1
-        let idleStore = makeStore(account: MainShellAccountUseCaseStub(), state: idleState)
+        let idleStore = makeStore(
+            account: MainShellAccountUseCaseStub(),
+            state: idleState,
+        )
 
-        await idleStore.send(.effect(.signInFinished(requestID: 1, result: .signedIn(curatedAccount))))
+        await idleStore.send(.effect(.signInFinished(
+            requestID: 1,
+            result: .signedIn(curatedAccount),
+        )))
 
         #expect(idleStore.state.phase == .idle)
     }

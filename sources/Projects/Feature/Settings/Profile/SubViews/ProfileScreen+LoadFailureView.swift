@@ -10,7 +10,10 @@ extension ProfileScreen {
 
         var body: some View {
             HStack {
-                VStack(alignment: .leading, spacing: Constant.messageSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.messageSpacing,
+                ) {
                     StyledText(text: Constant.title)
                         .textStyle(.subtitle3)
                     StyledText(text: Constant.message)
@@ -18,10 +21,16 @@ extension ProfileScreen {
                         .foregroundColorToken(.grey400)
                 }
                 Spacer()
-                FeedbackActionButton(title: Constant.retryTitle, action: onRetry)
-                    .style(.secondary)
-                    .size(.small)
-                    .fixedSize(horizontal: true, vertical: false)
+                FeedbackActionButton(
+                    title: Constant.retryTitle,
+                    action: onRetry,
+                )
+                .style(.secondary)
+                .size(.small)
+                .fixedSize(
+                    horizontal: true,
+                    vertical: false,
+                )
             }
             .frame(minHeight: Constant.minHeight)
         }

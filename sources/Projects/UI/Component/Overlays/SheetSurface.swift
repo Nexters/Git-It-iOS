@@ -21,7 +21,10 @@ public struct SheetSurface<Content: View, Footer: View>: View {
         VStack(spacing: 0) {
             Capsule()
                 .fill(Color(designSystem: ColorToken.grey500))
-                .frame(width: Constant.grabberWidth, height: Constant.grabberHeight)
+                .frame(
+                    width: Constant.grabberWidth,
+                    height: Constant.grabberHeight,
+                )
                 .padding(.top, Constant.grabberTopPadding)
                 .padding(.bottom, Constant.grabberBottomPadding)
 
@@ -38,7 +41,11 @@ public struct SheetSurface<Content: View, Footer: View>: View {
                         )
                 }
                 .frame(maxHeight: contentHeight)
-                .contentMargins(.all, 0, for: .scrollContent)
+                .contentMargins(
+                    .all,
+                    0,
+                    for: .scrollContent,
+                )
                 .scrollBounceBehavior(.basedOnSize)
                 .onPreferenceChange(ContentHeightPreferenceKey.self) { contentHeight = $0 }
             } else {
@@ -125,7 +132,10 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
             }
         }
     }
-    .frame(width: 390, height: 320)
+    .frame(
+        width: 390,
+        height: 320,
+    )
     .designSystemBackground(.grey700)
 }
 
@@ -135,7 +145,10 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
 
         SheetSurface {
             VStack(spacing: LayoutToken.margin) {
-                ForEach(0..<8, id: \.self) { index in
+                ForEach(
+                    0..<8,
+                    id: \.self,
+                ) { index in
                     StyledText(text: "정책 문서 \(index + 1)")
                 }
             }
@@ -144,6 +157,9 @@ private struct ContentHeightPreferenceKey: PreferenceKey {
         }
         .scrollable(true)
     }
-    .frame(width: 390, height: 320)
+    .frame(
+        width: 390,
+        height: 320,
+    )
     .designSystemBackground(.grey700)
 }

@@ -41,7 +41,10 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
         if let error {
             throw error
         }
-        return ProjectGenerationReceipt(projectID: projectID, quizLevel: request.quizLevel)
+        return ProjectGenerationReceipt(
+            projectID: projectID,
+            quizLevel: request.quizLevel,
+        )
     }
 
     func states() async -> AsyncStream<ProjectGenerationState> {

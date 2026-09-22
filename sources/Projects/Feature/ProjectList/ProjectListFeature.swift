@@ -89,13 +89,25 @@ public struct ProjectListFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.projectSummaries, action: \.projectSummaries) {
-            ProjectSummaryListFeature(projects: projects, refreshProjects: refreshProjects)
+        Scope(
+            state: \.projectSummaries,
+            action: \.projectSummaries,
+        ) {
+            ProjectSummaryListFeature(
+                projects: projects,
+                refreshProjects: refreshProjects,
+            )
         }
-        Scope(state: \.deletion, action: \.deletion) {
+        Scope(
+            state: \.deletion,
+            action: \.deletion,
+        ) {
             ProjectDeletionFeature(deleteProject: deleteProject)
         }
-        Scope(state: \.pagination, action: \.pagination) {
+        Scope(
+            state: \.pagination,
+            action: \.pagination,
+        ) {
             ProjectListPaginationFeature(requestNextPage: requestNextPage)
         }
         Reduce { state, action in
@@ -134,7 +146,10 @@ public struct ProjectListFeature: Sendable {
                     let next = summary.next,
                     next.quizID != nil
                 else { return .none }
-                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: next.setID)))
+                return .send(.delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: next.setID,
+                )))
 
             case .view(.menuTapped):
                 guard state.mode == .browsing else { return .none }

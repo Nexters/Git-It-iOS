@@ -11,7 +11,10 @@ extension ProjectDetailScreen {
         let onStart: (String) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.titleSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.titleSpacing,
+            ) {
                 StyledText(text: "학습 세트")
                     .textStyle(.subtitle2)
 
@@ -40,7 +43,10 @@ extension ProjectDetailScreen {
                 }
                 .padding(.vertical, Constant.emptyStateVerticalPadding)
             } else {
-                VStack(alignment: .leading, spacing: Constant.cardSpacing) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.cardSpacing,
+                ) {
                     ForEach(sets) { set in
                         LearningSetRow(
                             displayModel: .init(

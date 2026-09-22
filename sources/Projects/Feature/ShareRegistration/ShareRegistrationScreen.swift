@@ -40,16 +40,28 @@ public struct ShareRegistrationScreen: View {
             stepContent
 
         case .invalidURL(let reason):
-            guidance(title: Constant.invalidURLTitle, message: reason)
+            guidance(
+                title: Constant.invalidURLTitle,
+                message: reason,
+            )
 
         case .signInRequired:
-            guidance(title: Constant.signInTitle, message: Constant.signInGuidance)
+            guidance(
+                title: Constant.signInTitle,
+                message: Constant.signInGuidance,
+            )
 
         case .appLaunchRequired:
-            guidance(title: Constant.appLaunchTitle, message: Constant.appLaunchGuidance)
+            guidance(
+                title: Constant.appLaunchTitle,
+                message: Constant.appLaunchGuidance,
+            )
 
         case .succeeded:
-            guidance(title: Constant.successTitle, message: Constant.successGuidance)
+            guidance(
+                title: Constant.successTitle,
+                message: Constant.successGuidance,
+            )
 
         case .failed(let reason, _):
             Self.GuidanceView(
@@ -68,17 +80,26 @@ public struct ShareRegistrationScreen: View {
         switch store.step {
         case .repositoryConfirmation:
             RepositoryConfirmationScreen(
-                store: store.scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation)
+                store: store.scope(
+                    state: \.repositoryConfirmation,
+                    action: \.repositoryConfirmation,
+                )
             )
 
         case .quizLevelSelection:
             QuizLevelSelectionScreen(
-                store: store.scope(state: \.quizLevelSelection, action: \.quizLevelSelection)
+                store: store.scope(
+                    state: \.quizLevelSelection,
+                    action: \.quizLevelSelection,
+                )
             )
 
         case .quizGenerationConfirmation:
             QuizGenerationConfirmationScreen(
-                store: store.scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation)
+                store: store.scope(
+                    state: \.quizGenerationConfirmation,
+                    action: \.quizGenerationConfirmation,
+                )
             )
         }
     }

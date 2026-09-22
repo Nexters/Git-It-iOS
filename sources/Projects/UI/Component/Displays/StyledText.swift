@@ -16,10 +16,16 @@ public struct StyledText: View, Sendable, Equatable {
     public let text: String
 
     public var body: some View {
-        Text.designSystemStyled(text, style: textStyle)
-            .designSystemLineSpacing(textStyle)
-            .designSystemForeground(foregroundColor)
-            .fixedSize(horizontal: false, vertical: true)
+        Text.designSystemStyled(
+            text,
+            style: textStyle,
+        )
+        .designSystemLineSpacing(textStyle)
+        .designSystemForeground(foregroundColor)
+        .fixedSize(
+            horizontal: false,
+            vertical: true,
+        )
     }
 
     // MARK: Private
@@ -50,7 +56,10 @@ extension StyledText: ForegroundColorConfigurable {
 }
 
 #Preview("Styled Text") {
-    VStack(alignment: .leading, spacing: LayoutToken.gutter) {
+    VStack(
+        alignment: .leading,
+        spacing: LayoutToken.gutter,
+    ) {
         StyledText(text: "Headline 1")
             .textStyle(.headline1)
         StyledText(text: "Headline 2")
@@ -74,7 +83,10 @@ extension StyledText: ForegroundColorConfigurable {
             .textStyle(.caption2)
             .foregroundColorToken(.grey400)
     }
-    .frame(width: 320, alignment: .leading)
+    .frame(
+        width: 320,
+        alignment: .leading,
+    )
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)

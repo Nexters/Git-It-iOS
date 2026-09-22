@@ -26,7 +26,12 @@ struct LearningProjectServiceErrorTests {
         (409, "QUIZ-007", LearningProjectServiceError.unexpectedStatus),
     ])
     func `대표 서버 오류 코드를 매핑한다`(httpStatus: Int, code: String, expected: LearningProjectServiceError) {
-        let serverError = ServerAPIError(httpStatus: httpStatus, code: code, message: nil, fieldErrors: nil)
+        let serverError = ServerAPIError(
+            httpStatus: httpStatus,
+            code: code,
+            message: nil,
+            fieldErrors: nil,
+        )
 
         #expect(LearningProjectServiceError(from: serverError) == expected)
     }

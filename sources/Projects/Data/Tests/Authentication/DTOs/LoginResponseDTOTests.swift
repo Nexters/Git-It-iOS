@@ -12,7 +12,10 @@ struct LoginResponseDTOTests {
             {"accessToken":"access-secret","refreshToken":"refresh-secret","needsCuration":true}
             """#.utf8)
 
-        let response = try JSONDecoder().decode(LoginResponseDTO.self, from: json)
+        let response = try JSONDecoder().decode(
+            LoginResponseDTO.self,
+            from: json,
+        )
 
         #expect(response.accessToken == "access-secret")
         #expect(response.refreshToken == "refresh-secret")

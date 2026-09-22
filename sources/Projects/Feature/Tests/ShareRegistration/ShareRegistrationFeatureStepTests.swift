@@ -94,7 +94,10 @@ struct ShareRegistrationFeatureStepTests {
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.delegate(.submitRequested)))
-        await store.receive(.registration(.input(.submit(repository: ShareRegistrationTestSupport.repository, quizLevel: .l3))))
+        await store.receive(.registration(.input(.submit(
+            repository: ShareRegistrationTestSupport.repository,
+            quizLevel: .l3,
+        ))))
         await store.finish()
     }
 

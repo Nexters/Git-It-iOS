@@ -38,10 +38,16 @@ public struct ConfirmationSheet: View {
                 .padding(.top, Constant.textSetTopPadding)
 
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    ActionButton(title: displayModel.confirmTitle, action: onConfirmTap)
-                        .style(.destructive)
-                    ActionButton(title: displayModel.cancelTitle, action: onCancelTap)
-                        .style(.text)
+                    ActionButton(
+                        title: displayModel.confirmTitle,
+                        action: onConfirmTap,
+                    )
+                    .style(.destructive)
+                    ActionButton(
+                        title: displayModel.cancelTitle,
+                        action: onCancelTap,
+                    )
+                    .style(.text)
                 }
                 .padding(.top, Constant.buttonsTopPadding)
             }
@@ -70,12 +76,18 @@ public struct ConfirmationSheet: View {
             } placeholder: {
                 Color(designSystem: .grey500)
             }
-            .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+            .frame(
+                width: Constant.thumbnailSize,
+                height: Constant.thumbnailSize,
+            )
             .designSystemCornerRadius(.small)
             .accessibilityHidden(true)
         } else {
             Color(designSystem: .grey500)
-                .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+                .frame(
+                    width: Constant.thumbnailSize,
+                    height: Constant.thumbnailSize,
+                )
                 .designSystemCornerRadius(.small)
                 .accessibilityHidden(true)
         }
@@ -125,5 +137,8 @@ extension ConfirmationSheet {
             )
         }
     }
-    .frame(width: 390, height: 844)
+    .frame(
+        width: 390,
+        height: 844,
+    )
 }

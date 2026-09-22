@@ -22,7 +22,10 @@ public struct StandardJSONBodyCoding: HTTPBodyCoding {
     ) throws -> Body {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode(Body.self, from: data)
+        return try decoder.decode(
+            Body.self,
+            from: data,
+        )
     }
 
 }

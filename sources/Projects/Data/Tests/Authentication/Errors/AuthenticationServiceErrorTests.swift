@@ -23,7 +23,12 @@ struct AuthenticationServiceErrorTests {
         (418, "TEAPOT-001", AuthenticationServiceError.unexpectedStatus),
     ])
     func `대표 서버 오류 코드를 매핑한다`(httpStatus: Int, code: String, expected: AuthenticationServiceError) {
-        let serverError = ServerAPIError(httpStatus: httpStatus, code: code, message: nil, fieldErrors: nil)
+        let serverError = ServerAPIError(
+            httpStatus: httpStatus,
+            code: code,
+            message: nil,
+            fieldErrors: nil,
+        )
 
         #expect(AuthenticationServiceError(from: serverError) == expected)
     }

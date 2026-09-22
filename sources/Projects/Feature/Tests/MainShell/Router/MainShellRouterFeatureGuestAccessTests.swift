@@ -85,7 +85,10 @@ struct MainShellRouterFeatureGuestAccessTests {
         let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State(access: .guest)
         state.selectedTab = .settings
-        let store = makeStore(state: state, projects: projects)
+        let store = makeStore(
+            state: state,
+            projects: projects,
+        )
         store.exhaustivity = .off
 
         await store.send(.input(.memberAccessGranted)) {

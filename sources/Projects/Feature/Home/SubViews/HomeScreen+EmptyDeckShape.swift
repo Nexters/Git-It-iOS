@@ -19,9 +19,18 @@ extension HomeScreen {
             guard !bounds.isEmpty else { return unionPath }
 
             let scale = min(rect.width / bounds.width, rect.height / bounds.height)
-            let transform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
-                .scaledBy(x: scale, y: scale)
-                .translatedBy(x: -bounds.midX, y: -bounds.midY)
+            let transform = CGAffineTransform(
+                translationX: rect.midX,
+                y: rect.midY,
+            )
+            .scaledBy(
+                x: scale,
+                y: scale,
+            )
+            .translatedBy(
+                x: -bounds.midX,
+                y: -bounds.midY,
+            )
 
             return unionPath.applying(transform)
         }
@@ -40,18 +49,34 @@ extension HomeScreen {
 extension HomeScreen.EmptyDeckShape {
     struct Card: Sendable, Equatable {
 
+        // MARK: Internal
+
         let frame: CGRect
         let rotation: Angle
         let cornerRadius: CGFloat
 
-        fileprivate var path: Path {
-            let center = CGPoint(x: frame.midX, y: frame.midY)
-            let transform = CGAffineTransform(translationX: center.x, y: center.y)
-                .rotated(by: rotation.radians)
-                .translatedBy(x: -center.x, y: -center.y)
+        // MARK: Fileprivate
 
-            return Path(roundedRect: frame, cornerRadius: cornerRadius)
-                .applying(transform)
+        fileprivate var path: Path {
+            let center = CGPoint(
+                x: frame.midX,
+                y: frame.midY,
+            )
+            let transform = CGAffineTransform(
+                translationX: center.x,
+                y: center.y,
+            )
+            .rotated(by: rotation.radians)
+            .translatedBy(
+                x: -center.x,
+                y: -center.y,
+            )
+
+            return Path(
+                roundedRect: frame,
+                cornerRadius: cornerRadius,
+            )
+            .applying(transform)
         }
 
     }

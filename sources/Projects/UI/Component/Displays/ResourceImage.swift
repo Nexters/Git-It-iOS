@@ -108,16 +108,31 @@ public struct ResourceImage: View {
 
 #Preview("Resource Image") {
     HStack(spacing: LayoutToken.gutter) {
-        ResourceImage(asset: .illust(.knowledgeBasic), contentMode: .fill)
-            .frame(width: 96, height: 96)
-            .designSystemCornerRadius(.extraLarge)
+        ResourceImage(
+            asset: .illust(.knowledgeBasic),
+            contentMode: .fill,
+        )
+        .frame(
+            width: 96,
+            height: 96,
+        )
+        .designSystemCornerRadius(.extraLarge)
 
-        ResourceImage(asset: .icon(.user), contentMode: .fill)
-            .frame(width: 96, height: 96)
-            .clipShape(Circle())
+        ResourceImage(
+            asset: .icon(.user),
+            contentMode: .fill,
+        )
+        .frame(
+            width: 96,
+            height: 96,
+        )
+        .clipShape(Circle())
 
         ResourceImage(asset: .illust(.levelEntry))
-            .frame(width: 96, height: 96)
+            .frame(
+                width: 96,
+                height: 96,
+            )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
@@ -126,7 +141,10 @@ public struct ResourceImage: View {
 
 extension Image {
     public static func resizable(_ asset: ResourceImage.Asset) -> Image {
-        Image(asset.resourceName, bundle: .module)
-            .resizable()
+        Image(
+            asset.resourceName,
+            bundle: .module,
+        )
+        .resizable()
     }
 }

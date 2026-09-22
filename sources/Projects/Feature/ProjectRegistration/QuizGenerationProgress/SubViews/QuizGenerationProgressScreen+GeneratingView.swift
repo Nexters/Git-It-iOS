@@ -11,7 +11,10 @@ extension QuizGenerationProgressScreen {
         let onWaitAtHome: () -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 ResourceAnimation(asset: .setCreationLoading)
                     .frame(
                         width: Constant.loadingGraphicSize,
@@ -37,10 +40,13 @@ extension QuizGenerationProgressScreen {
             .padding(.vertical)
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
-                FeedbackActionButton(title: "홈에서 기다리기", action: onWaitAtHome)
-                    .style(.primaryText)
-                    .designSystemScreenMargin()
-                    .padding(.vertical, Constant.bottomButtonPadding)
+                FeedbackActionButton(
+                    title: "홈에서 기다리기",
+                    action: onWaitAtHome,
+                )
+                .style(.primaryText)
+                .designSystemScreenMargin()
+                .padding(.vertical, Constant.bottomButtonPadding)
             }
             .designSystemBackground(.backgroundGradient)
             .task { await runSimulatedProgress() }

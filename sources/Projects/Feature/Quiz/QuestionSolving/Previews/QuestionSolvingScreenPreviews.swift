@@ -105,14 +105,20 @@ private let essayGrading = EssayGrading(
 
 #Preview("문제 풀이 · 제출 중 · s06") {
     QuestionSolvingScreen(
-        store: previewStore(previewState(submission: .submitting, draftChoiceIndex: 1))
+        store: previewStore(previewState(
+            submission: .submitting,
+            draftChoiceIndex: 1,
+        ))
     )
 }
 
 #Preview("문제 풀이 · 제출 실패 · s07") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(submission: .failed(.temporarilyUnavailable), draftChoiceIndex: 1)
+            previewState(
+                submission: .failed(.temporarilyUnavailable),
+                draftChoiceIndex: 1,
+            )
         )
     )
 }
@@ -120,7 +126,10 @@ private let essayGrading = EssayGrading(
 #Preview("문제 풀이 · 정답 · s08") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(submission: .answered(.choice(correctGrading)), draftChoiceIndex: 0)
+            previewState(
+                submission: .answered(.choice(correctGrading)),
+                draftChoiceIndex: 0,
+            )
         )
     )
 }
@@ -128,7 +137,10 @@ private let essayGrading = EssayGrading(
 #Preview("문제 풀이 · 오답 · s09") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(submission: .answered(.choice(incorrectGrading)), draftChoiceIndex: 2)
+            previewState(
+                submission: .answered(.choice(incorrectGrading)),
+                draftChoiceIndex: 2,
+            )
         )
     )
 }
@@ -165,7 +177,10 @@ private let essayGrading = EssayGrading(
 #Preview("문제 풀이 · 순번 없는 단일 문제") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(questionNumber: nil, advanceActionTitle: "완료")
+            previewState(
+                questionNumber: nil,
+                advanceActionTitle: "완료",
+            )
         )
     )
 }

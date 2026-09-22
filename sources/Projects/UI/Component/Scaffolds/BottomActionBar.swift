@@ -47,6 +47,9 @@ public struct BottomActionBar<Content: View>: View {
         }
         .designSystemBackground(.grey600)
     }
-    .frame(width: 390, height: 240)
+    .frame(
+        width: 390,
+        height: 240,
+    )
     .designSystemBackground(.grey700)
 }

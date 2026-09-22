@@ -18,13 +18,19 @@ struct RepositoryLinkInputScreen: View {
     @Bindable var store: StoreOf<RepositoryLinkInputFeature>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             ScreenControlBar(
                 onLeadingTap: { send(.dismissTapped) }
             )
             .designSystemScreenMargin()
 
-            VStack(alignment: .leading, spacing: Constant.titleFieldSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.titleFieldSpacing,
+            ) {
                 StyledText(text: "GitHub 레포지토리\n링크를 붙여넣어 주세요")
                     .textStyle(.subtitle1)
 
@@ -61,7 +67,10 @@ struct RepositoryLinkInputScreen: View {
             .padding(.bottom, Constant.bottomButtonPadding)
         }
         .background(Self.KeyboardDismissLayer(onTap: { isLinkFieldFocused = false }))
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .ignoresSafeArea(
+            .keyboard,
+            edges: .bottom,
+        )
     }
 
     // MARK: Private

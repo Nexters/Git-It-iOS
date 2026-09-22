@@ -35,7 +35,10 @@ struct SettingsFeatureTests {
 
     @Test
     func `이미 받은 프로필이 있으면 task는 값을 유지한 채 reload를 보낸다`() async {
-        let updated = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+        let updated = SettingsTestFixture.profile(
+            position: .ios,
+            careerLevel: .senior,
+        )
         let store = makeStore(
             state: makeState(profile: SettingsTestFixture.curatedProfile),
             fetchMemberProfile: UserInfoUseCaseProfileMock(results: [.success(updated)]),
@@ -47,7 +50,10 @@ struct SettingsFeatureTests {
             $0.userProfile.requestID = 1
         }
         #expect(store.state.profile == SettingsTestFixture.curatedProfile)
-        await store.receive(.userProfile(.effect(.profileLoadFinished(requestID: 1, result: .success(updated))))) {
+        await store.receive(.userProfile(.effect(.profileLoadFinished(
+            requestID: 1,
+            result: .success(updated),
+        )))) {
             $0.userProfile.load = .loaded(updated)
         }
     }
@@ -97,7 +103,10 @@ struct SettingsFeatureTests {
     func `앱 설정에서 돌아오면 알림 권한에 refresh를 보낸다`() async {
         var state = SettingsFeature.State()
         state.notificationPermission.notificationStatus = .denied
-        let store = makeStore(state: state, notificationAuthorization: { .authorized })
+        let store = makeStore(
+            state: state,
+            notificationAuthorization: { .authorized },
+        )
 
         await store.send(.view(.applicationBecameActive))
         await store.receive(.notificationPermission(.input(.refresh)))
@@ -136,8 +145,14 @@ struct SettingsFeatureTests {
             $0.curationUpdate.positionMutation = .idle
         }
         await store.receive(.curationUpdate(.delegate(.positionUpdated(.ios))))
-        await store.receive(.userProfile(.input(.replace(SettingsTestFixture.profile(position: .ios, careerLevel: .entry))))) {
-            $0.userProfile.load = .loaded(SettingsTestFixture.profile(position: .ios, careerLevel: .entry))
+        await store.receive(.userProfile(.input(.replace(SettingsTestFixture.profile(
+            position: .ios,
+            careerLevel: .entry,
+        ))))) {
+            $0.userProfile.load = .loaded(SettingsTestFixture.profile(
+                position: .ios,
+                careerLevel: .entry,
+            ))
             $0.userProfile.requestID = 1
         }
 
@@ -161,9 +176,15 @@ struct SettingsFeatureTests {
         }
         await store.receive(.curationUpdate(.delegate(.careerLevelUpdated(.senior))))
         await store.receive(
-            .userProfile(.input(.replace(SettingsTestFixture.profile(position: .backend, careerLevel: .senior))))
+            .userProfile(.input(.replace(SettingsTestFixture.profile(
+                position: .backend,
+                careerLevel: .senior,
+            ))))
         ) {
-            $0.userProfile.load = .loaded(SettingsTestFixture.profile(position: .backend, careerLevel: .senior))
+            $0.userProfile.load = .loaded(SettingsTestFixture.profile(
+                position: .backend,
+                careerLevel: .senior,
+            ))
             $0.userProfile.requestID = 1
         }
 

@@ -20,7 +20,10 @@ public struct SavedQuestionCard: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             StyledText(text: displayModel.metadata)
                 .textStyle(.body2)
                 .foregroundColorToken(.grey300)
@@ -62,14 +65,20 @@ public struct SavedQuestionCard: View {
         let accessibilityTraits: AccessibilityTraits = isBookmarked ? [.isButton, .isSelected] : .isButton
 
         return Button(action: { toggleBookmark() }) {
-            ResourceImage(asset: .icon(icon), contentMode: .fit)
-                .designSystemForeground(tint)
-                .frame(width: Constant.bookmarkSize, height: Constant.bookmarkSize)
-                .frame(
-                    minWidth: ControlSizeToken.minimumTouch.cgFloatValue,
-                    minHeight: ControlSizeToken.minimumTouch.cgFloatValue,
-                )
-                .contentShape(Rectangle())
+            ResourceImage(
+                asset: .icon(icon),
+                contentMode: .fit,
+            )
+            .designSystemForeground(tint)
+            .frame(
+                width: Constant.bookmarkSize,
+                height: Constant.bookmarkSize,
+            )
+            .frame(
+                minWidth: ControlSizeToken.minimumTouch.cgFloatValue,
+                minHeight: ControlSizeToken.minimumTouch.cgFloatValue,
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)

@@ -22,7 +22,10 @@ struct ExternalRepositoryRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let repository = try await remote.repository(GitHubRepositoryRequest(owner: "facebook", repository: "react"))
+        let repository = try await remote.repository(GitHubRepositoryRequest(
+            owner: "facebook",
+            repository: "react",
+        ))
 
         #expect(repository == GitHubRepositoryResponseDTO(
             htmlURL: "https://github.com/facebook/react",
@@ -44,19 +47,29 @@ struct ExternalRepositoryRemoteTests {
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: ExternalRepositoryFetchError.offline) {
-            try await remote.repository(GitHubRepositoryRequest(owner: "facebook", repository: "react"))
+            try await remote.repository(GitHubRepositoryRequest(
+                owner: "facebook",
+                repository: "react",
+            ))
         }
     }
 
     @Test
     func `그 외 실패를 other 오류로 변환한다`() async throws {
         let transport = StubHTTPTransport(results: [
-            .response(HTTPTransportResponse(statusCode: 404, headers: [:], body: Data()))
+            .response(HTTPTransportResponse(
+                statusCode: 404,
+                headers: [:],
+                body: Data(),
+            ))
         ])
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: ExternalRepositoryFetchError.other) {
-            try await remote.repository(GitHubRepositoryRequest(owner: "facebook", repository: "react"))
+            try await remote.repository(GitHubRepositoryRequest(
+                owner: "facebook",
+                repository: "react",
+            ))
         }
     }
 
@@ -66,7 +79,10 @@ struct ExternalRepositoryRemoteTests {
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: CancellationError.self) {
-            try await remote.repository(GitHubRepositoryRequest(owner: "facebook", repository: "react"))
+            try await remote.repository(GitHubRepositoryRequest(
+                owner: "facebook",
+                repository: "react",
+            ))
         }
     }
 

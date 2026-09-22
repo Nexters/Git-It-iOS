@@ -20,8 +20,14 @@ public struct ProjectDetailRouter: View {
                     entryOverlay
                 }
             }
-            .alert("문제를 불러오지 못했어요", isPresented: entryFailureBinding) {
-                Button("확인", role: .cancel) {
+            .alert(
+                "문제를 불러오지 못했어요",
+                isPresented: entryFailureBinding,
+            ) {
+                Button(
+                    "확인",
+                    role: .cancel,
+                ) {
                     store.send(.singleQuestionEntry(.input(.failureDismissed)))
                 }
             } message: {
@@ -71,7 +77,10 @@ public struct ProjectDetailRouter: View {
     private var content: some View {
         FlowNavigationStack(path: pushedScreens) {
             ProjectDetailScreen(
-                store: store.scope(state: \.projectDetail, action: \.projectDetail)
+                store: store.scope(
+                    state: \.projectDetail,
+                    action: \.projectDetail,
+                )
             )
         } destination: { screen in
             pushedScreen(screen)
@@ -86,11 +95,19 @@ public struct ProjectDetailRouter: View {
 
         case .savedQuestions:
             SavedScreen(
-                store: store.scope(state: \.savedQuestions, action: \.savedQuestions)
+                store: store.scope(
+                    state: \.savedQuestions,
+                    action: \.savedQuestions,
+                )
             )
 
         case .singleQuestion:
-            if let singleQuestionStore = store.scope(state: \.singleQuestion, action: \.singleQuestion) {
+            if
+                let singleQuestionStore = store.scope(
+                    state: \.singleQuestion,
+                    action: \.singleQuestion,
+                )
+            {
                 QuestionSolvingScreen(store: singleQuestionStore)
             }
         }

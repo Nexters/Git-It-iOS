@@ -75,17 +75,29 @@ public struct IconGlassButton: View {
     public var body: some View {
         Button(action: action) {
             ResourceImage(asset: .icon(icon))
-                .frame(width: size.iconSize, height: size.iconSize)
+                .frame(
+                    width: size.iconSize,
+                    height: size.iconSize,
+                )
                 .designSystemForeground(style.tintColor)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .frame(width: size.surfaceSize, height: size.surfaceSize)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                )
+                .frame(
+                    width: size.surfaceSize,
+                    height: size.surfaceSize,
+                )
                 .glassEffect(
                     .regular
                         .tint(Color(designSystem: .clear))
                         .interactive(),
                     in: .circle,
                 )
-                .frame(width: size.touchSize, height: size.touchSize)
+                .frame(
+                    width: size.touchSize,
+                    height: size.touchSize,
+                )
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -125,17 +137,32 @@ extension IconGlassButton: SizeConfigurable {
 #Preview("Icon Glass Button") {
     VStack(spacing: LayoutToken.margin) {
         HStack(spacing: LayoutToken.gutter) {
-            IconGlassButton(icon: .chevronLeft, label: "뒤로 가기")
-            IconGlassButton(icon: .bookmark, label: "저장하기")
-                .style(.accent)
-            IconGlassButton(icon: .minus, label: "삭제하기")
-                .style(.destructive)
+            IconGlassButton(
+                icon: .chevronLeft,
+                label: "뒤로 가기",
+            )
+            IconGlassButton(
+                icon: .bookmark,
+                label: "저장하기",
+            )
+            .style(.accent)
+            IconGlassButton(
+                icon: .minus,
+                label: "삭제하기",
+            )
+            .style(.destructive)
         }
         HStack(spacing: LayoutToken.gutter) {
-            IconGlassButton(icon: .chevronLeft, label: "뒤로 가기")
-            IconGlassButton(icon: .bookmark, label: "저장하기")
-                .style(.accent)
-                .size(.medium)
+            IconGlassButton(
+                icon: .chevronLeft,
+                label: "뒤로 가기",
+            )
+            IconGlassButton(
+                icon: .bookmark,
+                label: "저장하기",
+            )
+            .style(.accent)
+            .size(.medium)
         }
     }
     .designSystemScreenMargin()
