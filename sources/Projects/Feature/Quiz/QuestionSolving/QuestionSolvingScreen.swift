@@ -88,7 +88,7 @@ struct QuestionSolvingScreen: View {
     private var sourceButton: some View {
         Button(action: { send(.sourceTapped) }) {
             HStack(spacing: Constant.sourceButtonSpacing) {
-                StyledText(text: "출처")
+                StyledText(text: LocalizedText.Quiz.questionSolvingSourceButtonTitle)
                     .textStyle(.body2)
                     .foregroundColorToken(.blue100)
 
@@ -115,7 +115,7 @@ struct QuestionSolvingScreen: View {
             in: RoundedRectangle(designSystem: .small),
         )
         .buttonStyle(.plain)
-        .accessibilityLabel("출처 보기")
+        .accessibilityLabel(LocalizedText.Quiz.questionSolvingSourceAccessibilityLabel)
     }
 
     @ViewBuilder
@@ -132,7 +132,7 @@ struct QuestionSolvingScreen: View {
 
             if case .choice(let grading) = store.answerOutcome {
                 LabeledCard(displayModel: .init(
-                    label: "AI 해설",
+                    label: LocalizedText.Quiz.questionSolvingChoiceExplanationLabel,
                     text: grading.explanation,
                 ))
                 .style(.accent)
@@ -149,7 +149,7 @@ struct QuestionSolvingScreen: View {
                 AnswerEditor(
                     text: essayTextBinding,
                     isFocused: $isEssayFieldFocused,
-                    placeholder: Constant.essayPlaceholder,
+                    placeholder: LocalizedText.Quiz.questionSolvingEssayPlaceholder,
                     characterLimit: QuestionSolvingFeature.essayCharacterLimit,
                     isDisabled: store.isSubmitting,
                 )
@@ -176,7 +176,9 @@ struct QuestionSolvingScreen: View {
     private var primaryAction: some View {
         if store.answerOutcome == nil {
             FeedbackActionButton(
-                title: store.submissionError == nil ? "제출하기" : "다시 제출하기",
+                title: store.submissionError == nil
+                    ? LocalizedText.Quiz.questionSolvingSubmitButtonTitle
+                    : LocalizedText.Quiz.questionSolvingResubmitButtonTitle,
                 action: { send(.submitAnswerTapped) },
             )
             .enabled(store.isSubmitEnabled)
@@ -189,7 +191,7 @@ struct QuestionSolvingScreen: View {
     }
 
     private var submissionFailureNotice: some View {
-        StyledText(text: Constant.submissionFailureMessage)
+        StyledText(text: LocalizedText.Quiz.questionSolvingSubmissionFailureMessage)
             .textStyle(.body2)
             .foregroundColorToken(.grey400)
     }
@@ -202,7 +204,9 @@ struct QuestionSolvingScreen: View {
                         get: { store.isBookmarked },
                         set: { _ in send(.bookmarkToggleTapped) },
                     ),
-                    accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
+                    accessibilityLabel: store.isBookmarked
+                        ? LocalizedText.Quiz.questionSolvingUnbookmarkAccessibilityLabel
+                        : LocalizedText.Quiz.questionSolvingBookmarkAccessibilityLabel,
                 )
 
                 primaryAction
@@ -219,8 +223,6 @@ extension QuestionSolvingScreen {
     fileprivate enum Constant {
         static let sectionSpacing: CGFloat = 24
         static let contentVerticalPadding: CGFloat = 20
-        static let essayPlaceholder = "답안을 서술해주세요"
-        static let submissionFailureMessage = "답안을 제출하지 못했어요. 다시 시도해 주세요."
         static let sourceButtonSpacing: CGFloat = 2
         static let sourceButtonChevronGlyphSize: CGFloat = 16
         static let sourceButtonChevronSize: CGFloat = 16

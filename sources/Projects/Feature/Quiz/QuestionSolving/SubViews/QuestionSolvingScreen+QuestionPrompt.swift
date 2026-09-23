@@ -16,7 +16,7 @@ extension QuestionSolvingScreen {
                 spacing: Constant.contentSpacing,
             ) {
                 if let questionNumber {
-                    TagBadge(text: "문제 \(questionNumber)")
+                    TagBadge(text: LocalizedText.Quiz.questionPromptNumberBadge(questionNumber: questionNumber))
                         .style(.accent)
                 }
 

@@ -39,7 +39,7 @@ extension QuestionSolvingScreen {
                 )
             } footer: {
                 FeedbackActionButton(
-                    title: "닫기",
+                    title: LocalizedText.Quiz.sourceSheetCloseButtonTitle,
                     action: onClose,
                 )
                 .padding(.top, Constant.buttonTopPadding)
@@ -61,8 +61,8 @@ extension QuestionSolvingScreen {
         }
 
         private var title: String {
-            guard let questionNumber else { return "출처" }
-            return "문제 \(questionNumber) 출처"
+            guard let questionNumber else { return LocalizedText.Quiz.sourceSheetTitle }
+            return LocalizedText.Quiz.sourceSheetNumberedTitle(questionNumber: questionNumber)
         }
 
         private func sourceBlock(source: QuestionSourceDisplay) -> some View {

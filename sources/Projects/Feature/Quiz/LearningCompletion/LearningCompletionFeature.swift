@@ -39,7 +39,10 @@ public struct LearningCompletionFeature: Sendable {
 
         public var scoreAccessibilityLabel: String? {
             guard isScorePresented else { return nil }
-            return "객관식 \(choiceQuestionCount)문제 중 \(correctChoiceCount)문제 정답"
+            return LocalizedText.Quiz.learningCompletionScoreAccessibilityLabel(
+                choiceQuestionCount: choiceQuestionCount,
+                correctChoiceCount: correctChoiceCount,
+            )
         }
 
     }

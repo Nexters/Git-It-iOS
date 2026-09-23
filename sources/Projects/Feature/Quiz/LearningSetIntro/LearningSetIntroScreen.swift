@@ -60,7 +60,7 @@ struct LearningSetIntroScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: "다시 시도하기",
+                title: LocalizedText.Quiz.learningSetIntroRetryButtonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()
@@ -83,14 +83,14 @@ struct LearningSetIntroScreen: View {
         BottomActionBar {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
-                    StyledText(text: "아직 풀 수 있는 문제가 없어요.")
+                    StyledText(text: LocalizedText.Quiz.learningSetIntroEmptyMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
                 }
 
                 FeedbackActionButton(
-                    title: "시작하기",
+                    title: LocalizedText.Quiz.learningSetIntroStartButtonTitle,
                     action: { send(.startTapped) },
                 )
                 .enabled(store.isStartEnabled)

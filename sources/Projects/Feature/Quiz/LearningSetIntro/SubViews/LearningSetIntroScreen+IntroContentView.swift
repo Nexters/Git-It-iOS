@@ -56,10 +56,10 @@ extension LearningSetIntroScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.failureTextSpacing) {
-                    StyledText(text: "학습 세트를 불러오지 못했어요")
+                    StyledText(text: LocalizedText.Quiz.introContentLoadFailureTitle)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: "잠시 후 다시 시도해 주세요.")
+                    StyledText(text: LocalizedText.Quiz.introContentLoadFailureMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)

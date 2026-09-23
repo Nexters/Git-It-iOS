@@ -34,16 +34,16 @@ public struct ChoiceOptionDisplay: Equatable, Sendable, Identifiable {
     public let isSelected: Bool
 
     public var accessibilityLabel: String {
-        var parts = ["\(id + 1)번 선택지", text]
+        var parts = [LocalizedText.Quiz.choiceOptionNumberLabel(number: id + 1), text]
         if isSelected {
-            parts.append("선택함")
+            parts.append(LocalizedText.Quiz.choiceOptionSelectedLabel)
         }
         switch emphasis {
         case .correct:
-            parts.append("정답")
+            parts.append(LocalizedText.Quiz.choiceOptionCorrectLabel)
 
         case .incorrect:
-            parts.append("오답")
+            parts.append(LocalizedText.Quiz.choiceOptionIncorrectLabel)
 
         case .neutral,
              .selected:

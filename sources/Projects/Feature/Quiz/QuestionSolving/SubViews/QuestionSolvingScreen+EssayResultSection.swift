@@ -15,11 +15,11 @@ extension QuestionSolvingScreen {
                 spacing: LayoutToken.margin,
             ) {
                 LabeledCard(displayModel: .init(
-                    label: "나의 답안",
+                    label: LocalizedText.Quiz.essayResultSectionMyAnswerLabel,
                     text: myAnswer,
                 ))
                 LabeledCard(displayModel: .init(
-                    label: "AI 해설",
+                    label: LocalizedText.Quiz.essayResultSectionExplanationLabel,
                     text: aiAnswer,
                 ))
                 .style(.accent)

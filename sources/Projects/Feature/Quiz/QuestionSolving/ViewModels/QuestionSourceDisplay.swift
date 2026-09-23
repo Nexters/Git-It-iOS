@@ -50,7 +50,7 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
             parts.append(summary)
         }
         if isLink {
-            parts.append("링크")
+            parts.append(LocalizedText.Quiz.questionSourceLinkLabel)
         }
         return parts.joined(separator: ", ")
     }
@@ -71,19 +71,22 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
     // MARK: Private
 
     private static func title(for source: QuizSource) -> String {
-        source.filePath ?? source.symbol ?? source.referenceURL ?? source.summary ?? "출처"
+        source.filePath ?? source.symbol ?? source.referenceURL ?? source.summary ?? LocalizedText.Quiz.questionSourceDefaultTitle
     }
 
     private static func lineRange(for source: QuizSource) -> String? {
         switch (source.startLine, source.endLine) {
         case (let start?, let end?):
-            "\(start)–\(end)행"
+            LocalizedText.Quiz.questionSourceLineRange(
+                start: start,
+                end: end,
+            )
 
         case (let start?, nil):
-            "\(start)행"
+            LocalizedText.Quiz.questionSourceStartLine(start: start)
 
         case (nil, let end?):
-            "\(end)행"
+            LocalizedText.Quiz.questionSourceEndLine(end: end)
 
         case (nil, nil):
             nil
