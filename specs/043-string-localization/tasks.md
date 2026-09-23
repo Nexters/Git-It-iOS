@@ -288,14 +288,14 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.4 Home (5개 파일, 23곳)
 
-- [ ] T077 [S1] `sources/Projects/Feature/Home/Resources/Home.xcstrings`를 만들고 아래 5개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T078 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Home.swift`에 `extension LocalizedText { enum Home { … } }`로 항목별 멤버를 선언한다
-- [ ] T079 [P] [S1] `sources/Projects/Feature/Home/HomeScreen.swift`의 문구 4곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
-- [ ] T080 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProfileHeaderView.swift`의 문구 3곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
-- [ ] T081 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`의 문구 7곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
-- [ ] T082 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+RegistrationPanelView.swift`의 문구 6곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
-- [ ] T083 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+SignInSectionView.swift`의 문구 3곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
-- [ ] T084 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Home`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T077 [S1] `sources/Projects/Feature/Home/Resources/Home.xcstrings`를 만들고 아래 5개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T078 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Home.swift`에 `extension LocalizedText { enum Home { … } }`로 항목별 멤버를 선언한다
+- [X] T079 [P] [S1] `sources/Projects/Feature/Home/HomeScreen.swift`의 문구 4곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
+- [X] T080 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProfileHeaderView.swift`의 문구 3곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
+- [X] T081 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+ProjectSection.swift`의 문구 7곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
+- [X] T082 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+RegistrationPanelView.swift`의 문구 6곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
+- [X] T083 [P] [S1] `sources/Projects/Feature/Home/SubViews/HomeScreen+SignInSectionView.swift`의 문구 3곳을 `LocalizedText.Home`로 교체한다(공통 작업 규칙)
+- [X] T084 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Home`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T077~T084의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

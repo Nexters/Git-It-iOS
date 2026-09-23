@@ -18,16 +18,16 @@ extension HomeScreen {
                     alignment: .leading,
                     spacing: 5,
                 ) {
-                    StyledText(text: "프로젝트 문제 생성")
+                    StyledText(text: LocalizedText.Home.registrationPanelCaption)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                     VStack(
                         alignment: .leading,
                         spacing: 0,
                     ) {
-                        StyledText(text: "오픈소스를 불러오고")
+                        StyledText(text: LocalizedText.Home.registrationPanelTitleFirstLine)
                             .textStyle(.subtitle3)
-                        StyledText(text: "문제로 익혀보세요")
+                        StyledText(text: LocalizedText.Home.registrationPanelTitleSecondLine)
                             .textStyle(.subtitle3)
                     }
                 }
@@ -41,7 +41,7 @@ extension HomeScreen {
                         generationInProgressLabel
                     } else {
                         Button(action: onRegister) {
-                            StyledText(text: "지금 불러오기")
+                            StyledText(text: LocalizedText.Home.registrationPanelRegisterButtonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey700)
                                 .frame(
@@ -56,7 +56,7 @@ extension HomeScreen {
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(Constant.registrationLabel)
+                        .accessibilityLabel(LocalizedText.Home.registrationPanelRegisterAccessibilityLabel)
                     }
                 }
             }
@@ -79,8 +79,6 @@ extension HomeScreen {
         // MARK: Private
 
         private enum Constant {
-            static let registrationLabel = "프로젝트 지금 불러오기"
-            static let generationInProgressLabel = "문제 생성 중"
             static let progressLabelSpacing: CGFloat = 8
             static let progressIndicatorSize: CGFloat = 20
             static let progressLabelHorizontalPadding: CGFloat = 12
@@ -93,7 +91,7 @@ extension HomeScreen {
                         width: Constant.progressIndicatorSize,
                         height: Constant.progressIndicatorSize,
                     )
-                StyledText(text: Constant.generationInProgressLabel)
+                StyledText(text: LocalizedText.Home.registrationPanelGenerationInProgressLabel)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey300)
             }
@@ -105,7 +103,7 @@ extension HomeScreen {
             )
             .frame(minHeight: 44)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(Constant.generationInProgressLabel)
+            .accessibilityLabel(LocalizedText.Home.registrationPanelGenerationInProgressLabel)
         }
 
     }

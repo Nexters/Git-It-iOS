@@ -23,12 +23,12 @@ extension HomeScreen {
                 spacing: Constant.sectionHeaderSpacing,
             ) {
                 HStack {
-                    StyledText(text: "학습 중인 레포지토리")
+                    StyledText(text: LocalizedText.Home.projectSectionTitle)
                         .textStyle(.subtitle3)
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText(text: "전체 보기")
+                            StyledText(text: LocalizedText.Home.projectSectionShowAllButtonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
@@ -42,7 +42,7 @@ extension HomeScreen {
                     .buttonStyle(.plain)
                     .disabled(!isShowAllEnabled)
                     .padding(8)
-                    .accessibilityLabel(Constant.showAllLabel)
+                    .accessibilityLabel(LocalizedText.Home.projectSectionShowAllAccessibilityLabel)
                 }
                 .designSystemScreenMargin()
 
@@ -56,7 +56,6 @@ extension HomeScreen {
         // MARK: Private
 
         private enum Constant {
-            static let showAllLabel = "학습 중인 레포지토리 전체 보기"
             static let sectionHeaderSpacing: CGFloat = 16
             static let retryMessageSpacing: CGFloat = 8
             static let chevronSize: CGFloat = 12
@@ -163,14 +162,14 @@ extension HomeScreen {
 
             case .empty:
                 emptyProjects {
-                    StyledText(text: "아직 등록된 프로젝트가 없어요.")
+                    StyledText(text: LocalizedText.Home.projectSectionEmptyMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
 
             case .signInRequired:
                 emptyProjects {
-                    StyledText(text: "로그인하면 학습 중인 레포지토리를 볼 수 있어요.")
+                    StyledText(text: LocalizedText.Home.projectSectionSignInRequiredMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
@@ -178,12 +177,12 @@ extension HomeScreen {
             case .failed:
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
-                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Home.projectSectionLoadFailureMessage)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
                         FeedbackActionButton(
-                            title: "다시 시도",
+                            title: LocalizedText.Home.projectSectionRetryButtonTitle,
                             action: onProjectRetryTapped,
                         )
                         .style(.secondary)

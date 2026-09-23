@@ -1,0 +1,282 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "homeSignInRequiredCloseButtonTitle" : {
+      "comment" : "홈 화면 로그인 필요 알림의 닫기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
+          }
+        }
+      }
+    },
+    "homeSignInRequiredMessage" : {
+      "comment" : "홈 화면에서 로그인 없이 프로젝트 생성을 시도했을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 만들려면 로그인해 주세요."
+          }
+        }
+      }
+    },
+    "homeSignInRequiredSignInButtonTitle" : {
+      "comment" : "홈 화면 로그인 필요 알림의 로그인 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인"
+          }
+        }
+      }
+    },
+    "homeSignInRequiredTitle" : {
+      "comment" : "홈 화면에서 로그인 없이 프로젝트 생성을 시도했을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인이 필요해요"
+          }
+        }
+      }
+    },
+    "profileHeaderLoadFailureMessage" : {
+      "comment" : "홈 화면 프로필 영역에서 프로필 불러오기에 실패했을 때 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "profileHeaderLoadFailureTitle" : {
+      "comment" : "홈 화면 프로필 영역에서 프로필 불러오기에 실패했을 때 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필을 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "profileHeaderRetryButtonTitle" : {
+      "comment" : "홈 화면 프로필 영역의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "projectSectionEmptyMessage" : {
+      "comment" : "홈 화면 프로젝트 영역에 등록된 프로젝트가 없을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 등록된 프로젝트가 없어요."
+          }
+        }
+      }
+    },
+    "projectSectionLoadFailureMessage" : {
+      "comment" : "홈 화면 프로젝트 영역에서 프로젝트 불러오기에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "projectSectionRetryButtonTitle" : {
+      "comment" : "홈 화면 프로젝트 영역의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "projectSectionShowAllAccessibilityLabel" : {
+      "comment" : "홈 화면 프로젝트 영역 전체 보기 버튼의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중인 레포지토리 전체 보기"
+          }
+        }
+      }
+    },
+    "projectSectionShowAllButtonTitle" : {
+      "comment" : "홈 화면 프로젝트 영역의 전체 보기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 보기"
+          }
+        }
+      }
+    },
+    "projectSectionSignInRequiredMessage" : {
+      "comment" : "홈 화면 프로젝트 영역에서 로그인하지 않았을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하면 학습 중인 레포지토리를 볼 수 있어요."
+          }
+        }
+      }
+    },
+    "projectSectionTitle" : {
+      "comment" : "홈 화면 프로젝트 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중인 레포지토리"
+          }
+        }
+      }
+    },
+    "registrationPanelCaption" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 상단의 작은 안내 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 문제 생성"
+          }
+        }
+      }
+    },
+    "registrationPanelGenerationInProgressLabel" : {
+      "comment" : "홈 화면 프로젝트 등록 패널에서 문제를 생성하는 동안 보이는 진행 문구와 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 중"
+          }
+        }
+      }
+    },
+    "registrationPanelRegisterAccessibilityLabel" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 불러오기 버튼의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 지금 불러오기"
+          }
+        }
+      }
+    },
+    "registrationPanelRegisterButtonTitle" : {
+      "comment" : "홈 화면 프로젝트 등록 패널의 불러오기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 불러오기"
+          }
+        }
+      }
+    },
+    "registrationPanelTitleFirstLine" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 제목의 첫 줄(두 줄을 각각 다른 텍스트로 표시)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오픈소스를 불러오고"
+          }
+        }
+      }
+    },
+    "registrationPanelTitleSecondLine" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 제목의 둘째 줄(두 줄을 각각 다른 텍스트로 표시)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제로 익혀보세요"
+          }
+        }
+      }
+    },
+    "signInSectionCaption" : {
+      "comment" : "홈 화면 로그인 안내 영역의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하고 나만의 학습을 시작해 보세요."
+          }
+        }
+      }
+    },
+    "signInSectionSignInButtonTitle" : {
+      "comment" : "홈 화면 로그인 안내 영역의 로그인 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인"
+          }
+        }
+      }
+    },
+    "signInSectionTitle" : {
+      "comment" : "홈 화면 로그인 안내 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인이 필요해요"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

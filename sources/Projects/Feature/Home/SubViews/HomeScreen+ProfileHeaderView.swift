@@ -16,15 +16,15 @@ extension HomeScreen {
                         alignment: .leading,
                         spacing: Constant.messageSpacing,
                     ) {
-                        StyledText(text: "프로필을 불러오지 못했어요")
+                        StyledText(text: LocalizedText.Home.profileHeaderLoadFailureTitle)
                             .textStyle(.subtitle3)
-                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Home.profileHeaderLoadFailureMessage)
                             .textStyle(.caption1)
                             .foregroundColorToken(.grey400)
                     }
                     Spacer()
                     FeedbackActionButton(
-                        title: "다시 시도",
+                        title: LocalizedText.Home.profileHeaderRetryButtonTitle,
                         action: onRetry,
                     )
                     .style(.secondary)

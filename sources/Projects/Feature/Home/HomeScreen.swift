@@ -22,16 +22,16 @@ public struct HomeScreen: View {
             .scrollIndicators(.hidden)
             .task { await send(.task).finish() }
             .alert(
-                Constant.signInRequiredTitle,
+                LocalizedText.Home.signInRequiredTitle,
                 isPresented: signInRequiredAlertBinding,
             ) {
-                Button(Constant.signInTitle) { send(.signInRequiredAlertSignInTapped) }
+                Button(LocalizedText.Home.signInRequiredSignInButtonTitle) { send(.signInRequiredAlertSignInTapped) }
                 Button(
-                    Constant.closeTitle,
+                    LocalizedText.Home.signInRequiredCloseButtonTitle,
                     role: .cancel,
                 ) { send(.signInRequiredAlertDismissed) }
             } message: {
-                Text(Constant.signInRequiredMessage)
+                Text(LocalizedText.Home.signInRequiredMessage)
             }
     }
 
@@ -108,9 +108,5 @@ extension HomeScreen {
         static let greetingTopPadding: CGFloat = 16
         static let registrationPanelTopPadding: CGFloat = 24
         static let projectSectionTopPadding: CGFloat = 32
-        static let signInRequiredTitle = "로그인이 필요해요"
-        static let signInRequiredMessage = "프로젝트를 만들려면 로그인해 주세요."
-        static let signInTitle = "로그인"
-        static let closeTitle = "닫기"
     }
 }
