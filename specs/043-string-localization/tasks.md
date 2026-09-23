@@ -410,21 +410,21 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 준비와 기반
 
-- [ ] T149 [S1] `sources/Projects/App/GitIt/Resources/Localizable.xcstrings`를 만들고 `GenerationReminderContent.swift`의 알림 제목·본문 4개(생성 완료 제목·본문, 생성 실패 제목·본문)를 등록한다
-- [ ] T150 [S1] `sources/Projects/App/GitIt/Localization/LocalizedText.swift`에 `internal enum LocalizedText`와 중첩 `enum GenerationReminder`를 만들고 4개 멤버를 선언한다
+- [X] T149 [S1] `sources/Projects/App/GitIt/Resources/Localizable.xcstrings`를 만들고 `GenerationReminderContent.swift`의 알림 제목·본문 4개(생성 완료 제목·본문, 생성 실패 제목·본문)를 등록한다
+- [X] T150 [S1] `sources/Projects/App/GitIt/Localization/LocalizedText.swift`에 `internal enum LocalizedText`와 중첩 `enum GenerationReminder`를 만들고 4개 멤버를 선언한다
 
 ### 테스트
 
-- [ ] T151 [S1] `sources/Projects/App/Tests/GitIt/Localization/LocalizedTextTests.swift`에 `@testable import GitIt`로 `LocalizedText.GenerationReminder`의 4개 멤버가 변경 전 한국어 문구를 반환하는지 검증하는 테스트를 작성한다
+- [X] T151 [S1] `sources/Projects/App/Tests/GitIt/Localization/LocalizedTextTests.swift`에 `@testable import GitIt`로 `LocalizedText.GenerationReminder`의 4개 멤버가 변경 전 한국어 문구를 반환하는지 검증하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T152 [S1] `sources/Projects/App/GitIt/GitItApp.swift`에서 `GenerationReminderContent` 참조 4곳을 `LocalizedText.GenerationReminder` 멤버로 교체한다
-- [ ] T153 [S1] `sources/Projects/App/GitIt/GenerationReminderContent.swift`를 삭제하고 저장소에 다른 참조가 없는지 확인한다
+- [X] T152 [S1] `sources/Projects/App/GitIt/GitItApp.swift`에서 `GenerationReminderContent` 참조 4곳을 `LocalizedText.GenerationReminder` 멤버로 교체한다
+- [X] T153 [S1] `sources/Projects/App/GitIt/GenerationReminderContent.swift`를 삭제하고 저장소에 다른 참조가 없는지 확인한다
 
 ### 정리와 단위 검증
 
-- [ ] T154 [no-write] `make tuist`(전후 `git status --porcelain` 비교) 후 `GIT_IT_ONLY_SCHEME=AppTests "$project_build_runner" compile`과 `test`를 통과시킨다
+- [X] T154 [no-write] `make tuist`(전후 `git status --porcelain` 비교) 후 `GIT_IT_ONLY_SCHEME=AppTests "$project_build_runner" compile`과 `test`를 통과시킨다
 
 **진행 점검**: T149~T154의 변경 파일과 검증 결과를 보고하고 전체 완료 검증으로 진행한다.
 
@@ -439,13 +439,13 @@ commit하지 않은 상태여야 한다.
 `after_implement` hook(`speckit.swift-format.run`)을 마친 뒤 그 단위를 최종 commit한다. 이미 파일 변경 단위가
 모두 commit된 단순 재개에서는 `tasks.md` 완료 표시를 위한 별도 최종 검증 단위를 둔다.
 
-- [ ] T155 [no-write] `make tuist` 후 `"$project_build_runner" build`, `compile`, `test`를 순서대로 실행해 모두 통과시킨다(SC-004)
-- [ ] T156 [no-write] `quickstart.md` §1·§3·§4를 실행해 strings 합성 파일 부재, 한국어 리터럴 잔여가 제외 대상뿐임(SC-001), 13개 카탈로그의 `sourceLanguage`·주석·`manual`·키 형식(SC-003)을 확인한다
-- [ ] T157 [no-write] [S1] `quickstart.md` §5를 한국어 시뮬레이터에서 실행해 대표 화면 6종과 로컬 알림 2종, VoiceOver 레이블이 변경 전과 같은지 확인한다(SC-002)
-- [ ] T158 [no-write] [S2] `quickstart.md` §5의 저장 필터 개수(0·1·여러 개)와 페이지·진행률 접근성 값 등 보간 문구가 변경 전과 같은지 확인한다
-- [ ] T159 [no-write] `quickstart.md` §6을 영어 시뮬레이터에서 실행해 키·빈 문자열 노출이 0건이고 모든 문구가 한국어인지 확인한다(SC-006, FR-008)
-- [ ] T160 [no-write] `quickstart.md` §8을 이 checkout이 아닌 scratchpad의 임시 `git worktree`에서 실행해 카탈로그 값만 바꿔 문구가 바뀌는지 확인하고, 임시 worktree를 제거한다(시나리오 1 수용 2). 이 checkout의 `git status`가 전후 같아야 한다
-- [ ] T161 [no-write] `quickstart.md` §7을 다시 실행해 최종 코드와 현지화 컨벤션 문서가 일치하는지 확인한다(FR-010)
+- [X] T155 [no-write] `make tuist` 후 `"$project_build_runner" build`, `compile`, `test`를 순서대로 실행해 모두 통과시킨다(SC-004)
+- [X] T156 [no-write] `quickstart.md` §1·§3·§4를 실행해 strings 합성 파일 부재, 한국어 리터럴 잔여가 제외 대상뿐임(SC-001), 13개 카탈로그의 `sourceLanguage`·주석·`manual`·키 형식(SC-003)을 확인한다
+- [X] T157 [no-write] [S1] `quickstart.md` §5를 한국어 시뮬레이터에서 실행해 대표 화면 6종과 로컬 알림 2종, VoiceOver 레이블이 변경 전과 같은지 확인한다(SC-002)
+- [X] T158 [no-write] [S2] `quickstart.md` §5의 저장 필터 개수(0·1·여러 개)와 페이지·진행률 접근성 값 등 보간 문구가 변경 전과 같은지 확인한다
+- [X] T159 [no-write] `quickstart.md` §6을 영어 시뮬레이터에서 실행해 키·빈 문자열 노출이 0건이고 모든 문구가 한국어인지 확인한다(SC-006, FR-008)
+- [X] T160 [no-write] `quickstart.md` §8을 이 checkout이 아닌 scratchpad의 임시 `git worktree`에서 실행해 카탈로그 값만 바꿔 문구가 바뀌는지 확인하고, 임시 worktree를 제거한다(시나리오 1 수용 2). 이 checkout의 `git status`가 전후 같아야 한다
+- [X] T161 [no-write] `quickstart.md` §7을 다시 실행해 최종 코드와 현지화 컨벤션 문서가 일치하는지 확인한다(FR-010)
 
 ## 의존성과 실행 순서
 
