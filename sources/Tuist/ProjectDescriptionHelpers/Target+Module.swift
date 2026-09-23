@@ -19,7 +19,10 @@ extension Target {
             bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: [.glob("\(sourceDirectory)/**", excluding: sourceExcludes)],
+            sources: [.glob(
+                "\(sourceDirectory)/**",
+                excluding: sourceExcludes,
+            )],
             resources: resources,
             dependencies: dependencies,
             settings: .settings(
@@ -29,7 +32,9 @@ extension Target {
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "SKIP_INSTALL": "YES",
+                    "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                     "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
+                    "SWIFT_EMIT_LOC_STRINGS": "NO",
                     "SWIFT_VERSION": "5.0",
                 ]) { current, _ in current }
             ),

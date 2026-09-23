@@ -90,6 +90,7 @@ extension AppModuleName {
                         "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "NO",
                         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+                        "SWIFT_EMIT_LOC_STRINGS": "NO",
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
                         "TARGETED_DEVICE_FAMILY": "1",
@@ -180,8 +181,14 @@ extension AppModuleName {
                         "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
-                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
-                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                        .debug(
+                            name: "Debug",
+                            xcconfig: "Config/debug.xcconfig",
+                        ),
+                        .release(
+                            name: "Release",
+                            xcconfig: "Config/release.xcconfig",
+                        ),
                     ],
                 ),
             )

@@ -35,7 +35,11 @@ extension ProjectName {
             case .UI:
                 UIModuleName.targets
             }
-        let options = Project.Options.options(automaticSchemesOptions: .disabled)
+        let options = Project.Options.options(
+            automaticSchemesOptions: .disabled,
+            defaultKnownRegions: ["ko", "Base"],
+            developmentRegion: "ko",
+        )
         let schemes: [Scheme] =
             switch self {
             case .App:
@@ -175,6 +179,7 @@ extension ProjectName {
             options: options,
             targets: targets,
             schemes: schemes,
+            resourceSynthesizers: .default.filter { $0 != .strings() },
         )
     }
 }
