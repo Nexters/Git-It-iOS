@@ -28,7 +28,7 @@ public struct AppleSignInButton: View {
                         weight: .semibold,
                     ))
                     .designSystemForeground(.black)
-                StyledText(text: "Apple로 시작하기")
+                StyledText(text: LocalizedText.AppleSignInButton.title)
                     .foregroundColorToken(.black)
             }
         }

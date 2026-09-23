@@ -73,9 +73,9 @@ public struct ChoiceAnswerOption: View {
                  .selected:
                 nil
             case .correct:
-                "정답"
+                LocalizedText.ChoiceAnswerOption.correctLabel
             case .incorrect:
-                "오답"
+                LocalizedText.ChoiceAnswerOption.incorrectLabel
             }
         }
     }
@@ -142,7 +142,11 @@ public struct ChoiceAnswerOption: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel(accessibilityLabel)
             .accessibilityAddTraits(state == .selected ? .isSelected : [])
-            .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기") { expansion.toggle() }
+            .accessibilityAction(
+                named: isExpanded.wrappedValue
+                    ? LocalizedText.ChoiceAnswerOption.collapseActionName
+                    : LocalizedText.ChoiceAnswerOption.expandActionName
+            ) { expansion.toggle() }
         }
     }
 

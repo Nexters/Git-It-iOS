@@ -60,7 +60,7 @@ public struct LabeledTextField: View {
                         width: Constant.clearButtonTouchSize,
                         height: Constant.clearButtonTouchSize,
                     )
-                    .accessibilityLabel("입력 지우기")
+                    .accessibilityLabel(LocalizedText.LabeledTextField.clearAccessibilityLabel)
                 }
             }
             .frame(height: Constant.fieldHeight)

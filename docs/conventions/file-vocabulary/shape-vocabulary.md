@@ -45,7 +45,7 @@
 | | `<화면>/` | 화면 하나와 그 화면이 조합하는 Feature |
 | | `Previews/` | 여러 화면의 프리뷰가 함께 쓰는 프리뷰 전용 타입 |
 | | `Shared/` | 둘 이상의 화면이 함께 쓰는 선언 — 이 아래에서만 형태 폴더를 씁니다 |
-| | `Resources/` | 흐름이 소유하는 자산 |
+| | `Resources/` | 흐름이 소유하는 자산과 문구 카탈로그 |
 | `Feature/<흐름>/<화면>/` | `SubViews/` | 그 화면 전용 서브뷰 |
 | | `ViewModels/` | 그 화면이 `State`에서 파생하는 표시 모델과 계산 타입 |
 | | `Previews/` | 그 화면의 프리뷰 |
@@ -55,19 +55,22 @@
 | `Feature/Shared/` | `Views/` | 둘 이상의 흐름이 함께 쓰는 View |
 | | `Models/` | 둘 이상의 흐름이 함께 쓰는 값 타입 |
 | | `Reducers/` | 둘 이상의 흐름이 합성하는 기능 Feature — View를 두지 않습니다 |
+| | `Localization/` | 모듈 문구 전용 타입 `LocalizedText`와 흐름별 확장 |
 | `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |
 | | `Layout/` | 화면 크기에서 파생하는 런타임 레이아웃 변수 |
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
 | | `Resources/` | 폰트 자산 |
 | `UI/Component/` | 역할 폴더 | [UIComponent 컨벤션 — 컴포넌트 역할 분류](../ui-component.md#3-컴포넌트-역할-분류)이 소유 |
 | | `Contracts/` | 여러 역할 폴더가 채택하는 시각 속성 계약 프로토콜 |
-| | `Resources/` | 이미지·애니메이션 자산 |
+| | `Resources/` | 이미지·애니메이션 자산과 문구 카탈로그 |
+| | `Localization/` | 모듈 문구 전용 타입 `LocalizedText` |
 | `UI/ComponentPreviewApp/` | `Catalogs/` | 레이아웃 계약 검토 카탈로그 |
 | `App/GitIt/` | `Reducers/` · `Screens/` | 앱 루트 Feature와 화면 |
 | | `Configurations/` | 실행 환경과 번들 설정 |
 | | `Loaders/` | 번들 리소스 해석 |
-| | `Resources/` | 앱 자산과 정책 문서 |
+| | `Resources/` | 앱 자산, 정책 문서와 문구 카탈로그 |
 | | `AppDelegates/` | 플랫폼 생명주기 delegate 타입 |
+| | `Localization/` | 모듈 문구 전용 타입 `LocalizedText` |
 | `Tests/<역할>/` | production과 같은 형태 폴더 | 대상 형태를 그대로 사용 |
 | | `TestDoubles/` | 둘 이상의 파일에서 쓰는 Test Double |
 | `Feature/Tests/<흐름>/` | `Router/` · `<화면>/` | production의 흐름 축을 그대로 미러링 |

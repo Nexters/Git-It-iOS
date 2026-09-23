@@ -28,7 +28,7 @@ public struct WebSheet: View {
 
                     IconGlassButton(
                         icon: .close,
-                        label: "닫기",
+                        label: LocalizedText.WebSheet.closeAccessibilityLabel,
                         action: onDismiss,
                     )
                 }

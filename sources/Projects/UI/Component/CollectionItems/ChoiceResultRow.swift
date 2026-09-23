@@ -37,9 +37,9 @@ public struct ChoiceResultRow: View {
         var accessibilitySuffix: String {
             switch self {
             case .correct:
-                "정답"
+                LocalizedText.ChoiceResultRow.correctLabel
             case .incorrect:
-                "오답"
+                LocalizedText.ChoiceResultRow.incorrectLabel
             }
         }
     }

@@ -125,37 +125,37 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 준비와 기반
 
-- [ ] T006 [P] `docs/conventions/file-vocabulary/shape-vocabulary.md` 표에 `Feature/Shared/`(“모듈 문구 전용 타입 `LocalizedText`와 흐름별 확장”), `UI/Component/`, `App/GitIt/`(“모듈 문구 전용 타입 `LocalizedText`”)의 `Localization/` 행을 추가하고 `Feature/<흐름>/Resources/`, `UI/Component/Resources/`, `App/GitIt/Resources/` 설명에 “문구 카탈로그”를 추가한다. 링크는 실행 단위 3에서 연결한다. `최종 수정일`을 갱신한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
-- [ ] T007 [P] `docs/conventions/ui-component/folder-file.md`의 `UI/Component/` 1뎁스 허용 목록에 `Localization/`(모듈 문구 전용 타입)을 추가하고 `최종 수정일`을 갱신한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
+- [X] T006 [P] `docs/conventions/file-vocabulary/shape-vocabulary.md` 표에 `Feature/Shared/`(“모듈 문구 전용 타입 `LocalizedText`와 흐름별 확장”), `UI/Component/`, `App/GitIt/`(“모듈 문구 전용 타입 `LocalizedText`”)의 `Localization/` 행을 추가하고 `Feature/<흐름>/Resources/`, `UI/Component/Resources/`, `App/GitIt/Resources/` 설명에 “문구 카탈로그”를 추가한다. 링크는 실행 단위 3에서 연결한다. `최종 수정일`을 갱신한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
+- [X] T007 [P] `docs/conventions/ui-component/folder-file.md`의 `UI/Component/` 1뎁스 허용 목록에 `Localization/`(모듈 문구 전용 타입)을 추가하고 `최종 수정일`을 갱신한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
 
-- [ ] T008 [S1] `sources/Projects/UI/Component/Resources/Localizable.xcstrings`를 만들고 아래 문구 교체 대상 파일의 사용자 노출 문구를 수동 항목으로 등록한다. 보간 항목(`PageIndicator` 페이지 안내 값, `ProgressSegments` 진행 레이블, `ContinuousProgressBar` 퍼센트 값, `PolicyAgreementRow` 전문 보기, `HomeProjectCard`·`LearningSetRow`·`ProjectRow` 레이블)은 이름 있는 위치 지정자로 만든다
-- [ ] T009 [no-write] `make tuist` 후 `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" compile`을 실행하고, Xcode Attributes inspector 또는 생성 소스에서 고정 항목과 보간 항목의 생성 심볼 이름·인자 레이블이 키·위치 지정자 이름과 같은지 확인한다(R1). 다르면 이후 작업을 멈추고 결과를 보고해 `research.md` 결정 5·6과 계약 문서를 먼저 갱신한다
-- [ ] T010 [S1] `sources/Projects/UI/Component/Localization/LocalizedText.swift`에 `internal enum LocalizedText`와 컴포넌트별 중첩 enum(`ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `AppleSignInButton`, `ChoiceAnswerOption`, `LabeledTextField`, `PolicyAgreementRow`, `ScreenControlBar`, `ContinuousProgressBar`, `PageIndicator`, `ProgressSegments`, `WebSheet`)을 만들고 항목마다 멤버를 선언한다([contracts/localized-text.md](./contracts/localized-text.md))
+- [X] T008 [S1] `sources/Projects/UI/Component/Resources/Localizable.xcstrings`를 만들고 아래 문구 교체 대상 파일의 사용자 노출 문구를 수동 항목으로 등록한다. 보간 항목(`PageIndicator` 페이지 안내 값, `ProgressSegments` 진행 레이블, `ContinuousProgressBar` 퍼센트 값, `PolicyAgreementRow` 전문 보기, `HomeProjectCard`·`LearningSetRow`·`ProjectRow` 레이블)은 이름 있는 위치 지정자로 만든다
+- [X] T009 [no-write] `make tuist` 후 `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" compile`을 실행하고, Xcode Attributes inspector 또는 생성 소스에서 고정 항목과 보간 항목의 생성 심볼 이름·인자 레이블이 키·위치 지정자 이름과 같은지 확인한다(R1). 다르면 이후 작업을 멈추고 결과를 보고해 `research.md` 결정 5·6과 계약 문서를 먼저 갱신한다
+- [X] T010 [S1] `sources/Projects/UI/Component/Localization/LocalizedText.swift`에 `internal enum LocalizedText`와 컴포넌트별 중첩 enum(`ChoiceResultRow`, `HomeProjectCard`, `LearningSetRow`, `ProjectRow`, `SavedQuestionCard`, `AppleSignInButton`, `ChoiceAnswerOption`, `LabeledTextField`, `PolicyAgreementRow`, `ScreenControlBar`, `ContinuousProgressBar`, `PageIndicator`, `ProgressSegments`, `WebSheet`)을 만들고 항목마다 멤버를 선언한다([contracts/localized-text.md](./contracts/localized-text.md))
 
 ### 테스트
 
-- [ ] T011 [S2] `sources/Projects/UI/Tests/Component/Unit/Localization/LocalizedTextTests.swift`에 `@testable import UIComponent`로 고정 항목 하나와 보간 항목 하나가 변경 전 한국어 문구를 반환하는지 검증하는 Swift Testing 테스트를 작성한다(한국어 동작 문장 이름)
+- [X] T011 [S2] `sources/Projects/UI/Tests/Component/Unit/Localization/LocalizedTextTests.swift`에 `@testable import UIComponent`로 고정 항목 하나와 보간 항목 하나가 변경 전 한국어 문구를 반환하는지 검증하는 Swift Testing 테스트를 작성한다(한국어 동작 문장 이름)
 
 ### 구현
 
-- [ ] T012 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T013 [P] [S1] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard.swift`의 문구 3곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T014 [P] [S1] `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T015 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T016 [P] [S1] `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T017 [P] [S1] `sources/Projects/UI/Component/Controls/AppleSignInButton.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T018 [P] [S1] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`의 문구 3곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T019 [P] [S1] `sources/Projects/UI/Component/Controls/LabeledTextField.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T020 [P] [S1] `sources/Projects/UI/Component/Controls/PolicyAgreementRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T021 [P] [S1] `sources/Projects/UI/Component/Controls/ScreenControlBar.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T022 [P] [S1] `sources/Projects/UI/Component/Indicators/ContinuousProgressBar.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T023 [P] [S1] `sources/Projects/UI/Component/Indicators/PageIndicator.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T024 [P] [S1] `sources/Projects/UI/Component/Indicators/ProgressSegments.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
-- [ ] T025 [P] [S1] `sources/Projects/UI/Component/Overlays/WebSheet.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T012 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ChoiceResultRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T013 [P] [S1] `sources/Projects/UI/Component/CollectionItems/HomeProjectCard.swift`의 문구 3곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T014 [P] [S1] `sources/Projects/UI/Component/CollectionItems/LearningSetRow.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T015 [P] [S1] `sources/Projects/UI/Component/CollectionItems/ProjectRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T016 [P] [S1] `sources/Projects/UI/Component/CollectionItems/SavedQuestionCard.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T017 [P] [S1] `sources/Projects/UI/Component/Controls/AppleSignInButton.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T018 [P] [S1] `sources/Projects/UI/Component/Controls/ChoiceAnswerOption.swift`의 문구 3곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T019 [P] [S1] `sources/Projects/UI/Component/Controls/LabeledTextField.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T020 [P] [S1] `sources/Projects/UI/Component/Controls/PolicyAgreementRow.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T021 [P] [S1] `sources/Projects/UI/Component/Controls/ScreenControlBar.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T022 [P] [S1] `sources/Projects/UI/Component/Indicators/ContinuousProgressBar.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T023 [P] [S1] `sources/Projects/UI/Component/Indicators/PageIndicator.swift`의 문구 2곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T024 [P] [S1] `sources/Projects/UI/Component/Indicators/ProgressSegments.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
+- [X] T025 [P] [S1] `sources/Projects/UI/Component/Overlays/WebSheet.swift`의 문구 1곳을 `LocalizedText`로 교체한다(공통 작업 규칙)
 
 ### 정리와 단위 검증
 
-- [ ] T026 [no-write] `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" compile`과 `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" test`를 통과시키고, 기존 `UI/Tests/Component` 한국어 기대값 테스트가 수정 없이 통과하는지 확인한다. `quickstart.md` §3의 검사를 `sources/Projects/UI/Component`로 한정해 실행하고 결과가 제외 대상뿐인지 확인한다
+- [X] T026 [no-write] `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" compile`과 `GIT_IT_ONLY_SCHEME=UI "$project_build_runner" test`를 통과시키고, 기존 `UI/Tests/Component` 한국어 기대값 테스트가 수정 없이 통과하는지 확인한다. `quickstart.md` §3의 검사를 `sources/Projects/UI/Component`로 한정해 실행하고 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T006~T026의 변경 파일, R1 확인 결과와 검증 결과를 보고하고 실행 단위 3으로 진행한다.
 

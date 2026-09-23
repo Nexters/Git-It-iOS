@@ -135,7 +135,10 @@ public struct LearningSetRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(displayModel.label) \(displayModel.title) 학습 시작")
+        .accessibilityLabel(LocalizedText.LearningSetRow.learningStartAccessibilityLabel(
+            label: displayModel.label,
+            title: displayModel.title,
+        ))
     }
 
 }

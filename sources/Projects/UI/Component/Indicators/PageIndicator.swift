@@ -28,7 +28,7 @@ public struct PageIndicator: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("페이지 안내")
+        .accessibilityLabel(LocalizedText.PageIndicator.accessibilityLabel)
         .accessibilityValue(
             Self.accessibilityValue(
                 currentPage: displayModel.currentPage,
@@ -43,7 +43,10 @@ public struct PageIndicator: View {
         currentPage: Int,
         totalPages: Int,
     ) -> String {
-        "전체 \(totalPages)페이지 중 \(currentPage + 1)번째"
+        LocalizedText.PageIndicator.accessibilityValue(
+            totalPages: totalPages,
+            currentPage: currentPage + 1,
+        )
     }
 
     // MARK: Private

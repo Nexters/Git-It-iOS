@@ -80,12 +80,14 @@ public struct PolicyAgreementRow: View {
     private let onOpenLink: () -> Void
 
     private var accessibilityLabel: String {
-        let requiredText = displayModel.isRequired ? "필수" : "선택"
+        let requiredText = displayModel.isRequired
+            ? LocalizedText.PolicyAgreementRow.requiredLabel
+            : LocalizedText.PolicyAgreementRow.optionalLabel
         return "\(requiredText), \(displayModel.title)"
     }
 
     private var openLinkAccessibilityLabel: String {
-        "\(displayModel.title) 전문 보기"
+        LocalizedText.PolicyAgreementRow.fullTextAccessibilityLabel(title: displayModel.title)
     }
 
 }

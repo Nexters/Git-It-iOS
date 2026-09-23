@@ -139,7 +139,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         if isDeleting {
             IconGlassButton(
                 icon: .minus,
-                label: "\(displayModel.name) 삭제",
+                label: LocalizedText.ProjectRow.deleteAccessibilityLabel(name: displayModel.name),
                 action: onAccessoryTap,
             )
             .style(.destructive)
@@ -148,7 +148,7 @@ public struct ProjectRow<Thumbnail: View>: View {
         } else {
             IconPlainButton(
                 icon: .play,
-                label: "\(displayModel.name) 학습 시작",
+                label: LocalizedText.ProjectRow.learningStartAccessibilityLabel(name: displayModel.name),
                 action: onAccessoryTap,
             )
         }

@@ -106,11 +106,11 @@ extension ScreenControlBar {
 
         public static let back = Control(
             icon: .chevronLeftWhite,
-            label: "뒤로 가기",
+            label: LocalizedText.ScreenControlBar.backAccessibilityLabel,
         )
         public static let close = Control(
             icon: .close,
-            label: "닫기",
+            label: LocalizedText.ScreenControlBar.closeAccessibilityLabel,
         )
 
         public let icon: Icon

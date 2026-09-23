@@ -25,7 +25,10 @@ public struct ProgressSegments: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("전체 \(displayModel.total)문항 중 \(displayModel.completed)문항 완료")
+        .accessibilityLabel(LocalizedText.ProgressSegments.accessibilityLabel(
+            total: displayModel.total,
+            completed: displayModel.completed,
+        ))
     }
 
     // MARK: Private
