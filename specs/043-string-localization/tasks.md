@@ -265,13 +265,13 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.2 Saved (4개 파일, 9곳)
 
-- [ ] T064 [S1] `sources/Projects/Feature/Saved/Resources/Saved.xcstrings`를 만들고 아래 4개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T065 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Saved.swift`에 `extension LocalizedText { enum Saved { … } }`로 항목별 멤버를 선언한다
-- [ ] T066 [P] [S1] `sources/Projects/Feature/Saved/SavedScreen.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
-- [ ] T067 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+FilterSection.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
-- [ ] T068 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+QuestionCollectionView.swift`의 문구 3곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
-- [ ] T069 [P] [S1] `sources/Projects/Feature/Saved/ViewModels/SavedQuestionDisplay.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
-- [ ] T070 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Saved`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T064 [S1] `sources/Projects/Feature/Saved/Resources/Saved.xcstrings`를 만들고 아래 4개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T065 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Saved.swift`에 `extension LocalizedText { enum Saved { … } }`로 항목별 멤버를 선언한다
+- [X] T066 [P] [S1] `sources/Projects/Feature/Saved/SavedScreen.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
+- [X] T067 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+FilterSection.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
+- [X] T068 [P] [S1] `sources/Projects/Feature/Saved/SubViews/SavedScreen+QuestionCollectionView.swift`의 문구 3곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
+- [X] T069 [P] [S1] `sources/Projects/Feature/Saved/ViewModels/SavedQuestionDisplay.swift`의 문구 2곳을 `LocalizedText.Saved`로 교체한다(공통 작업 규칙)
+- [X] T070 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Saved`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T064~T070의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

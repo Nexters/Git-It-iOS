@@ -22,7 +22,7 @@ public struct SavedQuestionDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Public
 
-    public static let actionTitle = "문제풀기"
+    public static let actionTitle = LocalizedText.Saved.questionActionTitle
 
     public let id: QuizID
     public let metadata: String
@@ -36,7 +36,11 @@ public struct SavedQuestionDisplay: Equatable, Sendable, Identifiable {
         questions.map {
             Self(
                 id: $0.quizID,
-                metadata: "\($0.projectName) · \($0.setLabel) · 문제 \($0.problemNumber)",
+                metadata: LocalizedText.Saved.questionMetadata(
+                    projectName: $0.projectName,
+                    setLabel: $0.setLabel,
+                    problemNumber: $0.problemNumber,
+                ),
                 prompt: $0.prompt,
                 isBookmarked: bookmarkOverrides[$0.quizID] ?? true,
             )
