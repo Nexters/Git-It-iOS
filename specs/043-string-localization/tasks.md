@@ -253,13 +253,13 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.1 MainShell (4개 파일, 13곳)
 
-- [ ] T057 [S1] `sources/Projects/Feature/MainShell/Resources/MainShell.xcstrings`를 만들고 아래 4개 파일의 문구를 등록한다(보간 항목 포함, S2). `MainShellTab.tabTitle`의 탭 이름(홈·프로젝트·저장·마이)을 포함한다.
-- [ ] T058 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+MainShell.swift`에 `extension LocalizedText { enum MainShell { … } }`로 항목별 멤버를 선언한다
-- [ ] T059 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의 문구 7곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
-- [ ] T060 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 문구 1곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
-- [ ] T061 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellTab.swift`의 문구 3곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
-- [ ] T062 [P] [S1] `sources/Projects/Feature/MainShell/Router/SubViews/MainShellRouter+SignInPromptView.swift`의 문구 2곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
-- [ ] T063 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/MainShell`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T057 [S1] `sources/Projects/Feature/MainShell/Resources/MainShell.xcstrings`를 만들고 아래 4개 파일의 문구를 등록한다(보간 항목 포함, S2). `MainShellTab.tabTitle`의 탭 이름(홈·프로젝트·저장·마이)을 포함한다.
+- [X] T058 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+MainShell.swift`에 `extension LocalizedText { enum MainShell { … } }`로 항목별 멤버를 선언한다
+- [X] T059 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouter.swift`의 문구 7곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
+- [X] T060 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellRouterFeature.swift`의 문구 1곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
+- [X] T061 [P] [S1] `sources/Projects/Feature/MainShell/Router/MainShellTab.swift`의 문구 3곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
+- [X] T062 [P] [S1] `sources/Projects/Feature/MainShell/Router/SubViews/MainShellRouter+SignInPromptView.swift`의 문구 2곳을 `LocalizedText.MainShell`로 교체한다(공통 작업 규칙)
+- [X] T063 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/MainShell`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T057~T063의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

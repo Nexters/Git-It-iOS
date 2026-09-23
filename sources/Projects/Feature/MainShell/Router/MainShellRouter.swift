@@ -67,33 +67,33 @@ public struct MainShellRouter: View {
             }
         }
         .alert(
-            "문제를 불러오지 못했어요",
+            LocalizedText.MainShell.singleQuestionFailureTitle,
             isPresented: entryFailureBinding,
         ) {
             Button(
-                "확인",
+                LocalizedText.MainShell.singleQuestionFailureConfirmButtonTitle,
                 role: .cancel,
             ) {
                 send(.singleQuestionFailureDismissed)
             }
         } message: {
-            Text("잠시 후 다시 시도해 주세요.")
+            Text(LocalizedText.MainShell.singleQuestionFailureMessage)
         }
         .overlay { singleQuestionOverlay }
         .overlay { guestLegalAgreementOverlay }
         .overlay { guestLegalDocumentOverlay }
         .alert(
-            "로그인하지 못했어요",
+            LocalizedText.MainShell.signInFailureTitle,
             isPresented: signInFailureBinding,
         ) {
             Button(
-                "확인",
+                LocalizedText.MainShell.signInFailureConfirmButtonTitle,
                 role: .cancel,
             ) {
                 send(.signInFailureDismissed)
             }
         } message: {
-            Text("잠시 후 다시 시도해 주세요.")
+            Text(LocalizedText.MainShell.signInFailureMessage)
         }
     }
 
@@ -183,7 +183,7 @@ public struct MainShellRouter: View {
             ProgressView()
                 .tint(Color(designSystem: .blue100))
         }
-        .accessibilityLabel("문제를 불러오는 중")
+        .accessibilityLabel(LocalizedText.MainShell.singleQuestionLoadingAccessibilityLabel)
     }
 
     private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {
