@@ -22,7 +22,7 @@ extension TutorialScreen {
                 ))
                 .padding(Constant.indicatorPadding)
 
-                StyledText(text: Constant.hintTitle)
+                StyledText(text: LocalizedText.Onboarding.tutorialSignInHintTitle)
                     .textStyle(.caption1)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
@@ -33,7 +33,7 @@ extension TutorialScreen {
                 AppleSignInButton(action: onAppleSignIn)
 
                 FeedbackActionButton(
-                    title: Constant.guestAccessTitle,
+                    title: LocalizedText.Onboarding.tutorialSignInGuestAccessButtonTitle,
                     action: onGuestAccess,
                 )
                 .enabled(isHintVisible)
@@ -43,7 +43,7 @@ extension TutorialScreen {
                 .accessibilityHidden(!isHintVisible)
                 .padding(.top, LayoutToken.compactSpacing)
 
-                StyledText(text: "버전 \(bundleVersion)")
+                StyledText(text: LocalizedText.Onboarding.tutorialSignInVersion(version: bundleVersion))
                     .textStyle(.body2)
                     .foregroundColorToken(.grey500)
                     .multilineTextAlignment(.center)
@@ -56,8 +56,6 @@ extension TutorialScreen {
         // MARK: Private
 
         private enum Constant {
-            static let hintTitle = "3초만에 가입하기"
-            static let guestAccessTitle = "로그인 없이 둘러보기"
             static let indicatorPadding: CGFloat = 12
             static let versionTopSpacing: CGFloat = 21
             static let bottomInset: CGFloat = 29

@@ -301,15 +301,15 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.5 Onboarding (6개 파일, 25곳)
 
-- [ ] T085 [S1] `sources/Projects/Feature/Onboarding/Resources/Onboarding.xcstrings`를 만들고 아래 6개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T086 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Onboarding.swift`에 `extension LocalizedText { enum Onboarding { … } }`로 항목별 멤버를 선언한다
-- [ ] T087 [P] [S1] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`의 문구 12곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T088 [P] [S1] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementScreen.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T089 [P] [S1] `sources/Projects/Feature/Onboarding/LegalAgreement/SubViews/LegalAgreementScreen+AllAgreementRow.swift`의 문구 1곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T090 [P] [S1] `sources/Projects/Feature/Onboarding/PositionSelection/PositionSelectionScreen.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T091 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+PageView.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T092 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
-- [ ] T093 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Onboarding`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T085 [S1] `sources/Projects/Feature/Onboarding/Resources/Onboarding.xcstrings`를 만들고 아래 6개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T086 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Onboarding.swift`에 `extension LocalizedText { enum Onboarding { … } }`로 항목별 멤버를 선언한다
+- [X] T087 [P] [S1] `sources/Projects/Feature/Onboarding/CareerSelection/CareerSelectionScreen.swift`의 문구 12곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T088 [P] [S1] `sources/Projects/Feature/Onboarding/LegalAgreement/LegalAgreementScreen.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T089 [P] [S1] `sources/Projects/Feature/Onboarding/LegalAgreement/SubViews/LegalAgreementScreen+AllAgreementRow.swift`의 문구 1곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T090 [P] [S1] `sources/Projects/Feature/Onboarding/PositionSelection/PositionSelectionScreen.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T091 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+PageView.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T092 [P] [S1] `sources/Projects/Feature/Onboarding/Tutorial/SubViews/TutorialScreen+SignInSection.swift`의 문구 3곳을 `LocalizedText.Onboarding`로 교체한다(공통 작업 규칙)
+- [X] T093 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Onboarding`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T085~T093의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

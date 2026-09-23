@@ -19,7 +19,7 @@ extension LegalAgreementScreen {
                             width: Constant.checkSize,
                             height: Constant.checkSize,
                         )
-                    StyledText(text: Constant.title)
+                    StyledText(text: LocalizedText.Onboarding.allAgreementRowTitle)
                         .textStyle(.body2)
                     Spacer(minLength: 0)
                 }
@@ -36,7 +36,6 @@ extension LegalAgreementScreen {
         // MARK: Private
 
         private enum Constant {
-            static let title = "전체 동의"
             static let rowHeight: CGFloat = 54
             static let checkSize: CGFloat = 24
             static let checkSpacing: CGFloat = 12

@@ -17,7 +17,7 @@ struct LegalAgreementScreen: View {
                 alignment: .leading,
                 spacing: 0,
             ) {
-                StyledText(text: "약관 동의")
+                StyledText(text: LocalizedText.Onboarding.legalAgreementTitle)
                     .textStyle(.subtitle1)
                     .padding(.top, LayoutToken.gutter)
                     .padding(.bottom, Constant.titleBottomSpacing)
@@ -53,13 +53,13 @@ struct LegalAgreementScreen: View {
 
                 HStack(spacing: LayoutToken.compactSpacing) {
                     FeedbackActionButton(
-                        title: "취소",
+                        title: LocalizedText.Onboarding.legalAgreementCancelButtonTitle,
                         action: { send(.cancelTapped) },
                     )
                     .style(.secondary)
 
                     FeedbackActionButton(
-                        title: "다음",
+                        title: LocalizedText.Onboarding.legalAgreementNextButtonTitle,
                         action: { send(.continueTapped) },
                     )
                     .enabled(store.canContinue)
