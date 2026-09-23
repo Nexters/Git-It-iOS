@@ -24,10 +24,10 @@ extension QuizGenerationProgressScreen {
                     .padding(.vertical, 30)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText(text: "학습세트를 만들고 있어요")
+                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationProgressTitle)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: "약 5분의 시간이 소요돼요")
+                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationProgressDurationMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
@@ -41,7 +41,7 @@ extension QuizGenerationProgressScreen {
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
                 FeedbackActionButton(
-                    title: "홈에서 기다리기",
+                    title: LocalizedText.ProjectRegistration.quizGenerationProgressWaitAtHomeButtonTitle,
                     action: onWaitAtHome,
                 )
                 .style(.primaryText)

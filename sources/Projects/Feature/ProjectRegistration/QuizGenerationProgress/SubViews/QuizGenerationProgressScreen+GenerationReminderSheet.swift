@@ -23,10 +23,10 @@ extension QuizGenerationProgressScreen {
                             )
 
                         VStack(spacing: Constant.textSetSpacing) {
-                            StyledText(text: "세트 생성이 완료되면\n리마인드 알림을 보내드려요.")
+                            StyledText(text: LocalizedText.ProjectRegistration.generationReminderSheetTitle)
                                 .textStyle(.subtitle1)
                                 .multilineTextAlignment(.center)
-                            StyledText(text: "프로필 설정페이지에서 언제든 설정할 수 있어요.")
+                            StyledText(text: LocalizedText.ProjectRegistration.generationReminderSheetMessage)
                                 .textStyle(.caption1)
                                 .foregroundColorToken(.grey400)
                                 .multilineTextAlignment(.center)
@@ -34,12 +34,12 @@ extension QuizGenerationProgressScreen {
 
                         VStack(spacing: LayoutToken.compactSpacing) {
                             FeedbackActionButton(
-                                title: "리마인드 알림 설정하기",
+                                title: LocalizedText.ProjectRegistration.generationReminderSheetEnableButtonTitle,
                                 action: onAccept,
                             )
 
                             FeedbackActionButton(
-                                title: "다시 보지 않기",
+                                title: LocalizedText.ProjectRegistration.generationReminderSheetDismissButtonTitle,
                                 action: onDecline,
                             )
                             .style(.text)

@@ -19,7 +19,7 @@ struct QuizLevelSelectionScreen: View {
             ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
-            StyledText(text: "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?")
+            StyledText(text: LocalizedText.ProjectRegistration.quizLevelSelectionTitle)
                 .textStyle(.subtitle1)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.titleTopPadding)
@@ -41,7 +41,7 @@ struct QuizLevelSelectionScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: "다음",
+                title: LocalizedText.ProjectRegistration.quizLevelSelectionNextButtonTitle,
                 action: { send(.nextTapped) },
             )
             .designSystemScreenMargin()
@@ -65,9 +65,24 @@ extension QuizLevelSelectionScreen {
 
     fileprivate static var levels: [Level] {
         [
-            (.l1, "기술 개념은 알아요", "실제 코드 작동 방식을 흐름 중심으로 학습", .knowledgeBasic),
-            (.l2, "일부 코드를 봤어요", "구현 의도와 연결 영향까지 포함", .knowledgeIntermediate),
-            (.l3, "유사 프로젝트 경험이 있어요", "심화 문제와 서술형 비중 확대", .knowledgeAdvanced),
+            (
+                .l1,
+                LocalizedText.ProjectRegistration.quizLevelSelectionBasicTitle,
+                LocalizedText.ProjectRegistration.quizLevelSelectionBasicDescription,
+                .knowledgeBasic,
+            ),
+            (
+                .l2,
+                LocalizedText.ProjectRegistration.quizLevelSelectionIntermediateTitle,
+                LocalizedText.ProjectRegistration.quizLevelSelectionIntermediateDescription,
+                .knowledgeIntermediate,
+            ),
+            (
+                .l3,
+                LocalizedText.ProjectRegistration.quizLevelSelectionAdvancedTitle,
+                LocalizedText.ProjectRegistration.quizLevelSelectionAdvancedDescription,
+                .knowledgeAdvanced,
+            ),
         ]
     }
 

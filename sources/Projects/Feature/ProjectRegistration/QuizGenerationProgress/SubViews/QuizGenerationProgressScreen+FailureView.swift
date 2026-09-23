@@ -19,10 +19,10 @@ extension QuizGenerationProgressScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.guideStepSpacing) {
-                    StyledText(text: "학습 세트를 만들지 못했어요")
+                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationFailureTitle)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: "잠시 후 다시 시도해 주세요.")
+                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationFailureMessage)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ extension QuizGenerationProgressScreen {
                 Spacer(minLength: 0)
 
                 FeedbackActionButton(
-                    title: "다시 시도하기",
+                    title: LocalizedText.ProjectRegistration.quizGenerationFailureRetryButtonTitle,
                     action: onRetry,
                 )
                 .designSystemScreenMargin()

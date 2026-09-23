@@ -22,7 +22,7 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: "이 레포지토리가 맞으면\n학습 설정을 진행할게요")
+                StyledText(text: LocalizedText.ProjectRegistration.repositoryConfirmationTitle)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
 
@@ -49,11 +49,11 @@ struct RepositoryConfirmationScreen: View {
 
             VStack(spacing: LayoutToken.compactSpacing) {
                 FeedbackActionButton(
-                    title: "다음",
+                    title: LocalizedText.ProjectRegistration.repositoryConfirmationNextButtonTitle,
                     action: { send(.confirmTapped) },
                 )
                 FeedbackActionButton(
-                    title: "이 레포지토리가 아니에요",
+                    title: LocalizedText.ProjectRegistration.repositoryConfirmationRejectButtonTitle,
                     action: { send(.rejectTapped) },
                 )
                 .style(.secondary)

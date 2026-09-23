@@ -18,10 +18,10 @@ struct QuizGenerationConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: "입력해주신 정보로\n학습 세트를 만들게요")
+                StyledText(text: LocalizedText.ProjectRegistration.quizGenerationConfirmationTitle)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
-                StyledText(text: "1~5분의 시간이 소요돼요")
+                StyledText(text: LocalizedText.ProjectRegistration.quizGenerationConfirmationDurationMessage)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ struct QuizGenerationConfirmationScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: "시작하기",
+                title: LocalizedText.ProjectRegistration.quizGenerationConfirmationStartButtonTitle,
                 action: { send(.startTapped) },
             )
             .designSystemScreenMargin()

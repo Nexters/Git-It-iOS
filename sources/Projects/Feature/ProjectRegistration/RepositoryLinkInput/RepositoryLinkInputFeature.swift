@@ -45,7 +45,9 @@ public struct RepositoryLinkInputFeature: Sendable {
         }
 
         public var validateButtonTitle: String {
-            validation == .validating ? "확인 중…" : "다음"
+            validation == .validating
+                ? LocalizedText.ProjectRegistration.repositoryLinkInputValidatingButtonTitle
+                : LocalizedText.ProjectRegistration.repositoryLinkInputNextButtonTitle
         }
 
     }

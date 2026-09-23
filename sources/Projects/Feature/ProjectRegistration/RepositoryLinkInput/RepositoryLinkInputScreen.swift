@@ -31,17 +31,19 @@ struct RepositoryLinkInputScreen: View {
                 alignment: .leading,
                 spacing: Constant.titleFieldSpacing,
             ) {
-                StyledText(text: "GitHub 레포지토리\n링크를 붙여넣어 주세요")
+                StyledText(text: LocalizedText.ProjectRegistration.repositoryLinkInputTitle)
                     .textStyle(.subtitle1)
 
                 LabeledTextField(
                     displayModel: .init(
-                        label: "링크",
+                        label: LocalizedText.ProjectRegistration.repositoryLinkInputFieldLabel,
                         placeholder: "https://github.com",
-                        supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
+                        supportingText: store.isValidationFailed
+                            ? LocalizedText.ProjectRegistration.repositoryLinkInputValidationErrorMessage
+                            : nil,
                     ),
                     text: repositoryURLInput,
-                    accessibilityLabel: "GitHub 레포지토리 링크",
+                    accessibilityLabel: LocalizedText.ProjectRegistration.repositoryLinkInputFieldAccessibilityLabel,
                     focus: $isLinkFieldFocused,
                 )
                 .error(store.isValidationFailed)

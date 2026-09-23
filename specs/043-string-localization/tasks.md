@@ -358,19 +358,19 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.9 ProjectRegistration (10개 파일, 43곳)
 
-- [ ] T122 [S1] `sources/Projects/Feature/ProjectRegistration/Resources/ProjectRegistration.xcstrings`를 만들고 아래 10개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T123 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ProjectRegistration.swift`에 `extension LocalizedText { enum ProjectRegistration { … } }`로 항목별 멤버를 선언한다
-- [ ] T124 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationConfirmation/QuizGenerationConfirmationScreen.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T125 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+ChecklistView.swift`의 문구 9곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T126 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+FailureView.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T127 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+GeneratingView.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T128 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+GenerationReminderSheet.swift`의 문구 4곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T129 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizLevelSelection/QuizLevelSelectionScreen.swift`의 문구 5곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T130 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T131 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeature.swift`의 문구 1곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T132 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputScreen.swift`의 문구 4곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T133 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/SubViews/RepositoryLinkInputScreen+GuideSectionView.swift`의 문구 8곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T134 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ProjectRegistration`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T122 [S1] `sources/Projects/Feature/ProjectRegistration/Resources/ProjectRegistration.xcstrings`를 만들고 아래 10개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T123 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ProjectRegistration.swift`에 `extension LocalizedText { enum ProjectRegistration { … } }`로 항목별 멤버를 선언한다
+- [X] T124 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationConfirmation/QuizGenerationConfirmationScreen.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T125 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+ChecklistView.swift`의 문구 9곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T126 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+FailureView.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T127 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+GeneratingView.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T128 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/SubViews/QuizGenerationProgressScreen+GenerationReminderSheet.swift`의 문구 4곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T129 [P] [S1] `sources/Projects/Feature/ProjectRegistration/QuizLevelSelection/QuizLevelSelectionScreen.swift`의 문구 5곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T130 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen.swift`의 문구 3곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T131 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputFeature.swift`의 문구 1곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T132 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/RepositoryLinkInputScreen.swift`의 문구 4곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T133 [P] [S1] `sources/Projects/Feature/ProjectRegistration/RepositoryLinkInput/SubViews/RepositoryLinkInputScreen+GuideSectionView.swift`의 문구 8곳을 `LocalizedText.ProjectRegistration`로 교체한다(공통 작업 규칙)
+- [X] T134 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ProjectRegistration`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T122~T134의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

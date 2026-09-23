@@ -1,0 +1,582 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "checklistAccessibilityLabel" : {
+      "comment" : "학습 세트 생성 진행 화면 체크리스트의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트 생성 진행 체크리스트"
+          }
+        }
+      }
+    },
+    "checklistActiveStatus" : {
+      "comment" : "학습 세트 생성 체크리스트 단계의 진행 중 상태 표기",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "진행 중"
+          }
+        }
+      }
+    },
+    "checklistCodeStructureAnalysisTitle" : {
+      "comment" : "학습 세트 생성 체크리스트의 코드 구조 분석 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코드 구조 분석"
+          }
+        }
+      }
+    },
+    "checklistDoneStatus" : {
+      "comment" : "학습 세트 생성 체크리스트 단계의 완료 상태 표기",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
+    },
+    "checklistLearningOutlineCompositionTitle" : {
+      "comment" : "학습 세트 생성 체크리스트의 학습 개념 구성 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 개념 구성"
+          }
+        }
+      }
+    },
+    "checklistPendingStatus" : {
+      "comment" : "학습 세트 생성 체크리스트 단계의 대기 중 상태 표기",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대기 중"
+          }
+        }
+      }
+    },
+    "checklistQuizGenerationTitle" : {
+      "comment" : "학습 세트 생성 체크리스트의 문제 생성 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성"
+          }
+        }
+      }
+    },
+    "checklistRepositoryInfoTitle" : {
+      "comment" : "학습 세트 생성 체크리스트의 프로젝트 정보 확인 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 정보 확인"
+          }
+        }
+      }
+    },
+    "checklistVerificationTitle" : {
+      "comment" : "학습 세트 생성 체크리스트의 세트 검증 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 검증"
+          }
+        }
+      }
+    },
+    "generationReminderSheetDismissButtonTitle" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 다시 보지 않기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 보지 않기"
+          }
+        }
+      }
+    },
+    "generationReminderSheetEnableButtonTitle" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 알림 설정 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리마인드 알림 설정하기"
+          }
+        }
+      }
+    },
+    "generationReminderSheetMessage" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필 설정페이지에서 언제든 설정할 수 있어요."
+          }
+        }
+      }
+    },
+    "generationReminderSheetTitle" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 생성이 완료되면\n리마인드 알림을 보내드려요."
+          }
+        }
+      }
+    },
+    "guideSectionAccessibilityLabel" : {
+      "comment" : "저장소 링크 입력 화면 안내 영역 펼침 버튼의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "불러오기 방법"
+          }
+        }
+      }
+    },
+    "guideSectionCollapsedAccessibilityValue" : {
+      "comment" : "저장소 링크 입력 화면 안내 영역이 접혔을 때의 접근성 값",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "접힘"
+          }
+        }
+      }
+    },
+    "guideSectionExpandedAccessibilityValue" : {
+      "comment" : "저장소 링크 입력 화면 안내 영역이 펼쳐졌을 때의 접근성 값",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "펼쳐짐"
+          }
+        }
+      }
+    },
+    "guideSectionFifthStep" : {
+      "comment" : "저장소 링크 입력 화면 안내의 다섯 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복사한 주소를 위에 입력해주세요."
+          }
+        }
+      }
+    },
+    "guideSectionFirstStep" : {
+      "comment" : "저장소 링크 입력 화면 안내의 첫 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습하고싶은 레포지토리를 발견하셨나요?"
+          }
+        }
+      }
+    },
+    "guideSectionFourthStep" : {
+      "comment" : "저장소 링크 입력 화면 안내의 네 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTPS 탭에서 주소 옆 복사 아이콘을 누릅니다."
+          }
+        }
+      }
+    },
+    "guideSectionSecondStep" : {
+      "comment" : "저장소 링크 입력 화면 안내의 두 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 리포지토리 페이지로 이동합니다."
+          }
+        }
+      }
+    },
+    "guideSectionThirdStep" : {
+      "comment" : "저장소 링크 입력 화면 안내의 세 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우측 상단의 [Code] 버튼을 클릭합니다."
+          }
+        }
+      }
+    },
+    "guideSectionTitle" : {
+      "comment" : "저장소 링크 입력 화면 안내 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "불러오기 방법"
+          }
+        }
+      }
+    },
+    "quizGenerationConfirmationDurationMessage" : {
+      "comment" : "학습 세트 생성 확인 화면의 소요 시간 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1~5분의 시간이 소요돼요"
+          }
+        }
+      }
+    },
+    "quizGenerationConfirmationStartButtonTitle" : {
+      "comment" : "학습 세트 생성 확인 화면의 생성 시작 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기"
+          }
+        }
+      }
+    },
+    "quizGenerationConfirmationTitle" : {
+      "comment" : "학습 세트 생성 확인 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "입력해주신 정보로\n학습 세트를 만들게요"
+          }
+        }
+      }
+    },
+    "quizGenerationFailureMessage" : {
+      "comment" : "학습 세트 생성 진행 화면에서 생성에 실패했을 때 보이는 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "quizGenerationFailureRetryButtonTitle" : {
+      "comment" : "학습 세트 생성 진행 화면의 생성 실패 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "quizGenerationFailureTitle" : {
+      "comment" : "학습 세트 생성 진행 화면에서 생성에 실패했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트를 만들지 못했어요"
+          }
+        }
+      }
+    },
+    "quizGenerationProgressDurationMessage" : {
+      "comment" : "학습 세트 생성 진행 화면의 소요 시간 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "약 5분의 시간이 소요돼요"
+          }
+        }
+      }
+    },
+    "quizGenerationProgressTitle" : {
+      "comment" : "학습 세트 생성 진행 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습세트를 만들고 있어요"
+          }
+        }
+      }
+    },
+    "quizGenerationProgressWaitAtHomeButtonTitle" : {
+      "comment" : "학습 세트 생성 진행 화면의 홈으로 돌아가 기다리는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈에서 기다리기"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionAdvancedDescription" : {
+      "comment" : "학습 수준 선택 화면의 세 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "심화 문제와 서술형 비중 확대"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionAdvancedTitle" : {
+      "comment" : "학습 수준 선택 화면의 세 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유사 프로젝트 경험이 있어요"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionBasicDescription" : {
+      "comment" : "학습 수준 선택 화면의 첫 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실제 코드 작동 방식을 흐름 중심으로 학습"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionBasicTitle" : {
+      "comment" : "학습 수준 선택 화면의 첫 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기술 개념은 알아요"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionIntermediateDescription" : {
+      "comment" : "학습 수준 선택 화면의 두 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구현 의도와 연결 영향까지 포함"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionIntermediateTitle" : {
+      "comment" : "학습 수준 선택 화면의 두 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일부 코드를 봤어요"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionNextButtonTitle" : {
+      "comment" : "학습 수준 선택 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "quizLevelSelectionTitle" : {
+      "comment" : "학습 수준 선택 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?"
+          }
+        }
+      }
+    },
+    "repositoryConfirmationNextButtonTitle" : {
+      "comment" : "저장소 확인 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "repositoryConfirmationRejectButtonTitle" : {
+      "comment" : "저장소 확인 화면에서 다른 저장소임을 알리는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리가 아니에요"
+          }
+        }
+      }
+    },
+    "repositoryConfirmationTitle" : {
+      "comment" : "저장소 확인 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리가 맞으면\n학습 설정을 진행할게요"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputFieldAccessibilityLabel" : {
+      "comment" : "저장소 링크 입력 화면 입력란의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 레포지토리 링크"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputFieldLabel" : {
+      "comment" : "저장소 링크 입력 화면 입력란의 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputNextButtonTitle" : {
+      "comment" : "저장소 링크 입력 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputTitle" : {
+      "comment" : "저장소 링크 입력 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 레포지토리\n링크를 붙여넣어 주세요"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputValidatingButtonTitle" : {
+      "comment" : "저장소 링크 입력 화면에서 링크를 확인하는 동안의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인 중…"
+          }
+        }
+      }
+    },
+    "repositoryLinkInputValidationErrorMessage" : {
+      "comment" : "저장소 링크 입력 화면에서 링크 검증에 실패했을 때 입력란 아래 보이는 오류 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "올바른 GitHub 레포지토리 링크를 입력해 주세요."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
