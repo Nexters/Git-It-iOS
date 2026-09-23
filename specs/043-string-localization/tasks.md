@@ -221,22 +221,22 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 준비와 기반
 
-- [ ] T050 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`의 `Feature` target `.module(...)`에 `resources: .resources([.glob(pattern: "*/Resources/**")])`를 추가한다. source glob과 `sourceExcludes`는 바꾸지 않는다
-- [ ] T051 [P] [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText.swift`에 case 없는 `internal enum LocalizedText {}` 루트를 만든다
-- [ ] T052 [P] [S1] `sources/Projects/Feature/AppEntry/Resources/AppEntry.xcstrings`를 만들고 `AppEntryScreen.swift`의 문구를 등록한다
-- [ ] T053 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+AppEntry.swift`에 `extension LocalizedText { enum AppEntry { … } }`로 항목별 멤버를 선언한다
+- [X] T050 [S1] `sources/Tuist/ProjectDescriptionHelpers/Projects/FeatureModuleName.swift`의 `Feature` target `.module(...)`에 `resources: .resources([.glob(pattern: "*/Resources/**")])`를 추가한다. source glob과 `sourceExcludes`는 바꾸지 않는다
+- [X] T051 [P] [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText.swift`에 case 없는 `internal enum LocalizedText {}` 루트를 만든다
+- [X] T052 [P] [S1] `sources/Projects/Feature/AppEntry/Resources/AppEntry.xcstrings`를 만들고 `AppEntryScreen.swift`의 문구를 등록한다
+- [X] T053 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+AppEntry.swift`에 `extension LocalizedText { enum AppEntry { … } }`로 항목별 멤버를 선언한다
 
 ### 테스트
 
-- [ ] T054 [S1] `sources/Projects/Feature/Tests/Shared/Localization/LocalizedTextTests.swift`에 `@testable import Feature`로 `LocalizedText.AppEntry`의 항목 하나가 변경 전 한국어 문구를 반환하는지 검증하는 테스트를 작성한다
+- [X] T054 [S1] `sources/Projects/Feature/Tests/Shared/Localization/LocalizedTextTests.swift`에 `@testable import Feature`로 `LocalizedText.AppEntry`의 항목 하나가 변경 전 한국어 문구를 반환하는지 검증하는 테스트를 작성한다
 
 ### 구현
 
-- [ ] T055 [S1] `sources/Projects/Feature/AppEntry/AppEntryScreen.swift`의 문구 3곳을 `LocalizedText.AppEntry`로 교체한다(공통 작업 규칙)
+- [X] T055 [S1] `sources/Projects/Feature/AppEntry/AppEntryScreen.swift`의 문구 3곳을 `LocalizedText.AppEntry`로 교체한다(공통 작업 규칙)
 
 ### 정리와 단위 검증
 
-- [ ] T056 [no-write] `make tuist`(전후 `git status --porcelain` 비교) 후 `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`과 `test`를 통과시킨다
+- [X] T056 [no-write] `make tuist`(전후 `git status --porcelain` 비교) 후 `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`과 `test`를 통과시킨다
 
 **진행 점검**: T050~T056의 변경 파일과 검증 결과를 보고하고 실행 단위 5로 진행한다.
 
