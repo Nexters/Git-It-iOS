@@ -24,17 +24,17 @@ public struct ProjectDetailRouter: View {
                 }
             }
             .alert(
-                "문제를 불러오지 못했어요",
+                LocalizedText.ProjectDetail.singleQuestionFailureTitle,
                 isPresented: entryFailureBinding,
             ) {
                 Button(
-                    "확인",
+                    LocalizedText.ProjectDetail.singleQuestionFailureConfirmButtonTitle,
                     role: .cancel,
                 ) {
                     send(.singleQuestionFailureDismissed)
                 }
             } message: {
-                Text("잠시 후 다시 시도해 주세요.")
+                Text(LocalizedText.ProjectDetail.singleQuestionFailureMessage)
             }
     }
 
@@ -59,7 +59,7 @@ public struct ProjectDetailRouter: View {
             ProgressView()
                 .tint(Color(designSystem: .blue100))
         }
-        .accessibilityLabel("문제를 불러오는 중")
+        .accessibilityLabel(LocalizedText.ProjectDetail.singleQuestionLoadingAccessibilityLabel)
     }
 
     private var pushedScreens: [ProjectDetailRouterFeature.ActiveScreen] {

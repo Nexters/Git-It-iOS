@@ -315,15 +315,15 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.6 ProjectDetail (6개 파일, 25곳)
 
-- [ ] T094 [S1] `sources/Projects/Feature/ProjectDetail/Resources/ProjectDetail.xcstrings`를 만들고 아래 6개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T095 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ProjectDetail.swift`에 `extension LocalizedText { enum ProjectDetail { … } }`로 항목별 멤버를 선언한다
-- [ ] T096 [P] [S1] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`의 문구 13곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T097 [P] [S1] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouter.swift`의 문구 4곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T098 [P] [S1] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`의 문구 1곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T099 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+DetailContentView.swift`의 문구 2곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T100 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`의 문구 3곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T101 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`의 문구 2곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
-- [ ] T102 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ProjectDetail`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T094 [S1] `sources/Projects/Feature/ProjectDetail/Resources/ProjectDetail.xcstrings`를 만들고 아래 6개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T095 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ProjectDetail.swift`에 `extension LocalizedText { enum ProjectDetail { … } }`로 항목별 멤버를 선언한다
+- [X] T096 [P] [S1] `sources/Projects/Feature/ProjectDetail/ProjectDetailScreen.swift`의 문구 13곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T097 [P] [S1] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouter.swift`의 문구 4곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T098 [P] [S1] `sources/Projects/Feature/ProjectDetail/Router/ProjectDetailRouterFeature.swift`의 문구 1곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T099 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+DetailContentView.swift`의 문구 2곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T100 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+RepositorySummaryView.swift`의 문구 3곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T101 [P] [S1] `sources/Projects/Feature/ProjectDetail/SubViews/ProjectDetailScreen+SetListSection.swift`의 문구 2곳을 `LocalizedText.ProjectDetail`로 교체한다(공통 작업 규칙)
+- [X] T102 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ProjectDetail`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T094~T102의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

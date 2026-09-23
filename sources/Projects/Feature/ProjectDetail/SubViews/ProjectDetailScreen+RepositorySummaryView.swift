@@ -47,7 +47,7 @@ extension ProjectDetailScreen {
 
                     LabeledProgressBar(
                         displayModel: .init(
-                            label: "전체 진행률",
+                            label: LocalizedText.ProjectDetail.repositorySummaryOverallProgressLabel,
                             progress: Double(overallProgressPercent) / 100,
                             valueText: "\(overallProgressPercent)%",
                         )
@@ -167,7 +167,7 @@ extension ProjectDetailScreen {
             }
             .buttonStyle(.plain)
             .disabled(!isResumeEnabled)
-            .accessibilityLabel("이어서 학습")
+            .accessibilityLabel(LocalizedText.ProjectDetail.repositorySummaryResumeAccessibilityLabel)
         }
 
         private func abbreviatedUnit(

@@ -1,0 +1,294 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "detailContentLoadFailureMessage" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 가운데 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "detailContentLoadFailureTitle" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 가운데 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "projectDetailDeletionDialogCancelButtonTitle" : {
+      "comment" : "프로젝트 상세 화면 삭제 확인 대화상자의 취소 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
+    },
+    "projectDetailDeletionDialogConfirmButtonTitle" : {
+      "comment" : "프로젝트 상세 화면 삭제 확인 대화상자의 삭제 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        }
+      }
+    },
+    "projectDetailDeletionDialogMessage" : {
+      "comment" : "프로젝트 상세 화면의 삭제 확인 대화상자 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다."
+          }
+        }
+      }
+    },
+    "projectDetailDeletionDialogTitle" : {
+      "comment" : "프로젝트 상세 화면의 삭제 확인 대화상자 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 삭제할까요?"
+          }
+        }
+      }
+    },
+    "projectDetailDeletionMenuItemAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 삭제 항목 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 삭제"
+          }
+        }
+      }
+    },
+    "projectDetailDeletionMenuItemTitle" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 삭제 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제하기"
+          }
+        }
+      }
+    },
+    "projectDetailMenuOpenAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 화면 상단 메뉴 버튼의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "메뉴 열기"
+          }
+        }
+      }
+    },
+    "projectDetailRepositoryLinkMenuItemAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장소 링크 항목 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub에서 보기"
+          }
+        }
+      }
+    },
+    "projectDetailRepositoryLinkMenuItemTitle" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장소 링크 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub에서 보기"
+          }
+        }
+      }
+    },
+    "projectDetailRetryButtonTitle" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 하단에 보이는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "projectDetailSavedQuestionsMenuItemAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장한 문제 항목 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 문제 보기"
+          }
+        }
+      }
+    },
+    "projectDetailSavedQuestionsMenuItemTitle" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장한 문제 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 문제"
+          }
+        }
+      }
+    },
+    "projectDetailSingleQuestionAdvanceButtonTitle" : {
+      "comment" : "프로젝트 상세 화면에서 연 단일 문제 풀이의 마지막 진행 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
+    },
+    "projectDetailSingleQuestionFailureConfirmButtonTitle" : {
+      "comment" : "프로젝트 상세 화면의 단일 문제 불러오기 실패 알림을 닫는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
+    },
+    "projectDetailSingleQuestionFailureMessage" : {
+      "comment" : "프로젝트 상세 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "projectDetailSingleQuestionFailureTitle" : {
+      "comment" : "프로젝트 상세 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "projectDetailSingleQuestionLoadingAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 화면에서 단일 문제를 준비하는 동안 보이는 로딩 표시의 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제를 불러오는 중"
+          }
+        }
+      }
+    },
+    "repositorySummaryOverallProgressLabel" : {
+      "comment" : "프로젝트 상세 저장소 요약의 전체 진행률 막대 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 진행률"
+          }
+        }
+      }
+    },
+    "repositorySummaryResumeAccessibilityLabel" : {
+      "comment" : "프로젝트 상세 저장소 요약의 이어서 학습 버튼 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이어서 학습"
+          }
+        }
+      }
+    },
+    "setListSectionEmptyMessage" : {
+      "comment" : "학습 세트가 없을 때 보이는 빈 상태 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 만들어진 학습 세트가 없습니다."
+          }
+        }
+      }
+    },
+    "setListSectionEmptyTitle" : {
+      "comment" : "학습 세트가 없을 때 보이는 빈 상태 제목(코드 표기 형태의 장식 문구)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sets = []"
+          }
+        }
+      }
+    },
+    "setListSectionTitle" : {
+      "comment" : "프로젝트 상세 화면 학습 세트 목록의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

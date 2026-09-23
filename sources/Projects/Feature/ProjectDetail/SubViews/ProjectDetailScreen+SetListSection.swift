@@ -15,7 +15,7 @@ extension ProjectDetailScreen {
                 alignment: .leading,
                 spacing: Constant.titleSpacing,
             ) {
-                StyledText(text: "학습 세트")
+                StyledText(text: LocalizedText.ProjectDetail.setListSectionTitle)
                     .textStyle(.subtitle2)
 
                 cards
@@ -35,8 +35,8 @@ extension ProjectDetailScreen {
             if sets.isEmpty {
                 EmptyState(
                     displayModel: .init(
-                        title: "sets = []",
-                        message: "아직 만들어진 학습 세트가 없습니다.",
+                        title: LocalizedText.ProjectDetail.setListSectionEmptyTitle,
+                        message: LocalizedText.ProjectDetail.setListSectionEmptyMessage,
                     )
                 ) {
                     ResourceImage(asset: .illust(.levelEntry))
