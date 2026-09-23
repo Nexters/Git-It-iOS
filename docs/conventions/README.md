@@ -16,6 +16,7 @@
 | [View 토큰](./view-tokens.md) | 색상·레이아웃·Typography 토큰 사용 규칙 |
 | [View 내부 선언](./view-declarations.md) | `Constant`·`Style` 등 View 내부 선언의 정의 위치, 접근 수준과 소유 판정 |
 | [UIComponent](./ui-component.md) | 컴포넌트 경계, 공개 입력, 파일·자산 구성과 검증 |
+| [현지화](./localization.md) | 사용자 노출 문구의 카탈로그, 키, `LocalizedText` 조회 진입점과 제외 대상 |
 | [TCA](./tca/README.md) | TCA 핵심 용어, 제약조건과 하위 문서 안내 |
 
 ## 문서 구조

@@ -2,8 +2,10 @@
 
 [Git It iOS View 내부 선언 컨벤션](../view-declarations.md)의 규칙 문서입니다.
 
-상태와 무관한 수치, 정적 문자열, 플레이스홀더는 case 없는 `Constant`의 `static` 멤버로
-정의합니다. 비제네릭 View는 `static let` 저장 프로퍼티를 사용합니다.
+상태와 무관한 수치, 사용자에게 보이지 않는 정적 문자열, 플레이스홀더는 case 없는 `Constant`의
+`static` 멤버로 정의합니다. 비제네릭 View는 `static let` 저장 프로퍼티를 사용합니다. 사용자 노출
+문구는 `Constant`가 아니라 [현지화 컨벤션 §4.1](../localization.md#41-localizedtext)의
+`LocalizedText`가 소유합니다.
 
 **최상위 View는 파일 하단의 `private extension`에 `Constant`를 정의합니다.** `body`를
 읽는 흐름이 상수 목록으로 끊기지 않게 하고, `private`을 extension 하나에 붙여 View 밖

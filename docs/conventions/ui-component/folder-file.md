@@ -3,7 +3,7 @@
 [Git It iOS UIComponent 컨벤션](../ui-component.md)의 규칙 문서입니다.
 
 - `UI/Component/`의 1뎁스는 §3.2의 역할 폴더, 여러 역할 폴더의 컴포넌트가 채택하는 시각 속성
-  계약을 두는 `Contracts/`, 모듈 문구 전용 타입 `LocalizedText`를 두는 `Localization/`과
+  계약을 두는 `Contracts/`, 모듈 문구 전용 타입 `LocalizedText`를 두는 `Localization/`([현지화 §4.1](../localization.md#41-localizedtext))과
   `Resources/`뿐입니다. `Components/` 같은 target 이름을 반복하는
   중간 폴더를 두지 않습니다.
 - 컴포넌트 파일과 타입 이름은 표현 대상을 사용하고 `View` 접미어를 붙이지 않습니다.

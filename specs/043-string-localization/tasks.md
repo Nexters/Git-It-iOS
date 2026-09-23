@@ -174,32 +174,32 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 구현
 
-- [ ] T027 [S1] `docs/conventions/localization.md` 인덱스를 [계약 §B](./contracts/localization-convention.md#b-인덱스-docsconventionslocalizationmd)대로 작성한다
-- [ ] T028 [P] [S1] `docs/conventions/localization/target-text.md`를 [계약 §C](./contracts/localization-convention.md#c1-localizationtarget-textmd--현지화-대상)의 규칙 본문으로 작성한다
-- [ ] T029 [P] [S1] `docs/conventions/localization/exclusion.md`를 [계약 §C](./contracts/localization-convention.md#c2-localizationexclusionmd--제외-대상)의 규칙 본문으로 작성한다
-- [ ] T030 [P] [S1] `docs/conventions/localization/string-catalog.md`를 [계약 §C](./contracts/localization-convention.md#c3-localizationstring-catalogmd--string-catalog)의 규칙 본문으로 작성한다
-- [ ] T031 [P] [S1] `docs/conventions/localization/key.md`를 [계약 §C](./contracts/localization-convention.md#c4-localizationkeymd--키)의 규칙 본문으로 작성한다
-- [ ] T032 [P] [S2] `docs/conventions/localization/entry-value.md`를 [계약 §C](./contracts/localization-convention.md#c5-localizationentry-valuemd--값과-주석)의 규칙 본문으로 작성한다
-- [ ] T033 [P] [S1] `docs/conventions/localization/localized-text.md`를 [계약 §C](./contracts/localization-convention.md#c6-localizationlocalized-textmd--localizedtext)의 규칙 본문으로 작성한다
-- [ ] T034 [P] [S1] `docs/conventions/localization/call-site.md`를 [계약 §C](./contracts/localization-convention.md#c7-localizationcall-sitemd--호출부)의 규칙 본문으로 작성한다
-- [ ] T035 [P] [S1] `docs/conventions/localization/development-language.md`를 [계약 §C](./contracts/localization-convention.md#c8-localizationdevelopment-languagemd--개발-언어와-빌드-설정)의 규칙 본문으로 작성한다
-- [ ] T036 [P] [S2] `docs/conventions/localization/adding-language.md`를 [계약 §C](./contracts/localization-convention.md#c9-localizationadding-languagemd--언어-추가)의 규칙 본문으로 작성한다
-- [ ] T037 [P] [S1] `docs/conventions/localization/verification.md`를 [계약 §C](./contracts/localization-convention.md#c10-localizationverificationmd--검증)의 규칙 본문으로 작성한다
-- [ ] T038 [P] [S1] `docs/conventions/README.md`의 표에 현지화 컨벤션 행을 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T039 [P] [S1] `docs/conventions/file-vocabulary/shape-vocabulary.md`의 세 `Localization/` 행에 현지화 컨벤션 §4.1(`../localization.md#41-localizedtext`) 링크를 연결한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
-- [ ] T040 [P] [S1] `docs/conventions/directory-file/resources.md`의 String Catalog 소유 문장과 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T041 [P] [S1] `docs/conventions/directory-file/feature-layout.md`의 1뎁스 표 `Resources/` 설명을 “흐름이 소유하는 자산과 문구 카탈로그 (§6)”로 고친다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T042 [P] [S1] `docs/conventions/ui-component/folder-file.md`의 `Localization/` 항목에 현지화 컨벤션 §4.1 링크를 연결한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
-- [ ] T043 [P] [S1] `docs/conventions/ui-component/asset.md`의 컴포넌트 고정 문구 카탈로그 소유 문장을 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T044 [P] [S1] `docs/conventions/view-declarations/constant.md`의 “사용자에게 보이지 않는 정적 문자열”로 고치고 사용자 노출 문구는 `LocalizedText`가 소유한다는 문장과 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T045 [P] [S1] `docs/conventions/view-declarations.md`의 §2.1 요약 문장을 `constant.md`와 같게 고친다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T046 [P] [S1] `docs/package-rules/ui.md`의 “구현 컨벤션”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T047 [P] [S1] `docs/package-rules/feature.md`의 “구현 컨벤션”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
-- [ ] T048 [P] [S1] `docs/package-rules/app.md`의 “정책”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T027 [S1] `docs/conventions/localization.md` 인덱스를 [계약 §B](./contracts/localization-convention.md#b-인덱스-docsconventionslocalizationmd)대로 작성한다
+- [X] T028 [P] [S1] `docs/conventions/localization/target-text.md`를 [계약 §C](./contracts/localization-convention.md#c1-localizationtarget-textmd--현지화-대상)의 규칙 본문으로 작성한다
+- [X] T029 [P] [S1] `docs/conventions/localization/exclusion.md`를 [계약 §C](./contracts/localization-convention.md#c2-localizationexclusionmd--제외-대상)의 규칙 본문으로 작성한다
+- [X] T030 [P] [S1] `docs/conventions/localization/string-catalog.md`를 [계약 §C](./contracts/localization-convention.md#c3-localizationstring-catalogmd--string-catalog)의 규칙 본문으로 작성한다
+- [X] T031 [P] [S1] `docs/conventions/localization/key.md`를 [계약 §C](./contracts/localization-convention.md#c4-localizationkeymd--키)의 규칙 본문으로 작성한다
+- [X] T032 [P] [S2] `docs/conventions/localization/entry-value.md`를 [계약 §C](./contracts/localization-convention.md#c5-localizationentry-valuemd--값과-주석)의 규칙 본문으로 작성한다
+- [X] T033 [P] [S1] `docs/conventions/localization/localized-text.md`를 [계약 §C](./contracts/localization-convention.md#c6-localizationlocalized-textmd--localizedtext)의 규칙 본문으로 작성한다
+- [X] T034 [P] [S1] `docs/conventions/localization/call-site.md`를 [계약 §C](./contracts/localization-convention.md#c7-localizationcall-sitemd--호출부)의 규칙 본문으로 작성한다
+- [X] T035 [P] [S1] `docs/conventions/localization/development-language.md`를 [계약 §C](./contracts/localization-convention.md#c8-localizationdevelopment-languagemd--개발-언어와-빌드-설정)의 규칙 본문으로 작성한다
+- [X] T036 [P] [S2] `docs/conventions/localization/adding-language.md`를 [계약 §C](./contracts/localization-convention.md#c9-localizationadding-languagemd--언어-추가)의 규칙 본문으로 작성한다
+- [X] T037 [P] [S1] `docs/conventions/localization/verification.md`를 [계약 §C](./contracts/localization-convention.md#c10-localizationverificationmd--검증)의 규칙 본문으로 작성한다
+- [X] T038 [P] [S1] `docs/conventions/README.md`의 표에 현지화 컨벤션 행을 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T039 [P] [S1] `docs/conventions/file-vocabulary/shape-vocabulary.md`의 세 `Localization/` 행에 현지화 컨벤션 §4.1(`../localization.md#41-localizedtext`) 링크를 연결한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
+- [X] T040 [P] [S1] `docs/conventions/directory-file/resources.md`의 String Catalog 소유 문장과 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T041 [P] [S1] `docs/conventions/directory-file/feature-layout.md`의 1뎁스 표 `Resources/` 설명을 “흐름이 소유하는 자산과 문구 카탈로그 (§6)”로 고친다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T042 [P] [S1] `docs/conventions/ui-component/folder-file.md`의 `Localization/` 항목에 현지화 컨벤션 §4.1 링크를 연결한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정))
+- [X] T043 [P] [S1] `docs/conventions/ui-component/asset.md`의 컴포넌트 고정 문구 카탈로그 소유 문장을 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T044 [P] [S1] `docs/conventions/view-declarations/constant.md`의 “사용자에게 보이지 않는 정적 문자열”로 고치고 사용자 노출 문구는 `LocalizedText`가 소유한다는 문장과 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T045 [P] [S1] `docs/conventions/view-declarations.md`의 §2.1 요약 문장을 `constant.md`와 같게 고친다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T046 [P] [S1] `docs/package-rules/ui.md`의 “구현 컨벤션”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T047 [P] [S1] `docs/package-rules/feature.md`의 “구현 컨벤션”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
+- [X] T048 [P] [S1] `docs/package-rules/app.md`의 “정책”에 현지화 컨벤션 링크를 추가한다([계약 §D](./contracts/localization-convention.md#d-기존-문서-수정)). `최종 수정일`을 갱신한다
 
 ### 정리와 단위 검증
 
-- [ ] T049 [no-write] `quickstart.md` §7을 실행해 문서 목록, 인덱스 순서, `###`의 링크 형식, 기존 문서의 링크 전용 서술, 모든 상대 링크 대상의 존재를 확인한다
+- [X] T049 [no-write] `quickstart.md` §7을 실행해 문서 목록, 인덱스 순서, `###`의 링크 형식, 기존 문서의 링크 전용 서술, 모든 상대 링크 대상의 존재를 확인한다
 
 **진행 점검**: T027~T049의 변경 파일과 검증 결과를 보고하고 실행 단위 4로 진행한다.
 
