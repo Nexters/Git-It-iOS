@@ -19,64 +19,71 @@ public struct ProjectListScreen: View {
     @Bindable public var store: StoreOf<ProjectListFeature>
 
     public var body: some View {
-        screen
-            .overlay {
-                if store.mode == .menuPresented {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .ignoresSafeArea()
-                        .accessibilityHidden(true)
-                        .onTapGesture { send(.menuDismissed) }
-                }
+        OverlayContainer {
+            header
+        } content: {
+            content
+        } footer: {
+            footer
+        }
+        .refreshable { await send(.refreshRequested).finish() }
+        .overlay {
+            if store.mode == .menuPresented {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .accessibilityHidden(true)
+                    .onTapGesture { send(.menuDismissed) }
             }
-            .overlay(alignment: .topTrailing) {
-                if store.mode == .menuPresented {
-                    ActionMenu(items: menuItems)
-                        .padding(.trailing, LayoutToken.margin)
-                        .offset(y: Constant.menuTopOffset)
-                        .transition(.opacity)
-                        .padding(.top, 10)
-                }
+        }
+        .overlay(alignment: .topTrailing) {
+            if store.mode == .menuPresented {
+                ActionMenu(items: menuItems)
+                    .padding(.trailing, LayoutToken.margin)
+                    .offset(y: Constant.menuTopOffset)
+                    .transition(.opacity)
+                    .padding(.top, 10)
             }
-            .animation(
-                .easeInOut(duration: Constant.menuTransitionDuration),
-                value: store.mode,
-            )
-            .overlay {
-                ModalOverlay(
-                    isPresented: Binding(
-                        get: { isDeletionConfirmationPresented },
-                        set: { isPresented in
-                            if !isPresented {
-                                send(.deletionCancelled)
-                            }
-                        },
-                    )
-                ) {
-                    ConfirmationSheet(
-                        displayModel: .init(
-                            imageURL: deletionTarget?.imageURL,
-                            title: "프로젝트를 삭제할까요?",
-                            message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
-                            confirmTitle: "삭제",
-                            cancelTitle: "취소",
-                        ),
-                        onConfirmTap: { send(.deletionConfirmed) },
-                        onCancelTap: { send(.deletionCancelled) },
-                    )
-                }
+        }
+        .animation(
+            .easeInOut(duration: Constant.menuTransitionDuration),
+            value: store.mode,
+        )
+        .overlay {
+            ModalOverlay(
+                isPresented: Binding(
+                    get: { isDeletionConfirmationPresented },
+                    set: { isPresented in
+                        if !isPresented {
+                            send(.deletionCancelled)
+                        }
+                    },
+                )
+            ) {
+                ConfirmationSheet(
+                    displayModel: .init(
+                        imageURL: deletionTarget?.imageURL,
+                        title: "프로젝트를 삭제할까요?",
+                        message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
+                        confirmTitle: "삭제",
+                        cancelTitle: "취소",
+                    ),
+                    onConfirmTap: { send(.deletionConfirmed) },
+                    onCancelTap: { send(.deletionCancelled) },
+                )
             }
-            .overlay {
-                if store.projectSummaries.load == .loading, store.projects.isEmpty {
-                    ProgressView()
-                        .tint(Color(designSystem: .blue100))
-                }
+        }
+        .overlay {
+            if store.projectSummaries.load == .loading, store.projects.isEmpty {
+                ProgressView()
+                    .tint(Color(designSystem: .blue100))
             }
-            .toolbar(
-                store.mode == .deleting ? .hidden : .visible,
-                for: .tabBar,
-            )
-            .task { await send(.task).finish() }
+        }
+        .toolbar(
+            store.mode == .deleting ? .hidden : .visible,
+            for: .tabBar,
+        )
+        .task { await send(.task).finish() }
     }
 
     // MARK: Internal
@@ -87,113 +94,76 @@ public struct ProjectListScreen: View {
 
     // MARK: Private
 
-    @ViewBuilder
-    private var screen: some View {
-        switch (store.projectSummaries.load, store.projects.isEmpty) {
-        case (.failed, _):
-            ScreenContainer {
-                Self.FailureView(onRetry: { send(.refreshRequested) })
-            }
-
-        case (_, true):
-            ScreenContainer {
-                VStack {
-                    HStack(alignment: .top) {
-                        VStack(
-                            alignment: .leading,
-                            spacing: Constant.headerTitleSpacing,
-                        ) {
-                            if let headerLeading {
-                                IconGlassButton(
-                                    icon: headerLeading.icon,
-                                    label: headerLeading.label,
-                                    action: headerLeadingTapped,
-                                )
-                                .size(.medium)
-                                .frame(height: Constant.headerControlRowHeight)
-                            }
-
-                            ScreenHeaderTitle(displayModel: .init(title: headerTitle))
-                                .frame(height: Constant.headerControlRowHeight)
-                        }
-
-                        Spacer()
-
-                        if let headerTrailing, !store.projects.isEmpty {
-                            IconGlassButton(
-                                icon: headerTrailing.icon,
-                                label: headerTrailing.label,
-                                action: headerTrailingTapped,
-                            )
-                            .size(.medium)
-                            .frame(minHeight: Constant.headerControlRowHeight)
-                        }
-                    }
-                    .padding(.vertical, Constant.headerBottomPadding)
-                    .designSystemScreenMargin()
-
-                    Self.EmptyProjectsView()
-                }
-            }
-
-        case (_, false):
-            content
+    private var isFailed: Bool {
+        if case .failed = store.projectSummaries.load {
+            return true
         }
+        return false
     }
 
-    private var content: some View {
-        OverlayContainer {
-            HStack(alignment: .top) {
-                VStack(
-                    alignment: .leading,
-                    spacing: Constant.headerTitleSpacing,
-                ) {
-                    if let headerLeading {
-                        IconGlassButton(
-                            icon: headerLeading.icon,
-                            label: headerLeading.label,
-                            action: headerLeadingTapped,
-                        )
-                        .size(.medium)
-                        .frame(minHeight: Constant.headerControlRowHeight)
-                    }
-
-                    ScreenHeaderTitle(displayModel: .init(title: headerTitle))
-                        .frame(minHeight: Constant.headerControlRowHeight)
-                }
-                .designSystemScreenMargin()
-
-                Spacer()
-
-                if let headerTrailing {
+    private var header: some View {
+        HStack(alignment: .top) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.headerTitleSpacing,
+            ) {
+                if let headerLeading {
                     IconGlassButton(
-                        icon: headerTrailing.icon,
-                        label: headerTrailing.label,
-                        action: headerTrailingTapped,
+                        icon: headerLeading.icon,
+                        label: headerLeading.label,
+                        action: headerLeadingTapped,
                     )
                     .size(.medium)
                     .frame(minHeight: Constant.headerControlRowHeight)
-                    .designSystemScreenMargin()
-                }
-            }
-            .padding(.vertical, Constant.headerBottomPadding)
-
-        } content: {
-            LazyVStack(spacing: LayoutToken.compactSpacing) {
-                ForEach(projects) { project in
-                    row(project)
-                        .onAppear { rowAppeared(projectID: project.id) }
                 }
 
-                Self.NextPageFooter(
-                    pagination: store.pagination.pagination,
-                    onRetry: { send(.nextPageRetryTapped) },
-                )
+                ScreenHeaderTitle(displayModel: .init(title: headerTitle))
+                    .frame(minHeight: Constant.headerControlRowHeight)
             }
             .designSystemScreenMargin()
-            .padding(.vertical, Constant.contentVerticalPadding)
+
+            Spacer()
+
+            if let headerTrailing, !isFailed, !projects.isEmpty {
+                IconGlassButton(
+                    icon: headerTrailing.icon,
+                    label: headerTrailing.label,
+                    action: headerTrailingTapped,
+                )
+                .size(.medium)
+                .frame(minHeight: Constant.headerControlRowHeight)
+                .designSystemScreenMargin()
+            }
         }
-        .refreshable { await send(.refreshRequested).finish() }
+        .padding(.vertical, Constant.headerBottomPadding)
+    }
+
+    private var content: some View {
+        Self.ProjectCollectionView(
+            projects: projects,
+            isFailed: isFailed,
+            row: { project in
+                row(project)
+                    .onAppear { rowAppeared(projectID: project.id) }
+            },
+        ) {
+            Self.NextPageFooter(
+                pagination: store.pagination.pagination,
+                onRetry: { send(.nextPageRetryTapped) },
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        if isFailed {
+            FeedbackActionButton(
+                title: "다시 시도하기",
+                action: { send(.refreshRequested) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.footerBottomPadding)
+        }
     }
 
     private var deletionTarget: ProjectListDisplay? {
@@ -280,7 +250,7 @@ public struct ProjectListScreen: View {
 
 extension ProjectListScreen {
     fileprivate enum Constant {
-        static let contentVerticalPadding: CGFloat = 16
+        static let footerBottomPadding: CGFloat = 24
         static let menuControl = ScreenControlBar.Control(
             icon: .menu,
             label: "메뉴 열기",

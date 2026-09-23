@@ -3,16 +3,16 @@ import Testing
 
 @testable import Feature
 
-@Suite("HomeProjectSectionState")
-struct HomeProjectSectionStateTests {
+@Suite("HomeScreen.ProjectSectionState")
+struct HomeScreenProjectSectionStateTests {
 
     @Test
     func `대기와 로딩은 모두 loading으로 접힌다`() {
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .idle,
             access: .member,
         ) == .loading)
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .loading,
             access: .member,
         ) == .loading)
@@ -20,7 +20,7 @@ struct HomeProjectSectionStateTests {
 
     @Test
     func `항목이 없는 목록은 empty로 구분한다`() {
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .loaded(HomeTestFixture.emptyPage),
             access: .member,
         ) == .empty)
@@ -29,7 +29,7 @@ struct HomeProjectSectionStateTests {
     @Test
     func `항목이 있는 목록은 순서를 유지한 표시 값으로 변환한다`() {
         guard
-            case .loaded(let displays) = HomeProjectSectionState(
+            case .loaded(let displays) = HomeScreen.ProjectSectionState(
                 .loaded(HomeTestFixture.manyProjectsPage),
                 access: .member,
             )
@@ -57,7 +57,7 @@ struct HomeProjectSectionStateTests {
         )
 
         guard
-            case .loaded(let displays) = HomeProjectSectionState(
+            case .loaded(let displays) = HomeScreen.ProjectSectionState(
                 .loaded(list),
                 access: .member,
             )
@@ -71,7 +71,7 @@ struct HomeProjectSectionStateTests {
 
     @Test
     func `조회 실패는 failed로 변환한다`() {
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .failed(.unexpected),
             access: .member,
         ) == .failed)
@@ -79,19 +79,19 @@ struct HomeProjectSectionStateTests {
 
     @Test
     func `비로그인이면 조회 상태와 무관하게 signInRequired다`() {
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .idle,
             access: .guest,
         ) == .signInRequired)
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .loading,
             access: .guest,
         ) == .signInRequired)
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .loaded(HomeTestFixture.manyProjectsPage),
             access: .guest,
         ) == .signInRequired)
-        #expect(HomeProjectSectionState(
+        #expect(HomeScreen.ProjectSectionState(
             .failed(.unexpected),
             access: .guest,
         ) == .signInRequired)

@@ -13,56 +13,14 @@ struct LearningSetIntroScreen: View {
     @Bindable var store: StoreOf<LearningSetIntroFeature>
 
     var body: some View {
-        Group {
-            if case .failed = store.setLoad {
-                ScreenContainer {
-                    ErrorView(
-                        bottomButtonPadding: Constant.bottomButtonPadding,
-                        onBack: { send(.backTapped) },
-                        onRetry: { send(.retryTapped) },
-                    )
-                }
-            } else {
-                content
-            }
-        }
-        .task { await send(.task).finish() }
-    }
-
-    // MARK: Private
-
-    private var content: some View {
         OverlayContainer {
-            ScreenControlBar(
-                onLeadingTap: { send(.backTapped) }
-            )
-            .designSystemScreenMargin()
+            header
         } content: {
-            VStack(
-                alignment: .leading,
-                spacing: Constant.textSpacing,
-            ) {
-                StyledText(text: store.label)
-                    .textStyle(.subtitle3)
-                    .foregroundColorToken(.blue100)
-                StyledText(text: store.learningSet?.title ?? "")
-                    .textStyle(.subtitle1)
-                StyledText(text: store.learningSet?.description ?? "")
-                    .textStyle(.body2)
-                    .foregroundColorToken(.grey400)
-                    .padding(.top, Constant.descriptionTopPadding)
-            }
-            .designSystemScreenMargin()
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .leading,
-            )
+            content
         } background: {
             screenBackground
         } footer: {
-            startAction
-                .designSystemScreenMargin()
+            footer
         }
         .overlay {
             if case .loading = store.setLoad {
@@ -70,11 +28,55 @@ struct LearningSetIntroScreen: View {
                     .tint(Color(designSystem: .blue100))
             }
         }
+        .task { await send(.task).finish() }
     }
 
+    // MARK: Private
+
+    private var isFailed: Bool {
+        if case .failed = store.setLoad {
+            return true
+        }
+        return false
+    }
+
+    private var header: some View {
+        ScreenControlBar(
+            onLeadingTap: { send(.backTapped) }
+        )
+        .designSystemScreenMargin()
+    }
+
+    private var content: some View {
+        Self.IntroContentView(
+            isFailed: isFailed,
+            label: store.label,
+            title: store.learningSet?.title ?? "",
+            description: store.learningSet?.description ?? "",
+        )
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        if isFailed {
+            FeedbackActionButton(
+                title: "다시 시도하기",
+                action: { send(.retryTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomButtonPadding)
+        } else {
+            startAction
+                .designSystemScreenMargin()
+        }
+    }
+
+    @ViewBuilder
     private var screenBackground: some View {
-        LinearGradient(designSystem: .backgroundGradient)
-            .accessibilityHidden(true)
+        if !isFailed {
+            LinearGradient(designSystem: .backgroundGradient)
+                .accessibilityHidden(true)
+        }
     }
 
     private var startAction: some View {

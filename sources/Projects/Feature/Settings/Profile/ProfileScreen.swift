@@ -20,28 +20,7 @@ public struct ProfileScreen: View {
 
     public var body: some View {
         OverlayContainer {
-            VStack(
-                alignment: .leading,
-                spacing: 0,
-            ) {
-                HStack(
-                    alignment: .top,
-                    spacing: LayoutToken.gutter,
-                ) {
-                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
-                        .frame(height: Constant.headerControlRowHeight)
-                    Spacer()
-
-                    IconGlassButton(
-                        icon: Constant.settingsControl.icon,
-                        label: Constant.settingsControl.label,
-                        action: { send(.settingsTapped) },
-                    )
-                    .size(.medium)
-                }
-                .padding(.vertical, Constant.headerBottomPadding)
-                .designSystemScreenMargin()
-            }
+            header
         } content: {
             content
         }
@@ -54,39 +33,33 @@ public struct ProfileScreen: View {
         ProfileDisplay(store.profile.load)
     }
 
-    @ViewBuilder
-    private var content: some View {
-        let current = display
-        if current.isFailed {
-            Self.LoadFailureView(onRetry: { send(.retryTapped) })
-                .designSystemScreenMargin()
-                .padding(.top, Constant.failureTopPadding)
-        } else if current.isLoading {
-            ProgressView()
-                .tint(Color(designSystem: .grey300))
-                .frame(maxWidth: .infinity)
-                .padding(.top, Constant.loadingTopPadding)
-        } else {
-            Self.ProfileHeaderView(display: current)
-                .padding(Constant.profileCardPadding)
-            StyledText(text: Constant.statisticsSectionTitle)
-                .textStyle(.caption2)
-                .foregroundColorToken(.grey400)
-                .frame(
-                    maxWidth: .infinity,
-                    alignment: .leading,
-                )
-                .designSystemScreenMargin()
-                .padding(.top, Constant.sectionTitleTopPadding)
-                .padding(.bottom, Constant.sectionTitleBottomPadding)
+    private var header: some View {
+        HStack(
+            alignment: .top,
+            spacing: LayoutToken.gutter,
+        ) {
+            ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+                .frame(height: Constant.headerControlRowHeight)
 
-            VStack(spacing: Constant.cardSpacing) {
-                Self.StatisticsCardView(display: current)
-                Self.WeeklyChartView(display: current)
-            }
-            .designSystemScreenMargin()
-            .padding(.bottom, Constant.contentBottomPadding)
+            Spacer()
+
+            IconGlassButton(
+                icon: Constant.settingsControl.icon,
+                label: Constant.settingsControl.label,
+                action: { send(.settingsTapped) },
+            )
+            .size(.medium)
         }
+        .padding(.vertical, Constant.headerBottomPadding)
+        .designSystemScreenMargin()
+    }
+
+    private var content: some View {
+        Self.ProfileContentView(
+            display: display,
+            statisticsSectionTitle: Constant.statisticsSectionTitle,
+            onRetry: { send(.retryTapped) },
+        )
     }
 
 }
@@ -101,13 +74,6 @@ extension ProfileScreen {
             icon: .setting,
             label: "설정",
         )
-        static let profileCardPadding: CGFloat = 20
-        static let sectionTitleTopPadding: CGFloat = 20
-        static let sectionTitleBottomPadding: CGFloat = 10
-        static let cardSpacing: CGFloat = 16
-        static let contentBottomPadding: CGFloat = 32
-        static let loadingTopPadding: CGFloat = 120
-        static let failureTopPadding: CGFloat = 20
         static let headerControlRowHeight: CGFloat = 40
         static let headerBottomPadding: CGFloat = 10
     }

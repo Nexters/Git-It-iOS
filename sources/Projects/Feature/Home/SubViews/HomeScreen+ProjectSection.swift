@@ -7,7 +7,7 @@ extension HomeScreen {
 
         // MARK: Internal
 
-        let state: HomeProjectSectionState
+        let state: HomeScreen.ProjectSectionState
         let isShowAllEnabled: Bool
 
         @Binding var cardListLeadingX: CGFloat?

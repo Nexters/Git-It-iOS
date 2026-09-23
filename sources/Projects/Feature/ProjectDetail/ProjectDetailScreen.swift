@@ -13,17 +13,14 @@ struct ProjectDetailScreen: View {
     @Bindable var store: StoreOf<ProjectDetailFeature>
 
     var body: some View {
-        Group {
-            if case .failed = store.detailLoad.loadStatus {
-                ScreenContainer {
-                    ErrorView(
-                        onBack: { send(.backTapped) },
-                        onRetry: { send(.retryTapped) },
-                    )
-                }
-            } else {
-                content
-            }
+        OverlayContainer {
+            header
+        } content: {
+            content
+        } background: {
+            background
+        } footer: {
+            footer
         }
         .overlay {
             if store.isMenuPresented {
@@ -88,15 +85,24 @@ struct ProjectDetailScreen: View {
         return false
     }
 
+    private var isFailed: Bool {
+        if case .failed = store.detailLoad.loadStatus {
+            return true
+        }
+        return false
+    }
+
+    private var header: some View {
+        ScreenControlBar(
+            displayModel: .init(trailing: isFailed ? nil : Constant.menuControl),
+            onLeadingTap: { send(.backTapped) },
+            onTrailingTap: { send(.menuTapped) },
+        )
+        .designSystemScreenMargin()
+    }
+
     private var content: some View {
-        OverlayContainer {
-            ScreenControlBar(
-                displayModel: .init(trailing: Constant.menuControl),
-                onLeadingTap: { send(.backTapped) },
-                onTrailingTap: { send(.menuTapped) },
-            )
-            .designSystemScreenMargin()
-        } content: {
+        Self.DetailContentView(isFailed: isFailed) {
             VStack(
                 alignment: .leading,
                 spacing: 0,
@@ -121,7 +127,24 @@ struct ProjectDetailScreen: View {
             }
             .padding(.top, Constant.summaryTopSpacing)
             .padding(.bottom, Constant.contentBottomPadding)
-        } background: {
+        }
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        if isFailed {
+            FeedbackActionButton(
+                title: "다시 시도하기",
+                action: { send(.retryTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.footerBottomPadding)
+        }
+    }
+
+    @ViewBuilder
+    private var background: some View {
+        if !isFailed {
             heroBackground
         }
     }
@@ -178,6 +201,7 @@ extension ProjectDetailScreen {
         static let contentBottomPadding: CGFloat = 16
         static let heroGradientHeight: CGFloat = 179
 
+        static let footerBottomPadding: CGFloat = 24
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
 

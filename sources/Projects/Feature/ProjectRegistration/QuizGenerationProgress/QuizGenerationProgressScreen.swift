@@ -31,25 +31,25 @@ struct QuizGenerationProgressScreen: View {
 
     // MARK: Private
 
-    @ViewBuilder
-    private var content: some View {
-        if case .failed = store.progress {
-            Self.FailureView(
-                bottomButtonPadding: Constant.failureBottomButtonPadding,
-                onDismiss: { send(.dismissTapped) },
-                onRetry: { send(.retryTapped) },
-            )
-        } else {
-            Self.GeneratingView(onWaitAtHome: { send(.waitAtHomeTapped) })
+    private var generationState: Self.GenerationStateView.State {
+        switch store.progress {
+        case .idle,
+             .submitting,
+             .awaitingOutcome:
+            .generating
+
+        case .failed:
+            .failed
         }
     }
 
-}
-
-// MARK: QuizGenerationProgressScreen.Constant
-
-extension QuizGenerationProgressScreen {
-    fileprivate enum Constant {
-        static let failureBottomButtonPadding: CGFloat = 24
+    private var content: some View {
+        Self.GenerationStateView(
+            state: generationState,
+            onWaitAtHome: { send(.waitAtHomeTapped) },
+            onDismiss: { send(.dismissTapped) },
+            onRetry: { send(.retryTapped) },
+        )
     }
+
 }
