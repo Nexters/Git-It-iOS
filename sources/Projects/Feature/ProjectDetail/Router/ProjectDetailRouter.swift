@@ -3,6 +3,7 @@ import DesignSystem
 import SwiftUI
 import UIComponent
 
+@ViewAction(for: ProjectDetailRouterFeature.self)
 public struct ProjectDetailRouter: View {
 
     // MARK: Lifecycle
@@ -12,6 +13,8 @@ public struct ProjectDetailRouter: View {
     }
 
     // MARK: Public
+
+    @Bindable public var store: StoreOf<ProjectDetailRouterFeature>
 
     public var body: some View {
         content
@@ -28,7 +31,7 @@ public struct ProjectDetailRouter: View {
                     "확인",
                     role: .cancel,
                 ) {
-                    store.send(.singleQuestionEntry(.input(.failureDismissed)))
+                    send(.singleQuestionFailureDismissed)
                 }
             } message: {
                 Text("잠시 후 다시 시도해 주세요.")
@@ -37,14 +40,12 @@ public struct ProjectDetailRouter: View {
 
     // MARK: Private
 
-    @Bindable private var store: StoreOf<ProjectDetailRouterFeature>
-
     private var entryFailureBinding: Binding<Bool> {
         Binding(
             get: { store.singleQuestionEntry.preparationError != nil },
             set: { isPresented in
                 guard !isPresented else { return }
-                store.send(.singleQuestionEntry(.input(.failureDismissed)))
+                send(.singleQuestionFailureDismissed)
             },
         )
     }

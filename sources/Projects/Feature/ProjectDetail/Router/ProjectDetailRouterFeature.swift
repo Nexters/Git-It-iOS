@@ -85,7 +85,8 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     }
 
-    public enum Action: Sendable, Equatable {
+    public enum Action: ViewAction, Sendable, Equatable {
+        case view(View)
         case projectDetail(ProjectDetailFeature.Action)
         case savedQuestions(SavedFeature.Action)
         case singleQuestion(QuestionSolvingFeature.Action)
@@ -93,6 +94,11 @@ public struct ProjectDetailRouterFeature: Sendable {
         case delegate(Delegate)
 
         // MARK: Public
+
+        @CasePathable
+        public enum View: Sendable, Equatable {
+            case singleQuestionFailureDismissed
+        }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
@@ -197,6 +203,9 @@ public struct ProjectDetailRouterFeature: Sendable {
 
             case .singleQuestionEntry(.delegate(.preparationFailed)):
                 return .none
+
+            case .view(.singleQuestionFailureDismissed):
+                return .send(.singleQuestionEntry(.input(.failureDismissed)))
 
             case .singleQuestion(.delegate(.advanceRequested)),
                  .singleQuestion(.delegate(.backRequested)):

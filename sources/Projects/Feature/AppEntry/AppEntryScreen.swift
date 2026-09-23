@@ -5,6 +5,7 @@ import UIComponent
 
 // MARK: - AppEntryScreen
 
+@ViewAction(for: AppEntryFeature.self)
 public struct AppEntryScreen: View {
 
     // MARK: Lifecycle
@@ -14,6 +15,8 @@ public struct AppEntryScreen: View {
     }
 
     // MARK: Public
+
+    @Bindable public var store: StoreOf<AppEntryFeature>
 
     public var body: some View {
         ScreenContainer {
@@ -38,8 +41,6 @@ public struct AppEntryScreen: View {
 
     // MARK: Private
 
-    @Bindable private var store: StoreOf<AppEntryFeature>
-
     private var recoverableErrorBinding: Binding<Bool> {
         Binding(
             get: { store.isShowingRecoverableError },
@@ -48,10 +49,6 @@ public struct AppEntryScreen: View {
                 send(.retryTapped)
             },
         )
-    }
-
-    private func send(_ action: AppEntryFeature.Action.View) {
-        store.send(.view(action))
     }
 
 }

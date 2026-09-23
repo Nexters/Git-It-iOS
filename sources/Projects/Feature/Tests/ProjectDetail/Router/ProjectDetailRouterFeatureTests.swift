@@ -158,6 +158,15 @@ struct ProjectDetailRouterFeatureTests {
         await store.receive(.delegate(.dismissRequested))
     }
 
+    @Test
+    func `단일 문제 준비 실패 알림을 닫으면 준비 흐름에 실패 닫기를 전달한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+
+        await store.send(.view(.singleQuestionFailureDismissed))
+        await store.receive(.singleQuestionEntry(.input(.failureDismissed)))
+    }
+
     // MARK: Private
 
     private func makeStore() -> TestStoreOf<ProjectDetailRouterFeature> {
