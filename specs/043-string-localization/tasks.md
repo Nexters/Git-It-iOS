@@ -329,11 +329,11 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.7 ShareRegistration (2개 파일, 20곳)
 
-- [ ] T103 [S1] `sources/Projects/Feature/ShareRegistration/Resources/ShareRegistration.xcstrings`를 만들고 아래 2개 파일의 문구를 등록한다(보간 항목 포함, S2). `SharedRepositoryRegistrationFeature`의 실패 사유 문구를 포함한다.
-- [ ] T104 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ShareRegistration.swift`에 `extension LocalizedText { enum ShareRegistration { … } }`로 항목별 멤버를 선언한다
-- [ ] T105 [P] [S1] `sources/Projects/Feature/ShareRegistration/ShareRegistrationScreen.swift`의 문구 12곳을 `LocalizedText.ShareRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T106 [P] [S1] `sources/Projects/Feature/ShareRegistration/SharedRepositoryRegistrationFeature.swift`의 문구 8곳을 `LocalizedText.ShareRegistration`로 교체한다(공통 작업 규칙)
-- [ ] T107 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ShareRegistration`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T103 [S1] `sources/Projects/Feature/ShareRegistration/Resources/ShareRegistration.xcstrings`를 만들고 아래 2개 파일의 문구를 등록한다(보간 항목 포함, S2). `SharedRepositoryRegistrationFeature`의 실패 사유 문구를 포함한다.
+- [X] T104 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+ShareRegistration.swift`에 `extension LocalizedText { enum ShareRegistration { … } }`로 항목별 멤버를 선언한다
+- [X] T105 [P] [S1] `sources/Projects/Feature/ShareRegistration/ShareRegistrationScreen.swift`의 문구 12곳을 `LocalizedText.ShareRegistration`로 교체한다(공통 작업 규칙)
+- [X] T106 [P] [S1] `sources/Projects/Feature/ShareRegistration/SharedRepositoryRegistrationFeature.swift`의 문구 8곳을 `LocalizedText.ShareRegistration`로 교체한다(공통 작업 규칙)
+- [X] T107 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. `quickstart.md` §3 검사를 `sources/Projects/Feature/ShareRegistration`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T103~T107의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 

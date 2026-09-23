@@ -163,9 +163,6 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
         case registration
     }
 
-    private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
-    private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
-
     private let parseRepositoryLink: any ExternalRepositoryLocator
     private let externalRepository: any ExternalRepositoryUseCase
     private let projectGeneration: any ProjectGenerationUseCase
@@ -175,38 +172,38 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     private static func registrationFailureReason(for error: ProjectGenerationError) -> String {
         switch error {
         case .invalidRequest:
-            "등록할 수 없는 저장소예요. 앱에서 다시 확인해 주세요."
+            LocalizedText.ShareRegistration.invalidRequestReason
 
         case .duplicateRequest:
-            "이미 등록 중인 저장소예요."
+            LocalizedText.ShareRegistration.duplicateRequestReason
 
         case .temporarilyUnavailable:
-            "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요."
+            LocalizedText.ShareRegistration.temporarilyUnavailableReason
 
         default:
-            "등록에 실패했어요. 잠시 후 다시 시도해 주세요."
+            LocalizedText.ShareRegistration.registrationFailureReason
         }
     }
 
     private static func lookupFailureReason(for error: ExternalRepositoryError) -> String {
         switch error {
         case .offline:
-            "네트워크에 연결할 수 없어요."
+            LocalizedText.ShareRegistration.offlineReason
 
         default:
-            "저장소 정보를 가져오지 못했어요."
+            LocalizedText.ShareRegistration.lookupFailureReason
         }
     }
 
     private func validate(_ state: inout State) -> Effect<Action> {
         state.phase = .validating
         guard let sharedURL = state.sharedURL else {
-            state.phase = .invalidURL(reason: Self.sharedItemUnavailableReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.sharedItemUnavailableReason)
             recordDiagnostic(.sharedItemUnavailable)
             return .none
         }
         guard parseRepositoryLink.location(from: sharedURL) != nil else {
-            state.phase = .invalidURL(reason: Self.invalidLinkReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.invalidLinkReason)
             recordDiagnostic(.repositoryLinkRejected)
             return .none
         }
@@ -233,7 +230,8 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             } catch let error as ExternalRepositoryError {
                 if error == .invalidURLFormat {
                     recordDiagnostic(.repositoryLinkRejected)
-                    await send(.effect(.validationFinished(.invalidURL(reason: Self.invalidLinkReason))))
+                    await send(.effect(.validationFinished(.invalidURL(reason: LocalizedText.ShareRegistration
+                            .invalidLinkReason))))
                 } else {
                     recordDiagnostic(.repositoryLookupFailed(reason: String(describing: error)))
                     await send(.effect(.validationFinished(.failed(
