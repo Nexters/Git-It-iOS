@@ -17,7 +17,7 @@ extension ProfileScreen {
                     alignment: .leading,
                     spacing: Constant.headerSpacing,
                 ) {
-                    StyledText(text: Constant.sectionLabel)
+                    StyledText(text: LocalizedText.Settings.weeklyChartSectionLabel)
                         .textStyle(.body3)
                         .foregroundColorToken(.grey400)
                     StyledText(text: display.weeklyTitle)
@@ -70,7 +70,6 @@ extension ProfileScreen {
         // MARK: Private
 
         private enum Constant {
-            static let sectionLabel = "주간 문제 풀이량"
             static let cardHeight: CGFloat = 223
             static let horizontalPadding: CGFloat = 16
             static let verticalPadding: CGFloat = 14
@@ -107,7 +106,10 @@ extension ProfileScreen {
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(bar.dayLabel) \(bar.count)문제")
+            .accessibilityLabel(LocalizedText.Settings.weeklyChartBarAccessibilityLabel(
+                dayLabel: bar.dayLabel,
+                count: bar.count,
+            ))
         }
 
         private func barHeight(for count: Int) -> CGFloat {

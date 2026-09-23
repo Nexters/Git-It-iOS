@@ -61,7 +61,17 @@ struct ProfileDisplay: Equatable, Sendable {
         }
     }
 
-    static let defaultDayLabels = ["월", "화", "수", "목", "금", "토", "일"]
+    static var defaultDayLabels: [String] {
+        [
+            LocalizedText.Settings.profileMondayLabel,
+            LocalizedText.Settings.profileTuesdayLabel,
+            LocalizedText.Settings.profileWednesdayLabel,
+            LocalizedText.Settings.profileThursdayLabel,
+            LocalizedText.Settings.profileFridayLabel,
+            LocalizedText.Settings.profileSaturdayLabel,
+            LocalizedText.Settings.profileSundayLabel,
+        ]
+    }
 
     let name: String?
     let email: String?
@@ -80,8 +90,8 @@ struct ProfileDisplay: Equatable, Sendable {
 
     var weeklyTitle: String {
         thisWeekSolvedCount == 0
-            ? "이번 주 첫 문제를 풀어볼까요?"
-            : "이번 주 \(thisWeekSolvedCount)문제를 풀었어요"
+            ? LocalizedText.Settings.profileWeeklyEmptyTitle
+            : LocalizedText.Settings.profileWeeklySolvedTitle(count: thisWeekSolvedCount)
     }
 
     var maxWeeklyCount: Int {

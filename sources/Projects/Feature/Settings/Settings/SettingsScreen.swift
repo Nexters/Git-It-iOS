@@ -42,7 +42,7 @@ public struct SettingsScreen: View {
                     alignment: .top,
                 )
 
-                ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+                ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.title))
                     .frame(
                         height: Constant.headerControlRowHeight,
                         alignment: .top,
@@ -55,13 +55,13 @@ public struct SettingsScreen: View {
                 alignment: .leading,
                 spacing: 10,
             ) {
-                Self.SectionView(title: Constant.learningSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.learningSectionTitle) {
                     SettingRow(
                         value: PositionDisplay.settingValue(for: store.profile?.curation?.position),
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingDevelop,
-                                title: Constant.positionTitle,
+                                title: LocalizedText.Settings.positionTitle,
                             )
                         },
                         onTap: {
@@ -73,20 +73,20 @@ public struct SettingsScreen: View {
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingLevel,
-                                title: Constant.careerLevelTitle,
+                                title: LocalizedText.Settings.careerLevelTitle,
                             )
                         },
                         onTap: { send(.careerLevelRowTapped) },
                     )
                 }
 
-                Self.SectionView(title: Constant.notificationSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.notificationSectionTitle) {
                     SettingRow(
                         value: notificationValue,
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingAlert,
-                                title: Constant.notificationTitle,
+                                title: LocalizedText.Settings.notificationTitle,
                             )
                         },
                         onTap: {
@@ -95,12 +95,12 @@ public struct SettingsScreen: View {
                     )
                 }
 
-                Self.SectionView(title: Constant.generalSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.generalSectionTitle) {
                     SettingRow(
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingPolicy,
-                                title: Constant.termsTitle,
+                                title: LocalizedText.Settings.termsTitle,
                             )
                         },
                         onTap: { send(.termsTapped) },
@@ -113,7 +113,7 @@ public struct SettingsScreen: View {
                                         width: 16,
                                         height: 16,
                                     )
-                                StyledText(text: Constant.signOutTitle)
+                                StyledText(text: LocalizedText.Settings.signOutButtonTitle)
                                     .textStyle(.body2)
                                     .foregroundColorToken(.error)
                             }
@@ -124,7 +124,7 @@ public struct SettingsScreen: View {
                     )
                     SettingRow(
                         content: {
-                            StyledText(text: Constant.deleteAccountTitle)
+                            StyledText(text: LocalizedText.Settings.deleteAccountButtonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey400)
                         },
@@ -168,7 +168,7 @@ public struct SettingsScreen: View {
     private var failureMessage: String? {
         switch store.accountAction.accountAction {
         case .failed:
-            Constant.accountActionFailureMessage
+            LocalizedText.Settings.accountActionFailureMessage
 
         case .idle,
              .signingOut,
@@ -180,7 +180,7 @@ public struct SettingsScreen: View {
 
     private var profileFailureMessage: String? {
         guard case .failed = store.userProfile.load else { return nil }
-        return Constant.profileFailureMessage
+        return LocalizedText.Settings.profileFailureMessage
     }
 
     private var notificationValue: String? {
@@ -189,10 +189,10 @@ public struct SettingsScreen: View {
             nil
 
         case .allowed:
-            Constant.notificationOnValue
+            LocalizedText.Settings.notificationOnValue
 
         case .denied:
-            Constant.notificationOffValue
+            LocalizedText.Settings.notificationOffValue
         }
     }
 
@@ -202,20 +202,6 @@ public struct SettingsScreen: View {
 
 extension SettingsScreen {
     fileprivate enum Constant {
-        static let title = "설정"
-        static let learningSectionTitle = "학습 설정"
-        static let notificationSectionTitle = "알림"
-        static let generalSectionTitle = "일반"
-        static let positionTitle = "개발 분야"
-        static let careerLevelTitle = "개발 수준"
-        static let notificationTitle = "세트 생성 완료 알림"
-        static let notificationOnValue = "켜짐"
-        static let notificationOffValue = "꺼짐"
-        static let termsTitle = "서비스 약관 및 정책"
-        static let signOutTitle = "로그아웃"
-        static let deleteAccountTitle = "계정 삭제"
-        static let accountActionFailureMessage = "요청을 처리하지 못했어요. 다시 시도해 주세요."
-        static let profileFailureMessage = "프로필을 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
         static let dividerHeight: CGFloat = 1
         static let failureTopPadding: CGFloat = 16
         static let contentBottomPadding: CGFloat = 32

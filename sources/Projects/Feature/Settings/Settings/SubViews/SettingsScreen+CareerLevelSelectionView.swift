@@ -35,7 +35,7 @@ extension SettingsScreen {
                         alignment: .top,
                     )
 
-                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.careerLevelSelectionTitle))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(
@@ -46,7 +46,7 @@ extension SettingsScreen {
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.curationUpdate.careerLevelMutation {
-                        StyledText(text: Constant.failureMessage)
+                        StyledText(text: LocalizedText.Settings.careerLevelSelectionFailureMessage)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)
@@ -85,8 +85,6 @@ extension SettingsScreen {
         // MARK: Private
 
         private enum Constant {
-            static let title = "개발 수준"
-            static let failureMessage = "변경에 실패했어요. 다시 시도해 주세요."
             static let messageSpacing: CGFloat = 12
             static let contentTopPadding: CGFloat = 8
             static let headerControlRowHeight: CGFloat = 40

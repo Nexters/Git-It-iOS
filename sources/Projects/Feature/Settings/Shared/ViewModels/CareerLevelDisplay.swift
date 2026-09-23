@@ -5,7 +5,9 @@ enum CareerLevelDisplay {
 
     static let orderedLevels: [CareerLevel] = [.entry, .junior, .middle, .senior]
 
-    static let unselectedTitle = "선택 안 함"
+    static var unselectedTitle: String {
+        LocalizedText.Settings.careerLevelUnselectedTitle
+    }
 
     static func identifier(for level: CareerLevel) -> String {
         switch level {
@@ -23,20 +25,20 @@ enum CareerLevelDisplay {
 
     static func title(for level: CareerLevel) -> String {
         switch level {
-        case .entry: "입문"
-        case .junior: "주니어"
-        case .middle: "미들"
-        case .senior: "시니어"
+        case .entry: LocalizedText.Settings.careerLevelEntryTitle
+        case .junior: LocalizedText.Settings.careerLevelJuniorTitle
+        case .middle: LocalizedText.Settings.careerLevelMiddleTitle
+        case .senior: LocalizedText.Settings.careerLevelSeniorTitle
         @unknown default: ""
         }
     }
 
     static func description(for level: CareerLevel) -> String {
         switch level {
-        case .entry: "프로젝트 코드를 처음 살펴봐요."
-        case .junior: "작은 기능 단위로 코드를 이해할 수 있어요."
-        case .middle: "프로젝트 구조와 흐름을 함께 살펴봐요."
-        case .senior: "설계 의도와 변경 영향을 분석할 수 있어요."
+        case .entry: LocalizedText.Settings.careerLevelEntryDescription
+        case .junior: LocalizedText.Settings.careerLevelJuniorDescription
+        case .middle: LocalizedText.Settings.careerLevelMiddleDescription
+        case .senior: LocalizedText.Settings.careerLevelSeniorDescription
         @unknown default: ""
         }
     }

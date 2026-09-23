@@ -376,20 +376,20 @@ snapshot한다. 별도 기준선 commit은 사용자가 요청했거나 협업�
 
 ### 5.10 Settings (11개 파일, 50곳)
 
-- [ ] T135 [S1] `sources/Projects/Feature/Settings/Resources/Settings.xcstrings`를 만들고 아래 11개 파일의 문구를 등록한다(보간 항목 포함, S2).
-- [ ] T136 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Settings.swift`에 `extension LocalizedText { enum Settings { … } }`로 항목별 멤버를 선언한다
-- [ ] T137 [P] [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T138 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+LoadFailureView.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T139 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+StatisticsCardView.swift`의 문구 5곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T140 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+WeeklyChartView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T141 [P] [S1] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T142 [P] [S1] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`의 문구 14곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T143 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`의 문구 6곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T144 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T145 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T146 [P] [S1] `sources/Projects/Feature/Settings/Shared/ViewModels/CareerLevelDisplay.swift`의 문구 9곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T147 [P] [S1] `sources/Projects/Feature/Settings/Shared/ViewModels/PositionDisplay.swift`의 문구 1곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
-- [ ] T148 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. 기존 한국어 기대값 테스트 `Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`가 수정 없이 통과하는지 `test`로 확인한다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Settings`로 한정해 결과가 제외 대상뿐인지 확인한다
+- [X] T135 [S1] `sources/Projects/Feature/Settings/Resources/Settings.xcstrings`를 만들고 아래 11개 파일의 문구를 등록한다(보간 항목 포함, S2).
+- [X] T136 [S1] `sources/Projects/Feature/Shared/Localization/LocalizedText+Settings.swift`에 `extension LocalizedText { enum Settings { … } }`로 항목별 멤버를 선언한다
+- [X] T137 [P] [S1] `sources/Projects/Feature/Settings/Profile/ProfileScreen.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T138 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+LoadFailureView.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T139 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+StatisticsCardView.swift`의 문구 5곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T140 [P] [S1] `sources/Projects/Feature/Settings/Profile/SubViews/ProfileScreen+WeeklyChartView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T141 [P] [S1] `sources/Projects/Feature/Settings/Profile/ViewModels/ProfileDisplay.swift`의 문구 3곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T142 [P] [S1] `sources/Projects/Feature/Settings/Settings/SettingsScreen.swift`의 문구 14곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T143 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+AccountDeletionView.swift`의 문구 6곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T144 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+CareerLevelSelectionView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T145 [P] [S1] `sources/Projects/Feature/Settings/Settings/SubViews/SettingsScreen+PositionSelectionView.swift`의 문구 2곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T146 [P] [S1] `sources/Projects/Feature/Settings/Shared/ViewModels/CareerLevelDisplay.swift`의 문구 9곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T147 [P] [S1] `sources/Projects/Feature/Settings/Shared/ViewModels/PositionDisplay.swift`의 문구 1곳을 `LocalizedText.Settings`로 교체한다(공통 작업 규칙)
+- [X] T148 [no-write] `GIT_IT_ONLY_SCHEME=Feature "$project_build_runner" compile`을 통과시킨다. 기존 한국어 기대값 테스트 `Feature/Tests/Settings/Profile/ViewModels/ProfileDisplayTests.swift`가 수정 없이 통과하는지 `test`로 확인한다. `quickstart.md` §3 검사를 `sources/Projects/Feature/Settings`로 한정해 결과가 제외 대상뿐인지 확인한다
 
 **진행 점검**: T135~T148의 변경 파일과 검증 결과를 보고하고 다음 흐름으로 진행한다.
 
