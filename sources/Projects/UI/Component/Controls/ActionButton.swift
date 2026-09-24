@@ -87,6 +87,17 @@ public struct ActionButton: View {
             }
         }
 
+        var horizontalPadding: CGFloat {
+            switch self {
+            case .large:
+                12
+            case .medium:
+                10
+            case .small:
+                8
+            }
+        }
+
         var minimumHitArea: CGFloat {
             ControlSizeToken.minimumTouch.cgFloatValue
         }
@@ -100,18 +111,20 @@ public struct ActionButton: View {
         Button(action: action) {
             ZStack {
                 content
+                    .padding(.horizontal, size.horizontalPadding)
                     .frame(maxWidth: .infinity)
                     .frame(height: size.surfaceHeight)
             }
+            .frame(minHeight: size.touchHeight)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
-        .frame(minHeight: size.touchHeight)
-        .contentShape(Rectangle())
-        .background(
-            style.backgroundColor(isEnabled: isEnabled),
-            in: RoundedRectangle(designSystem: .large),
-        )
+        .background {
+            RoundedRectangle(designSystem: .large)
+                .fill(style.backgroundColor(isEnabled: isEnabled))
+                .frame(height: size.surfaceHeight)
+        }
     }
 
     // MARK: Private
