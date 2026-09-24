@@ -40,43 +40,19 @@ struct HomeFeatureGuestAccessTests {
     }
 
     @Test
-    func `비로그인에서 등록을 누르면 로그인 필요 알럿을 띄우고 등록 delegate를 보내지 않는다`() async {
+    func `비로그인에서 등록을 누르면 등록 대신 signInRequired를 위임한다`() async {
         let store = makeStore(state: guestState())
 
-        await store.send(.view(.projectRegistrationTapped)) {
-            $0.isSignInRequiredAlertPresented = true
-        }
+        await store.send(.view(.projectRegistrationTapped))
+        await store.receive(.delegate(.signInRequired))
     }
 
     @Test
-    func `로그인 필요 알럿의 로그인을 누르면 알럿을 닫고 signInRequested를 위임한다`() async {
-        var state = guestState()
-        state.isSignInRequiredAlertPresented = true
-        let store = makeStore(state: state)
-
-        await store.send(.view(.signInRequiredAlertSignInTapped)) {
-            $0.isSignInRequiredAlertPresented = false
-        }
-        await store.receive(.delegate(.signInRequested))
-    }
-
-    @Test
-    func `로그인 필요 알럿의 닫기는 알럿만 닫는다`() async {
-        var state = guestState()
-        state.isSignInRequiredAlertPresented = true
-        let store = makeStore(state: state)
-
-        await store.send(.view(.signInRequiredAlertDismissed)) {
-            $0.isSignInRequiredAlertPresented = false
-        }
-    }
-
-    @Test
-    func `로그인 섹션의 로그인은 signInRequested를 위임한다`() async {
+    func `로그인 섹션의 로그인은 signInRequired를 위임한다`() async {
         let store = makeStore(state: guestState())
 
         await store.send(.view(.signInTapped))
-        await store.receive(.delegate(.signInRequested))
+        await store.receive(.delegate(.signInRequired))
     }
 
     @Test
@@ -107,10 +83,11 @@ struct HomeFeatureGuestAccessTests {
     }
 
     @Test
-    func `비로그인에서 전체 보기를 누르면 allProjectsRequested를 위임하지 않는다`() async {
+    func `비로그인에서 전체 보기를 누르면 allProjectsRequested 대신 signInRequired를 위임한다`() async {
         let store = makeStore(state: guestState())
 
         await store.send(.view(.showAllProjectsTapped))
+        await store.receive(.delegate(.signInRequired))
     }
 
     // MARK: Private

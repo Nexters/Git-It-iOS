@@ -21,18 +21,6 @@ public struct HomeScreen: View {
         OverlayContainer(content: { content })
             .scrollIndicators(.hidden)
             .task { await send(.task).finish() }
-            .alert(
-                LocalizedText.Home.signInRequiredTitle,
-                isPresented: signInRequiredAlertBinding,
-            ) {
-                Button(LocalizedText.Home.signInRequiredSignInButtonTitle) { send(.signInRequiredAlertSignInTapped) }
-                Button(
-                    LocalizedText.Home.signInRequiredCloseButtonTitle,
-                    role: .cancel,
-                ) { send(.signInRequiredAlertDismissed) }
-            } message: {
-                Text(LocalizedText.Home.signInRequiredMessage)
-            }
     }
 
     // MARK: Private
@@ -51,7 +39,7 @@ public struct HomeScreen: View {
                     store.projectSummaries.load,
                     access: store.access,
                 ),
-                isShowAllEnabled: store.access == .member,
+                isShowAllAvailable: store.access == .member,
                 cardListLeadingX: $cardListLeadingX,
                 onShowAllTapped: { send(.showAllProjectsTapped) },
                 onProjectRetryTapped: { send(.projectRetryTapped) },
@@ -86,16 +74,6 @@ public struct HomeScreen: View {
         }
         .designSystemScreenMargin()
         .padding(.bottom, Constant.projectSectionTopPadding)
-    }
-
-    private var signInRequiredAlertBinding: Binding<Bool> {
-        Binding(
-            get: { store.isSignInRequiredAlertPresented },
-            set: { isPresented in
-                guard !isPresented else { return }
-                send(.signInRequiredAlertDismissed)
-            },
-        )
     }
 
 }

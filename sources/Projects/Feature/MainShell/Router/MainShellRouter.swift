@@ -19,10 +19,7 @@ public struct MainShellRouter: View {
     @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
-        TabShell(
-            selected: selectedTab,
-            isEnabled: isTabEnabled,
-        ) { tab in
+        TabShell(selected: selectedTab) { tab in
             switch tab {
             case .home:
                 HomeScreen(store: store.scope(
@@ -57,7 +54,7 @@ public struct MainShellRouter: View {
                         action: \.settings,
                     ))
                 } else {
-                    Self.SignInPromptView(onSignIn: { send(.signInTapped) })
+                    ScreenContainer { EmptyView() }
                 }
             }
         }
@@ -80,29 +77,25 @@ public struct MainShellRouter: View {
             Text(LocalizedText.MainShell.singleQuestionFailureMessage)
         }
         .overlay { singleQuestionOverlay }
-        .overlay { guestLegalAgreementOverlay }
-        .overlay { guestLegalDocumentOverlay }
         .alert(
-            LocalizedText.MainShell.signInFailureTitle,
-            isPresented: signInFailureBinding,
+            LocalizedText.MainShell.signInRequiredTitle,
+            isPresented: signInRequiredAlertBinding,
         ) {
+            Button(LocalizedText.MainShell.signInRequiredSignInButtonTitle) {
+                send(.signInRequiredAlertSignInTapped)
+            }
             Button(
-                LocalizedText.MainShell.signInFailureConfirmButtonTitle,
+                LocalizedText.MainShell.signInRequiredCloseButtonTitle,
                 role: .cancel,
             ) {
-                send(.signInFailureDismissed)
+                send(.signInRequiredAlertDismissed)
             }
         } message: {
-            Text(LocalizedText.MainShell.signInFailureMessage)
+            Text(LocalizedText.MainShell.signInRequiredMessage)
         }
     }
 
     // MARK: Private
-
-    private var isTabEnabled: (MainShellTab) -> Bool {
-        let access = store.access
-        return { access == .member || ($0 != .projects && $0 != .saved) }
-    }
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(
@@ -111,57 +104,14 @@ public struct MainShellRouter: View {
         )
     }
 
-    private var signInFailureBinding: Binding<Bool> {
+    private var signInRequiredAlertBinding: Binding<Bool> {
         Binding(
-            get: { store.signIn.isFailed },
+            get: { store.isSignInRequiredAlertPresented },
             set: { isPresented in
                 guard !isPresented else { return }
-                send(.signInFailureDismissed)
+                send(.signInRequiredAlertDismissed)
             },
         )
-    }
-
-    private var guestLegalAgreementOverlay: some View {
-        ModalOverlay(
-            isPresented: Binding(
-                get: { store.signIn.isLegalAgreementPresented },
-                set: { isPresented in
-                    if !isPresented {
-                        send(.legalAgreementDismissed)
-                    }
-                },
-            )
-        ) {
-            LegalAgreementScreen(
-                store: store.scope(
-                    state: \.signIn.legalAgreement,
-                    action: \.signIn.legalAgreement,
-                )
-            )
-        }
-    }
-
-    private var guestLegalDocumentOverlay: some View {
-        ModalOverlay(
-            isPresented: Binding(
-                get: { store.signIn.legalAgreement.presentedDocument != nil },
-                set: { isPresented in
-                    if !isPresented {
-                        send(.legalDocumentSheetDismissed)
-                    }
-                },
-            )
-        ) {
-            if let document = store.signIn.legalAgreement.presentedDocument {
-                WebSheet(
-                    displayModel: .init(
-                        title: document.displayName,
-                        url: document.approvedURL,
-                    ),
-                    onDismiss: { send(.legalDocumentSheetDismissed) },
-                )
-            }
-        }
     }
 
     private var entryFailureBinding: Binding<Bool> {

@@ -1,54 +1,6 @@
 {
   "sourceLanguage" : "ko",
   "strings" : {
-    "homeSignInRequiredCloseButtonTitle" : {
-      "comment" : "홈 화면 로그인 필요 알림의 닫기 버튼 제목",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "닫기"
-          }
-        }
-      }
-    },
-    "homeSignInRequiredMessage" : {
-      "comment" : "홈 화면에서 로그인 없이 프로젝트 생성을 시도했을 때 보이는 알림의 본문",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "프로젝트를 만들려면 로그인해 주세요."
-          }
-        }
-      }
-    },
-    "homeSignInRequiredSignInButtonTitle" : {
-      "comment" : "홈 화면 로그인 필요 알림의 로그인 버튼 제목",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "로그인"
-          }
-        }
-      }
-    },
-    "homeSignInRequiredTitle" : {
-      "comment" : "홈 화면에서 로그인 없이 프로젝트 생성을 시도했을 때 보이는 알림의 제목",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "로그인이 필요해요"
-          }
-        }
-      }
-    },
     "profileHeaderLoadFailureMessage" : {
       "comment" : "홈 화면 프로필 영역에서 프로필 불러오기에 실패했을 때 보이는 안내 본문",
       "extractionState" : "manual",

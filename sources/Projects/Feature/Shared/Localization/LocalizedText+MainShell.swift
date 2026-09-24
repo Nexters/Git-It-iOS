@@ -32,16 +32,20 @@ extension LocalizedText {
             String(localized: .MainShell.mainShellSingleQuestionFailureConfirmButtonTitle)
         }
 
-        static var signInFailureTitle: String {
-            String(localized: .MainShell.mainShellSignInFailureTitle)
+        static var signInRequiredTitle: String {
+            String(localized: .MainShell.mainShellSignInRequiredTitle)
         }
 
-        static var signInFailureMessage: String {
-            String(localized: .MainShell.mainShellSignInFailureMessage)
+        static var signInRequiredMessage: String {
+            String(localized: .MainShell.mainShellSignInRequiredMessage)
         }
 
-        static var signInFailureConfirmButtonTitle: String {
-            String(localized: .MainShell.mainShellSignInFailureConfirmButtonTitle)
+        static var signInRequiredSignInButtonTitle: String {
+            String(localized: .MainShell.mainShellSignInRequiredSignInButtonTitle)
+        }
+
+        static var signInRequiredCloseButtonTitle: String {
+            String(localized: .MainShell.mainShellSignInRequiredCloseButtonTitle)
         }
 
         static var singleQuestionLoadingAccessibilityLabel: String {
@@ -50,14 +54,6 @@ extension LocalizedText {
 
         static var singleQuestionAdvanceButtonTitle: String {
             String(localized: .MainShell.mainShellSingleQuestionAdvanceButtonTitle)
-        }
-
-        static var signInPromptTitle: String {
-            String(localized: .MainShell.signInPromptTitle)
-        }
-
-        static var signInPromptMessage: String {
-            String(localized: .MainShell.signInPromptMessage)
         }
     }
 }

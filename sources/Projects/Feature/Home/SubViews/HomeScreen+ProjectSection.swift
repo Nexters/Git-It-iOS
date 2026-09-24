@@ -8,7 +8,7 @@ extension HomeScreen {
         // MARK: Internal
 
         let state: HomeScreen.ProjectSectionState
-        let isShowAllEnabled: Bool
+        let isShowAllAvailable: Bool
 
         @Binding var cardListLeadingX: CGFloat?
 
@@ -40,7 +40,6 @@ extension HomeScreen {
                         }
                     }
                     .buttonStyle(.plain)
-                    .disabled(!isShowAllEnabled)
                     .padding(8)
                     .accessibilityLabel(LocalizedText.Home.projectSectionShowAllAccessibilityLabel)
                 }
@@ -123,7 +122,7 @@ extension HomeScreen {
         }
 
         private var showAllColor: ColorToken {
-            isShowAllEnabled ? .blue100 : .grey400
+            isShowAllAvailable ? .blue100 : .grey400
         }
 
         private var emptyProjectCards: some View {

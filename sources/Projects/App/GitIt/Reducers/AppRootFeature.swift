@@ -208,18 +208,12 @@ nonisolated struct AppRootFeature: Sendable {
                 state.route = .mainShell
                 return .none
 
-            case .mainShell(.delegate(.signInSucceeded(let needsCuration))):
-                guard needsCuration else {
-                    return .merge(
-                        .send(.mainShell(.input(.memberAccessGranted))),
-                        registerDeviceIfNeeded(&state),
-                    )
-                }
+            case .mainShell(.delegate(.onboardingRequested)):
+                guard state.mainShell.access == .guest else { return .none }
                 let bundleVersion = state.onboarding.tutorial.bundleVersion
                 state.onboarding = OnboardingRouterFeature.State(
-                    startingAt: .curation,
+                    startingAt: .guide,
                     bundleVersion: bundleVersion,
-                    curationExit: .returnToCaller,
                 )
                 state.route = .onboarding
                 return .none

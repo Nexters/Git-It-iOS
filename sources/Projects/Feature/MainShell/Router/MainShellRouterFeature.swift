@@ -45,7 +45,7 @@ public struct MainShellRouterFeature: Sendable {
         public var settings = SettingsRouterFeature.State()
         public var singleQuestionEntry: SingleQuestionEntryFeature.State?
         @Presents public var singleQuestion: QuestionSolvingFeature.State?
-        public var signIn = SignInFeature.State()
+        public var isSignInRequiredAlertPresented = false
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -58,7 +58,6 @@ public struct MainShellRouterFeature: Sendable {
         case settings(SettingsRouterFeature.Action)
         case singleQuestionEntry(SingleQuestionEntryFeature.Action)
         case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
-        case signIn(SignInFeature.Action)
 
         // MARK: Public
 
@@ -71,10 +70,8 @@ public struct MainShellRouterFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case tabSelected(MainShellTab)
-            case signInTapped
-            case signInFailureDismissed
-            case legalAgreementDismissed
-            case legalDocumentSheetDismissed
+            case signInRequiredAlertSignInTapped
+            case signInRequiredAlertDismissed
             case singleQuestionFailureDismissed
         }
 
@@ -85,7 +82,7 @@ public struct MainShellRouterFeature: Sendable {
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
             case externalURLRequested(URL)
             case loggedOut
-            case signInSucceeded(needsCuration: Bool)
+            case onboardingRequested
         }
     }
 
@@ -143,16 +140,6 @@ public struct MainShellRouterFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
-        Scope(
-            state: \.signIn,
-            action: \.signIn,
-        ) {
-            SignInFeature(
-                signIn: { [account] in await account.signIn(with: $0) },
-                policyConsentStatus: { [account] in try await account.policyConsentStatus() },
-                consent: { [account] in try await account.consent(to: $0) },
-            )
-        }
         Reduce { state, action in
             switch action {
             case .input(.learningProjectsReloadRequested):
@@ -169,32 +156,31 @@ public struct MainShellRouterFeature: Sendable {
 
             case .view(.tabSelected(let tab)):
                 guard state.access == .member else {
-                    guard tab == .home || tab == .settings else { return .none }
+                    guard tab == .home else {
+                        state.isSignInRequiredAlertPresented = true
+                        return .none
+                    }
                     state.selectedTab = tab
                     return .none
                 }
                 state.selectedTab = tab
                 return reloadLearningProjects()
 
-            case .view(.signInTapped),
-                 .home(.delegate(.signInRequested)):
+            case .home(.delegate(.signInRequired)):
                 guard state.access == .guest else { return .none }
-                return .send(.signIn(.input(.start)))
+                state.isSignInRequiredAlertPresented = true
+                return .none
 
-            case .view(.signInFailureDismissed):
-                return .send(.signIn(.view(.failureDismissed)))
+            case .view(.signInRequiredAlertSignInTapped):
+                state.isSignInRequiredAlertPresented = false
+                return .send(.delegate(.onboardingRequested))
 
-            case .view(.legalAgreementDismissed):
-                return .send(.signIn(.view(.legalAgreementDismissed)))
-
-            case .view(.legalDocumentSheetDismissed):
-                return .send(.signIn(.view(.legalDocumentSheetDismissed)))
+            case .view(.signInRequiredAlertDismissed):
+                state.isSignInRequiredAlertPresented = false
+                return .none
 
             case .view(.singleQuestionFailureDismissed):
                 return .send(.singleQuestionEntry(.input(.failureDismissed)))
-
-            case .signIn(.delegate(.signedIn(let needsCuration))):
-                return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
 
             case .home(.delegate(.allProjectsRequested)):
                 state.selectedTab = .projects
@@ -265,7 +251,6 @@ public struct MainShellRouterFeature: Sendable {
                  .settings,
                  .singleQuestionEntry,
                  .singleQuestion,
-                 .signIn,
                  .delegate:
                 return .none
             }

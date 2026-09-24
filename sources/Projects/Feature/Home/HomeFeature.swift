@@ -35,7 +35,6 @@ public struct HomeFeature: Sendable {
         public var isGenerationInProgress = false
 
         public var access = MainShellAccess.member
-        public var isSignInRequiredAlertPresented = false
 
     }
 
@@ -58,8 +57,6 @@ public struct HomeFeature: Sendable {
             case projectCardTapped(projectID: ProjectID)
             case learningTapped(projectID: ProjectID)
             case signInTapped
-            case signInRequiredAlertSignInTapped
-            case signInRequiredAlertDismissed
         }
 
         @CasePathable
@@ -74,7 +71,7 @@ public struct HomeFeature: Sendable {
             case projectRegistrationRequested
             case projectDetailRequested(projectID: ProjectID)
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
-            case signInRequested
+            case signInRequired
             case allProjectsRequested
         }
     }
@@ -124,28 +121,17 @@ public struct HomeFeature: Sendable {
                 return .none
 
             case .view(.projectRegistrationTapped):
-                guard state.access == .member else {
-                    state.isSignInRequiredAlertPresented = true
-                    return .none
-                }
+                guard state.access == .member else { return .send(.delegate(.signInRequired)) }
                 guard !state.isGenerationInProgress else { return .none }
                 return .send(.delegate(.projectRegistrationRequested))
 
             case .view(.showAllProjectsTapped):
-                guard state.access == .member else { return .none }
+                guard state.access == .member else { return .send(.delegate(.signInRequired)) }
                 return .send(.delegate(.allProjectsRequested))
 
             case .view(.signInTapped):
                 guard state.access == .guest else { return .none }
-                return .send(.delegate(.signInRequested))
-
-            case .view(.signInRequiredAlertSignInTapped):
-                state.isSignInRequiredAlertPresented = false
-                return .send(.delegate(.signInRequested))
-
-            case .view(.signInRequiredAlertDismissed):
-                state.isSignInRequiredAlertPresented = false
-                return .none
+                return .send(.delegate(.signInRequired))
 
             case .view(.projectCardTapped(let projectID)):
                 return .send(.delegate(.projectDetailRequested(projectID: projectID)))

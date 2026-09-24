@@ -76,24 +76,47 @@ struct AppRootFeatureGuestAccessTests {
     }
 
     @Test
-    func `추가 입력이 필요 없는 로그인 성공은 선택 탭을 유지한 채 로그인 사용자 메인 화면으로 바꾸고 기기를 등록한다`() async {
+    func `비로그인 메인 화면의 온보딩 요청은 튜토리얼 첫 면으로 이동하고 비로그인 상태를 유지한다`() async {
         let appSetting = AppSettingUseCaseMock()
         var state = guestMainShellState()
-        state.mainShell.selectedTab = .settings
+        state.onboarding.tutorial.page = 3
+        let store = makeAppRootStore(
+            appSetting: appSetting,
+            state: state,
+        )
+
+        await store.send(.mainShell(.delegate(.onboardingRequested))) {
+            $0.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: "1.0.0",
+            )
+            $0.route = .onboarding
+        }
+
+        #expect(store.state.onboarding.activeScreen == .guide(.tutorial))
+        #expect(store.state.onboarding.tutorial.page == 1)
+        #expect(store.state.mainShell.access == .guest)
+        #expect(await appSetting.registerDeviceCallCount == 0)
+    }
+
+    @Test
+    func `온보딩에서 로그인을 마치면 로그인 사용자 메인 화면으로 바꾸고 기기를 등록한다`() async {
+        let appSetting = AppSettingUseCaseMock()
+        var state = guestMainShellState()
+        state.route = .onboarding
         let store = makeAppRootStore(
             appSetting: appSetting,
             state: state,
         )
         store.exhaustivity = .off
 
-        await store.send(.mainShell(.delegate(.signInSucceeded(needsCuration: false)))) {
+        await store.send(.onboarding(.delegate(.mainShellRequested))) {
+            $0.route = .mainShell
             $0.deviceRegistration = .registering
         }
         await store.receive(.mainShell(.input(.memberAccessGranted)))
 
-        #expect(store.state.route == .mainShell)
         #expect(store.state.mainShell.access == .member)
-        #expect(store.state.mainShell.selectedTab == .settings)
 
         await store.skipReceivedActions()
         await store.finish()
@@ -102,27 +125,16 @@ struct AppRootFeatureGuestAccessTests {
     }
 
     @Test
-    func `직군과 연차가 필요한 로그인 성공은 호출자 복귀 모드의 직군 선택으로 이동하고 메인 화면 상태를 유지한다`() async {
-        let appSetting = AppSettingUseCaseMock()
+    func `온보딩에서 다시 비로그인 진입을 고르면 비로그인 메인 화면으로 돌아간다`() async {
         var state = guestMainShellState()
-        state.mainShell.selectedTab = .settings
-        let store = makeAppRootStore(
-            appSetting: appSetting,
-            state: state,
-        )
+        state.route = .onboarding
+        let store = makeAppRootStore(state: state)
 
-        await store.send(.mainShell(.delegate(.signInSucceeded(needsCuration: true)))) {
-            $0.onboarding = OnboardingRouterFeature.State(
-                startingAt: .curation,
-                bundleVersion: "1.0.0",
-                curationExit: .returnToCaller,
-            )
-            $0.route = .onboarding
+        await store.send(.onboarding(.delegate(.guestAccessRequested))) {
+            $0.route = .mainShell
         }
 
         #expect(store.state.mainShell.access == .guest)
-        #expect(store.state.mainShell.selectedTab == .settings)
-        #expect(await appSetting.registerDeviceCallCount == 0)
     }
 
     @Test

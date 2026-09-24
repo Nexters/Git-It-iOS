@@ -4,22 +4,6 @@ import Foundation
 
 extension LocalizedText {
     enum Home {
-        static var signInRequiredTitle: String {
-            String(localized: .Home.homeSignInRequiredTitle)
-        }
-
-        static var signInRequiredMessage: String {
-            String(localized: .Home.homeSignInRequiredMessage)
-        }
-
-        static var signInRequiredSignInButtonTitle: String {
-            String(localized: .Home.homeSignInRequiredSignInButtonTitle)
-        }
-
-        static var signInRequiredCloseButtonTitle: String {
-            String(localized: .Home.homeSignInRequiredCloseButtonTitle)
-        }
-
         static var profileHeaderLoadFailureTitle: String {
             String(localized: .Home.profileHeaderLoadFailureTitle)
         }
