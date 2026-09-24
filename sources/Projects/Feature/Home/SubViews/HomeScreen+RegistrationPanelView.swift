@@ -32,8 +32,6 @@ extension HomeScreen {
                     }
                 }
 
-                Spacer(minLength: 12)
-
                 HStack {
                     Spacer()
 
@@ -45,17 +43,18 @@ extension HomeScreen {
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey700)
                                 .frame(
-                                    width: 104,
-                                    height: 37,
+                                    width: Constant.registerButtonWidth,
+                                    height: Constant.actionSurfaceHeight,
                                 )
                                 .background(
                                     Color(designSystem: .blue100),
                                     in: RoundedRectangle(designSystem: .medium),
                                 )
-                                .frame(minHeight: 44)
+                                .padding(.vertical, Constant.touchAreaOutset)
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .padding(.vertical, -Constant.touchAreaOutset)
                         .accessibilityLabel(LocalizedText.Home.registrationPanelRegisterAccessibilityLabel)
                     }
                 }
@@ -79,6 +78,9 @@ extension HomeScreen {
         // MARK: Private
 
         private enum Constant {
+            static let registerButtonWidth: CGFloat = 104
+            static let actionSurfaceHeight: CGFloat = 37
+            static let touchAreaOutset: CGFloat = (44 - actionSurfaceHeight) / 2
             static let progressLabelSpacing: CGFloat = 8
             static let progressIndicatorSize: CGFloat = 20
             static let progressLabelHorizontalPadding: CGFloat = 12
@@ -96,12 +98,11 @@ extension HomeScreen {
                     .foregroundColorToken(.grey300)
             }
             .padding(.horizontal, Constant.progressLabelHorizontalPadding)
-            .frame(height: 37)
+            .frame(height: Constant.actionSurfaceHeight)
             .background(
                 Color(designSystem: .grey500),
                 in: RoundedRectangle(designSystem: .medium),
             )
-            .frame(minHeight: 44)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(LocalizedText.Home.registrationPanelGenerationInProgressLabel)
         }
