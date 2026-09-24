@@ -8,7 +8,12 @@ extension ProjectName {
         .scheme(
             name: "AllTests",
             shared: true,
-            buildAction: .buildAction(targets: allTestTargets),
+            buildAction: .buildAction(
+                targets: allTestTargets,
+                preActions: allTestTargets.first.map {
+                    [.restoreModuleMapPermissions(target: $0)]
+                } ?? [],
+            ),
             testAction: .targets(allTestTargets.map {
                 .testableTarget(target: $0)
             }),
@@ -19,7 +24,10 @@ extension ProjectName {
 
     private static var allTestTargets: [TargetReference] {
         [
-            .project(path: ProjectName.App.projectPath, target: AppModuleName.GitItTests.rawValue),
+            .project(
+                path: ProjectName.App.projectPath,
+                target: AppModuleName.GitItTests.rawValue,
+            ),
             .project(
                 path: ProjectName.Composition.projectPath,
                 target: CompositionModuleName.CompositionAuthenticationTests.rawValue,
@@ -28,29 +36,74 @@ extension ProjectName {
                 path: ProjectName.Composition.projectPath,
                 target: CompositionModuleName.CompositionLearningProjectTests.rawValue,
             ),
-            .project(path: ProjectName.Composition.projectPath, target: CompositionModuleName.CompositionMemberTests.rawValue),
-            .project(path: ProjectName.Feature.projectPath, target: FeatureModuleName.FeatureTests.rawValue),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainIdentifierTests.rawValue),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainAccountTests.rawValue),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainUserInfoTests.rawValue),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainAppSettingTests.rawValue),
+            .project(
+                path: ProjectName.Composition.projectPath,
+                target: CompositionModuleName.CompositionMemberTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Feature.projectPath,
+                target: FeatureModuleName.FeatureTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainIdentifierTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainAccountTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainUserInfoTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainAppSettingTests.rawValue,
+            ),
             .project(
                 path: ProjectName.Domain.projectPath,
                 target: DomainModuleName.DomainExternalRepositoryTests.rawValue,
             ),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainQuizDetailTests.rawValue),
-            .project(path: ProjectName.Domain.projectPath, target: DomainModuleName.DomainProjectTests.rawValue),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainQuizDetailTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Domain.projectPath,
+                target: DomainModuleName.DomainProjectTests.rawValue,
+            ),
             .project(
                 path: ProjectName.Domain.projectPath,
                 target: DomainModuleName.DomainProjectGenerationTests.rawValue,
             ),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataAuthenticationTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataExternalRepositoryTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataLearningProjectTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataLegalConsentTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataMemberTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataNotificationTests.rawValue),
-            .project(path: ProjectName.Data.projectPath, target: DataModuleName.DataSharedTests.rawValue),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataAuthenticationTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataExternalRepositoryTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataLearningProjectTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataLegalConsentTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataMemberTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataNotificationTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.Data.projectPath,
+                target: DataModuleName.DataSharedTests.rawValue,
+            ),
             .project(
                 path: ProjectName.Infrastructure.projectPath,
                 target: InfrastructureModuleName.InfrastructureAuthenticationTests.rawValue,
@@ -67,8 +120,14 @@ extension ProjectName {
                 path: ProjectName.Infrastructure.projectPath,
                 target: InfrastructureModuleName.InfrastructureStorageTests.rawValue,
             ),
-            .project(path: ProjectName.UI.projectPath, target: UIModuleName.UIComponentTests.rawValue),
-            .project(path: ProjectName.UI.projectPath, target: UIModuleName.DesignSystemTests.rawValue),
+            .project(
+                path: ProjectName.UI.projectPath,
+                target: UIModuleName.UIComponentTests.rawValue,
+            ),
+            .project(
+                path: ProjectName.UI.projectPath,
+                target: UIModuleName.DesignSystemTests.rawValue,
+            ),
         ]
     }
 

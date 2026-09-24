@@ -195,9 +195,14 @@ extension Scheme {
         .scheme(
             name: name,
             shared: true,
-            buildAction: .buildAction(targets: buildTargets.map {
-                .target($0)
-            }),
+            buildAction: .buildAction(
+                targets: buildTargets.map {
+                    .target($0)
+                },
+                preActions: buildTargets.first.map {
+                    [.restoreModuleMapPermissions(target: .target($0))]
+                } ?? [],
+            ),
             testAction: .targets(testTargets.map {
                 .testableTarget(target: .target($0))
             }),
