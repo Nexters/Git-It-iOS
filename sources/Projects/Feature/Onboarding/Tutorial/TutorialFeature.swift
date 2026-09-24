@@ -122,15 +122,13 @@ public struct TutorialFeature: Sendable {
 
             case .view(.appleSignInTapped):
                 guard !state.isSigningIn, state.signIn.canStart else { return .none }
-                state.page = Constant.pageCount
                 return .send(.signIn(.input(.start)))
 
             case .view(.guestAccessTapped):
                 guard !state.isSigningIn else { return .none }
                 return .send(.delegate(.guestAccessRequested))
 
-            case .input(.returnToLastPage),
-                 .signIn(.delegate(.consentCancelled)):
+            case .input(.returnToLastPage):
                 state.page = Constant.pageCount
                 return .none
 

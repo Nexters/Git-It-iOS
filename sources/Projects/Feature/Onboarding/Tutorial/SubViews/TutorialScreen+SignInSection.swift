@@ -10,7 +10,6 @@ extension TutorialScreen {
         let currentPage: Int
         let totalPages: Int
         let bundleVersion: String
-        let isHintVisible: Bool
         let onAppleSignIn: () -> Void
         let onGuestAccess: () -> Void
 
@@ -26,8 +25,6 @@ extension TutorialScreen {
                     .textStyle(.caption1)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
-                    .opacity(isHintVisible ? 1 : 0)
-                    .accessibilityHidden(!isHintVisible)
                     .padding(.bottom, LayoutToken.compactSpacing)
 
                 AppleSignInButton(action: onAppleSignIn)
@@ -36,11 +33,8 @@ extension TutorialScreen {
                     title: LocalizedText.Onboarding.tutorialSignInGuestAccessButtonTitle,
                     action: onGuestAccess,
                 )
-                .enabled(isHintVisible)
                 .style(.text)
                 .size(.small)
-                .opacity(isHintVisible ? 1 : 0)
-                .accessibilityHidden(!isHintVisible)
                 .padding(.top, LayoutToken.compactSpacing)
 
                 StyledText(text: LocalizedText.Onboarding.tutorialSignInVersion(version: bundleVersion))
