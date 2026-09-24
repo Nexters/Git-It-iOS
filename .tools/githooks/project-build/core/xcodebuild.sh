@@ -22,6 +22,16 @@ project_xcodebuild_all() (
 		"$project_xcodebuild_results" <"$project_xcodebuild_targets"
 )
 
+project_xcodebuild_restore_module_maps() (
+	project_xcodebuild_products="$1/Build/Products"
+
+	# 첫 빌드 전에는 복구할 산출물이 없습니다.
+	[ -d "$project_xcodebuild_products" ] || return 0
+	# Tuist Copy Module Map은 읽기 전용 원본 권한까지 복사하므로 재실행 전에 덮어쓰기를 허용합니다.
+	find "$project_xcodebuild_products" -type f -path '*/Modules/module.modulemap' \
+		! -perm -u+w -exec chmod u+w {} +
+)
+
 project_xcodebuild_one() {
 	project_xcodebuild_workspace=$1
 	project_xcodebuild_derived_root=$2
@@ -65,6 +75,13 @@ project_xcodebuild_one() {
 	fi
 	printf '%s 시작: %s\n' "$project_xcodebuild_operation" "$project_xcodebuild_scheme"
 	project_xcodebuild_started_at=$(date +%s) || return 2
+	# 이전 빌드가 남긴 읽기 전용 module map 때문에 scheme이 실패하지 않게 합니다.
+	project_xcodebuild_restore_module_maps "$project_xcodebuild_derived" || {
+		printf 'failed\t%s\n' "$project_xcodebuild_scheme" >>"$project_xcodebuild_results"
+		printf '오류[project-build.scheme-failed]: 작업=%s scheme=%s 원인=module map 쓰기 권한 복구 실패\n조치: %s/Build/Products의 권한을 확인하세요\n' \
+			"$project_xcodebuild_operation" "$project_xcodebuild_scheme" "$project_xcodebuild_derived" >&2
+		return 1
+	}
 	# 호출자가 결과 경로를 제공하면 test action마다 충돌 없는 xcresult를 남깁니다.
 	set -- \
 		-quiet \
