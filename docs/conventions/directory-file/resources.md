@@ -4,7 +4,7 @@
 
 - 자산은 소스 루트 아래 `Resources/`가 소유합니다. Swift 소스와 같은 형태 폴더에 섞지
   않습니다.
-- String Catalog(`*.xcstrings`)도 `Resources/`가 소유하며, 배치와 형식은
+- String Catalog(`*.xcstrings`)는 예외로 `Resources/`가 아니라 `LocalizedText`와 같은 `Localization/`에 두며, 배치와 형식은
   [현지화 컨벤션 §3.1](../localization.md#31-string-catalog)이 소유합니다.
 - `*.xcassets` 내부 폴더 구조는 Xcode 자산 카탈로그가 소유하므로 §2의 뎁스 규칙을
   적용하지 않습니다.

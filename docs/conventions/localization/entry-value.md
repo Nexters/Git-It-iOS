@@ -18,12 +18,12 @@
 고정 문구 항목은 다음 형태입니다.
 
 ```json
-"webSheetCloseAccessibilityLabel" : {
-  "comment" : "웹 문서 시트의 닫기 버튼 접근성 레이블",
+"Settings.title" : {
+  "comment" : "설정 화면 상단 제목",
   "extractionState" : "manual",
   "localizations" : {
     "ko" : {
-      "stringUnit" : { "state" : "translated", "value" : "닫기" }
+      "stringUnit" : { "state" : "translated", "value" : "설정" }
     }
   }
 }
@@ -32,12 +32,12 @@
 보간 항목은 다음 형태입니다.
 
 ```json
-"projectRowDeleteAccessibilityLabel" : {
-  "comment" : "프로젝트 목록 행의 삭제 버튼 접근성 레이블. name: 프로젝트 이름",
+"Settings.Profile.Weekly.Solved.title" : {
+  "comment" : "마이 화면 주간 학습 영역의 제목. count: 이번 주에 푼 문제 수",
   "extractionState" : "manual",
   "localizations" : {
     "ko" : {
-      "stringUnit" : { "state" : "translated", "value" : "%1$(name)@ 삭제" }
+      "stringUnit" : { "state" : "translated", "value" : "이번 주 %1$(count)lld문제를 풀었어요" }
     }
   }
 }

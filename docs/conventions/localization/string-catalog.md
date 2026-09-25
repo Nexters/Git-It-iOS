@@ -4,18 +4,17 @@
 
 **형식은 String Catalog(`.xcstrings`)입니다.** `.strings`·`.stringsdict`를 새로 만들지 않습니다.
 
-**카탈로그는 문구를 쓰는 target이 소유하며 그 target의 `Resources/`에 둡니다.**
+**카탈로그는 문구를 쓰는 target마다 `Localizable.xcstrings` 하나이며, 그 target의 `LocalizedText`와
+같은 `Localization/` 폴더에 둡니다.**
 
 | target | 경로 | 테이블 이름 |
 | --- | --- | --- |
-| `UIComponent` | `UI/Component/Resources/Localizable.xcstrings` | `Localizable` |
-| `Feature` | `Feature/<흐름>/Resources/<흐름>.xcstrings` | 흐름 이름 |
-| `GitIt` | `App/GitIt/Resources/Localizable.xcstrings` | `Localizable` |
+| `UIComponent` | `UI/Component/Localization/Localizable.xcstrings` | `Localizable` |
+| `Feature` | `Feature/Shared/Localization/Localizable.xcstrings` | `Localizable` |
+| `GitIt` | `App/GitIt/Localization/Localizable.xcstrings` | `Localizable` |
 
-`Feature`는 target이 하나이므로 흐름마다 테이블 하나를 둡니다. 흐름 안의 `<흐름>/Shared/`·화면
-폴더가 쓰는 문구도 그 흐름 테이블에 둡니다. 둘 이상의 흐름이 같은 용도로 쓰는 문구가 생기면
-`Feature/Shared/Resources/Shared.xcstrings`를 만들고
-[형태 어휘 표](../file-vocabulary/shape-vocabulary.md)에 행을 추가합니다.
+`Feature`는 모든 흐름의 문구를 한 카탈로그에 둡니다. 흐름 구분은 카탈로그가 아니라
+`LocalizedText`의 흐름 enum이 맡습니다. 카탈로그를 흐름별로 나누거나 `Resources/`에 두지 않습니다.
 
 - 다른 target의 카탈로그나 번들을 조회하지 않습니다. Feature는 UIComponent 문구를, App은 Feature
   문구를 참조하지 않습니다.

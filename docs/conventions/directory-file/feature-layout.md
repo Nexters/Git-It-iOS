@@ -38,7 +38,7 @@ sources/Projects/Feature/ProjectRegistration/
 | `<화면>/` | 화면 하나와 그 화면이 조합하는 Feature |
 | `Previews/` | 여러 화면의 프리뷰가 함께 쓰는 프리뷰 전용 타입 |
 | `Shared/` | 여러 화면이 함께 쓰는 선언 — 이 아래에서만 형태 폴더를 씁니다 |
-| `Resources/` | 흐름이 소유하는 자산과 문구 카탈로그 (§6) |
+| `Resources/` | 흐름이 소유하는 자산 (§6) |
 
 - **화면 폴더는 Screen 하나와 그 화면이 조합하는 Feature를 담습니다.** 화면과 Feature는
   1:1이 아니며, Feature의 정의 단위가 관심사라는 근거는

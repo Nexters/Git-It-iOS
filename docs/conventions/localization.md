@@ -19,7 +19,7 @@
 ## 1. 적용 범위
 
 - `sources/Projects/UI/Component/**`, `sources/Projects/Feature/**`, `sources/Projects/App/GitIt/**`의
-  production 소스와 `Resources/*.xcstrings`
+  production 소스와 `Localization/Localizable.xcstrings`
 - 위 target의 표시 문구를 검증하는 테스트
 
 Domain·Data·Infrastructure·Composition은 사용자 노출 문구를 소유하지 않으므로 대상이 아닙니다.
@@ -100,7 +100,7 @@ Domain·Data·Infrastructure·Composition은 사용자 노출 문구를 소유�
 
 - [ ] 새로 추가한 사용자 노출 문구가 모두 소유 모듈의 카탈로그 항목인가?
 - [ ] 제외 대상(서버 값, 사용자 입력, 로그, 진단, 프리뷰, 테스트 픽스처)을 카탈로그에 넣지 않았는가?
-- [ ] 키가 lowerCamelCase 식별자이며 테이블 문맥을 반복하지 않는가?
+- [ ] 키가 `LocalizedText` 경로와 같은 점 구분 이름인가?
 - [ ] 같은 한국어 값이라도 용도가 다르면 다른 키인가?
 - [ ] 모든 항목에 주석이 있고, 보간 항목의 주석이 인자마다 의미를 설명하는가?
 - [ ] 호출부가 `LocalizedText`만 거치며 한국어 리터럴·생성 심볼·`String(localized:)`를 직접 쓰지 않는가?
