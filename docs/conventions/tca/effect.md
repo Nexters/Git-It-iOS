@@ -64,6 +64,7 @@ Effect는 Domain Use Case 호출, 비동기 대기, timer·clock, notification·
 
 ## 4. 검토 체크리스트
 
+- [ ] `Reduce`가 최상위 Action case만 분기하고, 연관값마다 한 단계씩 분기 함수로 나누는가?
 - [ ] dependency가 Reducer initializer로 주입되고 private 불변 프로퍼티로 보존되는가?
 - [ ] Effect의 성공·실패·취소와 소유 State 제거 경로가 명시적인가?
 - [ ] 서버 mutation이 `committing` 뒤 취소되지 않고 충돌 입력을 차단하는가?
