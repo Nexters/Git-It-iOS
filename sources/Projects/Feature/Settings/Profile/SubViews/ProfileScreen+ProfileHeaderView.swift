@@ -22,7 +22,6 @@ extension ProfileScreen {
                     height: Constant.avatarSize,
                 )
                 .clipShape(Circle())
-                .accessibilityHidden(true)
 
                 VStack(
                     alignment: .leading,
@@ -58,7 +57,6 @@ extension ProfileScreen {
                     alignment: .leading,
                 )
             }
-            .accessibilityElement(children: .combine)
         }
 
         // MARK: Private

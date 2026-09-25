@@ -19,7 +19,7 @@ struct QuizLevelSelectionScreen: View {
             ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
-            StyledText(text: LocalizedText.ProjectRegistration.quizLevelSelectionTitle)
+            StyledText(text: LocalizedText.ProjectRegistration.QuizLevelSelection.title)
                 .textStyle(.subtitle1)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.titleTopPadding)
@@ -41,7 +41,7 @@ struct QuizLevelSelectionScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: LocalizedText.ProjectRegistration.quizLevelSelectionNextButtonTitle,
+                title: LocalizedText.ProjectRegistration.QuizLevelSelection.Next.buttonTitle,
                 action: { send(.nextTapped) },
             )
             .designSystemScreenMargin()
@@ -67,20 +67,20 @@ extension QuizLevelSelectionScreen {
         [
             (
                 .l1,
-                LocalizedText.ProjectRegistration.quizLevelSelectionBasicTitle,
-                LocalizedText.ProjectRegistration.quizLevelSelectionBasicDescription,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Basic.title,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Basic.description,
                 .knowledgeBasic,
             ),
             (
                 .l2,
-                LocalizedText.ProjectRegistration.quizLevelSelectionIntermediateTitle,
-                LocalizedText.ProjectRegistration.quizLevelSelectionIntermediateDescription,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Intermediate.title,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Intermediate.description,
                 .knowledgeIntermediate,
             ),
             (
                 .l3,
-                LocalizedText.ProjectRegistration.quizLevelSelectionAdvancedTitle,
-                LocalizedText.ProjectRegistration.quizLevelSelectionAdvancedDescription,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Advanced.title,
+                LocalizedText.ProjectRegistration.QuizLevelSelection.Advanced.description,
                 .knowledgeAdvanced,
             ),
         ]

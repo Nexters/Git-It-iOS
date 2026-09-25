@@ -30,11 +30,6 @@ public struct HomeProjectCard: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(LocalizedText.HomeProjectCard.accessibilityLabel(
-                title: displayModel.title,
-                currentSetLabel: displayModel.currentSetLabel,
-            ))
 
             startButton
                 .padding(.trailing, Constant.startTrailingPadding)
@@ -46,7 +41,6 @@ public struct HomeProjectCard: View {
         )
         .background(Color(designSystem: style.cardColor))
         .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .contain)
     }
 
     // MARK: Internal
@@ -166,12 +160,6 @@ public struct HomeProjectCard: View {
         }
         .buttonStyle(.plain)
         .disabled(!isLearningEnabled)
-        .accessibilityLabel(LocalizedText.HomeProjectCard.learningStartAccessibilityLabel(title: displayModel.title))
-        .accessibilityHint(
-            isLearningEnabled
-                ? LocalizedText.HomeProjectCard.learningEnabledAccessibilityHint
-                : LocalizedText.HomeProjectCard.learningDisabledAccessibilityHint
-        )
     }
 
     private var progressBar: some View {

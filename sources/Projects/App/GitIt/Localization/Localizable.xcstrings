@@ -1,7 +1,7 @@
 {
   "sourceLanguage" : "ko",
   "strings" : {
-    "generationReminderCompletedBody" : {
+    "GenerationReminder.Completed.body" : {
       "comment" : "학습 세트 생성이 완료됐을 때 보내는 로컬 알림의 본문",
       "extractionState" : "manual",
       "localizations" : {
@@ -13,7 +13,7 @@
         }
       }
     },
-    "generationReminderCompletedTitle" : {
+    "GenerationReminder.Completed.title" : {
       "comment" : "학습 세트 생성이 완료됐을 때 보내는 로컬 알림의 제목",
       "extractionState" : "manual",
       "localizations" : {
@@ -25,7 +25,7 @@
         }
       }
     },
-    "generationReminderFailedBody" : {
+    "GenerationReminder.Failed.body" : {
       "comment" : "학습 세트 생성에 실패했을 때 보내는 로컬 알림의 본문",
       "extractionState" : "manual",
       "localizations" : {
@@ -37,7 +37,7 @@
         }
       }
     },
-    "generationReminderFailedTitle" : {
+    "GenerationReminder.Failed.title" : {
       "comment" : "학습 세트 생성에 실패했을 때 보내는 로컬 알림의 제목",
       "extractionState" : "manual",
       "localizations" : {

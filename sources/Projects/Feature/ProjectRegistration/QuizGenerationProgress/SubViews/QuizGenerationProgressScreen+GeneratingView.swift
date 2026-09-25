@@ -24,10 +24,10 @@ extension QuizGenerationProgressScreen {
                     .padding(.vertical, 30)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationProgressTitle)
+                    StyledText(text: LocalizedText.ProjectRegistration.QuizGenerationProgress.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: LocalizedText.ProjectRegistration.quizGenerationProgressDurationMessage)
+                    StyledText(text: LocalizedText.ProjectRegistration.QuizGenerationProgress.Duration.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
@@ -41,7 +41,7 @@ extension QuizGenerationProgressScreen {
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
                 FeedbackActionButton(
-                    title: LocalizedText.ProjectRegistration.quizGenerationProgressWaitAtHomeButtonTitle,
+                    title: LocalizedText.ProjectRegistration.QuizGenerationProgress.WaitAtHome.buttonTitle,
                     action: onWaitAtHome,
                 )
                 .style(.primaryText)

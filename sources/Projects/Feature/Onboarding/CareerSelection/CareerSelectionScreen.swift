@@ -21,12 +21,12 @@ struct CareerSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText(text: LocalizedText.Onboarding.careerSelectionTitle)
+                    StyledText(text: LocalizedText.Onboarding.CareerSelection.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
 
                     if store.submission == .failed {
-                        StyledText(text: LocalizedText.Onboarding.careerSelectionSubmissionFailureMessage)
+                        StyledText(text: LocalizedText.Onboarding.CareerSelection.SubmissionFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)
@@ -59,13 +59,13 @@ struct CareerSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 VStack(spacing: LayoutToken.gutter) {
-                    StyledText(text: LocalizedText.Onboarding.careerSelectionGuidance)
+                    StyledText(text: LocalizedText.Onboarding.CareerSelection.guidance)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
 
                     FeedbackActionButton(
-                        title: LocalizedText.Onboarding.careerSelectionNextButtonTitle,
+                        title: LocalizedText.Onboarding.CareerSelection.Next.buttonTitle,
                         action: { send(.submitTapped) },
                     )
                     .enabled(store.careerLevel != nil && store.submission != .submitting)
@@ -96,19 +96,19 @@ extension CareerSelectionScreen {
 
         static func title(for level: CareerLevel) -> String {
             switch level {
-            case .entry: LocalizedText.Onboarding.careerSelectionEntryTitle
-            case .junior: LocalizedText.Onboarding.careerSelectionJuniorTitle
-            case .middle: LocalizedText.Onboarding.careerSelectionMiddleTitle
-            case .senior: LocalizedText.Onboarding.careerSelectionSeniorTitle
+            case .entry: LocalizedText.Onboarding.CareerSelection.Entry.title
+            case .junior: LocalizedText.Onboarding.CareerSelection.Junior.title
+            case .middle: LocalizedText.Onboarding.CareerSelection.Middle.title
+            case .senior: LocalizedText.Onboarding.CareerSelection.Senior.title
             }
         }
 
         static func description(for level: CareerLevel) -> String {
             switch level {
-            case .entry: LocalizedText.Onboarding.careerSelectionEntryDescription
-            case .junior: LocalizedText.Onboarding.careerSelectionJuniorDescription
-            case .middle: LocalizedText.Onboarding.careerSelectionMiddleDescription
-            case .senior: LocalizedText.Onboarding.careerSelectionSeniorDescription
+            case .entry: LocalizedText.Onboarding.CareerSelection.Entry.description
+            case .junior: LocalizedText.Onboarding.CareerSelection.Junior.description
+            case .middle: LocalizedText.Onboarding.CareerSelection.Middle.description
+            case .senior: LocalizedText.Onboarding.CareerSelection.Senior.description
             }
         }
 

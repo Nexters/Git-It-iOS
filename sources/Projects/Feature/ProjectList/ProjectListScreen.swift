@@ -32,7 +32,6 @@ public struct ProjectListScreen: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .ignoresSafeArea()
-                    .accessibilityHidden(true)
                     .onTapGesture { send(.menuDismissed) }
             }
         }
@@ -63,10 +62,10 @@ public struct ProjectListScreen: View {
                 ConfirmationSheet(
                     displayModel: .init(
                         imageURL: deletionTarget?.imageURL,
-                        title: LocalizedText.ProjectList.deletionDialogTitle,
-                        message: LocalizedText.ProjectList.deletionDialogMessage,
-                        confirmTitle: LocalizedText.ProjectList.deletionDialogConfirmButtonTitle,
-                        cancelTitle: LocalizedText.ProjectList.deletionDialogCancelButtonTitle,
+                        title: LocalizedText.ProjectList.Deletion.Dialog.title,
+                        message: LocalizedText.ProjectList.Deletion.Dialog.message,
+                        confirmTitle: LocalizedText.ProjectList.Deletion.DialogConfirm.buttonTitle,
+                        cancelTitle: LocalizedText.ProjectList.Deletion.DialogCancel.buttonTitle,
                     ),
                     onConfirmTap: { send(.deletionConfirmed) },
                     onCancelTap: { send(.deletionCancelled) },
@@ -110,7 +109,6 @@ public struct ProjectListScreen: View {
                 if let headerLeading {
                     IconGlassButton(
                         icon: headerLeading.icon,
-                        label: headerLeading.label,
                         action: headerLeadingTapped,
                     )
                     .size(.medium)
@@ -127,7 +125,6 @@ public struct ProjectListScreen: View {
             if let headerTrailing, !isFailed, !projects.isEmpty {
                 IconGlassButton(
                     icon: headerTrailing.icon,
-                    label: headerTrailing.label,
                     action: headerTrailingTapped,
                 )
                 .size(.medium)
@@ -158,7 +155,7 @@ public struct ProjectListScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: LocalizedText.ProjectList.retryButtonTitle,
+                title: LocalizedText.ProjectList.Retry.buttonTitle,
                 action: { send(.refreshRequested) },
             )
             .designSystemScreenMargin()
@@ -179,7 +176,7 @@ public struct ProjectListScreen: View {
     }
 
     private var headerTitle: String {
-        store.mode == .deleting ? LocalizedText.ProjectList.deletingModeTitle : LocalizedText.ProjectList.title
+        store.mode == .deleting ? LocalizedText.ProjectList.DeletingMode.title : LocalizedText.ProjectList.title
     }
 
     private var headerLeading: ScreenControlBar.Control? {
@@ -190,8 +187,7 @@ public struct ProjectListScreen: View {
         store.mode == .deleting
             ? nil
             : ScreenControlBar.Control(
-                icon: .menu,
-                label: LocalizedText.ProjectList.menuOpenAccessibilityLabel,
+                icon: .menu
             )
     }
 
@@ -199,8 +195,7 @@ public struct ProjectListScreen: View {
         [
             .init(
                 id: "delete",
-                title: LocalizedText.ProjectList.deletionMenuItemTitle,
-                accessibilityLabel: LocalizedText.ProjectList.deletionMenuItemAccessibilityLabel,
+                title: LocalizedText.ProjectList.Deletion.MenuItem.title,
                 onSelect: { send(.deletionMenuItemTapped) },
             )
         ]

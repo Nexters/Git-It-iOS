@@ -46,8 +46,8 @@ public struct RepositoryLinkInputFeature: Sendable {
 
         public var validateButtonTitle: String {
             validation == .validating
-                ? LocalizedText.ProjectRegistration.repositoryLinkInputValidatingButtonTitle
-                : LocalizedText.ProjectRegistration.repositoryLinkInputNextButtonTitle
+                ? LocalizedText.ProjectRegistration.RepositoryLinkInput.Validating.buttonTitle
+                : LocalizedText.ProjectRegistration.RepositoryLinkInput.Next.buttonTitle
         }
 
     }

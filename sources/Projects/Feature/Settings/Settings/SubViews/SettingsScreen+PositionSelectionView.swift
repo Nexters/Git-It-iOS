@@ -23,7 +23,6 @@ extension SettingsScreen {
                     ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.backTapped) },
                         )
                         .size(.medium)
@@ -35,7 +34,7 @@ extension SettingsScreen {
                         alignment: .top,
                     )
 
-                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.positionSelectionTitle))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.PositionSelection.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(
@@ -46,7 +45,7 @@ extension SettingsScreen {
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.curationUpdate.positionMutation {
-                        StyledText(text: LocalizedText.Settings.positionSelectionFailureMessage)
+                        StyledText(text: LocalizedText.Settings.PositionSelection.Failure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)

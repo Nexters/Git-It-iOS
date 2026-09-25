@@ -33,25 +33,6 @@ public struct ChoiceOptionDisplay: Equatable, Sendable, Identifiable {
     public let emphasis: Emphasis
     public let isSelected: Bool
 
-    public var accessibilityLabel: String {
-        var parts = [LocalizedText.Quiz.choiceOptionNumberLabel(number: id + 1), text]
-        if isSelected {
-            parts.append(LocalizedText.Quiz.choiceOptionSelectedLabel)
-        }
-        switch emphasis {
-        case .correct:
-            parts.append(LocalizedText.Quiz.choiceOptionCorrectLabel)
-
-        case .incorrect:
-            parts.append(LocalizedText.Quiz.choiceOptionIncorrectLabel)
-
-        case .neutral,
-             .selected:
-            break
-        }
-        return parts.joined(separator: ", ")
-    }
-
     public static func editing(
         choices: [String],
         selectedIndex: Int?,

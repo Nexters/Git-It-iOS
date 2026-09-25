@@ -32,7 +32,6 @@ extension ShareRegistrationScreen {
                         .multilineTextAlignment(.center)
                 }
                 .designSystemScreenMargin()
-                .accessibilityElement(children: .combine)
 
                 Spacer(minLength: 0)
 

@@ -58,6 +58,7 @@ extension AppModuleName {
                 sources: ["\(sourceDirectory)/**"],
                 resources: [
                     "\(sourceDirectory)/Resources/**",
+                    "\(sourceDirectory)/Localization/**/*.xcstrings",
                     "Config/GoogleService-Info.plist",
                 ],
                 entitlements: .file(path: "GitIt.entitlements"),

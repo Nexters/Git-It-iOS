@@ -52,24 +52,6 @@ struct ChoiceOptionDisplayTests {
         #expect(options[3].emphasis == .neutral)
     }
 
-    @Test
-    func `접근성 문장은 순번과 선택 여부와 채점 결과를 색 없이 전달한다`() {
-        let grading = ChoiceGrading(
-            isCorrect: false,
-            correctIndex: 0,
-            explanation: "",
-        )
-        let options = ChoiceOptionDisplay.answered(
-            choices: choices,
-            selectedIndex: 1,
-            grading: grading,
-        )
-
-        #expect(options[0].accessibilityLabel == "1번 선택지, 첫 번째, 정답")
-        #expect(options[1].accessibilityLabel == "2번 선택지, 두 번째, 선택함, 오답")
-        #expect(options[2].accessibilityLabel == "3번 선택지, 세 번째")
-    }
-
     // MARK: Private
 
     private let choices = ["첫 번째", "두 번째", "세 번째", "네 번째"]

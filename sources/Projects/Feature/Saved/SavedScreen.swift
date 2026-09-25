@@ -49,7 +49,6 @@ struct SavedScreen: View {
                     if store.isBackControlPresented {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.backTapped) },
                         )
                         .size(.medium)
@@ -92,7 +91,7 @@ struct SavedScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: LocalizedText.Saved.retryButtonTitle,
+                title: LocalizedText.Saved.Retry.buttonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()

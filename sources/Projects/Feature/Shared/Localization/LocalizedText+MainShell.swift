@@ -4,56 +4,76 @@ import Foundation
 
 extension LocalizedText {
     enum MainShell {
-        static var tabHomeTitle: String {
-            String(localized: .MainShell.mainShellTabHomeTitle)
+        enum Tab {
+            enum Home {
+                static var title: String {
+                    String(localized: .mainShellTabHomeTitle)
+                }
+            }
+
+            enum Projects {
+                static var title: String {
+                    String(localized: .mainShellTabProjectsTitle)
+                }
+            }
+
+            enum Saved {
+                static var title: String {
+                    String(localized: .mainShellTabSavedTitle)
+                }
+            }
+
+            enum Settings {
+                static var title: String {
+                    String(localized: .mainShellTabSettingsTitle)
+                }
+            }
         }
 
-        static var tabProjectsTitle: String {
-            String(localized: .MainShell.mainShellTabProjectsTitle)
+        enum SingleQuestion {
+            enum Failure {
+                static var title: String {
+                    String(localized: .mainShellSingleQuestionFailureTitle)
+                }
+
+                static var message: String {
+                    String(localized: .mainShellSingleQuestionFailureMessage)
+                }
+            }
+
+            enum FailureConfirm {
+                static var buttonTitle: String {
+                    String(localized: .mainShellSingleQuestionFailureConfirmButtonTitle)
+                }
+            }
+
+            enum Advance {
+                static var buttonTitle: String {
+                    String(localized: .mainShellSingleQuestionAdvanceButtonTitle)
+                }
+            }
         }
 
-        static var tabSavedTitle: String {
-            String(localized: .MainShell.mainShellTabSavedTitle)
-        }
+        enum SignInRequired {
+            enum SignIn {
+                static var buttonTitle: String {
+                    String(localized: .mainShellSignInRequiredSignInButtonTitle)
+                }
+            }
 
-        static var tabSettingsTitle: String {
-            String(localized: .MainShell.mainShellTabSettingsTitle)
-        }
+            enum Close {
+                static var buttonTitle: String {
+                    String(localized: .mainShellSignInRequiredCloseButtonTitle)
+                }
+            }
 
-        static var singleQuestionFailureTitle: String {
-            String(localized: .MainShell.mainShellSingleQuestionFailureTitle)
-        }
+            static var title: String {
+                String(localized: .mainShellSignInRequiredTitle)
+            }
 
-        static var singleQuestionFailureMessage: String {
-            String(localized: .MainShell.mainShellSingleQuestionFailureMessage)
-        }
-
-        static var singleQuestionFailureConfirmButtonTitle: String {
-            String(localized: .MainShell.mainShellSingleQuestionFailureConfirmButtonTitle)
-        }
-
-        static var signInRequiredTitle: String {
-            String(localized: .MainShell.mainShellSignInRequiredTitle)
-        }
-
-        static var signInRequiredMessage: String {
-            String(localized: .MainShell.mainShellSignInRequiredMessage)
-        }
-
-        static var signInRequiredSignInButtonTitle: String {
-            String(localized: .MainShell.mainShellSignInRequiredSignInButtonTitle)
-        }
-
-        static var signInRequiredCloseButtonTitle: String {
-            String(localized: .MainShell.mainShellSignInRequiredCloseButtonTitle)
-        }
-
-        static var singleQuestionLoadingAccessibilityLabel: String {
-            String(localized: .MainShell.mainShellSingleQuestionLoadingAccessibilityLabel)
-        }
-
-        static var singleQuestionAdvanceButtonTitle: String {
-            String(localized: .MainShell.mainShellSingleQuestionAdvanceButtonTitle)
+            static var message: String {
+                String(localized: .mainShellSignInRequiredMessage)
+            }
         }
     }
 }

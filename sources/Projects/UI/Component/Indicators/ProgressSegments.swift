@@ -24,11 +24,6 @@ public struct ProgressSegments: View {
                     .frame(height: Constant.segmentHeight)
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(LocalizedText.ProgressSegments.accessibilityLabel(
-            total: displayModel.total,
-            completed: displayModel.completed,
-        ))
     }
 
     // MARK: Private

@@ -11,16 +11,16 @@ extension ProfileScreen {
         var body: some View {
             HStack(spacing: 0) {
                 column(
-                    label: LocalizedText.Settings.statisticsCardThisWeekLabel,
-                    value: LocalizedText.Settings.statisticsCardSolvedCountValue(count: display.thisWeekSolvedCount),
+                    label: LocalizedText.Settings.StatisticsCard.ThisWeek.label,
+                    value: LocalizedText.Settings.StatisticsCard.SolvedCount.value(count: display.thisWeekSolvedCount),
                 )
                 column(
-                    label: LocalizedText.Settings.statisticsCardThisMonthLabel,
-                    value: LocalizedText.Settings.statisticsCardSolvedCountValue(count: display.thisMonthSolvedCount),
+                    label: LocalizedText.Settings.StatisticsCard.ThisMonth.label,
+                    value: LocalizedText.Settings.StatisticsCard.SolvedCount.value(count: display.thisMonthSolvedCount),
                 )
                 column(
-                    label: LocalizedText.Settings.statisticsCardStreakLabel,
-                    value: LocalizedText.Settings.statisticsCardStreakDaysValue(days: display.streakDays),
+                    label: LocalizedText.Settings.StatisticsCard.Streak.label,
+                    value: LocalizedText.Settings.StatisticsCard.Streak.Days.value(days: display.streakDays),
                 )
             }
             .frame(maxWidth: .infinity)
@@ -65,7 +65,6 @@ extension ProfileScreen {
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .accessibilityElement(children: .combine)
         }
 
     }

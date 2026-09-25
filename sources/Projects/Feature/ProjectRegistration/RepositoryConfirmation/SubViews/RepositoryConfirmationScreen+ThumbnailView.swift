@@ -18,7 +18,6 @@ extension RepositoryConfirmationScreen {
                     height: Constant.size,
                 )
                 .designSystemCornerRadius(.medium)
-                .accessibilityHidden(true)
         }
 
         // MARK: Private

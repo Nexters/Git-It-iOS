@@ -17,7 +17,6 @@ public struct OnboardingRouter: View {
 
     public var body: some View {
         content
-            .accessibilityElement(children: .contain)
     }
 
     // MARK: Private

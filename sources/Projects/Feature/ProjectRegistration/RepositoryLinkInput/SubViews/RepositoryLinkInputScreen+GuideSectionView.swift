@@ -16,7 +16,7 @@ extension RepositoryLinkInputScreen {
                     isGuideExpanded.toggle()
                 } label: {
                     HStack(spacing: 0) {
-                        StyledText(text: LocalizedText.ProjectRegistration.guideSectionTitle)
+                        StyledText(text: LocalizedText.ProjectRegistration.GuideSection.title)
                             .textStyle(.body2)
                             .foregroundColorToken(.blue100)
                         Spacer(minLength: 0)
@@ -39,13 +39,6 @@ extension RepositoryLinkInputScreen {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(LocalizedText.ProjectRegistration.guideSectionAccessibilityLabel)
-                .accessibilityAddTraits(.isButton)
-                .accessibilityValue(
-                    isGuideExpanded
-                        ? LocalizedText.ProjectRegistration.guideSectionExpandedAccessibilityValue
-                        : LocalizedText.ProjectRegistration.guideSectionCollapsedAccessibilityValue
-                )
 
                 if isGuideExpanded {
                     VStack(
@@ -101,11 +94,11 @@ extension RepositoryLinkInputScreen {
 
         private var guideSteps: [String] {
             [
-                LocalizedText.ProjectRegistration.guideSectionFirstStep,
-                LocalizedText.ProjectRegistration.guideSectionSecondStep,
-                LocalizedText.ProjectRegistration.guideSectionThirdStep,
-                LocalizedText.ProjectRegistration.guideSectionFourthStep,
-                LocalizedText.ProjectRegistration.guideSectionFifthStep,
+                LocalizedText.ProjectRegistration.GuideSection.First.step,
+                LocalizedText.ProjectRegistration.GuideSection.Second.step,
+                LocalizedText.ProjectRegistration.GuideSection.Third.step,
+                LocalizedText.ProjectRegistration.GuideSection.Fourth.step,
+                LocalizedText.ProjectRegistration.GuideSection.Fifth.step,
             ]
         }
 

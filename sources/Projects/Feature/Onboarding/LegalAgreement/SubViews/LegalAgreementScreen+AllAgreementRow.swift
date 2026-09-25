@@ -19,7 +19,7 @@ extension LegalAgreementScreen {
                             width: Constant.checkSize,
                             height: Constant.checkSize,
                         )
-                    StyledText(text: LocalizedText.Onboarding.allAgreementRowTitle)
+                    StyledText(text: LocalizedText.Onboarding.AllAgreementRow.title)
                         .textStyle(.body2)
                     Spacer(minLength: 0)
                 }

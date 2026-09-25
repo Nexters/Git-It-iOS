@@ -64,34 +64,34 @@ public struct MainShellRouter: View {
             }
         }
         .alert(
-            LocalizedText.MainShell.singleQuestionFailureTitle,
+            LocalizedText.MainShell.SingleQuestion.Failure.title,
             isPresented: entryFailureBinding,
         ) {
             Button(
-                LocalizedText.MainShell.singleQuestionFailureConfirmButtonTitle,
+                LocalizedText.MainShell.SingleQuestion.FailureConfirm.buttonTitle,
                 role: .cancel,
             ) {
                 send(.singleQuestionFailureDismissed)
             }
         } message: {
-            Text(LocalizedText.MainShell.singleQuestionFailureMessage)
+            Text(LocalizedText.MainShell.SingleQuestion.Failure.message)
         }
         .overlay { singleQuestionOverlay }
         .alert(
-            LocalizedText.MainShell.signInRequiredTitle,
+            LocalizedText.MainShell.SignInRequired.title,
             isPresented: signInRequiredAlertBinding,
         ) {
-            Button(LocalizedText.MainShell.signInRequiredSignInButtonTitle) {
+            Button(LocalizedText.MainShell.SignInRequired.SignIn.buttonTitle) {
                 send(.signInRequiredAlertSignInTapped)
             }
             Button(
-                LocalizedText.MainShell.signInRequiredCloseButtonTitle,
+                LocalizedText.MainShell.SignInRequired.Close.buttonTitle,
                 role: .cancel,
             ) {
                 send(.signInRequiredAlertDismissed)
             }
         } message: {
-            Text(LocalizedText.MainShell.signInRequiredMessage)
+            Text(LocalizedText.MainShell.SignInRequired.message)
         }
     }
 
@@ -133,7 +133,6 @@ public struct MainShellRouter: View {
             ProgressView()
                 .tint(Color(designSystem: .blue100))
         }
-        .accessibilityLabel(LocalizedText.MainShell.singleQuestionLoadingAccessibilityLabel)
     }
 
     private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {

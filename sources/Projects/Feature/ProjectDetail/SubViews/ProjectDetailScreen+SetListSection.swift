@@ -15,7 +15,7 @@ extension ProjectDetailScreen {
                 alignment: .leading,
                 spacing: Constant.titleSpacing,
             ) {
-                StyledText(text: LocalizedText.ProjectDetail.setListSectionTitle)
+                StyledText(text: LocalizedText.ProjectDetail.SetListSection.title)
                     .textStyle(.subtitle2)
 
                 cards
@@ -35,8 +35,8 @@ extension ProjectDetailScreen {
             if sets.isEmpty {
                 EmptyState(
                     displayModel: .init(
-                        title: LocalizedText.ProjectDetail.setListSectionEmptyTitle,
-                        message: LocalizedText.ProjectDetail.setListSectionEmptyMessage,
+                        title: LocalizedText.ProjectDetail.SetListSection.Empty.title,
+                        message: LocalizedText.ProjectDetail.SetListSection.Empty.message,
                     )
                 ) {
                     ResourceImage(asset: .illust(.levelEntry))

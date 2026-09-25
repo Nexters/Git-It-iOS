@@ -18,10 +18,10 @@ struct QuizGenerationConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: LocalizedText.ProjectRegistration.quizGenerationConfirmationTitle)
+                StyledText(text: LocalizedText.ProjectRegistration.QuizGenerationConfirmation.title)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
-                StyledText(text: LocalizedText.ProjectRegistration.quizGenerationConfirmationDurationMessage)
+                StyledText(text: LocalizedText.ProjectRegistration.QuizGenerationConfirmation.Duration.message)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ struct QuizGenerationConfirmationScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: LocalizedText.ProjectRegistration.quizGenerationConfirmationStartButtonTitle,
+                title: LocalizedText.ProjectRegistration.QuizGenerationConfirmation.Start.buttonTitle,
                 action: { send(.startTapped) },
             )
             .designSystemScreenMargin()

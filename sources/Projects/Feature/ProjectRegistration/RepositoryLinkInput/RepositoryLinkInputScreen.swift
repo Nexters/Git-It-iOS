@@ -31,19 +31,18 @@ struct RepositoryLinkInputScreen: View {
                 alignment: .leading,
                 spacing: Constant.titleFieldSpacing,
             ) {
-                StyledText(text: LocalizedText.ProjectRegistration.repositoryLinkInputTitle)
+                StyledText(text: LocalizedText.ProjectRegistration.RepositoryLinkInput.title)
                     .textStyle(.subtitle1)
 
                 LabeledTextField(
                     displayModel: .init(
-                        label: LocalizedText.ProjectRegistration.repositoryLinkInputFieldLabel,
+                        label: LocalizedText.ProjectRegistration.RepositoryLinkInput.Field.label,
                         placeholder: "https://github.com",
                         supportingText: store.isValidationFailed
-                            ? LocalizedText.ProjectRegistration.repositoryLinkInputValidationErrorMessage
+                            ? LocalizedText.ProjectRegistration.RepositoryLinkInput.ValidationError.message
                             : nil,
                     ),
                     text: repositoryURLInput,
-                    accessibilityLabel: LocalizedText.ProjectRegistration.repositoryLinkInputFieldAccessibilityLabel,
                     focus: $isLinkFieldFocused,
                 )
                 .error(store.isValidationFailed)

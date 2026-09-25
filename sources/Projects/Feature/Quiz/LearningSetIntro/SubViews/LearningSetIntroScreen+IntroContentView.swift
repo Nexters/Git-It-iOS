@@ -56,10 +56,10 @@ extension LearningSetIntroScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.failureTextSpacing) {
-                    StyledText(text: LocalizedText.Quiz.introContentLoadFailureTitle)
+                    StyledText(text: LocalizedText.Quiz.IntroContent.LoadFailure.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: LocalizedText.Quiz.introContentLoadFailureMessage)
+                    StyledText(text: LocalizedText.Quiz.IntroContent.LoadFailure.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)

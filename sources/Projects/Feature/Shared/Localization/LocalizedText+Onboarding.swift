@@ -4,104 +4,148 @@ import Foundation
 
 extension LocalizedText {
     enum Onboarding {
-        static var careerSelectionTitle: String {
-            String(localized: .Onboarding.careerSelectionTitle)
+        enum AllAgreementRow {
+            static var title: String {
+                String(localized: .onboardingAllAgreementRowTitle)
+            }
         }
 
-        static var careerSelectionGuidance: String {
-            String(localized: .Onboarding.careerSelectionGuidance)
+        enum CareerSelection {
+            enum SubmissionFailure {
+                static var message: String {
+                    String(localized: .onboardingCareerSelectionSubmissionFailureMessage)
+                }
+            }
+
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .onboardingCareerSelectionNextButtonTitle)
+                }
+            }
+
+            enum Entry {
+                static var title: String {
+                    String(localized: .onboardingCareerSelectionEntryTitle)
+                }
+
+                static var description: String {
+                    String(localized: .onboardingCareerSelectionEntryDescription)
+                }
+            }
+
+            enum Junior {
+                static var title: String {
+                    String(localized: .onboardingCareerSelectionJuniorTitle)
+                }
+
+                static var description: String {
+                    String(localized: .onboardingCareerSelectionJuniorDescription)
+                }
+            }
+
+            enum Middle {
+                static var title: String {
+                    String(localized: .onboardingCareerSelectionMiddleTitle)
+                }
+
+                static var description: String {
+                    String(localized: .onboardingCareerSelectionMiddleDescription)
+                }
+            }
+
+            enum Senior {
+                static var title: String {
+                    String(localized: .onboardingCareerSelectionSeniorTitle)
+                }
+
+                static var description: String {
+                    String(localized: .onboardingCareerSelectionSeniorDescription)
+                }
+            }
+
+            static var title: String {
+                String(localized: .onboardingCareerSelectionTitle)
+            }
+
+            static var guidance: String {
+                String(localized: .onboardingCareerSelectionGuidance)
+            }
         }
 
-        static var careerSelectionSubmissionFailureMessage: String {
-            String(localized: .Onboarding.careerSelectionSubmissionFailureMessage)
+        enum LegalAgreement {
+            enum Cancel {
+                static var buttonTitle: String {
+                    String(localized: .onboardingLegalAgreementCancelButtonTitle)
+                }
+            }
+
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .onboardingLegalAgreementNextButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .onboardingLegalAgreementTitle)
+            }
         }
 
-        static var careerSelectionNextButtonTitle: String {
-            String(localized: .Onboarding.careerSelectionNextButtonTitle)
+        enum PositionSelection {
+            enum ExitFailure {
+                static var message: String {
+                    String(localized: .onboardingPositionSelectionExitFailureMessage)
+                }
+            }
+
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .onboardingPositionSelectionNextButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .onboardingPositionSelectionTitle)
+            }
         }
 
-        static var careerSelectionEntryTitle: String {
-            String(localized: .Onboarding.careerSelectionEntryTitle)
-        }
+        enum Tutorial {
+            enum Page {
+                enum First {
+                    static var title: String {
+                        String(localized: .onboardingTutorialPageFirstTitle)
+                    }
+                }
 
-        static var careerSelectionJuniorTitle: String {
-            String(localized: .Onboarding.careerSelectionJuniorTitle)
-        }
+                enum Second {
+                    static var title: String {
+                        String(localized: .onboardingTutorialPageSecondTitle)
+                    }
+                }
 
-        static var careerSelectionMiddleTitle: String {
-            String(localized: .Onboarding.careerSelectionMiddleTitle)
-        }
+                enum Third {
+                    static var title: String {
+                        String(localized: .onboardingTutorialPageThirdTitle)
+                    }
+                }
+            }
 
-        static var careerSelectionSeniorTitle: String {
-            String(localized: .Onboarding.careerSelectionSeniorTitle)
-        }
+            enum SignIn {
+                enum Hint {
+                    static var title: String {
+                        String(localized: .onboardingTutorialSignInHintTitle)
+                    }
+                }
 
-        static var careerSelectionEntryDescription: String {
-            String(localized: .Onboarding.careerSelectionEntryDescription)
-        }
+                enum GuestAccess {
+                    static var buttonTitle: String {
+                        String(localized: .onboardingTutorialSignInGuestAccessButtonTitle)
+                    }
+                }
 
-        static var careerSelectionJuniorDescription: String {
-            String(localized: .Onboarding.careerSelectionJuniorDescription)
-        }
-
-        static var careerSelectionMiddleDescription: String {
-            String(localized: .Onboarding.careerSelectionMiddleDescription)
-        }
-
-        static var careerSelectionSeniorDescription: String {
-            String(localized: .Onboarding.careerSelectionSeniorDescription)
-        }
-
-        static var legalAgreementTitle: String {
-            String(localized: .Onboarding.legalAgreementTitle)
-        }
-
-        static var legalAgreementCancelButtonTitle: String {
-            String(localized: .Onboarding.legalAgreementCancelButtonTitle)
-        }
-
-        static var legalAgreementNextButtonTitle: String {
-            String(localized: .Onboarding.legalAgreementNextButtonTitle)
-        }
-
-        static var allAgreementRowTitle: String {
-            String(localized: .Onboarding.allAgreementRowTitle)
-        }
-
-        static var positionSelectionTitle: String {
-            String(localized: .Onboarding.positionSelectionTitle)
-        }
-
-        static var positionSelectionExitFailureMessage: String {
-            String(localized: .Onboarding.positionSelectionExitFailureMessage)
-        }
-
-        static var positionSelectionNextButtonTitle: String {
-            String(localized: .Onboarding.positionSelectionNextButtonTitle)
-        }
-
-        static var tutorialPageFirstTitle: String {
-            String(localized: .Onboarding.tutorialPageFirstTitle)
-        }
-
-        static var tutorialPageSecondTitle: String {
-            String(localized: .Onboarding.tutorialPageSecondTitle)
-        }
-
-        static var tutorialPageThirdTitle: String {
-            String(localized: .Onboarding.tutorialPageThirdTitle)
-        }
-
-        static var tutorialSignInHintTitle: String {
-            String(localized: .Onboarding.tutorialSignInHintTitle)
-        }
-
-        static var tutorialSignInGuestAccessButtonTitle: String {
-            String(localized: .Onboarding.tutorialSignInGuestAccessButtonTitle)
-        }
-
-        static func tutorialSignInVersion(version: String) -> String {
-            String(localized: .Onboarding.tutorialSignInVersion(version: version))
+                static func version(version: String) -> String {
+                    String(localized: .onboardingTutorialSignInVersion(version: version))
+                }
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText(text: LocalizedText.ProjectRegistration.repositoryConfirmationTitle)
+                StyledText(text: LocalizedText.ProjectRegistration.RepositoryConfirmation.title)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
 
@@ -43,17 +43,16 @@ struct RepositoryConfirmationScreen: View {
                 .padding(.top, Constant.thumbnailTopPadding)
             }
             .designSystemScreenMargin()
-            .accessibilityElement(children: .combine)
 
             Spacer(minLength: 0)
 
             VStack(spacing: LayoutToken.compactSpacing) {
                 FeedbackActionButton(
-                    title: LocalizedText.ProjectRegistration.repositoryConfirmationNextButtonTitle,
+                    title: LocalizedText.ProjectRegistration.RepositoryConfirmation.Next.buttonTitle,
                     action: { send(.confirmTapped) },
                 )
                 FeedbackActionButton(
-                    title: LocalizedText.ProjectRegistration.repositoryConfirmationRejectButtonTitle,
+                    title: LocalizedText.ProjectRegistration.RepositoryConfirmation.Reject.buttonTitle,
                     action: { send(.rejectTapped) },
                 )
                 .style(.secondary)

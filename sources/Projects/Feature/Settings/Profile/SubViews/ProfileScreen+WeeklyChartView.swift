@@ -17,7 +17,7 @@ extension ProfileScreen {
                     alignment: .leading,
                     spacing: Constant.headerSpacing,
                 ) {
-                    StyledText(text: LocalizedText.Settings.weeklyChartSectionLabel)
+                    StyledText(text: LocalizedText.Settings.WeeklyChart.Section.label)
                         .textStyle(.body3)
                         .foregroundColorToken(.grey400)
                     StyledText(text: display.weeklyTitle)
@@ -105,11 +105,6 @@ extension ProfileScreen {
                     ))
             }
             .frame(maxWidth: .infinity)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(LocalizedText.Settings.weeklyChartBarAccessibilityLabel(
-                dayLabel: bar.dayLabel,
-                count: bar.count,
-            ))
         }
 
         private func barHeight(for count: Int) -> CGFloat {

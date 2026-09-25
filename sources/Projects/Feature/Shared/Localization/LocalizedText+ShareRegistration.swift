@@ -4,84 +4,116 @@ import Foundation
 
 extension LocalizedText {
     enum ShareRegistration {
-        static var lookupMessage: String {
-            String(localized: .ShareRegistration.shareRegistrationLookupMessage)
+        enum Lookup {
+            enum Failure {
+                static var reason: String {
+                    String(localized: .shareRegistrationLookupFailureReason)
+                }
+            }
+
+            static var message: String {
+                String(localized: .shareRegistrationLookupMessage)
+            }
         }
 
-        static var submittingMessage: String {
-            String(localized: .ShareRegistration.shareRegistrationSubmittingMessage)
+        enum Submitting {
+            static var message: String {
+                String(localized: .shareRegistrationSubmittingMessage)
+            }
         }
 
-        static var invalidLinkTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationInvalidLinkTitle)
+        enum InvalidLink {
+            static var title: String {
+                String(localized: .shareRegistrationInvalidLinkTitle)
+            }
+
+            static var reason: String {
+                String(localized: .shareRegistrationInvalidLinkReason)
+            }
         }
 
-        static var signInRequiredTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationSignInRequiredTitle)
+        enum SignInRequired {
+            static var title: String {
+                String(localized: .shareRegistrationSignInRequiredTitle)
+            }
+
+            static var message: String {
+                String(localized: .shareRegistrationSignInRequiredMessage)
+            }
         }
 
-        static var signInRequiredMessage: String {
-            String(localized: .ShareRegistration.shareRegistrationSignInRequiredMessage)
+        enum AppLaunchRequired {
+            static var title: String {
+                String(localized: .shareRegistrationAppLaunchRequiredTitle)
+            }
+
+            static var message: String {
+                String(localized: .shareRegistrationAppLaunchRequiredMessage)
+            }
         }
 
-        static var appLaunchRequiredTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationAppLaunchRequiredTitle)
+        enum Success {
+            static var title: String {
+                String(localized: .shareRegistrationSuccessTitle)
+            }
+
+            static var message: String {
+                String(localized: .shareRegistrationSuccessMessage)
+            }
         }
 
-        static var appLaunchRequiredMessage: String {
-            String(localized: .ShareRegistration.shareRegistrationAppLaunchRequiredMessage)
+        enum Failure {
+            static var title: String {
+                String(localized: .shareRegistrationFailureTitle)
+            }
         }
 
-        static var successTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationSuccessTitle)
+        enum Retry {
+            static var buttonTitle: String {
+                String(localized: .shareRegistrationRetryButtonTitle)
+            }
         }
 
-        static var successMessage: String {
-            String(localized: .ShareRegistration.shareRegistrationSuccessMessage)
+        enum Dismiss {
+            static var buttonTitle: String {
+                String(localized: .shareRegistrationDismissButtonTitle)
+            }
         }
 
-        static var failureTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationFailureTitle)
+        enum SharedItemUnavailable {
+            static var reason: String {
+                String(localized: .shareRegistrationSharedItemUnavailableReason)
+            }
         }
 
-        static var retryButtonTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationRetryButtonTitle)
+        enum InvalidRequest {
+            static var reason: String {
+                String(localized: .shareRegistrationInvalidRequestReason)
+            }
         }
 
-        static var dismissButtonTitle: String {
-            String(localized: .ShareRegistration.shareRegistrationDismissButtonTitle)
+        enum DuplicateRequest {
+            static var reason: String {
+                String(localized: .shareRegistrationDuplicateRequestReason)
+            }
         }
 
-        static var sharedItemUnavailableReason: String {
-            String(localized: .ShareRegistration.shareRegistrationSharedItemUnavailableReason)
+        enum TemporarilyUnavailable {
+            static var reason: String {
+                String(localized: .shareRegistrationTemporarilyUnavailableReason)
+            }
         }
 
-        static var invalidLinkReason: String {
-            String(localized: .ShareRegistration.shareRegistrationInvalidLinkReason)
+        enum RegistrationFailure {
+            static var reason: String {
+                String(localized: .shareRegistrationRegistrationFailureReason)
+            }
         }
 
-        static var invalidRequestReason: String {
-            String(localized: .ShareRegistration.shareRegistrationInvalidRequestReason)
-        }
-
-        static var duplicateRequestReason: String {
-            String(localized: .ShareRegistration.shareRegistrationDuplicateRequestReason)
-        }
-
-        static var temporarilyUnavailableReason: String {
-            String(localized: .ShareRegistration.shareRegistrationTemporarilyUnavailableReason)
-        }
-
-        static var registrationFailureReason: String {
-            String(localized: .ShareRegistration.shareRegistrationRegistrationFailureReason)
-        }
-
-        static var offlineReason: String {
-            String(localized: .ShareRegistration.shareRegistrationOfflineReason)
-        }
-
-        static var lookupFailureReason: String {
-            String(localized: .ShareRegistration.shareRegistrationLookupFailureReason)
+        enum Offline {
+            static var reason: String {
+                String(localized: .shareRegistrationOfflineReason)
+            }
         }
     }
 }

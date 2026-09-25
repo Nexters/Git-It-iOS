@@ -66,22 +66,6 @@ struct ChoiceResultRowTests {
     }
 
     @Test
-    func `접근성 라벨에 판정을 접미로 붙인다`() {
-        #expect(
-            ChoiceResultRow.accessibilityLabel(
-                text: "본문",
-                judgement: .correct,
-            ) == "본문, 정답"
-        )
-        #expect(
-            ChoiceResultRow.accessibilityLabel(
-                text: "본문",
-                judgement: .incorrect,
-            ) == "본문, 오답"
-        )
-    }
-
-    @Test
     func `판정별 배경은 색 토큰을 참조한다`() {
         #expect(ChoiceResultRow.Judgement.correct.backgroundColor == ColorToken.correct)
         #expect(ChoiceResultRow.Judgement.incorrect.backgroundColor == ColorToken.incorrect)

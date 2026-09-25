@@ -109,7 +109,7 @@ public struct ProjectDetailRouterFeature: Sendable {
         }
     }
 
-    public static let singleQuestionAdvanceActionTitle = LocalizedText.ProjectDetail.singleQuestionAdvanceButtonTitle
+    public static let singleQuestionAdvanceActionTitle = LocalizedText.ProjectDetail.SingleQuestion.Advance.buttonTitle
 
     public var body: some ReducerOf<Self> {
         Scope(

@@ -23,7 +23,6 @@ extension SettingsScreen {
                     ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.deleteAccountCancelled) },
                         )
                         .size(.medium)
@@ -35,7 +34,7 @@ extension SettingsScreen {
                         alignment: .top,
                     )
 
-                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.accountDeletionTitle))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.AccountDeletion.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(
@@ -56,7 +55,7 @@ extension SettingsScreen {
                     }
 
                     if case .failed = store.accountAction.accountAction {
-                        StyledText(text: LocalizedText.Settings.accountDeletionFailureMessage)
+                        StyledText(text: LocalizedText.Settings.AccountDeletion.Failure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                     }
@@ -70,7 +69,7 @@ extension SettingsScreen {
             } footer: {
                 BottomActionBar {
                     FeedbackActionButton(
-                        styledText: StyledText(text: LocalizedText.Settings.accountDeletionConfirmButtonTitle)
+                        styledText: StyledText(text: LocalizedText.Settings.AccountDeletion.Confirm.buttonTitle)
                             .foregroundColorToken(.error),
                         action: { send(.deleteAccountConfirmed) },
                     )
@@ -99,9 +98,9 @@ extension SettingsScreen {
 
         private var paragraphs: [String] {
             [
-                LocalizedText.Settings.accountDeletionFirstParagraph,
-                LocalizedText.Settings.accountDeletionSecondParagraph,
-                LocalizedText.Settings.accountDeletionThirdParagraph,
+                LocalizedText.Settings.AccountDeletion.First.paragraph,
+                LocalizedText.Settings.AccountDeletion.Second.paragraph,
+                LocalizedText.Settings.AccountDeletion.Third.paragraph,
             ]
         }
 

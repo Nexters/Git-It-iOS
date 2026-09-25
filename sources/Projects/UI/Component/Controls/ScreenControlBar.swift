@@ -27,7 +27,6 @@ public struct ScreenControlBar: View {
             if let leading = displayModel.leading {
                 IconGlassButton(
                     icon: leading.icon,
-                    label: leading.label,
                     action: onLeadingTap,
                 )
                 .size(.medium)
@@ -38,7 +37,6 @@ public struct ScreenControlBar: View {
             if let trailing = displayModel.trailing {
                 IconGlassButton(
                     icon: trailing.icon,
-                    label: trailing.label,
                     action: onTrailingTap,
                 )
                 .size(.medium)
@@ -93,11 +91,9 @@ extension ScreenControlBar {
         // MARK: Lifecycle
 
         public init(
-            icon: Icon,
-            label: String,
+            icon: Icon
         ) {
             self.icon = icon
-            self.label = label
         }
 
         // MARK: Public
@@ -105,16 +101,13 @@ extension ScreenControlBar {
         public typealias Icon = ResourceImage.Asset.Icon
 
         public static let back = Control(
-            icon: .chevronLeftWhite,
-            label: LocalizedText.ScreenControlBar.backAccessibilityLabel,
+            icon: .chevronLeftWhite
         )
         public static let close = Control(
-            icon: .close,
-            label: LocalizedText.ScreenControlBar.closeAccessibilityLabel,
+            icon: .close
         )
 
         public let icon: Icon
-        public let label: String
 
     }
 }
@@ -123,14 +116,12 @@ extension ScreenControlBar {
     VStack(spacing: LayoutToken.margin) {
         ScreenControlBar()
         ScreenControlBar(displayModel: .init(trailing: .init(
-            icon: .menu,
-            label: "더 보기",
+            icon: .menu
         )))
         ScreenControlBar(displayModel: .init(
             leading: .close,
             trailing: .init(
-                icon: .setting,
-                label: "설정 열기",
+                icon: .setting
             ),
         ))
     }

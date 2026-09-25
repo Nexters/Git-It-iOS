@@ -24,17 +24,17 @@ public struct ProjectDetailRouter: View {
                 }
             }
             .alert(
-                LocalizedText.ProjectDetail.singleQuestionFailureTitle,
+                LocalizedText.ProjectDetail.SingleQuestion.Failure.title,
                 isPresented: entryFailureBinding,
             ) {
                 Button(
-                    LocalizedText.ProjectDetail.singleQuestionFailureConfirmButtonTitle,
+                    LocalizedText.ProjectDetail.SingleQuestion.FailureConfirm.buttonTitle,
                     role: .cancel,
                 ) {
                     send(.singleQuestionFailureDismissed)
                 }
             } message: {
-                Text(LocalizedText.ProjectDetail.singleQuestionFailureMessage)
+                Text(LocalizedText.ProjectDetail.SingleQuestion.Failure.message)
             }
     }
 
@@ -59,7 +59,6 @@ public struct ProjectDetailRouter: View {
             ProgressView()
                 .tint(Color(designSystem: .blue100))
         }
-        .accessibilityLabel(LocalizedText.ProjectDetail.singleQuestionLoadingAccessibilityLabel)
     }
 
     private var pushedScreens: [ProjectDetailRouterFeature.ActiveScreen] {

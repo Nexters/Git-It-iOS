@@ -30,7 +30,7 @@ extension FeatureModuleName {
                     "Feature.xcodeproj/**",
                     "Project.swift",
                 ],
-                resources: .resources([.glob(pattern: "*/Resources/**")]),
+                resources: .resources([.glob(pattern: "Shared/Localization/**/*.xcstrings")]),
                 dependencies: [
                     .external(.ComposableArchitecture),
                     .fromDomain(.DomainIdentifier),

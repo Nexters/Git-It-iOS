@@ -31,7 +31,6 @@ public struct LabeledProgressBar: View {
             ContinuousProgressBar(progress: displayModel.progress)
                 .size(.detail)
         }
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: Private

@@ -16,15 +16,15 @@ extension HomeScreen {
                         alignment: .leading,
                         spacing: Constant.messageSpacing,
                     ) {
-                        StyledText(text: LocalizedText.Home.profileHeaderLoadFailureTitle)
+                        StyledText(text: LocalizedText.Home.ProfileHeader.LoadFailure.title)
                             .textStyle(.subtitle3)
-                        StyledText(text: LocalizedText.Home.profileHeaderLoadFailureMessage)
+                        StyledText(text: LocalizedText.Home.ProfileHeader.LoadFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.grey400)
                     }
                     Spacer()
                     FeedbackActionButton(
-                        title: LocalizedText.Home.profileHeaderRetryButtonTitle,
+                        title: LocalizedText.Home.ProfileHeader.Retry.buttonTitle,
                         action: onRetry,
                     )
                     .style(.secondary)
@@ -58,7 +58,6 @@ extension HomeScreen {
                             .foregroundColorToken(.grey400)
                     }
                 }
-                .accessibilityElement(children: .combine)
                 .padding(.top, Constant.topPadding)
                 .padding(.bottom, Constant.bottomPadding)
                 .frame(

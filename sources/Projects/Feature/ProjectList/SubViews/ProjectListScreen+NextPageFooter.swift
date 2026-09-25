@@ -20,13 +20,13 @@ extension ProjectListScreen {
 
             case .failed:
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: LocalizedText.ProjectList.nextPageFooterFailureMessage)
+                    StyledText(text: LocalizedText.ProjectList.NextPageFooter.Failure.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
 
                     FeedbackActionButton(
-                        title: LocalizedText.ProjectList.nextPageFooterRetryButtonTitle,
+                        title: LocalizedText.ProjectList.NextPageFooter.Retry.buttonTitle,
                         action: onRetry,
                     )
                     .style(.text)

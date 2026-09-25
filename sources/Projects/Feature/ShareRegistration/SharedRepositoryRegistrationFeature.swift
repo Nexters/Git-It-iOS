@@ -172,38 +172,38 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     private static func registrationFailureReason(for error: ProjectGenerationError) -> String {
         switch error {
         case .invalidRequest:
-            LocalizedText.ShareRegistration.invalidRequestReason
+            LocalizedText.ShareRegistration.InvalidRequest.reason
 
         case .duplicateRequest:
-            LocalizedText.ShareRegistration.duplicateRequestReason
+            LocalizedText.ShareRegistration.DuplicateRequest.reason
 
         case .temporarilyUnavailable:
-            LocalizedText.ShareRegistration.temporarilyUnavailableReason
+            LocalizedText.ShareRegistration.TemporarilyUnavailable.reason
 
         default:
-            LocalizedText.ShareRegistration.registrationFailureReason
+            LocalizedText.ShareRegistration.RegistrationFailure.reason
         }
     }
 
     private static func lookupFailureReason(for error: ExternalRepositoryError) -> String {
         switch error {
         case .offline:
-            LocalizedText.ShareRegistration.offlineReason
+            LocalizedText.ShareRegistration.Offline.reason
 
         default:
-            LocalizedText.ShareRegistration.lookupFailureReason
+            LocalizedText.ShareRegistration.Lookup.Failure.reason
         }
     }
 
     private func validate(_ state: inout State) -> Effect<Action> {
         state.phase = .validating
         guard let sharedURL = state.sharedURL else {
-            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.sharedItemUnavailableReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.SharedItemUnavailable.reason)
             recordDiagnostic(.sharedItemUnavailable)
             return .none
         }
         guard parseRepositoryLink.location(from: sharedURL) != nil else {
-            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.invalidLinkReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.InvalidLink.reason)
             recordDiagnostic(.repositoryLinkRejected)
             return .none
         }
@@ -230,8 +230,8 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             } catch let error as ExternalRepositoryError {
                 if error == .invalidURLFormat {
                     recordDiagnostic(.repositoryLinkRejected)
-                    await send(.effect(.validationFinished(.invalidURL(reason: LocalizedText.ShareRegistration
-                            .invalidLinkReason))))
+                    await send(.effect(.validationFinished(.invalidURL(reason: LocalizedText.ShareRegistration.InvalidLink
+                            .reason))))
                 } else {
                     recordDiagnostic(.repositoryLookupFailed(reason: String(describing: error)))
                     await send(.effect(.validationFinished(.failed(

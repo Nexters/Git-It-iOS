@@ -60,7 +60,7 @@ struct LearningSetIntroScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: LocalizedText.Quiz.learningSetIntroRetryButtonTitle,
+                title: LocalizedText.Quiz.LearningSetIntro.Retry.buttonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()
@@ -75,7 +75,6 @@ struct LearningSetIntroScreen: View {
     private var screenBackground: some View {
         if !isFailed {
             LinearGradient(designSystem: .backgroundGradient)
-                .accessibilityHidden(true)
         }
     }
 
@@ -83,14 +82,14 @@ struct LearningSetIntroScreen: View {
         BottomActionBar {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
-                    StyledText(text: LocalizedText.Quiz.learningSetIntroEmptyMessage)
+                    StyledText(text: LocalizedText.Quiz.LearningSetIntro.Empty.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
                 }
 
                 FeedbackActionButton(
-                    title: LocalizedText.Quiz.learningSetIntroStartButtonTitle,
+                    title: LocalizedText.Quiz.LearningSetIntro.Start.buttonTitle,
                     action: { send(.startTapped) },
                 )
                 .enabled(store.isStartEnabled)

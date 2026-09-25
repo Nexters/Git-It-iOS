@@ -51,7 +51,6 @@ public struct SplashView: View {
             }
             .frame(alignment: .leading)
         }
-        .accessibilityHidden(true)
         .task { await runIntroSequence() }
     }
 

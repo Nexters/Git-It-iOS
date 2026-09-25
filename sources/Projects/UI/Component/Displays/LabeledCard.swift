@@ -53,7 +53,6 @@ public struct LabeledCard: View {
         )
         .designSystemBackground(style.background)
         .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: Private

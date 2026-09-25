@@ -38,14 +38,13 @@ public struct ProfileScreen: View {
             alignment: .top,
             spacing: LayoutToken.gutter,
         ) {
-            ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.profileTitle))
+            ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.Profile.title))
                 .frame(height: Constant.headerControlRowHeight)
 
             Spacer()
 
             IconGlassButton(
                 icon: .setting,
-                label: LocalizedText.Settings.profileSettingsAccessibilityLabel,
                 action: { send(.settingsTapped) },
             )
             .size(.medium)
@@ -57,7 +56,7 @@ public struct ProfileScreen: View {
     private var content: some View {
         Self.ProfileContentView(
             display: display,
-            statisticsSectionTitle: LocalizedText.Settings.profileStatisticsSectionTitle,
+            statisticsSectionTitle: LocalizedText.Settings.Profile.StatisticsSection.title,
             onRetry: { send(.retryTapped) },
         )
     }

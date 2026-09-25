@@ -21,12 +21,12 @@ struct PositionSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText(text: LocalizedText.Onboarding.positionSelectionTitle)
+                    StyledText(text: LocalizedText.Onboarding.PositionSelection.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
 
                     if store.exitStatus == .failed {
-                        StyledText(text: LocalizedText.Onboarding.positionSelectionExitFailureMessage)
+                        StyledText(text: LocalizedText.Onboarding.PositionSelection.ExitFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)
@@ -56,7 +56,7 @@ struct PositionSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 FeedbackActionButton(
-                    title: LocalizedText.Onboarding.positionSelectionNextButtonTitle,
+                    title: LocalizedText.Onboarding.PositionSelection.Next.buttonTitle,
                     action: { send(.nextTapped) },
                 )
                 .enabled(store.position != nil)

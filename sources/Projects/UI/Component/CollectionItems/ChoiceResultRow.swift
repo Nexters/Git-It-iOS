@@ -33,15 +33,6 @@ public struct ChoiceResultRow: View {
                 .incorrect
             }
         }
-
-        var accessibilitySuffix: String {
-            switch self {
-            case .correct:
-                LocalizedText.ChoiceResultRow.correctLabel
-            case .incorrect:
-                LocalizedText.ChoiceResultRow.incorrectLabel
-            }
-        }
     }
 
     public var body: some View {
@@ -72,19 +63,9 @@ public struct ChoiceResultRow: View {
             .designSystemCornerRadius(.large)
         }
         .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityAddTraits(isExpanded ? [.isButton, .isSelected] : .isButton)
     }
 
     // MARK: Internal
-
-    static func accessibilityLabel(
-        text: String,
-        judgement: Judgement,
-    ) -> String {
-        "\(text), \(judgement.accessibilitySuffix)"
-    }
 
     func toggle() {
         isExpanded.toggle()
@@ -105,13 +86,6 @@ public struct ChoiceResultRow: View {
 
     private var height: CGFloat {
         isExpanded ? Constant.expandedHeight : Constant.collapsedHeight
-    }
-
-    private var accessibilityLabel: String {
-        Self.accessibilityLabel(
-            text: displayModel.text,
-            judgement: judgement,
-        )
     }
 
 }

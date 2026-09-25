@@ -30,7 +30,6 @@ public struct SettingsScreen: View {
                 ) {
                     IconGlassButton(
                         icon: ScreenControlBar.Control.back.icon,
-                        label: ScreenControlBar.Control.back.label,
                         action: { send(.backTapped) },
                     )
                     .size(.medium)
@@ -55,13 +54,13 @@ public struct SettingsScreen: View {
                 alignment: .leading,
                 spacing: 10,
             ) {
-                Self.SectionView(title: LocalizedText.Settings.learningSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.LearningSection.title) {
                     SettingRow(
                         value: PositionDisplay.settingValue(for: store.profile?.curation?.position),
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingDevelop,
-                                title: LocalizedText.Settings.positionTitle,
+                                title: LocalizedText.Settings.Position.title,
                             )
                         },
                         onTap: {
@@ -73,20 +72,20 @@ public struct SettingsScreen: View {
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingLevel,
-                                title: LocalizedText.Settings.careerLevelTitle,
+                                title: LocalizedText.Settings.CareerLevel.title,
                             )
                         },
                         onTap: { send(.careerLevelRowTapped) },
                     )
                 }
 
-                Self.SectionView(title: LocalizedText.Settings.notificationSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.NotificationSection.title) {
                     SettingRow(
                         value: notificationValue,
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingAlert,
-                                title: LocalizedText.Settings.notificationTitle,
+                                title: LocalizedText.Settings.Notification.title,
                             )
                         },
                         onTap: {
@@ -95,12 +94,12 @@ public struct SettingsScreen: View {
                     )
                 }
 
-                Self.SectionView(title: LocalizedText.Settings.generalSectionTitle) {
+                Self.SectionView(title: LocalizedText.Settings.GeneralSection.title) {
                     SettingRow(
                         content: {
                             Self.SettingRowContent(
                                 icon: .settingPolicy,
-                                title: LocalizedText.Settings.termsTitle,
+                                title: LocalizedText.Settings.Terms.title,
                             )
                         },
                         onTap: { send(.termsTapped) },
@@ -113,7 +112,7 @@ public struct SettingsScreen: View {
                                         width: 16,
                                         height: 16,
                                     )
-                                StyledText(text: LocalizedText.Settings.signOutButtonTitle)
+                                StyledText(text: LocalizedText.Settings.SignOut.buttonTitle)
                                     .textStyle(.body2)
                                     .foregroundColorToken(.error)
                             }
@@ -124,7 +123,7 @@ public struct SettingsScreen: View {
                     )
                     SettingRow(
                         content: {
-                            StyledText(text: LocalizedText.Settings.deleteAccountButtonTitle)
+                            StyledText(text: LocalizedText.Settings.DeleteAccount.buttonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey400)
                         },
@@ -168,7 +167,7 @@ public struct SettingsScreen: View {
     private var failureMessage: String? {
         switch store.accountAction.accountAction {
         case .failed:
-            LocalizedText.Settings.accountActionFailureMessage
+            LocalizedText.Settings.AccountActionFailure.message
 
         case .idle,
              .signingOut,
@@ -180,7 +179,7 @@ public struct SettingsScreen: View {
 
     private var profileFailureMessage: String? {
         guard case .failed = store.userProfile.load else { return nil }
-        return LocalizedText.Settings.profileFailureMessage
+        return LocalizedText.Settings.ProfileFailure.message
     }
 
     private var notificationValue: String? {
@@ -189,10 +188,10 @@ public struct SettingsScreen: View {
             nil
 
         case .allowed:
-            LocalizedText.Settings.notificationOnValue
+            LocalizedText.Settings.Notification.On.value
 
         case .denied:
-            LocalizedText.Settings.notificationOffValue
+            LocalizedText.Settings.Notification.Off.value
         }
     }
 

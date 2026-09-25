@@ -23,10 +23,10 @@ extension QuizGenerationProgressScreen {
                             )
 
                         VStack(spacing: Constant.textSetSpacing) {
-                            StyledText(text: LocalizedText.ProjectRegistration.generationReminderSheetTitle)
+                            StyledText(text: LocalizedText.ProjectRegistration.GenerationReminderSheet.title)
                                 .textStyle(.subtitle1)
                                 .multilineTextAlignment(.center)
-                            StyledText(text: LocalizedText.ProjectRegistration.generationReminderSheetMessage)
+                            StyledText(text: LocalizedText.ProjectRegistration.GenerationReminderSheet.message)
                                 .textStyle(.caption1)
                                 .foregroundColorToken(.grey400)
                                 .multilineTextAlignment(.center)
@@ -34,12 +34,12 @@ extension QuizGenerationProgressScreen {
 
                         VStack(spacing: LayoutToken.compactSpacing) {
                             FeedbackActionButton(
-                                title: LocalizedText.ProjectRegistration.generationReminderSheetEnableButtonTitle,
+                                title: LocalizedText.ProjectRegistration.GenerationReminderSheet.Enable.buttonTitle,
                                 action: onAccept,
                             )
 
                             FeedbackActionButton(
-                                title: LocalizedText.ProjectRegistration.generationReminderSheetDismissButtonTitle,
+                                title: LocalizedText.ProjectRegistration.GenerationReminderSheet.Dismiss.buttonTitle,
                                 action: onDecline,
                             )
                             .style(.text)

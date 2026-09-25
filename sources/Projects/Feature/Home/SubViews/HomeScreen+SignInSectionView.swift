@@ -14,15 +14,15 @@ extension HomeScreen {
                     alignment: .leading,
                     spacing: Constant.messageSpacing,
                 ) {
-                    StyledText(text: LocalizedText.Home.signInSectionTitle)
+                    StyledText(text: LocalizedText.Home.SignInSection.title)
                         .textStyle(.subtitle3)
-                    StyledText(text: LocalizedText.Home.signInSectionCaption)
+                    StyledText(text: LocalizedText.Home.SignInSection.caption)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                 }
                 Spacer()
                 FeedbackActionButton(
-                    title: LocalizedText.Home.signInSectionSignInButtonTitle,
+                    title: LocalizedText.Home.SignInSection.SignIn.buttonTitle,
                     action: onSignIn,
                 )
                 .style(.secondary)

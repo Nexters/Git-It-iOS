@@ -17,10 +17,10 @@ extension SavedScreen {
             case (true, _):
                 centered {
                     VStack(spacing: Constant.failureTextSpacing) {
-                        StyledText(text: LocalizedText.Saved.loadFailureTitle)
+                        StyledText(text: LocalizedText.Saved.LoadFailure.title)
                             .textStyle(.subtitle1)
                             .multilineTextAlignment(.center)
-                        StyledText(text: LocalizedText.Saved.loadFailureMessage)
+                        StyledText(text: LocalizedText.Saved.LoadFailure.message)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
@@ -31,8 +31,8 @@ extension SavedScreen {
                 centered {
                     EmptyState(
                         displayModel: .init(
-                            title: LocalizedText.Saved.emptyTitle,
-                            message: LocalizedText.Saved.emptyMessage,
+                            title: LocalizedText.Saved.Empty.title,
+                            message: LocalizedText.Saved.Empty.message,
                         )
                     ) {
                         ResourceAnimation(asset: .storageEmpty)

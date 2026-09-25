@@ -27,26 +27,6 @@ public struct PageIndicator: View {
                     )
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(LocalizedText.PageIndicator.accessibilityLabel)
-        .accessibilityValue(
-            Self.accessibilityValue(
-                currentPage: displayModel.currentPage,
-                totalPages: displayModel.totalPages,
-            )
-        )
-    }
-
-    // MARK: Internal
-
-    static func accessibilityValue(
-        currentPage: Int,
-        totalPages: Int,
-    ) -> String {
-        LocalizedText.PageIndicator.accessibilityValue(
-            totalPages: totalPages,
-            currentPage: currentPage + 1,
-        )
     }
 
     // MARK: Private

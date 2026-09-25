@@ -8,7 +8,7 @@ import Testing
 struct LearningCompletionFeatureTests {
 
     @Test
-    func `객관식이 있으면 점수를 표시하고 접근성 문장으로 읽어 준다`() {
+    func `객관식이 있으면 점수를 표시한다`() {
         let state = LearningCompletionFeature.State(
             projectID: "project-1",
             correctChoiceCount: 3,
@@ -16,7 +16,6 @@ struct LearningCompletionFeatureTests {
         )
 
         #expect(state.isScorePresented)
-        #expect(state.scoreAccessibilityLabel == "객관식 5문제 중 3문제 정답")
     }
 
     @Test
@@ -24,7 +23,6 @@ struct LearningCompletionFeatureTests {
         let state = LearningCompletionFeature.State(projectID: "project-1")
 
         #expect(!state.isScorePresented)
-        #expect(state.scoreAccessibilityLabel == nil)
     }
 
     @Test

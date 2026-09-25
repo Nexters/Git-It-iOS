@@ -63,13 +63,13 @@ struct ProfileDisplay: Equatable, Sendable {
 
     static var defaultDayLabels: [String] {
         [
-            LocalizedText.Settings.profileMondayLabel,
-            LocalizedText.Settings.profileTuesdayLabel,
-            LocalizedText.Settings.profileWednesdayLabel,
-            LocalizedText.Settings.profileThursdayLabel,
-            LocalizedText.Settings.profileFridayLabel,
-            LocalizedText.Settings.profileSaturdayLabel,
-            LocalizedText.Settings.profileSundayLabel,
+            LocalizedText.Settings.Profile.Monday.label,
+            LocalizedText.Settings.Profile.Tuesday.label,
+            LocalizedText.Settings.Profile.Wednesday.label,
+            LocalizedText.Settings.Profile.Thursday.label,
+            LocalizedText.Settings.Profile.Friday.label,
+            LocalizedText.Settings.Profile.Saturday.label,
+            LocalizedText.Settings.Profile.Sunday.label,
         ]
     }
 
@@ -90,8 +90,8 @@ struct ProfileDisplay: Equatable, Sendable {
 
     var weeklyTitle: String {
         thisWeekSolvedCount == 0
-            ? LocalizedText.Settings.profileWeeklyEmptyTitle
-            : LocalizedText.Settings.profileWeeklySolvedTitle(count: thisWeekSolvedCount)
+            ? LocalizedText.Settings.Profile.Weekly.Empty.title
+            : LocalizedText.Settings.Profile.Weekly.Solved.title(count: thisWeekSolvedCount)
     }
 
     var maxWeeklyCount: Int {

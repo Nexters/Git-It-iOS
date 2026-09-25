@@ -6,7 +6,7 @@ enum CareerLevelDisplay {
     static let orderedLevels: [CareerLevel] = [.entry, .junior, .middle, .senior]
 
     static var unselectedTitle: String {
-        LocalizedText.Settings.careerLevelUnselectedTitle
+        LocalizedText.Settings.CareerLevel.Unselected.title
     }
 
     static func identifier(for level: CareerLevel) -> String {
@@ -25,20 +25,20 @@ enum CareerLevelDisplay {
 
     static func title(for level: CareerLevel) -> String {
         switch level {
-        case .entry: LocalizedText.Settings.careerLevelEntryTitle
-        case .junior: LocalizedText.Settings.careerLevelJuniorTitle
-        case .middle: LocalizedText.Settings.careerLevelMiddleTitle
-        case .senior: LocalizedText.Settings.careerLevelSeniorTitle
+        case .entry: LocalizedText.Settings.CareerLevel.Entry.title
+        case .junior: LocalizedText.Settings.CareerLevel.Junior.title
+        case .middle: LocalizedText.Settings.CareerLevel.Middle.title
+        case .senior: LocalizedText.Settings.CareerLevel.Senior.title
         @unknown default: ""
         }
     }
 
     static func description(for level: CareerLevel) -> String {
         switch level {
-        case .entry: LocalizedText.Settings.careerLevelEntryDescription
-        case .junior: LocalizedText.Settings.careerLevelJuniorDescription
-        case .middle: LocalizedText.Settings.careerLevelMiddleDescription
-        case .senior: LocalizedText.Settings.careerLevelSeniorDescription
+        case .entry: LocalizedText.Settings.CareerLevel.Entry.description
+        case .junior: LocalizedText.Settings.CareerLevel.Junior.description
+        case .middle: LocalizedText.Settings.CareerLevel.Middle.description
+        case .senior: LocalizedText.Settings.CareerLevel.Senior.description
         @unknown default: ""
         }
     }

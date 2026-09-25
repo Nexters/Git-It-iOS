@@ -9,13 +9,11 @@ public struct IconPlainButton: View {
 
     public init(
         icon: Icon,
-        label: String,
         iconSize: CGFloat = 36,
         size: CGFloat = 36,
         action: @escaping () -> Void = { },
     ) {
         self.icon = icon
-        self.label = label
         self.iconSize = iconSize
         self.size = size
         self.action = action
@@ -54,7 +52,6 @@ public struct IconPlainButton: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(label)
     }
 
     // MARK: Private
@@ -64,7 +61,6 @@ public struct IconPlainButton: View {
     }
 
     private let icon: Icon
-    private let label: String
     private var foregroundColor = ColorToken.white
     private var backgroundColor = ColorToken.clear
     private let iconSize: CGFloat
@@ -96,12 +92,10 @@ extension IconPlainButton: BackgroundColorConfigurable {
 #Preview("Icon Plain Button") {
     HStack(spacing: LayoutToken.gutter) {
         IconPlainButton(
-            icon: .play,
-            label: "학습 시작",
+            icon: .play
         )
         IconPlainButton(
-            icon: .play,
-            label: "학습 시작",
+            icon: .play
         )
         .foregroundColorToken(.grey700)
         .backgroundColorToken(.blue100)

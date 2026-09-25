@@ -14,15 +14,15 @@ extension ProfileScreen {
                     alignment: .leading,
                     spacing: Constant.messageSpacing,
                 ) {
-                    StyledText(text: LocalizedText.Settings.profileLoadFailureTitle)
+                    StyledText(text: LocalizedText.Settings.Profile.LoadFailure.title)
                         .textStyle(.subtitle3)
-                    StyledText(text: LocalizedText.Settings.profileLoadFailureMessage)
+                    StyledText(text: LocalizedText.Settings.Profile.LoadFailure.message)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                 }
                 Spacer()
                 FeedbackActionButton(
-                    title: LocalizedText.Settings.profileLoadFailureRetryButtonTitle,
+                    title: LocalizedText.Settings.Profile.LoadFailure.Retry.buttonTitle,
                     action: onRetry,
                 )
                 .style(.secondary)

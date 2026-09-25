@@ -21,7 +21,7 @@ extension TutorialScreen {
                 ))
                 .padding(Constant.indicatorPadding)
 
-                StyledText(text: LocalizedText.Onboarding.tutorialSignInHintTitle)
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.Hint.title)
                     .textStyle(.caption1)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
@@ -30,14 +30,14 @@ extension TutorialScreen {
                 AppleSignInButton(action: onAppleSignIn)
 
                 FeedbackActionButton(
-                    title: LocalizedText.Onboarding.tutorialSignInGuestAccessButtonTitle,
+                    title: LocalizedText.Onboarding.Tutorial.SignIn.GuestAccess.buttonTitle,
                     action: onGuestAccess,
                 )
                 .style(.text)
                 .size(.small)
                 .padding(.top, LayoutToken.compactSpacing)
 
-                StyledText(text: LocalizedText.Onboarding.tutorialSignInVersion(version: bundleVersion))
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.version(version: bundleVersion))
                     .textStyle(.body2)
                     .foregroundColorToken(.grey500)
                     .multilineTextAlignment(.center)

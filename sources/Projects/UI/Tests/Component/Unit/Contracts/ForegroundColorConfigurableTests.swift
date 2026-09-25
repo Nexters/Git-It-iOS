@@ -35,23 +35,21 @@ struct ForegroundColorConfigurableTests {
     @Test
     func `IconPlainButton 전경색을 선언하지 않으면 White로 그린다`() {
         #expect(foregroundColor(of: IconPlainButton(
-            icon: .play,
-            label: "학습 시작",
+            icon: .play
         )) == ColorToken.white)
     }
 
     @Test
-    func `IconPlainButton 전경색 선언은 전경색만 바꾸고 배경색과 레이블을 유지한다`() {
+    func `IconPlainButton 전경색 선언은 전경색만 바꾸고 배경색과 아이콘을 유지한다`() {
         let original = IconPlainButton(
-            icon: .play,
-            label: "학습 시작",
+            icon: .play
         ).backgroundColorToken(.blue100)
 
         let colored = original.foregroundColorToken(.grey700)
 
         #expect(foregroundColor(of: colored) == ColorToken.grey700)
         #expect(Mirror(reflecting: colored).descendant("backgroundColor") as? ColorToken == ColorToken.blue100)
-        #expect(Mirror(reflecting: colored).descendant("label") as? String == "학습 시작")
+        #expect(Mirror(reflecting: colored).descendant("icon") as? IconPlainButton.Icon == .play)
     }
 
     @Test

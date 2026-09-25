@@ -88,7 +88,7 @@ struct QuestionSolvingScreen: View {
     private var sourceButton: some View {
         Button(action: { send(.sourceTapped) }) {
             HStack(spacing: Constant.sourceButtonSpacing) {
-                StyledText(text: LocalizedText.Quiz.questionSolvingSourceButtonTitle)
+                StyledText(text: LocalizedText.Quiz.QuestionSolving.Source.buttonTitle)
                     .textStyle(.body2)
                     .foregroundColorToken(.blue100)
 
@@ -115,7 +115,6 @@ struct QuestionSolvingScreen: View {
             in: RoundedRectangle(designSystem: .small),
         )
         .buttonStyle(.plain)
-        .accessibilityLabel(LocalizedText.Quiz.questionSolvingSourceAccessibilityLabel)
     }
 
     @ViewBuilder
@@ -132,7 +131,7 @@ struct QuestionSolvingScreen: View {
 
             if case .choice(let grading) = store.answerOutcome {
                 LabeledCard(displayModel: .init(
-                    label: LocalizedText.Quiz.questionSolvingChoiceExplanationLabel,
+                    label: LocalizedText.Quiz.QuestionSolving.ChoiceExplanation.label,
                     text: grading.explanation,
                 ))
                 .style(.accent)
@@ -149,7 +148,7 @@ struct QuestionSolvingScreen: View {
                 AnswerEditor(
                     text: essayTextBinding,
                     isFocused: $isEssayFieldFocused,
-                    placeholder: LocalizedText.Quiz.questionSolvingEssayPlaceholder,
+                    placeholder: LocalizedText.Quiz.QuestionSolving.Essay.placeholder,
                     characterLimit: QuestionSolvingFeature.essayCharacterLimit,
                     isDisabled: store.isSubmitting,
                 )
@@ -177,8 +176,8 @@ struct QuestionSolvingScreen: View {
         if store.answerOutcome == nil {
             FeedbackActionButton(
                 title: store.submissionError == nil
-                    ? LocalizedText.Quiz.questionSolvingSubmitButtonTitle
-                    : LocalizedText.Quiz.questionSolvingResubmitButtonTitle,
+                    ? LocalizedText.Quiz.QuestionSolving.Submit.buttonTitle
+                    : LocalizedText.Quiz.QuestionSolving.Resubmit.buttonTitle,
                 action: { send(.submitAnswerTapped) },
             )
             .enabled(store.isSubmitEnabled)
@@ -191,7 +190,7 @@ struct QuestionSolvingScreen: View {
     }
 
     private var submissionFailureNotice: some View {
-        StyledText(text: LocalizedText.Quiz.questionSolvingSubmissionFailureMessage)
+        StyledText(text: LocalizedText.Quiz.QuestionSolving.SubmissionFailure.message)
             .textStyle(.body2)
             .foregroundColorToken(.grey400)
     }
@@ -203,10 +202,7 @@ struct QuestionSolvingScreen: View {
                     isSaved: Binding(
                         get: { store.isBookmarked },
                         set: { _ in send(.bookmarkToggleTapped) },
-                    ),
-                    accessibilityLabel: store.isBookmarked
-                        ? LocalizedText.Quiz.questionSolvingUnbookmarkAccessibilityLabel
-                        : LocalizedText.Quiz.questionSolvingBookmarkAccessibilityLabel,
+                    )
                 )
 
                 primaryAction

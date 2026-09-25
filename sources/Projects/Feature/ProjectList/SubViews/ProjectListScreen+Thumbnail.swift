@@ -16,10 +16,8 @@ extension ProjectListScreen {
                 } placeholder: {
                     placeholder
                 }
-                .accessibilityHidden(true)
             } else {
                 placeholder
-                    .accessibilityHidden(true)
             }
         }
 

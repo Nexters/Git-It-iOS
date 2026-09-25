@@ -23,7 +23,7 @@ struct QuestionSourceDisplayTests {
     }
 
     @Test
-    func `URL이 있는 출처만 링크로 표시하고 접근성 문장에 링크를 알린다`() {
+    func `URL이 있는 출처만 링크로 표시한다`() {
         let displays = QuestionSourceDisplay.list(
             sources: [QuizTestFixture.fileSource, QuizTestFixture.referenceSource]
         )
@@ -31,7 +31,6 @@ struct QuestionSourceDisplayTests {
         #expect(!displays[0].isLink)
         #expect(displays[1].isLink)
         #expect(displays[1].referenceURL == URL(string: "https://developer.apple.com/documentation/swiftui"))
-        #expect(displays[1].accessibilityLabel.hasSuffix("링크"))
     }
 
     @Test

@@ -36,7 +36,6 @@ public struct ActionMenu: View {
                 }
                 .buttonStyle(.plain)
                 .designSystemCornerRadius(.large)
-                .accessibilityLabel(item.accessibilityLabel)
             }
         }
         .padding(Constant.containerPadding)
@@ -101,13 +100,11 @@ extension ActionMenu {
             id: String,
             title: String,
             role: Role = .normal,
-            accessibilityLabel: String,
             onSelect: @escaping () -> Void = { },
         ) {
             self.id = id
             self.title = title
             self.role = role
-            self.accessibilityLabel = accessibilityLabel
             self.onSelect = onSelect
         }
 
@@ -130,7 +127,6 @@ extension ActionMenu {
         public let id: String
         public let title: String
         public let role: Role
-        public let accessibilityLabel: String
         public let onSelect: () -> Void
 
     }
@@ -142,7 +138,6 @@ extension ActionMenu {
             .init(
                 id: "delete",
                 title: "프로젝트 삭제",
-                accessibilityLabel: "프로젝트 삭제 화면 열기",
             )
         ]
     )
@@ -161,18 +156,15 @@ extension ActionMenu {
             .init(
                 id: "savedQuestions",
                 title: "저장한 문제",
-                accessibilityLabel: "저장한 문제 보기",
             ),
             .init(
                 id: "repositoryLink",
                 title: "GitHub에서 보기",
-                accessibilityLabel: "GitHub에서 보기",
             ),
             .init(
                 id: "delete",
                 title: "삭제하기",
                 role: .destructive,
-                accessibilityLabel: "프로젝트 삭제",
             ),
         ]
     )

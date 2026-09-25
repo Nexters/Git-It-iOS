@@ -26,10 +26,10 @@ extension ProjectListScreen {
             case (true, _):
                 centered {
                     VStack(spacing: Constant.failureTextSpacing) {
-                        StyledText(text: LocalizedText.ProjectList.projectCollectionLoadFailureTitle)
+                        StyledText(text: LocalizedText.ProjectList.ProjectCollection.LoadFailure.title)
                             .textStyle(.subtitle1)
                             .multilineTextAlignment(.center)
-                        StyledText(text: LocalizedText.ProjectList.projectCollectionLoadFailureMessage)
+                        StyledText(text: LocalizedText.ProjectList.ProjectCollection.LoadFailure.message)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
@@ -40,8 +40,8 @@ extension ProjectListScreen {
                 centered {
                     EmptyState(
                         displayModel: .init(
-                            title: LocalizedText.ProjectList.projectCollectionEmptyTitle,
-                            message: LocalizedText.ProjectList.projectCollectionEmptyMessage,
+                            title: LocalizedText.ProjectList.ProjectCollection.Empty.title,
+                            message: LocalizedText.ProjectList.ProjectCollection.Empty.message,
                         )
                     ) {
                         ResourceAnimation(asset: .projectEmpty)

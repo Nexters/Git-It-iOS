@@ -41,10 +41,10 @@ extension ProjectDetailScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: LocalizedText.ProjectDetail.detailContentLoadFailureTitle)
+                    StyledText(text: LocalizedText.ProjectDetail.DetailContent.LoadFailure.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: LocalizedText.ProjectDetail.detailContentLoadFailureMessage)
+                    StyledText(text: LocalizedText.ProjectDetail.DetailContent.LoadFailure.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)

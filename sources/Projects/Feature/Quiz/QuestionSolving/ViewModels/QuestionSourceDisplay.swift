@@ -41,20 +41,6 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
         referenceURL != nil
     }
 
-    public var accessibilityLabel: String {
-        var parts = [title]
-        if let detail {
-            parts.append(detail)
-        }
-        if let summary {
-            parts.append(summary)
-        }
-        if isLink {
-            parts.append(LocalizedText.Quiz.questionSourceLinkLabel)
-        }
-        return parts.joined(separator: ", ")
-    }
-
     public static func list(sources: [QuizSource]) -> [Self] {
         sources.enumerated().map { index, source in
             Self(
@@ -71,22 +57,23 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
     // MARK: Private
 
     private static func title(for source: QuizSource) -> String {
-        source.filePath ?? source.symbol ?? source.referenceURL ?? source.summary ?? LocalizedText.Quiz.questionSourceDefaultTitle
+        source.filePath ?? source.symbol ?? source.referenceURL ?? source.summary ?? LocalizedText.Quiz.QuestionSource.Default
+            .title
     }
 
     private static func lineRange(for source: QuizSource) -> String? {
         switch (source.startLine, source.endLine) {
         case (let start?, let end?):
-            LocalizedText.Quiz.questionSourceLineRange(
+            LocalizedText.Quiz.QuestionSource.Line.range(
                 start: start,
                 end: end,
             )
 
         case (let start?, nil):
-            LocalizedText.Quiz.questionSourceStartLine(start: start)
+            LocalizedText.Quiz.QuestionSource.Start.line(start: start)
 
         case (nil, let end?):
-            LocalizedText.Quiz.questionSourceEndLine(end: end)
+            LocalizedText.Quiz.QuestionSource.End.line(end: end)
 
         case (nil, nil):
             nil

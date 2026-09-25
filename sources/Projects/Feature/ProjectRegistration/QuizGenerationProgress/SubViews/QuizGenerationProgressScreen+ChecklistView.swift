@@ -27,8 +27,6 @@ extension QuizGenerationProgressScreen {
                     )
                 }
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(LocalizedText.ProjectRegistration.checklistAccessibilityLabel)
         }
 
         // MARK: Private
@@ -54,8 +52,6 @@ extension QuizGenerationProgressScreen {
                     .foregroundColorToken(status == .pending ? .grey400 : .grey100)
                     .lineLimit(1)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title), \(status.accessibilityDescription)")
         }
 
         private func status(for stage: Stage) -> ChecklistStatus {
@@ -83,11 +79,11 @@ extension QuizGenerationProgressScreen {
 
         var title: String {
             switch self {
-            case .repositoryInfo: LocalizedText.ProjectRegistration.checklistRepositoryInfoTitle
-            case .codeStructureAnalysis: LocalizedText.ProjectRegistration.checklistCodeStructureAnalysisTitle
-            case .learningOutlineComposition: LocalizedText.ProjectRegistration.checklistLearningOutlineCompositionTitle
-            case .quizGeneration: LocalizedText.ProjectRegistration.checklistQuizGenerationTitle
-            case .verification: LocalizedText.ProjectRegistration.checklistVerificationTitle
+            case .repositoryInfo: LocalizedText.ProjectRegistration.Checklist.RepositoryInfo.title
+            case .codeStructureAnalysis: LocalizedText.ProjectRegistration.Checklist.CodeStructureAnalysis.title
+            case .learningOutlineComposition: LocalizedText.ProjectRegistration.Checklist.LearningOutlineComposition.title
+            case .quizGeneration: LocalizedText.ProjectRegistration.Checklist.QuizGeneration.title
+            case .verification: LocalizedText.ProjectRegistration.Checklist.Verification.title
             }
         }
 
@@ -115,14 +111,6 @@ extension QuizGenerationProgressScreen {
             case .done: ResourceImage(asset: .icon(.statusCheck))
             case .active: ResourceAnimation(asset: .generalLoading)
             case .pending: ResourceImage(asset: .icon(.statusLoadingDisabled))
-            }
-        }
-
-        var accessibilityDescription: String {
-            switch self {
-            case .done: LocalizedText.ProjectRegistration.checklistDoneStatus
-            case .active: LocalizedText.ProjectRegistration.checklistActiveStatus
-            case .pending: LocalizedText.ProjectRegistration.checklistPendingStatus
             }
         }
     }

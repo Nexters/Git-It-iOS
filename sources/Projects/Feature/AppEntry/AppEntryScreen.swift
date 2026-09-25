@@ -30,12 +30,12 @@ public struct AppEntryScreen: View {
         }
         .task { send(.task) }
         .alert(
-            LocalizedText.AppEntry.recoverableErrorTitle,
+            LocalizedText.AppEntry.RecoverableError.title,
             isPresented: recoverableErrorBinding,
         ) {
-            Button(LocalizedText.AppEntry.retryButtonTitle) { send(.retryTapped) }
+            Button(LocalizedText.AppEntry.Retry.buttonTitle) { send(.retryTapped) }
         } message: {
-            Text(LocalizedText.AppEntry.recoverableErrorMessage)
+            Text(LocalizedText.AppEntry.RecoverableError.message)
         }
     }
 

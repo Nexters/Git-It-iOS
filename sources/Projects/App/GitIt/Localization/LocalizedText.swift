@@ -5,20 +5,24 @@ import Foundation
 enum LocalizedText {
 
     enum GenerationReminder {
-        static var completedTitle: String {
-            String(localized: .generationReminderCompletedTitle)
+        enum Completed {
+            static var title: String {
+                String(localized: .generationReminderCompletedTitle)
+            }
+
+            static var body: String {
+                String(localized: .generationReminderCompletedBody)
+            }
         }
 
-        static var completedBody: String {
-            String(localized: .generationReminderCompletedBody)
-        }
+        enum Failed {
+            static var title: String {
+                String(localized: .generationReminderFailedTitle)
+            }
 
-        static var failedTitle: String {
-            String(localized: .generationReminderFailedTitle)
-        }
-
-        static var failedBody: String {
-            String(localized: .generationReminderFailedBody)
+            static var body: String {
+                String(localized: .generationReminderFailedBody)
+            }
         }
     }
 

@@ -18,16 +18,16 @@ extension HomeScreen {
                     alignment: .leading,
                     spacing: 5,
                 ) {
-                    StyledText(text: LocalizedText.Home.registrationPanelCaption)
+                    StyledText(text: LocalizedText.Home.RegistrationPanel.caption)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                     VStack(
                         alignment: .leading,
                         spacing: 0,
                     ) {
-                        StyledText(text: LocalizedText.Home.registrationPanelTitleFirstLine)
+                        StyledText(text: LocalizedText.Home.RegistrationPanel.Title.First.line)
                             .textStyle(.subtitle3)
-                        StyledText(text: LocalizedText.Home.registrationPanelTitleSecondLine)
+                        StyledText(text: LocalizedText.Home.RegistrationPanel.Title.Second.line)
                             .textStyle(.subtitle3)
                     }
                 }
@@ -39,7 +39,7 @@ extension HomeScreen {
                         generationInProgressLabel
                     } else {
                         Button(action: onRegister) {
-                            StyledText(text: LocalizedText.Home.registrationPanelRegisterButtonTitle)
+                            StyledText(text: LocalizedText.Home.RegistrationPanel.Register.buttonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey700)
                                 .frame(
@@ -55,7 +55,6 @@ extension HomeScreen {
                         }
                         .buttonStyle(.plain)
                         .padding(.vertical, -Constant.touchAreaOutset)
-                        .accessibilityLabel(LocalizedText.Home.registrationPanelRegisterAccessibilityLabel)
                     }
                 }
             }
@@ -93,7 +92,7 @@ extension HomeScreen {
                         width: Constant.progressIndicatorSize,
                         height: Constant.progressIndicatorSize,
                     )
-                StyledText(text: LocalizedText.Home.registrationPanelGenerationInProgressLabel)
+                StyledText(text: LocalizedText.Home.RegistrationPanel.GenerationInProgress.label)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey300)
             }
@@ -103,8 +102,6 @@ extension HomeScreen {
                 Color(designSystem: .grey500),
                 in: RoundedRectangle(designSystem: .medium),
             )
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(LocalizedText.Home.registrationPanelGenerationInProgressLabel)
         }
 
     }

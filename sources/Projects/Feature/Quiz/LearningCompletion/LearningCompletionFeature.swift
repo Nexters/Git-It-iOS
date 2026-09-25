@@ -37,14 +37,6 @@ public struct LearningCompletionFeature: Sendable {
             choiceQuestionCount > 0
         }
 
-        public var scoreAccessibilityLabel: String? {
-            guard isScorePresented else { return nil }
-            return LocalizedText.Quiz.learningCompletionScoreAccessibilityLabel(
-                choiceQuestionCount: choiceQuestionCount,
-                correctChoiceCount: correctChoiceCount,
-            )
-        }
-
     }
 
     public enum Action: ViewAction, Sendable, Equatable {

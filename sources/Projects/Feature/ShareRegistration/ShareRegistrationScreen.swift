@@ -31,44 +31,44 @@ public struct ShareRegistrationScreen: View {
     private var content: some View {
         switch store.registration.phase {
         case .validating:
-            Self.LoadingView(message: LocalizedText.ShareRegistration.lookupMessage)
+            Self.LoadingView(message: LocalizedText.ShareRegistration.Lookup.message)
 
         case .submitting:
-            Self.LoadingView(message: LocalizedText.ShareRegistration.submittingMessage)
+            Self.LoadingView(message: LocalizedText.ShareRegistration.Submitting.message)
 
         case .ready:
             stepContent
 
         case .invalidURL(let reason):
             guidance(
-                title: LocalizedText.ShareRegistration.invalidLinkTitle,
+                title: LocalizedText.ShareRegistration.InvalidLink.title,
                 message: reason,
             )
 
         case .signInRequired:
             guidance(
-                title: LocalizedText.ShareRegistration.signInRequiredTitle,
-                message: LocalizedText.ShareRegistration.signInRequiredMessage,
+                title: LocalizedText.ShareRegistration.SignInRequired.title,
+                message: LocalizedText.ShareRegistration.SignInRequired.message,
             )
 
         case .appLaunchRequired:
             guidance(
-                title: LocalizedText.ShareRegistration.appLaunchRequiredTitle,
-                message: LocalizedText.ShareRegistration.appLaunchRequiredMessage,
+                title: LocalizedText.ShareRegistration.AppLaunchRequired.title,
+                message: LocalizedText.ShareRegistration.AppLaunchRequired.message,
             )
 
         case .succeeded:
             guidance(
-                title: LocalizedText.ShareRegistration.successTitle,
-                message: LocalizedText.ShareRegistration.successMessage,
+                title: LocalizedText.ShareRegistration.Success.title,
+                message: LocalizedText.ShareRegistration.Success.message,
             )
 
         case .failed(let reason, _):
             Self.GuidanceView(
-                title: LocalizedText.ShareRegistration.failureTitle,
+                title: LocalizedText.ShareRegistration.Failure.title,
                 message: reason,
-                retryTitle: LocalizedText.ShareRegistration.retryButtonTitle,
-                dismissTitle: LocalizedText.ShareRegistration.dismissButtonTitle,
+                retryTitle: LocalizedText.ShareRegistration.Retry.buttonTitle,
+                dismissTitle: LocalizedText.ShareRegistration.Dismiss.buttonTitle,
                 onRetry: { send(.retryTapped) },
                 onDismiss: { send(.dismissTapped) },
             )
@@ -112,7 +112,7 @@ public struct ShareRegistrationScreen: View {
             title: title,
             message: message,
             retryTitle: nil,
-            dismissTitle: LocalizedText.ShareRegistration.dismissButtonTitle,
+            dismissTitle: LocalizedText.ShareRegistration.Dismiss.buttonTitle,
             onRetry: { },
             onDismiss: { send(.dismissTapped) },
         )

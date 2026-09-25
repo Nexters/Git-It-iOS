@@ -22,7 +22,7 @@ public struct SavedQuestionDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Public
 
-    public static let actionTitle = LocalizedText.Saved.questionActionTitle
+    public static let actionTitle = LocalizedText.Saved.Question.Action.title
 
     public let id: QuizID
     public let metadata: String
@@ -36,7 +36,7 @@ public struct SavedQuestionDisplay: Equatable, Sendable, Identifiable {
         questions.map {
             Self(
                 id: $0.quizID,
-                metadata: LocalizedText.Saved.questionMetadata(
+                metadata: LocalizedText.Saved.Question.metadata(
                     projectName: $0.projectName,
                     setLabel: $0.setLabel,
                     problemNumber: $0.problemNumber,

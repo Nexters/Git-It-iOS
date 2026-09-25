@@ -24,7 +24,6 @@ public struct ModalOverlay<Content: View>: View {
                     .designSystemOpacity(.scrim)
                     .ignoresSafeArea()
                     .transition(.opacity)
-                    .accessibilityHidden(true)
                     .onTapGesture { dismiss() }
 
                 content

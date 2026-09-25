@@ -41,9 +41,6 @@ public struct ContinuousProgressBar: View {
             }
         }
         .frame(height: size.value)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(LocalizedText.ContinuousProgressBar.accessibilityLabel)
-        .accessibilityValue(LocalizedText.ContinuousProgressBar.accessibilityValue(percent: Int((progress * 100).rounded())))
     }
 
     // MARK: Internal

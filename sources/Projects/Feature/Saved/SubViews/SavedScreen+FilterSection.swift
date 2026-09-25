@@ -22,7 +22,7 @@ extension SavedScreen {
                 ScrollView(.horizontal) {
                     HStack(spacing: LayoutToken.compactSpacing) {
                         Chip(
-                            label: LocalizedText.Saved.filterAllLabel,
+                            label: LocalizedText.Saved.Filter.All.label,
                             isSelected: Binding(
                                 get: { selectedProjectID == nil },
                                 set: { _ in onSelect(nil) },
@@ -40,7 +40,7 @@ extension SavedScreen {
                     }
                 }
                 .scrollIndicators(.hidden)
-                StyledText(text: LocalizedText.Saved.filterCount(count: count))
+                StyledText(text: LocalizedText.Saved.Filter.count(count: count))
                     .textStyle(.body2)
                     .foregroundColorToken(.grey400)
             }

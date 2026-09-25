@@ -23,12 +23,12 @@ extension HomeScreen {
                 spacing: Constant.sectionHeaderSpacing,
             ) {
                 HStack {
-                    StyledText(text: LocalizedText.Home.projectSectionTitle)
+                    StyledText(text: LocalizedText.Home.ProjectSection.title)
                         .textStyle(.subtitle3)
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText(text: LocalizedText.Home.projectSectionShowAllButtonTitle)
+                            StyledText(text: LocalizedText.Home.ProjectSection.ShowAll.buttonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
@@ -41,7 +41,6 @@ extension HomeScreen {
                     }
                     .buttonStyle(.plain)
                     .padding(8)
-                    .accessibilityLabel(LocalizedText.Home.projectSectionShowAllAccessibilityLabel)
                 }
                 .designSystemScreenMargin()
 
@@ -138,7 +137,6 @@ extension HomeScreen {
             }
             .scrollDisabled(true)
             .scrollIndicators(.hidden)
-            .accessibilityHidden(true)
         }
 
         private var emptyDeckShape: HomeScreen.EmptyDeckShape {
@@ -161,14 +159,14 @@ extension HomeScreen {
 
             case .empty:
                 emptyProjects {
-                    StyledText(text: LocalizedText.Home.projectSectionEmptyMessage)
+                    StyledText(text: LocalizedText.Home.ProjectSection.Empty.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
 
             case .signInRequired:
                 emptyProjects {
-                    StyledText(text: LocalizedText.Home.projectSectionSignInRequiredMessage)
+                    StyledText(text: LocalizedText.Home.ProjectSection.SignInRequired.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
@@ -176,12 +174,12 @@ extension HomeScreen {
             case .failed:
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
-                        StyledText(text: LocalizedText.Home.projectSectionLoadFailureMessage)
+                        StyledText(text: LocalizedText.Home.ProjectSection.LoadFailure.message)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
                         FeedbackActionButton(
-                            title: LocalizedText.Home.projectSectionRetryButtonTitle,
+                            title: LocalizedText.Home.ProjectSection.Retry.buttonTitle,
                             action: onProjectRetryTapped,
                         )
                         .style(.secondary)
@@ -211,7 +209,6 @@ extension HomeScreen {
                 accessary()
             }
             .frame(height: sectionHeight)
-            .accessibilityElement(children: .contain)
         }
 
         private func projectCards(_ projects: [HomeProjectDisplay]) -> some View {

@@ -27,7 +27,6 @@ struct ProjectDetailScreen: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .ignoresSafeArea()
-                    .accessibilityHidden(true)
                     .onTapGesture { send(.menuDismissed) }
             }
         }
@@ -57,10 +56,10 @@ struct ProjectDetailScreen: View {
                 ConfirmationSheet(
                     displayModel: .init(
                         imageURL: store.detailLoad.detail?.repository.imageURL,
-                        title: LocalizedText.ProjectDetail.deletionDialogTitle,
-                        message: LocalizedText.ProjectDetail.deletionDialogMessage,
-                        confirmTitle: LocalizedText.ProjectDetail.deletionDialogConfirmButtonTitle,
-                        cancelTitle: LocalizedText.ProjectDetail.deletionDialogCancelButtonTitle,
+                        title: LocalizedText.ProjectDetail.Deletion.Dialog.title,
+                        message: LocalizedText.ProjectDetail.Deletion.Dialog.message,
+                        confirmTitle: LocalizedText.ProjectDetail.Deletion.DialogConfirm.buttonTitle,
+                        cancelTitle: LocalizedText.ProjectDetail.Deletion.DialogCancel.buttonTitle,
                     ),
                     onConfirmTap: { send(.deletionConfirmed) },
                     onCancelTap: { send(.deletionCancelled) },
@@ -98,8 +97,7 @@ struct ProjectDetailScreen: View {
                 trailing: isFailed
                     ? nil
                     : ScreenControlBar.Control(
-                        icon: .menu,
-                        label: LocalizedText.ProjectDetail.menuOpenAccessibilityLabel,
+                        icon: .menu
                     )
             ),
             onLeadingTap: { send(.backTapped) },
@@ -141,7 +139,7 @@ struct ProjectDetailScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: LocalizedText.ProjectDetail.retryButtonTitle,
+                title: LocalizedText.ProjectDetail.Retry.buttonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()
@@ -159,28 +157,24 @@ struct ProjectDetailScreen: View {
     private var heroBackground: some View {
         LinearGradient(designSystem: Constant.heroGradient)
             .frame(height: Constant.heroGradientHeight)
-            .accessibilityHidden(true)
     }
 
     private var menuItems: [ActionMenu.Item] {
         [
             .init(
                 id: Constant.MenuItemID.savedQuestions,
-                title: LocalizedText.ProjectDetail.savedQuestionsMenuItemTitle,
-                accessibilityLabel: LocalizedText.ProjectDetail.savedQuestionsMenuItemAccessibilityLabel,
+                title: LocalizedText.ProjectDetail.SavedQuestionsMenuItem.title,
                 onSelect: { send(.savedQuestionsTapped) },
             ),
             .init(
                 id: Constant.MenuItemID.repositoryLink,
-                title: LocalizedText.ProjectDetail.repositoryLinkMenuItemTitle,
-                accessibilityLabel: LocalizedText.ProjectDetail.repositoryLinkMenuItemAccessibilityLabel,
+                title: LocalizedText.ProjectDetail.RepositoryLinkMenuItem.title,
                 onSelect: { send(.repositoryLinkTapped) },
             ),
             .init(
                 id: Constant.MenuItemID.delete,
-                title: LocalizedText.ProjectDetail.deletionMenuItemTitle,
+                title: LocalizedText.ProjectDetail.Deletion.MenuItem.title,
                 role: .destructive,
-                accessibilityLabel: LocalizedText.ProjectDetail.deletionMenuItemAccessibilityLabel,
                 onSelect: { send(.deleteTapped) },
             ),
         ]

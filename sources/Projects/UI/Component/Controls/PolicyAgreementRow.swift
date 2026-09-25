@@ -35,9 +35,6 @@ public struct PolicyAgreementRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits(isSelected ? .isSelected : [])
 
             Spacer(minLength: 0)
 
@@ -55,13 +52,8 @@ public struct PolicyAgreementRow: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(openLinkAccessibilityLabel)
-            .accessibilityIdentifier("policyAgreementRow.openLink.\(displayModel.title)")
         }
         .frame(height: 54)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Internal
@@ -78,17 +70,6 @@ public struct PolicyAgreementRow: View {
 
     private let displayModel: DisplayModel
     private let onOpenLink: () -> Void
-
-    private var accessibilityLabel: String {
-        let requiredText = displayModel.isRequired
-            ? LocalizedText.PolicyAgreementRow.requiredLabel
-            : LocalizedText.PolicyAgreementRow.optionalLabel
-        return "\(requiredText), \(displayModel.title)"
-    }
-
-    private var openLinkAccessibilityLabel: String {
-        LocalizedText.PolicyAgreementRow.fullTextAccessibilityLabel(title: displayModel.title)
-    }
 
 }
 

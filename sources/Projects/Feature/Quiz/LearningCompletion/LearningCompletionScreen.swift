@@ -36,19 +36,16 @@ struct LearningCompletionScreen: View {
                         width: Constant.animationSize,
                         height: Constant.animationSize,
                     )
-                    .accessibilityHidden(true)
 
-                StyledText(text: LocalizedText.Quiz.learningCompletionTitle)
+                StyledText(text: LocalizedText.Quiz.LearningCompletion.title)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
 
-                if let scoreLabel = store.scoreAccessibilityLabel {
+                if store.isScorePresented {
                     scoreView
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(scoreLabel)
                 }
 
-                StyledText(text: LocalizedText.Quiz.learningCompletionMessage)
+                StyledText(text: LocalizedText.Quiz.LearningCompletion.message)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
             }
@@ -57,7 +54,7 @@ struct LearningCompletionScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: LocalizedText.Quiz.learningCompletionConfirmButtonTitle,
+                title: LocalizedText.Quiz.LearningCompletion.Confirm.buttonTitle,
                 action: { send(.primaryActionTapped) },
             )
             .designSystemScreenMargin()

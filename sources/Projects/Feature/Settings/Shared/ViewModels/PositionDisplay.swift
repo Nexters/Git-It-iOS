@@ -5,7 +5,7 @@ enum PositionDisplay {
     static let orderedPositions: [MemberPosition] = [.frontend, .backend, .ios, .android]
 
     static var unselectedTitle: String {
-        LocalizedText.Settings.positionUnselectedTitle
+        LocalizedText.Settings.Position.Unselected.title
     }
 
     static func identifier(for position: MemberPosition) -> String {

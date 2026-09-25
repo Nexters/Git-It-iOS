@@ -86,7 +86,7 @@ public struct MainShellRouterFeature: Sendable {
         }
     }
 
-    public static let singleQuestionAdvanceActionTitle = LocalizedText.MainShell.singleQuestionAdvanceButtonTitle
+    public static let singleQuestionAdvanceActionTitle = LocalizedText.MainShell.SingleQuestion.Advance.buttonTitle
 
     public var body: some ReducerOf<Self> {
         Scope(

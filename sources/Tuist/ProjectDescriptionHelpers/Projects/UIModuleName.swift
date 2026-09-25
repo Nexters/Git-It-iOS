@@ -104,7 +104,10 @@ extension UIModuleName {
     )
 
     private static let uiComponentImageResources = ResourceFileElements.resources(
-        [.glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Resources/**")]
+        [
+            .glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Resources/**"),
+            .glob(pattern: "\(UIModuleName.UIComponent.sourceDirectory)/Localization/**/*.xcstrings"),
+        ]
     )
 
 }

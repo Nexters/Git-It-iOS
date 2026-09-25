@@ -23,7 +23,6 @@ extension SettingsScreen {
                     ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.backTapped) },
                         )
                         .size(.medium)
@@ -35,7 +34,7 @@ extension SettingsScreen {
                         alignment: .top,
                     )
 
-                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.careerLevelSelectionTitle))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.CareerLevelSelection.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(
@@ -46,7 +45,7 @@ extension SettingsScreen {
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
                     if case .failed = store.curationUpdate.careerLevelMutation {
-                        StyledText(text: LocalizedText.Settings.careerLevelSelectionFailureMessage)
+                        StyledText(text: LocalizedText.Settings.CareerLevelSelection.Failure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)

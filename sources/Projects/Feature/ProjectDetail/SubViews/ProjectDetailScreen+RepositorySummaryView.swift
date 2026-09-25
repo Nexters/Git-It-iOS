@@ -47,7 +47,7 @@ extension ProjectDetailScreen {
 
                     LabeledProgressBar(
                         displayModel: .init(
-                            label: LocalizedText.ProjectDetail.repositorySummaryOverallProgressLabel,
+                            label: LocalizedText.ProjectDetail.RepositorySummary.OverallProgress.label,
                             progress: Double(overallProgressPercent) / 100,
                             valueText: "\(overallProgressPercent)%",
                         )
@@ -90,7 +90,6 @@ extension ProjectDetailScreen {
                     height: Constant.bannerSize,
                 )
                 .designSystemCornerRadius(.medium)
-                .accessibilityHidden(true)
             } else {
                 Color(designSystem: .grey500)
                     .frame(
@@ -98,7 +97,6 @@ extension ProjectDetailScreen {
                         height: Constant.bannerSize,
                     )
                     .designSystemCornerRadius(.medium)
-                    .accessibilityHidden(true)
             }
         }
 
@@ -129,7 +127,6 @@ extension ProjectDetailScreen {
                         .lineLimit(1)
                 }
             }
-            .accessibilityElement(children: .combine)
         }
 
         private var formattedStarCount: String {
@@ -167,7 +164,6 @@ extension ProjectDetailScreen {
             }
             .buttonStyle(.plain)
             .disabled(!isResumeEnabled)
-            .accessibilityLabel(LocalizedText.ProjectDetail.repositorySummaryResumeAccessibilityLabel)
         }
 
         private func abbreviatedUnit(

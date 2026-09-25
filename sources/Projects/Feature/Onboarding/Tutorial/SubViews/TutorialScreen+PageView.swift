@@ -37,9 +37,9 @@ extension TutorialScreen {
 
         private var title: String {
             switch page {
-            case 1: LocalizedText.Onboarding.tutorialPageFirstTitle
-            case 2: LocalizedText.Onboarding.tutorialPageSecondTitle
-            default: LocalizedText.Onboarding.tutorialPageThirdTitle
+            case 1: LocalizedText.Onboarding.Tutorial.Page.First.title
+            case 2: LocalizedText.Onboarding.Tutorial.Page.Second.title
+            default: LocalizedText.Onboarding.Tutorial.Page.Third.title
             }
         }
 

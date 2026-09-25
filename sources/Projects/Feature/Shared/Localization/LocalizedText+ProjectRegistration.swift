@@ -4,196 +4,236 @@ import Foundation
 
 extension LocalizedText {
     enum ProjectRegistration {
-        static var quizGenerationConfirmationTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationConfirmationTitle)
+        enum Checklist {
+            enum RepositoryInfo {
+                static var title: String {
+                    String(localized: .projectRegistrationChecklistRepositoryInfoTitle)
+                }
+            }
+
+            enum CodeStructureAnalysis {
+                static var title: String {
+                    String(localized: .projectRegistrationChecklistCodeStructureAnalysisTitle)
+                }
+            }
+
+            enum LearningOutlineComposition {
+                static var title: String {
+                    String(localized: .projectRegistrationChecklistLearningOutlineCompositionTitle)
+                }
+            }
+
+            enum QuizGeneration {
+                static var title: String {
+                    String(localized: .projectRegistrationChecklistQuizGenerationTitle)
+                }
+            }
+
+            enum Verification {
+                static var title: String {
+                    String(localized: .projectRegistrationChecklistVerificationTitle)
+                }
+            }
         }
 
-        static var quizGenerationConfirmationDurationMessage: String {
-            String(localized: .ProjectRegistration.quizGenerationConfirmationDurationMessage)
+        enum GenerationReminderSheet {
+            enum Enable {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationGenerationReminderSheetEnableButtonTitle)
+                }
+            }
+
+            enum Dismiss {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationGenerationReminderSheetDismissButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationGenerationReminderSheetTitle)
+            }
+
+            static var message: String {
+                String(localized: .projectRegistrationGenerationReminderSheetMessage)
+            }
         }
 
-        static var quizGenerationConfirmationStartButtonTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationConfirmationStartButtonTitle)
+        enum GuideSection {
+            enum First {
+                static var step: String {
+                    String(localized: .projectRegistrationGuideSectionFirstStep)
+                }
+            }
+
+            enum Second {
+                static var step: String {
+                    String(localized: .projectRegistrationGuideSectionSecondStep)
+                }
+            }
+
+            enum Third {
+                static var step: String {
+                    String(localized: .projectRegistrationGuideSectionThirdStep)
+                }
+            }
+
+            enum Fourth {
+                static var step: String {
+                    String(localized: .projectRegistrationGuideSectionFourthStep)
+                }
+            }
+
+            enum Fifth {
+                static var step: String {
+                    String(localized: .projectRegistrationGuideSectionFifthStep)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationGuideSectionTitle)
+            }
         }
 
-        static var checklistAccessibilityLabel: String {
-            String(localized: .ProjectRegistration.checklistAccessibilityLabel)
+        enum QuizGenerationConfirmation {
+            enum Duration {
+                static var message: String {
+                    String(localized: .projectRegistrationQuizGenerationConfirmationDurationMessage)
+                }
+            }
+
+            enum Start {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationQuizGenerationConfirmationStartButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationQuizGenerationConfirmationTitle)
+            }
         }
 
-        static var checklistRepositoryInfoTitle: String {
-            String(localized: .ProjectRegistration.checklistRepositoryInfoTitle)
+        enum QuizGenerationFailure {
+            enum Retry {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationQuizGenerationFailureRetryButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationQuizGenerationFailureTitle)
+            }
+
+            static var message: String {
+                String(localized: .projectRegistrationQuizGenerationFailureMessage)
+            }
         }
 
-        static var checklistCodeStructureAnalysisTitle: String {
-            String(localized: .ProjectRegistration.checklistCodeStructureAnalysisTitle)
+        enum QuizGenerationProgress {
+            enum Duration {
+                static var message: String {
+                    String(localized: .projectRegistrationQuizGenerationProgressDurationMessage)
+                }
+            }
+
+            enum WaitAtHome {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationQuizGenerationProgressWaitAtHomeButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationQuizGenerationProgressTitle)
+            }
         }
 
-        static var checklistLearningOutlineCompositionTitle: String {
-            String(localized: .ProjectRegistration.checklistLearningOutlineCompositionTitle)
+        enum QuizLevelSelection {
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionNextButtonTitle)
+                }
+            }
+
+            enum Basic {
+                static var title: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionBasicTitle)
+                }
+
+                static var description: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionBasicDescription)
+                }
+            }
+
+            enum Intermediate {
+                static var title: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionIntermediateTitle)
+                }
+
+                static var description: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionIntermediateDescription)
+                }
+            }
+
+            enum Advanced {
+                static var title: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionAdvancedTitle)
+                }
+
+                static var description: String {
+                    String(localized: .projectRegistrationQuizLevelSelectionAdvancedDescription)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationQuizLevelSelectionTitle)
+            }
         }
 
-        static var checklistQuizGenerationTitle: String {
-            String(localized: .ProjectRegistration.checklistQuizGenerationTitle)
+        enum RepositoryConfirmation {
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationRepositoryConfirmationNextButtonTitle)
+                }
+            }
+
+            enum Reject {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationRepositoryConfirmationRejectButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .projectRegistrationRepositoryConfirmationTitle)
+            }
         }
 
-        static var checklistVerificationTitle: String {
-            String(localized: .ProjectRegistration.checklistVerificationTitle)
-        }
+        enum RepositoryLinkInput {
+            enum Field {
+                static var label: String {
+                    String(localized: .projectRegistrationRepositoryLinkInputFieldLabel)
+                }
+            }
 
-        static var checklistDoneStatus: String {
-            String(localized: .ProjectRegistration.checklistDoneStatus)
-        }
+            enum ValidationError {
+                static var message: String {
+                    String(localized: .projectRegistrationRepositoryLinkInputValidationErrorMessage)
+                }
+            }
 
-        static var checklistActiveStatus: String {
-            String(localized: .ProjectRegistration.checklistActiveStatus)
-        }
+            enum Validating {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationRepositoryLinkInputValidatingButtonTitle)
+                }
+            }
 
-        static var checklistPendingStatus: String {
-            String(localized: .ProjectRegistration.checklistPendingStatus)
-        }
+            enum Next {
+                static var buttonTitle: String {
+                    String(localized: .projectRegistrationRepositoryLinkInputNextButtonTitle)
+                }
+            }
 
-        static var quizGenerationFailureTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationFailureTitle)
-        }
-
-        static var quizGenerationFailureMessage: String {
-            String(localized: .ProjectRegistration.quizGenerationFailureMessage)
-        }
-
-        static var quizGenerationFailureRetryButtonTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationFailureRetryButtonTitle)
-        }
-
-        static var quizGenerationProgressTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationProgressTitle)
-        }
-
-        static var quizGenerationProgressDurationMessage: String {
-            String(localized: .ProjectRegistration.quizGenerationProgressDurationMessage)
-        }
-
-        static var quizGenerationProgressWaitAtHomeButtonTitle: String {
-            String(localized: .ProjectRegistration.quizGenerationProgressWaitAtHomeButtonTitle)
-        }
-
-        static var generationReminderSheetTitle: String {
-            String(localized: .ProjectRegistration.generationReminderSheetTitle)
-        }
-
-        static var generationReminderSheetMessage: String {
-            String(localized: .ProjectRegistration.generationReminderSheetMessage)
-        }
-
-        static var generationReminderSheetEnableButtonTitle: String {
-            String(localized: .ProjectRegistration.generationReminderSheetEnableButtonTitle)
-        }
-
-        static var generationReminderSheetDismissButtonTitle: String {
-            String(localized: .ProjectRegistration.generationReminderSheetDismissButtonTitle)
-        }
-
-        static var quizLevelSelectionTitle: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionTitle)
-        }
-
-        static var quizLevelSelectionNextButtonTitle: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionNextButtonTitle)
-        }
-
-        static var quizLevelSelectionBasicTitle: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionBasicTitle)
-        }
-
-        static var quizLevelSelectionBasicDescription: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionBasicDescription)
-        }
-
-        static var quizLevelSelectionIntermediateTitle: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionIntermediateTitle)
-        }
-
-        static var quizLevelSelectionIntermediateDescription: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionIntermediateDescription)
-        }
-
-        static var quizLevelSelectionAdvancedTitle: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionAdvancedTitle)
-        }
-
-        static var quizLevelSelectionAdvancedDescription: String {
-            String(localized: .ProjectRegistration.quizLevelSelectionAdvancedDescription)
-        }
-
-        static var repositoryConfirmationTitle: String {
-            String(localized: .ProjectRegistration.repositoryConfirmationTitle)
-        }
-
-        static var repositoryConfirmationNextButtonTitle: String {
-            String(localized: .ProjectRegistration.repositoryConfirmationNextButtonTitle)
-        }
-
-        static var repositoryConfirmationRejectButtonTitle: String {
-            String(localized: .ProjectRegistration.repositoryConfirmationRejectButtonTitle)
-        }
-
-        static var repositoryLinkInputTitle: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputTitle)
-        }
-
-        static var repositoryLinkInputFieldLabel: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputFieldLabel)
-        }
-
-        static var repositoryLinkInputValidationErrorMessage: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputValidationErrorMessage)
-        }
-
-        static var repositoryLinkInputFieldAccessibilityLabel: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputFieldAccessibilityLabel)
-        }
-
-        static var repositoryLinkInputValidatingButtonTitle: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputValidatingButtonTitle)
-        }
-
-        static var repositoryLinkInputNextButtonTitle: String {
-            String(localized: .ProjectRegistration.repositoryLinkInputNextButtonTitle)
-        }
-
-        static var guideSectionTitle: String {
-            String(localized: .ProjectRegistration.guideSectionTitle)
-        }
-
-        static var guideSectionAccessibilityLabel: String {
-            String(localized: .ProjectRegistration.guideSectionAccessibilityLabel)
-        }
-
-        static var guideSectionExpandedAccessibilityValue: String {
-            String(localized: .ProjectRegistration.guideSectionExpandedAccessibilityValue)
-        }
-
-        static var guideSectionCollapsedAccessibilityValue: String {
-            String(localized: .ProjectRegistration.guideSectionCollapsedAccessibilityValue)
-        }
-
-        static var guideSectionFirstStep: String {
-            String(localized: .ProjectRegistration.guideSectionFirstStep)
-        }
-
-        static var guideSectionSecondStep: String {
-            String(localized: .ProjectRegistration.guideSectionSecondStep)
-        }
-
-        static var guideSectionThirdStep: String {
-            String(localized: .ProjectRegistration.guideSectionThirdStep)
-        }
-
-        static var guideSectionFourthStep: String {
-            String(localized: .ProjectRegistration.guideSectionFourthStep)
-        }
-
-        static var guideSectionFifthStep: String {
-            String(localized: .ProjectRegistration.guideSectionFifthStep)
+            static var title: String {
+                String(localized: .projectRegistrationRepositoryLinkInputTitle)
+            }
         }
     }
 }

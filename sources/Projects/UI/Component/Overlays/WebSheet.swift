@@ -28,7 +28,6 @@ public struct WebSheet: View {
 
                     IconGlassButton(
                         icon: .close,
-                        label: LocalizedText.WebSheet.closeAccessibilityLabel,
                         action: onDismiss,
                     )
                 }

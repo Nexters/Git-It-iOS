@@ -4,16 +4,20 @@ import Foundation
 
 extension LocalizedText {
     enum AppEntry {
-        static var recoverableErrorTitle: String {
-            String(localized: .AppEntry.appEntryRecoverableErrorTitle)
+        enum RecoverableError {
+            static var title: String {
+                String(localized: .appEntryRecoverableErrorTitle)
+            }
+
+            static var message: String {
+                String(localized: .appEntryRecoverableErrorMessage)
+            }
         }
 
-        static var recoverableErrorMessage: String {
-            String(localized: .AppEntry.appEntryRecoverableErrorMessage)
-        }
-
-        static var retryButtonTitle: String {
-            String(localized: .AppEntry.appEntryRetryButtonTitle)
+        enum Retry {
+            static var buttonTitle: String {
+                String(localized: .appEntryRetryButtonTitle)
+            }
         }
     }
 }

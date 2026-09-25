@@ -30,8 +30,6 @@ public struct Chip: View {
         }
         .buttonStyle(.plain)
         .designSystemControlSize(.minimumTouch)
-        .accessibilityLabel(label)
-        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
     // MARK: Internal

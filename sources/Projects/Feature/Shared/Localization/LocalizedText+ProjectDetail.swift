@@ -4,100 +4,112 @@ import Foundation
 
 extension LocalizedText {
     enum ProjectDetail {
-        static var deletionDialogTitle: String {
-            String(localized: .ProjectDetail.projectDetailDeletionDialogTitle)
+        enum Deletion {
+            enum Dialog {
+                static var title: String {
+                    String(localized: .projectDetailDeletionDialogTitle)
+                }
+
+                static var message: String {
+                    String(localized: .projectDetailDeletionDialogMessage)
+                }
+            }
+
+            enum DialogConfirm {
+                static var buttonTitle: String {
+                    String(localized: .projectDetailDeletionDialogConfirmButtonTitle)
+                }
+            }
+
+            enum DialogCancel {
+                static var buttonTitle: String {
+                    String(localized: .projectDetailDeletionDialogCancelButtonTitle)
+                }
+            }
+
+            enum MenuItem {
+                static var title: String {
+                    String(localized: .projectDetailDeletionMenuItemTitle)
+                }
+            }
         }
 
-        static var deletionDialogMessage: String {
-            String(localized: .ProjectDetail.projectDetailDeletionDialogMessage)
+        enum Retry {
+            static var buttonTitle: String {
+                String(localized: .projectDetailRetryButtonTitle)
+            }
         }
 
-        static var deletionDialogConfirmButtonTitle: String {
-            String(localized: .ProjectDetail.projectDetailDeletionDialogConfirmButtonTitle)
+        enum SavedQuestionsMenuItem {
+            static var title: String {
+                String(localized: .projectDetailSavedQuestionsMenuItemTitle)
+            }
         }
 
-        static var deletionDialogCancelButtonTitle: String {
-            String(localized: .ProjectDetail.projectDetailDeletionDialogCancelButtonTitle)
+        enum RepositoryLinkMenuItem {
+            static var title: String {
+                String(localized: .projectDetailRepositoryLinkMenuItemTitle)
+            }
         }
 
-        static var retryButtonTitle: String {
-            String(localized: .ProjectDetail.projectDetailRetryButtonTitle)
+        enum SingleQuestion {
+            enum Failure {
+                static var title: String {
+                    String(localized: .projectDetailSingleQuestionFailureTitle)
+                }
+
+                static var message: String {
+                    String(localized: .projectDetailSingleQuestionFailureMessage)
+                }
+            }
+
+            enum FailureConfirm {
+                static var buttonTitle: String {
+                    String(localized: .projectDetailSingleQuestionFailureConfirmButtonTitle)
+                }
+            }
+
+            enum Advance {
+                static var buttonTitle: String {
+                    String(localized: .projectDetailSingleQuestionAdvanceButtonTitle)
+                }
+            }
         }
 
-        static var menuOpenAccessibilityLabel: String {
-            String(localized: .ProjectDetail.projectDetailMenuOpenAccessibilityLabel)
+        enum DetailContent {
+            enum LoadFailure {
+                static var title: String {
+                    String(localized: .projectDetailDetailContentLoadFailureTitle)
+                }
+
+                static var message: String {
+                    String(localized: .projectDetailDetailContentLoadFailureMessage)
+                }
+            }
         }
 
-        static var savedQuestionsMenuItemTitle: String {
-            String(localized: .ProjectDetail.projectDetailSavedQuestionsMenuItemTitle)
+        enum RepositorySummary {
+            enum OverallProgress {
+                static var label: String {
+                    String(localized: .projectDetailRepositorySummaryOverallProgressLabel)
+                }
+            }
         }
 
-        static var savedQuestionsMenuItemAccessibilityLabel: String {
-            String(localized: .ProjectDetail.projectDetailSavedQuestionsMenuItemAccessibilityLabel)
-        }
+        enum SetListSection {
+            enum Empty {
+                static var title: String {
+                    String(localized: .projectDetailSetListSectionEmptyTitle)
+                }
 
-        static var repositoryLinkMenuItemTitle: String {
-            String(localized: .ProjectDetail.projectDetailRepositoryLinkMenuItemTitle)
-        }
+                static var message: String {
+                    String(localized: .projectDetailSetListSectionEmptyMessage)
+                }
+            }
 
-        static var repositoryLinkMenuItemAccessibilityLabel: String {
-            String(localized: .ProjectDetail.projectDetailRepositoryLinkMenuItemAccessibilityLabel)
-        }
-
-        static var deletionMenuItemTitle: String {
-            String(localized: .ProjectDetail.projectDetailDeletionMenuItemTitle)
-        }
-
-        static var deletionMenuItemAccessibilityLabel: String {
-            String(localized: .ProjectDetail.projectDetailDeletionMenuItemAccessibilityLabel)
-        }
-
-        static var singleQuestionFailureTitle: String {
-            String(localized: .ProjectDetail.projectDetailSingleQuestionFailureTitle)
-        }
-
-        static var singleQuestionFailureMessage: String {
-            String(localized: .ProjectDetail.projectDetailSingleQuestionFailureMessage)
-        }
-
-        static var singleQuestionFailureConfirmButtonTitle: String {
-            String(localized: .ProjectDetail.projectDetailSingleQuestionFailureConfirmButtonTitle)
-        }
-
-        static var singleQuestionLoadingAccessibilityLabel: String {
-            String(localized: .ProjectDetail.projectDetailSingleQuestionLoadingAccessibilityLabel)
-        }
-
-        static var singleQuestionAdvanceButtonTitle: String {
-            String(localized: .ProjectDetail.projectDetailSingleQuestionAdvanceButtonTitle)
-        }
-
-        static var detailContentLoadFailureTitle: String {
-            String(localized: .ProjectDetail.detailContentLoadFailureTitle)
-        }
-
-        static var detailContentLoadFailureMessage: String {
-            String(localized: .ProjectDetail.detailContentLoadFailureMessage)
-        }
-
-        static var repositorySummaryOverallProgressLabel: String {
-            String(localized: .ProjectDetail.repositorySummaryOverallProgressLabel)
-        }
-
-        static var repositorySummaryResumeAccessibilityLabel: String {
-            String(localized: .ProjectDetail.repositorySummaryResumeAccessibilityLabel)
-        }
-
-        static var setListSectionTitle: String {
-            String(localized: .ProjectDetail.setListSectionTitle)
-        }
-
-        static var setListSectionEmptyTitle: String {
-            String(localized: .ProjectDetail.setListSectionEmptyTitle)
-        }
-
-        static var setListSectionEmptyMessage: String {
-            String(localized: .ProjectDetail.setListSectionEmptyMessage)
+            static var title: String {
+                String(localized: .projectDetailSetListSectionTitle)
+            }
         }
     }
 }

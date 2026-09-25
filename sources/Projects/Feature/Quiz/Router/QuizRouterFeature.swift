@@ -104,8 +104,8 @@ public struct QuizRouterFeature: Sendable {
         }
     }
 
-    public static let nextQuestionActionTitle = LocalizedText.Quiz.questionSolvingNextQuestionButtonTitle
-    public static let completeActionTitle = LocalizedText.Quiz.questionSolvingCompleteButtonTitle
+    public static let nextQuestionActionTitle = LocalizedText.Quiz.QuestionSolving.NextQuestion.buttonTitle
+    public static let completeActionTitle = LocalizedText.Quiz.QuestionSolving.Complete.buttonTitle
 
     public var body: some ReducerOf<Self> {
         Scope(

@@ -4,54 +4,68 @@ import Foundation
 
 extension LocalizedText {
     enum Saved {
-        static var title: String {
-            String(localized: .Saved.savedTitle)
+        enum Retry {
+            static var buttonTitle: String {
+                String(localized: .savedRetryButtonTitle)
+            }
         }
 
-        static var retryButtonTitle: String {
-            String(localized: .Saved.savedRetryButtonTitle)
+        enum LoadFailure {
+            static var title: String {
+                String(localized: .savedLoadFailureTitle)
+            }
+
+            static var message: String {
+                String(localized: .savedLoadFailureMessage)
+            }
         }
 
-        static var loadFailureTitle: String {
-            String(localized: .Saved.savedLoadFailureTitle)
+        enum Empty {
+            static var title: String {
+                String(localized: .savedEmptyTitle)
+            }
+
+            static var message: String {
+                String(localized: .savedEmptyMessage)
+            }
         }
 
-        static var loadFailureMessage: String {
-            String(localized: .Saved.savedLoadFailureMessage)
+        enum Filter {
+            enum All {
+                static var label: String {
+                    String(localized: .savedFilterAllLabel)
+                }
+            }
+
+            static func count(count: Int) -> String {
+                String(localized: .savedFilterCount(count: count))
+            }
         }
 
-        static var emptyTitle: String {
-            String(localized: .Saved.savedEmptyTitle)
-        }
+        enum Question {
+            enum Action {
+                static var title: String {
+                    String(localized: .savedQuestionActionTitle)
+                }
+            }
 
-        static var emptyMessage: String {
-            String(localized: .Saved.savedEmptyMessage)
-        }
-
-        static var filterAllLabel: String {
-            String(localized: .Saved.savedFilterAllLabel)
-        }
-
-        static var questionActionTitle: String {
-            String(localized: .Saved.savedQuestionActionTitle)
-        }
-
-        static func filterCount(count: Int) -> String {
-            String(localized: .Saved.savedFilterCount(count: count))
-        }
-
-        static func questionMetadata(
-            projectName: String,
-            setLabel: String,
-            problemNumber: Int,
-        ) -> String {
-            String(
-                localized: .Saved.savedQuestionMetadata(
-                    projectName: projectName,
-                    setLabel: setLabel,
-                    problemNumber: problemNumber,
+            static func metadata(
+                projectName: String,
+                setLabel: String,
+                problemNumber: Int,
+            ) -> String {
+                String(
+                    localized: .savedQuestionMetadata(
+                        projectName: projectName,
+                        setLabel: setLabel,
+                        problemNumber: problemNumber,
+                    )
                 )
-            )
+            }
+        }
+
+        static var title: String {
+            String(localized: .savedTitle)
         }
     }
 }

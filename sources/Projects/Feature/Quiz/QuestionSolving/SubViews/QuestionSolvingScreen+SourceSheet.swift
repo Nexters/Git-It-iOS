@@ -39,7 +39,7 @@ extension QuestionSolvingScreen {
                 )
             } footer: {
                 FeedbackActionButton(
-                    title: LocalizedText.Quiz.sourceSheetCloseButtonTitle,
+                    title: LocalizedText.Quiz.SourceSheet.Close.buttonTitle,
                     action: onClose,
                 )
                 .padding(.top, Constant.buttonTopPadding)
@@ -61,8 +61,8 @@ extension QuestionSolvingScreen {
         }
 
         private var title: String {
-            guard let questionNumber else { return LocalizedText.Quiz.sourceSheetTitle }
-            return LocalizedText.Quiz.sourceSheetNumberedTitle(questionNumber: questionNumber)
+            guard let questionNumber else { return LocalizedText.Quiz.SourceSheet.title }
+            return LocalizedText.Quiz.SourceSheet.Numbered.title(questionNumber: questionNumber)
         }
 
         private func sourceBlock(source: QuestionSourceDisplay) -> some View {
@@ -91,14 +91,11 @@ extension QuestionSolvingScreen {
                     )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(source.accessibilityLabel)
-                .accessibilityAddTraits(.isLink)
             } else {
                 linkChipContent(
                     source: source,
                     showsIcon: false,
                 )
-                .accessibilityLabel(source.accessibilityLabel)
             }
         }
 

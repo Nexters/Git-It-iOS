@@ -4,80 +4,106 @@ import Foundation
 
 extension LocalizedText {
     enum Home {
-        static var profileHeaderLoadFailureTitle: String {
-            String(localized: .Home.profileHeaderLoadFailureTitle)
+        enum ProfileHeader {
+            enum LoadFailure {
+                static var title: String {
+                    String(localized: .homeProfileHeaderLoadFailureTitle)
+                }
+
+                static var message: String {
+                    String(localized: .homeProfileHeaderLoadFailureMessage)
+                }
+            }
+
+            enum Retry {
+                static var buttonTitle: String {
+                    String(localized: .homeProfileHeaderRetryButtonTitle)
+                }
+            }
         }
 
-        static var profileHeaderLoadFailureMessage: String {
-            String(localized: .Home.profileHeaderLoadFailureMessage)
+        enum ProjectSection {
+            enum ShowAll {
+                static var buttonTitle: String {
+                    String(localized: .homeProjectSectionShowAllButtonTitle)
+                }
+            }
+
+            enum Empty {
+                static var message: String {
+                    String(localized: .homeProjectSectionEmptyMessage)
+                }
+            }
+
+            enum SignInRequired {
+                static var message: String {
+                    String(localized: .homeProjectSectionSignInRequiredMessage)
+                }
+            }
+
+            enum LoadFailure {
+                static var message: String {
+                    String(localized: .homeProjectSectionLoadFailureMessage)
+                }
+            }
+
+            enum Retry {
+                static var buttonTitle: String {
+                    String(localized: .homeProjectSectionRetryButtonTitle)
+                }
+            }
+
+            static var title: String {
+                String(localized: .homeProjectSectionTitle)
+            }
         }
 
-        static var profileHeaderRetryButtonTitle: String {
-            String(localized: .Home.profileHeaderRetryButtonTitle)
+        enum RegistrationPanel {
+            enum Title {
+                enum First {
+                    static var line: String {
+                        String(localized: .homeRegistrationPanelTitleFirstLine)
+                    }
+                }
+
+                enum Second {
+                    static var line: String {
+                        String(localized: .homeRegistrationPanelTitleSecondLine)
+                    }
+                }
+            }
+
+            enum Register {
+                static var buttonTitle: String {
+                    String(localized: .homeRegistrationPanelRegisterButtonTitle)
+                }
+            }
+
+            enum GenerationInProgress {
+                static var label: String {
+                    String(localized: .homeRegistrationPanelGenerationInProgressLabel)
+                }
+            }
+
+            static var caption: String {
+                String(localized: .homeRegistrationPanelCaption)
+            }
         }
 
-        static var registrationPanelCaption: String {
-            String(localized: .Home.registrationPanelCaption)
-        }
+        enum SignInSection {
+            enum SignIn {
+                static var buttonTitle: String {
+                    String(localized: .homeSignInSectionSignInButtonTitle)
+                }
+            }
 
-        static var registrationPanelTitleFirstLine: String {
-            String(localized: .Home.registrationPanelTitleFirstLine)
-        }
+            static var title: String {
+                String(localized: .homeSignInSectionTitle)
+            }
 
-        static var registrationPanelTitleSecondLine: String {
-            String(localized: .Home.registrationPanelTitleSecondLine)
-        }
-
-        static var registrationPanelRegisterButtonTitle: String {
-            String(localized: .Home.registrationPanelRegisterButtonTitle)
-        }
-
-        static var registrationPanelRegisterAccessibilityLabel: String {
-            String(localized: .Home.registrationPanelRegisterAccessibilityLabel)
-        }
-
-        static var registrationPanelGenerationInProgressLabel: String {
-            String(localized: .Home.registrationPanelGenerationInProgressLabel)
-        }
-
-        static var projectSectionTitle: String {
-            String(localized: .Home.projectSectionTitle)
-        }
-
-        static var projectSectionShowAllButtonTitle: String {
-            String(localized: .Home.projectSectionShowAllButtonTitle)
-        }
-
-        static var projectSectionShowAllAccessibilityLabel: String {
-            String(localized: .Home.projectSectionShowAllAccessibilityLabel)
-        }
-
-        static var projectSectionEmptyMessage: String {
-            String(localized: .Home.projectSectionEmptyMessage)
-        }
-
-        static var projectSectionSignInRequiredMessage: String {
-            String(localized: .Home.projectSectionSignInRequiredMessage)
-        }
-
-        static var projectSectionLoadFailureMessage: String {
-            String(localized: .Home.projectSectionLoadFailureMessage)
-        }
-
-        static var projectSectionRetryButtonTitle: String {
-            String(localized: .Home.projectSectionRetryButtonTitle)
-        }
-
-        static var signInSectionTitle: String {
-            String(localized: .Home.signInSectionTitle)
-        }
-
-        static var signInSectionCaption: String {
-            String(localized: .Home.signInSectionCaption)
-        }
-
-        static var signInSectionSignInButtonTitle: String {
-            String(localized: .Home.signInSectionSignInButtonTitle)
+            static var caption: String {
+                String(localized: .homeSignInSectionCaption)
+            }
         }
     }
 }
