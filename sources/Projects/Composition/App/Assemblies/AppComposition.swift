@@ -42,7 +42,10 @@ public struct AppComposition: Sendable {
         projectGeneration = concerns.projectGeneration
 
         let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
-            await generationOutcomeSource.ingest(rawPayload: rawPayload)
+            await generationOutcomeSource.ingest(
+                rawPayload: rawPayload,
+                deliveredAt: Date(),
+            )
         }
         self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
         let notificationAppCallbacks = NotificationAppCallbacks(

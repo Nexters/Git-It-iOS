@@ -17,10 +17,12 @@ struct GenerationOutcomeRepositoryAdapterTests {
             QuizGenerationOutcomeDTO(
                 projectID: "project-1",
                 status: .completed,
+                deliveredAt: Date(timeIntervalSince1970: 1_000),
             ),
             QuizGenerationOutcomeDTO(
                 projectID: "project-2",
                 status: .failed,
+                deliveredAt: Date(timeIntervalSince1970: 1_000),
             ),
         ]))
 

@@ -1,5 +1,6 @@
 import DataShared
 import Foundation
+import os
 import Synchronization
 
 // MARK: - LocalPendingGenerationStore
@@ -37,6 +38,7 @@ public actor LocalPendingGenerationStore {
                 next,
                 forKey: Self.stateKey,
             )
+            Self.logStoredState(next)
             self.broadcast(next)
             return next
         }
@@ -79,9 +81,23 @@ public actor LocalPendingGenerationStore {
         let requestedAt: Date
     }
 
+    private static let logger = Logger(
+        subsystem: "com.nexters.hytime.gitit",
+        category: "LocalPendingGenerationStore",
+    )
+
     private let storage: any KeyValueStorage
     private let subscribers = Mutex([UUID: AsyncStream<GenerationStateDTO>.Continuation]())
     private var lastOperation: Task<Void, Never>?
+
+    private static func logStoredState(_ state: GenerationStateDTO) {
+        let counts = Dictionary(
+            grouping: state.records,
+            by: \.status,
+        ).mapValues(\.count)
+        let summary = counts.keys.sorted().map { "\($0)=\(counts[$0] ?? 0)" }.joined(separator: " ")
+        logger.debug("생성 기록 저장: \(summary, privacy: .public)")
+    }
 
     private func exclusively<Result: Sendable>(
         _ operation: @escaping @Sendable () async -> Result

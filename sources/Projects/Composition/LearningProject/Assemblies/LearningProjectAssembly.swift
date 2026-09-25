@@ -51,7 +51,10 @@ public struct LearningProjectAssembly: Sendable {
         )
 
         ingestGenerationOutcomePayload = { rawPayload in
-            await generationOutcomeSource.ingest(rawPayload: rawPayload)
+            await generationOutcomeSource.ingest(
+                rawPayload: rawPayload,
+                deliveredAt: Date(),
+            )
         }
     }
 
