@@ -177,6 +177,7 @@ public struct ConcernUseCaseAssembly: Sendable {
         project = Project(
             repository: ProjectRepositoryAdapter(remote: projectRemote),
             signedOutEvents: signedOutEvents,
+            projectDeleted: { await projectGeneration.release($0) },
         )
     }
 

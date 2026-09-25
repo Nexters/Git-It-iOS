@@ -57,6 +57,10 @@ enum ShareRegistrationPreviewSupport {
         func states() async -> AsyncStream<ProjectGenerationState> {
             AsyncStream { $0.finish() }
         }
+
+        func synchronize() async { }
+
+        func release(_: ProjectID) async { }
     }
 
     private static let sampleRepository = ExternalRepository(

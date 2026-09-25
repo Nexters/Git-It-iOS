@@ -54,7 +54,7 @@ UseCase를 독립 타입으로 둘지, 모듈 능력 단위 계약에 합칠지�
 | `ExternalRepositoryUseCase` | `DomainExternalRepository` | `repository(at:)` |
 | `QuizDetailUseCase` | `DomainQuizDetail` | `quizSet(_:in:)`, `grade(_:)`(객관식·서술형), `bookmark(_:in:)`, `unbookmark(_:in:)`, `bookmarks(_:)` |
 | `ProjectUseCase` | `DomainProject` | `projects()`, `refresh()`, `requestNextPage()`, `detail(of:)`, `delete(_:)` |
-| `ProjectGenerationUseCase` | `DomainProjectGeneration` | `request(_:)`, `states()` |
+| `ProjectGenerationUseCase` | `DomainProjectGeneration` | `request(_:)`, `states()`, `synchronize()`, `release(_:)` |
 
 관심사 하나는 UseCase 계약 하나와 그 구현, 모델, 오류, 저장소 계약을 소유합니다. 앱에서 각 UseCase는
 인스턴스 하나만 만들고, 상태를 가진 관심사는 `actor`로 구현해 변경과 관찰의 순서를 보장합니다.

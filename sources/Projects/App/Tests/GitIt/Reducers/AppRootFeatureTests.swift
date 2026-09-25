@@ -848,6 +848,35 @@ struct AppRootLearningFlowTests {
         await store.finish()
     }
 
+    @Test
+    func `회원 상태에서 앱이 활성화되면 생성 상태를 동기화한다`() async {
+        let projectGeneration = ProjectGenerationUseCaseMock()
+        let store = makeAppRootStore(projectGeneration: projectGeneration)
+        store.exhaustivity = .off
+
+        await store.send(.view(.applicationBecameActive))
+        await store.skipReceivedActions()
+        await store.finish()
+
+        #expect(await projectGeneration.synchronizeCount == 1)
+    }
+
+    @Test
+    func `게스트 상태에서 앱이 활성화되면 생성 상태를 동기화하지 않는다`() async {
+        let projectGeneration = ProjectGenerationUseCaseMock()
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.mainShell = MainShellRouterFeature.State(access: .guest)
+        let store = makeAppRootStore(
+            projectGeneration: projectGeneration,
+            state: state,
+        )
+
+        await store.send(.view(.applicationBecameActive))
+        await store.finish()
+
+        #expect(await projectGeneration.synchronizeCount == 0)
+    }
+
     // MARK: Private
 
     private func presentedDetailState() -> AppRootFeature.State {

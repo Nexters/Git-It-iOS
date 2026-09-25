@@ -130,6 +130,35 @@ struct ProjectTests {
         ))
     }
 
+    @Test
+    func `삭제에 성공하면 삭제된 프로젝트를 한 번 알린다`() async throws {
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+        )])
+
+        try await fixture.project.delete("p1")
+
+        #expect(await fixture.deletions.projectIDs == ["p1"])
+    }
+
+    @Test
+    func `삭제에 실패하면 삭제를 알리지 않는다`() async {
+        let deletions = DeletionRecorder()
+        let (signedOut, _) = AsyncStream<Void>.makeStream()
+        let project = Project(
+            repository: FailingDeletionRepository(),
+            signedOutEvents: { signedOut },
+            projectDeleted: { await deletions.record($0) },
+        )
+
+        await #expect(throws: ProjectError.temporarilyUnavailable) {
+            try await project.delete("p1")
+        }
+
+        #expect(await deletions.projectIDs.isEmpty)
+    }
+
     // MARK: Private
 
     private struct Fixture {
@@ -144,20 +173,56 @@ struct ProjectTests {
                 pages: pages,
                 holdsFirstRequest: holdsFirstRequest,
             )
+            let deletions = DeletionRecorder()
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
             self.repository = repository
+            self.deletions = deletions
             self.signedOutContinuation = signedOutContinuation
             project = Project(
                 repository: repository,
                 signedOutEvents: { signedOut },
+                projectDeleted: { await deletions.record($0) },
             )
         }
 
         // MARK: Internal
 
         let repository: StubProjectRepository
+        let deletions: DeletionRecorder
         let signedOutContinuation: AsyncStream<Void>.Continuation
         let project: Project
+
+    }
+
+    private actor DeletionRecorder {
+
+        private(set) var projectIDs = [String]()
+
+        func record(_ projectID: String) {
+            projectIDs.append(projectID)
+        }
+
+    }
+
+    private struct FailingDeletionRepository: ProjectRepository {
+
+        func page(
+            _: Int,
+            size _: Int,
+        ) async throws -> ProjectPage {
+            ProjectPage(
+                summaries: [],
+                hasNextPage: false,
+            )
+        }
+
+        func detail(of _: String) async throws -> ProjectDetail {
+            throw ProjectError.notFound
+        }
+
+        func delete(_: String) async throws {
+            throw ProjectError.temporarilyUnavailable
+        }
 
     }
 

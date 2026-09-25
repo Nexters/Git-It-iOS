@@ -8,10 +8,12 @@ public actor Project: ProjectUseCase {
     public init(
         repository: any ProjectRepository,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
+        projectDeleted: @escaping @Sendable (ProjectID) async -> Void,
         pageSize: Int = 20,
     ) {
         self.repository = repository
         self.signedOutEvents = signedOutEvents
+        self.projectDeleted = projectDeleted
         self.pageSize = pageSize
     }
 
@@ -73,12 +75,14 @@ public actor Project: ProjectUseCase {
         try await repository.delete(projectID)
         loaded.removeAll { $0.id == projectID }
         emit()
+        await projectDeleted(projectID)
     }
 
     // MARK: Private
 
     private let repository: any ProjectRepository
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
+    private let projectDeleted: @Sendable (ProjectID) async -> Void
     private let pageSize: Int
 
     private var loaded = [ProjectSummary]()

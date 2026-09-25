@@ -65,6 +65,28 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         return stream
     }
 
+    public func synchronize() async {
+        guard let startTask else {
+            await startObserving()
+            return
+        }
+        await startTask.value
+        await purgeExpiredRecords()
+        await absorbPendingReminders()
+        await apply(pendingGenerations.pendingState())
+    }
+
+    public func release(_ projectID: ProjectID) async {
+        preservedOutcomes.removeAll { $0.projectID == projectID }
+        await pendingGenerations.releaseGeneration(projectID: projectID)
+        guard let startTask else {
+            await reminderScheduler.cancel(projectID: projectID)
+            return
+        }
+        await startTask.value
+        await apply(pendingGenerations.pendingState())
+    }
+
     // MARK: Private
 
     private static let preservedOutcomeLimit = 16

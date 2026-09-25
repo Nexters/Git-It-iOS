@@ -1,3 +1,4 @@
+import DomainIdentifier
 import DomainProjectGeneration
 
 actor ProjectGenerationUseCaseStub: ProjectGenerationUseCase {
@@ -29,6 +30,10 @@ actor ProjectGenerationUseCaseStub: ProjectGenerationUseCase {
     func states() async -> AsyncStream<ProjectGenerationState> {
         await generationStates.states()
     }
+
+    func synchronize() async { }
+
+    func release(_: ProjectID) async { }
 
     func recordedRequests() -> [ProjectGenerationRequest] {
         requests

@@ -443,6 +443,94 @@ struct ProjectGenerationTests {
         #expect(await fixture.scheduler.cancelledProjectIDs == ["p1"])
     }
 
+    @Test
+    func `저장소가 앱 밖에서 바뀐 뒤 동기화하면 그 기록을 상태에 반영한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        let finished = GenerationRecord(
+            repositoryURL: Self.request.repositoryURL,
+            projectID: "p1",
+            requestedAt: Self.requestedAt,
+            status: .failed,
+            finishedAt: Self.requestedAt,
+        )
+
+        await fixture.pendingGenerations.replaceStateSilently(GenerationState(records: [finished]))
+        await fixture.generation.synchronize()
+        let state = await Self.next(&states) { $0.requests.first?.phase == .failed }
+
+        #expect(state?.requests.first?.projectID == "p1")
+    }
+
+    @Test
+    func `동기화하면 보존 결과 반영을 다시 시도한다`() async {
+        let fixture = Fixture(state: Self.unattachedState(repositoryURLs: [Self.request.repositoryURL]))
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        await Self.settle { await fixture.pendingGenerations.finishedProjectIDs == ["p1"] }
+        let attached = GenerationState(records: [GenerationRecord(
+            repositoryURL: Self.request.repositoryURL,
+            projectID: "p1",
+            requestedAt: Self.requestedAt,
+        )])
+
+        await fixture.pendingGenerations.replaceStateSilently(attached)
+        await fixture.generation.synchronize()
+        let state = await Self.next(&states) { $0.requests.first?.phase == .ready }
+
+        #expect(state?.requests.first?.projectID == "p1")
+    }
+
+    @Test
+    func `동기화하면 보관 기한이 지난 기록을 정리하고 알림 예약을 취소한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+
+        fixture.sleeper.advance(by: 3_601)
+        await fixture.generation.synchronize()
+        _ = await Self.next(&states) { $0.requests.isEmpty }
+
+        #expect(await fixture.scheduler.cancelledProjectIDs.contains("p1"))
+    }
+
+    @Test
+    func `프로젝트를 해제하면 기록과 리마인드 대상을 지우고 알림 예약을 취소한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+
+        await fixture.generation.release("p1")
+        _ = await Self.next(&states) { $0.requests.isEmpty }
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        await Self.settle { await fixture.pendingGenerations.finishedProjectIDs == ["p1"] }
+
+        #expect(await fixture.pendingGenerations.state.records.isEmpty)
+        #expect(await fixture.scheduler.cancelledProjectIDs.contains("p1"))
+        #expect(await fixture.scheduler.scheduledReminders.isEmpty)
+    }
+
+    @Test
+    func `기록이 없는 프로젝트를 해제해도 오류 없이 끝난다`() async {
+        let fixture = Fixture()
+
+        await fixture.generation.release("p-unknown")
+
+        #expect(await fixture.pendingGenerations.state.records.isEmpty)
+        #expect(await fixture.scheduler.cancelledProjectIDs == ["p-unknown"])
+    }
+
     // MARK: Private
 
     private struct Fixture {

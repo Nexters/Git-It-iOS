@@ -1,3 +1,4 @@
+import DomainIdentifier
 import DomainProjectGeneration
 import Foundation
 
@@ -16,6 +17,8 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
     // MARK: Internal
 
     private(set) var requests = [ProjectGenerationRequest]()
+    private(set) var synchronizeCount = 0
+    private(set) var releasedProjectIDs = [ProjectID]()
 
     func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
         requests.append(request)
@@ -30,6 +33,14 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
             continuation.finish()
         }
         return stream
+    }
+
+    func synchronize() async {
+        synchronizeCount += 1
+    }
+
+    func release(_ projectID: ProjectID) async {
+        releasedProjectIDs.append(projectID)
     }
 
     func emit(_ next: ProjectGenerationState) {

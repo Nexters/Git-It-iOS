@@ -272,7 +272,10 @@ nonisolated struct AppRootFeature: Sendable {
             var effects: [Effect<Action>] = [
                 .run { [account] send in
                     await send(.effect(.signInVerified(account.verifySignIn())))
-                }
+                },
+                .run { [projectGeneration] _ in
+                    await projectGeneration.synchronize()
+                },
             ]
             if state.route == .mainShell {
                 effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))

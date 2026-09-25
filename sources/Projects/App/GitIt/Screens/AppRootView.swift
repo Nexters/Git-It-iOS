@@ -249,6 +249,10 @@ private enum AppRootPreviewSupport {
         func states() async -> AsyncStream<ProjectGenerationState> {
             AsyncStream { $0.finish() }
         }
+
+        func synchronize() async { }
+
+        func release(_: ProjectID) async { }
     }
 
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
