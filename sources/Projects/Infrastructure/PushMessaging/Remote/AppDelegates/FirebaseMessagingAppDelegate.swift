@@ -12,15 +12,17 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 
     // MARK: Public
 
+    public static let pendingPayloadLimit = 8
+
     public func configure(_ callbacks: PushNotificationCallbacks) {
         let pending = state.withLock { state -> PendingDelivery in
             state.callbacks = callbacks
             let pending = PendingDelivery(
                 apnsToken: state.pendingAPNsToken,
-                payload: state.pendingPayload,
+                payloads: state.pendingPayloads,
             )
             state.pendingAPNsToken = nil
-            state.pendingPayload = nil
+            state.pendingPayloads = []
             return pending
         }
 
@@ -28,9 +30,15 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
             Self.logger.debug("대기 슬롯의 APNs token을 전달합니다.")
             callbacks.forwardAPNsToken(apnsToken)
         }
-        if let payload = pending.payload {
-            Self.logger.debug("대기 슬롯의 payload를 전달합니다.")
-            Task { await callbacks.ingestGenerationOutcomePayload(payload) }
+        guard !pending.payloads.isEmpty else { return }
+        Self.logger.debug("대기 슬롯의 payload \(pending.payloads.count, privacy: .public)개를 도착 순서대로 전달합니다.")
+        Task {
+            for pendingPayload in pending.payloads {
+                await callbacks.ingestGenerationOutcomePayload(
+                    pendingPayload.payload,
+                    pendingPayload.delivery,
+                )
+            }
         }
     }
 
@@ -70,41 +78,49 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void,
     ) {
-        let payload = RemoteNotificationPayload(userInfo: userInfo)
-        let callbacks = state.withLock { state -> PushNotificationCallbacks? in
-            guard let callbacks = state.callbacks else {
-                state.pendingPayload = payload.userInfoStrings
-                return nil
-            }
-            return callbacks
-        }
-
-        guard let callbacks else {
-            Self.logger.notice("configure(_:) 전에 도착한 didReceiveRemoteNotification을 대기 슬롯에 보관합니다.")
+        let payload = RemoteNotificationPayload(userInfo: userInfo).userInfoStrings
+        let delivery = RemoteNotificationDelivery(
+            route: .background,
+            deliveredAt: Date(),
+        )
+        guard
+            let callbacks = callbacksOrPending(
+                payload,
+                delivery: delivery,
+            )
+        else {
             completionHandler(.noData)
             return
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
-        Self.logger.debug("didReceiveRemoteNotification 수신: \(payload.userInfoStrings, privacy: .public)")
+        Self.logger.debug("didReceiveRemoteNotification 수신: \(payload, privacy: .public)")
 
         Task {
-            await callbacks.ingestGenerationOutcomePayload(payload.userInfoStrings)
+            await callbacks.ingestGenerationOutcomePayload(
+                payload,
+                delivery,
+            )
             completionHandler(.newData)
         }
     }
 
     // MARK: Private
 
+    private struct PendingPayload {
+        let payload: [String: String]
+        let delivery: RemoteNotificationDelivery
+    }
+
     private struct PendingDelivery {
         let apnsToken: Data?
-        let payload: [String: String]?
+        let payloads: [PendingPayload]
     }
 
     private struct State {
         var callbacks: PushNotificationCallbacks?
         var pendingAPNsToken: Data?
-        var pendingPayload: [String: String]?
+        var pendingPayloads = [PendingPayload]()
     }
 
     private static let logger = Logger(
@@ -114,6 +130,54 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 
     private let state = Mutex(State())
 
+    private func callbacksOrPending(
+        _ payload: [String: String],
+        delivery: RemoteNotificationDelivery,
+    ) -> PushNotificationCallbacks? {
+        let callbacks = state.withLock { state -> PushNotificationCallbacks? in
+            guard let callbacks = state.callbacks else {
+                state.pendingPayloads.append(PendingPayload(
+                    payload: payload,
+                    delivery: delivery,
+                ))
+                if state.pendingPayloads.count > Self.pendingPayloadLimit {
+                    state.pendingPayloads.removeFirst(state.pendingPayloads.count - Self.pendingPayloadLimit)
+                }
+                return nil
+            }
+            return callbacks
+        }
+        let route = String(describing: delivery.route)
+        if callbacks == nil {
+            Self.logger
+                .notice(
+                    "configure(_:) 전에 도착한 원격 알림을 대기 슬롯에 보관합니다: route=\(route, privacy: .public) deliveredAt=\(delivery.deliveredAt, privacy: .public)"
+                )
+        } else {
+            Self.logger
+                .debug(
+                    "원격 알림을 전달합니다: route=\(route, privacy: .public) deliveredAt=\(delivery.deliveredAt, privacy: .public)"
+                )
+        }
+        return callbacks
+    }
+
+    private func ingest(
+        _ payload: [String: String],
+        delivery: RemoteNotificationDelivery,
+    ) async {
+        guard
+            let callbacks = callbacksOrPending(
+                payload,
+                delivery: delivery,
+            )
+        else { return }
+        await callbacks.ingestGenerationOutcomePayload(
+            payload,
+            delivery,
+        )
+    }
+
 }
 
 // MARK: UNUserNotificationCenterDelegate
@@ -121,8 +185,31 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 extension FirebaseMessagingAppDelegate: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(
         _: UNUserNotificationCenter,
-        willPresent _: UNNotification,
+        willPresent notification: UNNotification,
     ) async -> UNNotificationPresentationOptions {
-        [.banner, .list, .sound]
+        let payload = RemoteNotificationPayload(userInfo: notification.request.content.userInfo).userInfoStrings
+        await ingest(
+            payload,
+            delivery: RemoteNotificationDelivery(
+                route: .presentation,
+                deliveredAt: notification.date,
+            ),
+        )
+        return [.banner, .list, .sound]
+    }
+
+    public func userNotificationCenter(
+        _: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+    ) async {
+        let notification = response.notification
+        let payload = RemoteNotificationPayload(userInfo: notification.request.content.userInfo).userInfoStrings
+        await ingest(
+            payload,
+            delivery: RemoteNotificationDelivery(
+                route: .opened,
+                deliveredAt: notification.date,
+            ),
+        )
     }
 }

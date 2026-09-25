@@ -8,7 +8,7 @@ public struct NotificationAppCallbacks: Sendable {
 
     public init(
         forwardDeviceToken: @escaping @Sendable (Data) -> Void,
-        ingestRemoteMessagePayload: @escaping @Sendable ([String: String]) async -> Void,
+        ingestRemoteMessagePayload: @escaping @Sendable ([String: String], RemoteMessageDelivery) async -> Void,
     ) {
         self.forwardDeviceToken = forwardDeviceToken
         self.ingestRemoteMessagePayload = ingestRemoteMessagePayload
@@ -17,6 +17,6 @@ public struct NotificationAppCallbacks: Sendable {
     // MARK: Public
 
     public let forwardDeviceToken: @Sendable (Data) -> Void
-    public let ingestRemoteMessagePayload: @Sendable ([String: String]) async -> Void
+    public let ingestRemoteMessagePayload: @Sendable ([String: String], RemoteMessageDelivery) async -> Void
 
 }

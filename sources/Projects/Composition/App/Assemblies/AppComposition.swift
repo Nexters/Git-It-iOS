@@ -41,12 +41,14 @@ public struct AppComposition: Sendable {
         project = concerns.project
         projectGeneration = concerns.projectGeneration
 
-        let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
-            await generationOutcomeSource.ingest(
-                rawPayload: rawPayload,
-                deliveredAt: Date(),
-            )
-        }
+        let ingestGenerationOutcomePayload: @Sendable ([String: String], RemoteMessageDelivery)
+            async
+            -> Void = { rawPayload, delivery in
+                await generationOutcomeSource.ingest(
+                    rawPayload: rawPayload,
+                    deliveredAt: delivery.deliveredAt,
+                )
+            }
         self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
         let notificationAppCallbacks = NotificationAppCallbacks(
             forwardDeviceToken: { token in pushClientBox.client?.setDeviceToken(token) },
@@ -120,7 +122,7 @@ public struct AppComposition: Sendable {
     public let configureAppDelegate: @MainActor @Sendable (PushNotificationAppDelegate) -> Void
 
     public let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
-    public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
+    public let ingestGenerationOutcomePayload: @Sendable ([String: String], RemoteMessageDelivery) async -> Void
 
     public static func live(
         _ environment: Environment,

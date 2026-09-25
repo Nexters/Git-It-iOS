@@ -10,10 +10,16 @@ public final class NotificationAppDelegate: NSObject, UIApplicationDelegate {
     // MARK: Public
 
     public func configure(_ callbacks: NotificationAppCallbacks) {
+        let ingestRemoteMessagePayload = callbacks.ingestRemoteMessagePayload
         base.configure(
             PushNotificationCallbacks(
                 forwardAPNsToken: callbacks.forwardDeviceToken,
-                ingestGenerationOutcomePayload: callbacks.ingestRemoteMessagePayload,
+                ingestGenerationOutcomePayload: { payload, delivery in
+                    await ingestRemoteMessagePayload(
+                        payload,
+                        Self.messageDelivery(from: delivery),
+                    )
+                },
             )
         )
     }
@@ -53,5 +59,18 @@ public final class NotificationAppDelegate: NSObject, UIApplicationDelegate {
     // MARK: Private
 
     private let base = PushMessagingAppDelegate()
+
+    nonisolated private static func messageDelivery(from delivery: RemoteNotificationDelivery) -> RemoteMessageDelivery {
+        let route: RemoteMessageDelivery.Route =
+            switch delivery.route {
+            case .background: .background
+            case .presentation: .presentation
+            case .opened: .opened
+            }
+        return RemoteMessageDelivery(
+            route: route,
+            deliveredAt: delivery.deliveredAt,
+        )
+    }
 
 }
