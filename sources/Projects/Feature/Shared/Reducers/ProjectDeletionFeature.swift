@@ -75,68 +75,20 @@ public struct ProjectDeletionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.request(let projectID)):
-                switch state.deletion {
-                case .idle,
-                     .failed:
-                    state.deletion = .confirming(projectID: projectID)
-
-                case .confirming,
-                     .committing:
-                    break
-                }
-                return .none
-
-            case .input(.cancel):
-                switch state.deletion {
-                case .confirming,
-                     .failed:
-                    state.deletion = .idle
-
-                case .idle,
-                     .committing:
-                    break
-                }
-                return .none
-
-            case .input(.confirm):
-                guard case .confirming(let projectID) = state.deletion else { return .none }
-                state.deletion = .committing(projectID: projectID)
-                let instanceID = state.instanceID
-                return .run { [deleteProject] send in
-                    do {
-                        try await deleteProject(projectID)
-                        await send(.effect(.deletionFinished(
-                            projectID: projectID,
-                            error: nil,
-                        )))
-                    } catch {
-                        let mapped = error as? ProjectError ?? .unexpected
-                        await send(.effect(.deletionFinished(
-                            projectID: projectID,
-                            error: mapped,
-                        )))
-                    }
-                }
-                .cancellable(
-                    id: CancelID.deletion(instanceID),
-                    cancelInFlight: false,
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .effect(.deletionFinished(let projectID, nil)),
-                 .effect(.deletionFinished(let projectID, .some(.notFound))):
-                state.deletion = .idle
-                return .send(.delegate(.deleted(projectID: projectID)))
-
-            case .effect(.deletionFinished(let projectID, .some(let error))):
-                state.deletion = .failed(
-                    projectID: projectID,
-                    error: error,
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
                 )
-                return .none
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -148,5 +100,82 @@ public struct ProjectDeletionFeature: Sendable {
     }
 
     private let deleteProject: @Sendable (ProjectID) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .request(let projectID):
+            switch state.deletion {
+            case .idle,
+                 .failed:
+                state.deletion = .confirming(projectID: projectID)
+
+            case .confirming,
+                 .committing:
+                break
+            }
+            return .none
+
+        case .cancel:
+            switch state.deletion {
+            case .confirming,
+                 .failed:
+                state.deletion = .idle
+
+            case .idle,
+                 .committing:
+                break
+            }
+            return .none
+
+        case .confirm:
+            guard case .confirming(let projectID) = state.deletion else { return .none }
+            state.deletion = .committing(projectID: projectID)
+            let instanceID = state.instanceID
+            return .run { [deleteProject] send in
+                do {
+                    try await deleteProject(projectID)
+                    await send(.effect(.deletionFinished(
+                        projectID: projectID,
+                        error: nil,
+                    )))
+                } catch {
+                    let mapped = error as? ProjectError ?? .unexpected
+                    await send(.effect(.deletionFinished(
+                        projectID: projectID,
+                        error: mapped,
+                    )))
+                }
+            }
+            .cancellable(
+                id: CancelID.deletion(instanceID),
+                cancelInFlight: false,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .deletionFinished(let projectID, let error):
+            switch error {
+            case .none,
+                 .some(.notFound):
+                state.deletion = .idle
+                return .send(.delegate(.deleted(projectID: projectID)))
+
+            case .some(let error):
+                state.deletion = .failed(
+                    projectID: projectID,
+                    error: error,
+                )
+                return .none
+            }
+        }
+    }
 
 }

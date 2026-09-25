@@ -151,77 +151,38 @@ public struct ProjectDetailRouterFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .projectDetail(.delegate(.setStartRequested(let projectID, let setID, let label))):
-                return .send(.delegate(.learningSetRequested(
-                    projectID: projectID,
-                    setID: setID,
-                    label: label,
-                )))
-
-            case .projectDetail(.delegate(.savedQuestionsRequested)):
-                return activate(
-                    .savedQuestions,
-                    cause: .savedQuestionsRequested,
-                    state: &state,
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .projectDetail(.delegate(.externalURLRequested(let url))),
-                 .singleQuestion(.delegate(.externalURLRequested(let url))):
-                return .send(.delegate(.externalURLRequested(url)))
-
-            case .projectDetail(.delegate(.projectDeleted(let projectID))):
-                return .send(.delegate(.projectDeleted(projectID: projectID)))
-
-            case .projectDetail(.delegate(.dismissRequested)):
-                return .send(.delegate(.dismissRequested))
-
-            case .savedQuestions(.delegate(.questionSelected(let question))):
-                return .send(.singleQuestionEntry(.input(.questionRequested(
-                    setID: question.setID,
-                    questionID: question.quizID,
-                ))))
-
-            case .savedQuestions(.delegate(.backRequested)):
-                return activate(
-                    .projectDetail,
-                    cause: .backRequested,
-                    state: &state,
+            case .projectDetail(let action):
+                reduce(
+                    into: &state,
+                    projectDetail: action,
                 )
 
-            case .singleQuestionEntry(.delegate(.questionPrepared(let question, let projectID))):
-                state.singleQuestion = QuestionSolvingFeature.State(
-                    projectID: projectID,
-                    question: question,
-                    advanceActionTitle: Self.singleQuestionAdvanceActionTitle,
-                    isBookmarked: true,
-                )
-                return activate(
-                    .singleQuestion,
-                    cause: .singleQuestionPrepared(questionID: question.id),
-                    state: &state,
+            case .savedQuestions(let action):
+                reduce(
+                    into: &state,
+                    savedQuestions: action,
                 )
 
-            case .singleQuestionEntry(.delegate(.preparationFailed)):
-                return .none
-
-            case .view(.singleQuestionFailureDismissed):
-                return .send(.singleQuestionEntry(.input(.failureDismissed)))
-
-            case .singleQuestion(.delegate(.advanceRequested)),
-                 .singleQuestion(.delegate(.backRequested)):
-                state.singleQuestion = nil
-                return activate(
-                    .savedQuestions,
-                    cause: .singleQuestionFinished,
-                    state: &state,
+            case .singleQuestion(let action):
+                reduce(
+                    into: &state,
+                    singleQuestion: action,
                 )
 
-            case .projectDetail,
-                 .savedQuestions,
-                 .singleQuestion,
-                 .singleQuestionEntry,
-                 .delegate:
-                return .none
+            case .singleQuestionEntry(let action):
+                reduce(
+                    into: &state,
+                    singleQuestionEntry: action,
+                )
+
+            case .delegate:
+                .none
             }
         }
         .ifLet(
@@ -250,6 +211,115 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     private let project: any ProjectUseCase
     private let quizDetail: any QuizDetailUseCase
+
+    private func reduce(
+        into _: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .singleQuestionFailureDismissed:
+            .send(.singleQuestionEntry(.input(.failureDismissed)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        projectDetail action: ProjectDetailFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .setStartRequested(let projectID, let setID, let label):
+            return .send(.delegate(.learningSetRequested(
+                projectID: projectID,
+                setID: setID,
+                label: label,
+            )))
+
+        case .savedQuestionsRequested:
+            return activate(
+                .savedQuestions,
+                cause: .savedQuestionsRequested,
+                state: &state,
+            )
+
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .projectDeleted(let projectID):
+            return .send(.delegate(.projectDeleted(projectID: projectID)))
+
+        case .dismissRequested:
+            return .send(.delegate(.dismissRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        savedQuestions action: SavedFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .questionSelected(let question):
+            return .send(.singleQuestionEntry(.input(.questionRequested(
+                setID: question.setID,
+                questionID: question.quizID,
+            ))))
+
+        case .backRequested:
+            return activate(
+                .projectDetail,
+                cause: .backRequested,
+                state: &state,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        singleQuestion action: QuestionSolvingFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .advanceRequested,
+             .backRequested:
+            state.singleQuestion = nil
+            return activate(
+                .savedQuestions,
+                cause: .singleQuestionFinished,
+                state: &state,
+            )
+
+        case .answerSubmitted:
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        singleQuestionEntry action: SingleQuestionEntryFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .questionPrepared(let question, let projectID):
+            state.singleQuestion = QuestionSolvingFeature.State(
+                projectID: projectID,
+                question: question,
+                advanceActionTitle: Self.singleQuestionAdvanceActionTitle,
+                isBookmarked: true,
+            )
+            return activate(
+                .singleQuestion,
+                cause: .singleQuestionPrepared(questionID: question.id),
+                state: &state,
+            )
+
+        case .preparationFailed:
+            return .none
+        }
+    }
 
     private func activate(
         _ screen: ActiveScreen,

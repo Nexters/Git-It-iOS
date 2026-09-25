@@ -94,66 +94,22 @@ public struct HomeFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard state.access == .member else { return .none }
-                return startAccountLoad(state: &state)
-
-            case .input(.learningProjectsReloadRequested):
-                guard state.access == .member else { return .none }
-                return .send(.projectSummaries(.input(.refresh)))
-
-            case .input(.accessChanged(let access)):
-                let previousAccess = state.access
-                state.access = access
-                guard previousAccess == .guest, access == .member else { return .none }
-                return startAccountLoad(state: &state)
-
-            case .view(.profileRetryTapped):
-                guard state.access == .member, case .failed = state.profile.load else { return .none }
-                return .send(.profile(.input(.load)))
-
-            case .view(.projectRetryTapped):
-                guard state.access == .member, case .failed = state.projectSummaries.load else { return .none }
-                return .send(.projectSummaries(.input(.refresh)))
-
-            case .input(.generationProgressChanged(let isInProgress)):
-                state.isGenerationInProgress = isInProgress
-                return .none
-
-            case .view(.projectRegistrationTapped):
-                guard state.access == .member else { return .send(.delegate(.signInRequired)) }
-                guard !state.isGenerationInProgress else { return .none }
-                return .send(.delegate(.projectRegistrationRequested))
-
-            case .view(.showAllProjectsTapped):
-                guard state.access == .member else { return .send(.delegate(.signInRequired)) }
-                return .send(.delegate(.allProjectsRequested))
-
-            case .view(.signInTapped):
-                guard state.access == .guest else { return .none }
-                return .send(.delegate(.signInRequired))
-
-            case .view(.projectCardTapped(let projectID)):
-                return .send(.delegate(.projectDetailRequested(projectID: projectID)))
-
-            case .view(.learningTapped(let projectID)):
-                guard
-                    case .loaded(let list) = state.projectSummaries.load,
-                    let summary = list.summaries.first(where: { $0.id == projectID }),
-                    let next = summary.next,
-                    next.quizID != nil
-                else { return .none }
-                return .send(
-                    .delegate(.learningRequested(
-                        projectID: projectID,
-                        nextSetID: next.setID,
-                    ))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .profile,
-                 .projectSummaries,
-                 .delegate:
-                return .none
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
+
+            case .delegate,
+                 .profile,
+                 .projectSummaries:
+                .none
             }
         }
     }
@@ -163,6 +119,76 @@ public struct HomeFeature: Sendable {
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
     private let profile: @Sendable () async throws -> UserProfile
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .task:
+            guard state.access == .member else { return .none }
+            return startAccountLoad(state: &state)
+
+        case .profileRetryTapped:
+            guard state.access == .member, case .failed = state.profile.load else { return .none }
+            return .send(.profile(.input(.load)))
+
+        case .projectRetryTapped:
+            guard state.access == .member, case .failed = state.projectSummaries.load else { return .none }
+            return .send(.projectSummaries(.input(.refresh)))
+
+        case .projectRegistrationTapped:
+            guard state.access == .member else { return .send(.delegate(.signInRequired)) }
+            guard !state.isGenerationInProgress else { return .none }
+            return .send(.delegate(.projectRegistrationRequested))
+
+        case .showAllProjectsTapped:
+            guard state.access == .member else { return .send(.delegate(.signInRequired)) }
+            return .send(.delegate(.allProjectsRequested))
+
+        case .projectCardTapped(let projectID):
+            return .send(.delegate(.projectDetailRequested(projectID: projectID)))
+
+        case .learningTapped(let projectID):
+            guard
+                case .loaded(let list) = state.projectSummaries.load,
+                let summary = list.summaries.first(where: { $0.id == projectID }),
+                let next = summary.next,
+                next.quizID != nil
+            else { return .none }
+            return .send(
+                .delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: next.setID,
+                ))
+            )
+
+        case .signInTapped:
+            guard state.access == .guest else { return .none }
+            return .send(.delegate(.signInRequired))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .learningProjectsReloadRequested:
+            guard state.access == .member else { return .none }
+            return .send(.projectSummaries(.input(.refresh)))
+
+        case .generationProgressChanged(let isInProgress):
+            state.isGenerationInProgress = isInProgress
+            return .none
+
+        case .accessChanged(let access):
+            let previousAccess = state.access
+            state.access = access
+            guard previousAccess == .guest, access == .member else { return .none }
+            return startAccountLoad(state: &state)
+        }
+    }
 
     private func startAccountLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
         var effects = [ComposableArchitecture.Effect<Action>]()

@@ -112,92 +112,35 @@ public struct ProjectListFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                return .merge(
-                    .send(.pagination(.input(.refreshStarted))),
-                    .send(.projectSummaries(.input(.start))),
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .view(.refreshRequested),
-                 .input(.learningProjectsReloadRequested):
-                return .merge(
-                    .send(.pagination(.input(.refreshStarted))),
-                    .send(.projectSummaries(.input(.refresh))),
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .view(.listBottomReached):
-                guard
-                    state.projectSummaries.load.isLoaded,
-                    state.hasNextPage
-                else { return .none }
-                return .send(.pagination(.input(.nextPageRequested)))
+            case .delegate:
+                .none
 
-            case .view(.nextPageRetryTapped):
-                return .send(.pagination(.input(.retry)))
-
-            case .view(.projectRowTapped(let projectID)):
-                guard state.mode != .deleting else { return .none }
-                return .send(.delegate(.projectSelected(projectID: projectID)))
-
-            case .view(.learningTapped(let projectID)):
-                guard state.mode != .deleting else { return .none }
-                guard
-                    let summary = state.projects.first(where: { $0.id == projectID }),
-                    let next = summary.next,
-                    next.quizID != nil
-                else { return .none }
-                return .send(.delegate(.learningRequested(
-                    projectID: projectID,
-                    nextSetID: next.setID,
-                )))
-
-            case .view(.menuTapped):
-                guard state.mode == .browsing else { return .none }
-                state.mode = .menuPresented
-                return .none
-
-            case .view(.menuDismissed):
-                guard state.mode == .menuPresented else { return .none }
-                state.mode = .browsing
-                return .none
-
-            case .view(.deletionMenuItemTapped):
-                guard state.mode == .menuPresented else { return .none }
-                state.mode = .deleting
-                return .none
-
-            case .view(.backTapped):
-                guard state.mode == .deleting else { return .none }
-                state.mode = .browsing
-                return .send(.deletion(.input(.cancel)))
-
-            case .view(.deleteButtonTapped(let projectID)):
-                guard state.mode == .deleting else { return .none }
-                return .send(.deletion(.input(.request(projectID))))
-
-            case .view(.deletionCancelled):
-                return .send(.deletion(.input(.cancel)))
-
-            case .view(.deletionConfirmed):
-                return .send(.deletion(.input(.confirm)))
-
-            case .deletion(.delegate(.deleted(let projectID))):
-                return .merge(
-                    .send(.projectSummaries(.input(.projectRemoved(projectID)))),
-                    .send(.delegate(.projectDeleted)),
+            case .projectSummaries(let action):
+                reduce(
+                    into: &state,
+                    projectSummaries: action,
                 )
 
-            case .projectSummaries(.delegate(.listUpdated(let list))):
-                if list.summaries.isEmpty, state.mode == .deleting {
-                    state.mode = .browsing
-                }
-                return .send(.pagination(.input(.listReplaced(hasNextPage: list.hasNextPage))))
+            case .deletion(let action):
+                reduce(
+                    into: &state,
+                    deletion: action,
+                )
 
-            case .projectSummaries,
-                 .deletion,
-                 .pagination,
-                 .delegate:
-                return .none
+            case .pagination:
+                .none
             }
         }
     }
@@ -208,5 +151,121 @@ public struct ProjectListFeature: Sendable {
     private let refreshProjects: @Sendable () async throws -> Void
     private let requestNextPage: @Sendable () async throws -> Void
     private let deleteProject: @Sendable (ProjectID) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            return .merge(
+                .send(.pagination(.input(.refreshStarted))),
+                .send(.projectSummaries(.input(.start))),
+            )
+
+        case .refreshRequested:
+            return .merge(
+                .send(.pagination(.input(.refreshStarted))),
+                .send(.projectSummaries(.input(.refresh))),
+            )
+
+        case .listBottomReached:
+            guard
+                state.projectSummaries.load.isLoaded,
+                state.hasNextPage
+            else { return .none }
+            return .send(.pagination(.input(.nextPageRequested)))
+
+        case .nextPageRetryTapped:
+            return .send(.pagination(.input(.retry)))
+
+        case .projectRowTapped(let projectID):
+            guard state.mode != .deleting else { return .none }
+            return .send(.delegate(.projectSelected(projectID: projectID)))
+
+        case .learningTapped(let projectID):
+            guard state.mode != .deleting else { return .none }
+            guard
+                let summary = state.projects.first(where: { $0.id == projectID }),
+                let next = summary.next,
+                next.quizID != nil
+            else { return .none }
+            return .send(.delegate(.learningRequested(
+                projectID: projectID,
+                nextSetID: next.setID,
+            )))
+
+        case .menuTapped:
+            guard state.mode == .browsing else { return .none }
+            state.mode = .menuPresented
+            return .none
+
+        case .menuDismissed:
+            guard state.mode == .menuPresented else { return .none }
+            state.mode = .browsing
+            return .none
+
+        case .deletionMenuItemTapped:
+            guard state.mode == .menuPresented else { return .none }
+            state.mode = .deleting
+            return .none
+
+        case .backTapped:
+            guard state.mode == .deleting else { return .none }
+            state.mode = .browsing
+            return .send(.deletion(.input(.cancel)))
+
+        case .deleteButtonTapped(let projectID):
+            guard state.mode == .deleting else { return .none }
+            return .send(.deletion(.input(.request(projectID))))
+
+        case .deletionCancelled:
+            return .send(.deletion(.input(.cancel)))
+
+        case .deletionConfirmed:
+            return .send(.deletion(.input(.confirm)))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .learningProjectsReloadRequested:
+            .merge(
+                .send(.pagination(.input(.refreshStarted))),
+                .send(.projectSummaries(.input(.refresh))),
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        projectSummaries action: ProjectSummaryListFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .listUpdated(let list):
+            if list.summaries.isEmpty, state.mode == .deleting {
+                state.mode = .browsing
+            }
+            return .send(.pagination(.input(.listReplaced(hasNextPage: list.hasNextPage))))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        deletion action: ProjectDeletionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .deleted(let projectID):
+            return .merge(
+                .send(.projectSummaries(.input(.projectRemoved(projectID)))),
+                .send(.delegate(.projectDeleted)),
+            )
+        }
+    }
 
 }

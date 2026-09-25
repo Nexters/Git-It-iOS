@@ -35,14 +35,29 @@ public struct OnboardingExitFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
-            case .input(.curationSucceeded):
-                .send(.delegate(.shouldExit))
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
             case .delegate:
                 .none
             }
+        }
+    }
+
+    // MARK: Private
+
+    private func reduce(
+        into _: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .curationSucceeded:
+            .send(.delegate(.shouldExit))
         }
     }
 

@@ -130,80 +130,34 @@ public struct SettingsFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                let profileInput: UserProfileLoadFeature.Action.Input =
-                    state.profile == nil ? .load : .reload
-                return .merge(
-                    .send(.userProfile(.input(profileInput))),
-                    .send(.notificationPermission(.input(.refresh))),
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .input(.profileProvided(let profile)):
-                return .send(.userProfile(.input(.replace(profile))))
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .view(.applicationBecameActive):
-                return .send(.notificationPermission(.input(.refresh)))
+            case .curationUpdate(let action):
+                reduce(
+                    into: &state,
+                    curationUpdate: action,
+                )
 
-            case .view(.backTapped):
-                return .send(.delegate(.backRequested))
+            case .accountAction(let action):
+                reduce(
+                    into: &state,
+                    accountAction: action,
+                )
 
-            case .view(.positionRowTapped):
-                return .send(.delegate(.positionSelectionRequested))
-
-            case .view(.careerLevelRowTapped):
-                return .send(.delegate(.careerLevelSelectionRequested))
-
-            case .view(.notificationRowTapped):
-                return .send(.notificationPermission(.input(.rowTapped)))
-
-            case .view(.termsTapped):
-                guard let url = Constant.servicePolicyURL else { return .none }
-                return .send(.delegate(.externalURLRequested(url)))
-
-            case .view(.positionSelected(let position)):
-                return .send(.curationUpdate(.input(.positionSelected(position))))
-
-            case .view(.careerLevelSelected(let careerLevel)):
-                return .send(.curationUpdate(.input(.careerLevelSelected(careerLevel))))
-
-            case .view(.signOutTapped):
-                return .send(.accountAction(.input(.signOutRequested)))
-
-            case .view(.deleteAccountTapped):
-                return .send(.accountAction(.input(.deletionRequested)))
-
-            case .view(.deleteAccountCancelled):
-                return .send(.accountAction(.input(.deletionCancelled)))
-
-            case .view(.deleteAccountConfirmed):
-                return .send(.accountAction(.input(.deletionConfirmed)))
-
-            case .curationUpdate(.delegate(.positionUpdated(let position))):
-                guard let profile = state.profile?.replacing(position: position) else { return .none }
-                return .send(.userProfile(.input(.replace(profile))))
-
-            case .curationUpdate(.delegate(.careerLevelUpdated(let careerLevel))):
-                guard let profile = state.profile?.replacing(careerLevel: careerLevel) else { return .none }
-                return .send(.userProfile(.input(.replace(profile))))
-
-            case .accountAction(.delegate(.signedOut)):
-                return .send(.delegate(.signedOut))
-
-            case .accountAction(.delegate(.accountDeleted)):
-                return .send(.delegate(.accountDeleted))
-
-            case .accountAction(.delegate(.deletionConfirmationRequested)):
-                return .send(.delegate(.accountDeletionRequested))
-
-            case .accountAction(.delegate(.deletionCancelled)):
-                return .send(.delegate(.accountDeletionCancelled))
-
-            case .userProfile,
-                 .curationUpdate,
-                 .accountAction,
-                 .notificationPermission,
-                 .delegate:
-                return .none
+            case .delegate,
+                 .userProfile,
+                 .notificationPermission:
+                .none
             }
         }
     }
@@ -224,6 +178,104 @@ public struct SettingsFeature: Sendable {
     private let notificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let requestNotificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            let profileInput: UserProfileLoadFeature.Action.Input =
+                state.profile == nil ? .load : .reload
+            return .merge(
+                .send(.userProfile(.input(profileInput))),
+                .send(.notificationPermission(.input(.refresh))),
+            )
+
+        case .applicationBecameActive:
+            return .send(.notificationPermission(.input(.refresh)))
+
+        case .backTapped:
+            return .send(.delegate(.backRequested))
+
+        case .positionRowTapped:
+            return .send(.delegate(.positionSelectionRequested))
+
+        case .careerLevelRowTapped:
+            return .send(.delegate(.careerLevelSelectionRequested))
+
+        case .notificationRowTapped:
+            return .send(.notificationPermission(.input(.rowTapped)))
+
+        case .termsTapped:
+            guard let url = Constant.servicePolicyURL else { return .none }
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .positionSelected(let position):
+            return .send(.curationUpdate(.input(.positionSelected(position))))
+
+        case .careerLevelSelected(let careerLevel):
+            return .send(.curationUpdate(.input(.careerLevelSelected(careerLevel))))
+
+        case .signOutTapped:
+            return .send(.accountAction(.input(.signOutRequested)))
+
+        case .deleteAccountTapped:
+            return .send(.accountAction(.input(.deletionRequested)))
+
+        case .deleteAccountCancelled:
+            return .send(.accountAction(.input(.deletionCancelled)))
+
+        case .deleteAccountConfirmed:
+            return .send(.accountAction(.input(.deletionConfirmed)))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .profileProvided(let profile):
+            .send(.userProfile(.input(.replace(profile))))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        curationUpdate action: CurationUpdateFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .positionUpdated(let position):
+            guard let profile = state.profile?.replacing(position: position) else { return .none }
+            return .send(.userProfile(.input(.replace(profile))))
+
+        case .careerLevelUpdated(let careerLevel):
+            guard let profile = state.profile?.replacing(careerLevel: careerLevel) else { return .none }
+            return .send(.userProfile(.input(.replace(profile))))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        accountAction action: AccountActionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .signedOut:
+            return .send(.delegate(.signedOut))
+
+        case .accountDeleted:
+            return .send(.delegate(.accountDeleted))
+
+        case .deletionConfirmationRequested:
+            return .send(.delegate(.accountDeletionRequested))
+
+        case .deletionCancelled:
+            return .send(.delegate(.accountDeletionCancelled))
+        }
+    }
 
 }
 

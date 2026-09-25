@@ -140,60 +140,42 @@ public struct OnboardingRouterFeature: Sendable {
         }
         Reduce { state, action in
             let before = state.activeScreen
-            var effect = Effect<Action>.none
 
-            switch action {
-            case .tutorial(.delegate(.guestAccessRequested)):
-                effect = .send(.delegate(.guestAccessRequested))
+            let effect: Effect<Action> =
+                switch action {
+                case .view(let action):
+                    reduce(
+                        into: &state,
+                        view: action,
+                    )
 
-            case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
-                effect = advanceAfterSignIn(
-                    needsCuration: needsCuration,
-                    state: &state,
-                )
+                case .tutorial(let action):
+                    reduce(
+                        into: &state,
+                        tutorial: action,
+                    )
 
-            case .positionSelection(.delegate(.confirmed(let position))):
-                state.activeScreen = .curation(.careerSelection)
-                effect = .send(.careerSelection(.input(.positionProvided(position))))
+                case .positionSelection(let action):
+                    reduce(
+                        into: &state,
+                        positionSelection: action,
+                    )
 
-            case .positionSelection(.delegate(.exitRequested)):
-                state.positionSelection = PositionSelectionFeature.State()
-                state.careerSelection = CareerSelectionFeature.State()
-                switch state.curationExit {
-                case .returnToTutorial:
-                    state.activeScreen = .guide(.tutorial)
-                    effect = .send(.tutorial(.input(.returnToLastPage)))
+                case .careerSelection(let action):
+                    reduce(
+                        into: &state,
+                        careerSelection: action,
+                    )
 
-                case .returnToCaller:
-                    effect = .send(.delegate(.curationAbandoned))
+                case .exit(let action):
+                    reduce(
+                        into: &state,
+                        exit: action,
+                    )
+
+                case .delegate:
+                    .none
                 }
-
-            case .careerSelection(.delegate(.backRequested)):
-                state.activeScreen = .curation(.positionSelection)
-
-            case .careerSelection(.delegate(.curationSucceeded)):
-                effect = .send(.exit(.input(.curationSucceeded)))
-
-            case .exit(.delegate(.shouldExit)):
-                state.activeScreen = .curationSplash
-
-            case .view(.curationSplashFinished):
-                guard state.activeScreen == .curationSplash else { break }
-                effect = .send(.delegate(.mainShellRequested))
-
-            case .view(.legalAgreementDismissed):
-                effect = .send(.tutorial(.signIn(.view(.legalAgreementDismissed))))
-
-            case .view(.legalDocumentSheetDismissed):
-                effect = .send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
-
-            case .tutorial,
-                 .positionSelection,
-                 .careerSelection,
-                 .exit,
-                 .delegate:
-                break
-            }
 
             if state.activeScreen != before {
                 state.transitionLog.append(
@@ -218,6 +200,91 @@ public struct OnboardingRouterFeature: Sendable {
     private let updateCuration: @Sendable (Curation) async throws -> Void
     private let withdraw: @Sendable () async throws -> Void
     private let deletesCompletedAccountOnSignIn: Bool
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .curationSplashFinished:
+            guard state.activeScreen == .curationSplash else { return .none }
+            return .send(.delegate(.mainShellRequested))
+
+        case .legalAgreementDismissed:
+            return .send(.tutorial(.signIn(.view(.legalAgreementDismissed))))
+
+        case .legalDocumentSheetDismissed:
+            return .send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        tutorial action: TutorialFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .guestAccessRequested:
+            return .send(.delegate(.guestAccessRequested))
+
+        case .signInSucceeded(let needsCuration):
+            return advanceAfterSignIn(
+                needsCuration: needsCuration,
+                state: &state,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        positionSelection action: PositionSelectionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .confirmed(let position):
+            state.activeScreen = .curation(.careerSelection)
+            return .send(.careerSelection(.input(.positionProvided(position))))
+
+        case .exitRequested:
+            state.positionSelection = PositionSelectionFeature.State()
+            state.careerSelection = CareerSelectionFeature.State()
+            switch state.curationExit {
+            case .returnToTutorial:
+                state.activeScreen = .guide(.tutorial)
+                return .send(.tutorial(.input(.returnToLastPage)))
+
+            case .returnToCaller:
+                return .send(.delegate(.curationAbandoned))
+            }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        careerSelection action: CareerSelectionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .backRequested:
+            state.activeScreen = .curation(.positionSelection)
+            return .none
+
+        case .curationSucceeded:
+            return .send(.exit(.input(.curationSucceeded)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        exit action: OnboardingExitFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .shouldExit:
+            state.activeScreen = .curationSplash
+            return .none
+        }
+    }
 
     private func advanceAfterSignIn(
         needsCuration: Bool,

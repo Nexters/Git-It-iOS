@@ -32,17 +32,32 @@ public struct QuizGenerationConfirmationFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
-            case .view(.startTapped):
-                .send(.delegate(.submitRequested))
-
-            case .view(.backTapped):
-                .send(.delegate(.backRequested))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
             case .delegate:
                 .none
             }
+        }
+    }
+
+    // MARK: Private
+
+    private func reduce(
+        into _: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .startTapped:
+            .send(.delegate(.submitRequested))
+
+        case .backTapped:
+            .send(.delegate(.backRequested))
         }
     }
 

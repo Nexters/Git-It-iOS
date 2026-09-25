@@ -71,52 +71,20 @@ public struct CurationUpdateFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.positionSelected(let position)):
-                guard state.positionMutation != .committing else { return .none }
-                state.positionMutation = .committing
-                return .run { [updatePosition] send in
-                    do {
-                        try await updatePosition(position)
-                        await send(.effect(.positionUpdateFinished(position, nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.positionUpdateFinished(position, mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.positionMutation)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.careerLevelSelected(let careerLevel)):
-                guard state.careerLevelMutation != .committing else { return .none }
-                state.careerLevelMutation = .committing
-                return .run { [updateCareerLevel] send in
-                    do {
-                        try await updateCareerLevel(careerLevel)
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.careerLevelMutation)
-
-            case .effect(.positionUpdateFinished(let position, nil)):
-                state.positionMutation = .idle
-                return .send(.delegate(.positionUpdated(position)))
-
-            case .effect(.positionUpdateFinished(_, .some(let error))):
-                state.positionMutation = .failed(error)
-                return .none
-
-            case .effect(.careerLevelUpdateFinished(let careerLevel, nil)):
-                state.careerLevelMutation = .idle
-                return .send(.delegate(.careerLevelUpdated(careerLevel)))
-
-            case .effect(.careerLevelUpdateFinished(_, .some(let error))):
-                state.careerLevelMutation = .failed(error)
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -130,5 +98,69 @@ public struct CurationUpdateFeature: Sendable {
 
     private let updatePosition: @Sendable (MemberPosition) async throws -> Void
     private let updateCareerLevel: @Sendable (CareerLevel) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .positionSelected(let position):
+            guard state.positionMutation != .committing else { return .none }
+            state.positionMutation = .committing
+            return .run { [updatePosition] send in
+                do {
+                    try await updatePosition(position)
+                    await send(.effect(.positionUpdateFinished(position, nil)))
+                } catch {
+                    let mapped = error as? UserInfoError ?? .temporarilyUnavailable
+                    await send(.effect(.positionUpdateFinished(position, mapped)))
+                }
+            }
+            .cancellable(id: CancelID.positionMutation)
+
+        case .careerLevelSelected(let careerLevel):
+            guard state.careerLevelMutation != .committing else { return .none }
+            state.careerLevelMutation = .committing
+            return .run { [updateCareerLevel] send in
+                do {
+                    try await updateCareerLevel(careerLevel)
+                    await send(.effect(.careerLevelUpdateFinished(careerLevel, nil)))
+                } catch {
+                    let mapped = error as? UserInfoError ?? .temporarilyUnavailable
+                    await send(.effect(.careerLevelUpdateFinished(careerLevel, mapped)))
+                }
+            }
+            .cancellable(id: CancelID.careerLevelMutation)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .positionUpdateFinished(let position, let error):
+            switch error {
+            case nil:
+                state.positionMutation = .idle
+                return .send(.delegate(.positionUpdated(position)))
+
+            case .some(let error):
+                state.positionMutation = .failed(error)
+                return .none
+            }
+
+        case .careerLevelUpdateFinished(let careerLevel, let error):
+            switch error {
+            case nil:
+                state.careerLevelMutation = .idle
+                return .send(.delegate(.careerLevelUpdated(careerLevel)))
+
+            case .some(let error):
+                state.careerLevelMutation = .failed(error)
+                return .none
+            }
+        }
+    }
 
 }

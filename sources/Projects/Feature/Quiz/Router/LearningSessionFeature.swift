@@ -53,44 +53,57 @@ public struct LearningSessionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.started(let set, let resumption, let bookmarkedQuestionIDs)):
-                state.learningSet = set
-                state.resumption = resumption
-                state.bookmarkedQuestionIDs = bookmarkedQuestionIDs
-                guard !state.isInProgress else { return .none }
-                guard set.quizzes.indices.contains(resumption.startIndex) else {
-                    return .send(.delegate(.emptySetDetected))
-                }
-                state.currentQuestionIndex = resumption.startIndex
-                state.sessionCorrectChoiceCount = 0
-                state.isInProgress = true
-                return questionReady(state: state)
-
-            case .input(.answerRecorded(let choiceCorrect)):
-                if choiceCorrect == true {
-                    state.sessionCorrectChoiceCount += 1
-                }
-                return .none
-
-            case .input(.advanced):
-                let nextIndex = state.currentQuestionIndex + 1
-                guard let set = state.learningSet, set.quizzes.indices.contains(nextIndex) else {
-                    let resumption = state.resumption
-                    return .send(.delegate(.completed(
-                        correctChoiceCount: (resumption?.skippedCorrectChoiceCount ?? 0) + state.sessionCorrectChoiceCount,
-                        choiceQuestionCount: resumption?.choiceQuestionCount ?? 0,
-                    )))
-                }
-                state.currentQuestionIndex = nextIndex
-                return questionReady(state: state)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
 
     // MARK: Private
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .started(let set, let resumption, let bookmarkedQuestionIDs):
+            state.learningSet = set
+            state.resumption = resumption
+            state.bookmarkedQuestionIDs = bookmarkedQuestionIDs
+            guard !state.isInProgress else { return .none }
+            guard set.quizzes.indices.contains(resumption.startIndex) else {
+                return .send(.delegate(.emptySetDetected))
+            }
+            state.currentQuestionIndex = resumption.startIndex
+            state.sessionCorrectChoiceCount = 0
+            state.isInProgress = true
+            return questionReady(state: state)
+
+        case .answerRecorded(let choiceCorrect):
+            if choiceCorrect == true {
+                state.sessionCorrectChoiceCount += 1
+            }
+            return .none
+
+        case .advanced:
+            let nextIndex = state.currentQuestionIndex + 1
+            guard let set = state.learningSet, set.quizzes.indices.contains(nextIndex) else {
+                let resumption = state.resumption
+                return .send(.delegate(.completed(
+                    correctChoiceCount: (resumption?.skippedCorrectChoiceCount ?? 0) + state.sessionCorrectChoiceCount,
+                    choiceQuestionCount: resumption?.choiceQuestionCount ?? 0,
+                )))
+            }
+            state.currentQuestionIndex = nextIndex
+            return questionReady(state: state)
+        }
+    }
 
     private func questionReady(state: State) -> Effect<Action> {
         guard

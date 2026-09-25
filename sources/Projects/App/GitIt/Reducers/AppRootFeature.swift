@@ -147,194 +147,53 @@ nonisolated struct AppRootFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard state.route == .restoring else { return .none }
-                return .merge(
-                    .send(.appEntry(.view(.task))),
-                    .run { send in
-                        for await token in deviceTokenRefreshes() {
-                            await send(.effect(.deviceTokenRefreshed(token)))
-                        }
-                    }
-                    .cancellable(id: CancelID.deviceTokenRefreshes),
-                    .run { [projectGeneration] send in
-                        for await generationState in await projectGeneration.states() {
-                            await send(.effect(.generationStateChanged(generationState)))
-                        }
-                    }
-                    .cancellable(id: CancelID.generationObservation),
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .appEntry(.delegate(.destinationDecided(let destination))):
-                switch destination {
-                case .mainShell:
-                    state.route = .mainShell
-                    return registerDeviceIfNeeded(&state)
-
-                case .onboarding(let entryPoint):
-                    let bundleVersion = state.onboarding.tutorial.bundleVersion
-                    state.onboarding = OnboardingRouterFeature.State(
-                        startingAt: entryPoint,
-                        bundleVersion: bundleVersion,
-                    )
-                    state.route = .onboarding
-                    return .none
-                }
-
-            case .appEntry:
-                return .none
-
-            case .effect(.signInVerified(.reauthenticationRequired)):
-                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
-                return returnToOnboarding(&state)
-
-            case .effect(.signInVerified):
-                return .none
-
-            case .onboarding(.delegate(.mainShellRequested)):
-                state.route = .mainShell
-                guard state.mainShell.access == .guest else { return registerDeviceIfNeeded(&state) }
-                return .merge(
-                    .send(.mainShell(.input(.memberAccessGranted))),
-                    registerDeviceIfNeeded(&state),
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
                 )
 
-            case .onboarding(.delegate(.guestAccessRequested)):
-                state.mainShell = MainShellRouterFeature.State(access: .guest)
-                state.route = .mainShell
-                return .none
-
-            case .onboarding(.delegate(.curationAbandoned)):
-                state.route = .mainShell
-                return .none
-
-            case .mainShell(.delegate(.onboardingRequested)):
-                guard state.mainShell.access == .guest else { return .none }
-                let bundleVersion = state.onboarding.tutorial.bundleVersion
-                state.onboarding = OnboardingRouterFeature.State(
-                    startingAt: .guide,
-                    bundleVersion: bundleVersion,
-                )
-                state.route = .onboarding
-                return .none
-
-            case .mainShell(.delegate(.loggedOut)):
-                return returnToOnboarding(&state)
-
-            case .view(.applicationBecameActive):
-                guard state.mainShell.access == .member else { return .none }
-                var effects: [Effect<Action>] = [
-                    .run { [account] send in
-                        await send(.effect(.signInVerified(account.verifySignIn())))
-                    }
-                ]
-                if state.route == .mainShell {
-                    effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))
-                }
-                if state.deviceRegistration == .failed {
-                    effects.append(registerDeviceIfNeeded(&state))
-                }
-                return .merge(effects)
-
-            case .effect(.deviceTokenRefreshed(let token)):
-                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
-                return .merge(
-                    .run { [appSetting] _ in try? await appSetting.updateDeviceToken(token) },
-                    registerDeviceIfNeeded(&state),
+            case .appEntry(let action):
+                reduce(
+                    into: &state,
+                    appEntry: action,
                 )
 
-            case .effect(.deviceRegistrationSucceeded):
-                state.deviceRegistration = .registered
-                return .none
-
-            case .effect(.deviceRegistrationFailed):
-                state.deviceRegistration = .failed
-                return .none
-
-            case .mainShell(.delegate(.projectRegistrationRequested)):
-                state.projectRegistration = ProjectRegistrationRouterFeature.State()
-                return .none
-
-            case .mainShell(.delegate(.projectDetailRequested(let projectID))):
-                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
-                return .none
-
-            case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
-                guard
-                    let summary = loadedProject(
-                        projectID: projectID,
-                        state: state,
-                    )
-                else { return .none }
-                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
-                state.quiz = QuizRouterFeature.State(
-                    projectID: projectID,
-                    setID: nextSetID,
-                    setLabel: summary.currentSet.label,
-                    autoStartsLearning: true,
-                )
-                return .none
-
-            case .projectDetail(.presented(.delegate(.learningSetRequested(let projectID, let setID, let label)))):
-                state.quiz = QuizRouterFeature.State(
-                    projectID: projectID,
-                    setID: setID,
-                    setLabel: label,
-                )
-                return .none
-
-            case .mainShell(.delegate(.externalURLRequested(let url))),
-                 .projectDetail(.presented(.delegate(.externalURLRequested(let url)))),
-                 .quiz(.presented(.delegate(.externalURLRequested(let url)))):
-                return .run { [openExternalURL] _ in await openExternalURL(url) }
-
-            case .projectDetail(.presented(.delegate(.projectDeleted))):
-                state.projectDetail = nil
-                return .send(.mainShell(.input(.learningProjectsReloadRequested)))
-
-            case .projectDetail(.presented(.delegate(.dismissRequested))):
-                state.projectDetail = nil
-                return .none
-
-            case .quiz(.presented(.delegate(.dismissRequested(let projectID)))):
-                state.quiz = nil
-                let refreshProjects = Effect<Action>.run { [project] _ in try? await project.refresh() }
-                guard state.projectDetail?.projectID == projectID else {
-                    state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
-                    return refreshProjects
-                }
-                return .merge(
-                    refreshProjects,
-                    .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested))))),
+            case .onboarding(let action):
+                reduce(
+                    into: &state,
+                    onboarding: action,
                 )
 
-            case .projectDetail,
-                 .quiz:
-                return .none
-
-            case .effect(.generationStateChanged(let generationState)):
-                return applyGenerationState(
-                    generationState,
-                    state: &state,
+            case .mainShell(let action):
+                reduce(
+                    into: &state,
+                    mainShell: action,
                 )
 
-            case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
-                state.projectRegistration = nil
-                return .send(.mainShell(.input(.learningProjectsReloadRequested)))
+            case .projectRegistration(let action):
+                reduce(
+                    into: &state,
+                    projectRegistration: action,
+                )
 
-            case .projectRegistration(.presented(.delegate(.generationReminderPreferenceSelected(_)))):
-                return .none
+            case .projectDetail(let action):
+                reduce(
+                    into: &state,
+                    projectDetail: action,
+                )
 
-            case .projectRegistration(.presented(.delegate(.dismissRequested))):
-                state.projectRegistration = nil
-                return .none
-
-            case .projectRegistration:
-                return .none
-
-            case .onboarding,
-                 .mainShell:
-                return .none
+            case .quiz(let action):
+                reduce(
+                    into: &state,
+                    quiz: action,
+                )
             }
         }
         .ifLet(
@@ -384,6 +243,263 @@ nonisolated struct AppRootFeature: Sendable {
     private let openExternalURL: @Sendable (URL) async -> Void
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
     private let deletesCompletedAccountOnSignIn: Bool
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            guard state.route == .restoring else { return .none }
+            return .merge(
+                .send(.appEntry(.view(.task))),
+                .run { send in
+                    for await token in deviceTokenRefreshes() {
+                        await send(.effect(.deviceTokenRefreshed(token)))
+                    }
+                }
+                .cancellable(id: CancelID.deviceTokenRefreshes),
+                .run { [projectGeneration] send in
+                    for await generationState in await projectGeneration.states() {
+                        await send(.effect(.generationStateChanged(generationState)))
+                    }
+                }
+                .cancellable(id: CancelID.generationObservation),
+            )
+
+        case .applicationBecameActive:
+            guard state.mainShell.access == .member else { return .none }
+            var effects: [Effect<Action>] = [
+                .run { [account] send in
+                    await send(.effect(.signInVerified(account.verifySignIn())))
+                }
+            ]
+            if state.route == .mainShell {
+                effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))
+            }
+            if state.deviceRegistration == .failed {
+                effects.append(registerDeviceIfNeeded(&state))
+            }
+            return .merge(effects)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .signInVerified(let verification):
+            guard
+                verification == .reauthenticationRequired,
+                state.route == .mainShell,
+                state.mainShell.access == .member
+            else { return .none }
+            return returnToOnboarding(&state)
+
+        case .deviceRegistrationSucceeded:
+            state.deviceRegistration = .registered
+            return .none
+
+        case .deviceRegistrationFailed:
+            state.deviceRegistration = .failed
+            return .none
+
+        case .deviceTokenRefreshed(let token):
+            guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
+            return .merge(
+                .run { [appSetting] _ in try? await appSetting.updateDeviceToken(token) },
+                registerDeviceIfNeeded(&state),
+            )
+
+        case .generationStateChanged(let generationState):
+            return applyGenerationState(
+                generationState,
+                state: &state,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        appEntry action: AppEntryFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .destinationDecided(let destination):
+            switch destination {
+            case .mainShell:
+                state.route = .mainShell
+                return registerDeviceIfNeeded(&state)
+
+            case .onboarding(let entryPoint):
+                let bundleVersion = state.onboarding.tutorial.bundleVersion
+                state.onboarding = OnboardingRouterFeature.State(
+                    startingAt: entryPoint,
+                    bundleVersion: bundleVersion,
+                )
+                state.route = .onboarding
+                return .none
+            }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        onboarding action: OnboardingRouterFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .mainShellRequested:
+            state.route = .mainShell
+            guard state.mainShell.access == .guest else { return registerDeviceIfNeeded(&state) }
+            return .merge(
+                .send(.mainShell(.input(.memberAccessGranted))),
+                registerDeviceIfNeeded(&state),
+            )
+
+        case .guestAccessRequested:
+            state.mainShell = MainShellRouterFeature.State(access: .guest)
+            state.route = .mainShell
+            return .none
+
+        case .curationAbandoned:
+            state.route = .mainShell
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        mainShell action: MainShellRouterFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .onboardingRequested:
+            guard state.mainShell.access == .guest else { return .none }
+            let bundleVersion = state.onboarding.tutorial.bundleVersion
+            state.onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: bundleVersion,
+            )
+            state.route = .onboarding
+            return .none
+
+        case .loggedOut:
+            return returnToOnboarding(&state)
+
+        case .projectRegistrationRequested:
+            state.projectRegistration = ProjectRegistrationRouterFeature.State()
+            return .none
+
+        case .projectDetailRequested(let projectID):
+            state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
+            return .none
+
+        case .learningRequested(let projectID, let nextSetID):
+            guard
+                let summary = loadedProject(
+                    projectID: projectID,
+                    state: state,
+                )
+            else { return .none }
+            state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
+            state.quiz = QuizRouterFeature.State(
+                projectID: projectID,
+                setID: nextSetID,
+                setLabel: summary.currentSet.label,
+                autoStartsLearning: true,
+            )
+            return .none
+
+        case .externalURLRequested(let url):
+            return .run { [openExternalURL] _ in await openExternalURL(url) }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        projectRegistration action: PresentationAction<ProjectRegistrationRouterFeature.Action>,
+    ) -> Effect<Action> {
+        guard
+            case .presented(let action) = action,
+            case .delegate(let action) = action
+        else {
+            return .none
+        }
+        switch action {
+        case .projectRegistered:
+            state.projectRegistration = nil
+            return .send(.mainShell(.input(.learningProjectsReloadRequested)))
+
+        case .generationReminderPreferenceSelected:
+            return .none
+
+        case .dismissRequested:
+            state.projectRegistration = nil
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        projectDetail action: PresentationAction<ProjectDetailRouterFeature.Action>,
+    ) -> Effect<Action> {
+        guard
+            case .presented(let action) = action,
+            case .delegate(let action) = action
+        else {
+            return .none
+        }
+        switch action {
+        case .learningSetRequested(let projectID, let setID, let label):
+            state.quiz = QuizRouterFeature.State(
+                projectID: projectID,
+                setID: setID,
+                setLabel: label,
+            )
+            return .none
+
+        case .externalURLRequested(let url):
+            return .run { [openExternalURL] _ in await openExternalURL(url) }
+
+        case .projectDeleted:
+            state.projectDetail = nil
+            return .send(.mainShell(.input(.learningProjectsReloadRequested)))
+
+        case .dismissRequested:
+            state.projectDetail = nil
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        quiz action: PresentationAction<QuizRouterFeature.Action>,
+    ) -> Effect<Action> {
+        guard
+            case .presented(let action) = action,
+            case .delegate(let action) = action
+        else {
+            return .none
+        }
+        switch action {
+        case .externalURLRequested(let url):
+            return .run { [openExternalURL] _ in await openExternalURL(url) }
+
+        case .dismissRequested(let projectID):
+            state.quiz = nil
+            let refreshProjects = Effect<Action>.run { [project] _ in try? await project.refresh() }
+            guard state.projectDetail?.projectID == projectID else {
+                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
+                return refreshProjects
+            }
+            return .merge(
+                refreshProjects,
+                .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested))))),
+            )
+        }
+    }
 
     private func loadedProject(
         projectID: ProjectID,

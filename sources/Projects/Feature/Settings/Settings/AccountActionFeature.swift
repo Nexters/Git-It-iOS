@@ -88,74 +88,20 @@ public struct AccountActionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.signOutRequested):
-                guard state.accountAction.canStart else { return .none }
-                state.accountAction = .signingOut
-                return .run { [signOut] send in
-                    let result = await signOut()
-                    await send(.effect(.signOutFinished(result)))
-                }
-                .cancellable(id: CancelID.accountAction)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.deletionRequested):
-                guard state.accountAction.canStart else { return .none }
-                state.accountAction = .confirmingDeletion
-                return .send(.delegate(.deletionConfirmationRequested))
-
-            case .input(.deletionCancelled):
-                switch state.accountAction {
-                case .confirmingDeletion,
-                     .failed:
-                    state.accountAction = .idle
-
-                case .idle,
-                     .signingOut,
-                     .deletingAccount:
-                    break
-                }
-                return .send(.delegate(.deletionCancelled))
-
-            case .input(.deletionConfirmed):
-                switch state.accountAction {
-                case .confirmingDeletion,
-                     .failed:
-                    break
-
-                case .idle,
-                     .signingOut,
-                     .deletingAccount:
-                    return .none
-                }
-                state.accountAction = .deletingAccount
-                return .run { [withdraw] send in
-                    do {
-                        try await withdraw()
-                        await send(.effect(.deleteAccountFinished(nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.deleteAccountFinished(mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.accountAction)
-
-            case .effect(.signOutFinished(.signedOut)):
-                state.accountAction = .idle
-                return .send(.delegate(.signedOut))
-
-            case .effect(.signOutFinished(.retryableFailure)):
-                state.accountAction = .failed(.temporarilyUnavailable)
-                return .none
-
-            case .effect(.deleteAccountFinished(nil)):
-                state.accountAction = .idle
-                return .send(.delegate(.accountDeleted))
-
-            case .effect(.deleteAccountFinished(.some(let error))):
-                state.accountAction = .failed(error)
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -168,5 +114,91 @@ public struct AccountActionFeature: Sendable {
 
     private let signOut: @Sendable () async -> SignOutResult
     private let withdraw: @Sendable () async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .signOutRequested:
+            guard state.accountAction.canStart else { return .none }
+            state.accountAction = .signingOut
+            return .run { [signOut] send in
+                let result = await signOut()
+                await send(.effect(.signOutFinished(result)))
+            }
+            .cancellable(id: CancelID.accountAction)
+
+        case .deletionRequested:
+            guard state.accountAction.canStart else { return .none }
+            state.accountAction = .confirmingDeletion
+            return .send(.delegate(.deletionConfirmationRequested))
+
+        case .deletionCancelled:
+            switch state.accountAction {
+            case .confirmingDeletion,
+                 .failed:
+                state.accountAction = .idle
+
+            case .idle,
+                 .signingOut,
+                 .deletingAccount:
+                break
+            }
+            return .send(.delegate(.deletionCancelled))
+
+        case .deletionConfirmed:
+            switch state.accountAction {
+            case .confirmingDeletion,
+                 .failed:
+                break
+
+            case .idle,
+                 .signingOut,
+                 .deletingAccount:
+                return .none
+            }
+            state.accountAction = .deletingAccount
+            return .run { [withdraw] send in
+                do {
+                    try await withdraw()
+                    await send(.effect(.deleteAccountFinished(nil)))
+                } catch {
+                    let mapped = error as? UserInfoError ?? .temporarilyUnavailable
+                    await send(.effect(.deleteAccountFinished(mapped)))
+                }
+            }
+            .cancellable(id: CancelID.accountAction)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .signOutFinished(let result):
+            switch result {
+            case .signedOut:
+                state.accountAction = .idle
+                return .send(.delegate(.signedOut))
+
+            case .retryableFailure:
+                state.accountAction = .failed(.temporarilyUnavailable)
+                return .none
+            }
+
+        case .deleteAccountFinished(let error):
+            switch error {
+            case nil:
+                state.accountAction = .idle
+                return .send(.delegate(.accountDeleted))
+
+            case .some(let error):
+                state.accountAction = .failed(error)
+                return .none
+            }
+        }
+    }
 
 }

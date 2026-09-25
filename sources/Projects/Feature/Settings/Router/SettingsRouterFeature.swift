@@ -91,57 +91,20 @@ public struct SettingsRouterFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .profile(.delegate(.settingsRequested)):
-                state.activeScreen = .settings(.list)
-                guard let profile = state.profile.profile.profile else { return .none }
-                return .send(.settings(.input(.profileProvided(profile))))
+            case .profile(let action):
+                reduce(
+                    into: &state,
+                    profile: action,
+                )
 
-            case .settings(.delegate(.backRequested)):
-                switch state.activeScreen {
-                case .settings(.list):
-                    state.activeScreen = .profile
-                    guard let profile = state.settings.profile else { return .none }
-                    return .send(.profile(.profile(.input(.replace(profile)))))
+            case .settings(let action):
+                reduce(
+                    into: &state,
+                    settings: action,
+                )
 
-                case .settings(.positionSelection),
-                     .settings(.careerLevelSelection),
-                     .settings(.accountDeletion):
-                    state.activeScreen = .settings(.list)
-
-                case .profile:
-                    break
-                }
-                return .none
-
-            case .settings(.delegate(.positionSelectionRequested)):
-                state.activeScreen = .settings(.positionSelection)
-                return .none
-
-            case .settings(.delegate(.careerLevelSelectionRequested)):
-                state.activeScreen = .settings(.careerLevelSelection)
-                return .none
-
-            case .settings(.delegate(.accountDeletionRequested)):
-                state.activeScreen = .settings(.accountDeletion)
-                return .none
-
-            case .settings(.delegate(.accountDeletionCancelled)):
-                state.activeScreen = .settings(.list)
-                return .none
-
-            case .settings(.delegate(.signedOut)):
-                return .send(.delegate(.signedOut))
-
-            case .settings(.delegate(.accountDeleted)):
-                return .send(.delegate(.accountDeleted))
-
-            case .settings(.delegate(.externalURLRequested(let url))):
-                return .send(.delegate(.externalURLRequested(url)))
-
-            case .profile,
-                 .settings,
-                 .delegate:
-                return .none
+            case .delegate:
+                .none
             }
         }
     }
@@ -160,6 +123,69 @@ public struct SettingsRouterFeature: Sendable {
             detail: detail,
             curation: curation,
         )
+    }
+
+    private func reduce(
+        into state: inout State,
+        profile action: ProfileFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .settingsRequested:
+            state.activeScreen = .settings(.list)
+            guard let profile = state.profile.profile.profile else { return .none }
+            return .send(.settings(.input(.profileProvided(profile))))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        settings action: SettingsFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .backRequested:
+            switch state.activeScreen {
+            case .settings(.list):
+                state.activeScreen = .profile
+                guard let profile = state.settings.profile else { return .none }
+                return .send(.profile(.profile(.input(.replace(profile)))))
+
+            case .settings(.positionSelection),
+                 .settings(.careerLevelSelection),
+                 .settings(.accountDeletion):
+                state.activeScreen = .settings(.list)
+
+            case .profile:
+                break
+            }
+            return .none
+
+        case .positionSelectionRequested:
+            state.activeScreen = .settings(.positionSelection)
+            return .none
+
+        case .careerLevelSelectionRequested:
+            state.activeScreen = .settings(.careerLevelSelection)
+            return .none
+
+        case .accountDeletionRequested:
+            state.activeScreen = .settings(.accountDeletion)
+            return .none
+
+        case .accountDeletionCancelled:
+            state.activeScreen = .settings(.list)
+            return .none
+
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .signedOut:
+            return .send(.delegate(.signedOut))
+
+        case .accountDeleted:
+            return .send(.delegate(.accountDeleted))
+        }
     }
 
 }

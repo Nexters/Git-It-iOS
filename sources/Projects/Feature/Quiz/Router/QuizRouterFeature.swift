@@ -136,69 +136,32 @@ public struct QuizRouterFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .learningSetIntro(.delegate(.startRequested(let set, let resumption, let bookmarkedQuestionIDs))):
-                let started = Effect<Action>.send(.session(.input(.started(
-                    set: set,
-                    resumption: resumption,
-                    bookmarkedQuestionIDs: bookmarkedQuestionIDs,
-                ))))
-                guard state.questionSolving != nil else { return started }
-                return .merge(started, activate(
-                    .questionSolving,
-                    cause: .startRequested,
-                    state: &state,
-                ))
-
-            case .session(.delegate(.questionReady(let question, let number, let isBookmarked, let isLast))):
-                state.questionSolving = QuestionSolvingFeature.State(
-                    projectID: state.projectID,
-                    question: question,
-                    questionNumber: number,
-                    advanceActionTitle: isLast ? Self.completeActionTitle : Self.nextQuestionActionTitle,
-                    isBookmarked: isBookmarked,
-                )
-                return activate(
-                    .questionSolving,
-                    cause: .startRequested,
-                    state: &state,
+            case .learningSetIntro(let action):
+                reduce(
+                    into: &state,
+                    learningSetIntro: action,
                 )
 
-            case .session(.delegate(.emptySetDetected)):
-                return .send(.learningSetIntro(.input(.emptySetReported)))
-
-            case .session(.delegate(.completed(let correctChoiceCount, let choiceQuestionCount))):
-                state.learningCompletion.choiceQuestionCount = choiceQuestionCount
-                state.learningCompletion.correctChoiceCount = correctChoiceCount
-                return activate(
-                    .learningCompletion,
-                    cause: .advancedToCompletion,
-                    state: &state,
+            case .questionSolving(let action):
+                reduce(
+                    into: &state,
+                    questionSolving: action,
                 )
 
-            case .learningSetIntro(.delegate(.backRequested)):
-                return .send(.delegate(.dismissRequested(projectID: state.projectID)))
+            case .learningCompletion(let action):
+                reduce(
+                    into: &state,
+                    learningCompletion: action,
+                )
 
-            case .questionSolving(.delegate(.backRequested)):
-                return .send(.delegate(.dismissRequested(projectID: state.projectID)))
+            case .session(let action):
+                reduce(
+                    into: &state,
+                    session: action,
+                )
 
-            case .questionSolving(.delegate(.answerSubmitted(_, let choiceCorrect))):
-                return .send(.session(.input(.answerRecorded(choiceCorrect: choiceCorrect))))
-
-            case .questionSolving(.delegate(.advanceRequested)):
-                return .send(.session(.input(.advanced)))
-
-            case .questionSolving(.delegate(.externalURLRequested(let url))):
-                return .send(.delegate(.externalURLRequested(url)))
-
-            case .learningCompletion(.delegate(.dismissRequested)):
-                return .send(.delegate(.dismissRequested(projectID: state.projectID)))
-
-            case .learningSetIntro,
-                 .questionSolving,
-                 .learningCompletion,
-                 .session,
-                 .delegate:
-                return .none
+            case .delegate:
+                .none
             }
         }
         .ifLet(
@@ -226,6 +189,95 @@ public struct QuizRouterFeature: Sendable {
     // MARK: Private
 
     private let quizDetail: any QuizDetailUseCase
+
+    private func reduce(
+        into state: inout State,
+        learningSetIntro action: LearningSetIntroFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .startRequested(let set, let resumption, let bookmarkedQuestionIDs):
+            let started = Effect<Action>.send(.session(.input(.started(
+                set: set,
+                resumption: resumption,
+                bookmarkedQuestionIDs: bookmarkedQuestionIDs,
+            ))))
+            guard state.questionSolving != nil else { return started }
+            return .merge(started, activate(
+                .questionSolving,
+                cause: .startRequested,
+                state: &state,
+            ))
+
+        case .backRequested:
+            return .send(.delegate(.dismissRequested(projectID: state.projectID)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        questionSolving action: QuestionSolvingFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .backRequested:
+            return .send(.delegate(.dismissRequested(projectID: state.projectID)))
+
+        case .answerSubmitted(_, let choiceCorrect):
+            return .send(.session(.input(.answerRecorded(choiceCorrect: choiceCorrect))))
+
+        case .advanceRequested:
+            return .send(.session(.input(.advanced)))
+
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        learningCompletion action: LearningCompletionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .dismissRequested:
+            return .send(.delegate(.dismissRequested(projectID: state.projectID)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        session action: LearningSessionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .questionReady(let question, let number, let isBookmarked, let isLast):
+            state.questionSolving = QuestionSolvingFeature.State(
+                projectID: state.projectID,
+                question: question,
+                questionNumber: number,
+                advanceActionTitle: isLast ? Self.completeActionTitle : Self.nextQuestionActionTitle,
+                isBookmarked: isBookmarked,
+            )
+            return activate(
+                .questionSolving,
+                cause: .startRequested,
+                state: &state,
+            )
+
+        case .emptySetDetected:
+            return .send(.learningSetIntro(.input(.emptySetReported)))
+
+        case .completed(let correctChoiceCount, let choiceQuestionCount):
+            state.learningCompletion.choiceQuestionCount = choiceQuestionCount
+            state.learningCompletion.correctChoiceCount = correctChoiceCount
+            return activate(
+                .learningCompletion,
+                cause: .advancedToCompletion,
+                state: &state,
+            )
+        }
+    }
 
     private func activate(
         _ screen: ActiveScreen,

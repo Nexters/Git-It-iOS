@@ -136,57 +136,41 @@ public struct ShareRegistrationFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard let sharedURL = state.registration.sharedURL else { return .none }
-                return .send(.registration(.input(.validate(sharedURL: sharedURL))))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .view(.sharedURLResolved(let sharedURL)):
-                return .send(.registration(.input(.validate(sharedURL: sharedURL))))
+            case .registration(let action):
+                reduce(
+                    into: &state,
+                    registration: action,
+                )
 
-            case .view(.retryTapped):
-                return .send(.registration(.input(.retry)))
+            case .repositoryConfirmation(let action):
+                reduce(
+                    into: &state,
+                    repositoryConfirmation: action,
+                )
 
-            case .view(.dismissTapped):
-                return dismissIfIdle(state)
+            case .quizLevelSelection(let action):
+                reduce(
+                    into: &state,
+                    quizLevelSelection: action,
+                )
 
-            case .registration(.delegate(.repositoryResolved(let repository))):
-                state.step = .repositoryConfirmation
-                return .send(.repositoryConfirmation(.input(.repositoryProvided(repository))))
+            case .quizGenerationConfirmation(let action):
+                reduce(
+                    into: &state,
+                    quizGenerationConfirmation: action,
+                )
 
-            case .repositoryConfirmation(.delegate(.confirmed)):
-                state.step = .quizLevelSelection
-                return .none
-
-            case .repositoryConfirmation(.delegate(.rejected)):
-                return dismissIfIdle(state)
-
-            case .quizLevelSelection(.delegate(.confirmed)):
-                state.step = .quizGenerationConfirmation
-                return .none
-
-            case .quizLevelSelection(.delegate(.backRequested)):
-                state.step = .repositoryConfirmation
-                return .none
-
-            case .quizGenerationConfirmation(.delegate(.submitRequested)):
-                guard let repository = state.repository else { return .none }
-                return .send(.registration(.input(.submit(
-                    repository: repository,
-                    quizLevel: state.quizLevel,
-                ))))
-
-            case .quizGenerationConfirmation(.delegate(.backRequested)):
-                state.step = .quizLevelSelection
-                return .none
-
-            case .registration,
-                 .repositoryConfirmation,
-                 .quizGenerationConfirmation,
-                 .quizLevelSelection:
-                return .none
-
-            case .delegate(.dismissRequested):
-                return .run { _ in await dismiss() }
+            case .delegate(let action):
+                reduce(
+                    into: &state,
+                    delegate: action,
+                )
             }
         }
     }
@@ -199,6 +183,98 @@ public struct ShareRegistrationFeature: Sendable {
     private let signInAvailability: @Sendable () async -> SignInAvailability
     private let recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void
     private let dismiss: @MainActor @Sendable () -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            guard let sharedURL = state.registration.sharedURL else { return .none }
+            return .send(.registration(.input(.validate(sharedURL: sharedURL))))
+
+        case .sharedURLResolved(let sharedURL):
+            return .send(.registration(.input(.validate(sharedURL: sharedURL))))
+
+        case .retryTapped:
+            return .send(.registration(.input(.retry)))
+
+        case .dismissTapped:
+            return dismissIfIdle(state)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        registration action: SharedRepositoryRegistrationFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .repositoryResolved(let repository):
+            state.step = .repositoryConfirmation
+            return .send(.repositoryConfirmation(.input(.repositoryProvided(repository))))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        repositoryConfirmation action: RepositoryConfirmationFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .confirmed:
+            state.step = .quizLevelSelection
+            return .none
+
+        case .rejected:
+            return dismissIfIdle(state)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        quizLevelSelection action: QuizLevelSelectionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .confirmed:
+            state.step = .quizGenerationConfirmation
+            return .none
+
+        case .backRequested:
+            state.step = .repositoryConfirmation
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        quizGenerationConfirmation action: QuizGenerationConfirmationFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .submitRequested:
+            guard let repository = state.repository else { return .none }
+            return .send(.registration(.input(.submit(
+                repository: repository,
+                quizLevel: state.quizLevel,
+            ))))
+
+        case .backRequested:
+            state.step = .quizLevelSelection
+            return .none
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        delegate action: Action.Delegate,
+    ) -> Effect<Action> {
+        switch action {
+        case .dismissRequested:
+            .run { _ in await dismiss() }
+        }
+    }
 
     private func dismissIfIdle(_ state: State) -> Effect<Action> {
         guard state.canDismiss else { return .none }

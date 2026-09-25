@@ -99,59 +99,20 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.validate(let sharedURL)):
-                state.sharedURL = sharedURL
-                return validate(&state)
-
-            case .input(.submit(let repository, let quizLevel)):
-                guard !state.isSubmitting else { return .none }
-                state.submission = Submission(
-                    repository: repository,
-                    quizLevel: quizLevel,
-                )
-                return submit(&state)
-
-            case .input(.retry):
-                guard case .failed(_, let retry) = state.phase else { return .none }
-                return switch retry {
-                case .lookup: validate(&state)
-                case .registration: submit(&state)
-                }
-
-            case .input(.cancel):
-                return .merge(
-                    .cancel(id: CancelID.registration),
-                    .cancel(id: CancelID.validation),
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .effect(.validationFinished(let phase)):
-                state.phase = phase
-                return .none
-
-            case .effect(.repositoryResolved(let repository)):
-                state.phase = .ready(repository)
-                return .send(.delegate(.repositoryResolved(repository)))
-
-            case .effect(.registrationFinished(.success)):
-                state.phase = .succeeded
-                recordDiagnostic(.registrationSucceeded)
-                return .none
-
-            case .effect(.registrationFinished(.failure(let error))):
-                if error == .unauthorized {
-                    state.phase = .signInRequired
-                    recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
-                } else {
-                    state.phase = .failed(
-                        reason: Self.registrationFailureReason(for: error),
-                        retry: .registration,
-                    )
-                    recordDiagnostic(.registrationFailed(reason: String(describing: error)))
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -192,6 +153,74 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
 
         default:
             LocalizedText.ShareRegistration.Lookup.Failure.reason
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .validate(let sharedURL):
+            state.sharedURL = sharedURL
+            return validate(&state)
+
+        case .submit(let repository, let quizLevel):
+            guard !state.isSubmitting else { return .none }
+            state.submission = Submission(
+                repository: repository,
+                quizLevel: quizLevel,
+            )
+            return submit(&state)
+
+        case .retry:
+            guard case .failed(_, let retry) = state.phase else { return .none }
+            return switch retry {
+            case .lookup: validate(&state)
+            case .registration: submit(&state)
+            }
+
+        case .cancel:
+            return .merge(
+                .cancel(id: CancelID.registration),
+                .cancel(id: CancelID.validation),
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .validationFinished(let phase):
+            state.phase = phase
+            return .none
+
+        case .repositoryResolved(let repository):
+            state.phase = .ready(repository)
+            return .send(.delegate(.repositoryResolved(repository)))
+
+        case .registrationFinished(let result):
+            switch result {
+            case .success:
+                state.phase = .succeeded
+                recordDiagnostic(.registrationSucceeded)
+                return .none
+
+            case .failure(let error):
+                if error == .unauthorized {
+                    state.phase = .signInRequired
+                    recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
+                } else {
+                    state.phase = .failed(
+                        reason: Self.registrationFailureReason(for: error),
+                        retry: .registration,
+                    )
+                    recordDiagnostic(.registrationFailed(reason: String(describing: error)))
+                }
+                return .none
+            }
         }
     }
 

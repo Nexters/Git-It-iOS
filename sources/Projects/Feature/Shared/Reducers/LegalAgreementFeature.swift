@@ -88,71 +88,26 @@ public struct LegalAgreementFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.load):
-                guard state.requiredDocuments.isEmpty else { return .none }
-                return .run { send in
-                    let status = try? await policyConsentStatus()
-                    await send(
-                        .effect(
-                            .statusLoaded(
-                                requiredDocuments: status?.documents ?? [],
-                                isStoredConsentValid: status?.isSatisfied ?? false,
-                            )
-                        )
-                    )
-                }
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .input(.prepare):
-                state.selectedDocumentIDs = []
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
-            case .view(.documentToggled(let documentID)):
-                if state.selectedDocumentIDs.contains(documentID) {
-                    state.selectedDocumentIDs.remove(documentID)
-                } else {
-                    state.selectedDocumentIDs.insert(documentID)
-                }
-                return .none
-
-            case .view(.allDocumentsToggled):
-                if state.isAllSelected {
-                    state.selectedDocumentIDs.removeAll()
-                } else {
-                    state.selectedDocumentIDs = Set(state.requiredDocuments.map(\.id))
-                }
-                return .none
-
-            case .view(.documentLinkTapped(let documentID)):
-                state.presentedDocumentID = documentID
-                return .none
-
-            case .view(.documentSheetDismissed):
-                state.presentedDocumentID = nil
-                return .none
-
-            case .view(.cancelTapped):
-                state.selectedDocumentIDs = []
-                state.presentedDocumentID = nil
-                return .send(.delegate(.cancelled))
-
-            case .view(.continueTapped):
-                guard state.canContinue else { return .none }
-                let documentIDs = state.requiredDocuments
-                    .map(\.id)
-                    .filter { state.selectedDocumentIDs.contains($0) }
-                state.isStoredConsentValid = true
-                return .run { send in
-                    try? await consent(documentIDs)
-                    await send(.delegate(.consentCompleted))
-                }
-
-            case .effect(.statusLoaded(let documents, let isStoredConsentValid)):
-                state.requiredDocuments = documents
-                state.isStoredConsentValid = isStoredConsentValid
-                return .none
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -161,5 +116,89 @@ public struct LegalAgreementFeature: Sendable {
 
     private let policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus
     private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .documentToggled(let documentID):
+            if state.selectedDocumentIDs.contains(documentID) {
+                state.selectedDocumentIDs.remove(documentID)
+            } else {
+                state.selectedDocumentIDs.insert(documentID)
+            }
+            return .none
+
+        case .allDocumentsToggled:
+            if state.isAllSelected {
+                state.selectedDocumentIDs.removeAll()
+            } else {
+                state.selectedDocumentIDs = Set(state.requiredDocuments.map(\.id))
+            }
+            return .none
+
+        case .documentLinkTapped(let documentID):
+            state.presentedDocumentID = documentID
+            return .none
+
+        case .documentSheetDismissed:
+            state.presentedDocumentID = nil
+            return .none
+
+        case .cancelTapped:
+            state.selectedDocumentIDs = []
+            state.presentedDocumentID = nil
+            return .send(.delegate(.cancelled))
+
+        case .continueTapped:
+            guard state.canContinue else { return .none }
+            let documentIDs = state.requiredDocuments
+                .map(\.id)
+                .filter { state.selectedDocumentIDs.contains($0) }
+            state.isStoredConsentValid = true
+            return .run { send in
+                try? await consent(documentIDs)
+                await send(.delegate(.consentCompleted))
+            }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .statusLoaded(let documents, let isStoredConsentValid):
+            state.requiredDocuments = documents
+            state.isStoredConsentValid = isStoredConsentValid
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .load:
+            guard state.requiredDocuments.isEmpty else { return .none }
+            return .run { send in
+                let status = try? await policyConsentStatus()
+                await send(
+                    .effect(
+                        .statusLoaded(
+                            requiredDocuments: status?.documents ?? [],
+                            isStoredConsentValid: status?.isSatisfied ?? false,
+                        )
+                    )
+                )
+            }
+
+        case .prepare:
+            state.selectedDocumentIDs = []
+            return .none
+        }
+    }
 
 }

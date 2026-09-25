@@ -74,49 +74,17 @@ public struct UserProfileLoadFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.load):
-                return startLoad(
-                    state: &state,
-                    showsLoading: true,
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .input(.reload):
-                switch state.load {
-                case .loaded:
-                    return startLoad(
-                        state: &state,
-                        showsLoading: false,
-                    )
-
-                case .loading:
-                    return .none
-
-                case .idle,
-                     .failed:
-                    return startLoad(
-                        state: &state,
-                        showsLoading: true,
-                    )
-                }
-
-            case .input(.replace(let profile)):
-                state.requestID += 1
-                state.load = .loaded(profile)
-                return .cancel(id: CancelID.profile(state.instanceID))
-
-            case .effect(.profileLoadFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .success(let profile):
-                    state.load = .loaded(profile)
-
-                case .failure(let error):
-                    if case .loaded = state.load {
-                        return .none
-                    }
-                    state.load = .failed(error)
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
             }
         }
     }
@@ -128,6 +96,64 @@ public struct UserProfileLoadFeature: Sendable {
     }
 
     private let profile: @Sendable () async throws -> UserProfile
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .load:
+            return startLoad(
+                state: &state,
+                showsLoading: true,
+            )
+
+        case .reload:
+            switch state.load {
+            case .loaded:
+                return startLoad(
+                    state: &state,
+                    showsLoading: false,
+                )
+
+            case .loading:
+                return .none
+
+            case .idle,
+                 .failed:
+                return startLoad(
+                    state: &state,
+                    showsLoading: true,
+                )
+            }
+
+        case .replace(let profile):
+            state.requestID += 1
+            state.load = .loaded(profile)
+            return .cancel(id: CancelID.profile(state.instanceID))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch event {
+        case .profileLoadFinished(let requestID, let result):
+            guard requestID == state.requestID else { return .none }
+            switch result {
+            case .success(let profile):
+                state.load = .loaded(profile)
+
+            case .failure(let error):
+                if case .loaded = state.load {
+                    return .none
+                }
+                state.load = .failed(error)
+            }
+            return .none
+        }
+    }
 
     private func startLoad(
         state: inout State,

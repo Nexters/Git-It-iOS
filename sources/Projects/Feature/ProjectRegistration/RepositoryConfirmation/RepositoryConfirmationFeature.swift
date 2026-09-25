@@ -51,24 +51,52 @@ public struct RepositoryConfirmationFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.repositoryProvided(let repository)):
-                state.repository = repository
-                return .none
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .input(.cleared):
-                state.repository = nil
-                return .none
-
-            case .view(.confirmTapped):
-                return .send(.delegate(.confirmed))
-
-            case .view(.rejectTapped),
-                 .view(.backTapped):
-                return .send(.delegate(.rejected))
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
+        }
+    }
+
+    // MARK: Private
+
+    private func reduce(
+        into _: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .confirmTapped:
+            .send(.delegate(.confirmed))
+
+        case .rejectTapped,
+             .backTapped:
+            .send(.delegate(.rejected))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .repositoryProvided(let repository):
+            state.repository = repository
+            return .none
+
+        case .cleared:
+            state.repository = nil
+            return .none
         }
     }
 

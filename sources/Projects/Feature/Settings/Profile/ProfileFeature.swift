@@ -54,29 +54,15 @@ public struct ProfileFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                switch state.profile.load {
-                case .idle,
-                     .failed:
-                    return .send(.profile(.input(.load)))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-                case .loaded:
-                    return .send(.profile(.input(.reload)))
-
-                case .loading:
-                    return .none
-                }
-
-            case .view(.retryTapped):
-                guard case .failed = state.profile.load else { return .none }
-                return .send(.profile(.input(.load)))
-
-            case .view(.settingsTapped):
-                return .send(.delegate(.settingsRequested))
-
-            case .profile,
-                 .delegate:
-                return .none
+            case .delegate,
+                 .profile:
+                .none
             }
         }
     }
@@ -84,5 +70,32 @@ public struct ProfileFeature: Sendable {
     // MARK: Private
 
     private let profile: @Sendable () async throws -> UserProfile
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            switch state.profile.load {
+            case .idle,
+                 .failed:
+                return .send(.profile(.input(.load)))
+
+            case .loaded:
+                return .send(.profile(.input(.reload)))
+
+            case .loading:
+                return .none
+            }
+
+        case .retryTapped:
+            guard case .failed = state.profile.load else { return .none }
+            return .send(.profile(.input(.load)))
+
+        case .settingsTapped:
+            return .send(.delegate(.settingsRequested))
+        }
+    }
 
 }

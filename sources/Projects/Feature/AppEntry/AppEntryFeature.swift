@@ -84,111 +84,20 @@ public struct AppEntryFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard state.authentication == .idle else { return .none }
-                state.automaticRetryCount = 0
-                return restoreSignIn(&state)
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .view(.retryTapped):
-                guard state.authentication != .restoring else { return .none }
-                state.automaticRetryCount = 0
-                return restoreSignIn(&state)
-
-            case .view(.splashAnimationFinished):
-                guard !state.isSplashAnimationFinished else { return .none }
-                state.isSplashAnimationFinished = true
-                guard let destination = state.pendingDestination else { return .none }
-                state.pendingDestination = nil
-                return .send(.delegate(.destinationDecided(destination)))
-
-            case .effect(.restoreSignInFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .signedIn:
-                    return .run { send in
-                        do {
-                            let curation = try await curation()
-                            await send(.effect(.curationFetchFinished(
-                                requestID: requestID,
-                                result: .success(curation),
-                            )))
-                        } catch {
-                            let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                            await send(.effect(.curationFetchFinished(
-                                requestID: requestID,
-                                result: .failure(mapped),
-                            )))
-                        }
-                    }
-                    .cancellable(
-                        id: CancelID.profile,
-                        cancelInFlight: true,
-                    )
-
-                case .signedOut:
-                    state.authentication = .idle
-                    return decideDestination(
-                        .onboarding(startingAt: .guide),
-                        state: &state,
-                    )
-
-                case .temporarilyUnavailable:
-                    return retryAutomaticallyOrFail(&state)
-                }
-
-            case .effect(.curationFetchFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .success(let curation):
-                    if curation != nil {
-                        return decideDestination(
-                            .mainShell,
-                            state: &state,
-                        )
-                    } else {
-                        return decideDestination(
-                            .onboarding(startingAt: .curation),
-                            state: &state,
-                        )
-                    }
-
-                case .failure(.memberUnavailable):
-                    return .run { send in
-                        let result = await signOut()
-                        await send(.effect(.localCleanupFinished(
-                            requestID: requestID,
-                            result: result,
-                        )))
-                    }
-                    .cancellable(
-                        id: CancelID.cleanup,
-                        cancelInFlight: true,
-                    )
-
-                case .failure(.unauthorized):
-                    state.authentication = .retryableFailure
-                    return .none
-
-                case .failure:
-                    return retryAutomaticallyOrFail(&state)
-                }
-
-            case .effect(.localCleanupFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .signedOut:
-                    state.authentication = .idle
-                    return decideDestination(
-                        .onboarding(startingAt: .guide),
-                        state: &state,
-                    )
-
-                case .retryableFailure:
-                    return retryAutomaticallyOrFail(&state)
-                }
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -208,6 +117,123 @@ public struct AppEntryFeature: Sendable {
     private let restoreSignIn: @Sendable () async -> SignInRestoration
     private let curation: @Sendable () async throws -> Curation?
     private let signOut: @Sendable () async -> SignOutResult
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            guard state.authentication == .idle else { return .none }
+            state.automaticRetryCount = 0
+            return restoreSignIn(&state)
+
+        case .retryTapped:
+            guard state.authentication != .restoring else { return .none }
+            state.automaticRetryCount = 0
+            return restoreSignIn(&state)
+
+        case .splashAnimationFinished:
+            guard !state.isSplashAnimationFinished else { return .none }
+            state.isSplashAnimationFinished = true
+            guard let destination = state.pendingDestination else { return .none }
+            state.pendingDestination = nil
+            return .send(.delegate(.destinationDecided(destination)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .restoreSignInFinished(let requestID, let result):
+            guard requestID == state.requestID else { return .none }
+            switch result {
+            case .signedIn:
+                return .run { send in
+                    do {
+                        let curation = try await curation()
+                        await send(.effect(.curationFetchFinished(
+                            requestID: requestID,
+                            result: .success(curation),
+                        )))
+                    } catch {
+                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
+                        await send(.effect(.curationFetchFinished(
+                            requestID: requestID,
+                            result: .failure(mapped),
+                        )))
+                    }
+                }
+                .cancellable(
+                    id: CancelID.profile,
+                    cancelInFlight: true,
+                )
+
+            case .signedOut:
+                state.authentication = .idle
+                return decideDestination(
+                    .onboarding(startingAt: .guide),
+                    state: &state,
+                )
+
+            case .temporarilyUnavailable:
+                return retryAutomaticallyOrFail(&state)
+            }
+
+        case .curationFetchFinished(let requestID, let result):
+            guard requestID == state.requestID else { return .none }
+            switch result {
+            case .success(let curation):
+                if curation != nil {
+                    return decideDestination(
+                        .mainShell,
+                        state: &state,
+                    )
+                } else {
+                    return decideDestination(
+                        .onboarding(startingAt: .curation),
+                        state: &state,
+                    )
+                }
+
+            case .failure(.memberUnavailable):
+                return .run { send in
+                    let result = await signOut()
+                    await send(.effect(.localCleanupFinished(
+                        requestID: requestID,
+                        result: result,
+                    )))
+                }
+                .cancellable(
+                    id: CancelID.cleanup,
+                    cancelInFlight: true,
+                )
+
+            case .failure(.unauthorized):
+                state.authentication = .retryableFailure
+                return .none
+
+            case .failure:
+                return retryAutomaticallyOrFail(&state)
+            }
+
+        case .localCleanupFinished(let requestID, let result):
+            guard requestID == state.requestID else { return .none }
+            switch result {
+            case .signedOut:
+                state.authentication = .idle
+                return decideDestination(
+                    .onboarding(startingAt: .guide),
+                    state: &state,
+                )
+
+            case .retryableFailure:
+                return retryAutomaticallyOrFail(&state)
+            }
+        }
+    }
 
     private func restoreSignIn(_ state: inout State) -> Effect<Action> {
         state.authentication = .restoring

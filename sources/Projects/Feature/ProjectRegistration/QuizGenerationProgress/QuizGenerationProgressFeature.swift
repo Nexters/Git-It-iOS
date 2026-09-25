@@ -80,6 +80,18 @@ public struct QuizGenerationProgressFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .view(let action):
+                return reduce(
+                    into: &state,
+                    view: action,
+                )
+
+            case .effect(let event):
+                return reduce(
+                    into: &state,
+                    effect: event,
+                )
+
             case .submit(let repository, let quizLevel):
                 state.repository = repository
                 state.quizLevel = quizLevel
@@ -88,80 +100,6 @@ public struct QuizGenerationProgressFeature: Sendable {
                     quizLevel: quizLevel,
                     state: &state,
                 )
-
-            case .view(.retryTapped):
-                guard
-                    case .failed = state.progress,
-                    let repository = state.repository
-                else { return .none }
-                return submit(
-                    repository: repository,
-                    quizLevel: state.quizLevel,
-                    state: &state,
-                )
-
-            case .view(.dismissTapped):
-                return .send(.delegate(.dismissRequested))
-
-            case .view(.waitAtHomeTapped):
-                guard case .awaitingOutcome = state.progress else { return .none }
-                return .run { [notificationAuthorization] send in
-                    await send(.effect(.waitAtHomeAuthorizationChecked(await notificationAuthorization())))
-                }
-
-            case .effect(.waitAtHomeAuthorizationChecked(let status)):
-                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
-                guard status == .authorized else {
-                    state.isGenerationReminderSheetPresented = true
-                    return .none
-                }
-                return finishWaiting(
-                    receipt: receipt,
-                    isReminderEnabled: true,
-                )
-
-            case .view(.generationReminderAccepted):
-                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
-                state.isGenerationReminderSheetPresented = false
-                return acceptGenerationReminder(receipt: receipt)
-
-            case .view(.generationReminderDeclined):
-                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
-                state.isGenerationReminderSheetPresented = false
-                return finishWaiting(
-                    receipt: receipt,
-                    isReminderEnabled: false,
-                )
-
-            case .effect(.submissionFinished(.success(let receipt))):
-                state.progress = .awaitingOutcome(receipt)
-                return .none
-
-            case .effect(.submissionFinished(.failure(let error))):
-                return transitionToFailure(
-                    error,
-                    state: &state,
-                )
-
-            case .effect(.generationPhaseReceived(let phase)):
-                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
-                switch phase {
-                case .inProgress,
-                     .preparing:
-                    return .none
-
-                case .ready:
-                    return finishWaiting(
-                        receipt: receipt,
-                        isReminderEnabled: nil,
-                    )
-
-                case .failed:
-                    return transitionToFailure(
-                        .unexpected,
-                        state: &state,
-                    )
-                }
 
             case .delegate:
                 return .none
@@ -180,6 +118,97 @@ public struct QuizGenerationProgressFeature: Sendable {
     private let notificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let requestNotificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .waitAtHomeTapped:
+            guard case .awaitingOutcome = state.progress else { return .none }
+            return .run { [notificationAuthorization] send in
+                await send(.effect(.waitAtHomeAuthorizationChecked(await notificationAuthorization())))
+            }
+
+        case .retryTapped:
+            guard
+                case .failed = state.progress,
+                let repository = state.repository
+            else { return .none }
+            return submit(
+                repository: repository,
+                quizLevel: state.quizLevel,
+                state: &state,
+            )
+
+        case .dismissTapped:
+            return .send(.delegate(.dismissRequested))
+
+        case .generationReminderAccepted:
+            guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+            state.isGenerationReminderSheetPresented = false
+            return acceptGenerationReminder(receipt: receipt)
+
+        case .generationReminderDeclined:
+            guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+            state.isGenerationReminderSheetPresented = false
+            return finishWaiting(
+                receipt: receipt,
+                isReminderEnabled: false,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .submissionFinished(let result):
+            switch result {
+            case .success(let receipt):
+                state.progress = .awaitingOutcome(receipt)
+                return .none
+
+            case .failure(let error):
+                return transitionToFailure(
+                    error,
+                    state: &state,
+                )
+            }
+
+        case .generationPhaseReceived(let phase):
+            guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+            switch phase {
+            case .inProgress,
+                 .preparing:
+                return .none
+
+            case .ready:
+                return finishWaiting(
+                    receipt: receipt,
+                    isReminderEnabled: nil,
+                )
+
+            case .failed:
+                return transitionToFailure(
+                    .unexpected,
+                    state: &state,
+                )
+            }
+
+        case .waitAtHomeAuthorizationChecked(let status):
+            guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+            guard status == .authorized else {
+                state.isGenerationReminderSheetPresented = true
+                return .none
+            }
+            return finishWaiting(
+                receipt: receipt,
+                isReminderEnabled: true,
+            )
+        }
+    }
 
     private func submit(
         repository: ExternalRepository,

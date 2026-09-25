@@ -95,38 +95,20 @@ public struct ProjectSummaryListFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.start):
-                return .merge(
-                    observeProjects(state: state),
-                    startRefresh(state: &state),
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .input(.refresh):
-                return startRefresh(state: &state)
-
-            case .input(.projectRemoved(let projectID)):
-                guard case .loaded(let list) = state.load else { return .none }
-                let updated = ProjectList(
-                    summaries: list.summaries.filter { $0.id != projectID },
-                    hasNextPage: list.hasNextPage,
-                    isLoaded: list.isLoaded,
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
                 )
-                state.load = .loaded(updated)
-                return .send(.delegate(.listUpdated(updated)))
-
-            case .effect(.projectsReceived(let list)):
-                guard list.isLoaded else { return .none }
-                state.load = .loaded(list)
-                return .send(.delegate(.listUpdated(list)))
-
-            case .effect(.refreshFinished(let requestID, let error)):
-                guard requestID == state.requestID else { return .none }
-                guard let error, !state.load.isLoaded else { return .none }
-                state.load = .failed(error)
-                return .none
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -140,6 +122,50 @@ public struct ProjectSummaryListFeature: Sendable {
 
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .start:
+            return .merge(
+                observeProjects(state: state),
+                startRefresh(state: &state),
+            )
+
+        case .refresh:
+            return startRefresh(state: &state)
+
+        case .projectRemoved(let projectID):
+            guard case .loaded(let list) = state.load else { return .none }
+            let updated = ProjectList(
+                summaries: list.summaries.filter { $0.id != projectID },
+                hasNextPage: list.hasNextPage,
+                isLoaded: list.isLoaded,
+            )
+            state.load = .loaded(updated)
+            return .send(.delegate(.listUpdated(updated)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch event {
+        case .projectsReceived(let list):
+            guard list.isLoaded else { return .none }
+            state.load = .loaded(list)
+            return .send(.delegate(.listUpdated(list)))
+
+        case .refreshFinished(let requestID, let error):
+            guard requestID == state.requestID else { return .none }
+            guard let error, !state.load.isLoaded else { return .none }
+            state.load = .failed(error)
+            return .none
+        }
+    }
 
     private func observeProjects(state: State) -> ComposableArchitecture.Effect<Action> {
         let projects = projects
