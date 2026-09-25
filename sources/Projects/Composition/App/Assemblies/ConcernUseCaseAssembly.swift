@@ -160,7 +160,8 @@ public struct ConcernUseCaseAssembly: Sendable {
                         namespace: LocalPendingGenerationStore.namespace,
                         location: .appGroup,
                     )
-                )
+                ),
+                waitPolicy: LearningProjectAssembly.generationWaitPolicy,
             ),
             outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
             reminderScheduler: GenerationReminderSchedulerAdapter(
@@ -171,6 +172,7 @@ public struct ConcernUseCaseAssembly: Sendable {
                 failedBody: generationReminder.failedBody,
             ),
             signedOutEvents: signedOutEvents,
+            waitPolicy: LearningProjectAssembly.generationWaitPolicy,
         )
         self.projectGeneration = projectGeneration
 
