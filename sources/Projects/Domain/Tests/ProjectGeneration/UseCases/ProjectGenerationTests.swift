@@ -53,31 +53,25 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `생성 중과 준비 중인 프로젝트를 배너 대상으로 보고 대기 시간이 지나면 ready를 방출한다`() async throws {
+    func `생성 중인 요청은 결과가 도착하면 바로 ready를 방출한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
 
         let inProgress = await Self.next(&states) { _ in true }
-        #expect(inProgress?.requests.map(\.phase) == [.inProgress(readyAt: Self.readyAt)])
-        #expect(inProgress?.preparingProjectIDs == ["p1"])
+        #expect(inProgress?.requests.map(\.phase) == [.inProgress])
 
-        fixture.sleeper.advance(by: 10)
         fixture.outcomes.emit(GenerationOutcome(
             projectID: "p1",
             status: .completed,
         ))
-        let preparing = await Self.next(&states) { $0.requests.first?.phase == .preparing(readyAt: Self.readyAt) }
-        #expect(preparing?.preparingProjectIDs == ["p1"])
-
-        await Self.settle { fixture.sleeper.sleeperCount > 0 }
-        fixture.sleeper.advance(by: 290)
         let ready = await Self.next(&states) { $0.requests.first?.phase == .ready }
-        #expect(ready?.preparingProjectIDs.isEmpty == true)
+
+        #expect(ready?.requests.first?.projectID == "p1")
     }
 
     @Test
-    func `생성이 완료되면 준비 완료 시각에 완료 알림을 예약한다`() async throws {
+    func `생성이 완료되면 즉시 완료 알림을 예약한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
@@ -87,7 +81,7 @@ struct ProjectGenerationTests {
             projectID: "p1",
             status: .completed,
         ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .preparing(readyAt: Self.readyAt) }
+        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
 
         #expect(await fixture.scheduler.scheduledReminders == [
             .init(
@@ -95,7 +89,7 @@ struct ProjectGenerationTests {
                     projectID: "p1",
                     kind: .completed,
                 ),
-                date: Self.readyAt,
+                date: Self.requestedAt,
             )
         ])
     }
@@ -111,9 +105,8 @@ struct ProjectGenerationTests {
             projectID: "p1",
             status: .failed,
         ))
-        let failed = await Self.next(&states) { $0.requests.first?.phase == .failed }
+        _ = await Self.next(&states) { $0.requests.first?.phase == .failed }
 
-        #expect(failed?.preparingProjectIDs.isEmpty == true)
         #expect(await fixture.scheduler.scheduledReminders == [
             .init(
                 reminder: GenerationReminder(
@@ -165,9 +158,8 @@ struct ProjectGenerationTests {
         _ = await states.next()
 
         fixture.signedOutContinuation.yield(())
-        let state = await Self.next(&states) { $0.requests.isEmpty }
+        _ = await Self.next(&states) { $0.requests.isEmpty }
 
-        #expect(state?.preparingProjectIDs.isEmpty == true)
         #expect(await fixture.pendingGenerations.state.records.isEmpty)
     }
 
@@ -198,7 +190,6 @@ struct ProjectGenerationTests {
                 reminderScheduler: scheduler,
                 signedOutEvents: { signedOut },
                 now: { sleeper.now },
-                sleep: { try await sleeper.sleep($0) },
             )
         }
 
@@ -219,7 +210,6 @@ struct ProjectGenerationTests {
         quizLevel: .l2,
     )
     private static let requestedAt = Date(timeIntervalSince1970: 10_000)
-    private static let readyAt = requestedAt.addingTimeInterval(300)
 
     private static func next(
         _ iterator: inout AsyncStream<ProjectGenerationState>.Iterator,
@@ -231,13 +221,6 @@ struct ProjectGenerationTests {
             }
         }
         return nil
-    }
-
-    private static func settle(until condition: @Sendable () async -> Bool) async {
-        for _ in 0 ..< 200 {
-            guard await !condition() else { return }
-            await Task.yield()
-        }
     }
 
 }

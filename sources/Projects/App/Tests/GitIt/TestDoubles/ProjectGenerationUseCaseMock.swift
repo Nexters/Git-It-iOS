@@ -6,10 +6,7 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
     // MARK: Lifecycle
 
     init(
-        stored: ProjectGenerationState = ProjectGenerationState(
-            requests: [],
-            preparingProjectIDs: [],
-        ),
+        stored: ProjectGenerationState = ProjectGenerationState(requests: []),
         keepsObservationOpen: Bool = false,
     ) {
         state = stored

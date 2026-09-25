@@ -180,8 +180,7 @@ public struct QuizGenerationProgressFeature: Sendable {
         case .generationPhaseReceived(let phase):
             guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
             switch phase {
-            case .inProgress,
-                 .preparing:
+            case .inProgress:
                 return .none
 
             case .ready:

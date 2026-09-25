@@ -160,8 +160,7 @@ public struct ConcernUseCaseAssembly: Sendable {
                         namespace: LocalPendingGenerationStore.namespace,
                         location: .appGroup,
                     )
-                ),
-                waitPolicy: LearningProjectAssembly.generationWaitPolicy,
+                )
             ),
             outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
             reminderScheduler: GenerationReminderSchedulerAdapter(
@@ -172,15 +171,11 @@ public struct ConcernUseCaseAssembly: Sendable {
                 failedBody: generationReminder.failedBody,
             ),
             signedOutEvents: signedOutEvents,
-            waitPolicy: LearningProjectAssembly.generationWaitPolicy,
         )
         self.projectGeneration = projectGeneration
 
         project = Project(
             repository: ProjectRepositoryAdapter(remote: projectRemote),
-            preparingProjectIDs: {
-                await Self.preparingProjectIDs(from: projectGeneration.states())
-            },
             signedOutEvents: signedOutEvents,
         )
     }
@@ -242,20 +237,6 @@ public struct ConcernUseCaseAssembly: Sendable {
             let task = Task {
                 for await state in states where state == .signedOut {
                     continuation.yield(())
-                }
-                continuation.finish()
-            }
-            continuation.onTermination = { _ in task.cancel() }
-        }
-    }
-
-    public static func preparingProjectIDs(
-        from states: AsyncStream<ProjectGenerationState>
-    ) -> AsyncStream<Set<ProjectID>> {
-        AsyncStream { continuation in
-            let task = Task {
-                for await state in states {
-                    continuation.yield(state.preparingProjectIDs)
                 }
                 continuation.finish()
             }

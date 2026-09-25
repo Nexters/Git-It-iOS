@@ -206,8 +206,7 @@ struct QuizGenerationProgressFeatureTests {
     func `진행 중 단계는 상태를 바꾸지 않는다`() async {
         let store = makeQuizGenerationProgressStore(state: awaitingState())
 
-        await store.send(.effect(.generationPhaseReceived(.inProgress(readyAt: .distantFuture))))
-        await store.send(.effect(.generationPhaseReceived(.preparing(readyAt: .distantFuture))))
+        await store.send(.effect(.generationPhaseReceived(.inProgress)))
 
         #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
     }

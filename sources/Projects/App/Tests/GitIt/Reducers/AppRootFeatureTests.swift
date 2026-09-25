@@ -658,7 +658,7 @@ struct AppRootFeatureTests {
         )
 
         await projectGeneration.emit(
-            AppRootTestFixture.generationState(phase: .inProgress(readyAt: Date(timeIntervalSince1970: 2_000)))
+            AppRootTestFixture.generationState(phase: .inProgress)
         )
         await store.receive(
             \.effect.generationStateChanged,
@@ -678,7 +678,7 @@ struct AppRootFeatureTests {
     func `생성이 끝난 요청만 남으면 홈의 진행 중 표시를 해제한다`() async {
         let projectGeneration = ProjectGenerationUseCaseMock(
             stored: AppRootTestFixture.generationState(
-                phase: .inProgress(readyAt: Date(timeIntervalSince1970: 2_000))
+                phase: .inProgress
             ),
             keepsObservationOpen: true,
         )

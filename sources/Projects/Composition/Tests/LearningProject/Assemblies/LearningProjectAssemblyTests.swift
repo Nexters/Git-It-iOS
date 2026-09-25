@@ -24,7 +24,6 @@ struct LearningProjectAssemblyTests {
         let state = await iterator.next()
 
         #expect(state?.requests.isEmpty == true)
-        #expect(state?.preparingProjectIDs.isEmpty == true)
     }
 
     // MARK: Private

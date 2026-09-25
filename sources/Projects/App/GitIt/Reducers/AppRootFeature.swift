@@ -534,8 +534,7 @@ nonisolated struct AppRootFeature: Sendable {
     ) -> Effect<Action> {
         let isGenerationInProgress = generationState.requests.contains { request in
             switch request.phase {
-            case .inProgress,
-                 .preparing:
+            case .inProgress:
                 true
 
             case .ready,

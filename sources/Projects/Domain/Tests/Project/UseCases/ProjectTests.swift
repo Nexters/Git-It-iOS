@@ -73,49 +73,6 @@ struct ProjectTests {
     }
 
     @Test
-    func `준비 중인 프로젝트는 재요청 없이 목록에서 뺀다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(
-            summaries: [Self.summary("p1"), Self.summary("p2")],
-            hasNextPage: false,
-        )])
-        try await fixture.project.refresh()
-        var lists = await fixture.project.projects().makeAsyncIterator()
-        _ = await lists.next()
-
-        fixture.preparingContinuation.yield(["p2"])
-
-        let list = await Self.next(&lists) { $0.summaries.count == 1 }
-        #expect(list?.summaries.map(\.id) == ["p1"])
-        #expect(await fixture.repository.requestedPageIndexes == [0])
-    }
-
-    @Test
-    func `준비 목록에서 빠진 프로젝트가 생기면 첫 페이지를 새로고침한다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(
-            summaries: [Self.summary("p1")],
-            hasNextPage: false,
-        )])
-        try await fixture.project.refresh()
-        var lists = await fixture.project.projects().makeAsyncIterator()
-        _ = await lists.next()
-        fixture.preparingContinuation.yield(["p2"])
-        _ = await Self.next(&lists) { _ in true }
-
-        await fixture.repository.setPage(
-            ProjectPage(
-                summaries: [Self.summary("p2"), Self.summary("p1")],
-                hasNextPage: false,
-            ),
-            at: 0,
-        )
-        fixture.preparingContinuation.yield([])
-
-        let list = await Self.next(&lists) { $0.summaries.count == 2 }
-        #expect(list?.summaries.map(\.id) == ["p2", "p1"])
-        #expect(await fixture.repository.requestedPageIndexes == [0, 0])
-    }
-
-    @Test
     func `삭제에 성공하면 목록에서 제거한다`() async throws {
         let fixture = Fixture(pages: [0: ProjectPage(
             summaries: [Self.summary("p1"), Self.summary("p2")],
@@ -187,14 +144,11 @@ struct ProjectTests {
                 pages: pages,
                 holdsFirstRequest: holdsFirstRequest,
             )
-            let (preparing, preparingContinuation) = AsyncStream<Set<String>>.makeStream()
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
             self.repository = repository
-            self.preparingContinuation = preparingContinuation
             self.signedOutContinuation = signedOutContinuation
             project = Project(
                 repository: repository,
-                preparingProjectIDs: { preparing },
                 signedOutEvents: { signedOut },
             )
         }
@@ -202,7 +156,6 @@ struct ProjectTests {
         // MARK: Internal
 
         let repository: StubProjectRepository
-        let preparingContinuation: AsyncStream<Set<String>>.Continuation
         let signedOutContinuation: AsyncStream<Void>.Continuation
         let project: Project
 

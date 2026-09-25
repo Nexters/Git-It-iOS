@@ -145,10 +145,7 @@ struct PendingGenerationRepositoryAdapterTests {
     ) -> PendingGenerationRepositoryAdapter {
         PendingGenerationRepositoryAdapter(
             store: LocalPendingGenerationStore(storage: storage),
-            waitPolicy: GenerationWaitPolicy(
-                minimumWait: 300,
-                retentionLimit: retentionLimit,
-            ),
+            waitPolicy: GenerationWaitPolicy(retentionLimit: retentionLimit),
             now: now,
         )
     }

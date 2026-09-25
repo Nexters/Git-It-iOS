@@ -7,12 +7,10 @@ public actor Project: ProjectUseCase {
 
     public init(
         repository: any ProjectRepository,
-        preparingProjectIDs: @escaping @Sendable () async -> AsyncStream<Set<ProjectID>>,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         pageSize: Int = 20,
     ) {
         self.repository = repository
-        self.preparingProjectIDs = preparingProjectIDs
         self.signedOutEvents = signedOutEvents
         self.pageSize = pageSize
     }
@@ -80,7 +78,6 @@ public actor Project: ProjectUseCase {
     // MARK: Private
 
     private let repository: any ProjectRepository
-    private let preparingProjectIDs: @Sendable () async -> AsyncStream<Set<ProjectID>>
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let pageSize: Int
 
@@ -88,7 +85,6 @@ public actor Project: ProjectUseCase {
     private var nextPageIndex = 0
     private var hasNextPage = false
     private var isLoaded = false
-    private var excludedIDs = Set<ProjectID>()
     private var epoch = 0
     private var firstPageTask: Task<Void, Error>?
     private var nextPageTask: Task<Void, Error>?
@@ -97,7 +93,7 @@ public actor Project: ProjectUseCase {
 
     private var currentList: ProjectList {
         ProjectList(
-            summaries: loaded.filter { !excludedIDs.contains($0.id) },
+            summaries: loaded,
             hasNextPage: hasNextPage,
             isLoaded: isLoaded,
         )
@@ -105,19 +101,13 @@ public actor Project: ProjectUseCase {
 
     private func startObserving() {
         guard observationTasks.isEmpty else { return }
-        let preparingProjectIDs = preparingProjectIDs
         let signedOutEvents = signedOutEvents
         observationTasks = [
-            Task { [weak self] in
-                for await projectIDs in await preparingProjectIDs() {
-                    await self?.exclude(projectIDs)
-                }
-            },
             Task { [weak self] in
                 for await _ in await signedOutEvents() {
                     await self?.reset()
                 }
-            },
+            }
         ]
     }
 
@@ -176,14 +166,6 @@ public actor Project: ProjectUseCase {
     private func clearNextPageTask(epoch: Int) {
         guard epoch == self.epoch else { return }
         nextPageTask = nil
-    }
-
-    private func exclude(_ projectIDs: Set<ProjectID>) async {
-        let released = excludedIDs.subtracting(projectIDs)
-        excludedIDs = projectIDs
-        emit()
-        guard !released.isEmpty, isLoaded else { return }
-        try? await requestFirstPage()
     }
 
     private func reset() {

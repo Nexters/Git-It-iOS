@@ -13,7 +13,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
-        sleep: @escaping @Sendable (TimeInterval) async throws -> Void = { try await Task.sleep(for: .seconds($0)) },
     ) {
         self.repository = repository
         self.pendingGenerations = pendingGenerations
@@ -22,7 +21,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         self.signedOutEvents = signedOutEvents
         self.waitPolicy = waitPolicy
         self.now = now
-        self.sleep = sleep
     }
 
     // MARK: Public
@@ -74,14 +72,12 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
-    private let sleep: @Sendable (TimeInterval) async throws -> Void
 
     private var generationState = GenerationState()
     private var reminderProjectIDs = Set<ProjectID>()
     private var subscribers = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var startTask: Task<Void, Never>?
     private var observationTasks = [Task<Void, Never>]()
-    private var readyTimerTask: Task<Void, Never>?
 
     private func startObserving() async {
         if startTask == nil {
@@ -165,7 +161,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             await scheduleReminderIfRegistered(for: record)
         }
         emit()
-        resetReadyTimer()
     }
 
     private func scheduleReminderIfRegistered(for record: GenerationRecord) async {
@@ -182,7 +177,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
                     projectID: projectID,
                     kind: .completed,
                 ),
-                at: waitPolicy.readyDate(for: record),
+                at: now(),
             )
 
         case .failed:
@@ -200,80 +195,24 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     }
 
     private func projectedState() -> ProjectGenerationState {
-        let current = now()
-        let requests = generationState.records.map { record in
-            ProjectGenerationRequestState(
-                repositoryURL: record.repositoryURL,
-                projectID: record.projectID,
-                requestedAt: record.requestedAt,
-                phase: phase(
-                    of: record,
-                    now: current,
-                ),
-            )
-        }
-        let preparingProjectIDs = requests.reduce(into: Set<ProjectID>()) { projectIDs, request in
-            switch request.phase {
-            case .inProgress,
-                 .preparing:
-                if let projectID = request.projectID {
-                    projectIDs.insert(projectID)
-                }
-
-            case .ready,
-                 .failed:
-                break
+        ProjectGenerationState(
+            requests: generationState.records.map { record in
+                ProjectGenerationRequestState(
+                    repositoryURL: record.repositoryURL,
+                    projectID: record.projectID,
+                    requestedAt: record.requestedAt,
+                    phase: phase(of: record),
+                )
             }
-        }
-        return ProjectGenerationState(
-            requests: requests,
-            preparingProjectIDs: preparingProjectIDs,
         )
     }
 
-    private func phase(
-        of record: GenerationRecord,
-        now: Date,
-    ) -> ProjectGenerationPhase {
-        let readyAt = waitPolicy.readyDate(for: record)
+    private func phase(of record: GenerationRecord) -> ProjectGenerationPhase {
         switch record.status {
-        case .inProgress:
-            return .inProgress(readyAt: readyAt)
-
-        case .completed:
-            return now < readyAt ? .preparing(readyAt: readyAt) : .ready
-
-        case .failed:
-            return .failed
+        case .inProgress: .inProgress
+        case .completed: .ready
+        case .failed: .failed
         }
-    }
-
-    private func resetReadyTimer() {
-        readyTimerTask?.cancel()
-        readyTimerTask = nil
-        let current = now()
-        let earliestReadyAt = generationState.records
-            .filter { $0.status == .completed }
-            .map { waitPolicy.readyDate(for: $0) }
-            .filter { current < $0 }
-            .min()
-        guard let earliestReadyAt else { return }
-        let sleep = sleep
-        let delay = earliestReadyAt.timeIntervalSince(current)
-        readyTimerTask = Task { [weak self] in
-            do {
-                try await sleep(delay)
-            } catch {
-                return
-            }
-            guard !Task.isCancelled else { return }
-            await self?.readyTimerFired()
-        }
-    }
-
-    private func readyTimerFired() {
-        emit()
-        resetReadyTimer()
     }
 
     private func emit() {

@@ -37,8 +37,7 @@ public struct LearningProjectAssembly: Sendable {
                         namespace: LocalPendingGenerationStore.namespace,
                         location: .appGroup,
                     )
-                ),
-                waitPolicy: Self.generationWaitPolicy,
+                )
             ),
             outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
             reminderScheduler: GenerationReminderSchedulerAdapter(
@@ -49,7 +48,6 @@ public struct LearningProjectAssembly: Sendable {
                 failedBody: reminderContent.failedBody,
             ),
             signedOutEvents: signedOutEvents,
-            waitPolicy: Self.generationWaitPolicy,
         )
 
         ingestGenerationOutcomePayload = { rawPayload in
@@ -83,15 +81,6 @@ public struct LearningProjectAssembly: Sendable {
         public let failedBody: String
 
     }
-
-    #if DEBUG
-    public static let generationWaitPolicy = GenerationWaitPolicy(
-        minimumWait: 0,
-        retentionLimit: GenerationWaitPolicy.standard.retentionLimit,
-    )
-    #else
-    public static let generationWaitPolicy = GenerationWaitPolicy.standard
-    #endif
 
     public let projectGeneration: any ProjectGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void

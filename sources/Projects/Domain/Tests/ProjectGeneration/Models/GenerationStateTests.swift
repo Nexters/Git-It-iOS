@@ -256,12 +256,7 @@ struct GenerationStateTests {
     }
 
     @Test
-    func `준비 완료 시각은 요청 시각에 최소 대기 시간을 더한 값이다`() {
-        let record = GenerationRecord(
-            repositoryURL: Self.url,
-            requestedAt: Self.requestedAt,
-        )
-        #expect(GenerationWaitPolicy.standard.readyDate(for: record) == Self.requestedAt.addingTimeInterval(300))
+    func `표준 정책의 보관 기간은 1시간이다`() {
         #expect(GenerationWaitPolicy.standard.retentionLimit == 3_600)
     }
 
