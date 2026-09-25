@@ -90,7 +90,7 @@ extension AppModuleName {
                         "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
                         "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "NO",
                         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
-                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
                         "SWIFT_EMIT_LOC_STRINGS": "NO",
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
@@ -143,6 +143,7 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
                     ]

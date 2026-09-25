@@ -1,7 +1,7 @@
 import Foundation
 import Synchronization
 
-final class DeviceTokenRefreshStream: Sendable {
+nonisolated final class DeviceTokenRefreshStream: Sendable {
 
     // MARK: Internal
 

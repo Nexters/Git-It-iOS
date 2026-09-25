@@ -8,7 +8,7 @@ import DomainUserInfo
 import Foundation
 @testable import GitIt
 
-enum AppRootTestFixture {
+nonisolated enum AppRootTestFixture {
 
     static let repositoryURL: ExternalRepositoryURL = "https://github.com/owner/repo"
     static let projectID: ProjectID = "project-1"
