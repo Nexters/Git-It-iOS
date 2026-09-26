@@ -8,9 +8,9 @@
 [UIComponent 컨벤션 — 재사용 판단](../ui-component/reuse.md)에 따라 컴포넌트로 옮깁니다.
 
 ```swift
-// ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen+ThumbnailView.swift
-extension RepositoryConfirmationScreen {
-    struct ThumbnailView: View {
+// <흐름>/Example/SubViews/ExampleScreen+SummaryView.swift
+extension ExampleScreen {
+    struct SummaryView: View {
         var body: some View { ... }
 
         private enum Constant {
@@ -24,7 +24,7 @@ extension RepositoryConfirmationScreen {
   위치에 두지 않습니다.
 - **화면 `body`에서 서브뷰를 호출할 때는 `Self.`을 붙입니다.** 그 표현이 이 화면이
   소유한 서브뷰라는 것을 호출부에서 바로 드러내기 위한 것입니다
-  (`Self.ThumbnailView()`).
+  (`Self.SummaryView()`).
 - 서브뷰의 상수는 화면과 같은 방식으로 **서브뷰 자신의 `Constant`** 에 정의합니다.
   부모 화면의 `Constant`를 직접 참조하지 않으며, 같은 값을 써야 하면 서브뷰 생성자로
   주입받고 부모 화면이 초기화 시 넘깁니다
@@ -42,8 +42,8 @@ extension RepositoryConfirmationScreen {
   ([View 내부 선언 컨벤션 — 선언 소유 판단](../view-declarations/ownership.md)).
 
   ```swift
-  extension HomeScreen {
-      struct ProfileHeaderView: View {
+  extension ExampleScreen {
+      struct HeaderView: View {
           let name: String?
           let role: String
           let isFailed: Bool
@@ -52,7 +52,7 @@ extension RepositoryConfirmationScreen {
   }
   ```
 
-  화면은 `HomeFeature.State.ProfileLoad`를 읽어 이 값들을 만들어 넘깁니다. 서브뷰는
+  화면은 `ExampleFeature.State`의 프로필 로드 상태를 읽어 이 값들을 만들어 넘깁니다. 서브뷰는
   Feature도 Domain도 모릅니다.
 
 - 화면 파일이 길어지면 서브뷰를

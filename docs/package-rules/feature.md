@@ -40,11 +40,10 @@ Navigation은 Feature의 범위가 아닙니다.
 - Feature는 자신의 State와 업무 모델을 UIComponent의 표시 값과 SwiftUI `Binding`으로
   연결하고, 컴포넌트 콜백을 Feature Action으로 해석합니다.
 - Feature View는 컴포넌트 호출 지점에서 State와 업무 모델을 컴포넌트의 표시 값 모델
-  (`DisplayModel`)로 매핑합니다. 예를 들어 홈 화면은 `HomeProjectDisplay`에서
-  `HomeProjectCard.DisplayModel`을 만들어 넘깁니다.
+  (`DisplayModel`)로 매핑합니다.
 - 화면 View는 컴포넌트가 스스로 바꾸는 상태의 `Binding`을 호출 지점이나 View의 계산
   프로퍼티에서 `Binding(get:set:)`으로 만듭니다. getter는 State에서 값을 읽고, setter는
-  기존 View Action을 보냅니다(예: `set: { _ in send(.bookmarkToggleTapped) }`).
+  기존 View Action을 보냅니다(예: `set: { _ in send(.exampleToggleTapped) }`).
   닫기만 쓰는 상태는 `false`를 받을 때만 닫기 Action을 보냅니다.
 - Feature 바깥의 Navigation은 App이 해석할 delegate 또는 navigation intent로
   출력합니다.

@@ -8,27 +8,27 @@
 ```swift
 @Test
 func `삭제 확인 성공은 선택한 식별자를 한 번 전달한다`() async throws {
-    let project = try makeProject(id: "project-1")
-    let deleteProject = DeleteLearningProjectMock(
+    let item = try makeItem(id: "item-1")
+    let deleteItem = DeleteExampleItemMock(
         behavior: .result(.success(()))
     )
     let store = makeStore(
-        project: project,
+        item: item,
         isDeleteMode: true,
-        deleteLearningProject: deleteProject,
+        deleteExampleItem: deleteItem,
     )
 
-    await store.send(.deleteButtonTapped(project.id)) {
-        $0.pendingDeletion = project.id
+    await store.send(.deleteButtonTapped(item.id)) {
+        $0.pendingDeletion = item.id
     }
     await store.send(.deletionConfirmed)
     await store.receive(\.deletionResponse) {
-        $0.projects.remove(id: project.id)
+        $0.items.remove(id: item.id)
         $0.pendingDeletion = nil
         $0.isDeleteMode = false
     }
 
-    #expect(await deleteProject.snapshot() == [project.id])
+    #expect(await deleteItem.snapshot() == [item.id])
 }
 ```
 

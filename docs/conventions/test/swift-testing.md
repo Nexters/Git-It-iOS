@@ -8,12 +8,12 @@
 ```swift
 import Testing
 
-@Suite("학습 프로젝트 목록 로딩")
-struct LearningProjectListLoadingTests {
+@Suite("예시 목록 로딩")
+struct ExampleListLoadingTests {
 
     @Test
     func `빈 페이지는 로딩 완료와 빈 상태를 함께 표현한다`() {
-        let state = LearningProjectListFeature.State(loadState: .loaded)
+        let state = ExampleListFeature.State(loadState: .loaded)
 
         #expect(state.isEmpty)
     }

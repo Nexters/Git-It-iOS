@@ -12,5 +12,5 @@ cancellation 또는 후속 Action 전달이 필요할 때만 만듭니다.
   반영합니다.
 - 동시에 실행되면 안 되거나 소유 State 제거 시 끝나야 하는 Effect에는 안정적인
   cancellation ID와 명시적인 취소 경로를 둡니다.
-- helper 이름은 `loadInitialProjects`, `deleteProject`처럼 대상과 의도를 표현합니다.
+- helper 이름은 `loadInitialItems`, `deleteItem`처럼 대상과 의도를 표현합니다.
   반환 타입이 이미 `Effect<Action>`이면 `Effect`를 이름에 반복하지 않습니다.

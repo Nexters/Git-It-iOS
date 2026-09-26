@@ -6,6 +6,6 @@
 둡니다. 진입점은 종류가 아니라 target 자체를 대표하는 단 하나의 파일입니다.
 
 ```text
-App/GitIt/GitItApp.swift
-UI/ComponentPreviewApp/UIComponentPreviewAppApp.swift
+<패키지>/<소스 루트>/<앱 이름>App.swift
+App/Example/ExampleApp.swift
 ```

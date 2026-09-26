@@ -11,11 +11,11 @@
 
 ```swift
 @Reducer
-public struct ProjectFeature: Sendable {
-    public init(fetchProject: any FetchProjectUseCase) {
-        self.fetchProject = fetchProject
+public struct ExampleFeature: Sendable {
+    public init(fetchItem: any FetchExampleItemUseCase) {
+        self.fetchItem = fetchItem
     }
 
-    private let fetchProject: any FetchProjectUseCase
+    private let fetchItem: any FetchExampleItemUseCase
 }
 ```

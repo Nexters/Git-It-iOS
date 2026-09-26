@@ -58,14 +58,14 @@ Feature는 자신의 수명 안에서 완결되는 화면만 소유하고, 그 �
 - [ ] UIComponent에 TCA, Feature 또는 Domain 업무 타입이 노출되지 않는가?
 - [ ] Feature가 다른 최상위 Feature를 직접 생성하거나 App Navigation 방식을 명령하지
       않는가?
-- [ ] 전환 컨텍스트(`FlowNavigationStack`·`TabShell`) 하나마다 Router가 하나인가?
+- [ ] 전환 컨텍스트(순차 흐름 스택·탭 셸) 하나마다 Router가 하나인가?
       한 Router가 두 전환 컨텍스트를 쥐거나, 스택 없이 push를 대신 구현하지 않는가?
 - [ ] Router의 `State`에 전환 상태만 있고, 진입 준비·결과 판단·공용 오류 표시는 별개
       Feature로 조합되어 있는가?
 - [ ] Router의 State가 조합하는 화면 Feature의 State를 항상 함께 보유하는가?
 - [ ] 활성 화면 값에 "완료" 같은 상위 이탈 의미의 case가 없는가? 이탈 조건이 한
       `delegate`로 드러나지 않는다면 조건부 Feature로 분리되어 있는가?
-- [ ] 순차 흐름의 화면 전환이 활성 화면 값에서 파생한 `FlowNavigationStack` 경로로
+- [ ] 순차 흐름의 화면 전환이 활성 화면 값에서 파생한 순차 흐름 스택 경로로
       표현되고, `StackState`나 쓰기 가능한 경로 `Binding`을 쓰지 않았는가?
 - [ ] 뒤로가기가 활성 화면 값을 되돌리는 상태 전이이고, 화면 Feature의 State를 새로
       만들지 않는가?

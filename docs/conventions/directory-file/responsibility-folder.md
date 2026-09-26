@@ -8,11 +8,11 @@
 
 ```text
 DTOs/
-└── Answer/
-    ├── SubmitChoiceAnswerRequestDTO.swift
-    ├── SubmitChoiceAnswerResponseDTO.swift
-    ├── SubmitEssayAnswerRequestDTO.swift
-    └── SubmitEssayAnswerResponseDTO.swift
+└── Example/
+    ├── CreateExampleRequestDTO.swift
+    ├── CreateExampleResponseDTO.swift
+    ├── UpdateExampleRequestDTO.swift
+    └── UpdateExampleResponseDTO.swift
 ```
 
 책임 이름 폴더는 형태 폴더의 대체물이 아닙니다. 묶으려는 파일들의 **형태가 서로

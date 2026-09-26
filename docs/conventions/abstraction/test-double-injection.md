@@ -18,27 +18,27 @@
 
 | 검증 대상 | 더블을 주입하는 곳 |
 | --- | --- |
-| Data Remote | 내부 `init(client:)`에 넘기는 `HTTPClient`의 `HTTPTransport` |
-| 키 기반 값 저장 Store | `KeyValueStorage` (`InMemoryKeyValueStorage`) |
-| 보안 값 저장 Store | `SecureValueStorage` (`InMemorySecureValueStorage`) |
-| 알림 연동 | `LocalReminderNotifier` |
-| Composition Adapter·Assembly | 그 어댑터가 받는 Data 구체 타입의 공개 initializer가 받는 Data 역할 계약(`RequestTransport`, `KeyValueStorage`, `SecureValueStorage`) |
+| Data Remote | 내부 initializer에 넘기는 Infrastructure 전송 클라이언트의 전송 계약 |
+| 키 기반 값 저장 Store | Data의 키 기반 값 저장 역할 계약 (메모리 더블) |
+| 보안 값 저장 Store | Data의 보안 값 저장 역할 계약 (메모리 더블) |
+| 알림 연동 | Data의 알림 역할 계약 |
+| Composition Adapter·Assembly | 그 어댑터가 받는 Data 구체 타입의 공개 initializer가 받는 Data 역할 계약 |
 
 ## 예시
 
-`ProjectRemote`의 동작을 검증할 때 별도의 remote 프로토콜과 그 스텁을 만들지
-않고, `StubHTTPTransport`를 주입합니다.
+Data Remote의 동작을 검증할 때 별도의 remote 프로토콜과 그 스텁을 만들지 않고,
+Infrastructure 전송 계약의 스텁을 주입합니다.
 
 ```swift
-let transport = StubHTTPTransport(responses: [...])
-let remote = ProjectRemote(client: HTTPClient(transport: transport), accessTokenProvider: { nil })
+let transport = StubExampleHTTPTransport(responses: [...])
+let remote = ExampleRemote(client: ExampleHTTPClient(transport: transport))
 ```
 
 Composition 테스트는 Data 공개 initializer에 Data 역할 계약 더블을 넘깁니다.
 
 ```swift
-let transport = RecordingRequestTransport(results: [TransportResponse(statusCode: 200, body: ...)])
-let remote = ProjectRemote(baseURL: baseURL, transport: transport, responseTimeout: .seconds(5), accessTokenProvider: { nil })
+let transport = RecordingExampleTransport(results: [ExampleTransportResponse(statusCode: 200, body: ...)])
+let remote = ExampleRemote(baseURL: baseURL, transport: transport, responseTimeout: .seconds(5))
 ```
 
 이 구성은 요청 경로·헤더·본문과 응답 디코딩까지 함께 검증합니다. 그런 프로토콜 스텁은

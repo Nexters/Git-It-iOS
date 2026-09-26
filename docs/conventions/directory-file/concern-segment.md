@@ -6,14 +6,14 @@
 세그먼트**를 하나 더 두고, 형태·타입 패밀리 뎁스는 그 아래에서 셉니다.
 
 ```text
-sources/Projects/Infrastructure/Authentication/Keychain/Stores/
-                 └────────────────────────────┘ └──────┘ └────┘
-                          소스 루트              관심사   1뎁스
+sources/Projects/Infrastructure/<소스 루트>/<관심사>/<형태>/
+                 └─────────────────────────┘ └──────┘ └────┘
+                          소스 루트             관심사   1뎁스
 ```
 
 Infrastructure는 하나의 기술 능력 target이 여러 하위 능력을 담을 수 있으므로 관심사
-세그먼트를 기본으로 사용합니다. `Authentication` target의 Apple 인증·Keychain·난수는
-서로 대체되지 않는 기술 능력이며, target을 쪼개지 않고 관심사 세그먼트로 구분합니다.
+세그먼트를 기본으로 사용합니다. 한 기술 능력 target 안의 하위 능력들이 서로 대체되지
+않는 기술 능력이면 target을 쪼개지 않고 관심사 세그먼트로 구분합니다.
 
 여러 관심사가 함께 쓰는 선언은 `Shared` 관심사 세그먼트에 모으고, 그 아래에서도 형태
 폴더 규칙을 그대로 적용합니다(`Feature/Shared/Models/`). `Shared`는 관심사 세그먼트

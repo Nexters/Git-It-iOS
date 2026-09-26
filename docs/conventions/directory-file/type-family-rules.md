@@ -6,11 +6,11 @@
 모읍니다. 파일이 하나면 폴더를 만들지 않고 형태 폴더에 직접 둡니다.
 
 ```text
-NetworkClient/Models/
-├── HTTPMethod.swift                # 파일이 하나이므로 폴더를 만들지 않는다
-└── HTTPRequest/
-    ├── HTTPRequest.swift
-    └── HTTPRequest+QueryItem.swift
+<소스 루트>/Models/
+├── ExampleKind.swift               # 파일이 하나이므로 폴더를 만들지 않는다
+└── ExampleRequest/
+    ├── ExampleRequest.swift
+    └── ExampleRequest+Parameter.swift
 ```
 
 UIComponent는 컴포넌트에 딸린 선언을 한 파일에 두므로 이 폴더를 만들지 않습니다

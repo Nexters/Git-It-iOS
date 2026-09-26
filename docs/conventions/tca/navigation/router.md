@@ -17,12 +17,11 @@ Feature의 정의 단위가 화면이 아니라 관심사라는 근거는
 **Router의 정의 단위**
 
 - **Router 하나의 관심사 단위는 하나의 전환 컨텍스트입니다.** 전환 컨텍스트는 순차
-  흐름에서는 하나의 `FlowNavigationStack`, 셸 흐름에서는 하나의 `TabShell`입니다.
+  흐름에서는 하나의 순차 흐름 스택 컴포넌트, 셸 흐름에서는 하나의 탭 셸 컴포넌트입니다.
   **전환 컨텍스트 하나에 Router 하나**를 둡니다.
 - **흐름과 Router는 1:1이 아닙니다.** 한 흐름 안에 전환 컨텍스트가 둘이면 Router도
   둘이고, 전환 컨텍스트를 포함하는 쪽의 Router가 포함되는 쪽의 Router를 조합합니다.
-  셸인 `MainShellRouterFeature`가 스택을 소유한 `SettingsRouterFeature`를 조합하는
-  것이 그 예입니다.
+  셸 Router가 스택을 소유한 하위 Router를 조합하는 경우가 여기에 해당합니다.
 - **하나의 Router가 두 전환 컨텍스트를 함께 쥐지 않습니다.** 전환 컨텍스트를 갖지 않는
   Router가 오버레이나 `@Presents`로 push를 대신 구현하는 것도 여기에 해당합니다. push는
   그 스택을 소유한 Router가 수행하고, 스택이 없다면 스택을 소유하는 Router를 새로
@@ -30,7 +29,7 @@ Feature의 정의 단위가 화면이 아니라 관심사라는 근거는
 - **전환이 아닌 관심사는 Router가 소유하지 않고 조합합니다.** 진입 준비, 결과 판단과
   흐름 공용 오류 표시는 각각 자신의 Feature로 두고 Router가 `Scope`로 조합하며, Router
   자신의 `State`에는 전환 상태만 둡니다. 여러 Router가 같은 준비 관심사를 쓰면 그
-  Feature를 각각 조합합니다 — 화면이 없는 `SingleQuestionEntryFeature`가 그 예입니다.
+  Feature를 각각 조합합니다. 이런 준비 Feature는 화면을 갖지 않을 수 있습니다.
 - Router가 조합한 관심사 Feature의 `delegate`는 Router가 해석합니다. 그 결과가 전환이면
   Router가 활성 화면 값을 바꾸고, 흐름 이탈이면 Router 자신의 `delegate`로 올립니다.
 
@@ -42,9 +41,8 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
 
 | | 순차 흐름 | 셸 흐름 |
 | --- | --- | --- |
-| 예 | `ProjectRegistration` | `MainShell` |
 | 화면 관계 | 정해진 순서로 이어지는 여정 | 병렬로 존재하고 임의 순서로 오감 |
-| Router가 소유하는 골격 | `FlowNavigationStack` — 화면들이 배경을 공유 | `TabShell` — 각 화면이 자기 `ScreenContainer`를 가짐 |
+| Router가 소유하는 골격 | 순차 흐름 스택 컴포넌트 — 화면들이 배경을 공유 | 탭 셸 컴포넌트 — 각 화면이 자기 화면 루트 컨테이너를 가짐 |
 | 활성 화면 값 | 세부 화면을 연관값으로 갖는 계층형 enum | 화면을 나열하는 평평한 enum |
 | 흐름 차원의 뒤로가기 | 있음 | 없음 |
 | 이동 이벤트 | 기록함 | 기록하지 않음 — 전환 순서에 의미가 없음 |
@@ -53,8 +51,8 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
 **Router가 조합하는 대상**
 
 - Router는 같은 흐름의 화면 Feature뿐 아니라 **다른 흐름의 진입 Feature**도
-  조합할 수 있습니다. `MainShellRouterFeature`가 `HomeFeature`를 `Scope`로 조합하는
-  것이 그 예입니다.
+  조합할 수 있습니다. 셸 Router가 다른 흐름의 진입 화면 Feature를 `Scope`로 조합하는
+  경우가 여기에 해당합니다.
 - 따라서 자신의 화면을 하나도 갖지 않고 `Router/`만 있는 흐름이 존재할 수 있습니다
   ([디렉터리·파일 컨벤션 — Feature 패키지의 흐름 배치](../../directory-file/feature-layout.md)).
 - 조합 대상이 다른 흐름이어도 경계는 같습니다. 자식은 `delegate`로만 상위 의도를
@@ -73,13 +71,13 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
   child state에서 `scope`로 얻습니다. Router View가 전환 관심사 Feature 하나만
   관찰해야 하는 것은 아니며, 그 흐름이 조합하는 다른 관심사 Feature도 함께 관찰할 수
   있습니다.
-- 골격 컴포넌트는 순차 흐름이면 `FlowNavigationStack`, 셸 흐름이면 `TabShell`입니다.
-  셸 흐름에서는 각 화면이 자신의 `ScreenContainer`를 소유하므로 Router가 이를 다시
-  감싸지 않습니다. 순차 흐름의 화면들이 배경을 공유해야 하면 Router가
-  `FlowNavigationStack`을 `ScreenContainer`로 감쌉니다.
+- 골격 컴포넌트는 순차 흐름이면 순차 흐름 스택 컴포넌트, 셸 흐름이면 탭 셸 컴포넌트입니다.
+  셸 흐름에서는 각 화면이 자신의 화면 루트 컨테이너를 소유하므로 Router가 이를 다시
+  감싸지 않습니다. 순차 흐름의 화면들이 배경을 공유해야 하면 Router가 순차 흐름 스택
+  컴포넌트를 화면 루트 컨테이너로 감쌉니다.
 - **활성 화면 값 타입은 Router가 소유합니다.** 순차 흐름의 계층형 enum과 셸 흐름의 탭
   enum 모두 `Router/`에 둡니다.
-- **순차 흐름의 화면 전환은 `FlowNavigationStack`의 push입니다.** Router View는 활성
+- **순차 흐름의 화면 전환은 순차 흐름 스택 컴포넌트의 push입니다.** Router View는 활성
   화면 값에서 경로 배열을 파생시켜 전달하고, 그 경로가 곧 스택입니다. 활성 화면 값이
   정본이므로 `StackState`와 `NavigationStack`의 쓰기 가능한 경로 `Binding`은 쓰지
   않습니다. 활성 화면 값의 첫 화면이 스택의 루트이고, 나머지 화면은 push된 목적지로
@@ -90,8 +88,8 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
   State를 **항상 보유**해 되돌아간 화면의 입력값을 보존하도록 정했으므로, 두 모델은
   양립하지 않습니다. 표준 예제를 그대로 옮기지 않고 이 프로젝트의 흐름 모델을
   우선합니다.
-- `FlowNavigationStack`은 navigation bar와 시스템 뒤로가기 제스처를 감춥니다. 뒤로가기
-  입력 경로는 각 화면이 소유한 `ScreenControlBar` 하나뿐입니다.
+- 순차 흐름 스택 컴포넌트는 navigation bar와 시스템 뒤로가기 제스처를 감춥니다. 뒤로가기
+  입력 경로는 각 화면이 소유한 화면 상단 컨트롤 바 하나뿐입니다.
 - **뒤로가기는 활성 화면 값을 이전 값으로 되돌리는 상태 전이입니다.** View를 pop하거나
   화면 Feature를 다시 주입해 State를 새로 만들지 않습니다. child state를 항상 보유하므로
   되돌아간 화면의 입력값은 그대로 보존됩니다.
@@ -101,7 +99,7 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
 **구성** (순차 흐름)
 
 - Router의 `State`는 조합하는 각 화면 Feature의 State를 **항상 함께 보유**합니다. 현재
-  어떤 화면이 활성 상태인지는 별도의 연관값 enum(예: `ActiveScreen`)으로 표현하며, 이
+  어떤 화면이 활성 상태인지는 별도의 연관값 enum으로 표현하며, 이
   값은 최상위 화면 Feature 단위를 case로 갖고 그 내부에 세부 화면이 있으면(예: 하나의
   화면 Feature가 여러 단계를 가짐) 그 세부 화면을 연관값으로 함께 포함하는 계층형
   값입니다.
@@ -109,12 +107,10 @@ Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕
   벗어나는 것은 활성 화면 전환이 아니라 Router의 `delegate`입니다.
 - 상위로 나가야 하는 조건이 **한 화면 Feature의 `delegate` 하나로 그대로 드러나면**
   Router가 그 `delegate`를 자신의 `delegate`로 바꿔 올립니다. 별도 Feature를 두지
-  않습니다. `ProjectRegistrationRouterFeature`가 진행 화면의
-  `projectRegistered`를 그대로 올리는 것이 그 예입니다.
+  않습니다.
 - 상위로 나가야 하는지가 **여러 신호의 조합이나 추가 단계에 달려 있으면**, 그 판단만
   하는 별도의 얇은 조건부 Feature를 두고 판단 결과를 `delegate`로 Router에 알립니다. 이
   조건부 Feature는 "완료 여부"가 아니라 "Router 전환 여부"를 판단하는 책임만 가집니다.
-  큐레이션 성공과 splash 표시를 함께 봐야 하는 `OnboardingExitFeature`가 그 예입니다.
 - Router의 `body`는 조합하는 모든 화면 Feature와 조건부 Feature를 `Scope`로 구성하고,
   뒤이어 Router 자신의 `Reduce`에서 화면 Feature의 `delegate`를 해석해 활성 화면을
   전환하거나 조건부 Feature로 조정 신호를 전달합니다.

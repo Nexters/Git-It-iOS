@@ -22,51 +22,37 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 
 ## Target 구성
 
-명세 034에서 단일 `CompositionAdapter`(다른 패키지 모듈 12개 의존)를 Domain 축으로 나눈
-결과입니다. "의존 수"는 target manifest 블록의 `.from<패키지>(…)` 선언 수이며 같은 패키지
-`.target`, `.external`, `.sdk`는 세지 않습니다.
-
-| Target | 소속 축 | 의존 수 | 담는 것 |
-| --- | --- | --- | --- |
-| `CompositionAuthentication` | Account | 4 | 인증·로그인·정책 동의 Adapter, `RequestCredentialProvider` 연결, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
-| `CompositionLearningProject` | Project·QuizDetail·ProjectGeneration·ExternalRepository | 5 | 프로젝트·퀴즈·생성·외부 저장소 Adapter와 조립 |
-| `CompositionMember` | UserInfo·AppSetting | 4 | 사용자 정보·기기 식별자 Adapter |
-| `CompositionApp` | 앱 조립 루트 | 5 | 축 조립과 `ConcernUseCaseAssembly`를 묶어 App에 관심사 UseCase 7개를 공개 |
-| `CompositionShareExtension` | 공유 확장 조립 루트 | 5 | 공유 확장이 쓰는 축 조립만 묶어 공개 |
-
-- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 관심사 타깃**의 축에 둡니다. 외부
-  저장소 조회는 계약이 `DomainExternalRepository`에, 생성 리마인드는 `DomainProjectGeneration`에
-  있으므로 둘 다 LearningProject 축입니다.
-- 요청 인증 정보는 `RequestCredentialProvider` 하나를 만들어 모든 Remote의 인증 헤더 공급과
-  `AccountUseCase`의 로그인 무효화 신호에 연결합니다. 이 연결은 Account 축이 소유합니다.
+- Composition target은 Domain 관심사 축으로 나눕니다. 조립 루트는 앱·확장처럼 실행 진입점마다
+  두고, 실제로 사용하는 축 target만 참조합니다.
+- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 관심사 타깃**의 축에 둡니다.
+- 여러 Remote가 공유하는 요청 인증 정보 공급자는 하나만 만들어 모든 Remote의 인증 정보
+  공급과 로그인 무효화 신호에 연결합니다. 이 연결은 인증 계약이 속한 관심사 축이 소유합니다.
 - 공용 target은 둘 이상의 축이 같은 의미로 쓰는 조립 요소만 담고 Domain·Data 모듈에
   의존해서는 안 됩니다.
-- 모든 Composition target은 다른 패키지 모듈 의존 수가 6개를 넘어서는 안 됩니다. 조립
-  루트가 Data 타입을 직접 만들어야 한다면 그 생성을 해당 축 조립 API로 옮깁니다.
-- 조립 루트는 실제로 사용하는 축 target만 참조합니다.
+- 모든 Composition target은 다른 패키지 모듈 의존 수가 6개를 넘어서는 안 됩니다. 의존 수는
+  target manifest 블록의 `.from<패키지>(…)` 선언 수이며 같은 패키지 `.target`, `.external`,
+  `.sdk`는 세지 않습니다. 조립 루트가 Data 타입을 직접 만들어야 한다면 그 생성을 해당 축
+  조립 API로 옮깁니다.
 - 패키지 간 허용 방향과 target manifest에 선언하지 않은 모듈 import는
   `.tools/package-dependencies`가 검사합니다. target을 추가하거나 이름을 바꾸면
   `.tools/package-dependencies/config/source-roots`도 함께 갱신합니다.
 
-## 이동 후 남는 책임과 남지 않는 책임
+## 조립 책임의 범위
 
-명세 032에서 조립 경계에 들어와 있던 책임을 소유 패키지로 되돌린 결과입니다.
+조립 시점에 객체를 생성하고 실행 환경에 맞는 구현을 선택하는 일은 Composition의 책임입니다.
+무엇이 옳은지 정하는 규칙과 어디에 어떤 이름으로 저장할지 정하는 스키마는 Composition의
+책임이 아닙니다.
 
-| 책임 | 소유 패키지 | Composition에 남는 것 |
-| --- | --- | --- |
-| 저장 네임스페이스·키·저장 형식 | `Data<기능>` | Domain 타입과 저장 레코드 사이의 변환 |
-| App Group 식별자와 Keychain 접근 그룹 | `InfrastructureStorage`, `InfrastructureAuthentication` (Data 생성 진입점이 사용) | `StorageFactory` 위치(`.appGroup`/`.device`) 선택 |
-| 로그인 가용성 판정 | `DomainAccount` | 공유 표시·로그인 기록 계약의 Adapter |
-| 기기 등록 대상 구성 | `DomainAppSetting` | deviceID 계약의 Adapter |
-| 리마인드 예약 정책 | `DomainProjectGeneration` | 알림 계약의 Adapter |
-| 알림 제목과 본문 | `App` | 조립 인자로 전달 |
-| 앱 기동 순서 | `App` | 순서 없는 개별 조각의 공개 |
-| 외부 라이브러리 타입 | `Infrastructure` (Data 내부 구현만 사용) | Data 생성 진입점 호출 |
-
-조립 시점에 객체를 생성하는 일 자체는 Composition의 책임입니다.
-[아키텍처 3.5](../architecture.md)가 정한 대로 Composition은 Data 생성 진입점과 역할 계약을
-이용해 실행 환경에 맞는 구현을 선택하고 객체 생성 순서와 수명을 결정합니다. 이 명세가 걷어낸 것은 "무엇을 만들지 고르는 일"이 아니라 "무엇이 옳은지
-정하는 규칙"과 "어디에 어떤 이름으로 저장할지 정하는 스키마"입니다.
+- 저장 네임스페이스·키·저장 형식은 소유 `Data<기능>` 모듈이 정하고, Composition은 Domain
+  타입과 저장 레코드 사이의 변환만 담당합니다.
+- App Group 식별자와 Keychain 접근 그룹 같은 저장 좌표는 Infrastructure와 Data 생성
+  진입점이 소유하고, Composition은 생성 진입점이 제공하는 저장 위치 중 하나를 선택합니다.
+- 가용성 판정, 등록 대상 구성, 예약 정책 같은 비즈니스 판정은 Domain 관심사가 소유하고,
+  Composition은 그 판정이 요구하는 계약의 Adapter만 구현합니다.
+- 사용자에게 보이는 문구와 앱 기동 순서는 App이 소유합니다. Composition은 문구를 조립
+  인자로 받고, 순서 없는 개별 조각을 공개합니다.
+- 외부 라이브러리 타입은 Data 내부 구현만 사용하고, Composition은 Data 생성 진입점을
+  호출합니다.
 
 ## 제약조건
 

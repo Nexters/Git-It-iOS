@@ -9,6 +9,6 @@
 그 밖의 패키지는 별도 파일로 나눠 소유 타입의 패밀리 폴더에 둡니다.
 
 ```text
-Scaffolds/
-└── TabShell.swift   # TabShell, TabShellItem(protocol이라 중첩 불가), TabShellPreviewItem(프리뷰 전용)
+<역할 폴더>/
+└── ExampleContainer.swift   # ExampleContainer, ExampleContainerEntry(protocol이라 중첩 불가), ExampleContainerPreviewEntry(프리뷰 전용)
 ```

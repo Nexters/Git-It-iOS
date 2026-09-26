@@ -7,23 +7,23 @@ Feature 화면은 TCA `Store`를 화면 상태의 단일 정본으로 사용하�
 `ViewModel`이나 시각 변형 `Style`을 정의하지 않습니다.
 
 ```swift
-// Home/HomeView.swift
-public struct HomeView: View {
-    public init(store: StoreOf<HomeFeature>) {
+// Example/ExampleScreen.swift
+public struct ExampleScreen: View {
+    public init(store: StoreOf<ExampleFeature>) {
         self.store = store
     }
 
     public var body: some View {
-        ScreenContainer {
-            if store.hasProjects {
-                projectList
+        ExampleContainer {
+            if store.hasItems {
+                itemList
             } else {
                 emptyState
             }
         }
     }
 
-    @Bindable private var store: StoreOf<HomeFeature>
+    @Bindable private var store: StoreOf<ExampleFeature>
 }
 ```
 

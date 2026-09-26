@@ -28,19 +28,19 @@ public enum Action: ViewAction, Sendable, Equatable {
     public enum View: Sendable, Equatable {
         case task
         case retryTapped
-        case projectRowTapped(projectID: String)
+        case itemRowTapped(itemID: String)
         case deletionConfirmed
     }
 
     public enum EffectEvent: Sendable, Equatable {
-        case projectsLoadFinished(
+        case itemsLoadFinished(
             requestID: Int,
-            result: Result<LearningProjectPage, LearningProjectError>
+            result: Result<ExamplePage, ExampleError>
         )
     }
 
     public enum Delegate: Sendable, Equatable {
-        case learningRequested(route: LearningRoute)
+        case detailRequested(route: ExampleRoute)
     }
 }
 ```
