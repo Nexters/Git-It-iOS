@@ -98,7 +98,7 @@ struct PendingGenerationRepositoryAdapterTests {
 
         var iterator = await adapter.pendingStateChanges().makeAsyncIterator()
         let first = await iterator.next()
-        await adapter.finishGeneration(
+        _ = await adapter.finishGeneration(
             projectID: "project-1",
             status: .completed,
             finishedAt: Self.requestedAt,
@@ -107,6 +107,48 @@ struct PendingGenerationRepositoryAdapterTests {
 
         #expect(first?.record(projectID: "project-1")?.status == .inProgress)
         #expect(second?.record(projectID: "project-1")?.status == .completed)
+    }
+
+    @Test
+    func `기록이 있는 프로젝트의 결과 반영은 true를 돌려준다`() async {
+        let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage())
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        await adapter.attachProjectID(
+            "project-1",
+            toRepositoryURL: Self.url,
+        )
+
+        let isRecorded = await adapter.finishGeneration(
+            projectID: "project-1",
+            status: .completed,
+            finishedAt: Self.requestedAt,
+        )
+
+        #expect(isRecorded)
+        #expect(await adapter.pendingState().record(projectID: "project-1")?.status == .completed)
+    }
+
+    @Test
+    func `기록이 없는 프로젝트의 결과 반영은 false를 돌려주고 저장소를 바꾸지 않는다`() async {
+        let storage = InMemoryKeyValueStorage()
+        let adapter = Self.makeAdapter(storage: storage)
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        let before = await adapter.pendingState()
+
+        let isRecorded = await adapter.finishGeneration(
+            projectID: "project-unknown",
+            status: .completed,
+            finishedAt: Self.requestedAt,
+        )
+
+        #expect(!isRecorded)
+        #expect(await adapter.pendingState() == before)
     }
 
     // MARK: Private
@@ -145,7 +187,10 @@ struct PendingGenerationRepositoryAdapterTests {
     ) -> PendingGenerationRepositoryAdapter {
         PendingGenerationRepositoryAdapter(
             store: LocalPendingGenerationStore(storage: storage),
-            waitPolicy: GenerationWaitPolicy(retentionLimit: retentionLimit),
+            waitPolicy: GenerationWaitPolicy(
+                retentionLimit: retentionLimit,
+                reminderValidity: 300,
+            ),
             now: now,
         )
     }

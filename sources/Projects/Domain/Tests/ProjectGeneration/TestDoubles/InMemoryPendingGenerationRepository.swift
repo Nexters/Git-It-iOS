@@ -6,8 +6,14 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 
     // MARK: Lifecycle
 
-    init(state: GenerationState = GenerationState()) {
+    init(
+        state: GenerationState = GenerationState(),
+        retentionLimit: TimeInterval = GenerationWaitPolicy.standard.retentionLimit,
+        now: @escaping @Sendable () -> Date,
+    ) {
         self.state = state
+        self.retentionLimit = retentionLimit
+        self.now = now
     }
 
     // MARK: Internal
@@ -21,7 +27,7 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
     }
 
     func pendingState() async -> GenerationState {
-        state
+        visibleState()
     }
 
     func pendingStateChanges() async -> AsyncStream<GenerationState> {
@@ -31,7 +37,7 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         continuation.onTermination = { [weak self] _ in
             Task { await self?.removeSubscriber(subscriberID) }
         }
-        continuation.yield(state)
+        continuation.yield(visibleState())
         return stream
     }
 
@@ -63,13 +69,15 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         projectID: String,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async {
+    ) async -> Bool {
         finishedProjectIDs.append(projectID)
+        guard visibleState().records.contains(where: { $0.projectID == projectID }) else { return false }
         update(state.finishing(
             projectID: projectID,
             status: status,
             at: finishedAt,
         ))
+        return true
     }
 
     func releaseGeneration(repositoryURL: String) async {
@@ -95,14 +103,28 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         return reminderProjectIDs
     }
 
+    func replaceStateSilently(_ next: GenerationState) {
+        state = next
+    }
+
     // MARK: Private
 
+    private let retentionLimit: TimeInterval
+    private let now: @Sendable () -> Date
     private var subscribers = [UUID: AsyncStream<GenerationState>.Continuation]()
+
+    private func visibleState() -> GenerationState {
+        state.purgingExpired(
+            now: now(),
+            retentionLimit: retentionLimit,
+        )
+    }
 
     private func update(_ next: GenerationState) {
         state = next
+        let visible = visibleState()
         for continuation in subscribers.values {
-            continuation.yield(next)
+            continuation.yield(visible)
         }
     }
 

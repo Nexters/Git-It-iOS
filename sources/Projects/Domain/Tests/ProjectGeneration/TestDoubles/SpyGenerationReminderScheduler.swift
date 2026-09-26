@@ -18,6 +18,7 @@ actor SpyGenerationReminderScheduler: GenerationReminderScheduler {
     }
 
     private(set) var scheduledReminders = [ScheduledReminder]()
+    private(set) var cancelledProjectIDs = [String]()
 
     func isAuthorized() async -> Bool {
         authorized
@@ -33,8 +34,16 @@ actor SpyGenerationReminderScheduler: GenerationReminderScheduler {
         ))
     }
 
+    func setAuthorized(_ isAuthorized: Bool) {
+        authorized = isAuthorized
+    }
+
+    func cancel(projectID: String) async {
+        cancelledProjectIDs.append(projectID)
+    }
+
     // MARK: Private
 
-    private let authorized: Bool
+    private var authorized: Bool
 
 }

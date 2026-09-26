@@ -1,4 +1,5 @@
 import DomainIdentifier
+import Foundation
 
 public struct GenerationOutcome: Equatable, Sendable {
 
@@ -7,9 +8,11 @@ public struct GenerationOutcome: Equatable, Sendable {
     public init(
         projectID: ProjectID,
         status: Status,
+        arrivedAt: Date,
     ) {
         self.projectID = projectID
         self.status = status
+        self.arrivedAt = arrivedAt
     }
 
     // MARK: Public
@@ -21,5 +24,6 @@ public struct GenerationOutcome: Equatable, Sendable {
 
     public let projectID: ProjectID
     public let status: Status
+    public let arrivedAt: Date
 
 }

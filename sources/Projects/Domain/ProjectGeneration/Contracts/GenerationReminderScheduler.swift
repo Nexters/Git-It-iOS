@@ -1,3 +1,4 @@
+import DomainIdentifier
 import Foundation
 
 public protocol GenerationReminderScheduler: Sendable {
@@ -6,4 +7,5 @@ public protocol GenerationReminderScheduler: Sendable {
         _ reminder: GenerationReminder,
         at date: Date,
     ) async
+    func cancel(projectID: ProjectID) async
 }

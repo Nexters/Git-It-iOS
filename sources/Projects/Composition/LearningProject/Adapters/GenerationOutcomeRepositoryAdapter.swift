@@ -36,12 +36,14 @@ public struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
             GenerationOutcome(
                 projectID: dto.projectID,
                 status: .completed,
+                arrivedAt: dto.deliveredAt,
             )
 
         case .failed:
             GenerationOutcome(
                 projectID: dto.projectID,
                 status: .failed,
+                arrivedAt: dto.deliveredAt,
             )
         }
     }

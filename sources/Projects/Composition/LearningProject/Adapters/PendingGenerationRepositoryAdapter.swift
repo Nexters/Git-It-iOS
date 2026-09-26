@@ -74,12 +74,15 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         projectID: ProjectID,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async {
-        await modify { $0.finishing(
-            projectID: projectID,
-            status: status,
-            at: finishedAt,
-        ) }
+    ) async -> Bool {
+        await modify { state in
+            guard state.record(projectID: projectID) != nil else { return nil }
+            return state.finishing(
+                projectID: projectID,
+                status: status,
+                at: finishedAt,
+            )
+        }
     }
 
     public func releaseGeneration(repositoryURL: ExternalRepositoryURL) async {

@@ -1,4 +1,5 @@
 import DataNotification
+import DomainIdentifier
 import DomainProjectGeneration
 import Foundation
 
@@ -42,6 +43,11 @@ public struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
         )
     }
 
+    public func cancel(projectID: ProjectID) async {
+        await reminderNotifier.cancel(identifier: completedIdentifier(for: projectID))
+        await reminderNotifier.cancel(identifier: failedIdentifier(for: projectID))
+    }
+
     // MARK: Private
 
     private let reminderNotifier: any LocalReminderNotifier
@@ -52,10 +58,18 @@ public struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
 
     private func identifier(for reminder: GenerationReminder) -> String {
         switch reminder.kind {
-        case .completed: "generation-completed-\(reminder.projectID)"
-        case .failed: "generation-failed-\(reminder.projectID)"
-        @unknown default: "generation-completed-\(reminder.projectID)"
+        case .completed: completedIdentifier(for: reminder.projectID)
+        case .failed: failedIdentifier(for: reminder.projectID)
+        @unknown default: completedIdentifier(for: reminder.projectID)
         }
+    }
+
+    private func completedIdentifier(for projectID: ProjectID) -> String {
+        "generation-completed-\(projectID)"
+    }
+
+    private func failedIdentifier(for projectID: ProjectID) -> String {
+        "generation-failed-\(projectID)"
     }
 
     private func title(for kind: GenerationReminder.Kind) -> String {

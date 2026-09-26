@@ -35,12 +35,31 @@ struct GenerationOutcomeRepositoryAdapterTests {
             GenerationOutcome(
                 projectID: "project-1",
                 status: .completed,
+                arrivedAt: Date(timeIntervalSince1970: 1_000),
             ),
             GenerationOutcome(
                 projectID: "project-2",
                 status: .failed,
+                arrivedAt: Date(timeIntervalSince1970: 1_000),
             ),
         ])
+    }
+
+    @Test
+    func `DTO의 전달 시각을 결과의 도착 시각으로 옮긴다`() async {
+        let deliveredAt = Date(timeIntervalSince1970: 2_500)
+        let adapter = GenerationOutcomeRepositoryAdapter(source: StubOutcomeSource(dtos: [
+            QuizGenerationOutcomeDTO(
+                projectID: "project-1",
+                status: .completed,
+                deliveredAt: deliveredAt,
+            )
+        ]))
+
+        var iterator = await adapter.outcomes().makeAsyncIterator()
+        let outcome = await iterator.next()
+
+        #expect(outcome?.arrivedAt == deliveredAt)
     }
 
     // MARK: Private

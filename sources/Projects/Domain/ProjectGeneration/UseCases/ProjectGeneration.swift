@@ -13,6 +13,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
+        sleep: @escaping @Sendable (TimeInterval) async throws -> Void = { try await Task.sleep(for: .seconds($0)) },
     ) {
         self.repository = repository
         self.pendingGenerations = pendingGenerations
@@ -21,6 +22,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         self.signedOutEvents = signedOutEvents
         self.waitPolicy = waitPolicy
         self.now = now
+        self.sleep = sleep
     }
 
     // MARK: Public
@@ -65,6 +67,9 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     // MARK: Private
 
+    private static let preservedOutcomeLimit = 16
+    private static let expiryTimerMargin: TimeInterval = 1
+
     private let repository: any ProjectGenerationRepository
     private let pendingGenerations: any PendingGenerationRepository
     private let outcomes: any GenerationOutcomeRepository
@@ -72,12 +77,15 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
+    private let sleep: @Sendable (TimeInterval) async throws -> Void
 
     private var generationState = GenerationState()
     private var reminderProjectIDs = Set<ProjectID>()
+    private var preservedOutcomes = [GenerationOutcome]()
     private var subscribers = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var startTask: Task<Void, Never>?
     private var observationTasks = [Task<Void, Never>]()
+    private var deadlineTimerTask: Task<Void, Never>?
 
     private func startObserving() async {
         if startTask == nil {
@@ -141,32 +149,84 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             case .completed: .completed
             case .failed: .failed
             }
-        await pendingGenerations.finishGeneration(
+        let isRecorded = await pendingGenerations.finishGeneration(
             projectID: outcome.projectID,
             status: status,
-            finishedAt: now(),
+            finishedAt: outcome.arrivedAt,
         )
+        if !isRecorded {
+            preserve(outcome)
+        }
+    }
+
+    private func preserve(_ outcome: GenerationOutcome) {
+        guard
+            !isExpired(
+                outcome,
+                now: now(),
+            ),
+            !preservedOutcomes.contains(where: { $0.projectID == outcome.projectID })
+        else { return }
+        preservedOutcomes.append(outcome)
+        if preservedOutcomes.count > Self.preservedOutcomeLimit {
+            preservedOutcomes.removeFirst(preservedOutcomes.count - Self.preservedOutcomeLimit)
+        }
+    }
+
+    private func retryPreservedOutcomes() async {
+        let current = now()
+        preservedOutcomes.removeAll { isExpired(
+            $0,
+            now: current,
+        ) }
+        let recordedProjectIDs = Set(generationState.records.compactMap(\.projectID))
+        let retryingOutcomes = preservedOutcomes.filter { recordedProjectIDs.contains($0.projectID) }
+        guard !retryingOutcomes.isEmpty else { return }
+        preservedOutcomes.removeAll { recordedProjectIDs.contains($0.projectID) }
+        for outcome in retryingOutcomes {
+            await finish(outcome)
+        }
+    }
+
+    private func isExpired(
+        _ outcome: GenerationOutcome,
+        now: Date,
+    ) -> Bool {
+        now.timeIntervalSince(outcome.arrivedAt) > waitPolicy.retentionLimit
     }
 
     private func releaseAll() async {
         reminderProjectIDs.removeAll()
+        preservedOutcomes.removeAll()
         await pendingGenerations.releaseAll()
         await apply(pendingGenerations.pendingState())
     }
 
     private func apply(_ state: GenerationState) async {
+        let previousProjectIDs = Set(generationState.records.compactMap(\.projectID))
         generationState = state
+        let removedProjectIDs = previousProjectIDs.subtracting(state.records.compactMap(\.projectID))
+        for projectID in removedProjectIDs {
+            reminderProjectIDs.remove(projectID)
+            await reminderScheduler.cancel(projectID: projectID)
+        }
         await absorbPendingReminders()
         for record in state.records where record.status != .inProgress {
             await scheduleReminderIfRegistered(for: record)
         }
         emit()
+        resetDeadlineTimer()
+        await retryPreservedOutcomes()
     }
 
     private func scheduleReminderIfRegistered(for record: GenerationRecord) async {
         guard
             let projectID = record.projectID,
             reminderProjectIDs.remove(projectID) != nil,
+            waitPolicy.isReminderValid(
+                record,
+                now: now(),
+            ),
             await reminderScheduler.isAuthorized()
         else { return }
 
@@ -213,6 +273,32 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         case .completed: .ready
         case .failed: .failed
         }
+    }
+
+    private func resetDeadlineTimer() {
+        deadlineTimerTask?.cancel()
+        deadlineTimerTask = nil
+        let current = now()
+        let earliestDeadline = generationState.records
+            .map { waitPolicy.expiryDate(for: $0).addingTimeInterval(Self.expiryTimerMargin) }
+            .filter { current < $0 }
+            .min()
+        guard let earliestDeadline else { return }
+        let sleep = sleep
+        let delay = earliestDeadline.timeIntervalSince(current)
+        deadlineTimerTask = Task { [weak self] in
+            do {
+                try await sleep(delay)
+            } catch {
+                return
+            }
+            await self?.deadlineTimerFired()
+        }
+    }
+
+    private func deadlineTimerFired() async {
+        await purgeExpiredRecords()
+        await apply(pendingGenerations.pendingState())
     }
 
     private func emit() {

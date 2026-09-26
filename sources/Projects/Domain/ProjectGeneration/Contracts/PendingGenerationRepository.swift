@@ -16,7 +16,7 @@ public protocol PendingGenerationRepository: Sendable {
         projectID: ProjectID,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async
+    ) async -> Bool
     func releaseGeneration(repositoryURL: ExternalRepositoryURL) async
     func releaseGeneration(projectID: ProjectID) async
     func releaseAll() async
