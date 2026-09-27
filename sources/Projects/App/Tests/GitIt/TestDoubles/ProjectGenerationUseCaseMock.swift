@@ -35,6 +35,10 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
         return stream
     }
 
+    func outcomeArrivals() async -> AsyncStream<ProjectID> {
+        AsyncStream { $0.finish() }
+    }
+
     func synchronize() async {
         synchronizeCount += 1
     }

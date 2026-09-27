@@ -51,6 +51,10 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
         AsyncStream { $0.finish() }
     }
 
+    func outcomeArrivals() async -> AsyncStream<ProjectID> {
+        AsyncStream { $0.finish() }
+    }
+
     func synchronize() async { }
 
     func release(_: ProjectID) async { }

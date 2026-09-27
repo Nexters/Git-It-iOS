@@ -531,6 +531,158 @@ struct ProjectGenerationTests {
         #expect(await fixture.scheduler.cancelledProjectIDs == ["p-unknown"])
     }
 
+    @Test
+    func `생성 결과가 도착하면 그 프로젝트 식별자를 도착 알림으로 방출한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p1")
+    }
+
+    @Test
+    func `생성 기록이 없는 프로젝트의 결과도 도착 알림으로 방출한다`() async {
+        let fixture = Fixture()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        fixture.outcomes.emit(Self.outcome(
+            "p-unknown",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p-unknown")
+    }
+
+    @Test
+    func `보존한 결과를 다시 반영할 때는 도착 알림을 방출하지 않는다`() async {
+        let fixture = Fixture(state: Self.unattachedState(repositoryURLs: [Self.request.repositoryURL]))
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        #expect(await arrivals.next() == "p1")
+
+        await fixture.pendingGenerations.attachProjectID(
+            "p1",
+            toRepositoryURL: Self.request.repositoryURL,
+        )
+        await fixture.generation.synchronize()
+        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
+        fixture.outcomes.emit(Self.outcome(
+            "p2",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p2")
+    }
+
+    @Test
+    func `도착 알림은 생성 기록 반영을 마친 뒤 방출한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        _ = await arrivals.next()
+        var states = await fixture.generation.states().makeAsyncIterator()
+
+        #expect(await states.next()?.requests.first?.phase == .ready)
+    }
+
+    @Test
+    func `같은 프로젝트의 같은 결과가 다시 도착하면 도착 알림을 다시 방출하지 않는다`() async {
+        let fixture = Fixture()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+            arrivedAt: Self.requestedAt.addingTimeInterval(1),
+        ))
+        fixture.outcomes.emit(Self.outcome(
+            "p2",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p1")
+        #expect(await arrivals.next() == "p2")
+    }
+
+    @Test
+    func `같은 프로젝트라도 상태가 다른 결과는 도착 알림을 방출한다`() async {
+        let fixture = Fixture()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .failed,
+        ))
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p1")
+        #expect(await arrivals.next() == "p1")
+    }
+
+    @Test
+    func `보관 기한이 지난 뒤 같은 결과가 다시 도착하면 도착 알림을 방출한다`() async {
+        let fixture = Fixture()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        #expect(await arrivals.next() == "p1")
+
+        fixture.sleeper.advance(by: 3_601)
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+            arrivedAt: fixture.sleeper.now,
+        ))
+
+        #expect(await arrivals.next() == "p1")
+    }
+
+    @Test
+    func `로그아웃한 뒤 같은 결과가 다시 도착하면 도착 알림을 방출한다`() async {
+        let fixture = Fixture(state: Self.unattachedState(repositoryURLs: [Self.request.repositoryURL]))
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        #expect(await arrivals.next() == "p1")
+
+        fixture.signedOutContinuation.yield(())
+        _ = await Self.next(&states) { $0.requests.isEmpty }
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p1")
+    }
+
     // MARK: Private
 
     private struct Fixture {

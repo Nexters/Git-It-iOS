@@ -65,6 +65,17 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         return stream
     }
 
+    public func outcomeArrivals() async -> AsyncStream<ProjectID> {
+        await startObserving()
+        let (stream, continuation) = AsyncStream<ProjectID>.makeStream()
+        let subscriberID = UUID()
+        arrivalSubscribers[subscriberID] = continuation
+        continuation.onTermination = { [weak self] _ in
+            Task { await self?.removeArrivalSubscriber(subscriberID) }
+        }
+        return stream
+    }
+
     public func synchronize() async {
         guard let startTask else {
             await startObserving()
@@ -90,6 +101,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     // MARK: Private
 
     private static let preservedOutcomeLimit = 16
+    private static let recentArrivalLimit = 32
     private static let expiryTimerMargin: TimeInterval = 1
 
     private let repository: any ProjectGenerationRepository
@@ -105,6 +117,8 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private var reminderProjectIDs = Set<ProjectID>()
     private var preservedOutcomes = [GenerationOutcome]()
     private var subscribers = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
+    private var arrivalSubscribers = [UUID: AsyncStream<ProjectID>.Continuation]()
+    private var recentArrivals = [GenerationOutcome]()
     private var startTask: Task<Void, Never>?
     private var observationTasks = [Task<Void, Never>]()
     private var deadlineTimerTask: Task<Void, Never>?
@@ -127,7 +141,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         observationTasks = [
             Task { [weak self] in
                 for await outcome in outcomeStream {
-                    await self?.finish(outcome)
+                    await self?.receive(outcome)
                 }
             },
             Task { [weak self] in
@@ -165,7 +179,32 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         }
     }
 
-    private func finish(_ outcome: GenerationOutcome) async {
+    private func receive(_ outcome: GenerationOutcome) async {
+        if await finish(outcome) {
+            await apply(pendingGenerations.pendingState())
+        }
+        announceArrival(of: outcome)
+    }
+
+    private func announceArrival(of outcome: GenerationOutcome) {
+        let current = now()
+        let isDuplicate = recentArrivals.contains { arrival in
+            arrival.projectID == outcome.projectID
+                && arrival.status == outcome.status
+                && current.timeIntervalSince(arrival.arrivedAt) <= waitPolicy.retentionLimit
+        }
+        guard !isDuplicate else { return }
+        recentArrivals.append(outcome)
+        if recentArrivals.count > Self.recentArrivalLimit {
+            recentArrivals.removeFirst(recentArrivals.count - Self.recentArrivalLimit)
+        }
+        for continuation in arrivalSubscribers.values {
+            continuation.yield(outcome.projectID)
+        }
+    }
+
+    @discardableResult
+    private func finish(_ outcome: GenerationOutcome) async -> Bool {
         let status: GenerationRecord.Status =
             switch outcome.status {
             case .completed: .completed
@@ -179,6 +218,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         if !isRecorded {
             preserve(outcome)
         }
+        return isRecorded
     }
 
     private func preserve(_ outcome: GenerationOutcome) {
@@ -220,6 +260,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private func releaseAll() async {
         reminderProjectIDs.removeAll()
         preservedOutcomes.removeAll()
+        recentArrivals.removeAll()
         await pendingGenerations.releaseAll()
         await apply(pendingGenerations.pendingState())
     }
@@ -332,6 +373,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     private func removeSubscriber(_ subscriberID: UUID) {
         subscribers.removeValue(forKey: subscriberID)
+    }
+
+    private func removeArrivalSubscriber(_ subscriberID: UUID) {
+        arrivalSubscribers.removeValue(forKey: subscriberID)
     }
 
 }
