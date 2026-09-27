@@ -73,6 +73,7 @@ nonisolated struct AppRootFeature: Sendable {
         var onboarding: OnboardingRouterFeature.State
         var mainShell = MainShellRouterFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
+        var isInBackground = false
 
         @Presents var projectRegistration: ProjectRegistrationRouterFeature.State?
         @Presents var projectDetail: ProjectDetailRouterFeature.State?
@@ -95,6 +96,7 @@ nonisolated struct AppRootFeature: Sendable {
         enum View: Sendable, Equatable {
             case task
             case applicationBecameActive
+            case applicationEnteredBackground
         }
 
         @CasePathable
@@ -104,6 +106,8 @@ nonisolated struct AppRootFeature: Sendable {
             case deviceRegistrationFailed
             case deviceTokenRefreshed(String)
             case generationStateChanged(ProjectGenerationState)
+            case generationOutcomeArrived(ProjectID)
+            case learningProjectsRefreshFinished(error: ProjectError?)
         }
     }
 
@@ -230,6 +234,8 @@ nonisolated struct AppRootFeature: Sendable {
         case deviceRegistration
         case deviceTokenRefreshes
         case generationObservation
+        case generationOutcomeObservation
+        case learningProjectsRefresh
     }
 
     private let account: any AccountUseCase
@@ -265,9 +271,17 @@ nonisolated struct AppRootFeature: Sendable {
                     }
                 }
                 .cancellable(id: CancelID.generationObservation),
+                .run { [projectGeneration] send in
+                    for await projectID in await projectGeneration.outcomeArrivals() {
+                        await send(.effect(.generationOutcomeArrived(projectID)))
+                    }
+                }
+                .cancellable(id: CancelID.generationOutcomeObservation),
             )
 
         case .applicationBecameActive:
+            let returnedFromBackground = state.isInBackground
+            state.isInBackground = false
             guard state.mainShell.access == .member else { return .none }
             var effects: [Effect<Action>] = [
                 .run { [account] send in
@@ -277,13 +291,17 @@ nonisolated struct AppRootFeature: Sendable {
                     await projectGeneration.synchronize()
                 },
             ]
-            if state.route == .mainShell {
-                effects.append(.send(.mainShell(.input(.learningProjectsReloadRequested))))
+            if returnedFromBackground, state.route == .mainShell {
+                effects.append(refreshLearningProjects())
             }
             if state.deviceRegistration == .failed {
                 effects.append(registerDeviceIfNeeded(&state))
             }
             return .merge(effects)
+
+        case .applicationEnteredBackground:
+            state.isInBackground = true
+            return .none
         }
     }
 
@@ -320,6 +338,17 @@ nonisolated struct AppRootFeature: Sendable {
                 generationState,
                 state: &state,
             )
+
+        case .generationOutcomeArrived:
+            guard
+                !state.isInBackground,
+                state.route == .mainShell,
+                state.mainShell.access == .member
+            else { return .none }
+            return refreshLearningProjects()
+
+        case .learningProjectsRefreshFinished:
+            return .none
         }
     }
 
@@ -529,6 +558,22 @@ nonisolated struct AppRootFeature: Sendable {
             }
         }
         .cancellable(id: CancelID.deviceRegistration)
+    }
+
+    private func refreshLearningProjects() -> Effect<Action> {
+        .run { [project] send in
+            do {
+                try await project.refreshReplacingInFlightRequest()
+                await send(.effect(.learningProjectsRefreshFinished(error: nil)))
+            } catch {
+                let mapped = error as? ProjectError ?? .unexpected
+                await send(.effect(.learningProjectsRefreshFinished(error: mapped)))
+            }
+        }
+        .cancellable(
+            id: CancelID.learningProjectsRefresh,
+            cancelInFlight: true,
+        )
     }
 
     private func applyGenerationState(

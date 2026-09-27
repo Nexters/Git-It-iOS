@@ -36,7 +36,12 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
     }
 
     func outcomeArrivals() async -> AsyncStream<ProjectID> {
-        AsyncStream { $0.finish() }
+        let (stream, continuation) = AsyncStream<ProjectID>.makeStream()
+        arrivalContinuation = continuation
+        if !keepsObservationOpen {
+            continuation.finish()
+        }
+        return stream
     }
 
     func synchronize() async {
@@ -54,6 +59,15 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
 
     func finish() {
         continuation?.finish()
+        arrivalContinuation?.finish()
+    }
+
+    func emitArrival(_ projectID: ProjectID) {
+        arrivalContinuation?.yield(projectID)
+    }
+
+    func finishArrivals() {
+        arrivalContinuation?.finish()
     }
 
     // MARK: Private
@@ -61,5 +75,6 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
     private let keepsObservationOpen: Bool
     private var state: ProjectGenerationState
     private var continuation: AsyncStream<ProjectGenerationState>.Continuation?
+    private var arrivalContinuation: AsyncStream<ProjectID>.Continuation?
 
 }

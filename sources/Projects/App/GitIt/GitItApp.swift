@@ -71,8 +71,19 @@ struct GitItApp: App {
                     )()
                 }
                 .onChange(of: scenePhase) { _, newPhase in
-                    guard newPhase == .active else { return }
-                    rootStore.send(.view(.applicationBecameActive))
+                    switch newPhase {
+                    case .active:
+                        rootStore.send(.view(.applicationBecameActive))
+
+                    case .background:
+                        rootStore.send(.view(.applicationEnteredBackground))
+
+                    case .inactive:
+                        break
+
+                    @unknown default:
+                        break
+                    }
                 }
         }
     }
