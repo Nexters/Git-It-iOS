@@ -39,10 +39,23 @@ public actor Project: ProjectUseCase {
         try await requestFirstPage()
     }
 
+    public func refreshReplacingInFlightRequest() async throws {
+        startObserving()
+        epoch += 1
+        firstPageTask?.cancel()
+        firstPageTask = nil
+        nextPageTask?.cancel()
+        nextPageTask = nil
+        try await requestFirstPage()
+    }
+
     public func requestNextPage() async throws {
         startObserving()
         if let nextPageTask {
-            try await nextPageTask.value
+            try await awaitNextPage(
+                nextPageTask,
+                epoch: epoch,
+            )
             return
         }
         guard hasNextPage else { return }
@@ -62,7 +75,10 @@ public actor Project: ProjectUseCase {
         }
         nextPageTask = task
         defer { clearNextPageTask(epoch: epoch) }
-        try await task.value
+        try await awaitNextPage(
+            task,
+            epoch: epoch,
+        )
     }
 
     public func detail(of projectID: ProjectID) async throws -> ProjectDetail {
@@ -90,6 +106,7 @@ public actor Project: ProjectUseCase {
     private var hasNextPage = false
     private var isLoaded = false
     private var epoch = 0
+    private var resetEpoch = 0
     private var firstPageTask: Task<Void, Error>?
     private var nextPageTask: Task<Void, Error>?
     private var subscribers = [UUID: AsyncStream<ProjectList>.Continuation]()
@@ -117,7 +134,10 @@ public actor Project: ProjectUseCase {
 
     private func requestFirstPage() async throws {
         if let firstPageTask {
-            try await firstPageTask.value
+            try await awaitFirstPage(
+                firstPageTask,
+                epoch: epoch,
+            )
             return
         }
         let repository = repository
@@ -135,7 +155,41 @@ public actor Project: ProjectUseCase {
         }
         firstPageTask = task
         defer { clearFirstPageTask(epoch: epoch) }
-        try await task.value
+        try await awaitFirstPage(
+            task,
+            epoch: epoch,
+        )
+    }
+
+    private func awaitFirstPage(
+        _ task: Task<Void, Error>,
+        epoch requestEpoch: Int,
+    ) async throws {
+        do {
+            try await task.value
+        } catch {
+            guard isReplaced(requestEpoch) else { throw error }
+        }
+        guard isReplaced(requestEpoch), let firstPageTask else { return }
+        try await awaitFirstPage(
+            firstPageTask,
+            epoch: epoch,
+        )
+    }
+
+    private func awaitNextPage(
+        _ task: Task<Void, Error>,
+        epoch requestEpoch: Int,
+    ) async throws {
+        do {
+            try await task.value
+        } catch {
+            guard isReplaced(requestEpoch) else { throw error }
+        }
+    }
+
+    private func isReplaced(_ requestEpoch: Int) -> Bool {
+        requestEpoch != epoch && resetEpoch <= requestEpoch
     }
 
     private func replaceWithFirstPage(
@@ -174,6 +228,7 @@ public actor Project: ProjectUseCase {
 
     private func reset() {
         epoch += 1
+        resetEpoch = epoch
         firstPageTask = nil
         nextPageTask = nil
         loaded = []

@@ -159,6 +159,153 @@ struct ProjectTests {
         #expect(await deletions.projectIDs.isEmpty)
     }
 
+    @Test
+    func `대체 새로고침은 진행 중인 첫 페이지 요청을 취소하고 새로 요청한다`() async throws {
+        let fixture = Fixture(
+            pages: [0: Self.page("p1")],
+            heldRequestNumbers: [0],
+        )
+        let refresh = Task { try await fixture.project.refresh() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0] }
+
+        try await fixture.project.refreshReplacingInFlightRequest()
+        try await refresh.value
+
+        #expect(await fixture.repository.requestedPageIndexes == [0, 0])
+        #expect(await fixture.repository.cancelledRequestNumbers == [0])
+    }
+
+    @Test
+    func `대체된 첫 페이지 응답은 목록에 반영하지 않는다`() async throws {
+        let fixture = Fixture(
+            pages: [0: Self.page("p-new")],
+            heldRequestNumbers: [0],
+            ignoresCancellation: true,
+        )
+        await fixture.repository.setPage(
+            Self.page("p-old"),
+            forRequest: 0,
+        )
+        let refresh = Task { try await fixture.project.refresh() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0] }
+
+        try await fixture.project.refreshReplacingInFlightRequest()
+        await fixture.repository.release(request: 0)
+        try await refresh.value
+
+        var lists = await fixture.project.projects().makeAsyncIterator()
+        let list = await lists.next()
+        #expect(list?.summaries.map(\.id) == ["p-new"])
+    }
+
+    @Test
+    func `대체된 새로고침 호출자는 오류 없이 최신 요청의 결과를 받는다`() async throws {
+        let fixture = Fixture(
+            pages: [0: Self.page("p-new")],
+            heldRequestNumbers: [0, 1],
+        )
+        let refresh = Task { try await fixture.project.refresh() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0] }
+        let replacing = Task { try await fixture.project.refreshReplacingInFlightRequest() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0, 0] }
+
+        await fixture.repository.release(request: 1)
+        try await refresh.value
+        try await replacing.value
+
+        var lists = await fixture.project.projects().makeAsyncIterator()
+        let list = await lists.next()
+        #expect(list?.summaries.map(\.id) == ["p-new"])
+    }
+
+    @Test
+    func `대체 새로고침이 진행 중인 다음 페이지 요청을 취소하면 오류 없이 끝나고 페이지를 붙이지 않는다`() async throws {
+        let fixture = Fixture(
+            pages: [
+                0: ProjectPage(
+                    summaries: [Self.summary("p1")],
+                    hasNextPage: true,
+                ),
+                1: Self.page("p2"),
+            ],
+            heldRequestNumbers: [1],
+        )
+        try await fixture.project.refresh()
+        let nextPage = Task { try await fixture.project.requestNextPage() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0, 1] }
+
+        try await fixture.project.refreshReplacingInFlightRequest()
+        try await nextPage.value
+
+        var lists = await fixture.project.projects().makeAsyncIterator()
+        let list = await lists.next()
+        #expect(list?.summaries.map(\.id) == ["p1"])
+        #expect(await fixture.repository.requestedPageIndexes == [0, 1, 0])
+        #expect(await fixture.repository.cancelledRequestNumbers == [1])
+    }
+
+    @Test
+    func `대체 새로고침을 연달아 호출해도 진행 중인 첫 페이지 요청은 하나다`() async throws {
+        let fixture = Fixture(
+            pages: [0: Self.page("p1")],
+            heldRequestNumbers: [0, 1],
+        )
+        let first = Task { try await fixture.project.refreshReplacingInFlightRequest() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0] }
+        let second = Task { try await fixture.project.refreshReplacingInFlightRequest() }
+        await Self.settle {
+            let cancelled = await fixture.repository.cancelledRequestNumbers
+            let requested = await fixture.repository.requestedPageIndexes
+            return cancelled == [0] && requested == [0, 0]
+        }
+
+        #expect(await fixture.repository.requestedPageIndexes == [0, 0])
+        #expect(await fixture.repository.cancelledRequestNumbers == [0])
+        await fixture.repository.release(request: 1)
+        try await first.value
+        try await second.value
+        #expect(await fixture.repository.requestedPageIndexes == [0, 0])
+    }
+
+    @Test
+    func `대체 새로고침이 실패하면 오류를 전달하고 마지막 목록을 유지한다`() async throws {
+        let fixture = Fixture(pages: [0: Self.page("p1")])
+        try await fixture.project.refresh()
+        await fixture.repository.setFailure(.temporarilyUnavailable)
+
+        await #expect(throws: ProjectError.temporarilyUnavailable) {
+            try await fixture.project.refreshReplacingInFlightRequest()
+        }
+
+        var lists = await fixture.project.projects().makeAsyncIterator()
+        let list = await lists.next()
+        #expect(list == ProjectList(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+            isLoaded: true,
+        ))
+    }
+
+    @Test
+    func `두 구독자가 대체 새로고침 결과를 같은 목록으로 받는다`() async throws {
+        let fixture = Fixture(pages: [0: Self.page("p1")])
+        var first = await fixture.project.projects().makeAsyncIterator()
+        var second = await fixture.project.projects().makeAsyncIterator()
+        _ = await Self.next(&first) { $0.isLoaded }
+        _ = await Self.next(&second) { $0.isLoaded }
+
+        await fixture.repository.setPage(
+            Self.page("p2"),
+            at: 0,
+        )
+        try await fixture.project.refreshReplacingInFlightRequest()
+
+        let firstList = await Self.next(&first) { $0.summaries.map(\.id) == ["p2"] }
+        let secondList = await Self.next(&second) { $0.summaries.map(\.id) == ["p2"] }
+        #expect(firstList != nil)
+        #expect(firstList == secondList)
+    }
+
     // MARK: Private
 
     private struct Fixture {
@@ -168,10 +315,14 @@ struct ProjectTests {
         init(
             pages: [Int: ProjectPage],
             holdsFirstRequest: Bool = false,
+            heldRequestNumbers: Set<Int> = [],
+            ignoresCancellation: Bool = false,
         ) {
             let repository = StubProjectRepository(
                 pages: pages,
                 holdsFirstRequest: holdsFirstRequest,
+                heldRequestNumbers: heldRequestNumbers,
+                ignoresCancellation: ignoresCancellation,
             )
             let deletions = DeletionRecorder()
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
@@ -224,6 +375,13 @@ struct ProjectTests {
             throw ProjectError.temporarilyUnavailable
         }
 
+    }
+
+    private static func page(_ id: String) -> ProjectPage {
+        ProjectPage(
+            summaries: [summary(id)],
+            hasNextPage: false,
+        )
     }
 
     private static func summary(_ id: String) -> ProjectSummary {

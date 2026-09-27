@@ -122,24 +122,24 @@ Feature 프리뷰 적합 타입이 같은 커밋에 없으면 compile되지 않�
 
 ### 준비
 
-- [ ] T010 [S1] `sources/Projects/Domain/Tests/Project/TestDoubles/StubProjectRepository.swift`를 확장한다: 요청마다 붙잡을 수 있게 하고(예: 붙잡을 요청 순번 집합), 순번으로 하나씩 풀 수 있게 하며, 붙잡힌 요청이 취소되면 `withTaskCancellationHandler`로 즉시 `CancellationError`를 던지고 취소된 요청 순번을 기록한다. 페이지별 응답을 요청 순번별로 다르게 줄 수 있게 한다. 기존 `holdsFirstRequest`, `release()`, `setPage(_:at:)`, `setFailure(_:)`, `requestedPageIndexes`의 동작은 유지해 기존 테스트가 그대로 통과해야 한다
+- [X] T010 [S1] `sources/Projects/Domain/Tests/Project/TestDoubles/StubProjectRepository.swift`를 확장한다: 요청마다 붙잡을 수 있게 하고(예: 붙잡을 요청 순번 집합), 순번으로 하나씩 풀 수 있게 하며, 붙잡힌 요청이 취소되면 `withTaskCancellationHandler`로 즉시 `CancellationError`를 던지고 취소된 요청 순번을 기록한다. 페이지별 응답을 요청 순번별로 다르게 줄 수 있게 한다. 기존 `holdsFirstRequest`, `release()`, `setPage(_:at:)`, `setFailure(_:)`, `requestedPageIndexes`의 동작은 유지해 기존 테스트가 그대로 통과해야 한다
 
 ### 테스트
 
-- [ ] T011 [S1] [S2] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`에 새 연산 테스트를 각각 별도 `@Test`로 추가한다: (1) `` `대체 새로고침은 진행 중인 첫 페이지 요청을 취소하고 새로 요청한다` ``(요청 2회, 첫 요청 취소 기록) (2) `` `대체된 첫 페이지 응답은 목록에 반영하지 않는다` ``(취소를 무시하고 늦게 도착한 옛 응답이 목록을 바꾸지 않음) (3) `` `대체된 새로고침 호출자는 오류 없이 최신 요청의 결과를 받는다` ``(`refresh()` 진행 중 대체 → 기존 호출이 throw 없이 반환하고 목록은 새 응답) (4) `` `대체 새로고침이 진행 중인 다음 페이지 요청을 취소하면 오류 없이 끝나고 페이지를 붙이지 않는다` `` (5) `` `대체 새로고침을 연달아 호출해도 진행 중인 첫 페이지 요청은 하나다` `` (6) `` `대체 새로고침이 실패하면 오류를 전달하고 마지막 목록을 유지한다` `` (7) `` `두 구독자가 대체 새로고침 결과를 같은 목록으로 받는다` ``(`projects()` 구독 둘이 새 첫 페이지 목록을 똑같이 받음, FR-008). 기존 8개 테스트(`첫 로드와 새로고침이 동시에 일어나면 첫 페이지를 한 번만 요청한다` 포함)는 수정하지 않는다
+- [X] T011 [S1] [S2] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`에 새 연산 테스트를 각각 별도 `@Test`로 추가한다: (1) `` `대체 새로고침은 진행 중인 첫 페이지 요청을 취소하고 새로 요청한다` ``(요청 2회, 첫 요청 취소 기록) (2) `` `대체된 첫 페이지 응답은 목록에 반영하지 않는다` ``(취소를 무시하고 늦게 도착한 옛 응답이 목록을 바꾸지 않음) (3) `` `대체된 새로고침 호출자는 오류 없이 최신 요청의 결과를 받는다` ``(`refresh()` 진행 중 대체 → 기존 호출이 throw 없이 반환하고 목록은 새 응답) (4) `` `대체 새로고침이 진행 중인 다음 페이지 요청을 취소하면 오류 없이 끝나고 페이지를 붙이지 않는다` `` (5) `` `대체 새로고침을 연달아 호출해도 진행 중인 첫 페이지 요청은 하나다` `` (6) `` `대체 새로고침이 실패하면 오류를 전달하고 마지막 목록을 유지한다` `` (7) `` `두 구독자가 대체 새로고침 결과를 같은 목록으로 받는다` ``(`projects()` 구독 둘이 새 첫 페이지 목록을 똑같이 받음, FR-008). 기존 8개 테스트(`첫 로드와 새로고침이 동시에 일어나면 첫 페이지를 한 번만 요청한다` 포함)는 수정하지 않는다
 
 ### 구현
 
-- [ ] T012 [S1] `sources/Projects/Domain/Project/UseCases/ProjectUseCase.swift`에 요구사항 `func refreshReplacingInFlightRequest() async throws`를 `refresh()` 다음 순서로 추가한다
-- [ ] T013 [S1] `sources/Projects/Domain/Project/UseCases/Project.swift`에 `refreshReplacingInFlightRequest()`를 구현하고 대기 규칙을 보강한다: `epoch`를 증가시키고 진행 중인 `firstPageTask`·`nextPageTask`를 `cancel()` 후 `nil`로 두며 목록은 유지한 채 새 세대로 첫 페이지 요청을 시작한다. 첫 페이지 호출자(`refresh()`와 새 연산)는 기다리던 요청이 대체로 끝나면 오류 없이 최신 `firstPageTask`를 이어서 기다리고, 다음 페이지 호출자는 대체되면 오류 없이 반환한다. "대체됨"은 요청 세대 비교와 대체 사유로 판정하고 오류 종류로 판정하지 않는다. 로그아웃 `reset()`의 기존 동작(요청 미취소, 기다리던 결과 그대로 전달)은 바꾸지 않는다([research L3](./research.md#l3-대체된-요청과-호출자의-처리))
-- [ ] T014 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/ProjectUseCaseMock.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 호출 횟수만 기록하고 즉시 반환한다. 기존 `snapshot()` 반환 형태는 바꾸지 않는다
-- [ ] T015 [P] `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/ProjectUseCaseDetailStub.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 기존 `refresh()`처럼 아무 일도 하지 않는다
-- [ ] T016 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 `NoopProject`에 `refreshReplacingInFlightRequest()`를 추가한다. 기존 `refresh()`처럼 `CancellationError()`를 던진다
-- [ ] T017 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectUseCaseMock.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 이 단위에서는 즉시 반환만 한다(기록·제어 기능은 T020)
+- [X] T012 [S1] `sources/Projects/Domain/Project/UseCases/ProjectUseCase.swift`에 요구사항 `func refreshReplacingInFlightRequest() async throws`를 `refresh()` 다음 순서로 추가한다
+- [X] T013 [S1] `sources/Projects/Domain/Project/UseCases/Project.swift`에 `refreshReplacingInFlightRequest()`를 구현하고 대기 규칙을 보강한다: `epoch`를 증가시키고 진행 중인 `firstPageTask`·`nextPageTask`를 `cancel()` 후 `nil`로 두며 목록은 유지한 채 새 세대로 첫 페이지 요청을 시작한다. 첫 페이지 호출자(`refresh()`와 새 연산)는 기다리던 요청이 대체로 끝나면 오류 없이 최신 `firstPageTask`를 이어서 기다리고, 다음 페이지 호출자는 대체되면 오류 없이 반환한다. "대체됨"은 요청 세대 비교와 대체 사유로 판정하고 오류 종류로 판정하지 않는다. 로그아웃 `reset()`의 기존 동작(요청 미취소, 기다리던 결과 그대로 전달)은 바꾸지 않는다([research L3](./research.md#l3-대체된-요청과-호출자의-처리))
+- [X] T014 [P] `sources/Projects/Feature/Tests/Home/TestDoubles/ProjectUseCaseMock.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 호출 횟수만 기록하고 즉시 반환한다. 기존 `snapshot()` 반환 형태는 바꾸지 않는다
+- [X] T015 [P] `sources/Projects/Feature/Tests/ProjectDetail/TestDoubles/ProjectUseCaseDetailStub.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 기존 `refresh()`처럼 아무 일도 하지 않는다
+- [X] T016 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 `NoopProject`에 `refreshReplacingInFlightRequest()`를 추가한다. 기존 `refresh()`처럼 `CancellationError()`를 던진다
+- [X] T017 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectUseCaseMock.swift`에 `refreshReplacingInFlightRequest()`를 추가한다. 이 단위에서는 즉시 반환만 한다(기록·제어 기능은 T020)
 
 ### 정리와 단위 검증
 
-- [ ] T018 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 통합 검증하고 결과를 기록한다
+- [X] T018 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 통합 검증하고 결과를 기록한다
 
 **진행 점검**: T010~T018의 변경 파일과 검증 결과를 보고하고 실행 단위 3으로 진행한다. 새 범위나 권한이 필요하면
 여기서 중단하고 명시적 승인을 요청한다.

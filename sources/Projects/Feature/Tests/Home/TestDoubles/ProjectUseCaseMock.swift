@@ -49,6 +49,10 @@ actor ProjectUseCaseMock: ProjectUseCase {
         }
     }
 
+    func refreshReplacingInFlightRequest() async throws {
+        replacingRefreshCallCount += 1
+    }
+
     func requestNextPage() async throws {
         nextPageCallCount += 1
         guard !nextPageResults.isEmpty else { return }
@@ -103,6 +107,7 @@ actor ProjectUseCaseMock: ProjectUseCase {
     private var detailResults: [Result<ProjectDetail, ProjectError>]
     private let suspendsRefresh: Bool
     private var refreshCallCount = 0
+    private var replacingRefreshCallCount = 0
     private var nextPageCallCount = 0
     private var requestedDetailProjectIDs = [ProjectID]()
     private var continuations = [UUID: AsyncStream<ProjectList>.Continuation]()

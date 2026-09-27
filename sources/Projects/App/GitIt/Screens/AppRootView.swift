@@ -228,6 +228,10 @@ private enum AppRootPreviewSupport {
             throw CancellationError()
         }
 
+        func refreshReplacingInFlightRequest() async throws {
+            throw CancellationError()
+        }
+
         func requestNextPage() async throws {
             throw CancellationError()
         }

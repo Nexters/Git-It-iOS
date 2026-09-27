@@ -31,6 +31,8 @@ actor ProjectUseCaseDetailStub: ProjectUseCase {
 
     func refresh() async throws { }
 
+    func refreshReplacingInFlightRequest() async throws { }
+
     func requestNextPage() async throws { }
 
     func detail(of projectID: ProjectID) async throws -> ProjectDetail {
