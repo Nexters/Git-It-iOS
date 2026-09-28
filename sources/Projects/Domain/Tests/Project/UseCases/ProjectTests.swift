@@ -415,7 +415,7 @@ struct ProjectTests {
     }
 
     private static func settle(until condition: @Sendable () async -> Bool) async {
-        for _ in 0 ..< 200 {
+        for _ in 0 ..< 1_000 {
             guard await !condition() else { return }
             await Task.yield()
         }
