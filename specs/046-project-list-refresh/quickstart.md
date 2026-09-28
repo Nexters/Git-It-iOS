@@ -64,3 +64,15 @@ project_build_runner=$(./.tools/repository-paths/bin/repository-paths.sh GIT_IT_
 서버 협의 항목으로 분리해 PR에 기록한다(명확화 2026-09-28 질문 3).
 
 실기기 검증을 수행하지 못하면 PR에 미검증 범위(백그라운드 수신 경로, 2초 기준, 서버 반영 순서)로 남긴다(Constitution 원칙 3).
+
+## 5. 알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)
+
+자동 검증은 2절의 `test`에 포함된다(Domain `ProjectGenerationTests`·`ProjectTests`, Data `DeliveredRemoteMessageClientTests`,
+Composition `GenerationOutcomeRepositoryAdapterTests`).
+
+시뮬레이터 보조 확인(선택): 앱을 백그라운드로 보낸 상태에서 진행 중 기록의 `projectId`로 alert payload를 `xcrun simctl push`로
+보낸다(시뮬레이터는 content-available 콜백을 부르지 않으므로 누락 상황이 재현된다). 알림을 누르지 않고 앱 아이콘으로 돌아와
+버튼이 활성화되고 목록 요청이 1회인지 확인한다.
+
+실기기 검증은 [device-verification.md](./device-verification.md)의 "알림 누락 뒤 앱 아이콘 복귀 복구" 표와 생성 중 목록 포함 여부 항목을 채운다.
+생성 중 프로젝트가 목록에 포함되면 FR-026의 전제가 어긋난 것이므로 서버 협의 항목으로 분리하고 PR에 기록한다.

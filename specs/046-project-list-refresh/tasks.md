@@ -269,3 +269,77 @@ commit된 단순 재개에서는 `tasks.md` 완료 표시를 위한 별도 최�
   ([research L7](./research.md#l7-새-공개-이름)). 네이밍만 바꾸는 작업은 없다.
 - 범위 밖 후속 항목: 풀이 흐름 종료 경로의 `try? await project.refresh()`([research L9](./research.md#l9-컨벤션과-기존-관행의-충돌))는
   이 작업 목록에 포함하지 않고 PR에 기록한다.
+
+---
+
+## 추가 단계(2026-09-28): 알림 누락 뒤 앱 아이콘 복귀 복구
+
+[plan.md "추가 계획(2026-09-28)"](./plan.md#추가-계획2026-09-28-알림-누락-뒤-앱-아이콘-복귀-복구)의 실행 단위 4~7이다. 위상 순서는
+Infrastructure → Data → Domain → Composition → Feature → App이며([architecture.md 3.1](../../docs/architecture.md)), 단위 4·5는
+단일 패키지, 단위 6·7은 프로토콜 요구사항·생성자 인자 추가로 적합 타입이 같은 커밋에 있어야 compile되는 integration unit이다.
+시나리오 라벨은 `[S8]`(알림 누락 뒤 앱 아이콘 복귀 복구)과 `[S7]`(실기기 검증)을 쓴다. 파일 경로는 `sources/Projects/` 기준으로
+적지 않고 저장소 상대경로 전체로 적는다.
+
+## 실행 단위 4: 알림 센터 원격 알림 조회 (Infrastructure)
+
+**목표**: 시스템 알림 센터에 남은 원격 알림을 플랫폼 타입 없이 조회한다([research D3](./research.md#d3-알림-센터-읽기의-계층-배치)).
+
+- [ ] T029 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Models/DeliveredRemoteNotification.swift`를 새로 만든다. `public struct DeliveredRemoteNotification: Equatable, Sendable`에 `public init(payload: [String: String], deliveredAt: Date)`, `public let payload: [String: String]`, `public let deliveredAt: Date`를 둔다(`RemoteNotificationDelivery`와 같은 `// MARK: Lifecycle`/`// MARK: Public` 구성)
+- [ ] T030 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/DeliveredNotificationClient.swift`를 새로 만든다. `public protocol DeliveredNotificationClient: Sendable { func deliveredRemoteNotifications() async -> [DeliveredRemoteNotification] }`
+- [ ] T031 [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/NotificationCenterDeliveredNotificationClient.swift`를 새로 만든다. `public struct NotificationCenterDeliveredNotificationClient: DeliveredNotificationClient`(public init)가 `UNUserNotificationCenter.current().deliveredNotifications()`를 읽어 `request.trigger`가 `UNPushNotificationTrigger`인 알림만 골라 `DeliveredRemoteNotification(payload: RemoteNotificationPayload(userInfo:).userInfoStrings, deliveredAt: notification.date)`로 바꿔 반환한다. 알림을 지우거나 바꾸지 않는다(FR-024)
+- [ ] T032 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 4를 검증하고 결과를 기록한다. 이 패키지에는 테스트 target이 없고 구현이 시스템 알림 센터에 의존하므로 동작 확인은 실기기 검증(T061)으로 넘긴다
+
+## 실행 단위 5: 전달된 원격 메시지 읽기 (Data)
+
+**목표**: Data 언어의 역할 계약과 생성 진입점으로 알림 센터 읽기를 공개한다.
+
+- [ ] T033 [P] [S8] `sources/Projects/Data/Notification/Models/DeliveredRemoteMessage.swift`를 새로 만든다. `public struct DeliveredRemoteMessage: Equatable, Sendable`(`payload: [String: String]`, `deliveredAt: Date`, public init)
+- [ ] T034 [P] [S8] `sources/Projects/Data/Notification/Contracts/DeliveredRemoteMessageReader.swift`를 새로 만든다. `public protocol DeliveredRemoteMessageReader: Sendable { func deliveredMessages() async -> [DeliveredRemoteMessage] }`
+- [ ] T035 [S8] `sources/Projects/Data/Notification/Clients/DeliveredRemoteMessageClient.swift`를 새로 만든다. 내부 `struct DeliveredRemoteMessageClient: DeliveredRemoteMessageReader`가 `init(notificationClient: any DeliveredNotificationClient)`로 주입받아 결과를 `DeliveredRemoteMessage`로 바꾸고, `os.Logger`(subsystem `com.nexters.hytime.gitit`, category `DeliveredRemoteMessageClient`)로 읽은 개수를 debug 로그로 남긴다
+- [ ] T036 [S8] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`에 `public static func deliveredRemoteMessageReader() -> any DeliveredRemoteMessageReader`를 추가해 `DeliveredRemoteMessageClient(notificationClient: NotificationCenterDeliveredNotificationClient())`를 반환한다(`import InfrastructurePushMessaging` 추가)
+- [ ] T037 [P] [S8] `sources/Projects/Data/Tests/Notification/TestDoubles/StubDeliveredNotificationClient.swift`를 새로 만든다. 생성자로 받은 `[DeliveredRemoteNotification]`을 반환하는 `DeliveredNotificationClient` 더블
+- [ ] T038 [S8] `sources/Projects/Data/Tests/Notification/Clients/DeliveredRemoteMessageClientTests.swift`를 새로 만들고 `@Suite`에 `` `알림 센터의 원격 알림을 payload와 전달 시각 그대로 전달된 메시지로 바꾼다` ``, `` `알림 센터가 비어 있으면 빈 목록을 반환한다` ``를 둔다
+- [ ] T039 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 5를 검증하고 결과를 기록한다
+
+## 실행 단위 6: 알림 센터 결과 동기화 (integration: Domain → Composition)
+
+**목표**: 회원 앱 활성화 동기화에서 알림 센터 결과를 기록에 반영하고 도착 알림은 방출하지 않는다(FR-023~FR-025).
+**분리 불가 근거**: `GenerationOutcomeRepository` 요구사항 추가는 Domain 테스트 더블과 Composition 어댑터가 같은 커밋에서 바뀌어야 compile된다.
+
+- [ ] T040 [S8] `sources/Projects/Domain/ProjectGeneration/Contracts/GenerationOutcomeRepository.swift`에 `func deliveredOutcomes() async -> [GenerationOutcome]`를 추가한다
+- [ ] T041 [S8] `sources/Projects/Domain/Tests/ProjectGeneration/TestDoubles/StubGenerationOutcomeRepository.swift`에 알림 센터 결과를 설정하는 `setDeliveredOutcomes(_:)`(Mutex 보관)와 그 값을 반환하는 `deliveredOutcomes()`를 추가한다
+- [ ] T042 [S8] `sources/Projects/Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`에 테스트를 추가한다: (1) `` `동기화하면 알림 센터에 남은 결과로 진행 중 기록을 결과 상태로 바꾼다` `` (2) `` `알림 센터 결과로 반영해도 도착 알림을 방출하지 않는다` `` (3) `` `이미 반영된 알림 센터 결과로는 로컬 알림을 다시 예약하지 않는다` `` (4) `` `기록에 없는 프로젝트의 알림 센터 결과는 기록을 바꾸지 않는다` `` (5) `` `알림 센터로 반영한 결과가 다시 도착해도 도착 알림을 방출하지 않는다` ``
+- [ ] T043 [S8] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`의 `synchronize()`가 기존 동작(관찰 시작 전이면 `startObserving()`, 아니면 만료 정리·리마인드 흡수·상태 반영) 뒤에 `outcomes.deliveredOutcomes()`의 각 결과를 `finish`로 반영하고, 기록된 결과가 있으면 상태를 다시 반영하며, 각 결과를 도착 알림 중복 판정 목록에만 기록하고 구독자에게 방출하지 않도록 바꾼다([research D1·D2](./research.md#d1-알림-센터를-읽는-시점과-소유자))
+- [ ] T044 [S8] `sources/Projects/Composition/LearningProject/Adapters/GenerationOutcomeRepositoryAdapter.swift`에 `deliveredMessages: any DeliveredRemoteMessageReader` 생성자 인자를 추가하고 `deliveredOutcomes()`가 각 메시지를 `QuizGenerationOutcomeDTO(rawPayload:deliveredAt:)`로 파싱해 실패분을 버리고 기존 변환으로 `GenerationOutcome`을 만든다(`import DataNotification`)
+- [ ] T045 [S8] `sources/Projects/Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`와 `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`에 `deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil` 인자를 추가하고 없으면 `NotificationFactory.deliveredRemoteMessageReader()`로 어댑터에 전달한다
+- [ ] T046 [S8] `sources/Projects/Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift`의 기존 어댑터 생성을 새 인자에 맞추고(빈 reader 더블을 파일 안 private 타입으로 둔다), `` `알림 센터 메시지 중 파싱에 성공한 생성 결과만 전달 시각으로 반환한다` ``를 추가한다. 다른 Composition 테스트가 어댑터나 Assembly를 만들며 compile되지 않으면 같은 방식으로 맞춘다
+- [ ] T047 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 6을 검증하고 결과를 기록한다
+
+## 실행 단위 7: 목록 기반 완료 판정 (integration: Domain → Composition → Feature → App)
+
+**목표**: 반영된 목록 응답에 나타난 프로젝트의 진행 중 기록을 완료로 바꾸고 로컬 알림을 보내지 않는다(FR-026).
+**분리 불가 근거**: `ProjectGenerationUseCase` 요구사항과 `Project.init` 인자 추가는 모든 적합 타입·생성 지점이 같은 커밋에서 바뀌어야 compile된다.
+
+- [ ] T048 [S8] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGenerationUseCase.swift`에 `func completeGenerations(of listedProjectIDs: Set<ProjectID>) async`를 추가한다
+- [ ] T049 [S8] `sources/Projects/Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`에 테스트를 추가한다: (1) `` `목록에 나타난 프로젝트의 진행 중 기록을 완료로 바꾼다` `` (2) `` `목록으로 완료한 기록에는 로컬 알림을 예약하지 않는다` `` (3) `` `목록에 없는 진행 중 기록은 그대로 둔다` `` (4) `` `이미 실패한 기록은 목록에 나타나도 바꾸지 않는다` `` (5) `` `목록으로 완료해도 도착 알림을 방출하지 않는다` ``
+- [ ] T050 [S8] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`에 `completeGenerations(of:)`를 구현한다: 관찰이 시작되지 않았으면 먼저 시작하고, 현재 상태에서 식별자가 집합에 있고 진행 중인 기록만 골라 없으면 반환한다. 대기 중 리마인드를 흡수한 뒤 대상 식별자를 리마인드 대상에서 빼고 `pendingGenerations.finishGeneration(projectID:status: .completed, finishedAt: now())`로 바꾼 다음 상태를 다시 반영한다([research D5](./research.md#d5-목록-완료-판정-규칙))
+- [ ] T051 [S8] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`에 테스트를 추가하고 기존 `Project(` 생성 지점을 새 인자에 맞춘다: (1) `` `첫 페이지가 반영되면 그 페이지의 프로젝트 식별자를 알린다` `` (2) `` `다음 페이지가 반영되면 그 페이지의 프로젝트 식별자를 알린다` `` (3) `` `대체된 요청의 응답으로는 프로젝트 식별자를 알리지 않는다` ``. 호출 기록은 테스트 파일 안의 `actor` 기록기로 모은다
+- [ ] T052 [S8] `sources/Projects/Domain/Project/UseCases/Project.swift`의 `init`에 `projectsListed: @escaping @Sendable (Set<ProjectID>) async -> Void`(`projectDeleted` 다음, `pageSize` 앞)를 추가하고, 첫 페이지 교체와 다음 페이지 추가가 현재 세대로 반영된 경우에만 그 페이지 요약의 식별자 집합으로 호출한다
+- [ ] T053 [S8] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `Project(` 생성에 `projectsListed: { await projectGeneration.completeGenerations(of: $0) }`를 추가한다
+- [ ] T054 [P] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/ProjectGenerationUseCaseStub.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
+- [ ] T055 [P] `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ProjectGenerationUseCaseSpy.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
+- [ ] T056 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 `NoopProjectGeneration`에 `completeGenerations(of:)`의 빈 구현을 추가한다
+- [ ] T057 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectGenerationUseCaseMock.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
+- [ ] T058 [S7] `specs/046-project-list-refresh/device-verification.md`의 "알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)" 표가 명세 시나리오 7-4·7-5를 모두 담는지 확인하고, 빠진 칸이 있으면 `(관찰 대기)`로 추가한다. 기존 관찰 기록은 바꾸지 않는다
+- [ ] T059 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 7을 검증하고 결과를 기록한다
+
+## 추가 단계 전체 완료 검증
+
+- [ ] T060 [no-write] 저장소 루트에서 `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 한 번씩 실행하고 각 결과를 기록한다. 실패하면 구성·컴파일·테스트·Simulator 환경으로 분류한다(SC-012 회귀 포함)
+- [ ] T061 [no-write] S8 수용 기준을 확인한다: SC-016은 T042, SC-017은 T049·T051 결과로 확인한다. SC-018과 시나리오 7-4·7-5는 실기기 검증이 필요하므로 수행 여부를 확인하고, 수행되지 않았으면 알림 센터 읽기 구현(T031), 생성 중 프로젝트의 목록 미포함 전제, 2초 기준을 PR의 미검증 범위로 넘긴다
+
+### 추가 단계 의존성과 추적
+
+- 순서: 단위 4(T029~T032) → 단위 5(T033~T039) → 단위 6(T040~T047) → 단위 7(T048~T059) → T060·T061. 같은 기능 범위이므로 단위 사이 승인 게이트는 없다.
+- 단위 내부 병렬: T029·T030, T033·T034·T037, T054~T057.
+- 추적: S8 — FR-023~FR-025는 T029~T047, FR-026은 T048~T053. S7 — T058, T061. T054~T057은 compile을 위한 적합 타입 갱신이라 시나리오 라벨이 없다.

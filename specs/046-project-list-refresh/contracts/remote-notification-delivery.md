@@ -40,3 +40,18 @@
 | Data `LocalPendingGenerationStore` | 기록 저장 후 상태별 개수 |
 
 subsystem은 기존 값 `com.nexters.hytime.gitit`를 유지하고, 식별자와 시각은 `privacy: .public`으로 남긴다.
+
+## 알림 센터 경로 (2026-09-28 추가)
+
+| 경로 | 계기 | 전달 시각 | 도착 알림(목록 갱신 계기) |
+|---|---|---|---|
+| 알림 센터 | 회원 앱 활성화의 `synchronize()` | 시스템 전달 시각 | 방출하지 않음(FR-025) |
+
+| 계층 | 시그니처 |
+|---|---|
+| Infrastructure | `protocol DeliveredNotificationClient { func deliveredRemoteNotifications() async -> [DeliveredRemoteNotification] }`, 구현 `NotificationCenterDeliveredNotificationClient` |
+| Data | `protocol DeliveredRemoteMessageReader { func deliveredMessages() async -> [DeliveredRemoteMessage] }`, `NotificationFactory.deliveredRemoteMessageReader()` |
+| Composition | `GenerationOutcomeRepositoryAdapter(source:deliveredMessages:)` |
+
+- 앱은 알림 센터의 알림을 지우거나 바꾸지 않는다(FR-024).
+- Data client는 읽은 원격 알림 개수를 진단 로그로 남긴다.

@@ -101,3 +101,34 @@
 | 결과 소스 버퍼 | Data `PushQuizGenerationOutcomeSource` | 첫 구독 전 최대 32개 FIFO, 첫 구독에 모두 전달 |
 | 설정 전 도착 슬롯 | Infrastructure `FirebaseMessagingAppDelegate` | `configure(_:)` 전 최대 8개 FIFO |
 | 리마인드 판정 | `GenerationWaitPolicy.reminderValidity` | 300초. 결과 반영 즉시 예약 |
+
+## 5. 알림 누락 뒤 복구 (2026-09-28 추가)
+
+### 알림 센터 결과 — `DeliveredRemoteNotification`(Infrastructure) → `DeliveredRemoteMessage`(Data) → `GenerationOutcome`(Domain)
+
+| 필드 | 형식 | 규칙 |
+|---|---|---|
+| payload | `[String: String]` | 원격 알림 `userInfo`를 문자열 사전으로 바꾼 값. 로컬 알림(trigger가 원격 푸시가 아님)은 포함하지 않는다 |
+| deliveredAt | `Date` | 시스템이 알림을 전달한 시각. Domain 결과의 `arrivedAt`이 된다(FR-023) |
+
+- Composition에서 `QuizGenerationOutcomeDTO(rawPayload:deliveredAt:)` 파싱에 실패한 항목은 버린다.
+
+### 전이 규칙 — `ProjectGeneration`
+
+| 계기 | 조건 | 결과 |
+|---|---|---|
+| `synchronize()` 중 알림 센터 결과 | 기록 있음, 진행 중 | 결과 상태로 전이, 리마인드 유효 시간 판정(FR-021), 도착 알림 방출 없음 |
+| `synchronize()` 중 알림 센터 결과 | 기록 있음, 이미 결과 상태 | 기록 변화 없음, 로컬 알림 재예약 없음 |
+| `synchronize()` 중 알림 센터 결과 | 기록 없음 | 기존 보존 규칙(개수·기간 상한) 적용, 기록 변화 없음 |
+| `completeGenerations(of:)` | 식별자 연결됨, 진행 중, 집합에 포함 | 완료로 전이(`finishedAt` = 현재), 리마인드 대상에서 제거, 로컬 알림 없음 |
+| `completeGenerations(of:)` | 그 밖 | 변화 없음, 저장소 쓰기 없음 |
+
+- 알림 센터 결과는 도착 알림 중복 판정 목록에 기록되어, 같은 결과의 뒤늦은 수신이 도착 알림을 만들지 않는다.
+
+### `Project` — 목록 반영 알림
+
+| 계기 | 호출 |
+|---|---|
+| 첫 페이지 응답이 현재 세대로 반영됨 | `projectsListed(첫 페이지 식별자 집합)` |
+| 다음 페이지 응답이 현재 세대로 반영됨 | `projectsListed(그 페이지 식별자 집합)` |
+| 대체·초기화로 버려진 응답 | 호출 없음 |

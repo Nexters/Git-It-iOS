@@ -71,3 +71,39 @@
 
 - `GenerationOutcome.init(projectID:status:arrivedAt:)`: `arrivedAt`은 필수다.
 - `GenerationWaitPolicy.init(retentionLimit:reminderValidity:)`: `.standard`는 3600초, 300초다.
+
+## 2026-09-28 추가 — 알림 누락 뒤 복구
+
+### `GenerationOutcomeRepository`
+
+```swift
+public protocol GenerationOutcomeRepository: Sendable {
+    func outcomes() async -> AsyncStream<GenerationOutcome>
+    func deliveredOutcomes() async -> [GenerationOutcome]
+}
+```
+
+- `deliveredOutcomes()`는 알림 센터에 남은 생성 결과를 전달 시각과 함께 반환한다. 파싱 실패분은 포함하지 않는다.
+
+### `ProjectGenerationUseCase`
+
+```swift
+func completeGenerations(of listedProjectIDs: Set<ProjectID>) async
+```
+
+- 진행 중이고 식별자가 집합에 있는 기록만 완료로 바꾼다. 로컬 알림을 예약하지 않고 도착 알림을 방출하지 않는다.
+- `synchronize()`는 기존 동작 뒤에 `deliveredOutcomes()`를 반영한다(도착 알림 방출 없음).
+
+### `Project.init`
+
+```swift
+public init(
+    repository: any ProjectRepository,
+    signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
+    projectDeleted: @escaping @Sendable (ProjectID) async -> Void,
+    projectsListed: @escaping @Sendable (Set<ProjectID>) async -> Void,
+    pageSize: Int = 20,
+)
+```
+
+- 현재 세대로 반영된 페이지의 식별자로만 호출한다.

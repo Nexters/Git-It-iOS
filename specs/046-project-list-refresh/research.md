@@ -314,3 +314,100 @@
 
 - **결정**: 서버의 생성 상태 조회 API와 폴링은 채택하지 않는다(FR-020, 019 FR-022). 알림 권한이 없고 백그라운드 수신도
   실패하면 복구는 보관 기한(R5)과 목록 자동 갱신 계기(FR-001)에 의존한다.
+
+## 3부. 알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)
+
+시나리오 8, FR-023~FR-026을 다룬다. 1부·2부 결정은 그대로 유지한다.
+
+### 현재 구조 조사
+
+- 생성 결과는 `FirebaseMessagingAppDelegate`(Infrastructure)의 세 콜백 → `NotificationAppDelegate`(Data) →
+  `AppComposition.ingestGenerationOutcomePayload` → `PushQuizGenerationOutcomeSource.ingest`(Data) →
+  `GenerationOutcomeRepositoryAdapter.outcomes()`(Composition) → `ProjectGeneration.receive`(Domain) 순서로 흐른다.
+- 앱 활성화 시 `AppRootFeature`는 회원일 때 `ProjectGeneration.synchronize()`를 부르고, 백그라운드를 거친 경우
+  `Project.refreshReplacingInFlightRequest()`를 부른다.
+- `UNUserNotificationCenter`를 쓰는 곳은 Infrastructure(`LocalNotificationAuthorizationClient`, `FirebaseMessagingAppDelegate`)뿐이다.
+- `Project`와 `ProjectGeneration`은 서로 import하지 않는다. 프로젝트 삭제 시 기록 해제는 `Project.init`의
+  `projectDeleted` 클로저를 `ConcernUseCaseAssembly`가 `projectGeneration.release`로 연결한다.
+- `Project.projects()`는 구독 시 목록이 없으면 첫 페이지를 요청한다. 따라서 App이 목록을 관찰해 완료를 판정하면
+  게스트·로그인 전에도 목록 요청이 생길 수 있다.
+- CompositionLearningProject는 이미 DataNotification에, DataNotification은 InfrastructurePushMessaging에 의존한다.
+
+### D1. 알림 센터를 읽는 시점과 소유자
+
+- 결정: `ProjectGeneration.synchronize()`가 기존 동기화(만료 정리, 리마인드 흡수, 상태 반영) 뒤에
+  `GenerationOutcomeRepository.deliveredOutcomes()`로 알림 센터의 생성 결과를 읽어 반영한다. App 호출 지점은 바뀌지 않는다.
+- 근거: FR-013의 활성화 동기화가 이미 회원 활성화마다 호출된다. 결과 반영 규칙(FR-012, FR-015, FR-016, FR-021)은
+  `ProjectGeneration`이 소유하므로 같은 경로(`finish`)를 재사용하면 규칙이 한 곳에 남는다.
+- 검토한 대안: App이 알림 센터를 읽어 `ingestGenerationOutcomePayload`로 다시 넣는 방식. 결과가 도착 알림
+  (`outcomeArrivals`)으로도 방출되어 FR-025를 어기고, App이 Infrastructure 능력을 직접 호출해야 한다.
+
+### D2. 알림 센터 결과의 도착 알림 억제
+
+- 결정: 알림 센터에서 읽은 결과는 `finish`로 기록에 반영하고, 도착 알림 중복 판정 목록(`recentArrivals`)에만 넣고
+  구독자에게 방출하지 않는다.
+- 근거: FR-025. 같은 활성화의 FR-001 갱신이 목록을 맡는다. 판정 목록에 넣어 두면 같은 결과가 뒤늦게 백그라운드 수신으로
+  다시 도착해도 목록 요청을 새로 만들지 않는다(FR-005).
+- 검토한 대안: 판정 목록에도 넣지 않는 방식. 뒤늦은 중복 도착이 목록 요청을 한 번 더 만든다.
+
+### D3. 알림 센터 읽기의 계층 배치
+
+- 결정:
+  - Infrastructure `InfrastructurePushMessaging`: 역할 프로토콜 `DeliveredNotificationClient`와 구현
+    `NotificationCenterDeliveredNotificationClient`, 모델 `DeliveredRemoteNotification`(payload 문자열 사전, 전달 시각).
+    원격 알림만 고르기 위해 trigger가 `UNPushNotificationTrigger`인 알림만 반환한다. payload 변환은 기존
+    `RemoteNotificationPayload`를 쓴다.
+  - Data `DataNotification`: 역할 계약 `DeliveredRemoteMessageReader`, 모델 `DeliveredRemoteMessage`, 내부 구현
+    `DeliveredRemoteMessageClient`, 생성 진입점 `NotificationFactory.deliveredRemoteMessageReader()`. 읽은 개수를 진단 로그로 남긴다(FR-018 연장).
+  - Composition `GenerationOutcomeRepositoryAdapter`: `deliveredOutcomes()`에서 `DeliveredRemoteMessage`를 기존 공개 파서
+    `QuizGenerationOutcomeDTO(rawPayload:deliveredAt:)`로 변환하고 파싱 실패분을 버린 뒤 Domain `GenerationOutcome`으로 바꾼다.
+    두 조립 지점(`ConcernUseCaseAssembly`, `LearningProjectAssembly`)은 `LocalReminderNotifier`와 같이 선택 인자로 reader를 받고,
+    없으면 Factory 기본값을 쓴다.
+- 근거: [data.md](../../docs/package-rules/data.md) — 기술 API는 Data 역할 타입 내부에서만 쓰고, Composition·테스트가 대체할 수
+  있도록 Data가 역할 계약과 Factory를 공개한다. 파싱 규칙은 원격 수신 경로와 같은 DTO 생성자를 공유해 FR-023의
+  "같은 파싱 기준"을 보장한다. manifest 의존성 변경이 필요 없다.
+- 검토한 대안: `PushQuizGenerationOutcomeSource`가 알림 센터를 직접 읽는 방식. DataLearningProject에 Infrastructure·
+  DataNotification 의존을 새로 추가해야 한다. `PushMessagingClient`에 메서드를 추가하는 방식은 Firebase 활성화 전에는
+  클라이언트가 없어 읽을 수 없다.
+
+### D4. 목록 응답으로 완료를 판정하는 위치
+
+- 결정: `Project.init`에 `projectsListed: @Sendable (Set<ProjectID>) async -> Void`를 추가하고, 첫 페이지 교체나 다음 페이지
+  추가가 목록에 실제로 반영된 뒤에만 그 페이지의 프로젝트 식별자로 호출한다. `ConcernUseCaseAssembly`가 이를
+  `ProjectGenerationUseCase.completeGenerations(of:)`로 연결한다.
+- 근거: `projectDeleted` → `release`와 같은 관심사 간 연결 선례다. 목록 응답을 받는 모든 경로(최초 로드, 자동 갱신,
+  수동 새로고침, 다음 페이지)를 한 곳에서 덮고, 취소·대체되어 반영되지 않은 응답은 호출하지 않는다. App이 목록을
+  관찰하지 않으므로 게스트에서 목록 요청이 새로 생기지 않는다.
+- 검토한 대안: App `AppRootFeature`가 `projects()`를 관찰해 판정하는 방식. 구독이 첫 페이지 요청을 일으키고, 목록
+  반영과 판정 사이에 Reducer 왕복이 생긴다.
+
+### D5. 목록 완료 판정 규칙
+
+- 결정: `completeGenerations(of:)`는 현재 상태에서 프로젝트 식별자가 주어진 집합에 있고 진행 중인 기록만 골라 완료
+  (`finishedAt` = 현재 시각)로 바꾼다. 바꾸기 전에 대기 중 리마인드를 흡수하고 그 프로젝트를 리마인드 대상에서 빼
+  로컬 알림을 예약하지 않는다. 대상이 없으면 저장소에 쓰지 않는다. 도착 알림은 방출하지 않는다.
+- 근거: FR-026. 목록에 없다는 이유로 실패 처리하지 않는다. 대상이 없을 때 쓰지 않아 목록 응답마다 저장소 변경 방출이
+  생기지 않는다. 먼저 확정된 상태 유지 규칙은 `GenerationRecord.finishing`이 이미 보장한다.
+- 검토한 대안: 목록 판정 결과도 로컬 알림 유효 시간 규칙으로 발송하는 방식. 사용자가 앱에서 목록을 보는 중이므로
+  명세 결정(발송하지 않음)과 어긋난다.
+
+### D6. 새 공개 이름
+
+| 이름 | 책임 문장 |
+|---|---|
+| `GenerationOutcomeRepository.deliveredOutcomes()` | 사용자에게 이미 전달되어 남아 있는 생성 결과를 조회한다 |
+| `ProjectGenerationUseCase.completeGenerations(of:)` | 목록에 나타난 프로젝트의 진행 중 생성을 완료로 확정한다 |
+| `Project.init(projectsListed:)` | 목록에 반영된 프로젝트 식별자를 알린다(`projectDeleted`와 같은 사건형 이름) |
+| `DeliveredRemoteMessageReader.deliveredMessages()` | 알림 센터에 남은 원격 메시지를 읽는다(Data 언어, 기술 이름 없음) |
+| `DeliveredNotificationClient.deliveredRemoteNotifications()` | 시스템 알림 센터에서 원격 알림을 조회한다(Infrastructure) |
+
+### D7. 테스트 설계
+
+- Domain `ProjectGenerationTests`: 알림 센터 결과로 기록이 결과 상태가 되는지, 도착 알림이 방출되지 않는지, 이미 반영된 결과로
+  로컬 알림이 다시 예약되지 않는지, 기록 없는 결과가 기록을 바꾸지 않는지. `completeGenerations(of:)`가 진행 중 기록만
+  완료로 바꾸고 로컬 알림을 예약하지 않는지, 포함되지 않은 기록은 그대로인지.
+- Domain `ProjectTests`: 첫 페이지·다음 페이지 반영 시 `projectsListed`가 그 페이지 식별자로 호출되고, 대체된 요청의 응답으로는
+  호출되지 않는지.
+- Data `DeliveredRemoteMessageClientTests`: Infrastructure 역할 더블로 payload·전달 시각 변환을 검증한다.
+- Composition `GenerationOutcomeRepositoryAdapterTests`: 파싱 성공분만 Domain 결과로 바뀌는지.
+- Infrastructure 구현은 시스템 알림 센터에 의존하므로 자동 테스트 대신 실기기 검증(시나리오 7-5)으로 확인한다.
