@@ -317,7 +317,7 @@
 
 ## 3부. 알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)
 
-시나리오 8, FR-023~FR-026을 다룬다. 1부·2부 결정은 그대로 유지한다.
+시나리오 8, FR-023~FR-025를 다룬다. 1부·2부 결정은 그대로 유지한다.
 
 ### 현재 구조 조사
 
@@ -370,44 +370,32 @@
   DataNotification 의존을 새로 추가해야 한다. `PushMessagingClient`에 메서드를 추가하는 방식은 Firebase 활성화 전에는
   클라이언트가 없어 읽을 수 없다.
 
-### D4. 목록 응답으로 완료를 판정하는 위치
+### D4. 목록 응답으로 완료를 판정하지 않는다 (2026-09-28 수정)
 
-- 결정: `Project.init`에 `projectsListed: @Sendable (Set<ProjectID>) async -> Void`를 추가하고, 첫 페이지 교체나 다음 페이지
-  추가가 목록에 실제로 반영된 뒤에만 그 페이지의 프로젝트 식별자로 호출한다. `ConcernUseCaseAssembly`가 이를
-  `ProjectGenerationUseCase.completeGenerations(of:)`로 연결한다.
-- 근거: `projectDeleted` → `release`와 같은 관심사 간 연결 선례다. 목록 응답을 받는 모든 경로(최초 로드, 자동 갱신,
-  수동 새로고침, 다음 페이지)를 한 곳에서 덮고, 취소·대체되어 반영되지 않은 응답은 호출하지 않는다. App이 목록을
-  관찰하지 않으므로 게스트에서 목록 요청이 새로 생기지 않는다.
-- 검토한 대안: App `AppRootFeature`가 `projects()`를 관찰해 판정하는 방식. 구독이 첫 페이지 요청을 일으키고, 목록
-  반영과 판정 사이에 Reducer 왕복이 생긴다.
+- 결정: 목록 응답에 포함된 프로젝트로 생성 기록을 완료로 바꾸지 않는다. 처음 결정한 `Project.init(projectsListed:)` →
+  `ProjectGenerationUseCase.completeGenerations(of:)` 연결(FR-026)은 폐기하고 구현
+  커밋 `22f1a09`는 브랜치 이력에서 제거했다(`backup/project-list-refresh-22f1a09`에 보존).
+- 근거: 목록 항목에는 생성 상태 필드가 없고, 생성 중인 프로젝트가 목록에 없다는 사실이 실기기에서 확인되지 않았다(`7dd9435`에서
+  앱이 생성 중 프로젝트를 목록에서 걸러냈던 이력이 있다). 목록 포함으로 완료를 판정하면 생성 중 목록 갱신(최초 로드, 포그라운드
+  진입, 수동 새로고침)에서 기록이 완료로 바뀌고 리마인드 대상이 지워져, 결과가 도착해도 로컬 알림이 예약되지 않는다.
+- 결과: 알림 센터 결과(D1~D3)가 없으면 보관 기한 정리(R5)가 복구 경로다.
 
-### D5. 목록 완료 판정 규칙
+### D5. 목록 완료 판정 규칙 (폐기)
 
-- 결정: `completeGenerations(of:)`는 현재 상태에서 프로젝트 식별자가 주어진 집합에 있고 진행 중인 기록만 골라 완료
-  (`finishedAt` = 현재 시각)로 바꾼다. 바꾸기 전에 대기 중 리마인드를 흡수하고 그 프로젝트를 리마인드 대상에서 빼
-  로컬 알림을 예약하지 않는다. 대상이 없으면 저장소에 쓰지 않는다. 도착 알림은 방출하지 않는다.
-- 근거: FR-026. 목록에 없다는 이유로 실패 처리하지 않는다. 대상이 없을 때 쓰지 않아 목록 응답마다 저장소 변경 방출이
-  생기지 않는다. 먼저 확정된 상태 유지 규칙은 `GenerationRecord.finishing`이 이미 보장한다.
-- 검토한 대안: 목록 판정 결과도 로컬 알림 유효 시간 규칙으로 발송하는 방식. 사용자가 앱에서 목록을 보는 중이므로
-  명세 결정(발송하지 않음)과 어긋난다.
+- FR-026 폐기로 이 결정(`completeGenerations(of:)`의 판정·리마인드 제외 규칙)을 폐기했다. 근거는 D4를 따른다. 식별자 D5는 재사용하지 않는다.
 
 ### D6. 새 공개 이름
 
 | 이름 | 책임 문장 |
 |---|---|
 | `GenerationOutcomeRepository.deliveredOutcomes()` | 사용자에게 이미 전달되어 남아 있는 생성 결과를 조회한다 |
-| `ProjectGenerationUseCase.completeGenerations(of:)` | 목록에 나타난 프로젝트의 진행 중 생성을 완료로 확정한다 |
-| `Project.init(projectsListed:)` | 목록에 반영된 프로젝트 식별자를 알린다(`projectDeleted`와 같은 사건형 이름) |
 | `DeliveredRemoteMessageReader.deliveredMessages()` | 알림 센터에 남은 원격 메시지를 읽는다(Data 언어, 기술 이름 없음) |
 | `DeliveredNotificationClient.deliveredRemoteNotifications()` | 시스템 알림 센터에서 원격 알림을 조회한다(Infrastructure) |
 
 ### D7. 테스트 설계
 
 - Domain `ProjectGenerationTests`: 알림 센터 결과로 기록이 결과 상태가 되는지, 도착 알림이 방출되지 않는지, 이미 반영된 결과로
-  로컬 알림이 다시 예약되지 않는지, 기록 없는 결과가 기록을 바꾸지 않는지. `completeGenerations(of:)`가 진행 중 기록만
-  완료로 바꾸고 로컬 알림을 예약하지 않는지, 포함되지 않은 기록은 그대로인지.
-- Domain `ProjectTests`: 첫 페이지·다음 페이지 반영 시 `projectsListed`가 그 페이지 식별자로 호출되고, 대체된 요청의 응답으로는
-  호출되지 않는지.
+  로컬 알림이 다시 예약되지 않는지, 기록 없는 결과가 기록을 바꾸지 않는지.
 - Data `DeliveredRemoteMessageClientTests`: Infrastructure 역할 더블로 payload·전달 시각 변환을 검증한다.
 - Composition `GenerationOutcomeRepositoryAdapterTests`: 파싱 성공분만 Domain 결과로 바뀌는지.
 - Infrastructure 구현은 시스템 알림 센터에 의존하므로 자동 테스트 대신 실기기 검증(시나리오 7-5)으로 확인한다.

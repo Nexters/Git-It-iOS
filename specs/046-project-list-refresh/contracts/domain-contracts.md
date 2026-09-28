@@ -87,23 +87,4 @@ public protocol GenerationOutcomeRepository: Sendable {
 
 ### `ProjectGenerationUseCase`
 
-```swift
-func completeGenerations(of listedProjectIDs: Set<ProjectID>) async
-```
-
-- 진행 중이고 식별자가 집합에 있는 기록만 완료로 바꾼다. 로컬 알림을 예약하지 않고 도착 알림을 방출하지 않는다.
 - `synchronize()`는 기존 동작 뒤에 `deliveredOutcomes()`를 반영한다(도착 알림 방출 없음).
-
-### `Project.init`
-
-```swift
-public init(
-    repository: any ProjectRepository,
-    signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
-    projectDeleted: @escaping @Sendable (ProjectID) async -> Void,
-    projectsListed: @escaping @Sendable (Set<ProjectID>) async -> Void,
-    pageSize: Int = 20,
-)
-```
-
-- 현재 세대로 반영된 페이지의 식별자로만 호출한다.

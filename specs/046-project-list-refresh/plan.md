@@ -10,7 +10,7 @@
 
 ## 요약
 
-> 2026-09-28 추가: 시나리오 8, FR-023~FR-026(알림 누락 뒤 앱 아이콘 복귀 복구)의 계획은 아래 "추가 계획(2026-09-28)"에 있다.
+> 2026-09-28 추가: 시나리오 8, FR-023~FR-025(알림 누락 뒤 앱 아이콘 복귀 복구)의 계획은 아래 "추가 계획(2026-09-28)"에 있다.
 > 이 절 이하의 기존 계획(목록 자동 갱신)은 구현 완료 상태로 유지한다.
 
 남은 범위는 목록 자동 갱신(FR-001~FR-008)과 실기기 검증(FR-019)이다. 생성 상태 고착 해결(FR-009~FR-018,
@@ -248,16 +248,15 @@ compile에 필요한 최소 구현만 둔다.
    `GenerationOutcomeRepository.deliveredOutcomes()`를 읽어 기존 `finish` 경로로 반영하고, 도착 알림은 방출하지 않는다.
    알림 센터 읽기는 Infrastructure(`DeliveredNotificationClient`) → Data(`DeliveredRemoteMessageReader`) → Composition
    어댑터(기존 DTO 파서로 파싱) 순서로 전달한다([research D1~D3](./research.md#3부-알림-누락-뒤-앱-아이콘-복귀-복구-2026-09-28-추가)).
-2. **목록 기반 완료 판정(FR-026)**: `Project`가 현재 세대로 반영한 페이지의 식별자를 `projectsListed`로 알리고,
-   `ConcernUseCaseAssembly`가 이를 `ProjectGenerationUseCase.completeGenerations(of:)`로 연결한다. 진행 중 기록만 완료로 바꾸고
-   로컬 알림은 보내지 않는다([research D4·D5](./research.md#d4-목록-응답으로-완료를-판정하는-위치)).
-3. App `AppRootFeature`, Feature 동작은 바뀌지 않는다. `ProjectGenerationUseCase` 요구사항 추가로 적합 타입(App 프리뷰·테스트
-   더블, Feature 테스트 더블)만 갱신한다.
+2. App `AppRootFeature`, Feature 동작은 바뀌지 않는다.
+
+> 2026-09-28 수정: 목록 기반 완료 판정(FR-026, 실행 단위 7)은 명세에서 폐기되어 계획에서 제거했다. 구현
+> 커밋 `22f1a09`는 브랜치 이력에서 제거했다(`backup/project-list-refresh-22f1a09`에 보존)([research D4](./research.md#d4-목록-응답으로-완료를-판정하지-않는다-2026-09-28-수정)).
 
 ### 기술 맥락 변경
 
-- **변경 패키지**: Infrastructure(`InfrastructurePushMessaging`), Data(`DataNotification`), Domain(`DomainProjectGeneration`,
-  `DomainProject`), Composition(`CompositionLearningProject`, `CompositionApp`), 적합 타입 갱신으로 Feature·App.
+- **변경 패키지**: Infrastructure(`InfrastructurePushMessaging`), Data(`DataNotification`), Domain(`DomainProjectGeneration`),
+  Composition(`CompositionLearningProject`, `CompositionApp`).
 - **manifest 변경**: 없음. CompositionLearningProject → DataNotification → InfrastructurePushMessaging 의존이 이미 있다.
 - **제약**: 폴링·서버 변경 없음(FR-020). 알림 센터 알림을 지우지 않음(FR-024). 미해결 `NEEDS CLARIFICATION` 없음.
 
@@ -266,10 +265,10 @@ compile에 필요한 최소 구현만 둔다.
 | 원칙 | 점검 | 결과 |
 |---|---|---|
 | 1. 명시적인 경계 | UNUserNotificationCenter는 Infrastructure에만, Data는 역할 계약과 Factory로 감싸고, Composition이 Data→Domain 변환, 관심사 간 연결은 Composition 클로저(`projectDeleted` 선례). 새 의존 방향 없음 | 통과 |
-| 2. 상태와 데이터 안전성 | 판정 상태는 `ProjectGeneration`·`Project` actor 내부. 대체된 목록 응답은 완료 판정에 쓰지 않음 | 통과 |
+| 2. 상태와 데이터 안전성 | 판정 상태는 `ProjectGeneration` actor 내부 | 통과 |
 | 3. 검증 가능한 변경 | 단위마다 compile, 마지막에 build·compile·test. Infrastructure 구현은 실기기 검증 항목으로 남김 | 통과 |
 | 5. 수정 경로 | 이 명령은 계획 산출물만 수정했다 | 통과 |
-| 7. 위험 기반 실행 단위 | 아래 실행 단위 4~7, 프로토콜 요구사항 추가는 integration unit | 통과 |
+| 7. 위험 기반 실행 단위 | 아래 실행 단위 4~6(7은 폐기), 프로토콜 요구사항 추가는 integration unit | 통과 |
 | 10·11. 네이밍·컨벤션 | [research D6](./research.md#d6-새-공개-이름), 아래 적용 컨벤션 | 통과 |
 
 ### 적용 컨벤션(추가분)
@@ -291,8 +290,8 @@ compile에 필요한 최소 구현만 둔다.
 |---|---|---|---|---|---|
 | 4 | 알림 센터 원격 알림 조회 | Infrastructure | `DeliveredNotificationClient`, 구현, 모델 | 단일 패키지 | `compile` |
 | 5 | 전달된 원격 메시지 읽기 | Data | 역할 계약·모델·client·Factory와 테스트 | 단일 패키지 | `compile` |
-| 6 | 알림 센터 결과 동기화 | integration (Domain → Composition) | `deliveredOutcomes()` 추가, `synchronize()` 반영, 어댑터·Assembly 연결 | 프로토콜 요구사항 추가 시 적합 타입(Domain 테스트 더블, Composition 어댑터)이 같은 커밋에 있어야 compile된다 | `compile` |
-| 7 | 목록 기반 완료 판정 | integration (Domain → Composition → Feature → App) | `completeGenerations(of:)`, `Project.projectsListed`, Assembly 연결, 적합 타입 갱신 | `ProjectGenerationUseCase` 요구사항과 `Project.init` 인자 추가는 모든 적합 타입·생성 지점이 같은 커밋에 있어야 compile된다 | `compile`, 마지막에 `build`·`compile`·`test` |
+| 6 | 알림 센터 결과 동기화 | integration (Domain → Composition) | `deliveredOutcomes()` 추가, `synchronize()` 반영, 어댑터·Assembly 연결 | 프로토콜 요구사항 추가 시 적합 타입(Domain 테스트 더블, Composition 어댑터)이 같은 커밋에 있어야 compile된다 | `compile`, 마지막에 `build`·`compile`·`test` |
+| 7 | 목록 기반 완료 판정 | 폐기 | FR-026 폐기로 제거. 구현 커밋은 브랜치 이력에서 제거했고 완료한 실기기 검증 표 점검(T058)만 이력으로 남음 | — | — |
 
 ### 단위별 파일(추가분, `sources/Projects/` 기준)
 
@@ -302,10 +301,6 @@ compile에 필요한 최소 구현만 둔다.
 | 5 | Data | `Data/Notification/Contracts/DeliveredRemoteMessageReader.swift`(신규), `Data/Notification/Models/DeliveredRemoteMessage.swift`(신규), `Data/Notification/Clients/DeliveredRemoteMessageClient.swift`(신규), `Data/Notification/Factories/NotificationFactory.swift`, `Data/Tests/Notification/Clients/DeliveredRemoteMessageClientTests.swift`(신규), `Data/Tests/Notification/TestDoubles/StubDeliveredNotificationClient.swift`(신규) |
 | 6 | Domain | `Domain/ProjectGeneration/Contracts/GenerationOutcomeRepository.swift`, `Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`, `Domain/Tests/ProjectGeneration/TestDoubles/StubGenerationOutcomeRepository.swift`, `Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift` |
 | 6 | Composition | `Composition/LearningProject/Adapters/GenerationOutcomeRepositoryAdapter.swift`, `Composition/LearningProject/Assemblies/LearningProjectAssembly.swift`, `Composition/App/Assemblies/ConcernUseCaseAssembly.swift`, `Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift` |
-| 7 | Domain | `Domain/ProjectGeneration/UseCases/ProjectGenerationUseCase.swift`, `Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`, `Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`, `Domain/Project/UseCases/Project.swift`, `Domain/Tests/Project/UseCases/ProjectTests.swift` |
-| 7 | Composition | `Composition/App/Assemblies/ConcernUseCaseAssembly.swift` |
-| 7 | Feature | `Feature/Tests/ProjectRegistration/TestDoubles/ProjectGenerationUseCaseStub.swift`, `Feature/Tests/ShareRegistration/TestDoubles/ProjectGenerationUseCaseSpy.swift` |
-| 7 | App | `App/GitIt/Screens/AppRootView.swift`, `App/Tests/GitIt/TestDoubles/ProjectGenerationUseCaseMock.swift` |
 
-적합 타입 목록은 구현 시 `: ProjectGenerationUseCase`, `GenerationOutcomeRepository`, `Project(` 검색으로 다시 확인하고,
+적합 타입 목록은 구현 시 `GenerationOutcomeRepository` 검색으로 다시 확인하고,
 누락된 파일이 있으면 해당 단위에 포함한다.

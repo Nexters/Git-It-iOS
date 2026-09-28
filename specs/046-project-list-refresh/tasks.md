@@ -274,9 +274,9 @@ commit된 단순 재개에서는 `tasks.md` 완료 표시를 위한 별도 최�
 
 ## 추가 단계(2026-09-28): 알림 누락 뒤 앱 아이콘 복귀 복구
 
-[plan.md "추가 계획(2026-09-28)"](./plan.md#추가-계획2026-09-28-알림-누락-뒤-앱-아이콘-복귀-복구)의 실행 단위 4~7이다. 위상 순서는
+[plan.md "추가 계획(2026-09-28)"](./plan.md#추가-계획2026-09-28-알림-누락-뒤-앱-아이콘-복귀-복구)의 실행 단위 4~7이다(단위 7은 폐기). 위상 순서는
 Infrastructure → Data → Domain → Composition → Feature → App이며([architecture.md 3.1](../../docs/architecture.md)), 단위 4·5는
-단일 패키지, 단위 6·7은 프로토콜 요구사항·생성자 인자 추가로 적합 타입이 같은 커밋에 있어야 compile되는 integration unit이다.
+단일 패키지, 단위 6은 프로토콜 요구사항 추가로 적합 타입이 같은 커밋에 있어야 compile되는 integration unit이다.
 시나리오 라벨은 `[S8]`(알림 누락 뒤 앱 아이콘 복귀 복구)과 `[S7]`(실기기 검증)을 쓴다. 파일 경로는 `sources/Projects/` 기준으로
 적지 않고 저장소 상대경로 전체로 적는다.
 
@@ -315,31 +315,24 @@ Infrastructure → Data → Domain → Composition → Feature → App이며([ar
 - [X] T046 [S8] `sources/Projects/Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift`의 기존 어댑터 생성을 새 인자에 맞추고(빈 reader 더블을 파일 안 private 타입으로 둔다), `` `알림 센터 메시지 중 파싱에 성공한 생성 결과만 전달 시각으로 반환한다` ``를 추가한다. 다른 Composition 테스트가 어댑터나 Assembly를 만들며 compile되지 않으면 같은 방식으로 맞춘다
 - [X] T047 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 6을 검증하고 결과를 기록한다
 
-## 실행 단위 7: 목록 기반 완료 판정 (integration: Domain → Composition → Feature → App)
+## 실행 단위 7: 목록 기반 완료 판정 (폐기, 2026-09-28)
 
-**목표**: 반영된 목록 응답에 나타난 프로젝트의 진행 중 기록을 완료로 바꾸고 로컬 알림을 보내지 않는다(FR-026).
-**분리 불가 근거**: `ProjectGenerationUseCase` 요구사항과 `Project.init` 인자 추가는 모든 적합 타입·생성 지점이 같은 커밋에서 바뀌어야 compile된다.
+FR-026과 SC-017이 폐기되어 이 단위의 구현 작업(T048~T057, T059)을 제거했다. 식별자 T048~T057, T059는 재사용하지
+않는다. 구현 커밋 `22f1a09`는 브랜치 이력에서 제거했다(`backup/project-list-refresh-22f1a09`에 보존). 같은 커밋의 `ProjectTests.settle` 반복 한도 증가는 FR-026과 무관한 테스트 안정화라 `97d55df`로 따로
+남겼다. 아래 T058은 이 단위에서 완료한 실기기 검증 표 점검으로, 폐기와 무관해 이력으로 남긴다.
 
-- [ ] T048 [S8] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGenerationUseCase.swift`에 `func completeGenerations(of listedProjectIDs: Set<ProjectID>) async`를 추가한다
-- [ ] T049 [S8] `sources/Projects/Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`에 테스트를 추가한다: (1) `` `목록에 나타난 프로젝트의 진행 중 기록을 완료로 바꾼다` `` (2) `` `목록으로 완료한 기록에는 로컬 알림을 예약하지 않는다` `` (3) `` `목록에 없는 진행 중 기록은 그대로 둔다` `` (4) `` `이미 실패한 기록은 목록에 나타나도 바꾸지 않는다` `` (5) `` `목록으로 완료해도 도착 알림을 방출하지 않는다` ``
-- [ ] T050 [S8] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`에 `completeGenerations(of:)`를 구현한다: 관찰이 시작되지 않았으면 먼저 시작하고, 현재 상태에서 식별자가 집합에 있고 진행 중인 기록만 골라 없으면 반환한다. 대기 중 리마인드를 흡수한 뒤 대상 식별자를 리마인드 대상에서 빼고 `pendingGenerations.finishGeneration(projectID:status: .completed, finishedAt: now())`로 바꾼 다음 상태를 다시 반영한다([research D5](./research.md#d5-목록-완료-판정-규칙))
-- [ ] T051 [S8] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`에 테스트를 추가하고 기존 `Project(` 생성 지점을 새 인자에 맞춘다: (1) `` `첫 페이지가 반영되면 그 페이지의 프로젝트 식별자를 알린다` `` (2) `` `다음 페이지가 반영되면 그 페이지의 프로젝트 식별자를 알린다` `` (3) `` `대체된 요청의 응답으로는 프로젝트 식별자를 알리지 않는다` ``. 호출 기록은 테스트 파일 안의 `actor` 기록기로 모은다
-- [ ] T052 [S8] `sources/Projects/Domain/Project/UseCases/Project.swift`의 `init`에 `projectsListed: @escaping @Sendable (Set<ProjectID>) async -> Void`(`projectDeleted` 다음, `pageSize` 앞)를 추가하고, 첫 페이지 교체와 다음 페이지 추가가 현재 세대로 반영된 경우에만 그 페이지 요약의 식별자 집합으로 호출한다
-- [ ] T053 [S8] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `Project(` 생성에 `projectsListed: { await projectGeneration.completeGenerations(of: $0) }`를 추가한다
-- [ ] T054 [P] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/ProjectGenerationUseCaseStub.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
-- [ ] T055 [P] `sources/Projects/Feature/Tests/ShareRegistration/TestDoubles/ProjectGenerationUseCaseSpy.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
-- [ ] T056 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 `NoopProjectGeneration`에 `completeGenerations(of:)`의 빈 구현을 추가한다
-- [ ] T057 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectGenerationUseCaseMock.swift`에 `completeGenerations(of:)`의 빈 구현을 추가한다
-- [ ] T058 [S7] `specs/046-project-list-refresh/device-verification.md`의 "알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)" 표가 명세 시나리오 7-4·7-5를 모두 담는지 확인하고, 빠진 칸이 있으면 `(관찰 대기)`로 추가한다. 기존 관찰 기록은 바꾸지 않는다
-- [ ] T059 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 7을 검증하고 결과를 기록한다
+- [X] T058 [S7] `specs/046-project-list-refresh/device-verification.md`의 "알림 누락 뒤 앱 아이콘 복귀 복구 (2026-09-28 추가)" 표가 명세 시나리오 7-4·7-5를 모두 담는지 확인하고, 빠진 칸이 있으면 `(관찰 대기)`로 추가한다. 기존 관찰 기록은 바꾸지 않는다
 
 ## 추가 단계 전체 완료 검증
 
+T060·T061은 FR-026 구현이 포함된 상태에서 완료했으나 그 상태가 브랜치 이력에서 제거되어 미완료로 되돌렸다. 현재 이력에서
+다시 수행한다.
+
 - [ ] T060 [no-write] 저장소 루트에서 `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 한 번씩 실행하고 각 결과를 기록한다. 실패하면 구성·컴파일·테스트·Simulator 환경으로 분류한다(SC-012 회귀 포함)
-- [ ] T061 [no-write] S8 수용 기준을 확인한다: SC-016은 T042, SC-017은 T049·T051 결과로 확인한다. SC-018과 시나리오 7-4·7-5는 실기기 검증이 필요하므로 수행 여부를 확인하고, 수행되지 않았으면 알림 센터 읽기 구현(T031), 생성 중 프로젝트의 목록 미포함 전제, 2초 기준을 PR의 미검증 범위로 넘긴다
+- [ ] T061 [no-write] S8 수용 기준을 확인한다: SC-016은 T042 결과로 확인한다. SC-018과 시나리오 7-4·7-5는 실기기 검증이 필요하므로 수행 여부를 확인하고, 수행되지 않았으면 알림 센터 읽기 구현(T031), 2초 기준을 PR의 미검증 범위로 넘긴다
 
 ### 추가 단계 의존성과 추적
 
-- 순서: 단위 4(T029~T032) → 단위 5(T033~T039) → 단위 6(T040~T047) → 단위 7(T048~T059) → T060·T061. 같은 기능 범위이므로 단위 사이 승인 게이트는 없다.
-- 단위 내부 병렬: T029·T030, T033·T034·T037, T054~T057.
-- 추적: S8 — FR-023~FR-025는 T029~T047, FR-026은 T048~T053. S7 — T058, T061. T054~T057은 compile을 위한 적합 타입 갱신이라 시나리오 라벨이 없다.
+- 순서: 단위 4(T029~T032) → 단위 5(T033~T039) → 단위 6(T040~T047) → 단위 7(T058) → T060·T061. 같은 기능 범위이므로 단위 사이 승인 게이트는 없다.
+- 단위 내부 병렬: T029·T030, T033·T034·T037.
+- 추적: S8 — FR-023~FR-025는 T029~T047. S7 — T058, T061. FR-026은 폐기해 작업이 없다.
