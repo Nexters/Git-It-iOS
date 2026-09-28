@@ -284,10 +284,10 @@ Infrastructure → Data → Domain → Composition → Feature → App이며([ar
 
 **목표**: 시스템 알림 센터에 남은 원격 알림을 플랫폼 타입 없이 조회한다([research D3](./research.md#d3-알림-센터-읽기의-계층-배치)).
 
-- [ ] T029 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Models/DeliveredRemoteNotification.swift`를 새로 만든다. `public struct DeliveredRemoteNotification: Equatable, Sendable`에 `public init(payload: [String: String], deliveredAt: Date)`, `public let payload: [String: String]`, `public let deliveredAt: Date`를 둔다(`RemoteNotificationDelivery`와 같은 `// MARK: Lifecycle`/`// MARK: Public` 구성)
-- [ ] T030 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/DeliveredNotificationClient.swift`를 새로 만든다. `public protocol DeliveredNotificationClient: Sendable { func deliveredRemoteNotifications() async -> [DeliveredRemoteNotification] }`
-- [ ] T031 [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/NotificationCenterDeliveredNotificationClient.swift`를 새로 만든다. `public struct NotificationCenterDeliveredNotificationClient: DeliveredNotificationClient`(public init)가 `UNUserNotificationCenter.current().deliveredNotifications()`를 읽어 `request.trigger`가 `UNPushNotificationTrigger`인 알림만 골라 `DeliveredRemoteNotification(payload: RemoteNotificationPayload(userInfo:).userInfoStrings, deliveredAt: notification.date)`로 바꿔 반환한다. 알림을 지우거나 바꾸지 않는다(FR-024)
-- [ ] T032 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 4를 검증하고 결과를 기록한다. 이 패키지에는 테스트 target이 없고 구현이 시스템 알림 센터에 의존하므로 동작 확인은 실기기 검증(T061)으로 넘긴다
+- [X] T029 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Models/DeliveredRemoteNotification.swift`를 새로 만든다. `public struct DeliveredRemoteNotification: Equatable, Sendable`에 `public init(payload: [String: String], deliveredAt: Date)`, `public let payload: [String: String]`, `public let deliveredAt: Date`를 둔다(`RemoteNotificationDelivery`와 같은 `// MARK: Lifecycle`/`// MARK: Public` 구성)
+- [X] T030 [P] [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/DeliveredNotificationClient.swift`를 새로 만든다. `public protocol DeliveredNotificationClient: Sendable { func deliveredRemoteNotifications() async -> [DeliveredRemoteNotification] }`
+- [X] T031 [S8] `sources/Projects/Infrastructure/PushMessaging/Remote/Clients/NotificationCenterDeliveredNotificationClient.swift`를 새로 만든다. `public struct NotificationCenterDeliveredNotificationClient: DeliveredNotificationClient`(public init)가 `UNUserNotificationCenter.current().deliveredNotifications()`를 읽어 `request.trigger`가 `UNPushNotificationTrigger`인 알림만 골라 `DeliveredRemoteNotification(payload: RemoteNotificationPayload(userInfo:).userInfoStrings, deliveredAt: notification.date)`로 바꿔 반환한다. 알림을 지우거나 바꾸지 않는다(FR-024)
+- [X] T032 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 4를 검증하고 결과를 기록한다. 이 패키지에는 테스트 target이 없고 구현이 시스템 알림 센터에 의존하므로 동작 확인은 실기기 검증(T061)으로 넘긴다
 
 ## 실행 단위 5: 전달된 원격 메시지 읽기 (Data)
 
