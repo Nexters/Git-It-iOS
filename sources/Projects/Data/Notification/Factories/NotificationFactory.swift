@@ -1,4 +1,5 @@
 import InfrastructureLocalNotification
+import InfrastructurePushMessaging
 
 // MARK: - NotificationFactory
 
@@ -12,6 +13,10 @@ public enum NotificationFactory {
 
     public static func remoteMessageReceiver() -> any RemoteMessageReceiver {
         RemoteMessageClient()
+    }
+
+    public static func deliveredRemoteMessageReader() -> any DeliveredRemoteMessageReader {
+        DeliveredRemoteMessageClient(notificationClient: NotificationCenterDeliveredNotificationClient())
     }
 
 }

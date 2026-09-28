@@ -293,13 +293,13 @@ Infrastructure → Data → Domain → Composition → Feature → App이며([ar
 
 **목표**: Data 언어의 역할 계약과 생성 진입점으로 알림 센터 읽기를 공개한다.
 
-- [ ] T033 [P] [S8] `sources/Projects/Data/Notification/Models/DeliveredRemoteMessage.swift`를 새로 만든다. `public struct DeliveredRemoteMessage: Equatable, Sendable`(`payload: [String: String]`, `deliveredAt: Date`, public init)
-- [ ] T034 [P] [S8] `sources/Projects/Data/Notification/Contracts/DeliveredRemoteMessageReader.swift`를 새로 만든다. `public protocol DeliveredRemoteMessageReader: Sendable { func deliveredMessages() async -> [DeliveredRemoteMessage] }`
-- [ ] T035 [S8] `sources/Projects/Data/Notification/Clients/DeliveredRemoteMessageClient.swift`를 새로 만든다. 내부 `struct DeliveredRemoteMessageClient: DeliveredRemoteMessageReader`가 `init(notificationClient: any DeliveredNotificationClient)`로 주입받아 결과를 `DeliveredRemoteMessage`로 바꾸고, `os.Logger`(subsystem `com.nexters.hytime.gitit`, category `DeliveredRemoteMessageClient`)로 읽은 개수를 debug 로그로 남긴다
-- [ ] T036 [S8] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`에 `public static func deliveredRemoteMessageReader() -> any DeliveredRemoteMessageReader`를 추가해 `DeliveredRemoteMessageClient(notificationClient: NotificationCenterDeliveredNotificationClient())`를 반환한다(`import InfrastructurePushMessaging` 추가)
-- [ ] T037 [P] [S8] `sources/Projects/Data/Tests/Notification/TestDoubles/StubDeliveredNotificationClient.swift`를 새로 만든다. 생성자로 받은 `[DeliveredRemoteNotification]`을 반환하는 `DeliveredNotificationClient` 더블
-- [ ] T038 [S8] `sources/Projects/Data/Tests/Notification/Clients/DeliveredRemoteMessageClientTests.swift`를 새로 만들고 `@Suite`에 `` `알림 센터의 원격 알림을 payload와 전달 시각 그대로 전달된 메시지로 바꾼다` ``, `` `알림 센터가 비어 있으면 빈 목록을 반환한다` ``를 둔다
-- [ ] T039 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 5를 검증하고 결과를 기록한다
+- [X] T033 [P] [S8] `sources/Projects/Data/Notification/Models/DeliveredRemoteMessage.swift`를 새로 만든다. `public struct DeliveredRemoteMessage: Equatable, Sendable`(`payload: [String: String]`, `deliveredAt: Date`, public init)
+- [X] T034 [P] [S8] `sources/Projects/Data/Notification/Contracts/DeliveredRemoteMessageReader.swift`를 새로 만든다. `public protocol DeliveredRemoteMessageReader: Sendable { func deliveredMessages() async -> [DeliveredRemoteMessage] }`
+- [X] T035 [S8] `sources/Projects/Data/Notification/Clients/DeliveredRemoteMessageClient.swift`를 새로 만든다. 내부 `struct DeliveredRemoteMessageClient: DeliveredRemoteMessageReader`가 `init(notificationClient: any DeliveredNotificationClient)`로 주입받아 결과를 `DeliveredRemoteMessage`로 바꾸고, `os.Logger`(subsystem `com.nexters.hytime.gitit`, category `DeliveredRemoteMessageClient`)로 읽은 개수를 debug 로그로 남긴다
+- [X] T036 [S8] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`에 `public static func deliveredRemoteMessageReader() -> any DeliveredRemoteMessageReader`를 추가해 `DeliveredRemoteMessageClient(notificationClient: NotificationCenterDeliveredNotificationClient())`를 반환한다(`import InfrastructurePushMessaging` 추가)
+- [X] T037 [P] [S8] `sources/Projects/Data/Tests/Notification/TestDoubles/StubDeliveredNotificationClient.swift`를 새로 만든다. 생성자로 받은 `[DeliveredRemoteNotification]`을 반환하는 `DeliveredNotificationClient` 더블
+- [X] T038 [S8] `sources/Projects/Data/Tests/Notification/Clients/DeliveredRemoteMessageClientTests.swift`를 새로 만들고 `@Suite`에 `` `알림 센터의 원격 알림을 payload와 전달 시각 그대로 전달된 메시지로 바꾼다` ``, `` `알림 센터가 비어 있으면 빈 목록을 반환한다` ``를 둔다
+- [X] T039 [no-write] 저장소 루트에서 `"$project_build_runner" compile`을 실행해 단위 5를 검증하고 결과를 기록한다
 
 ## 실행 단위 6: 알림 센터 결과 동기화 (integration: Domain → Composition)
 
