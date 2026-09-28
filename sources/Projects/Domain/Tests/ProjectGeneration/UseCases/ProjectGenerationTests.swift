@@ -85,6 +85,7 @@ struct ProjectGenerationTests {
             arrivedAt: fixture.sleeper.now,
         ))
         _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
+        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
 
         #expect(await fixture.scheduler.scheduledReminders == [
             .init(
@@ -109,6 +110,7 @@ struct ProjectGenerationTests {
             .failed,
         ))
         _ = await Self.next(&states) { $0.requests.first?.phase == .failed }
+        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
 
         #expect(await fixture.scheduler.scheduledReminders == [
             .init(
@@ -681,6 +683,101 @@ struct ProjectGenerationTests {
         ))
 
         #expect(await arrivals.next() == "p1")
+    }
+
+    @Test
+    func `동기화하면 알림 센터에 남은 결과로 진행 중 기록을 결과 상태로 바꾼다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
+            "p1",
+            .failed,
+        )])
+
+        await fixture.generation.synchronize()
+        let state = await Self.next(&states) { $0.requests.first?.phase == .failed }
+
+        #expect(state?.requests.first?.projectID == "p1")
+    }
+
+    @Test
+    func `알림 센터 결과로 반영해도 도착 알림을 방출하지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
+            "p1",
+            .completed,
+        )])
+
+        await fixture.generation.synchronize()
+        fixture.outcomes.emit(Self.outcome(
+            "p2",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p2")
+        #expect(await fixture.pendingGenerations.state.record(projectID: "p1")?.status == .completed)
+    }
+
+    @Test
+    func `이미 반영된 알림 센터 결과로는 로컬 알림을 다시 예약하지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
+            "p1",
+            .completed,
+            arrivedAt: fixture.sleeper.now,
+        )])
+
+        await fixture.generation.synchronize()
+        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
+        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
+        await fixture.generation.synchronize()
+
+        #expect(await fixture.scheduler.scheduledReminders.count == 1)
+    }
+
+    @Test
+    func `기록에 없는 프로젝트의 알림 센터 결과는 기록을 바꾸지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
+            "p-unknown",
+            .completed,
+        )])
+
+        await fixture.generation.synchronize()
+
+        #expect(await fixture.pendingGenerations.state.record(projectID: "p1")?.status == .inProgress)
+        #expect(await fixture.pendingGenerations.state.record(projectID: "p-unknown") == nil)
+    }
+
+    @Test
+    func `알림 센터로 반영한 결과가 다시 도착해도 도착 알림을 방출하지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
+            "p1",
+            .completed,
+        )])
+
+        await fixture.generation.synchronize()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        fixture.outcomes.emit(Self.outcome(
+            "p2",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p2")
     }
 
     // MARK: Private

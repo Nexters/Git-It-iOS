@@ -1,4 +1,5 @@
 import DataLearningProject
+import DataNotification
 import DomainProjectGeneration
 
 // MARK: - GenerationOutcomeRepositoryAdapter
@@ -7,8 +8,12 @@ public struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
 
     // MARK: Lifecycle
 
-    public init(source: any QuizGenerationOutcomeSource) {
+    public init(
+        source: any QuizGenerationOutcomeSource,
+        deliveredMessages: any DeliveredRemoteMessageReader,
+    ) {
         self.source = source
+        self.deliveredMessages = deliveredMessages
     }
 
     // MARK: Public
@@ -26,9 +31,19 @@ public struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
         }
     }
 
+    public func deliveredOutcomes() async -> [GenerationOutcome] {
+        await deliveredMessages.deliveredMessages().compactMap { message in
+            QuizGenerationOutcomeDTO(
+                rawPayload: message.payload,
+                deliveredAt: message.deliveredAt,
+            ).map(outcome(from:))
+        }
+    }
+
     // MARK: Private
 
     private let source: any QuizGenerationOutcomeSource
+    private let deliveredMessages: any DeliveredRemoteMessageReader
 
     private func outcome(from dto: QuizGenerationOutcomeDTO) -> GenerationOutcome {
         switch dto.status {

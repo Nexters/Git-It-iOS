@@ -36,6 +36,7 @@ public struct ConcernUseCaseAssembly: Sendable {
         sharedStorage: (any KeyValueStorage)?,
         reminderNotifier: (any LocalReminderNotifier)? = nil,
         generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
+        deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil,
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         memberResponseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
@@ -162,7 +163,10 @@ public struct ConcernUseCaseAssembly: Sendable {
                     )
                 )
             ),
-            outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
+            outcomes: GenerationOutcomeRepositoryAdapter(
+                source: generationOutcomeSource,
+                deliveredMessages: deliveredRemoteMessageReader ?? NotificationFactory.deliveredRemoteMessageReader(),
+            ),
             reminderScheduler: GenerationReminderSchedulerAdapter(
                 reminderNotifier: notifier,
                 completedTitle: generationReminder.completedTitle,

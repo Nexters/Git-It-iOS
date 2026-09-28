@@ -17,6 +17,7 @@ public struct LearningProjectAssembly: Sendable {
         reminderContent: GenerationReminderContent = GenerationReminderContent(),
         reminderNotifier: (any LocalReminderNotifier)? = nil,
         generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
+        deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
@@ -39,7 +40,10 @@ public struct LearningProjectAssembly: Sendable {
                     )
                 )
             ),
-            outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
+            outcomes: GenerationOutcomeRepositoryAdapter(
+                source: generationOutcomeSource,
+                deliveredMessages: deliveredRemoteMessageReader ?? NotificationFactory.deliveredRemoteMessageReader(),
+            ),
             reminderScheduler: GenerationReminderSchedulerAdapter(
                 reminderNotifier: notifier,
                 completedTitle: reminderContent.completedTitle,

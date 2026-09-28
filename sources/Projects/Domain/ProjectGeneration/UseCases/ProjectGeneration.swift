@@ -77,14 +77,15 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     }
 
     public func synchronize() async {
-        guard let startTask else {
+        if let startTask {
+            await startTask.value
+            await purgeExpiredRecords()
+            await absorbPendingReminders()
+            await apply(pendingGenerations.pendingState())
+        } else {
             await startObserving()
-            return
         }
-        await startTask.value
-        await purgeExpiredRecords()
-        await absorbPendingReminders()
-        await apply(pendingGenerations.pendingState())
+        await absorbDeliveredOutcomes()
     }
 
     public func release(_ projectID: ProjectID) async {
@@ -186,21 +187,40 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         announceArrival(of: outcome)
     }
 
+    private func absorbDeliveredOutcomes() async {
+        var hasRecordedOutcome = false
+        for outcome in await outcomes.deliveredOutcomes() {
+            if await finish(outcome) {
+                hasRecordedOutcome = true
+            }
+            recordArrival(of: outcome)
+        }
+        if hasRecordedOutcome {
+            await apply(pendingGenerations.pendingState())
+        }
+    }
+
     private func announceArrival(of outcome: GenerationOutcome) {
+        guard recordArrival(of: outcome) else { return }
+        for continuation in arrivalSubscribers.values {
+            continuation.yield(outcome.projectID)
+        }
+    }
+
+    @discardableResult
+    private func recordArrival(of outcome: GenerationOutcome) -> Bool {
         let current = now()
         let isDuplicate = recentArrivals.contains { arrival in
             arrival.projectID == outcome.projectID
                 && arrival.status == outcome.status
                 && current.timeIntervalSince(arrival.arrivedAt) <= waitPolicy.retentionLimit
         }
-        guard !isDuplicate else { return }
+        guard !isDuplicate else { return false }
         recentArrivals.append(outcome)
         if recentArrivals.count > Self.recentArrivalLimit {
             recentArrivals.removeFirst(recentArrivals.count - Self.recentArrivalLimit)
         }
-        for continuation in arrivalSubscribers.values {
-            continuation.yield(outcome.projectID)
-        }
+        return true
     }
 
     @discardableResult
