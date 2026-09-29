@@ -34,4 +34,14 @@ import SwiftUI
         )
     )
 }
+
+#Preview("생성 중") {
+    ShareRegistrationScreen(store: ShareRegistrationPreviewSupport.store(phase: .generationInProgress))
+}
+
+#Preview("생성 상태 확인 실패") {
+    ShareRegistrationScreen(
+        store: ShareRegistrationPreviewSupport.store(phase: .generationUnverified(retry: .lookup))
+    )
+}
 #endif

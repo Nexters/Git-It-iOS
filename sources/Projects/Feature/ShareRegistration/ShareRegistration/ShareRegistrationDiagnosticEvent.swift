@@ -7,4 +7,6 @@ public enum ShareRegistrationDiagnosticEvent: Equatable, Sendable {
     case repositoryLookupFailed(reason: String)
     case registrationFailed(reason: String)
     case registrationSucceeded
+    case generationInProgressBlocked
+    case generationStateUnverified
 }

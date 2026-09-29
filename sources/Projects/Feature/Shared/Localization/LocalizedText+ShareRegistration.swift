@@ -115,5 +115,25 @@ extension LocalizedText {
                 String(localized: .shareRegistrationOfflineReason)
             }
         }
+
+        enum GenerationInProgress {
+            static var title: String {
+                String(localized: .shareRegistrationGenerationInProgressTitle)
+            }
+
+            static var message: String {
+                String(localized: .shareRegistrationGenerationInProgressMessage)
+            }
+        }
+
+        enum GenerationUnverified {
+            static var title: String {
+                String(localized: .shareRegistrationGenerationUnverifiedTitle)
+            }
+
+            static var reason: String {
+                String(localized: .shareRegistrationGenerationUnverifiedReason)
+            }
+        }
     }
 }

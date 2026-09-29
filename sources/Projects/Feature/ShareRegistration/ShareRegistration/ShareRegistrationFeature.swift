@@ -71,10 +71,14 @@ public struct ShareRegistrationFeature: Sendable {
         }
 
         public var canRetry: Bool {
-            if case .failed = registration.phase {
-                return true
+            switch registration.phase {
+            case .failed,
+                 .generationUnverified:
+                true
+
+            default:
+                false
             }
-            return false
         }
 
     }
@@ -110,8 +114,9 @@ public struct ShareRegistrationFeature: Sendable {
         ) {
             SharedRepositoryRegistrationFeature(
                 parseRepositoryLink: parseRepositoryLink,
-                externalRepository: externalRepository,
-                projectGeneration: projectGeneration,
+                lookUpRepository: { [externalRepository] in try await externalRepository.repository(at: $0) },
+                requestGeneration: { [projectGeneration] in try await projectGeneration.request($0) },
+                currentGenerationState: { [projectGeneration] in try await projectGeneration.currentState() },
                 signInAvailability: signInAvailability,
                 recordDiagnostic: recordDiagnostic,
             )

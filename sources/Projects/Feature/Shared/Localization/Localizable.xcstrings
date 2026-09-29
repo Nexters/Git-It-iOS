@@ -2689,6 +2689,54 @@
         }
       }
     },
+    "ShareRegistration.GenerationInProgress.message" : {
+      "comment" : "공유 등록 화면에서 이미 진행 중인 문제 생성이 있어 등록할 수 없을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 문제를 생성하고 있어요. 생성이 끝난 뒤 다시 공유해 주세요. Git-It 앱을 열면 최신 생성 상태가 반영돼요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationInProgress.title" : {
+      "comment" : "공유 등록 화면에서 이미 진행 중인 문제 생성이 있을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 중"
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationUnverified.reason" : {
+      "comment" : "공유 등록 화면에서 문제 생성 상태를 확인하지 못했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationUnverified.title" : {
+      "comment" : "공유 등록 화면에서 문제 생성 상태를 확인하지 못했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생성 상태를 확인하지 못했어요"
+          }
+        }
+      }
+    },
     "ShareRegistration.InvalidLink.reason" : {
       "comment" : "공유 등록 화면에서 공유한 링크가 GitHub 저장소 주소가 아닐 때 보이는 사유",
       "extractionState" : "manual",

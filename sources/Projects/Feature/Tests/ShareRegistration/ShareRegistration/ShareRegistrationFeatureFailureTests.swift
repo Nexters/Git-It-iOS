@@ -28,6 +28,54 @@ struct ShareRegistrationFeatureFailureTests {
     }
 
     @Test
+    func `생성 상태 확인에 실패하면 재시도와 닫기를 모두 허용한다`() {
+        var state = Self.readyState()
+        state.registration.phase = .generationUnverified(retry: .lookup)
+        let store = Self.makeStore(state: state)
+
+        #expect(store.state.canRetry)
+        #expect(store.state.canDismiss)
+    }
+
+    @Test
+    func `생성 중 안내 상태에서는 재시도 없이 닫기만 허용한다`() {
+        var state = Self.readyState()
+        state.registration.phase = .generationInProgress
+        let store = Self.makeStore(state: state)
+
+        #expect(!store.state.canRetry)
+        #expect(store.state.canDismiss)
+    }
+
+    @Test
+    func `주입한 생성 요청 기능의 현재 상태로 판정하고 확인 실패의 재시도는 상태 조회부터 다시 한다`() async {
+        let projectGeneration = ProjectGenerationUseCaseSpy(currentStates: [
+            .failure(.stateUnavailable),
+            .success(ProjectGenerationState(requests: [ProjectGenerationRequestState(
+                repositoryURL: "https://github.com/owner/other",
+                projectID: nil,
+                requestedAt: Date(timeIntervalSince1970: 10_000),
+                phase: .inProgress,
+            )])),
+        ])
+        let store = Self.makeStore(
+            state: ShareRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL),
+            projectGeneration: projectGeneration,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.skipReceivedActions()
+        #expect(store.state.registration.phase == .generationUnverified(retry: .lookup))
+
+        await store.send(.view(.retryTapped))
+        await store.skipReceivedActions()
+        #expect(store.state.registration.phase == .generationInProgress)
+        #expect(projectGeneration.currentStateCallCount == 2)
+        #expect(projectGeneration.callCount == 0)
+    }
+
+    @Test
     func `요청 중에는 닫기 동작을 받지 않는다`() async {
         var state = Self.readyState()
         state.registration.phase = .submitting
@@ -59,7 +107,8 @@ struct ShareRegistrationFeatureFailureTests {
     }
 
     private static func makeStore(
-        state: ShareRegistrationFeature.State? = nil
+        state: ShareRegistrationFeature.State? = nil,
+        projectGeneration: ProjectGenerationUseCaseSpy = ProjectGenerationUseCaseSpy(),
     ) -> TestStoreOf<ShareRegistrationFeature> {
         TestStore(initialState: state ?? readyState()) {
             ShareRegistrationFeature(
@@ -67,7 +116,7 @@ struct ShareRegistrationFeatureFailureTests {
                 externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                projectGeneration: ProjectGenerationUseCaseSpy(),
+                projectGeneration: projectGeneration,
                 signInAvailability: { .signedIn },
             )
         }

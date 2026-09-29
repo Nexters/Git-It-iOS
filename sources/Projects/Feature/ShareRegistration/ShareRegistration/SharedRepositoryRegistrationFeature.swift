@@ -12,14 +12,16 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
 
     public init(
         parseRepositoryLink: any ExternalRepositoryLocator,
-        externalRepository: any ExternalRepositoryUseCase,
-        projectGeneration: any ProjectGenerationUseCase,
+        lookUpRepository: @escaping @Sendable (ExternalRepositoryURL) async throws -> ExternalRepository,
+        requestGeneration: @escaping @Sendable (ProjectGenerationRequest) async throws -> ProjectGenerationReceipt,
+        currentGenerationState: @escaping @Sendable () async throws -> ProjectGenerationState,
         signInAvailability: @escaping @Sendable () async -> SignInAvailability,
         recordDiagnostic: @escaping @Sendable (ShareRegistrationDiagnosticEvent) -> Void,
     ) {
         self.parseRepositoryLink = parseRepositoryLink
-        self.externalRepository = externalRepository
-        self.projectGeneration = projectGeneration
+        self.lookUpRepository = lookUpRepository
+        self.requestGeneration = requestGeneration
+        self.currentGenerationState = currentGenerationState
         self.signInAvailability = signInAvailability
         self.recordDiagnostic = recordDiagnostic
     }
@@ -51,6 +53,8 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             case submitting
             case succeeded
             case failed(reason: String, retry: RetryTarget)
+            case generationInProgress
+            case generationUnverified(retry: RetryTarget)
         }
 
         public var sharedURL: String?
@@ -125,8 +129,9 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     }
 
     private let parseRepositoryLink: any ExternalRepositoryLocator
-    private let externalRepository: any ExternalRepositoryUseCase
-    private let projectGeneration: any ProjectGenerationUseCase
+    private let lookUpRepository: @Sendable (ExternalRepositoryURL) async throws -> ExternalRepository
+    private let requestGeneration: @Sendable (ProjectGenerationRequest) async throws -> ProjectGenerationReceipt
+    private let currentGenerationState: @Sendable () async throws -> ProjectGenerationState
     private let signInAvailability: @Sendable () async -> SignInAvailability
     private let recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void
 
@@ -143,6 +148,21 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
 
         default:
             LocalizedText.ShareRegistration.RegistrationFailure.reason
+        }
+    }
+
+    private static func generationBlockedPhase(
+        currentGenerationState: @Sendable () async throws -> ProjectGenerationState,
+        recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void,
+        retry: State.RetryTarget,
+    ) async -> State.Phase? {
+        do {
+            guard try await currentGenerationState().hasRequestInProgress else { return nil }
+            recordDiagnostic(.generationInProgressBlocked)
+            return .generationInProgress
+        } catch {
+            recordDiagnostic(.generationStateUnverified)
+            return .generationUnverified(retry: retry)
         }
     }
 
@@ -174,7 +194,15 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             return submit(&state)
 
         case .retry:
-            guard case .failed(_, let retry) = state.phase else { return .none }
+            let retry: State.RetryTarget
+            switch state.phase {
+            case .failed(_, let target),
+                 .generationUnverified(let target):
+                retry = target
+
+            default:
+                return .none
+            }
             return switch retry {
             case .lookup: validate(&state)
             case .registration: submit(&state)
@@ -237,7 +265,7 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             return .none
         }
 
-        return .run { [signInAvailability, externalRepository, recordDiagnostic] send in
+        return .run { [signInAvailability, currentGenerationState, lookUpRepository, recordDiagnostic] send in
             let availability = await signInAvailability()
             recordDiagnostic(.signInAvailabilityResolved(availability))
             switch availability {
@@ -253,8 +281,19 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
                 break
             }
 
+            if
+                let blocked = await Self.generationBlockedPhase(
+                    currentGenerationState: currentGenerationState,
+                    recordDiagnostic: recordDiagnostic,
+                    retry: .lookup,
+                )
+            {
+                await send(.effect(.validationFinished(blocked)))
+                return
+            }
+
             do {
-                let repository = try await externalRepository.repository(at: sharedURL)
+                let repository = try await lookUpRepository(sharedURL)
                 await send(.effect(.repositoryResolved(repository)))
             } catch let error as ExternalRepositoryError {
                 if error == .invalidURLFormat {
@@ -285,7 +324,7 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     private func submit(_ state: inout State) -> Effect<Action> {
         guard let submission = state.submission else { return .none }
         state.phase = .submitting
-        return .run { [signInAvailability, projectGeneration, recordDiagnostic] send in
+        return .run { [signInAvailability, currentGenerationState, requestGeneration, recordDiagnostic] send in
             let availability = await signInAvailability()
             guard availability == .signedIn else {
                 recordDiagnostic(.signInAvailabilityResolved(availability))
@@ -295,8 +334,19 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
                 return
             }
 
+            if
+                let blocked = await Self.generationBlockedPhase(
+                    currentGenerationState: currentGenerationState,
+                    recordDiagnostic: recordDiagnostic,
+                    retry: .registration,
+                )
+            {
+                await send(.effect(.validationFinished(blocked)))
+                return
+            }
+
             do {
-                let receipt = try await projectGeneration.request(ProjectGenerationRequest(
+                let receipt = try await requestGeneration(ProjectGenerationRequest(
                     repositoryURL: submission.repository.canonicalURL,
                     quizLevel: submission.quizLevel,
                 ))

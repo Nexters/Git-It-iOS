@@ -72,6 +72,22 @@ public struct ShareRegistrationScreen: View {
                 onRetry: { send(.retryTapped) },
                 onDismiss: { send(.dismissTapped) },
             )
+
+        case .generationInProgress:
+            guidance(
+                title: LocalizedText.ShareRegistration.GenerationInProgress.title,
+                message: LocalizedText.ShareRegistration.GenerationInProgress.message,
+            )
+
+        case .generationUnverified:
+            Self.GuidanceView(
+                title: LocalizedText.ShareRegistration.GenerationUnverified.title,
+                message: LocalizedText.ShareRegistration.GenerationUnverified.reason,
+                retryTitle: LocalizedText.ShareRegistration.Retry.buttonTitle,
+                dismissTitle: LocalizedText.ShareRegistration.Dismiss.buttonTitle,
+                onRetry: { send(.retryTapped) },
+                onDismiss: { send(.dismissTapped) },
+            )
         }
     }
 

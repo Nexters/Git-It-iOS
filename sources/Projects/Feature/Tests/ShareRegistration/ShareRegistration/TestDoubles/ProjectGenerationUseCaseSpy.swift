@@ -10,10 +10,14 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
         projectID: ProjectID = "project-1",
         error: ProjectGenerationError? = nil,
         suspendsUntilResumed: Bool = false,
+        currentStates: [Result<ProjectGenerationState, ProjectGenerationError>] = [
+            .success(ProjectGenerationState(requests: []))
+        ],
     ) {
         self.projectID = projectID
         self.error = error
         self.suspendsUntilResumed = suspendsUntilResumed
+        stateReads = Mutex(StateReads(results: currentStates))
     }
 
     // MARK: Internal
@@ -24,6 +28,10 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
 
     var lastQuizLevel: QuizLevel? {
         calls.withLock { $0.last }
+    }
+
+    var currentStateCallCount: Int {
+        stateReads.withLock { $0.count }
     }
 
     func resume() {
@@ -52,7 +60,13 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
     }
 
     func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
-        ProjectGenerationState(requests: [])
+        let result = stateReads.withLock { reads -> Result<ProjectGenerationState, ProjectGenerationError> in
+            reads.count += 1
+            guard let last = reads.results.last else { return .success(ProjectGenerationState(requests: [])) }
+            let index = reads.count - 1
+            return index < reads.results.count ? reads.results[index] : last
+        }
+        return try result.get()
     }
 
     func outcomeArrivals() async -> AsyncStream<ProjectID> {
@@ -70,10 +84,16 @@ final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {
         var last: QuizLevel?
     }
 
+    private struct StateReads {
+        let results: [Result<ProjectGenerationState, ProjectGenerationError>]
+        var count = 0
+    }
+
     private let projectID: ProjectID
     private let error: ProjectGenerationError?
     private let suspendsUntilResumed: Bool
     private let gate = AsyncStream.makeStream(of: Void.self)
     private let calls = Mutex(Calls())
+    private let stateReads: Mutex<StateReads>
 
 }
