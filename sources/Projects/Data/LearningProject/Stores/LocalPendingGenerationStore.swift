@@ -24,6 +24,10 @@ public actor LocalPendingGenerationStore {
         await exclusively { await self.loadState() }
     }
 
+    public func verifiedState() async throws(KeyValueStorageError) -> GenerationStateDTO {
+        try await exclusively { await self.loadVerifiedState() }.get()
+    }
+
     public func stateChanges() async -> AsyncStream<GenerationStateDTO> {
         await exclusively { await self.subscribe() }
     }
@@ -116,6 +120,18 @@ public actor LocalPendingGenerationStore {
             GenerationStateDTO.self,
             forKey: Self.stateKey,
         ) ?? GenerationStateDTO(records: [])
+    }
+
+    private func loadVerifiedState() async -> Result<GenerationStateDTO, KeyValueStorageError> {
+        do {
+            let state = try await storage.verifiedValue(
+                GenerationStateDTO.self,
+                forKey: Self.stateKey,
+            )
+            return .success(state ?? GenerationStateDTO(records: []))
+        } catch {
+            return .failure(error)
+        }
     }
 
     private func loadReminderEntries() async -> [ReminderEntry] {

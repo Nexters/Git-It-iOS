@@ -111,27 +111,27 @@ target 3개의 `InMemoryKeyValueStorage`가 같은 커밋에서 새 연산을 �
 
 ### 테스트
 
-- [ ] T004 [P] [S1] `sources/Projects/Data/Tests/Shared/Stores/LocalKeyValueStorageTests.swift`에 `LocalKeyValueStorage.verifiedValue(_:forKey:)`가 값이 없으면 `nil`, 저장된 값을 요청 형식으로 해석할 수 없으면 `KeyValueStorageError.unreadable`을 던지고, 정상 값은 그대로 돌려주는 테스트를 추가한다
-- [ ] T005 [P] [S1] `sources/Projects/Data/Tests/Shared/Factories/StorageFactoryTests.swift`에 저장소를 만들 수 없을 때 받은 `UnavailableKeyValueStorage`의 `verifiedValue`가 `KeyValueStorageError.unavailable`을 던지고 기존 `value`는 `nil`을 유지하는 테스트를 추가한다
-- [ ] T006 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`에 `LocalPendingGenerationStore.verifiedState()`가 기록이 없으면 빈 `GenerationStateDTO`를, 기록이 있으면 저장된 값을 돌려주고 저장소의 `KeyValueStorageError`를 그대로 전파하는 테스트를 추가한다
+- [X] T004 [P] [S1] `sources/Projects/Data/Tests/Shared/Stores/LocalKeyValueStorageTests.swift`에 `LocalKeyValueStorage.verifiedValue(_:forKey:)`가 값이 없으면 `nil`, 저장된 값을 요청 형식으로 해석할 수 없으면 `KeyValueStorageError.unreadable`을 던지고, 정상 값은 그대로 돌려주는 테스트를 추가한다
+- [X] T005 [P] [S1] `sources/Projects/Data/Tests/Shared/Factories/StorageFactoryTests.swift`에 저장소를 만들 수 없을 때 받은 `UnavailableKeyValueStorage`의 `verifiedValue`가 `KeyValueStorageError.unavailable`을 던지고 기존 `value`는 `nil`을 유지하는 테스트를 추가한다
+- [X] T006 [P] [S1] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`에 `LocalPendingGenerationStore.verifiedState()`가 기록이 없으면 빈 `GenerationStateDTO`를, 기록이 있으면 저장된 값을 돌려주고 저장소의 `KeyValueStorageError`를 그대로 전파하는 테스트를 추가한다
 
 ### 구현
 
-- [ ] T007 [S1] `sources/Projects/Data/Shared/Errors/KeyValueStorageError.swift`를 신규 작성해 `public enum KeyValueStorageError: Error, Equatable, Sendable { case unavailable, unreadable }`를 정의한다(키 기반 값 저장소를 읽을 수 없는 이유)
-- [ ] T008 [S1] `sources/Projects/Data/Shared/Contracts/KeyValueStorage.swift`에 `func verifiedValue<Value: Codable & Sendable>(_ type: Value.Type, forKey key: String) async throws(KeyValueStorageError) -> Value?` 요구사항을 추가한다. 기존 `value(_:forKey:)`는 바꾸지 않는다
-- [ ] T009 [P] [S1] `sources/Projects/Data/Shared/Stores/LocalKeyValueStorage.swift`에 `verifiedValue`를 구현한다(값 없음 `nil`, 디코딩 실패 `unreadable`)
-- [ ] T010 [P] [S1] `sources/Projects/Data/Shared/Stores/UnavailableKeyValueStorage.swift`에 항상 `unavailable`을 던지는 `verifiedValue`를 구현한다
-- [ ] T011 [S1] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에 `public func verifiedState() async throws(KeyValueStorageError) -> GenerationStateDTO`를 추가한다. 다른 연산과 같은 직렬 실행(`exclusively`) 안에서 `verifiedValue`로 읽고, 값이 없으면 빈 상태를 돌려준다
-- [ ] T012 [P] [S1] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
-- [ ] T013 [P] [S1] `sources/Projects/Data/Tests/LegalConsent/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
-- [ ] T014 [P] [S1] `sources/Projects/Data/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현하고, T006의 오류 전파 검증을 위해 initializer로 판독 실패를 설정할 수 있게 한다
-- [ ] T015 [P] [S1] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
-- [ ] T016 [P] [S1] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
-- [ ] T017 [P] [S1] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현하고, 실행 단위 2의 Adapter 오류 변환 검증을 위해 initializer로 판독 실패(`unavailable`, `unreadable`)를 설정할 수 있게 한다
+- [X] T007 [S1] `sources/Projects/Data/Shared/Errors/KeyValueStorageError.swift`를 신규 작성해 `public enum KeyValueStorageError: Error, Equatable, Sendable { case unavailable, unreadable }`를 정의한다(키 기반 값 저장소를 읽을 수 없는 이유)
+- [X] T008 [S1] `sources/Projects/Data/Shared/Contracts/KeyValueStorage.swift`에 `func verifiedValue<Value: Codable & Sendable>(_ type: Value.Type, forKey key: String) async throws(KeyValueStorageError) -> Value?` 요구사항을 추가한다. 기존 `value(_:forKey:)`는 바꾸지 않는다
+- [X] T009 [P] [S1] `sources/Projects/Data/Shared/Stores/LocalKeyValueStorage.swift`에 `verifiedValue`를 구현한다(값 없음 `nil`, 디코딩 실패 `unreadable`)
+- [X] T010 [P] [S1] `sources/Projects/Data/Shared/Stores/UnavailableKeyValueStorage.swift`에 항상 `unavailable`을 던지는 `verifiedValue`를 구현한다
+- [X] T011 [S1] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에 `public func verifiedState() async throws(KeyValueStorageError) -> GenerationStateDTO`를 추가한다. 다른 연산과 같은 직렬 실행(`exclusively`) 안에서 `verifiedValue`로 읽고, 값이 없으면 빈 상태를 돌려준다
+- [X] T012 [P] [S1] `sources/Projects/Data/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
+- [X] T013 [P] [S1] `sources/Projects/Data/Tests/LegalConsent/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
+- [X] T014 [P] [S1] `sources/Projects/Data/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현하고, T006의 오류 전파 검증을 위해 initializer로 판독 실패를 설정할 수 있게 한다
+- [X] T015 [P] [S1] `sources/Projects/Composition/Tests/Authentication/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
+- [X] T016 [P] [S1] `sources/Projects/Composition/Tests/ShareExtension/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현한다
+- [X] T017 [P] [S1] `sources/Projects/Composition/Tests/LearningProject/TestDoubles/InMemoryKeyValueStorage.swift`에 `verifiedValue`를 구현하고, 실행 단위 2의 Adapter 오류 변환 검증을 위해 initializer로 판독 실패(`unavailable`, `unreadable`)를 설정할 수 있게 한다
 
 ### 정리와 단위 검증
 
-- [ ] T018 [no-write] `"$project_build_runner" compile`로 Data·Composition 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
+- [X] T018 [no-write] `"$project_build_runner" compile`로 Data·Composition 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
 
 **진행 점검**: T004~T018의 변경 파일과 검증 결과를 보고하고 실행 단위 2로 진행한다.
 

@@ -6,6 +6,12 @@ import Synchronization
 
 final class InMemoryKeyValueStorage: KeyValueStorage {
 
+    // MARK: Lifecycle
+
+    init(verificationFailure: KeyValueStorageError? = nil) {
+        self.verificationFailure = verificationFailure
+    }
+
     // MARK: Internal
 
     func value<Value: Codable & Sendable>(
@@ -17,6 +23,24 @@ final class InMemoryKeyValueStorage: KeyValueStorage {
             Value.self,
             from: data,
         )
+    }
+
+    func verifiedValue<Value: Codable & Sendable>(
+        _: Value.Type,
+        forKey key: String,
+    ) async throws(KeyValueStorageError) -> Value? {
+        if let verificationFailure {
+            throw verificationFailure
+        }
+        guard let data = values.withLock({ $0[key] }) else { return nil }
+        do {
+            return try JSONDecoder().decode(
+                Value.self,
+                from: data,
+            )
+        } catch {
+            throw .unreadable
+        }
     }
 
     func setValue(
@@ -41,6 +65,7 @@ final class InMemoryKeyValueStorage: KeyValueStorage {
 
     // MARK: Private
 
+    private let verificationFailure: KeyValueStorageError?
     private let values = Mutex<[String: Data]>([:])
 
 }

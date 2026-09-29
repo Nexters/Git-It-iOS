@@ -19,6 +19,35 @@ struct LocalPendingGenerationStoreTests {
     }
 
     @Test
+    func `확인 조회는 저장한 적이 없으면 빈 생성 상태를 돌려준다`() async throws {
+        let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage())
+
+        let state = try await store.verifiedState()
+
+        #expect(state.records.isEmpty)
+    }
+
+    @Test
+    func `확인 조회는 기록된 생성 상태를 돌려준다`() async throws {
+        let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage())
+        let state = GenerationStateDTO(records: [Self.record(projectID: "p1")])
+        await store.modifyState { _ in state }
+
+        let verified = try await store.verifiedState()
+
+        #expect(verified == state)
+    }
+
+    @Test(arguments: [KeyValueStorageError.unavailable, .unreadable])
+    func `확인 조회는 저장소의 판독 실패를 그대로 전파한다`(failure: KeyValueStorageError) async {
+        let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage(verificationFailure: failure))
+
+        await #expect(throws: failure) {
+            try await store.verifiedState()
+        }
+    }
+
+    @Test
     func `변환 결과를 기록하고 같은 저장소의 다른 인스턴스가 그 상태를 읽는다`() async {
         let storage = InMemoryKeyValueStorage()
         let store = LocalPendingGenerationStore(storage: storage)

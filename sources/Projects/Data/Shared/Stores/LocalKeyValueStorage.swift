@@ -24,6 +24,21 @@ struct LocalKeyValueStorage: KeyValueStorage {
         )
     }
 
+    func verifiedValue<Value: Codable & Sendable>(
+        _: Value.Type,
+        forKey key: String,
+    ) async throws(KeyValueStorageError) -> Value? {
+        guard let data = await store.value(forKey: key) else { return nil }
+        do {
+            return try JSONDecoder().decode(
+                Value.self,
+                from: data,
+            )
+        } catch {
+            throw .unreadable
+        }
+    }
+
     func setValue(
         _ value: some Codable & Sendable,
         forKey key: String,
