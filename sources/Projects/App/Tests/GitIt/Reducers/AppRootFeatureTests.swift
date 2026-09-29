@@ -622,6 +622,30 @@ struct AppRootFeatureTests {
         await store.finish()
     }
 
+    @Test(arguments: [
+        [ProjectGenerationPhase.ready, .inProgress],
+        [.ready],
+        [.failed],
+        [],
+    ])
+    func `홈 잠금 여부는 생성 상태의 생성 중 판정과 같다`(phases: [ProjectGenerationPhase]) async {
+        let generationState = ProjectGenerationState(requests: phases.enumerated().map { index, phase in
+            ProjectGenerationRequestState(
+                repositoryURL: "https://github.com/owner/repo\(index)",
+                projectID: "project-\(index)",
+                requestedAt: Date(timeIntervalSince1970: 1_000),
+                phase: phase,
+            )
+        })
+        let store = makeAppRootStore()
+        store.exhaustivity = .off
+
+        await store.send(.effect(.generationStateChanged(generationState)))
+        await store.skipReceivedActions(strict: false)
+
+        #expect(store.state.mainShell.home.isGenerationInProgress == generationState.hasRequestInProgress)
+    }
+
     @Test
     func `생성이 끝난 요청만 남으면 홈의 진행 중 표시를 해제한다`() async {
         let projectGeneration = ProjectGenerationUseCaseMock(

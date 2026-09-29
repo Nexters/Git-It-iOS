@@ -580,16 +580,7 @@ nonisolated struct AppRootFeature: Sendable {
         _ generationState: ProjectGenerationState,
         state: inout State,
     ) -> Effect<Action> {
-        let isGenerationInProgress = generationState.requests.contains { request in
-            switch request.phase {
-            case .inProgress:
-                true
-
-            case .ready,
-                 .failed:
-                false
-            }
-        }
+        let isGenerationInProgress = generationState.hasRequestInProgress
         guard state.mainShell.home.isGenerationInProgress != isGenerationInProgress else { return .none }
         return .send(.mainShell(.home(.input(.generationProgressChanged(isInProgress: isGenerationInProgress)))))
     }

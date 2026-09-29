@@ -239,15 +239,15 @@ Composition Adapter, Domain 테스트 더블, Feature 테스트 더블 2개, App
 
 ### 테스트
 
-- [ ] T048 [S2] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 진행 중 요청 있음·완료(`.ready`)만·실패만·요청 없음 생성 상태에서 홈 잠금 여부가 그 상태의 `hasRequestInProgress`와 같은지(T036과 같은 입력 집합) 검증하는 테스트를 추가한다. 기존 홈 잠금 테스트는 그대로 통과해야 한다
+- [X] T048 [S2] `sources/Projects/App/Tests/GitIt/Reducers/AppRootFeatureTests.swift`에 진행 중 요청 있음·완료(`.ready`)만·실패만·요청 없음 생성 상태에서 홈 잠금 여부가 그 상태의 `hasRequestInProgress`와 같은지(T036과 같은 입력 집합) 검증하는 테스트를 추가한다. 기존 홈 잠금 테스트는 그대로 통과해야 한다
 
 ### 구현
 
-- [ ] T049 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `applyGenerationState`가 `requests`의 `.inProgress` 직접 검사 대신 `ProjectGenerationState.hasRequestInProgress`를 쓰게 바꾼다
+- [X] T049 [S2] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`의 `applyGenerationState`가 `requests`의 `.inProgress` 직접 검사 대신 `ProjectGenerationState.hasRequestInProgress`를 쓰게 바꾼다
 
 ### 정리와 단위 검증
 
-- [ ] T050 [no-write] `"$project_build_runner" compile`로 App 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
+- [X] T050 [no-write] `"$project_build_runner" compile`로 App 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
 
 **진행 점검**: T048~T050의 변경 파일과 검증 결과를 보고하고 전체 완료 검증으로 진행한다.
 
@@ -261,10 +261,10 @@ Composition Adapter, Domain 테스트 더블, Feature 테스트 더블 2개, App
 (`speckit.swift-format.run`)을 마친 뒤 그 단위를 최종 commit한다. 이미 파일 변경 단위가 모두 commit된 단순 재개에서는
 `tasks.md` 완료 표시를 위한 별도 최종 검증 단위를 둔다.
 
-- [ ] T051 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고, 기존 공유 확장·생성 요청·앱 루트 테스트를 포함한 결과를 기록한다(SC-001~SC-005, FR-012)
-- [ ] T052 [no-write] [S2] `sources/Projects`에서 `.inProgress`와 `hasRequestInProgress`를 검색해 요청 목록 전체의 진행 중 존재 판정이 `ProjectGenerationState.hasRequestInProgress` 한 곳에만 정의되고 `AppRootFeature`와 `SharedRepositoryRegistrationFeature`가 그 프로퍼티만 쓰는지 확인한다. [research R8](./research.md#r8-테스트-설계)에 따라 단일 요청 단계 분기(`QuizGenerationProgressFeature`), 기록 상태↔단계 매핑(`PendingGenerationRepositoryAdapter`, `ProjectGeneration.phase(of:)`), 같은 저장소 중복 검사(`GenerationState`)는 판정 규칙 정의에서 제외한다(SC-004, FR-009, FR-011)
-- [ ] T053 [no-write] [S1] 개발 빌드를 설치한 실기기에서 [quickstart.md](./quickstart.md) "3. 실기기 검증" 1~5단계와 Console.app의 `generationInProgressBlocked` 진단 로그를 확인한다(SC-006). 실기기를 쓸 수 없으면 미검증으로 기록하고, 확인 실패 안내(`generationUnverified`)는 자동 테스트로만 검증했다는 사실과 함께 PR 미검증 범위에 적는다
-- [ ] T054 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
+- [X] T051 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고, 기존 공유 확장·생성 요청·앱 루트 테스트를 포함한 결과를 기록한다(SC-001~SC-005, FR-012)
+- [X] T052 [no-write] [S2] `sources/Projects`에서 `.inProgress`와 `hasRequestInProgress`를 검색해 요청 목록 전체의 진행 중 존재 판정이 `ProjectGenerationState.hasRequestInProgress` 한 곳에만 정의되고 `AppRootFeature`와 `SharedRepositoryRegistrationFeature`가 그 프로퍼티만 쓰는지 확인한다. [research R8](./research.md#r8-테스트-설계)에 따라 단일 요청 단계 분기(`QuizGenerationProgressFeature`), 기록 상태↔단계 매핑(`PendingGenerationRepositoryAdapter`, `ProjectGeneration.phase(of:)`), 같은 저장소 중복 검사(`GenerationState`)는 판정 규칙 정의에서 제외한다(SC-004, FR-009, FR-011)
+- [X] T053 [no-write] [S1] 개발 빌드를 설치한 실기기에서 [quickstart.md](./quickstart.md) "3. 실기기 검증" 1~5단계와 Console.app의 `generationInProgressBlocked` 진단 로그를 확인한다(SC-006). 실기기를 쓸 수 없으면 미검증으로 기록하고, 확인 실패 안내(`generationUnverified`)는 자동 테스트로만 검증했다는 사실과 함께 PR 미검증 범위에 적는다 — 결과: 실기기를 사용할 수 없어 미검증으로 기록
+- [X] T054 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
 
 ## 의존성과 실행 순서
 
