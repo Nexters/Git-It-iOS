@@ -8,10 +8,12 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 
     init(
         state: GenerationState = GenerationState(),
+        confirmationFailure: (any Error)? = nil,
         retentionLimit: TimeInterval = GenerationWaitPolicy.standard.retentionLimit,
         now: @escaping @Sendable () -> Date,
     ) {
         self.state = state
+        self.confirmationFailure = confirmationFailure
         self.retentionLimit = retentionLimit
         self.now = now
     }
@@ -28,6 +30,13 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 
     func pendingState() async -> GenerationState {
         visibleState()
+    }
+
+    func confirmedPendingState() async throws -> GenerationState {
+        if let confirmationFailure {
+            throw confirmationFailure
+        }
+        return visibleState()
     }
 
     func pendingStateChanges() async -> AsyncStream<GenerationState> {
@@ -109,6 +118,7 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 
     // MARK: Private
 
+    private let confirmationFailure: (any Error)?
     private let retentionLimit: TimeInterval
     private let now: @Sendable () -> Date
     private var subscribers = [UUID: AsyncStream<GenerationState>.Continuation]()

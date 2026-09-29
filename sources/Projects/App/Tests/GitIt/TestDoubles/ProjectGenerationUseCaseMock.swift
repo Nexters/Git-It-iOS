@@ -35,6 +35,10 @@ actor ProjectGenerationUseCaseMock: ProjectGenerationUseCase {
         return stream
     }
 
+    func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
+        state
+    }
+
     func outcomeArrivals() async -> AsyncStream<ProjectID> {
         let (stream, continuation) = AsyncStream<ProjectID>.makeStream()
         arrivalContinuation = continuation

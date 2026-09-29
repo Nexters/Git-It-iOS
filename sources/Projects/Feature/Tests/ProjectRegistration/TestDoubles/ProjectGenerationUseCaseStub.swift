@@ -31,6 +31,10 @@ actor ProjectGenerationUseCaseStub: ProjectGenerationUseCase {
         await generationStates.states()
     }
 
+    func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
+        ProjectGenerationState(requests: [])
+    }
+
     func outcomeArrivals() async -> AsyncStream<ProjectID> {
         AsyncStream { $0.finish() }
     }

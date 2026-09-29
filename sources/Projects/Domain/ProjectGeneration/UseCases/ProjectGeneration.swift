@@ -61,8 +61,18 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         continuation.onTermination = { [weak self] _ in
             Task { await self?.removeSubscriber(subscriberID) }
         }
-        continuation.yield(projectedState())
+        continuation.yield(projectedState(of: generationState))
         return stream
+    }
+
+    public func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
+        do {
+            return try await projectedState(of: pendingGenerations.confirmedPendingState())
+        } catch let error as ProjectGenerationError {
+            throw error
+        } catch {
+            throw .stateUnavailable
+        }
     }
 
     public func outcomeArrivals() async -> AsyncStream<ProjectID> {
@@ -337,9 +347,9 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         }
     }
 
-    private func projectedState() -> ProjectGenerationState {
+    private func projectedState(of state: GenerationState) -> ProjectGenerationState {
         ProjectGenerationState(
-            requests: generationState.records.map { record in
+            requests: state.records.map { record in
                 ProjectGenerationRequestState(
                     repositoryURL: record.repositoryURL,
                     projectID: record.projectID,
@@ -385,7 +395,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     }
 
     private func emit() {
-        let state = projectedState()
+        let state = projectedState(of: generationState)
         for continuation in subscribers.values {
             continuation.yield(state)
         }

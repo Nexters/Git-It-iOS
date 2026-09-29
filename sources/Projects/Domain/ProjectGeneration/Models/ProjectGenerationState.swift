@@ -10,4 +10,8 @@ public struct ProjectGenerationState: Equatable, Sendable {
 
     public let requests: [ProjectGenerationRequestState]
 
+    public var hasRequestInProgress: Bool {
+        requests.contains { $0.phase == .inProgress }
+    }
+
 }

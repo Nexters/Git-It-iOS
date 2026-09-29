@@ -3,6 +3,7 @@ import Foundation
 
 public protocol PendingGenerationRepository: Sendable {
     func pendingState() async -> GenerationState
+    func confirmedPendingState() async throws -> GenerationState
     func pendingStateChanges() async -> AsyncStream<GenerationState>
     func beginGeneration(
         repositoryURL: ExternalRepositoryURL,

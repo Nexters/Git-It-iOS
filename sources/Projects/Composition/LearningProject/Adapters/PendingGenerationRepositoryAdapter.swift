@@ -29,6 +29,20 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         )
     }
 
+    public func confirmedPendingState() async throws -> GenerationState {
+        let dto: GenerationStateDTO
+        do {
+            dto = try await store.verifiedState()
+        } catch {
+            throw ProjectGenerationError.stateUnavailable
+        }
+        return Self.purged(
+            Self.state(from: dto),
+            waitPolicy: waitPolicy,
+            now: now(),
+        )
+    }
+
     public func pendingStateChanges() async -> AsyncStream<GenerationState> {
         let changes = await store.stateChanges()
         let waitPolicy = waitPolicy

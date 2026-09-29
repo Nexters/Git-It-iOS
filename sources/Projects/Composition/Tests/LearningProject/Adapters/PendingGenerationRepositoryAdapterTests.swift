@@ -1,3 +1,4 @@
+import DataShared
 import Foundation
 import Synchronization
 import Testing
@@ -82,6 +83,39 @@ struct PendingGenerationRepositoryAdapterTests {
             repositoryURL: Self.url,
             requestedAt: clock.current(),
         ))
+    }
+
+    @Test
+    func `확인된 대기 상태는 저장 기록을 Domain 모델로 바꾸고 보존 기간이 지난 기록을 뺀다`() async throws {
+        let clock = Clock(now: Self.requestedAt)
+        let adapter = Self.makeAdapter(
+            storage: InMemoryKeyValueStorage(),
+            now: { clock.current() },
+        )
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        await adapter.attachProjectID(
+            "project-1",
+            toRepositoryURL: Self.url,
+        )
+
+        let current = try await adapter.confirmedPendingState()
+        clock.advance(to: Self.requestedAt.addingTimeInterval(Self.retentionLimit + 1))
+        let expired = try await adapter.confirmedPendingState()
+
+        #expect(current.record(projectID: "project-1")?.status == .inProgress)
+        #expect(expired.records.isEmpty)
+    }
+
+    @Test(arguments: [KeyValueStorageError.unavailable, .unreadable])
+    func `확인된 대기 상태 조회는 저장소 판독 실패를 stateUnavailable로 바꿔 던진다`(failure: KeyValueStorageError) async {
+        let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage(verificationFailure: failure))
+
+        await #expect(throws: ProjectGenerationError.stateUnavailable) {
+            try await adapter.confirmedPendingState()
+        }
     }
 
     @Test

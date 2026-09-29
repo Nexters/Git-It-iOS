@@ -780,6 +780,83 @@ struct ProjectGenerationTests {
         #expect(await arrivals.next() == "p2")
     }
 
+    @Test
+    func `현재 상태 조회는 보관 기한이 지난 기록을 빼고 기록 상태를 단계로 바꿔 돌려준다`() async throws {
+        let expiredAt = Self.requestedAt.addingTimeInterval(-GenerationWaitPolicy.standard.retentionLimit - 1)
+        let fixture = Fixture(state: GenerationState(records: [
+            GenerationRecord(
+                repositoryURL: "https://github.com/owner/expired",
+                projectID: "p0",
+                requestedAt: expiredAt,
+            ),
+            GenerationRecord(
+                repositoryURL: "https://github.com/owner/progress",
+                requestedAt: Self.requestedAt,
+            ),
+            GenerationRecord(
+                repositoryURL: "https://github.com/owner/ready",
+                projectID: "p2",
+                requestedAt: Self.requestedAt,
+                status: .completed,
+                finishedAt: Self.requestedAt,
+            ),
+            GenerationRecord(
+                repositoryURL: "https://github.com/owner/failed",
+                projectID: "p3",
+                requestedAt: Self.requestedAt,
+                status: .failed,
+                finishedAt: Self.requestedAt,
+            ),
+        ]))
+
+        let state = try await fixture.generation.currentState()
+
+        #expect(state.requests.map(\.repositoryURL) == [
+            "https://github.com/owner/progress",
+            "https://github.com/owner/ready",
+            "https://github.com/owner/failed",
+        ])
+        #expect(state.requests.map(\.phase) == [.inProgress, .ready, .failed])
+        #expect(state.hasRequestInProgress)
+    }
+
+    @Test
+    func `현재 상태 조회는 결과·저장소 변경 관찰과 만료 타이머를 시작하지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+
+        _ = try await fixture.generation.currentState()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+        ))
+        for _ in 0 ..< 50 {
+            await Task.yield()
+        }
+
+        #expect(await fixture.pendingGenerations.subscriberCount == 0)
+        #expect(fixture.sleeper.sleeperCount == 0)
+        #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
+    }
+
+    @Test
+    func `현재 상태 조회는 저장소가 알린 stateUnavailable을 그대로 전달한다`() async {
+        let fixture = Fixture(confirmationFailure: ProjectGenerationError.stateUnavailable)
+
+        await #expect(throws: ProjectGenerationError.stateUnavailable) {
+            try await fixture.generation.currentState()
+        }
+    }
+
+    @Test
+    func `현재 상태 조회는 저장소의 다른 오류도 stateUnavailable로 알린다`() async {
+        let fixture = Fixture(confirmationFailure: CancellationError())
+
+        await #expect(throws: ProjectGenerationError.stateUnavailable) {
+            try await fixture.generation.currentState()
+        }
+    }
+
     // MARK: Private
 
     private struct Fixture {
@@ -789,12 +866,14 @@ struct ProjectGenerationTests {
         init(
             repository: StubProjectGenerationRepository = StubProjectGenerationRepository(),
             state: GenerationState = GenerationState(),
+            confirmationFailure: (any Error)? = nil,
             scheduler: SpyGenerationReminderScheduler = SpyGenerationReminderScheduler(),
         ) {
             let outcomes = StubGenerationOutcomeRepository()
             let sleeper = ManualSleeper(now: ProjectGenerationTests.requestedAt)
             let pendingGenerations = InMemoryPendingGenerationRepository(
                 state: state,
+                confirmationFailure: confirmationFailure,
                 now: { sleeper.now },
             )
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()

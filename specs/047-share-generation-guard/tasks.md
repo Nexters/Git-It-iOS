@@ -155,27 +155,27 @@ Composition Adapter, Domain 테스트 더블, Feature 테스트 더블 2개, App
 
 ### 테스트
 
-- [ ] T019 [P] [S2] `sources/Projects/Domain/Tests/ProjectGeneration/Models/ProjectGenerationStateTests.swift`를 신규 작성해 `hasRequestInProgress`가 진행 중 요청이 하나라도 있으면 참이고, 완료만·실패만·빈 요청 목록이면 거짓이며, 프로젝트 식별자가 없는 진행 중 요청도 참인지 검증한다
-- [ ] T020 [P] [S1] `sources/Projects/Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`에 `currentState()`가 `states()`와 같은 투영(보관 기한 경과 기록 제외, 기록 상태→단계 변환)을 돌려주고, 결과·로그아웃·저장소 변경 관찰과 만료 타이머를 시작하지 않으며, 저장소 계약이 던진 `ProjectGenerationError.stateUnavailable`을 그대로 전달하고 그 밖의 오류도 `stateUnavailable`로 보는 테스트를 추가한다
-- [ ] T021 [P] [S1] `sources/Projects/Composition/Tests/LearningProject/Adapters/PendingGenerationRepositoryAdapterTests.swift`에 `confirmedPendingState()`가 저장된 기록을 Domain `GenerationState`로 바꾸며 `pendingState()`와 같은 보관 기한 정리를 적용하고, 저장소 판독 실패(`unavailable`, `unreadable`) 각각을 `ProjectGenerationError.stateUnavailable`로 바꿔 던지는 테스트를 추가한다
+- [X] T019 [P] [S2] `sources/Projects/Domain/Tests/ProjectGeneration/Models/ProjectGenerationStateTests.swift`를 신규 작성해 `hasRequestInProgress`가 진행 중 요청이 하나라도 있으면 참이고, 완료만·실패만·빈 요청 목록이면 거짓이며, 프로젝트 식별자가 없는 진행 중 요청도 참인지 검증한다
+- [X] T020 [P] [S1] `sources/Projects/Domain/Tests/ProjectGeneration/UseCases/ProjectGenerationTests.swift`에 `currentState()`가 `states()`와 같은 투영(보관 기한 경과 기록 제외, 기록 상태→단계 변환)을 돌려주고, 결과·로그아웃·저장소 변경 관찰과 만료 타이머를 시작하지 않으며, 저장소 계약이 던진 `ProjectGenerationError.stateUnavailable`을 그대로 전달하고 그 밖의 오류도 `stateUnavailable`로 보는 테스트를 추가한다
+- [X] T021 [P] [S1] `sources/Projects/Composition/Tests/LearningProject/Adapters/PendingGenerationRepositoryAdapterTests.swift`에 `confirmedPendingState()`가 저장된 기록을 Domain `GenerationState`로 바꾸며 `pendingState()`와 같은 보관 기한 정리를 적용하고, 저장소 판독 실패(`unavailable`, `unreadable`) 각각을 `ProjectGenerationError.stateUnavailable`로 바꿔 던지는 테스트를 추가한다
 
 ### 구현
 
-- [ ] T022 [S2] `sources/Projects/Domain/ProjectGeneration/Models/ProjectGenerationState.swift`에 계산 프로퍼티 `public var hasRequestInProgress: Bool`(요청 중 `.inProgress` 단계가 하나라도 있으면 참)을 추가한다. 이 프로퍼티가 "생성 중" 판정 규칙의 유일한 정의다
-- [ ] T023 [P] [S1] `sources/Projects/Domain/ProjectGeneration/Errors/ProjectGenerationError.swift`에 `case stateUnavailable`(생성 상태를 확인할 수 없음)을 추가한다
-- [ ] T024 [P] [S1] `sources/Projects/Domain/ProjectGeneration/Contracts/PendingGenerationRepository.swift`에 `func confirmedPendingState() async throws -> GenerationState` 요구사항을 추가한다(기존 계약과 같은 untyped `throws`, 던지는 오류는 `ProjectGenerationError`)
-- [ ] T025 [S1] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGenerationUseCase.swift`에 `func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState` 요구사항을 추가한다
-- [ ] T026 [S1] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`에 `currentState()`를 구현한다. `confirmedPendingState()`로 한 번 읽어 `states()`와 같은 투영 규칙으로 변환하고(actor 저장 상태가 아닌 읽은 값을 입력으로 받는 투영 함수를 두 연산이 공유), actor 상태 변경·관찰 시작 없이 `ProjectGenerationError`는 그대로, 그 밖의 오류는 `stateUnavailable`로 던진다
-- [ ] T027 [S1] `sources/Projects/Domain/Tests/ProjectGeneration/TestDoubles/InMemoryPendingGenerationRepository.swift`에 `confirmedPendingState()`를 구현하고 initializer로 판독 실패(던질 오류)를 설정할 수 있게 한다
-- [ ] T028 [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRepositoryAdapter.swift`에 `confirmedPendingState()`를 구현한다. `store.verifiedState()`를 Domain `GenerationState`로 바꾸고 `pendingState()`와 같은 `purged` 정리를 적용하며, `KeyValueStorageError`의 모든 사례를 `ProjectGenerationError.stateUnavailable`로 바꿔 던진다. Data 오류 타입을 Domain 계약 밖으로 내보내지 않고 비즈니스 판정은 두지 않는다
-- [ ] T029 [P] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/ProjectGenerationUseCaseStub.swift`에 `currentState()`를 구현한다
-- [ ] T030 [P] `sources/Projects/Feature/Tests/ShareRegistration/ShareRegistration/TestDoubles/ProjectGenerationUseCaseSpy.swift`에 `currentState()`를 구현한다(기본값은 진행 중 요청이 없는 빈 상태)
-- [ ] T031 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 전용 `NoopProjectGeneration`에 `currentState()`를 구현한다(빈 상태 반환)
-- [ ] T032 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectGenerationUseCaseMock.swift`에 `currentState()`를 구현한다
+- [X] T022 [S2] `sources/Projects/Domain/ProjectGeneration/Models/ProjectGenerationState.swift`에 계산 프로퍼티 `public var hasRequestInProgress: Bool`(요청 중 `.inProgress` 단계가 하나라도 있으면 참)을 추가한다. 이 프로퍼티가 "생성 중" 판정 규칙의 유일한 정의다
+- [X] T023 [P] [S1] `sources/Projects/Domain/ProjectGeneration/Errors/ProjectGenerationError.swift`에 `case stateUnavailable`(생성 상태를 확인할 수 없음)을 추가한다
+- [X] T024 [P] [S1] `sources/Projects/Domain/ProjectGeneration/Contracts/PendingGenerationRepository.swift`에 `func confirmedPendingState() async throws -> GenerationState` 요구사항을 추가한다(기존 계약과 같은 untyped `throws`, 던지는 오류는 `ProjectGenerationError`)
+- [X] T025 [S1] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGenerationUseCase.swift`에 `func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState` 요구사항을 추가한다
+- [X] T026 [S1] `sources/Projects/Domain/ProjectGeneration/UseCases/ProjectGeneration.swift`에 `currentState()`를 구현한다. `confirmedPendingState()`로 한 번 읽어 `states()`와 같은 투영 규칙으로 변환하고(actor 저장 상태가 아닌 읽은 값을 입력으로 받는 투영 함수를 두 연산이 공유), actor 상태 변경·관찰 시작 없이 `ProjectGenerationError`는 그대로, 그 밖의 오류는 `stateUnavailable`로 던진다
+- [X] T027 [S1] `sources/Projects/Domain/Tests/ProjectGeneration/TestDoubles/InMemoryPendingGenerationRepository.swift`에 `confirmedPendingState()`를 구현하고 initializer로 판독 실패(던질 오류)를 설정할 수 있게 한다
+- [X] T028 [S1] `sources/Projects/Composition/LearningProject/Adapters/PendingGenerationRepositoryAdapter.swift`에 `confirmedPendingState()`를 구현한다. `store.verifiedState()`를 Domain `GenerationState`로 바꾸고 `pendingState()`와 같은 `purged` 정리를 적용하며, `KeyValueStorageError`의 모든 사례를 `ProjectGenerationError.stateUnavailable`로 바꿔 던진다. Data 오류 타입을 Domain 계약 밖으로 내보내지 않고 비즈니스 판정은 두지 않는다
+- [X] T029 [P] `sources/Projects/Feature/Tests/ProjectRegistration/TestDoubles/ProjectGenerationUseCaseStub.swift`에 `currentState()`를 구현한다
+- [X] T030 [P] `sources/Projects/Feature/Tests/ShareRegistration/ShareRegistration/TestDoubles/ProjectGenerationUseCaseSpy.swift`에 `currentState()`를 구현한다(기본값은 진행 중 요청이 없는 빈 상태)
+- [X] T031 [P] `sources/Projects/App/GitIt/Screens/AppRootView.swift`의 프리뷰 전용 `NoopProjectGeneration`에 `currentState()`를 구현한다(빈 상태 반환)
+- [X] T032 [P] `sources/Projects/App/Tests/GitIt/TestDoubles/ProjectGenerationUseCaseMock.swift`에 `currentState()`를 구현한다
 
 ### 정리와 단위 검증
 
-- [ ] T033 [no-write] `"$project_build_runner" compile`로 Domain·Composition·Feature·App 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
+- [X] T033 [no-write] `"$project_build_runner" compile`로 Domain·Composition·Feature·App 테스트 target을 포함한 build-for-testing이 통과하는지 확인한다
 
 **진행 점검**: T019~T033의 변경 파일과 검증 결과를 보고하고 실행 단위 3으로 진행한다.
 
