@@ -211,25 +211,25 @@ delegate만 제거한다(FR-012, FR-013).
 
 ### 테스트
 
-- [ ] T035 [S6] `sources/Projects/Feature/Tests/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeatureTests.swift`를 고친다
+- [X] T035 [S6] `sources/Projects/Feature/Tests/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeatureTests.swift`를 고친다
   - 이름을 바꾸고 `generationReminderPreferenceSelected` 수신 단언을 뺀다. 권한 요청 횟수·설정 열기 횟수·`projectRegistered` 수신은 그대로 검증한다
     - `알림 수락은 권한을 요청하고 리마인드 사용을 알린 뒤 등록을 알린다` → `알림 수락은 권한을 요청한 뒤 등록을 알린다`
     - `알림 거절은 리마인드 미사용을 알리고 등록을 알린다` → `알림 거절은 권한 요청 없이 등록을 알린다`
     - `ready 단계를 받으면 리마인드 선택 없이 등록을 알린다` → `ready 단계를 받으면 등록을 알린다`
   - `알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록을 알린다`, `알림 권한이 없으면 리마인드 시트를 연다`, `권한 요청이 거부되면 설정 화면을 정확히 한 번 안내한다`는 이름을 유지하고 선택값 단언만 뺀다
-- [ ] T036 [S6] `sources/Projects/Feature/Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift`에서 `generationReminderPreferenceSelected` delegate 수신 단언을 제거한다
+- [X] T036 [S6] `sources/Projects/Feature/Tests/ProjectRegistration/Router/ProjectRegistrationRouterFeatureTests.swift`에서 `generationReminderPreferenceSelected` delegate 수신 단언을 제거한다
 
 ### 구현
 
-- [ ] T037 [S6] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeature.swift`를 정리한다
+- [X] T037 [S6] `sources/Projects/Feature/ProjectRegistration/QuizGenerationProgress/QuizGenerationProgressFeature.swift`를 정리한다
   - 제거: `Action.Delegate.generationReminderPreferenceSelected(isEnabled:)`, `finishWaiting(receipt:isReminderEnabled:)`의 `isReminderEnabled` 인자와 그 전달
   - 유지: `waitAtHomeTapped`, `waitAtHomeAuthorizationChecked`, `generationReminderAccepted`·`generationReminderDeclined`, 시트 상태, `acceptGenerationReminder`의 권한 요청과 설정 열기
-- [ ] T038 [S6] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`에서 `Action.Delegate.generationReminderPreferenceSelected`와 하위 delegate를 상위로 전달하던 분기를 제거한다
-- [ ] T039 [S6] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에서 `case .generationReminderPreferenceSelected: return .none` 분기를 제거한다
+- [X] T038 [S6] `sources/Projects/Feature/ProjectRegistration/Router/ProjectRegistrationRouterFeature.swift`에서 `Action.Delegate.generationReminderPreferenceSelected`와 하위 delegate를 상위로 전달하던 분기를 제거한다
+- [X] T039 [S6] `sources/Projects/App/GitIt/Reducers/AppRootFeature.swift`에서 `case .generationReminderPreferenceSelected: return .none` 분기를 제거한다
 
 ### 정리와 단위 검증
 
-- [ ] T040 [no-write] `"$project_build_runner" compile`이 통과하는지 확인하고, `sources/Projects`에서 `generationReminderPreferenceSelected|isReminderEnabled` 검색이 0건인지 확인한다
+- [X] T040 [no-write] `"$project_build_runner" compile`이 통과하는지 확인하고, `sources/Projects`에서 `generationReminderPreferenceSelected|isReminderEnabled` 검색이 0건인지 확인한다
 
 ---
 

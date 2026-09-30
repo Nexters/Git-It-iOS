@@ -464,9 +464,6 @@ nonisolated struct AppRootFeature: Sendable {
             state.projectRegistration = nil
             return .send(.mainShell(.input(.learningProjectsReloadRequested)))
 
-        case .generationReminderPreferenceSelected:
-            return .none
-
         case .dismissRequested:
             state.projectRegistration = nil
             return .none

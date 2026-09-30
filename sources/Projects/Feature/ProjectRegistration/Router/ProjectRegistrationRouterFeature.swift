@@ -62,7 +62,6 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectRegistered(ProjectGenerationReceipt)
-            case generationReminderPreferenceSelected(isEnabled: Bool)
             case dismissRequested
         }
     }
@@ -253,9 +252,6 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         switch action {
         case .projectRegistered(let receipt):
             return .send(.delegate(.projectRegistered(receipt)))
-
-        case .generationReminderPreferenceSelected(let isEnabled):
-            return .send(.delegate(.generationReminderPreferenceSelected(isEnabled: isEnabled)))
 
         case .dismissRequested:
             return .send(.delegate(.dismissRequested))

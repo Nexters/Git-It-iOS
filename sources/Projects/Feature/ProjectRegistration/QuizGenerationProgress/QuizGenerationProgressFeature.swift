@@ -72,7 +72,6 @@ public struct QuizGenerationProgressFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectRegistered(ProjectGenerationReceipt)
-            case generationReminderPreferenceSelected(isEnabled: Bool)
             case dismissRequested
         }
     }
@@ -152,10 +151,7 @@ public struct QuizGenerationProgressFeature: Sendable {
         case .generationReminderDeclined:
             guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
             state.isGenerationReminderSheetPresented = false
-            return finishWaiting(
-                receipt: receipt,
-                isReminderEnabled: false,
-            )
+            return finishWaiting(receipt: receipt)
         }
     }
 
@@ -184,10 +180,7 @@ public struct QuizGenerationProgressFeature: Sendable {
                 return .none
 
             case .ready:
-                return finishWaiting(
-                    receipt: receipt,
-                    isReminderEnabled: nil,
-                )
+                return finishWaiting(receipt: receipt)
 
             case .failed:
                 return transitionToFailure(
@@ -202,10 +195,7 @@ public struct QuizGenerationProgressFeature: Sendable {
                 state.isGenerationReminderSheetPresented = true
                 return .none
             }
-            return finishWaiting(
-                receipt: receipt,
-                isReminderEnabled: true,
-            )
+            return finishWaiting(receipt: receipt)
         }
     }
 
@@ -258,23 +248,14 @@ public struct QuizGenerationProgressFeature: Sendable {
                     await openNotificationSettings()
                 }
             },
-            finishWaiting(
-                receipt: receipt,
-                isReminderEnabled: true,
-            ),
+            finishWaiting(receipt: receipt),
         )
     }
 
-    private func finishWaiting(
-        receipt: ProjectGenerationReceipt,
-        isReminderEnabled: Bool?,
-    ) -> Effect<Action> {
+    private func finishWaiting(receipt: ProjectGenerationReceipt) -> Effect<Action> {
         .merge(
             .cancel(id: CancelID.registrationPipeline),
             .run { send in
-                if let isReminderEnabled {
-                    await send(.delegate(.generationReminderPreferenceSelected(isEnabled: isReminderEnabled)))
-                }
                 await send(.delegate(.projectRegistered(receipt)))
             },
         )

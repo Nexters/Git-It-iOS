@@ -144,9 +144,6 @@ struct ProjectRegistrationRouterFeatureTests {
         await store.send(.quizGenerationProgress(.delegate(.projectRegistered(sampleReceipt))))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
-        await store.send(.quizGenerationProgress(.delegate(.generationReminderPreferenceSelected(isEnabled: true))))
-        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
-
         await store.send(.quizGenerationProgress(.delegate(.dismissRequested)))
         await store.receive(.delegate(.dismissRequested))
     }
