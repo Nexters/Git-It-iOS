@@ -57,31 +57,6 @@ struct GenerationStateTests {
     }
 
     @Test
-    func `진행 중이고 식별자가 부여된 기록만 활성 프로젝트로 센다`() {
-        let state = GenerationState()
-            .beginning(
-                repositoryURL: Self.url,
-                requestedAt: Self.requestedAt,
-            )?
-            .beginning(
-                repositoryURL: Self.otherURL,
-                requestedAt: Self.requestedAt,
-            )?
-            .attachingProjectID(
-                "p1",
-                toRepositoryURL: Self.url,
-            )
-        #expect(state?.activeProjectIDs == ["p1"])
-
-        let completed = state?.finishing(
-            projectID: "p1",
-            status: .completed,
-            at: Self.finishedAt,
-        )
-        #expect(completed?.activeProjectIDs.isEmpty == true)
-    }
-
-    @Test
     func `같은 프로젝트 식별자를 가진 기록은 하나만 남는다`() {
         let state = GenerationState()
             .beginning(

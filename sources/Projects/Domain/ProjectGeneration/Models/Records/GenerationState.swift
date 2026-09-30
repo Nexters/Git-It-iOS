@@ -13,10 +13,6 @@ public struct GenerationState: Equatable, Sendable {
 
     public let records: [GenerationRecord]
 
-    public var activeProjectIDs: Set<ProjectID> {
-        Set(records.filter { $0.status == .inProgress }.compactMap(\.projectID))
-    }
-
     public func isCreating(repositoryURL: ExternalRepositoryURL) -> Bool {
         let key = GenerationRecord.normalizedURL(repositoryURL)
         return records.contains { $0.repositoryURL == key && $0.status == .inProgress }

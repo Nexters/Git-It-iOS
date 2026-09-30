@@ -30,7 +30,7 @@ struct PendingGenerationRepositoryAdapterTests {
 
         let state = await app.pendingState()
         #expect(state.isCreating(repositoryURL: Self.url))
-        #expect(state.activeProjectIDs == ["project-1"])
+        #expect(state.record(repositoryURL: Self.url)?.projectID == "project-1")
     }
 
     @Test
