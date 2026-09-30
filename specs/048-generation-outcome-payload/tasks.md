@@ -243,25 +243,25 @@ delegate만 제거한다(FR-012, FR-013).
 
 ### 테스트
 
-- [ ] T041 [S1] [S2] `sources/Projects/Data/Tests/LearningProject/DTOs/QuizGenerationOutcomeDTOTests.swift`에 판정표 1~3번 테스트를 추가한다. 관찰 원문 payload는 `aps`, `gcm.message_id`, `google.c.sender.id`, `google.c.fid`, `google.c.a.e` 키를 포함한 사전으로 쓴다
+- [X] T041 [S1] [S2] `sources/Projects/Data/Tests/LearningProject/DTOs/QuizGenerationOutcomeDTOTests.swift`에 판정표 1~3번 테스트를 추가한다. 관찰 원문 payload는 `aps`, `gcm.message_id`, `google.c.sender.id`, `google.c.fid`, `google.c.a.e` 키를 포함한 사전으로 쓴다
   - `서버 QUIZ_READY 알림 원문을 완료 결과로 인식한다`
   - `서버 QUIZ_REJECTED 알림 원문을 실패 결과로 인식한다`(원문 2건을 인자로 받는 parameterized 테스트)
-- [ ] T042 [S3] 같은 파일에 판정표 6~9·11번 테스트를 추가한다. 기존 `status` 테스트(4·5·10·12번에 해당)는 유지한다
+- [X] T042 [S3] 같은 파일에 판정표 6~9·11번 테스트를 추가한다. 기존 `status` 테스트(4·5·10·12번에 해당)는 유지한다
   - `type과 status가 함께 있으면 type을 따른다`
   - `알 수 없는 type이면 status로 판정한다`
   - `type 값은 대소문자와 표기가 정확히 같아야 인식한다`(`quiz_ready`, `QUIZ_FAILED` 인자)
   - `projectId가 빈 문자열이면 인식하지 않는다`
-- [ ] T043 [S3] `sources/Projects/Data/Tests/LearningProject/Sources/PushQuizGenerationOutcomeSourceTests.swift`에 `서버 type 형식 payload를 수신하면 결과로 전달한다`를 추가한다. 관찰 원문 `QUIZ_REJECTED` payload를 `ingest`하고 구독 스트림이 실패 결과를 받는지 확인한다
+- [X] T043 [S3] `sources/Projects/Data/Tests/LearningProject/Sources/PushQuizGenerationOutcomeSourceTests.swift`에 `서버 type 형식 payload를 수신하면 결과로 전달한다`를 추가한다. 관찰 원문 `QUIZ_REJECTED` payload를 `ingest`하고 구독 스트림이 실패 결과를 받는지 확인한다
 
 ### 구현
 
-- [ ] T044 [S1] [S2] [S3] `sources/Projects/Data/LearningProject/DTOs/QuizGenerationOutcomeDTO.swift`의 `init?(rawPayload:deliveredAt:)`를 [계약의 판정 순서](./contracts/generation-outcome-payload.md#판정-순서)대로 바꾼다
+- [X] T044 [S1] [S2] [S3] `sources/Projects/Data/LearningProject/DTOs/QuizGenerationOutcomeDTO.swift`의 `init?(rawPayload:deliveredAt:)`를 [계약의 판정 순서](./contracts/generation-outcome-payload.md#판정-순서)대로 바꾼다
   - `type` 값과 `RawStatus`의 대응은 파일 안의 비공개 선언으로 둔다
   - `RawStatus` 이름·케이스와 공개 초기화 형태는 유지한다(R4)
 
 ### 정리와 단위 검증
 
-- [ ] T045 [no-write] `"$project_build_runner" compile`이 통과하는지 확인한다
+- [X] T045 [no-write] `"$project_build_runner" compile`이 통과하는지 확인한다
 
 ---
 

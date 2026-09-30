@@ -124,6 +124,32 @@ struct PushQuizGenerationOutcomeSourceTests {
         #expect(await secondIterator.next() == Self.outcome(projectID: "project-2"))
     }
 
+    @Test
+    func `서버 type 형식 payload를 수신하면 결과로 전달한다`() async {
+        let source = PushQuizGenerationOutcomeSource()
+        let stream = source.outcomes()
+
+        await source.ingest(
+            rawPayload: [
+                "projectId": "6abbacabf55054fd8fbb479d",
+                "type": "QUIZ_REJECTED",
+                "aps": "{\n    alert = {\n        body = \"다른 저장소로 등록해 주세요\";\n        title = \"문제를 만들 수 없는 저장소예요\";\n    };\n}",
+                "gcm.message_id": "1759140000000000",
+                "google.c.sender.id": "000000000000",
+                "google.c.fid": "fid-placeholder",
+                "google.c.a.e": "1",
+            ],
+            deliveredAt: Self.deliveredAt,
+        )
+
+        var iterator = stream.makeAsyncIterator()
+        #expect(await iterator.next() == QuizGenerationOutcomeDTO(
+            projectID: "6abbacabf55054fd8fbb479d",
+            status: .failed,
+            deliveredAt: Self.deliveredAt,
+        ))
+    }
+
     // MARK: Private
 
     private static let deliveredAt = Date(timeIntervalSince1970: 1_000)

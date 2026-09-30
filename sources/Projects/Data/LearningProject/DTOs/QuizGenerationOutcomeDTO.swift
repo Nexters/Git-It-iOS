@@ -20,8 +20,8 @@ public struct QuizGenerationOutcomeDTO: Equatable, Sendable {
     ) {
         guard
             let projectID = rawPayload["projectId"],
-            let statusValue = rawPayload["status"],
-            let status = RawStatus(rawValue: statusValue)
+            !projectID.isEmpty,
+            let status = Self.status(in: rawPayload)
         else { return nil }
         self.init(
             projectID: projectID,
@@ -40,5 +40,19 @@ public struct QuizGenerationOutcomeDTO: Equatable, Sendable {
     public let projectID: String
     public let status: RawStatus
     public let deliveredAt: Date
+
+    // MARK: Private
+
+    private static let statusByType: [String: RawStatus] = [
+        "QUIZ_READY": .completed,
+        "QUIZ_REJECTED": .failed,
+    ]
+
+    private static func status(in rawPayload: [String: String]) -> RawStatus? {
+        if let type = rawPayload["type"], let status = statusByType[type] {
+            return status
+        }
+        return rawPayload["status"].flatMap(RawStatus.init(rawValue:))
+    }
 
 }
