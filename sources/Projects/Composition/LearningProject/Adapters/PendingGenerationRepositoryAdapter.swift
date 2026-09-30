@@ -111,17 +111,6 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         await modify { _ in GenerationState() }
     }
 
-    public func enqueueReminder(projectID: ProjectID) async {
-        await store.appendReminder(
-            projectID: projectID,
-            requestedAt: now(),
-        )
-    }
-
-    public func drainReminderProjectIDs() async -> [ProjectID] {
-        await store.drainReminderProjectIDs()
-    }
-
     // MARK: Private
 
     private static let inProgressStatus = "inProgress"

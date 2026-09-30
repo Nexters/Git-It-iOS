@@ -78,20 +78,12 @@ public struct AppComposition: Sendable {
             externalRepositoryBaseURL: URL,
             appVersion: String,
             osVersion: String,
-            generationReminderTitle: String,
-            generationReminderBody: String,
-            generationFailureReminderTitle: String,
-            generationFailureReminderBody: String,
             policyDocuments: [PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
             self.externalRepositoryBaseURL = externalRepositoryBaseURL
             self.appVersion = appVersion
             self.osVersion = osVersion
-            self.generationReminderTitle = generationReminderTitle
-            self.generationReminderBody = generationReminderBody
-            self.generationFailureReminderTitle = generationFailureReminderTitle
-            self.generationFailureReminderBody = generationFailureReminderBody
             self.policyDocuments = policyDocuments
         }
 
@@ -101,10 +93,6 @@ public struct AppComposition: Sendable {
         public let externalRepositoryBaseURL: URL
         public let appVersion: String
         public let osVersion: String
-        public let generationReminderTitle: String
-        public let generationReminderBody: String
-        public let generationFailureReminderTitle: String
-        public let generationFailureReminderBody: String
         public let policyDocuments: [PolicyDocument]
 
     }
@@ -140,12 +128,6 @@ public struct AppComposition: Sendable {
                     policyDocuments: environment.policyDocuments,
                     appVersion: environment.appVersion,
                     osVersion: environment.osVersion,
-                    generationReminder: ConcernUseCaseAssembly.GenerationReminderContent(
-                        completedTitle: environment.generationReminderTitle,
-                        completedBody: environment.generationReminderBody,
-                        failedTitle: environment.generationFailureReminderTitle,
-                        failedBody: environment.generationFailureReminderBody,
-                    ),
                     requestCredentialProvider: authentication.requestCredentialProvider,
                     secureStorage: secureStorage,
                     sharedStorage: StorageFactory.keyValueStorage(

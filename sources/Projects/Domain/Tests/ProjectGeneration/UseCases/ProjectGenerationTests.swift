@@ -31,7 +31,7 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `요청만 호출하면 결과 관찰을 시작하지 않고 알림 대상을 대기열에 남긴다`() async throws {
+    func `요청만 호출하면 결과 관찰을 시작하지 않는다`() async throws {
         let fixture = Fixture()
 
         let receipt = try await fixture.generation.request(Self.request)
@@ -49,7 +49,6 @@ struct ProjectGenerationTests {
         ))
         #expect(await fixture.pendingGenerations.subscriberCount == 0)
         #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
-        #expect(await fixture.pendingGenerations.reminderProjectIDs == ["p1"])
     }
 
     @Test
@@ -73,33 +72,7 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `생성이 완료되면 즉시 완료 알림을 예약한다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .completed,
-            arrivedAt: fixture.sleeper.now,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
-
-        #expect(await fixture.scheduler.scheduledReminders == [
-            .init(
-                reminder: GenerationReminder(
-                    projectID: "p1",
-                    kind: .completed,
-                ),
-                date: Self.requestedAt,
-            )
-        ])
-    }
-
-    @Test
-    func `생성이 실패하면 즉시 failed를 방출하고 실패 알림을 보낸다`() async throws {
+    func `생성이 실패하면 즉시 failed를 방출한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
@@ -109,34 +82,9 @@ struct ProjectGenerationTests {
             "p1",
             .failed,
         ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .failed }
-        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
+        let failed = await Self.next(&states) { $0.requests.first?.phase == .failed }
 
-        #expect(await fixture.scheduler.scheduledReminders == [
-            .init(
-                reminder: GenerationReminder(
-                    projectID: "p1",
-                    kind: .failed,
-                ),
-                date: Self.requestedAt,
-            )
-        ])
-    }
-
-    @Test
-    func `알림 권한이 없으면 생성 결과 알림을 예약하지 않는다`() async throws {
-        let fixture = Fixture(scheduler: SpyGenerationReminderScheduler(isAuthorized: false))
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .failed,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .failed }
-
-        #expect(await fixture.scheduler.scheduledReminders.isEmpty)
+        #expect(failed?.requests.first?.projectID == "p1")
     }
 
     @Test
@@ -206,7 +154,7 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `같은 결과가 두 번 도착해도 기록 전이와 알림 예약은 한 번이다`() async throws {
+    func `같은 결과가 두 번 도착해도 기록 전이는 한 번이다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
@@ -225,7 +173,6 @@ struct ProjectGenerationTests {
         await Self.settle { await fixture.pendingGenerations.finishedProjectIDs.count == 2 }
 
         #expect(await fixture.pendingGenerations.state.records.first?.finishedAt == Self.requestedAt)
-        #expect(await fixture.scheduler.scheduledReminders.count == 1)
     }
 
     @Test
@@ -338,114 +285,6 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `결과 도착 후 5분 안이고 권한이 있으면 알림을 한 번 예약한다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-        fixture.sleeper.advance(by: 100)
-
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .completed,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
-
-        #expect(await fixture.scheduler.scheduledReminders.count == 1)
-    }
-
-    @Test
-    func `결과 도착 후 5분이 지나면 권한이 있어도 알림을 예약하지 않는다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-        fixture.sleeper.advance(by: 400)
-
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .completed,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-
-        #expect(await fixture.scheduler.scheduledReminders.isEmpty)
-    }
-
-    @Test
-    func `권한이 없어 버린 리마인드 대상은 나중에 권한이 생겨도 예약하지 않는다`() async throws {
-        let fixture = Fixture(scheduler: SpyGenerationReminderScheduler(isAuthorized: false))
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .completed,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-
-        await fixture.scheduler.setAuthorized(true)
-        await Self.advance(
-            fixture.sleeper,
-            by: 300,
-        )
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-
-        #expect(await fixture.scheduler.scheduledReminders.isEmpty)
-    }
-
-    @Test
-    func `로그아웃하면 모든 기록의 프로젝트 알림 예약을 취소한다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-
-        fixture.signedOutContinuation.yield(())
-        _ = await Self.next(&states) { $0.requests.isEmpty }
-
-        #expect(await fixture.scheduler.cancelledProjectIDs.contains("p1"))
-    }
-
-    @Test
-    func `보관 기한이 지나 상태에서 사라진 기록의 프로젝트 알림 예약을 취소한다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-        fixture.outcomes.emit(Self.outcome(
-            "p1",
-            .completed,
-        ))
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-
-        await Self.advance(
-            fixture.sleeper,
-            by: 3_601,
-        )
-        _ = await Self.next(&states) { $0.requests.isEmpty }
-
-        #expect(await fixture.scheduler.cancelledProjectIDs == ["p1"])
-    }
-
-    @Test
-    func `앱 밖에서 저장소 기록이 사라지면 다음 상태 적용 때 그 프로젝트 알림 예약을 취소한다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-
-        await fixture.pendingGenerations.replaceStateSilently(GenerationState())
-        await Self.advance(
-            fixture.sleeper,
-            by: 1,
-        )
-        _ = await Self.next(&states) { $0.requests.isEmpty }
-
-        #expect(await fixture.scheduler.cancelledProjectIDs == ["p1"])
-    }
-
-    @Test
     func `저장소가 앱 밖에서 바뀐 뒤 동기화하면 그 기록을 상태에 반영한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
@@ -490,7 +329,7 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `동기화하면 보관 기한이 지난 기록을 정리하고 알림 예약을 취소한다`() async throws {
+    func `동기화하면 보관 기한이 지난 기록을 정리한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
@@ -500,11 +339,11 @@ struct ProjectGenerationTests {
         await fixture.generation.synchronize()
         _ = await Self.next(&states) { $0.requests.isEmpty }
 
-        #expect(await fixture.scheduler.cancelledProjectIDs.contains("p1"))
+        #expect(await fixture.pendingGenerations.state.records.isEmpty)
     }
 
     @Test
-    func `프로젝트를 해제하면 기록과 리마인드 대상을 지우고 알림 예약을 취소한다`() async throws {
+    func `프로젝트를 해제하면 기록을 지운다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
         var states = await fixture.generation.states().makeAsyncIterator()
@@ -519,8 +358,6 @@ struct ProjectGenerationTests {
         await Self.settle { await fixture.pendingGenerations.finishedProjectIDs == ["p1"] }
 
         #expect(await fixture.pendingGenerations.state.records.isEmpty)
-        #expect(await fixture.scheduler.cancelledProjectIDs.contains("p1"))
-        #expect(await fixture.scheduler.scheduledReminders.isEmpty)
     }
 
     @Test
@@ -530,7 +367,6 @@ struct ProjectGenerationTests {
         await fixture.generation.release("p-unknown")
 
         #expect(await fixture.pendingGenerations.state.records.isEmpty)
-        #expect(await fixture.scheduler.cancelledProjectIDs == ["p-unknown"])
     }
 
     @Test
@@ -723,26 +559,6 @@ struct ProjectGenerationTests {
     }
 
     @Test
-    func `이미 반영된 알림 센터 결과로는 로컬 알림을 다시 예약하지 않는다`() async throws {
-        let fixture = Fixture()
-        _ = try await fixture.generation.request(Self.request)
-        var states = await fixture.generation.states().makeAsyncIterator()
-        _ = await states.next()
-        fixture.outcomes.setDeliveredOutcomes([Self.outcome(
-            "p1",
-            .completed,
-            arrivedAt: fixture.sleeper.now,
-        )])
-
-        await fixture.generation.synchronize()
-        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
-        await Self.settle { await !fixture.scheduler.scheduledReminders.isEmpty }
-        await fixture.generation.synchronize()
-
-        #expect(await fixture.scheduler.scheduledReminders.count == 1)
-    }
-
-    @Test
     func `기록에 없는 프로젝트의 알림 센터 결과는 기록을 바꾸지 않는다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)
@@ -867,7 +683,6 @@ struct ProjectGenerationTests {
             repository: StubProjectGenerationRepository = StubProjectGenerationRepository(),
             state: GenerationState = GenerationState(),
             confirmationFailure: (any Error)? = nil,
-            scheduler: SpyGenerationReminderScheduler = SpyGenerationReminderScheduler(),
         ) {
             let outcomes = StubGenerationOutcomeRepository()
             let sleeper = ManualSleeper(now: ProjectGenerationTests.requestedAt)
@@ -879,7 +694,6 @@ struct ProjectGenerationTests {
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
             self.repository = repository
             self.pendingGenerations = pendingGenerations
-            self.scheduler = scheduler
             self.outcomes = outcomes
             self.sleeper = sleeper
             self.signedOutContinuation = signedOutContinuation
@@ -887,7 +701,6 @@ struct ProjectGenerationTests {
                 repository: repository,
                 pendingGenerations: pendingGenerations,
                 outcomes: outcomes,
-                reminderScheduler: scheduler,
                 signedOutEvents: { signedOut },
                 now: { sleeper.now },
                 sleep: { try await sleeper.sleep($0) },
@@ -898,7 +711,6 @@ struct ProjectGenerationTests {
 
         let repository: StubProjectGenerationRepository
         let pendingGenerations: InMemoryPendingGenerationRepository
-        let scheduler: SpyGenerationReminderScheduler
         let outcomes: StubGenerationOutcomeRepository
         let sleeper: ManualSleeper
         let signedOutContinuation: AsyncStream<Void>.Continuation

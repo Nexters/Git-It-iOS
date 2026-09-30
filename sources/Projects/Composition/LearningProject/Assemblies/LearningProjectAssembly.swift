@@ -14,8 +14,6 @@ public struct LearningProjectAssembly: Sendable {
         baseURL: URL,
         credential: @escaping @Sendable () async -> RequestCredential,
         credentialRejected: @escaping @Sendable () async -> Void,
-        reminderContent: GenerationReminderContent = GenerationReminderContent(),
-        reminderNotifier: (any LocalReminderNotifier)? = nil,
         generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
         deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
@@ -23,7 +21,6 @@ public struct LearningProjectAssembly: Sendable {
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         sharedStorage: (any KeyValueStorage)? = nil,
     ) {
-        let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
         projectGeneration = ProjectGeneration(
             repository: ProjectGenerationRepositoryAdapter(remote: ProjectRemote(
                 baseURL: baseURL,
@@ -44,13 +41,6 @@ public struct LearningProjectAssembly: Sendable {
                 source: generationOutcomeSource,
                 deliveredMessages: deliveredRemoteMessageReader ?? NotificationFactory.deliveredRemoteMessageReader(),
             ),
-            reminderScheduler: GenerationReminderSchedulerAdapter(
-                reminderNotifier: notifier,
-                completedTitle: reminderContent.completedTitle,
-                completedBody: reminderContent.completedBody,
-                failedTitle: reminderContent.failedTitle,
-                failedBody: reminderContent.failedBody,
-            ),
             signedOutEvents: signedOutEvents,
         )
 
@@ -63,31 +53,6 @@ public struct LearningProjectAssembly: Sendable {
     }
 
     // MARK: Public
-
-    public struct GenerationReminderContent: Sendable {
-
-        // MARK: Lifecycle
-
-        public init(
-            completedTitle: String = "",
-            completedBody: String = "",
-            failedTitle: String = "",
-            failedBody: String = "",
-        ) {
-            self.completedTitle = completedTitle
-            self.completedBody = completedBody
-            self.failedTitle = failedTitle
-            self.failedBody = failedBody
-        }
-
-        // MARK: Public
-
-        public let completedTitle: String
-        public let completedBody: String
-        public let failedTitle: String
-        public let failedBody: String
-
-    }
 
     public let projectGeneration: any ProjectGenerationUseCase
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void

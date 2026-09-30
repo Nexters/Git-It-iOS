@@ -34,18 +34,6 @@ struct PendingGenerationRepositoryAdapterTests {
     }
 
     @Test
-    func `같은 저장소를 공유하면 한쪽이 남긴 알림 대기를 다른 쪽이 흡수한다`() async {
-        let storage = InMemoryKeyValueStorage()
-        let shareExtension = Self.makeAdapter(storage: storage)
-        let app = Self.makeAdapter(storage: storage)
-
-        await shareExtension.enqueueReminder(projectID: "project-1")
-
-        #expect(await app.drainReminderProjectIDs() == ["project-1"])
-        #expect(await shareExtension.drainReminderProjectIDs().isEmpty)
-    }
-
-    @Test
     func `같은 URL로 동시에 생성을 시작하면 하나만 성공한다`() async {
         let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage())
 
@@ -221,10 +209,7 @@ struct PendingGenerationRepositoryAdapterTests {
     ) -> PendingGenerationRepositoryAdapter {
         PendingGenerationRepositoryAdapter(
             store: LocalPendingGenerationStore(storage: storage),
-            waitPolicy: GenerationWaitPolicy(
-                retentionLimit: retentionLimit,
-                reminderValidity: 300,
-            ),
+            waitPolicy: GenerationWaitPolicy(retentionLimit: retentionLimit),
             now: now,
         )
     }

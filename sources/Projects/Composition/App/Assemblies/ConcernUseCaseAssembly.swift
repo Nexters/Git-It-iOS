@@ -30,7 +30,6 @@ public struct ConcernUseCaseAssembly: Sendable {
         policyDocuments: [PolicyDocument],
         appVersion: String,
         osVersion: String,
-        generationReminder: GenerationReminderContent,
         requestCredentialProvider: RequestCredentialProvider,
         secureStorage: (any SecureValueStorage)?,
         sharedStorage: (any KeyValueStorage)?,
@@ -167,13 +166,6 @@ public struct ConcernUseCaseAssembly: Sendable {
                 source: generationOutcomeSource,
                 deliveredMessages: deliveredRemoteMessageReader ?? NotificationFactory.deliveredRemoteMessageReader(),
             ),
-            reminderScheduler: GenerationReminderSchedulerAdapter(
-                reminderNotifier: notifier,
-                completedTitle: generationReminder.completedTitle,
-                completedBody: generationReminder.completedBody,
-                failedTitle: generationReminder.failedTitle,
-                failedBody: generationReminder.failedBody,
-            ),
             signedOutEvents: signedOutEvents,
         )
         self.projectGeneration = projectGeneration
@@ -186,31 +178,6 @@ public struct ConcernUseCaseAssembly: Sendable {
     }
 
     // MARK: Public
-
-    public struct GenerationReminderContent: Sendable {
-
-        // MARK: Lifecycle
-
-        public init(
-            completedTitle: String,
-            completedBody: String,
-            failedTitle: String,
-            failedBody: String,
-        ) {
-            self.completedTitle = completedTitle
-            self.completedBody = completedBody
-            self.failedTitle = failedTitle
-            self.failedBody = failedBody
-        }
-
-        // MARK: Public
-
-        public let completedTitle: String
-        public let completedBody: String
-        public let failedTitle: String
-        public let failedBody: String
-
-    }
 
     public let account: any AccountUseCase
     public let userInfo: any UserInfoUseCase

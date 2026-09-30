@@ -21,7 +21,6 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
     // MARK: Internal
 
     private(set) var state: GenerationState
-    private(set) var reminderProjectIDs = [String]()
     private(set) var finishedProjectIDs = [String]()
 
     var subscriberCount: Int {
@@ -98,18 +97,7 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
     }
 
     func releaseAll() async {
-        reminderProjectIDs.removeAll()
         update(GenerationState())
-    }
-
-    func enqueueReminder(projectID: String) async {
-        guard !reminderProjectIDs.contains(projectID) else { return }
-        reminderProjectIDs.append(projectID)
-    }
-
-    func drainReminderProjectIDs() async -> [String] {
-        defer { reminderProjectIDs.removeAll() }
-        return reminderProjectIDs
     }
 
     func replaceStateSilently(_ next: GenerationState) {

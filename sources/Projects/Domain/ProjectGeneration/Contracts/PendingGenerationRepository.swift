@@ -21,6 +21,4 @@ public protocol PendingGenerationRepository: Sendable {
     func releaseGeneration(repositoryURL: ExternalRepositoryURL) async
     func releaseGeneration(projectID: ProjectID) async
     func releaseAll() async
-    func enqueueReminder(projectID: ProjectID) async
-    func drainReminderProjectIDs() async -> [ProjectID]
 }

@@ -9,7 +9,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         repository: any ProjectGenerationRepository,
         pendingGenerations: any PendingGenerationRepository,
         outcomes: any GenerationOutcomeRepository,
-        reminderScheduler: any GenerationReminderScheduler,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
@@ -18,7 +17,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         self.repository = repository
         self.pendingGenerations = pendingGenerations
         self.outcomes = outcomes
-        self.reminderScheduler = reminderScheduler
         self.signedOutEvents = signedOutEvents
         self.waitPolicy = waitPolicy
         self.now = now
@@ -49,7 +47,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             receipt.projectID,
             toRepositoryURL: request.repositoryURL,
         )
-        await pendingGenerations.enqueueReminder(projectID: receipt.projectID)
         return receipt
     }
 
@@ -90,7 +87,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         if let startTask {
             await startTask.value
             await purgeExpiredRecords()
-            await absorbPendingReminders()
             await apply(pendingGenerations.pendingState())
         } else {
             await startObserving()
@@ -101,10 +97,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     public func release(_ projectID: ProjectID) async {
         preservedOutcomes.removeAll { $0.projectID == projectID }
         await pendingGenerations.releaseGeneration(projectID: projectID)
-        guard let startTask else {
-            await reminderScheduler.cancel(projectID: projectID)
-            return
-        }
+        guard let startTask else { return }
         await startTask.value
         await apply(pendingGenerations.pendingState())
     }
@@ -118,14 +111,12 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private let repository: any ProjectGenerationRepository
     private let pendingGenerations: any PendingGenerationRepository
     private let outcomes: any GenerationOutcomeRepository
-    private let reminderScheduler: any GenerationReminderScheduler
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
     private let sleep: @Sendable (TimeInterval) async throws -> Void
 
     private var generationState = GenerationState()
-    private var reminderProjectIDs = Set<ProjectID>()
     private var preservedOutcomes = [GenerationOutcome]()
     private var subscribers = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var arrivalSubscribers = [UUID: AsyncStream<ProjectID>.Continuation]()
@@ -143,7 +134,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     private func start() async {
         await purgeExpiredRecords()
-        await absorbPendingReminders()
         await apply(pendingGenerations.pendingState())
 
         let outcomeStream = await outcomes.outcomes()
@@ -181,12 +171,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             } else {
                 await pendingGenerations.releaseGeneration(repositoryURL: record.repositoryURL)
             }
-        }
-    }
-
-    private func absorbPendingReminders() async {
-        for projectID in await pendingGenerations.drainReminderProjectIDs() {
-            reminderProjectIDs.insert(projectID)
         }
     }
 
@@ -288,7 +272,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     }
 
     private func releaseAll() async {
-        reminderProjectIDs.removeAll()
         preservedOutcomes.removeAll()
         recentArrivals.removeAll()
         await pendingGenerations.releaseAll()
@@ -296,55 +279,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     }
 
     private func apply(_ state: GenerationState) async {
-        let previousProjectIDs = Set(generationState.records.compactMap(\.projectID))
         generationState = state
-        let removedProjectIDs = previousProjectIDs.subtracting(state.records.compactMap(\.projectID))
-        for projectID in removedProjectIDs {
-            reminderProjectIDs.remove(projectID)
-            await reminderScheduler.cancel(projectID: projectID)
-        }
-        await absorbPendingReminders()
-        for record in state.records where record.status != .inProgress {
-            await scheduleReminderIfRegistered(for: record)
-        }
         emit()
         resetDeadlineTimer()
         await retryPreservedOutcomes()
-    }
-
-    private func scheduleReminderIfRegistered(for record: GenerationRecord) async {
-        guard
-            let projectID = record.projectID,
-            reminderProjectIDs.remove(projectID) != nil,
-            waitPolicy.isReminderValid(
-                record,
-                now: now(),
-            ),
-            await reminderScheduler.isAuthorized()
-        else { return }
-
-        switch record.status {
-        case .completed:
-            await reminderScheduler.schedule(
-                GenerationReminder(
-                    projectID: projectID,
-                    kind: .completed,
-                ),
-                at: now(),
-            )
-
-        case .failed:
-            await reminderScheduler.schedule(
-                GenerationReminder(
-                    projectID: projectID,
-                    kind: .failed,
-                ),
-                at: now(),
-            )
-
-        case .inProgress:
-            break
-        }
     }
 
     private func projectedState(of state: GenerationState) -> ProjectGenerationState {

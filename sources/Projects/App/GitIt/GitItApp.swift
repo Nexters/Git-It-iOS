@@ -21,10 +21,6 @@ struct GitItApp: App {
                 externalRepositoryBaseURL: AppEndpointHost.externalRepository.url,
                 appVersion: bundleVersion,
                 osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
-                generationReminderTitle: LocalizedText.GenerationReminder.Completed.title,
-                generationReminderBody: LocalizedText.GenerationReminder.Completed.body,
-                generationFailureReminderTitle: LocalizedText.GenerationReminder.Failed.title,
-                generationFailureReminderBody: LocalizedText.GenerationReminder.Failed.body,
                 policyDocuments: policyDocuments,
             )
         )
