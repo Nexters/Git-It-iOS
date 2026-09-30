@@ -189,11 +189,11 @@ compile된다.
 
 **독립 검증**: `make tuist` 후 `"$project_build_runner" compile`
 
-- [ ] T030 [S7] `sources/Projects/Infrastructure/LocalNotification/Clients/NotificationAuthorizationClient.swift`에서 `isAuthorized()`, `present(_:)`, `schedule(_:at:)`, `cancel(identifier:)` 요구사항을 제거한다. `requestAuthorization()`과 `authorizationSetting()`은 유지한다
-- [ ] T031 [S7] `sources/Projects/Infrastructure/LocalNotification/Clients/LocalNotificationAuthorizationClient.swift`에서 T030으로 사라진 메서드 구현과 비공개 `add(_:trigger:)`를 제거한다
-- [ ] T032 [S7] `sources/Projects/Infrastructure/LocalNotification/Models/LocalNotificationRequest.swift`를 삭제한다
-- [ ] T033 [S7] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에서 예약·표시·취소 기록 프로퍼티와 `isAuthorized` 구현을 제거한다
-- [ ] T034 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다. 이어서 `sources/Projects`에서 `LocalNotificationRequest|isAuthorized\(\)` 검색이 0건인지 확인한다
+- [X] T030 [S7] `sources/Projects/Infrastructure/LocalNotification/Clients/NotificationAuthorizationClient.swift`에서 `isAuthorized()`, `present(_:)`, `schedule(_:at:)`, `cancel(identifier:)` 요구사항을 제거한다. `requestAuthorization()`과 `authorizationSetting()`은 유지한다
+- [X] T031 [S7] `sources/Projects/Infrastructure/LocalNotification/Clients/LocalNotificationAuthorizationClient.swift`에서 T030으로 사라진 메서드 구현과 비공개 `add(_:trigger:)`를 제거한다
+- [X] T032 [S7] `sources/Projects/Infrastructure/LocalNotification/Models/LocalNotificationRequest.swift`를 삭제한다
+- [X] T033 [S7] `sources/Projects/Data/Tests/Notification/TestDoubles/SpyNotificationAuthorizationClient.swift`에서 예약·표시·취소 기록 프로퍼티와 `isAuthorized` 구현을 제거한다
+- [X] T034 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다. 이어서 `sources/Projects`에서 `LocalNotificationRequest|isAuthorized\(\)` 검색이 0건인지 확인한다
 
 ---
 
