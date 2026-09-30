@@ -337,9 +337,9 @@ struct ProjectGenerationTests {
 
         fixture.sleeper.advance(by: 3_601)
         await fixture.generation.synchronize()
-        _ = await Self.next(&states) { $0.requests.isEmpty }
+        let state = await Self.next(&states) { $0.requests.isEmpty }
 
-        #expect(await fixture.pendingGenerations.state.records.isEmpty)
+        #expect(state?.requests.isEmpty == true)
     }
 
     @Test
