@@ -101,6 +101,56 @@ struct GenerationOutcomeRepositoryAdapterTests {
         ])
     }
 
+    @Test
+    func `알림 센터 메시지의 서버 type 결과를 전달 시각과 함께 반환한다`() async {
+        let readyDeliveredAt = Date(timeIntervalSince1970: 4_000)
+        let rejectedDeliveredAt = Date(timeIntervalSince1970: 5_000)
+        let adapter = GenerationOutcomeRepositoryAdapter(
+            source: StubOutcomeSource(dtos: []),
+            deliveredMessages: StubDeliveredMessageReader(messages: [
+                DeliveredRemoteMessage(
+                    payload: [
+                        "projectId": "6abbb1b4f55054fd8fbb4ca3",
+                        "type": "QUIZ_READY",
+                        "aps": "{\n    alert = {\n        body = \"새 문제가 도착했어요\";\n        title = \"프로젝트 준비 완료\";\n    };\n}",
+                        "gcm.message_id": "1759140000000000",
+                        "google.c.a.e": "1",
+                    ],
+                    deliveredAt: readyDeliveredAt,
+                ),
+                DeliveredRemoteMessage(
+                    payload: [
+                        "projectId": "6abbacabf55054fd8fbb479d",
+                        "type": "QUIZ_REJECTED",
+                        "aps": "{\n    alert = {\n        body = \"다른 저장소로 등록해 주세요\";\n        title = \"문제를 만들 수 없는 저장소예요\";\n    };\n}",
+                        "gcm.message_id": "1759140000000001",
+                        "google.c.a.e": "1",
+                    ],
+                    deliveredAt: rejectedDeliveredAt,
+                ),
+                DeliveredRemoteMessage(
+                    payload: ["title": "공지"],
+                    deliveredAt: readyDeliveredAt,
+                ),
+            ]),
+        )
+
+        let outcomes = await adapter.deliveredOutcomes()
+
+        #expect(outcomes == [
+            GenerationOutcome(
+                projectID: "6abbb1b4f55054fd8fbb4ca3",
+                status: .completed,
+                arrivedAt: readyDeliveredAt,
+            ),
+            GenerationOutcome(
+                projectID: "6abbacabf55054fd8fbb479d",
+                status: .failed,
+                arrivedAt: rejectedDeliveredAt,
+            ),
+        ])
+    }
+
     // MARK: Private
 
     private struct StubDeliveredMessageReader: DeliveredRemoteMessageReader {

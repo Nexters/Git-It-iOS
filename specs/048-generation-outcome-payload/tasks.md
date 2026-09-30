@@ -273,8 +273,8 @@ delegate만 제거한다(FR-012, FR-013).
 
 **독립 검증**: `"$project_build_runner" compile`
 
-- [ ] T046 [S3] `sources/Projects/Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift`에 `알림 센터 메시지의 서버 type 결과를 전달 시각과 함께 반환한다`를 추가한다. 관찰 원문 `QUIZ_READY`·`QUIZ_REJECTED` payload와 결과가 아닌 메시지를 섞고, 완료·실패 결과 두 건만 전달 시각과 함께 반환되는지 확인한다
-- [ ] T047 [no-write] `"$project_build_runner" compile`이 통과하는지 확인한다
+- [X] T046 [S3] `sources/Projects/Composition/Tests/LearningProject/Adapters/GenerationOutcomeRepositoryAdapterTests.swift`에 `알림 센터 메시지의 서버 type 결과를 전달 시각과 함께 반환한다`를 추가한다. 관찰 원문 `QUIZ_READY`·`QUIZ_REJECTED` payload와 결과가 아닌 메시지를 섞고, 완료·실패 결과 두 건만 전달 시각과 함께 반환되는지 확인한다
+- [X] T047 [no-write] `"$project_build_runner" compile`이 통과하는지 확인한다
 
 ---
 
