@@ -370,6 +370,146 @@ struct ProjectGenerationTests {
     }
 
     @Test
+    func `목록에서 확인된 진행 중 프로젝트를 완료로 기록한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        fixture.sleeper.advance(by: 10)
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+
+        let record = await fixture.pendingGenerations.state.records.first
+        #expect(record?.status == .completed)
+        #expect(record?.finishedAt == fixture.sleeper.now)
+    }
+
+    @Test
+    func `목록에 없는 진행 중 프로젝트는 바꾸지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+
+        await fixture.generation.confirmCompletion(of: ["p-other"])
+
+        #expect(await fixture.pendingGenerations.state.records.first?.status == .inProgress)
+        #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
+    }
+
+    @Test
+    func `프로젝트 식별자가 없는 기록은 목록 확인으로 바꾸지 않는다`() async {
+        let fixture = Fixture(state: Self.unattachedState(repositoryURLs: [Self.request.repositoryURL]))
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+
+        #expect(await fixture.pendingGenerations.state.records.first?.status == .inProgress)
+        #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
+    }
+
+    @Test(arguments: [GenerationOutcome.Status.completed, .failed])
+    func `이미 완료되거나 실패한 기록은 목록 확인으로 바꾸지 않는다`(status: GenerationOutcome.Status) async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            status,
+        ))
+        _ = await Self.next(&states) { $0.requests.first?.phase != .inProgress }
+        let finished = await fixture.pendingGenerations.state.records.first
+        fixture.sleeper.advance(by: 10)
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+
+        let record = await fixture.pendingGenerations.state.records.first
+        #expect(record?.status == finished?.status)
+        #expect(record?.finishedAt == Self.requestedAt)
+    }
+
+    @Test
+    func `기록에 없는 프로젝트의 목록 확인은 기록을 만들지 않는다`() async {
+        let fixture = Fixture()
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+
+        #expect(await fixture.pendingGenerations.state.records.isEmpty)
+        #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
+    }
+
+    @Test
+    func `빈 목록 확인은 어떤 기록도 바꾸지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+
+        await fixture.generation.confirmCompletion(of: [])
+
+        #expect(await fixture.pendingGenerations.state.records.first?.status == .inProgress)
+        #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
+    }
+
+    @Test
+    func `목록 확인은 도착 알림을 방출하지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+        var arrivals = await fixture.generation.outcomeArrivals().makeAsyncIterator()
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
+        fixture.outcomes.emit(Self.outcome(
+            "p-other",
+            .completed,
+        ))
+
+        #expect(await arrivals.next() == "p-other")
+    }
+
+    @Test
+    func `목록 확인으로 완료되면 상태 구독자가 ready를 받는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+        let ready = await Self.next(&states) { $0.requests.first?.phase == .ready }
+
+        #expect(ready?.requests.first?.projectID == "p1")
+    }
+
+    @Test
+    func `목록 확인으로 완료된 뒤 같은 프로젝트의 결과가 도착해도 완료 시각이 바뀌지 않는다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+        var states = await fixture.generation.states().makeAsyncIterator()
+        _ = await states.next()
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+        _ = await Self.next(&states) { $0.requests.first?.phase == .ready }
+        fixture.sleeper.advance(by: 10)
+        fixture.outcomes.emit(Self.outcome(
+            "p1",
+            .completed,
+            arrivedAt: fixture.sleeper.now,
+        ))
+        await Self.settle { await fixture.pendingGenerations.finishedProjectIDs.count == 2 }
+
+        let record = await fixture.pendingGenerations.state.records.first
+        #expect(record?.status == .completed)
+        #expect(record?.finishedAt == Self.requestedAt)
+    }
+
+    @Test
+    func `관찰을 시작하기 전의 목록 확인도 저장소에 반영한다`() async throws {
+        let fixture = Fixture()
+        _ = try await fixture.generation.request(Self.request)
+
+        await fixture.generation.confirmCompletion(of: ["p1"])
+
+        #expect(await fixture.pendingGenerations.state.records.first?.status == .completed)
+        #expect(await fixture.pendingGenerations.subscriberCount == 0)
+    }
+
+    @Test
     func `생성 결과가 도착하면 그 프로젝트 식별자를 도착 알림으로 방출한다`() async throws {
         let fixture = Fixture()
         _ = try await fixture.generation.request(Self.request)

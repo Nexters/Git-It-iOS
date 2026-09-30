@@ -102,6 +102,31 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         await apply(pendingGenerations.pendingState())
     }
 
+    public func confirmCompletion(of projectIDs: [ProjectID]) async {
+        guard !projectIDs.isEmpty else { return }
+        let listedProjectIDs = Set(projectIDs)
+        let finishedAt = now()
+        var hasRecordedCompletion = false
+        for record in await pendingGenerations.pendingState().records where record.status == .inProgress {
+            guard
+                let projectID = record.projectID,
+                listedProjectIDs.contains(projectID)
+            else { continue }
+            if
+                await pendingGenerations.finishGeneration(
+                    projectID: projectID,
+                    status: .completed,
+                    finishedAt: finishedAt,
+                )
+            {
+                hasRecordedCompletion = true
+            }
+        }
+        guard hasRecordedCompletion, let startTask else { return }
+        await startTask.value
+        await apply(pendingGenerations.pendingState())
+    }
+
     // MARK: Private
 
     private static let preservedOutcomeLimit = 16
