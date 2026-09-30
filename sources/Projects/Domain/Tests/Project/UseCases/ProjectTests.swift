@@ -150,6 +150,7 @@ struct ProjectTests {
             repository: FailingDeletionRepository(),
             signedOutEvents: { signedOut },
             projectDeleted: { await deletions.record($0) },
+            projectsListed: { _ in },
         )
 
         await #expect(throws: ProjectError.temporarilyUnavailable) {
@@ -157,6 +158,70 @@ struct ProjectTests {
         }
 
         #expect(await deletions.projectIDs.isEmpty)
+    }
+
+    @Test
+    func `첫 페이지를 반영하면 그 페이지의 프로젝트를 알린다`() async throws {
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1"), Self.summary("p2")],
+            hasNextPage: false,
+        )])
+
+        try await fixture.project.refresh()
+
+        #expect(await fixture.listings.projectIDs == [["p1", "p2"]])
+    }
+
+    @Test
+    func `다음 페이지를 붙이면 그 페이지의 프로젝트를 알린다`() async throws {
+        let fixture = Fixture(pages: [
+            0: ProjectPage(
+                summaries: [Self.summary("p1"), Self.summary("p2")],
+                hasNextPage: true,
+            ),
+            1: ProjectPage(
+                summaries: [Self.summary("p2"), Self.summary("p3")],
+                hasNextPage: false,
+            ),
+        ])
+
+        try await fixture.project.refresh()
+        try await fixture.project.requestNextPage()
+
+        #expect(await fixture.listings.projectIDs == [["p1", "p2"], ["p2", "p3"]])
+    }
+
+    @Test
+    func `대체된 첫 페이지 응답은 프로젝트를 알리지 않는다`() async throws {
+        let fixture = Fixture(
+            pages: [0: Self.page("p-new")],
+            heldRequestNumbers: [0],
+            ignoresCancellation: true,
+        )
+        await fixture.repository.setPage(
+            Self.page("p-old"),
+            forRequest: 0,
+        )
+        let refresh = Task { try await fixture.project.refresh() }
+        await Self.settle { await fixture.repository.requestedPageIndexes == [0] }
+
+        try await fixture.project.refreshReplacingInFlightRequest()
+        await fixture.repository.release(request: 0)
+        try await refresh.value
+
+        #expect(await fixture.listings.projectIDs == [["p-new"]])
+    }
+
+    @Test
+    func `첫 페이지 로드가 실패하면 프로젝트를 알리지 않는다`() async {
+        let fixture = Fixture(pages: [0: Self.page("p1")])
+        await fixture.repository.setFailure(.temporarilyUnavailable)
+
+        await #expect(throws: ProjectError.temporarilyUnavailable) {
+            try await fixture.project.refresh()
+        }
+
+        #expect(await fixture.listings.projectIDs.isEmpty)
     }
 
     @Test
@@ -325,14 +390,17 @@ struct ProjectTests {
                 ignoresCancellation: ignoresCancellation,
             )
             let deletions = DeletionRecorder()
+            let listings = ListingRecorder()
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
             self.repository = repository
             self.deletions = deletions
+            self.listings = listings
             self.signedOutContinuation = signedOutContinuation
             project = Project(
                 repository: repository,
                 signedOutEvents: { signedOut },
                 projectDeleted: { await deletions.record($0) },
+                projectsListed: { await listings.record($0) },
             )
         }
 
@@ -340,6 +408,7 @@ struct ProjectTests {
 
         let repository: StubProjectRepository
         let deletions: DeletionRecorder
+        let listings: ListingRecorder
         let signedOutContinuation: AsyncStream<Void>.Continuation
         let project: Project
 
@@ -351,6 +420,16 @@ struct ProjectTests {
 
         func record(_ projectID: String) {
             projectIDs.append(projectID)
+        }
+
+    }
+
+    private actor ListingRecorder {
+
+        private(set) var projectIDs = [[String]]()
+
+        func record(_ projectIDs: [String]) {
+            self.projectIDs.append(projectIDs)
         }
 
     }

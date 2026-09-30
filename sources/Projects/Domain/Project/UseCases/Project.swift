@@ -9,11 +9,13 @@ public actor Project: ProjectUseCase {
         repository: any ProjectRepository,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         projectDeleted: @escaping @Sendable (ProjectID) async -> Void,
+        projectsListed: @escaping @Sendable ([ProjectID]) async -> Void,
         pageSize: Int = 20,
     ) {
         self.repository = repository
         self.signedOutEvents = signedOutEvents
         self.projectDeleted = projectDeleted
+        self.projectsListed = projectsListed
         self.pageSize = pageSize
     }
 
@@ -68,10 +70,13 @@ public actor Project: ProjectUseCase {
                 index,
                 size: size,
             )
-            self.appendPage(
-                page,
-                epoch: epoch,
-            )
+            guard
+                self.appendPage(
+                    page,
+                    epoch: epoch,
+                )
+            else { return }
+            await self.projectsListed(page.summaries.map(\.id))
         }
         nextPageTask = task
         defer { clearNextPageTask(epoch: epoch) }
@@ -99,6 +104,7 @@ public actor Project: ProjectUseCase {
     private let repository: any ProjectRepository
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let projectDeleted: @Sendable (ProjectID) async -> Void
+    private let projectsListed: @Sendable ([ProjectID]) async -> Void
     private let pageSize: Int
 
     private var loaded = [ProjectSummary]()
@@ -148,10 +154,13 @@ public actor Project: ProjectUseCase {
                 0,
                 size: size,
             )
-            self.replaceWithFirstPage(
-                page,
-                epoch: epoch,
-            )
+            guard
+                self.replaceWithFirstPage(
+                    page,
+                    epoch: epoch,
+                )
+            else { return }
+            await self.projectsListed(page.summaries.map(\.id))
         }
         firstPageTask = task
         defer { clearFirstPageTask(epoch: epoch) }
@@ -195,25 +204,27 @@ public actor Project: ProjectUseCase {
     private func replaceWithFirstPage(
         _ page: ProjectPage,
         epoch: Int,
-    ) {
-        guard epoch == self.epoch else { return }
+    ) -> Bool {
+        guard epoch == self.epoch else { return false }
         loaded = page.summaries
         nextPageIndex = 1
         hasNextPage = page.hasNextPage
         isLoaded = true
         emit()
+        return true
     }
 
     private func appendPage(
         _ page: ProjectPage,
         epoch: Int,
-    ) {
-        guard epoch == self.epoch else { return }
+    ) -> Bool {
+        guard epoch == self.epoch else { return false }
         let loadedIDs = Set(loaded.map(\.id))
         loaded += page.summaries.filter { !loadedIDs.contains($0.id) }
         nextPageIndex += 1
         hasNextPage = page.hasNextPage
         emit()
+        return true
     }
 
     private func clearFirstPageTask(epoch: Int) {

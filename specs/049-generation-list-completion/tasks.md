@@ -107,7 +107,7 @@ compile과 실기기 검증(T011)으로 확인한다([R5](./research.md#r5-compo
 
 ### 테스트
 
-- [ ] T004 [S1] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`를 고친다
+- [X] T004 [S1] `sources/Projects/Domain/Tests/Project/UseCases/ProjectTests.swift`를 고친다
   - 파일 끝 `DeletionRecorder` 옆에 같은 형태의 `private actor ListingRecorder`를 추가한다. `record(_ projectIDs: [String])`와 `private(set) var listings: [[String]]`를 둔다
   - `Fixture`에 `listings: ListingRecorder` 프로퍼티를 추가하고 `Project(...)` 생성에 `projectsListed: { await listings.record($0) }`를 넘긴다
   - 다음 테스트를 추가한다. 페이지 데이터는 기존 테스트가 쓰는 `pages:` 딕셔너리 형식을 따른다
@@ -119,16 +119,16 @@ compile과 실기기 검증(T011)으로 확인한다([R5](./research.md#r5-compo
 
 ### 구현
 
-- [ ] T005 [S1] `sources/Projects/Domain/Project/UseCases/Project.swift`를 고친다
+- [X] T005 [S1] `sources/Projects/Domain/Project/UseCases/Project.swift`를 고친다
   - `init`에 `projectsListed: @escaping @Sendable ([ProjectID]) async -> Void` 인자를 `projectDeleted` 뒤, `pageSize` 앞에 추가하고 `private let projectsListed`에 저장한다
   - `requestFirstPage`의 Task 안에서 `replaceWithFirstPage`가 페이지를 목록에 반영했을 때만 `await self.projectsListed(page.summaries.map(\.id))`를 부른다. `requestNextPage`의 Task와 `appendPage`도 같다
   - `replaceWithFirstPage`·`appendPage`는 epoch 가드로 반영 여부를 결정하므로, 반영 여부를 `Bool`로 돌려주고 Task가 그 값으로 호출을 결정한다. 대체된 응답(epoch 불일치)과 실패한 로드는 부르지 않는다
   - `reset`·`delete`·`detail`은 바꾸지 않는다
-- [ ] T006 [S1] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `Project(...)` 생성에 `projectsListed: { await projectGeneration.confirmCompletion(of: $0) }`를 `projectDeleted:` 뒤에 추가한다. 다른 조립 인자는 바꾸지 않는다
+- [X] T006 [S1] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `Project(...)` 생성에 `projectsListed: { await projectGeneration.confirmCompletion(of: $0) }`를 `projectDeleted:` 뒤에 추가한다. 다른 조립 인자는 바꾸지 않는다
 
 ### 정리와 단위 검증
 
-- [ ] T007 [no-write] `"$project_build_runner" compile`이 통과하는지 확인하고, `sources/Projects`에서 `projectDeleted:` 검색 결과의 production 호출처(`ConcernUseCaseAssembly.swift`)마다 `projectsListed:`가 함께 있는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다
+- [X] T007 [no-write] `"$project_build_runner" compile`이 통과하는지 확인하고, `sources/Projects`에서 `projectDeleted:` 검색 결과의 production 호출처(`ConcernUseCaseAssembly.swift`)마다 `projectsListed:`가 함께 있는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다
 
 ---
 
