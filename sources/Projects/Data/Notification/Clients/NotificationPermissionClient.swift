@@ -1,9 +1,9 @@
 import Foundation
 import InfrastructureLocalNotification
 
-// MARK: - ReminderNotificationClient
+// MARK: - NotificationPermissionClient
 
-struct ReminderNotificationClient: LocalReminderNotifier {
+struct NotificationPermissionClient: NotificationPermissionRequester {
 
     // MARK: Lifecycle
 
@@ -13,7 +13,7 @@ struct ReminderNotificationClient: LocalReminderNotifier {
 
     // MARK: Internal
 
-    func requestAuthorization() async -> ReminderAuthorizationStatus {
+    func requestAuthorization() async -> NotificationPermissionRequestResult {
         switch await authorizationClient.requestAuthorization() {
         case .authorized: .authorized
         case .declined: .declined
@@ -21,7 +21,7 @@ struct ReminderNotificationClient: LocalReminderNotifier {
         }
     }
 
-    func authorizationSetting() async -> ReminderAuthorizationSetting {
+    func authorizationSetting() async -> NotificationPermissionSetting {
         switch await authorizationClient.authorizationSetting() {
         case .notDetermined: .notDetermined
         case .authorized: .authorized

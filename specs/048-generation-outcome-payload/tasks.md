@@ -290,18 +290,18 @@ delegate만 제거한다(FR-012, FR-013).
 **독립 검증**: `make tuist` 후 `"$project_build_runner" compile`. `git diff -M --stat`에서 파일 이동이 rename으로 인식되고,
 본문 변경이 식별자 치환뿐이어야 한다.
 
-- [ ] T048 [S7] Data 소스 파일을 `git mv`로 옮기고 타입 이름을 바꾼다([research R8](./research.md#r8-알림-권한-계약-이름fr-015))
+- [X] T048 [S7] Data 소스 파일을 `git mv`로 옮기고 타입 이름을 바꾼다([research R8](./research.md#r8-알림-권한-계약-이름fr-015))
   - `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift` → `sources/Projects/Data/Notification/Contracts/NotificationPermissionRequester.swift` (`LocalReminderNotifier` → `NotificationPermissionRequester`)
   - `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift` → `sources/Projects/Data/Notification/Clients/NotificationPermissionClient.swift` (`ReminderNotificationClient` → `NotificationPermissionClient`)
   - `sources/Projects/Data/Notification/Models/ReminderAuthorizationSetting.swift` → `sources/Projects/Data/Notification/Models/NotificationPermissionSetting.swift` (`ReminderAuthorizationSetting` → `NotificationPermissionSetting`)
   - `sources/Projects/Data/Notification/Models/ReminderAuthorizationStatus.swift` → `sources/Projects/Data/Notification/Models/NotificationPermissionRequestResult.swift` (`ReminderAuthorizationStatus` → `NotificationPermissionRequestResult`)
-- [ ] T049 [S7] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`의 `localReminderNotifier()`를 `notificationPermissionRequester()`로 바꾸고, 반환 타입을 `any NotificationPermissionRequester`로 한다
-- [ ] T050 [S7] Data 테스트 파일을 `git mv`로 옮기고 suite·타입 참조를 바꾼다
+- [X] T049 [S7] `sources/Projects/Data/Notification/Factories/NotificationFactory.swift`의 `localReminderNotifier()`를 `notificationPermissionRequester()`로 바꾸고, 반환 타입을 `any NotificationPermissionRequester`로 한다
+- [X] T050 [S7] Data 테스트 파일을 `git mv`로 옮기고 suite·타입 참조를 바꾼다
   - `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift` → `sources/Projects/Data/Tests/Notification/Clients/NotificationPermissionClientTests.swift`
   - `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift` → `sources/Projects/Data/Tests/LearningProject/Layouts/PendingGenerationStorageCoordinateTests.swift`
-- [ ] T051 [S7] `sources/Projects/Composition/LearningProject/Adapters/NotificationAuthorizationAdapter.swift`의 초기화 인자·저장 프로퍼티를 `permissionRequester: any NotificationPermissionRequester`로 바꾸고, 새 Data 모델 이름을 반영한다
-- [ ] T052 [S7] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `reminderNotifier` 인자를 `notificationPermissionRequester`로 바꾸고, `NotificationFactory.notificationPermissionRequester()`와 `NotificationAuthorizationAdapter(permissionRequester:)`로 연결한다
-- [ ] T053 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다. 이어서 `sources/Projects`에서 `LocalReminderNotifier|ReminderNotificationClient|ReminderAuthorization(Setting|Status)|localReminderNotifier|reminderNotifier` 검색이 0건인지 확인한다
+- [X] T051 [S7] `sources/Projects/Composition/LearningProject/Adapters/NotificationAuthorizationAdapter.swift`의 초기화 인자·저장 프로퍼티를 `permissionRequester: any NotificationPermissionRequester`로 바꾸고, 새 Data 모델 이름을 반영한다
+- [X] T052 [S7] `sources/Projects/Composition/App/Assemblies/ConcernUseCaseAssembly.swift`의 `reminderNotifier` 인자를 `notificationPermissionRequester`로 바꾸고, `NotificationFactory.notificationPermissionRequester()`와 `NotificationAuthorizationAdapter(permissionRequester:)`로 연결한다
+- [X] T053 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다. 이어서 `sources/Projects`에서 `LocalReminderNotifier|ReminderNotificationClient|ReminderAuthorization(Setting|Status)|localReminderNotifier|reminderNotifier` 검색이 0건인지 확인한다
 
 ---
 

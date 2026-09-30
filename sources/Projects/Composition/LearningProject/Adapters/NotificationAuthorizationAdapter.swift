@@ -7,14 +7,14 @@ public struct NotificationAuthorizationAdapter: NotificationAuthorization {
 
     // MARK: Lifecycle
 
-    public init(reminderNotifier: any LocalReminderNotifier) {
-        self.reminderNotifier = reminderNotifier
+    public init(permissionRequester: any NotificationPermissionRequester) {
+        self.permissionRequester = permissionRequester
     }
 
     // MARK: Public
 
     public func status() async -> NotificationAuthorizationStatus {
-        switch await reminderNotifier.authorizationSetting() {
+        switch await permissionRequester.authorizationSetting() {
         case .notDetermined: .notDetermined
         case .authorized: .authorized
         case .denied: .denied
@@ -22,7 +22,7 @@ public struct NotificationAuthorizationAdapter: NotificationAuthorization {
     }
 
     public func requestAuthorization() async -> NotificationAuthorizationStatus {
-        switch await reminderNotifier.requestAuthorization() {
+        switch await permissionRequester.requestAuthorization() {
         case .authorized: .authorized
         case .declined,
              .previouslyDenied: .denied
@@ -31,6 +31,6 @@ public struct NotificationAuthorizationAdapter: NotificationAuthorization {
 
     // MARK: Private
 
-    private let reminderNotifier: any LocalReminderNotifier
+    private let permissionRequester: any NotificationPermissionRequester
 
 }

@@ -4,22 +4,22 @@ import Testing
 
 @testable import DataNotification
 
-// MARK: - ReminderNotificationClientTests
+// MARK: - NotificationPermissionClientTests
 
-@Suite("ReminderNotificationClient")
-struct ReminderNotificationClientTests {
+@Suite("NotificationPermissionClient")
+struct NotificationPermissionClientTests {
 
     @Test(arguments: [
-        (NotificationAuthorizationStatus.authorized, ReminderAuthorizationStatus.authorized),
+        (NotificationAuthorizationStatus.authorized, NotificationPermissionRequestResult.authorized),
         (.declined, .declined),
         (.previouslyDenied, .previouslyDenied),
     ])
     func `권한 요청 결과를 알림 권한 상태로 변환한다`(
         status: NotificationAuthorizationStatus,
-        expected: ReminderAuthorizationStatus,
+        expected: NotificationPermissionRequestResult,
     ) async {
         let authorizationClient = SpyNotificationAuthorizationClient(status: status)
-        let client = ReminderNotificationClient(authorizationClient: authorizationClient)
+        let client = NotificationPermissionClient(authorizationClient: authorizationClient)
 
         let result = await client.requestAuthorization()
 
@@ -28,16 +28,16 @@ struct ReminderNotificationClientTests {
     }
 
     @Test(arguments: [
-        (NotificationAuthorizationSetting.notDetermined, ReminderAuthorizationSetting.notDetermined),
+        (NotificationAuthorizationSetting.notDetermined, NotificationPermissionSetting.notDetermined),
         (.authorized, .authorized),
         (.denied, .denied),
     ])
     func `권한을 요청하지 않고 현재 알림 권한 설정을 변환한다`(
         setting: NotificationAuthorizationSetting,
-        expected: ReminderAuthorizationSetting,
+        expected: NotificationPermissionSetting,
     ) async {
         let authorizationClient = SpyNotificationAuthorizationClient(setting: setting)
-        let client = ReminderNotificationClient(authorizationClient: authorizationClient)
+        let client = NotificationPermissionClient(authorizationClient: authorizationClient)
 
         let result = await client.authorizationSetting()
 

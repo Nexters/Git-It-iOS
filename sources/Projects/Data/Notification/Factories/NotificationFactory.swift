@@ -7,8 +7,8 @@ public enum NotificationFactory {
 
     // MARK: Public
 
-    public static func localReminderNotifier() -> any LocalReminderNotifier {
-        ReminderNotificationClient(authorizationClient: LocalNotificationAuthorizationClient())
+    public static func notificationPermissionRequester() -> any NotificationPermissionRequester {
+        NotificationPermissionClient(authorizationClient: LocalNotificationAuthorizationClient())
     }
 
     public static func remoteMessageReceiver() -> any RemoteMessageReceiver {

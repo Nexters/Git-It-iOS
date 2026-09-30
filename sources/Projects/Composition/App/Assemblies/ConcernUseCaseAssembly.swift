@@ -33,7 +33,7 @@ public struct ConcernUseCaseAssembly: Sendable {
         requestCredentialProvider: RequestCredentialProvider,
         secureStorage: (any SecureValueStorage)?,
         sharedStorage: (any KeyValueStorage)?,
-        reminderNotifier: (any LocalReminderNotifier)? = nil,
+        notificationPermissionRequester: (any NotificationPermissionRequester)? = nil,
         generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
         deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil,
         transport: (any RequestTransport)? = nil,
@@ -106,9 +106,9 @@ public struct ConcernUseCaseAssembly: Sendable {
                 sessionStorage: sessionStorage,
             )
         )
-        let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
+        let permissionRequester = notificationPermissionRequester ?? NotificationFactory.notificationPermissionRequester()
         appSetting = AppSetting(
-            notificationAuthorization: NotificationAuthorizationAdapter(reminderNotifier: notifier),
+            notificationAuthorization: NotificationAuthorizationAdapter(permissionRequester: permissionRequester),
             deviceRegistrationRepository: DeviceRegistrationRepositoryAdapter(remote: memberRemote),
             deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(
                 secureStorage: secureStorage ?? StorageFactory.secureValueStorage(
