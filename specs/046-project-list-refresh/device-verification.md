@@ -36,8 +36,8 @@
 
 | 항목 | 관찰 |
 |---|---|
-| `content-available` 포함 여부 | (관찰 대기) |
-| `projectId`·`status` 키와 값 형식 | (관찰 대기) |
+| `content-available` 포함 여부 | (이번 관찰에서 확인 못 함) |
+| `projectId`·`status` 키와 값 형식 | `status` 없음. `type: QUIZ_READY`(완료)·`QUIZ_REJECTED`(생성 불가)와 최상위 `projectId`, 2026-09-29 iPhone 12 mini 관찰 3건 |
 | 등록 응답 `projectId`와 일치 여부 | (관찰 대기) |
 
 ## 목록 자동 갱신 (046)

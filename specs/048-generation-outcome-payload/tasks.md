@@ -313,8 +313,8 @@ delegate만 제거한다(FR-012, FR-013).
 
 **독립 검증**: 문서 검토. SC-006을 확인한다.
 
-- [ ] T054 [S4] `specs/046-project-list-refresh/spec.md`를 고친다. 서버 payload를 `status: completed/failed`로 단정한 가정 문장(가정 섹션의 "서버의 생성 결과 원격 알림은 … `status`(`completed`/`failed`)를 payload에 담는다")에 "2026-09-29 실기기 관찰로 정정: 서버는 `type`(`QUIZ_READY`·`QUIZ_REJECTED`)을 보낸다. [048 명세](../048-generation-outcome-payload/spec.md) 참조" 표시를 붙인다. 다른 문장은 바꾸지 않는다
-- [ ] T055 [S4] `specs/046-project-list-refresh/device-verification.md`의 "서버 payload" 표를 채운다
+- [X] T054 [S4] `specs/046-project-list-refresh/spec.md`를 고친다. 서버 payload를 `status: completed/failed`로 단정한 가정 문장(가정 섹션의 "서버의 생성 결과 원격 알림은 … `status`(`completed`/`failed`)를 payload에 담는다")에 "2026-09-29 실기기 관찰로 정정: 서버는 `type`(`QUIZ_READY`·`QUIZ_REJECTED`)을 보낸다. [048 명세](../048-generation-outcome-payload/spec.md) 참조" 표시를 붙인다. 다른 문장은 바꾸지 않는다
+- [X] T055 [S4] `specs/046-project-list-refresh/device-verification.md`의 "서버 payload" 표를 채운다
   - `projectId`·`status` 키와 값 형식 행: "`status` 없음. `type: QUIZ_READY`(완료)·`QUIZ_REJECTED`(생성 불가)와 최상위 `projectId`, 2026-09-29 iPhone 12 mini 관찰 3건"
   - `content-available` 포함 여부 행: "(이번 관찰에서 확인 못 함)"
   - 등록 응답 `projectId` 일치 행: 관찰 대기로 둔다
@@ -323,10 +323,10 @@ delegate만 제거한다(FR-012, FR-013).
 
 ## 전체 완료 검증 (마지막 적용 단위 뒤, `[no-write]`)
 
-- [ ] T056 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 결과를 기록한다(SC-001, SC-003, SC-004, SC-008, SC-009)
-- [ ] T057 [no-write] [S7] [quickstart.md](./quickstart.md) "2. 잔여 참조 검색"을 실행해 0건인지 확인한다(SC-010, SC-007)
+- [X] T056 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 결과를 기록한다(SC-001, SC-003, SC-004, SC-008, SC-009)
+- [X] T057 [no-write] [S7] [quickstart.md](./quickstart.md) "2. 잔여 참조 검색"을 실행해 0건인지 확인한다(SC-010, SC-007)
 - [ ] T058 [no-write] [S1] [S2] [S5] [S6] 실기기에서 [quickstart.md](./quickstart.md) "3. 실기기 검증" 1~6을 확인한다(SC-002, SC-005). 실기기를 쓸 수 없으면 미검증으로 기록하고 PR 미검증 범위에 적는다
-- [ ] T059 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
+- [X] T059 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
 
 ---
 
