@@ -149,31 +149,31 @@ project_build_runner=$(./.tools/repository-paths/bin/repository-paths.sh GIT_IT_
 
 ### 구현
 
-- [ ] T021 [S5] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에서 다음을 제거한다. `namespace`, `stateKey`, 상태 조회·확인 조회·구독·`modifyState`는 유지한다(R6)
+- [X] T021 [S5] `sources/Projects/Data/LearningProject/Stores/LocalPendingGenerationStore.swift`에서 다음을 제거한다. `namespace`, `stateKey`, 상태 조회·확인 조회·구독·`modifyState`는 유지한다(R6)
   - `pendingGenerationRemindersKey`, `pendingReminderLimit`
   - `appendReminder(projectID:requestedAt:)`, `drainReminderProjectIDs()`
   - 비공개 `ReminderEntry`, `loadReminderEntries()`
-- [ ] T022 [S5] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에서 `isAuthorized()`, `schedule(_:at:)`, `cancel(identifier:)` 요구사항을 제거한다. `requestAuthorization()`과 `authorizationSetting()`만 남긴다
-- [ ] T023 [S5] `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에서 T022로 사라진 세 메서드의 구현을 제거한다
-- [ ] T024 [S5] `sources/Projects/Data/Notification/Models/ReminderNotification.swift`를 삭제한다
+- [X] T022 [S5] `sources/Projects/Data/Notification/Contracts/LocalReminderNotifier.swift`에서 `isAuthorized()`, `schedule(_:at:)`, `cancel(identifier:)` 요구사항을 제거한다. `requestAuthorization()`과 `authorizationSetting()`만 남긴다
+- [X] T023 [S5] `sources/Projects/Data/Notification/Clients/ReminderNotificationClient.swift`에서 T022로 사라진 세 메서드의 구현을 제거한다
+- [X] T024 [S5] `sources/Projects/Data/Notification/Models/ReminderNotification.swift`를 삭제한다
 
 ### 테스트
 
-- [ ] T025 [P] [S5] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`를 정리한다
+- [X] T025 [P] [S5] `sources/Projects/Data/Tests/LearningProject/Stores/LocalPendingGenerationStoreTests.swift`를 정리한다
   - 삭제: `같은 프로젝트의 알림 대기는 한 번만 기록하고 흡수하면 비워진다`, `알림 대기가 상한을 넘으면 오래된 항목부터 버린다`, `알림 대기 저장값이 손상되면 빈 목록으로 취급하고 기록을 이어간다`
   - 수정: `저장소를 사용할 수 없으면 기록해도 빈 상태와 빈 알림 대기를 돌려준다`를 `저장소를 사용할 수 없으면 기록해도 빈 상태를 돌려준다`로 바꾸고 대기열 검증을 뺀다
-- [ ] T026 [P] [S5] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`를 정리한다
+- [X] T026 [P] [S5] `sources/Projects/Data/Tests/LearningProject/Layouts/GenerationReminderStorageCoordinateTests.swift`를 정리한다
   - 삭제: `대기 리마인드 보관 한도는 32개로 유지된다`
   - 수정: 첫 테스트를 `생성 대기 상태는 기존 App Group 네임스페이스와 키를 그대로 쓴다`로 바꾸고 `namespace`·`stateKey`만 검증한다
-- [ ] T027 [P] [S5] `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에서 다음 세 테스트를 삭제한다. `권한 요청 결과를 알림 권한 상태로 변환한다`와 `권한을 요청하지 않고 현재 알림 권한 설정을 변환한다`는 유지한다
+- [X] T027 [P] [S5] `sources/Projects/Data/Tests/Notification/Clients/ReminderNotificationClientTests.swift`에서 다음 세 테스트를 삭제한다. `권한 요청 결과를 알림 권한 상태로 변환한다`와 `권한을 요청하지 않고 현재 알림 권한 설정을 변환한다`는 유지한다
   - `권한 허용 여부를 그대로 전달한다`
   - `예약 요청의 식별자와 제목, 본문, 시각을 전달한다`
   - `취소 요청을 식별자와 함께 위임한다`
 
 ### 정리와 단위 검증
 
-- [ ] T028 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다
-- [ ] T029 [no-write] [S7] `sources/Projects`에서 `pendingGenerationReminders|pendingReminderLimit|appendReminder|drainReminderProjectIDs|ReminderEntry|ReminderNotification\b` 검색이 0건인지 확인한다
+- [X] T028 [no-write] `make tuist`를 실행한 뒤 `"$project_build_runner" compile`이 통과하는지 확인한다. 실행 전후 `git status --porcelain`을 비교한다
+- [X] T029 [no-write] [S7] `sources/Projects`에서 `pendingGenerationReminders|pendingReminderLimit|appendReminder|drainReminderProjectIDs|ReminderEntry|ReminderNotification\b` 검색이 0건인지 확인한다
 
 ---
 

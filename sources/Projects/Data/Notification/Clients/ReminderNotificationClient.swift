@@ -21,34 +21,12 @@ struct ReminderNotificationClient: LocalReminderNotifier {
         }
     }
 
-    func isAuthorized() async -> Bool {
-        await authorizationClient.isAuthorized()
-    }
-
     func authorizationSetting() async -> ReminderAuthorizationSetting {
         switch await authorizationClient.authorizationSetting() {
         case .notDetermined: .notDetermined
         case .authorized: .authorized
         case .denied: .denied
         }
-    }
-
-    func schedule(
-        _ reminder: ReminderNotification,
-        at date: Date,
-    ) async {
-        authorizationClient.schedule(
-            LocalNotificationRequest(
-                identifier: reminder.identifier,
-                title: reminder.title,
-                body: reminder.body,
-            ),
-            at: date,
-        )
-    }
-
-    func cancel(identifier: String) async {
-        authorizationClient.cancel(identifier: identifier)
     }
 
     // MARK: Private

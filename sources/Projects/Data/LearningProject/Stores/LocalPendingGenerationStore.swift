@@ -17,8 +17,6 @@ public actor LocalPendingGenerationStore {
 
     public static let namespace = "com.nexters.hytime.gitit.sharedSession"
     public static let stateKey = "generationState"
-    public static let pendingGenerationRemindersKey = "pendingGenerationReminders"
-    public static let pendingReminderLimit = 32
 
     public func state() async -> GenerationStateDTO {
         await exclusively { await self.loadState() }
@@ -48,42 +46,7 @@ public actor LocalPendingGenerationStore {
         }
     }
 
-    public func appendReminder(
-        projectID: String,
-        requestedAt: Date,
-    ) async {
-        await exclusively {
-            var entries = await self.loadReminderEntries()
-            guard !entries.contains(where: { $0.projectID == projectID }) else { return }
-            entries.append(ReminderEntry(
-                projectID: projectID,
-                requestedAt: requestedAt,
-            ))
-            if entries.count > Self.pendingReminderLimit {
-                entries.removeFirst(entries.count - Self.pendingReminderLimit)
-            }
-            await self.storage.setValue(
-                entries,
-                forKey: Self.pendingGenerationRemindersKey,
-            )
-        }
-    }
-
-    public func drainReminderProjectIDs() async -> [String] {
-        await exclusively {
-            let entries = await self.loadReminderEntries()
-            guard !entries.isEmpty else { return [] }
-            await self.storage.removeValue(forKey: Self.pendingGenerationRemindersKey)
-            return entries.map(\.projectID)
-        }
-    }
-
     // MARK: Private
-
-    private struct ReminderEntry: Codable, Sendable {
-        let projectID: String
-        let requestedAt: Date
-    }
 
     private static let logger = Logger(
         subsystem: "com.nexters.hytime.gitit",
@@ -132,13 +95,6 @@ public actor LocalPendingGenerationStore {
         } catch {
             return .failure(error)
         }
-    }
-
-    private func loadReminderEntries() async -> [ReminderEntry] {
-        await storage.value(
-            [ReminderEntry].self,
-            forKey: Self.pendingGenerationRemindersKey,
-        ) ?? []
     }
 
     private func subscribe() async -> AsyncStream<GenerationStateDTO> {

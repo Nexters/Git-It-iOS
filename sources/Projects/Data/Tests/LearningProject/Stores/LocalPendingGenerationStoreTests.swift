@@ -105,76 +105,14 @@ struct LocalPendingGenerationStoreTests {
     }
 
     @Test
-    func `같은 프로젝트의 알림 대기는 한 번만 기록하고 흡수하면 비워진다`() async {
-        let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage())
-
-        await store.appendReminder(
-            projectID: "project-1",
-            requestedAt: Self.requestedAt,
-        )
-        await store.appendReminder(
-            projectID: "project-1",
-            requestedAt: Self.requestedAt,
-        )
-        await store.appendReminder(
-            projectID: "project-2",
-            requestedAt: Self.requestedAt,
-        )
-
-        #expect(await store.drainReminderProjectIDs() == ["project-1", "project-2"])
-        #expect(await store.drainReminderProjectIDs().isEmpty)
-    }
-
-    @Test
-    func `알림 대기가 상한을 넘으면 오래된 항목부터 버린다`() async {
-        let store = LocalPendingGenerationStore(storage: InMemoryKeyValueStorage())
-        let overflow = LocalPendingGenerationStore.pendingReminderLimit + 2
-
-        for index in 0 ..< overflow {
-            await store.appendReminder(
-                projectID: "project-\(index)",
-                requestedAt: Self.requestedAt,
-            )
-        }
-
-        let drained = await store.drainReminderProjectIDs()
-        #expect(drained.count == 32)
-        #expect(drained.first == "project-2")
-        #expect(drained.last == "project-\(overflow - 1)")
-    }
-
-    @Test
-    func `알림 대기 저장값이 손상되면 빈 목록으로 취급하고 기록을 이어간다`() async {
-        let storage = InMemoryKeyValueStorage()
-        await storage.setValue(
-            "corrupted",
-            forKey: "pendingGenerationReminders",
-        )
-        let store = LocalPendingGenerationStore(storage: storage)
-
-        #expect(await store.drainReminderProjectIDs().isEmpty)
-
-        await store.appendReminder(
-            projectID: "project-1",
-            requestedAt: Self.requestedAt,
-        )
-        #expect(await store.drainReminderProjectIDs() == ["project-1"])
-    }
-
-    @Test
-    func `저장소를 사용할 수 없으면 기록해도 빈 상태와 빈 알림 대기를 돌려준다`() async {
+    func `저장소를 사용할 수 없으면 기록해도 빈 상태를 돌려준다`() async {
         let store = LocalPendingGenerationStore(
             storage: StorageFactory.keyValueStorage(store: nil)
         )
 
         await store.modifyState { _ in GenerationStateDTO(records: [Self.record(projectID: "p1")]) }
-        await store.appendReminder(
-            projectID: "project-1",
-            requestedAt: Self.requestedAt,
-        )
 
         #expect(await store.state().records.isEmpty)
-        #expect(await store.drainReminderProjectIDs().isEmpty)
     }
 
     // MARK: Private
