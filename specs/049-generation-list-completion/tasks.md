@@ -140,16 +140,16 @@ compile과 실기기 검증(T011)으로 확인한다([R5](./research.md#r5-compo
 
 **독립 검증**: 문서 검토. SC-007을 확인한다.
 
-- [ ] T008 [S4] `specs/048-generation-outcome-payload/spec.md` 가정 섹션의 "생성 결과는 원격 알림으로만 들어오므로, 로컬 결과 알림을 제거해도 … 원격 알림이 아닌 결과 경로가 생기면 그때 알림 방식을 다시 정한다." 문장 끝에 "*(2026-10-01 갱신: 서버 프로젝트 목록 확인으로도 완료가 들어온다. 목록 경로에는 추가 알림을 두지 않는다. [049 명세](../049-generation-list-completion/spec.md) FR-007 참조)*"를 붙인다. 다른 문장은 바꾸지 않는다
+- [X] T008 [S4] `specs/048-generation-outcome-payload/spec.md` 가정 섹션의 "생성 결과는 원격 알림으로만 들어오므로, 로컬 결과 알림을 제거해도 … 원격 알림이 아닌 결과 경로가 생기면 그때 알림 방식을 다시 정한다." 문장 끝에 "*(2026-10-01 갱신: 서버 프로젝트 목록 확인으로도 완료가 들어온다. 목록 경로에는 추가 알림을 두지 않는다. [049 명세](../049-generation-list-completion/spec.md) FR-007 참조)*"를 붙인다. 다른 문장은 바꾸지 않는다
 
 ---
 
 ## 전체 완료 검증 (마지막 적용 단위 뒤, `[no-write]`)
 
-- [ ] T009 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 결과를 기록한다(SC-001, SC-003, SC-004, SC-005, SC-006)
-- [ ] T010 [no-write] [S4] [quickstart.md](./quickstart.md) "2. 문서 확인"으로 048 가정에 갱신 표시가 있는지 확인한다(SC-007)
+- [X] T009 [no-write] `"$project_build_runner" build`, `"$project_build_runner" compile`, `"$project_build_runner" test`를 순서대로 실행하고 결과를 기록한다(SC-001, SC-003, SC-004, SC-005, SC-006)
+- [X] T010 [no-write] [S4] [quickstart.md](./quickstart.md) "2. 문서 확인"으로 048 가정에 갱신 표시가 있는지 확인한다(SC-007)
 - [ ] T011 [no-write] [S1] [S2] [S3] 실기기에서 [quickstart.md](./quickstart.md) "3. 실기기 검증" 1~6을 확인한다(SC-001, SC-002). 실기기를 쓸 수 없거나 알림 누락을 재현할 수 없으면 미검증으로 기록하고 PR 미검증 범위에 적는다
-- [ ] T012 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
+- [X] T012 [no-write] 실행 전후 `git status --porcelain`을 비교해 검증 작업이 추적 파일을 바꾸지 않았는지 확인한다
 
 ---
 
