@@ -236,10 +236,10 @@ target으로 나눈 이유가 빌드 그래프에 그대로 드러난다.
 
 ## 가정
 
-- 역할 target의 이름은 계획 단계에서 확정한다. 사용자가 쓴 역할 어휘(Implement, Interface,
-  Dependency, Test)를 유지하되 프로젝트의 축약 금지 규칙과 target 이름 규칙을 적용한다. 기본안은
-  `DomainUseCaseImplementation`, `DomainUseCaseInterface`, `DomainUseCaseDependency`,
-  `DomainUseCaseTests`다.
+- 역할 target의 이름은 [Domain 패키지 규칙](../../docs/package-rules/domain.md#역할별-타깃-구성)의
+  표를 따른다. production target은 `DomainUseCaseImplementation`, `DomainUseCaseInterface`,
+  `DomainUseCaseDependency`다. UseCase Test 역할의 test target은 패키지 전체 test target인
+  `DomainTests`로 두어 소스 루트 `Tests/`를 이름에서 계산할 수 있게 한다(2026-10-05 사용자 결정).
 - 폴더 배치의 기본안은 `Domain/<역할>/<관심사>/<형태>/`다. 기존 디렉터리 컨벤션의 관심사 세그먼트
   규칙을 Domain에 적용한 것이다.
 - 개정 대상 규칙 문서의 기본안은 `docs/package-rules/domain.md`,

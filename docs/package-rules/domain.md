@@ -53,7 +53,7 @@ Domain target은 관심사가 아니라 선언이 UseCase에 대해 맡는 역�
 | `DomainUseCaseInterface` | `UseCaseInterface/` | UseCase 계약, 모델, Value Object, 식별자, 오류 | 없음 |
 | `DomainUseCaseDependency` | `UseCaseDependency/` | UseCase 구현이 생성자로 주입받는 외부 기능 계약(Repository 등) | `DomainUseCaseInterface` |
 | `DomainUseCaseImplementation` | `UseCaseImplementation/` | UseCase 계약의 구현 | `DomainUseCaseInterface`, `DomainUseCaseDependency` |
-| `DomainUseCaseTests` | `Tests/` | 위 target의 테스트와 Test Double | 위 세 target |
+| `DomainTests` | `Tests/` | 위 target의 테스트와 Test Double | 위 세 target |
 
 - 새 선언은 위 표의 역할로 target을 정합니다. 관심사가 늘어도 target을 추가하지 않고 관심사
   세그먼트를 추가합니다.
