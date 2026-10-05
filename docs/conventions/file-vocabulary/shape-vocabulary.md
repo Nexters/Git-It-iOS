@@ -10,10 +10,11 @@
 
 | 소스 루트 | 1뎁스 폴더 | 담는 선언 |
 | --- | --- | --- |
-| `Domain/<관심사>/` | `Models/` | 비즈니스 모델과 값 타입 |
-| | `Contracts/` | Domain이 외부에 요구하는 계약 프로토콜 |
-| | `UseCases/` | 유스케이스 계약과 그 구현 |
+| `Domain/UseCaseInterface/<관심사>/` | `UseCases/` | 유스케이스 계약 |
+| | `Models/` | 비즈니스 모델과 값 타입 |
 | | `Errors/` | Domain 오류 타입 |
+| `Domain/UseCaseDependency/<관심사>/` | `Contracts/` | Domain이 외부에 요구하는 계약 프로토콜 |
+| `Domain/UseCaseImplementation/<관심사>/` | `UseCases/` | 유스케이스 계약의 구현 |
 | `Data/<관심사>/` | `DTOs/` | 외부 전송 모델 |
 | | `Requests/` | 요청 값 타입 |
 | | `Endpoints/` | 엔드포인트와 요청 조립 |
