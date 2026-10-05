@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import DomainAccount
+@testable import DomainUseCaseImplementation
 
 @Suite("Account 로그인 가용성")
 struct AccountAvailabilityTests {

@@ -1,7 +1,8 @@
 import DataAuthentication
 import DataMember
 import DataShared
-import DomainUserInfo
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - UserInfoRepositoryAdapter
 

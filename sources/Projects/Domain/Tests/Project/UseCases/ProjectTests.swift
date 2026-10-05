@@ -1,7 +1,9 @@
+import DomainUseCaseDependency
 import Foundation
 import Testing
 
-@testable import DomainProject
+@testable import DomainUseCaseImplementation
+@testable import DomainUseCaseInterface
 
 @Suite("Project")
 struct ProjectTests {

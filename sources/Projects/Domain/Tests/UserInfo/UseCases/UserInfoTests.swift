@@ -1,7 +1,8 @@
 import Foundation
 import Testing
 
-@testable import DomainUserInfo
+@testable import DomainUseCaseImplementation
+@testable import DomainUseCaseInterface
 
 @Suite("UserInfo")
 struct UserInfoTests {

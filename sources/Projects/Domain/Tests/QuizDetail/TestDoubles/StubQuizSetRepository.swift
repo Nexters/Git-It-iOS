@@ -1,4 +1,5 @@
-@testable import DomainQuizDetail
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 struct StubQuizSetRepository: QuizSetRepository {
 

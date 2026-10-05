@@ -1,10 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainAppSetting
-import DomainIdentifier
-import DomainProject
-import DomainQuizDetail
-import DomainUserInfo
+import DomainUseCaseInterface
 import Foundation
 
 @Reducer

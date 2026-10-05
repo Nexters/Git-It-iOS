@@ -1,4 +1,4 @@
-import DomainQuizDetail
+import DomainUseCaseInterface
 
 actor QuizDetailUseCaseChoiceGradingStub {
 

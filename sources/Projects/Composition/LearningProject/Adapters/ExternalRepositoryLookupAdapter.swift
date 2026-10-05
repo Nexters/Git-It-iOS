@@ -1,9 +1,10 @@
 import DataExternalRepository
-import DomainExternalRepository
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - ExternalRepositoryLookupAdapter
 
-public struct ExternalRepositoryLookupAdapter: DomainExternalRepository.ExternalRepositoryLookup {
+public struct ExternalRepositoryLookupAdapter: DomainUseCaseDependency.ExternalRepositoryLookup {
 
     // MARK: Lifecycle
 
@@ -16,13 +17,13 @@ public struct ExternalRepositoryLookupAdapter: DomainExternalRepository.External
     public func repository(
         owner: String,
         name: String,
-    ) async throws -> DomainExternalRepository.ExternalRepository {
+    ) async throws -> DomainUseCaseInterface.ExternalRepository {
         do {
             let response = try await remote.repository(GitHubRepositoryRequest(
                 owner: owner,
                 repository: name,
             ))
-            return DomainExternalRepository.ExternalRepository(
+            return DomainUseCaseInterface.ExternalRepository(
                 canonicalURL: response.htmlURL,
                 ownerName: response.ownerLogin,
                 repositoryName: response.repositoryName,

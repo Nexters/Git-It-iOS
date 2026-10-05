@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import DesignSystem
-import DomainQuizDetail
 import SwiftUI
 import UIComponent
 

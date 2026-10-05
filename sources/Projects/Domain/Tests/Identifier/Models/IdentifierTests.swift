@@ -1,6 +1,6 @@
 import Testing
 
-@testable import DomainIdentifier
+@testable import DomainUseCaseInterface
 
 @Suite("Identifier")
 struct IdentifierTests {

@@ -1,6 +1,7 @@
 import DataLearningProject
 import DataNotification
-import DomainProjectGeneration
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - GenerationOutcomeRepositoryAdapter
 

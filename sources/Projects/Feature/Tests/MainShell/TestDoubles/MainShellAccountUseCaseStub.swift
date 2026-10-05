@@ -1,4 +1,4 @@
-import DomainAccount
+import DomainUseCaseInterface
 
 actor MainShellAccountUseCaseStub: AccountUseCase {
 

@@ -1,7 +1,8 @@
+import DomainUseCaseDependency
 import Foundation
 import Synchronization
 
-@testable import DomainProjectGeneration
+@testable import DomainUseCaseInterface
 
 final class StubGenerationOutcomeRepository: GenerationOutcomeRepository, Sendable {
 

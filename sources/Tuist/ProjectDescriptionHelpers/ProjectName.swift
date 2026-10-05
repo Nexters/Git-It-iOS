@@ -99,24 +99,12 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        DomainModuleName.DomainIdentifier.rawValue,
-                        DomainModuleName.DomainAccount.rawValue,
-                        DomainModuleName.DomainUserInfo.rawValue,
-                        DomainModuleName.DomainAppSetting.rawValue,
-                        DomainModuleName.DomainExternalRepository.rawValue,
-                        DomainModuleName.DomainQuizDetail.rawValue,
-                        DomainModuleName.DomainProject.rawValue,
-                        DomainModuleName.DomainProjectGeneration.rawValue,
+                        DomainModuleName.DomainUseCaseInterface.rawValue,
+                        DomainModuleName.DomainUseCaseDependency.rawValue,
+                        DomainModuleName.DomainUseCaseImplementation.rawValue,
                     ],
                     testTargets: [
-                        DomainModuleName.DomainIdentifierTests.rawValue,
-                        DomainModuleName.DomainAccountTests.rawValue,
-                        DomainModuleName.DomainUserInfoTests.rawValue,
-                        DomainModuleName.DomainAppSettingTests.rawValue,
-                        DomainModuleName.DomainExternalRepositoryTests.rawValue,
-                        DomainModuleName.DomainQuizDetailTests.rawValue,
-                        DomainModuleName.DomainProjectTests.rawValue,
-                        DomainModuleName.DomainProjectGenerationTests.rawValue,
+                        DomainModuleName.DomainTests.rawValue
                     ],
                 )]
 

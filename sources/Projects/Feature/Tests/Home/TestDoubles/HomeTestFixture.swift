@@ -1,5 +1,4 @@
-import DomainProject
-import DomainUserInfo
+import DomainUseCaseInterface
 
 enum HomeTestFixture {
 

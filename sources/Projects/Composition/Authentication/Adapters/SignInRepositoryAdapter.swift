@@ -1,6 +1,7 @@
 import DataAuthentication
 import DataShared
-import DomainAccount
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - SignInRepositoryAdapter

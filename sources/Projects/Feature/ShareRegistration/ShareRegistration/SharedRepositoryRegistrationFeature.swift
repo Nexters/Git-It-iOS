@@ -1,8 +1,6 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainExternalRepository
-import DomainIdentifier
-import DomainProjectGeneration
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 @Reducer

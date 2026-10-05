@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainIdentifier
-import DomainProject
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - ProjectListFeature

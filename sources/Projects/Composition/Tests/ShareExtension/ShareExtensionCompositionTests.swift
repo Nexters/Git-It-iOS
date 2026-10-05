@@ -5,8 +5,7 @@ import Testing
 @testable import CompositionShareExtension
 @testable import DataAuthentication
 @testable import DataLearningProject
-@testable import DomainAccount
-@testable import DomainProjectGeneration
+@testable import DomainUseCaseInterface
 
 // MARK: - ShareExtensionCompositionTests
 

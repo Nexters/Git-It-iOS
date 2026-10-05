@@ -4,7 +4,7 @@ import Testing
 
 @testable import CompositionAuthentication
 @testable import DataAuthentication
-@testable import DomainAccount
+@testable import DomainUseCaseInterface
 
 // MARK: - SignInRepositoryAdapterTests
 

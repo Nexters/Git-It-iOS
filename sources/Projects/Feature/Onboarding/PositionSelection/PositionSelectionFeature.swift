@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainUserInfo
+import DomainUseCaseInterface
 
 @Reducer
 public struct PositionSelectionFeature: Sendable {

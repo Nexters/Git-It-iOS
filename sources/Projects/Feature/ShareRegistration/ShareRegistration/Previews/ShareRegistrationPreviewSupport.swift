@@ -1,6 +1,6 @@
 #if DEBUG
 import ComposableArchitecture
-import DomainExternalRepository
+import DomainUseCaseInterface
 
 // MARK: - ShareRegistrationPreviewSupport
 

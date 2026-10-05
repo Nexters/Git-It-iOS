@@ -1,4 +1,5 @@
-@testable import DomainAppSetting
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 struct StubNotificationAuthorization: NotificationAuthorization {
 

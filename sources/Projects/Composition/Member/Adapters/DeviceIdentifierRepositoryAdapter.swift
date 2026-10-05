@@ -1,6 +1,7 @@
 import DataMember
 import DataShared
-import DomainAppSetting
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - DeviceIdentifierRepositoryAdapter
 

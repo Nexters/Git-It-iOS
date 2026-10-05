@@ -1,6 +1,4 @@
-import DomainIdentifier
-import DomainProject
-import DomainQuizDetail
+import DomainUseCaseInterface
 
 enum ProjectDetailTestFixture {
 

@@ -1,4 +1,4 @@
-import DomainAppSetting
+import DomainUseCaseInterface
 import Foundation
 
 actor AppSettingUseCaseMock: AppSettingUseCase {

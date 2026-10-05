@@ -1,5 +1,4 @@
-import DomainExternalRepository
-import DomainIdentifier
+import DomainUseCaseInterface
 import Synchronization
 
 struct ExternalRepositoryUseCaseFixedResultStub: ExternalRepositoryUseCase {

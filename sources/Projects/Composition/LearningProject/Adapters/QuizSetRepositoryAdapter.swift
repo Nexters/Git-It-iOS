@@ -1,6 +1,6 @@
 import DataLearningProject
-import DomainIdentifier
-import DomainQuizDetail
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - QuizSetRepositoryAdapter
 

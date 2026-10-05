@@ -4,7 +4,7 @@ import Testing
 @testable import CompositionLearningProject
 @testable import DataExternalRepository
 @testable import DataShared
-@testable import DomainExternalRepository
+@testable import DomainUseCaseInterface
 
 // MARK: - ExternalRepositoryLookupAdapterTests
 

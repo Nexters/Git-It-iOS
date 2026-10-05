@@ -1,5 +1,4 @@
-import DomainAccount
-import DomainUserInfo
+import DomainUseCaseInterface
 import Testing
 
 @testable import Feature

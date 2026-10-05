@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainProject
-import DomainUserInfo
+import DomainUseCaseInterface
 import SwiftUI
 
 private enum HomePreviewFixture {

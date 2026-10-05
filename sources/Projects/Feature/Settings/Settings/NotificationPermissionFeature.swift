@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainAppSetting
+import DomainUseCaseInterface
 
 @Reducer
 public struct NotificationPermissionFeature: Sendable {

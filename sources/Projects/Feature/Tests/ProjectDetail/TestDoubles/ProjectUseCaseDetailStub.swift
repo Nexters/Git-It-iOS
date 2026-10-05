@@ -1,5 +1,4 @@
-import DomainIdentifier
-import DomainProject
+import DomainUseCaseInterface
 
 actor ProjectUseCaseDetailStub: ProjectUseCase {
 

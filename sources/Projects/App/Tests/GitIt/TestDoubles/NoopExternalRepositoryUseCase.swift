@@ -1,5 +1,4 @@
-import DomainExternalRepository
-import DomainIdentifier
+import DomainUseCaseInterface
 import Foundation
 
 struct NoopExternalRepositoryUseCase: ExternalRepositoryUseCase {

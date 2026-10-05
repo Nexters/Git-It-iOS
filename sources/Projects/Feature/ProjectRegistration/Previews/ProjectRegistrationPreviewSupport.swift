@@ -1,5 +1,4 @@
-import DomainExternalRepository
-import DomainProjectGeneration
+import DomainUseCaseInterface
 import Foundation
 
 enum ProjectRegistrationPreviewSupport {

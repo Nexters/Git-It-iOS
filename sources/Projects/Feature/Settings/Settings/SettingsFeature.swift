@@ -1,7 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainAppSetting
-import DomainUserInfo
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - SettingsFeature

@@ -1,5 +1,5 @@
-import DomainExternalRepository
-import DomainIdentifier
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 struct StubRepositoryURLParser: ExternalRepositoryLocator {
 

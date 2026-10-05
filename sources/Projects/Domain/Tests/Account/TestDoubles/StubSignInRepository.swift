@@ -1,4 +1,5 @@
-@testable import DomainAccount
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 actor StubSignInRepository: SignInRepository {
 

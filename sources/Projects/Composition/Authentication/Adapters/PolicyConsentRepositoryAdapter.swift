@@ -1,5 +1,6 @@
 import DataLegalConsent
-import DomainAccount
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - PolicyConsentRepositoryAdapter

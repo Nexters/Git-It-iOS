@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainUserInfo
 import Testing
 
 @testable import Feature

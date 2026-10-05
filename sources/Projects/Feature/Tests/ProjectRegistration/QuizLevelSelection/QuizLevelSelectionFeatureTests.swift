@@ -1,4 +1,4 @@
-import DomainProjectGeneration
+import DomainUseCaseInterface
 import Testing
 
 @testable import Feature

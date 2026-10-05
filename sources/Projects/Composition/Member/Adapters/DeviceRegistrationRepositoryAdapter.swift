@@ -1,5 +1,6 @@
 import DataMember
-import DomainAppSetting
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - DeviceRegistrationRepositoryAdapter
 

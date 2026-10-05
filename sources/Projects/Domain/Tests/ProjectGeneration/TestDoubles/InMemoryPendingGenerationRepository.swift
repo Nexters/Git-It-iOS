@@ -1,6 +1,7 @@
+import DomainUseCaseDependency
 import Foundation
 
-@testable import DomainProjectGeneration
+@testable import DomainUseCaseInterface
 
 actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 

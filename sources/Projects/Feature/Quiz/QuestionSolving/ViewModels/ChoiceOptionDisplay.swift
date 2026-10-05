@@ -1,4 +1,4 @@
-import DomainQuizDetail
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - ChoiceOptionDisplay

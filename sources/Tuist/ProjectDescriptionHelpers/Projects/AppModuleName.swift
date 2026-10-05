@@ -66,14 +66,7 @@ extension AppModuleName {
                     .target(name: AppModuleName.ShareExtension.rawValue),
                     .fromComposition(.CompositionApp),
                     .fromFeature(.Feature),
-                    .fromDomain(.DomainIdentifier),
-                    .fromDomain(.DomainAccount),
-                    .fromDomain(.DomainUserInfo),
-                    .fromDomain(.DomainAppSetting),
-                    .fromDomain(.DomainExternalRepository),
-                    .fromDomain(.DomainQuizDetail),
-                    .fromDomain(.DomainProject),
-                    .fromDomain(.DomainProjectGeneration),
+                    .fromDomain(.DomainUseCaseInterface),
                 ],
                 settings: .settings(
                     base: [
@@ -129,14 +122,7 @@ extension AppModuleName {
                     .external(.ComposableArchitecture),
                     .fromFeature(.Feature),
                     .fromComposition(.CompositionApp),
-                    .fromDomain(.DomainIdentifier),
-                    .fromDomain(.DomainAccount),
-                    .fromDomain(.DomainUserInfo),
-                    .fromDomain(.DomainAppSetting),
-                    .fromDomain(.DomainExternalRepository),
-                    .fromDomain(.DomainQuizDetail),
-                    .fromDomain(.DomainProject),
-                    .fromDomain(.DomainProjectGeneration),
+                    .fromDomain(.DomainUseCaseInterface),
                 ],
                 settings: .settings(
                     base: [
@@ -164,10 +150,6 @@ extension AppModuleName {
                 dependencies: [
                     .fromComposition(.CompositionShareExtension),
                     .fromFeature(.Feature),
-                    .fromDomain(.DomainIdentifier),
-                    .fromDomain(.DomainAccount),
-                    .fromDomain(.DomainExternalRepository),
-                    .fromDomain(.DomainProjectGeneration),
                     .external(.ComposableArchitecture),
                 ],
                 settings: .settings(

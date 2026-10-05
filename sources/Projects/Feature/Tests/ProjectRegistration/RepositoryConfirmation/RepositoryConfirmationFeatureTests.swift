@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainExternalRepository
 import Testing
 
 @testable import Feature

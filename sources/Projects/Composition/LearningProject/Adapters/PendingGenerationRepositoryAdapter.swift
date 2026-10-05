@@ -1,6 +1,6 @@
 import DataLearningProject
-import DomainIdentifier
-import DomainProjectGeneration
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - PendingGenerationRepositoryAdapter

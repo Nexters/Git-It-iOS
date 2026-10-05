@@ -2,9 +2,8 @@ import CompositionAuthentication
 import CompositionLearningProject
 import DataAuthentication
 import DataShared
-import DomainAccount
-import DomainExternalRepository
-import DomainProjectGeneration
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - ShareExtensionComposition
