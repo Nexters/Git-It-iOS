@@ -1,33 +1,30 @@
 <!--
 Sync Impact Report
-- Version change: 7.1.0 → 7.2.0
-- Modified principles: 11. 컨벤션 근거 기반 설계와 작업 생성 — 적용 스킬을
-  `/speckit-plan`·`/speckit-tasks`에서 `/speckit-converge`(새 파일 변경 작업 append)까지
-  확장하고, `/speckit-analyze`가 같은 근거 문서로 위반을 탐지하도록 검증 의무를 추가
+- Version change: 7.2.0 → 7.3.0
+- Modified principles: 7. 위험 기반 실행 단위 — 공개 선언을 제거하는 변경에 한해 사용처(상위
+  패키지)부터 역위상 순서로 구현하는 예외를 추가하고, 예외 단위는 제거만 포함하며 plan.md에
+  적용 단위와 근거를 기록하도록 규정
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/constitution-template.md (실제 헌법의
-  `## 원칙`·`## 적용` 구조와 메타데이터 블록에 맞게 재작성);
-  ✅ .specify/templates/tasks-template.md (최상위 제목을 실행 단위 형식으로 통일하고
-  integration unit 예시 추가); ✅ .specify/templates/plan-template.md (변경 불필요);
+- Templates requiring updates: ✅ .specify/templates/plan-template.md (실행 단위 진행에 제거 예외 반영);
+  ✅ .specify/templates/tasks-template.md (구성·실행 단위 순서에 제거 예외 반영);
   ✅ .specify/templates/spec-template.md (변경 불필요);
-  ✅ .specify/templates/checklist-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-converge/SKILL.md;
-  ✅ .agents/skills/speckit-analyze/SKILL.md;
-  ✅ .agents/skills/speckit-clarify/SKILL.md (명세 반영 대상 섹션을 한국어 정본 제목으로 교정);
-  ✅ .agents/skills/speckit-plan/SKILL.md, speckit-tasks/SKILL.md (7.1.0에서 반영 완료)
-- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md)는 원칙 5 참조로 동기화 완료;
-  ✅ docs/conventions/**, docs/package-rules/**, docs/architecture.md 검토 완료(변경 불필요)
-- Evidence records: 없음
+  ✅ .specify/templates/checklist-template.md (변경 불필요);
+  ✅ .specify/templates/constitution-template.md (변경 불필요)
+- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md;
+  ✅ .agents/skills/speckit-tasks/SKILL.md; ✅ .agents/skills/speckit-converge/SKILL.md
+- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md) 변경 불필요;
+  ✅ docs/architecture.md 검토 완료(의존성 표 자체는 변경 없음)
+- Evidence records: specs/048-generation-outcome-payload 분석(D1), research.md R10
 - Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 7.2.0<br>
+**버전**: 7.3.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-09-20
+**최종 수정일**: 2026-09-30
 
 ## 원칙
 
@@ -142,6 +139,10 @@ Sync Impact Report
   먼저 구현합니다. 순서의 근거는 [아키텍처 문서](../../docs/architecture.md)의 프로젝트 내부
   패키지 의존성 표이며, 고정된 패키지 이름 목록을 이 문서나 하위 산출물에 정본으로 두지
   않습니다.
+- 공개 선언을 제거하는 변경은 예외로 사용처(상위 패키지)부터 역위상 순서로 구현할 수
+  있습니다. 하위 계약을 먼저 지우면 상위 구현이 compile되지 않기 때문입니다. 이 예외를 쓰는
+  단위는 제거만 해야 하고, 새 선언 추가나 동작 변경을 섞지 않습니다. `plan.md`에는 예외를
+  적용한 단위와 근거를 기록합니다.
 - 서로 의존하지 않는 단위의 상대적 순서는 `tasks.md`가 정하고 그 근거를 함께 남깁니다.
 - 현재 명세가 변경하지 않는 패키지는 건너뛰되, 남은 적용 대상 패키지 사이의 위상 순서는
   깨지 않습니다.
