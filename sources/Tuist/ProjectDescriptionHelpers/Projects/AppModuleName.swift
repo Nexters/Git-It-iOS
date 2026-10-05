@@ -199,7 +199,7 @@ extension AppModuleName {
 
     // MARK: Private
 
-    private static let buildVersion = "8"
+    private static let buildVersion = "9"
     private static let marketingVersion = "1.0.0"
 
 }
