@@ -6,6 +6,9 @@ import Testing
 @MainActor
 @Suite("HomeFeature 이동 intent")
 struct HomeFeatureNavigationTests {
+
+    // MARK: Internal
+
     @Test
     func `프로젝트 등록 CTA는 동일한 delegate를 전달한다`() async {
         let store = makeStore()
@@ -42,12 +45,16 @@ struct HomeFeatureNavigationTests {
         await store.send(.view(.learningTapped(projectID: "missing")))
     }
 
+    // MARK: Private
+
     private func makeStore(state: HomeFeature.State = .init()) -> TestStoreOf<HomeFeature> {
         TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
     }
+
 }

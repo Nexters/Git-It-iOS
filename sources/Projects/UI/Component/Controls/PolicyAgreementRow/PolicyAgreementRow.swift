@@ -27,8 +27,9 @@ public struct PolicyAgreementRow: View {
         HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
             Button(action: onToggle) {
                 HStack(spacing: 12) {
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
+                        .frame(width: Constant.checkSize, height: Constant.checkSize)
                     StyledText.body1(title)
                 }
                 .contentShape(Rectangle())

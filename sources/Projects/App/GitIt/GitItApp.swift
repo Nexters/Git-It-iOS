@@ -4,6 +4,7 @@ import DomainAuthentication
 import DomainMember
 import Foundation
 import SwiftUI
+import UIKit
 
 #if DEBUG
 import AppDebug
@@ -46,7 +47,7 @@ struct GitItApp: App {
                 restoreSession: restoreSession,
                 signIn: composition.signIn,
                 signOut: composition.signOut,
-                observeAuthenticationOutcomes: composition.observeAuthenticationOutcomes,
+                authenticationOutcomes: composition.authenticationOutcomes,
                 fetchMemberProfile: composition.fetchMemberProfile,
                 completeCuration: composition.completeCuration,
                 policyConsent: composition.policyConsent,
@@ -56,20 +57,68 @@ struct GitItApp: App {
                 updateMemberPosition: composition.updateMemberPosition,
                 updateMemberCareerLevel: composition.updateMemberCareerLevel,
                 deleteMemberAccount: composition.deleteMemberAccount,
+                fetchExternalRepository: composition.fetchExternalRepository,
+                createLearningProject: composition.createLearningProject,
+                observeGenerationOutcomes: composition.observeGenerationOutcomes,
+                requestGenerationReminder: composition.requestGenerationReminder,
+                trackGenerationProgress: composition.trackGenerationProgress,
+                openNotificationSettings: {
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    await UIApplication.shared.open(url)
+                },
+                registerCurrentDevice: composition.registerCurrentDevice,
+                deviceTokenRefreshes: composition.deviceTokenRefreshes,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
                 resetAllForTesting: resetAllForTesting,
             )
         }
+        self.composition = composition
     }
 
     // MARK: Internal
 
+    @UIApplicationDelegateAdaptor(PushNotificationAppDelegate.self) var appDelegate
+
     let rootStore: StoreOf<AppRootFeature>
+    let composition: AppComposition
 
     var body: some Scene {
         WindowGroup {
             AppRootView(store: rootStore)
+                .task {
+                    // 콜백 주입은 Composition 경계 안에서 이뤄지고, 주입 전에 도착한
+                    // launch push는 AppDelegate의 대기 슬롯이 보관한다.
+                    await composition.bootstrap(appDelegate)
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    guard newPhase == .active else { return }
+                    rootStore.send(.view(.applicationBecameActive))
+                }
+                .onOpenURL { url in
+                    guard url.scheme == Constant.sharedLinkURLScheme else { return }
+                    guard let link = Self.takeSharedRepositoryLink() else { return }
+                    rootStore.send(.effect(.sharedRepositoryLinkReceived(link)))
+                }
         }
+    }
+
+    // MARK: Private
+
+    private enum Constant {
+        static let sharedLinkURLScheme = "gitit"
+        static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
+        static let sharedLinkStorageKey = "sharedRepositoryURL"
+    }
+
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// App Group 컨테이너에서 값을 읽는 즉시 컨테이너에서 지운다. 이후 수명은 앱 실행 중
+    /// 메모리로만 유지한다.
+    private static func takeSharedRepositoryLink() -> SharedRepositoryLink? {
+        guard let defaults = UserDefaults(suiteName: Constant.appGroupIdentifier) else { return nil }
+        guard let urlString = defaults.string(forKey: Constant.sharedLinkStorageKey) else { return nil }
+        defaults.removeObject(forKey: Constant.sharedLinkStorageKey)
+        return SharedRepositoryLink(url: urlString)
     }
 
 }

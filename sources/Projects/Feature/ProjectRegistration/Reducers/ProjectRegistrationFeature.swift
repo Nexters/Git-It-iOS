@@ -12,22 +12,63 @@ public struct ProjectRegistrationFeature: Sendable {
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
+        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
+        waitPolicy: GenerationWaitPolicy = .standard,
+        now: @escaping @Sendable () -> Date = { Date() },
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
+        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.requestGenerationReminder = requestGenerationReminder
+        self.openNotificationSettings = openNotificationSettings
+        self.waitPolicy = waitPolicy
+        self.now = now
     }
 
     // MARK: Public
 
+    /// 저장소 확인 → 이해도 선택 → 생성 확정으로 이어지는 배타적 단계다.
+    /// View 재생성으로 손실되면 사용자 흐름이 바뀌므로 Feature 상태가 소유한다.
+    public enum RegistrationStep: Equatable, Sendable {
+        case repositoryConfirmation
+        case quizLevelSelection
+        case generationConfirmation
+    }
+
     @ObservableState
     public struct State: Equatable, Sendable {
-        public init() { }
+
+        // MARK: Lifecycle
+
+        /// 공유 시트로 전달받은 URL을 링크 입력 초기값으로 1회 소비하기 위한 진입점이다.
+        /// 검증되지 않은 외부 입력이므로 기존 검증 경로를 그대로 통과한다.
+        public init(initialRepositoryURL: String = "") {
+            repositoryURLInput = initialRepositoryURL
+            pendingAutomaticValidation = !initialRepositoryURL.isEmpty
+        }
+
+        // MARK: Public
 
         public var repositoryURLInput = ""
         public var quizLevel = QuizLevel.l1
         public var validation = ValidationStatus.idle
-        public var submission = SubmissionStatus.idle
+        public var progress = RegistrationProgress.idle
+        public var step = RegistrationStep.repositoryConfirmation
         public var validationRequestID = 0
+        public var isGenerationReminderSheetPresented = false
+        /// 생성 요청을 제출한 시각이다. 최소 대기 시간 계산의 기준이 된다.
+        public var requestedAt: Date?
+        /// 도착했지만 최소 대기 시간이 남아 아직 노출하지 않은 생성 결과다.
+        public var pendingOutcome: GenerationOutcome?
+
+        // MARK: Internal
+
+        /// 초기값과 함께 세워지고 화면이 처음 나타날 때 1회만 소비되는 자동 검증 표식이다.
+        /// 자동 실행 여부는 이 화면의 상태이므로 화면이나 App이 아니라 Feature가 소유한다.
+        var pendingAutomaticValidation = false
+
     }
 
     public enum ValidationStatus: Equatable, Sendable {
@@ -37,9 +78,11 @@ public struct ProjectRegistrationFeature: Sendable {
         case failed
     }
 
-    public enum SubmissionStatus: Equatable, Sendable {
+    /// 제출부터 생성 결과 판정까지의 수명을 함께 소유하므로 이름이 그 범위를 드러낸다.
+    public enum RegistrationProgress: Equatable, Sendable {
         case idle
-        case committing
+        case submitting
+        case awaitingOutcome(ProjectRegistrationReceipt)
         case failed(LearningProjectError)
     }
 
@@ -52,30 +95,48 @@ public struct ProjectRegistrationFeature: Sendable {
 
         @CasePathable
         public enum View: Sendable, Equatable {
+            case task
             case repositoryURLChanged(String)
             case quizLevelSelected(QuizLevel)
             case validateTapped
+            case repositoryConfirmed
+            case quizLevelConfirmed
+            case stepBackTapped
             case submitTapped
+            case waitAtHomeTapped
+            case generationReminderAccepted
+            case generationReminderDeclined
+            case retryTapped
         }
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case validationFinished(requestID: Int, result: Result<ExternalRepository, ExternalRepositoryError>)
             case submissionFinished(Result<ProjectRegistrationReceipt, LearningProjectError>)
+            case generationOutcomeReceived(GenerationOutcome)
+            case waitAtHomeAuthorizationChecked(isAuthorized: Bool)
+            case minimumWaitElapsed
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectRegistered(ProjectRegistrationReceipt)
+            case generationReminderPreferenceSelected(isEnabled: Bool)
         }
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .view(.task):
+                guard state.pendingAutomaticValidation else { return .none }
+                state.pendingAutomaticValidation = false
+                return startValidation(&state)
+
             case .view(.repositoryURLChanged(let text)):
                 state.repositoryURLInput = text
                 state.validation = .idle
+                state.step = .repositoryConfirmation
                 return .none
 
             case .view(.quizLevelSelected(let level)):
@@ -83,61 +144,115 @@ public struct ProjectRegistrationFeature: Sendable {
                 return .none
 
             case .view(.validateTapped):
-                guard !state.repositoryURLInput.isEmpty else { return .none }
-                state.validationRequestID += 1
-                let currentRequestID = state.validationRequestID
-                state.validation = .validating
-                let url = state.repositoryURLInput
-                return .run { send in
-                    do {
-                        let repository = try await fetchExternalRepository(url: url)
-                        await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
-                    } catch {
-                        let mapped = error as? ExternalRepositoryError ?? .other
-                        await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
-                    }
+                return startValidation(&state)
+
+            case .view(.repositoryConfirmed):
+                guard case .validated = state.validation else { return .none }
+                state.step = .quizLevelSelection
+                return .none
+
+            case .view(.quizLevelConfirmed):
+                guard state.step == .quizLevelSelection else { return .none }
+                state.step = .generationConfirmation
+                return .none
+
+            case .view(.stepBackTapped):
+                switch state.step {
+                case .generationConfirmation:
+                    state.step = .quizLevelSelection
+
+                case .quizLevelSelection:
+                    state.step = .repositoryConfirmation
+
+                case .repositoryConfirmation:
+                    break
                 }
-                .cancellable(id: CancelID.validation, cancelInFlight: true)
+                return .none
 
             case .view(.submitTapped):
                 guard
                     case .validated(let repository) = state.validation,
-                    state.submission != .committing
+                    state.progress != .submitting
                 else { return .none }
-                state.submission = .committing
-                let quizLevel = state.quizLevel
-                return .run { send in
-                    do {
-                        let receipt = try await createLearningProject(
-                            githubRepoURL: repository.canonicalURL,
-                            quizLevel: quizLevel,
-                        )
-                        await send(.effect(.submissionFinished(.success(receipt))))
-                    } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
-                        await send(.effect(.submissionFinished(.failure(mapped))))
-                    }
+                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+
+            case .view(.retryTapped):
+                guard
+                    case .failed = state.progress,
+                    case .validated(let repository) = state.validation
+                else { return .none }
+                return submit(repository: repository, quizLevel: state.quizLevel, state: &state)
+
+            case .view(.waitAtHomeTapped):
+                guard case .awaitingOutcome = state.progress else { return .none }
+                return .run { [requestGenerationReminder] send in
+                    let isAuthorized = await requestGenerationReminder.isAuthorized()
+                    await send(.effect(.waitAtHomeAuthorizationChecked(isAuthorized: isAuthorized)))
                 }
-                .cancellable(id: CancelID.submission)
+
+            case .effect(.waitAtHomeAuthorizationChecked(let isAuthorized)):
+                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+                guard isAuthorized else {
+                    state.isGenerationReminderSheetPresented = true
+                    return .none
+                }
+                return acceptGenerationReminder(receipt: receipt)
+
+            case .view(.generationReminderAccepted):
+                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+                state.isGenerationReminderSheetPresented = false
+                return acceptGenerationReminder(receipt: receipt)
+
+            case .view(.generationReminderDeclined):
+                guard case .awaitingOutcome(let receipt) = state.progress else { return .none }
+                state.isGenerationReminderSheetPresented = false
+                return finishWaiting(receipt: receipt, isReminderEnabled: false)
 
             case .effect(.validationFinished(let requestID, let result)):
                 guard requestID == state.validationRequestID else { return .none }
                 switch result {
                 case .success(let repository):
                     state.validation = .validated(repository)
+                    state.step = .repositoryConfirmation
 
                 case .failure:
                     state.validation = .failed
+                    state.step = .repositoryConfirmation
                 }
                 return .none
 
             case .effect(.submissionFinished(.success(let receipt))):
-                state.submission = .idle
-                return .send(.delegate(.projectRegistered(receipt)))
+                state.progress = .awaitingOutcome(receipt)
+                return .none
 
             case .effect(.submissionFinished(.failure(let error))):
-                state.submission = .failed(error)
-                return .none
+                return transitionToFailure(error, state: &state)
+
+            case .effect(.generationOutcomeReceived(let outcome)):
+                guard
+                    case .awaitingOutcome(let receipt) = state.progress,
+                    outcome.projectID == receipt.projectID
+                else { return .none }
+                // 완료와 실패 모두 같은 게이트를 따른다. 최소 대기 시간이 남아 있으면 결과를
+                // 보관만 하고, 남은 시간이 지난 뒤에 한 번에 노출한다.
+                let remaining = remainingWait(requestedAt: state.requestedAt, projectID: receipt.projectID)
+                guard remaining > 0 else {
+                    // 이미 최소 대기 시간이 지났다면 추가 지연 없이 곧바로 노출한다.
+                    return applyOutcome(outcome, receipt: receipt, state: &state)
+                }
+                state.pendingOutcome = outcome
+                return .run { send in
+                    try await Task.sleep(for: .seconds(remaining))
+                    await send(.effect(.minimumWaitElapsed))
+                }
+                .cancellable(id: CancelID.minimumWait, cancelInFlight: true)
+
+            case .effect(.minimumWaitElapsed):
+                guard
+                    case .awaitingOutcome(let receipt) = state.progress,
+                    let outcome = state.pendingOutcome
+                else { return .none }
+                return applyOutcome(outcome, receipt: receipt, state: &state)
 
             case .delegate:
                 return .none
@@ -149,10 +264,142 @@ public struct ProjectRegistrationFeature: Sendable {
 
     private enum CancelID: Hashable {
         case validation
-        case submission
+        /// 구독 확립과 생성 요청, 결과 관찰이 하나의 실행 경로이므로 취소 단위도 하나다.
+        case registrationPipeline
+        /// 도착한 결과를 최소 대기 시간까지 붙잡아 두는 대기다.
+        case minimumWait
     }
 
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
+    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let openNotificationSettings: @MainActor @Sendable () async -> Void
+    private let waitPolicy: GenerationWaitPolicy
+    private let now: @Sendable () -> Date
+
+    /// 사용자가 "다음"을 누른 경로와 공유 진입의 자동 실행 경로가 같은 검증을 수행하도록
+    /// 시작 지점을 하나로 둔다.
+    private func startValidation(_ state: inout State) -> Effect<Action> {
+        guard !state.repositoryURLInput.isEmpty else { return .none }
+        state.validationRequestID += 1
+        let currentRequestID = state.validationRequestID
+        state.validation = .validating
+        let url = state.repositoryURLInput
+        return .run { send in
+            do {
+                let repository = try await fetchExternalRepository(url: url)
+                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(repository))))
+            } catch {
+                let mapped = error as? ExternalRepositoryError ?? .other
+                await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
+            }
+        }
+        .cancellable(id: CancelID.validation, cancelInFlight: true)
+    }
+
+    /// 생성 결과 구독을 먼저 확립한 뒤에 생성을 요청하고, 응답으로 받은 `projectID`로
+    /// 이미 확립된 스트림을 필터링한다. 세 단계가 순서가 보장되는 단일 실행 경로에 있으므로
+    /// 요청과 응답 사이에 도착한 결과도 스트림 버퍼에 남아 유실되지 않는다.
+    private func submit(
+        repository: ExternalRepository,
+        quizLevel: QuizLevel,
+        state: inout State,
+    ) -> Effect<Action> {
+        state.progress = .submitting
+        state.requestedAt = now()
+        state.pendingOutcome = nil
+        return .run { send in
+            let outcomes = await observeGenerationOutcomes()
+
+            let receipt: ProjectRegistrationReceipt
+            do {
+                receipt = try await createLearningProject(
+                    githubRepoURL: repository.canonicalURL,
+                    quizLevel: quizLevel,
+                )
+            } catch {
+                let mapped = error as? LearningProjectError ?? .unexpected
+                await send(.effect(.submissionFinished(.failure(mapped))))
+                return
+            }
+            await send(.effect(.submissionFinished(.success(receipt))))
+
+            for await outcome in outcomes where outcome.projectID == receipt.projectID {
+                await send(.effect(.generationOutcomeReceived(outcome)))
+                // 생성 결과는 종료 신호다. 첫 결과만 전달해 중복 수신을 구조적으로 막는다.
+                break
+            }
+        }
+        .cancellable(id: CancelID.registrationPipeline, cancelInFlight: true)
+    }
+
+    /// 실패로 전이할 때 표시 중인 리마인드 시트를 함께 닫아 사용자가 재시도나 종료를
+    /// 선택할 수 있게 한다.
+    private func transitionToFailure(
+        _ error: LearningProjectError,
+        state: inout State,
+    ) -> Effect<Action> {
+        state.progress = .failed(error)
+        state.isGenerationReminderSheetPresented = false
+        state.pendingOutcome = nil
+        return .merge(
+            .cancel(id: CancelID.registrationPipeline),
+            .cancel(id: CancelID.minimumWait),
+        )
+    }
+
+    /// 요청 시각 기준으로 아직 남은 최소 대기 시간이다. 요청 시각을 모르면 대기하지 않는다.
+    private func remainingWait(
+        requestedAt: Date?,
+        projectID: String,
+    ) -> TimeInterval {
+        guard let requestedAt else { return 0 }
+        let progress = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
+        return waitPolicy.readyDate(for: progress).timeIntervalSince(now())
+    }
+
+    /// 보관 여부와 무관하게 생성 결과를 화면에 노출하는 단일 경로다.
+    private func applyOutcome(
+        _ outcome: GenerationOutcome,
+        receipt: ProjectRegistrationReceipt,
+        state: inout State,
+    ) -> Effect<Action> {
+        state.pendingOutcome = nil
+        switch outcome.status {
+        case .completed:
+            return finishWaiting(receipt: receipt, isReminderEnabled: nil)
+
+        case .failed:
+            return transitionToFailure(.unexpected, state: &state)
+        }
+    }
+
+    private func acceptGenerationReminder(receipt: ProjectRegistrationReceipt) -> Effect<Action> {
+        .merge(
+            .run { [requestGenerationReminder, openNotificationSettings, projectID = receipt.projectID] _ in
+                if await requestGenerationReminder(projectID: projectID) == .previouslyDenied {
+                    await openNotificationSettings()
+                }
+            },
+            finishWaiting(receipt: receipt, isReminderEnabled: true),
+        )
+    }
+
+    private func finishWaiting(
+        receipt: ProjectRegistrationReceipt,
+        isReminderEnabled: Bool?,
+    ) -> Effect<Action> {
+        .merge(
+            .cancel(id: CancelID.registrationPipeline),
+            .cancel(id: CancelID.minimumWait),
+            .run { send in
+                if let isReminderEnabled {
+                    await send(.delegate(.generationReminderPreferenceSelected(isEnabled: isReminderEnabled)))
+                }
+                await send(.delegate(.projectRegistered(receipt)))
+            },
+        )
+    }
 
 }

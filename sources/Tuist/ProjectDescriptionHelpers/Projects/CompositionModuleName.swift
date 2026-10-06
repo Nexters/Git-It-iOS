@@ -36,6 +36,7 @@ extension CompositionModuleName {
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
                     .fromInfrastructure(.InfrastructureStorage),
+                    .fromInfrastructure(.InfrastructurePushMessaging),
                 ],
             )
 

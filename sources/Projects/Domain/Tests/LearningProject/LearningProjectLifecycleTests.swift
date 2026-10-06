@@ -22,7 +22,8 @@ struct LearningProjectLifecycleTests {
             quizLevel: .l1,
         )
         let fetchExternalRepository = FetchExternalRepository(
-            lookup: LifecycleExternalRepositoryLookup(repository: externalRepository)
+            lookup: LifecycleExternalRepositoryLookup(repository: externalRepository),
+            urlParser: LifecycleExternalRepositoryURLParser(),
         )
         let createLearningProject = CreateLearningProject(
             repository: LifecycleLearningProjectRepository(registration: registration)
@@ -53,6 +54,14 @@ struct LearningProjectLifecycleTests {
         await #expect(throws: LearningProjectError.notFound) {
             try await fetchLearningProjectDetail(projectID: "project-1")
         }
+    }
+}
+
+// MARK: - LifecycleExternalRepositoryURLParser
+
+private struct LifecycleExternalRepositoryURLParser: ExternalRepositoryURLParser {
+    func location(from _: String) -> ExternalRepositoryLocation? {
+        ExternalRepositoryLocation(owner: "owner", name: "repo")
     }
 }
 

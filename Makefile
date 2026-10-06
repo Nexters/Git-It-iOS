@@ -29,7 +29,7 @@ hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh
 
 format: ## 현재 변경된 Swift 소스만 포맷합니다
-	$(SWIFT_FORMAT_RUNNER) format
+	$(SWIFT_FORMAT_RUNNER) format "$$(pwd)/sources/Projects"
 
 verify-tools: ## 셸 스크립트 검증에 필요한 ShellCheck·shfmt를 준비합니다
 	./tools/script-verification/bin/prepare-tools.sh

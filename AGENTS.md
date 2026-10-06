@@ -87,7 +87,7 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 - **SwiftUI·UIComponent·TCA 구현은 공통 컨벤션을 따릅니다.** View 생성 경로와 내부
   선언은 [View](docs/conventions/view.md), 컴포넌트 역할 분류는
   [UIComponent](docs/conventions/ui-component.md), Feature 상태와 Effect는
-  [TCA](docs/conventions/tca.md) 컨벤션을 따릅니다.
+  [TCA](docs/conventions/tca/README.md) 컨벤션을 따릅니다.
 - **Figma 디자인을 화면·컴포넌트로 옮길 때는 `.agents/skills/implement-figma-ui`를 사용합니다.**
   [Figma 노드 인덱스](.agents/skills/implement-figma-ui/references/figma-index.md)로 대상 노드를
   확정하고, [컴포넌트 인덱스](.agents/skills/implement-figma-ui/references/component-index.md)와

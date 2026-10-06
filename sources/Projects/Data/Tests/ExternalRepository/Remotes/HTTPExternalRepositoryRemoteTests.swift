@@ -16,7 +16,7 @@ struct HTTPExternalRepositoryRemoteTests {
                 statusCode: 200,
                 headers: [:],
                 body: Data(#"""
-                    {"html_url":"https://github.com/facebook/react","owner":{"avatar_url":"https://avatar"},"stargazers_count":10,"topics":["swift"]}
+                    {"html_url":"https://github.com/facebook/react","name":"react","owner":{"login":"facebook","avatar_url":"https://avatar"},"stargazers_count":10,"topics":["swift"]}
                     """#.utf8),
             ))
         ])

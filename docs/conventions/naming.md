@@ -4,13 +4,13 @@
 
 **작성일**: 2026-08-13
 
-**최종 수정일**: 2026-08-21 (표준 약어 대소문자 규칙 추가)
+**최종 수정일**: 2026-08-31 (문서 간 중복 제거와 소유 문서 정리)
 
 ## 목적
 
-이 문서는 [Constitution 원칙 10](../../.specify/memory/constitution.md#10-책임과-문맥에-따른-네이밍)의 상세 적용 기준입니다. 프로젝트가 소유하는 공개 API와 패키지·선언 경계를 넘는 값의 이름을 검토할 때 사용합니다. 패키지 책임과 의존 방향은 [아키텍처 문서](../architecture.md)를 함께 따릅니다.
+이 문서는 [Constitution 원칙 10](../../.specify/memory/constitution.md#10-책임과-문맥에-따른-네이밍)의 상세 적용 기준입니다. 프로젝트가 소유하는 공개 API와 패키지·선언 경계를 넘는 값의 이름을 검토할 때 사용합니다. 상위 문서와의 우선순위는 [컨벤션 공통 규칙](./README.md#상위-문서와-충돌-해소)을 따릅니다.
 
-이 문서가 Constitution과 충돌하면 Constitution이 우선합니다. 이 문서의 예시는 판단 기준을 설명하기 위한 것이며, 특정 기능에서 사용한 이름을 다른 기능의 필수 접두어·접미어 또는 전역 어휘로 승격하지 않습니다.
+이 문서의 예시는 판단 기준을 설명하기 위한 것이며, 특정 기능에서 사용한 이름을 다른 기능의 필수 접두어·접미어 또는 전역 어휘로 승격하지 않습니다.
 
 ## 1. 적용 범위
 
@@ -110,15 +110,11 @@ Tuist target 이름은 빌드 그래프에서 소속 패키지를 식별해야 �
 포함할 수 있습니다. 반면 `sources/Projects/<패키지>/` 아래의 source·test 폴더는 이미
 패키지 문맥 안에 있으므로 target 이름의 패키지 접두어를 반복하지 않고 역할만 사용합니다.
 예를 들어 `InfrastructureAuthentication`과 `InfrastructureAuthenticationTests` target의
-source·test 폴더는 각각 `Authentication/`, `Tests/Authentication/`으로 둡니다. 테스트
-폴더의 세부 규칙은 [테스트 컨벤션](./test.md#7-파일과-target-구성)을
-따릅니다.
+source·test 폴더는 각각 `Authentication/`, `Tests/Authentication/`으로 둡니다.
 
-새 target을 추가할 때는 각 `ModuleName` enum의 `sourceDirectory` 연산 프로퍼티에서
-target 이름 앞의 패키지명을 제거해 역할 경로를 계산합니다. 테스트 target은 계산한 역할을
-`Tests/<역할>/` 아래에 배치하고, `Target.module` 또는 `Target.testModule`의 필수
-`sourceDirectory` 인자에 전달합니다. 공통 Tuist helper는 전달받은 경로에 `/**`만 붙이며,
-target 이름을 source glob의 기본값으로 사용하거나 별도 폴더명을 덧붙이지 않습니다.
+이 이름 관계를 실제 폴더 경로와 Tuist 매니페스트에 적용하는 절차는
+[디렉터리·파일 컨벤션 §3](./directory-file.md#3-소스-루트)과
+[§7](./directory-file.md#7-tuist-매니페스트와의-일치)이 소유합니다.
 
 ## 5. 접두어와 접미어
 

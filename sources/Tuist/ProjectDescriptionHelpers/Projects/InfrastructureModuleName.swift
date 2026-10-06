@@ -11,6 +11,7 @@ enum InfrastructureModuleName: String {
     case InfrastructureCacheTests
     case InfrastructureStorage
     case InfrastructureStorageTests
+    case InfrastructurePushMessaging
 }
 
 extension InfrastructureModuleName {
@@ -66,6 +67,14 @@ extension InfrastructureModuleName {
                 name: InfrastructureModuleName.InfrastructureStorage.rawValue
             ),
         ),
+        .module(
+            name: InfrastructureModuleName.InfrastructurePushMessaging.rawValue,
+            sourceDirectory: InfrastructureModuleName.InfrastructurePushMessaging.sourceDirectory,
+            dependencies: [
+                .external(.FirebaseCore),
+                .external(.FirebaseMessaging),
+            ],
+        ),
     ]
 
     var sourceDirectory: String {
@@ -74,7 +83,8 @@ extension InfrastructureModuleName {
         case .InfrastructureAuthentication,
              .InfrastructureNetworkClient,
              .InfrastructureCache,
-             .InfrastructureStorage:
+             .InfrastructureStorage,
+             .InfrastructurePushMessaging:
             directoryName
         case .InfrastructureAuthenticationTests,
              .InfrastructureNetworkClientTests,

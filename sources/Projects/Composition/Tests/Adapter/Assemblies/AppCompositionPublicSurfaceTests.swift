@@ -21,7 +21,7 @@ struct AppCompositionPublicSurfaceTests {
             "signIn",
             "signOut",
             "restoreSession",
-            "observeAuthenticationOutcomes",
+            "authenticationOutcomes",
             "refreshSession",
             "verifyAccessToken",
             "policyConsent",
@@ -41,6 +41,13 @@ struct AppCompositionPublicSurfaceTests {
             "registerMemberDevice",
             "deleteMemberAccount",
             "fetchExternalRepository",
+            "observeGenerationOutcomes",
+            "requestGenerationReminder",
+            "trackGenerationProgress",
+            "bootstrap",
+            "registerCurrentDevice",
+            "deviceTokenRefreshes",
+            "ingestGenerationOutcomePayload",
         ]
 
         #expect(labels == expected)

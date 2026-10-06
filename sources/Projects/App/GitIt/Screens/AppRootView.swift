@@ -3,6 +3,7 @@ import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Feature
+import Foundation
 import SwiftUI
 
 #if DEBUG
@@ -41,6 +42,11 @@ struct AppRootView: View {
                     ResetAllButton(action: { send(.resetAllTapped) })
                 }
             #endif
+                .fullScreenCover(
+                    item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
+                ) { store in
+                    ProjectRegistrationScreen(store: store)
+                }
         }
     }
 
@@ -80,7 +86,7 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopObserveAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCase {
+    struct NoopAuthenticationOutcomes: AuthenticationOutcomesUseCase {
         func callAsFunction() async -> AsyncStream<AuthenticationOutcome> {
             AsyncStream { _ in }
         }
@@ -160,6 +166,50 @@ private enum AppRootPreviewSupport {
         }
     }
 
+    struct NoopFetchExternalRepository: FetchExternalRepositoryUseCase {
+        func callAsFunction(url _: String) async throws -> ExternalRepository {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopCreateLearningProject: CreateLearningProjectUseCase {
+        func callAsFunction(
+            githubRepoURL _: String,
+            quizLevel _: QuizLevel,
+        ) async throws -> ProjectRegistrationReceipt {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopObserveGenerationOutcomes: ObserveGenerationOutcomesUseCase {
+        func callAsFunction() async -> AsyncStream<GenerationOutcome> {
+            AsyncStream { _ in }
+        }
+    }
+
+    struct NoopRequestGenerationReminder: RequestGenerationReminderUseCase {
+        func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+            .authorized
+        }
+
+        func isAuthorized() async -> Bool {
+            true
+        }
+    }
+
+    struct NoopTrackGenerationProgress: TrackGenerationProgressUseCase {
+        func begin(
+            projectID _: String,
+            requestedAt _: Date,
+        ) async { }
+
+        func current() async -> GenerationProgress? {
+            nil
+        }
+
+        func end() async { }
+    }
+
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = route
@@ -168,7 +218,7 @@ private enum AppRootPreviewSupport {
                 restoreSession: NoopRestoreSession(),
                 signIn: NoopSignIn(),
                 signOut: NoopSignOut(),
-                observeAuthenticationOutcomes: NoopObserveAuthenticationOutcomes(),
+                authenticationOutcomes: NoopAuthenticationOutcomes(),
                 fetchMemberProfile: NoopFetchMemberProfile(),
                 completeCuration: NoopCompleteCuration(),
                 policyConsent: NoopPolicyConsent(),
@@ -178,6 +228,11 @@ private enum AppRootPreviewSupport {
                 updateMemberPosition: NoopUpdateMemberPosition(),
                 updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),
+                fetchExternalRepository: NoopFetchExternalRepository(),
+                createLearningProject: NoopCreateLearningProject(),
+                observeGenerationOutcomes: NoopObserveGenerationOutcomes(),
+                requestGenerationReminder: NoopRequestGenerationReminder(),
+                trackGenerationProgress: NoopTrackGenerationProgress(),
             )
         }
     }

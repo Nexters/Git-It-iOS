@@ -14,7 +14,7 @@ Presentation 경계입니다. Domain이 제공하는 비즈니스 기능을 사�
 navigation intent로 출력합니다.
 
 이 문서는 Feature가 소유하는 책임과 허용 의존성을 정의합니다. `State`, `Action`,
-`Reducer`, Effect와 Store 연결의 구현 방식은 [TCA 컨벤션](../conventions/tca.md), 화면
+`Reducer`, Effect와 Store 연결의 구현 방식은 [TCA 컨벤션](../conventions/tca/README.md), 화면
 구현 방식은 [View 컨벤션](../conventions/view.md)을 따릅니다.
 
 ## 적용 범위
@@ -50,7 +50,7 @@ UI 내부 자산을 공개 계약에 포함하지 않습니다.
 ## 구현 컨벤션
 
 - TCA Feature 구성, dependency 주입, Effect 취소와 화면 연결은
-  [TCA 컨벤션](../conventions/tca.md)을 따릅니다.
+  [TCA 컨벤션](../conventions/tca/README.md)을 따릅니다.
 - 화면 생성 경로, 디자인 토큰, 내부 선언, 접근성과 프리뷰는
   [View 컨벤션](../conventions/view.md)을 따릅니다.
 - UIComponent 입력 경계와 재사용 판단은

@@ -17,7 +17,11 @@ struct HomeFeatureLoadTests {
             suspendsRequests: true,
         )
         let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.task)) {
@@ -50,7 +54,11 @@ struct HomeFeatureLoadTests {
         state.profileLoad = .failed(.temporarilyUnavailable)
         state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
         let store = TestStore(initialState: state) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.profileRetryTapped)) {
@@ -74,6 +82,7 @@ struct HomeFeatureLoadTests {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
                 fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
             )
         }
 
@@ -91,7 +100,11 @@ struct HomeFeatureLoadTests {
             suspendsRequests: true,
         )
         let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature(fetchLearningProjects: projects, fetchMemberProfile: profile)
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+            )
         }
 
         await store.send(.view(.task)) {
@@ -110,5 +123,52 @@ struct HomeFeatureLoadTests {
         await store.receive(.effect(.projectsLoadFinished(requestID: 1, result: .failure(.temporarilyUnavailable)))) {
             $0.projectLoad = .failed(.temporarilyUnavailable)
         }
+    }
+
+    @Test
+    func `프로젝트 재시도는 프로필을 보존하고 프로젝트만 다시 조회한다`() async {
+        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.oneProjectPage)])
+        var state = HomeFeature.State()
+        state.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.projectLoad = .failed(.temporarilyUnavailable)
+        let store = TestStore(initialState: state) {
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: profile,
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+            )
+        }
+
+        await store.send(.view(.projectRetryTapped)) {
+            $0.projectLoad = .loading
+            $0.projectRequestID = 1
+        }
+        await store.receive(
+            .effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.oneProjectPage)))
+        ) {
+            $0.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
+        }
+
+        #expect(await profile.snapshot().callCount == 0)
+        #expect(await projects.snapshot().callCount == 1)
+    }
+
+    @Test
+    func `실패 상태가 아니면 프로젝트 재시도는 아무 효과도 내지 않는다`() async {
+        let projects = HomeLearningProjectsUseCaseMock(results: [.success(HomeTestFixture.oneProjectPage)])
+        var state = HomeFeature.State()
+        state.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
+        let store = TestStore(initialState: state) {
+            HomeFeature(
+                fetchLearningProjects: projects,
+                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
+                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+            )
+        }
+
+        await store.send(.view(.projectRetryTapped))
+
+        #expect(await projects.snapshot().callCount == 0)
     }
 }

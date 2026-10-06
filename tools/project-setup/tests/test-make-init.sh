@@ -34,10 +34,14 @@ printf '%s\n' \
 # shellcheck disable=SC2016
 printf '%s\n' \
 	'#!/bin/sh' \
+	'printf "format|%s|%s|%s\\n" "$PWD" "$1" "$2" >>"$TEST_CALL_LOG"' >"$repository/format.sh"
+# shellcheck disable=SC2016
+printf '%s\n' \
+	'#!/bin/sh' \
 	'printf "hooks|install\\n" >>"$TEST_CALL_LOG"' \
 	>"$repository/hooks/hook-management/bin/install.sh"
 chmod +x "$repository/tools/repository-paths/bin/repository-paths.sh" \
-	"$work/bin/tuist" "$repository/setup.sh" \
+	"$work/bin/tuist" "$repository/setup.sh" "$repository/format.sh" \
 	"$repository/hooks/hook-management/bin/install.sh"
 repository=$(CDPATH='' cd -- "$repository" && pwd -P)
 
@@ -54,4 +58,11 @@ printf '%s\n' \
 	'setup|developer-tools' >"$work/expected"
 diff -u "$work/expected" "$call_log"
 
-printf 'PASS: make init\n'
+# make format이 저장소 루트의 Projects 절대 경로를 공개 runner에 전달하는지 검증합니다.
+: >"$call_log"
+TEST_CALL_LOG=$call_log make -s -C "$repository" format
+printf 'format|%s|format|%s/sources/Projects\n' \
+	"$repository" "$repository" >"$work/expected"
+diff -u "$work/expected" "$call_log"
+
+printf 'PASS: make init and format\n'

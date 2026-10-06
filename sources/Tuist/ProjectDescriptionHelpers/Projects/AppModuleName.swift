@@ -6,6 +6,7 @@ enum AppModuleName: String, CaseIterable {
     case AppDebug
     case GitIt
     case GitItTests
+    case ShareExtension
 }
 
 extension AppModuleName {
@@ -18,6 +19,8 @@ extension AppModuleName {
             directoryName
         case .GitItTests:
             "Tests/\(directoryName.droppingSuffix("Tests"))"
+        case .ShareExtension:
+            directoryName
         }
     }
 
@@ -48,8 +51,21 @@ extension AppModuleName {
                             "UIApplicationSupportsMultipleScenes": false
                         ],
                         "UIApplicationSupportsIndirectInputEvents": true,
+                        "UIBackgroundModes": [
+                            "remote-notification"
+                        ],
+                        "FirebaseAppDelegateProxyEnabled": false,
                         "GIT_IT_API_HOST": "$(GIT_IT_API_HOST)",
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
+                        "CFBundleURLTypes": [
+                            [
+                                "CFBundleTypeRole": "Editor",
+                                "CFBundleURLName": "com.nexters.hytime.gitit.sharedLink",
+                                "CFBundleURLSchemes": [
+                                    "gitit"
+                                ],
+                            ]
+                        ],
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
                             "UIInterfaceOrientationPortrait",
@@ -65,15 +81,17 @@ extension AppModuleName {
                     ]
                 ),
                 sources: ["\(sourceDirectory)/**"],
-                resources: ["\(sourceDirectory)/Resources/**"],
+                resources: [
+                    "\(sourceDirectory)/Resources/**",
+                    "Config/GoogleService-Info.plist",
+                ],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
                     .target(name: AppModuleName.AppDebug.rawValue),
+                    .target(name: AppModuleName.ShareExtension.rawValue),
                     .fromComposition(.CompositionAdapter),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
-                    .external(.FirebaseAnalytics),
-                    .external(.FirebaseCrashlytics),
                 ],
                 settings: .settings(
                     base: [
@@ -127,6 +145,38 @@ extension AppModuleName {
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                         "SWIFT_VERSION": "5.0",
                     ]
+                ),
+            )
+
+        case .ShareExtension:
+            .target(
+                name: rawValue,
+                destinations: .iOS,
+                product: .appExtension,
+                bundleId: "com.nexters.hytime.gitit.ShareExtension",
+                deploymentTargets: .iOS("26.0"),
+                infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
+                sources: ["\(sourceDirectory)/**/*.swift"],
+                entitlements: .file(path: "ShareExtension.entitlements"),
+                // 확장은 URL 형식을 판정하지 않고 그대로 앱에 넘기므로 프로젝트 내부 패키지에
+                // 의존하지 않는다.
+                dependencies: [],
+                settings: .settings(
+                    base: [
+                        "CODE_SIGN_STYLE": "Automatic",
+                        "CURRENT_PROJECT_VERSION": "1",
+                        "DEVELOPMENT_TEAM": "6924CABL23",
+                        "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        "MARKETING_VERSION": "1.0.0",
+                        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+                        "SWIFT_VERSION": "5.0",
+                        "TARGETED_DEVICE_FAMILY": "1,2",
+                    ],
+                    configurations: [
+                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
+                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                    ],
                 ),
             )
         }

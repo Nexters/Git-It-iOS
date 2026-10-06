@@ -3,6 +3,7 @@ import DomainAuthentication
 import DomainLearningProject
 import DomainMember
 import Foundation
+import Synchronization
 @testable import GitIt
 
 // MARK: - FetchMemberProfileUseCaseMock
@@ -48,6 +49,18 @@ actor ResetAllForTestingSpy {
     }
 }
 
+// MARK: - NoopRequestGenerationReminderUseCase
+
+struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
+    func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+        .authorized
+    }
+
+    func isAuthorized() async -> Bool {
+        true
+    }
+}
+
 // MARK: - AppRootTestFixture
 
 enum AppRootTestFixture {
@@ -74,8 +87,16 @@ func makeAppRootStore(
     restoreSession: RestoreSessionUseCaseMock = RestoreSessionUseCaseMock(),
     fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    observeAuthenticationOutcomes: ObserveAuthenticationOutcomesUseCaseMock = ObserveAuthenticationOutcomesUseCaseMock(),
+    authenticationOutcomes: AuthenticationOutcomesUseCaseMock = AuthenticationOutcomesUseCaseMock(),
     resetAllForTesting: (@Sendable () async -> Void)? = nil,
+    observeGenerationOutcomes: ObserveGenerationOutcomesUseCaseMock =
+        ObserveGenerationOutcomesUseCaseMock(),
+    requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
+    trackGenerationProgress: TrackGenerationProgressSpy = TrackGenerationProgressSpy(),
+    waitPolicy: GenerationWaitPolicy = .standard,
+    now: @escaping @Sendable () -> Date = { Date() },
+    registerCurrentDevice: RegisterCurrentDeviceSpy = RegisterCurrentDeviceSpy(),
+    deviceTokenRefreshes: DeviceTokenRefreshStream = DeviceTokenRefreshStream(),
     state: AppRootFeature.State = AppRootFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<AppRootFeature> {
     TestStore(initialState: state) {
@@ -83,7 +104,7 @@ func makeAppRootStore(
             restoreSession: restoreSession,
             signIn: NoopSignInUseCase(),
             signOut: signOut,
-            observeAuthenticationOutcomes: observeAuthenticationOutcomes,
+            authenticationOutcomes: authenticationOutcomes,
             fetchMemberProfile: fetchMemberProfile,
             completeCuration: NoopCompleteCurationUseCase(),
             policyConsent: NoopPolicyConsentUseCase(),
@@ -93,7 +114,138 @@ func makeAppRootStore(
             updateMemberPosition: NoopUpdateMemberPositionUseCase(),
             updateMemberCareerLevel: NoopUpdateMemberCareerLevelUseCase(),
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
+            fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
+            createLearningProject: NoopCreateLearningProjectUseCase(),
+            observeGenerationOutcomes: observeGenerationOutcomes,
+            requestGenerationReminder: requestGenerationReminder,
+            trackGenerationProgress: trackGenerationProgress,
+            waitPolicy: waitPolicy,
+            now: now,
+            registerCurrentDevice: { try await registerCurrentDevice() },
+            deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
             resetAllForTesting: resetAllForTesting,
         )
     }
+}
+
+// MARK: - TrackGenerationProgressSpy
+
+/// 진행 상태 저장·복원 호출을 관찰한다. 기기 저장소 없이 App의 수명 규칙만 검증하기 위한
+/// 대역이다.
+actor TrackGenerationProgressSpy: TrackGenerationProgressUseCase {
+
+    // MARK: Lifecycle
+
+    init(stored: GenerationProgress? = nil) {
+        self.stored = stored
+    }
+
+    // MARK: Internal
+
+    private(set) var beganCount = 0
+    private(set) var endedCount = 0
+
+    func begin(
+        projectID: String,
+        requestedAt: Date,
+    ) async {
+        beganCount += 1
+        stored = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
+    }
+
+    func current() async -> GenerationProgress? {
+        stored
+    }
+
+    func end() async {
+        endedCount += 1
+        stored = nil
+    }
+
+    // MARK: Private
+
+    private var stored: GenerationProgress?
+
+}
+
+// MARK: - RegisterCurrentDeviceSpy
+
+/// 기기 등록 호출 횟수와 결과를 관찰한다. 실패 후 재시도와 동시 trigger 직렬화를
+/// 외부 SDK·Keychain 접근 없이 검증하기 위한 대역이다.
+actor RegisterCurrentDeviceSpy {
+
+    // MARK: Lifecycle
+
+    init(results: [Result<Void, any Error>] = [.success(())]) {
+        self.results = results
+    }
+
+    // MARK: Internal
+
+    private(set) var callCount = 0
+
+    func callAsFunction() async throws {
+        callCount += 1
+        guard suspends else { try nextResult().get()
+            return
+        }
+        try await withCheckedThrowingContinuation { continuation in
+            continuations.append((continuation, nextResult()))
+        }
+    }
+
+    func setSuspends(_ suspends: Bool) {
+        self.suspends = suspends
+    }
+
+    func resumeOldest() {
+        guard !continuations.isEmpty else { return }
+        let (continuation, result) = continuations.removeFirst()
+        continuation.resume(with: result)
+    }
+
+    // MARK: Private
+
+    private var results: [Result<Void, any Error>]
+    private var suspends = false
+    private var continuations = [(CheckedContinuation<Void, any Error>, Result<Void, any Error>)]()
+
+    private func nextResult() -> Result<Void, any Error> {
+        guard !results.isEmpty else { return .success(()) }
+        return results.count > 1 ? results.removeFirst() : results[0]
+    }
+
+}
+
+// MARK: - DeviceTokenRefreshStream
+
+/// 등록 token 갱신 신호를 테스트에서 직접 방출하기 위한 대역이다.
+final class DeviceTokenRefreshStream: Sendable {
+
+    // MARK: Internal
+
+    func makeStream() -> AsyncStream<Void> {
+        let (stream, continuation) = AsyncStream<Void>.makeStream()
+        self.continuation.withLock { $0 = continuation }
+        return stream
+    }
+
+    func emit() {
+        continuation.withLock { $0?.yield(()) }
+    }
+
+    func finish() {
+        continuation.withLock { $0?.finish() }
+    }
+
+    // MARK: Private
+
+    private let continuation = Mutex<AsyncStream<Void>.Continuation?>(nil)
+
+}
+
+// MARK: - DeviceRegistrationTestError
+
+enum DeviceRegistrationTestError: Error {
+    case failed
 }

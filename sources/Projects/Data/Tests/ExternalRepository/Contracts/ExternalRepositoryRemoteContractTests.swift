@@ -11,6 +11,8 @@ struct ExternalRepositoryRemoteContractTests {
         let request = GitHubRepositoryRequest(owner: "facebook", repository: "react")
         let response = GitHubRepositoryResponseDTO(
             htmlURL: "https://github.com/facebook/react",
+            ownerLogin: "facebook",
+            repositoryName: "react",
             ownerAvatarURL: nil,
             starCount: 240000,
             topics: ["javascript"],

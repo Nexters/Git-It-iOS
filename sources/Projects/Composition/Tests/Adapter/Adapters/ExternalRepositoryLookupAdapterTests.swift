@@ -13,13 +13,15 @@ struct ExternalRepositoryLookupAdapterTests {
     func `GitHub 응답 DTO를 Domain 모델로 변환한다`() async throws {
         let remote = StubExternalRepositoryRemote(result: .success(GitHubRepositoryResponseDTO(
             htmlURL: "https://github.com/facebook/react",
+            ownerLogin: "facebook",
+            repositoryName: "react",
             ownerAvatarURL: "https://avatar",
             starCount: 10,
             topics: ["swift"],
         )))
         let adapter = ExternalRepositoryLookupAdapter(remote: remote)
 
-        let repository = try await adapter.repository(owner: "facebook", name: "react")
+        let repository = try await adapter.repository(owner: "Facebook", name: "React")
 
         #expect(repository.canonicalURL == "https://github.com/facebook/react")
         #expect(repository.ownerName == "facebook")

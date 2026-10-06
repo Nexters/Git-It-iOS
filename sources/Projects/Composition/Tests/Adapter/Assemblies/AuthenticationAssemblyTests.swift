@@ -14,7 +14,7 @@ struct AuthenticationAssemblyTests {
         _ = assembly.signIn as any SignInUseCase
         _ = assembly.signOut as any SignOutUseCase
         _ = assembly.restoreSession as any RestoreSessionUseCase
-        _ = assembly.observeAuthenticationOutcomes as any ObserveAuthenticationOutcomesUseCase
+        _ = assembly.authenticationOutcomes as any AuthenticationOutcomesUseCase
         _ = assembly.refreshSession as any RefreshSessionUseCase
         _ = assembly.verifyAccessToken as any VerifyAccessTokenUseCase
     }

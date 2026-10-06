@@ -52,7 +52,7 @@ public struct AuthenticationAssembly: Sendable {
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
-        observeAuthenticationOutcomes = ObserveAuthenticationOutcomes(
+        authenticationOutcomes = AuthenticationOutcomes(
             authenticationRepository: authenticationRepository,
             loginSessionRepository: loginSessionRepository,
         )
@@ -70,7 +70,7 @@ public struct AuthenticationAssembly: Sendable {
     public let signIn: any SignInUseCase
     public let signOut: any SignOutUseCase
     public let restoreSession: any RestoreSessionUseCase
-    public let observeAuthenticationOutcomes: any ObserveAuthenticationOutcomesUseCase
+    public let authenticationOutcomes: any AuthenticationOutcomesUseCase
     public let refreshSession: any RefreshSessionUseCase
     public let verifyAccessToken: any VerifyAccessTokenUseCase
     public let policyConsent: any PolicyConsentUseCase
