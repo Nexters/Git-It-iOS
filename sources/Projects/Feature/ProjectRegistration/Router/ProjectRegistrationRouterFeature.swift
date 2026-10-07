@@ -5,10 +5,12 @@ import Foundation
 @Reducer
 public struct ProjectRegistrationRouterFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         fetchExternalRepository: any FetchExternalRepositoryUseCase,
         createLearningProject: any CreateLearningProjectUseCase,
-        observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase,
+        trackGeneration: any TrackGenerationUseCase,
         requestGenerationReminder: any RequestGenerationReminderUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
         waitPolicy: GenerationWaitPolicy = .standard,
@@ -16,14 +18,16 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     ) {
         self.fetchExternalRepository = fetchExternalRepository
         self.createLearningProject = createLearningProject
-        self.observeGenerationOutcomes = observeGenerationOutcomes
+        self.trackGeneration = trackGeneration
         self.requestGenerationReminder = requestGenerationReminder
         self.openNotificationSettings = openNotificationSettings
         self.waitPolicy = waitPolicy
         self.now = now
     }
 
-    public enum ActiveScreen: Equatable, Sendable {
+    // MARK: Public
+
+    public enum ActiveScreen: Hashable, Sendable {
         case repositoryLinkInput
         case repositoryConfirmation
         case quizLevelSelection
@@ -39,18 +43,17 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
-        public init(initialRepositoryURL: String = "") {
-            repositoryLinkInput = RepositoryLinkInputFeature.State(initialRepositoryURL: initialRepositoryURL)
-        }
+        public init() { }
 
         public var activeScreen = ActiveScreen.repositoryLinkInput
-        public var screenTransitions: [ScreenTransition] = []
+        public var screenTransitions = [ScreenTransition]()
 
-        public var repositoryLinkInput: RepositoryLinkInputFeature.State
+        public var repositoryLinkInput = RepositoryLinkInputFeature.State()
         public var repositoryConfirmation = RepositoryConfirmationFeature.State()
         public var quizLevelSelection = QuizLevelSelectionFeature.State()
         public var quizGenerationConfirmation = QuizGenerationConfirmationFeature.State()
         public var quizGenerationProgress = QuizGenerationProgressFeature.State()
+
     }
 
     public enum Action: Sendable, Equatable {
@@ -85,7 +88,7 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         Scope(state: \.quizGenerationProgress, action: \.quizGenerationProgress) {
             QuizGenerationProgressFeature(
                 createLearningProject: createLearningProject,
-                observeGenerationOutcomes: observeGenerationOutcomes,
+                trackGeneration: trackGeneration,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
                 waitPolicy: waitPolicy,
@@ -146,15 +149,20 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         }
     }
 
+    // MARK: Private
+
     private let fetchExternalRepository: any FetchExternalRepositoryUseCase
     private let createLearningProject: any CreateLearningProjectUseCase
-    private let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    private let trackGeneration: any TrackGenerationUseCase
     private let requestGenerationReminder: any RequestGenerationReminderUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
 
-    private func activate(_ screen: ActiveScreen, state: inout State) -> Effect<Action> {
+    private func activate(
+        _ screen: ActiveScreen,
+        state: inout State,
+    ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
         state.screenTransitions.append(ScreenTransition(from: state.activeScreen, to: screen))
         state.activeScreen = screen

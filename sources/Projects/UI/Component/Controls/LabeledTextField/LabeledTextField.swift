@@ -118,7 +118,7 @@ extension LabeledTextField {
 }
 
 #Preview("LabeledTextField") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         LabeledTextField(label: "링크", placeholder: "https://github.com", text: .constant(""))
         LabeledTextField(label: "링크", placeholder: "https://github.com", text: .constant("https://github.com/gitit"))
         LabeledTextField(
@@ -130,6 +130,6 @@ extension LabeledTextField {
         )
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

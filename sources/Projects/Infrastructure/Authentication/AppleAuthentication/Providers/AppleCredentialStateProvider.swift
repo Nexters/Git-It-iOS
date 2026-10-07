@@ -1,7 +1,7 @@
 import AuthenticationServices
 import Foundation
 
-public actor AppleCredentialStateProvider {
+public struct AppleCredentialStateProvider: Sendable {
 
     // MARK: Lifecycle
 
@@ -37,20 +37,9 @@ public actor AppleCredentialStateProvider {
         (try? await stateLookup(userID)) ?? .temporarilyUnavailable
     }
 
-    public func changes() -> AsyncStream<AppleCredentialState> {
-        AsyncStream { continuation in
-            continuations.append(continuation)
-        }
-    }
-
-    public func receiveRevocation(for _: String) {
-        for continuation in continuations { continuation.yield(.revoked) }
-    }
-
     // MARK: Private
 
     private let stateLookup: @Sendable (String) async throws -> AppleCredentialState
-    private var continuations = [AsyncStream<AppleCredentialState>.Continuation]()
 
     private static func liveState(for userID: String) async throws -> AppleCredentialState {
         try await withCheckedThrowingContinuation { continuation in

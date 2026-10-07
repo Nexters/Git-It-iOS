@@ -13,11 +13,4 @@ struct RestoreSessionResultTests {
         #expect(results[1] == .unauthenticated)
         #expect(results[2] == .recoverableFailure)
     }
-
-    @Test
-    func `AuthenticationOutcome과 별개 타입이다`() {
-        let user = AuthenticatedUser(id: "user-1", availability: .available, displayName: nil)
-
-        #expect(type(of: AuthenticationOutcome.authenticated(user)) != type(of: RestoreSessionResult.authenticated(user)))
-    }
 }

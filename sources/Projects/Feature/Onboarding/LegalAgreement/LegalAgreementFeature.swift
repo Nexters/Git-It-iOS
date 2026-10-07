@@ -6,21 +6,27 @@ import Foundation
 @Reducer
 public struct LegalAgreementFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(policyConsent: any PolicyConsentUseCase) {
         self.policyConsent = policyConsent
     }
 
+    // MARK: Public
+
     @ObservableState
     public struct State: Equatable, Sendable {
 
+        // MARK: Lifecycle
+
         public init() { }
+
+        // MARK: Public
 
         public var requiredDocuments = [PolicyDocument]()
         public var storedConsentRecords = [PolicyConsentRecord]()
         public var selectedDocumentIDs = Set<String>()
         public var presentedDocumentID: String?
-
-        var pendingNeedsCuration: Bool?
 
         public var presentedDocument: PolicyDocument? {
             guard let presentedDocumentID else { return nil }
@@ -41,6 +47,7 @@ public struct LegalAgreementFeature: Sendable {
         public var isStoredConsentValid: Bool {
             PolicyConsentRecord.isConsentValid(storedRecords: storedConsentRecords, for: requiredDocuments)
         }
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -48,6 +55,8 @@ public struct LegalAgreementFeature: Sendable {
         case effect(EffectEvent)
         case input(Input)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -67,12 +76,12 @@ public struct LegalAgreementFeature: Sendable {
         @CasePathable
         public enum Input: Sendable, Equatable {
             case load
-            case prepare(needsCuration: Bool)
+            case prepare
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case consentCompleted(needsCuration: Bool)
+            case consentCompleted
             case cancelled
         }
     }
@@ -97,8 +106,7 @@ public struct LegalAgreementFeature: Sendable {
                     )
                 }
 
-            case .input(.prepare(let needsCuration)):
-                state.pendingNeedsCuration = needsCuration
+            case .input(.prepare):
                 state.selectedDocumentIDs = []
                 return .none
 
@@ -129,11 +137,10 @@ public struct LegalAgreementFeature: Sendable {
             case .view(.cancelTapped):
                 state.selectedDocumentIDs = []
                 state.presentedDocumentID = nil
-                state.pendingNeedsCuration = nil
                 return .send(.delegate(.cancelled))
 
             case .view(.continueTapped):
-                guard state.canContinue, let needsCuration = state.pendingNeedsCuration else { return .none }
+                guard state.canContinue else { return .none }
                 let records = state.requiredDocuments
                     .filter { state.selectedDocumentIDs.contains($0.identifier) }
                     .map {
@@ -144,10 +151,9 @@ public struct LegalAgreementFeature: Sendable {
                         )
                     }
                 state.storedConsentRecords = records
-                state.pendingNeedsCuration = nil
                 return .run { send in
                     try? await policyConsent.saveConsentRecords(records)
-                    await send(.delegate(.consentCompleted(needsCuration: needsCuration)))
+                    await send(.delegate(.consentCompleted))
                 }
 
             case .effect(.documentsLoaded(let documents, let records)):
@@ -160,6 +166,8 @@ public struct LegalAgreementFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private let policyConsent: any PolicyConsentUseCase
 

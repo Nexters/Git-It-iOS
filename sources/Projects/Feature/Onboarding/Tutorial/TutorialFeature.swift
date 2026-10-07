@@ -5,6 +5,8 @@ import DomainMember
 @Reducer
 public struct TutorialFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(
         signIn: any SignInUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
@@ -14,6 +16,8 @@ public struct TutorialFeature: Sendable {
         self.deleteMemberAccount = deleteMemberAccount
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
+
+    // MARK: Public
 
     public enum AuthenticationStatus: Equatable, Sendable {
         case idle
@@ -47,6 +51,7 @@ public struct TutorialFeature: Sendable {
         public var isShowingRecoverableError: Bool {
             authentication == .retryableFailure || authentication == .cancelled
         }
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -54,6 +59,8 @@ public struct TutorialFeature: Sendable {
         case effect(EffectEvent)
         case input(Input)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -70,11 +77,13 @@ public struct TutorialFeature: Sendable {
         @CasePathable
         public enum Input: Sendable, Equatable {
             case returnToLastPage
+            case startSignIn
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case appeared
+            case signInRequested
             case signInSucceeded(needsCuration: Bool)
         }
     }
@@ -90,6 +99,10 @@ public struct TutorialFeature: Sendable {
                 return .none
 
             case .view(.appleSignInTapped):
+                guard state.authentication != .signingIn else { return .none }
+                return .send(.delegate(.signInRequested))
+
+            case .input(.startSignIn):
                 guard state.authentication != .signingIn else { return .none }
                 return startSignIn(&state)
 
@@ -129,6 +142,8 @@ public struct TutorialFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum Constant {
         static let pageCount = 3

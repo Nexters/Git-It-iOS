@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor StubFetchLearningProjectDetailUseCase: FetchLearningProjectDetailUseCase {
+actor StubFetchLearningProjectDetailUseCase {
 
     // MARK: Lifecycle
 
@@ -12,6 +12,10 @@ actor StubFetchLearningProjectDetailUseCase: FetchLearningProjectDetailUseCase {
 
     private(set) var callCount = 0
     private(set) var requestedProjectIDs = [String]()
+
+    nonisolated var fetchDetail: @Sendable (String) async throws -> LearningProjectDetail {
+        { try await self(projectID: $0) }
+    }
 
     func callAsFunction(projectID: String) async throws -> LearningProjectDetail {
         callCount += 1

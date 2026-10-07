@@ -7,6 +7,8 @@ public struct LearningProjectPage: Equatable, Sendable {
         self.hasNext = hasNext
     }
 
+    public static let firstIndex = 0
+
     public let items: [LearningProjectSummary]
     public let hasNext: Bool
 }

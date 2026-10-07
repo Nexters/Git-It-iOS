@@ -13,16 +13,16 @@ extension LegalAgreementScreen {
         var body: some View {
             Button(action: onToggle) {
                 HStack(spacing: Constant.checkSpacing) {
-                    ResourceImage(asset: isSelected ? .icon(.checkmarkChecked) : .icon(.checkmarkDisable))
+                    ResourceImage(asset: isSelected ? .icon(.statusCheck) : .icon(.statusDisabled))
                         .designSystemForeground(isSelected ? .blue100 : .grey400)
                         .frame(width: Constant.checkSize, height: Constant.checkSize)
-                    StyledText.body1(Constant.title)
+                    StyledText.body2(Constant.title)
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, Constant.rowHorizontalPadding)
                 .frame(height: Constant.rowHeight)
                 .frame(maxWidth: .infinity)
-                .designSystemBackground(.raisedBackground)
+                .designSystemBackground(.grey500)
                 .designSystemCornerRadius(.medium)
                 .contentShape(Rectangle())
             }

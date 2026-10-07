@@ -1,5 +1,6 @@
 import DesignSystem
 import SwiftUI
+import UIKit
 
 public struct ActionButton: View {
 
@@ -40,23 +41,25 @@ public struct ActionButton: View {
         case secondary
         case destructive
         case text
+        case primaryText
 
         // MARK: Internal
 
         func backgroundColor(isEnabled: Bool) -> Color {
             switch self {
-            case .text:
+            case .text,
+                 .primaryText:
                 return Color(designSystem: ColorToken.clear)
 
             case .secondary:
-                return Color(designSystem: SemanticColorToken.raisedBackground)
+                return Color(designSystem: ColorToken.grey500)
 
             case .primary:
-                guard isEnabled else { return Color(designSystem: SemanticColorToken.raisedBackground) }
-                return Color(designSystem: SemanticColorToken.brandAccent)
+                guard isEnabled else { return Color(designSystem: ColorToken.grey500) }
+                return Color(designSystem: ColorToken.blue100)
 
             case .destructive:
-                guard isEnabled else { return Color(designSystem: SemanticColorToken.raisedBackground) }
+                guard isEnabled else { return Color(designSystem: ColorToken.grey500) }
                 return Color(designSystem: ColorToken.error)
             }
         }
@@ -67,6 +70,8 @@ public struct ActionButton: View {
             switch self {
             case .primary:
                 return .grey700
+            case .primaryText:
+                return .blue100
             case .secondary,
                  .destructive,
                  .text:
@@ -103,21 +108,24 @@ public struct ActionButton: View {
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button(action: {
+            Self.hapticGenerator.impactOccurred()
+            action()
+        }) {
             ZStack {
                 content
                     .frame(maxWidth: .infinity)
                     .frame(height: size.surfaceHeight)
-                    .background(
-                        style.backgroundColor(isEnabled: isEnabled),
-                        in: RoundedRectangle(designSystem: .large),
-                    )
             }
-            .frame(minHeight: size.touchHeight)
-            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
+        .frame(minHeight: size.touchHeight)
+        .contentShape(Rectangle())
+        .background(
+            style.backgroundColor(isEnabled: isEnabled),
+            in: RoundedRectangle(designSystem: .large),
+        )
     }
 
     public static func primary(
@@ -234,6 +242,21 @@ public struct ActionButton: View {
         Self(
             styledText: styledText,
             style: .text,
+            size: size,
+            isEnabled: isEnabled,
+            action: action,
+        )
+    }
+
+    public static func primaryText(
+        _ title: String,
+        size: Size = .large,
+        isEnabled: Bool = true,
+        action: @escaping () -> Void = { },
+    ) -> Self {
+        Self(
+            title: title,
+            style: .primaryText,
             size: size,
             isEnabled: isEnabled,
             action: action,
@@ -246,6 +269,8 @@ public struct ActionButton: View {
         case title(String)
         case styled(StyledText)
     }
+
+    private static let hapticGenerator = UIImpactFeedbackGenerator(style: .light)
 
     private let label: Label
     private let style: Style
@@ -271,7 +296,7 @@ public struct ActionButton: View {
 }
 
 #Preview("Action Button") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ActionButton.primary("Primary")
         ActionButton.secondary("Secondary")
         ActionButton.destructive("Destructive")
@@ -280,6 +305,6 @@ public struct ActionButton: View {
         ActionButton.text("Disabled Text", isEnabled: false)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

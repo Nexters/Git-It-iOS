@@ -153,7 +153,7 @@ struct ProfileFeatureTests {
         fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
     ) -> TestStoreOf<ProfileFeature> {
         TestStore(initialState: state) {
-            ProfileFeature(fetchMemberProfile: fetchMemberProfile)
+            ProfileFeature(fetchMemberProfile: fetchMemberProfile.fetchProfile)
         }
     }
 

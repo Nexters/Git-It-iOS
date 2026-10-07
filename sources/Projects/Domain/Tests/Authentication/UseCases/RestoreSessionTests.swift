@@ -119,7 +119,7 @@ struct RestoreSessionTests {
     }
 
     @Test
-    func `AuthenticationOutcome을 재사용하지 않는 별개 타입을 반환한다`() async {
+    func `세션 복원 전용 결과 타입을 반환한다`() async {
         let recorder = RestoreSessionCallRecorder()
         let restoreSession = makeRestoreSession(
             sessionBehavior: .missing,
@@ -202,10 +202,6 @@ private actor RestoreSessionAuthenticationRepository: AuthenticationRepository {
     func authorizationStatus() async throws -> AuthorizationStatus {
         await recorder.append(.authorizationStatus)
         return status
-    }
-
-    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
-        AsyncStream { $0.finish() }
     }
 
     func clearAuthentication() async throws {

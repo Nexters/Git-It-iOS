@@ -13,20 +13,6 @@ private enum ProfilePreviewFixture {
         WeeklyLearningCount(dayLabel: "일", count: 0),
     ]
 
-    static func profile(
-        position: MemberPosition?,
-        careerLevel: CareerLevel?,
-        statistics: LearningStatistics,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: "프로덕션에 푸시하는 고양이",
-            email: "kimlee@github.io",
-            position: position,
-            careerLevel: careerLevel,
-            statistics: statistics,
-        )
-    }
-
     static let emptyStatistics = LearningStatistics(
         thisWeekSolvedCount: 0,
         thisMonthSolvedCount: 0,
@@ -40,6 +26,20 @@ private enum ProfilePreviewFixture {
         streakDays: 4,
         weeklyCounts: weeklyCounts,
     )
+
+    static func profile(
+        position: MemberPosition?,
+        careerLevel: CareerLevel?,
+        statistics: LearningStatistics,
+    ) -> MemberProfile {
+        MemberProfile(
+            name: "프로덕션에 푸시하는 고양이",
+            email: "kimlee@github.io",
+            position: position,
+            careerLevel: careerLevel,
+            statistics: statistics,
+        )
+    }
 
     @MainActor
     static func store(profileLoad: ProfileFeature.State.ProfileLoad) -> StoreOf<ProfileFeature> {

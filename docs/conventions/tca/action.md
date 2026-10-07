@@ -17,8 +17,8 @@
 Effect를 반환하며, 앞으로 할 일을 그대로 명령하는 `fetchProjects` 같은 View Action을
 만들지 않습니다. Effect 자체의 작성 방식은 [Effect 컨벤션](./effect.md)을 따릅니다.
 
-상위 문서와의 우선순위는
-[컨벤션 공통 규칙](../README.md#상위-문서와-충돌-해소)을 따릅니다.
+문서 우선순위, 문서 구조와 문서 간 참조 규칙은
+[컨벤션 공통 원칙](../common/README.md)이 소유합니다.
 
 ## 1. 적용 범위
 
@@ -30,72 +30,22 @@ Effect를 반환하며, 앞으로 할 일을 그대로 명령하는 `fetchProjec
 
 ## 2. 출처 분류
 
-Action은 기본적으로 발생 출처에 따라 `view`, `effect`, `delegate`로 분류합니다. 부모의
-외부 조정 신호가 실제로 필요할 때만 `input`을, composition이 있을 때만 child Action과
-`destination`을 추가합니다. 사용하지 않는 분류를 형식적으로 만들지 않습니다.
+Action은 기본적으로 발생 출처에 따라 `view`, `effect`, `delegate`로 분류합니다.
 
-| 분류 | 보내는 주체 | 역할 |
-| --- | --- | --- |
-| `view` | SwiftUI 화면 | 사용자 입력과 화면 lifecycle 사건 |
-| `input` | 부모 Feature 또는 App | 외부 조정 신호 |
-| `effect` | Effect | 비동기 완료·실패·stream event |
-| child case | Child Reducer | Feature composition |
-| `destination` | TCA presentation | sheet·alert·내부 화면 Action |
-| `delegate` | 현재 Reducer | 부모 또는 App에 전달할 결과·의도 |
-
-TCA 화면은 `@ViewAction`과 `ViewAction`을 사용해 화면이 `View` Action만 보낼 수 있도록
-경계를 코드로 드러냅니다.
-
-```swift
-public enum Action: ViewAction, Sendable, Equatable {
-    case view(View)
-    case effect(EffectEvent)
-    case delegate(Delegate)
-
-    @CasePathable
-    public enum View: Sendable, Equatable {
-        case task
-        case retryTapped
-        case projectRowTapped(projectID: String)
-        case deletionConfirmed
-    }
-
-    public enum EffectEvent: Sendable, Equatable {
-        case projectsLoadFinished(
-            requestID: Int,
-            result: Result<LearningProjectPage, LearningProjectError>
-        )
-    }
-
-    public enum Delegate: Sendable, Equatable {
-        case learningRequested(route: LearningRoute)
-    }
-}
-```
+→ [Action 출처 분류](./action/source.md)
 
 ## 3. 이름과 payload
 
-- View Action은 `retryTapped`, `refreshRequested`, `deletionConfirmed`처럼 관찰된 사용자
-  사건이나 lifecycle 사건으로 이름을 짓습니다.
-- `fetchProjects`, `deleteProject`, `navigateToQuiz`, `showError`처럼 앞으로 할 작업이나
-  구현 결정을 View Action 이름으로 사용하지 않습니다.
-- 성공과 실패를 하나의 `Result`로 전달하는 Effect event는
-  `projectsLoadFinished`처럼 완료된 작업을 표현합니다. `Response`는 실제 응답 객체가
-  Feature 경계에서 의미를 가질 때만 사용합니다.
-- Delegate는 `learningRequested`, `projectSelected`, `authenticationRequired`처럼
-  Feature가 외부에 알리는 의미를 표현하고 `pushProjectDetail`처럼 App의 전환 방식을
-  명령하지 않습니다.
-- Delegate payload는 App이 제거될 Child State를 다시 조회하지 않고도 즉시 해석할 수
-  있도록 목적지 결정에 필요한 값을 완전하게 전달합니다.
-- 사용자가 직접 발생시킬 수 없는 Effect event와 delegate를 View가 보내지 못하게
-  Action 접근 경계를 유지합니다.
+View Action은 관찰된 사건, Effect event는 완료된 작업, Delegate는 외부에 알리는 의미를 이름으로 표현합니다.
+
+→ [Action 이름과 payload](./action/naming.md)
 
 ## 4. Binding Action
 
-`BindableAction`은 아직 제출되지 않은 텍스트, selection과 local form toggle처럼 화면의
-draft 입력을 변경하는 용도로 제한합니다. 삭제, 탈퇴, 북마크 또는 서버 정본을 즉시
-바꾸는 작업은 binding setter에서 실행하지 않고 `submitTapped`, `deletionConfirmed`와
-같은 명시적인 View Action을 거칩니다.
+`BindableAction`은 아직 제출되지 않은 텍스트, selection과 local form toggle처럼 화면의 draft 입력을 변경하는 용도로
+제한합니다.
+
+→ [Binding Action](./action/binding.md)
 
 ## 5. 검토 체크리스트
 

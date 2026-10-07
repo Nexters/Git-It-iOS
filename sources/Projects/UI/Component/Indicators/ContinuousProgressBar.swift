@@ -5,11 +5,31 @@ public struct ContinuousProgressBar: View {
 
     // MARK: Lifecycle
 
-    public init(progress: Double) {
+    public init(
+        progress: Double,
+        height: Height = .row,
+    ) {
         self.progress = Self.clampedProgress(progress)
+        self.height = height
     }
 
     // MARK: Public
+
+    public enum Height: Sendable, Equatable {
+        case row
+        case detail
+
+        // MARK: Internal
+
+        var value: CGFloat {
+            switch self {
+            case .row:
+                Constant.rowHeight
+            case .detail:
+                Constant.detailHeight
+            }
+        }
+    }
 
     public var body: some View {
         GeometryReader { proxy in
@@ -22,7 +42,7 @@ public struct ContinuousProgressBar: View {
                     .frame(width: proxy.size.width * progress)
             }
         }
-        .frame(height: Constant.surfaceHeight)
+        .frame(height: height.value)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("학습 진행률")
         .accessibilityValue("\(Int((progress * 100).rounded()))퍼센트")
@@ -31,14 +51,14 @@ public struct ContinuousProgressBar: View {
     // MARK: Internal
 
     static var surfaceHeight: CGFloat {
-        Constant.surfaceHeight
+        Constant.rowHeight
     }
 
-    static var trackColorToken: SemanticColorToken {
+    static var trackColorToken: ColorToken {
         Constant.trackColorToken
     }
 
-    static var fillColorToken: SemanticColorToken {
+    static var fillColorToken: ColorToken {
         Constant.fillColorToken
     }
 
@@ -51,23 +71,25 @@ public struct ContinuousProgressBar: View {
     // MARK: Private
 
     private enum Constant {
-        static let surfaceHeight: CGFloat = 6
-        static let trackColorToken = SemanticColorToken.progressTrack
-        static let fillColorToken = SemanticColorToken.progressFill
+        static let rowHeight: CGFloat = 6
+        static let detailHeight: CGFloat = 10
+        static let trackColorToken = ColorToken.grey500
+        static let fillColorToken = ColorToken.blue200
     }
 
     private let progress: Double
+    private let height: Height
 
 }
 
 #Preview("Continuous Progress Bar") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         ContinuousProgressBar(progress: 0)
         ContinuousProgressBar(progress: 0.45)
         ContinuousProgressBar(progress: 1)
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

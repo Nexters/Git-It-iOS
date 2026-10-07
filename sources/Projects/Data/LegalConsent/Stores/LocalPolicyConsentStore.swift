@@ -1,6 +1,6 @@
 import InfrastructureStorage
 
-public struct LocalPolicyConsentStore: PolicyConsentStore {
+public struct LocalPolicyConsentStore: Sendable {
 
     // MARK: Lifecycle
 

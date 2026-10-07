@@ -17,7 +17,7 @@ struct SavedFeatureTests {
         let store = makeStore(
             fetchBookmarkedQuestions: fetchBookmarkedQuestions,
             state: SavedFeature.State(
-                projectFilter: ProjectDetailTestFixture.projectID,
+                initialProjectFilter: ProjectDetailTestFixture.projectID,
                 isBackControlPresented: true,
             ),
         )
@@ -31,16 +31,40 @@ struct SavedFeatureTests {
     }
 
     @Test
-    func `필터가 고정되어 있으면 다른 프로젝트로 바꿀 수 없다`() async {
+    func `프로젝트에서 진입해도 다른 프로젝트 필터로 바꿔 다시 조회한다`() async {
         let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(
             results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
         )
         let store = makeStore(
             fetchBookmarkedQuestions: fetchBookmarkedQuestions,
-            state: SavedFeature.State(projectFilter: ProjectDetailTestFixture.projectID),
+            state: SavedFeature.State(initialProjectFilter: ProjectDetailTestFixture.projectID),
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.filterSelected(projectID: "project-2"))) {
+            $0.selectedProjectID = "project-2"
+        }
+        await store.receive(\.effect.bookmarksLoadFinished)
+
+        await store.send(.view(.filterSelected(projectID: nil))) {
+            $0.selectedProjectID = nil
+        }
+        await store.receive(\.effect.bookmarksLoadFinished)
+
+        #expect(await fetchBookmarkedQuestions.requestedProjectIDs == ["project-2", nil])
+    }
+
+    @Test
+    func `이미 선택된 필터를 다시 누르면 조회하지 않는다`() async {
+        let fetchBookmarkedQuestions = StubFetchBookmarkedQuestionsUseCase(
+            results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
+        )
+        let store = makeStore(
+            fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+            state: SavedFeature.State(initialProjectFilter: ProjectDetailTestFixture.projectID),
         )
 
-        await store.send(.view(.filterSelected(projectID: "project-2")))
+        await store.send(.view(.filterSelected(projectID: ProjectDetailTestFixture.projectID)))
 
         #expect(await fetchBookmarkedQuestions.callCount == 0)
     }
@@ -106,19 +130,51 @@ struct SavedFeatureTests {
         await store.send(.view(.backTapped))
     }
 
+    @Test
+    func `북마크를 해제하면 목록에서 제거하지 않고 상태만 갱신한다`() async {
+        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
+        let setQuestionBookmark = StubSetQuestionBookmarkUseCase(
+            results: [.success(BookmarkState(bookmarked: false))]
+        )
+        let store = makeStore(setQuestionBookmark: setQuestionBookmark)
+        store.exhaustivity = .off
+
+        await store.send(.view(.task))
+        await store.receive(\.effect.bookmarksLoadFinished)
+
+        await store.send(.view(.bookmarkToggleTapped(question)))
+        await store.receive(\.effect.bookmarkToggleFinished) {
+            $0.bookmarkOverrides[question.questionID] = false
+            $0.bookmarkMutations[question.questionID] = .idle
+        }
+
+        #expect(await setQuestionBookmark.invocations == [
+            StubSetQuestionBookmarkUseCase.Invocation(
+                projectID: question.projectID,
+                questionID: question.questionID,
+                bookmarked: false,
+            )
+        ])
+        #expect(store.state.collection?.bookmarks.contains(where: { $0.questionID == question.questionID }) == true)
+    }
+
     // MARK: Private
 
     private func makeStore(
         fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase = StubFetchBookmarkedQuestionsUseCase(
             results: [.success(ProjectDetailTestFixture.savedQuestionCollection)]
         ),
+        setQuestionBookmark: StubSetQuestionBookmarkUseCase = StubSetQuestionBookmarkUseCase(),
         state: SavedFeature.State = SavedFeature.State(
-            projectFilter: ProjectDetailTestFixture.projectID,
+            initialProjectFilter: ProjectDetailTestFixture.projectID,
             isBackControlPresented: true,
         ),
     ) -> TestStoreOf<SavedFeature> {
         TestStore(initialState: state) {
-            SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+            SavedFeature(
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions.fetchBookmarks,
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
     }
 

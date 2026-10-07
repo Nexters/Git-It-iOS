@@ -85,7 +85,7 @@ struct SingleQuestionEntryFeatureTests {
         ),
     ) -> TestStoreOf<SingleQuestionEntryFeature> {
         TestStore(initialState: state) {
-            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)
+            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet.fetchSet)
         }
     }
 

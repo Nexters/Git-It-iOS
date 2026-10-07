@@ -40,22 +40,32 @@ public struct Chip: View {
     private let isSelected: Bool
     private let onTap: () -> Void
 
-    private var backgroundColor: SemanticColorToken {
-        isSelected ? .brandAccent : .raisedBackground
+    private var backgroundColor: ColorToken {
+        isSelected ? .blue100 : .grey600
     }
 
     private var labelColor: ColorToken {
-        isSelected ? .grey700 : .blue100
+        isSelected ? .grey700 : .grey100
     }
 
 }
 
+// MARK: Chip.Constant
+
+extension Chip {
+    enum Constant {
+        static let height: CGFloat = 36
+        static let horizontalPadding: CGFloat = 8
+        static let labelLineLimit = 1
+    }
+}
+
 #Preview("Chip") {
-    HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+    HStack(spacing: LayoutToken.compactSpacing) {
         Chip(label: "전체", isSelected: true) { }
         Chip(label: "SwiftUI", isSelected: false) { }
         Chip(label: "동시성", isSelected: false) { }
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

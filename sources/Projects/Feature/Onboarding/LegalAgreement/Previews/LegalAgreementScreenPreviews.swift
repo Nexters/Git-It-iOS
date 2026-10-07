@@ -2,8 +2,8 @@ import ComposableArchitecture
 import DesignSystem
 import SwiftUI
 
-private extension LegalAgreementFeature.State {
-    static func preview(
+extension LegalAgreementFeature.State {
+    fileprivate static func preview(
         selectedDocumentIDs: Set<String> = [],
         presentedDocumentID: String? = nil,
     ) -> Self {

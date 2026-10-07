@@ -48,6 +48,11 @@ rg -q 'lint-changed-swift\.sh' "$workflow"
 rg -q 'needs\.swift-lint\.result' "$workflow"
 rg -q 'GIT_IT_SCRIPT_VERIFICATION_RUNNER' "$workflow"
 
+# 패키지 의존성 검사는 변경 분류와 무관하게 실행되고 gate 결과에 포함되어야 합니다.
+rg -q '^  package-dependencies:' "$workflow"
+rg -q 'GIT_IT_PACKAGE_DEPENDENCY_RUNNER' "$workflow"
+rg -q 'needs\.package-dependencies\.result' "$workflow"
+
 # build -> compile -> test가 분리된 job으로, 이 순서의 needs 의존을 유지하는지 고정합니다.
 rg -q '^  build:' "$workflow"
 rg -q '^  compile:' "$workflow"

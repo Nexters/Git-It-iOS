@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPBookmarkRemote
 
-public struct HTTPBookmarkRemote: BookmarkRemote {
+public struct HTTPBookmarkRemote: Sendable {
 
     // MARK: Lifecycle
 

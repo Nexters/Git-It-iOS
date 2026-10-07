@@ -45,6 +45,7 @@ extension DataModuleName {
                 dependencies: [
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -55,6 +56,10 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataAuthentication.rawValue
                 ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureStorage),
+                ],
             )
 
         case .DataLearningProject:
@@ -124,7 +129,8 @@ extension DataModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -135,6 +141,9 @@ extension DataModuleName {
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication)
+                ],
             )
         }
     }

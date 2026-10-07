@@ -2,8 +2,8 @@ import ComposableArchitecture
 import DomainMember
 import SwiftUI
 
-private extension CareerSelectionFeature.State {
-    static func preview(
+extension CareerSelectionFeature.State {
+    fileprivate static func preview(
         careerLevel: CareerLevel? = nil,
         submission: CareerSelectionFeature.Submission = .idle,
     ) -> Self {

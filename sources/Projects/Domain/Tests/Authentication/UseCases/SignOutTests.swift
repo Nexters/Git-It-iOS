@@ -116,10 +116,6 @@ private actor SignOutAuthenticationRepository: AuthenticationRepository {
         .temporarilyUnavailable
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
-        AsyncStream { $0.finish() }
-    }
-
     func clearAuthentication() async throws {
         await recorder.append(.clearAuthentication)
         if shouldFail {

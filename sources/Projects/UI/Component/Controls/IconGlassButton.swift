@@ -6,13 +6,13 @@ public struct IconGlassButton: View {
     // MARK: Lifecycle
 
     public init(
-        symbol: String,
+        icon: Icon,
         label: String,
         style: Style = .neutral,
         size: Size = .small,
         action: @escaping () -> Void = { },
     ) {
-        self.symbol = symbol
+        self.icon = icon
         self.label = label
         self.style = style
         self.size = size
@@ -20,6 +20,8 @@ public struct IconGlassButton: View {
     }
 
     // MARK: Public
+
+    public typealias Icon = ResourceImage.Asset.Icon
 
     public enum Style: Sendable, Equatable {
         case neutral
@@ -74,8 +76,8 @@ public struct IconGlassButton: View {
 
     public var body: some View {
         Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: size.iconSize))
+            ResourceImage(asset: .icon(icon))
+                .frame(width: size.iconSize, height: size.iconSize)
                 .designSystemForeground(style.tintColor)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .frame(width: size.surfaceSize, height: size.surfaceSize)
@@ -93,35 +95,35 @@ public struct IconGlassButton: View {
     }
 
     public static func neutral(
-        symbol: String,
+        icon: Icon,
         label: String,
         size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
-        Self(symbol: symbol, label: label, style: .neutral, size: size, action: action)
+        Self(icon: icon, label: label, style: .neutral, size: size, action: action)
     }
 
     public static func accent(
-        symbol: String,
+        icon: Icon,
         label: String,
         size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
-        Self(symbol: symbol, label: label, style: .accent, size: size, action: action)
+        Self(icon: icon, label: label, style: .accent, size: size, action: action)
     }
 
     public static func destructive(
-        symbol: String,
+        icon: Icon,
         label: String,
         size: Size = .small,
         action: @escaping () -> Void = { },
     ) -> Self {
-        Self(symbol: symbol, label: label, style: .destructive, size: size, action: action)
+        Self(icon: icon, label: label, style: .destructive, size: size, action: action)
     }
 
     // MARK: Private
 
-    private let symbol: String
+    private let icon: Icon
     private let label: String
     private let style: Style
     private let size: Size
@@ -130,18 +132,18 @@ public struct IconGlassButton: View {
 }
 
 #Preview("Icon Glass Button") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
-        HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-            IconGlassButton.neutral(symbol: "chevron.left", label: "뒤로 가기")
-            IconGlassButton.accent(symbol: "bookmark", label: "저장하기")
-            IconGlassButton.destructive(symbol: "trash", label: "삭제하기")
+    VStack(spacing: LayoutToken.margin) {
+        HStack(spacing: LayoutToken.gutter) {
+            IconGlassButton.neutral(icon: .chevronLeft, label: "뒤로 가기")
+            IconGlassButton.accent(icon: .bookmark, label: "저장하기")
+            IconGlassButton.destructive(icon: .minus, label: "삭제하기")
         }
-        HStack(spacing: LayoutToken.gutter.cgFloatValue) {
-            IconGlassButton.neutral(symbol: "chevron.left", label: "뒤로 가기", size: .small)
-            IconGlassButton.accent(symbol: "bookmark", label: "저장하기", size: .medium)
+        HStack(spacing: LayoutToken.gutter) {
+            IconGlassButton.neutral(icon: .chevronLeft, label: "뒤로 가기", size: .small)
+            IconGlassButton.accent(icon: .bookmark, label: "저장하기", size: .medium)
         }
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.blue500)
 }

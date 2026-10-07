@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-03 (화면 전용 서브뷰 허용과 UseCase 구현 금지 명시)
+**최종 수정일**: 2026-09-13 (아키텍처 결정 기록의 Feature 주입 규범을 제약조건으로 이관)
 
 ## 설명
 
@@ -66,6 +66,10 @@ UI 내부 자산을 공개 계약에 포함하지 않습니다.
 - Infrastructure의 기술 API를 참조해서는 안 됩니다.
 - Composition에 직접 접근해 dependency를 조회해서는 안 됩니다.
 - Repository 또는 production 구현체를 Feature 내부에서 생성해서는 안 됩니다.
+- 필수 UseCase에 기본 live 값을 주는 initializer로 App 주입을 우회해서는 안 됩니다.
+  dependency 누락은 런타임 fallback이 아니라 컴파일 오류로 드러나야 합니다.
+- 상위 Feature가 하위 Feature에 UseCase를 전달할 때 구현을 교체하거나 새로 생성해서는 안
+  되며, 하위가 사용하는 최소 subset만 전달합니다.
 - Domain의 비즈니스 규칙을 Feature에 다시 구현해서는 안 됩니다.
 - 재사용 가능한 UI 컴포넌트를 소유해서는 안 됩니다.
 - Feature State, Action 또는 업무 모델을 UIComponent 공개 API에 노출해서는 안 됩니다.

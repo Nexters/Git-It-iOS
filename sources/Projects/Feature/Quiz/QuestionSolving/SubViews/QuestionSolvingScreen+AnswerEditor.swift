@@ -8,6 +8,7 @@ extension QuestionSolvingScreen {
         // MARK: Internal
 
         @Binding var text: String
+
         var isFocused: FocusState<Bool>.Binding
 
         let placeholder: String
@@ -15,24 +16,25 @@ extension QuestionSolvingScreen {
         let isDisabled: Bool
 
         var body: some View {
-            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing) {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
                         StyledText.body1(placeholder, color: .grey400)
-                            .padding(Constant.textInset)
+                            .allowsHitTesting(false)
                     }
 
                     TextEditor(text: $text)
                         .scrollContentBackground(.hidden)
-                        .scrollDisabled(true)
+                        .contentMargins(.all, 0, for: .scrollContent)
+                        .font(Font.designSystem(Constant.textStyle))
+                        .designSystemLineSpacing(Constant.textStyle)
                         .focused(isFocused)
                         .designSystemForeground(.grey100)
-                        .padding(.horizontal, Constant.editorHorizontalInset)
                         .disabled(isDisabled)
-                        .frame(maxHeight: Constant.maximumHeight)
                 }
-                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight)
-                .designSystemBackground(.cardBackground)
+                .padding(Constant.textInset)
+                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight, alignment: .top)
+                .designSystemBackground(.grey600)
                 .designSystemCornerRadius(.small)
                 .overlay {
                     RoundedRectangle(designSystem: .small)
@@ -49,10 +51,10 @@ extension QuestionSolvingScreen {
         // MARK: Private
 
         private enum Constant {
+            static let textStyle = TextStyleToken.body1
             static let minimumHeight: CGFloat = 160
             static let maximumHeight: CGFloat = 240
             static let textInset: CGFloat = 16
-            static let editorHorizontalInset: CGFloat = 12
         }
 
         private var borderToken: BorderToken {

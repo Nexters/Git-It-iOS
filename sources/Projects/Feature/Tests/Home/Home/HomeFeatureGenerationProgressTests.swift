@@ -68,8 +68,8 @@ struct HomeFeatureGenerationProgressTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: profile.fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -90,8 +90,8 @@ struct HomeFeatureGenerationProgressTests {
         TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
     }

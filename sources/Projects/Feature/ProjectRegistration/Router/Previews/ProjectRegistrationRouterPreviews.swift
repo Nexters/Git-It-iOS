@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
-private extension ProjectRegistrationRouterFeature.State {
-    static func preview(activeScreen: ProjectRegistrationRouterFeature.ActiveScreen) -> Self {
+extension ProjectRegistrationRouterFeature.State {
+    fileprivate static func preview(activeScreen: ProjectRegistrationRouterFeature.ActiveScreen) -> Self {
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = activeScreen
         state.repositoryConfirmation.repository = ProjectRegistrationPreviewSupport.repository

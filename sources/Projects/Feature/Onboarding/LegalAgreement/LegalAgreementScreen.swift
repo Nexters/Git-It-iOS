@@ -4,10 +4,10 @@ import DomainAuthentication
 import SwiftUI
 import UIComponent
 
+// MARK: - LegalAgreementScreen
+
 @ViewAction(for: LegalAgreementFeature.self)
 struct LegalAgreementScreen: View {
-
-    // MARK: Internal
 
     @Bindable var store: StoreOf<LegalAgreementFeature>
 
@@ -15,8 +15,8 @@ struct LegalAgreementScreen: View {
         SheetSurface(isScrollable: true) {
             VStack(alignment: .leading, spacing: 0) {
                 StyledText.subtitle1("약관 동의")
-                    .padding(.top, LayoutToken.gutter.cgFloatValue)
-                    .padding(.bottom, LayoutToken.gutter.cgFloatValue)
+                    .padding(.top, LayoutToken.gutter)
+                    .padding(.bottom, Constant.titleBottomSpacing)
 
                 Self.AllAgreementRow(
                     isSelected: store.isAllSelected,
@@ -32,11 +32,12 @@ struct LegalAgreementScreen: View {
                             onToggle: { send(.documentToggled(documentID: document.identifier)) },
                             onOpenLink: { send(.documentLinkTapped(documentID: document.identifier)) },
                         )
-                        .padding(.leading, 19)
+                        .padding(.leading, Constant.documentRowLeadingPadding)
                     }
                 }
+                .padding(.top, Constant.documentsTopSpacing)
 
-                HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                HStack(spacing: LayoutToken.compactSpacing) {
                     ActionButton.secondary("취소", action: { send(.cancelTapped) })
 
                     ActionButton.primary(
@@ -50,11 +51,15 @@ struct LegalAgreementScreen: View {
         }
     }
 
-
 }
 
-private extension LegalAgreementScreen {
-    enum Constant {
+// MARK: LegalAgreementScreen.Constant
+
+extension LegalAgreementScreen {
+    fileprivate enum Constant {
         static let actionsTopSpacing: CGFloat = 25
+        static let titleBottomSpacing: CGFloat = 10
+        static let documentsTopSpacing: CGFloat = 7
+        static let documentRowLeadingPadding: CGFloat = 17
     }
 }

@@ -2,7 +2,6 @@ import SwiftUI
 import UIComponent
 
 extension ProfileScreen {
-    /// 주간 문제 풀이량 막대 그래프 카드(Figma `1539:19236`).
     struct WeeklyChartView: View {
 
         // MARK: Internal
@@ -12,7 +11,7 @@ extension ProfileScreen {
         var body: some View {
             VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
                 VStack(alignment: .leading, spacing: Constant.headerSpacing) {
-                    StyledText.caption2(Constant.sectionLabel, color: .grey400)
+                    StyledText.body3(Constant.sectionLabel, color: .grey400)
                     StyledText.subtitle3(display.weeklyTitle)
                 }
 
@@ -61,7 +60,6 @@ extension ProfileScreen {
             static let barCornerRadius: CGFloat = 4
         }
 
-        /// 막대 최대 높이 = 막대 행 높이 − 수치 라벨 높이 − 라벨·막대 간격.
         private var maxBarHeight: CGFloat {
             Constant.barsHeight - Constant.labelRowHeight - Constant.countToBarSpacing
         }

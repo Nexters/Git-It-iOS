@@ -1,0 +1,12 @@
+# 패키지별 허용 의존성입니다. docs/architecture.md 3.1 표와 1:1로 대응해야 합니다.
+#
+# 형식: <패키지>: <허용 패키지 공백 구분>
+# 허용 의존성이 없으면 콜론 뒤를 비웁니다. target 단위 예외는 두지 않습니다.
+
+App: Feature Composition Domain
+Composition: Domain Data Infrastructure
+Feature: Domain UI
+Domain:
+Data: Infrastructure
+Infrastructure:
+UI:

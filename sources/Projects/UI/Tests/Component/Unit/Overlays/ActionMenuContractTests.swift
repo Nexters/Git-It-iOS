@@ -5,23 +5,16 @@ import Testing
 @Suite("ActionMenu 계약")
 struct ActionMenuContractTests {
     @Test
-    func `두 항목은 내부 가용 높이를 채워 181x126pt와 내부 여백을 보존한다`() {
-        #expect(ActionMenu.menuWidth == 181)
-        #expect(ActionMenu.menuHeight == 126)
-        #expect(ActionMenu.topPadding == 8)
-        #expect(ActionMenu.horizontalPadding == 14)
-        #expect(ActionMenu.bottomPadding == 9)
-        #expect(ActionMenu.availableContentHeight == 109)
-        #expect(ActionMenu.itemMinimumHeight(itemCount: 2) == 54.5)
-        #expect(ActionMenu.contentMinimumHeight(itemCount: 2) == 109)
-        #expect(ActionMenu.menuMinimumHeight(itemCount: 2) == 126)
+    func `메뉴 표면은 폭 160과 4pt 컨테이너 여백을 보존한다`() {
+        #expect(ActionMenu.menuWidth == 160)
+        #expect(ActionMenu.containerPadding == 4)
     }
 
     @Test
-    func `항목 수가 늘면 각 항목의 44pt 터치 영역을 보존하며 메뉴가 확장된다`() {
-        #expect(ActionMenu.itemMinimumHeight(itemCount: 3) == 44)
-        #expect(ActionMenu.contentMinimumHeight(itemCount: 3) == 132)
-        #expect(ActionMenu.menuMinimumHeight(itemCount: 3) == 149)
+    func `행은 좌우 10 상 9 하 10 여백을 보존한다`() {
+        #expect(ActionMenu.rowHorizontalPadding == 10)
+        #expect(ActionMenu.rowTopPadding == 9)
+        #expect(ActionMenu.rowBottomPadding == 10)
     }
 
     @Test
@@ -48,5 +41,28 @@ struct ActionMenuContractTests {
 
         #expect(item.title == "프로젝트 삭제")
         #expect(item.accessibilityLabel == "학습 프로젝트 삭제 모드 열기")
+    }
+
+    @Test
+    func `역할을 지정하지 않으면 일반 행으로 취급한다`() {
+        let item = ActionMenu.Item(
+            id: "close",
+            title: "메뉴 닫기",
+            accessibilityLabel: "메뉴 닫기",
+        )
+
+        #expect(item.role == .normal)
+    }
+
+    @Test
+    func `파괴적 역할을 명시적으로 지정할 수 있다`() {
+        let item = ActionMenu.Item(
+            id: "delete",
+            title: "삭제하기",
+            role: .destructive,
+            accessibilityLabel: "프로젝트 삭제",
+        )
+
+        #expect(item.role == .destructive)
     }
 }

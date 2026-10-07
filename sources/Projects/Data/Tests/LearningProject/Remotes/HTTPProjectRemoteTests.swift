@@ -32,6 +32,29 @@ struct HTTPProjectRemoteTests {
     }
 
     @Test
+    func `목록 응답의 항목과 다음 페이지 여부를 그대로 보존한다`() async throws {
+        let transport = StubHTTPTransport(results: [
+            .response(jsonResponse(
+                statusCode: 200,
+                envelope: #"""
+                    {"success":true,"data":{"items":[{"projectId":"project-1","repositoryName":"repo","repositoryImageUrl":null,"techStack":["Swift"],"currentSetLabel":"Set 1","currentSetTitle":"Basics","nextSetId":null,"nextQuestionId":null,"overallProgressPercent":0}],"hasNext":true},"code":null,"message":null,"errors":null}
+                    """#,
+            ))
+        ])
+        let remote = makeRemote(transport: transport)
+
+        let page = try await remote.fetchProjects(page: 0, size: 20)
+
+        #expect(page.items.count == 1)
+        #expect(page.items.first?.projectID == "project-1")
+        #expect(page.items.first?.currentSetLabel == "Set 1")
+        #expect(page.items.first?.currentSetTitle == "Basics")
+        #expect(page.items.first?.techStack == ["Swift"])
+        #expect(page.items.first?.overallProgressPercent == 0)
+        #expect(page.hasNext)
+    }
+
+    @Test
     func `프로젝트 상세 응답을 Domain 표기와 일치하는 DTO로 변환한다`() async throws {
         let transport = StubHTTPTransport(results: [
             .response(jsonResponse(

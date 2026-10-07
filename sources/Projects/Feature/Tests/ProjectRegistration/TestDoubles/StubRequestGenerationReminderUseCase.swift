@@ -20,6 +20,11 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
         return nextResult()
     }
 
+    func requestAuthorization() async -> NotificationAuthorizationOutcome {
+        authorizationRequestCount += 1
+        return nextResult()
+    }
+
     func isAuthorized() async -> Bool {
         isAuthorizedResult
     }
@@ -28,11 +33,16 @@ actor StubRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
         (callCount, lastProjectID)
     }
 
+    func authorizationRequestSnapshot() -> Int {
+        authorizationRequestCount
+    }
+
     // MARK: Private
 
     private var results: [NotificationAuthorizationOutcome]
     private let isAuthorizedResult: Bool
     private var callCount = 0
+    private var authorizationRequestCount = 0
     private var lastProjectID: String?
 
     private func nextResult() -> NotificationAuthorizationOutcome {

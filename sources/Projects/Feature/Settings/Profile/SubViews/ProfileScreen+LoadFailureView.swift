@@ -2,7 +2,6 @@ import SwiftUI
 import UIComponent
 
 extension ProfileScreen {
-    /// 프로필 조회 실패 시 재시도 가능한 오류 안내(FR-007).
     struct LoadFailureView: View {
 
         // MARK: Internal

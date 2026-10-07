@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import DomainLearningProject
@@ -20,11 +21,9 @@ struct FetchLearningProjectsTests {
             overallProgressPercent: 40,
         )
         let page = LearningProjectPage(items: [summary], hasNext: true)
-        let fetchLearningProjects = FetchLearningProjects(
-            repository: FetchLearningProjectsRepository(behavior: .succeed(page))
-        )
+        let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result == page)
     }
@@ -56,25 +55,117 @@ struct FetchLearningProjectsTests {
             ),
         ]
         let page = LearningProjectPage(items: items, hasNext: false)
-        let fetchLearningProjects = FetchLearningProjects(
-            repository: FetchLearningProjectsRepository(behavior: .succeed(page))
-        )
+        let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
 
-        let result = try await fetchLearningProjects()
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
 
         #expect(result.items.count == items.count)
     }
 
     @Test
     func `미인증 오류를 그대로 전파한다`() async throws {
-        let fetchLearningProjects = FetchLearningProjects(
-            repository: FetchLearningProjectsRepository(behavior: .fail(.unauthorized))
-        )
+        let fetchLearningProjects = makeFetchLearningProjects(behavior: .fail(.unauthorized))
 
         await #expect(throws: LearningProjectError.unauthorized) {
-            try await fetchLearningProjects()
+            try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
         }
     }
+
+    @Test
+    func `생성 중인 레포지토리는 결과 목록에서 제외한다`() async throws {
+        let creatingItem = LearningProjectSummary(
+            projectID: "creating-project",
+            repositoryName: "repo-creating",
+            repositoryImageURL: nil,
+            techStack: [],
+            currentSetLabel: "Set 1",
+            currentSetTitle: "title",
+            nextSetID: "set-1",
+            nextQuestionID: "question-1",
+            overallProgressPercent: 0,
+        )
+        let readyItem = LearningProjectSummary(
+            projectID: "ready-project",
+            repositoryName: "repo-ready",
+            repositoryImageURL: nil,
+            techStack: [],
+            currentSetLabel: "Set 1",
+            currentSetTitle: "title",
+            nextSetID: "set-1",
+            nextQuestionID: "question-1",
+            overallProgressPercent: 50,
+        )
+        let page = LearningProjectPage(items: [creatingItem, readyItem], hasNext: true)
+        let fetchLearningProjects = makeFetchLearningProjects(
+            behavior: .succeed(page),
+            activeProjectIDs: ["creating-project"],
+        )
+
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
+
+        #expect(result.items.map(\.projectID) == ["ready-project"])
+        #expect(result.hasNext == true)
+    }
+
+    @Test
+    func `생성 중인 레포지토리가 없으면 서버 응답을 그대로 반환한다`() async throws {
+        let page = LearningProjectPage(items: [], hasNext: false)
+        let fetchLearningProjects = makeFetchLearningProjects(behavior: .succeed(page))
+
+        let result = try await fetchLearningProjects(page: LearningProjectPage.firstIndex)
+
+        #expect(result == page)
+    }
+
+    @Test
+    func `요청한 페이지를 고정된 페이지 크기와 함께 저장소에 전달한다`() async throws {
+        let page = LearningProjectPage(items: [], hasNext: false)
+        let repository = FetchLearningProjectsRepository(behavior: .succeed(page))
+        let fetchLearningProjects = FetchLearningProjects(
+            repository: repository,
+            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: []),
+        )
+
+        _ = try await fetchLearningProjects(page: 2)
+
+        let request = await repository.requestSnapshot()
+        #expect(request.page == 2)
+        #expect(request.size == 20)
+    }
+}
+
+extension FetchLearningProjectsTests {
+
+    // MARK: Internal
+
+    static func makeTrackGeneration(activeProjectIDs: Set<String>) -> TrackGeneration {
+        let records = activeProjectIDs.map { projectID in
+            GenerationRecord(
+                githubRepoURL: "https://github.com/owner/\(projectID)",
+                projectID: projectID,
+                requestedAt: Date(timeIntervalSince1970: 1_000),
+            )
+        }
+        return TrackGeneration(
+            stateRepository: StubGenerationStateRepository(stored: GenerationState(records: records)),
+            outcomeRepository: StubGenerationOutcomeRepository(),
+            waitPolicy: GenerationWaitPolicy(minimumWait: 1, retentionLimit: 100_000),
+            now: { Date(timeIntervalSince1970: 1_000) },
+        )
+    }
+
+    // MARK: Private
+
+    private func makeFetchLearningProjects(
+        behavior: FetchLearningProjectsRepository.Behavior,
+        activeProjectIDs: Set<String> = [],
+    ) -> FetchLearningProjects {
+        FetchLearningProjects(
+            repository: FetchLearningProjectsRepository(behavior: behavior),
+            trackGeneration: Self.makeTrackGeneration(activeProjectIDs: activeProjectIDs),
+        )
+    }
+
 }
 
 // MARK: - FetchLearningProjectsRepository
@@ -102,12 +193,14 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
     }
 
     func fetchProjects(
-        page _: Int,
-        size _: Int,
+        page: Int,
+        size: Int,
     ) async throws -> LearningProjectPage {
+        requestedPage = page
+        requestedSize = size
         switch behavior {
-        case .succeed(let page):
-            return page
+        case .succeed(let loaded):
+            return loaded
 
         case .fail(let error):
             throw error
@@ -122,8 +215,14 @@ private actor FetchLearningProjectsRepository: LearningProjectRepository {
         throw LearningProjectError.unexpected
     }
 
+    func requestSnapshot() -> (page: Int?, size: Int?) {
+        (requestedPage, requestedSize)
+    }
+
     // MARK: Private
 
     private let behavior: Behavior
+    private var requestedPage: Int?
+    private var requestedSize: Int?
 
 }

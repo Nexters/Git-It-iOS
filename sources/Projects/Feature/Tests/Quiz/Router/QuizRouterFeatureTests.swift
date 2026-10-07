@@ -140,9 +140,9 @@ struct QuizRouterFeatureTests {
             )
         ) {
             QuizRouterFeature(
-                fetchLearningSet: StubFetchLearningSetUseCase(results: [.success(QuizTestFixture.unansweredSet)]),
-                fetchBookmarkedQuestions: StubFetchBookmarkedQuestionsUseCase(
-                    results: [.success(QuizTestFixture.bookmarkCollection)]
+                learningLibrary: LearningLibraryUseCaseMock(
+                    setResults: [.success(QuizTestFixture.unansweredSet)],
+                    bookmarkResults: [.success(QuizTestFixture.bookmarkCollection)],
                 ),
                 submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
                 submitEssayAnswer: StubSubmitEssayAnswerUseCase(),

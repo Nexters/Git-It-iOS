@@ -4,7 +4,7 @@ public struct BookmarkedQuestionCollection: Equatable, Sendable {
 
     public init(
         totalCount: Int,
-        availableProjects: [String],
+        availableProjects: [BookmarkedProject],
         bookmarks: [BookmarkedQuestion],
     ) {
         self.totalCount = totalCount
@@ -15,7 +15,7 @@ public struct BookmarkedQuestionCollection: Equatable, Sendable {
     // MARK: Public
 
     public let totalCount: Int
-    public let availableProjects: [String]
+    public let availableProjects: [BookmarkedProject]
     public let bookmarks: [BookmarkedQuestion]
 
 }

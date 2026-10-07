@@ -14,20 +14,37 @@ public struct QuizRouter: View {
     // MARK: Public
 
     public var body: some View {
-        content
+        FlowNavigationStack(path: pushedScreens) {
+            LearningSetIntroScreen(
+                store: store.scope(state: \.learningSetIntro, action: \.learningSetIntro)
+            )
+        } destination: { screen in
+            pushedScreen(screen)
+        }
     }
 
     // MARK: Private
 
     @Bindable private var store: StoreOf<QuizRouterFeature>
 
-    @ViewBuilder
-    private var content: some View {
+    private var pushedScreens: [QuizRouterFeature.ActiveScreen] {
         switch store.activeScreen {
         case .learningSetIntro:
-            LearningSetIntroScreen(
-                store: store.scope(state: \.learningSetIntro, action: \.learningSetIntro)
-            )
+            []
+
+        case .questionSolving:
+            [.questionSolving]
+
+        case .learningCompletion:
+            [.questionSolving, .learningCompletion]
+        }
+    }
+
+    @ViewBuilder
+    private func pushedScreen(_ screen: QuizRouterFeature.ActiveScreen) -> some View {
+        switch screen {
+        case .learningSetIntro:
+            EmptyView()
 
         case .questionSolving:
             if let questionSolvingStore = store.scope(state: \.questionSolving, action: \.questionSolving) {

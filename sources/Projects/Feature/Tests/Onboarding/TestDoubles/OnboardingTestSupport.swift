@@ -13,7 +13,7 @@ func makeAppEntryStore(
     TestStore(initialState: state) {
         AppEntryFeature(
             restoreSession: restoreSession,
-            fetchMemberProfile: fetchMemberProfile,
+            fetchMemberProfile: fetchMemberProfile.fetchProfile,
             signOut: signOut,
         )
     }
@@ -57,7 +57,7 @@ func makeCareerSelectionStore(
     state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
 ) -> TestStoreOf<CareerSelectionFeature> {
     TestStore(initialState: state) {
-        CareerSelectionFeature(completeCuration: completeCuration)
+        CareerSelectionFeature(completeCuration: completeCuration.complete)
     }
 }
 
@@ -73,7 +73,7 @@ func makeOnboardingRouterStore(
     signIn: SignInUseCaseMock = SignInUseCaseMock(),
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
     policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
-    completeCuration: CompleteCurationUseCaseMock = CompleteCurationUseCaseMock(),
+    memberAccount: MemberAccountUseCaseMock = MemberAccountUseCaseMock(),
     deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: OnboardingRouterFeature.State = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0"),
@@ -83,7 +83,7 @@ func makeOnboardingRouterStore(
             signIn: signIn,
             signOut: signOut,
             policyConsent: policyConsent,
-            completeCuration: completeCuration,
+            memberAccount: memberAccount,
             deleteMemberAccount: deleteMemberAccount,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )

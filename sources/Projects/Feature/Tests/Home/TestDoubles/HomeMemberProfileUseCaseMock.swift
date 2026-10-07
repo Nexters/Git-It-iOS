@@ -1,6 +1,6 @@
 import DomainMember
 
-actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
+actor HomeMemberProfileUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -13,6 +13,10 @@ actor HomeMemberProfileUseCaseMock: FetchMemberProfileUseCase {
     }
 
     // MARK: Internal
+
+    nonisolated var fetchProfile: @Sendable () async throws -> MemberProfile {
+        { try await self() }
+    }
 
     func callAsFunction() async throws -> MemberProfile {
         callCount += 1

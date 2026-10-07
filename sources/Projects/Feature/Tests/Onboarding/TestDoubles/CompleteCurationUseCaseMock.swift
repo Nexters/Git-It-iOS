@@ -2,7 +2,7 @@ import DomainAuthentication
 import DomainMember
 import Foundation
 
-actor CompleteCurationUseCaseMock: CompleteCurationUseCase {
+actor CompleteCurationUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -15,6 +15,10 @@ actor CompleteCurationUseCaseMock: CompleteCurationUseCase {
     struct Call: Equatable {
         let position: MemberPosition
         let careerLevel: CareerLevel
+    }
+
+    nonisolated var complete: @Sendable (MemberPosition, CareerLevel) async throws -> Void {
+        { try await self(position: $0, careerLevel: $1) }
     }
 
     func callAsFunction(

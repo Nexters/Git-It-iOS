@@ -7,8 +7,8 @@ import Testing
 struct AccessibilityContractTests {
     @Test
     func `아이콘 전용 버튼은 접근성 라벨을 생략할 수 없다`() {
-        _ = IconPlainButton(symbol: "ic-play-1", label: "학습 시작")
-        _ = IconGlassButton(symbol: "ellipsis", label: "더 보기")
+        _ = IconPlainButton(icon: .play, label: "학습 시작")
+        _ = IconGlassButton(icon: .menu, label: "더 보기")
         _ = BookmarkButton(isSaved: false, accessibilityLabel: "저장하기") { }
     }
 
@@ -28,9 +28,9 @@ struct AccessibilityContractTests {
     }
 
     @Test
-    func `탭 항목은 선택 여부에 따라 역할 색을 바꿔 색만으로 상태를 전달하지 않는다`() {
-        #expect(TabShellPreviewItem.tabColor(isSelected: true) == SemanticColorToken.brandAccent)
-        #expect(TabShellPreviewItem.tabColor(isSelected: false) == SemanticColorToken.mutedText)
+    func `탭 항목은 선택 여부에 따라 색 토큰을 바꾼다`() {
+        #expect(TabShellPreviewItem.tabColor(isSelected: true) == ColorToken.blue100)
+        #expect(TabShellPreviewItem.tabColor(isSelected: false) == ColorToken.grey400)
     }
 
     @Test

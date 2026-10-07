@@ -18,14 +18,14 @@ public struct RubricView: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: LayoutToken.gutter.cgFloatValue) {
+        VStack(alignment: .leading, spacing: LayoutToken.gutter) {
             if let overallFeedback {
                 StyledText.body1(overallFeedback)
             }
 
-            VStack(alignment: .leading, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            VStack(alignment: .leading, spacing: LayoutToken.compactSpacing) {
                 ForEach(Array(criteria.enumerated()), id: \.offset) { _, criterion in
-                    HStack(alignment: .top, spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                    HStack(alignment: .top, spacing: LayoutToken.compactSpacing) {
                         Image(systemName: "checkmark.circle")
                             .designSystemForeground(.blue100)
                         StyledText.body2(criterion, color: .grey300)
@@ -35,7 +35,7 @@ public struct RubricView: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .combine)
     }
@@ -45,6 +45,14 @@ public struct RubricView: View {
     private let criteria: [String]
     private let overallFeedback: String?
 
+}
+
+// MARK: RubricView.Constant
+
+extension RubricView {
+    fileprivate enum Constant {
+        static let contentPadding: CGFloat = 18
+    }
 }
 
 #Preview("Rubric View") {
@@ -57,6 +65,6 @@ public struct RubricView: View {
     )
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

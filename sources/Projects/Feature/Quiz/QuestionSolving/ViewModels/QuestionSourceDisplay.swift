@@ -3,7 +3,6 @@ import Foundation
 
 // MARK: - QuestionSourceDisplay
 
-/// 출처 한 건의 표시 값입니다. 서브뷰는 Domain 모델을 받지 않습니다.
 public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Lifecycle
@@ -29,12 +28,10 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
     public let id: Int
     public let title: String
     public let detail: String?
-    /// GitHub 앵커 표기(`L1`, `L1-L5`)로, 출처 칩의 표시 문구에 씁니다.
     public let lineAnchor: String?
     public let summary: String?
     public let referenceURL: URL?
 
-    /// 출처 칩에 표시하는 한 줄 문구입니다. 예: `blueprints.py:L1`.
     public var linkLabel: String {
         guard let lineAnchor else { return title }
         return "\(title):\(lineAnchor)"
@@ -58,7 +55,6 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
         return parts.joined(separator: ", ")
     }
 
-    /// 출처 배열 전체를 응답 순서 그대로 변환합니다.
     public static func list(sources: [QuestionSource]) -> [Self] {
         sources.enumerated().map { index, source in
             Self(

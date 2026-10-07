@@ -28,8 +28,8 @@ struct TextFieldTests {
     }
 
     @Test
-    func `입력됨 상태는 비활성 라벨 역할 색 1pt를 쓴다`() {
-        #expect(TextField.State.filled.borderColor == SemanticColorToken.mutedText.colorToken)
+    func `입력됨 상태는 grey400 1pt 테두리를 쓴다`() {
+        #expect(TextField.State.filled.borderColor == ColorToken.grey400)
         #expect(TextField.State.filled.borderWidth == 1)
     }
 

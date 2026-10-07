@@ -52,7 +52,7 @@ public struct SplashView: View {
     }
 
     private enum Constant {
-        static let lineSpacing: CGFloat = 4
+        static let lineSpacing: CGFloat = 3
         static let typingInterval1 = Duration.milliseconds(72)
         static let typingInterval2 = Duration.milliseconds(62)
         static let initialDelay = Duration.milliseconds(200)

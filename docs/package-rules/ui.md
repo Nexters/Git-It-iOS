@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-08-21
+**최종 수정일**: 2026-09-13 (의미 토큰 언급 제거)
 
 ## 설명
 
@@ -32,25 +32,22 @@ Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가
 - production target은 공통 디자인 규칙 또는 화면에서 독립된 재사용 UI 구성요소를
   제공해야 합니다.
 - 공개 API는 사용처 수와 관계없이 Feature 구현에서 독립된 표현 계약으로 설계합니다.
-- 공개 API와 구현은 `ComposableArchitecture`에 의존하지 않으며 TCA의 Store, Reducer,
-  Effect와 Action 타입을 사용하지 않습니다.
-- Feature State, Action, 업무 모델 또는 내부 구현 이름을 공개 API에 노출하지 않습니다.
 
 ## Target 책임과 의존 방향
 
 ### DesignSystem
 
-- 원시·의미 디자인 토큰, 폰트와 토큰 적용 API를 소유합니다.
+- 디자인 토큰, 폰트와 토큰 적용 API를 소유합니다.
 - UIComponent나 Feature 화면에 의존하지 않습니다.
 - 여러 컴포넌트나 화면이 공유하는 시각 값을 토큰으로 승격하고 유효성 검증을 제공합니다.
-- 원시 값, 의미 토큰과 적용 API 사이의 변환을 target 안에서 완료합니다.
+- 원시 값과 적용 API 사이의 변환을 target 안에서 완료합니다.
 
 ### UIComponent
 
 - DesignSystem을 사용해 역할별 재사용 컴포넌트와 컴포넌트 자산을 제공합니다.
 - Feature, Domain, Data, Infrastructure 또는 Composition 타입을 참조하지 않습니다.
-- 읽기 값은 초기화 인자, 변경 값은 Binding, 일회성 입력은 콜백으로 받습니다.
-- 컴포넌트의 상세 구현은 [UIComponent 컨벤션](../conventions/ui-component.md)을
+- 공개 입력의 형태는 [View 컨벤션 — 공개 생성 경로](../conventions/view.md#3-공개-생성-경로)를,
+  컴포넌트의 상세 구현은 [UIComponent 컨벤션](../conventions/ui-component.md)을
   따릅니다.
 
 ### 검토·테스트 Target

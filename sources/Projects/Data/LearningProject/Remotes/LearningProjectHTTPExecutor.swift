@@ -101,7 +101,7 @@ struct LearningProjectHTTPExecutor: Sendable {
                 fieldErrors: envelope.errors,
             )
         } catch {
-            throw DataLearningProjectError.decoding
+            throw DataLearningProjectError.unexpectedStatus
         }
     }
 
@@ -119,7 +119,7 @@ struct LearningProjectHTTPExecutor: Sendable {
             return .transport
 
         case .responseDecodingFailed:
-            return .decoding
+            return .unexpectedStatus
 
         @unknown default:
             return .unexpectedStatus

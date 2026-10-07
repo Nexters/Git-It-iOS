@@ -19,8 +19,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: HomeFeature.State()) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: profile.fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -56,8 +56,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: profile.fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -81,8 +81,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -102,8 +102,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: HomeFeature.State()) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: profile.fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -135,8 +135,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: profile,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: profile.fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 
@@ -162,8 +162,8 @@ struct HomeFeatureLoadTests {
         let store = TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: projects,
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
 

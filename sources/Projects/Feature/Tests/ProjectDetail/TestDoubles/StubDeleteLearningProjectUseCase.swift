@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor StubDeleteLearningProjectUseCase: DeleteLearningProjectUseCase {
+actor StubDeleteLearningProjectUseCase {
 
     // MARK: Lifecycle
 
@@ -12,6 +12,10 @@ actor StubDeleteLearningProjectUseCase: DeleteLearningProjectUseCase {
 
     private(set) var callCount = 0
     private(set) var requestedProjectIDs = [String]()
+
+    nonisolated var deleteProject: @Sendable (String) async throws -> Void {
+        { try await self(projectID: $0) }
+    }
 
     func callAsFunction(projectID: String) async throws {
         callCount += 1

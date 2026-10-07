@@ -24,11 +24,18 @@ struct HTTPExternalRepositoryRemoteTests {
 
         let repository = try await remote.repository(GitHubRepositoryRequest(owner: "facebook", repository: "react"))
 
-        #expect(repository.htmlURL == "https://github.com/facebook/react")
-        #expect(repository.starCount == 10)
-        let request = await transport.recordedRequests.first
-        #expect(request?.url.path == "/repos/facebook/react")
-        #expect(request?.headers["Accept"] == "application/vnd.github+json")
+        #expect(repository == GitHubRepositoryResponseDTO(
+            htmlURL: "https://github.com/facebook/react",
+            ownerLogin: "facebook",
+            repositoryName: "react",
+            ownerAvatarURL: "https://avatar",
+            starCount: 10,
+            topics: ["swift"],
+        ))
+        let requests = await transport.recordedRequests
+        #expect(requests.count == 1)
+        #expect(requests.first?.url.path == "/repos/facebook/react")
+        #expect(requests.first?.headers["Accept"] == "application/vnd.github+json")
     }
 
     @Test

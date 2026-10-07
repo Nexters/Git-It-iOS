@@ -10,14 +10,12 @@ public struct QuizRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningSet: any FetchLearningSetUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
     ) {
-        self.fetchLearningSet = fetchLearningSet
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -25,7 +23,7 @@ public struct QuizRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case learningSetIntro
         case questionSolving
         case learningCompletion
@@ -118,15 +116,14 @@ public struct QuizRouterFeature: Sendable {
         }
     }
 
-    /// 진행 컨트롤 문구입니다. 문제 화면은 이 값만 읽고 흐름을 알지 않습니다.
     public static let nextQuestionActionTitle = "다음 문제"
     public static let completeActionTitle = "학습 완료"
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.learningSetIntro, action: \.learningSetIntro) {
             LearningSetIntroFeature(
-                fetchLearningSet: fetchLearningSet,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) },
+                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
             )
         }
         Scope(state: \.learningCompletion, action: \.learningCompletion) {
@@ -202,8 +199,7 @@ public struct QuizRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let fetchLearningSet: any FetchLearningSetUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

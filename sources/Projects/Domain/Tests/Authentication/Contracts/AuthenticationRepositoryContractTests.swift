@@ -16,19 +16,14 @@ struct AuthenticationRepositoryContractTests {
 
         let grant = try await repository.authenticate(using: .apple)
         let status = try await repository.authorizationStatus()
-        let changes = await repository.authorizationChanges()
-        var iterator = changes.makeAsyncIterator()
-        let change = await iterator.next()
         try await repository.clearAuthentication()
 
         #expect(grant == expectedGrant)
         #expect(status == .authorized)
-        #expect(change == .reauthenticationRequired)
         #expect(
             await repository.recordedCalls() == [
                 .authenticate(.apple),
                 .authorizationStatus,
-                .authorizationChanges,
                 .clearAuthentication,
             ]
         )
@@ -50,7 +45,6 @@ private actor AuthenticationRepositoryContractProbe: AuthenticationRepository {
     enum Call: Equatable, Sendable {
         case authenticate(AuthenticationMethod)
         case authorizationStatus
-        case authorizationChanges
         case clearAuthentication
     }
 
@@ -62,14 +56,6 @@ private actor AuthenticationRepositoryContractProbe: AuthenticationRepository {
     func authorizationStatus() async throws -> AuthorizationStatus {
         calls.append(.authorizationStatus)
         return .authorized
-    }
-
-    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
-        calls.append(.authorizationChanges)
-        return AsyncStream { continuation in
-            continuation.yield(.reauthenticationRequired)
-            continuation.finish()
-        }
     }
 
     func clearAuthentication() async throws {

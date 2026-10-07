@@ -4,9 +4,13 @@ import DomainMember
 @Reducer
 public struct CareerSelectionFeature: Sendable {
 
-    public init(completeCuration: any CompleteCurationUseCase) {
+    // MARK: Lifecycle
+
+    public init(completeCuration: @escaping @Sendable (MemberPosition, CareerLevel) async throws -> Void) {
         self.completeCuration = completeCuration
     }
+
+    // MARK: Public
 
     public enum Submission: Equatable, Sendable {
         case idle
@@ -28,6 +32,8 @@ public struct CareerSelectionFeature: Sendable {
         case view(View)
         case effect(EffectEvent)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -69,7 +75,7 @@ public struct CareerSelectionFeature: Sendable {
                 state.submission = .submitting
                 return .run { send in
                     do {
-                        try await completeCuration(position: position, careerLevel: careerLevel)
+                        try await completeCuration(position, careerLevel)
                         await send(.effect(.curationFinished(success: true)))
                     } catch {
                         await send(.effect(.curationFinished(success: false)))
@@ -91,10 +97,12 @@ public struct CareerSelectionFeature: Sendable {
         }
     }
 
+    // MARK: Private
+
     private enum CancelID: Hashable {
         case curation
     }
 
-    private let completeCuration: any CompleteCurationUseCase
+    private let completeCuration: @Sendable (MemberPosition, CareerLevel) async throws -> Void
 
 }

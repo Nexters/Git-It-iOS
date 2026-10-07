@@ -21,7 +21,7 @@ public struct SelectableSettingRow: View {
 
     public var body: some View {
         Button(action: onTap) {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            HStack(spacing: LayoutToken.compactSpacing) {
                 StyledText.body1(title)
 
                 Spacer(minLength: Constant.minimumTrailingSpacing)
@@ -48,12 +48,22 @@ public struct SelectableSettingRow: View {
 
 }
 
+// MARK: SelectableSettingRow.Constant
+
+extension SelectableSettingRow {
+    fileprivate enum Constant {
+        static let horizontalPadding: CGFloat = 18
+        static let minimumHeight: CGFloat = 52
+        static let minimumTrailingSpacing: CGFloat = 4
+    }
+}
+
 #Preview("Selectable Setting Row") {
     VStack(spacing: 0) {
         SelectableSettingRow(title: "주니어", isSelected: true)
         SelectableSettingRow(title: "시니어")
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

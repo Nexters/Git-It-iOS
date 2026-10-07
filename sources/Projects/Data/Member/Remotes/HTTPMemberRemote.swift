@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPMemberRemote
 
-public struct HTTPMemberRemote: MemberRemote {
+public struct HTTPMemberRemote: Sendable {
 
     // MARK: Lifecycle
 
@@ -127,7 +127,7 @@ public struct HTTPMemberRemote: MemberRemote {
                 fieldErrors: envelope.errors,
             )
         } catch {
-            throw DataMemberError.decoding
+            throw DataMemberError.unexpectedStatus
         }
     }
 
@@ -145,7 +145,7 @@ public struct HTTPMemberRemote: MemberRemote {
             return .transport
 
         case .responseDecodingFailed:
-            return .decoding
+            return .unexpectedStatus
 
         @unknown default:
             return .unexpectedStatus

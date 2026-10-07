@@ -15,10 +15,10 @@ struct ContinuousProgressBarContractTests {
     }
 
     @Test
-    func `표면 높이는 6pt이고 track과 fill 의미 토큰을 사용한다`() {
+    func `표면 높이는 6pt이고 track과 fill 색 토큰을 사용한다`() {
         #expect(ContinuousProgressBar.surfaceHeight == 6)
-        #expect(ContinuousProgressBar.trackColorToken == .progressTrack)
-        #expect(ContinuousProgressBar.fillColorToken == .progressFill)
+        #expect(ContinuousProgressBar.trackColorToken == .grey500)
+        #expect(ContinuousProgressBar.fillColorToken == .blue200)
     }
 
     @Test

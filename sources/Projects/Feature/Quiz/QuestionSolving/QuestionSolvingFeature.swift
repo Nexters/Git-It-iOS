@@ -62,9 +62,7 @@ public struct QuestionSolvingFeature: Sendable {
 
         public let projectID: String
         public var question: Question
-        /// `nil`이면 순번을 표시하지 않습니다.
         public var questionNumber: Int?
-        /// 결과 상태 하단 컨트롤의 문구입니다. 이 Feature는 자신을 쓰는 흐름을 알지 않습니다.
         public let advanceActionTitle: String
 
         public var submission = Submission.editing
@@ -99,7 +97,7 @@ public struct QuestionSolvingFeature: Sendable {
                 return draftChoiceIndex != nil
 
             case .essay:
-                return !draftEssayText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                return true
             }
         }
 
@@ -150,7 +148,6 @@ public struct QuestionSolvingFeature: Sendable {
         }
     }
 
-    /// 서술형 답안의 최대 글자 수입니다.
     public static let essayCharacterLimit = 400
 
     public var body: some ReducerOf<Self> {
@@ -292,7 +289,6 @@ public struct QuestionSolvingFeature: Sendable {
 
         case .essay:
             let text = state.draftEssayText
-            guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .none }
             state.submission = .submitting
             return .run { send in
                 do {

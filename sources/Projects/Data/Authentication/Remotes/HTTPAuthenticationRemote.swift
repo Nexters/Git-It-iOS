@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPAuthenticationRemote
 
-public struct HTTPAuthenticationRemote: AuthenticationRemote {
+public struct HTTPAuthenticationRemote: Sendable {
 
     // MARK: Lifecycle
 
@@ -122,7 +122,7 @@ public struct HTTPAuthenticationRemote: AuthenticationRemote {
                 fieldErrors: envelope.errors,
             )
         } catch {
-            throw DataAuthenticationError.decoding
+            throw DataAuthenticationError.unexpectedStatus
         }
     }
 
@@ -140,7 +140,7 @@ public struct HTTPAuthenticationRemote: AuthenticationRemote {
             return .transport
 
         case .responseDecodingFailed:
-            return .decoding
+            return .unexpectedStatus
 
         @unknown default:
             return .unexpectedStatus

@@ -1,6 +1,8 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - ActionMenu
+
 public struct ActionMenu: View {
 
     // MARK: Lifecycle
@@ -16,36 +18,27 @@ public struct ActionMenu: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(items) { item in
                 Button {
                     onSelect(item.id)
                 } label: {
-                    StyledText.body2(item.title, color: Constant.titleColor)
-                        .frame(
-                            maxWidth: .infinity,
-                            minHeight: Self.itemMinimumHeight(
-                                itemCount: items.count
-                            ),
-                            alignment: .leading,
-                        )
+                    StyledText.body2(item.title, color: item.role.titleColor)
+                        .padding(.horizontal, Constant.rowHorizontalPadding)
+                        .padding(.top, Constant.rowTopPadding)
+                        .padding(.bottom, Constant.rowBottomPadding)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .designSystemCornerRadius(.large)
                 .accessibilityLabel(item.accessibilityLabel)
             }
         }
-        .frame(
-            minHeight: Self.contentMinimumHeight(
-                itemCount: items.count
-            )
-        )
-        .padding(.top, Constant.topPadding)
-        .padding(.horizontal, Constant.horizontalPadding)
-        .padding(.bottom, Constant.bottomPadding)
-        .frame(width: Constant.menuWidth)
-        .background(
-            Color(designSystem: Constant.backgroundColor),
+        .padding(Constant.containerPadding)
+        .frame(width: Constant.menuWidth, alignment: .leading)
+        .glassEffect(
+            .regular.tint(Color(designSystem: .white5)),
             in: RoundedRectangle(designSystem: .large),
         )
     }
@@ -56,48 +49,20 @@ public struct ActionMenu: View {
         Constant.menuWidth
     }
 
-    static var menuHeight: CGFloat {
-        Constant.menuHeight
+    static var containerPadding: CGFloat {
+        Constant.containerPadding
     }
 
-    static var topPadding: CGFloat {
-        Constant.topPadding
+    static var rowHorizontalPadding: CGFloat {
+        Constant.rowHorizontalPadding
     }
 
-    static var horizontalPadding: CGFloat {
-        Constant.horizontalPadding
+    static var rowTopPadding: CGFloat {
+        Constant.rowTopPadding
     }
 
-    static var bottomPadding: CGFloat {
-        Constant.bottomPadding
-    }
-
-    static var availableContentHeight: CGFloat {
-        Constant.menuHeight
-            - Constant.topPadding
-            - Constant.bottomPadding
-    }
-
-    static func itemMinimumHeight(itemCount: Int) -> CGFloat {
-        guard itemCount > 0 else { return Constant.itemMinimumHeight }
-
-        return max(
-            Constant.itemMinimumHeight,
-            availableContentHeight / CGFloat(itemCount),
-        )
-    }
-
-    static func contentMinimumHeight(itemCount: Int) -> CGFloat {
-        max(
-            availableContentHeight,
-            itemMinimumHeight(itemCount: itemCount) * CGFloat(max(itemCount, 0)),
-        )
-    }
-
-    static func menuMinimumHeight(itemCount: Int) -> CGFloat {
-        Constant.topPadding
-            + contentMinimumHeight(itemCount: itemCount)
-            + Constant.bottomPadding
+    static var rowBottomPadding: CGFloat {
+        Constant.rowBottomPadding
     }
 
     // MARK: Private
@@ -107,23 +72,57 @@ public struct ActionMenu: View {
 
 }
 
+// MARK: ActionMenu.Constant
+
+extension ActionMenu {
+    fileprivate enum Constant {
+        static let menuWidth: CGFloat = 160
+        static let containerPadding: CGFloat = 4
+        static let rowHorizontalPadding: CGFloat = 10
+        static let rowTopPadding: CGFloat = 9
+        static let rowBottomPadding: CGFloat = 10
+    }
+}
+
 #Preview("Action Menu") {
     ActionMenu(
         items: [
             .init(
                 id: "delete",
                 title: "프로젝트 삭제",
-                accessibilityLabel: "학습 프로젝트 삭제 모드 열기",
+                accessibilityLabel: "프로젝트 삭제 화면 열기",
+            )
+        ]
+    )
+    .designSystemScreenMargin()
+    .padding(.vertical, LayoutToken.margin)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .designSystemBackground(.grey700)
+}
+
+#Preview("Action Menu · 파괴적 행 포함") {
+    ActionMenu(
+        items: [
+            .init(
+                id: "savedQuestions",
+                title: "저장한 문제",
+                accessibilityLabel: "저장한 문제 보기",
             ),
             .init(
-                id: "close",
-                title: "메뉴 닫기",
-                accessibilityLabel: "프로젝트 메뉴 닫기",
+                id: "repositoryLink",
+                title: "GitHub에서 보기",
+                accessibilityLabel: "GitHub에서 보기",
+            ),
+            .init(
+                id: "delete",
+                title: "삭제하기",
+                role: .destructive,
+                accessibilityLabel: "프로젝트 삭제",
             ),
         ]
     )
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .designSystemBackground(.grey700)
 }

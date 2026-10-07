@@ -5,17 +5,19 @@ import Testing
 
 @testable import Feature
 
+// MARK: - QuizGenerationProgressFeatureTests
+
 @Suite("QuizGenerationProgressFeature")
 struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `submit 성공 시 createLearningProject가 검증된 canonicalURL과 선택된 QuizLevel로 정확히 한 번 호출된다`() async {
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestedAt = Date(timeIntervalSince1970: 1_000)
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             now: { requestedAt },
         )
 
@@ -43,10 +45,10 @@ struct QuizGenerationProgressFeatureTests {
     func `submit은 요청 시각을 기록해 최소 대기 계산의 기준으로 남긴다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             now: { requestedAt },
         )
 
@@ -86,14 +88,14 @@ struct QuizGenerationProgressFeatureTests {
     func `retryTapped는 동일 입력으로 재제출한다`() async {
         let requestedAt = Date(timeIntervalSince1970: 1_000)
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         var state = QuizGenerationProgressFeature.State()
         state.repository = sampleRepository
         state.quizLevel = .l3
         state.progress = .failed(.unexpected)
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             now: { requestedAt },
             state: state,
         )
@@ -131,7 +133,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `waitAtHomeTapped는 알림 옵션이 꺼져 있으면 시트를 거친 뒤 projectRegistered를 정확히 한 번 출력한다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(
             results: [.authorized],
             isAuthorizedResult: false,
@@ -139,7 +141,7 @@ struct QuizGenerationProgressFeatureTests {
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             state: state,
         )
@@ -160,7 +162,7 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `waitAtHomeTapped는 알림 권한이 이미 허용되어 있으면 시트 없이 바로 등록하고 projectRegistered를 출력한다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(
             results: [.authorized],
             isAuthorizedResult: true,
@@ -168,7 +170,7 @@ struct QuizGenerationProgressFeatureTests {
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             state: state,
         )
@@ -187,12 +189,12 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `알림 수락은 generationReminderPreferenceSelected true를 출력한 뒤 waitAtHome 동작을 이어간다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         state.isGenerationReminderSheetPresented = true
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             state: state,
         )
 
@@ -208,14 +210,14 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `권한이 허용되면 설정 화면 안내 없이 기존 waitAtHome 동작이 유지된다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.authorized])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         state.isGenerationReminderSheetPresented = true
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
@@ -236,14 +238,14 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `권한을 방금 거부해도 설정 화면을 안내하지 않는다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.declined])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         state.isGenerationReminderSheetPresented = true
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
@@ -264,14 +266,14 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `권한이 이미 거부된 상태면 설정 화면을 정확히 한 번 안내한다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let requestGenerationReminder = StubRequestGenerationReminderUseCase(results: [.previouslyDenied])
         let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = QuizGenerationProgressFeature.State()
         state.progress = .awaitingOutcome(sampleReceipt)
         state.isGenerationReminderSheetPresented = true
         let store = makeQuizGenerationProgressStore(
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: openNotificationSettings,
             state: state,
@@ -292,11 +294,11 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `awaitingOutcome 중 일치하는 projectID의 completed 수신은 projectRegistered를 출력한다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
         )
         store.exhaustivity = .off
 
@@ -415,14 +417,14 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `생성 요청이 전송되는 시점에 생성 결과 구독이 이미 확립돼 있다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let createLearningProject = StubCreateLearningProjectUseCase(
             results: [.success(sampleReceipt)],
             suspendsRequests: true,
         )
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
         )
         store.exhaustivity = .off
 
@@ -438,14 +440,14 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `생성 요청 응답보다 먼저 도착한 완료 결과가 진행 화면에 반영된다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let createLearningProject = StubCreateLearningProjectUseCase(
             results: [.success(sampleReceipt)],
             suspendsRequests: true,
         )
         let store = makeQuizGenerationProgressStore(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
         )
         store.exhaustivity = .off
 
@@ -462,10 +464,10 @@ struct QuizGenerationProgressFeatureTests {
 
     @Test
     func `같은 프로젝트의 완료 결과를 2회 수신해도 상태와 delegate 전달이 1회 수신과 같다`() async {
-        let observeGenerationOutcomes = StubObserveGenerationOutcomesUseCase()
+        let observeGenerationOutcomes = StubTrackGenerationUseCase()
         let store = makeQuizGenerationProgressStore(
             createLearningProject: StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)]),
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: observeGenerationOutcomes,
         )
         store.exhaustivity = .off
 
@@ -525,7 +527,7 @@ struct QuizGenerationProgressFeatureTests {
         ) {
             QuizGenerationProgressHostFeature(
                 createLearningProject: createLearningProject,
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
         store.exhaustivity = .off
@@ -543,6 +545,8 @@ struct QuizGenerationProgressFeatureTests {
 
 }
 
+// MARK: - QuizGenerationProgressHostFeature
+
 @Reducer
 private struct QuizGenerationProgressHostFeature {
 
@@ -556,14 +560,14 @@ private struct QuizGenerationProgressHostFeature {
     }
 
     let createLearningProject: any CreateLearningProjectUseCase
-    let observeGenerationOutcomes: any ObserveGenerationOutcomesUseCase
+    let trackGeneration: any TrackGenerationUseCase
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
             .ifLet(\.$child, action: \.child) {
                 QuizGenerationProgressFeature(
                     createLearningProject: createLearningProject,
-                    observeGenerationOutcomes: observeGenerationOutcomes,
+                    trackGeneration: trackGeneration,
                     requestGenerationReminder: StubRequestGenerationReminderUseCase(results: [.authorized]),
                 )
             }

@@ -2,20 +2,25 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
+// MARK: - RepositoryLinkInputScreen
+
 @ViewAction(for: RepositoryLinkInputFeature.self)
 struct RepositoryLinkInputScreen: View {
+
+    // MARK: Lifecycle
 
     init(store: StoreOf<RepositoryLinkInputFeature>) {
         self.store = store
     }
 
+    // MARK: Internal
+
     @Bindable var store: StoreOf<RepositoryLinkInputFeature>
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScreenHeader(
-                style: .largeTitle,
-                onLeadingTap: { send(.dismissTapped) },
+            ScreenControlBar(
+                onLeadingTap: { send(.dismissTapped) }
             )
             .designSystemScreenMargin()
 
@@ -54,8 +59,9 @@ struct RepositoryLinkInputScreen: View {
         }
         .background(Self.KeyboardDismissLayer(onTap: { isLinkFieldFocused = false }))
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .task { send(.task) }
     }
+
+    // MARK: Private
 
     @FocusState private var isLinkFieldFocused: Bool
 
@@ -66,15 +72,16 @@ struct RepositoryLinkInputScreen: View {
         )
     }
 
-
 }
 
-private extension RepositoryLinkInputScreen {
-    enum Constant {
+// MARK: RepositoryLinkInputScreen.Constant
+
+extension RepositoryLinkInputScreen {
+    fileprivate enum Constant {
         static let titleFieldSpacing: CGFloat = 16
-        static let headerContentSpacing: CGFloat = 32
+        static let headerContentSpacing: CGFloat = 18
         static let fieldGuideSpacing: CGFloat = 32
         static let guideHorizontalPadding: CGFloat = 20
-        static let bottomButtonPadding: CGFloat = 34
+        static let bottomButtonPadding: CGFloat = 24
     }
 }

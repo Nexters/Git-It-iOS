@@ -23,6 +23,12 @@ extension RepositoryConfirmationScreen {
 
         // MARK: Private
 
+        private enum Constant {
+            static let size: CGFloat = 80
+            static let loadingSize: CGFloat = 28
+            static let overlayOpacity = 0.2
+        }
+
         @ViewBuilder
         private var avatar: some View {
             if let avatarURL {
@@ -57,12 +63,6 @@ extension RepositoryConfirmationScreen {
                     LinearGradient(designSystem: .gradient3)
                         .opacity(Constant.overlayOpacity)
                 }
-        }
-
-        private enum Constant {
-            static let size: CGFloat = 80
-            static let loadingSize: CGFloat = 28
-            static let overlayOpacity = 0.2
         }
 
     }

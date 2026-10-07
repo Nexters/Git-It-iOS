@@ -36,7 +36,7 @@ func makeQuizLevelSelectionStore(
 
 func makeQuizGenerationProgressStore(
     createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase = StubObserveGenerationOutcomesUseCase(),
+    trackGeneration: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
     requestGenerationReminder: StubRequestGenerationReminderUseCase =
         StubRequestGenerationReminderUseCase(results: [.authorized]),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
@@ -47,7 +47,7 @@ func makeQuizGenerationProgressStore(
     TestStore(initialState: state) {
         QuizGenerationProgressFeature(
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: trackGeneration,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: { await openNotificationSettings() },
             waitPolicy: waitPolicy,
@@ -59,7 +59,7 @@ func makeQuizGenerationProgressStore(
 func makeProjectRegistrationRouterStore(
     fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
     createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase = StubObserveGenerationOutcomesUseCase(),
+    trackGeneration: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
     requestGenerationReminder: StubRequestGenerationReminderUseCase =
         StubRequestGenerationReminderUseCase(results: [.authorized]),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
@@ -71,7 +71,7 @@ func makeProjectRegistrationRouterStore(
         ProjectRegistrationRouterFeature(
             fetchExternalRepository: fetchExternalRepository,
             createLearningProject: createLearningProject,
-            observeGenerationOutcomes: observeGenerationOutcomes,
+            trackGeneration: trackGeneration,
             requestGenerationReminder: requestGenerationReminder,
             openNotificationSettings: { await openNotificationSettings() },
             waitPolicy: waitPolicy,
@@ -92,6 +92,8 @@ func waitUntil(
         try? await Task.sleep(for: .milliseconds(1))
     }
 }
+
+// MARK: - OpenNotificationSettingsSpy
 
 actor OpenNotificationSettingsSpy {
 

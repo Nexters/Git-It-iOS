@@ -40,6 +40,25 @@ struct LocalPolicyConsentStoreTests {
     }
 
     @Test
+    func `removeAll은 저장된 모든 문서 기록을 지운다`() async {
+        let (store, _) = makeStore()
+        await store.saveRecord(PolicyConsentRecordDTO(
+            documentIdentifier: "privacy-policy",
+            version: "1",
+            acceptedAt: Date(),
+        ))
+        await store.saveRecord(PolicyConsentRecordDTO(
+            documentIdentifier: "terms-of-service",
+            version: "1",
+            acceptedAt: Date(),
+        ))
+
+        await store.removeAll()
+
+        #expect(await store.records().isEmpty)
+    }
+
+    @Test
     func `logout과 무관하게 유지되고 앱 데이터 삭제를 시뮬레이션하면 부재로 돌아간다`() async throws {
         let suiteName = "policy-consent-\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
