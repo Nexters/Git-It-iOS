@@ -645,7 +645,6 @@ struct ProjectRegistrationFeatureTests {
         await store.send(.view(.submitTapped))
         await waitUntil { await createLearningProject.recordedCalls().count == 1 }
 
-        // 응답이 도착하기 전에 완료 신호가 먼저 도착한다.
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
         await createLearningProject.resumeOldest()
 
@@ -672,7 +671,7 @@ struct ProjectRegistrationFeatureTests {
         await observeGenerationOutcomes.finish()
 
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
-        // 두 번째 결과는 전달되지 않으므로 남은 Effect 없이 종료된다.
+
         await store.finish()
 
         #expect(await observeGenerationOutcomes.establishedSubscriptionCount() == 1)
@@ -696,7 +695,6 @@ struct ProjectRegistrationFeatureTests {
             $0.isGenerationReminderSheetPresented = false
         }
 
-        // 실패 상태에서 재시도가 유효하다.
         await store.send(.view(.retryTapped)) {
             $0.progress = .submitting
         }
@@ -817,8 +815,6 @@ private func validatedState() -> ProjectRegistrationFeature.State {
     return state
 }
 
-/// 조건이 만족될 때까지 짧게 양보하며 기다린다. 순서 보장을 검증하는 테스트에서
-/// 고정 지연 대신 실제 진행 시점을 관찰하기 위해 사용한다.
 private func waitUntil(
     timeout: Duration = .seconds(2),
     _ condition: @Sendable () async -> Bool,

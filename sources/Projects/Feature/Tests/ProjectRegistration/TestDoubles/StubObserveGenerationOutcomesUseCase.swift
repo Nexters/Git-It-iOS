@@ -19,7 +19,6 @@ actor StubObserveGenerationOutcomesUseCase: ObserveGenerationOutcomesUseCase {
         continuation?.finish()
     }
 
-    /// 구독이 확립된 시점을 관찰하기 위한 지원 함수다.
     func hasEstablishedSubscription() -> Bool {
         continuation != nil
     }

@@ -21,7 +21,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 content(item)
                     .tabItem {
                         Image(item.tabSystemImage, bundle: .module)
-                            .padding(.bottom, 4)
+                            .padding(.bottom, LayoutToken.tightSpacing.cgFloatValue)
                         Text.designSystemStyled(item.tabTitle, style: .tabItem)
                     }
                     .tag(item)
@@ -40,7 +40,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
 #Preview("Tab Shell") {
     TabShell(selected: .constant(TabShellPreviewItem.home)) { _ in
-        ScreenContainer {
+        ScreenContainer { _ in
             StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
         }
     }

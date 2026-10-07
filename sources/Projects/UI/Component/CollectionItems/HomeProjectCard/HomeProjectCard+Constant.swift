@@ -3,9 +3,7 @@ import SwiftUI
 
 extension HomeProjectCard {
     enum Constant {
-        static let cardWidth: CGFloat = 154
         static let cardHeight: CGFloat = 192
-        static let titleWidth: CGFloat = 94
         static let titleSpacing: CGFloat = 6
         static let headerLeadingPadding: CGFloat = 14
         static let headerTrailingPadding: CGFloat = 10

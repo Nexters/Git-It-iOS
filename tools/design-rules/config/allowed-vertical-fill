@@ -1,0 +1,8 @@
+# vertical-fill 규칙의 허용 목록입니다.
+# 한 줄에 `저장소 상대경로<공백>이유`를 적습니다.
+
+sources/Projects/UI/Component/Overlays/WebSheet.swift 웹 콘텐츠는 세로 채움이 정당하다
+sources/Projects/UI/Component/Scaffolds/ScreenContainer/ScreenContainer.swift 화면 골격은 화면 전체를 채운다
+sources/Projects/UI/Component/Controls/IconGlassButton.swift 아이콘을 고정 정사각 표면 안에서 가운데 정렬한다
+sources/Projects/UI/Component/Controls/IconPlainButton.swift 아이콘을 고정 정사각 표면 안에서 가운데 정렬한다
+sources/Projects/UI/Component/Displays/OnboardingMockup/OnboardingMockup.swift 목업 삽화는 주어진 영역을 채운다

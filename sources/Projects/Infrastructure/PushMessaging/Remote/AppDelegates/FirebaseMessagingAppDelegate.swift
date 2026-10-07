@@ -12,8 +12,6 @@ public final class FirebaseMessagingAppDelegate: NSObject, UIApplicationDelegate
 
     // MARK: Public
 
-    /// 콜백을 이 인스턴스가 소유한다. 주입 전에 도착한 APNs token과 remote notification payload는
-    /// 각각 대기 슬롯에 1건 보관했다가 주입 직후 정확히 1회 전달한다.
     public func configure(_ callbacks: PushNotificationCallbacks) {
         let pending = state.withLock { state -> PendingDelivery in
             state.callbacks = callbacks

@@ -10,6 +10,23 @@ extension ScreenHeader {
 
         // MARK: Internal
 
+        var layoutMetricsHeaderStyle: LayoutMetrics.HeaderStyle {
+            switch self {
+            case .default:
+                .plain
+            case .inlineTitle:
+                .inlineTitle
+            case .inlineUser:
+                .inlineUser
+            case .largeTitle:
+                .largeTitle
+            }
+        }
+
+        var height: CGFloat {
+            CGFloat(layoutMetricsHeaderStyle.height)
+        }
+
         var controlRowHeight: CGFloat {
             switch self {
             case .inlineUser:

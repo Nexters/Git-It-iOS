@@ -26,6 +26,30 @@ extension LayoutToken {
         name: "CompactSpacing",
         value: 8,
     )
+    public static let tightSpacing = LayoutToken(
+        name: "TightSpacing",
+        value: 4,
+    )
+    public static let iconSpacing = LayoutToken(
+        name: "IconSpacing",
+        value: 6,
+    )
+    public static let cardHorizontalPadding = LayoutToken(
+        name: "CardHorizontalPadding",
+        value: 18,
+    )
+    public static let cardTopPadding = LayoutToken(
+        name: "CardTopPadding",
+        value: 14,
+    )
 
-    public static let all: [LayoutToken] = [margin, gutter, compactSpacing]
+    public static let all: [LayoutToken] = [
+        margin,
+        gutter,
+        compactSpacing,
+        tightSpacing,
+        iconSpacing,
+        cardHorizontalPadding,
+        cardTopPadding,
+    ]
 }

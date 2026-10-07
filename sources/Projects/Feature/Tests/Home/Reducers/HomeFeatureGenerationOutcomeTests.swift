@@ -129,14 +129,12 @@ struct HomeFeatureGenerationOutcomeTests {
             )
         }
 
-        // 조회 중에 도착한 결과는 즉시 재조회하지 않고 예약만 한다.
         await store.send(.effect(.generationOutcomeReceived(GenerationOutcome(projectID: "project-1", status: .completed)))) {
             $0.appliedOutcomeProjectIDs = ["project-1"]
             $0.isProjectRefreshPending = true
         }
         #expect(await projects.snapshot().callCount == 0)
 
-        // 조회가 끝나면 예약한 갱신을 소비해 목록을 최신화한다.
         await store.send(.effect(.projectsLoadFinished(requestID: 1, result: .success(HomeTestFixture.oneProjectPage)))) {
             $0.projectLoad = .loading
             $0.isProjectRefreshPending = false

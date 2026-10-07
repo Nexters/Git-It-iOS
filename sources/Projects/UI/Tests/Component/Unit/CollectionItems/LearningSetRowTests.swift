@@ -7,7 +7,6 @@ import Testing
 struct LearningSetRowTests {
     @Test
     func `크기는 320×130pt를 유지한다`() {
-        #expect(LearningSetRow.width == 320)
         #expect(LearningSetRow.height == 130)
     }
 

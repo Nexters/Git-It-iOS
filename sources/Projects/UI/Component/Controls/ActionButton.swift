@@ -94,7 +94,7 @@ public struct ActionButton: View {
         }
 
         var minimumHitArea: CGFloat {
-            44
+            ControlSizeToken.minimumTouch.cgFloatValue
         }
 
         var touchHeight: CGFloat {
@@ -116,6 +116,7 @@ public struct ActionButton: View {
             .frame(minHeight: size.touchHeight)
             .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .disabled(!isEnabled)
     }
 

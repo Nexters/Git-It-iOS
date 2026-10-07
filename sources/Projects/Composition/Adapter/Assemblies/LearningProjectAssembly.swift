@@ -72,7 +72,6 @@ public struct LearningProjectAssembly: Sendable {
 
     // MARK: Internal
 
-    /// 진행 상태를 알림 예약 시각 계산에 다시 쓰기 위해 조립 경계 안에서만 공개한다.
     let generationProgressRepository: any GenerationProgressRepository
 
     // MARK: Private

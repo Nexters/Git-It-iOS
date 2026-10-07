@@ -13,7 +13,7 @@ struct TutorialScreen: View {
     @Bindable var store: StoreOf<OnboardingGuideFeature>
 
     var body: some View {
-        ScreenContainer {
+        ScreenContainer { _ in
             VStack(spacing: 0) {
                 TabView(selection: pageBinding) {
                     ForEach(1...Constant.pageCount, id: \.self) { page in
@@ -25,7 +25,9 @@ struct TutorialScreen: View {
                 .onAppear {
                     UIScrollView.appearance().bounces = false
                 }
-                .designSystemBackground(.blue500)
+                .background {
+                    Color(designSystem: ColorToken.blue500).ignoresSafeArea(edges: .top)
+                }
                 signInSection
             }
         }

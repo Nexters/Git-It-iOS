@@ -38,6 +38,10 @@ extension CornerRadiusToken {
         name: "ExtraLarge",
         value: 16,
     )
+    public static let pill = CornerRadiusToken(
+        name: "Pill",
+        value: 999,
+    )
 
-    public static let all: [CornerRadiusToken] = [micro, compact, small, medium, large, extraLarge]
+    public static let all: [CornerRadiusToken] = [micro, compact, small, medium, large, extraLarge, pill]
 }

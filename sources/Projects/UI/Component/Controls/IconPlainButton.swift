@@ -51,7 +51,7 @@ public struct IconPlainButton: View {
     // MARK: Private
 
     private enum Constant {
-        static let minimumTouchSize: CGFloat = 44
+        static let minimumTouchSize = ControlSizeToken.minimumTouch.cgFloatValue
     }
 
     private let symbol: String

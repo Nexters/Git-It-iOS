@@ -70,6 +70,18 @@ extension ColorToken {
         group: .blue,
         hex: "#B9D6FE",
     )
+    public static let blue300Alpha10 = ColorToken(
+        name: "Blue300Alpha10",
+        group: .blue,
+        hex: "#7E94BB",
+        opacityPercent: 10,
+    )
+    public static let blue300Alpha24 = ColorToken(
+        name: "Blue300Alpha24",
+        group: .blue,
+        hex: "#7E94BB",
+        opacityPercent: 24,
+    )
 
     public static let purple500 = ColorToken(
         name: "Purple500",
@@ -163,7 +175,24 @@ extension ColorToken {
         group: .opacity,
         hex: "#000000",
     )
-
+    public static let black25 = ColorToken(
+        name: "Black25",
+        group: .opacity,
+        hex: "#000000",
+        opacityPercent: 25,
+    )
+    public static let black35 = ColorToken(
+        name: "Black35",
+        group: .opacity,
+        hex: "#000000",
+        opacityPercent: 35,
+    )
+    public static let black45 = ColorToken(
+        name: "Black45",
+        group: .opacity,
+        hex: "#000000",
+        opacityPercent: 45,
+    )
     public static let black70 = ColorToken(
         name: "Black 70",
         group: .opacity,
@@ -205,6 +234,8 @@ extension ColorToken {
         blue300,
         blue200,
         blue100,
+        blue300Alpha10,
+        blue300Alpha24,
         purple500,
         purple400,
         purple300,
@@ -222,6 +253,9 @@ extension ColorToken {
         white30,
         white70,
         black,
+        black25,
+        black35,
+        black45,
         black70,
         error,
         correct,

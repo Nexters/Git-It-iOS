@@ -68,7 +68,7 @@ public struct IconGlassButton: View {
         }
 
         var touchSize: CGFloat {
-            44
+            ControlSizeToken.minimumTouch.cgFloatValue
         }
     }
 

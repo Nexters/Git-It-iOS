@@ -5,15 +5,21 @@ public struct ScreenEdgeScrim: View {
 
     // MARK: Lifecycle
 
-    private init(_ style: Style) {
+    private init(
+        _ style: Style,
+        layoutMetrics: LayoutMetrics,
+    ) {
         self.style = style
+        self.layoutMetrics = layoutMetrics
     }
 
     // MARK: Public
 
     public enum Style: Sendable, Equatable {
-        case top
-        case bottom
+        case top(headerStyle: LayoutMetrics.HeaderStyle)
+        case bottom(hasTabBar: Bool)
+
+        // MARK: Internal
 
         var gradientToken: GradientToken {
             switch self {
@@ -23,20 +29,36 @@ public struct ScreenEdgeScrim: View {
                 .bottomEdgeScrim
             }
         }
+
+        func height(layoutMetrics: LayoutMetrics) -> CGFloat {
+            switch self {
+            case .top(let headerStyle):
+                CGFloat(layoutMetrics.topScrimHeight(headerStyle: headerStyle))
+            case .bottom(let hasTabBar):
+                CGFloat(layoutMetrics.bottomScrimHeight(hasTabBar: hasTabBar))
+            }
+        }
     }
 
     public var body: some View {
         LinearGradient(designSystem: style.gradientToken)
+            .frame(height: style.height(layoutMetrics: layoutMetrics))
             .allowsHitTesting(Constant.allowsHitTesting)
             .accessibilityHidden(true)
     }
 
-    public static func top() -> Self {
-        Self(.top)
+    public static func top(
+        headerStyle: LayoutMetrics.HeaderStyle = .plain,
+        layoutMetrics: LayoutMetrics = .default,
+    ) -> Self {
+        Self(.top(headerStyle: headerStyle), layoutMetrics: layoutMetrics)
     }
 
-    public static func bottom() -> Self {
-        Self(.bottom)
+    public static func bottom(
+        hasTabBar: Bool = false,
+        layoutMetrics: LayoutMetrics = .default,
+    ) -> Self {
+        Self(.bottom(hasTabBar: hasTabBar), layoutMetrics: layoutMetrics)
     }
 
     // MARK: Internal
@@ -51,17 +73,16 @@ public struct ScreenEdgeScrim: View {
         static let allowsHitTesting = false
     }
 
+    private let layoutMetrics: LayoutMetrics
     private let style: Style
 
 }
 
 #Preview("Screen Edge Scrim") {
     VStack(spacing: LayoutToken.margin.cgFloatValue) {
-        ScreenEdgeScrim.top()
-            .frame(height: 103)
+        ScreenEdgeScrim.top(headerStyle: .plain)
 
-        ScreenEdgeScrim.bottom()
-            .frame(height: 127)
+        ScreenEdgeScrim.bottom(hasTabBar: true)
     }
     .frame(width: 360)
     .designSystemBackground(.grey700)

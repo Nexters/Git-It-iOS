@@ -7,7 +7,11 @@ public struct BottomActionBar<Content: View>: View {
 
     // MARK: Lifecycle
 
-    public init(@ViewBuilder content: () -> Content) {
+    public init(
+        layoutMetrics: LayoutMetrics = .default,
+        @ViewBuilder content: () -> Content,
+    ) {
+        self.layoutMetrics = layoutMetrics
         self.content = content()
     }
 
@@ -17,12 +21,12 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .designSystemScreenMargin()
-            .padding(.bottom, Constant.bottomPadding)
+            .padding(.bottom, CGFloat(layoutMetrics.tabBarBottomInset))
     }
 
     // MARK: Private
 
+    private let layoutMetrics: LayoutMetrics
     private let content: Content
 
 }

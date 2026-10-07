@@ -18,6 +18,10 @@ extension ControlSizeToken {
         name: "Action",
         value: 54,
     )
+    public static let minimumTouch = ControlSizeToken(
+        name: "MinimumTouch",
+        value: 44,
+    )
 
-    public static let all: [ControlSizeToken] = [action]
+    public static let all: [ControlSizeToken] = [action, minimumTouch]
 }

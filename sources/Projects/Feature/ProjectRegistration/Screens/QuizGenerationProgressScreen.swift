@@ -97,10 +97,6 @@ struct QuizGenerationProgressScreen: View {
 
     @State private var progress: Double = 0
 
-    /// Figma `Gradient` 레이어(`2026:29389`)의 실제 `gradientTransform`을 읽으면(A, `use_figma`
-    /// 2026-08-31) 색상 스톱 0%·100%가 도형 자체의 상하 경계가 아니라 도형 밖 y=549.4~1433.7(800pt
-    /// 프레임 기준)에 위치한다 — 도형이 프레임보다 크고 아래로 이동해, 화면에는 0%~28% 구간만 보인다.
-    /// 색은 그대로 두고 `start`/`end`만 이 값으로 프레임 밖까지 확장해야 같은 결과가 난다.
     private var backgroundGradient: GradientToken {
         GradientToken(
             name: "Gradient 2 · 생성 진행 화면",
@@ -187,8 +183,7 @@ extension QuizGenerationProgressScreen {
         static let checklistIconSize: CGFloat = 24
         static let bottomButtonPadding: CGFloat = 58
         static let simulatedDurationRange: ClosedRange<Double> = 180...300
-        /// 진행률 시뮬레이션은 마지막 단계가 완료로 표시되기 직전에서 멈춘다. 실제 완료 전이는
-        /// 최소 대기 시간과 생성 결과가 결정하므로 화면이 스스로 완료를 표시하지 않는다(FR-013).
+
         static let maxSimulatedProgress = 0.98
         static let simulatedProgressTickInterval = Duration.milliseconds(200)
     }

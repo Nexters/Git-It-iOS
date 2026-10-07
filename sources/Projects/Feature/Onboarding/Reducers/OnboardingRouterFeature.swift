@@ -5,10 +5,6 @@ import Foundation
 
 // MARK: - OnboardingRouterFeature
 
-/// 온보딩 안내(`OnboardingGuideFeature`)와 큐레이션(`CurationFeature`) 화면 Feature를
-/// 조합하고, 실제로 화면이 전환될 때마다 테스트로 조회 가능한 이동 이벤트를 기록하는
-/// Router Feature. Router의 화면 값에는 "완료" case를 두지 않으며, 상위(App Root)로
-/// 나가야 하는지는 `OnboardingExitFeature`가 판단해 `delegate`로 알린다.
 @Reducer
 public struct OnboardingRouterFeature: Sendable {
 
@@ -32,16 +28,12 @@ public struct OnboardingRouterFeature: Sendable {
 
     // MARK: Public
 
-    /// Router가 관리하는 화면. 최상위 단위(온보딩 안내/큐레이션)를 나타내며, 각 단위
-    /// 내부의 세부 화면을 연관값으로 함께 표현하는 계층형 값이다. "완료"는 이 값의
-    /// case가 아니다(FR-005·FR-006).
     public enum ActiveScreen: Equatable, Sendable {
         case guide(OnboardingGuideFeature.Screen)
         case curation(CurationFeature.Screen)
         case curationSplash
     }
 
-    /// Router가 관리하는 화면이 실제로 전환될 때 남는 기록(FR-006).
     public struct ScreenTransitionEvent: Equatable, Sendable {
         public let from: ActiveScreen
         public let to: ActiveScreen

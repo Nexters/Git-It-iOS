@@ -18,13 +18,14 @@ public struct AppleSignInButton: View {
 
     public var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: 6) {
+            HStack(alignment: .center, spacing: LayoutToken.iconSpacing.cgFloatValue) {
                 Image(systemName: "applelogo")
                     .font(.system(size: 16))
                     .designSystemForeground(.black)
                 StyledText.body1("Apple로 시작하기", color: .black)
             }
         }
+        .buttonStyle(.plain)
         .frame(height: Constant.surfaceHeight)
         .frame(maxWidth: .infinity)
         .designSystemBackground(.white)

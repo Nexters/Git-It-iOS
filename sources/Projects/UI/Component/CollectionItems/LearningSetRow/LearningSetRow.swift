@@ -42,19 +42,22 @@ public struct LearningSetRow: View {
                 ContinuousProgressBar(progress: progress)
             }
             .padding(Constant.contentPadding)
-            .frame(width: Constant.width, height: Constant.height, alignment: .topLeading)
-            .designSystemBackground(.cardBackground)
+            .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)
+            .designSystemBackground(.screenBackground)
             .designSystemCornerRadius(.large)
+            .overlay {
+                RoundedRectangle(designSystem: .large)
+                    .stroke(
+                        Color(designSystem: BorderToken.default.colorToken),
+                        lineWidth: CGFloat(BorderToken.default.width),
+                    )
+            }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
     }
 
     // MARK: Internal
-
-    static var width: CGFloat {
-        Constant.width
-    }
 
     static var height: CGFloat {
         Constant.height

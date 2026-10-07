@@ -32,7 +32,7 @@ public struct TextField: View {
                     RoundedRectangle(designSystem: .small)
                         .stroke(
                             Color(designSystem: state.borderColor),
-                            lineWidth: Constant.borderWidth,
+                            lineWidth: state.borderWidth,
                         )
                 }
 
@@ -52,28 +52,46 @@ public struct TextField: View {
 
         // MARK: Internal
 
-        var borderColor: ColorToken {
+        var borderToken: BorderToken {
             switch self {
-            case .default: .grey500
-            case .active: .blue100
-            case .filled: .grey400
-            case .error: .error
+            case .default:
+                .default
+
+            case .active:
+                .focus
+
+            case .filled:
+                BorderToken(
+                    name: SemanticColorToken.mutedText.name,
+                    width: 1,
+                    colorToken: SemanticColorToken.mutedText.colorToken,
+                )
+
+            case .error:
+                .error
             }
         }
 
-        var backgroundColor: ColorToken {
-            .grey600
+        var borderColor: ColorToken {
+            borderToken.colorToken
+        }
+
+        var borderWidth: CGFloat {
+            CGFloat(borderToken.width)
+        }
+
+        var backgroundColor: SemanticColorToken {
+            .cardBackground
         }
     }
 
-    // MARK: Private
-
-    private enum Constant {
+    enum Constant {
         static let horizontalPadding: CGFloat = 16
         static let surfaceHeight: CGFloat = 52
-        static let borderWidth: CGFloat = 1
         static let errorSpacing: CGFloat = 4
     }
+
+    // MARK: Private
 
     @FocusState private var isFocused: Bool
 

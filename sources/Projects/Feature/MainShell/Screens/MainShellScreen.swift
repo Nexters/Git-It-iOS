@@ -26,8 +26,9 @@ public struct MainShellScreen: View {
             case .projects,
                  .saved,
                  .settings:
-                ScreenContainer {
+                ScreenContainer { _ in
                     StyledText.subtitle1(tab.tabTitle, alignment: .center)
+                        .designSystemScreenMargin()
                 }
             }
         }

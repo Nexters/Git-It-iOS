@@ -7,6 +7,10 @@ extension EmptyState {
             128
         }
 
+        static var illustrationSpacing: CGFloat {
+            20
+        }
+
         static var textSpacing: CGFloat {
             8
         }

@@ -22,7 +22,7 @@ public struct SavedQuestionCard: View {
     public var body: some View {
         VStack(alignment: .leading) {
             StyledText.caption1(metadata, color: .grey300)
-                .padding(.top, 14)
+                .padding(.top, LayoutToken.cardTopPadding.cgFloatValue)
             StyledText.subtitle3(prompt)
                 .padding(.top, 10)
             HStack {
@@ -32,9 +32,14 @@ public struct SavedQuestionCard: View {
                 Spacer()
                 Button(action: onActionTap) {
                     StyledText.body2(actionTitle, color: .grey700, alignment: .center)
-                }.frame(width: 84, height: 36)
-                    .designSystemBackground(.blue100)
-                    .designSystemCornerRadius(.small)
+                        .frame(height: Constant.actionHeight)
+                        .frame(maxWidth: .infinity)
+                        .designSystemBackground(.blue100)
+                        .designSystemCornerRadius(.small)
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: Constant.actionMaximumWidth)
+                .designSystemControlSize(.minimumTouch)
             }
             .padding(.vertical, 16)
         }

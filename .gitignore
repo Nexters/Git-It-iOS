@@ -159,3 +159,4 @@ sources/graph.png
 *.xcconfig
 sources/Projects/App/Config/debug.xcconfig
 sources/Projects/App/Config/release.xcconfig
+specs/024-ui-design-spec-alignment/reference-swift/**

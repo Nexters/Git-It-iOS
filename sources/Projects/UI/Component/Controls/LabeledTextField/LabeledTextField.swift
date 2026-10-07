@@ -84,7 +84,6 @@ public struct LabeledTextField: View {
 
     // MARK: Private
 
-    /// 호출부가 포커스를 관찰하지 않을 때 `focused(_:)`에 넘길 내부 상태입니다.
     @FocusState private var unboundFocus: Bool
 
     private let label: String

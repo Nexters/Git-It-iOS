@@ -21,7 +21,6 @@ struct HomeCardScrollLayout: Equatable, Sendable {
             return -16
         }
         if position <= 0 {
-            // P0 왼쪽으로 나가는 카드는 P0→P1 기울기를 반대 방향으로 이어받는다.
             return Double(position) * 16
         }
         if position >= 2 {

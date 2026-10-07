@@ -12,6 +12,7 @@ public struct HomeProjectCard: View {
         currentSetLabel: String,
         setTitle: String,
         variant: Variant,
+        layoutMetrics: LayoutMetrics = .default,
         isLearningEnabled: Bool = true,
         onSelect: @escaping () -> Void = { },
         onStart: @escaping () -> Void = { },
@@ -22,6 +23,7 @@ public struct HomeProjectCard: View {
         self.currentSetLabel = currentSetLabel
         self.setTitle = setTitle
         self.variant = variant
+        self.layoutMetrics = layoutMetrics
         self.isLearningEnabled = isLearningEnabled
         self.onSelect = onSelect
         self.onStart = onStart
@@ -43,7 +45,7 @@ public struct HomeProjectCard: View {
                 .padding(.trailing, Constant.headerTrailingPadding)
                 .padding(.top, Constant.headerTopPadding)
         }
-        .frame(width: Constant.cardWidth, height: Constant.cardHeight)
+        .frame(width: cardWidth, height: Constant.cardHeight)
         .background(Color(designSystem: variant.cardColor))
         .designSystemCornerRadius(.large)
         .accessibilityElement(children: .contain)
@@ -72,6 +74,7 @@ public struct HomeProjectCard: View {
 
     // MARK: Private
 
+    private let layoutMetrics: LayoutMetrics
     private let title: String
     private let technologies: String
     private let progress: Double
@@ -97,7 +100,7 @@ public struct HomeProjectCard: View {
                 )
                 .lineLimit(3)
             }
-            .frame(width: Constant.titleWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, Constant.headerLeadingPadding)
             .padding(.trailing, Constant.headerTrailingPadding + Constant.startTouchSize)
             .padding(.top, Constant.headerTopPadding)
@@ -130,7 +133,11 @@ public struct HomeProjectCard: View {
             .padding(.trailing, Constant.headerTrailingPadding)
             .padding(.bottom, Constant.footerBottomPadding)
         }
-        .frame(width: Constant.cardWidth, height: Constant.cardHeight)
+        .frame(width: cardWidth, height: Constant.cardHeight)
+    }
+
+    private var cardWidth: CGFloat {
+        CGFloat(layoutMetrics.gridColumn2)
     }
 
     private var startButton: some View {

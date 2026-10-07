@@ -6,7 +6,7 @@
 #
 # 실행 순서는 이 파일의 줄 순서가 아니라 진입점의 고정 순서를 따릅니다.
 #
-#   script-tests → swift-format → build → compile
+#   script-tests → swift-format → design-rules → build → compile
 #
 # Swift 포맷은 staged 파일에 적용합니다. 파일이 변경되면 재검토·stage 후 다시
 # 커밋해야 합니다. 여기에 적힌 단계의 스크립트가 없거나 실행 권한이 없으면
@@ -17,6 +17,7 @@
 #
 #   script-tests   셸 회귀·정적 검증
 #   swift-format   staged Swift 포맷 적용
+#   design-rules   디자인 규격 금지 패턴 검사
 #   build          모든 공유 scheme Debug 빌드
 #   compile        테스트 scheme build-for-testing
 #

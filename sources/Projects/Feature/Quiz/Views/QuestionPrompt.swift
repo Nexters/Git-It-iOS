@@ -1,25 +1,18 @@
 import DesignSystem
 import SwiftUI
+import UIComponent
 
 // MARK: - QuestionPrompt
 
-public struct QuestionPrompt: View {
+struct QuestionPrompt: View {
 
-    // MARK: Lifecycle
+    // MARK: Internal
 
-    public init(
-        index: Int,
-        total: Int,
-        prompt: String,
-    ) {
-        self.index = index
-        self.total = total
-        self.prompt = prompt
-    }
+    let index: Int
+    let total: Int
+    let prompt: String
 
-    // MARK: Public
-
-    public var body: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: LayoutToken.compactSpacing.cgFloatValue) {
             StyledText.caption1("Q\(index) / \(total)", color: .blue100)
             StyledText.subtitle2(prompt)
@@ -27,12 +20,6 @@ public struct QuestionPrompt: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
-
-    // MARK: Private
-
-    private let index: Int
-    private let total: Int
-    private let prompt: String
 
 }
 
@@ -42,8 +29,6 @@ public struct QuestionPrompt: View {
         total: 10,
         prompt: "SwiftUI에서 State와 Binding의 차이를 설명하세요.",
     )
-    .frame(width: 320)
-    .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin.cgFloatValue)
     .designSystemBackground(.grey700)
 }

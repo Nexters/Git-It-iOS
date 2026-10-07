@@ -2,8 +2,6 @@ import Foundation
 
 // MARK: - GitHubRepositoryURLParser
 
-/// GitHub 저장소 URL 문자열을 소유자와 저장소 이름으로 해석한다. 공유 시트로 들어온 URL과
-/// 사용자가 직접 입력한 URL이 같은 규칙으로 판정되도록 이 타입 하나가 규칙을 소유한다.
 public struct GitHubRepositoryURLParser: Sendable {
 
     // MARK: Lifecycle
@@ -48,9 +46,6 @@ public struct GitHubRepositoryURLParser: Sendable {
 
     // MARK: Private
 
-    /// scheme이 없는 입력(`github.com/owner/repo`, `www.github.com/owner/repo`)에
-    /// `https://`를 보충해 `http://`, `https://`, `www.` 조합 모두 host 판별이
-    /// 가능하도록 한다.
     private static func normalizedURLString(from trimmed: String) -> String {
         let lowercased = trimmed.lowercased()
         guard lowercased.hasPrefix("http://") || lowercased.hasPrefix("https://")

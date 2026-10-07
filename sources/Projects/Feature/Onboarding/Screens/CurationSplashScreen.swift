@@ -11,7 +11,7 @@ struct CurationSplashScreen: View {
     let onCompletion: @MainActor @Sendable () -> Void
 
     var body: some View {
-        ScreenContainer {
+        ScreenContainer { _ in
             SplashView(onCompletion: onCompletion)
                 .designSystemScreenMargin()
         }

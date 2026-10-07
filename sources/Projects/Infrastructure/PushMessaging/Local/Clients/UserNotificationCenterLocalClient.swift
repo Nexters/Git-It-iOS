@@ -72,10 +72,9 @@ public final class UserNotificationCenterLocalClient: LocalNotificationClient, S
         Self.logger.debug(
             "로컬 알림 예약: identifier=\(request.identifier, privacy: .public) delay=\(delay, privacy: .public)"
         )
-        // 같은 식별자의 이전 예약을 먼저 제거해 예약이 1건만 남게 한다.
+
         cancel(identifier: request.identifier)
         guard delay > 0 else {
-            // 이미 지난 시각이면 추가 지연 없이 즉시 발송한다.
             add(request, trigger: nil)
             return
         }

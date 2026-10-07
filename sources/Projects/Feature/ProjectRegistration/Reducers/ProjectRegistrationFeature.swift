@@ -29,8 +29,6 @@ public struct ProjectRegistrationFeature: Sendable {
 
     // MARK: Public
 
-    /// 저장소 확인 → 이해도 선택 → 생성 확정으로 이어지는 배타적 단계다.
-    /// View 재생성으로 손실되면 사용자 흐름이 바뀌므로 Feature 상태가 소유한다.
     public enum RegistrationStep: Equatable, Sendable {
         case repositoryConfirmation
         case quizLevelSelection
@@ -42,8 +40,6 @@ public struct ProjectRegistrationFeature: Sendable {
 
         // MARK: Lifecycle
 
-        /// 공유 시트로 전달받은 URL을 링크 입력 초기값으로 1회 소비하기 위한 진입점이다.
-        /// 검증되지 않은 외부 입력이므로 기존 검증 경로를 그대로 통과한다.
         public init(initialRepositoryURL: String = "") {
             repositoryURLInput = initialRepositoryURL
             pendingAutomaticValidation = !initialRepositoryURL.isEmpty
@@ -58,15 +54,13 @@ public struct ProjectRegistrationFeature: Sendable {
         public var step = RegistrationStep.repositoryConfirmation
         public var validationRequestID = 0
         public var isGenerationReminderSheetPresented = false
-        /// 생성 요청을 제출한 시각이다. 최소 대기 시간 계산의 기준이 된다.
+
         public var requestedAt: Date?
-        /// 도착했지만 최소 대기 시간이 남아 아직 노출하지 않은 생성 결과다.
+
         public var pendingOutcome: GenerationOutcome?
 
         // MARK: Internal
 
-        /// 초기값과 함께 세워지고 화면이 처음 나타날 때 1회만 소비되는 자동 검증 표식이다.
-        /// 자동 실행 여부는 이 화면의 상태이므로 화면이나 App이 아니라 Feature가 소유한다.
         var pendingAutomaticValidation = false
 
     }
@@ -78,7 +72,6 @@ public struct ProjectRegistrationFeature: Sendable {
         case failed
     }
 
-    /// 제출부터 생성 결과 판정까지의 수명을 함께 소유하므로 이름이 그 범위를 드러낸다.
     public enum RegistrationProgress: Equatable, Sendable {
         case idle
         case submitting
@@ -233,11 +226,9 @@ public struct ProjectRegistrationFeature: Sendable {
                     case .awaitingOutcome(let receipt) = state.progress,
                     outcome.projectID == receipt.projectID
                 else { return .none }
-                // 완료와 실패 모두 같은 게이트를 따른다. 최소 대기 시간이 남아 있으면 결과를
-                // 보관만 하고, 남은 시간이 지난 뒤에 한 번에 노출한다.
+
                 let remaining = remainingWait(requestedAt: state.requestedAt, projectID: receipt.projectID)
                 guard remaining > 0 else {
-                    // 이미 최소 대기 시간이 지났다면 추가 지연 없이 곧바로 노출한다.
                     return applyOutcome(outcome, receipt: receipt, state: &state)
                 }
                 state.pendingOutcome = outcome
@@ -264,9 +255,9 @@ public struct ProjectRegistrationFeature: Sendable {
 
     private enum CancelID: Hashable {
         case validation
-        /// 구독 확립과 생성 요청, 결과 관찰이 하나의 실행 경로이므로 취소 단위도 하나다.
+
         case registrationPipeline
-        /// 도착한 결과를 최소 대기 시간까지 붙잡아 두는 대기다.
+
         case minimumWait
     }
 
@@ -278,8 +269,6 @@ public struct ProjectRegistrationFeature: Sendable {
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
 
-    /// 사용자가 "다음"을 누른 경로와 공유 진입의 자동 실행 경로가 같은 검증을 수행하도록
-    /// 시작 지점을 하나로 둔다.
     private func startValidation(_ state: inout State) -> Effect<Action> {
         guard !state.repositoryURLInput.isEmpty else { return .none }
         state.validationRequestID += 1
@@ -298,9 +287,6 @@ public struct ProjectRegistrationFeature: Sendable {
         .cancellable(id: CancelID.validation, cancelInFlight: true)
     }
 
-    /// 생성 결과 구독을 먼저 확립한 뒤에 생성을 요청하고, 응답으로 받은 `projectID`로
-    /// 이미 확립된 스트림을 필터링한다. 세 단계가 순서가 보장되는 단일 실행 경로에 있으므로
-    /// 요청과 응답 사이에 도착한 결과도 스트림 버퍼에 남아 유실되지 않는다.
     private func submit(
         repository: ExternalRepository,
         quizLevel: QuizLevel,
@@ -327,15 +313,13 @@ public struct ProjectRegistrationFeature: Sendable {
 
             for await outcome in outcomes where outcome.projectID == receipt.projectID {
                 await send(.effect(.generationOutcomeReceived(outcome)))
-                // 생성 결과는 종료 신호다. 첫 결과만 전달해 중복 수신을 구조적으로 막는다.
+
                 break
             }
         }
         .cancellable(id: CancelID.registrationPipeline, cancelInFlight: true)
     }
 
-    /// 실패로 전이할 때 표시 중인 리마인드 시트를 함께 닫아 사용자가 재시도나 종료를
-    /// 선택할 수 있게 한다.
     private func transitionToFailure(
         _ error: LearningProjectError,
         state: inout State,
@@ -349,7 +333,6 @@ public struct ProjectRegistrationFeature: Sendable {
         )
     }
 
-    /// 요청 시각 기준으로 아직 남은 최소 대기 시간이다. 요청 시각을 모르면 대기하지 않는다.
     private func remainingWait(
         requestedAt: Date?,
         projectID: String,
@@ -359,7 +342,6 @@ public struct ProjectRegistrationFeature: Sendable {
         return waitPolicy.readyDate(for: progress).timeIntervalSince(now())
     }
 
-    /// 보관 여부와 무관하게 생성 결과를 화면에 노출하는 단일 경로다.
     private func applyOutcome(
         _ outcome: GenerationOutcome,
         receipt: ProjectRegistrationReceipt,

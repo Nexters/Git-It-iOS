@@ -14,6 +14,7 @@ public struct MemberAssembly: Sendable {
         baseURL: URL,
         loginSessionRepository: any LoginSessionRepository,
         accessTokenProvider: @escaping @Sendable () async -> String?,
+        clearLocalStateAfterAccountDeletion: @escaping @Sendable () async -> Void = { },
         transport: (any HTTPTransport)? = nil,
         responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
     ) {
@@ -31,7 +32,10 @@ public struct MemberAssembly: Sendable {
         updateMemberPosition = UpdateMemberPosition(repository: repository)
         updateMemberCareerLevel = UpdateMemberCareerLevel(repository: repository)
         registerMemberDevice = RegisterMemberDevice(repository: repository)
-        deleteMemberAccount = DeleteMemberAccount(repository: repository)
+        deleteMemberAccount = DeleteMemberAccount(
+            repository: repository,
+            clearLocalState: clearLocalStateAfterAccountDeletion,
+        )
     }
 
     // MARK: Public

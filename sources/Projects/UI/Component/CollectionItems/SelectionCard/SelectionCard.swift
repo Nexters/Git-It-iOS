@@ -48,13 +48,19 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, minHeight: style.minimumHeight, alignment: .leading)
-        .designSystemBackground(.cardBackground)
+        .designSystemBackground(.screenBackground)
         .designSystemCornerRadius(.large)
+        .overlay {
+            if isSelected {
+                RoundedRectangle(designSystem: .large)
+                    .fill(Color(designSystem: SemanticColorToken.selectedSurface))
+            }
+        }
         .overlay {
             RoundedRectangle(designSystem: .large)
                 .stroke(
-                    isSelected ? Color(designSystem: .blue200) : .clear,
-                    lineWidth: Constant.borderWidth,
+                    Color(designSystem: borderToken.colorToken),
+                    lineWidth: CGFloat(borderToken.width),
                 )
         }
         .accessibilityElement(children: .combine)
@@ -69,6 +75,10 @@ public struct SelectionCard<Thumbnail: View>: View {
     private let isSelected: Bool
     private let style: SelectionCardStyle
     private let thumbnail: Thumbnail
+
+    private var borderToken: BorderToken {
+        isSelected ? .focus : .default
+    }
 
 }
 
