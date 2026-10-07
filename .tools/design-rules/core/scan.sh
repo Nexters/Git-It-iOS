@@ -20,7 +20,8 @@ design_rules_scan_file() (
 	if [ -n "$design_rules_allow_list" ] && [ -f "$design_rules_allow_list" ]; then
 		while IFS= read -r design_rules_entry; do
 			case "$design_rules_entry" in '' | '#'*) continue ;; esac
-			design_rules_allow_path=${design_rules_entry%%[!!-~]*}
+			# 문자 범위 표현은 UTF-8 locale에서 정렬 순서를 따라 경로 문자를 놓치므로 문자 클래스로 자릅니다.
+			design_rules_allow_path=${design_rules_entry%%[[:space:]]*}
 			case "$design_rules_file" in
 			*"/$design_rules_allow_path") return 0 ;;
 			esac
