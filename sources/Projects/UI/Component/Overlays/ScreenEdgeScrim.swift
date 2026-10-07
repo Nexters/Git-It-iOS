@@ -38,7 +38,7 @@ public struct ScreenEdgeScrim: View {
 }
 
 #Preview("Screen Edge Scrim") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         ScreenEdgeScrim.top(height: 70)
 
         ScreenEdgeScrim.bottom(height: 92)

@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPProjectRemote
 
-public struct HTTPProjectRemote: ProjectRemote {
+public struct HTTPProjectRemote: Sendable {
 
     // MARK: Lifecycle
 

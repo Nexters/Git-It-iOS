@@ -5,6 +5,8 @@ import UIComponent
 extension QuizGenerationProgressScreen {
     struct GenerationReminderSheet: View {
 
+        // MARK: Internal
+
         let onAccept: () -> Void
         let onDecline: () -> Void
 
@@ -22,9 +24,10 @@ extension QuizGenerationProgressScreen {
                             StyledText.caption1("프로필 설정페이지에서 언제든 설정할 수 있어요.", color: .grey400, alignment: .center)
                         }
 
-                        VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
-                            ActionButton.primary("리마인드 알림 설정하기", action: onAccept)
-                            ActionButton.text("다시 보지 않기", size: .medium, action: onDecline)
+                        VStack(spacing: LayoutToken.compactSpacing) {
+                            ActionButton.primary("리마인드 알림 설정하기", size: .large, action: onAccept)
+
+                            ActionButton.text("다시 보지 않기", size: .small, action: onDecline)
                         }
                     }
                     .padding(.top, Constant.contentTopPadding)
@@ -34,11 +37,14 @@ extension QuizGenerationProgressScreen {
             .presentationBackground(.clear)
         }
 
+        // MARK: Private
+
         private enum Constant {
-            static let contentSpacing: CGFloat = 24
+            static let contentSpacing: CGFloat = 31
             static let textSetSpacing: CGFloat = 8
             static let bellSize: CGFloat = 120
-            static let contentTopPadding: CGFloat = 16
+            static let contentTopPadding: CGFloat = 21
         }
+
     }
 }

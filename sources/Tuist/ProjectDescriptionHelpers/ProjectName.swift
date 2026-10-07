@@ -43,7 +43,8 @@ extension ProjectName {
                     .package(
                         name: rawValue,
                         buildTargets: [
-                            AppModuleName.GitIt.rawValue
+                            AppModuleName.GitIt.rawValue,
+                            AppModuleName.ShareExtension.rawValue,
                         ],
                         testTargets: [],
                         runTarget: AppModuleName.GitIt.rawValue,
@@ -64,10 +65,19 @@ extension ProjectName {
                 [.package(
                     name: rawValue,
                     buildTargets: [
-                        CompositionModuleName.CompositionAdapter.rawValue
+                        CompositionModuleName.CompositionShared.rawValue,
+                        CompositionModuleName.CompositionAuthentication.rawValue,
+                        CompositionModuleName.CompositionLearningProject.rawValue,
+                        CompositionModuleName.CompositionMember.rawValue,
+                        CompositionModuleName.CompositionApp.rawValue,
+                        CompositionModuleName.CompositionShareExtension.rawValue,
                     ],
                     testTargets: [
-                        CompositionModuleName.CompositionAdapterTests.rawValue
+                        CompositionModuleName.CompositionAuthenticationTests.rawValue,
+                        CompositionModuleName.CompositionLearningProjectTests.rawValue,
+                        CompositionModuleName.CompositionMemberTests.rawValue,
+                        CompositionModuleName.CompositionAppTests.rawValue,
+                        CompositionModuleName.CompositionShareExtensionTests.rawValue,
                     ],
                 )]
 

@@ -6,10 +6,6 @@ import Feature
 import Foundation
 import SwiftUI
 
-#if DEBUG
-import AppDebug
-#endif
-
 // MARK: - AppRootView
 
 @ViewAction(for: AppRootFeature.self)
@@ -37,27 +33,23 @@ struct AppRootView: View {
 
         case .mainShell:
             MainShellRouter(store: store.scope(state: \.mainShell, action: \.mainShell))
-//            #if DEBUG
-//                .safeAreaInset(edge: .bottom) {
-//                    ResetAllButton(action: { send(.resetAllTapped) })
-//                }
-//            #endif
                 .fullScreenCover(
                     item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
-                ) { store in
-                    ProjectRegistrationRouter(store: store)
+                ) { projectRegistrationStore in
+                    ProjectRegistrationRouter(store: projectRegistrationStore)
                 }
                 .fullScreenCover(
                     item: $store.scope(state: \.projectDetail, action: \.projectDetail)
                 ) { projectDetailStore in
                     ProjectDetailRouter(store: projectDetailStore)
-                        .fullScreenCover(
-                            item: $store.scope(state: \.quiz, action: \.quiz)
-                        ) { quizStore in
-                            QuizRouter(store: quizStore)
-                        }
+                        .overlay { QuizRouterOverlay(store: quizStore) }
                 }
+                .transaction(value: store.projectDetail != nil) { $0.disablesAnimations = true }
         }
+    }
+
+    private var quizStore: StoreOf<QuizRouterFeature>? {
+        store.scope(state: \.quiz, action: \.quiz.presented)
     }
 
 }
@@ -96,14 +88,14 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopAuthenticationOutcomes: AuthenticationOutcomesUseCase {
-        func callAsFunction() async -> AsyncStream<AuthenticationOutcome> {
-            AsyncStream { _ in }
+    struct NoopVerifyAuthorization: VerifyAuthorizationUseCase {
+        func callAsFunction() async -> AuthorizationStatus {
+            .authorized
         }
     }
 
-    struct NoopFetchMemberProfile: FetchMemberProfileUseCase {
-        func callAsFunction() async throws -> MemberProfile {
+    struct NoopMemberAccount: MemberAccountUseCase {
+        func profile() async throws -> MemberProfile {
             MemberProfile(
                 name: "미리보기",
                 email: "preview@example.com",
@@ -117,10 +109,16 @@ private enum AppRootPreviewSupport {
                 ),
             )
         }
-    }
 
-    struct NoopCompleteCuration: CompleteCurationUseCase {
-        func callAsFunction(
+        func updatePosition(_: MemberPosition) async throws {
+            throw CancellationError()
+        }
+
+        func updateCareerLevel(_: CareerLevel) async throws {
+            throw CancellationError()
+        }
+
+        func completeCuration(
             position _: MemberPosition,
             careerLevel _: CareerLevel,
         ) async throws { }
@@ -146,34 +144,28 @@ private enum AppRootPreviewSupport {
     }
 
     struct NoopFetchLearningProjects: FetchLearningProjectsUseCase {
-        func callAsFunction() async throws -> LearningProjectPage {
+        func callAsFunction(page _: Int) async throws -> LearningProjectPage {
             throw CancellationError()
         }
     }
 
-    struct NoopDeleteLearningProject: DeleteLearningProjectUseCase {
-        func callAsFunction(projectID _: String) async throws {
+    struct NoopLearningLibrary: LearningLibraryUseCase {
+        func project(id _: String) async throws -> LearningProjectDetail {
             throw CancellationError()
         }
-    }
 
-    struct NoopFetchBookmarkedQuestions: FetchBookmarkedQuestionsUseCase {
-        func callAsFunction(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        func deleteProject(id _: String) async throws {
             throw CancellationError()
         }
-    }
 
-    struct NoopFetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
-        func callAsFunction(projectID _: String) async throws -> LearningProjectDetail {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopFetchLearningSet: FetchLearningSetUseCase {
-        func callAsFunction(
+        func learningSet(
             projectID _: String,
             setID _: String,
         ) async throws -> LearningSet {
+            throw CancellationError()
+        }
+
+        func bookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
             throw CancellationError()
         }
     }
@@ -208,18 +200,6 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopUpdateMemberPosition: UpdateMemberPositionUseCase {
-        func callAsFunction(_: MemberPosition) async throws {
-            throw CancellationError()
-        }
-    }
-
-    struct NoopUpdateMemberCareerLevel: UpdateMemberCareerLevelUseCase {
-        func callAsFunction(_: CareerLevel) async throws {
-            throw CancellationError()
-        }
-    }
-
     struct NoopDeleteMemberAccount: DeleteMemberAccountUseCase {
         func callAsFunction() async throws {
             throw CancellationError()
@@ -241,14 +221,12 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopObserveGenerationOutcomes: ObserveGenerationOutcomesUseCase {
-        func callAsFunction() async -> AsyncStream<GenerationOutcome> {
-            AsyncStream { _ in }
-        }
-    }
-
     struct NoopRequestGenerationReminder: RequestGenerationReminderUseCase {
         func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+            .authorized
+        }
+
+        func requestAuthorization() async -> NotificationAuthorizationOutcome {
             .authorized
         }
 
@@ -257,17 +235,28 @@ private enum AppRootPreviewSupport {
         }
     }
 
-    struct NoopTrackGenerationProgress: TrackGenerationProgressUseCase {
+    struct NoopTrackGeneration: TrackGenerationUseCase {
         func begin(
-            projectID _: String,
+            githubRepoURL _: String,
             requestedAt _: Date,
-        ) async { }
-
-        func current() async -> GenerationProgress? {
-            nil
+        ) async -> Bool {
+            false
         }
 
-        func end() async { }
+        func attachProjectID(
+            _: String,
+            toGithubRepoURL _: String,
+        ) async { }
+
+        func end(githubRepoURL _: String) async { }
+        func end(projectID _: String) async { }
+        func current() async -> GenerationState {
+            GenerationState()
+        }
+
+        func states() async -> AsyncStream<GenerationState> {
+            AsyncStream { $0.finish() }
+        }
     }
 
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {
@@ -278,26 +267,20 @@ private enum AppRootPreviewSupport {
                 restoreSession: NoopRestoreSession(),
                 signIn: NoopSignIn(),
                 signOut: NoopSignOut(),
-                authenticationOutcomes: NoopAuthenticationOutcomes(),
-                fetchMemberProfile: NoopFetchMemberProfile(),
-                completeCuration: NoopCompleteCuration(),
+                verifyAuthorization: NoopVerifyAuthorization(),
+                memberAccount: NoopMemberAccount(),
                 policyConsent: NoopPolicyConsent(),
                 fetchLearningProjects: NoopFetchLearningProjects(),
-                fetchLearningProjectDetail: NoopFetchLearningProjectDetail(),
-                deleteLearningProject: NoopDeleteLearningProject(),
-                fetchBookmarkedQuestions: NoopFetchBookmarkedQuestions(),
-                fetchLearningSet: NoopFetchLearningSet(),
+                learningLibrary: NoopLearningLibrary(),
                 submitChoiceAnswer: NoopSubmitChoiceAnswer(),
                 submitEssayAnswer: NoopSubmitEssayAnswer(),
                 setQuestionBookmark: NoopSetQuestionBookmark(),
-                updateMemberPosition: NoopUpdateMemberPosition(),
-                updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),
                 fetchExternalRepository: NoopFetchExternalRepository(),
                 createLearningProject: NoopCreateLearningProject(),
-                observeGenerationOutcomes: NoopObserveGenerationOutcomes(),
                 requestGenerationReminder: NoopRequestGenerationReminder(),
-                trackGenerationProgress: NoopTrackGenerationProgress(),
+                trackGeneration: NoopTrackGeneration(),
+                deviceTokenRefreshes: { AsyncStream { $0.finish() } },
             )
         }
     }

@@ -22,9 +22,11 @@ public struct BookmarkButton: View {
     public var body: some View {
         Button(action: onTap) {
             Image(systemName: symbol)
+                .font(.system(size: Constant.glyphSize))
                 .designSystemForeground(isSaved ? .blue100 : .grey400)
-                .frame(width: Constant.surfaceSize, height: Constant.surfaceSize)
-                .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+                .frame(width: Constant.surfaceWidth, height: Constant.surfaceHeight)
+                .designSystemBackground(.grey500)
+                .designSystemCornerRadius(.large)
                 .frame(
                     minWidth: ControlSizeToken.minimumTouch.cgFloatValue,
                     minHeight: ControlSizeToken.minimumTouch.cgFloatValue,
@@ -45,7 +47,9 @@ public struct BookmarkButton: View {
     // MARK: Private
 
     private enum Constant {
-        static let surfaceSize: CGFloat = ControlSizeToken.action.cgFloatValue
+        static let surfaceWidth: CGFloat = 40
+        static let surfaceHeight: CGFloat = ControlSizeToken.action.cgFloatValue
+        static let glyphSize: CGFloat = 16
     }
 
     private let isSaved: Bool
@@ -59,10 +63,10 @@ public struct BookmarkButton: View {
 }
 
 #Preview("Bookmark Button") {
-    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    HStack(spacing: LayoutToken.gutter) {
         BookmarkButton(isSaved: false, accessibilityLabel: "저장하기") { }
         BookmarkButton(isSaved: true, accessibilityLabel: "저장 해제하기") { }
     }
-    .padding(LayoutToken.margin.cgFloatValue)
+    .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

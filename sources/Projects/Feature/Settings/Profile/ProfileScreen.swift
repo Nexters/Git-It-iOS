@@ -1,10 +1,10 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UIComponent
 
 // MARK: - ProfileScreen
 
-/// "마이" 탭의 프로필 화면(Figma `1539:19209`).
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
 
@@ -19,21 +19,26 @@ public struct ProfileScreen: View {
     @Bindable public var store: StoreOf<ProfileFeature>
 
     public var body: some View {
-        OverlayContainer(content: {
+        OverlayContainer {
             VStack(alignment: .leading, spacing: 0) {
-                ScreenHeader(
-                    title: Constant.title,
-                    style: .inlineTitle,
-                    leading: nil,
-                    trailing: Constant.settingsControl,
-                    onTrailingTap: { send(.settingsTapped) },
-                )
-                .designSystemScreenMargin()
+                HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                    ScreenHeaderTitle(title: Constant.title)
+                        .frame(height: Constant.headerControlRowHeight)
+                    Spacer()
 
-                content
+                    IconGlassButton.neutral(
+                        icon: Constant.settingsControl.icon,
+                        label: Constant.settingsControl.label,
+                        size: .medium,
+                        action: { send(.settingsTapped) },
+                    )
+                }
+                .padding(.vertical, Constant.headerBottomPadding)
+                .designSystemScreenMargin()
             }
-        })
-        .scrollIndicators(.hidden)
+        } content: {
+            content
+        }
         .task { await send(.task).finish() }
     }
 
@@ -58,8 +63,8 @@ public struct ProfileScreen: View {
         } else {
             Self.ProfileHeaderView(display: current)
                 .padding(Constant.profileCardPadding)
-
             StyledText.caption2(Constant.statisticsSectionTitle, color: .grey400)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.sectionTitleTopPadding)
                 .padding(.bottom, Constant.sectionTitleBottomPadding)
@@ -81,7 +86,7 @@ extension ProfileScreen {
     fileprivate enum Constant {
         static let title = "마이"
         static let statisticsSectionTitle = "학습 현황"
-        static let settingsControl = ScreenHeader.Control(symbol: "gearshape", label: "설정")
+        static let settingsControl = ScreenControlBar.Control(icon: .setting, label: "설정")
         static let profileCardPadding: CGFloat = 20
         static let sectionTitleTopPadding: CGFloat = 20
         static let sectionTitleBottomPadding: CGFloat = 10
@@ -89,5 +94,7 @@ extension ProfileScreen {
         static let contentBottomPadding: CGFloat = 32
         static let loadingTopPadding: CGFloat = 120
         static let failureTopPadding: CGFloat = 20
+        static let headerControlRowHeight: CGFloat = 40
+        static let headerBottomPadding: CGFloat = 10
     }
 }

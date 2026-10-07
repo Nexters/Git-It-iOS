@@ -25,11 +25,11 @@ extension QuestionSolvingScreen {
                         }
                     }
                     .padding(.vertical, Constant.titleToSourcesSpacing)
-
-                    ActionButton.primary("닫기", action: onClose)
-                        .padding(.top, Constant.buttonTopPadding)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            } footer: {
+                ActionButton.primary("닫기", action: onClose)
+                    .padding(.top, Constant.buttonTopPadding)
             }
         }
 
@@ -82,7 +82,7 @@ extension QuestionSolvingScreen {
             source: QuestionSourceDisplay,
             showsIcon: Bool,
         ) -> some View {
-            HStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+            HStack(spacing: LayoutToken.compactSpacing) {
                 StyledText.body1(source.linkLabel, color: .white70)
                     .lineLimit(1)
                     .truncationMode(.head)

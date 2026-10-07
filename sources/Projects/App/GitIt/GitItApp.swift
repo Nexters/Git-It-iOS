@@ -1,14 +1,10 @@
 import ComposableArchitecture
-import CompositionAdapter
+import CompositionApp
 import DomainAuthentication
 import DomainMember
 import Foundation
 import SwiftUI
 import UIKit
-
-#if DEBUG
-import AppDebug
-#endif
 
 // MARK: - GitItApp
 
@@ -19,54 +15,39 @@ struct GitItApp: App {
 
     init() {
         let policyDocuments = (try? PolicyManifestLoader.loadPolicyDocuments()) ?? []
+        let bundleVersion = AppBundleMetadata.shortVersion.value
         let composition = AppComposition.live(
             AppComposition.Environment(
                 apiBaseURL: AppEndpointHost.api.url,
                 externalRepositoryBaseURL: AppEndpointHost.externalRepository.url,
+                appVersion: bundleVersion,
+                osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+                generationReminderTitle: GenerationReminderContent.title,
+                generationReminderBody: GenerationReminderContent.body,
                 policyDocuments: policyDocuments,
             )
         )
 
         let restoreSession = composition.restoreSession
         let deletesCompletedAccountOnSignIn = false
-
-        #if DEBUG
-        let resetAll = ResetAllUseCase(
-            deleteMemberAccount: composition.deleteMemberAccount,
-            signOut: composition.signOut,
-            policyConsent: composition.policyConsent,
-        )
-        let resetAllForTesting: (@Sendable () async -> Void)? = { await resetAll() }
-        #else
-        let resetAllForTesting: (@Sendable () async -> Void)? = nil
-        #endif
-
-        let bundleVersion = AppBundleMetadata.shortVersion.value
         rootStore = Store(initialState: AppRootFeature.State(bundleVersion: bundleVersion)) {
             AppRootFeature(
                 restoreSession: restoreSession,
                 signIn: composition.signIn,
                 signOut: composition.signOut,
-                authenticationOutcomes: composition.authenticationOutcomes,
-                fetchMemberProfile: composition.fetchMemberProfile,
-                completeCuration: composition.completeCuration,
+                verifyAuthorization: composition.verifyAuthorization,
+                memberAccount: composition.memberAccount,
                 policyConsent: composition.policyConsent,
                 fetchLearningProjects: composition.fetchLearningProjects,
-                fetchLearningProjectDetail: composition.fetchLearningProjectDetail,
-                deleteLearningProject: composition.deleteLearningProject,
-                fetchBookmarkedQuestions: composition.fetchBookmarkedQuestions,
-                fetchLearningSet: composition.fetchLearningSet,
+                learningLibrary: composition.learningLibrary,
                 submitChoiceAnswer: composition.submitChoiceAnswer,
                 submitEssayAnswer: composition.submitEssayAnswer,
                 setQuestionBookmark: composition.setQuestionBookmark,
-                updateMemberPosition: composition.updateMemberPosition,
-                updateMemberCareerLevel: composition.updateMemberCareerLevel,
                 deleteMemberAccount: composition.deleteMemberAccount,
                 fetchExternalRepository: composition.fetchExternalRepository,
                 createLearningProject: composition.createLearningProject,
-                observeGenerationOutcomes: composition.observeGenerationOutcomes,
                 requestGenerationReminder: composition.requestGenerationReminder,
-                trackGenerationProgress: composition.trackGenerationProgress,
+                trackGeneration: composition.trackGeneration,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     await UIApplication.shared.open(url)
@@ -77,7 +58,6 @@ struct GitItApp: App {
                 registerCurrentDevice: composition.registerCurrentDevice,
                 deviceTokenRefreshes: composition.deviceTokenRefreshes,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
-                resetAllForTesting: resetAllForTesting,
             )
         }
         self.composition = composition
@@ -94,36 +74,22 @@ struct GitItApp: App {
         WindowGroup {
             AppRootView(store: rootStore)
                 .task {
-                    await composition.bootstrap(appDelegate)
+                    await AppLaunchSequence(
+                        recordSharedSessionState: composition.recordSharedSessionState,
+                        activatePushClient: composition.activatePushClient,
+                        configureAppDelegate: { composition.configureAppDelegate(appDelegate) },
+                        startObservingGenerationState: composition.startObservingGenerationState,
+                    )()
                 }
                 .onChange(of: scenePhase) { _, newPhase in
                     guard newPhase == .active else { return }
                     rootStore.send(.view(.applicationBecameActive))
-                }
-                .onOpenURL { url in
-                    guard url.host() == Constant.sharedLinkHost, url.path() == Constant.sharedLinkPath else { return }
-                    guard let link = Self.takeSharedRepositoryLink() else { return }
-                    rootStore.send(.effect(.sharedRepositoryLinkReceived(link)))
                 }
         }
     }
 
     // MARK: Private
 
-    private enum Constant {
-        static let sharedLinkHost = "git-it.kr"
-        static let sharedLinkPath = "/shared-link"
-        static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
-        static let sharedLinkStorageKey = "sharedRepositoryURL"
-    }
-
     @Environment(\.scenePhase) private var scenePhase
-
-    private static func takeSharedRepositoryLink() -> SharedRepositoryLink? {
-        guard let defaults = UserDefaults(suiteName: Constant.appGroupIdentifier) else { return nil }
-        guard let urlString = defaults.string(forKey: Constant.sharedLinkStorageKey) else { return nil }
-        defaults.removeObject(forKey: Constant.sharedLinkStorageKey)
-        return SharedRepositoryLink(url: urlString)
-    }
 
 }

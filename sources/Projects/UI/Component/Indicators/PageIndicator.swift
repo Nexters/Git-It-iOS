@@ -52,12 +52,12 @@ public struct PageIndicator: View {
 }
 
 #Preview("Page Indicator") {
-    VStack(spacing: LayoutToken.margin.cgFloatValue) {
+    VStack(spacing: LayoutToken.margin) {
         PageIndicator(currentPage: 0, totalPages: 3)
         PageIndicator(currentPage: 1, totalPages: 3)
         PageIndicator(currentPage: 2, totalPages: 3)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

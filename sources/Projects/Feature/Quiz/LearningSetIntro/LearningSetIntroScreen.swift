@@ -33,22 +33,24 @@ struct LearningSetIntroScreen: View {
 
     private var content: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
-                style: .largeTitle,
-                onLeadingTap: { send(.backTapped) },
+            ScreenControlBar(
+                onLeadingTap: { send(.backTapped) }
             )
+            .designSystemScreenMargin()
         } content: {
             VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                StyledText.subtitle2(store.label, color: .blue100)
+                StyledText.subtitle3(store.label, color: .blue100)
                 StyledText.subtitle1(store.learningSet?.title ?? "")
                 StyledText.body2(store.learningSet?.description ?? "", color: .grey400)
                     .padding(.top, Constant.descriptionTopPadding)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             .designSystemScreenMargin()
-            .padding(.top, Constant.textTopPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        } background: {
+            screenBackground
         } footer: {
             startAction
+                .designSystemScreenMargin()
         }
         .overlay {
             if case .loading = store.setLoad {
@@ -58,8 +60,13 @@ struct LearningSetIntroScreen: View {
         }
     }
 
+    private var screenBackground: some View {
+        LinearGradient(designSystem: .backgroundGradient)
+            .accessibilityHidden(true)
+    }
+
     private var startAction: some View {
-        ScreenOverlayFooter {
+        BottomActionBar {
             VStack(spacing: Constant.textSpacing) {
                 if store.isEmptySetReported {
                     StyledText.body2("아직 풀 수 있는 문제가 없어요.", color: .grey400, alignment: .center)
@@ -82,7 +89,7 @@ extension LearningSetIntroScreen {
     fileprivate enum Constant {
         static let textTopPadding: CGFloat = 24
         static let textSpacing: CGFloat = 8
-        static let descriptionTopPadding: CGFloat = 10
-        static let bottomButtonPadding: CGFloat = 34
+        static let descriptionTopPadding: CGFloat = 8
+        static let bottomButtonPadding: CGFloat = 24
     }
 }

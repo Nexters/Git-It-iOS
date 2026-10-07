@@ -17,7 +17,7 @@ public struct WebContentView: View {
     public var body: some View {
         WebView(url: url)
             .webViewContentBackground(.hidden)
-            .background(Color(designSystem: .cardBackground))
+            .background(Color(designSystem: .grey600))
     }
 
     // MARK: Private

@@ -139,8 +139,8 @@ struct LearningSetIntroFeatureTests {
     ) -> TestStoreOf<LearningSetIntroFeature> {
         TestStore(initialState: state) {
             LearningSetIntroFeature(
-                fetchLearningSet: fetchLearningSet,
-                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchLearningSet: fetchLearningSet.fetchSet,
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions.fetchBookmarks,
             )
         }
     }

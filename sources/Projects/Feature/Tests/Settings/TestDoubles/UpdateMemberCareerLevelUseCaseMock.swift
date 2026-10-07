@@ -1,6 +1,6 @@
 import DomainMember
 
-actor UpdateMemberCareerLevelUseCaseMock: UpdateMemberCareerLevelUseCase {
+actor UpdateMemberCareerLevelUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -9,6 +9,10 @@ actor UpdateMemberCareerLevelUseCaseMock: UpdateMemberCareerLevelUseCase {
     }
 
     // MARK: Internal
+
+    nonisolated var updateCareerLevel: @Sendable (CareerLevel) async throws -> Void {
+        { try await self($0) }
+    }
 
     func callAsFunction(_ careerLevel: CareerLevel) async throws {
         requestedCareerLevels.append(careerLevel)

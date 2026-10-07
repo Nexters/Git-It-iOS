@@ -51,8 +51,8 @@ struct HomeFeatureNavigationTests {
         TestStore(initialState: state) {
             HomeFeature(
                 fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: HomeMemberProfileUseCaseMock(),
-                observeGenerationOutcomes: StubObserveGenerationOutcomesUseCase(),
+                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
+                trackGeneration: StubTrackGenerationUseCase(),
             )
         }
     }

@@ -218,10 +218,6 @@ private actor SignInAuthenticationRepository: AuthenticationRepository {
         .authorized
     }
 
-    func authorizationChanges() async -> AsyncStream<AuthorizationStatus> {
-        AsyncStream { $0.finish() }
-    }
-
     func clearAuthentication() async throws {
         await recorder.append(.clearAuthentication)
     }

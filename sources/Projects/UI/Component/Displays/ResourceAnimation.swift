@@ -55,7 +55,7 @@ public struct ResourceAnimation: View {
 }
 
 #Preview("Resource Animation") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ResourceAnimation(asset: .generalLoading)
             .frame(width: 128, height: 128)
 
@@ -66,12 +66,12 @@ public struct ResourceAnimation: View {
             .frame(width: 128, height: 128)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }
 
 #Preview("Resource Animation 2") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         ResourceAnimation(asset: .setCreationLoading, speed: 1.5)
             .frame(width: 250, height: 250)
 
@@ -79,6 +79,6 @@ public struct ResourceAnimation: View {
             .frame(width: 200, height: 200)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

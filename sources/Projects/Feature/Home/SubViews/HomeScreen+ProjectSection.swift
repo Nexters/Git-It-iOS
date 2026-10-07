@@ -1,0 +1,239 @@
+import DesignSystem
+import SwiftUI
+import UIComponent
+
+extension HomeScreen {
+    struct ProjectSection: View {
+
+        // MARK: Internal
+
+        let state: HomeProjectSectionState
+
+        @Binding var cardListLeadingX: CGFloat?
+
+        let onShowAllTapped: () -> Void
+        let onProjectRetryTapped: () -> Void
+        let onProjectCardTapped: (String) -> Void
+        let onLearningTapped: (String) -> Void
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: Constant.sectionHeaderSpacing) {
+                HStack {
+                    StyledText.subtitle3("학습 중인 레포지토리")
+                    Spacer()
+                    Button(action: onShowAllTapped) {
+                        HStack(spacing: 8) {
+                            StyledText.body2("전체 보기", color: .blue100)
+                            ResourceImage(asset: .icon(.chevronRight))
+                                .frame(width: Constant.chevronSize, height: Constant.chevronSize)
+                                .designSystemForeground(.blue100)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(8)
+                    .accessibilityLabel(Constant.showAllLabel)
+                }
+                .designSystemScreenMargin()
+
+                projectContent
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { sectionWidth = $0 }
+        }
+
+        // MARK: Private
+
+        private enum Constant {
+            static let showAllLabel = "학습 중인 레포지토리 전체 보기"
+            static let sectionHeaderSpacing: CGFloat = 16
+            static let retryMessageSpacing: CGFloat = 8
+            static let chevronSize: CGFloat = 12
+            static let screenMargin: CGFloat = 16
+            static let cardSpacing: CGFloat = 0
+            static let strokeWidth: CGFloat = 2
+            static let maximumCardRotationDegrees: CGFloat = 16
+            static let trailingInset: CGFloat = 16
+
+            static let emptyDeckCardSpacing: CGFloat = 0
+            static let emptyDeckCardRotations: [Angle] = [.zero, .degrees(12), .degrees(-14)]
+
+            static let defaultSectionWidth: CGFloat = 402
+
+            static func cardWidth(forSectionWidth sectionWidth: CGFloat) -> CGFloat {
+                let contentWidth = sectionWidth - LayoutToken.margin * 2
+                return (contentWidth - LayoutToken.gutter) / 2
+            }
+
+            static func cardStride(cardWidth: CGFloat) -> CGFloat {
+                cardWidth + cardSpacing
+            }
+
+            static func rotationSlack(cardWidth: CGFloat) -> CGFloat {
+                let radians = maximumCardRotationDegrees * .pi / 180
+                let cardHeight = HomeProjectCard.designHeight
+                let rotatedHeight = cardWidth * sin(radians) + cardHeight * cos(radians)
+
+                return max((rotatedHeight - cardHeight) / 2, 0)
+            }
+
+            static func sectionHeight(cardWidth: CGFloat) -> CGFloat {
+                HomeProjectCard.designHeight + rotationSlack(cardWidth: cardWidth) * 2
+            }
+
+            static func emptyDeckCards() -> [HomeScreen.EmptyDeckShape.Card] {
+                let cardSize = CGSize(
+                    width: HomeProjectCard.designWidth,
+                    height: HomeProjectCard.designHeight,
+                )
+
+                return emptyDeckCardRotations.enumerated().map { index, rotation in
+                    HomeScreen.EmptyDeckShape.Card(
+                        frame: CGRect(
+                            x: CGFloat(index) * (cardSize.width + emptyDeckCardSpacing),
+                            y: 0,
+                            width: cardSize.width,
+                            height: cardSize.height,
+                        ),
+                        rotation: rotation,
+                        cornerRadius: CornerRadiusToken.large.cgFloatValue,
+                    )
+                }
+            }
+        }
+
+        @State private var sectionWidth: CGFloat = Constant.defaultSectionWidth
+
+        private var cardWidth: CGFloat {
+            Constant.cardWidth(forSectionWidth: sectionWidth)
+        }
+
+        private var sectionHeight: CGFloat {
+            Constant.sectionHeight(cardWidth: cardWidth)
+        }
+
+        private var emptyProjectCards: some View {
+            let shape = emptyDeckShape
+
+            return ScrollView(.horizontal) {
+                emptyDeckSilhouette(shape: shape)
+                    .frame(
+                        width: shape.size.width,
+                        height: shape.size.height,
+                    )
+                    .padding(.leading, Constant.screenMargin)
+            }
+            .scrollDisabled(true)
+            .scrollIndicators(.hidden)
+            .accessibilityHidden(true)
+        }
+
+        private var emptyDeckShape: HomeScreen.EmptyDeckShape {
+            HomeScreen.EmptyDeckShape(cards: Constant.emptyDeckCards())
+        }
+
+        @ViewBuilder
+        private var projectContent: some View {
+            switch state {
+            case .loaded(let projects):
+                projectCards(projects)
+
+            case .loading:
+                emptyProjects {
+                    ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
+                }
+
+            case .empty:
+                emptyProjects {
+                    StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
+                }
+
+            case .failed:
+                emptyProjects {
+                    VStack(spacing: Constant.retryMessageSpacing) {
+                        StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
+                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped)
+                    }
+                    .designSystemScreenMargin()
+                }
+            }
+        }
+
+        private func emptyDeckSilhouette(shape: HomeScreen.EmptyDeckShape) -> some View {
+            shape
+                .fill(Color(designSystem: .blue500))
+                .overlay {
+                    shape
+                        .stroke(Color(designSystem: .blue300), lineWidth: Constant.strokeWidth * 2)
+                        .clipShape(shape)
+                }
+        }
+
+        private func emptyProjects(@ViewBuilder accessary: () -> some View) -> some View {
+            ZStack {
+                emptyProjectCards
+                accessary()
+            }
+            .frame(height: sectionHeight)
+            .accessibilityElement(children: .contain)
+        }
+
+        private func projectCards(_ projects: [HomeProjectDisplay]) -> some View {
+            projectCardScroll(projects)
+                .frame(height: sectionHeight)
+        }
+
+        private func projectCardScroll(_ projects: [HomeProjectDisplay]) -> some View {
+            let layout = cardListLeadingX.map {
+                HomeCardScrollLayout(
+                    p0CenterX: $0 + cardWidth / 2,
+                    cardStride: Constant.cardStride(cardWidth: cardWidth),
+                )
+            }
+
+            return ScrollView(.horizontal) {
+                LazyHStack(spacing: Constant.cardSpacing) {
+                    ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
+                        HomeProjectCard(
+                            title: project.title,
+                            technologies: project.technologies,
+                            progress: project.progress,
+                            currentSetLabel: project.currentSetLabel,
+                            setTitle: project.setTitle,
+                            variant: project.variant,
+                            isLearningEnabled: project.isLearningEnabled,
+                            onSelect: { onProjectCardTapped(String(project.projectID)) },
+                            onStart: { onLearningTapped(String(project.projectID)) },
+                        )
+                        .visualEffect { content, proxy in
+                            content.rotationEffect(
+                                .degrees(
+                                    layout?.angle(
+                                        cardCenterX: proxy.frame(in: .scrollView(axis: .horizontal)).midX
+                                    ) ?? 0
+                                )
+                            )
+                        }
+                    }
+                }
+                .background(alignment: .leading) {
+                    Color.clear
+                        .frame(width: 0, height: 0)
+                        .onGeometryChange(for: CGFloat.self) { proxy in
+                            proxy.frame(in: .scrollView(axis: .horizontal)).minX
+                        } action: { minX in
+                            guard cardListLeadingX == nil else { return }
+                            cardListLeadingX = minX
+                        }
+                }
+                .scrollTargetLayout()
+                .padding(.vertical, Constant.rotationSlack(cardWidth: cardWidth))
+            }
+            .safeAreaPadding(.leading, Constant.screenMargin)
+            .safeAreaPadding(.trailing, Constant.trailingInset)
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
+        }
+
+    }
+}

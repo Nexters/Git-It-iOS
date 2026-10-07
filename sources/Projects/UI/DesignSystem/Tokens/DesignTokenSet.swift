@@ -6,11 +6,9 @@ public struct DesignTokenSet: Sendable {
 
     public init(
         colors: [ColorToken],
-        semanticColors: [SemanticColorToken],
         gradients: [GradientToken],
         fontFamilies: [FontFamilyToken],
         textStyles: [TextStyleToken],
-        layouts: [LayoutToken],
         opacities: [OpacityToken],
         cornerRadii: [CornerRadiusToken],
         borders: [BorderToken],
@@ -18,11 +16,9 @@ public struct DesignTokenSet: Sendable {
         controlSizes: [ControlSizeToken],
     ) {
         self.colors = colors
-        self.semanticColors = semanticColors
         self.gradients = gradients
         self.fontFamilies = fontFamilies
         self.textStyles = textStyles
-        self.layouts = layouts
         self.opacities = opacities
         self.cornerRadii = cornerRadii
         self.borders = borders
@@ -33,11 +29,9 @@ public struct DesignTokenSet: Sendable {
     // MARK: Public
 
     public let colors: [ColorToken]
-    public let semanticColors: [SemanticColorToken]
     public let gradients: [GradientToken]
     public let fontFamilies: [FontFamilyToken]
     public let textStyles: [TextStyleToken]
-    public let layouts: [LayoutToken]
     public let opacities: [OpacityToken]
     public let cornerRadii: [CornerRadiusToken]
     public let borders: [BorderToken]
@@ -49,11 +43,9 @@ public struct DesignTokenSet: Sendable {
 extension DesignTokenSet {
     public static let current = DesignTokenSet(
         colors: ColorToken.all,
-        semanticColors: SemanticColorToken.all,
         gradients: GradientToken.all,
         fontFamilies: FontFamilyToken.all,
         textStyles: TextStyleToken.all,
-        layouts: LayoutToken.all,
         opacities: OpacityToken.all,
         cornerRadii: CornerRadiusToken.all,
         borders: BorderToken.all,
@@ -80,10 +72,6 @@ extension DesignTokenSet {
             names: colors.map(\.name),
         )
         errors += Self.duplicateNameErrors(
-            category: "SemanticColorToken",
-            names: semanticColors.map(\.name),
-        )
-        errors += Self.duplicateNameErrors(
             category: "GradientToken",
             names: gradients.map(\.name),
         )
@@ -94,10 +82,6 @@ extension DesignTokenSet {
         errors += Self.duplicateNameErrors(
             category: "TextStyleToken",
             names: textStyles.map(\.name),
-        )
-        errors += Self.duplicateNameErrors(
-            category: "LayoutToken",
-            names: layouts.map(\.name),
         )
         errors += Self.duplicateNameErrors(
             category: "OpacityToken",
@@ -150,13 +134,6 @@ extension DesignTokenSet {
                 ))
             }
         }
-        for layout in layouts where layout.value < 0 {
-            errors.append(.outOfRange(
-                category: "LayoutToken",
-                name: layout.name,
-                detail: "value \(layout.value) < 0",
-            ))
-        }
         for cornerRadius in cornerRadii where cornerRadius.value < 0 {
             errors.append(.outOfRange(
                 category: "CornerRadiusToken",
@@ -180,13 +157,6 @@ extension DesignTokenSet {
         }
 
         let colorNames = Set(colors.map(\.name))
-        for semanticColor in semanticColors where !colorNames.contains(semanticColor.colorToken.name) {
-            errors.append(.danglingReference(
-                category: "SemanticColorToken",
-                name: semanticColor.name,
-                reference: semanticColor.colorToken.name,
-            ))
-        }
         for border in borders where !colorNames.contains(border.colorToken.name) {
             errors.append(.danglingReference(
                 category: "BorderToken",

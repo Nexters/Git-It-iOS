@@ -33,14 +33,13 @@ public struct ResourceImage: View {
             case bookmark = "ic-bookmark"
             case bookmarkFilled = "ic-bookmark-filled"
             case cancel = "ic-cancel"
-            case checkmarkChecked = "ic-checkmark-checked"
-            case checkmarkDisable = "ic-checkmark-disable"
-            case chevronDown = "ic-chevron-down-1"
-            case chevronLeft = "ic-chevron-left-1"
-            case chevronLeftLarge = "ic-chevron-left-2"
-            case chevronRight = "ic-chevron-right-1"
-            case chevronRightLarge = "ic-chevron-right-2"
-            case chevronUp = "ic-chevron-up-1"
+            case chevronDown = "ic-chevron-down"
+            case chevronLeft = "ic-chevron-left"
+            case chevronRight = "ic-chevron-right"
+            case chevronUp = "ic-chevron-up"
+            case chevronLeftWhite = "ic-chevron-left-white"
+            case chevronRightWhite = "ic-chevron-right-white"
+            case close = "ic-close"
             case edit = "ic-edit"
             case fileText = "ic-file-text"
             case home = "ic-home"
@@ -53,6 +52,7 @@ public struct ResourceImage: View {
             case profile = "ic-profile"
             case setting = "ic-setting"
             case settingAlert = "ic-setting-alert"
+            case settingChevron = "ic-setting-chevron"
             case settingDelete = "ic-setting-delete"
             case settingDevelop = "ic-setting-develop"
             case settingLevel = "ic-setting-level"
@@ -61,9 +61,9 @@ public struct ResourceImage: View {
             case star = "ic-star"
             case statusCheck = "ic-status-check"
             case statusDisabled = "ic-status-disabled"
+            case statusLoading = "ic-status-loading"
             case statusLoadingDisabled = "ic-status-loading-disable"
             case user = "ic-user"
-            case x = "ic-x"
         }
 
         public enum Illust: String, Sendable, Equatable, CaseIterable {
@@ -107,7 +107,7 @@ public struct ResourceImage: View {
 }
 
 #Preview("Resource Image") {
-    HStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    HStack(spacing: LayoutToken.gutter) {
         ResourceImage(asset: .illust(.knowledgeBasic), contentMode: .fill)
             .frame(width: 96, height: 96)
             .designSystemCornerRadius(.extraLarge)
@@ -120,7 +120,7 @@ public struct ResourceImage: View {
             .frame(width: 96, height: 96)
     }
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }
 

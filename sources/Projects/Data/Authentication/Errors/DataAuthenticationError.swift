@@ -3,7 +3,6 @@ public enum DataAuthenticationError: CaseIterable, Equatable, Error, Sendable {
     case unauthorized
     case temporarilyUnavailable
     case transport
-    case decoding
     case unexpectedStatus
 
     public init(from serverError: ServerAPIError) {

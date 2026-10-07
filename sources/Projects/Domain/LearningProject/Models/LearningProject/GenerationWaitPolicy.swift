@@ -22,15 +22,15 @@ public struct GenerationWaitPolicy: Equatable, Sendable {
     public let minimumWait: TimeInterval
     public let retentionLimit: TimeInterval
 
-    public func readyDate(for progress: GenerationProgress) -> Date {
-        progress.requestedAt.addingTimeInterval(minimumWait)
+    public func readyDate(for record: GenerationRecord) -> Date {
+        record.requestedAt.addingTimeInterval(minimumWait)
     }
 
     public func isExpired(
-        _ progress: GenerationProgress,
+        _ record: GenerationRecord,
         now: Date,
     ) -> Bool {
-        now.timeIntervalSince(progress.requestedAt) > retentionLimit
+        record.isExpired(now: now, retentionLimit: retentionLimit)
     }
 
 }

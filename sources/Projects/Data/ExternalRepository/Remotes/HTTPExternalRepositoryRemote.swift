@@ -2,7 +2,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPExternalRepositoryRemote
 
-public struct HTTPExternalRepositoryRemote: ExternalRepositoryRemote {
+public struct HTTPExternalRepositoryRemote: Sendable {
 
     // MARK: Lifecycle
 

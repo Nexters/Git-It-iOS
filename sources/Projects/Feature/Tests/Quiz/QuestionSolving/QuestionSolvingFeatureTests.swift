@@ -28,17 +28,19 @@ struct QuestionSolvingFeatureTests {
         #expect(await submitChoiceAnswer.invocations.isEmpty)
     }
 
-    @Test
-    func `공백만 있는 서술형은 제출하지 않는다`() async {
-        let submitEssayAnswer = StubSubmitEssayAnswerUseCase()
+    @Test(arguments: ["", "   \n "])
+    func `비어 있거나 공백만 있는 서술형도 제출한다`(draftEssayText: String) async {
+        let submitEssayAnswer = StubSubmitEssayAnswerUseCase(results: [.success(QuizTestFixture.essayResult)])
         let store = makeStore(
             submitEssayAnswer: submitEssayAnswer,
-            state: essayState(draftEssayText: "   \n "),
+            state: essayState(draftEssayText: draftEssayText),
         )
+        store.exhaustivity = .off
 
         await store.send(.view(.submitAnswerTapped))
+        await store.receive(\.effect.essayAnswerFinished)
 
-        #expect(await submitEssayAnswer.invocations.isEmpty)
+        #expect(await submitEssayAnswer.invocations.count == 1)
     }
 
     @Test

@@ -55,13 +55,34 @@ public struct ProjectDetailRouter: View {
         .accessibilityLabel("문제를 불러오는 중")
     }
 
-    @ViewBuilder
-    private var content: some View {
+    private var pushedScreens: [ProjectDetailRouterFeature.ActiveScreen] {
         switch store.activeScreen {
         case .projectDetail:
+            []
+
+        case .savedQuestions:
+            [.savedQuestions]
+
+        case .singleQuestion:
+            [.savedQuestions, .singleQuestion]
+        }
+    }
+
+    private var content: some View {
+        FlowNavigationStack(path: pushedScreens) {
             ProjectDetailScreen(
                 store: store.scope(state: \.projectDetail, action: \.projectDetail)
             )
+        } destination: { screen in
+            pushedScreen(screen)
+        }
+    }
+
+    @ViewBuilder
+    private func pushedScreen(_ screen: ProjectDetailRouterFeature.ActiveScreen) -> some View {
+        switch screen {
+        case .projectDetail:
+            EmptyView()
 
         case .savedQuestions:
             SavedScreen(

@@ -14,7 +14,8 @@ App은 여러 Feature의 navigation intent를 애플리케이션 수준의 화�
 
 - 공개 이름은 [네이밍 컨벤션](../conventions/naming.md)을 따르며 실행 진입점, 애플리케이션 전체 Navigation과 Feature↔Composition 연결 책임만 드러내야 합니다.
 - 모든 내부 target은 실행 진입점, 플랫폼 생명주기 연결, Feature↔Composition 조립 또는 Navigation에 기여해야 합니다.
-- Composition이 제공하는 dependency를 Feature initializer 또는 명시적인 초기화 인자에 주입해야 합니다.
+- production Composition을 정확히 1회 생성하고, 각 Feature에 그 Feature가 실제로 사용하는 UseCase만 initializer 또는 명시적인 초기화 인자로 주입해야 합니다. Composition 컨테이너 전체를 전달하지 않습니다.
+- root Feature와 root Store를 생성하고 세션·온보딩 판정 결과에 따라 root 경로를 선택해야 합니다.
 - Feature가 외부 화면 흐름 변경을 요청하면 App이 목적지와 전환 방식을 결정해야 합니다.
 - 실행 환경 선택이 필요한 경우 App이 실행 환경을 결정해 Composition 생성 시 전달해야 합니다.
 - Navigation과 조립에 필요한 Domain 타입을 직접 사용할 수 있습니다.
@@ -28,3 +29,4 @@ App은 여러 Feature의 navigation intent를 애플리케이션 수준의 화�
 - Feature의 Presentation 상태나 화면 구현을 App에 옮겨서는 안 됩니다.
 - 공용 UI 구성요소를 소유하거나 UI 패키지에 직접 의존해서는 안 됩니다.
 - Service Locator나 전역 dependency container를 통해 Feature dependency를 조회하게 해서는 안 됩니다.
+- production App이 sample, preview 또는 test 구현을 주입해서는 안 됩니다.

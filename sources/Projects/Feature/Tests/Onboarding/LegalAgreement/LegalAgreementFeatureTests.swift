@@ -32,23 +32,21 @@ struct LegalAgreementFeatureTests {
     }
 
     @Test
-    func `prepare 입력은 대기 중인 needsCuration을 보관하고 선택을 초기화한다`() async {
+    func `prepare 입력은 선택을 초기화한다`() async {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.selectedDocumentIDs = [OnboardingTestFixture.privacyPolicy.identifier]
         let store = makeLegalAgreementStore(state: state)
 
-        await store.send(.input(.prepare(needsCuration: true))) {
-            $0.pendingNeedsCuration = true
+        await store.send(.input(.prepare)) {
             $0.selectedDocumentIDs = []
         }
     }
 
     @Test
-    func `필수 문서를 모두 선택하고 계속하기를 누르면 동의를 저장하고 대기 중인 needsCuration을 위임한다`() async {
+    func `필수 문서를 모두 선택하고 계속하기를 누르면 동의를 저장하고 완료를 위임한다`() async {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.pendingNeedsCuration = true
         let policyConsent = PolicyConsentUseCaseMock(requiredDocuments: OnboardingTestFixture.requiredDocuments)
         let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
         store.exhaustivity = .off
@@ -59,9 +57,8 @@ struct LegalAgreementFeatureTests {
         #expect(store.state.isAllSelected)
 
         await store.send(.view(.continueTapped))
-        #expect(store.state.pendingNeedsCuration == nil)
 
-        await store.receive(.delegate(.consentCompleted(needsCuration: true)))
+        await store.receive(.delegate(.consentCompleted))
 
         let snapshot = await policyConsent.snapshot()
         #expect(snapshot.savedRecords.count == 1)
@@ -87,7 +84,6 @@ struct LegalAgreementFeatureTests {
     func `일부만 선택하면 계속하기가 비활성 상태로 유지되고 저장을 호출하지 않는다`() async {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
-        state.pendingNeedsCuration = true
         let policyConsent = PolicyConsentUseCaseMock(requiredDocuments: OnboardingTestFixture.requiredDocuments)
         let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
 
@@ -106,13 +102,11 @@ struct LegalAgreementFeatureTests {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.selectedDocumentIDs = [OnboardingTestFixture.privacyPolicy.identifier]
-        state.pendingNeedsCuration = true
         let policyConsent = PolicyConsentUseCaseMock(requiredDocuments: OnboardingTestFixture.requiredDocuments)
         let store = makeLegalAgreementStore(policyConsent: policyConsent, state: state)
 
         await store.send(.view(.cancelTapped)) {
             $0.selectedDocumentIDs = []
-            $0.pendingNeedsCuration = nil
         }
         await store.receive(.delegate(.cancelled))
 
@@ -137,7 +131,7 @@ struct LegalAgreementFeatureTests {
     }
 
     @Test
-    func `저장된 동의 기록이 필수 문서를 모두 덮으면 유효한 동의로 판단한다`() async {
+    func `저장된 동의 기록이 필수 문서를 모두 덮으면 유효한 동의로 판단한다`() {
         var state = LegalAgreementFeature.State()
         state.requiredDocuments = OnboardingTestFixture.requiredDocuments
         state.storedConsentRecords = OnboardingTestFixture.validConsentRecords

@@ -4,7 +4,11 @@ import DomainLearningProject
 @Reducer
 public struct RepositoryConfirmationFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init() { }
+
+    // MARK: Public
 
     @ObservableState
     public struct State: Equatable, Sendable {
@@ -14,6 +18,7 @@ public struct RepositoryConfirmationFeature: Sendable {
         }
 
         public var repository: ExternalRepository?
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -38,14 +43,14 @@ public struct RepositoryConfirmationFeature: Sendable {
         Reduce { _, action in
             switch action {
             case .view(.confirmTapped):
-                return .send(.delegate(.confirmed))
+                .send(.delegate(.confirmed))
 
             case .view(.rejectTapped),
                  .view(.backTapped):
-                return .send(.delegate(.rejected))
+                .send(.delegate(.rejected))
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }

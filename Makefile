@@ -3,13 +3,14 @@
 
 PATHS_SH := ./tools/repository-paths/bin/repository-paths.sh
 IOS_ROOT := $(shell $(PATHS_SH) GIT_IT_IOS_ROOT)
+PROJECTS_ROOT := $(shell $(PATHS_SH) GIT_IT_PROJECTS_ROOT)
 HOOKS_ROOT := $(shell $(PATHS_SH) GIT_IT_HOOKS_ROOT)
 SWIFT_FORMAT_RUNNER := $(shell $(PATHS_SH) GIT_IT_SWIFT_FORMAT_RUNNER)
 PROJECT_SETUP_RUNNER := $(shell $(PATHS_SH) GIT_IT_PROJECT_SETUP_RUNNER)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help init tuist clean hooks format verify-tools
+.PHONY: help init tuist clean hooks format-changed format-all verify-tools
 
 help: ## 사용 가능한 명령을 표시합니다
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  make %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -28,8 +29,11 @@ clean: ## Tuist의 로컬 캐시와 아티팩트를 정리합니다
 hooks: ## Git local core.hooksPath와 훅 실행 권한을 설정합니다
 	$(HOOKS_ROOT)/hook-management/bin/install.sh
 
-format: ## 현재 변경된 Swift 소스만 포맷합니다
-	$(SWIFT_FORMAT_RUNNER) format "$$(pwd)/sources/Projects"
+format-changed: ## 현재 추가·수정된 Swift 소스만 포맷합니다
+	$(SWIFT_FORMAT_RUNNER) format "$$(pwd)/$(PROJECTS_ROOT)"
+
+format-all: ## 패키지 소스 전체 Swift 파일을 포맷합니다
+	$(SWIFT_FORMAT_RUNNER) format-all "$$(pwd)/$(PROJECTS_ROOT)"
 
 verify-tools: ## 셸 스크립트 검증에 필요한 ShellCheck·shfmt를 준비합니다
 	./tools/script-verification/bin/prepare-tools.sh

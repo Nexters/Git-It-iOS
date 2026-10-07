@@ -2,7 +2,7 @@ import DomainAuthentication
 import DomainMember
 import Foundation
 
-actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
+actor FetchMemberProfileUseCaseMock {
 
     // MARK: Lifecycle
 
@@ -11,6 +11,10 @@ actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
     }
 
     // MARK: Internal
+
+    nonisolated var fetchProfile: @Sendable () async throws -> MemberProfile {
+        { try await self() }
+    }
 
     func callAsFunction() async throws -> MemberProfile {
         callCount += 1

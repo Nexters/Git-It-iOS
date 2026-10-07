@@ -102,8 +102,42 @@ extension GradientToken {
         ],
     )
 
+    public static let backgroundGradient = GradientToken(
+        name: "BackgroundGradient",
+        start: .init(x: 0.5, y: 0.6),
+        end: .init(x: 0.5, y: 3.0),
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+            ),
+            Stop(
+                position: 1,
+                hex: "#A5C4F0",
+            ),
+        ],
+    )
+
     public static let topEdgeScrim = GradientToken(
         name: "TopEdgeScrim",
+        start: topToBottomEnd,
+        end: topToBottomStart,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 1,
+                hex: "#141414",
+                opacity: 0.5,
+            ),
+        ],
+    )
+
+    public static let quizTopScrim = GradientToken(
+        name: "QuizTopScrim",
         start: topToBottomEnd,
         end: topToBottomStart,
         stops: [
@@ -119,21 +153,66 @@ extension GradientToken {
             ),
         ],
     )
-
     public static let bottomEdgeScrim = GradientToken(
         name: "BottomEdgeScrim",
         start: topToBottomStart,
         end: topToBottomEnd,
         stops: [
             Stop(
-                position: 0.7,
+                position: 1,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 0.2,
                 hex: "#141414",
                 opacity: 0.6,
+            ),
+        ],
+    )
+
+    public static let overlayHeaderScrim = GradientToken(
+        name: "OverlayHeaderScrim",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0.6,
+            ),
+            Stop(
+                position: 0.65,
+                hex: "#141414",
+                opacity: 0.2,
             ),
             Stop(
                 position: 1,
                 hex: "#141414",
                 opacity: 0,
+            ),
+        ],
+    )
+
+    public static let overlayFooterScrim = GradientToken(
+        name: "OverlayFooterScrim",
+        start: topToBottomStart,
+        end: topToBottomEnd,
+        stops: [
+            Stop(
+                position: 0,
+                hex: "#141414",
+                opacity: 0,
+            ),
+            Stop(
+                position: 0.2,
+                hex: "#141414",
+                opacity: 0.8,
+            ),
+            Stop(
+                position: 1,
+                hex: "#141414",
+                opacity: 1,
             ),
         ],
     )

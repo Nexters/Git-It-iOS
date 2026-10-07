@@ -1,6 +1,6 @@
 import DomainLearningProject
 
-actor StubFetchBookmarkedQuestionsUseCase: FetchBookmarkedQuestionsUseCase {
+actor StubFetchBookmarkedQuestionsUseCase {
 
     // MARK: Lifecycle
 
@@ -12,6 +12,10 @@ actor StubFetchBookmarkedQuestionsUseCase: FetchBookmarkedQuestionsUseCase {
 
     private(set) var callCount = 0
     private(set) var requestedProjectIDs = [String?]()
+
+    nonisolated var fetchBookmarks: @Sendable (String?) async throws -> BookmarkedQuestionCollection {
+        { try await self(projectID: $0) }
+    }
 
     func callAsFunction(projectID: String?) async throws -> BookmarkedQuestionCollection {
         callCount += 1

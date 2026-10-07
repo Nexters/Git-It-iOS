@@ -3,7 +3,6 @@ public enum DataMemberError: CaseIterable, Equatable, Error, Sendable {
     case unauthorized
     case temporarilyUnavailable
     case transport
-    case decoding
     case unexpectedStatus
     case memberUnavailable
 

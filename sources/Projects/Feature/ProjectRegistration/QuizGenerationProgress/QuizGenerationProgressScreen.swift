@@ -2,19 +2,18 @@ import ComposableArchitecture
 import SwiftUI
 import UIComponent
 
+// MARK: - QuizGenerationProgressScreen
+
 @ViewAction(for: QuizGenerationProgressFeature.self)
 struct QuizGenerationProgressScreen: View {
 
     // MARK: Internal
 
-    init(store: StoreOf<QuizGenerationProgressFeature>) {
-        self.store = store
-    }
-
     @Bindable var store: StoreOf<QuizGenerationProgressFeature>
 
     var body: some View {
         content
+            .frame(maxWidth: .infinity)
             .sheet(
                 isPresented: Binding(
                     get: { store.isGenerationReminderSheetPresented },
@@ -47,8 +46,10 @@ struct QuizGenerationProgressScreen: View {
 
 }
 
-private extension QuizGenerationProgressScreen {
-    enum Constant {
-        static let failureBottomButtonPadding: CGFloat = 34
+// MARK: QuizGenerationProgressScreen.Constant
+
+extension QuizGenerationProgressScreen {
+    fileprivate enum Constant {
+        static let failureBottomButtonPadding: CGFloat = 24
     }
 }

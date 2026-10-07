@@ -74,6 +74,23 @@ jobs:
       - name: Verify project scripts
         run: "$GIT_IT_SCRIPT_VERIFICATION_RUNNER"
 
+  package-dependencies:
+    name: package dependencies
+    needs: changes
+    # 문서만 바뀐 PR에서도 아키텍처 표와 설정의 대응을 검사하므로 변경 분류를 조건으로 두지 않습니다.
+    if: ${{ vars.GIT_IT_CI_VALIDATION_ENABLED == 'true' }}
+    runs-on: macos-26
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Load repository paths
+        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+
+      - name: Check package dependencies
+        run: "$GIT_IT_PACKAGE_DEPENDENCY_RUNNER"
+
   swift-lint:
     name: lint
     needs: changes
@@ -323,6 +340,7 @@ jobs:
     needs:
       - changes
       - script-quality
+      - package-dependencies
       - swift-lint
       - build
       - compile
@@ -338,6 +356,7 @@ jobs:
           ./tools/ci/bin/gate-evaluate.sh \
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
+            "${{ needs.package-dependencies.result }}" \
             "${{ needs.swift-lint.result }}" \
             "${{ needs.build.result }}" \
             "${{ needs.compile.result }}" \

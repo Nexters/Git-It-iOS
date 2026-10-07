@@ -10,18 +10,12 @@ public struct ProjectDetailRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
-        deleteLearningProject: any DeleteLearningProjectUseCase,
-        fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
-        fetchLearningSet: any FetchLearningSetUseCase,
+        learningLibrary: any LearningLibraryUseCase,
         submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
         submitEssayAnswer: any SubmitEssayAnswerUseCase,
         setQuestionBookmark: any SetQuestionBookmarkUseCase,
     ) {
-        self.fetchLearningProjectDetail = fetchLearningProjectDetail
-        self.deleteLearningProject = deleteLearningProject
-        self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
-        self.fetchLearningSet = fetchLearningSet
+        self.learningLibrary = learningLibrary
         self.submitChoiceAnswer = submitChoiceAnswer
         self.submitEssayAnswer = submitEssayAnswer
         self.setQuestionBookmark = setQuestionBookmark
@@ -29,7 +23,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     // MARK: Public
 
-    public enum ActiveScreen: Equatable, Sendable {
+    public enum ActiveScreen: Hashable, Sendable {
         case projectDetail
         case savedQuestions
         case singleQuestion
@@ -72,7 +66,7 @@ public struct ProjectDetailRouterFeature: Sendable {
         public init(projectID: String) {
             self.projectID = projectID
             projectDetail = ProjectDetailFeature.State(projectID: projectID)
-            savedQuestions = SavedFeature.State(projectFilter: projectID, isBackControlPresented: true)
+            savedQuestions = SavedFeature.State(initialProjectFilter: projectID, isBackControlPresented: true)
             singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: projectID)
         }
 
@@ -108,21 +102,26 @@ public struct ProjectDetailRouterFeature: Sendable {
         }
     }
 
-    /// 단일 문제 결과에서 목록으로 돌아가는 컨트롤 문구입니다.
     public static let singleQuestionAdvanceActionTitle = "완료"
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.projectDetail, action: \.projectDetail) {
             ProjectDetailFeature(
-                fetchLearningProjectDetail: fetchLearningProjectDetail,
-                deleteLearningProject: deleteLearningProject,
+                fetchLearningProjectDetail: { [learningLibrary] in try await learningLibrary.project(id: $0) },
+                deleteLearningProject: { [learningLibrary] in try await learningLibrary.deleteProject(id: $0) },
             )
         }
         Scope(state: \.savedQuestions, action: \.savedQuestions) {
-            SavedFeature(fetchBookmarkedQuestions: fetchBookmarkedQuestions)
+            SavedFeature(
+                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
+                setQuestionBookmark: setQuestionBookmark,
+            )
         }
         Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: fetchLearningSet)
+            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(
+                projectID: $0,
+                setID: $1,
+            ) })
         }
         Reduce { state, action in
             switch action {
@@ -191,10 +190,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
-    private let deleteLearningProject: any DeleteLearningProjectUseCase
-    private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
-    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let learningLibrary: any LearningLibraryUseCase
     private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
     private let submitEssayAnswer: any SubmitEssayAnswerUseCase
     private let setQuestionBookmark: any SetQuestionBookmarkUseCase

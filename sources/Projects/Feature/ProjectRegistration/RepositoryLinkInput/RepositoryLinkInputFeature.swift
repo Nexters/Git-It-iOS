@@ -5,9 +5,13 @@ import Foundation
 @Reducer
 public struct RepositoryLinkInputFeature: Sendable {
 
+    // MARK: Lifecycle
+
     public init(fetchExternalRepository: any FetchExternalRepositoryUseCase) {
         self.fetchExternalRepository = fetchExternalRepository
     }
+
+    // MARK: Public
 
     public enum ValidationStatus: Equatable, Sendable {
         case idle
@@ -19,16 +23,15 @@ public struct RepositoryLinkInputFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
 
-        public init(initialRepositoryURL: String = "") {
-            repositoryURLInput = initialRepositoryURL
-            pendingAutomaticValidation = !initialRepositoryURL.isEmpty
-        }
+        // MARK: Lifecycle
+
+        public init() { }
+
+        // MARK: Public
 
         public var repositoryURLInput = ""
         public var validation = ValidationStatus.idle
         public var validationRequestID = 0
-
-        var pendingAutomaticValidation = false
 
         public var canValidate: Bool {
             !repositoryURLInput.isEmpty && validation != .validating
@@ -44,6 +47,7 @@ public struct RepositoryLinkInputFeature: Sendable {
         public var validateButtonTitle: String {
             validation == .validating ? "확인 중…" : "다음"
         }
+
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -51,9 +55,10 @@ public struct RepositoryLinkInputFeature: Sendable {
         case effect(EffectEvent)
         case delegate(Delegate)
 
+        // MARK: Public
+
         @CasePathable
         public enum View: Sendable, Equatable {
-            case task
             case repositoryURLChanged(String)
             case validateTapped
             case dismissTapped
@@ -74,11 +79,6 @@ public struct RepositoryLinkInputFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                guard state.pendingAutomaticValidation else { return .none }
-                state.pendingAutomaticValidation = false
-                return startValidation(&state)
-
             case .view(.repositoryURLChanged(let text)):
                 state.repositoryURLInput = text
                 state.validation = .idle
@@ -107,6 +107,8 @@ public struct RepositoryLinkInputFeature: Sendable {
             }
         }
     }
+
+    // MARK: Private
 
     private enum CancelID: Hashable {
         case validation

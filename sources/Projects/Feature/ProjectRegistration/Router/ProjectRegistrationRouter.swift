@@ -14,7 +14,13 @@ public struct ProjectRegistrationRouter: View {
 
     public var body: some View {
         ScreenContainer {
-            content
+            FlowNavigationStack(path: pushedScreens) {
+                RepositoryLinkInputScreen(
+                    store: store.scope(state: \.repositoryLinkInput, action: \.repositoryLinkInput)
+                )
+            } destination: { screen in
+                pushedScreen(screen)
+            }
         }
     }
 
@@ -22,13 +28,35 @@ public struct ProjectRegistrationRouter: View {
 
     @Bindable private var store: StoreOf<ProjectRegistrationRouterFeature>
 
-    @ViewBuilder
-    private var content: some View {
+    private var pushedScreens: [ProjectRegistrationRouterFeature.ActiveScreen] {
         switch store.activeScreen {
         case .repositoryLinkInput:
-            RepositoryLinkInputScreen(
-                store: store.scope(state: \.repositoryLinkInput, action: \.repositoryLinkInput)
-            )
+            []
+
+        case .repositoryConfirmation:
+            [.repositoryConfirmation]
+
+        case .quizLevelSelection:
+            [.repositoryConfirmation, .quizLevelSelection]
+
+        case .quizGenerationConfirmation:
+            [.repositoryConfirmation, .quizLevelSelection, .quizGenerationConfirmation]
+
+        case .quizGenerationProgress:
+            [
+                .repositoryConfirmation,
+                .quizLevelSelection,
+                .quizGenerationConfirmation,
+                .quizGenerationProgress,
+            ]
+        }
+    }
+
+    @ViewBuilder
+    private func pushedScreen(_ screen: ProjectRegistrationRouterFeature.ActiveScreen) -> some View {
+        switch screen {
+        case .repositoryLinkInput:
+            EmptyView()
 
         case .repositoryConfirmation:
             RepositoryConfirmationScreen(

@@ -62,9 +62,9 @@ public struct TextField: View {
 
             case .filled:
                 BorderToken(
-                    name: SemanticColorToken.mutedText.name,
+                    name: ColorToken.grey400.name,
                     width: 1,
-                    colorToken: SemanticColorToken.mutedText.colorToken,
+                    colorToken: .grey400,
                 )
 
             case .error:
@@ -80,8 +80,8 @@ public struct TextField: View {
             CGFloat(borderToken.width)
         }
 
-        var backgroundColor: SemanticColorToken {
-            .cardBackground
+        var backgroundColor: ColorToken {
+            .grey600
         }
     }
 
@@ -130,7 +130,7 @@ public struct TextField: View {
 }
 
 #Preview("Text Field") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         TextField(
             placeholder: "닉네임을 입력해주세요",
             text: .constant(""),
@@ -147,6 +147,6 @@ public struct TextField: View {
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

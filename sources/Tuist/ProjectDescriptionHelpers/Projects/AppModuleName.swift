@@ -3,18 +3,18 @@ import ProjectDescription
 // MARK: - AppModuleName
 
 enum AppModuleName: String, CaseIterable {
-    case AppDebug
     case GitIt
     case GitItTests
     case ShareExtension
 }
 
 extension AppModuleName {
+
+    // MARK: Internal
+
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.App.rawValue)
         return switch self {
-        case .AppDebug:
-            directoryName
         case .GitIt:
             directoryName
         case .GitItTests:
@@ -26,17 +26,6 @@ extension AppModuleName {
 
     var target: Target {
         switch self {
-        case .AppDebug:
-            .module(
-                name: rawValue,
-                sourceDirectory: sourceDirectory,
-                dependencies: [
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainMember),
-                ],
-                buildLibraryForDistribution: false,
-            )
-
         case .GitIt:
             .target(
                 name: rawValue,
@@ -46,7 +35,10 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .extendingDefault(
                     with: [
+                        "CFBundleDisplayName": "Git-It",
                         "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+                        "ITSAppUsesNonExemptEncryption": false,
                         "UIApplicationSceneManifest": [
                             "UIApplicationSupportsMultipleScenes": false
                         ],
@@ -59,15 +51,7 @@ extension AppModuleName {
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
-                            "UIInterfaceOrientationPortrait",
-                            "UIInterfaceOrientationLandscapeLeft",
-                            "UIInterfaceOrientationLandscapeRight",
-                        ],
-                        "UISupportedInterfaceOrientations~ipad": [
-                            "UIInterfaceOrientationPortrait",
-                            "UIInterfaceOrientationPortraitUpsideDown",
-                            "UIInterfaceOrientationLandscapeLeft",
-                            "UIInterfaceOrientationLandscapeRight",
+                            "UIInterfaceOrientationPortrait"
                         ],
                     ]
                 ),
@@ -78,11 +62,12 @@ extension AppModuleName {
                 ],
                 entitlements: .file(path: "GitIt.entitlements"),
                 dependencies: [
-                    .target(name: AppModuleName.AppDebug.rawValue),
                     .target(name: AppModuleName.ShareExtension.rawValue),
-                    .fromComposition(.CompositionAdapter),
+                    .fromComposition(.CompositionApp),
                     .fromFeature(.Feature),
                     .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainMember),
                 ],
                 settings: .settings(
                     base: [
@@ -92,7 +77,8 @@ extension AppModuleName {
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_PREVIEWS": "YES",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        "MARKETING_VERSION": "1.0.0",
+                        "CURRENT_PROJECT_VERSION": .string(Self.buildVersion),
+                        "MARKETING_VERSION": .string(Self.marketingVersion),
                         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
                         "SUPPORTS_MACCATALYST": "NO",
                         "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
@@ -101,11 +87,19 @@ extension AppModuleName {
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
-                        "TARGETED_DEVICE_FAMILY": "1,2",
+                        "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
-                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
-                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                        .debug(
+                            name: "Debug",
+                            settings: ["APS_ENVIRONMENT": "development"],
+                            xcconfig: "Config/debug.xcconfig",
+                        ),
+                        .release(
+                            name: "Release",
+                            settings: ["APS_ENVIRONMENT": "production"],
+                            xcconfig: "Config/release.xcconfig",
+                        ),
                     ],
                 ),
             )
@@ -118,12 +112,15 @@ extension AppModuleName {
                 bundleId: "com.nexters.hytime.gitit.tests",
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .default,
-                sources: ["\(sourceDirectory)/**"],
+                sources: [
+                    "\(sourceDirectory)/**",
+                    "\(AppModuleName.ShareExtension.sourceDirectory)/SharedItemURLResolver.swift",
+                ],
                 dependencies: [
                     .target(name: AppModuleName.GitIt.rawValue),
                     .external(.ComposableArchitecture),
                     .fromFeature(.Feature),
-                    .fromComposition(.CompositionAdapter),
+                    .fromComposition(.CompositionApp),
                     .fromDomain(.DomainAuthentication),
                     .fromDomain(.DomainLearningProject),
                     .fromDomain(.DomainMember),
@@ -133,6 +130,7 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
                     ]
                 ),
@@ -147,21 +145,26 @@ extension AppModuleName {
                 deploymentTargets: .iOS("26.0"),
                 infoPlist: .file(path: "\(sourceDirectory)/Info.plist"),
                 sources: ["\(sourceDirectory)/**/*.swift"],
+                resources: ["\(sourceDirectory)/PrivacyInfo.xcprivacy"],
                 entitlements: .file(path: "ShareExtension.entitlements"),
-                // 확장은 URL 형식을 판정하지 않고 그대로 앱에 넘기므로 프로젝트 내부 패키지에
-                // 의존하지 않는다.
-                dependencies: [],
+                dependencies: [
+                    .fromComposition(.CompositionShareExtension),
+                    .fromFeature(.Feature),
+                    .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainLearningProject),
+                    .external(.ComposableArchitecture),
+                ],
                 settings: .settings(
                     base: [
                         "CODE_SIGN_STYLE": "Automatic",
-                        "CURRENT_PROJECT_VERSION": "1",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-                        "MARKETING_VERSION": "1.0.0",
+                        "CURRENT_PROJECT_VERSION": .string(Self.buildVersion),
+                        "MARKETING_VERSION": .string(Self.marketingVersion),
                         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
-                        "TARGETED_DEVICE_FAMILY": "1,2",
+                        "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
                         .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
@@ -171,4 +174,10 @@ extension AppModuleName {
             )
         }
     }
+
+    // MARK: Private
+
+    private static let buildVersion = "7"
+    private static let marketingVersion = "1.0.0"
+
 }

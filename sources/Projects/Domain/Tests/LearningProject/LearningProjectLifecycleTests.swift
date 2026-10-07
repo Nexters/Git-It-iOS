@@ -26,7 +26,11 @@ struct LearningProjectLifecycleTests {
             urlParser: LifecycleExternalRepositoryURLParser(),
         )
         let createLearningProject = CreateLearningProject(
-            repository: LifecycleLearningProjectRepository(registration: registration)
+            repository: LifecycleLearningProjectRepository(registration: registration),
+            trackGeneration: TrackGeneration(
+                stateRepository: StubGenerationStateRepository(),
+                outcomeRepository: StubGenerationOutcomeRepository(),
+            ),
         )
 
         let fetchedRepository = try await fetchExternalRepository(url: "https://github.com/owner/repo")
@@ -46,13 +50,16 @@ struct LearningProjectLifecycleTests {
             requestStatus: "READY",
             quizLevel: .l1,
         ))
-        let deleteLearningProject = DeleteLearningProject(repository: repository)
-        let fetchLearningProjectDetail = FetchLearningProjectDetail(repository: repository)
+        let library = LearningLibrary(
+            projectRepository: repository,
+            learningSetRepository: LifecycleLearningSetRepository(),
+            bookmarkRepository: LifecycleBookmarkRepository(),
+        )
 
-        try await deleteLearningProject(projectID: "project-1")
+        try await library.deleteProject(id: "project-1")
 
         await #expect(throws: LearningProjectError.notFound) {
-            try await fetchLearningProjectDetail(projectID: "project-1")
+            _ = try await library.project(id: "project-1")
         }
     }
 }
@@ -144,4 +151,31 @@ private actor LifecycleLearningProjectRepository: LearningProjectRepository {
     private let registration: ProjectRegistrationReceipt
     private var deleted = false
 
+}
+
+// MARK: - LifecycleLearningSetRepository
+
+private struct LifecycleLearningSetRepository: LearningSetRepository {
+    func fetchSet(
+        projectID _: String,
+        setID _: String,
+    ) async throws -> LearningSet {
+        throw LearningProjectError.unexpected
+    }
+}
+
+// MARK: - LifecycleBookmarkRepository
+
+private struct LifecycleBookmarkRepository: BookmarkRepository {
+    func setBookmark(
+        projectID _: String,
+        questionID _: String,
+        bookmarked: Bool,
+    ) async throws -> BookmarkState {
+        BookmarkState(bookmarked: bookmarked)
+    }
+
+    func fetchBookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        BookmarkedQuestionCollection(totalCount: 0, availableProjects: [], bookmarks: [])
+    }
 }

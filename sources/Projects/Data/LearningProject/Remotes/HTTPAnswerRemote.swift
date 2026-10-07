@@ -3,7 +3,7 @@ import InfrastructureNetworkClient
 
 // MARK: - HTTPAnswerRemote
 
-public struct HTTPAnswerRemote: AnswerRemote {
+public struct HTTPAnswerRemote: Sendable {
 
     // MARK: Lifecycle
 

@@ -13,13 +13,14 @@ struct PositionSelectionScreen: View {
 
     var body: some View {
         OverlayContainer {
-            ScreenOverlayHeader(
+            ScreenControlBar(
                 leading: .close,
                 onLeadingTap: { send(.backTapped) },
             )
+            .designSystemScreenMargin()
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
-                VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+                VStack(spacing: LayoutToken.compactSpacing) {
                     StyledText.subtitle1(Constant.title, alignment: .center)
 
                     if store.exitStatus == .failed {
@@ -48,14 +49,15 @@ struct PositionSelectionScreen: View {
                 )
             }
             .designSystemScreenMargin()
-            .padding(.top, LayoutToken.margin.cgFloatValue)
+            .padding(.top, LayoutToken.margin)
         } footer: {
-            ScreenOverlayFooter {
+            BottomActionBar {
                 ActionButton.primary(
                     "다음",
                     isEnabled: store.position != nil,
                     action: { send(.nextTapped) },
                 )
+                .designSystemScreenMargin()
             }
         }
     }

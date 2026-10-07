@@ -7,7 +7,6 @@ extension Target {
         sourceExcludes: [Path] = [],
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
-        buildLibraryForDistribution: Bool = true,
     ) -> Self {
         .target(
             name: name,
@@ -21,11 +20,12 @@ extension Target {
             dependencies: dependencies,
             settings: .settings(
                 base: [
-                    "BUILD_LIBRARY_FOR_DISTRIBUTION": buildLibraryForDistribution ? "YES" : "NO",
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "NO",
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "SKIP_INSTALL": "YES",
+                    "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
                     "SWIFT_VERSION": "5.0",
                 ]
             ),
@@ -53,6 +53,7 @@ extension Target {
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "SKIP_INSTALL": "YES",
+                    "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
                     "SWIFT_VERSION": "5.0",
                 ]
             ),

@@ -1,5 +1,6 @@
 import DesignSystem
 import SwiftUI
+import UIKit
 
 public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCases: RandomAccessCollection {
 
@@ -21,13 +22,16 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 content(item)
                     .tabItem {
                         Image(item.tabSystemImage, bundle: .module)
-                            .padding(.bottom, LayoutToken.tightSpacing.cgFloatValue)
+                            .padding(.bottom, LayoutToken.tightSpacing)
                         Text.designSystemStyled(item.tabTitle, style: .tabItem)
                     }
                     .tag(item)
             }
         }
-        .tint(Color(designSystem: .brandAccent))
+        .tint(Color(designSystem: .blue100))
+        .onAppear {
+            UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .blue100))
+        }
     }
 
     // MARK: Private

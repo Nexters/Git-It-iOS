@@ -29,7 +29,9 @@ struct TutorialFeatureTests {
         let signIn = SignInUseCaseMock(results: [.success(OnboardingTestFixture.authenticatedUser, needsCuration: false)])
         let store = makeTutorialStore(signIn: signIn)
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1
@@ -54,7 +56,9 @@ struct TutorialFeatureTests {
         let signIn = SignInUseCaseMock(results: [.retryableFailure])
         let store = makeTutorialStore(signIn: signIn)
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1
@@ -72,7 +76,9 @@ struct TutorialFeatureTests {
         let signIn = SignInUseCaseMock(results: [.cancelled])
         let store = makeTutorialStore(signIn: signIn)
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1
@@ -88,7 +94,9 @@ struct TutorialFeatureTests {
         let signIn = SignInUseCaseMock(results: [.cancelled])
         let store = makeTutorialStore(signIn: signIn)
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1
@@ -97,6 +105,19 @@ struct TutorialFeatureTests {
         await store.receive(.effect(.signInFinished(requestID: 1, result: .cancelled))) {
             $0.authentication = .cancelled
         }
+    }
+
+    @Test
+    func `Apple 로그인 탭은 곧바로 로그인하지 않고 signInRequested를 위임한다`() async {
+        let signIn = SignInUseCaseMock(results: [.success(OnboardingTestFixture.authenticatedUser, needsCuration: false)])
+        let store = makeTutorialStore(signIn: signIn)
+
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+
+        #expect(store.state.authentication == .idle)
+        #expect(store.state.requestID == 0)
+        #expect(await signIn.snapshot().isEmpty)
     }
 
     @Test
@@ -123,7 +144,9 @@ struct TutorialFeatureTests {
             deletesCompletedAccountOnSignIn: true,
         )
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1
@@ -168,7 +191,9 @@ struct TutorialFeatureTests {
             deletesCompletedAccountOnSignIn: true,
         )
 
-        await store.send(.view(.appleSignInTapped)) {
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.delegate(.signInRequested))
+        await store.send(.input(.startSignIn)) {
             $0.page = 3
             $0.authentication = .signingIn
             $0.requestID = 1

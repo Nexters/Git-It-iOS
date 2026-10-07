@@ -6,13 +6,12 @@ import Testing
 struct DataMemberErrorTests {
 
     @Test
-    func `공급자 중립 실패 의미를 7개로 구분한다`() {
+    func `공급자 중립 실패 의미를 6개로 구분한다`() {
         #expect(DataMemberError.allCases == [
             .invalidRequest,
             .unauthorized,
             .temporarilyUnavailable,
             .transport,
-            .decoding,
             .unexpectedStatus,
             .memberUnavailable,
         ])

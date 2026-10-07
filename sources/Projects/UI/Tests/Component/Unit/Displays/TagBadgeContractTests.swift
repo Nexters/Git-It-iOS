@@ -23,6 +23,18 @@ struct TagBadgeContractTests {
     }
 
     @Test
+    func `muted 스타일은 Grey500 배경과 Grey300 라벨을 쓴다`() {
+        #expect(TagBadge.Style.muted.backgroundColor == ColorToken.grey500)
+        #expect(TagBadge.Style.muted.textColor == ColorToken.grey300)
+    }
+
+    @Test
+    func `compact 크기는 Body 3 텍스트 스타일을 쓴다`() {
+        #expect(TagBadge.Size.regular.textStyle == TextStyleToken.body2)
+        #expect(TagBadge.Size.compact.textStyle == TextStyleToken.body3)
+    }
+
+    @Test
     func `표시 상태를 스스로 보관하지 않는다`() {
         let stateProperties = Mirror(reflecting: TagBadge.neutral("완료")).children.filter {
             ($0.label ?? "").hasPrefix("_")

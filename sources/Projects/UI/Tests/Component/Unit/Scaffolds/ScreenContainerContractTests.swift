@@ -8,15 +8,15 @@ import Testing
 struct ScreenContainerContractTests {
     @Test
     func `화면 좌우 여백은 화면 여백 토큰 하나만 쓴다`() {
-        #expect(LayoutToken.margin.value == 20)
+        #expect(LayoutToken.margin == 20)
     }
 
     @Test
-    func `배경 역할 색을 받아 생성한다`() {
+    func `배경 색 토큰을 받아 생성한다`() {
         _ = ScreenContainer {
             StyledText.body1("콘텐츠")
         }
-        _ = ScreenContainer(background: .cardBackground) {
+        _ = ScreenContainer(background: .grey600) {
             StyledText.body1("콘텐츠")
         }
     }

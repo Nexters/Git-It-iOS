@@ -4,7 +4,7 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon[\r]
 
 # Volume metadata
 .DocumentRevisions-V100
@@ -163,3 +163,5 @@ sources/graph.png
 sources/Projects/App/Config/debug.xcconfig
 sources/Projects/App/Config/release.xcconfig
 specs/024-ui-design-spec-alignment/reference-swift/**
+docs/retrospective/**
+.agents/skills/project-retrospective**

@@ -6,9 +6,9 @@ import Foundation
 import Synchronization
 @testable import GitIt
 
-// MARK: - FetchMemberProfileUseCaseMock
+// MARK: - MemberAccountUseCaseMock
 
-actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
+actor MemberAccountUseCaseMock: MemberAccountUseCase {
 
     // MARK: Lifecycle
 
@@ -18,10 +18,19 @@ actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
 
     // MARK: Internal
 
-    func callAsFunction() async throws -> MemberProfile {
+    func profile() async throws -> MemberProfile {
         callCount += 1
         return try nextResult().get()
     }
+
+    func updatePosition(_: MemberPosition) async throws { }
+
+    func updateCareerLevel(_: CareerLevel) async throws { }
+
+    func completeCuration(
+        position _: MemberPosition,
+        careerLevel _: CareerLevel,
+    ) async throws { }
 
     func snapshot() -> Int {
         callCount
@@ -39,20 +48,14 @@ actor FetchMemberProfileUseCaseMock: FetchMemberProfileUseCase {
 
 }
 
-// MARK: - ResetAllForTestingSpy
-
-actor ResetAllForTestingSpy {
-    private(set) var callCount = 0
-
-    func callAsFunction() {
-        callCount += 1
-    }
-}
-
 // MARK: - NoopRequestGenerationReminderUseCase
 
 struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
     func callAsFunction(projectID _: String) async -> NotificationAuthorizationOutcome {
+        .authorized
+    }
+
+    func requestAuthorization() async -> NotificationAuthorizationOutcome {
         .authorized
     }
 
@@ -61,22 +64,26 @@ struct NoopRequestGenerationReminderUseCase: RequestGenerationReminderUseCase {
     }
 }
 
-// MARK: - NoopFetchLearningProjectDetailUseCase
+// MARK: - NoopLearningLibraryUseCase
 
-struct NoopFetchLearningProjectDetailUseCase: FetchLearningProjectDetailUseCase {
-    func callAsFunction(projectID: String) async throws -> LearningProjectDetail {
-        AppRootTestFixture.projectDetail(projectID: projectID)
+struct NoopLearningLibraryUseCase: LearningLibraryUseCase {
+    func project(id: String) async throws -> LearningProjectDetail {
+        AppRootTestFixture.projectDetail(projectID: id)
     }
-}
 
-// MARK: - NoopFetchLearningSetUseCase
+    func deleteProject(id _: String) async throws {
+        throw CancellationError()
+    }
 
-struct NoopFetchLearningSetUseCase: FetchLearningSetUseCase {
-    func callAsFunction(
+    func learningSet(
         projectID _: String,
         setID: String,
     ) async throws -> LearningSet {
         AppRootTestFixture.learningSet(setID: setID)
+    }
+
+    func bookmarkedQuestions(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+        throw CancellationError()
     }
 }
 
@@ -155,6 +162,12 @@ enum AppRootTestFixture {
 
     static let repositoryURL = "https://github.com/owner/repo"
 
+    static func mainShellState() -> AppRootFeature.State {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        return state
+    }
+
     static func projectDetail(projectID: String) -> LearningProjectDetail {
         LearningProjectDetail(
             projectID: projectID,
@@ -189,14 +202,11 @@ enum AppRootTestFixture {
 
 func makeAppRootStore(
     restoreSession: RestoreSessionUseCaseMock = RestoreSessionUseCaseMock(),
-    fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
+    memberAccount: MemberAccountUseCaseMock = MemberAccountUseCaseMock(),
     signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    authenticationOutcomes: AuthenticationOutcomesUseCaseMock = AuthenticationOutcomesUseCaseMock(),
-    resetAllForTesting: (@Sendable () async -> Void)? = nil,
-    observeGenerationOutcomes: ObserveGenerationOutcomesUseCaseMock =
-        ObserveGenerationOutcomesUseCaseMock(),
+    verifyAuthorization: VerifyAuthorizationUseCaseMock = VerifyAuthorizationUseCaseMock(),
     requestGenerationReminder: NoopRequestGenerationReminderUseCase = NoopRequestGenerationReminderUseCase(),
-    trackGenerationProgress: TrackGenerationProgressSpy = TrackGenerationProgressSpy(),
+    trackGeneration: TrackGenerationUseCaseMock = TrackGenerationUseCaseMock(),
     waitPolicy: GenerationWaitPolicy = .standard,
     now: @escaping @Sendable () -> Date = { Date() },
     registerCurrentDevice: RegisterCurrentDeviceSpy = RegisterCurrentDeviceSpy(),
@@ -209,72 +219,26 @@ func makeAppRootStore(
             restoreSession: restoreSession,
             signIn: NoopSignInUseCase(),
             signOut: signOut,
-            authenticationOutcomes: authenticationOutcomes,
-            fetchMemberProfile: fetchMemberProfile,
-            completeCuration: NoopCompleteCurationUseCase(),
+            verifyAuthorization: verifyAuthorization,
+            memberAccount: memberAccount,
             policyConsent: NoopPolicyConsentUseCase(),
             fetchLearningProjects: NoopFetchLearningProjectsUseCase(),
-            fetchLearningProjectDetail: NoopFetchLearningProjectDetailUseCase(),
-            deleteLearningProject: NoopDeleteLearningProjectUseCase(),
-            fetchBookmarkedQuestions: NoopFetchBookmarkedQuestionsUseCase(),
-            fetchLearningSet: NoopFetchLearningSetUseCase(),
+            learningLibrary: NoopLearningLibraryUseCase(),
             submitChoiceAnswer: NoopSubmitChoiceAnswerUseCase(),
             submitEssayAnswer: NoopSubmitEssayAnswerUseCase(),
             setQuestionBookmark: NoopSetQuestionBookmarkUseCase(),
-            updateMemberPosition: NoopUpdateMemberPositionUseCase(),
-            updateMemberCareerLevel: NoopUpdateMemberCareerLevelUseCase(),
             deleteMemberAccount: NoopDeleteMemberAccountUseCase(),
             fetchExternalRepository: NoopFetchExternalRepositoryUseCase(),
             createLearningProject: NoopCreateLearningProjectUseCase(),
-            observeGenerationOutcomes: observeGenerationOutcomes,
             requestGenerationReminder: requestGenerationReminder,
-            trackGenerationProgress: trackGenerationProgress,
+            trackGeneration: trackGeneration,
             waitPolicy: waitPolicy,
             now: now,
             openExternalURL: { await openExternalURL($0) },
             registerCurrentDevice: { try await registerCurrentDevice() },
             deviceTokenRefreshes: { deviceTokenRefreshes.makeStream() },
-            resetAllForTesting: resetAllForTesting,
         )
     }
-}
-
-// MARK: - TrackGenerationProgressSpy
-
-actor TrackGenerationProgressSpy: TrackGenerationProgressUseCase {
-
-    // MARK: Lifecycle
-
-    init(stored: GenerationProgress? = nil) {
-        self.stored = stored
-    }
-
-    // MARK: Internal
-
-    private(set) var beganCount = 0
-    private(set) var endedCount = 0
-
-    func begin(
-        projectID: String,
-        requestedAt: Date,
-    ) async {
-        beganCount += 1
-        stored = GenerationProgress(projectID: projectID, requestedAt: requestedAt)
-    }
-
-    func current() async -> GenerationProgress? {
-        stored
-    }
-
-    func end() async {
-        endedCount += 1
-        stored = nil
-    }
-
-    // MARK: Private
-
-    private var stored: GenerationProgress?
-
 }
 
 // MARK: - RegisterCurrentDeviceSpy
@@ -330,14 +294,14 @@ final class DeviceTokenRefreshStream: Sendable {
 
     // MARK: Internal
 
-    func makeStream() -> AsyncStream<Void> {
-        let (stream, continuation) = AsyncStream<Void>.makeStream()
+    func makeStream() -> AsyncStream<String> {
+        let (stream, continuation) = AsyncStream<String>.makeStream()
         self.continuation.withLock { $0 = continuation }
         return stream
     }
 
-    func emit() {
-        continuation.withLock { $0?.yield(()) }
+    func emit(_ token: String = "device-token") {
+        continuation.withLock { $0?.yield(token) }
     }
 
     func finish() {
@@ -346,7 +310,7 @@ final class DeviceTokenRefreshStream: Sendable {
 
     // MARK: Private
 
-    private let continuation = Mutex<AsyncStream<Void>.Continuation?>(nil)
+    private let continuation = Mutex<AsyncStream<String>.Continuation?>(nil)
 
 }
 

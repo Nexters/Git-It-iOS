@@ -82,9 +82,6 @@ public struct ChoiceAnswerOption: View {
         }
     }
 
-    /// 선택지가 펼쳐지는 방식입니다. 답안을 고르는 동안에는 선택 여부만으로 펼침이
-    /// 결정되는 `fixed` 형태를, 채점 결과를 확인할 때는 각 선택지를 독립적으로
-    /// 열고 닫을 수 있는 `toggleable` 형태를 사용합니다.
     public enum ExpansionControl {
         case fixed(isExpanded: Bool)
         case toggleable(isExpanded: Bool, onToggleExpand: () -> Void)
@@ -138,7 +135,7 @@ public struct ChoiceAnswerOption: View {
         static let topPadding: CGFloat = 14
         static let bottomPadding: CGFloat = 18
         static let rowSpacing: CGFloat = 4
-        static let chevronIconSize: CGFloat = 10
+        static let chevronIconSize: CGFloat = 16
         static let chevronTapSize: CGFloat = 36
     }
 
@@ -155,7 +152,10 @@ public struct ChoiceAnswerOption: View {
         return "\(letter), \(text), \(suffix)"
     }
 
-    private func card(isExpanded: Bool, reservesChevronSpace: Bool) -> some View {
+    private func card(
+        isExpanded: Bool,
+        reservesChevronSpace: Bool,
+    ) -> some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: Constant.rowSpacing) {
                 HStack {
@@ -195,7 +195,7 @@ public struct ChoiceAnswerOption: View {
 }
 
 #Preview("Choice Answer Option") {
-    VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+    VStack(spacing: LayoutToken.compactSpacing) {
         ChoiceAnswerOption(letter: "A", text: "State", state: .default)
         ChoiceAnswerOption(letter: "B", text: "Binding", state: .selected, expansion: .fixed(isExpanded: true))
         ChoiceAnswerOption(
@@ -213,6 +213,6 @@ public struct ChoiceAnswerOption: View {
     }
     .frame(width: 320)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }

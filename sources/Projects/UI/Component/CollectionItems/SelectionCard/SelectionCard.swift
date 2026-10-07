@@ -48,26 +48,48 @@ public struct SelectionCard<Thumbnail: View>: View {
         }
         .padding(Constant.contentPadding)
         .frame(maxWidth: .infinity, minHeight: style.minimumHeight, alignment: .leading)
-        .designSystemBackground(.screenBackground)
+        .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
         .overlay {
-            if isSelected {
+            if let borderToken {
                 RoundedRectangle(designSystem: .large)
-                    .fill(Color(designSystem: SemanticColorToken.selectedSurface))
+                    .stroke(
+                        Color(designSystem: borderToken.colorToken),
+                        lineWidth: CGFloat(borderToken.width),
+                    )
             }
-        }
-        .overlay {
-            RoundedRectangle(designSystem: .large)
-                .stroke(
-                    Color(designSystem: borderToken.colorToken),
-                    lineWidth: CGFloat(borderToken.width),
-                )
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Private
+
+    private enum Constant {
+        static var thumbnailSize: CGFloat {
+            52
+        }
+
+        static var thumbnailSpacing: CGFloat {
+            16
+        }
+
+        static var titleSpacing: CGFloat {
+            3
+        }
+
+        static var badgeSpacing: CGFloat {
+            6
+        }
+
+        static var contentPadding: CGFloat {
+            14
+        }
+
+        static var borderWidth: CGFloat {
+            1
+        }
+    }
 
     private let title: String
     private let supportingText: String?
@@ -76,8 +98,8 @@ public struct SelectionCard<Thumbnail: View>: View {
     private let style: SelectionCardStyle
     private let thumbnail: Thumbnail
 
-    private var borderToken: BorderToken {
-        isSelected ? .focus : .default
+    private var borderToken: BorderToken? {
+        isSelected ? .highlight : nil
     }
 
 }
@@ -100,7 +122,7 @@ extension SelectionCard where Thumbnail == EmptyView {
 }
 
 #Preview("Selection Card") {
-    VStack(spacing: LayoutToken.gutter.cgFloatValue) {
+    VStack(spacing: LayoutToken.gutter) {
         SelectionCard(
             title: "기술 개념은 알아요",
             supportingText: "실제 코드 흐름을 중심으로 학습",
@@ -120,17 +142,17 @@ extension SelectionCard where Thumbnail == EmptyView {
     }
     .frame(width: 340)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }
 
 #Preview("Selection Card - compact · 737:10372") {
-    VStack(spacing: LayoutToken.compactSpacing.cgFloatValue) {
+    VStack(spacing: LayoutToken.compactSpacing) {
         SelectionCard(title: "Front-end")
         SelectionCard(title: "Back-end", isSelected: true)
     }
     .frame(width: 340)
     .designSystemScreenMargin()
-    .padding(.vertical, LayoutToken.margin.cgFloatValue)
+    .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)
 }
