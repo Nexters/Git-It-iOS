@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 
 enum PositionDisplay {
 

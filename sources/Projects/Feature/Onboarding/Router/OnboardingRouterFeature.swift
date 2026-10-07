@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 import Foundation
 
 @Reducer
@@ -9,18 +9,20 @@ public struct OnboardingRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        signIn: any SignInUseCase,
-        signOut: any SignOutUseCase,
-        policyConsent: any PolicyConsentUseCase,
-        memberAccount: any MemberAccountUseCase,
-        deleteMemberAccount: any DeleteMemberAccountUseCase,
+        signIn: @escaping @Sendable (SignInMethod) async -> SignInResult,
+        signOut: @escaping @Sendable () async -> SignOutResult,
+        policyConsentStatus: @escaping @Sendable () async throws -> PolicyConsentStatus,
+        consent: @escaping @Sendable ([PolicyDocumentID]) async throws -> Void,
+        updateCuration: @escaping @Sendable (Curation) async throws -> Void,
+        withdraw: @escaping @Sendable () async throws -> Void,
         deletesCompletedAccountOnSignIn: Bool = false,
     ) {
         self.signIn = signIn
         self.signOut = signOut
-        self.policyConsent = policyConsent
-        self.memberAccount = memberAccount
-        self.deleteMemberAccount = deleteMemberAccount
+        self.policyConsentStatus = policyConsentStatus
+        self.consent = consent
+        self.updateCuration = updateCuration
+        self.withdraw = withdraw
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
     }
 
@@ -105,20 +107,18 @@ public struct OnboardingRouterFeature: Sendable {
         Scope(state: \.tutorial, action: \.tutorial) {
             TutorialFeature(
                 signIn: signIn,
-                deleteMemberAccount: deleteMemberAccount,
+                withdraw: withdraw,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
         }
         Scope(state: \.legalAgreement, action: \.legalAgreement) {
-            LegalAgreementFeature(policyConsent: policyConsent)
+            LegalAgreementFeature(policyConsentStatus: policyConsentStatus, consent: consent)
         }
         Scope(state: \.positionSelection, action: \.positionSelection) {
             PositionSelectionFeature(signOut: signOut)
         }
         Scope(state: \.careerSelection, action: \.careerSelection) {
-            CareerSelectionFeature(completeCuration: { [memberAccount] in
-                try await memberAccount.completeCuration(position: $0, careerLevel: $1)
-            })
+            CareerSelectionFeature(updateCuration: updateCuration)
         }
         Scope(state: \.exit, action: \.exit) {
             OnboardingExitFeature()
@@ -200,11 +200,12 @@ public struct OnboardingRouterFeature: Sendable {
 
     // MARK: Private
 
-    private let signIn: any SignInUseCase
-    private let signOut: any SignOutUseCase
-    private let policyConsent: any PolicyConsentUseCase
-    private let memberAccount: any MemberAccountUseCase
-    private let deleteMemberAccount: any DeleteMemberAccountUseCase
+    private let signIn: @Sendable (SignInMethod) async -> SignInResult
+    private let signOut: @Sendable () async -> SignOutResult
+    private let policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus
+    private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
+    private let updateCuration: @Sendable (Curation) async throws -> Void
+    private let withdraw: @Sendable () async throws -> Void
     private let deletesCompletedAccountOnSignIn: Bool
 
     private func advanceAfterSignIn(

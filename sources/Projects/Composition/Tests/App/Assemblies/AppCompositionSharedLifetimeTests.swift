@@ -1,40 +1,34 @@
-import DomainAuthentication
-import DomainLearningProject
 import Foundation
 import Testing
 
 @testable import CompositionApp
-@testable import CompositionAuthentication
 @testable import DataAuthentication
-@testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
+@testable import DataShared
 
 @Suite("AppComposition 공유 세션 수명")
 struct AppCompositionSharedLifetimeTests {
 
     @Test
-    func `LearningProject와 Member 보호 Remote가 같은 access token을 사용한다`() async throws {
-        let keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-        try SessionRecordCoding(keychainStore: keychainStore).save(SessionRecord(
-            tokens: SessionTokens(
-                accessToken: "shared-access-token",
-                refreshToken: "refresh-1",
-                accessTokenExpiresAt: nil,
-                refreshTokenExpiresAt: nil,
-            ),
-            onboarding: LocalOnboardingState(needsCuration: false, acceptedLegalVersions: [], acceptedAt: nil),
+    func `Project와 UserInfo 보호 Remote가 같은 access token을 사용한다`() async throws {
+        let secureStorage = InMemorySecureValueStorage()
+        try SessionRecordStorageCoding(storage: secureStorage).save(StoredSessionRecord(
+            accessToken: "shared-access-token",
+            refreshToken: "refresh-1",
+            accessTokenExpiresAt: nil,
+            refreshTokenExpiresAt: nil,
+            needsCuration: false,
+            acceptedLegalVersions: [],
+            acceptedAt: nil,
         ))
 
-        let transport = RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let transport = RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"{"success":true,"data":{"items":[],"hasNext":false},"code":null,"message":null,"errors":null}"#
                     .utf8),
             ),
-            HTTPTransportResponse(
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"""
                     {"success":true,"data":{"name":"홍길동","email":"a@b.com","position":"BACKEND","careerLevel":"JUNIOR","thisWeekSolvedCount":0,"thisMonthSolvedCount":0,"streakDays":0,"weeklyChart":[]},"code":null,"message":null,"errors":null}
                     """#.utf8),
@@ -49,18 +43,20 @@ struct AppCompositionSharedLifetimeTests {
                 osVersion: "Version 26.0",
                 generationReminderTitle: "세트 생성 완료",
                 generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
+                generationFailureReminderTitle: "세트 생성 실패",
+                generationFailureReminderBody: "학습 세트를 만들지 못했어요. 다시 시도해주세요.",
             ),
-            keychainStore: keychainStore,
+            secureStorage: secureStorage,
             transport: transport,
         )
 
-        _ = try await composition.fetchLearningProjects(page: LearningProjectPage.firstIndex)
-        _ = try await composition.memberAccount.profile()
+        try await composition.project.refresh()
+        _ = try await composition.userInfo.detail()
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 2)
-        #expect(requests[0].headers["Authorization"] == "Bearer shared-access-token")
-        #expect(requests[1].headers["Authorization"] == "Bearer shared-access-token")
+        #expect(requests[0].headerFields["authorization"] == "Bearer shared-access-token")
+        #expect(requests[1].headerFields["authorization"] == "Bearer shared-access-token")
     }
 
 }

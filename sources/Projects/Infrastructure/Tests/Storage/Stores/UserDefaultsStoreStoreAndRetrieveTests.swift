@@ -5,15 +5,15 @@ import Testing
 struct UserDefaultsStoreStoreAndRetrieveTests {
 
     @Test
-    func `Codable 값을 저장한 직후 같은 키로 조회하면 저장한 값이 그대로 반환된다`() async throws {
+    func `바이트 값을 저장한 직후 같은 키로 조회하면 저장한 바이트가 그대로 반환된다`() async throws {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
 
-        await store.store("V", forKey: "A")
+        await store.store(Data("V".utf8), forKey: "A")
 
-        #expect(await store.value(forKey: "A") == "V")
+        #expect(await store.value(forKey: "A") == Data("V".utf8))
     }
 
     @Test
@@ -21,12 +21,24 @@ struct UserDefaultsStoreStoreAndRetrieveTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
-        await store.store("V1", forKey: "A")
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        await store.store(Data("V1".utf8), forKey: "A")
 
-        await store.store("V2", forKey: "A")
+        await store.store(Data("V2".utf8), forKey: "A")
 
-        #expect(await store.value(forKey: "A") == "V2")
+        #expect(await store.value(forKey: "A") == Data("V2".utf8))
+    }
+
+    @Test
+    func `namespace와 키를 점으로 이은 UserDefaults 키에 저장한다`() async throws {
+        let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
+        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let store = UserDefaultsStore(namespace: "test.namespace", userDefaults: userDefaults)
+
+        await store.store(Data("V".utf8), forKey: "A")
+
+        #expect(userDefaults.data(forKey: "test.namespace.A") == Data("V".utf8))
     }
 
     @Test
@@ -34,14 +46,14 @@ struct UserDefaultsStoreStoreAndRetrieveTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let storeA = UserDefaultsStore<String>(namespace: "namespaceA", userDefaults: userDefaults)
-        let storeB = UserDefaultsStore<String>(namespace: "namespaceB", userDefaults: userDefaults)
+        let storeA = UserDefaultsStore(namespace: "namespaceA", userDefaults: userDefaults)
+        let storeB = UserDefaultsStore(namespace: "namespaceB", userDefaults: userDefaults)
 
-        await storeA.store("A값", forKey: "동일한-키")
-        await storeB.store("B값", forKey: "동일한-키")
+        await storeA.store(Data("A값".utf8), forKey: "동일한-키")
+        await storeB.store(Data("B값".utf8), forKey: "동일한-키")
 
-        #expect(await storeA.value(forKey: "동일한-키") == "A값")
-        #expect(await storeB.value(forKey: "동일한-키") == "B값")
+        #expect(await storeA.value(forKey: "동일한-키") == Data("A값".utf8))
+        #expect(await storeB.value(forKey: "동일한-키") == Data("B값".utf8))
     }
 
     @Test
@@ -49,13 +61,13 @@ struct UserDefaultsStoreStoreAndRetrieveTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore<String>(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
 
-        await store.store("V1", forKey: "A")
-        await store.store("V2", forKey: "B")
+        await store.store(Data("V1".utf8), forKey: "A")
+        await store.store(Data("V2".utf8), forKey: "B")
 
-        #expect(await store.value(forKey: "A") == "V1")
-        #expect(await store.value(forKey: "B") == "V2")
+        #expect(await store.value(forKey: "A") == Data("V1".utf8))
+        #expect(await store.value(forKey: "B") == Data("V2".utf8))
     }
 
 }

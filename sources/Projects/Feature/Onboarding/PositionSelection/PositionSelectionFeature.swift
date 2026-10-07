@@ -1,13 +1,13 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 
 @Reducer
 public struct PositionSelectionFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(signOut: any SignOutUseCase) {
+    public init(signOut: @escaping @Sendable () async -> SignOutResult) {
         self.signOut = signOut
     }
 
@@ -75,7 +75,7 @@ public struct PositionSelectionFeature: Sendable {
 
             case .effect(.signOutFinished(let result)):
                 switch result {
-                case .success:
+                case .signedOut:
                     state.exitStatus = .idle
                     return .send(.delegate(.exitRequested))
 
@@ -96,6 +96,6 @@ public struct PositionSelectionFeature: Sendable {
         case exit
     }
 
-    private let signOut: any SignOutUseCase
+    private let signOut: @Sendable () async -> SignOutResult
 
 }

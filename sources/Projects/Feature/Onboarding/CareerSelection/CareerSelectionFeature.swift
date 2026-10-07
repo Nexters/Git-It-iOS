@@ -1,13 +1,13 @@
 import ComposableArchitecture
-import DomainMember
+import DomainUserInfo
 
 @Reducer
 public struct CareerSelectionFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(completeCuration: @escaping @Sendable (MemberPosition, CareerLevel) async throws -> Void) {
-        self.completeCuration = completeCuration
+    public init(updateCuration: @escaping @Sendable (Curation) async throws -> Void) {
+        self.updateCuration = updateCuration
     }
 
     // MARK: Public
@@ -75,7 +75,7 @@ public struct CareerSelectionFeature: Sendable {
                 state.submission = .submitting
                 return .run { send in
                     do {
-                        try await completeCuration(position, careerLevel)
+                        try await updateCuration(Curation(position: position, careerLevel: careerLevel))
                         await send(.effect(.curationFinished(success: true)))
                     } catch {
                         await send(.effect(.curationFinished(success: false)))
@@ -103,6 +103,6 @@ public struct CareerSelectionFeature: Sendable {
         case curation
     }
 
-    private let completeCuration: @Sendable (MemberPosition, CareerLevel) async throws -> Void
+    private let updateCuration: @Sendable (Curation) async throws -> Void
 
 }

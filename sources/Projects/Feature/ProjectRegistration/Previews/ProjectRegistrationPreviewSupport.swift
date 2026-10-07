@@ -1,4 +1,5 @@
-import DomainLearningProject
+import DomainExternalRepository
+import DomainProjectGeneration
 import Foundation
 
 enum ProjectRegistrationPreviewSupport {
@@ -20,9 +21,8 @@ enum ProjectRegistrationPreviewSupport {
         techStack: repository.techStack,
     )
 
-    static let receipt = ProjectRegistrationReceipt(
+    static let receipt = ProjectGenerationReceipt(
         projectID: "preview-project",
-        requestStatus: "accepted",
         quizLevel: .l1,
     )
 }

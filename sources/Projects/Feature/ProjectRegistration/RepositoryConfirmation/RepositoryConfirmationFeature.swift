@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainExternalRepository
 
 @Reducer
 public struct RepositoryConfirmationFeature: Sendable {

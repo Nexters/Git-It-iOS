@@ -2,44 +2,54 @@ import Foundation
 import Testing
 @testable import CompositionAuthentication
 @testable import DataAuthentication
-@testable import DomainAuthentication
-@testable import InfrastructureAuthentication
+@testable import DataShared
 
 struct AuthenticationAssemblyTests {
 
     @Test
-    func `live 그래프 생성이 성공하고 노출 property가 모두 UseCase Protocol 타입이다`() throws {
-        let assembly = AuthenticationAssembly(baseURL: try #require(URL(string: "https://api.git-it.example.com")))
+    func `저장된 세션이 없으면 요청 자격이 signedOut이다`() async {
+        let assembly = AuthenticationAssembly(
+            secureStorage: InMemorySecureValueStorage(),
+            sharedStorage: InMemoryKeyValueStorage(),
+        )
 
-        _ = assembly.signIn as any SignInUseCase
-        _ = assembly.signOut as any SignOutUseCase
-        _ = assembly.restoreSession as any RestoreSessionUseCase
-        _ = assembly.verifyAuthorization as any VerifyAuthorizationUseCase
-        _ = assembly.refreshSession as any RefreshSessionUseCase
+        #expect(await assembly.requestCredentialProvider.credential() == .signedOut)
     }
 
     @Test
-    func `저장된 세션이 없으면 restoreSession이 RestoreSessionResult unauthenticated를 반환한다`() async throws {
+    func `저장된 세션이 없으면 공유 세션 표시를 로그아웃으로 기록한다`() async {
+        let sharedStorage = InMemoryKeyValueStorage()
         let assembly = AuthenticationAssembly(
-            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            secureStorage: InMemorySecureValueStorage(),
+            sharedStorage: sharedStorage,
         )
 
-        let result = await assembly.restoreSession()
+        await assembly.recordSharedSessionState()
 
-        #expect(result == .unauthenticated)
+        #expect(await SharedSessionStateMarkerCoding(storage: sharedStorage).loadSignedInState() == false)
     }
 
     @Test
-    func `저장된 세션이 없어도 signOut은 SignOutResult success를 반환한다`() async throws {
+    func `저장된 세션이 있으면 공유 세션 표시를 로그인으로 기록한다`() async throws {
+        let secureStorage = InMemorySecureValueStorage()
+        try SessionRecordStorageCoding(storage: secureStorage).save(StoredSessionRecord(
+            accessToken: "access-token",
+            refreshToken: "refresh-token",
+            accessTokenExpiresAt: nil,
+            refreshTokenExpiresAt: nil,
+            needsCuration: false,
+            acceptedLegalVersions: [],
+            acceptedAt: nil,
+        ))
+        let sharedStorage = InMemoryKeyValueStorage()
         let assembly = AuthenticationAssembly(
-            baseURL: try #require(URL(string: "https://api.git-it.example.com")),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
+            secureStorage: secureStorage,
+            sharedStorage: sharedStorage,
         )
 
-        let result = await assembly.signOut()
+        await assembly.recordSharedSessionState()
 
-        #expect(result == .success)
+        #expect(await SharedSessionStateMarkerCoding(storage: sharedStorage).loadSignedInState() == true)
     }
 
 }

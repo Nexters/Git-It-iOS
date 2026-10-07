@@ -1,5 +1,5 @@
-import InfrastructurePushMessaging
+import DataNotification
 
 // MARK: - PushNotificationAppDelegate
 
-public typealias PushNotificationAppDelegate = PushMessagingAppDelegate
+public typealias PushNotificationAppDelegate = NotificationAppDelegate

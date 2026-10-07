@@ -8,6 +8,8 @@ public protocol NotificationAuthorizationClient: Sendable {
 
     func isAuthorized() async -> Bool
 
+    func authorizationSetting() async -> NotificationAuthorizationSetting
+
     func present(_ request: LocalNotificationRequest)
 
     func schedule(

@@ -1,12 +1,10 @@
 import Foundation
 import Testing
 
-@testable import CompositionApp
 @testable import CompositionAuthentication
 @testable import DataAuthentication
-@testable import DomainAuthentication
-@testable import InfrastructureAuthentication
-@testable import InfrastructureNetworkClient
+@testable import DataShared
+@testable import DomainAccount
 
 // MARK: - SharedLifetimeTests
 
@@ -16,41 +14,41 @@ struct SharedLifetimeTests {
     // MARK: Internal
 
     @Test
-    func `같은 KeychainStore를 공유해도 Authentication과 LoginSession의 저장 값이 서로 섞이지 않는다`() async throws {
-        let sharedKeychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
+    func `같은 보안 저장소를 공유해도 Authentication과 SignIn의 저장 값이 서로 섞이지 않는다`() async throws {
+        let sharedSecureStorage = InMemorySecureValueStorage()
         let authenticationRepository = AuthenticationRepositoryAdapter(
-            authorizationProvider: AppleAuthorizationProvider(),
-            credentialStateProvider: AppleCredentialStateProvider(),
-            keychainStore: sharedKeychainStore,
+            appleSignInSource: AppleSignInSource(),
+            secureStorage: sharedSecureStorage,
         )
-        let loginSessionRepository = LoginSessionRepositoryAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: [])),
-            keychainStore: sharedKeychainStore,
+        let signInRepository = SignInRepositoryAdapter(
+            remote: makeRemote(transport: RecordingRequestTransport(results: [])),
+            sessionStorage: sharedSecureStorage,
+            appleIdentityStorage: sharedSecureStorage,
+            requestCredentialProvider: RequestCredentialProvider(secureStorage: sharedSecureStorage),
+            sharedSessionStateMarkerCoding: nil,
         )
 
         try await authenticationRepository.clearAuthentication()
-        try await loginSessionRepository.signOut()
+        try await signInRepository.signOut()
 
-        let restoredBeforeLogin = try await loginSessionRepository.restore()
-        let statusBeforeLogin = try await authenticationRepository.authorizationStatus()
+        let restoredBeforeSignIn = try await signInRepository.restore()
+        let statusBeforeSignIn = try await authenticationRepository.authorizationStatus()
 
-        #expect(restoredBeforeLogin == nil)
-        #expect(statusBeforeLogin == .reauthenticationRequired)
+        #expect(restoredBeforeSignIn == nil)
+        #expect(statusBeforeSignIn == .reauthenticationRequired)
 
         try await authenticationRepository.clearAuthentication()
-        try await loginSessionRepository.signOut()
+        try await signInRepository.signOut()
     }
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPAuthenticationRemote {
-        HTTPAuthenticationRemote(
-            client: HTTPClient(
-                baseURL: URL(string: "https://api.git-it.example.com")!,
-                bodyCoding: StandardJSONBodyCoding(),
-                transport: transport,
-            ),
-            accessTokenProvider: { nil },
+    private func makeRemote(transport: RecordingRequestTransport) -> AuthenticationRemote {
+        AuthenticationRemote(
+            baseURL: URL(string: "https://api.git-it.example.com")!,
+            transport: transport,
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+            credential: { .signedOut },
         )
     }
 

@@ -43,5 +43,4 @@ digraph PackageDependencyGraph {
 
     Composition -> Domain
     Composition -> Data
-    Composition -> Infrastructure
 }

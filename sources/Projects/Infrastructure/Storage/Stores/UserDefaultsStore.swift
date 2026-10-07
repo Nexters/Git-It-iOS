@@ -1,6 +1,6 @@
 import Foundation
 
-public actor UserDefaultsStore<Value: Codable & Sendable> {
+public actor UserDefaultsStore {
 
     // MARK: Lifecycle
 
@@ -15,16 +15,14 @@ public actor UserDefaultsStore<Value: Codable & Sendable> {
     // MARK: Public
 
     public func store(
-        _ value: Value,
+        _ data: Data,
         forKey key: String,
     ) {
-        guard let data = try? JSONEncoder().encode(value) else { return }
         userDefaults.set(data, forKey: storageKey(for: key))
     }
 
-    public func value(forKey key: String) -> Value? {
-        guard let data = userDefaults.data(forKey: storageKey(for: key)) else { return nil }
-        return try? JSONDecoder().decode(Value.self, from: data)
+    public func value(forKey key: String) -> Data? {
+        userDefaults.data(forKey: storageKey(for: key))
     }
 
     public func removeValue(forKey key: String) {

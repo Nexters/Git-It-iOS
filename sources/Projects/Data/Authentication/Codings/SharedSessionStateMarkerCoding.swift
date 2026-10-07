@@ -1,5 +1,5 @@
+import DataShared
 import Foundation
-import InfrastructureStorage
 
 // MARK: - SharedSessionStateMarkerCoding
 
@@ -7,11 +7,8 @@ public struct SharedSessionStateMarkerCoding: Sendable {
 
     // MARK: Lifecycle
 
-    public init(userDefaults: UserDefaults) {
-        store = UserDefaultsStore<Marker>(
-            namespace: AppGroupUserDefaults.sharedSessionNamespace,
-            userDefaults: userDefaults,
-        )
+    public init(storage: any KeyValueStorage) {
+        self.storage = storage
     }
 
     // MARK: Public
@@ -21,7 +18,7 @@ public struct SharedSessionStateMarkerCoding: Sendable {
 
     public func loadSignedInState() async -> Bool? {
         guard
-            let marker = await store.value(forKey: Self.stateMarkerKey),
+            let marker = await storage.value(Marker.self, forKey: Self.stateMarkerKey),
             marker.schemaVersion == Self.markerSchemaVersion
         else { return nil }
         return marker.isSignedIn
@@ -31,7 +28,7 @@ public struct SharedSessionStateMarkerCoding: Sendable {
         isSignedIn: Bool,
         updatedAt: Date = Date(),
     ) async {
-        await store.store(
+        await storage.setValue(
             Marker(
                 schemaVersion: Self.markerSchemaVersion,
                 isSignedIn: isSignedIn,
@@ -49,6 +46,6 @@ public struct SharedSessionStateMarkerCoding: Sendable {
         let updatedAt: Date
     }
 
-    private let store: UserDefaultsStore<Marker>
+    private let storage: any KeyValueStorage
 
 }

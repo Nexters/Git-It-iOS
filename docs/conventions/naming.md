@@ -80,12 +80,13 @@
 | Composition | Adapter, 조립, 구현 선택, 객체 수명 | 새로운 비즈니스 규칙, Data 처리 정책 |
 | Feature | 사용자 기능, Presentation 상태·Action·화면 흐름 | DTO, 저장·네트워크 기술, production 구현체 |
 | Domain | 비즈니스 모델·정책·Use Case·외부 기능 계약 | 공급자, 서버 schema, 저장·플랫폼 기술 |
-| Data | 획득·저장·캐시·동기화, DTO, 필요한 기술 계약 | Domain 모델·Repository, Infrastructure 구체 타입 |
+| Data | 획득·저장·캐시·동기화의 실행 역할, DTO | Domain 모델·Repository, Infrastructure 구체 타입, 전송·저장 기술 용어 |
 | Infrastructure | 범용 플랫폼·라이브러리 기술 능력 | Domain·Data 의미, 서비스 고유 schema |
 | UI | 디자인 토큰과 범용 UI 구성요소 | 특정 Feature 상태·업무 흐름·데이터 접근 |
 
 패키지 이름을 접두어처럼 붙여 경계를 표시하지 않습니다. 대신 선언 자체가 소유하는 책임을 표현합니다. 패키지 밖에서 충돌하거나 오해할 실제 근거가 있을 때만
-구분 문맥을 추가합니다.
+구분 문맥을 추가합니다. Domain·Data·Infrastructure 사이의 관심사 경계와 판정 기준은
+[아키텍처 결정 기록 D-ARCH-004](../architecture.md#9-아키텍처-결정-기록)가 소유합니다.
 
 ### Target과 소스 폴더
 
@@ -108,6 +109,9 @@
 외부 API, 서버 schema, 표준과 플랫폼이 고정한 고유 명칭은 원문 의미와 표기를 보존합니다.
 
 → [외부 고정 명칭과 공급자 중립 경계](./naming/external-names.md)
+
+외부 서비스·공급자 이름을 Data 공개 이름에 허용하는 기준의 정본은
+[아키텍처 결정 기록 D-ARCH-004](../architecture.md#9-아키텍처-결정-기록)입니다.
 
 ## 8. rename과 설계·동작 변경 분리
 

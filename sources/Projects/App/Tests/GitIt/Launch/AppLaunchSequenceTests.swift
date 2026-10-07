@@ -11,13 +11,12 @@ struct AppLaunchSequenceTests {
 
     @Test
     @MainActor
-    func `마커 저장 푸시 활성화 AppDelegate 구성 생성 상태 관측 순서로 실행한다`() async {
+    func `마커 저장 푸시 활성화 AppDelegate 구성 순서로 실행한다`() async {
         let recorded = Mutex([String]())
         let sequence = AppLaunchSequence(
             recordSharedSessionState: { recorded.withLock { $0.append("recordSharedSessionState") } },
             activatePushClient: { recorded.withLock { $0.append("activatePushClient") } },
             configureAppDelegate: { recorded.withLock { $0.append("configureAppDelegate") } },
-            startObservingGenerationState: { recorded.withLock { $0.append("startObservingGenerationState") } },
         )
 
         await sequence()
@@ -26,7 +25,6 @@ struct AppLaunchSequenceTests {
             "recordSharedSessionState",
             "activatePushClient",
             "configureAppDelegate",
-            "startObservingGenerationState",
         ])
     }
 

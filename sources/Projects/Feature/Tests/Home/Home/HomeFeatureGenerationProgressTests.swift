@@ -61,37 +61,57 @@ struct HomeFeatureGenerationProgressTests {
 
     @Test
     func `진행 중에도 프로필 재시도 조회는 그대로 수행된다`() async {
-        let profile = HomeMemberProfileUseCaseMock(results: [.success(HomeTestFixture.profileWithBoth)])
+        let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
         state.profileLoad = .failed(.temporarilyUnavailable)
-        let store = TestStore(initialState: state) {
-            HomeFeature(
-                fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: profile.fetchProfile,
-                trackGeneration: StubTrackGenerationUseCase(),
-            )
-        }
+        let store = makeStore(profile: profile, state: state)
 
         await store.send(.view(.profileRetryTapped)) {
             $0.profileLoad = .loading
             $0.profileRequestID = 1
         }
-        await store.receive(.effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))) {
+        await store.receive(
+            .effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))
+        ) {
             $0.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         }
 
+        #expect(store.state.isGenerationInProgress)
         #expect(await profile.snapshot().callCount == 1)
+    }
+
+    @Test
+    func `진행 중에도 프로젝트 갱신 재시도는 그대로 수행된다`() async {
+        let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
+        var state = HomeFeature.State()
+        state.isGenerationInProgress = true
+        state.projectLoad = .failed(.temporarilyUnavailable)
+        let store = makeStore(projects: projects, state: state)
+
+        await store.send(.view(.projectRetryTapped)) {
+            $0.projectLoad = .loading
+            $0.projectRequestID = 1
+        }
+        await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
+
+        #expect(await projects.snapshot().refreshCallCount == 1)
     }
 
     // MARK: Private
 
-    private func makeStore(state: HomeFeature.State = .init()) -> TestStoreOf<HomeFeature> {
+    private func makeStore(
+        projects: ProjectUseCaseMock = ProjectUseCaseMock(),
+        profile: UserInfoUseCaseSuspendableProfileMock = UserInfoUseCaseSuspendableProfileMock(
+            results: [.success(HomeTestFixture.profileWithBoth)]
+        ),
+        state: HomeFeature.State = .init(),
+    ) -> TestStoreOf<HomeFeature> {
         TestStore(initialState: state) {
             HomeFeature(
-                fetchLearningProjects: HomeLearningProjectsUseCaseMock(),
-                fetchMemberProfile: HomeMemberProfileUseCaseMock().fetchProfile,
-                trackGeneration: StubTrackGenerationUseCase(),
+                projects: { await projects.projects() },
+                refreshProjects: { try await projects.refresh() },
+                profile: profile.fetchProfile,
             )
         }
     }

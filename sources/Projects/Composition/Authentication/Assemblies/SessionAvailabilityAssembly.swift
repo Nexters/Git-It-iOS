@@ -1,7 +1,7 @@
 import DataAuthentication
-import DomainAuthentication
+import DataShared
+import DomainAccount
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - SessionAvailabilityAssembly
 
@@ -10,27 +10,27 @@ public struct SessionAvailabilityAssembly: Sendable {
     // MARK: Lifecycle
 
     public init(
-        keychainStore: KeychainStore,
-        sharedDefaults: UserDefaults?,
+        secureStorage: (any SecureValueStorage)?,
+        sharedStorage: (any KeyValueStorage)?,
     ) {
-        let markerCoding = sharedDefaults.map(SharedSessionStateMarkerCoding.init(userDefaults:))
-        let resolveSessionAvailability: @Sendable () async -> SessionAvailability = {
-            guard let markerCoding else { return .appLaunchRequired }
-            return await ResolveSessionAvailability(
-                markerRepository: SharedSessionMarkerRepositoryAdapter(markerCoding: markerCoding),
-                sessionRepository: StoredSessionRepositoryAdapter(keychainStore: keychainStore),
-            )()
-        }
-        self.resolveSessionAvailability = resolveSessionAvailability
-        accessTokenProvider = {
-            guard case .available(let accessToken) = await resolveSessionAvailability() else { return nil }
-            return accessToken
+        let sessionStorage = secureStorage ?? StorageFactory.secureValueStorage(
+            namespace: SessionStorageLayout.namespace,
+            location: .appGroup,
+        )
+        let requestCredentialProvider = RequestCredentialProvider(secureStorage: sessionStorage)
+        self.requestCredentialProvider = requestCredentialProvider
+
+        let markerCoding = sharedStorage.map(SharedSessionStateMarkerCoding.init(storage:))
+        signInAvailability = {
+            guard let isSignedIn = await markerCoding?.loadSignedInState() else { return .appLaunchRequired }
+            guard isSignedIn, await requestCredentialProvider.credential() != .signedOut else { return .signInRequired }
+            return .signedIn
         }
     }
 
     // MARK: Public
 
-    public let resolveSessionAvailability: @Sendable () async -> SessionAvailability
-    public let accessTokenProvider: @Sendable () async -> String?
+    public let requestCredentialProvider: RequestCredentialProvider
+    public let signInAvailability: @Sendable () async -> SignInAvailability
 
 }

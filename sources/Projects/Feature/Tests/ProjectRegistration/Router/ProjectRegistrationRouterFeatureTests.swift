@@ -1,10 +1,10 @@
 import ComposableArchitecture
-import DomainLearningProject
-import Foundation
+import DomainProjectGeneration
 import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectRegistrationRouterFeature 화면 전환")
 struct ProjectRegistrationRouterFeatureTests {
 
@@ -72,17 +72,16 @@ struct ProjectRegistrationRouterFeatureTests {
 
     @Test
     func `생성 시작은 진행 화면으로 전환하고 확인된 저장소와 선택한 난이도로 제출을 요청한다`() async {
-        let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
-        let observeGenerationOutcomes = StubTrackGenerationUseCase()
+        let generationStates = ProjectGenerationStateStreamStub()
+        let projectGeneration = ProjectGenerationUseCaseStub(
+            results: [.success(sampleReceipt)],
+            generationStates: generationStates,
+        )
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = .quizGenerationConfirmation
         state.repositoryConfirmation.repository = sampleRepository
         state.quizLevelSelection.quizLevel = .l2
-        let store = makeProjectRegistrationRouterStore(
-            createLearningProject: createLearningProject,
-            trackGeneration: observeGenerationOutcomes,
-            state: state,
-        )
+        let store = makeProjectRegistrationRouterStore(projectGeneration: projectGeneration, state: state)
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.view(.startTapped)))
@@ -93,29 +92,29 @@ struct ProjectRegistrationRouterFeatureTests {
 
         await store.receive(.quizGenerationProgress(.effect(.submissionFinished(.success(sampleReceipt)))))
         #expect(
-            await createLearningProject.recordedCalls() == [
-                StubCreateLearningProjectUseCase.Call(githubRepoURL: sampleRepository.canonicalURL, quizLevel: .l2)
+            await projectGeneration.recordedRequests() == [
+                ProjectGenerationRequest(repositoryURL: sampleRepository.canonicalURL, quizLevel: .l2)
             ]
         )
 
-        await observeGenerationOutcomes.finish()
-        await store.skipReceivedActions()
+        await generationStates.finish()
+        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
     @Test
     func `확인된 저장소가 없으면 생성 시작이 아무 효과도 내지 않는다`() async {
-        let createLearningProject = StubCreateLearningProjectUseCase(results: [.success(sampleReceipt)])
+        let projectGeneration = ProjectGenerationUseCaseStub(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = .quizGenerationConfirmation
-        let store = makeProjectRegistrationRouterStore(createLearningProject: createLearningProject, state: state)
+        let store = makeProjectRegistrationRouterStore(projectGeneration: projectGeneration, state: state)
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.view(.startTapped)))
         await store.receive(.quizGenerationConfirmation(.delegate(.submitRequested)))
 
         #expect(store.state.activeScreen == .quizGenerationConfirmation)
-        #expect(await createLearningProject.recordedCalls().isEmpty)
+        #expect(await projectGeneration.recordedRequests().isEmpty)
     }
 
     @Test

@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainMember
+import DomainUserInfo
 import SwiftUI
 
 private enum ProfilePreviewFixture {
@@ -31,14 +31,23 @@ private enum ProfilePreviewFixture {
         position: MemberPosition?,
         careerLevel: CareerLevel?,
         statistics: LearningStatistics,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: "프로덕션에 푸시하는 고양이",
-            email: "kimlee@github.io",
-            position: position,
-            careerLevel: careerLevel,
-            statistics: statistics,
+    ) -> UserProfile {
+        UserProfile(
+            detail: UserDetail(
+                name: "프로덕션에 푸시하는 고양이",
+                email: "kimlee@github.io",
+                statistics: statistics,
+            ),
+            curation: Self.curation(position: position, careerLevel: careerLevel),
         )
+    }
+
+    static func curation(
+        position: MemberPosition?,
+        careerLevel: CareerLevel?,
+    ) -> Curation? {
+        guard let position, let careerLevel else { return nil }
+        return Curation(position: position, careerLevel: careerLevel)
     }
 
     @MainActor

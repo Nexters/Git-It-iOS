@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainExternalRepository
+import DomainProjectGeneration
 import Foundation
 import Testing
 
@@ -33,8 +34,8 @@ struct ShareRegistrationFeatureFailureTests {
 
     @Test
     func `재시도는 등록 단계부터 다시 수행한다`() async {
-        let createLearningProject = SpyCreateLearningProject(error: .temporarilyUnavailable)
-        let store = Self.makeStore(createLearningProject: createLearningProject)
+        let projectGeneration = ProjectGenerationUseCaseSpy(error: .temporarilyUnavailable)
+        let store = Self.makeStore(projectGeneration: projectGeneration)
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.delegate(.submitRequested)))
@@ -42,7 +43,7 @@ struct ShareRegistrationFeatureFailureTests {
         await store.send(.view(.retryTapped))
         await store.skipReceivedActions()
 
-        #expect(createLearningProject.callCount == 2)
+        #expect(projectGeneration.callCount == 2)
     }
 
     @Test
@@ -71,8 +72,8 @@ struct ShareRegistrationFeatureFailureTests {
     // MARK: Private
 
     private static func makeStore(
-        error: LearningProjectError? = nil,
-        createLearningProject: SpyCreateLearningProject? = nil,
+        error: ProjectGenerationError? = nil,
+        projectGeneration: ProjectGenerationUseCaseSpy? = nil,
     ) -> TestStoreOf<ShareRegistrationFeature> {
         var state = ShareRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL)
         state.repositoryConfirmation.repository = ShareRegistrationTestSupport.repository
@@ -80,11 +81,11 @@ struct ShareRegistrationFeatureFailureTests {
         return TestStore(initialState: state) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
-                fetchExternalRepository: StubFetchExternalRepository(
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                createLearningProject: createLearningProject ?? SpyCreateLearningProject(error: error),
-                resolveSession: { .available },
+                projectGeneration: projectGeneration ?? ProjectGenerationUseCaseSpy(error: error),
+                signInAvailability: { .signedIn },
             )
         }
     }

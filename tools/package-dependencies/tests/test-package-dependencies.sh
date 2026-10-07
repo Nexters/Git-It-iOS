@@ -28,7 +28,7 @@ make_fixture() {
 | 패키지 | 허용 의존성 |
 |---|---|
 | App | Feature, Composition, Domain |
-| Composition | Domain, Data, Infrastructure |
+| Composition | Domain, Data |
 | Feature | Domain, UI |
 | Domain | — |
 | Data | Infrastructure |
@@ -39,7 +39,7 @@ make_fixture() {
 
 	write_file "$fixture/config/allowed-dependencies" '# fixture
 App: Feature Composition Domain
-Composition: Domain Data Infrastructure
+Composition: Domain Data
 Feature: Domain UI
 Domain:
 Data: Infrastructure
@@ -102,7 +102,6 @@ extension CompositionModuleName {
                 dependencies: [
                     .fromDomain(.DomainMember),
                     .fromData(.DataMember),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
         }
@@ -236,8 +235,7 @@ import SwiftUI'
 import Testing'
 	write_file "$projects/App/Project.swift" 'import ProjectDescription'
 	write_file "$projects/Composition/App/AppComposition.swift" 'import DataMember
-import DomainMember
-import InfrastructureNetworkClient'
+import DomainMember'
 	write_file "$projects/Feature/Home/HomeFeature.swift" 'import DomainMember
 import UIComponent'
 	write_file "$projects/Feature/Tests/Home/HomeFeatureTests.swift" 'import DomainMember
@@ -379,7 +377,21 @@ mv "$work/edited" "$fixture/config/source-roots"
 run_check
 expect 'source root 누락' 2 'package-dependencies.source-root-missing'
 
-# 14. 인자는 받지 않는다.
+# 14. Composition의 Infrastructure import는 실패한다.
+make_fixture
+append "$projects/Composition/App/AppComposition.swift" 'import InfrastructureNetworkClient'
+run_check
+expect 'Composition Infrastructure import' 1 '[import-package] CompositionApp target(Composition)에서 Infrastructure 패키지 모듈 InfrastructureNetworkClient'
+
+# 15. Composition manifest의 Infrastructure 선언은 실패한다.
+make_fixture
+sed 's/\.fromData(\.DataMember),/.fromData(.DataMember),\
+                    .fromInfrastructure(.InfrastructureNetworkClient),/' "$manifests/CompositionModuleName.swift" >"$work/edited"
+mv "$work/edited" "$manifests/CompositionModuleName.swift"
+run_check
+expect 'Composition Infrastructure manifest' 1 '[manifest-package] CompositionApp target이 Infrastructure 패키지 모듈 InfrastructureNetworkClient'
+
+# 16. 인자는 받지 않는다.
 if "$runner" unexpected >"$work/out" 2>"$work/err"; then
 	status=0
 else

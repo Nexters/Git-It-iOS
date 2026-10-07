@@ -1,66 +1,75 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 import Foundation
 @testable import Feature
 
+@MainActor
 func makeAppEntryStore(
-    restoreSession: RestoreSessionUseCaseMock = RestoreSessionUseCaseMock(),
-    fetchMemberProfile: FetchMemberProfileUseCaseMock = FetchMemberProfileUseCaseMock(),
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
+    restoreSession: AccountUseCaseRestorationMock = AccountUseCaseRestorationMock(),
+    fetchMemberProfile: UserInfoUseCaseProfileMock = UserInfoUseCaseProfileMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
     state: AppEntryFeature.State = AppEntryFeature.State(),
 ) -> TestStoreOf<AppEntryFeature> {
     TestStore(initialState: state) {
         AppEntryFeature(
-            restoreSession: restoreSession,
-            fetchMemberProfile: fetchMemberProfile.fetchProfile,
-            signOut: signOut,
+            restoreSignIn: restoreSession.restoreSignIn,
+            curation: fetchMemberProfile.curation,
+            signOut: signOut.signOut,
         )
     }
 }
 
+@MainActor
 func makeTutorialStore(
-    signIn: SignInUseCaseMock = SignInUseCaseMock(),
-    deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+    signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
+    accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: TutorialFeature.State = TutorialFeature.State(bundleVersion: "1.0.0"),
 ) -> TestStoreOf<TutorialFeature> {
     TestStore(initialState: state) {
         TutorialFeature(
-            signIn: signIn,
-            deleteMemberAccount: deleteMemberAccount,
+            signIn: signIn.signIn,
+            withdraw: accountWithdrawal.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }
 }
 
+@MainActor
 func makeLegalAgreementStore(
-    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
+    policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
     state: LegalAgreementFeature.State = LegalAgreementFeature.State(),
 ) -> TestStoreOf<LegalAgreementFeature> {
     TestStore(initialState: state) {
-        LegalAgreementFeature(policyConsent: policyConsent)
+        LegalAgreementFeature(
+            policyConsentStatus: policyConsent.policyConsentStatus,
+            consent: policyConsent.consent,
+        )
     }
 }
 
+@MainActor
 func makePositionSelectionStore(
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
     state: PositionSelectionFeature.State = PositionSelectionFeature.State(),
 ) -> TestStoreOf<PositionSelectionFeature> {
     TestStore(initialState: state) {
-        PositionSelectionFeature(signOut: signOut)
+        PositionSelectionFeature(signOut: signOut.signOut)
     }
 }
 
+@MainActor
 func makeCareerSelectionStore(
-    completeCuration: CompleteCurationUseCaseMock = CompleteCurationUseCaseMock(),
+    completeCuration: UserInfoUseCaseCurationMock = UserInfoUseCaseCurationMock(),
     state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
 ) -> TestStoreOf<CareerSelectionFeature> {
     TestStore(initialState: state) {
-        CareerSelectionFeature(completeCuration: completeCuration.complete)
+        CareerSelectionFeature(updateCuration: completeCuration.updateCuration)
     }
 }
 
+@MainActor
 func makeOnboardingExitStore(
     state: OnboardingExitFeature.State = OnboardingExitFeature.State()
 ) -> TestStoreOf<OnboardingExitFeature> {
@@ -69,22 +78,24 @@ func makeOnboardingExitStore(
     }
 }
 
+@MainActor
 func makeOnboardingRouterStore(
-    signIn: SignInUseCaseMock = SignInUseCaseMock(),
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
-    memberAccount: MemberAccountUseCaseMock = MemberAccountUseCaseMock(),
-    deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
+    signIn: AccountUseCaseSignInMock = AccountUseCaseSignInMock(),
+    signOut: AccountUseCaseSignOutMock = AccountUseCaseSignOutMock(),
+    policyConsent: AccountUseCaseConsentMock = AccountUseCaseConsentMock(),
+    userInfo: UserInfoUseCaseMock = UserInfoUseCaseMock(),
+    accountWithdrawal: AccountUseCaseWithdrawalMock = AccountUseCaseWithdrawalMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
     state: OnboardingRouterFeature.State = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: "1.0.0"),
 ) -> TestStoreOf<OnboardingRouterFeature> {
     TestStore(initialState: state) {
         OnboardingRouterFeature(
-            signIn: signIn,
-            signOut: signOut,
-            policyConsent: policyConsent,
-            memberAccount: memberAccount,
-            deleteMemberAccount: deleteMemberAccount,
+            signIn: signIn.signIn,
+            signOut: signOut.signOut,
+            policyConsentStatus: policyConsent.policyConsentStatus,
+            consent: policyConsent.consent,
+            updateCuration: { try await userInfo.updateCuration($0) },
+            withdraw: accountWithdrawal.withdraw,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }

@@ -6,7 +6,7 @@
 
 ## 설명
 
-Composition은 Domain과 Data 사이의 Adapter를 구현하고 production dependency graph를 구성하는 조립 경계입니다. Infrastructure 객체, Data concrete 구현, Domain↔Data Adapter와 Domain UseCase 구현을 조립해 실행 환경에 맞는 구현 선택, 객체 생성 순서, 공유 범위와 수명 관리를 담당합니다.
+Composition은 Domain과 Data 사이의 Adapter를 구현하고 production dependency graph를 구성하는 조립 경계입니다. Data 생성 진입점이 만드는 구현과 Data 역할 계약의 대체 구현, Data concrete 구현, Domain↔Data Adapter와 Domain UseCase 구현을 조립해 실행 환경에 맞는 구현 선택, 객체 생성 순서, 공유 범위와 수명 관리를 담당합니다.
 
 Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapter로 연결합니다. Data가 요구하는 기술 계약의 concrete 구현은 Data가 Infrastructure 기술 API 위에서 직접 소유하므로, Composition은 이를 변환하는 별도 Adapter를 두지 않고 그 구현을 조립 대상으로만 사용합니다. Composition은 App이 Feature에 주입할 수 있는 Domain UseCase Protocol 타입의 실행 가능한 dependency만 제공한다.
 
@@ -16,9 +16,9 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 - 모든 내부 target은 Adapter 구현, 객체 생성, 구현 선택 또는 수명 관리에 기여해야 합니다.
 - Domain이 정의한 계약은 Data가 제공하는 기능을 이용한 Domain↔Data Adapter로 충족해야 합니다.
 - Data 모델·DTO·오류와 Domain 모델·오류 사이의 변환은 Domain↔Data Adapter가 담당해야 합니다.
-- 실행 환경별 production/test/stub 구현 선택이 필요한 경우 Composition에서 결정해야 합니다.
+- 실행 환경별 production/test/stub 구현 선택이 필요한 경우 Composition에서 결정해야 합니다. 실제 구현은 Data 생성 진입점으로 얻고, 대체 구현은 Data 역할 계약 타입의 선택 인자(`nil`이면 실제 구현)로 받습니다.
 - 객체 수명과 공유 범위는 Composition이 명시적으로 결정해야 합니다. 공유 수명이 필요한 Repository·세션 객체는 중복 생성해서는 안 됩니다.
-- App이 Feature에 주입할 수 있도록 Domain UseCase Protocol 타입의 실행 가능한 dependency를 공개해야 합니다. 내부 Adapter와 Infrastructure 객체는 공개 API에 노출해서는 안 됩니다.
+- App이 Feature에 주입할 수 있도록 Domain UseCase Protocol 타입의 실행 가능한 dependency를 공개해야 합니다. 내부 Adapter는 공개 API에 노출해서는 안 되며, 공개 API 인자는 Domain·Data 타입만 사용해야 합니다.
 
 ## Target 구성
 
@@ -28,16 +28,17 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 
 | Target | 소속 축 | 의존 수 | 담는 것 |
 | --- | --- | --- | --- |
-| `CompositionShared` | 공용 | 1 | 여러 축의 조립이 공유하는 HTTP 클라이언트 구성 |
-| `CompositionAuthentication` | Authentication | 6 | 인증·세션·정책 동의 Adapter, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
-| `CompositionLearningProject` | LearningProject | 6 | 학습 자료·생성 추적·외부 저장소·생성 리마인드 Adapter와 조립 |
-| `CompositionMember` | Member | 5 | 회원·큐레이션·기기 식별자 Adapter, `MemberAssembly` |
-| `CompositionApp` | 앱 조립 루트 | 6 | 축 조립을 묶어 App에 Domain UseCase를 공개 |
-| `CompositionShareExtension` | 공유 확장 조립 루트 | 6 | 공유 확장이 쓰는 축 조립만 묶어 공개 |
+| `CompositionAuthentication` | Account | 4 | 인증·로그인·정책 동의 Adapter, `RequestCredentialProvider` 연결, `AuthenticationAssembly`, `SessionAvailabilityAssembly` |
+| `CompositionLearningProject` | Project·QuizDetail·ProjectGeneration·ExternalRepository | 5 | 프로젝트·퀴즈·생성·외부 저장소 Adapter와 조립 |
+| `CompositionMember` | UserInfo·AppSetting | 4 | 사용자 정보·기기 식별자 Adapter |
+| `CompositionApp` | 앱 조립 루트 | 5 | 축 조립과 `ConcernUseCaseAssembly`를 묶어 App에 관심사 UseCase 7개를 공개 |
+| `CompositionShareExtension` | 공유 확장 조립 루트 | 5 | 공유 확장이 쓰는 축 조립만 묶어 공개 |
 
-- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 모듈**의 축에 둡니다. 외부
-  저장소 조회와 생성 리마인드는 계약이 `DomainLearningProject`에 있으므로 LearningProject
-  축입니다.
+- Adapter와 조립은 **구현하거나 공개하는 Domain 계약이 속한 관심사 타깃**의 축에 둡니다. 외부
+  저장소 조회는 계약이 `DomainExternalRepository`에, 생성 리마인드는 `DomainProjectGeneration`에
+  있으므로 둘 다 LearningProject 축입니다.
+- 요청 인증 정보는 `RequestCredentialProvider` 하나를 만들어 모든 Remote의 인증 헤더 공급과
+  `AccountUseCase`의 로그인 무효화 신호에 연결합니다. 이 연결은 Account 축이 소유합니다.
 - 공용 target은 둘 이상의 축이 같은 의미로 쓰는 조립 요소만 담고 Domain·Data 모듈에
   의존해서는 안 됩니다.
 - 모든 Composition target은 다른 패키지 모듈 의존 수가 6개를 넘어서는 안 됩니다. 조립
@@ -54,18 +55,17 @@ Domain이 요구하는 외부 기능 계약은 Data 기능을 이용하는 Adapt
 | 책임 | 소유 패키지 | Composition에 남는 것 |
 | --- | --- | --- |
 | 저장 네임스페이스·키·저장 형식 | `Data<기능>` | Domain 타입과 저장 레코드 사이의 변환 |
-| App Group 식별자와 Keychain 접근 그룹 | `InfrastructureStorage`, `InfrastructureAuthentication` | 진입점 호출 |
-| 세션 유효성 판정 | `DomainAuthentication` | 마커·저장 세션 계약의 Adapter |
-| 기기 등록 대상 구성 | `DomainMember` | deviceID 계약의 Adapter |
-| 리마인드 예약 정책 | `DomainLearningProject` | 알림 계약의 Adapter |
+| App Group 식별자와 Keychain 접근 그룹 | `InfrastructureStorage`, `InfrastructureAuthentication` (Data 생성 진입점이 사용) | `StorageFactory` 위치(`.appGroup`/`.device`) 선택 |
+| 로그인 가용성 판정 | `DomainAccount` | 공유 표시·로그인 기록 계약의 Adapter |
+| 기기 등록 대상 구성 | `DomainAppSetting` | deviceID 계약의 Adapter |
+| 리마인드 예약 정책 | `DomainProjectGeneration` | 알림 계약의 Adapter |
 | 알림 제목과 본문 | `App` | 조립 인자로 전달 |
 | 앱 기동 순서 | `App` | 순서 없는 개별 조각의 공개 |
-| 외부 라이브러리 타입 | `Infrastructure` | 공급자 중립 진입점 호출 |
+| 외부 라이브러리 타입 | `Infrastructure` (Data 내부 구현만 사용) | Data 생성 진입점 호출 |
 
 조립 시점에 객체를 생성하는 일 자체는 Composition의 책임입니다.
-[아키텍처 3.5](../architecture.md)가 정한 대로 Composition은 Data가 Infrastructure 기술
-API 위에서 소유하는 concrete 구현을 실행 환경에 맞게 선택해 객체 생성 순서와 수명을
-결정합니다. 이 명세가 걷어낸 것은 "무엇을 만들지 고르는 일"이 아니라 "무엇이 옳은지
+[아키텍처 3.5](../architecture.md)가 정한 대로 Composition은 Data 생성 진입점과 역할 계약을
+이용해 실행 환경에 맞는 구현을 선택하고 객체 생성 순서와 수명을 결정합니다. 이 명세가 걷어낸 것은 "무엇을 만들지 고르는 일"이 아니라 "무엇이 옳은지
 정하는 규칙"과 "어디에 어떤 이름으로 저장할지 정하는 스키마"입니다.
 
 ## 제약조건
@@ -76,8 +76,8 @@ API 위에서 소유하는 concrete 구현을 실행 환경에 맞게 선택해 
 - Feature reducer, Feature dependency 묶음, Store 또는 View를 생성해서는 안 됩니다.
 - Feature, App 또는 UI target을 의존성으로 선언해서는 안 됩니다.
 - Feature가 Composition에 직접 접근하도록 Service Locator API를 제공해서는 안 됩니다.
-- Infrastructure의 외부 라이브러리 구체 API를 Data 구현이 아닌 Composition이 직접 사용해서는 안 됩니다.
-- 저장 네임스페이스·키·저장 형식을 Composition이 정의해서는 안 됩니다. 그 좌표는 소유 `Data<기능>` 모듈과 Infrastructure 진입점이 소유합니다.
+- Infrastructure target을 의존성으로 선언하거나 import해서는 안 됩니다. 기술 능력은 Data 생성 진입점과 역할 계약으로만 사용합니다.
+- 저장 네임스페이스·키·저장 형식을 Composition이 정의해서는 안 됩니다. 그 좌표는 소유 `Data<기능>` 모듈과 Data 생성 진입점이 소유합니다.
 - 사용자에게 보이는 문구를 Composition이 가져서는 안 됩니다. 문구는 App이 조립 인자로 전달합니다.
 - 실행 순서를 강제하는 클로저를 공개해서는 안 됩니다. 조각을 공개하고 순서는 App이 정합니다.
 - 앱·OS 버전처럼 실행 환경에서 읽는 값을 Composition이 직접 조회해서는 안 됩니다. App이 전달합니다.

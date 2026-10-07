@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 import Foundation
 
 struct ProfileDisplay: Equatable, Sendable {
@@ -9,7 +9,7 @@ struct ProfileDisplay: Equatable, Sendable {
         _ profileLoad: ProfileFeature.State.ProfileLoad,
         todayLabel: String = Self.currentDayLabel(),
     ) {
-        let profile: MemberProfile? =
+        let profile: UserProfile? =
             switch profileLoad {
             case .loaded(let loaded):
                 loaded
@@ -19,12 +19,12 @@ struct ProfileDisplay: Equatable, Sendable {
                  .failed:
                 nil
             }
-        let statistics = profile?.statistics
+        let statistics = profile?.detail.statistics
 
-        name = profile?.name
-        email = profile?.email
-        positionBadgeText = profile.flatMap(\.position).map(PositionDisplay.title(for:))
-        careerLevelBadgeText = profile.flatMap(\.careerLevel).map(CareerLevelDisplay.title(for:))
+        name = profile?.detail.name
+        email = profile?.detail.email
+        positionBadgeText = profile?.curation.map { PositionDisplay.title(for: $0.position) }
+        careerLevelBadgeText = profile?.curation.map { CareerLevelDisplay.title(for: $0.careerLevel) }
         thisWeekSolvedCount = statistics?.thisWeekSolvedCount ?? 0
         thisMonthSolvedCount = statistics?.thisMonthSolvedCount ?? 0
         streakDays = statistics?.streakDays ?? 0

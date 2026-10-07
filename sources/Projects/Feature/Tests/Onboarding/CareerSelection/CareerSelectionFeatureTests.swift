@@ -1,8 +1,9 @@
-import DomainMember
+import DomainUserInfo
 import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("CareerSelectionFeature")
 struct CareerSelectionFeatureTests {
 
@@ -26,19 +27,20 @@ struct CareerSelectionFeatureTests {
         var state = CareerSelectionFeature.State()
         state.position = .ios
         state.careerLevel = .junior
-        let completeCuration = CompleteCurationUseCaseMock(results: [.success(())])
+        let completeCuration = UserInfoUseCaseCurationMock(results: [.success(())], suspendsRequests: true)
         let store = makeCareerSelectionStore(completeCuration: completeCuration, state: state)
 
         await store.send(.view(.submitTapped)) {
             $0.submission = .submitting
         }
         await store.send(.view(.submitTapped))
+        await completeCuration.resumeOldest()
         await store.receive(.effect(.curationFinished(success: true))) {
             $0.submission = .idle
         }
         await store.receive(.delegate(.curationSucceeded))
 
-        #expect(await completeCuration.snapshot() == [.init(position: .ios, careerLevel: .junior)])
+        #expect(await completeCuration.snapshot() == [Curation(position: .ios, careerLevel: .junior)])
     }
 
     @Test
@@ -46,7 +48,7 @@ struct CareerSelectionFeatureTests {
         var state = CareerSelectionFeature.State()
         state.position = .android
         state.careerLevel = .senior
-        let completeCuration = CompleteCurationUseCaseMock(results: [.failure(.temporarilyUnavailable), .success(())])
+        let completeCuration = UserInfoUseCaseCurationMock(results: [.failure(.temporarilyUnavailable), .success(())])
         let store = makeCareerSelectionStore(completeCuration: completeCuration, state: state)
 
         await store.send(.view(.submitTapped)) {

@@ -1,5 +1,7 @@
 import ComposableArchitecture
-import DomainMember
+import DomainAccount
+import DomainAppSetting
+import DomainUserInfo
 import Foundation
 import Testing
 
@@ -128,33 +130,81 @@ struct SettingsRouterFeatureTests {
 
     // MARK: Private
 
-    private let profile = MemberProfile(
-        name: "프로덕션에 푸시하는 고양이",
-        email: "kimlee@github.io",
-        position: .backend,
-        careerLevel: .entry,
-        statistics: LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0, streakDays: 0, weeklyCounts: []),
-    )
+    private let profile = SettingsTestFixture.profile(position: .backend, careerLevel: .entry)
 
-    private let updatedProfile = MemberProfile(
-        name: "프로덕션에 푸시하는 고양이",
-        email: "kimlee@github.io",
-        position: .ios,
-        careerLevel: .senior,
-        statistics: LearningStatistics(thisWeekSolvedCount: 0, thisMonthSolvedCount: 0, streakDays: 0, weeklyCounts: []),
-    )
+    private let updatedProfile = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
 
     private func makeStore(
         state: SettingsRouterFeature.State = .init()
     ) -> TestStoreOf<SettingsRouterFeature> {
         TestStore(initialState: state) {
             SettingsRouterFeature(
-                signOut: SignOutUseCaseMock(),
-                memberAccount: MemberAccountUseCaseMock(),
-                deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
-                requestGenerationReminder: StubRequestGenerationReminderUseCase(),
+                account: SettingsRouterAccountUseCaseStub(),
+                userInfo: UserInfoUseCaseMock(),
+                appSetting: SettingsRouterAppSettingUseCaseStub(),
             )
         }
+    }
+
+}
+
+// MARK: - SettingsRouterAccountUseCaseStub
+
+private struct SettingsRouterAccountUseCaseStub: AccountUseCase {
+
+    func signIn(with method: SignInMethod) async -> SignInResult {
+        _ = method
+        return .retryableFailure
+    }
+
+    func signOut() async -> SignOutResult {
+        .signedOut
+    }
+
+    func signInStates() async -> AsyncStream<SignInState> {
+        AsyncStream { $0.finish() }
+    }
+
+    func restoreSignIn() async -> SignInRestoration {
+        .signedOut
+    }
+
+    func verifySignIn() async -> SignInVerification {
+        .valid
+    }
+
+    func signInAvailability() async -> SignInAvailability {
+        .signedIn
+    }
+
+    func policyConsentStatus() async throws -> PolicyConsentStatus {
+        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
+    }
+
+    func consent(to documentIDs: [PolicyDocumentID]) async throws {
+        _ = documentIDs
+    }
+
+    func withdraw() async throws { }
+
+}
+
+// MARK: - SettingsRouterAppSettingUseCaseStub
+
+private struct SettingsRouterAppSettingUseCaseStub: AppSettingUseCase {
+
+    func notificationAuthorization() async -> NotificationAuthorizationStatus {
+        .denied
+    }
+
+    func requestNotificationAuthorization() async -> NotificationAuthorizationStatus {
+        .denied
+    }
+
+    func registerDevice() async throws { }
+
+    func updateDeviceToken(_ token: DeviceToken) async throws {
+        _ = token
     }
 
 }

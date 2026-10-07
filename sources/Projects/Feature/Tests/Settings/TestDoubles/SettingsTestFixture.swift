@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 
 enum SettingsTestFixture {
     static let curatedProfile = profile(position: .backend, careerLevel: .entry)
@@ -10,18 +10,25 @@ enum SettingsTestFixture {
     static func profile(
         position: MemberPosition?,
         careerLevel: CareerLevel?,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: "프로덕션에 푸시하는 고양이",
-            email: "kimlee@github.io",
-            position: position,
-            careerLevel: careerLevel,
-            statistics: LearningStatistics(
-                thisWeekSolvedCount: 11,
-                thisMonthSolvedCount: 27,
-                streakDays: 4,
-                weeklyCounts: [WeeklyLearningCount(dayLabel: "월", count: 3)],
+    ) -> UserProfile {
+        let curation: Curation? =
+            if let position, let careerLevel {
+                Curation(position: position, careerLevel: careerLevel)
+            } else {
+                nil
+            }
+        return UserProfile(
+            detail: UserDetail(
+                name: "프로덕션에 푸시하는 고양이",
+                email: "kimlee@github.io",
+                statistics: LearningStatistics(
+                    thisWeekSolvedCount: 11,
+                    thisMonthSolvedCount: 27,
+                    streakDays: 4,
+                    weeklyCounts: [WeeklyLearningCount(dayLabel: "월", count: 3)],
+                ),
             ),
+            curation: curation,
         )
     }
 }

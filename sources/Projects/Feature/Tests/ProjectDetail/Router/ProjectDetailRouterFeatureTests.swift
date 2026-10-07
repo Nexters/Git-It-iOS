@@ -1,10 +1,10 @@
 import ComposableArchitecture
-import DomainLearningProject
 import Foundation
 import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("ProjectDetailRouterFeature 화면 전환과 위임")
 struct ProjectDetailRouterFeatureTests {
 
@@ -34,10 +34,10 @@ struct ProjectDetailRouterFeatureTests {
             .projectDetail(.delegate(.savedQuestionsRequested(projectID: ProjectDetailTestFixture.projectID)))
         )
 
-        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
-        await store.send(.savedQuestions(.delegate(.questionSelected(question))))
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
+        await store.send(.savedQuestions(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "question-0")))
+            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
         )
 
         #expect(store.state.activeScreen == .savedQuestions)
@@ -47,15 +47,15 @@ struct ProjectDetailRouterFeatureTests {
     func `준비가 끝나면 단일 문제 화면으로 전환한다`() async {
         let store = makeStore()
         store.exhaustivity = .off
-        let question = QuizTestFixture.unansweredSet.questions[0]
+        let quiz = QuizTestFixture.unansweredSet.quizzes[0]
 
         await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
-            question: question,
+            question: quiz,
             projectID: ProjectDetailTestFixture.projectID,
         ))))
 
         #expect(store.state.activeScreen == .singleQuestion)
-        #expect(store.state.singleQuestion?.question == question)
+        #expect(store.state.singleQuestion?.question == quiz)
         #expect(store.state.singleQuestion?.questionNumber == nil)
         #expect(
             store.state.singleQuestion?.advanceActionTitle
@@ -63,7 +63,7 @@ struct ProjectDetailRouterFeatureTests {
         )
         #expect(
             store.state.screenTransitions.map(\.cause)
-                == [.singleQuestionPrepared(questionID: question.questionID)]
+                == [.singleQuestionPrepared(questionID: quiz.id)]
         )
     }
 
@@ -72,7 +72,7 @@ struct ProjectDetailRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        await store.send(.singleQuestionEntry(.delegate(.preparationFailed(.questionUnavailable))))
+        await store.send(.singleQuestionEntry(.delegate(.preparationFailed(.quizUnavailable))))
 
         #expect(store.state.activeScreen == .projectDetail)
         #expect(store.state.singleQuestion == nil)
@@ -84,7 +84,7 @@ struct ProjectDetailRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
         await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
-            question: QuizTestFixture.unansweredSet.questions[0],
+            question: QuizTestFixture.unansweredSet.quizzes[0],
             projectID: ProjectDetailTestFixture.projectID,
         ))))
 
@@ -100,7 +100,7 @@ struct ProjectDetailRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
         await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
-            question: QuizTestFixture.unansweredSet.questions[0],
+            question: QuizTestFixture.unansweredSet.quizzes[0],
             projectID: ProjectDetailTestFixture.projectID,
         ))))
 
@@ -162,14 +162,13 @@ struct ProjectDetailRouterFeatureTests {
             initialState: ProjectDetailRouterFeature.State(projectID: ProjectDetailTestFixture.projectID)
         ) {
             ProjectDetailRouterFeature(
-                learningLibrary: LearningLibraryUseCaseMock(
-                    detailResults: [.success(ProjectDetailTestFixture.mixedProgressDetail)],
-                    setResults: [.success(QuizTestFixture.unansweredSet)],
-                    bookmarkResults: [.success(ProjectDetailTestFixture.savedQuestionCollection)],
+                project: ProjectUseCaseDetailStub(
+                    results: [.success(ProjectDetailTestFixture.mixedProgressDetail)]
                 ),
-                submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
-                submitEssayAnswer: StubSubmitEssayAnswerUseCase(),
-                setQuestionBookmark: StubSetQuestionBookmarkUseCase(),
+                quizDetail: QuizDetailUseCaseMock(
+                    quizSetResults: [.success(QuizTestFixture.unansweredSet)],
+                    bookmarkListResults: [.success(ProjectDetailTestFixture.savedQuizList)],
+                ),
             )
         }
     }

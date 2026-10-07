@@ -13,9 +13,15 @@ enum DataModuleName: String, CaseIterable {
     case DataLegalConsentTests
     case DataMember
     case DataMemberTests
+    case DataNotification
+    case DataNotificationTests
+    case DataShared
+    case DataSharedTests
 }
 
 extension DataModuleName {
+    static let packageName = "GitItData"
+
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Data.rawValue)
         return switch self {
@@ -24,14 +30,18 @@ extension DataModuleName {
             .DataExternalRepository,
             .DataLearningProject,
             .DataLegalConsent,
-            .DataMember:
+            .DataMember,
+            .DataNotification,
+            .DataShared:
             directoryName
         case
             .DataAuthenticationTests,
             .DataExternalRepositoryTests,
             .DataLearningProjectTests,
             .DataLegalConsentTests,
-            .DataMemberTests:
+            .DataMemberTests,
+            .DataNotificationTests,
+            .DataSharedTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
@@ -42,7 +52,9 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
                     .fromInfrastructure(.InfrastructureAuthentication),
                     .fromInfrastructure(.InfrastructureStorage),
@@ -53,6 +65,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataAuthentication.rawValue
                 ),
@@ -66,9 +79,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -76,8 +90,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
+                    .target(name: DataModuleName.DataShared.rawValue),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 
@@ -85,6 +101,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataExternalRepository.rawValue
                 ),
@@ -94,12 +111,12 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureStorage),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureNetworkClient)
                 ],
             )
 
@@ -107,8 +124,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
-                    .fromInfrastructure(.InfrastructureStorage)
+                    .target(name: DataModuleName.DataShared.rawValue),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
 
@@ -116,6 +135,7 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataLegalConsent.rawValue
                 ),
@@ -128,9 +148,10 @@ extension DataModuleName {
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 dependencies: [
+                    .target(name: DataModuleName.DataShared.rawValue),
                     .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
                 ],
             )
 
@@ -138,11 +159,60 @@ extension DataModuleName {
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
                 productionTarget: .target(
                     name: DataModuleName.DataMember.rawValue
                 ),
+            )
+
+        case .DataNotification:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureLocalNotification),
+                    .fromInfrastructure(.InfrastructurePushMessaging),
+                ],
+            )
+
+        case .DataNotificationTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                productionTarget: .target(
+                    name: DataModuleName.DataNotification.rawValue
+                ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureAuthentication)
+                    .fromInfrastructure(.InfrastructureLocalNotification)
+                ],
+            )
+
+        case .DataShared:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                dependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureStorage),
+                ],
+            )
+
+        case .DataSharedTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                packageName: Self.packageName,
+                productionTarget: .target(
+                    name: DataModuleName.DataShared.rawValue
+                ),
+                additionalDependencies: [
+                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
+                    .fromInfrastructure(.InfrastructureStorage),
                 ],
             )
         }

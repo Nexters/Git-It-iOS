@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
-import DomainLearningProject
+import DomainQuizDetail
 import SwiftUI
 import UIComponent
 
@@ -97,26 +97,26 @@ struct QuestionSolvingScreen: View {
 
     @ViewBuilder
     private var answerSection: some View {
-        switch store.question.format {
-        case .multipleChoice:
+        switch store.question.content {
+        case .choice:
             ChoiceSection(
-                questionID: store.question.questionID,
+                questionID: store.question.id,
                 options: choiceOptions,
                 isEnabled: store.answerOutcome == nil && !store.isSubmitting,
                 isGraded: store.answerOutcome != nil,
                 onSelect: { send(.choiceSelected($0)) },
             )
 
-            if case .choice(let result) = store.answerOutcome {
-                LabeledCard.accent(label: "AI 해설", text: result.explanation)
+            if case .choice(let grading) = store.answerOutcome {
+                LabeledCard.accent(label: "AI 해설", text: grading.explanation)
             }
 
         case .essay:
-            if case .essay(let result) = store.answerOutcome {
+            if case .essay(let grading) = store.answerOutcome {
                 EssayResultSection(
                     myAnswer: store.draftEssayText,
-                    aiAnswer: result.explanation,
-                    criteria: result.rubric.criteria,
+                    aiAnswer: grading.explanation,
+                    criteria: grading.rubric,
                 )
             } else {
                 AnswerEditor(
@@ -131,14 +131,14 @@ struct QuestionSolvingScreen: View {
     }
 
     private var choiceOptions: [ChoiceOptionDisplay] {
-        let choices = store.question.choices ?? []
-        guard case .choice(let result) = store.answerOutcome else {
+        guard case .choice(let choices, _) = store.question.content else { return [] }
+        guard case .choice(let grading) = store.answerOutcome else {
             return ChoiceOptionDisplay.editing(choices: choices, selectedIndex: store.draftChoiceIndex)
         }
         return ChoiceOptionDisplay.answered(
             choices: choices,
             selectedIndex: store.draftChoiceIndex,
-            result: result,
+            grading: grading,
         )
     }
 

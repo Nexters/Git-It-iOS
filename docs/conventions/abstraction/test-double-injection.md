@@ -3,7 +3,8 @@
 [Git It iOS 추상화 컨벤션](../abstraction.md)의 규칙 문서입니다.
 
 "테스트에서 이 타입을 대체해야 한다"는 것만으로 프로토콜을 두지 않습니다. 그 대신 그
-타입이 **의존하는 경계 계약**에 더블을 주입합니다.
+타입이 **의존하는 경계 계약**에 더블을 주입합니다. Composition 테스트는 Infrastructure에
+의존할 수 없으므로 그 경계 계약은 Data가 소유한 역할 계약입니다.
 
 ## 왜 근거가 되지 않는가
 
@@ -17,26 +18,34 @@
 
 | 검증 대상 | 더블을 주입하는 곳 |
 | --- | --- |
-| HTTP 기반 Remote | `HTTPTransport` |
-| `UserDefaults` 기반 Store | 격리된 suite로 만든 `UserDefaultsStore` |
-| Keychain 기반 Store | 테스트 전용 접근 그룹으로 만든 `KeychainStore` |
-| Composition Adapter | 그 어댑터가 받는 Data 구체 타입이 의존하는 위 계약 |
+| Data Remote | 내부 `init(client:)`에 넘기는 `HTTPClient`의 `HTTPTransport` |
+| 키 기반 값 저장 Store | `KeyValueStorage` (`InMemoryKeyValueStorage`) |
+| 보안 값 저장 Store | `SecureValueStorage` (`InMemorySecureValueStorage`) |
+| 알림 연동 | `LocalReminderNotifier` |
+| Composition Adapter·Assembly | 그 어댑터가 받는 Data 구체 타입의 공개 initializer가 받는 Data 역할 계약(`RequestTransport`, `KeyValueStorage`, `SecureValueStorage`) |
 
 ## 예시
 
-`HTTPProjectRemote`의 동작을 검증할 때 `ProjectRemote` 프로토콜과 그 스텁을 만들지
+`ProjectRemote`의 동작을 검증할 때 별도의 remote 프로토콜과 그 스텁을 만들지
 않고, `StubHTTPTransport`를 주입합니다.
 
 ```swift
 let transport = StubHTTPTransport(responses: [...])
-let remote = HTTPProjectRemote(client: HTTPClient(transport: transport), accessTokenProvider: { nil })
+let remote = ProjectRemote(client: HTTPClient(transport: transport), accessTokenProvider: { nil })
 ```
 
-이 구성은 요청 경로·헤더·본문과 응답 디코딩까지 함께 검증합니다. `ProjectRemote` 스텁은
+Composition 테스트는 Data 공개 initializer에 Data 역할 계약 더블을 넘깁니다.
+
+```swift
+let transport = RecordingRequestTransport(results: [TransportResponse(statusCode: 200, body: ...)])
+let remote = ProjectRemote(baseURL: baseURL, transport: transport, responseTimeout: .seconds(5), accessTokenProvider: { nil })
+```
+
+이 구성은 요청 경로·헤더·본문과 응답 디코딩까지 함께 검증합니다. 그런 프로토콜 스텁은
 그중 어느 것도 검증하지 못합니다.
 
 Composition Adapter 테스트도 같은 구성을 씁니다. 어댑터가 받는 Data 구체 타입을 실제로
-만들고 그 아래 전송 계층에만 더블을 둡니다. 어댑터의 DTO→Domain 변환과 오류 재매핑이
+만들고 그 아래 Data 역할 계약에만 더블을 둡니다. 어댑터의 DTO→Domain 변환과 오류 재매핑이
 실제 응답을 지나 검증됩니다.
 
 ## 예외

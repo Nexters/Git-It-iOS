@@ -8,7 +8,6 @@ GitIt App/GitIt
 GitItTests App/Tests/GitIt
 ShareExtension App/ShareExtension
 
-CompositionShared Composition/Shared
 CompositionAuthentication Composition/Authentication
 CompositionAuthenticationTests Composition/Tests/Authentication
 CompositionLearningProject Composition/LearningProject
@@ -23,12 +22,22 @@ CompositionShareExtensionTests Composition/Tests/ShareExtension
 Feature Feature
 FeatureTests Feature/Tests
 
-DomainAuthentication Domain/Authentication
-DomainAuthenticationTests Domain/Tests/Authentication
-DomainLearningProject Domain/LearningProject
-DomainLearningProjectTests Domain/Tests/LearningProject
-DomainMember Domain/Member
-DomainMemberTests Domain/Tests/Member
+DomainIdentifier Domain/Identifier
+DomainIdentifierTests Domain/Tests/Identifier
+DomainAccount Domain/Account
+DomainAccountTests Domain/Tests/Account
+DomainUserInfo Domain/UserInfo
+DomainUserInfoTests Domain/Tests/UserInfo
+DomainAppSetting Domain/AppSetting
+DomainAppSettingTests Domain/Tests/AppSetting
+DomainExternalRepository Domain/ExternalRepository
+DomainExternalRepositoryTests Domain/Tests/ExternalRepository
+DomainQuizDetail Domain/QuizDetail
+DomainQuizDetailTests Domain/Tests/QuizDetail
+DomainProject Domain/Project
+DomainProjectTests Domain/Tests/Project
+DomainProjectGeneration Domain/ProjectGeneration
+DomainProjectGenerationTests Domain/Tests/ProjectGeneration
 
 DataAuthentication Data/Authentication
 DataAuthenticationTests Data/Tests/Authentication
@@ -40,6 +49,10 @@ DataLegalConsent Data/LegalConsent
 DataLegalConsentTests Data/Tests/LegalConsent
 DataMember Data/Member
 DataMemberTests Data/Tests/Member
+DataNotification Data/Notification
+DataNotificationTests Data/Tests/Notification
+DataShared Data/Shared
+DataSharedTests Data/Tests/Shared
 
 InfrastructureAuthentication Infrastructure/Authentication
 InfrastructureAuthenticationTests Infrastructure/Tests/Authentication

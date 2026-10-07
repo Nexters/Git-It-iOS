@@ -1,5 +1,7 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainProject
+import DomainQuizDetail
 import Foundation
 
 // MARK: - ProjectDetailRouterFeature
@@ -10,15 +12,11 @@ public struct ProjectDetailRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        learningLibrary: any LearningLibraryUseCase,
-        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
-        submitEssayAnswer: any SubmitEssayAnswerUseCase,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
+        project: any ProjectUseCase,
+        quizDetail: any QuizDetailUseCase,
     ) {
-        self.learningLibrary = learningLibrary
-        self.submitChoiceAnswer = submitChoiceAnswer
-        self.submitEssayAnswer = submitEssayAnswer
-        self.setQuestionBookmark = setQuestionBookmark
+        self.project = project
+        self.quizDetail = quizDetail
     }
 
     // MARK: Public
@@ -47,7 +45,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
         public enum Cause: Equatable, Sendable {
             case savedQuestionsRequested
-            case singleQuestionPrepared(questionID: String)
+            case singleQuestionPrepared(questionID: QuizID)
             case singleQuestionFinished
             case backRequested
         }
@@ -63,7 +61,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
         // MARK: Lifecycle
 
-        public init(projectID: String) {
+        public init(projectID: ProjectID) {
             self.projectID = projectID
             projectDetail = ProjectDetailFeature.State(projectID: projectID)
             savedQuestions = SavedFeature.State(initialProjectFilter: projectID, isBackControlPresented: true)
@@ -72,7 +70,7 @@ public struct ProjectDetailRouterFeature: Sendable {
 
         // MARK: Public
 
-        public let projectID: String
+        public let projectID: ProjectID
 
         public var activeScreen = ActiveScreen.projectDetail
         public var screenTransitions = [ScreenTransition]()
@@ -95,9 +93,9 @@ public struct ProjectDetailRouterFeature: Sendable {
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case learningSetRequested(projectID: String, setID: String, label: String)
+            case learningSetRequested(projectID: ProjectID, setID: QuizSetID, label: String)
             case externalURLRequested(URL)
-            case projectDeleted(projectID: String)
+            case projectDeleted(projectID: ProjectID)
             case dismissRequested
         }
     }
@@ -107,21 +105,22 @@ public struct ProjectDetailRouterFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Scope(state: \.projectDetail, action: \.projectDetail) {
             ProjectDetailFeature(
-                fetchLearningProjectDetail: { [learningLibrary] in try await learningLibrary.project(id: $0) },
-                deleteLearningProject: { [learningLibrary] in try await learningLibrary.deleteProject(id: $0) },
+                projectDetail: { [project] in try await project.detail(of: $0) },
+                deleteProject: { [project] in try await project.delete($0) },
             )
         }
         Scope(state: \.savedQuestions, action: \.savedQuestions) {
             SavedFeature(
-                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
-                setQuestionBookmark: setQuestionBookmark,
+                fetchBookmarks: { [quizDetail] in try await quizDetail.bookmarks($0) },
+                setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
+                    isBookmarked
+                        ? try await quizDetail.bookmark(quizID, in: projectID)
+                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                },
             )
         }
         Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(
-                projectID: $0,
-                setID: $1,
-            ) })
+            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet($0, in: $1) })
         }
         Reduce { state, action in
             switch action {
@@ -144,7 +143,7 @@ public struct ProjectDetailRouterFeature: Sendable {
             case .savedQuestions(.delegate(.questionSelected(let question))):
                 return .send(.singleQuestionEntry(.input(.questionRequested(
                     setID: question.setID,
-                    questionID: question.questionID,
+                    questionID: question.quizID,
                 ))))
 
             case .savedQuestions(.delegate(.backRequested)):
@@ -159,7 +158,7 @@ public struct ProjectDetailRouterFeature: Sendable {
                 )
                 return activate(
                     .singleQuestion,
-                    cause: .singleQuestionPrepared(questionID: question.questionID),
+                    cause: .singleQuestionPrepared(questionID: question.id),
                     state: &state,
                 )
 
@@ -181,19 +180,21 @@ public struct ProjectDetailRouterFeature: Sendable {
         }
         .ifLet(\.singleQuestion, action: \.singleQuestion) {
             QuestionSolvingFeature(
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
+                gradeChoiceAnswer: { [quizDetail] in try await quizDetail.grade($0) },
+                gradeEssayAnswer: { [quizDetail] in try await quizDetail.grade($0) },
+                setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
+                    isBookmarked
+                        ? try await quizDetail.bookmark(quizID, in: projectID)
+                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                },
             )
         }
     }
 
     // MARK: Private
 
-    private let learningLibrary: any LearningLibraryUseCase
-    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
+    private let project: any ProjectUseCase
+    private let quizDetail: any QuizDetailUseCase
 
     private func activate(
         _ screen: ActiveScreen,

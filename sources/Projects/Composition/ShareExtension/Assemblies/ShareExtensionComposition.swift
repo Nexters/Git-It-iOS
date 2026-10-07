@@ -1,12 +1,12 @@
 import CompositionAuthentication
 import CompositionLearningProject
-import DomainAuthentication
-import DomainLearningProject
+import DataAuthentication
+import DataNotification
+import DataShared
+import DomainAccount
+import DomainExternalRepository
+import DomainProjectGeneration
 import Foundation
-import InfrastructureAuthentication
-import InfrastructureLocalNotification
-import InfrastructureNetworkClient
-import InfrastructureStorage
 
 // MARK: - ShareExtensionComposition
 
@@ -15,18 +15,14 @@ public struct ShareExtensionComposition: Sendable {
     // MARK: Lifecycle
 
     private init(
-        externalRepository: ExternalRepositoryAssembly,
+        externalRepositoryAssembly: ExternalRepositoryAssembly,
         learningProject: LearningProjectAssembly,
-        resolveSessionAvailability: @escaping @Sendable () async -> SessionAvailability,
-        localNotificationClient: any NotificationAuthorizationClient,
-        enqueueGenerationReminder: @escaping @Sendable (String) async -> Void,
+        signInAvailability: @escaping @Sendable () async -> SignInAvailability,
     ) {
-        parseRepositoryLink = externalRepository.urlParser
-        fetchExternalRepository = externalRepository.fetchExternalRepository
-        createLearningProject = learningProject.createLearningProject
-        self.resolveSessionAvailability = resolveSessionAvailability
-        isNotificationAuthorized = { await localNotificationClient.isAuthorized() }
-        self.enqueueGenerationReminder = enqueueGenerationReminder
+        parseRepositoryLink = externalRepositoryAssembly.locator
+        externalRepository = externalRepositoryAssembly.externalRepository
+        projectGeneration = learningProject.projectGeneration
+        self.signInAvailability = signInAvailability
     }
 
     // MARK: Public
@@ -50,38 +46,41 @@ public struct ShareExtensionComposition: Sendable {
 
     }
 
-    public let parseRepositoryLink: any ExternalRepositoryURLParser
-    public let fetchExternalRepository: any FetchExternalRepositoryUseCase
-    public let createLearningProject: any CreateLearningProjectUseCase
-    public let resolveSessionAvailability: @Sendable () async -> SessionAvailability
-    public let isNotificationAuthorized: @Sendable () async -> Bool
-    public let enqueueGenerationReminder: @Sendable (String) async -> Void
+    public let parseRepositoryLink: any ExternalRepositoryLocator
+    public let externalRepository: any ExternalRepositoryUseCase
+    public let projectGeneration: any ProjectGenerationUseCase
+    public let signInAvailability: @Sendable () async -> SignInAvailability
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
-        sharedDefaults: UserDefaults? = AppGroupUserDefaults.makeShared(),
-        localNotificationClient: any NotificationAuthorizationClient = LocalNotificationAuthorizationClient(),
-        transport: (any HTTPTransport)? = nil,
+        secureStorage: (any SecureValueStorage)? = nil,
+        sharedStorage: (any KeyValueStorage)? = StorageFactory.keyValueStorage(
+            namespace: SessionStorageLayout.sharedSessionNamespace,
+            location: .appGroup,
+        ),
+        reminderNotifier: (any LocalReminderNotifier)? = nil,
+        transport: (any RequestTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
-            keychainStore: keychainStore,
-            sharedDefaults: sharedDefaults,
+            secureStorage: secureStorage,
+            sharedStorage: sharedStorage,
         )
+        let requestCredentialProvider = sessionAvailability.requestCredentialProvider
 
         return ShareExtensionComposition(
-            externalRepository: ExternalRepositoryAssembly(
+            externalRepositoryAssembly: ExternalRepositoryAssembly(
                 baseURL: environment.externalRepositoryBaseURL,
                 transport: transport,
             ),
             learningProject: LearningProjectAssembly(
                 baseURL: environment.apiBaseURL,
-                accessTokenProvider: sessionAvailability.accessTokenProvider,
+                credential: { await requestCredentialProvider.credential() },
+                credentialRejected: { await requestCredentialProvider.credentialRejected() },
+                reminderNotifier: reminderNotifier,
                 transport: transport,
+                sharedStorage: sharedStorage,
             ),
-            resolveSessionAvailability: sessionAvailability.resolveSessionAvailability,
-            localNotificationClient: localNotificationClient,
-            enqueueGenerationReminder: GenerationReminderAssembly.makePendingReminderEnqueue(sharedDefaults: sharedDefaults),
+            signInAvailability: sessionAvailability.signInAvailability,
         )
     }
 

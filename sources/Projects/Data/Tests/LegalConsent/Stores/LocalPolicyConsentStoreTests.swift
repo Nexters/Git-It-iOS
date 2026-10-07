@@ -1,5 +1,4 @@
 import Foundation
-import InfrastructureStorage
 import Testing
 
 @testable import DataLegalConsent
@@ -11,7 +10,7 @@ struct LocalPolicyConsentStoreTests {
 
     @Test
     func `저장한 문서별 기록을 그대로 조회한다`() async {
-        let (store, _) = makeStore()
+        let store = makeStore()
         let privacy = PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
         let terms = PolicyConsentRecordDTO(documentIdentifier: "terms-of-service", version: "1", acceptedAt: Date())
 
@@ -24,7 +23,7 @@ struct LocalPolicyConsentStoreTests {
 
     @Test
     func `같은 문서 ID를 다시 저장하면 이전 기록을 교체하고 다른 문서 기록에는 영향이 없다`() async {
-        let (store, _) = makeStore()
+        let store = makeStore()
         let firstVersion = PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
         let terms = PolicyConsentRecordDTO(documentIdentifier: "terms-of-service", version: "1", acceptedAt: Date())
         await store.saveRecord(firstVersion)
@@ -41,7 +40,7 @@ struct LocalPolicyConsentStoreTests {
 
     @Test
     func `removeAll은 저장된 모든 문서 기록을 지운다`() async {
-        let (store, _) = makeStore()
+        let store = makeStore()
         await store.saveRecord(PolicyConsentRecordDTO(
             documentIdentifier: "privacy-policy",
             version: "1",
@@ -59,38 +58,23 @@ struct LocalPolicyConsentStoreTests {
     }
 
     @Test
-    func `logout과 무관하게 유지되고 앱 데이터 삭제를 시뮬레이션하면 부재로 돌아간다`() async throws {
-        let suiteName = "policy-consent-\(UUID().uuidString)"
-        let userDefaults = try #require(UserDefaults(suiteName: suiteName))
-        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+    func `logout과 무관하게 유지되고 앱 데이터 삭제를 시뮬레이션하면 부재로 돌아간다`() async {
+        let storage = InMemoryKeyValueStorage()
 
-        let store = LocalPolicyConsentStore(store: UserDefaultsStore(namespace: "legal-consent", userDefaults: userDefaults))
+        let store = LocalPolicyConsentStore(storage: storage)
         await store.saveRecord(PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date()))
 
-        let afterLogout = LocalPolicyConsentStore(store: UserDefaultsStore(
-            namespace: "legal-consent",
-            userDefaults: userDefaults,
-        ))
+        let afterLogout = LocalPolicyConsentStore(storage: storage)
         #expect(await afterLogout.records().isEmpty == false)
 
-        userDefaults.removePersistentDomain(forName: suiteName)
-
-        let afterAppDataDeletion = LocalPolicyConsentStore(store: UserDefaultsStore(
-            namespace: "legal-consent",
-            userDefaults: userDefaults,
-        ))
+        let afterAppDataDeletion = LocalPolicyConsentStore(storage: InMemoryKeyValueStorage())
         #expect(await afterAppDataDeletion.records().isEmpty)
     }
 
     // MARK: Private
 
-    private func makeStore() -> (LocalPolicyConsentStore, UserDefaults) {
-        let suiteName = "policy-consent-\(UUID().uuidString)"
-        let userDefaults = UserDefaults(suiteName: suiteName)!
-        return (
-            LocalPolicyConsentStore(store: UserDefaultsStore(namespace: "legal-consent", userDefaults: userDefaults)),
-            userDefaults,
-        )
+    private func makeStore() -> LocalPolicyConsentStore {
+        LocalPolicyConsentStore(storage: InMemoryKeyValueStorage())
     }
 
 }

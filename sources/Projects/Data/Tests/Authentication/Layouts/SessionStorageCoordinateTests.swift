@@ -11,14 +11,14 @@ struct SessionStorageCoordinateTests {
 
     @Test
     func `세션 레코드는 기존 Keychain 네임스페이스와 키를 그대로 쓴다`() {
-        #expect(SessionKeychainLayout.namespace.rawValue == "com.nexters.hytime.gitit.session")
-        #expect(SessionKeychainLayout.Key.sessionRecord.rawValue == "sessionRecord")
+        #expect(SessionStorageLayout.namespace == "com.nexters.hytime.gitit.session")
+        #expect(SessionStorageLayout.Key.sessionRecord.rawValue == "sessionRecord")
     }
 
     @Test
     func `Apple 식별자는 기존 Keychain 네임스페이스와 키를 그대로 쓴다`() {
-        #expect(AppleIdentityKeychainLayout.namespace.rawValue == "com.nexters.hytime.gitit.authentication")
-        #expect(AppleIdentityKeychainLayout.Key.appleUserID.rawValue == "appleUserID")
+        #expect(AppleIdentityStorageLayout.namespace == "com.nexters.hytime.gitit.authentication")
+        #expect(AppleIdentityStorageLayout.Key.appleUserID.rawValue == "appleUserID")
     }
 
     @Test

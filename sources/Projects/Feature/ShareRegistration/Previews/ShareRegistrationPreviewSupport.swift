@@ -1,6 +1,8 @@
 #if DEBUG
 import ComposableArchitecture
-import DomainLearningProject
+import DomainExternalRepository
+import DomainIdentifier
+import DomainProjectGeneration
 import Foundation
 
 // MARK: - ShareRegistrationPreviewSupport
@@ -15,38 +17,35 @@ enum ShareRegistrationPreviewSupport {
         state.repositoryConfirmation.repository = sampleRepository
         return Store(initialState: state) {
             ShareRegistrationFeature(
-                parseRepositoryLink: PreviewURLParser(),
-                fetchExternalRepository: PreviewFetchExternalRepository(),
-                createLearningProject: PreviewCreateLearningProject(),
-                resolveSession: { .available },
+                parseRepositoryLink: PreviewRepositoryLocator(),
+                externalRepository: PreviewExternalRepository(),
+                projectGeneration: PreviewProjectGeneration(),
+                signInAvailability: { .signedIn },
             )
         }
     }
 
     // MARK: Private
 
-    private struct PreviewURLParser: ExternalRepositoryURLParser {
-        func location(from _: String) -> ExternalRepositoryLocation? {
+    private struct PreviewRepositoryLocator: ExternalRepositoryLocator {
+        func location(from _: ExternalRepositoryURL) -> ExternalRepositoryLocation? {
             ExternalRepositoryLocation(owner: "apple", name: "swift")
         }
     }
 
-    private struct PreviewFetchExternalRepository: FetchExternalRepositoryUseCase {
-        func callAsFunction(url _: String) async throws -> ExternalRepository {
+    private struct PreviewExternalRepository: ExternalRepositoryUseCase {
+        func repository(at _: ExternalRepositoryURL) async throws -> ExternalRepository {
             ShareRegistrationPreviewSupport.sampleRepository
         }
     }
 
-    private struct PreviewCreateLearningProject: CreateLearningProjectUseCase {
-        func callAsFunction(
-            githubRepoURL _: String,
-            quizLevel: QuizLevel,
-        ) async throws -> ProjectRegistrationReceipt {
-            ProjectRegistrationReceipt(
-                projectID: "preview-project",
-                requestStatus: "accepted",
-                quizLevel: quizLevel,
-            )
+    private struct PreviewProjectGeneration: ProjectGenerationUseCase {
+        func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
+            ProjectGenerationReceipt(projectID: "preview-project", quizLevel: request.quizLevel)
+        }
+
+        func states() async -> AsyncStream<ProjectGenerationState> {
+            AsyncStream { $0.finish() }
         }
     }
 

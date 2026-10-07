@@ -14,10 +14,6 @@ public enum AppGroupKeychainStore {
         KeychainStore(accessGroup: accessGroup)
     }
 
-    public static func makeLegacy() -> KeychainStore {
-        KeychainStore()
-    }
-
     // MARK: Private
 
     private static let teamIdentifierPrefix = "6924CABL23."

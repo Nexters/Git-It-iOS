@@ -1,4 +1,4 @@
-import DomainMember
+import DomainUserInfo
 import Testing
 
 @testable import Feature
@@ -22,21 +22,16 @@ struct ProfileDisplayTests {
     }
 
     @Test
-    func `직군·연차 배지는 설정된 값만 만들고 미설정이면 숨긴다`() {
-        let both = ProfileDisplay(.loaded(profile(position: .backend, careerLevel: .entry)), todayLabel: "수")
-        #expect(both.positionBadgeText == "Back-end")
-        #expect(both.careerLevelBadgeText == "입문")
-        #expect(both.hasBadges)
+    func `직군·연차 배지는 큐레이션이 있을 때만 만들고 없으면 숨긴다`() {
+        let curated = ProfileDisplay(.loaded(profile(position: .backend, careerLevel: .entry)), todayLabel: "수")
+        #expect(curated.positionBadgeText == "Back-end")
+        #expect(curated.careerLevelBadgeText == "입문")
+        #expect(curated.hasBadges)
 
-        let positionOnly = ProfileDisplay(.loaded(profile(position: .ios, careerLevel: nil)), todayLabel: "수")
-        #expect(positionOnly.positionBadgeText == "iOS")
-        #expect(positionOnly.careerLevelBadgeText == nil)
-        #expect(positionOnly.hasBadges)
-
-        let none = ProfileDisplay(.loaded(profile(position: nil, careerLevel: nil)), todayLabel: "수")
-        #expect(none.positionBadgeText == nil)
-        #expect(none.careerLevelBadgeText == nil)
-        #expect(!none.hasBadges)
+        let uncurated = ProfileDisplay(.loaded(profile(position: nil, careerLevel: nil)), todayLabel: "수")
+        #expect(uncurated.positionBadgeText == nil)
+        #expect(uncurated.careerLevelBadgeText == nil)
+        #expect(!uncurated.hasBadges)
     }
 
     @Test
@@ -125,13 +120,20 @@ struct ProfileDisplayTests {
         position: MemberPosition? = .backend,
         careerLevel: CareerLevel?,
         statistics: LearningStatistics? = nil,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: "프로덕션에 푸시하는 고양이",
-            email: "kimlee@github.io",
-            position: position,
-            careerLevel: careerLevel,
-            statistics: statistics ?? activeStatistics,
+    ) -> UserProfile {
+        let curation: Curation? =
+            if let position, let careerLevel {
+                Curation(position: position, careerLevel: careerLevel)
+            } else {
+                nil
+            }
+        return UserProfile(
+            detail: UserDetail(
+                name: "프로덕션에 푸시하는 고양이",
+                email: "kimlee@github.io",
+                statistics: statistics ?? activeStatistics,
+            ),
+            curation: curation,
         )
     }
 

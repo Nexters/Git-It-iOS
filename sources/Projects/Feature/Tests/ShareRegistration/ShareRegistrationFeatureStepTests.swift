@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainExternalRepository
 import Foundation
 import Testing
 
@@ -73,11 +73,11 @@ struct ShareRegistrationFeatureStepTests {
         return TestStore(initialState: initialState) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
-                fetchExternalRepository: StubFetchExternalRepository(
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                createLearningProject: SpyCreateLearningProject(),
-                resolveSession: { .available },
+                projectGeneration: ProjectGenerationUseCaseSpy(),
+                signInAvailability: { .signedIn },
             )
         }
     }

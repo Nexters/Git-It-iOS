@@ -1,5 +1,5 @@
+import DataShared
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - LocalDeviceIdentifierStore
 
@@ -7,31 +7,29 @@ public struct LocalDeviceIdentifierStore: Sendable {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        self.keychainStore = keychainStore
+    public init(storage: any SecureValueStorage) {
+        self.storage = storage
     }
 
     // MARK: Public
 
-    public static let namespace = KeychainNamespace("com.nexters.hytime.gitit.device")
+    public static let namespace = "com.nexters.hytime.gitit.device"
     public static let key = "deviceID"
 
     public func loadOrCreate() -> String {
         if
-            let data = try? keychainStore.load(for: Self.key, in: Self.namespace),
+            let data = try? storage.data(forKey: Self.key),
             let existing = String(data: data, encoding: .utf8)
         {
             return existing
         }
         let newDeviceID = UUID().uuidString
-        if let data = newDeviceID.data(using: .utf8) {
-            try? keychainStore.save(data, for: Self.key, in: Self.namespace)
-        }
+        try? storage.setData(Data(newDeviceID.utf8), forKey: Self.key)
         return newDeviceID
     }
 
     // MARK: Private
 
-    private let keychainStore: KeychainStore
+    private let storage: any SecureValueStorage
 
 }

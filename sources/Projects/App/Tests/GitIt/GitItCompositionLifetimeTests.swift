@@ -1,3 +1,4 @@
+import DomainAppSetting
 import Testing
 
 @testable import GitIt
@@ -35,7 +36,7 @@ struct GitItCompositionLifetimeTests {
         let app = GitItApp()
 
         await #expect(throws: (any Error).self) {
-            try await app.composition.registerCurrentDevice()
+            try await app.composition.appSetting.registerDevice()
         }
     }
 

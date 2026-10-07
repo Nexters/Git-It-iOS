@@ -59,6 +59,25 @@ public final class LocalNotificationAuthorizationClient: NotificationAuthorizati
         }
     }
 
+    public func authorizationSetting() async -> NotificationAuthorizationSetting {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            return .notDetermined
+
+        case .denied:
+            return .denied
+
+        case .authorized,
+             .provisional,
+             .ephemeral:
+            return .authorized
+
+        @unknown default:
+            return .denied
+        }
+    }
+
     public func present(_ request: LocalNotificationRequest) {
         Self.logger.debug("로컬 알림 발송: identifier=\(request.identifier, privacy: .public)")
         add(request, trigger: nil)

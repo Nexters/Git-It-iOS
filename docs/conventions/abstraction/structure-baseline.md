@@ -5,14 +5,16 @@
 
 ## 1. 수치
 
-| 항목 | 적용 전 | 적용 후 |
-| --- | --- | --- |
-| 프로덕션 Swift 파일 수 | 521 | 512 |
-| 프로덕션 프로토콜 수 | 56 | 47 |
-| Data 프로덕션 Contracts 파일 수 | 11 | 2 |
+| 항목 | 적용 전 | 적용 후 | 명세 036 후 |
+| --- | --- | --- | --- |
+| 프로덕션 Swift 파일 수 | 521 | 512 | 535 |
+| 프로덕션 프로토콜 수 | 56 | 47 | 50 |
+| Data 프로덕션 Contracts 파일 수 | 11 | 2 | 6 |
 
 "적용 전"은 `feature/layer-overengineering`의 시작 commit `51ee74f`, "적용 후"는 그
-브랜치의 계층 축소 작업을 마친 시점입니다.
+브랜치의 계층 축소 작업을 마친 시점입니다. "명세 036 후"는
+`feature/pending-repository-legacy-cleanup`에서 생성 대기 Repository 통합과 Data 역할 계약
+도입을 마친 시점입니다.
 
 ## 2. 세는 명령
 
@@ -42,17 +44,20 @@ git ls-files 'sources/Projects/**/*.swift' | grep -v '/Tests/' \
 
 근거 A·B의 정의는 [두 가지 근거](./protocol-criteria.md)에 있습니다.
 
-### 3.1 근거 A — 패키지 경계를 넘는 계약 (20개)
+### 3.1 근거 A — 패키지 경계를 넘는 계약 (28개)
 
 요구하는 쪽이 계약을 소유하고 제공하는 쪽이 채택해 의존 방향을 뒤집습니다.
 
 | 소유 패키지 | 프로토콜 | 채택 위치 |
 | --- | --- | --- |
-| Domain Authentication | `AuthenticationRepository`, `LoginSessionRepository`, `PolicyConsentRepository` | Composition Adapter |
-| Domain LearningProject | `AnswerRepository`, `BookmarkRepository`, `ExternalRepositoryLookup`, `ExternalRepositoryURLParser`, `GenerationOutcomeRepository`, `GenerationReminderRegistry`, `GenerationStateRepository`, `LearningProjectRepository`, `LearningSetRepository`, `NotificationAuthorizationGateway` | Composition Adapter |
-| Domain Member | `MemberRepository` | Composition Adapter |
-| Data LearningProject | `GenerationStateStore`, `QuizGenerationOutcomeSource` | Data 내부 구현과 Composition |
-| Infrastructure | `HTTPTransport`, `HTTPBodyCoding`, `NotificationAuthorizationClient`, `PushMessagingClient` | Data·Composition |
+| Domain Authentication | `AuthenticationRepository`, `LoginSessionRepository`, `PolicyConsentRepository`, `CurrentSessionRepository`, `SharedSignInStateRepository` | Composition Adapter |
+| Domain LearningProject | `AnswerRepository`, `BookmarkRepository`, `ExternalRepositoryLookup`, `ExternalRepositoryLocator`, `GenerationOutcomeRepository`, `GenerationReminderScheduler`, `LearningProjectRepository`, `LearningSetRepository`, `NotificationAuthorization`, `PendingGenerationRepository` | Composition Adapter |
+| Domain LearningProject | `GenerationReminderRegistration` | Domain `ScheduleGenerationReminderUseCase`가 상속(Composition 채택자 없음, 존치 재검토는 점검 문서 DS-12) |
+| Domain Member | `DeviceIdentifierRepository`, `MemberRepository` | Composition Adapter |
+| Data LearningProject | `QuizGenerationOutcomeSource` | Data 내부 구현과 Composition |
+| Data Shared | `KeyValueStorage`, `SecureValueStorage`, `RequestTransport` | Data 내부 구현(생성 진입점), Composition·테스트가 대체 구현 주입 |
+| Data Notification | `LocalReminderNotifier`, `RemoteMessageReceiver` | Data 내부 구현(생성 진입점), Composition·테스트가 대체 구현 주입 |
+| Infrastructure | `HTTPTransport`, `HTTPBodyCoding`, `NotificationAuthorizationClient`, `PushMessagingClient` | Data 내부 구현 |
 
 `HTTPTransport`는 근거 B도 함께 충족합니다. `URLSessionTransport`가 프로덕션 구현이고
 테스트가 다른 구현을 넣습니다.
@@ -63,20 +68,18 @@ git ls-files 'sources/Projects/**/*.swift' | grep -v '/Tests/' \
 | --- | --- |
 | `TabShellItem` (UI) | `associatedtype`·`CaseIterable` 제약을 표현하는 형태이며 교체 가능성과 무관합니다. [추상화 컨벤션](../abstraction.md)의 적용 범위 밖입니다 |
 
-### 3.3 UseCase 프로토콜 (25개) — 별도 명세가 판단합니다
+### 3.3 UseCase 프로토콜 (20개) — 별도 명세가 판단합니다
 
 Domain Authentication 7개(`PolicyConsentUseCase`, `RefreshSessionUseCase`,
-`RestoreSessionUseCase`, `SignInUseCase`, `SignOutUseCase`,
-`VerifyAccessTokenUseCase`, `VerifyAuthorizationUseCase`), Domain LearningProject
-12개(`CreateLearningProjectUseCase`, `DeleteLearningProjectUseCase`,
-`FetchBookmarkedQuestionsUseCase`, `FetchExternalRepositoryUseCase`,
-`FetchLearningProjectDetailUseCase`, `FetchLearningProjectsUseCase`,
-`FetchLearningSetUseCase`, `RequestGenerationReminderUseCase`,
+`ResolveSessionAvailabilityUseCase`, `RestoreSessionUseCase`, `SignInUseCase`,
+`SignOutUseCase`, `VerifyAuthorizationUseCase`), Domain LearningProject
+10개(`CreateLearningProjectUseCase`, `FetchExternalRepositoryUseCase`,
+`FetchLearningProjectsUseCase`, `LearningLibraryUseCase`,
+`RequestGenerationReminderUseCase`, `ScheduleGenerationReminderUseCase`,
 `SetQuestionBookmarkUseCase`, `SubmitChoiceAnswerUseCase`,
 `SubmitEssayAnswerUseCase`, `TrackGenerationUseCase`), Domain Member
-6개(`CompleteCurationUseCase`, `DeleteMemberAccountUseCase`,
-`FetchMemberProfileUseCase`, `RegisterMemberDeviceUseCase`,
-`UpdateMemberCareerLevelUseCase`, `UpdateMemberPositionUseCase`)입니다.
+3개(`DeleteMemberAccountUseCase`, `MemberAccountUseCase`,
+`RegisterCurrentDeviceUseCase`)입니다.
 
 Feature·App이 패키지 경계를 넘어 받지만 구현도 같은 Domain 패키지에 있어 의존 방향이
 뒤집히지 않습니다. 근거 A를 온전히 충족한다고 보기 어렵습니다. UseCase 계층의 존치와

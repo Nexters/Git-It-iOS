@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
-import Foundation
+import DomainExternalRepository
+import DomainProjectGeneration
 
 @testable import Feature
 
@@ -13,69 +13,60 @@ let sampleRepository = ExternalRepository(
     techStack: ["Swift"],
 )
 
-let sampleReceipt = ProjectRegistrationReceipt(
+let sampleReceipt = ProjectGenerationReceipt(
     projectID: "project-1",
-    requestStatus: "ready",
     quizLevel: .l1,
 )
 
+@MainActor
 func makeRepositoryLinkInputStore(
-    fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
+    externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
     state: RepositoryLinkInputFeature.State = RepositoryLinkInputFeature.State(),
 ) -> TestStoreOf<RepositoryLinkInputFeature> {
     TestStore(initialState: state) {
-        RepositoryLinkInputFeature(fetchExternalRepository: fetchExternalRepository)
+        RepositoryLinkInputFeature(repository: { try await externalRepository.repository(at: $0) })
     }
 }
 
+@MainActor
 func makeQuizLevelSelectionStore(
     state: QuizLevelSelectionFeature.State = QuizLevelSelectionFeature.State()
 ) -> TestStoreOf<QuizLevelSelectionFeature> {
     TestStore(initialState: state) { QuizLevelSelectionFeature() }
 }
 
+@MainActor
 func makeQuizGenerationProgressStore(
-    createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    trackGeneration: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
-    requestGenerationReminder: StubRequestGenerationReminderUseCase =
-        StubRequestGenerationReminderUseCase(results: [.authorized]),
+    projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),
+    appSetting: AppSettingUseCaseStub = AppSettingUseCaseStub(),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
-    waitPolicy: GenerationWaitPolicy = .standard,
-    now: @escaping @Sendable () -> Date = { Date() },
     state: QuizGenerationProgressFeature.State = QuizGenerationProgressFeature.State(),
 ) -> TestStoreOf<QuizGenerationProgressFeature> {
     TestStore(initialState: state) {
         QuizGenerationProgressFeature(
-            createLearningProject: createLearningProject,
-            trackGeneration: trackGeneration,
-            requestGenerationReminder: requestGenerationReminder,
+            requestGeneration: { try await projectGeneration.request($0) },
+            generationStates: { await projectGeneration.states() },
+            notificationAuthorization: { await appSetting.notificationAuthorization() },
+            requestNotificationAuthorization: { await appSetting.requestNotificationAuthorization() },
             openNotificationSettings: { await openNotificationSettings() },
-            waitPolicy: waitPolicy,
-            now: now,
         )
     }
 }
 
+@MainActor
 func makeProjectRegistrationRouterStore(
-    fetchExternalRepository: StubFetchExternalRepositoryUseCase = StubFetchExternalRepositoryUseCase(),
-    createLearningProject: StubCreateLearningProjectUseCase = StubCreateLearningProjectUseCase(),
-    trackGeneration: StubTrackGenerationUseCase = StubTrackGenerationUseCase(),
-    requestGenerationReminder: StubRequestGenerationReminderUseCase =
-        StubRequestGenerationReminderUseCase(results: [.authorized]),
+    externalRepository: ExternalRepositoryUseCaseStub = ExternalRepositoryUseCaseStub(),
+    projectGeneration: ProjectGenerationUseCaseStub = ProjectGenerationUseCaseStub(),
+    appSetting: AppSettingUseCaseStub = AppSettingUseCaseStub(),
     openNotificationSettings: OpenNotificationSettingsSpy = OpenNotificationSettingsSpy(),
-    waitPolicy: GenerationWaitPolicy = .standard,
-    now: @escaping @Sendable () -> Date = { Date() },
     state: ProjectRegistrationRouterFeature.State = ProjectRegistrationRouterFeature.State(),
 ) -> TestStoreOf<ProjectRegistrationRouterFeature> {
     TestStore(initialState: state) {
         ProjectRegistrationRouterFeature(
-            fetchExternalRepository: fetchExternalRepository,
-            createLearningProject: createLearningProject,
-            trackGeneration: trackGeneration,
-            requestGenerationReminder: requestGenerationReminder,
+            externalRepository: externalRepository,
+            projectGeneration: projectGeneration,
+            appSetting: appSetting,
             openNotificationSettings: { await openNotificationSettings() },
-            waitPolicy: waitPolicy,
-            now: now,
         )
     }
 }

@@ -3,7 +3,6 @@ import ProjectDescription
 // MARK: - CompositionModuleName
 
 enum CompositionModuleName: String, CaseIterable {
-    case CompositionShared
     case CompositionAuthentication
     case CompositionAuthenticationTests
     case CompositionLearningProject
@@ -20,8 +19,7 @@ extension CompositionModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Composition.rawValue)
         return switch self {
-        case .CompositionShared,
-             .CompositionAuthentication,
+        case .CompositionAuthentication,
              .CompositionLearningProject,
              .CompositionMember,
              .CompositionApp,
@@ -38,27 +36,16 @@ extension CompositionModuleName {
 
     var target: Target {
         switch self {
-        case .CompositionShared:
-            .module(
-                name: rawValue,
-                sourceDirectory: sourceDirectory,
-                dependencies: [
-                    .fromInfrastructure(.InfrastructureNetworkClient)
-                ],
-            )
-
         case .CompositionAuthentication:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
-                    .fromDomain(.DomainAuthentication),
+                    .fromDomain(.DomainIdentifier),
+                    .fromDomain(.DomainAccount),
                     .fromData(.DataAuthentication),
                     .fromData(.DataLegalConsent),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureStorage),
+                    .fromData(.DataShared),
                 ],
             )
 
@@ -76,13 +63,16 @@ extension CompositionModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
-                    .fromDomain(.DomainLearningProject),
+                    .fromDomain(.DomainIdentifier),
+                    .fromDomain(.DomainAppSetting),
+                    .fromDomain(.DomainExternalRepository),
+                    .fromDomain(.DomainQuizDetail),
+                    .fromDomain(.DomainProject),
+                    .fromDomain(.DomainProjectGeneration),
                     .fromData(.DataLearningProject),
                     .fromData(.DataExternalRepository),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureStorage),
-                    .fromInfrastructure(.InfrastructureLocalNotification),
+                    .fromData(.DataNotification),
+                    .fromData(.DataShared),
                 ],
             )
 
@@ -100,12 +90,13 @@ extension CompositionModuleName {
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 dependencies: [
-                    .target(name: CompositionModuleName.CompositionShared.rawValue),
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainMember),
+                    .fromDomain(.DomainIdentifier),
+                    .fromDomain(.DomainAccount),
+                    .fromDomain(.DomainUserInfo),
+                    .fromDomain(.DomainAppSetting),
+                    .fromData(.DataAuthentication),
                     .fromData(.DataMember),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
+                    .fromData(.DataShared),
                 ],
             )
 
@@ -126,12 +117,21 @@ extension CompositionModuleName {
                     .target(name: CompositionModuleName.CompositionAuthentication.rawValue),
                     .target(name: CompositionModuleName.CompositionLearningProject.rawValue),
                     .target(name: CompositionModuleName.CompositionMember.rawValue),
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainLearningProject),
-                    .fromDomain(.DomainMember),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructurePushMessaging),
+                    .fromDomain(.DomainIdentifier),
+                    .fromDomain(.DomainAccount),
+                    .fromDomain(.DomainUserInfo),
+                    .fromDomain(.DomainAppSetting),
+                    .fromDomain(.DomainExternalRepository),
+                    .fromDomain(.DomainQuizDetail),
+                    .fromDomain(.DomainProject),
+                    .fromDomain(.DomainProjectGeneration),
+                    .fromData(.DataAuthentication),
+                    .fromData(.DataExternalRepository),
+                    .fromData(.DataLearningProject),
+                    .fromData(.DataLegalConsent),
+                    .fromData(.DataMember),
+                    .fromData(.DataNotification),
+                    .fromData(.DataShared),
                 ],
             )
 
@@ -157,12 +157,15 @@ extension CompositionModuleName {
                 dependencies: [
                     .target(name: CompositionModuleName.CompositionAuthentication.rawValue),
                     .target(name: CompositionModuleName.CompositionLearningProject.rawValue),
-                    .fromDomain(.DomainAuthentication),
-                    .fromDomain(.DomainLearningProject),
-                    .fromInfrastructure(.InfrastructureNetworkClient),
-                    .fromInfrastructure(.InfrastructureAuthentication),
-                    .fromInfrastructure(.InfrastructureStorage),
-                    .fromInfrastructure(.InfrastructureLocalNotification),
+                    .fromDomain(.DomainIdentifier),
+                    .fromDomain(.DomainAccount),
+                    .fromDomain(.DomainExternalRepository),
+                    .fromDomain(.DomainProjectGeneration),
+                    .fromData(.DataAuthentication),
+                    .fromData(.DataExternalRepository),
+                    .fromData(.DataLearningProject),
+                    .fromData(.DataNotification),
+                    .fromData(.DataShared),
                 ],
             )
 

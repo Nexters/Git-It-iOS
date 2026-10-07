@@ -1,8 +1,7 @@
-import CompositionShared
 import DataExternalRepository
-import DomainLearningProject
+import DataShared
+import DomainExternalRepository
 import Foundation
-import InfrastructureNetworkClient
 
 // MARK: - ExternalRepositoryAssembly
 
@@ -12,22 +11,28 @@ public struct ExternalRepositoryAssembly: Sendable {
 
     public init(
         baseURL: URL,
-        transport: (any HTTPTransport)? = nil,
-        responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        transport: (any RequestTransport)? = nil,
+        responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
     ) {
-        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
-        let lookup = ExternalRepositoryLookupAdapter(remote: HTTPExternalRepositoryRemote(client: client))
+        let locator = ExternalRepositoryLocatorAdapter(parser: GitHubRepositoryURLParser())
+        self.locator = locator
 
-        let urlParser = ExternalRepositoryURLParserAdapter(parser: GitHubRepositoryURLParser())
-        self.urlParser = urlParser
-
-        fetchExternalRepository = FetchExternalRepository(lookup: lookup, urlParser: urlParser)
+        externalRepository = ExternalRepositoryResolver(
+            lookup: ExternalRepositoryLookupAdapter(
+                remote: ExternalRepositoryRemote(
+                    baseURL: baseURL,
+                    transport: transport,
+                    responseTimeout: responseTimeout,
+                )
+            ),
+            locator: locator,
+        )
     }
 
     // MARK: Public
 
-    public let fetchExternalRepository: any FetchExternalRepositoryUseCase
+    public let externalRepository: any ExternalRepositoryUseCase
 
-    public let urlParser: any ExternalRepositoryURLParser
+    public let locator: any ExternalRepositoryLocator
 
 }

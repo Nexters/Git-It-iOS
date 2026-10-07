@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 import Foundation
 
 // MARK: - OnboardingEntryPoint
@@ -18,12 +18,12 @@ public struct AppEntryFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        restoreSession: any RestoreSessionUseCase,
-        fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile,
-        signOut: any SignOutUseCase,
+        restoreSignIn: @escaping @Sendable () async -> SignInRestoration,
+        curation: @escaping @Sendable () async throws -> Curation?,
+        signOut: @escaping @Sendable () async -> SignOutResult,
     ) {
-        self.restoreSession = restoreSession
-        self.fetchMemberProfile = fetchMemberProfile
+        self.restoreSignIn = restoreSignIn
+        self.curation = curation
         self.signOut = signOut
     }
 
@@ -77,8 +77,8 @@ public struct AppEntryFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
-            case restoreSessionFinished(requestID: Int, result: RestoreSessionResult)
-            case memberProfileFetchFinished(requestID: Int, result: Result<MemberProfile, MemberError>)
+            case restoreSignInFinished(requestID: Int, result: SignInRestoration)
+            case curationFetchFinished(requestID: Int, result: Result<Curation?, UserInfoError>)
             case localCleanupFinished(requestID: Int, result: SignOutResult)
         }
 
@@ -94,12 +94,12 @@ public struct AppEntryFeature: Sendable {
             case .view(.task):
                 guard state.authentication == .idle else { return .none }
                 state.automaticRetryCount = 0
-                return restoreSession(&state)
+                return restoreSignIn(&state)
 
             case .view(.retryTapped):
                 guard state.authentication != .restoring else { return .none }
                 state.automaticRetryCount = 0
-                return restoreSession(&state)
+                return restoreSignIn(&state)
 
             case .view(.splashAnimationFinished):
                 guard !state.isSplashAnimationFinished else { return .none }
@@ -108,34 +108,34 @@ public struct AppEntryFeature: Sendable {
                 state.pendingDestination = nil
                 return .send(.delegate(.destinationDecided(destination)))
 
-            case .effect(.restoreSessionFinished(let requestID, let result)):
+            case .effect(.restoreSignInFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
                 switch result {
-                case .authenticated:
+                case .signedIn:
                     return .run { send in
                         do {
-                            let profile = try await fetchMemberProfile()
-                            await send(.effect(.memberProfileFetchFinished(requestID: requestID, result: .success(profile))))
+                            let curation = try await curation()
+                            await send(.effect(.curationFetchFinished(requestID: requestID, result: .success(curation))))
                         } catch {
-                            let mapped = error as? MemberError ?? .temporarilyUnavailable
-                            await send(.effect(.memberProfileFetchFinished(requestID: requestID, result: .failure(mapped))))
+                            let mapped = error as? UserInfoError ?? .temporarilyUnavailable
+                            await send(.effect(.curationFetchFinished(requestID: requestID, result: .failure(mapped))))
                         }
                     }
                     .cancellable(id: CancelID.profile, cancelInFlight: true)
 
-                case .unauthenticated:
+                case .signedOut:
                     state.authentication = .idle
                     return decideDestination(.onboarding(startingAt: .guide), state: &state)
 
-                case .recoverableFailure:
+                case .temporarilyUnavailable:
                     return retryAutomaticallyOrFail(&state)
                 }
 
-            case .effect(.memberProfileFetchFinished(let requestID, let result)):
+            case .effect(.curationFetchFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
                 switch result {
-                case .success(let profile):
-                    if profile.position != nil, profile.careerLevel != nil {
+                case .success(let curation):
+                    if curation != nil {
                         return decideDestination(.mainShell, state: &state)
                     } else {
                         return decideDestination(.onboarding(startingAt: .curation), state: &state)
@@ -159,7 +159,7 @@ public struct AppEntryFeature: Sendable {
             case .effect(.localCleanupFinished(let requestID, let result)):
                 guard requestID == state.requestID else { return .none }
                 switch result {
-                case .success:
+                case .signedOut:
                     state.authentication = .idle
                     return decideDestination(.onboarding(startingAt: .guide), state: &state)
 
@@ -185,18 +185,18 @@ public struct AppEntryFeature: Sendable {
         case cleanup
     }
 
-    private let restoreSession: any RestoreSessionUseCase
-    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
-    private let signOut: any SignOutUseCase
+    private let restoreSignIn: @Sendable () async -> SignInRestoration
+    private let curation: @Sendable () async throws -> Curation?
+    private let signOut: @Sendable () async -> SignOutResult
 
-    private func restoreSession(_ state: inout State) -> Effect<Action> {
+    private func restoreSignIn(_ state: inout State) -> Effect<Action> {
         state.authentication = .restoring
         state.requestID += 1
         state.pendingDestination = nil
         let requestID = state.requestID
         return .run { send in
-            let result = await restoreSession()
-            await send(.effect(.restoreSessionFinished(requestID: requestID, result: result)))
+            let result = await restoreSignIn()
+            await send(.effect(.restoreSignInFinished(requestID: requestID, result: result)))
         }
         .cancellable(id: CancelID.restore, cancelInFlight: true)
     }
@@ -207,7 +207,7 @@ public struct AppEntryFeature: Sendable {
             return .none
         }
         state.automaticRetryCount += 1
-        return restoreSession(&state)
+        return restoreSignIn(&state)
     }
 
     private func decideDestination(

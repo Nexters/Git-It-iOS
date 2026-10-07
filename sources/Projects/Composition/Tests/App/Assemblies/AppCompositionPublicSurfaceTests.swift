@@ -16,34 +16,24 @@ struct AppCompositionPublicSurfaceTests {
                 osVersion: "Version 26.0",
                 generationReminderTitle: "세트 생성 완료",
                 generationReminderBody: "학습 세트 생성이 완료됐어요. 지금 확인해보세요.",
+                generationFailureReminderTitle: "세트 생성 실패",
+                generationFailureReminderBody: "학습 세트를 만들지 못했어요. 다시 시도해주세요.",
             )
         )
 
         let labels = Set(Mirror(reflecting: composition).children.compactMap(\.label))
 
         let expected: Set = [
-            "signIn",
-            "signOut",
-            "restoreSession",
-            "verifyAuthorization",
-            "refreshSession",
-            "policyConsent",
-            "memberAccount",
-            "fetchLearningProjects",
-            "learningLibrary",
-            "createLearningProject",
-            "submitChoiceAnswer",
-            "submitEssayAnswer",
-            "setQuestionBookmark",
-            "deleteMemberAccount",
-            "fetchExternalRepository",
-            "requestGenerationReminder",
-            "trackGeneration",
+            "account",
+            "userInfo",
+            "appSetting",
+            "externalRepository",
+            "quizDetail",
+            "project",
+            "projectGeneration",
             "recordSharedSessionState",
             "activatePushClient",
             "configureAppDelegate",
-            "startObservingGenerationState",
-            "registerCurrentDevice",
             "deviceTokenRefreshes",
             "ingestGenerationOutcomePayload",
         ]

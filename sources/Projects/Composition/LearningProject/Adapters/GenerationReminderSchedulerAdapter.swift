@@ -1,38 +1,42 @@
-import DomainLearningProject
+import DataNotification
+import DomainProjectGeneration
 import Foundation
-import InfrastructureLocalNotification
 
 // MARK: - GenerationReminderSchedulerAdapter
 
-struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
+public struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
 
     // MARK: Lifecycle
 
-    init(
-        localNotificationClient: any NotificationAuthorizationClient,
-        title: String,
-        body: String,
+    public init(
+        reminderNotifier: any LocalReminderNotifier,
+        completedTitle: String,
+        completedBody: String,
+        failedTitle: String,
+        failedBody: String,
     ) {
-        self.localNotificationClient = localNotificationClient
-        self.title = title
-        self.body = body
+        self.reminderNotifier = reminderNotifier
+        self.completedTitle = completedTitle
+        self.completedBody = completedBody
+        self.failedTitle = failedTitle
+        self.failedBody = failedBody
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func isAuthorized() async -> Bool {
-        await localNotificationClient.isAuthorized()
+    public func isAuthorized() async -> Bool {
+        await reminderNotifier.isAuthorized()
     }
 
-    func schedule(
-        identifier: String,
+    public func schedule(
+        _ reminder: GenerationReminder,
         at date: Date,
     ) async {
-        localNotificationClient.schedule(
-            LocalNotificationRequest(
-                identifier: identifier,
-                title: title,
-                body: body,
+        await reminderNotifier.schedule(
+            ReminderNotification(
+                identifier: identifier(for: reminder),
+                title: title(for: reminder.kind),
+                body: body(for: reminder.kind),
             ),
             at: date,
         )
@@ -40,8 +44,34 @@ struct GenerationReminderSchedulerAdapter: GenerationReminderScheduler {
 
     // MARK: Private
 
-    private let localNotificationClient: any NotificationAuthorizationClient
-    private let title: String
-    private let body: String
+    private let reminderNotifier: any LocalReminderNotifier
+    private let completedTitle: String
+    private let completedBody: String
+    private let failedTitle: String
+    private let failedBody: String
+
+    private func identifier(for reminder: GenerationReminder) -> String {
+        switch reminder.kind {
+        case .completed: "generation-completed-\(reminder.projectID)"
+        case .failed: "generation-failed-\(reminder.projectID)"
+        @unknown default: "generation-completed-\(reminder.projectID)"
+        }
+    }
+
+    private func title(for kind: GenerationReminder.Kind) -> String {
+        switch kind {
+        case .completed: completedTitle
+        case .failed: failedTitle
+        @unknown default: completedTitle
+        }
+    }
+
+    private func body(for kind: GenerationReminder.Kind) -> String {
+        switch kind {
+        case .completed: completedBody
+        case .failed: failedBody
+        @unknown default: completedBody
+        }
+    }
 
 }

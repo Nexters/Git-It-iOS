@@ -1,12 +1,13 @@
 import Foundation
 import Testing
 @testable import CompositionAuthentication
+@testable import CompositionLearningProject
 @testable import CompositionShareExtension
 @testable import DataAuthentication
 @testable import DataLearningProject
-@testable import DomainAuthentication
-@testable import InfrastructureAuthentication
-@testable import InfrastructureLocalNotification
+@testable import DataNotification
+@testable import DomainAccount
+@testable import DomainProjectGeneration
 
 // MARK: - ShareExtensionCompositionTests
 
@@ -19,46 +20,56 @@ struct ShareExtensionCompositionTests {
     func `마커가 없으면 앱 실행 필요로 판정한다`() async throws {
         let context = try Context()
 
-        #expect(await context.composition.resolveSessionAvailability() == .appLaunchRequired)
+        #expect(await context.composition.signInAvailability() == .appLaunchRequired)
     }
 
     @Test
-    func `저장된 세션이 있으면 갱신 없이 접근 토큰을 사용한다`() async throws {
+    func `저장된 세션이 있으면 로그인된 상태로 판정한다`() async throws {
         let context = try Context()
         await context.markerCoding.save(isSignedIn: true)
         try context.saveSession(accessToken: "shared-token")
 
-        #expect(await context.composition.resolveSessionAvailability() == .available(accessToken: "shared-token"))
+        #expect(await context.composition.signInAvailability() == .signedIn)
     }
 
     @Test
-    func `알림 권한 상태를 조회만 하고 요청하지 않는다`() async throws {
-        let context = try Context(isNotificationAuthorized: true)
-
-        #expect(await context.composition.isNotificationAuthorized() == true)
-        #expect(context.localNotificationClient.authorizationRequestCount == 0)
-    }
-
-    @Test
-    func `등록한 프로젝트를 본 앱이 흡수할 대기 목록에 남긴다`() async throws {
+    func `만료된 로그인 기록이면 로그인이 필요하다고 판정한다`() async throws {
         let context = try Context()
+        await context.markerCoding.save(isSignedIn: true)
+        try context.saveSession(accessToken: "expired-token", accessTokenExpiresAt: Date(timeIntervalSince1970: 0))
 
-        await context.composition.enqueueGenerationReminder("project-1")
+        #expect(await context.composition.signInAvailability() == .signInRequired)
+    }
 
-        let coding = PendingGenerationReminderCoding(userDefaults: context.userDefaults)
-        #expect(await coding.drainProjectIDs() == ["project-1"])
+    @Test
+    func `생성 요청이 실패하면 진행 중 기록과 알림 대기열을 남기지 않는다`() async throws {
+        let context = try Context()
+        await context.markerCoding.save(isSignedIn: true)
+        try context.saveSession(accessToken: "shared-token")
+
+        await #expect(throws: (any Error).self) {
+            _ = try await context.composition.projectGeneration.request(
+                ProjectGenerationRequest(repositoryURL: "https://github.com/owner/repo", quizLevel: .l2)
+            )
+        }
+
+        let pendingGenerations = PendingGenerationRepositoryAdapter(
+            store: LocalPendingGenerationStore(storage: context.sharedStorage)
+        )
+        #expect(await pendingGenerations.pendingState().records.isEmpty)
+        #expect(await pendingGenerations.drainReminderProjectIDs().isEmpty)
     }
 
     @Test
     func `공유 저장소를 사용할 수 없으면 앱 실행 필요로 판정한다`() async throws {
         let composition = ShareExtensionComposition.live(
             try Context.environment(),
-            keychainStore: KeychainStore(backend: KeychainStore.InMemoryBackend()),
-            sharedDefaults: nil,
-            localNotificationClient: SpyNotificationAuthorizationClient(isAuthorized: false),
+            secureStorage: InMemorySecureValueStorage(),
+            sharedStorage: nil,
+            reminderNotifier: SpyLocalReminderNotifier(isAuthorized: false),
         )
 
-        #expect(await composition.resolveSessionAvailability() == .appLaunchRequired)
+        #expect(await composition.signInAvailability() == .appLaunchRequired)
     }
 
     // MARK: Private
@@ -67,28 +78,27 @@ struct ShareExtensionCompositionTests {
 
         // MARK: Lifecycle
 
-        init(isNotificationAuthorized: Bool = false) throws {
-            userDefaults = try #require(
-                UserDefaults(suiteName: "ShareExtensionCompositionTests.\(UUID().uuidString)")
-            )
-            keychainStore = KeychainStore(backend: KeychainStore.InMemoryBackend())
-            markerCoding = SharedSessionStateMarkerCoding(userDefaults: userDefaults)
-            let localNotificationClient = SpyNotificationAuthorizationClient(isAuthorized: isNotificationAuthorized)
-            self.localNotificationClient = localNotificationClient
+        init() throws {
+            secureStorage = InMemorySecureValueStorage()
+            let sharedStorage = InMemoryKeyValueStorage()
+            self.sharedStorage = sharedStorage
+            markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
+            let reminderNotifier = SpyLocalReminderNotifier(isAuthorized: false)
+            self.reminderNotifier = reminderNotifier
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
-                keychainStore: keychainStore,
-                sharedDefaults: userDefaults,
-                localNotificationClient: localNotificationClient,
+                secureStorage: secureStorage,
+                sharedStorage: sharedStorage,
+                reminderNotifier: reminderNotifier,
             )
         }
 
         // MARK: Internal
 
-        let userDefaults: UserDefaults
-        let keychainStore: KeychainStore
+        let sharedStorage: InMemoryKeyValueStorage
+        let secureStorage: InMemorySecureValueStorage
         let markerCoding: SharedSessionStateMarkerCoding
-        let localNotificationClient: SpyNotificationAuthorizationClient
+        let reminderNotifier: SpyLocalReminderNotifier
         let composition: ShareExtensionComposition
 
         static func environment() throws -> ShareExtensionComposition.Environment {
@@ -98,20 +108,19 @@ struct ShareExtensionCompositionTests {
             )
         }
 
-        func saveSession(accessToken: String) throws {
-            try SessionRecordCoding(keychainStore: keychainStore).save(
-                SessionRecord(
-                    tokens: SessionTokens(
-                        accessToken: accessToken,
-                        refreshToken: "refresh",
-                        accessTokenExpiresAt: nil,
-                        refreshTokenExpiresAt: nil,
-                    ),
-                    onboarding: LocalOnboardingState(
-                        needsCuration: false,
-                        acceptedLegalVersions: [],
-                        acceptedAt: nil,
-                    ),
+        func saveSession(
+            accessToken: String,
+            accessTokenExpiresAt: Date? = nil,
+        ) throws {
+            try SessionRecordStorageCoding(storage: secureStorage).save(
+                StoredSessionRecord(
+                    accessToken: accessToken,
+                    refreshToken: "refresh",
+                    accessTokenExpiresAt: accessTokenExpiresAt,
+                    refreshTokenExpiresAt: nil,
+                    needsCuration: false,
+                    acceptedLegalVersions: [],
+                    acceptedAt: nil,
                 )
             )
         }

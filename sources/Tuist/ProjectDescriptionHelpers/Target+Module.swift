@@ -1,9 +1,13 @@
 import ProjectDescription
 
 extension Target {
+
+    // MARK: Internal
+
     static func module(
         name: String,
         sourceDirectory: String,
+        packageName: String? = nil,
         sourceExcludes: [Path] = [],
         resources: ResourceFileElements? = nil,
         dependencies: [TargetDependency] = [],
@@ -19,7 +23,7 @@ extension Target {
             resources: resources,
             dependencies: dependencies,
             settings: .settings(
-                base: [
+                base: packageNameSettings(packageName).merging([
                     "BUILD_LIBRARY_FOR_DISTRIBUTION": "NO",
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
@@ -27,7 +31,7 @@ extension Target {
                     "SKIP_INSTALL": "YES",
                     "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
                     "SWIFT_VERSION": "5.0",
-                ]
+                ]) { current, _ in current }
             ),
         )
     }
@@ -63,6 +67,7 @@ extension Target {
     static func testModule(
         name: String,
         sourceDirectory: String,
+        packageName: String? = nil,
         productionTarget: TargetDependency,
         additionalDependencies: [TargetDependency] = [],
     ) -> Self {
@@ -79,12 +84,12 @@ extension Target {
             sources: ["\(testSourceDirectory)/**"],
             dependencies: [productionTarget] + additionalDependencies,
             settings: .settings(
-                base: [
+                base: packageNameSettings(packageName).merging([
                     "CODE_SIGN_STYLE": "Automatic",
                     "DEVELOPMENT_TEAM": "6924CABL23",
                     "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
                     "SWIFT_VERSION": "5.0",
-                ]
+                ]) { current, _ in current }
             ),
         )
     }
@@ -135,4 +140,12 @@ extension Target {
             ),
         )
     }
+
+    // MARK: Private
+
+    private static func packageNameSettings(_ packageName: String?) -> SettingsDictionary {
+        guard let packageName else { return [:] }
+        return ["OTHER_SWIFT_FLAGS": "$(inherited) -package-name \(packageName)"]
+    }
+
 }

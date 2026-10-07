@@ -42,7 +42,7 @@ extension SettingsScreen {
                             .init(
                                 id: PositionDisplay.identifier(for: position),
                                 title: PositionDisplay.title(for: position),
-                                isSelected: store.profile?.position == position,
+                                isSelected: store.profile?.curation?.position == position,
                             )
                         },
                         style: .compact,

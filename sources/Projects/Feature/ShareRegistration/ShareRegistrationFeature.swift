@@ -1,5 +1,8 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainAccount
+import DomainExternalRepository
+import DomainIdentifier
+import DomainProjectGeneration
 import Foundation
 
 // MARK: - ShareRegistrationFeature
@@ -10,21 +13,17 @@ public struct ShareRegistrationFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        parseRepositoryLink: any ExternalRepositoryURLParser,
-        fetchExternalRepository: any FetchExternalRepositoryUseCase,
-        createLearningProject: any CreateLearningProjectUseCase,
-        resolveSession: @escaping @Sendable () async -> ShareRegistrationSessionState,
-        isNotificationAuthorized: @escaping @Sendable () async -> Bool = { false },
-        enqueueGenerationReminder: @escaping @Sendable (String) async -> Void = { _ in },
+        parseRepositoryLink: any ExternalRepositoryLocator,
+        externalRepository: any ExternalRepositoryUseCase,
+        projectGeneration: any ProjectGenerationUseCase,
+        signInAvailability: @escaping @Sendable () async -> SignInAvailability,
         recordDiagnostic: @escaping @Sendable (ShareRegistrationDiagnosticEvent) -> Void = { _ in },
         dismiss: @escaping @MainActor @Sendable () -> Void = { },
     ) {
         self.parseRepositoryLink = parseRepositoryLink
-        self.fetchExternalRepository = fetchExternalRepository
-        self.createLearningProject = createLearningProject
-        self.resolveSession = resolveSession
-        self.isNotificationAuthorized = isNotificationAuthorized
-        self.enqueueGenerationReminder = enqueueGenerationReminder
+        self.externalRepository = externalRepository
+        self.projectGeneration = projectGeneration
+        self.signInAvailability = signInAvailability
         self.recordDiagnostic = recordDiagnostic
         self.dismiss = dismiss
     }
@@ -117,7 +116,7 @@ public struct ShareRegistrationFeature: Sendable {
         public enum EffectEvent: Sendable, Equatable {
             case validationFinished(Status)
             case repositoryResolved(ExternalRepository)
-            case registrationFinished(Result<String, LearningProjectError>)
+            case registrationFinished(Result<ProjectID, ProjectGenerationError>)
         }
 
         @CasePathable
@@ -189,15 +188,15 @@ public struct ShareRegistrationFeature: Sendable {
 
             case .effect(.registrationFinished(let result)):
                 switch result {
-                case .success(let projectID):
+                case .success:
                     state.status = .succeeded
                     recordDiagnostic(.registrationSucceeded)
-                    return enqueueReminderIfAuthorized(projectID: projectID)
+                    return .none
 
                 case .failure(let error):
                     if error == .unauthorized {
                         state.status = .signInRequired
-                        recordDiagnostic(.sessionResolved(.signInRequired))
+                        recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
                     } else {
                         state.status = .failed(
                             reason: Self.registrationFailureReason(for: error),
@@ -229,22 +228,20 @@ public struct ShareRegistrationFeature: Sendable {
     private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
     private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
 
-    private let parseRepositoryLink: any ExternalRepositoryURLParser
-    private let fetchExternalRepository: any FetchExternalRepositoryUseCase
-    private let createLearningProject: any CreateLearningProjectUseCase
-    private let resolveSession: @Sendable () async -> ShareRegistrationSessionState
-    private let isNotificationAuthorized: @Sendable () async -> Bool
-    private let enqueueGenerationReminder: @Sendable (String) async -> Void
+    private let parseRepositoryLink: any ExternalRepositoryLocator
+    private let externalRepository: any ExternalRepositoryUseCase
+    private let projectGeneration: any ProjectGenerationUseCase
+    private let signInAvailability: @Sendable () async -> SignInAvailability
     private let recordDiagnostic: @Sendable (ShareRegistrationDiagnosticEvent) -> Void
     private let dismiss: @MainActor @Sendable () -> Void
 
-    private static func registrationFailureReason(for error: LearningProjectError) -> String {
+    private static func registrationFailureReason(for error: ProjectGenerationError) -> String {
         switch error {
         case .invalidRequest:
             "등록할 수 없는 저장소예요. 앱에서 다시 확인해 주세요."
 
-        case .notFound:
-            "저장소를 찾지 못했어요."
+        case .duplicateRequest:
+            "이미 등록 중인 저장소예요."
 
         case .temporarilyUnavailable:
             "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요."
@@ -287,9 +284,9 @@ public struct ShareRegistrationFeature: Sendable {
         }
 
         return .run { send in
-            let session = await resolveSession()
-            recordDiagnostic(.sessionResolved(session))
-            switch session {
+            let availability = await signInAvailability()
+            recordDiagnostic(.signInAvailabilityResolved(availability))
+            switch availability {
             case .signInRequired:
                 await send(.effect(.validationFinished(.signInRequired)))
                 return
@@ -298,12 +295,12 @@ public struct ShareRegistrationFeature: Sendable {
                 await send(.effect(.validationFinished(.appLaunchRequired)))
                 return
 
-            case .available:
+            case .signedIn:
                 break
             }
 
             do {
-                let repository = try await fetchExternalRepository(url: sharedURL)
+                let repository = try await externalRepository.repository(at: sharedURL)
                 await send(.effect(.repositoryResolved(repository)))
             } catch let error as ExternalRepositoryError {
                 if error == .invalidURLFormat {
@@ -316,9 +313,6 @@ public struct ShareRegistrationFeature: Sendable {
                         retry: .lookup,
                     ))))
                 }
-            } catch let error as LearningProjectError where error == .unauthorized {
-                recordDiagnostic(.sessionResolved(.signInRequired))
-                await send(.effect(.validationFinished(.signInRequired)))
             } catch {
                 recordDiagnostic(.repositoryLookupFailed(reason: String(describing: error)))
                 await send(.effect(.validationFinished(.failed(
@@ -335,26 +329,27 @@ public struct ShareRegistrationFeature: Sendable {
         state.status = .submitting
         let quizLevel = state.quizLevel
         return .run { send in
+            let availability = await signInAvailability()
+            guard availability == .signedIn else {
+                recordDiagnostic(.signInAvailabilityResolved(availability))
+                await send(.effect(.validationFinished(
+                    availability == .signInRequired ? .signInRequired : .appLaunchRequired
+                )))
+                return
+            }
+
             do {
-                let receipt = try await createLearningProject(
-                    githubRepoURL: repository.canonicalURL,
+                let receipt = try await projectGeneration.request(ProjectGenerationRequest(
+                    repositoryURL: repository.canonicalURL,
                     quizLevel: quizLevel,
-                )
+                ))
                 await send(.effect(.registrationFinished(.success(receipt.projectID))))
             } catch {
-                let mapped = error as? LearningProjectError ?? .unexpected
+                let mapped = error as? ProjectGenerationError ?? .unexpected
                 await send(.effect(.registrationFinished(.failure(mapped))))
             }
         }
         .cancellable(id: CancelID.registration, cancelInFlight: true)
-    }
-
-    private func enqueueReminderIfAuthorized(projectID: String) -> Effect<Action> {
-        .run { _ in
-            guard await isNotificationAuthorized() else { return }
-            await enqueueGenerationReminder(projectID)
-            recordDiagnostic(.generationReminderEnqueued)
-        }
     }
 
 }

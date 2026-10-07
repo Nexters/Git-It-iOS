@@ -1,105 +1,77 @@
 import DataAuthentication
-import DomainAuthentication
+import DataShared
+import DomainAccount
 import Foundation
-import InfrastructureAuthentication
 
 // MARK: - AuthenticationRepositoryAdapter
 
-actor AuthenticationRepositoryAdapter: AuthenticationRepository {
+public actor AuthenticationRepositoryAdapter: DomainAccount.AuthenticationRepository {
 
     // MARK: Lifecycle
 
-    init(
-        authorizationProvider: AppleAuthorizationProvider,
-        credentialStateProvider: AppleCredentialStateProvider,
-        keychainStore: KeychainStore,
+    public init(
+        appleSignInSource: AppleSignInSource,
+        secureStorage: any SecureValueStorage,
     ) {
-        self.authorizationProvider = authorizationProvider
-        self.credentialStateProvider = credentialStateProvider
-        appleIdentityStore = AppleIdentityKeychainStore(keychainStore: keychainStore)
+        self.appleSignInSource = appleSignInSource
+        appleIdentityStore = AppleIdentityStore(storage: secureStorage)
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func authenticate(using method: AuthenticationMethod) async throws -> AuthenticationGrant {
+    public func authenticate(using method: SignInMethod) async throws -> AuthenticationGrant {
         switch method {
         case .apple:
             do {
-                let credential = try await authorizationProvider.authorize()
-                guard
-                    let tokenData = credential.identityToken,
-                    let idToken = String(data: tokenData, encoding: .utf8)
-                else {
-                    throw AuthenticationError.temporarilyUnavailable
-                }
-                try? persistUserID(credential.userID)
-                return AuthenticationGrant(id: .init(rawValue: idToken), method: .apple)
-            } catch let error as AppleAuthorizationError {
+                let credential = try await appleSignInSource.authorize()
+                try? appleIdentityStore.save(credential.userID)
+                return AuthenticationGrant(id: credential.identityToken, method: .apple)
+            } catch let error as AppleSignInError {
                 throw domainError(for: error)
             }
 
         @unknown default:
-            throw AuthenticationError.temporarilyUnavailable
+            throw AccountError.temporarilyUnavailable
         }
     }
 
-    func authorizationStatus() async throws -> AuthorizationStatus {
-        guard let userID = try? loadUserID() else { return .reauthenticationRequired }
-        return domainStatus(await credentialStateProvider.state(for: userID))
+    public func authorizationStatus() async throws -> SignInVerification {
+        guard let userID = try? appleIdentityStore.load() else { return .reauthenticationRequired }
+        return verification(for: await appleSignInSource.state(forUserID: userID))
     }
 
-    func clearAuthentication() async throws {
+    public func clearAuthentication() async throws {
         do {
             try appleIdentityStore.delete()
-        } catch is KeychainStoreError {
-            throw AuthenticationError.temporarilyUnavailable
+        } catch is SecureValueStorageError {
+            throw AccountError.temporarilyUnavailable
         }
     }
 
     // MARK: Private
 
-    private let authorizationProvider: AppleAuthorizationProvider
-    private let credentialStateProvider: AppleCredentialStateProvider
-    private let appleIdentityStore: AppleIdentityKeychainStore
+    private let appleSignInSource: AppleSignInSource
+    private let appleIdentityStore: AppleIdentityStore
 
-    private func persistUserID(_ userID: String) throws {
-        try appleIdentityStore.save(userID)
-    }
-
-    private func loadUserID() throws -> String? {
-        try appleIdentityStore.load()
-    }
-
-    private func domainStatus(_ state: AppleCredentialState) -> AuthorizationStatus {
+    private func verification(for state: AppleSignInState) -> SignInVerification {
         switch state {
         case .authorized:
-            .authorized
+            .valid
 
-        case .revoked,
-             .notFound,
-             .transferred:
+        case .reauthenticationRequired:
             .reauthenticationRequired
 
         case .temporarilyUnavailable:
             .temporarilyUnavailable
-
-        @unknown default:
-            .temporarilyUnavailable
         }
     }
 
-    private func domainError(for error: AppleAuthorizationError) -> AuthenticationError {
+    private func domainError(for error: AppleSignInError) -> AccountError {
         switch error {
         case .cancelled:
-            .cancelled
+            .signInCancelled
 
-        case .invalidCallback,
-             .expiredAttempt,
-             .missingCredential,
-             .unavailable:
-            .temporarilyUnavailable
-
-        @unknown default:
+        case .unavailable:
             .temporarilyUnavailable
         }
     }

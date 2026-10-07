@@ -3,8 +3,8 @@ import Testing
 
 @testable import CompositionLearningProject
 @testable import DataExternalRepository
-@testable import DomainLearningProject
-@testable import InfrastructureNetworkClient
+@testable import DataShared
+@testable import DomainExternalRepository
 
 // MARK: - ExternalRepositoryLookupAdapterTests
 
@@ -15,16 +15,15 @@ struct ExternalRepositoryLookupAdapterTests {
 
     @Test
     func `GitHub 응답 DTO를 Domain 모델로 변환한다`() async throws {
-        let transport = RecordingHTTPTransport(results: [
-            HTTPTransportResponse(
+        let transport = RecordingRequestTransport(results: [
+            TransportResponse(
                 statusCode: 200,
-                headers: [:],
                 body: Data(#"""
                     {"html_url":"https://github.com/facebook/react","name":"react","owner":{"login":"facebook","avatar_url":"https://avatar"},"stargazers_count":10,"topics":["swift"]}
                     """#.utf8),
             )
         ])
-        let adapter = ExternalRepositoryLookupAdapter(remote: makeRemote(transport: transport))
+        let adapter = ExternalRepositoryLookupAdapter(remote: Self.makeRemote(transport: transport))
 
         let repository = try await adapter.repository(owner: "facebook", name: "react")
 
@@ -39,24 +38,24 @@ struct ExternalRepositoryLookupAdapterTests {
     }
 
     @Test
-    func `Data 오류를 Domain 오류로 변환한다`() async throws {
+    func `Data 오류를 Domain 오류로 변환한다`() async {
         let adapter = ExternalRepositoryLookupAdapter(
-            remote: makeRemote(transport: RecordingHTTPTransport(results: []))
+            remote: Self.makeRemote(transport: RecordingRequestTransport(results: []))
         )
 
         await #expect(throws: ExternalRepositoryError.offline) {
-            try await adapter.repository(owner: "facebook", name: "react")
+            _ = try await adapter.repository(owner: "facebook", name: "react")
         }
     }
 
     // MARK: Private
 
-    private func makeRemote(transport: RecordingHTTPTransport) -> HTTPExternalRepositoryRemote {
-        HTTPExternalRepositoryRemote(client: HTTPClient(
+    private static func makeRemote(transport: RecordingRequestTransport) -> ExternalRepositoryRemote {
+        ExternalRepositoryRemote(
             baseURL: URL(string: "https://api.github.com")!,
-            bodyCoding: StandardJSONBodyCoding(),
             transport: transport,
-        ))
+            responseTimeout: RequestClientFactory.defaultResponseTimeout,
+        )
     }
 
 }

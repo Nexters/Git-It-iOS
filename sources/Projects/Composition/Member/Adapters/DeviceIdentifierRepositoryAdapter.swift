@@ -1,6 +1,6 @@
 import DataMember
-import DomainMember
-import InfrastructureAuthentication
+import DataShared
+import DomainAppSetting
 
 // MARK: - DeviceIdentifierRepositoryAdapter
 
@@ -8,13 +8,13 @@ public struct DeviceIdentifierRepositoryAdapter: DeviceIdentifierRepository {
 
     // MARK: Lifecycle
 
-    public init(keychainStore: KeychainStore) {
-        store = LocalDeviceIdentifierStore(keychainStore: keychainStore)
+    public init(secureStorage: any SecureValueStorage) {
+        store = LocalDeviceIdentifierStore(storage: secureStorage)
     }
 
     // MARK: Public
 
-    public func currentDeviceID() async -> String {
+    public func currentDeviceID() async -> DeviceID {
         store.loadOrCreate()
     }
 

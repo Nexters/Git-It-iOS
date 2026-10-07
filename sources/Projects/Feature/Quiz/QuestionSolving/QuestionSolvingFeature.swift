@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
 // MARK: - QuestionSolvingFeature
@@ -10,33 +11,33 @@ public struct QuestionSolvingFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
-        submitEssayAnswer: any SubmitEssayAnswerUseCase,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
+        gradeChoiceAnswer: @escaping @Sendable (ChoiceAnswer) async throws -> ChoiceGrading,
+        gradeEssayAnswer: @escaping @Sendable (EssayAnswer) async throws -> EssayGrading,
+        setBookmark: @escaping @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState,
     ) {
-        self.submitChoiceAnswer = submitChoiceAnswer
-        self.submitEssayAnswer = submitEssayAnswer
-        self.setQuestionBookmark = setQuestionBookmark
+        self.gradeChoiceAnswer = gradeChoiceAnswer
+        self.gradeEssayAnswer = gradeEssayAnswer
+        self.setBookmark = setBookmark
     }
 
     // MARK: Public
 
     public enum AnswerOutcome: Equatable, Sendable {
-        case choice(ChoiceAnswerResult)
-        case essay(EssayAnswerResult)
+        case choice(ChoiceGrading)
+        case essay(EssayGrading)
     }
 
     public enum Submission: Equatable, Sendable {
         case editing
         case submitting
         case answered(AnswerOutcome)
-        case failed(LearningProjectError)
+        case failed(QuizDetailError)
     }
 
     public enum BookmarkMutation: Equatable, Sendable {
         case idle
         case committing
-        case failed(LearningProjectError)
+        case failed(QuizDetailError)
     }
 
     @ObservableState
@@ -45,8 +46,8 @@ public struct QuestionSolvingFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            projectID: String,
-            question: Question,
+            projectID: ProjectID,
+            question: Quiz,
             questionNumber: Int? = nil,
             advanceActionTitle: String,
             isBookmarked: Bool = false,
@@ -60,8 +61,8 @@ public struct QuestionSolvingFeature: Sendable {
 
         // MARK: Public
 
-        public let projectID: String
-        public var question: Question
+        public let projectID: ProjectID
+        public var question: Quiz
         public var questionNumber: Int?
         public let advanceActionTitle: String
 
@@ -81,7 +82,7 @@ public struct QuestionSolvingFeature: Sendable {
             return outcome
         }
 
-        public var submissionError: LearningProjectError? {
+        public var submissionError: QuizDetailError? {
             guard case .failed(let error) = submission else { return nil }
             return error
         }
@@ -92,8 +93,8 @@ public struct QuestionSolvingFeature: Sendable {
 
         public var isSubmitEnabled: Bool {
             guard !isSubmitting, answerOutcome == nil else { return false }
-            switch question.format {
-            case .multipleChoice:
+            switch question.content {
+            case .choice:
                 return draftChoiceIndex != nil
 
             case .essay:
@@ -126,22 +127,22 @@ public struct QuestionSolvingFeature: Sendable {
         @CasePathable
         public enum EffectEvent: Sendable, Equatable {
             case choiceAnswerFinished(
-                questionID: String,
-                result: Result<ChoiceAnswerResult, LearningProjectError>,
+                questionID: QuizID,
+                result: Result<ChoiceGrading, QuizDetailError>,
             )
             case essayAnswerFinished(
-                questionID: String,
-                result: Result<EssayAnswerResult, LearningProjectError>,
+                questionID: QuizID,
+                result: Result<EssayGrading, QuizDetailError>,
             )
             case bookmarkFinished(
-                questionID: String,
-                result: Result<BookmarkState, LearningProjectError>,
+                questionID: QuizID,
+                result: Result<QuizBookmarkState, QuizDetailError>,
             )
         }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
-            case answerSubmitted(questionID: String, choiceCorrect: Bool?)
+            case answerSubmitted(questionID: QuizID, choiceCorrect: Bool?)
             case advanceRequested
             case externalURLRequested(URL)
             case backRequested
@@ -174,18 +175,14 @@ public struct QuestionSolvingFeature: Sendable {
                 guard state.bookmarkMutation != .committing else { return .none }
                 state.bookmarkMutation = .committing
                 let projectID = state.projectID
-                let questionID = state.question.questionID
+                let questionID = state.question.id
                 let bookmarked = !state.isBookmarked
                 return .run { send in
                     do {
-                        let result = try await setQuestionBookmark(
-                            projectID: projectID,
-                            questionID: questionID,
-                            bookmarked: bookmarked,
-                        )
-                        await send(.effect(.bookmarkFinished(questionID: questionID, result: .success(result))))
+                        let bookmarkState = try await setBookmark(questionID, projectID, bookmarked)
+                        await send(.effect(.bookmarkFinished(questionID: questionID, result: .success(bookmarkState))))
                     } catch {
-                        let mapped = error as? LearningProjectError ?? .unexpected
+                        let mapped = error as? QuizDetailError ?? .unexpected
                         await send(.effect(.bookmarkFinished(questionID: questionID, result: .failure(mapped))))
                     }
                 }
@@ -208,13 +205,13 @@ public struct QuestionSolvingFeature: Sendable {
                 return .send(.delegate(.backRequested))
 
             case .effect(.choiceAnswerFinished(let questionID, let result)):
-                guard questionID == state.question.questionID else { return .none }
+                guard questionID == state.question.id else { return .none }
                 switch result {
-                case .success(let outcome):
-                    state.submission = .answered(.choice(outcome))
+                case .success(let grading):
+                    state.submission = .answered(.choice(grading))
                     return .send(.delegate(.answerSubmitted(
                         questionID: questionID,
-                        choiceCorrect: outcome.correct,
+                        choiceCorrect: grading.isCorrect,
                     )))
 
                 case .failure(let error):
@@ -223,10 +220,10 @@ public struct QuestionSolvingFeature: Sendable {
                 }
 
             case .effect(.essayAnswerFinished(let questionID, let result)):
-                guard questionID == state.question.questionID else { return .none }
+                guard questionID == state.question.id else { return .none }
                 switch result {
-                case .success(let outcome):
-                    state.submission = .answered(.essay(outcome))
+                case .success(let grading):
+                    state.submission = .answered(.essay(grading))
                     return .send(.delegate(.answerSubmitted(questionID: questionID, choiceCorrect: nil)))
 
                 case .failure(let error):
@@ -235,10 +232,10 @@ public struct QuestionSolvingFeature: Sendable {
                 }
 
             case .effect(.bookmarkFinished(let questionID, let result)):
-                guard questionID == state.question.questionID else { return .none }
+                guard questionID == state.question.id else { return .none }
                 switch result {
                 case .success(let bookmarkState):
-                    state.isBookmarked = bookmarkState.bookmarked
+                    state.isBookmarked = bookmarkState.isBookmarked
                     state.bookmarkMutation = .idle
 
                 case .failure(let error):
@@ -259,47 +256,48 @@ public struct QuestionSolvingFeature: Sendable {
         case bookmark
     }
 
-    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
+    private let gradeChoiceAnswer: @Sendable (ChoiceAnswer) async throws -> ChoiceGrading
+    private let gradeEssayAnswer: @Sendable (EssayAnswer) async throws -> EssayGrading
+    private let setBookmark: @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState
 
     private func submit(_ state: inout State) -> Effect<Action> {
         guard state.submission != .submitting, state.answerOutcome == nil else { return .none }
         let projectID = state.projectID
-        let questionID = state.question.questionID
+        let questionID = state.question.id
 
-        switch state.question.format {
-        case .multipleChoice:
+        switch state.question.content {
+        case .choice:
             guard let selectedIndex = state.draftChoiceIndex else { return .none }
             state.submission = .submitting
+            let answer = ChoiceAnswer(
+                projectID: projectID,
+                quizID: questionID,
+                selectedIndex: selectedIndex,
+            )
             return .run { send in
                 do {
-                    let result = try await submitChoiceAnswer(
-                        projectID: projectID,
-                        questionID: questionID,
-                        selectedIndex: selectedIndex,
-                    )
-                    await send(.effect(.choiceAnswerFinished(questionID: questionID, result: .success(result))))
+                    let grading = try await gradeChoiceAnswer(answer)
+                    await send(.effect(.choiceAnswerFinished(questionID: questionID, result: .success(grading))))
                 } catch {
-                    let mapped = error as? LearningProjectError ?? .unexpected
+                    let mapped = error as? QuizDetailError ?? .unexpected
                     await send(.effect(.choiceAnswerFinished(questionID: questionID, result: .failure(mapped))))
                 }
             }
             .cancellable(id: CancelID.submit, cancelInFlight: true)
 
         case .essay:
-            let text = state.draftEssayText
             state.submission = .submitting
+            let answer = EssayAnswer(
+                projectID: projectID,
+                quizID: questionID,
+                text: state.draftEssayText,
+            )
             return .run { send in
                 do {
-                    let result = try await submitEssayAnswer(
-                        projectID: projectID,
-                        questionID: questionID,
-                        text: text,
-                    )
-                    await send(.effect(.essayAnswerFinished(questionID: questionID, result: .success(result))))
+                    let grading = try await gradeEssayAnswer(answer)
+                    await send(.effect(.essayAnswerFinished(questionID: questionID, result: .success(grading))))
                 } catch {
-                    let mapped = error as? LearningProjectError ?? .unexpected
+                    let mapped = error as? QuizDetailError ?? .unexpected
                     await send(.effect(.essayAnswerFinished(questionID: questionID, result: .failure(mapped))))
                 }
             }

@@ -1,24 +1,22 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainProject
 import SwiftUI
 import UIComponent
 
-private func previewProject(index: Int) -> LearningProjectSummary {
-    LearningProjectSummary(
-        projectID: "project-\(index)",
+private func previewProject(index: Int) -> ProjectSummary {
+    ProjectSummary(
+        id: "project-\(index)",
         repositoryName: "0-jerry/git-it-ios-\(index)",
         repositoryImageURL: nil,
         techStack: ["Swift", "SwiftUI", "TCA"],
-        currentSetLabel: "CHAPTER \(index)",
-        currentSetTitle: "의존성 주입과 모듈 경계",
-        nextSetID: "set-\(index)",
-        nextQuestionID: "question-\(index)",
-        overallProgressPercent: index * 20,
+        currentSet: ProjectSetLabel(label: "CHAPTER \(index)", title: "의존성 주입과 모듈 경계"),
+        next: ProjectNextQuiz(setID: "set-\(index)", quizID: "quiz-\(index)"),
+        progressPercent: index * 20,
     )
 }
 
 private func previewState(
-    projects: [LearningProjectSummary] = (1...4).map(previewProject(index:)),
+    projects: [ProjectSummary] = (1...4).map(previewProject(index:)),
     initialLoad: ProjectListFeature.InitialLoad = .loaded,
     pagination: ProjectListFeature.Pagination = .exhausted,
     mode: ProjectListFeature.Mode = .browsing,
@@ -66,11 +64,11 @@ private func previewStore(_ state: ProjectListFeature.State) -> StoreOf<ProjectL
 }
 
 #Preview("프로젝트 목록 · 다음 페이지 조회 중") {
-    ProjectListScreen(store: previewStore(previewState(pagination: .loading(nextPage: 1))))
+    ProjectListScreen(store: previewStore(previewState(pagination: .loading)))
 }
 
 #Preview("프로젝트 목록 · 다음 페이지 실패") {
     ProjectListScreen(
-        store: previewStore(previewState(pagination: .failed(nextPage: 1, error: .temporarilyUnavailable)))
+        store: previewStore(previewState(pagination: .failed(.temporarilyUnavailable)))
     )
 }

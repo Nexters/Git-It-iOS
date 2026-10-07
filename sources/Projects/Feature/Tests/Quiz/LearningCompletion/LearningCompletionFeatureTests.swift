@@ -3,6 +3,7 @@ import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("LearningCompletionFeature 완료 표현")
 struct LearningCompletionFeatureTests {
 

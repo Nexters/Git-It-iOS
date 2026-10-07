@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainProject
 import Testing
 
 @testable import Feature
@@ -8,7 +8,7 @@ struct HomeProjectDisplayTests {
 
     @Test
     func `Domain 원문과 순서를 카드 표시 값으로 변환한다`() {
-        let displays = HomeTestFixture.manyProjectsPage.items.enumerated()
+        let displays = HomeTestFixture.manyProjectsPage.summaries.enumerated()
             .map { HomeProjectDisplay($0.element, index: $0.offset) }
 
         #expect(displays.map(\.title) == ["Repository 0", "Repository 1", "Repository 2", "Repository 3"])
@@ -32,16 +32,14 @@ struct HomeProjectDisplayTests {
     func `긴 표시 값도 원문을 축약 모델로 바꾸지 않는다`() {
         let longName = String(repeating: "긴 프로젝트 이름", count: 12)
         let project = HomeTestFixture.project(index: 0)
-        let replaced = LearningProjectSummary(
-            projectID: project.projectID,
+        let replaced = ProjectSummary(
+            id: project.id,
             repositoryName: longName,
             repositoryImageURL: project.repositoryImageURL,
             techStack: project.techStack,
-            currentSetLabel: project.currentSetLabel,
-            currentSetTitle: project.currentSetTitle,
-            nextSetID: project.nextSetID,
-            nextQuestionID: project.nextQuestionID,
-            overallProgressPercent: project.overallProgressPercent,
+            currentSet: project.currentSet,
+            next: project.next,
+            progressPercent: project.progressPercent,
         )
 
         #expect(HomeProjectDisplay(replaced, index: 0).title == longName)

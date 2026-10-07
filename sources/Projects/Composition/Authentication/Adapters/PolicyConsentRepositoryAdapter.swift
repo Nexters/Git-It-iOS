@@ -1,51 +1,41 @@
 import DataLegalConsent
-import DomainAuthentication
+import DomainAccount
 import Foundation
 
 // MARK: - PolicyConsentRepositoryAdapter
 
-struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
+public struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
 
     // MARK: Lifecycle
 
-    init(store: LocalPolicyConsentStore) {
+    public init(store: LocalPolicyConsentStore) {
         self.store = store
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func storedConsentRecords() async throws -> [PolicyConsentRecord] {
-        await store.records().map(domainRecord(from:))
-    }
-
-    func saveConsentRecords(_ records: [PolicyConsentRecord]) async throws {
-        for record in records {
-            await store.saveRecord(dtoRecord(from: record))
+    public func consents() async throws -> [PolicyConsent] {
+        await store.records().map {
+            PolicyConsent(documentID: $0.documentIdentifier, version: $0.version, consentedAt: $0.acceptedAt)
         }
     }
 
-    func clearConsentRecords() async throws {
+    public func record(_ consents: [PolicyConsent]) async throws {
+        for consent in consents {
+            await store.saveRecord(PolicyConsentRecordDTO(
+                documentIdentifier: consent.documentID,
+                version: consent.version,
+                acceptedAt: consent.consentedAt,
+            ))
+        }
+    }
+
+    public func removeAll() async throws {
         await store.removeAll()
     }
 
     // MARK: Private
 
     private let store: LocalPolicyConsentStore
-
-    private func domainRecord(from dto: PolicyConsentRecordDTO) -> PolicyConsentRecord {
-        PolicyConsentRecord(
-            documentIdentifier: dto.documentIdentifier,
-            version: dto.version,
-            acceptedAt: dto.acceptedAt,
-        )
-    }
-
-    private func dtoRecord(from record: PolicyConsentRecord) -> PolicyConsentRecordDTO {
-        PolicyConsentRecordDTO(
-            documentIdentifier: record.documentIdentifier,
-            version: record.version,
-            acceptedAt: record.acceptedAt,
-        )
-    }
 
 }

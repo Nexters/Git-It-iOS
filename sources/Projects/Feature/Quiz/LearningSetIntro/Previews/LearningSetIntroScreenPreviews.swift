@@ -1,13 +1,13 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainQuizDetail
 import SwiftUI
 import UIComponent
 
-private let previewSet = LearningSet(
-    setID: "set-1",
+private let previewSet = QuizSet(
+    id: "set-1",
     title: "의존성 주입과 모듈 경계",
     description: "이 세트에서는 모듈 사이의 의존 방향과 주입 지점을 확인합니다.",
-    questions: [],
+    quizzes: [],
 )
 
 private func previewState(

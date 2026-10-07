@@ -1,29 +1,38 @@
 import ComposableArchitecture
-import DomainMember
+import DomainUserInfo
 import SwiftUI
 
 private enum SettingsPreviewFixture {
     static func profile(
         position: MemberPosition?,
         careerLevel: CareerLevel?,
-    ) -> MemberProfile {
-        MemberProfile(
-            name: "프로덕션에 푸시하는 고양이",
-            email: "kimlee@github.io",
-            position: position,
-            careerLevel: careerLevel,
-            statistics: LearningStatistics(
-                thisWeekSolvedCount: 0,
-                thisMonthSolvedCount: 0,
-                streakDays: 0,
-                weeklyCounts: [],
+    ) -> UserProfile {
+        UserProfile(
+            detail: UserDetail(
+                name: "프로덕션에 푸시하는 고양이",
+                email: "kimlee@github.io",
+                statistics: LearningStatistics(
+                    thisWeekSolvedCount: 0,
+                    thisMonthSolvedCount: 0,
+                    streakDays: 0,
+                    weeklyCounts: [],
+                ),
             ),
+            curation: Self.curation(position: position, careerLevel: careerLevel),
         )
+    }
+
+    static func curation(
+        position: MemberPosition?,
+        careerLevel: CareerLevel?,
+    ) -> Curation? {
+        guard let position, let careerLevel else { return nil }
+        return Curation(position: position, careerLevel: careerLevel)
     }
 
     @MainActor
     static func store(
-        profile: MemberProfile? = SettingsPreviewFixture.profile(position: .backend, careerLevel: .entry),
+        profile: UserProfile? = SettingsPreviewFixture.profile(position: .backend, careerLevel: .entry),
         accountAction: SettingsFeature.AccountAction = .idle,
         positionMutation: SettingsFeature.MutationStatus = .idle,
     ) -> StoreOf<SettingsFeature> {

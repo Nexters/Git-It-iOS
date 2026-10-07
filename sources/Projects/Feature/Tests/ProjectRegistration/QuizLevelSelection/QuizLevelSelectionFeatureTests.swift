@@ -1,14 +1,15 @@
-import DomainLearningProject
+import DomainProjectGeneration
 import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("QuizLevelSelectionFeature")
 struct QuizLevelSelectionFeatureTests {
 
     @Test
     func `levelSelected는 선택한 값을 반영한다`() async {
-        let store = makeQuizLevelSelectionStore()
+        let store = makeQuizLevelSelectionStore(state: QuizLevelSelectionFeature.State(quizLevel: .l3))
 
         for level in QuizLevel.allCases {
             await store.send(.view(.levelSelected(level))) {

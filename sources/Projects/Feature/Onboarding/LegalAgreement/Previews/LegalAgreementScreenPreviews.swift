@@ -29,12 +29,12 @@ private func legalAgreementPreview(_ state: LegalAgreementFeature.State) -> some
 
 #Preview("Legal Agreement - 전체 선택 · 786:38391") {
     legalAgreementPreview(
-        .preview(selectedDocumentIDs: Set(OnboardingPreviewSupport.requiredDocuments.map(\.identifier)))
+        .preview(selectedDocumentIDs: Set(OnboardingPreviewSupport.requiredDocuments.map(\.id)))
     )
 }
 
 #Preview("Legal Agreement - 약관 웹시트") {
     legalAgreementPreview(
-        .preview(presentedDocumentID: OnboardingPreviewSupport.requiredDocuments[0].identifier)
+        .preview(presentedDocumentID: OnboardingPreviewSupport.requiredDocuments[0].id)
     )
 }

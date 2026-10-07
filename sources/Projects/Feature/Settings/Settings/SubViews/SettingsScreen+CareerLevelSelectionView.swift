@@ -44,7 +44,7 @@ extension SettingsScreen {
                                 title: CareerLevelDisplay.title(for: level),
                                 supportingText: CareerLevelDisplay.description(for: level),
                                 illust: CareerLevelDisplay.illust(for: level),
-                                isSelected: store.profile?.careerLevel == level,
+                                isSelected: store.profile?.curation?.careerLevel == level,
                             )
                         },
                         onSelect: { identifier in

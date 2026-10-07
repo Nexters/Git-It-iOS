@@ -1,4 +1,5 @@
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 
 enum QuizTestFixture {
 
@@ -12,42 +13,38 @@ enum QuizTestFixture {
     static let partiallyAnsweredSet = set(answeredCount: 2)
     static let fullyAnsweredSet = set(answeredCount: 3)
 
-    static let essayOnlySet = LearningSet(
-        setID: setID,
+    static let essayOnlySet = QuizSet(
+        id: setID,
         title: "서술형 전용 세트",
         description: "서술형만 담긴 세트입니다.",
-        questions: [
-            essayQuestion(index: 0, myAnswer: nil),
-            essayQuestion(index: 1, myAnswer: nil),
+        quizzes: [
+            essayQuiz(index: 0, submitted: nil),
+            essayQuiz(index: 1, submitted: nil),
         ],
     )
 
-    static let emptySet = LearningSet(
-        setID: setID,
+    static let emptySet = QuizSet(
+        id: setID,
         title: "빈 세트",
         description: "문제가 없는 세트입니다.",
-        questions: [],
+        quizzes: [],
     )
 
-    static let questionWithoutSources = Question(
-        questionID: "question-no-source",
+    static let quizWithoutSources = Quiz(
+        id: "quiz-no-source",
         prompt: "출처가 없는 문제",
-        format: .multipleChoice,
-        choices: choices,
+        content: .choice(options: choices, submitted: nil),
         sources: [],
-        myAnswer: nil,
     )
 
-    static let questionWithManySources = Question(
-        questionID: "question-many-sources",
+    static let quizWithManySources = Quiz(
+        id: "quiz-many-sources",
         prompt: "출처가 여럿인 문제",
-        format: .multipleChoice,
-        choices: choices,
+        content: .choice(options: choices, submitted: nil),
         sources: [fileSource, referenceSource],
-        myAnswer: nil,
     )
 
-    static let fileSource = QuestionSource(
+    static let fileSource = QuizSource(
         filePath: "Sources/App/AppDelegate.swift",
         startLine: 10,
         endLine: 24,
@@ -56,7 +53,7 @@ enum QuizTestFixture {
         referenceURL: nil,
     )
 
-    static let referenceSource = QuestionSource(
+    static let referenceSource = QuizSource(
         filePath: nil,
         startLine: nil,
         endLine: nil,
@@ -65,92 +62,91 @@ enum QuizTestFixture {
         referenceURL: "https://developer.apple.com/documentation/swiftui",
     )
 
-    static let correctChoiceResult = ChoiceAnswerResult(
-        correct: true,
-        answerIndex: 1,
+    static let correctChoiceGrading = ChoiceGrading(
+        isCorrect: true,
+        correctIndex: 1,
         explanation: "두 번째 선택지가 정답입니다.",
     )
 
-    static let incorrectChoiceResult = ChoiceAnswerResult(
-        correct: false,
-        answerIndex: 2,
+    static let incorrectChoiceGrading = ChoiceGrading(
+        isCorrect: false,
+        correctIndex: 2,
         explanation: "세 번째 선택지가 정답입니다.",
     )
 
-    static let essayResult = EssayAnswerResult(
+    static let essayGrading = EssayGrading(
         explanation: "AI가 작성한 모범 답안입니다.",
-        rubric: Rubric(criteria: ["핵심 개념", "예시"]),
+        rubric: ["핵심 개념", "예시"],
     )
 
-    static let bookmarkCollection = BookmarkedQuestionCollection(
+    static let bookmarkList = QuizBookmarkList(
         totalCount: 1,
-        availableProjects: [BookmarkedProject(id: projectID, name: "owner/repo")],
-        bookmarks: [bookmarkedQuestion(index: 0)],
+        projects: [QuizBookmarkProject(id: projectID, name: "owner/repo")],
+        bookmarks: [bookmark(index: 0)],
     )
 
-    static func choiceQuestion(
+    static func choiceQuiz(
         index: Int,
-        myAnswer: SubmittedAnswer?,
-    ) -> Question {
-        Question(
-            questionID: "question-\(index)",
+        submitted: ChoiceSubmission?,
+    ) -> Quiz {
+        Quiz(
+            id: "quiz-\(index)",
             prompt: "객관식 문제 \(index)",
-            format: .multipleChoice,
-            choices: choices,
+            content: .choice(options: choices, submitted: submitted),
             sources: [fileSource],
-            myAnswer: myAnswer,
         )
     }
 
-    static func essayQuestion(
+    static func essayQuiz(
         index: Int,
-        myAnswer: SubmittedAnswer?,
-    ) -> Question {
-        Question(
-            questionID: "question-\(index)",
+        submitted: EssaySubmission?,
+    ) -> Quiz {
+        Quiz(
+            id: "quiz-\(index)",
             prompt: "서술형 문제 \(index)",
-            format: .essay,
-            choices: nil,
+            content: .essay(submitted: submitted),
             sources: [fileSource, referenceSource],
-            myAnswer: myAnswer,
         )
     }
 
-    static func bookmarkedQuestion(
+    static func bookmark(
         index: Int,
-        projectID: String = QuizTestFixture.projectID,
-        setID: String = QuizTestFixture.setID,
-    ) -> BookmarkedQuestion {
-        BookmarkedQuestion(
+        projectID: ProjectID = QuizTestFixture.projectID,
+        setID: QuizSetID = QuizTestFixture.setID,
+    ) -> QuizBookmark {
+        QuizBookmark(
             projectID: projectID,
+            projectName: "owner/repo",
             setID: setID,
-            questionID: "question-\(index)",
+            setLabel: setLabel,
+            problemNumber: index + 1,
+            quizID: "quiz-\(index)",
             prompt: "저장한 문제 \(index)",
         )
     }
 
-    static func set(answeredCount: Int) -> LearningSet {
-        LearningSet(
-            setID: setID,
+    static func set(answeredCount: Int) -> QuizSet {
+        QuizSet(
+            id: setID,
             title: "학습 세트",
             description: "세트 설명입니다.",
-            questions: [
-                choiceQuestion(
+            quizzes: [
+                choiceQuiz(
                     index: 0,
-                    myAnswer: answeredCount > 0
-                        ? SubmittedAnswer(selectedIndex: 1, text: nil, correct: true)
+                    submitted: answeredCount > 0
+                        ? ChoiceSubmission(selectedIndex: 1, isCorrect: true)
                         : nil,
                 ),
-                choiceQuestion(
+                choiceQuiz(
                     index: 1,
-                    myAnswer: answeredCount > 1
-                        ? SubmittedAnswer(selectedIndex: 0, text: nil, correct: false)
+                    submitted: answeredCount > 1
+                        ? ChoiceSubmission(selectedIndex: 0, isCorrect: false)
                         : nil,
                 ),
-                essayQuestion(
+                essayQuiz(
                     index: 2,
-                    myAnswer: answeredCount > 2
-                        ? SubmittedAnswer(selectedIndex: nil, text: "제출한 답안", correct: nil)
+                    submitted: answeredCount > 2
+                        ? EssaySubmission(text: "제출한 답안")
                         : nil,
                 ),
             ],

@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainMember
+import DomainUserInfo
 import SwiftUI
 
 extension CareerSelectionFeature.State {

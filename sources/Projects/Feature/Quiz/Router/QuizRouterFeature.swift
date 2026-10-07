@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainIdentifier
+import DomainQuizDetail
 import Foundation
 
 // MARK: - QuizRouterFeature
@@ -9,16 +10,8 @@ public struct QuizRouterFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(
-        learningLibrary: any LearningLibraryUseCase,
-        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
-        submitEssayAnswer: any SubmitEssayAnswerUseCase,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
-    ) {
-        self.learningLibrary = learningLibrary
-        self.submitChoiceAnswer = submitChoiceAnswer
-        self.submitEssayAnswer = submitEssayAnswer
-        self.setQuestionBookmark = setQuestionBookmark
+    public init(quizDetail: any QuizDetailUseCase) {
+        self.quizDetail = quizDetail
     }
 
     // MARK: Public
@@ -62,8 +55,8 @@ public struct QuizRouterFeature: Sendable {
         // MARK: Lifecycle
 
         public init(
-            projectID: String,
-            setID: String,
+            projectID: ProjectID,
+            setID: QuizSetID,
             setLabel: String,
             autoStartsLearning: Bool = false,
         ) {
@@ -81,8 +74,8 @@ public struct QuizRouterFeature: Sendable {
 
         // MARK: Public
 
-        public let projectID: String
-        public let setID: String
+        public let projectID: ProjectID
+        public let setID: QuizSetID
         public let setLabel: String
 
         public var activeScreen = ActiveScreen.learningSetIntro
@@ -92,11 +85,11 @@ public struct QuizRouterFeature: Sendable {
         public var questionSolving: QuestionSolvingFeature.State?
         public var learningCompletion: LearningCompletionFeature.State
 
-        public internal(set) var learningSet: LearningSet?
+        public internal(set) var learningSet: QuizSet?
         public internal(set) var currentQuestionIndex = 0
         public internal(set) var resumption: LearningSetResumption?
         public internal(set) var sessionCorrectChoiceCount = 0
-        public internal(set) var bookmarkedQuestionIDs = Set<String>()
+        public internal(set) var bookmarkedQuestionIDs = Set<QuizID>()
 
     }
 
@@ -111,8 +104,7 @@ public struct QuizRouterFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case externalURLRequested(URL)
-            case progressInvalidated(projectID: String)
-            case dismissRequested(projectID: String)
+            case dismissRequested(projectID: ProjectID)
         }
     }
 
@@ -122,8 +114,10 @@ public struct QuizRouterFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Scope(state: \.learningSetIntro, action: \.learningSetIntro) {
             LearningSetIntroFeature(
-                fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(projectID: $0, setID: $1) },
-                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
+                fetchQuizSet: { [quizDetail] setID, projectID in
+                    try await quizDetail.quizSet(setID, in: projectID)
+                },
+                fetchBookmarks: { [quizDetail] filter in try await quizDetail.bookmarks(filter) },
             )
         }
         Scope(state: \.learningCompletion, action: \.learningCompletion) {
@@ -140,7 +134,7 @@ public struct QuizRouterFeature: Sendable {
                     return activate(.questionSolving, cause: .startRequested, state: &state)
                 }
 
-                guard set.questions.indices.contains(resumption.startIndex) else {
+                guard set.quizzes.indices.contains(resumption.startIndex) else {
                     return .send(.learningSetIntro(.input(.emptySetReported)))
                 }
 
@@ -159,11 +153,11 @@ public struct QuizRouterFeature: Sendable {
                 if choiceCorrect == true {
                     state.sessionCorrectChoiceCount += 1
                 }
-                return .send(.delegate(.progressInvalidated(projectID: state.projectID)))
+                return .none
 
             case .questionSolving(.delegate(.advanceRequested)):
                 let nextIndex = state.currentQuestionIndex + 1
-                guard let set = state.learningSet, set.questions.indices.contains(nextIndex) else {
+                guard let set = state.learningSet, set.quizzes.indices.contains(nextIndex) else {
                     let resumption = state.resumption
                     state.learningCompletion.choiceQuestionCount = resumption?.choiceQuestionCount ?? 0
                     state.learningCompletion.correctChoiceCount =
@@ -190,34 +184,35 @@ public struct QuizRouterFeature: Sendable {
         }
         .ifLet(\.questionSolving, action: \.questionSolving) {
             QuestionSolvingFeature(
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
+                gradeChoiceAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
+                gradeEssayAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
+                setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
+                    isBookmarked
+                        ? try await quizDetail.bookmark(quizID, in: projectID)
+                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                },
             )
         }
     }
 
     // MARK: Private
 
-    private let learningLibrary: any LearningLibraryUseCase
-    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
+    private let quizDetail: any QuizDetailUseCase
 
     private func questionSolvingState(state: State) -> QuestionSolvingFeature.State? {
         guard
             let set = state.learningSet,
-            set.questions.indices.contains(state.currentQuestionIndex)
+            set.quizzes.indices.contains(state.currentQuestionIndex)
         else { return nil }
 
-        let question = set.questions[state.currentQuestionIndex]
-        let isLastQuestion = state.currentQuestionIndex == set.questions.count - 1
+        let quiz = set.quizzes[state.currentQuestionIndex]
+        let isLastQuestion = state.currentQuestionIndex == set.quizzes.count - 1
         return QuestionSolvingFeature.State(
             projectID: state.projectID,
-            question: question,
+            question: quiz,
             questionNumber: state.currentQuestionIndex + 1,
             advanceActionTitle: isLastQuestion ? Self.completeActionTitle : Self.nextQuestionActionTitle,
-            isBookmarked: state.bookmarkedQuestionIDs.contains(question.questionID),
+            isBookmarked: state.bookmarkedQuestionIDs.contains(quiz.id),
         )
     }
 

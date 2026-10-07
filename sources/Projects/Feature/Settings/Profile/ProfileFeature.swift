@@ -1,13 +1,13 @@
 import ComposableArchitecture
-import DomainMember
+import DomainUserInfo
 
 @Reducer
 public struct ProfileFeature: Sendable {
 
     // MARK: Lifecycle
 
-    public init(fetchMemberProfile: @escaping @Sendable () async throws -> MemberProfile) {
-        self.fetchMemberProfile = fetchMemberProfile
+    public init(profile: @escaping @Sendable () async throws -> UserProfile) {
+        self.profile = profile
     }
 
     // MARK: Public
@@ -24,8 +24,8 @@ public struct ProfileFeature: Sendable {
         public enum ProfileLoad: Equatable, Sendable {
             case idle
             case loading
-            case loaded(MemberProfile)
-            case failed(MemberError)
+            case loaded(UserProfile)
+            case failed(UserInfoError)
         }
 
         public var profileLoad = ProfileLoad.idle
@@ -49,7 +49,7 @@ public struct ProfileFeature: Sendable {
 
         @CasePathable
         public enum EffectEvent: Equatable, Sendable {
-            case profileLoadFinished(requestID: Int, result: Result<MemberProfile, MemberError>)
+            case profileLoadFinished(requestID: Int, result: Result<UserProfile, UserInfoError>)
         }
 
         @CasePathable
@@ -107,7 +107,7 @@ public struct ProfileFeature: Sendable {
         case profile
     }
 
-    private let fetchMemberProfile: @Sendable () async throws -> MemberProfile
+    private let profile: @Sendable () async throws -> UserProfile
 
     private func startProfileLoad(
         state: inout State,
@@ -118,15 +118,15 @@ public struct ProfileFeature: Sendable {
             state.profileLoad = .loading
         }
         let requestID = state.profileRequestID
-        let fetchMemberProfile = fetchMemberProfile
+        let profile = profile
 
         return .run { send in
             do {
                 await send(.effect(.profileLoadFinished(
                     requestID: requestID,
-                    result: .success(try await fetchMemberProfile()),
+                    result: .success(try await profile()),
                 )))
-            } catch let error as MemberError {
+            } catch let error as UserInfoError {
                 await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(error))))
             } catch {
                 await send(.effect(.profileLoadFinished(

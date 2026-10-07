@@ -1,34 +1,34 @@
-import InfrastructureStorage
+import DataShared
 
 public struct LocalPolicyConsentStore: Sendable {
 
     // MARK: Lifecycle
 
-    public init(store: UserDefaultsStore<[PolicyConsentRecordDTO]>) {
-        self.store = store
+    public init(storage: any KeyValueStorage) {
+        self.storage = storage
     }
 
     // MARK: Public
 
     public func records() async -> [PolicyConsentRecordDTO] {
-        await store.value(forKey: Self.recordsKey) ?? []
+        await storage.value([PolicyConsentRecordDTO].self, forKey: Self.recordsKey) ?? []
     }
 
     public func saveRecord(_ record: PolicyConsentRecordDTO) async {
         var current = await records()
         current.removeAll { $0.documentIdentifier == record.documentIdentifier }
         current.append(record)
-        await store.store(current, forKey: Self.recordsKey)
+        await storage.setValue(current, forKey: Self.recordsKey)
     }
 
     public func removeAll() async {
-        await store.removeAll()
+        await storage.removeAllValues()
     }
 
     // MARK: Private
 
     private static let recordsKey = "records"
 
-    private let store: UserDefaultsStore<[PolicyConsentRecordDTO]>
+    private let storage: any KeyValueStorage
 
 }

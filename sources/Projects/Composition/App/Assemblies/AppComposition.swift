@@ -1,13 +1,16 @@
 import CompositionAuthentication
-import CompositionLearningProject
-import CompositionMember
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DataAuthentication
+import DataLearningProject
+import DataNotification
+import DataShared
+import DomainAccount
+import DomainAppSetting
+import DomainExternalRepository
+import DomainProject
+import DomainProjectGeneration
+import DomainQuizDetail
+import DomainUserInfo
 import Foundation
-import InfrastructureAuthentication
-import InfrastructureNetworkClient
-import InfrastructurePushMessaging
 import Synchronization
 
 // MARK: - AppComposition
@@ -18,66 +21,38 @@ public struct AppComposition: Sendable {
 
     private init(
         authentication: AuthenticationAssembly,
-        learningProject: LearningProjectAssembly,
-        member: MemberAssembly,
-        externalRepository: ExternalRepositoryAssembly,
-        generationReminder: GenerationReminderAssembly,
-        keychainStore: KeychainStore,
-        appVersion: String,
-        osVersion: String,
+        makeConcerns: (PushQuizGenerationOutcomeSource, @escaping @Sendable () async throws -> DeviceToken)
+            -> ConcernUseCaseAssembly,
     ) {
-        signIn = authentication.signIn
-        signOut = authentication.signOut
-        restoreSession = authentication.restoreSession
-        verifyAuthorization = authentication.verifyAuthorization
-        refreshSession = authentication.refreshSession
-        policyConsent = authentication.policyConsent
-        memberAccount = member.memberAccount
-
-        fetchLearningProjects = learningProject.fetchLearningProjects
-        learningLibrary = learningProject.learningLibrary
-        createLearningProject = learningProject.createLearningProject
-        submitChoiceAnswer = learningProject.submitChoiceAnswer
-        submitEssayAnswer = learningProject.submitEssayAnswer
-        setQuestionBookmark = learningProject.setQuestionBookmark
-        trackGeneration = learningProject.trackGeneration
-
-        deleteMemberAccount = member.deleteMemberAccount
-
-        fetchExternalRepository = externalRepository.fetchExternalRepository
-
-        requestGenerationReminder = generationReminder.requestGenerationReminder
-
         let pushClientBox = PushClientBox()
+        let deviceToken: @Sendable () async throws -> DeviceToken = {
+            guard let pushClient = pushClientBox.client else {
+                throw PushBootstrapError.notBootstrapped
+            }
+            return try await pushClient.registrationToken()
+        }
+        let generationOutcomeSource = PushQuizGenerationOutcomeSource()
+        let concerns = makeConcerns(generationOutcomeSource, deviceToken)
+        account = concerns.account
+        userInfo = concerns.userInfo
+        appSetting = concerns.appSetting
+        externalRepository = concerns.externalRepository
+        quizDetail = concerns.quizDetail
+        project = concerns.project
+        projectGeneration = concerns.projectGeneration
+
         let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void = { rawPayload in
-            await learningProject.ingestGenerationOutcomePayload(rawPayload)
+            await generationOutcomeSource.ingest(rawPayload: rawPayload)
         }
         self.ingestGenerationOutcomePayload = ingestGenerationOutcomePayload
-        let pushNotificationCallbacks = PushNotificationCallbacks(
-            forwardAPNsToken: { token in pushClientBox.client?.setAPNsToken(token) },
-            ingestGenerationOutcomePayload: ingestGenerationOutcomePayload,
+        let notificationAppCallbacks = NotificationAppCallbacks(
+            forwardDeviceToken: { token in pushClientBox.client?.setDeviceToken(token) },
+            ingestRemoteMessagePayload: ingestGenerationOutcomePayload,
         )
 
-        let trackGeneration = learningProject.trackGeneration
-        let startObservingGenerationState = generationReminder.startObservingGenerationState
         recordSharedSessionState = authentication.recordSharedSessionState
         activatePushClient = { pushClientBox.activate() }
-        configureAppDelegate = { appDelegate in appDelegate.configure(pushNotificationCallbacks) }
-        self.startObservingGenerationState = {
-            await startObservingGenerationState(trackGeneration)
-        }
-
-        registerCurrentDevice = member.makeRegisterCurrentDevice(
-            keychainStore: keychainStore,
-            appVersion: appVersion,
-            osVersion: osVersion,
-            deviceTokenProvider: {
-                guard let pushClient = pushClientBox.client else {
-                    throw PushBootstrapError.notBootstrapped
-                }
-                return try await pushClient.registrationToken()
-            },
-        )
+        configureAppDelegate = { appDelegate in appDelegate.configure(notificationAppCallbacks) }
 
         deviceTokenRefreshes = {
             guard let pushClient = pushClientBox.client else {
@@ -100,6 +75,8 @@ public struct AppComposition: Sendable {
             osVersion: String,
             generationReminderTitle: String,
             generationReminderBody: String,
+            generationFailureReminderTitle: String,
+            generationFailureReminderBody: String,
             policyDocuments: [PolicyDocument] = [],
         ) {
             self.apiBaseURL = apiBaseURL
@@ -108,6 +85,8 @@ public struct AppComposition: Sendable {
             self.osVersion = osVersion
             self.generationReminderTitle = generationReminderTitle
             self.generationReminderBody = generationReminderBody
+            self.generationFailureReminderTitle = generationFailureReminderTitle
+            self.generationFailureReminderBody = generationFailureReminderBody
             self.policyDocuments = policyDocuments
         }
 
@@ -119,90 +98,61 @@ public struct AppComposition: Sendable {
         public let osVersion: String
         public let generationReminderTitle: String
         public let generationReminderBody: String
+        public let generationFailureReminderTitle: String
+        public let generationFailureReminderBody: String
         public let policyDocuments: [PolicyDocument]
 
     }
 
-    public let signIn: any SignInUseCase
-    public let signOut: any SignOutUseCase
-    public let restoreSession: any RestoreSessionUseCase
-    public let verifyAuthorization: any VerifyAuthorizationUseCase
-    public let refreshSession: any RefreshSessionUseCase
-    public let policyConsent: any PolicyConsentUseCase
-    public let memberAccount: any MemberAccountUseCase
-
-    public let fetchLearningProjects: any FetchLearningProjectsUseCase
-    public let learningLibrary: any LearningLibraryUseCase
-    public let createLearningProject: any CreateLearningProjectUseCase
-    public let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    public let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    public let setQuestionBookmark: any SetQuestionBookmarkUseCase
-
-    public let deleteMemberAccount: any DeleteMemberAccountUseCase
-
-    public let fetchExternalRepository: any FetchExternalRepositoryUseCase
-
-    public let requestGenerationReminder: any RequestGenerationReminderUseCase
-    public let trackGeneration: any TrackGenerationUseCase
+    public let account: any AccountUseCase
+    public let userInfo: any UserInfoUseCase
+    public let appSetting: any AppSettingUseCase
+    public let quizDetail: any QuizDetailUseCase
+    public let project: any ProjectUseCase
+    public let projectGeneration: any ProjectGenerationUseCase
+    public let externalRepository: any ExternalRepositoryUseCase
 
     public let recordSharedSessionState: @Sendable () async -> Void
     public let activatePushClient: @Sendable () -> Void
     public let configureAppDelegate: @MainActor @Sendable (PushNotificationAppDelegate) -> Void
-    public let startObservingGenerationState: @Sendable () async -> Void
 
-    public let registerCurrentDevice: @Sendable () async throws -> Void
     public let deviceTokenRefreshes: @Sendable () -> AsyncStream<String>
     public let ingestGenerationOutcomePayload: @Sendable ([String: String]) async -> Void
 
     public static func live(
         _ environment: Environment,
-        keychainStore: KeychainStore = AppGroupKeychainStore.makeShared(),
-        transport: (any HTTPTransport)? = nil,
+        secureStorage: (any SecureValueStorage)? = nil,
+        transport: (any RequestTransport)? = nil,
     ) -> AppComposition {
-        AuthenticationAssembly.migrateSessionKeychain(sharedKeychainStore: keychainStore)
-
-        let authentication = AuthenticationAssembly(
-            baseURL: environment.apiBaseURL,
-            policyDocuments: environment.policyDocuments,
-            keychainStore: keychainStore,
-            transport: transport,
-        )
-        let accessTokenProvider = authentication.accessTokenProvider
-        let learningProject = LearningProjectAssembly(
-            baseURL: environment.apiBaseURL,
-            accessTokenProvider: accessTokenProvider,
-            transport: transport,
-        )
-        let member = MemberAssembly(
-            baseURL: environment.apiBaseURL,
-            loginSessionRepository: authentication.loginSessionRepository,
-            accessTokenProvider: accessTokenProvider,
-            clearLocalStateAfterAccountDeletion: {
-                let trackGeneration = learningProject.trackGeneration
-                for record in await trackGeneration.current().records {
-                    await trackGeneration.end(githubRepoURL: record.githubRepoURL)
-                }
-            },
-            transport: transport,
-            responseTimeout: memberResponseTimeout,
-        )
-        let externalRepository = ExternalRepositoryAssembly(
-            baseURL: environment.externalRepositoryBaseURL,
-            transport: transport,
-        )
+        let authentication = AuthenticationAssembly(secureStorage: secureStorage)
 
         return AppComposition(
             authentication: authentication,
-            learningProject: learningProject,
-            member: member,
-            externalRepository: externalRepository,
-            generationReminder: GenerationReminderAssembly(
-                reminderTitle: environment.generationReminderTitle,
-                reminderBody: environment.generationReminderBody,
-            ),
-            keychainStore: keychainStore,
-            appVersion: environment.appVersion,
-            osVersion: environment.osVersion,
+            makeConcerns: { generationOutcomeSource, deviceToken in
+                ConcernUseCaseAssembly(
+                    apiBaseURL: environment.apiBaseURL,
+                    externalRepositoryBaseURL: environment.externalRepositoryBaseURL,
+                    policyDocuments: environment.policyDocuments,
+                    appVersion: environment.appVersion,
+                    osVersion: environment.osVersion,
+                    generationReminder: ConcernUseCaseAssembly.GenerationReminderContent(
+                        completedTitle: environment.generationReminderTitle,
+                        completedBody: environment.generationReminderBody,
+                        failedTitle: environment.generationFailureReminderTitle,
+                        failedBody: environment.generationFailureReminderBody,
+                    ),
+                    requestCredentialProvider: authentication.requestCredentialProvider,
+                    secureStorage: secureStorage,
+                    sharedStorage: StorageFactory.keyValueStorage(
+                        namespace: SessionStorageLayout.sharedSessionNamespace,
+                        location: .appGroup,
+                    ),
+                    generationOutcomeSource: generationOutcomeSource,
+                    transport: transport,
+                    memberResponseTimeout: memberResponseTimeout,
+                    deviceToken: deviceToken,
+                )
+            },
         )
     }
 
@@ -212,20 +162,20 @@ public struct AppComposition: Sendable {
 
         // MARK: Internal
 
-        var client: (any PushMessagingClient)? {
+        var client: (any RemoteMessageReceiver)? {
             storage.withLock { $0 }
         }
 
         func activate() {
             storage.withLock { client in
                 guard client == nil else { return }
-                client = PushMessagingClientFactory.make()
+                client = NotificationFactory.remoteMessageReceiver()
             }
         }
 
         // MARK: Private
 
-        private let storage = Mutex<(any PushMessagingClient)?>(nil)
+        private let storage = Mutex<(any RemoteMessageReceiver)?>(nil)
 
     }
 

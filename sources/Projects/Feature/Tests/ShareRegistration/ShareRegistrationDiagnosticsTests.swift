@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainAccount
+import DomainExternalRepository
 import Foundation
 import Synchronization
 import Testing
@@ -42,14 +43,14 @@ struct ShareRegistrationDiagnosticsTests {
     @Test
     func `세션 판정 결과를 토큰 없이 남긴다`() async {
         let recorder = Recorder()
-        let store = Self.makeStore(session: .appLaunchRequired, recorder: recorder)
+        let store = Self.makeStore(availability: .appLaunchRequired, recorder: recorder)
 
         await store.send(.view(.task))
         await store.receive(\.effect.validationFinished) {
             $0.status = .appLaunchRequired
         }
 
-        #expect(recorder.events == [.sessionResolved(.appLaunchRequired)])
+        #expect(recorder.events == [.signInAvailabilityResolved(.appLaunchRequired)])
     }
 
     @Test
@@ -64,7 +65,7 @@ struct ShareRegistrationDiagnosticsTests {
         await store.send(.view(.task))
         await store.skipReceivedActions()
 
-        #expect(recorder.events.contains(.sessionResolved(.available)))
+        #expect(recorder.events.contains(.signInAvailabilityResolved(.signedIn)))
         #expect(recorder.events.contains { event in
             if case .repositoryLookupFailed = event {
                 return true
@@ -116,16 +117,16 @@ struct ShareRegistrationDiagnosticsTests {
     private static func makeStore(
         sharedURL: String? = ShareRegistrationTestSupport.sharedURL,
         location: ExternalRepositoryLocation? = ShareRegistrationTestSupport.location,
-        session: ShareRegistrationSessionState = .available,
+        availability: SignInAvailability = .signedIn,
         lookupResult: Result<ExternalRepository, any Error> = .success(ShareRegistrationTestSupport.repository),
         recorder: Recorder,
     ) -> TestStoreOf<ShareRegistrationFeature> {
         TestStore(initialState: ShareRegistrationFeature.State(sharedURL: sharedURL)) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: location),
-                fetchExternalRepository: StubFetchExternalRepository(result: lookupResult),
-                createLearningProject: SpyCreateLearningProject(),
-                resolveSession: { session },
+                externalRepository: ExternalRepositoryUseCaseFixedResultStub(result: lookupResult),
+                projectGeneration: ProjectGenerationUseCaseSpy(),
+                signInAvailability: { availability },
                 recordDiagnostic: { recorder.record($0) },
             )
         }

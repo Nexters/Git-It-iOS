@@ -1,10 +1,8 @@
-import CompositionShared
+import DataAuthentication
 import DataMember
-import DomainAuthentication
-import DomainMember
+import DataShared
+import DomainUserInfo
 import Foundation
-import InfrastructureAuthentication
-import InfrastructureNetworkClient
 
 // MARK: - MemberAssembly
 
@@ -14,52 +12,32 @@ public struct MemberAssembly: Sendable {
 
     public init(
         baseURL: URL,
-        loginSessionRepository: any LoginSessionRepository,
-        accessTokenProvider: @escaping @Sendable () async -> String?,
-        clearLocalStateAfterAccountDeletion: @escaping @Sendable () async -> Void = { },
-        transport: (any HTTPTransport)? = nil,
-        responseTimeout: Duration = HTTPClient.defaultResponseTimeout,
+        credential: @escaping @Sendable () async -> RequestCredential,
+        credentialRejected: @escaping @Sendable () async -> Void,
+        secureStorage: (any SecureValueStorage)? = nil,
+        transport: (any RequestTransport)? = nil,
+        responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
     ) {
-        let client = makeHTTPClient(baseURL: baseURL, responseTimeout: responseTimeout, transport: transport)
-        let baseRepository = MemberRepositoryAdapter(
-            remote: HTTPMemberRemote(client: client, accessTokenProvider: accessTokenProvider)
+        let sessionStorage = secureStorage ?? StorageFactory.secureValueStorage(
+            namespace: SessionStorageLayout.namespace,
+            location: .appGroup,
         )
-        let repository = CurationRepositoryAdapter(
-            remote: baseRepository,
-            loginSessionRepository: loginSessionRepository,
-        )
-
-        memberAccount = MemberAccount(repository: repository)
-        self.repository = repository
-        deleteMemberAccount = DeleteMemberAccount(
-            repository: repository,
-            clearLocalState: clearLocalStateAfterAccountDeletion,
+        userInfo = UserInfo(
+            repository: UserInfoRepositoryAdapter(
+                remote: MemberRemote(
+                    baseURL: baseURL,
+                    transport: transport,
+                    responseTimeout: responseTimeout,
+                    credential: credential,
+                    credentialRejected: credentialRejected,
+                ),
+                sessionStorage: sessionStorage,
+            )
         )
     }
 
     // MARK: Public
 
-    public let memberAccount: any MemberAccountUseCase
-    public let deleteMemberAccount: any DeleteMemberAccountUseCase
-
-    public func makeRegisterCurrentDevice(
-        keychainStore: KeychainStore,
-        appVersion: String,
-        osVersion: String,
-        deviceTokenProvider: @escaping @Sendable () async throws -> String,
-    ) -> @Sendable () async throws -> Void {
-        let registerCurrentDevice = RegisterCurrentDevice(
-            repository: repository,
-            deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(keychainStore: keychainStore),
-            appVersion: appVersion,
-            osVersion: osVersion,
-            deviceTokenProvider: deviceTokenProvider,
-        )
-        return { try await registerCurrentDevice() }
-    }
-
-    // MARK: Private
-
-    private let repository: any MemberRepository
+    public let userInfo: any UserInfoUseCase
 
 }

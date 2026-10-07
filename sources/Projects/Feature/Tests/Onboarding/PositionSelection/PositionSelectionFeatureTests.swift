@@ -1,9 +1,10 @@
-import DomainAuthentication
-import DomainMember
+import DomainAccount
+import DomainUserInfo
 import Testing
 
 @testable import Feature
 
+@MainActor
 @Suite("PositionSelectionFeature")
 struct PositionSelectionFeatureTests {
 
@@ -39,13 +40,13 @@ struct PositionSelectionFeatureTests {
     func `뒤로 가기는 sign-out 성공 시 exitRequested를 위임한다`() async {
         var state = PositionSelectionFeature.State()
         state.position = .ios
-        let signOut = SignOutUseCaseMock(results: [.success])
+        let signOut = AccountUseCaseSignOutMock(results: [.signedOut])
         let store = makePositionSelectionStore(signOut: signOut, state: state)
 
         await store.send(.view(.backTapped)) {
             $0.exitStatus = .inProgress
         }
-        await store.receive(.effect(.signOutFinished(.success))) {
+        await store.receive(.effect(.signOutFinished(.signedOut))) {
             $0.exitStatus = .idle
         }
         await store.receive(.delegate(.exitRequested))
@@ -55,7 +56,7 @@ struct PositionSelectionFeatureTests {
 
     @Test
     func `뒤로 가기는 sign-out 실패 시 오류를 유지하고 재시도할 수 있다`() async {
-        let signOut = SignOutUseCaseMock(results: [.retryableFailure, .success])
+        let signOut = AccountUseCaseSignOutMock(results: [.retryableFailure, .signedOut])
         let store = makePositionSelectionStore(signOut: signOut)
 
         await store.send(.view(.backTapped)) {
@@ -68,7 +69,7 @@ struct PositionSelectionFeatureTests {
         await store.send(.view(.backTapped)) {
             $0.exitStatus = .inProgress
         }
-        await store.receive(.effect(.signOutFinished(.success))) {
+        await store.receive(.effect(.signOutFinished(.signedOut))) {
             $0.exitStatus = .idle
         }
         await store.receive(.delegate(.exitRequested))

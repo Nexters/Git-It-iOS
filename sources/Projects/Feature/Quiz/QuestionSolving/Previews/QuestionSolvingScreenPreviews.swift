@@ -1,10 +1,10 @@
 import ComposableArchitecture
-import DomainLearningProject
+import DomainQuizDetail
 import SwiftUI
 import UIComponent
 
 private let previewSources = [
-    QuestionSource(
+    QuizSource(
         filePath: "Sources/App/Composition/AppComposition.swift",
         startLine: 42,
         endLine: 60,
@@ -12,7 +12,7 @@ private let previewSources = [
         summary: "의존성을 조립하는 지점입니다.",
         referenceURL: nil,
     ),
-    QuestionSource(
+    QuizSource(
         filePath: nil,
         startLine: nil,
         endLine: nil,
@@ -22,31 +22,30 @@ private let previewSources = [
     ),
 ]
 
-private let choiceQuestion = Question(
-    questionID: "question-1",
+private let choiceQuestion = Quiz(
+    id: "question-1",
     prompt: "Composition 패키지가 Domain에 의존해도 되는 이유는 무엇인가?",
-    format: .multipleChoice,
-    choices: [
-        "Domain이 다른 패키지에 의존하지 않기 때문",
-        "Composition이 앱 진입점이기 때문",
-        "Domain이 UI를 포함하기 때문",
-        "의존 방향에 제약이 없기 때문",
-    ],
+    content: .choice(
+        options: [
+            "Domain이 다른 패키지에 의존하지 않기 때문",
+            "Composition이 앱 진입점이기 때문",
+            "Domain이 UI를 포함하기 때문",
+            "의존 방향에 제약이 없기 때문",
+        ],
+        submitted: nil,
+    ),
     sources: previewSources,
-    myAnswer: nil,
 )
 
-private let essayQuestion = Question(
-    questionID: "question-2",
+private let essayQuestion = Quiz(
+    id: "question-2",
     prompt: "생성자 주입이 Service Locator보다 나은 점을 설명하세요.",
-    format: .essay,
-    choices: nil,
+    content: .essay(submitted: nil),
     sources: previewSources,
-    myAnswer: nil,
 )
 
 private func previewState(
-    question: Question = choiceQuestion,
+    question: Quiz = choiceQuestion,
     questionNumber: Int? = 3,
     advanceActionTitle: String = "다음 문제",
     submission: QuestionSolvingFeature.Submission = .editing,
@@ -71,21 +70,21 @@ private func previewStore(_ state: QuestionSolvingFeature.State) -> StoreOf<Ques
     Store(initialState: state) { EmptyReducer() }
 }
 
-private let correctResult = ChoiceAnswerResult(
-    correct: true,
-    answerIndex: 0,
+private let correctGrading = ChoiceGrading(
+    isCorrect: true,
+    correctIndex: 0,
     explanation: "Domain은 다른 패키지에 의존하지 않으므로 조립 계층이 참조할 수 있습니다.",
 )
 
-private let incorrectResult = ChoiceAnswerResult(
-    correct: false,
-    answerIndex: 0,
+private let incorrectGrading = ChoiceGrading(
+    isCorrect: false,
+    correctIndex: 0,
     explanation: "Domain은 다른 패키지에 의존하지 않으므로 조립 계층이 참조할 수 있습니다.",
 )
 
-private let essayResult = EssayAnswerResult(
+private let essayGrading = EssayGrading(
     explanation: "생성자 주입은 의존성을 타입 시그니처로 드러내 테스트 대체를 쉽게 만듭니다.",
-    rubric: Rubric(criteria: ["의존성 노출 여부를 설명했습니다", "테스트 대체 용이성을 언급했습니다"]),
+    rubric: ["의존성 노출 여부를 설명했습니다", "테스트 대체 용이성을 언급했습니다"],
 )
 
 #Preview("문제 풀이 · 미선택 · s03") {
@@ -121,7 +120,7 @@ private let essayResult = EssayAnswerResult(
 #Preview("문제 풀이 · 정답 · s08") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(submission: .answered(.choice(correctResult)), draftChoiceIndex: 0)
+            previewState(submission: .answered(.choice(correctGrading)), draftChoiceIndex: 0)
         )
     )
 }
@@ -129,7 +128,7 @@ private let essayResult = EssayAnswerResult(
 #Preview("문제 풀이 · 오답 · s09") {
     QuestionSolvingScreen(
         store: previewStore(
-            previewState(submission: .answered(.choice(incorrectResult)), draftChoiceIndex: 2)
+            previewState(submission: .answered(.choice(incorrectGrading)), draftChoiceIndex: 2)
         )
     )
 }
@@ -156,7 +155,7 @@ private let essayResult = EssayAnswerResult(
         store: previewStore(
             previewState(
                 question: essayQuestion,
-                submission: .answered(.essay(essayResult)),
+                submission: .answered(.essay(essayGrading)),
                 draftEssayText: "생성자 주입은 필요한 의존성을 타입 시그니처에 드러냅니다.",
             )
         )

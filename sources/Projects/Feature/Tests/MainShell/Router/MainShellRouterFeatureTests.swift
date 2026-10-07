@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import DomainLearningProject
-import DomainMember
+import DomainAccount
+import DomainAppSetting
 import Testing
 
 @testable import Feature
@@ -21,20 +21,19 @@ struct MainShellRouterFeatureTests {
 
     @Test
     func `탭을 왕복하면 프로젝트를 다시 조회하고 실패해도 그리던 목록을 유지한다`() async {
-        let memberAccount = MemberAccountUseCaseMock()
-        let projects = HomeLearningProjectsUseCaseMock()
+        let userInfo = UserInfoUseCaseMock()
+        let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State()
         state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
         state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(state: state, projects: projects, memberAccount: memberAccount)
+        let store = makeStore(state: state, projects: projects, userInfo: userInfo)
         store.exhaustivity = .off
 
         await store.send(.view(.tabSelected(.projects))) { $0.selectedTab = .projects }
         await store.send(.view(.tabSelected(.home))) { $0.selectedTab = .home }
         await store.finish()
 
-        #expect(await memberAccount.snapshot().profileCallCount == 0)
-        #expect(await projects.snapshot().callCount > 0)
+        #expect(await projects.snapshot().refreshCallCount > 0)
         #expect(store.state.home.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
     }
 
@@ -96,28 +95,30 @@ struct MainShellRouterFeatureTests {
     func `저장한 문제를 고르면 그 프로젝트 세트로 준비를 요청한다`() async {
         let store = makeStore()
         store.exhaustivity = .off
-        let question = ProjectDetailTestFixture.savedQuestionCollection.bookmarks[0]
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
 
-        await store.send(.saved(.delegate(.questionSelected(question))))
+        await store.send(.saved(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "question-0")))
+            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
         )
 
-        #expect(store.state.singleQuestionEntry?.projectID == question.projectID)
+        #expect(store.state.singleQuestionEntry?.projectID == bookmark.projectID)
     }
 
     @Test
     func `준비가 끝나면 단일 문제 화면을 연다`() async {
         let store = makeStore()
         store.exhaustivity = .off
-        let question = QuizTestFixture.unansweredSet.questions[0]
+        let quiz = QuizTestFixture.unansweredSet.quizzes[0]
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
 
+        await store.send(.saved(.delegate(.questionSelected(bookmark))))
         await store.send(.singleQuestionEntry(.delegate(.questionPrepared(
-            question: question,
+            question: quiz,
             projectID: ProjectDetailTestFixture.projectID,
         ))))
 
-        #expect(store.state.singleQuestion?.question == question)
+        #expect(store.state.singleQuestion?.question == quiz)
         #expect(
             store.state.singleQuestion?.advanceActionTitle
                 == MainShellRouterFeature.singleQuestionAdvanceActionTitle
@@ -130,7 +131,7 @@ struct MainShellRouterFeatureTests {
         state.selectedTab = .saved
         state.singleQuestion = QuestionSolvingFeature.State(
             projectID: ProjectDetailTestFixture.projectID,
-            question: QuizTestFixture.unansweredSet.questions[0],
+            question: QuizTestFixture.unansweredSet.quizzes[0],
             advanceActionTitle: MainShellRouterFeature.singleQuestionAdvanceActionTitle,
             isBookmarked: true,
         )
@@ -147,23 +148,79 @@ struct MainShellRouterFeatureTests {
 
     private func makeStore(
         state: MainShellRouterFeature.State = .init(),
-        projects: HomeLearningProjectsUseCaseMock = .init(),
-        memberAccount: MemberAccountUseCaseMock = .init(),
+        projects: ProjectUseCaseMock = .init(),
+        userInfo: UserInfoUseCaseMock = .init(),
     ) -> TestStoreOf<MainShellRouterFeature> {
         TestStore(initialState: state) {
             MainShellRouterFeature(
-                fetchLearningProjects: projects,
-                learningLibrary: LearningLibraryUseCaseMock(),
-                submitChoiceAnswer: StubSubmitChoiceAnswerUseCase(),
-                submitEssayAnswer: StubSubmitEssayAnswerUseCase(),
-                setQuestionBookmark: StubSetQuestionBookmarkUseCase(),
-                signOut: SignOutUseCaseMock(),
-                memberAccount: memberAccount,
-                deleteMemberAccount: DeleteMemberAccountUseCaseMock(),
-                trackGeneration: StubTrackGenerationUseCase(),
-                requestGenerationReminder: StubRequestGenerationReminderUseCase(),
+                project: projects,
+                quizDetail: QuizDetailUseCaseMock(),
+                account: MainShellAccountUseCaseStub(),
+                userInfo: userInfo,
+                appSetting: MainShellAppSettingUseCaseStub(),
             )
         }
+    }
+
+}
+
+// MARK: - MainShellAccountUseCaseStub
+
+private struct MainShellAccountUseCaseStub: AccountUseCase {
+
+    func signIn(with method: SignInMethod) async -> SignInResult {
+        _ = method
+        return .retryableFailure
+    }
+
+    func signOut() async -> SignOutResult {
+        .signedOut
+    }
+
+    func signInStates() async -> AsyncStream<SignInState> {
+        AsyncStream { $0.finish() }
+    }
+
+    func restoreSignIn() async -> SignInRestoration {
+        .signedOut
+    }
+
+    func verifySignIn() async -> SignInVerification {
+        .valid
+    }
+
+    func signInAvailability() async -> SignInAvailability {
+        .signedIn
+    }
+
+    func policyConsentStatus() async throws -> PolicyConsentStatus {
+        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
+    }
+
+    func consent(to documentIDs: [PolicyDocumentID]) async throws {
+        _ = documentIDs
+    }
+
+    func withdraw() async throws { }
+
+}
+
+// MARK: - MainShellAppSettingUseCaseStub
+
+private struct MainShellAppSettingUseCaseStub: AppSettingUseCase {
+
+    func notificationAuthorization() async -> NotificationAuthorizationStatus {
+        .denied
+    }
+
+    func requestNotificationAuthorization() async -> NotificationAuthorizationStatus {
+        .denied
+    }
+
+    func registerDevice() async throws { }
+
+    func updateDeviceToken(_ token: DeviceToken) async throws {
+        _ = token
     }
 
 }

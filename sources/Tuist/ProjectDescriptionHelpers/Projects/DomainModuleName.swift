@@ -3,74 +3,190 @@ import ProjectDescription
 // MARK: - DomainModuleName
 
 enum DomainModuleName: String, CaseIterable {
-    case DomainAuthentication
-    case DomainAuthenticationTests
-    case DomainLearningProject
-    case DomainLearningProjectTests
-    case DomainMember
-    case DomainMemberTests
+    case DomainIdentifier
+    case DomainIdentifierTests
+    case DomainAccount
+    case DomainAccountTests
+    case DomainUserInfo
+    case DomainUserInfoTests
+    case DomainAppSetting
+    case DomainAppSettingTests
+    case DomainExternalRepository
+    case DomainExternalRepositoryTests
+    case DomainQuizDetail
+    case DomainQuizDetailTests
+    case DomainProject
+    case DomainProjectTests
+    case DomainProjectGeneration
+    case DomainProjectGenerationTests
 }
 
 extension DomainModuleName {
     var sourceDirectory: String {
         let directoryName = rawValue.droppingPrefix(ProjectName.Domain.rawValue)
         return switch self {
-        case .DomainAuthentication,
-             .DomainLearningProject,
-             .DomainMember:
+        case .DomainIdentifier,
+             .DomainAccount,
+             .DomainUserInfo,
+             .DomainAppSetting,
+             .DomainExternalRepository,
+             .DomainQuizDetail,
+             .DomainProject,
+             .DomainProjectGeneration:
             directoryName
 
-        case .DomainAuthenticationTests,
-             .DomainLearningProjectTests,
-             .DomainMemberTests:
+        case .DomainIdentifierTests,
+             .DomainAccountTests,
+             .DomainUserInfoTests,
+             .DomainAppSettingTests,
+             .DomainExternalRepositoryTests,
+             .DomainQuizDetailTests,
+             .DomainProjectTests,
+             .DomainProjectGenerationTests:
             "\(directoryName.droppingSuffix("Tests"))"
         }
     }
 
     var target: Target {
         switch self {
-        case .DomainAuthentication:
+        case .DomainIdentifier:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
             )
 
-        case .DomainAuthenticationTests:
+        case .DomainIdentifierTests:
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
-                    name: DomainModuleName.DomainAuthentication.rawValue
+                    name: DomainModuleName.DomainIdentifier.rawValue
                 ),
             )
 
-        case .DomainLearningProject:
+        case .DomainAccount:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
             )
 
-        case .DomainLearningProjectTests:
+        case .DomainAccountTests:
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
-                    name: DomainModuleName.DomainLearningProject.rawValue
+                    name: DomainModuleName.DomainAccount.rawValue
                 ),
             )
 
-        case .DomainMember:
+        case .DomainUserInfo:
             .module(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
             )
 
-        case .DomainMemberTests:
+        case .DomainUserInfoTests:
             .testModule(
                 name: rawValue,
                 sourceDirectory: sourceDirectory,
                 productionTarget: .target(
-                    name: DomainModuleName.DomainMember.rawValue
+                    name: DomainModuleName.DomainUserInfo.rawValue
+                ),
+            )
+
+        case .DomainAppSetting:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
+            )
+
+        case .DomainAppSettingTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainAppSetting.rawValue
+                ),
+            )
+
+        case .DomainExternalRepository:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
+            )
+
+        case .DomainExternalRepositoryTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainExternalRepository.rawValue
+                ),
+            )
+
+        case .DomainQuizDetail:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
+            )
+
+        case .DomainQuizDetailTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainQuizDetail.rawValue
+                ),
+            )
+
+        case .DomainProject:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
+            )
+
+        case .DomainProjectTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainProject.rawValue
+                ),
+            )
+
+        case .DomainProjectGeneration:
+            .module(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                dependencies: [
+                    .target(name: DomainModuleName.DomainIdentifier.rawValue)
+                ],
+            )
+
+        case .DomainProjectGenerationTests:
+            .testModule(
+                name: rawValue,
+                sourceDirectory: sourceDirectory,
+                productionTarget: .target(
+                    name: DomainModuleName.DomainProjectGeneration.rawValue
                 ),
             )
         }

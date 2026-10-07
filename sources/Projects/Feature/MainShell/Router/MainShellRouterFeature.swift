@@ -1,7 +1,10 @@
 import ComposableArchitecture
-import DomainAuthentication
-import DomainLearningProject
-import DomainMember
+import DomainAccount
+import DomainAppSetting
+import DomainIdentifier
+import DomainProject
+import DomainQuizDetail
+import DomainUserInfo
 import Foundation
 
 @Reducer
@@ -10,28 +13,18 @@ public struct MainShellRouterFeature: Sendable {
     // MARK: Lifecycle
 
     public init(
-        fetchLearningProjects: any FetchLearningProjectsUseCase,
-        learningLibrary: any LearningLibraryUseCase,
-        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
-        submitEssayAnswer: any SubmitEssayAnswerUseCase,
-        setQuestionBookmark: any SetQuestionBookmarkUseCase,
-        signOut: any SignOutUseCase,
-        memberAccount: any MemberAccountUseCase,
-        deleteMemberAccount: any DeleteMemberAccountUseCase,
-        trackGeneration: any TrackGenerationUseCase,
-        requestGenerationReminder: any RequestGenerationReminderUseCase,
+        project: any ProjectUseCase,
+        quizDetail: any QuizDetailUseCase,
+        account: any AccountUseCase,
+        userInfo: any UserInfoUseCase,
+        appSetting: any AppSettingUseCase,
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
     ) {
-        self.fetchLearningProjects = fetchLearningProjects
-        self.learningLibrary = learningLibrary
-        self.submitChoiceAnswer = submitChoiceAnswer
-        self.submitEssayAnswer = submitEssayAnswer
-        self.setQuestionBookmark = setQuestionBookmark
-        self.signOut = signOut
-        self.memberAccount = memberAccount
-        self.deleteMemberAccount = deleteMemberAccount
-        self.trackGeneration = trackGeneration
-        self.requestGenerationReminder = requestGenerationReminder
+        self.project = project
+        self.quizDetail = quizDetail
+        self.account = account
+        self.userInfo = userInfo
+        self.appSetting = appSetting
         self.openNotificationSettings = openNotificationSettings
     }
 
@@ -76,8 +69,8 @@ public struct MainShellRouterFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectRegistrationRequested
-            case projectDetailRequested(projectID: String)
-            case learningRequested(projectID: String, nextSetID: String)
+            case projectDetailRequested(projectID: ProjectID)
+            case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
             case externalURLRequested(URL)
             case loggedOut
         }
@@ -88,29 +81,34 @@ public struct MainShellRouterFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {
             HomeFeature(
-                fetchLearningProjects: fetchLearningProjects,
-                fetchMemberProfile: { [memberAccount] in try await memberAccount.profile() },
-                trackGeneration: trackGeneration,
+                projects: { [project] in await project.projects() },
+                refreshProjects: { [project] in try await project.refresh() },
+                profile: { [userInfo] in try await Self.profile(from: userInfo) },
             )
         }
         Scope(state: \.projectList, action: \.projectList) {
             ProjectListFeature(
-                fetchLearningProjects: fetchLearningProjects,
-                deleteLearningProject: { [learningLibrary] in try await learningLibrary.deleteProject(id: $0) },
+                projects: { [project] in await project.projects() },
+                refreshProjects: { [project] in try await project.refresh() },
+                requestNextPage: { [project] in try await project.requestNextPage() },
+                deleteProject: { [project] in try await project.delete($0) },
             )
         }
         Scope(state: \.saved, action: \.saved) {
             SavedFeature(
-                fetchBookmarkedQuestions: { [learningLibrary] in try await learningLibrary.bookmarkedQuestions(projectID: $0) },
-                setQuestionBookmark: setQuestionBookmark,
+                fetchBookmarks: { [quizDetail] in try await quizDetail.bookmarks($0) },
+                setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
+                    isBookmarked
+                        ? try await quizDetail.bookmark(quizID, in: projectID)
+                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                },
             )
         }
         Scope(state: \.settings, action: \.settings) {
             SettingsRouterFeature(
-                signOut: signOut,
-                memberAccount: memberAccount,
-                deleteMemberAccount: deleteMemberAccount,
-                requestGenerationReminder: requestGenerationReminder,
+                account: account,
+                userInfo: userInfo,
+                appSetting: appSetting,
                 openNotificationSettings: openNotificationSettings,
             )
         }
@@ -149,7 +147,7 @@ public struct MainShellRouterFeature: Sendable {
                 state.singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: question.projectID)
                 return .send(.singleQuestionEntry(.input(.questionRequested(
                     setID: question.setID,
-                    questionID: question.questionID,
+                    questionID: question.quizID,
                 ))))
 
             case .singleQuestionEntry(.delegate(.questionPrepared(let question, let projectID))):
@@ -191,33 +189,35 @@ public struct MainShellRouterFeature: Sendable {
             }
         }
         .ifLet(\.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchLearningSet: { [learningLibrary] in try await learningLibrary.learningSet(
-                projectID: $0,
-                setID: $1,
-            ) })
+            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet($0, in: $1) })
         }
         .ifLet(\.$singleQuestion, action: \.singleQuestion) {
             QuestionSolvingFeature(
-                submitChoiceAnswer: submitChoiceAnswer,
-                submitEssayAnswer: submitEssayAnswer,
-                setQuestionBookmark: setQuestionBookmark,
+                gradeChoiceAnswer: { [quizDetail] in try await quizDetail.grade($0) },
+                gradeEssayAnswer: { [quizDetail] in try await quizDetail.grade($0) },
+                setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
+                    isBookmarked
+                        ? try await quizDetail.bookmark(quizID, in: projectID)
+                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                },
             )
         }
     }
 
     // MARK: Private
 
-    private let fetchLearningProjects: any FetchLearningProjectsUseCase
-    private let learningLibrary: any LearningLibraryUseCase
-    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
-    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
-    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
-    private let signOut: any SignOutUseCase
-    private let memberAccount: any MemberAccountUseCase
-    private let deleteMemberAccount: any DeleteMemberAccountUseCase
-    private let trackGeneration: any TrackGenerationUseCase
-    private let requestGenerationReminder: any RequestGenerationReminderUseCase
+    private let project: any ProjectUseCase
+    private let quizDetail: any QuizDetailUseCase
+    private let account: any AccountUseCase
+    private let userInfo: any UserInfoUseCase
+    private let appSetting: any AppSettingUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private static func profile(from userInfo: any UserInfoUseCase) async throws -> UserProfile {
+        async let detail = userInfo.detail()
+        async let curation = userInfo.curation()
+        return try await UserProfile(detail: detail, curation: curation)
+    }
 
     private func reloadLearningProjects() -> ComposableArchitecture.Effect<Action> {
         .merge(

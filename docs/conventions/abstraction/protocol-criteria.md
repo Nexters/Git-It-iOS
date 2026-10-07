@@ -16,7 +16,16 @@ public protocol LearningProjectRepository: Sendable { ... }
 
 // Infrastructure가 소유하고 Data가 사용한다
 public protocol HTTPTransport: Sendable { ... }
+
+// Data가 소유하고 Composition·테스트가 대체 구현을 주입한다
+public protocol KeyValueStorage: Sendable { ... }
 ```
+
+Composition은 Infrastructure에 의존할 수 없습니다. 그래서 Composition이나 테스트가 저장·전송·알림
+같은 기술 능력을 고르거나 대체해야 하면, Data가 기술 이름 없는 역할 계약과 실제 구현을 만드는
+생성 진입점을 소유합니다. Composition은 생성 진입점으로 실제 구현을 얻고, 테스트는 계약의 대체
+구현을 주입합니다. 이 계약은 Infrastructure 기술 계약을 Composition 쪽으로 옮기는 경계이므로 근거
+A를 충족합니다.
 
 경계를 넘더라도 **의존 방향을 뒤집을 필요가 없으면** 근거 A가 아닙니다. Composition이
 Data의 구체 타입을 직접 받는 것은 아키텍처가 허용하는 방향이므로, 그 사이에 프로토콜을
@@ -42,6 +51,9 @@ Data의 구체 타입을 직접 받는 것은 아키텍처가 허용하는 방�
 | 타입 | 판정 | 근거 |
 | --- | --- | --- |
 | `HTTPTransport` | 둔다 | 근거 A — Infrastructure가 소유하고 Data가 사용한다 |
+| `KeyValueStorage`, `SecureValueStorage` | 둔다 | 근거 A — Data가 소유하고 Composition이 저장 위치별 구현을 고르며 테스트가 메모리 더블을 주입한다 |
+| `RequestTransport` | 둔다 | 근거 A — Data가 소유하고 Composition 테스트가 요청 기록 더블을 주입한다 |
+| `LocalReminderNotifier`, `RemoteMessageReceiver` | 둔다 | 근거 A — Data가 소유하고 Composition이 생성 진입점 구현이나 대체 구현을 주입한다 |
 | `LearningProjectRepository` | 둔다 | 근거 A — Domain이 소유하고 Composition이 채택한다 |
-| `HTTPProjectRemote` | 두지 않는다 | Data 안에서만 쓰이고 구현이 하나다. Composition은 이 구체 타입을 직접 받는다 |
+| `ProjectRemote` | 두지 않는다 | Data 안에서만 쓰이고 구현이 하나다. Composition은 이 구체 타입을 직접 받는다 |
 | `LocalPolicyConsentStore` | 두지 않는다 | 같음 |

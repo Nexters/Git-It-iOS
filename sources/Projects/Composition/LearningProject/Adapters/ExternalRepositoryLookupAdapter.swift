@@ -1,25 +1,25 @@
 import DataExternalRepository
-import DomainLearningProject
+import DomainExternalRepository
 
 // MARK: - ExternalRepositoryLookupAdapter
 
-struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
+public struct ExternalRepositoryLookupAdapter: DomainExternalRepository.ExternalRepositoryLookup {
 
     // MARK: Lifecycle
 
-    init(remote: HTTPExternalRepositoryRemote) {
+    public init(remote: ExternalRepositoryRemote) {
         self.remote = remote
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    func repository(
+    public func repository(
         owner: String,
         name: String,
-    ) async throws -> ExternalRepository {
+    ) async throws -> DomainExternalRepository.ExternalRepository {
         do {
             let response = try await remote.repository(GitHubRepositoryRequest(owner: owner, repository: name))
-            return ExternalRepository(
+            return DomainExternalRepository.ExternalRepository(
                 canonicalURL: response.htmlURL,
                 ownerName: response.ownerLogin,
                 repositoryName: response.repositoryName,
@@ -27,16 +27,16 @@ struct ExternalRepositoryLookupAdapter: ExternalRepositoryLookup {
                 starCount: response.starCount,
                 techStack: response.topics,
             )
-        } catch let error as DataExternalRepositoryError {
+        } catch let error as ExternalRepositoryFetchError {
             throw domainError(for: error)
         }
     }
 
     // MARK: Private
 
-    private let remote: HTTPExternalRepositoryRemote
+    private let remote: ExternalRepositoryRemote
 
-    private func domainError(for error: DataExternalRepositoryError) -> ExternalRepositoryError {
+    private func domainError(for error: ExternalRepositoryFetchError) -> ExternalRepositoryError {
         switch error {
         case .offline:
             .offline

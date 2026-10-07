@@ -1,4 +1,4 @@
-import DomainLearningProject
+import DomainQuizDetail
 import Foundation
 
 // MARK: - QuestionSourceDisplay
@@ -55,7 +55,7 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
         return parts.joined(separator: ", ")
     }
 
-    public static func list(sources: [QuestionSource]) -> [Self] {
+    public static func list(sources: [QuizSource]) -> [Self] {
         sources.enumerated().map { index, source in
             Self(
                 id: index,
@@ -70,11 +70,11 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
 
     // MARK: Private
 
-    private static func title(for source: QuestionSource) -> String {
+    private static func title(for source: QuizSource) -> String {
         source.filePath ?? source.symbol ?? source.referenceURL ?? source.summary ?? "출처"
     }
 
-    private static func lineRange(for source: QuestionSource) -> String? {
+    private static func lineRange(for source: QuizSource) -> String? {
         switch (source.startLine, source.endLine) {
         case (let start?, let end?):
             "\(start)–\(end)행"
@@ -90,7 +90,7 @@ public struct QuestionSourceDisplay: Equatable, Sendable, Identifiable {
         }
     }
 
-    private static func lineAnchor(for source: QuestionSource) -> String? {
+    private static func lineAnchor(for source: QuizSource) -> String? {
         switch (source.startLine, source.endLine) {
         case (let start?, let end?) where start != end:
             "L\(start)-L\(end)"
