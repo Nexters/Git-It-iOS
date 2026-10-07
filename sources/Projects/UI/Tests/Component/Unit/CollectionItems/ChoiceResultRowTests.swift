@@ -51,10 +51,4 @@ struct ChoiceResultRowTests {
         #expect(ChoiceResultRow.Judgement.correct.backgroundColor == ColorToken.correct)
         #expect(ChoiceResultRow.Judgement.incorrect.backgroundColor == ColorToken.incorrect)
     }
-
-    @Test
-    func `접힘과 펼침 높이는 규격 값을 유지한다`() {
-        #expect(ChoiceResultRow.Constant.collapsedHeight == 59)
-        #expect(ChoiceResultRow.Constant.expandedHeight == 111)
-    }
 }

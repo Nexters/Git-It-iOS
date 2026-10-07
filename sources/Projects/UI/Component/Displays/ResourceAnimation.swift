@@ -26,6 +26,7 @@ public struct ResourceAnimation: View {
         case complete
         case generalLoading = "general-loading"
         case notification
+        case projectEmpty = "project-empty"
         case setCreationLoading = "set-creation-loading"
         case storageEmpty = "storage-empty"
 

@@ -1,6 +1,5 @@
 import DataMember
 import DomainMember
-import Foundation
 
 // MARK: - MemberRepositoryAdapter
 
@@ -37,9 +36,12 @@ struct MemberRepositoryAdapter: MemberRepository {
                 position: try domainPosition(response.position),
                 careerLevel: try domainCareerLevel(response.careerLevel),
                 statistics: LearningStatistics(
-                    totalAnsweredCount: response.thisMonthSolvedCount,
-                    totalCorrectCount: 0,
-                    weeklyCounts: response.weeklyChart.compactMap(weeklyCount(from:)),
+                    thisWeekSolvedCount: response.thisWeekSolvedCount,
+                    thisMonthSolvedCount: response.thisMonthSolvedCount,
+                    streakDays: response.streakDays,
+                    weeklyCounts: response.weeklyChart.map {
+                        WeeklyLearningCount(dayLabel: $0.dayLabel, count: $0.count)
+                    },
                 ),
             )
         } catch let error as DataMemberError {
@@ -88,19 +90,6 @@ struct MemberRepositoryAdapter: MemberRepository {
     // MARK: Private
 
     private let remote: MemberRemote
-    private let dayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
-
-    private func weeklyCount(from dto: WeeklyChartItemDTO) -> WeeklyLearningCount? {
-        guard let date = dayFormatter.date(from: dto.date) else { return nil }
-        return WeeklyLearningCount(weekStartDate: date, count: dto.solvedCount)
-    }
 
     private func dtoPosition(_ position: MemberPosition) -> PositionDTO {
         switch position {

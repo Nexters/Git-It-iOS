@@ -57,15 +57,6 @@ extension AppModuleName {
                         "FirebaseAppDelegateProxyEnabled": false,
                         "GIT_IT_API_HOST": "$(GIT_IT_API_HOST)",
                         "GIT_IT_EXTERNAL_REPOSITORY_HOST": "$(GIT_IT_EXTERNAL_REPOSITORY_HOST)",
-                        "CFBundleURLTypes": [
-                            [
-                                "CFBundleTypeRole": "Editor",
-                                "CFBundleURLName": "com.nexters.hytime.gitit.sharedLink",
-                                "CFBundleURLSchemes": [
-                                    "gitit"
-                                ],
-                            ]
-                        ],
                         "UILaunchScreen": [:],
                         "UISupportedInterfaceOrientations": [
                             "UIInterfaceOrientationPortrait",
@@ -98,7 +89,6 @@ extension AppModuleName {
                         "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
                         "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor",
                         "CODE_SIGN_STYLE": "Automatic",
-                        "CURRENT_PROJECT_VERSION": "1",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_PREVIEWS": "YES",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",

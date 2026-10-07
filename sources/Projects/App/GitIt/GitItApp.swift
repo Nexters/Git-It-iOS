@@ -52,8 +52,13 @@ struct GitItApp: App {
                 completeCuration: composition.completeCuration,
                 policyConsent: composition.policyConsent,
                 fetchLearningProjects: composition.fetchLearningProjects,
+                fetchLearningProjectDetail: composition.fetchLearningProjectDetail,
                 deleteLearningProject: composition.deleteLearningProject,
                 fetchBookmarkedQuestions: composition.fetchBookmarkedQuestions,
+                fetchLearningSet: composition.fetchLearningSet,
+                submitChoiceAnswer: composition.submitChoiceAnswer,
+                submitEssayAnswer: composition.submitEssayAnswer,
+                setQuestionBookmark: composition.setQuestionBookmark,
                 updateMemberPosition: composition.updateMemberPosition,
                 updateMemberCareerLevel: composition.updateMemberCareerLevel,
                 deleteMemberAccount: composition.deleteMemberAccount,
@@ -64,6 +69,9 @@ struct GitItApp: App {
                 trackGenerationProgress: composition.trackGenerationProgress,
                 openNotificationSettings: {
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    await UIApplication.shared.open(url)
+                },
+                openExternalURL: { @MainActor url in
                     await UIApplication.shared.open(url)
                 },
                 registerCurrentDevice: composition.registerCurrentDevice,
@@ -93,7 +101,7 @@ struct GitItApp: App {
                     rootStore.send(.view(.applicationBecameActive))
                 }
                 .onOpenURL { url in
-                    guard url.scheme == Constant.sharedLinkURLScheme else { return }
+                    guard url.host() == Constant.sharedLinkHost, url.path() == Constant.sharedLinkPath else { return }
                     guard let link = Self.takeSharedRepositoryLink() else { return }
                     rootStore.send(.effect(.sharedRepositoryLinkReceived(link)))
                 }
@@ -103,7 +111,8 @@ struct GitItApp: App {
     // MARK: Private
 
     private enum Constant {
-        static let sharedLinkURLScheme = "gitit"
+        static let sharedLinkHost = "git-it.kr"
+        static let sharedLinkPath = "/shared-link"
         static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
         static let sharedLinkStorageKey = "sharedRepositoryURL"
     }

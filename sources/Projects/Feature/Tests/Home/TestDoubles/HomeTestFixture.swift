@@ -25,8 +25,9 @@ enum HomeTestFixture {
             position: position,
             careerLevel: careerLevel,
             statistics: LearningStatistics(
-                totalAnsweredCount: 12,
-                totalCorrectCount: 9,
+                thisWeekSolvedCount: 12,
+                thisMonthSolvedCount: 9,
+                streakDays: 3,
                 weeklyCounts: [],
             ),
         )

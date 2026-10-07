@@ -58,6 +58,43 @@ struct LearningProjectRepositoryAdapterTests {
     }
 
     @Test
+    func `상세 응답의 세트 문제 수와 완료 수를 그대로 보존한다`() async throws {
+        let remote = StubProjectRemote(fetchProjectDetailResult: .success(ProjectDetailResponseDTO(
+            projectID: "project-1",
+            repositoryURL: "https://github.com/owner/repo",
+            repositoryName: "repo",
+            repositoryImageURL: nil,
+            starCount: 3,
+            techStack: [],
+            overallProgressPercent: 40,
+            nextQuestionID: "question-1",
+            sets: [
+                ProjectSetSummaryDTO(
+                    setID: "set-1",
+                    label: "Set 1",
+                    title: "KMP 프로젝트 구조 확인하기",
+                    problemCount: 5,
+                    completedCount: 2,
+                ),
+                ProjectSetSummaryDTO(
+                    setID: "set-2",
+                    label: "Set 2",
+                    title: "KDoc 주석 규칙 확인하기",
+                    problemCount: 3,
+                    completedCount: 0,
+                ),
+            ],
+        )))
+        let adapter = LearningProjectRepositoryAdapter(remote: remote)
+
+        let detail = try await adapter.fetchProjectDetail(projectID: "project-1")
+
+        #expect(detail.sets.map(\.setID) == ["set-1", "set-2"])
+        #expect(detail.sets.map(\.problemCount) == [5, 3])
+        #expect(detail.sets.map(\.completedCount) == [2, 0])
+    }
+
+    @Test
     func `등록 요청을 Data DTO로 위임하고 응답을 Domain 등록 결과로 변환한다`() async throws {
         let remote = StubProjectRemote(registerProjectResult: .success(RegisterProjectResponseDTO(
             projectID: "project-1",

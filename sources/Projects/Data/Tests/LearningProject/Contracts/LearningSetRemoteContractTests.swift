@@ -1,4 +1,5 @@
 import Foundation
+import InfrastructureNetworkClient
 import Testing
 
 @testable import DataLearningProject
@@ -33,10 +34,7 @@ struct LearningSetRemoteContractTests {
               }
             }
             """#.utf8)
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-
-        let question = try decoder.decode(QuestionResponseDTO.self, from: json)
+        let question = try StandardJSONBodyCoding().decode(QuestionResponseDTO.self, from: json)
 
         #expect(question.choices == ["A", "B", "C"])
         #expect(question.myAnswer?.selectedIndex == 1)
@@ -56,7 +54,7 @@ struct LearningSetRemoteContractTests {
             }
             """#.utf8)
 
-        let question = try JSONDecoder().decode(QuestionResponseDTO.self, from: json)
+        let question = try StandardJSONBodyCoding().decode(QuestionResponseDTO.self, from: json)
 
         #expect(question.myAnswer == nil)
     }

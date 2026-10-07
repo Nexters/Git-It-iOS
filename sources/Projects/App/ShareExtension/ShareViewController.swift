@@ -29,18 +29,34 @@ final class ShareViewController: UIViewController {
     }
 
     private func firstRepositoryURL() async -> String? {
-        let items = (extensionContext?.inputItems as? [NSExtensionItem]) ?? []
-        let identifier = UTType.url.identifier
-        for item in items {
-            for provider in item.attachments ?? []
-                where provider.hasItemConformingToTypeIdentifier(identifier)
-            {
-                guard let url = try? await provider.loadItem(forTypeIdentifier: identifier) as? URL else {
-                    continue
-                }
-                return url.absoluteString
+        let providers = ((extensionContext?.inputItems as? [NSExtensionItem]) ?? [])
+            .flatMap { $0.attachments ?? [] }
+
+        for provider in providers {
+            if let urlString = await urlString(from: provider) {
+                return urlString
             }
         }
+        return nil
+    }
+
+    private func urlString(from provider: NSItemProvider) async -> String? {
+        let urlIdentifier = UTType.url.identifier
+        if
+            provider.hasItemConformingToTypeIdentifier(urlIdentifier),
+            let url = try? await provider.loadItem(forTypeIdentifier: urlIdentifier) as? URL
+        {
+            return url.absoluteString
+        }
+
+        let textIdentifier = UTType.plainText.identifier
+        if
+            provider.hasItemConformingToTypeIdentifier(textIdentifier),
+            let text = try? await provider.loadItem(forTypeIdentifier: textIdentifier) as? String
+        {
+            return SharedURLExtractor.firstURLString(inText: text)
+        }
+
         return nil
     }
 

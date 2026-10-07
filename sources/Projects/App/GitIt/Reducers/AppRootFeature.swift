@@ -21,8 +21,13 @@ nonisolated struct AppRootFeature: Sendable {
         completeCuration: any CompleteCurationUseCase,
         policyConsent: any PolicyConsentUseCase,
         fetchLearningProjects: any FetchLearningProjectsUseCase,
+        fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase,
         deleteLearningProject: any DeleteLearningProjectUseCase,
         fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase,
+        fetchLearningSet: any FetchLearningSetUseCase,
+        submitChoiceAnswer: any SubmitChoiceAnswerUseCase,
+        submitEssayAnswer: any SubmitEssayAnswerUseCase,
+        setQuestionBookmark: any SetQuestionBookmarkUseCase,
         updateMemberPosition: any UpdateMemberPositionUseCase,
         updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase,
         deleteMemberAccount: any DeleteMemberAccountUseCase,
@@ -34,6 +39,7 @@ nonisolated struct AppRootFeature: Sendable {
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
         openNotificationSettings: @escaping @MainActor @Sendable () async -> Void = { },
+        openExternalURL: @escaping @Sendable (URL) async -> Void = { _ in },
         registerCurrentDevice: @escaping @Sendable () async throws -> Void = { },
         deviceTokenRefreshes: @escaping @Sendable () -> AsyncStream<Void> = { AsyncStream { $0.finish() } },
         deletesCompletedAccountOnSignIn: Bool = false,
@@ -47,8 +53,13 @@ nonisolated struct AppRootFeature: Sendable {
         self.completeCuration = completeCuration
         self.policyConsent = policyConsent
         self.fetchLearningProjects = fetchLearningProjects
+        self.fetchLearningProjectDetail = fetchLearningProjectDetail
         self.deleteLearningProject = deleteLearningProject
         self.fetchBookmarkedQuestions = fetchBookmarkedQuestions
+        self.fetchLearningSet = fetchLearningSet
+        self.submitChoiceAnswer = submitChoiceAnswer
+        self.submitEssayAnswer = submitEssayAnswer
+        self.setQuestionBookmark = setQuestionBookmark
         self.updateMemberPosition = updateMemberPosition
         self.updateMemberCareerLevel = updateMemberCareerLevel
         self.deleteMemberAccount = deleteMemberAccount
@@ -60,6 +71,7 @@ nonisolated struct AppRootFeature: Sendable {
         self.waitPolicy = waitPolicy
         self.now = now
         self.openNotificationSettings = openNotificationSettings
+        self.openExternalURL = openExternalURL
         self.registerCurrentDevice = registerCurrentDevice
         self.deviceTokenRefreshes = deviceTokenRefreshes
         self.deletesCompletedAccountOnSignIn = deletesCompletedAccountOnSignIn
@@ -91,7 +103,7 @@ nonisolated struct AppRootFeature: Sendable {
         var route = Route.restoring
         var appEntry: AppEntryFeature.State
         var onboarding: OnboardingRouterFeature.State
-        var mainShell = MainShellFeature.State()
+        var mainShell = MainShellRouterFeature.State()
         var deviceRegistration = DeviceRegistrationStatus.idle
 
         var generationProgress: GenerationProgress?
@@ -99,7 +111,9 @@ nonisolated struct AppRootFeature: Sendable {
         var isGenerationProgressRestored = false
 
         var pendingSharedLink: SharedRepositoryLink?
-        @Presents var projectRegistration: ProjectRegistrationFeature.State?
+        @Presents var projectRegistration: ProjectRegistrationRouterFeature.State?
+        @Presents var projectDetail: ProjectDetailRouterFeature.State?
+        @Presents var quiz: QuizRouterFeature.State?
     }
 
     enum Action: ViewAction, Sendable, Equatable {
@@ -107,8 +121,10 @@ nonisolated struct AppRootFeature: Sendable {
         case effect(EffectEvent)
         case appEntry(AppEntryFeature.Action)
         case onboarding(OnboardingRouterFeature.Action)
-        case mainShell(MainShellFeature.Action)
-        case projectRegistration(PresentationAction<ProjectRegistrationFeature.Action>)
+        case mainShell(MainShellRouterFeature.Action)
+        case projectRegistration(PresentationAction<ProjectRegistrationRouterFeature.Action>)
+        case projectDetail(PresentationAction<ProjectDetailRouterFeature.Action>)
+        case quiz(PresentationAction<QuizRouterFeature.Action>)
 
         // MARK: Internal
 
@@ -151,7 +167,7 @@ nonisolated struct AppRootFeature: Sendable {
             )
         }
         Scope(state: \.mainShell, action: \.mainShell) {
-            MainShellFeature(
+            MainShellRouterFeature(
                 fetchLearningProjects: fetchLearningProjects,
                 deleteLearningProject: deleteLearningProject,
                 fetchBookmarkedQuestions: fetchBookmarkedQuestions,
@@ -197,7 +213,7 @@ nonisolated struct AppRootFeature: Sendable {
                     )
 
                 case .onboarding(let entryPoint):
-                    let bundleVersion = state.onboarding.guide.bundleVersion
+                    let bundleVersion = state.onboarding.tutorial.bundleVersion
                     state.onboarding = OnboardingRouterFeature.State(startingAt: entryPoint, bundleVersion: bundleVersion)
                     state.route = .onboarding
                     return .none
@@ -251,15 +267,64 @@ nonisolated struct AppRootFeature: Sendable {
                 return returnToOnboarding(&state)
 
             case .mainShell(.delegate(.projectRegistrationRequested)):
-                state.projectRegistration = ProjectRegistrationFeature.State()
+                state.projectRegistration = ProjectRegistrationRouterFeature.State()
                 return .none
 
-            case .mainShell(.delegate(.questionSelected)),
-                 .mainShell(.delegate(.projectDetailRequested)),
-                 .mainShell(.delegate(.learningRequested)):
+            case .mainShell(.delegate(.projectDetailRequested(let projectID))):
+                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 return .none
 
-            case .projectRegistration(.presented(.effect(.submissionFinished(.success(let receipt))))):
+            case .mainShell(.delegate(.questionSelected)):
+                return .none
+
+            case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
+                guard
+                    case .loaded(let page) = state.mainShell.home.projectLoad,
+                    let project = page.items.first(where: { $0.projectID == projectID })
+                else { return .none }
+                state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
+                state.quiz = QuizRouterFeature.State(
+                    projectID: projectID,
+                    setID: nextSetID,
+                    setLabel: project.currentSetLabel,
+                    autoStartsLearning: true,
+                )
+                return .none
+
+            case .projectDetail(.presented(.delegate(.learningSetRequested(let projectID, let setID, let label)))):
+                state.quiz = QuizRouterFeature.State(projectID: projectID, setID: setID, setLabel: label)
+                return .none
+
+            case .mainShell(.delegate(.externalURLRequested(let url))),
+                 .projectDetail(.presented(.delegate(.externalURLRequested(let url)))),
+                 .quiz(.presented(.delegate(.externalURLRequested(let url)))):
+                return .run { [openExternalURL] _ in await openExternalURL(url) }
+
+            case .projectDetail(.presented(.delegate(.projectDeleted))):
+                state.projectDetail = nil
+                return .send(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+
+            case .projectDetail(.presented(.delegate(.dismissRequested))):
+                state.projectDetail = nil
+                return .none
+
+            case .quiz(.presented(.delegate(.progressInvalidated(let projectID)))):
+                guard state.projectDetail?.projectID == projectID else { return .none }
+                return .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
+
+            case .quiz(.presented(.delegate(.dismissRequested(let projectID)))):
+                state.quiz = nil
+                guard state.projectDetail?.projectID == projectID else {
+                    state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
+                    return .none
+                }
+                return .send(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
+
+            case .projectDetail,
+                 .quiz:
+                return .none
+
+            case .projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(let receipt)))))):
                 let progress = GenerationProgress(projectID: receipt.projectID, requestedAt: now())
                 state.generationProgress = progress
                 state.isGenerationProgressRestored = false
@@ -291,7 +356,7 @@ nonisolated struct AppRootFeature: Sendable {
                     return .none
                 }
                 state.pendingSharedLink = nil
-                state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+                state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
                 return .none
 
             case .effect(.generationProgressReleased(let projectID)):
@@ -320,6 +385,10 @@ nonisolated struct AppRootFeature: Sendable {
             case .projectRegistration(.presented(.delegate(.generationReminderPreferenceSelected(_)))):
                 return .none
 
+            case .projectRegistration(.presented(.delegate(.dismissRequested))):
+                state.projectRegistration = nil
+                return .none
+
             case .projectRegistration:
                 return .none
 
@@ -329,12 +398,32 @@ nonisolated struct AppRootFeature: Sendable {
             }
         }
         .ifLet(\.$projectRegistration, action: \.projectRegistration) {
-            ProjectRegistrationFeature(
+            ProjectRegistrationRouterFeature(
                 fetchExternalRepository: fetchExternalRepository,
                 createLearningProject: createLearningProject,
                 observeGenerationOutcomes: observeGenerationOutcomes,
                 requestGenerationReminder: requestGenerationReminder,
                 openNotificationSettings: openNotificationSettings,
+            )
+        }
+        .ifLet(\.$projectDetail, action: \.projectDetail) {
+            ProjectDetailRouterFeature(
+                fetchLearningProjectDetail: fetchLearningProjectDetail,
+                deleteLearningProject: deleteLearningProject,
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                fetchLearningSet: fetchLearningSet,
+                submitChoiceAnswer: submitChoiceAnswer,
+                submitEssayAnswer: submitEssayAnswer,
+                setQuestionBookmark: setQuestionBookmark,
+            )
+        }
+        .ifLet(\.$quiz, action: \.quiz) {
+            QuizRouterFeature(
+                fetchLearningSet: fetchLearningSet,
+                fetchBookmarkedQuestions: fetchBookmarkedQuestions,
+                submitChoiceAnswer: submitChoiceAnswer,
+                submitEssayAnswer: submitEssayAnswer,
+                setQuestionBookmark: setQuestionBookmark,
             )
         }
     }
@@ -357,8 +446,13 @@ nonisolated struct AppRootFeature: Sendable {
     private let completeCuration: any CompleteCurationUseCase
     private let policyConsent: any PolicyConsentUseCase
     private let fetchLearningProjects: any FetchLearningProjectsUseCase
+    private let fetchLearningProjectDetail: any FetchLearningProjectDetailUseCase
     private let deleteLearningProject: any DeleteLearningProjectUseCase
     private let fetchBookmarkedQuestions: any FetchBookmarkedQuestionsUseCase
+    private let fetchLearningSet: any FetchLearningSetUseCase
+    private let submitChoiceAnswer: any SubmitChoiceAnswerUseCase
+    private let submitEssayAnswer: any SubmitEssayAnswerUseCase
+    private let setQuestionBookmark: any SetQuestionBookmarkUseCase
     private let updateMemberPosition: any UpdateMemberPositionUseCase
     private let updateMemberCareerLevel: any UpdateMemberCareerLevelUseCase
     private let deleteMemberAccount: any DeleteMemberAccountUseCase
@@ -370,6 +464,7 @@ nonisolated struct AppRootFeature: Sendable {
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+    private let openExternalURL: @Sendable (URL) async -> Void
     private let registerCurrentDevice: @Sendable () async throws -> Void
     private let deviceTokenRefreshes: @Sendable () -> AsyncStream<Void>
     private let deletesCompletedAccountOnSignIn: Bool
@@ -393,7 +488,7 @@ nonisolated struct AppRootFeature: Sendable {
         guard let link = state.pendingSharedLink else { return .none }
         state.pendingSharedLink = nil
         guard state.generationProgress == nil else { return .none }
-        state.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: link.url)
+        state.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: link.url)
         return .none
     }
 
@@ -428,10 +523,12 @@ nonisolated struct AppRootFeature: Sendable {
     }
 
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
-        let bundleVersion = state.onboarding.guide.bundleVersion
+        let bundleVersion = state.onboarding.tutorial.bundleVersion
         state.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)
-        state.mainShell = MainShellFeature.State()
+        state.mainShell = MainShellRouterFeature.State()
         state.projectRegistration = nil
+        state.projectDetail = nil
+        state.quiz = nil
         state.deviceRegistration = .idle
         state.generationProgress = nil
         state.isGenerationProgressRestored = false

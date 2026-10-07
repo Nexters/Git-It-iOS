@@ -3,19 +3,22 @@ public struct LearningStatistics: Equatable, Sendable {
     // MARK: Lifecycle
 
     public init(
-        totalAnsweredCount: Int,
-        totalCorrectCount: Int,
+        thisWeekSolvedCount: Int,
+        thisMonthSolvedCount: Int,
+        streakDays: Int,
         weeklyCounts: [WeeklyLearningCount],
     ) {
-        self.totalAnsweredCount = totalAnsweredCount
-        self.totalCorrectCount = totalCorrectCount
+        self.thisWeekSolvedCount = thisWeekSolvedCount
+        self.thisMonthSolvedCount = thisMonthSolvedCount
+        self.streakDays = streakDays
         self.weeklyCounts = weeklyCounts
     }
 
     // MARK: Public
 
-    public let totalAnsweredCount: Int
-    public let totalCorrectCount: Int
+    public let thisWeekSolvedCount: Int
+    public let thisMonthSolvedCount: Int
+    public let streakDays: Int
     public let weeklyCounts: [WeeklyLearningCount]
 
 }

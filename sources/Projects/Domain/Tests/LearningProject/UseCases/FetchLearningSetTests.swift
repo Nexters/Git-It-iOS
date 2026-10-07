@@ -14,7 +14,7 @@ struct FetchLearningSetTests {
                 prompt: "prompt-1",
                 format: .multipleChoice,
                 choices: ["a", "b"],
-                source: QuestionSource(filePath: nil, referenceURL: nil),
+                sources: [],
                 myAnswer: nil,
             ),
             Question(
@@ -22,11 +22,11 @@ struct FetchLearningSetTests {
                 prompt: "prompt-2",
                 format: .essay,
                 choices: nil,
-                source: QuestionSource(filePath: nil, referenceURL: nil),
+                sources: [],
                 myAnswer: nil,
             ),
         ]
-        let set = LearningSet(setID: "set-1", title: "title", questions: questions)
+        let set = LearningSet(setID: "set-1", title: "title", description: "description", questions: questions)
         let fetchLearningSet = FetchLearningSet(repository: FetchLearningSetRepository(behavior: .succeed(set)))
 
         let result = try await fetchLearningSet(projectID: "project-1", setID: "set-1")
@@ -43,10 +43,15 @@ struct FetchLearningSetTests {
             prompt: "prompt",
             format: .multipleChoice,
             choices: ["a"],
-            source: QuestionSource(filePath: nil, referenceURL: nil),
+            sources: [],
             myAnswer: nil,
         )
-        let set = LearningSet(setID: "set-1", title: "title", questions: [question])
+        let set = LearningSet(
+            setID: "set-1",
+            title: "title",
+            description: "description",
+            questions: [question],
+        )
         let fetchLearningSet = FetchLearningSet(repository: FetchLearningSetRepository(behavior: .succeed(set)))
 
         let result = try await fetchLearningSet(projectID: "project-1", setID: "set-1")

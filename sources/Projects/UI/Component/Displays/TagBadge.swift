@@ -25,7 +25,7 @@ public struct TagBadge: View {
         var backgroundColor: ColorToken {
             switch self {
             case .neutral: .grey500
-            case .accent: .blue100
+            case .accent: .blue400
             case .selected: .blue400
             }
         }
@@ -33,7 +33,7 @@ public struct TagBadge: View {
         var textColor: ColorToken {
             switch self {
             case .neutral: .blue100
-            case .accent: .grey700
+            case .accent: .blue100
             case .selected: .grey100
             }
         }

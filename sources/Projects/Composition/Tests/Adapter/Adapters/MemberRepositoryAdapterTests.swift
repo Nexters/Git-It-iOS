@@ -19,7 +19,7 @@ struct MemberRepositoryAdapterTests {
             thisWeekSolvedCount: 3,
             thisMonthSolvedCount: 12,
             streakDays: 5,
-            weeklyChart: [WeeklyChartItemDTO(date: "2026-08-17", solvedCount: 3)],
+            weeklyChart: [WeeklyChartItemDTO(dayLabel: "월", count: 3)],
         )))
         let adapter = MemberRepositoryAdapter(remote: remote)
 
@@ -28,7 +28,12 @@ struct MemberRepositoryAdapterTests {
         #expect(profile.name == "홍길동")
         #expect(profile.position == .backend)
         #expect(profile.careerLevel == .junior)
+        #expect(profile.statistics.thisWeekSolvedCount == 3)
+        #expect(profile.statistics.thisMonthSolvedCount == 12)
+        #expect(profile.statistics.streakDays == 5)
         #expect(profile.statistics.weeklyCounts.count == 1)
+        #expect(profile.statistics.weeklyCounts.first?.dayLabel == "월")
+        #expect(profile.statistics.weeklyCounts.first?.count == 3)
     }
 
     @Test

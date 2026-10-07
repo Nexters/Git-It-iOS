@@ -19,33 +19,45 @@ func makeAppEntryStore(
     }
 }
 
-func makeOnboardingGuideStore(
+func makeTutorialStore(
     signIn: SignInUseCaseMock = SignInUseCaseMock(),
-    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
     deleteMemberAccount: DeleteMemberAccountUseCaseMock = DeleteMemberAccountUseCaseMock(),
     deletesCompletedAccountOnSignIn: Bool = false,
-    state: OnboardingGuideFeature.State = OnboardingGuideFeature.State(bundleVersion: "1.0.0"),
-) -> TestStoreOf<OnboardingGuideFeature> {
+    state: TutorialFeature.State = TutorialFeature.State(bundleVersion: "1.0.0"),
+) -> TestStoreOf<TutorialFeature> {
     TestStore(initialState: state) {
-        OnboardingGuideFeature(
+        TutorialFeature(
             signIn: signIn,
-            policyConsent: policyConsent,
             deleteMemberAccount: deleteMemberAccount,
             deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
         )
     }
 }
 
-func makeCurationStore(
-    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
-    completeCuration: CompleteCurationUseCaseMock = CompleteCurationUseCaseMock(),
-    state: CurationFeature.State = CurationFeature.State(),
-) -> TestStoreOf<CurationFeature> {
+func makeLegalAgreementStore(
+    policyConsent: PolicyConsentUseCaseMock = PolicyConsentUseCaseMock(),
+    state: LegalAgreementFeature.State = LegalAgreementFeature.State(),
+) -> TestStoreOf<LegalAgreementFeature> {
     TestStore(initialState: state) {
-        CurationFeature(
-            signOut: signOut,
-            completeCuration: completeCuration,
-        )
+        LegalAgreementFeature(policyConsent: policyConsent)
+    }
+}
+
+func makePositionSelectionStore(
+    signOut: SignOutUseCaseMock = SignOutUseCaseMock(),
+    state: PositionSelectionFeature.State = PositionSelectionFeature.State(),
+) -> TestStoreOf<PositionSelectionFeature> {
+    TestStore(initialState: state) {
+        PositionSelectionFeature(signOut: signOut)
+    }
+}
+
+func makeCareerSelectionStore(
+    completeCuration: CompleteCurationUseCaseMock = CompleteCurationUseCaseMock(),
+    state: CareerSelectionFeature.State = CareerSelectionFeature.State(),
+) -> TestStoreOf<CareerSelectionFeature> {
+    TestStore(initialState: state) {
+        CareerSelectionFeature(completeCuration: completeCuration)
     }
 }
 

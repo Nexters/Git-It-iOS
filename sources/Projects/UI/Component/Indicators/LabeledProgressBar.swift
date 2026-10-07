@@ -11,10 +11,12 @@ public struct LabeledProgressBar: View {
         label: String,
         progress: Double,
         valueText: String,
+        valueColor: ColorToken = .grey400,
     ) {
         self.label = label
         self.progress = progress
         self.valueText = valueText
+        self.valueColor = valueColor
     }
 
     // MARK: Public
@@ -24,7 +26,7 @@ public struct LabeledProgressBar: View {
             HStack {
                 StyledText.caption1(label, color: .grey400)
                 Spacer(minLength: 0)
-                StyledText.caption1(valueText, color: .grey400)
+                StyledText.caption1(valueText, color: valueColor)
             }
 
             ContinuousProgressBar(progress: progress)
@@ -37,6 +39,7 @@ public struct LabeledProgressBar: View {
     private let label: String
     private let progress: Double
     private let valueText: String
+    private let valueColor: ColorToken
 
 }
 

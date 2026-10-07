@@ -40,7 +40,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
 
 #Preview("Tab Shell") {
     TabShell(selected: .constant(TabShellPreviewItem.home)) { _ in
-        ScreenContainer { _ in
+        ScreenContainer {
             StyledText.subtitle1("선택한 탭 콘텐츠", alignment: .center)
         }
     }

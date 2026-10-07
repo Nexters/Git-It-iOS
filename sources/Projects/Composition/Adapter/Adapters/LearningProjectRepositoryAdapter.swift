@@ -63,8 +63,8 @@ struct LearningProjectRepositoryAdapter: LearningProjectRepository {
                         setID: $0.setID,
                         label: $0.label,
                         title: $0.title,
-                        problemCount: 0,
-                        completedCount: 0,
+                        problemCount: $0.problemCount,
+                        completedCount: $0.completedCount,
                     )
                 },
             )

@@ -12,5 +12,9 @@
 	<array>
 		<string>group.com.nexters.hytime.gitit</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:git-it.kr</string>
+	</array>
 </dict>
 </plist>

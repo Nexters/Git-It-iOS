@@ -61,9 +61,9 @@ public struct IconGlassButton: View {
         var iconSize: CGFloat {
             switch self {
             case .medium:
-                17
+                24
             case .small:
-                15
+                20
             }
         }
 
@@ -81,7 +81,7 @@ public struct IconGlassButton: View {
                 .frame(width: size.surfaceSize, height: size.surfaceSize)
                 .glassEffect(
                     .regular
-                        .tint(Color(designSystem: style.backgroundColor))
+                        .tint(Color(designSystem: .clear))
                         .interactive(),
                     in: .circle,
                 )

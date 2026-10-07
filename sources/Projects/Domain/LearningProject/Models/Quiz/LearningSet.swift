@@ -5,10 +5,12 @@ public struct LearningSet: Equatable, Sendable {
     public init(
         setID: String,
         title: String,
+        description: String,
         questions: [Question],
     ) {
         self.setID = setID
         self.title = title
+        self.description = description
         self.questions = questions
     }
 
@@ -16,6 +18,8 @@ public struct LearningSet: Equatable, Sendable {
 
     public let setID: String
     public let title: String
+    public let description: String
+    /// 서버 응답 순서를 그대로 보존합니다.
     public let questions: [Question]
 
 }

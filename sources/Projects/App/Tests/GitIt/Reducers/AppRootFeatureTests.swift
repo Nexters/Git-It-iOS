@@ -7,6 +7,8 @@ import Testing
 
 @testable import GitIt
 
+// MARK: - AppRootFeatureTests
+
 @Suite("AppRootFeature root 전환")
 struct AppRootFeatureTests {
 
@@ -193,7 +195,7 @@ struct AppRootFeatureTests {
 
         await loggedOutStore.send(.mainShell(.delegate(.loggedOut))) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await loggedOutStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -216,7 +218,7 @@ struct AppRootFeatureTests {
         await authenticationOutcomes.emit(.unauthenticated)
         await sessionStore.receive(.effect(.authenticationOutcomeReceived(.unauthenticated))) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await sessionStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -237,7 +239,7 @@ struct AppRootFeatureTests {
         await resetStore.send(.view(.resetAllTapped))
         await resetStore.receive(.effect(.resetAllFinished)) {
             $0.route = .onboarding
-            $0.mainShell = MainShellFeature.State()
+            $0.mainShell = MainShellRouterFeature.State()
         }
         await resetStore.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
@@ -247,7 +249,7 @@ struct AppRootFeatureTests {
     }
 
     @Test
-    func `MainShell의 등록·ProjectDetail·학습 delegate는 payload를 보존하며 route와 MainShell 상태를 바꾸지 않는다`() async {
+    func `MainShell의 등록·ProjectDetail delegate는 payload를 보존하며 route와 MainShell 상태를 바꾸지 않는다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
         let store = makeAppRootStore(state: state)
@@ -255,21 +257,64 @@ struct AppRootFeatureTests {
 
         await store.send(.mainShell(.delegate(.projectRegistrationRequested)))
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.mainShell == MainShellRouterFeature.State())
 
         await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
         #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.mainShell == MainShellRouterFeature.State())
+    }
+
+    @Test
+    func `Home 학습 요청은 일치하는 프로젝트가 없으면 풀이 흐름을 열지 않는다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
 
         await store.send(
             .mainShell(
                 .delegate(
-                    .learningRequested(projectID: "project-1", nextSetID: "set-1", nextQuestionID: "question-1")
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1")
                 )
             )
         )
-        #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell == MainShellFeature.State())
+        #expect(store.state.quiz == nil)
+    }
+
+    @Test
+    func `Home 학습 요청은 일치하는 프로젝트가 있으면 그 세트의 풀이 흐름을 연다`() async {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        state.mainShell.home.projectLoad = .loaded(
+            LearningProjectPage(
+                items: [
+                    LearningProjectSummary(
+                        projectID: "project-1",
+                        repositoryName: "repo",
+                        repositoryImageURL: nil,
+                        techStack: ["Swift"],
+                        currentSetLabel: "Set 1",
+                        currentSetTitle: "Basics",
+                        nextSetID: "set-1",
+                        nextQuestionID: "question-1",
+                        overallProgressPercent: 0,
+                    )
+                ],
+                hasNext: false,
+            )
+        )
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(
+            .mainShell(
+                .delegate(
+                    .learningRequested(projectID: "project-1", nextSetID: "set-1")
+                )
+            )
+        ) {
+            $0.quiz = QuizRouterFeature.State(projectID: "project-1", setID: "set-1", setLabel: "Set 1")
+        }
     }
 
     @Test
@@ -280,7 +325,7 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.mainShell(.delegate(.projectRegistrationRequested))) {
-            $0.projectRegistration = ProjectRegistrationFeature.State()
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State()
         }
     }
 
@@ -288,7 +333,7 @@ struct AppRootFeatureTests {
     func `등록 완료 delegate는 등록 흐름을 닫고 Home을 정확히 한 번 재조회한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
@@ -443,7 +488,7 @@ struct AppRootFeatureTests {
     func `인증 종료 시 등록 흐름 child와 기기 등록 상태를 함께 제거한다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         state.deviceRegistration = .failed
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
@@ -461,7 +506,7 @@ struct AppRootFeatureTests {
     func `재로그인 시 이전 세션의 등록 흐름 화면이 다시 표시되지 않는다`() async {
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(state: state)
         store.exhaustivity = .off
 
@@ -486,7 +531,7 @@ struct AppRootFeatureTests {
         let trackGenerationProgress = TrackGenerationProgressSpy()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             trackGenerationProgress: trackGenerationProgress,
             waitPolicy: GenerationWaitPolicy(minimumWait: 0.05, retentionLimit: 60),
@@ -495,10 +540,13 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt)))))) {
-            $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
-            $0.mainShell.home.isGenerationInProgress = true
-        }
+        await store
+            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self
+                    .receipt)))))))
+            {
+                $0.generationProgress = GenerationProgress(projectID: "project-1", requestedAt: requestedAt)
+                $0.mainShell.home.isGenerationInProgress = true
+            }
 
         #expect(await trackGenerationProgress.beganCount == 1)
 
@@ -512,7 +560,7 @@ struct AppRootFeatureTests {
         let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             observeGenerationOutcomes: observeGenerationOutcomes,
             waitPolicy: GenerationWaitPolicy(minimumWait: 60, retentionLimit: 3_600),
@@ -521,7 +569,8 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await store
+            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
 
         #expect(store.state.generationProgress?.projectID == "project-1")
@@ -539,7 +588,7 @@ struct AppRootFeatureTests {
         let observeGenerationOutcomes = ObserveGenerationOutcomesUseCaseMock()
         var state = AppRootFeature.State(bundleVersion: "1.0.0")
         state.route = .mainShell
-        state.projectRegistration = ProjectRegistrationFeature.State()
+        state.projectRegistration = ProjectRegistrationRouterFeature.State()
         let store = makeAppRootStore(
             observeGenerationOutcomes: observeGenerationOutcomes,
             trackGenerationProgress: trackGenerationProgress,
@@ -549,7 +598,8 @@ struct AppRootFeatureTests {
         )
         store.exhaustivity = .off
 
-        await store.send(.projectRegistration(.presented(.effect(.submissionFinished(.success(Self.receipt))))))
+        await store
+            .send(.projectRegistration(.presented(.quizGenerationProgress(.effect(.submissionFinished(.success(Self.receipt)))))))
         await observeGenerationOutcomes.emit(GenerationOutcome(projectID: "project-1", status: .completed))
 
         await store.receive(.effect(.generationProgressReleased(projectID: "project-1")), timeout: .seconds(5)) {
@@ -643,10 +693,10 @@ struct AppRootFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL)))) {
-            $0.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: Self.sharedURL)
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
         }
 
-        #expect(store.state.projectRegistration?.repositoryURLInput == Self.sharedURL)
+        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
         #expect(store.state.pendingSharedLink == nil)
 
         await store.skipReceivedActions()
@@ -666,7 +716,7 @@ struct AppRootFeatureTests {
         await store.send(.onboarding(.delegate(.mainShellRequested))) {
             $0.route = .mainShell
             $0.pendingSharedLink = nil
-            $0.projectRegistration = ProjectRegistrationFeature.State(initialRepositoryURL: Self.sharedURL)
+            $0.projectRegistration = ProjectRegistrationRouterFeature.State(initialRepositoryURL: Self.sharedURL)
         }
 
         await store.skipReceivedActions()
@@ -700,7 +750,7 @@ struct AppRootFeatureTests {
 
         await store.send(.effect(.sharedRepositoryLinkReceived(SharedRepositoryLink(url: Self.sharedURL))))
         await store.send(.onboarding(.delegate(.mainShellRequested)))
-        #expect(store.state.projectRegistration?.repositoryURLInput == Self.sharedURL)
+        #expect(store.state.projectRegistration?.repositoryLinkInput.repositoryURLInput == Self.sharedURL)
 
         await store.send(.mainShell(.delegate(.loggedOut))) {
             $0.projectRegistration = nil
@@ -743,5 +793,104 @@ struct AppRootFeatureTests {
         ],
         hasNext: false,
     )
+
+}
+
+// MARK: - AppRootLearningFlowTests
+
+@Suite("AppRootFeature 학습 흐름 표시")
+struct AppRootLearningFlowTests {
+
+    // MARK: Internal
+
+    @Test
+    func `프로젝트 상세 요청은 상세 흐름을 표시한다`() async {
+        let store = makeAppRootStore(state: mainShellState())
+        store.exhaustivity = .off
+
+        await store.send(.mainShell(.delegate(.projectDetailRequested(projectID: "project-1"))))
+
+        #expect(store.state.projectDetail?.projectID == "project-1")
+    }
+
+    @Test
+    func `세트 선택은 상세 흐름 위에 풀이 흐름을 표시한다`() async {
+        let store = makeAppRootStore(state: presentedDetailState())
+        store.exhaustivity = .off
+
+        await store.send(.projectDetail(.presented(.delegate(.learningSetRequested(
+            projectID: "project-1",
+            setID: "set-1",
+            label: "CHAPTER 1",
+        )))))
+
+        #expect(store.state.quiz?.projectID == "project-1")
+        #expect(store.state.quiz?.setID == "set-1")
+        #expect(store.state.quiz?.setLabel == "CHAPTER 1")
+        #expect(store.state.projectDetail != nil)
+    }
+
+    @Test
+    func `풀이 흐름을 닫으면 상세로 돌아가고 갱신을 요청한다`() async {
+        var state = presentedDetailState()
+        state.quiz = QuizRouterFeature.State(projectID: "project-1", setID: "set-1", setLabel: "CHAPTER 1")
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.quiz(.presented(.delegate(.dismissRequested(projectID: "project-1")))))
+        await store.receive(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
+
+        #expect(store.state.quiz == nil)
+        #expect(store.state.projectDetail?.projectID == "project-1")
+    }
+
+    @Test
+    func `풀이 중 진행이 바뀌면 표시 중인 상세에 갱신을 전달한다`() async {
+        var state = presentedDetailState()
+        state.quiz = QuizRouterFeature.State(projectID: "project-1", setID: "set-1", setLabel: "CHAPTER 1")
+        let store = makeAppRootStore(state: state)
+        store.exhaustivity = .off
+
+        await store.send(.quiz(.presented(.delegate(.progressInvalidated(projectID: "project-1")))))
+        await store.receive(.projectDetail(.presented(.projectDetail(.input(.refreshRequested)))))
+    }
+
+    @Test
+    func `외부 URL 요청은 주입된 경로를 정확히 한 번 사용한다`() async throws {
+        let openExternalURL = OpenExternalURLSpy()
+        let store = makeAppRootStore(openExternalURL: openExternalURL, state: presentedDetailState())
+        store.exhaustivity = .off
+        let url = try #require(URL(string: AppRootTestFixture.repositoryURL))
+
+        await store.send(.projectDetail(.presented(.delegate(.externalURLRequested(url)))))
+        await store.finish()
+
+        #expect(await openExternalURL.openedURLs == [url])
+    }
+
+    @Test
+    func `삭제 완료는 상세 표시를 해제하고 목록 갱신을 요청한다`() async {
+        let store = makeAppRootStore(state: presentedDetailState())
+        store.exhaustivity = .off
+
+        await store.send(.projectDetail(.presented(.delegate(.projectDeleted(projectID: "project-1")))))
+        await store.receive(.mainShell(.home(.input(.learningProjectsReloadRequested))))
+
+        #expect(store.state.projectDetail == nil)
+    }
+
+    // MARK: Private
+
+    private func mainShellState() -> AppRootFeature.State {
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.route = .mainShell
+        return state
+    }
+
+    private func presentedDetailState() -> AppRootFeature.State {
+        var state = mainShellState()
+        state.projectDetail = ProjectDetailRouterFeature.State(projectID: "project-1")
+        return state
+    }
 
 }

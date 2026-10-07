@@ -93,7 +93,8 @@ extension DataModuleName {
                     name: DataModuleName.DataLearningProject.rawValue
                 ),
                 additionalDependencies: [
-                    .fromInfrastructure(.InfrastructureStorage)
+                    .fromInfrastructure(.InfrastructureStorage),
+                    .fromInfrastructure(.InfrastructureNetworkClient),
                 ],
             )
 

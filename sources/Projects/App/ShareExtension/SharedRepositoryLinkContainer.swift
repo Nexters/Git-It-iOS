@@ -8,7 +8,7 @@ enum SharedRepositoryLinkContainer {
 
     static let appGroupIdentifier = "group.com.nexters.hytime.gitit"
     static let storageKey = "sharedRepositoryURL"
-    static let containerAppURL = "gitit://shared-link"
+    static let containerAppURL = "https://git-it.kr/shared-link"
 
     static func store(_ urlString: String) {
         guard let defaults = UserDefaults(suiteName: appGroupIdentifier) else { return }

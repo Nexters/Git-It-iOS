@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-08-31 ([TCA 컨벤션](./README.md)에서 분리)
+**최종 수정일**: 2026-09-03 (Router-Feature를 흐름의 필수 구성으로 확정, 흐름 이탈 판단 기준 정리)
 
 ## 목적
 
@@ -54,25 +54,81 @@
 [§4](../view.md#4-화면-조립)가, UIComponent 입력 경계는
 [UIComponent 컨벤션 §2](../ui-component.md#2-공개-계약)가 소유합니다.
 
-### 2.3 Router-Feature와 화면 이동 추적
+### 2.3 Router-Feature와 화면 전환 소유
 
-여러 화면 Feature를 순차적인 여정으로 조합해야 하고 그 조합 자체가 이동 추적처럼
-독립적으로 검증할 가치가 있는 책임이면, 조합을 전담하는 별도의 Router-Feature를 둘 수
-있습니다. Router-Feature는 화면 Feature가 아니라 화면 Feature들의 조합과 전환만
-책임지는 상위 Feature입니다.
+**화면이 둘 이상인 흐름은 그 화면 Feature들의 조합과 전환을 전담하는 Router-Feature를
+둡니다.** 화면 Feature는 자신의 화면 상태만 소유하고 어떤 화면 다음에 어떤 화면이
+오는지는 알지 않습니다. Router-Feature는 화면 Feature가 아니라 화면 Feature들의 조합과
+전환만 책임지는 상위 Feature입니다. 화면이 하나뿐인 흐름은 조합할 대상이 없으므로
+Router를 두지 않습니다.
 
-**구성**
+화면과 Feature가 1:1이라는 전제는
+[Feature 컨벤션 §2](./feature.md#2-feature-단위), Router 파일이 놓이는 자리는
+[디렉터리·파일 컨벤션 §4.3](../directory-file.md#43-feature-패키지의-흐름-배치)이
+소유합니다.
+
+**흐름의 두 종류**
+
+Router가 조합하는 화면의 관계에 따라 흐름을 두 종류로 나눕니다. 아래 **Router View와
+뒤로가기**는 두 종류에 공통이고, 그 뒤의 **구성**·**화면 이동 이벤트**는 순차 흐름에만
+적용합니다.
+
+| | 순차 흐름 | 셸 흐름 |
+| --- | --- | --- |
+| 예 | `ProjectRegistration` | `MainShell` |
+| 화면 관계 | 정해진 순서로 이어지는 여정 | 병렬로 존재하고 임의 순서로 오감 |
+| Router가 소유하는 골격 | `ScreenContainer` — 화면들이 배경을 공유 | `TabShell` — 각 화면이 자기 `ScreenContainer`를 가짐 |
+| 활성 화면 값 | 세부 화면을 연관값으로 갖는 계층형 enum | 화면을 나열하는 평평한 enum |
+| 흐름 차원의 뒤로가기 | 있음 | 없음 |
+| 이동 이벤트 | 기록함 | 기록하지 않음 — 전환 순서에 의미가 없음 |
+| 화면의 위치 | 같은 target의 화면 폴더 | 대체로 다른 target의 흐름 |
+
+**Router가 조합하는 대상**
+
+- Router는 같은 흐름의 화면 Feature뿐 아니라 **다른 target의 흐름 진입 Feature**도
+  조합할 수 있습니다. `MainShellRouterFeature`가 `HomeFeature`를 `Scope`로 조합하는
+  것이 그 예입니다.
+- 따라서 자신의 화면을 하나도 갖지 않고 `Router/`만 있는 흐름이 존재할 수 있습니다
+  ([디렉터리·파일 컨벤션 §4.3](../directory-file.md#43-feature-패키지의-흐름-배치)).
+- 조합 대상이 다른 target이어도 경계는 같습니다. 자식은 `delegate`로만 상위 의도를
+  알리고 Router가 그것을 해석하며, Router는 자식의 내부 상태를 직접 바꾸지 않습니다.
+
+**Router View와 뒤로가기**
+
+- Router는 화면 Feature들과 마찬가지로 **View와 Feature를 1:1 쌍으로 소유합니다.**
+  Router View가 그 흐름의 **골격 컴포넌트**와 흐름 공용 sheet·alert를 소유하고, 활성
+  화면 값을 `switch`해 해당 화면을 그립니다. 각 화면의 Store는 Router State가 항상
+  보유하는 child state에서 `scope`로 얻습니다.
+- 골격 컴포넌트는 순차 흐름이면 `ScreenContainer`, 셸 흐름이면 `TabShell`입니다. 셸
+  흐름에서는 각 화면이 자신의 `ScreenContainer`를 소유하므로 Router가 이를 다시 감싸지
+  않습니다.
+- **활성 화면 값 타입은 Router가 소유합니다.** 순차 흐름의 계층형 enum과 셸 흐름의 탭
+  enum 모두 `Router/`에 둡니다.
+- **흐름 내 화면 전환에 `NavigationStack`·`StackState`를 쓰지 않습니다.** 활성 화면
+  값을 바꾸는 것이 곧 전환입니다.
+- **뒤로가기는 활성 화면 값을 이전 값으로 되돌리는 상태 전이입니다.** View를 pop하거나
+  화면 Feature를 다시 주입해 State를 새로 만들지 않습니다. child state를 항상 보유하므로
+  되돌아간 화면의 입력값은 그대로 보존됩니다.
+- 흐름 내 뒤로가기 입력은 화면의 View Action으로 들어와 Router가 해석합니다. 화면
+  Feature는 자신의 이전 화면이 무엇인지 알지 않습니다.
+
+**구성** (순차 흐름)
 
 - Router의 `State`는 조합하는 각 화면 Feature의 State를 **항상 함께 보유**합니다. 현재
   어떤 화면이 활성 상태인지는 별도의 연관값 enum(예: `ActiveScreen`)으로 표현하며, 이
   값은 최상위 화면 Feature 단위를 case로 갖고 그 내부에 세부 화면이 있으면(예: 하나의
   화면 Feature가 여러 단계를 가짐) 그 세부 화면을 연관값으로 함께 포함하는 계층형
   값입니다.
-- 이 활성 화면 값에는 "완료"처럼 상위로 나가야 함을 뜻하는 case를 두지 않습니다. 상위로
-  나가야 하는 조건(예: 마지막 화면의 제출 성공)을 관찰해 "Router가 전환해야 하는가"만
-  판단하는 별도의 얇은 조건부 Feature를 두고, 그 판단 결과를 `delegate`로 Router에
-  알립니다. 이 조건부 Feature는 "완료 여부"가 아니라 "Router 전환 여부"를 판단하는
-  책임만 가집니다.
+- 이 활성 화면 값에는 "완료"처럼 상위로 나가야 함을 뜻하는 case를 두지 않습니다. 흐름을
+  벗어나는 것은 활성 화면 전환이 아니라 Router의 `delegate`입니다.
+- 상위로 나가야 하는 조건이 **한 화면 Feature의 `delegate` 하나로 그대로 드러나면**
+  Router가 그 `delegate`를 자신의 `delegate`로 바꿔 올립니다. 별도 Feature를 두지
+  않습니다. `ProjectRegistrationRouterFeature`가 진행 화면의
+  `projectRegistered`를 그대로 올리는 것이 그 예입니다.
+- 상위로 나가야 하는지가 **여러 신호의 조합이나 추가 단계에 달려 있으면**, 그 판단만
+  하는 별도의 얇은 조건부 Feature를 두고 판단 결과를 `delegate`로 Router에 알립니다. 이
+  조건부 Feature는 "완료 여부"가 아니라 "Router 전환 여부"를 판단하는 책임만 가집니다.
+  큐레이션 성공과 splash 표시를 함께 봐야 하는 `OnboardingExitFeature`가 그 예입니다.
 - Router의 `body`는 조합하는 모든 화면 Feature와 조건부 Feature를 `Scope`로 구성하고,
   뒤이어 Router 자신의 `Reduce`에서 화면 Feature의 `delegate`를 해석해 활성 화면을
   전환하거나 조건부 Feature로 조정 신호를 전달합니다.
@@ -80,7 +136,7 @@
   여정이면 `@Presents`/`Destination` 대신 이 방식(항상 존재하는 Child + 활성 enum)을
   사용합니다. `@Presents`의 존재/부재 의미론은 이런 순차 여정에 적합하지 않습니다.
 
-**화면 이동 이벤트**
+**화면 이동 이벤트** (순차 흐름)
 
 - Router는 자신이 관리하는 활성 화면이 실제로 바뀔 때마다 전환 이전 화면, 전환 이후
   화면과 전환을 유발한 Action을 식별할 수 있는 값을 담은 이동 이벤트를 State에 기록해
@@ -118,9 +174,14 @@
 - [ ] Feature가 다른 최상위 Feature를 직접 생성하거나 App Navigation 방식을 명령하지
       않는가?
 - [ ] Router의 State가 조합하는 화면 Feature의 State를 항상 함께 보유하는가?
-- [ ] 활성 화면 값에 "완료" 같은 상위 이탈 의미의 case가 없고, 이탈 판단이 별도의
-      조건부 Feature로 분리되어 있는가?
-- [ ] 화면 이동 이벤트가 State에 기록되고 테스트가 직접 조회할 수 있는가?
+- [ ] 활성 화면 값에 "완료" 같은 상위 이탈 의미의 case가 없는가? 이탈 조건이 한
+      `delegate`로 드러나지 않는다면 조건부 Feature로 분리되어 있는가?
+- [ ] 흐름 내 화면 전환에 `NavigationStack`·`StackState`를 쓰지 않았는가?
+- [ ] 뒤로가기가 활성 화면 값을 되돌리는 상태 전이이고, 화면 Feature의 State를 새로
+      만들지 않는가?
+- [ ] 화면 Feature가 자신의 다음·이전 화면을 알지 않고 `delegate`로만 의도를 알리는가?
+- [ ] 순차 흐름의 화면 이동 이벤트가 State에 기록되고 테스트가 직접 조회할 수 있는가?
+      (셸 흐름은 기록하지 않습니다.)
 - [ ] Router보다 긴 생명주기가 필요한 상태가 Router나 화면 Feature의 State가 아니라
       상위 정본에 있는가?
 

@@ -136,7 +136,7 @@ public struct SplashView: View {
 }
 
 #Preview("Splash") {
-    ScreenContainer { _ in
+    ScreenContainer {
         SplashView()
             .designSystemScreenMargin()
     }

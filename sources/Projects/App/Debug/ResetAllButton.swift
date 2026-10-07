@@ -14,7 +14,7 @@ public struct ResetAllButton: View {
 
     public var body: some View {
         Button(
-            "설정 초기화 (회원탈퇴·로그아웃·약관 동의 삭제)",
+            "설정 초기화",
             action: action,
         )
         .buttonStyle(.borderedProminent)

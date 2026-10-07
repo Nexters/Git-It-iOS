@@ -33,19 +33,29 @@ struct AppRootView: View {
             AppEntryScreen(store: store.scope(state: \.appEntry, action: \.appEntry))
 
         case .onboarding:
-            OnboardingScreen(store: store.scope(state: \.onboarding, action: \.onboarding))
+            OnboardingRouter(store: store.scope(state: \.onboarding, action: \.onboarding))
 
         case .mainShell:
-            MainShellScreen(store: store.scope(state: \.mainShell, action: \.mainShell))
-            #if DEBUG
-                .safeAreaInset(edge: .bottom) {
-                    ResetAllButton(action: { send(.resetAllTapped) })
-                }
-            #endif
+            MainShellRouter(store: store.scope(state: \.mainShell, action: \.mainShell))
+//            #if DEBUG
+//                .safeAreaInset(edge: .bottom) {
+//                    ResetAllButton(action: { send(.resetAllTapped) })
+//                }
+//            #endif
                 .fullScreenCover(
                     item: $store.scope(state: \.projectRegistration, action: \.projectRegistration)
                 ) { store in
-                    ProjectRegistrationScreen(store: store)
+                    ProjectRegistrationRouter(store: store)
+                }
+                .fullScreenCover(
+                    item: $store.scope(state: \.projectDetail, action: \.projectDetail)
+                ) { projectDetailStore in
+                    ProjectDetailRouter(store: projectDetailStore)
+                        .fullScreenCover(
+                            item: $store.scope(state: \.quiz, action: \.quiz)
+                        ) { quizStore in
+                            QuizRouter(store: quizStore)
+                        }
                 }
         }
     }
@@ -99,7 +109,12 @@ private enum AppRootPreviewSupport {
                 email: "preview@example.com",
                 position: nil,
                 careerLevel: nil,
-                statistics: LearningStatistics(totalAnsweredCount: 0, totalCorrectCount: 0, weeklyCounts: []),
+                statistics: LearningStatistics(
+                    thisWeekSolvedCount: 0,
+                    thisMonthSolvedCount: 0,
+                    streakDays: 0,
+                    weeklyCounts: [],
+                ),
             )
         }
     }
@@ -144,6 +159,51 @@ private enum AppRootPreviewSupport {
 
     struct NoopFetchBookmarkedQuestions: FetchBookmarkedQuestionsUseCase {
         func callAsFunction(projectID _: String?) async throws -> BookmarkedQuestionCollection {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopFetchLearningProjectDetail: FetchLearningProjectDetailUseCase {
+        func callAsFunction(projectID _: String) async throws -> LearningProjectDetail {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopFetchLearningSet: FetchLearningSetUseCase {
+        func callAsFunction(
+            projectID _: String,
+            setID _: String,
+        ) async throws -> LearningSet {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSubmitChoiceAnswer: SubmitChoiceAnswerUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            selectedIndex _: Int,
+        ) async throws -> ChoiceAnswerResult {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSubmitEssayAnswer: SubmitEssayAnswerUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            text _: String,
+        ) async throws -> EssayAnswerResult {
+            throw CancellationError()
+        }
+    }
+
+    struct NoopSetQuestionBookmark: SetQuestionBookmarkUseCase {
+        func callAsFunction(
+            projectID _: String,
+            questionID _: String,
+            bookmarked _: Bool,
+        ) async throws -> BookmarkState {
             throw CancellationError()
         }
     }
@@ -223,8 +283,13 @@ private enum AppRootPreviewSupport {
                 completeCuration: NoopCompleteCuration(),
                 policyConsent: NoopPolicyConsent(),
                 fetchLearningProjects: NoopFetchLearningProjects(),
+                fetchLearningProjectDetail: NoopFetchLearningProjectDetail(),
                 deleteLearningProject: NoopDeleteLearningProject(),
                 fetchBookmarkedQuestions: NoopFetchBookmarkedQuestions(),
+                fetchLearningSet: NoopFetchLearningSet(),
+                submitChoiceAnswer: NoopSubmitChoiceAnswer(),
+                submitEssayAnswer: NoopSubmitEssayAnswer(),
+                setQuestionBookmark: NoopSetQuestionBookmark(),
                 updateMemberPosition: NoopUpdateMemberPosition(),
                 updateMemberCareerLevel: NoopUpdateMemberCareerLevel(),
                 deleteMemberAccount: NoopDeleteMemberAccount(),

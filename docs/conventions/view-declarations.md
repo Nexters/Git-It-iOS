@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-08-31 ([View 컨벤션](./view.md)에서 분리)
+**최종 수정일**: 2026-09-03 (`Constant` 자료를 §2.1로 모으고 소유 판정 규칙을 §2.2로 정리)
 
 ## 목적
 
@@ -28,8 +28,13 @@ Feature의 `State`, `Action`, Reducer와 cancellation ID는 View가 아니라 Fe
 
 ## 2. View 내부 선언
 
-**View가 소유하는 선언은 별도 파일로 나누지 않고 View 타입 안에 중첩해 View 파일에
-함께 둡니다.** 이 규칙은 UIComponent 컴포넌트와 Feature 화면에 동일하게 적용합니다.
+**View가 소유하는 선언은 언제나 그 View의 이름 아래에, 소유 View와 같은 파일에
+둡니다.** 파일 최상위로 꺼내지 않고, `{View}+{선언}.swift`처럼 별도 파일로도 나누지
+않습니다. 이 규칙은 UIComponent 컴포넌트와 Feature 화면에 동일하게 적용합니다.
+
+`Constant`뿐 아니라 `Style`과 그 밖에 View가 소유하는 모든 보조 선언에 같은 형태를
+적용합니다 — **View 선언 뒤의 `private extension {View}` 블록**입니다. `private`을
+붙일 수 없는 선언은 View가 소유해서는 안 됩니다(§2.2).
 단, Feature의 `State`, `Action`, Reducer와 cancellation ID는 View가 아니라 Feature 타입이
 소유하므로 화면 파일로 옮기지 않습니다.
 
@@ -57,8 +62,44 @@ Style이 빌드 시 정렬하므로 파일 안의 배치를 사람이 관리하�
 
 ### 2.1 `Constant`
 
-상태와 무관한 수치, 정적 문자열, 플레이스홀더는 case 없는 `private enum Constant`의
-`static` 멤버로 정의합니다. 비제네릭 View는 `static let` 저장 프로퍼티를 사용합니다.
+상태와 무관한 수치, 정적 문자열, 플레이스홀더는 case 없는 `Constant`의 `static` 멤버로
+정의합니다. 비제네릭 View는 `static let` 저장 프로퍼티를 사용합니다.
+
+**최상위 View는 파일 하단의 `private extension`에 `Constant`를 정의합니다.** `body`를
+읽는 흐름이 상수 목록으로 끊기지 않게 하고, `private`을 extension 하나에 붙여 View 밖
+참조를 막기 위한 것입니다.
+
+```swift
+struct RepositoryLinkInputScreen: View {
+    var body: some View { ... }
+}
+
+private extension RepositoryLinkInputScreen {
+    enum Constant {
+        static let titleFieldSpacing: CGFloat = 16
+        static let bottomButtonPadding: CGFloat = 34
+    }
+}
+```
+
+**중첩 서브뷰는 자기 타입 안에 `private enum Constant`로 둡니다.** 서브뷰는 이미
+`{화면}+{서브뷰}.swift`라는 자기 파일을 갖고 있어 상수가 `body`에서 멀지 않고,
+extension으로 다시 꺼내면 `화면.서브뷰` 전체 경로를 반복해야 합니다. 부모 화면의
+`Constant`를 직접 참조하지 않고, 같은 값을 써야 하면 서브뷰 생성자로 주입받아 부모
+화면이 초기화 시 넘깁니다. 서브뷰를 언제 만드는지와 호출 규칙은
+[View 컨벤션 §4.3](./view.md#43-화면-전용-서브뷰)이 소유합니다.
+
+```swift
+extension RepositoryLinkInputScreen {
+    struct GuideSectionView: View {
+        var body: some View { ... }
+
+        private enum Constant {
+            static let rowSpacing: CGFloat = 12
+        }
+    }
+}
+```
 
 ```swift
 private enum Constant {
@@ -106,9 +147,9 @@ public struct SheetSurface<Content: View>: View {
   않습니다. 계산이 필요한 순간 그 값은 상수가 아닙니다.
 - 외부 입력이나 `Binding` 값에 따라 달라지는 값은 상수가 아니므로 `Constant`가 아니라
   View의 private 연산 프로퍼티로 표현합니다.
-- 여러 타입이 공유하는 값은 `Constant`에 복제하지 않고
-  [View 토큰 컨벤션 §2.3](./view-tokens.md#23-레이아웃모서리컨트롤-크기)에 따라
-  토큰으로 승격합니다.
+- **`Constant`는 `{View}+Constant.swift`처럼 별도 파일로 나누지 않습니다.** 상수는
+  `body`를 읽을 때 곧바로 확인해야 하는 값이라 같은 파일에 있어야 하고, 파일을 나누면
+  `private`을 쓸 수 없어 View 밖에서 참조할 길이 열립니다.
 
 다음은 상수로 승격하지 않습니다.
 
@@ -118,7 +159,27 @@ public struct SheetSurface<Content: View>: View {
 그 외에 **한 파일에서 두 번 이상 나타나거나, 이름 없이는 의미가 드러나지 않는
 수치**는 `Constant`에 둡니다.
 
-### 2.2 `Style`
+### 2.2 `private`을 붙일 수 없으면 소유가 잘못된 것입니다
+
+**View가 소유하는 선언은 예외 없이 `private`입니다.** 접근 수준을 넓혀야 컴파일되는
+상황은 규칙의 예외가 아니라 **그 선언의 소유자를 잘못 정했다는 신호**입니다. 접근
+제어자를 푸는 대신 소유를 다시 정합니다.
+
+| 증상 | 실제 문제 | 해결 |
+| --- | --- | --- |
+| 서브뷰 파일이 부모 View의 `Constant`를 참조한다 | 상수의 소유자가 부모가 아니다 | 서브뷰가 자기 `Constant`를 갖거나, 같은 값이 필요하면 생성자로 주입받습니다(§2.1) |
+| 여러 View가 같은 값을 참조한다 | 그 값은 한 View의 상수가 아니다 | [View 토큰 컨벤션 §2.3](./view-tokens.md#23-레이아웃모서리컨트롤-크기)에 따라 DesignSystem 토큰으로 승격합니다 |
+| 화면과 서브뷰가 같은 표시 모델을 주고받는다 | 표시 모델은 View 소유 선언이 아니다 | View에 중첩하지 않고 최상위 타입으로 분리해 [파일·형태 어휘 컨벤션 §2.1](./file-vocabulary.md#21-파일-하나에-타입-하나)에 따라 자기 파일에 둡니다 |
+
+표시 모델을 View에 중첩하면 그 View의 내부 선언인 것처럼 보이지만, 실제로는 화면과
+서브뷰가 주고받는 **경계 타입**입니다. 경계 타입은 중첩 대상이 아닙니다.
+
+**예외는 화면이 서브뷰에게 제공하는 `typealias` 하나뿐입니다.** 서브뷰가 TCA·Domain에
+의존하지 않도록 화면이 이름만 다시 붙이는 선언이므로, 서브뷰 파일에서 참조되는 것이 이
+선언의 목적 자체입니다([View 컨벤션 §4.3](./view.md#43-화면-전용-서브뷰)). 이름이 아니라
+값을 담는 표시 타입은 위 표 세 번째 행대로 최상위 타입으로 분리합니다.
+
+### 2.3 `Style`
 
 고정된 토큰 조합을 갖는 시각 변형이 **둘 이상일 때만** `Style`을 정의합니다. 변형이
 하나뿐인 View는 `Style`을 정의하지 않으며, 화면은 시각 변형이 아니라 화면 상태를
@@ -182,7 +243,7 @@ public struct ActionButton: View {
 [View 컨벤션 §3.2](./view.md#32-컴포넌트의-공개-생성-경로는-두-가지입니다)의 시각
 변형 팩토리를 기본 선택 수단으로 사용합니다.
 
-### 2.3 외부 상태와 `Binding`
+### 2.4 외부 상태와 `Binding`
 
 UI 컴포넌트는 표시 상태의 원본을 소유하지 않습니다. 읽기 전용 값은 불변 저장
 프로퍼티로 받고, 컴포넌트의 조작 결과를 외부 상태에 즉시 반영해야 하는 경우에만
@@ -193,7 +254,7 @@ SwiftUI `Binding`을 받습니다. 단방향 이벤트는 `Binding`으로 가장
 - `Binding`의 기본값을 `.constant`로 제공해 상태 연결 누락을 숨기지 않습니다.
 - 로딩·선택·활성화처럼 외부가 결정하는 상태는 표시 값 또는 `Binding`으로 명시합니다.
 
-### 2.4 중첩할 수 없는 경우
+### 2.5 중첩할 수 없는 경우
 
 Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는 경우가 있습니다.
 
@@ -219,7 +280,14 @@ Swift 제약으로 중첩이 불가능하거나 중첩이 호출부를 해치는
       파일에 함께 있는가?
 - [ ] Feature 화면에는 `Constant`와 화면 전용 렌더링 보조 선언만 있고, `State`,
       `Action`, Reducer를 중복한 ViewModel·Style이 없는가?
-- [ ] 최상위로 꺼낸 선언이 §2.4의 중첩 불가 사유에 해당하는가?
+- [ ] 최상위로 꺼낸 선언이 §2.5의 중첩 불가 사유에 해당하는가?
+- [ ] View가 소유하는 선언이 예외 없이 `private`인가? 접근 수준을 넓히는 대신 §2.2의
+      표대로 소유를 다시 정했는가?
+- [ ] 최상위 View의 `Constant`가 파일 하단 `private extension` 블록에 있는가?
+- [ ] 중첩 서브뷰의 `Constant`가 부모가 아니라 서브뷰 자신에게 있는가?
+- [ ] 화면과 서브뷰가 주고받는 표시 모델을 View에 중첩하지 않고 최상위 타입으로
+      분리했는가?
+- [ ] `{View}+Constant.swift`처럼 선언을 별도 파일로 나누지 않았는가?
 - [ ] 중첩 타입 이름이 소유 View 이름을 반복하지 않는가?
 - [ ] 이름 없이 의미가 드러나지 않는 수치가 `Constant`에 있는가?
 - [ ] `Constant`에 case와 인스턴스 멤버가 없고 멤버가 리터럴만 반환하는가?

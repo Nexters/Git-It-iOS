@@ -59,7 +59,7 @@ public struct ScreenHeader: View {
                     IconGlassButton.neutral(
                         symbol: leading.symbol,
                         label: leading.label,
-                        size: .small,
+                        size: .medium,
                         action: onLeadingTap,
                     )
                 }
@@ -74,7 +74,7 @@ public struct ScreenHeader: View {
                     IconGlassButton.neutral(
                         symbol: trailing.symbol,
                         label: trailing.label,
-                        size: .small,
+                        size: .medium,
                         action: onTrailingTap,
                     )
                 }
