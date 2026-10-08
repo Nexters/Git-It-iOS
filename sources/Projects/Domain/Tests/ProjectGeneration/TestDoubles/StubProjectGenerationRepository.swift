@@ -1,4 +1,5 @@
-@testable import DomainProjectGeneration
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 actor StubProjectGenerationRepository: ProjectGenerationRepository {
 

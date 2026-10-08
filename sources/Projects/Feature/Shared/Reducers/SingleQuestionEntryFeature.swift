@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainIdentifier
-import DomainQuizDetail
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - SingleQuestionEntryFeature

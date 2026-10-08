@@ -1,6 +1,5 @@
 import DesignSystem
-import DomainIdentifier
-import DomainQuizDetail
+import DomainUseCaseInterface
 import SwiftUI
 import UIComponent
 

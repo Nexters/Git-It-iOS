@@ -1,4 +1,5 @@
-@testable import DomainAppSetting
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 actor SpyDeviceRegistrationRepository: DeviceRegistrationRepository, DeviceIdentifierRepository {
 

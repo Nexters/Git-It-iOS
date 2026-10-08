@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import DomainProjectGeneration
+@testable import DomainUseCaseInterface
 
 @Suite("GenerationState")
 struct GenerationStateTests {

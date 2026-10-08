@@ -6,7 +6,7 @@ import Testing
 @testable import DataAuthentication
 @testable import DataMember
 @testable import DataShared
-@testable import DomainUserInfo
+@testable import DomainUseCaseInterface
 
 // MARK: - UserInfoRepositoryAdapterTests
 

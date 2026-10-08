@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainExternalRepository
-import DomainProjectGeneration
+import DomainUseCaseInterface
 
 @testable import Feature
 

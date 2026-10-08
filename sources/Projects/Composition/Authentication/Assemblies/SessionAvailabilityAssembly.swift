@@ -1,6 +1,6 @@
 import DataAuthentication
 import DataShared
-import DomainAccount
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - SessionAvailabilityAssembly

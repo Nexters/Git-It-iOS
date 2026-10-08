@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
+import DomainUseCaseInterface
 import Foundation
 
 @Reducer

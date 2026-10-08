@@ -1,11 +1,12 @@
 import DataAuthentication
 import DataShared
-import DomainAccount
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - AuthenticationRepositoryAdapter
 
-public actor AuthenticationRepositoryAdapter: DomainAccount.AuthenticationRepository {
+public actor AuthenticationRepositoryAdapter: DomainUseCaseDependency.AuthenticationRepository {
 
     // MARK: Lifecycle
 

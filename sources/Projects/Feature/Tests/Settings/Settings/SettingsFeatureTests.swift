@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainAppSetting
-import DomainUserInfo
+import DomainUseCaseInterface
 import Foundation
 import Testing
 

@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainProjectGeneration
+import DomainUseCaseInterface
 
 @Reducer
 public struct QuizLevelSelectionFeature: Sendable {

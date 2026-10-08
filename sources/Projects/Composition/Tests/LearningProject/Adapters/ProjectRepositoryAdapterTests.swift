@@ -4,7 +4,7 @@ import Testing
 @testable import CompositionLearningProject
 @testable import DataLearningProject
 @testable import DataShared
-@testable import DomainProject
+@testable import DomainUseCaseInterface
 
 // MARK: - ProjectRepositoryAdapterTests
 

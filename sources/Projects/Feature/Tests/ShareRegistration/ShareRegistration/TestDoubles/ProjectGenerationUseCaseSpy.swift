@@ -1,5 +1,4 @@
-import DomainIdentifier
-import DomainProjectGeneration
+import DomainUseCaseInterface
 import Synchronization
 
 final class ProjectGenerationUseCaseSpy: ProjectGenerationUseCase, Sendable {

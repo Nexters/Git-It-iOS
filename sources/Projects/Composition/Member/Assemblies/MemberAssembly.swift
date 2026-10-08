@@ -1,7 +1,8 @@
 import DataAuthentication
 import DataMember
 import DataShared
-import DomainUserInfo
+import DomainUseCaseImplementation
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - MemberAssembly

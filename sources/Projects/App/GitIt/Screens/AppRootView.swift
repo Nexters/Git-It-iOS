@@ -1,12 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainAppSetting
-import DomainExternalRepository
-import DomainIdentifier
-import DomainProject
-import DomainProjectGeneration
-import DomainQuizDetail
-import DomainUserInfo
+import DomainUseCaseInterface
 import Feature
 import Foundation
 import SwiftUI

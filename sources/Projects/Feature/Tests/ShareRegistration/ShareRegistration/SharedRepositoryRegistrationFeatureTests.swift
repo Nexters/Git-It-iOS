@@ -1,7 +1,5 @@
 import ComposableArchitecture
-import DomainAccount
-import DomainExternalRepository
-import DomainProjectGeneration
+import DomainUseCaseInterface
 import Foundation
 import Synchronization
 import Testing

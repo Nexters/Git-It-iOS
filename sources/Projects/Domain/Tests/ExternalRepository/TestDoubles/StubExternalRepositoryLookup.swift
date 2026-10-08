@@ -1,4 +1,5 @@
-@testable import DomainExternalRepository
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 actor StubExternalRepositoryLookup: ExternalRepositoryLookup {
 

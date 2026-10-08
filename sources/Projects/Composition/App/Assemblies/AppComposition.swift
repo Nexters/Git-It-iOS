@@ -3,13 +3,7 @@ import DataAuthentication
 import DataLearningProject
 import DataNotification
 import DataShared
-import DomainAccount
-import DomainAppSetting
-import DomainExternalRepository
-import DomainProject
-import DomainProjectGeneration
-import DomainQuizDetail
-import DomainUserInfo
+import DomainUseCaseInterface
 import Foundation
 import Synchronization
 

@@ -42,17 +42,37 @@ UseCase를 독립 타입으로 둘지, 모듈 능력 단위 계약에 합칠지�
 이 기준은 Domain 안에서만 판정합니다. Feature가 어떤 단위로 주입받는지는 기준의 입력이
 아니며, 통합 계약을 받은 Router가 하위 Feature에 개별 동작만 전달하는 것은 허용됩니다.
 
-## 관심사별 UseCase와 타깃 구성
+## 역할별 타깃 구성
 
-- 관심사 하나는 자기 타깃을 갖고, UseCase 계약 하나와 그 구현, 모델, 오류, 저장소 계약을
-  소유합니다.
+Domain target은 관심사가 아니라 선언이 UseCase에 대해 맡는 역할로 나눕니다. 관심사는 target을
+만들지 않고 각 역할 target의 소스 루트 아래 관심사 세그먼트로 둡니다
+([디렉터리·파일 컨벤션 — 관심사 세그먼트](../conventions/directory-file/concern-segment.md)).
+
+| target | 소스 루트 | 소유하는 선언 | Domain 안에서 허용하는 import |
+| --- | --- | --- | --- |
+| `DomainUseCaseInterface` | `UseCaseInterface/` | UseCase 계약, 모델, Value Object, 식별자, 오류 | 없음 |
+| `DomainUseCaseDependency` | `UseCaseDependency/` | UseCase 구현이 생성자로 주입받는 외부 기능 계약(Repository 등) | `DomainUseCaseInterface` |
+| `DomainUseCaseImplementation` | `UseCaseImplementation/` | UseCase 계약의 구현 | `DomainUseCaseInterface`, `DomainUseCaseDependency` |
+| `DomainTests` | `Tests/` | 위 target의 테스트와 Test Double | 위 세 target |
+
+- 새 선언은 위 표의 역할로 target을 정합니다. 관심사가 늘어도 target을 추가하지 않고 관심사
+  세그먼트를 추가합니다.
+- 모델·Value Object·식별자·오류는 UseCase 계약과 외부 기능 계약이 함께 쓰므로
+  `DomainUseCaseInterface`가 소유합니다. UseCase 계약과 모델은 외부 기능 계약의 타입을 참조하지
+  않습니다.
+- UseCase 계약을 사용하는 쪽은 `DomainUseCaseImplementation`을 import하지 않습니다. 구현을
+  생성하는 곳은 Composition뿐입니다.
+- `DomainUseCaseDependency`의 계약은 Composition의 Adapter가 구현하고
+  `DomainUseCaseImplementation`이 주입받습니다.
+- 관심사 하나는 UseCase 계약 하나와 그 구현, 모델, 오류, 외부 기능 계약을 소유하며 각 선언을
+  역할 target의 같은 이름 관심사 세그먼트에 둡니다.
+- 같은 개념을 두 관심사가 모두 다루면 각 관심사가 자기 언어의 모델을 따로 소유하고, 식별자만
+  공유합니다. 여러 관심사가 공유하는 식별자는 `UseCaseInterface/Identifier/`에 `typealias`로
+  둡니다.
+- 모든 관심사가 한 모듈을 공유하므로 target 안의 최상위 타입 이름은 관심사와 무관하게 유일해야
+  합니다.
 - 앱에서 각 UseCase는 인스턴스 하나만 만들고, 상태를 가진 관심사는 `actor`로 구현해 변경과
   관찰의 순서를 보장합니다.
-- 관심사 타깃은 서로 import하지 않습니다. 여러 관심사가 공유하는 식별자는 식별자 전용
-  타깃에 `typealias`로 두고, 관심사 타깃은 필요할 때만 그 타깃을 import합니다. 식별자 전용
-  타깃은 모델, 계약, UseCase, 오류를 두지 않습니다.
-- 같은 개념을 두 관심사가 모두 다루면 각 관심사가 자기 언어의 모델을 따로 소유하고,
-  식별자만 공유합니다.
 - 말단 화면 Feature는 UseCase 계약 전체를 받지 않고 자신이 쓰는 동작 하나만 클로저로 받아,
   쓰지 않는 능력에 닿지 않습니다. UseCase 계약은 Router와 루트 Feature까지만 쓰입니다.
 
@@ -64,6 +84,7 @@ UseCase를 독립 타입으로 둘지, 모듈 능력 단위 계약에 합칠지�
 - 네트워크, 저장소, 파일 시스템과 같은 구체 기술을 계약 이름이나 타입에 노출해서는 안 됩니다.
 - Repository와 외부 기능 계약의 production 구현을 소유해서는 안 됩니다.
 - Feature 상태, 화면 표현 또는 Navigation 로직을 포함해서는 안 됩니다.
-- 관심사 타깃은 다른 관심사 타깃을 import해서는 안 됩니다. Domain 안에서 허용하는 유일한 import 대상은
-  식별자 전용 타깃입니다.
-- 식별자 전용 타깃은 식별자 `typealias` 외의 선언을 소유해서는 안 됩니다.
+- Domain target은 [역할별 타깃 구성](#역할별-타깃-구성)의 표가 허용하지 않는 Domain target을
+  import해서는 안 됩니다.
+- `DomainUseCaseInterface`는 외부 기능 계약이나 UseCase 계약의 구현을 소유해서는 안 됩니다.
+- `UseCaseInterface/Identifier/`는 식별자 `typealias` 외의 선언을 소유해서는 안 됩니다.

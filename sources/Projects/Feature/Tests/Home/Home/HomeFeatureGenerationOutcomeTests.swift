@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainProject
 import Testing
 
 @testable import Feature

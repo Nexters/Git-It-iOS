@@ -1,5 +1,4 @@
-import DomainIdentifier
-import DomainQuizDetail
+import DomainUseCaseInterface
 import Foundation
 
 struct NoopQuizDetailUseCase: QuizDetailUseCase {

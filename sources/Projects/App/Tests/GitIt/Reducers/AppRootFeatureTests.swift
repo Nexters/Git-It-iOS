@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainProject
-import DomainProjectGeneration
+import DomainUseCaseInterface
 import Feature
 import Foundation
 import Testing

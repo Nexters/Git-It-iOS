@@ -1,4 +1,4 @@
-import DomainAccount
+import DomainUseCaseInterface
 
 public enum ShareRegistrationDiagnosticEvent: Equatable, Sendable {
     case sharedItemUnavailable

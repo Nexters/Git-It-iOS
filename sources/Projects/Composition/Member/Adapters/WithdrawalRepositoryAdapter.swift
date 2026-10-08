@@ -1,5 +1,6 @@
 import DataMember
-import DomainAccount
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - WithdrawalRepositoryAdapter
 

@@ -1,7 +1,8 @@
 import Foundation
 import Testing
 
-@testable import DomainAppSetting
+@testable import DomainUseCaseImplementation
+@testable import DomainUseCaseInterface
 
 @Suite("AppSetting")
 struct AppSettingTests {

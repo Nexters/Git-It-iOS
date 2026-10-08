@@ -1,5 +1,4 @@
-import DomainIdentifier
-import DomainProject
+import DomainUseCaseInterface
 import Foundation
 
 actor ProjectUseCaseMock: ProjectUseCase {

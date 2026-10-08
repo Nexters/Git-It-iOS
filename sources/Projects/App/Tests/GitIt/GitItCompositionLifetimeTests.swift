@@ -1,4 +1,3 @@
-import DomainAppSetting
 import Testing
 
 @testable import GitIt

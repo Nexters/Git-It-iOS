@@ -1,6 +1,6 @@
 import DataLearningProject
-import DomainIdentifier
-import DomainProject
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - ProjectRepositoryAdapter
 

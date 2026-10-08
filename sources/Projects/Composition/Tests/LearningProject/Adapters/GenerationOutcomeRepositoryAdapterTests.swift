@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import CompositionLearningProject
 @testable import DataLearningProject
-@testable import DomainProjectGeneration
+@testable import DomainUseCaseInterface
 
 // MARK: - GenerationOutcomeRepositoryAdapterTests
 

@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainUserInfo
+import DomainUseCaseInterface
 
 @Reducer
 public struct ProfileFeature: Sendable {

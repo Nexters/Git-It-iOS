@@ -22,22 +22,10 @@ CompositionShareExtensionTests Composition/Tests/ShareExtension
 Feature Feature
 FeatureTests Feature/Tests
 
-DomainIdentifier Domain/Identifier
-DomainIdentifierTests Domain/Tests/Identifier
-DomainAccount Domain/Account
-DomainAccountTests Domain/Tests/Account
-DomainUserInfo Domain/UserInfo
-DomainUserInfoTests Domain/Tests/UserInfo
-DomainAppSetting Domain/AppSetting
-DomainAppSettingTests Domain/Tests/AppSetting
-DomainExternalRepository Domain/ExternalRepository
-DomainExternalRepositoryTests Domain/Tests/ExternalRepository
-DomainQuizDetail Domain/QuizDetail
-DomainQuizDetailTests Domain/Tests/QuizDetail
-DomainProject Domain/Project
-DomainProjectTests Domain/Tests/Project
-DomainProjectGeneration Domain/ProjectGeneration
-DomainProjectGenerationTests Domain/Tests/ProjectGeneration
+DomainUseCaseInterface Domain/UseCaseInterface
+DomainUseCaseDependency Domain/UseCaseDependency
+DomainUseCaseImplementation Domain/UseCaseImplementation
+DomainTests Domain/Tests
 
 DataAuthentication Data/Authentication
 DataAuthenticationTests Data/Tests/Authentication

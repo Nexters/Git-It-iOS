@@ -1,4 +1,5 @@
-@testable import DomainUserInfo
+import DomainUseCaseDependency
+@testable import DomainUseCaseInterface
 
 actor StubUserInfoRepository: UserInfoRepository {
 

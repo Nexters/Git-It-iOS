@@ -1,4 +1,4 @@
-import DomainUserInfo
+import DomainUseCaseInterface
 
 struct HomeProfileDisplay: Equatable, Sendable {
 

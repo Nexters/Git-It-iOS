@@ -1,7 +1,8 @@
 import Foundation
 import Testing
 
-@testable import DomainAccount
+@testable import DomainUseCaseImplementation
+@testable import DomainUseCaseInterface
 
 @Suite("Account 약관 동의·탈퇴")
 struct AccountPolicyConsentTests {

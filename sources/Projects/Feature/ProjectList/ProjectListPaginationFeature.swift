@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainProject
+import DomainUseCaseInterface
 
 @Reducer
 public struct ProjectListPaginationFeature: Sendable {

@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainExternalRepository
-import DomainIdentifier
+import DomainUseCaseInterface
 
 @Reducer
 public struct RepositoryLinkInputFeature: Sendable {

@@ -1,5 +1,6 @@
 import DataLearningProject
-import DomainProjectGeneration
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - ProjectGenerationRepositoryAdapter
 

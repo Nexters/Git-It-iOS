@@ -1,10 +1,10 @@
 import DataExternalRepository
-import DomainExternalRepository
-import DomainIdentifier
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - ExternalRepositoryLocatorAdapter
 
-public struct ExternalRepositoryLocatorAdapter: DomainExternalRepository.ExternalRepositoryLocator {
+public struct ExternalRepositoryLocatorAdapter: DomainUseCaseDependency.ExternalRepositoryLocator {
 
     // MARK: Lifecycle
 
@@ -14,9 +14,9 @@ public struct ExternalRepositoryLocatorAdapter: DomainExternalRepository.Externa
 
     // MARK: Public
 
-    public func location(from url: ExternalRepositoryURL) -> DomainExternalRepository.ExternalRepositoryLocation? {
+    public func location(from url: ExternalRepositoryURL) -> DomainUseCaseInterface.ExternalRepositoryLocation? {
         parser.location(from: url).map {
-            DomainExternalRepository.ExternalRepositoryLocation(
+            DomainUseCaseInterface.ExternalRepositoryLocation(
                 owner: $0.owner,
                 name: $0.name,
             )

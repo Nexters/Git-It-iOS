@@ -1,5 +1,6 @@
 import DataNotification
-import DomainAppSetting
+import DomainUseCaseDependency
+import DomainUseCaseInterface
 
 // MARK: - NotificationAuthorizationAdapter
 

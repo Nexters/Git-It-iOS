@@ -1,6 +1,8 @@
 import DataExternalRepository
 import DataShared
-import DomainExternalRepository
+import DomainUseCaseDependency
+import DomainUseCaseImplementation
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - ExternalRepositoryAssembly

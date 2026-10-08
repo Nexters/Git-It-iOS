@@ -1,7 +1,8 @@
 import Foundation
 import Testing
 
-@testable import DomainExternalRepository
+@testable import DomainUseCaseImplementation
+@testable import DomainUseCaseInterface
 
 @Suite("ExternalRepositoryResolver")
 struct ExternalRepositoryResolverTests {

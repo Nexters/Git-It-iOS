@@ -1,4 +1,4 @@
-import DomainAccount
+import DomainUseCaseInterface
 import Foundation
 
 actor AccountUseCaseSignOutMock {

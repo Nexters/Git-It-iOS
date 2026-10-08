@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DomainQuizDetail
+import DomainUseCaseInterface
 import Testing
 
 @testable import Feature

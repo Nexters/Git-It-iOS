@@ -1,4 +1,4 @@
-import DomainExternalRepository
+import DomainUseCaseInterface
 
 enum ShareRegistrationTestSupport {
 

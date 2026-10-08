@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainIdentifier
-import DomainProject
+import DomainUseCaseInterface
 
 @Reducer
 public struct ProjectDetailLoadFeature: Sendable {

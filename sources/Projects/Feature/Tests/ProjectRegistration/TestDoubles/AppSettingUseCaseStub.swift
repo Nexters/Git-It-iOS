@@ -1,4 +1,4 @@
-import DomainAppSetting
+import DomainUseCaseInterface
 
 actor AppSettingUseCaseStub: AppSettingUseCase {
 

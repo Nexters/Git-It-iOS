@@ -1,7 +1,8 @@
 import DataLearningProject
 import DataNotification
 import DataShared
-import DomainProjectGeneration
+import DomainUseCaseImplementation
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - LearningProjectAssembly

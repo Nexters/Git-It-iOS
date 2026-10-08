@@ -8,14 +8,8 @@ import DataLegalConsent
 import DataMember
 import DataNotification
 import DataShared
-import DomainAccount
-import DomainAppSetting
-import DomainExternalRepository
-import DomainIdentifier
-import DomainProject
-import DomainProjectGeneration
-import DomainQuizDetail
-import DomainUserInfo
+import DomainUseCaseImplementation
+import DomainUseCaseInterface
 import Foundation
 
 // MARK: - ConcernUseCaseAssembly

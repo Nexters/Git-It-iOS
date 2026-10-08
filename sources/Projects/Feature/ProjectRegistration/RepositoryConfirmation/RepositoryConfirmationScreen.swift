@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import DesignSystem
-import DomainExternalRepository
 import Foundation
 import SwiftUI
 import UIComponent

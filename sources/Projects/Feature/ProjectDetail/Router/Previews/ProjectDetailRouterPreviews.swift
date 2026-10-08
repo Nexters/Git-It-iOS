@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import DomainProject
-import DomainQuizDetail
+import DomainUseCaseInterface
 import SwiftUI
 
 private let previewQuiz = Quiz(

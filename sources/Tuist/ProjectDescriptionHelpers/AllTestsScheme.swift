@@ -46,35 +46,7 @@ extension ProjectName {
             ),
             .project(
                 path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainIdentifierTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainAccountTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainUserInfoTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainAppSettingTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainExternalRepositoryTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainQuizDetailTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainProjectTests.rawValue,
-            ),
-            .project(
-                path: ProjectName.Domain.projectPath,
-                target: DomainModuleName.DomainProjectGenerationTests.rawValue,
+                target: DomainModuleName.DomainTests.rawValue,
             ),
             .project(
                 path: ProjectName.Data.projectPath,

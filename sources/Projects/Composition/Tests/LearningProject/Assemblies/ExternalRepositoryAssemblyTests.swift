@@ -1,8 +1,9 @@
+import DomainUseCaseDependency
 import Foundation
 import Testing
 @testable import CompositionLearningProject
 @testable import DataExternalRepository
-@testable import DomainExternalRepository
+@testable import DomainUseCaseInterface
 
 struct ExternalRepositoryAssemblyTests {
 
