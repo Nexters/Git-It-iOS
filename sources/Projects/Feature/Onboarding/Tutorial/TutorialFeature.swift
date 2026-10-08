@@ -113,53 +113,32 @@ public struct TutorialFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.appeared):
-                return .send(.signIn(.input(.prepareConsent)))
-
-            case .view(.pageChanged(let page)):
-                state.page = page
-                return .none
-
-            case .view(.appleSignInTapped):
-                guard !state.isSigningIn, state.signIn.canStart else { return .none }
-                state.page = Constant.pageCount
-                return .send(.signIn(.input(.start)))
-
-            case .view(.guestAccessTapped):
-                guard !state.isSigningIn else { return .none }
-                return .send(.delegate(.guestAccessRequested))
-
-            case .input(.returnToLastPage),
-                 .signIn(.delegate(.consentCancelled)):
-                state.page = Constant.pageCount
-                return .none
-
-            case .signIn(.delegate(.signedIn(let needsCuration))):
-                guard
-                    deletesCompletedAccountOnSignIn,
-                    !needsCuration,
-                    !state.hasAttemptedCompletedAccountReset
-                else {
-                    return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
-                }
-                state.hasAttemptedCompletedAccountReset = true
-                state.accountReset = .resetting
-                return .run { [withdraw] send in
-                    try? await withdraw()
-                    await send(.effect(.accountResetFinished))
-                }
-                .cancellable(
-                    id: CancelID.accountReset,
-                    cancelInFlight: true,
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .effect(.accountResetFinished):
-                state.accountReset = .idle
-                return .send(.signIn(.input(.start)))
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
-            case .signIn,
-                 .delegate:
-                return .none
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
+
+            case .signIn(let action):
+                reduce(
+                    into: &state,
+                    signIn: action,
+                )
+
+            case .delegate:
+                .none
             }
         }
     }
@@ -179,5 +158,80 @@ public struct TutorialFeature: Sendable {
     private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
     private let withdraw: @Sendable () async throws -> Void
     private let deletesCompletedAccountOnSignIn: Bool
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .appeared:
+            return .send(.signIn(.input(.prepareConsent)))
+
+        case .pageChanged(let page):
+            state.page = page
+            return .none
+
+        case .appleSignInTapped:
+            guard !state.isSigningIn, state.signIn.canStart else { return .none }
+            return .send(.signIn(.input(.start)))
+
+        case .guestAccessTapped:
+            guard !state.isSigningIn else { return .none }
+            return .send(.delegate(.guestAccessRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .accountResetFinished:
+            state.accountReset = .idle
+            return .send(.signIn(.input(.start)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .returnToLastPage:
+            state.page = Constant.pageCount
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        signIn action: SignInFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .signedIn(let needsCuration):
+            guard
+                deletesCompletedAccountOnSignIn,
+                !needsCuration,
+                !state.hasAttemptedCompletedAccountReset
+            else {
+                return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
+            }
+            state.hasAttemptedCompletedAccountReset = true
+            state.accountReset = .resetting
+            return .run { [withdraw] send in
+                try? await withdraw()
+                await send(.effect(.accountResetFinished))
+            }
+            .cancellable(
+                id: CancelID.accountReset,
+                cancelInFlight: true,
+            )
+
+        case .consentCancelled,
+             .signInCancelled:
+            return .none
+        }
+    }
 
 }

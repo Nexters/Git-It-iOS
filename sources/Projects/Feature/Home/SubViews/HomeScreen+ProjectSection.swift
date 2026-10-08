@@ -8,7 +8,7 @@ extension HomeScreen {
         // MARK: Internal
 
         let state: HomeScreen.ProjectSectionState
-        let isShowAllEnabled: Bool
+        let isShowAllAvailable: Bool
 
         @Binding var cardListLeadingX: CGFloat?
 
@@ -23,12 +23,12 @@ extension HomeScreen {
                 spacing: Constant.sectionHeaderSpacing,
             ) {
                 HStack {
-                    StyledText(text: "학습 중인 레포지토리")
+                    StyledText(text: LocalizedText.Home.ProjectSection.title)
                         .textStyle(.subtitle3)
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText(text: "전체 보기")
+                            StyledText(text: LocalizedText.Home.ProjectSection.ShowAll.buttonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
@@ -40,9 +40,7 @@ extension HomeScreen {
                         }
                     }
                     .buttonStyle(.plain)
-                    .disabled(!isShowAllEnabled)
                     .padding(8)
-                    .accessibilityLabel(Constant.showAllLabel)
                 }
                 .designSystemScreenMargin()
 
@@ -56,7 +54,6 @@ extension HomeScreen {
         // MARK: Private
 
         private enum Constant {
-            static let showAllLabel = "학습 중인 레포지토리 전체 보기"
             static let sectionHeaderSpacing: CGFloat = 16
             static let retryMessageSpacing: CGFloat = 8
             static let chevronSize: CGFloat = 12
@@ -124,7 +121,7 @@ extension HomeScreen {
         }
 
         private var showAllColor: ColorToken {
-            isShowAllEnabled ? .blue100 : .grey400
+            isShowAllAvailable ? .blue100 : .grey400
         }
 
         private var emptyProjectCards: some View {
@@ -140,7 +137,6 @@ extension HomeScreen {
             }
             .scrollDisabled(true)
             .scrollIndicators(.hidden)
-            .accessibilityHidden(true)
         }
 
         private var emptyDeckShape: HomeScreen.EmptyDeckShape {
@@ -163,14 +159,14 @@ extension HomeScreen {
 
             case .empty:
                 emptyProjects {
-                    StyledText(text: "아직 등록된 프로젝트가 없어요.")
+                    StyledText(text: LocalizedText.Home.ProjectSection.Empty.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
 
             case .signInRequired:
                 emptyProjects {
-                    StyledText(text: "로그인하면 학습 중인 레포지토리를 볼 수 있어요.")
+                    StyledText(text: LocalizedText.Home.ProjectSection.SignInRequired.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.purple200)
                 }
@@ -178,12 +174,12 @@ extension HomeScreen {
             case .failed:
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
-                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Home.ProjectSection.LoadFailure.message)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
                         FeedbackActionButton(
-                            title: "다시 시도",
+                            title: LocalizedText.Home.ProjectSection.Retry.buttonTitle,
                             action: onProjectRetryTapped,
                         )
                         .style(.secondary)
@@ -213,7 +209,6 @@ extension HomeScreen {
                 accessary()
             }
             .frame(height: sectionHeight)
-            .accessibilityElement(children: .contain)
         }
 
         private func projectCards(_ projects: [HomeProjectDisplay]) -> some View {

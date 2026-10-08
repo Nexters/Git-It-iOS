@@ -21,12 +21,12 @@ struct CareerSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText(text: Constant.title)
+                    StyledText(text: LocalizedText.Onboarding.CareerSelection.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
 
                     if store.submission == .failed {
-                        StyledText(text: "제출에 실패했어요. 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Onboarding.CareerSelection.SubmissionFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)
@@ -59,13 +59,13 @@ struct CareerSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 VStack(spacing: LayoutToken.gutter) {
-                    StyledText(text: Constant.guidance)
+                    StyledText(text: LocalizedText.Onboarding.CareerSelection.guidance)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
 
                     FeedbackActionButton(
-                        title: "다음",
+                        title: LocalizedText.Onboarding.CareerSelection.Next.buttonTitle,
                         action: { send(.submitTapped) },
                     )
                     .enabled(store.careerLevel != nil && store.submission != .submitting)
@@ -96,19 +96,19 @@ extension CareerSelectionScreen {
 
         static func title(for level: CareerLevel) -> String {
             switch level {
-            case .entry: "입문"
-            case .junior: "주니어"
-            case .middle: "미들"
-            case .senior: "시니어"
+            case .entry: LocalizedText.Onboarding.CareerSelection.Entry.title
+            case .junior: LocalizedText.Onboarding.CareerSelection.Junior.title
+            case .middle: LocalizedText.Onboarding.CareerSelection.Middle.title
+            case .senior: LocalizedText.Onboarding.CareerSelection.Senior.title
             }
         }
 
         static func description(for level: CareerLevel) -> String {
             switch level {
-            case .entry: "프로젝트 코드를 처음 살펴봐요."
-            case .junior: "작은 기능 단위로 코드를 이해할 수 있어요."
-            case .middle: "프로젝트 구조와 흐름을 함께 살펴봐요."
-            case .senior: "설계 의도와 변경 영향을 분석할 수 있어요."
+            case .entry: LocalizedText.Onboarding.CareerSelection.Entry.description
+            case .junior: LocalizedText.Onboarding.CareerSelection.Junior.description
+            case .middle: LocalizedText.Onboarding.CareerSelection.Middle.description
+            case .senior: LocalizedText.Onboarding.CareerSelection.Senior.description
             }
         }
 
@@ -123,8 +123,6 @@ extension CareerSelectionScreen {
     }
 
     fileprivate enum Constant {
-        static let title = "실제 프로젝트 코드를\n어느 정도 이해할 수 있나요?"
-        static let guidance = "정답은 없어요. 현재 가장 가까운 수준을 선택해주세요."
         static let titleToOptionsSpacing: CGFloat = 64
     }
 }

@@ -62,30 +62,17 @@ public struct ProjectListPaginationFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.nextPageRequested):
-                guard state.pagination == .idle else { return .none }
-                return startNextPageLoad(state: &state)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.retry):
-                guard case .failed = state.pagination else { return .none }
-                return startNextPageLoad(state: &state)
-
-            case .input(.listReplaced(let hasNextPage)):
-                state.hasNextPage = hasNextPage
-                state.pagination = hasNextPage ? .idle : .exhausted
-                return .none
-
-            case .input(.refreshStarted):
-                return .cancel(id: CancelID.nextPage)
-
-            case .effect(.nextPageFinished(let error)):
-                guard case .loading = state.pagination else { return .none }
-                if let error {
-                    state.pagination = .failed(error)
-                } else {
-                    state.pagination = state.hasNextPage ? .idle : .exhausted
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
             }
         }
     }
@@ -97,6 +84,45 @@ public struct ProjectListPaginationFeature: Sendable {
     }
 
     private let requestNextPage: @Sendable () async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .nextPageRequested:
+            guard state.pagination == .idle else { return .none }
+            return startNextPageLoad(state: &state)
+
+        case .retry:
+            guard case .failed = state.pagination else { return .none }
+            return startNextPageLoad(state: &state)
+
+        case .listReplaced(let hasNextPage):
+            state.hasNextPage = hasNextPage
+            state.pagination = hasNextPage ? .idle : .exhausted
+            return .none
+
+        case .refreshStarted:
+            return .cancel(id: CancelID.nextPage)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .nextPageFinished(let error):
+            guard case .loading = state.pagination else { return .none }
+            if let error {
+                state.pagination = .failed(error)
+            } else {
+                state.pagination = state.hasNextPage ? .idle : .exhausted
+            }
+            return .none
+        }
+    }
 
     private func startNextPageLoad(state: inout State) -> Effect<Action> {
         state.pagination = .loading

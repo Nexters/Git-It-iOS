@@ -33,25 +33,6 @@ public struct ChoiceOptionDisplay: Equatable, Sendable, Identifiable {
     public let emphasis: Emphasis
     public let isSelected: Bool
 
-    public var accessibilityLabel: String {
-        var parts = ["\(id + 1)번 선택지", text]
-        if isSelected {
-            parts.append("선택함")
-        }
-        switch emphasis {
-        case .correct:
-            parts.append("정답")
-
-        case .incorrect:
-            parts.append("오답")
-
-        case .neutral,
-             .selected:
-            break
-        }
-        return parts.joined(separator: ", ")
-    }
-
     public static func editing(
         choices: [String],
         selectedIndex: Int?,

@@ -30,12 +30,12 @@ public struct AppEntryScreen: View {
         }
         .task { send(.task) }
         .alert(
-            "세션을 확인하지 못했어요",
+            LocalizedText.AppEntry.RecoverableError.title,
             isPresented: recoverableErrorBinding,
         ) {
-            Button("다시 시도") { send(.retryTapped) }
+            Button(LocalizedText.AppEntry.Retry.buttonTitle) { send(.retryTapped) }
         } message: {
-            Text("네트워크 상태를 확인한 뒤\n다시 시도해 주세요.")
+            Text(LocalizedText.AppEntry.RecoverableError.message)
         }
     }
 

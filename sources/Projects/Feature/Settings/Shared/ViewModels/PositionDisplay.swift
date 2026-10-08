@@ -4,7 +4,9 @@ enum PositionDisplay {
 
     static let orderedPositions: [MemberPosition] = [.frontend, .backend, .ios, .android]
 
-    static let unselectedTitle = "선택 안 함"
+    static var unselectedTitle: String {
+        LocalizedText.Settings.Position.Unselected.title
+    }
 
     static func identifier(for position: MemberPosition) -> String {
         switch position {

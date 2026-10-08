@@ -27,16 +27,14 @@ struct TutorialFeatureTests {
     }
 
     @Test
-    func `Apple 로그인 성공은 마지막 페이지로 이동한 뒤 needsCuration을 그대로 위임한다`() async {
+    func `Apple 로그인 성공은 needsCuration을 그대로 위임한다`() async {
         let signIn = AccountUseCaseSignInMock(results: [.signedIn(curatedAccount)])
         let store = makeTutorialStore(
             signIn: signIn,
             state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped)) {
-            $0.page = 3
-        }
+        await store.send(.view(.appleSignInTapped))
         await store.receive(.signIn(.input(.start))) {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
@@ -64,9 +62,7 @@ struct TutorialFeatureTests {
             state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped)) {
-            $0.page = 3
-        }
+        await store.send(.view(.appleSignInTapped))
         await store.receive(.signIn(.input(.start))) {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
@@ -92,9 +88,7 @@ struct TutorialFeatureTests {
             state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped)) {
-            $0.page = 3
-        }
+        await store.send(.view(.appleSignInTapped))
         await store.receive(.signIn(.input(.start))) {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
@@ -111,14 +105,32 @@ struct TutorialFeatureTests {
     }
 
     @Test
-    func `약관 동의를 취소하면 마지막 페이지로 되돌린다`() async {
+    func `첫 페이지에서 Apple 로그인을 누르면 페이지 이동 없이 바로 로그인을 시작한다`() async {
+        var state = consentCheckedState()
+        state.page = 1
+        let store = makeTutorialStore(
+            signIn: AccountUseCaseSignInMock(
+                results: [.retryableFailure],
+                suspendsRequests: true,
+            ),
+            state: state,
+        )
+        store.exhaustivity = .off
+
+        await store.send(.view(.appleSignInTapped))
+        await store.receive(.signIn(.input(.start)))
+
+        #expect(store.state.page == 1)
+        #expect(store.state.isSigningIn)
+    }
+
+    @Test
+    func `약관 동의를 취소하면 현재 페이지를 유지한다`() async {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
         state.page = 1
         let store = makeTutorialStore(state: state)
 
-        await store.send(.signIn(.delegate(.consentCancelled))) {
-            $0.page = 3
-        }
+        await store.send(.signIn(.delegate(.consentCancelled)))
     }
 
     @Test
@@ -143,9 +155,7 @@ struct TutorialFeatureTests {
             state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped)) {
-            $0.page = 3
-        }
+        await store.send(.view(.appleSignInTapped))
         await store.receive(.signIn(.input(.start))) {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
@@ -191,9 +201,7 @@ struct TutorialFeatureTests {
             state: consentCheckedState(),
         )
 
-        await store.send(.view(.appleSignInTapped)) {
-            $0.page = 3
-        }
+        await store.send(.view(.appleSignInTapped))
         await store.receive(.signIn(.input(.start))) {
             $0.signIn.phase = .signingIn
             $0.signIn.requestID = 1
@@ -229,8 +237,10 @@ struct TutorialFeatureTests {
     }
 
     @Test
-    func `비로그인 진입을 누르면 guestAccessRequested를 위임한다`() async {
-        let store = makeTutorialStore()
+    func `첫 페이지에서도 비로그인 진입을 누르면 guestAccessRequested를 위임한다`() async {
+        var state = TutorialFeature.State(bundleVersion: "1.0.0")
+        state.page = 1
+        let store = makeTutorialStore(state: state)
 
         await store.send(.view(.guestAccessTapped))
         await store.receive(.delegate(.guestAccessRequested))

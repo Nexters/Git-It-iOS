@@ -11,16 +11,16 @@ extension ProfileScreen {
         var body: some View {
             HStack(spacing: 0) {
                 column(
-                    label: Constant.thisWeekLabel,
-                    value: "\(display.thisWeekSolvedCount)\(Constant.countUnit)",
+                    label: LocalizedText.Settings.StatisticsCard.ThisWeek.label,
+                    value: LocalizedText.Settings.StatisticsCard.SolvedCount.value(count: display.thisWeekSolvedCount),
                 )
                 column(
-                    label: Constant.thisMonthLabel,
-                    value: "\(display.thisMonthSolvedCount)\(Constant.countUnit)",
+                    label: LocalizedText.Settings.StatisticsCard.ThisMonth.label,
+                    value: LocalizedText.Settings.StatisticsCard.SolvedCount.value(count: display.thisMonthSolvedCount),
                 )
                 column(
-                    label: Constant.streakLabel,
-                    value: "\(display.streakDays)\(Constant.dayUnit)",
+                    label: LocalizedText.Settings.StatisticsCard.Streak.label,
+                    value: LocalizedText.Settings.StatisticsCard.Streak.Days.value(days: display.streakDays),
                 )
             }
             .frame(maxWidth: .infinity)
@@ -34,11 +34,6 @@ extension ProfileScreen {
         // MARK: Private
 
         private enum Constant {
-            static let thisWeekLabel = "이번 주"
-            static let thisMonthLabel = "이번 달"
-            static let streakLabel = "연속 학습"
-            static let countUnit = "문제"
-            static let dayUnit = "일"
             static let height: CGFloat = 88
             static let columnSpacing: CGFloat = 4
             static let gradientEndOpacity = 0.5
@@ -70,7 +65,6 @@ extension ProfileScreen {
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
-            .accessibilityElement(children: .combine)
         }
 
     }

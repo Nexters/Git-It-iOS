@@ -45,7 +45,7 @@ public struct MainShellRouterFeature: Sendable {
         public var settings = SettingsRouterFeature.State()
         public var singleQuestionEntry: SingleQuestionEntryFeature.State?
         @Presents public var singleQuestion: QuestionSolvingFeature.State?
-        public var signIn = SignInFeature.State()
+        public var isSignInRequiredAlertPresented = false
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
@@ -58,7 +58,6 @@ public struct MainShellRouterFeature: Sendable {
         case settings(SettingsRouterFeature.Action)
         case singleQuestionEntry(SingleQuestionEntryFeature.Action)
         case singleQuestion(PresentationAction<QuestionSolvingFeature.Action>)
-        case signIn(SignInFeature.Action)
 
         // MARK: Public
 
@@ -71,10 +70,8 @@ public struct MainShellRouterFeature: Sendable {
         @CasePathable
         public enum View: Sendable, Equatable {
             case tabSelected(MainShellTab)
-            case signInTapped
-            case signInFailureDismissed
-            case legalAgreementDismissed
-            case legalDocumentSheetDismissed
+            case signInRequiredAlertSignInTapped
+            case signInRequiredAlertDismissed
             case singleQuestionFailureDismissed
         }
 
@@ -85,11 +82,11 @@ public struct MainShellRouterFeature: Sendable {
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
             case externalURLRequested(URL)
             case loggedOut
-            case signInSucceeded(needsCuration: Bool)
+            case onboardingRequested
         }
     }
 
-    public static let singleQuestionAdvanceActionTitle = "완료"
+    public static let singleQuestionAdvanceActionTitle = LocalizedText.MainShell.SingleQuestion.Advance.buttonTitle
 
     public var body: some ReducerOf<Self> {
         Scope(
@@ -143,131 +140,58 @@ public struct MainShellRouterFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
-        Scope(
-            state: \.signIn,
-            action: \.signIn,
-        ) {
-            SignInFeature(
-                signIn: { [account] in await account.signIn(with: $0) },
-                policyConsentStatus: { [account] in try await account.policyConsentStatus() },
-                consent: { [account] in try await account.consent(to: $0) },
-            )
-        }
         Reduce { state, action in
             switch action {
-            case .input(.learningProjectsReloadRequested):
-                guard state.access == .member else { return .none }
-                return reloadLearningProjects()
-
-            case .input(.memberAccessGranted):
-                guard state.access == .guest else { return .none }
-                state.access = .member
-                return .merge(
-                    .send(.home(.input(.accessChanged(.member)))),
-                    .send(.projectList(.input(.learningProjectsReloadRequested))),
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .view(.tabSelected(let tab)):
-                guard state.access == .member else {
-                    guard tab == .home || tab == .settings else { return .none }
-                    state.selectedTab = tab
-                    return .none
-                }
-                state.selectedTab = tab
-                return reloadLearningProjects()
-
-            case .view(.signInTapped),
-                 .home(.delegate(.signInRequested)):
-                guard state.access == .guest else { return .none }
-                return .send(.signIn(.input(.start)))
-
-            case .view(.signInFailureDismissed):
-                return .send(.signIn(.view(.failureDismissed)))
-
-            case .view(.legalAgreementDismissed):
-                return .send(.signIn(.view(.legalAgreementDismissed)))
-
-            case .view(.legalDocumentSheetDismissed):
-                return .send(.signIn(.view(.legalDocumentSheetDismissed)))
-
-            case .view(.singleQuestionFailureDismissed):
-                return .send(.singleQuestionEntry(.input(.failureDismissed)))
-
-            case .signIn(.delegate(.signedIn(let needsCuration))):
-                return .send(.delegate(.signInSucceeded(needsCuration: needsCuration)))
-
-            case .home(.delegate(.allProjectsRequested)):
-                state.selectedTab = .projects
-                return reloadLearningProjects()
-
-            case .home(.delegate(.projectRegistrationRequested)):
-                return .send(.delegate(.projectRegistrationRequested))
-
-            case .home(.delegate(.projectDetailRequested(let projectID))):
-                return .send(.delegate(.projectDetailRequested(projectID: projectID)))
-
-            case .home(.delegate(.learningRequested(let projectID, let nextSetID))):
-                return .send(.delegate(.learningRequested(
-                    projectID: projectID,
-                    nextSetID: nextSetID,
-                )))
-
-            case .projectList(.delegate(.projectDeleted)):
-                return .send(.home(.input(.learningProjectsReloadRequested)))
-
-            case .projectList(.delegate(.projectSelected(let projectID))):
-                return .send(.delegate(.projectDetailRequested(projectID: projectID)))
-
-            case .projectList(.delegate(.learningRequested(let projectID, let nextSetID))):
-                return .send(.delegate(.learningRequested(
-                    projectID: projectID,
-                    nextSetID: nextSetID,
-                )))
-
-            case .saved(.delegate(.questionSelected(let question))):
-                state.singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: question.projectID)
-                return .send(.singleQuestionEntry(.input(.questionRequested(
-                    setID: question.setID,
-                    questionID: question.quizID,
-                ))))
-
-            case .singleQuestionEntry(.delegate(.questionPrepared(let question, let projectID))):
-                state.singleQuestion = QuestionSolvingFeature.State(
-                    projectID: projectID,
-                    question: question,
-                    advanceActionTitle: Self.singleQuestionAdvanceActionTitle,
-                    isBookmarked: true,
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
-                return .none
 
-            case .singleQuestionEntry(.delegate(.preparationFailed)):
-                return .none
+            case .home(let action):
+                reduce(
+                    into: &state,
+                    home: action,
+                )
 
-            case .singleQuestion(.presented(.delegate(.advanceRequested))),
-                 .singleQuestion(.presented(.delegate(.backRequested))):
-                state.singleQuestion = nil
-                return .none
+            case .projectList(let action):
+                reduce(
+                    into: &state,
+                    projectList: action,
+                )
 
-            case .singleQuestion(.presented(.delegate(.externalURLRequested(let url)))):
-                return .send(.delegate(.externalURLRequested(url)))
+            case .saved(let action):
+                reduce(
+                    into: &state,
+                    saved: action,
+                )
 
-            case .settings(.delegate(.externalURLRequested(let url))):
-                return .send(.delegate(.externalURLRequested(url)))
+            case .settings(let action):
+                reduce(
+                    into: &state,
+                    settings: action,
+                )
 
-            case .settings(.delegate(.signedOut)),
-                 .settings(.delegate(.accountDeleted)):
-                state = MainShellRouterFeature.State()
-                return .send(.delegate(.loggedOut))
+            case .singleQuestionEntry(let action):
+                reduce(
+                    into: &state,
+                    singleQuestionEntry: action,
+                )
 
-            case .home,
-                 .projectList,
-                 .saved,
-                 .settings,
-                 .singleQuestionEntry,
-                 .singleQuestion,
-                 .signIn,
-                 .delegate:
-                return .none
+            case .singleQuestion(let action):
+                reduce(
+                    into: &state,
+                    singleQuestion: action,
+                )
+
+            case .delegate:
+                .none
             }
         }
         .ifLet(
@@ -317,6 +241,182 @@ public struct MainShellRouterFeature: Sendable {
             detail: detail,
             curation: curation,
         )
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .learningProjectsReloadRequested:
+            guard state.access == .member else { return .none }
+            return reloadLearningProjects()
+
+        case .memberAccessGranted:
+            guard state.access == .guest else { return .none }
+            state.access = .member
+            return .merge(
+                .send(.home(.input(.accessChanged(.member)))),
+                .send(.projectList(.input(.learningProjectsReloadRequested))),
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .tabSelected(let tab):
+            guard state.access == .member else {
+                guard tab == .home else {
+                    state.isSignInRequiredAlertPresented = true
+                    return .none
+                }
+                state.selectedTab = tab
+                return .none
+            }
+            state.selectedTab = tab
+            return reloadLearningProjects()
+
+        case .signInRequiredAlertSignInTapped:
+            state.isSignInRequiredAlertPresented = false
+            return .send(.delegate(.onboardingRequested))
+
+        case .signInRequiredAlertDismissed:
+            state.isSignInRequiredAlertPresented = false
+            return .none
+
+        case .singleQuestionFailureDismissed:
+            return .send(.singleQuestionEntry(.input(.failureDismissed)))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        home action: HomeFeature.Action,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .signInRequired:
+            guard state.access == .guest else { return .none }
+            state.isSignInRequiredAlertPresented = true
+            return .none
+
+        case .allProjectsRequested:
+            state.selectedTab = .projects
+            return reloadLearningProjects()
+
+        case .projectRegistrationRequested:
+            return .send(.delegate(.projectRegistrationRequested))
+
+        case .projectDetailRequested(let projectID):
+            return .send(.delegate(.projectDetailRequested(projectID: projectID)))
+
+        case .learningRequested(let projectID, let nextSetID):
+            return .send(.delegate(.learningRequested(
+                projectID: projectID,
+                nextSetID: nextSetID,
+            )))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        projectList action: ProjectListFeature.Action,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .projectDeleted:
+            return .send(.home(.input(.learningProjectsReloadRequested)))
+
+        case .projectSelected(let projectID):
+            return .send(.delegate(.projectDetailRequested(projectID: projectID)))
+
+        case .learningRequested(let projectID, let nextSetID):
+            return .send(.delegate(.learningRequested(
+                projectID: projectID,
+                nextSetID: nextSetID,
+            )))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        saved action: SavedFeature.Action,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .questionSelected(let question):
+            state.singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: question.projectID)
+            return .send(.singleQuestionEntry(.input(.questionRequested(
+                setID: question.setID,
+                questionID: question.quizID,
+            ))))
+
+        case .backRequested:
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        settings action: SettingsRouterFeature.Action,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .signedOut,
+             .accountDeleted:
+            state = MainShellRouterFeature.State()
+            return .send(.delegate(.loggedOut))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        singleQuestionEntry action: SingleQuestionEntryFeature.Action,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .questionPrepared(let question, let projectID):
+            state.singleQuestion = QuestionSolvingFeature.State(
+                projectID: projectID,
+                question: question,
+                advanceActionTitle: Self.singleQuestionAdvanceActionTitle,
+                isBookmarked: true,
+            )
+            return .none
+
+        case .preparationFailed:
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        singleQuestion action: PresentationAction<QuestionSolvingFeature.Action>,
+    ) -> ComposableArchitecture.Effect<Action> {
+        guard
+            case .presented(let action) = action,
+            case .delegate(let action) = action
+        else {
+            return .none
+        }
+        switch action {
+        case .advanceRequested,
+             .backRequested:
+            state.singleQuestion = nil
+            return .none
+
+        case .externalURLRequested(let url):
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .answerSubmitted:
+            return .none
+        }
     }
 
     private func reloadLearningProjects() -> ComposableArchitecture.Effect<Action> {

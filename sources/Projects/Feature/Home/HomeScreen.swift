@@ -21,18 +21,6 @@ public struct HomeScreen: View {
         OverlayContainer(content: { content })
             .scrollIndicators(.hidden)
             .task { await send(.task).finish() }
-            .alert(
-                Constant.signInRequiredTitle,
-                isPresented: signInRequiredAlertBinding,
-            ) {
-                Button(Constant.signInTitle) { send(.signInRequiredAlertSignInTapped) }
-                Button(
-                    Constant.closeTitle,
-                    role: .cancel,
-                ) { send(.signInRequiredAlertDismissed) }
-            } message: {
-                Text(Constant.signInRequiredMessage)
-            }
     }
 
     // MARK: Private
@@ -51,7 +39,7 @@ public struct HomeScreen: View {
                     store.projectSummaries.load,
                     access: store.access,
                 ),
-                isShowAllEnabled: store.access == .member,
+                isShowAllAvailable: store.access == .member,
                 cardListLeadingX: $cardListLeadingX,
                 onShowAllTapped: { send(.showAllProjectsTapped) },
                 onProjectRetryTapped: { send(.projectRetryTapped) },
@@ -88,16 +76,6 @@ public struct HomeScreen: View {
         .padding(.bottom, Constant.projectSectionTopPadding)
     }
 
-    private var signInRequiredAlertBinding: Binding<Bool> {
-        Binding(
-            get: { store.isSignInRequiredAlertPresented },
-            set: { isPresented in
-                guard !isPresented else { return }
-                send(.signInRequiredAlertDismissed)
-            },
-        )
-    }
-
 }
 
 // MARK: HomeScreen.Constant
@@ -108,9 +86,5 @@ extension HomeScreen {
         static let greetingTopPadding: CGFloat = 16
         static let registrationPanelTopPadding: CGFloat = 24
         static let projectSectionTopPadding: CGFloat = 32
-        static let signInRequiredTitle = "로그인이 필요해요"
-        static let signInRequiredMessage = "프로젝트를 만들려면 로그인해 주세요."
-        static let signInTitle = "로그인"
-        static let closeTitle = "닫기"
     }
 }

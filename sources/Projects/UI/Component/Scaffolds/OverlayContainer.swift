@@ -90,7 +90,6 @@ public struct OverlayContainer<
     private func occlusionSpacer(matching view: () -> some View) -> some View {
         view()
             .hidden()
-            .accessibilityHidden(true)
     }
 
 }

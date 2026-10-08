@@ -24,7 +24,6 @@ struct ActionMenuContractTests {
             ActionMenu.Item(
                 id: id,
                 title: id,
-                accessibilityLabel: id,
                 onSelect: { selectedIDs.append(id) },
             )
         }
@@ -36,23 +35,10 @@ struct ActionMenuContractTests {
     }
 
     @Test
-    func `항목은 화면 문맥 없이 사용자 목적을 설명하는 VoiceOver 라벨을 소유한다`() {
-        let item = ActionMenu.Item(
-            id: "delete",
-            title: "프로젝트 삭제",
-            accessibilityLabel: "학습 프로젝트 삭제 모드 열기",
-        )
-
-        #expect(item.title == "프로젝트 삭제")
-        #expect(item.accessibilityLabel == "학습 프로젝트 삭제 모드 열기")
-    }
-
-    @Test
     func `역할을 지정하지 않으면 일반 행으로 취급한다`() {
         let item = ActionMenu.Item(
             id: "close",
             title: "메뉴 닫기",
-            accessibilityLabel: "메뉴 닫기",
         )
 
         #expect(item.role == .normal)
@@ -64,7 +50,6 @@ struct ActionMenuContractTests {
             id: "delete",
             title: "삭제하기",
             role: .destructive,
-            accessibilityLabel: "프로젝트 삭제",
         )
 
         #expect(item.role == .destructive)

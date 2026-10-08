@@ -19,10 +19,7 @@ public struct MainShellRouter: View {
     @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
-        TabShell(
-            selected: selectedTab,
-            isEnabled: isTabEnabled,
-        ) { tab in
+        TabShell(selected: selectedTab) { tab in
             switch tab {
             case .home:
                 HomeScreen(store: store.scope(
@@ -57,7 +54,7 @@ public struct MainShellRouter: View {
                         action: \.settings,
                     ))
                 } else {
-                    Self.SignInPromptView(onSignIn: { send(.signInTapped) })
+                    ScreenContainer { EmptyView() }
                 }
             }
         }
@@ -67,42 +64,38 @@ public struct MainShellRouter: View {
             }
         }
         .alert(
-            "문제를 불러오지 못했어요",
+            LocalizedText.MainShell.SingleQuestion.Failure.title,
             isPresented: entryFailureBinding,
         ) {
             Button(
-                "확인",
+                LocalizedText.MainShell.SingleQuestion.FailureConfirm.buttonTitle,
                 role: .cancel,
             ) {
                 send(.singleQuestionFailureDismissed)
             }
         } message: {
-            Text("잠시 후 다시 시도해 주세요.")
+            Text(LocalizedText.MainShell.SingleQuestion.Failure.message)
         }
         .overlay { singleQuestionOverlay }
-        .overlay { guestLegalAgreementOverlay }
-        .overlay { guestLegalDocumentOverlay }
         .alert(
-            "로그인하지 못했어요",
-            isPresented: signInFailureBinding,
+            LocalizedText.MainShell.SignInRequired.title,
+            isPresented: signInRequiredAlertBinding,
         ) {
+            Button(LocalizedText.MainShell.SignInRequired.SignIn.buttonTitle) {
+                send(.signInRequiredAlertSignInTapped)
+            }
             Button(
-                "확인",
+                LocalizedText.MainShell.SignInRequired.Close.buttonTitle,
                 role: .cancel,
             ) {
-                send(.signInFailureDismissed)
+                send(.signInRequiredAlertDismissed)
             }
         } message: {
-            Text("잠시 후 다시 시도해 주세요.")
+            Text(LocalizedText.MainShell.SignInRequired.message)
         }
     }
 
     // MARK: Private
-
-    private var isTabEnabled: (MainShellTab) -> Bool {
-        let access = store.access
-        return { access == .member || ($0 != .projects && $0 != .saved) }
-    }
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(
@@ -111,57 +104,14 @@ public struct MainShellRouter: View {
         )
     }
 
-    private var signInFailureBinding: Binding<Bool> {
+    private var signInRequiredAlertBinding: Binding<Bool> {
         Binding(
-            get: { store.signIn.isFailed },
+            get: { store.isSignInRequiredAlertPresented },
             set: { isPresented in
                 guard !isPresented else { return }
-                send(.signInFailureDismissed)
+                send(.signInRequiredAlertDismissed)
             },
         )
-    }
-
-    private var guestLegalAgreementOverlay: some View {
-        ModalOverlay(
-            isPresented: Binding(
-                get: { store.signIn.isLegalAgreementPresented },
-                set: { isPresented in
-                    if !isPresented {
-                        send(.legalAgreementDismissed)
-                    }
-                },
-            )
-        ) {
-            LegalAgreementScreen(
-                store: store.scope(
-                    state: \.signIn.legalAgreement,
-                    action: \.signIn.legalAgreement,
-                )
-            )
-        }
-    }
-
-    private var guestLegalDocumentOverlay: some View {
-        ModalOverlay(
-            isPresented: Binding(
-                get: { store.signIn.legalAgreement.presentedDocument != nil },
-                set: { isPresented in
-                    if !isPresented {
-                        send(.legalDocumentSheetDismissed)
-                    }
-                },
-            )
-        ) {
-            if let document = store.signIn.legalAgreement.presentedDocument {
-                WebSheet(
-                    displayModel: .init(
-                        title: document.displayName,
-                        url: document.approvedURL,
-                    ),
-                    onDismiss: { send(.legalDocumentSheetDismissed) },
-                )
-            }
-        }
     }
 
     private var entryFailureBinding: Binding<Bool> {
@@ -183,7 +133,6 @@ public struct MainShellRouter: View {
             ProgressView()
                 .tint(Color(designSystem: .blue100))
         }
-        .accessibilityLabel("문제를 불러오는 중")
     }
 
     private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {

@@ -45,7 +45,9 @@ public struct RepositoryLinkInputFeature: Sendable {
         }
 
         public var validateButtonTitle: String {
-            validation == .validating ? "확인 중…" : "다음"
+            validation == .validating
+                ? LocalizedText.ProjectRegistration.RepositoryLinkInput.Validating.buttonTitle
+                : LocalizedText.ProjectRegistration.RepositoryLinkInput.Next.buttonTitle
         }
 
     }
@@ -85,35 +87,26 @@ public struct RepositoryLinkInputFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.repositoryURLChanged(let text)):
-                state.repositoryURLInput = text
-                state.validation = .idle
-                return .none
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .view(.validateTapped):
-                return startValidation(&state)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.validationReset):
-                state.validation = .idle
-                return .none
-
-            case .view(.dismissTapped):
-                return .send(.delegate(.dismissRequested))
-
-            case .effect(.validationFinished(let requestID, let result)):
-                guard requestID == state.validationRequestID else { return .none }
-                switch result {
-                case .success(let repository):
-                    state.validation = .validated(repository)
-                    return .send(.delegate(.repositoryValidated(repository)))
-
-                case .failure:
-                    state.validation = .failed
-                    return .none
-                }
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -125,6 +118,54 @@ public struct RepositoryLinkInputFeature: Sendable {
     }
 
     private let repository: @Sendable (ExternalRepositoryURL) async throws -> ExternalRepository
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .repositoryURLChanged(let text):
+            state.repositoryURLInput = text
+            state.validation = .idle
+            return .none
+
+        case .validateTapped:
+            return startValidation(&state)
+
+        case .dismissTapped:
+            return .send(.delegate(.dismissRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .validationReset:
+            state.validation = .idle
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .validationFinished(let requestID, let result):
+            guard requestID == state.validationRequestID else { return .none }
+            switch result {
+            case .success(let repository):
+                state.validation = .validated(repository)
+                return .send(.delegate(.repositoryValidated(repository)))
+
+            case .failure:
+                state.validation = .failed
+                return .none
+            }
+        }
+    }
 
     private func startValidation(_ state: inout State) -> Effect<Action> {
         guard !state.repositoryURLInput.isEmpty else { return .none }

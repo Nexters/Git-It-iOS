@@ -7,12 +7,8 @@ public struct BookmarkButton: View {
 
     // MARK: Lifecycle
 
-    public init(
-        isSaved: Binding<Bool>,
-        accessibilityLabel: String,
-    ) {
+    public init(isSaved: Binding<Bool>) {
         _isSaved = isSaved
-        self.accessibilityLabel = accessibilityLabel
     }
 
     // MARK: Public
@@ -35,8 +31,6 @@ public struct BookmarkButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityAddTraits(isSaved ? [.isButton, .isSelected] : .isButton)
     }
 
     // MARK: Internal
@@ -59,8 +53,6 @@ public struct BookmarkButton: View {
 
     @Binding private var isSaved: Bool
 
-    private let accessibilityLabel: String
-
     private var symbol: String {
         Self.symbol(isSaved: isSaved)
     }
@@ -69,14 +61,8 @@ public struct BookmarkButton: View {
 
 #Preview("Bookmark Button") {
     HStack(spacing: LayoutToken.gutter) {
-        BookmarkButton(
-            isSaved: .constant(false),
-            accessibilityLabel: "저장하기",
-        )
-        BookmarkButton(
-            isSaved: .constant(true),
-            accessibilityLabel: "저장 해제하기",
-        )
+        BookmarkButton(isSaved: .constant(false))
+        BookmarkButton(isSaved: .constant(true))
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

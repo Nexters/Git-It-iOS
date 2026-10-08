@@ -16,15 +16,15 @@ extension HomeScreen {
                         alignment: .leading,
                         spacing: Constant.messageSpacing,
                     ) {
-                        StyledText(text: "프로필을 불러오지 못했어요")
+                        StyledText(text: LocalizedText.Home.ProfileHeader.LoadFailure.title)
                             .textStyle(.subtitle3)
-                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Home.ProfileHeader.LoadFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.grey400)
                     }
                     Spacer()
                     FeedbackActionButton(
-                        title: "다시 시도",
+                        title: LocalizedText.Home.ProfileHeader.Retry.buttonTitle,
                         action: onRetry,
                     )
                     .style(.secondary)
@@ -58,7 +58,6 @@ extension HomeScreen {
                             .foregroundColorToken(.grey400)
                     }
                 }
-                .accessibilityElement(children: .combine)
                 .padding(.top, Constant.topPadding)
                 .padding(.bottom, Constant.bottomPadding)
                 .frame(

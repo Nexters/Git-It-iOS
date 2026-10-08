@@ -41,10 +41,10 @@ extension ProjectDetailScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: "프로젝트를 불러오지 못했어요")
+                    StyledText(text: LocalizedText.ProjectDetail.DetailContent.LoadFailure.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
-                    StyledText(text: "잠시 후 다시 시도해 주세요.")
+                    StyledText(text: LocalizedText.ProjectDetail.DetailContent.LoadFailure.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)

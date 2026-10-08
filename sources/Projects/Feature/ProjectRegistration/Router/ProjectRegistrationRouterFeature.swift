@@ -110,82 +110,38 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .repositoryLinkInput(.delegate(.repositoryValidated(let repository))):
-                return .merge(
-                    .send(.repositoryConfirmation(.input(.repositoryProvided(repository)))),
-                    activate(
-                        .repositoryConfirmation,
-                        state: &state,
-                    ),
+            case .repositoryLinkInput(let action):
+                reduce(
+                    into: &state,
+                    repositoryLinkInput: action,
                 )
 
-            case .repositoryLinkInput(.delegate(.dismissRequested)):
-                return .send(.delegate(.dismissRequested))
-
-            case .repositoryConfirmation(.delegate(.confirmed)):
-                return activate(
-                    .quizLevelSelection,
-                    state: &state,
+            case .repositoryConfirmation(let action):
+                reduce(
+                    into: &state,
+                    repositoryConfirmation: action,
                 )
 
-            case .repositoryConfirmation(.delegate(.rejected)):
-                return .merge(
-                    .send(.repositoryLinkInput(.input(.validationReset))),
-                    .send(.repositoryConfirmation(.input(.cleared))),
-                    activate(
-                        .repositoryLinkInput,
-                        state: &state,
-                    ),
+            case .quizLevelSelection(let action):
+                reduce(
+                    into: &state,
+                    quizLevelSelection: action,
                 )
 
-            case .quizLevelSelection(.delegate(.confirmed)):
-                return activate(
-                    .quizGenerationConfirmation,
-                    state: &state,
+            case .quizGenerationConfirmation(let action):
+                reduce(
+                    into: &state,
+                    quizGenerationConfirmation: action,
                 )
 
-            case .quizLevelSelection(.delegate(.backRequested)):
-                return activate(
-                    .repositoryConfirmation,
-                    state: &state,
+            case .quizGenerationProgress(let action):
+                reduce(
+                    into: &state,
+                    quizGenerationProgress: action,
                 )
 
-            case .quizGenerationConfirmation(.delegate(.submitRequested)):
-                guard let repository = state.repositoryConfirmation.repository else { return .none }
-                let quizLevel = state.quizLevelSelection.quizLevel
-                return .merge(
-                    activate(
-                        .quizGenerationProgress,
-                        state: &state,
-                    ),
-                    .send(.quizGenerationProgress(.submit(
-                        repository: repository,
-                        quizLevel: quizLevel,
-                    ))),
-                )
-
-            case .quizGenerationConfirmation(.delegate(.backRequested)):
-                return activate(
-                    .quizLevelSelection,
-                    state: &state,
-                )
-
-            case .quizGenerationProgress(.delegate(.projectRegistered(let receipt))):
-                return .send(.delegate(.projectRegistered(receipt)))
-
-            case .quizGenerationProgress(.delegate(.generationReminderPreferenceSelected(let isEnabled))):
-                return .send(.delegate(.generationReminderPreferenceSelected(isEnabled: isEnabled)))
-
-            case .quizGenerationProgress(.delegate(.dismissRequested)):
-                return .send(.delegate(.dismissRequested))
-
-            case .repositoryLinkInput,
-                 .repositoryConfirmation,
-                 .quizLevelSelection,
-                 .quizGenerationConfirmation,
-                 .quizGenerationProgress,
-                 .delegate:
-                return .none
+            case .delegate:
+                .none
             }
         }
     }
@@ -196,6 +152,115 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     private let projectGeneration: any ProjectGenerationUseCase
     private let appSetting: any AppSettingUseCase
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func reduce(
+        into state: inout State,
+        repositoryLinkInput action: RepositoryLinkInputFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .repositoryValidated(let repository):
+            return .merge(
+                .send(.repositoryConfirmation(.input(.repositoryProvided(repository)))),
+                activate(
+                    .repositoryConfirmation,
+                    state: &state,
+                ),
+            )
+
+        case .dismissRequested:
+            return .send(.delegate(.dismissRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        repositoryConfirmation action: RepositoryConfirmationFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .confirmed:
+            return activate(
+                .quizLevelSelection,
+                state: &state,
+            )
+
+        case .rejected:
+            return .merge(
+                .send(.repositoryLinkInput(.input(.validationReset))),
+                .send(.repositoryConfirmation(.input(.cleared))),
+                activate(
+                    .repositoryLinkInput,
+                    state: &state,
+                ),
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        quizLevelSelection action: QuizLevelSelectionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .confirmed:
+            return activate(
+                .quizGenerationConfirmation,
+                state: &state,
+            )
+
+        case .backRequested:
+            return activate(
+                .repositoryConfirmation,
+                state: &state,
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        quizGenerationConfirmation action: QuizGenerationConfirmationFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .submitRequested:
+            guard let repository = state.repositoryConfirmation.repository else { return .none }
+            let quizLevel = state.quizLevelSelection.quizLevel
+            return .merge(
+                activate(
+                    .quizGenerationProgress,
+                    state: &state,
+                ),
+                .send(.quizGenerationProgress(.submit(
+                    repository: repository,
+                    quizLevel: quizLevel,
+                ))),
+            )
+
+        case .backRequested:
+            return activate(
+                .quizLevelSelection,
+                state: &state,
+            )
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        quizGenerationProgress action: QuizGenerationProgressFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .projectRegistered(let receipt):
+            return .send(.delegate(.projectRegistered(receipt)))
+
+        case .generationReminderPreferenceSelected(let isEnabled):
+            return .send(.delegate(.generationReminderPreferenceSelected(isEnabled: isEnabled)))
+
+        case .dismissRequested:
+            return .send(.delegate(.dismissRequested))
+        }
+    }
 
     private func activate(
         _ screen: ActiveScreen,

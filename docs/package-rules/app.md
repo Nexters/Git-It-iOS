@@ -20,6 +20,7 @@ App은 여러 Feature의 navigation intent를 애플리케이션 수준의 화�
 - 실행 환경 선택이 필요한 경우 App이 실행 환경을 결정해 Composition 생성 시 전달해야 합니다.
 - Navigation과 조립에 필요한 Domain 타입을 직접 사용할 수 있습니다.
 - 프로젝트 내부 의존성은 아키텍처 문서에서 App에 허용한 패키지로 한정해야 합니다. Infrastructure는 직접 의존하거나 import해서는 안 되며, 플랫폼 앱 델리게이트 같은 기술 연결은 Composition이 공개한 타입으로만 사용합니다.
+- 앱이 표시하는 문구(로컬 알림 등)는 [현지화 컨벤션](../conventions/localization.md)을 따릅니다.
 
 ## 제약조건
 

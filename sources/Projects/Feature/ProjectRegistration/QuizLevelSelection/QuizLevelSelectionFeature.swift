@@ -42,19 +42,34 @@ public struct QuizLevelSelectionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.levelSelected(let level)):
-                state.quizLevel = level
-                return .none
-
-            case .view(.nextTapped):
-                return .send(.delegate(.confirmed(state.quizLevel)))
-
-            case .view(.backTapped):
-                return .send(.delegate(.backRequested))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
+        }
+    }
+
+    // MARK: Private
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .levelSelected(let level):
+            state.quizLevel = level
+            return .none
+
+        case .nextTapped:
+            return .send(.delegate(.confirmed(state.quizLevel)))
+
+        case .backTapped:
+            return .send(.delegate(.backRequested))
         }
     }
 

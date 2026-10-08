@@ -60,27 +60,17 @@ public struct NotificationPermissionFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.refresh):
-                return .run { [notificationAuthorization] send in
-                    await send(.effect(.authorizationChecked(notificationAuthorization())))
-                }
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.rowTapped):
-                return .run { [notificationAuthorization, requestNotificationAuthorization, openNotificationSettings] send in
-                    switch await notificationAuthorization() {
-                    case .notDetermined:
-                        let status = await requestNotificationAuthorization()
-                        await send(.effect(.authorizationChecked(status)))
-
-                    case .authorized,
-                         .denied:
-                        await openNotificationSettings()
-                    }
-                }
-
-            case .effect(.authorizationChecked(let status)):
-                state.notificationStatus = status == .authorized ? .allowed : .denied
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
             }
         }
     }
@@ -90,5 +80,41 @@ public struct NotificationPermissionFeature: Sendable {
     private let notificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let requestNotificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
+
+    private func reduce(
+        into _: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .refresh:
+            .run { [notificationAuthorization] send in
+                await send(.effect(.authorizationChecked(notificationAuthorization())))
+            }
+
+        case .rowTapped:
+            .run { [notificationAuthorization, requestNotificationAuthorization, openNotificationSettings] send in
+                switch await notificationAuthorization() {
+                case .notDetermined:
+                    let status = await requestNotificationAuthorization()
+                    await send(.effect(.authorizationChecked(status)))
+
+                case .authorized,
+                     .denied:
+                    await openNotificationSettings()
+                }
+            }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .authorizationChecked(let status):
+            state.notificationStatus = status == .authorized ? .allowed : .denied
+            return .none
+        }
+    }
 
 }

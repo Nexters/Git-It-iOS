@@ -11,7 +11,7 @@ extension TutorialScreen {
 
         var body: some View {
             VStack(spacing: 0) {
-                StyledText(text: Constant.title(for: page))
+                StyledText(text: title)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
                     .padding(.top, Constant.titleTopInset)
@@ -33,13 +33,13 @@ extension TutorialScreen {
         private enum Constant {
             static let titleTopInset: CGFloat = 68
             static let mockupWidth: CGFloat = 212
+        }
 
-            static func title(for page: Int) -> String {
-                switch page {
-                case 1: "오픈소스를 문제화하고\n나만의 덱으로 만들어보세요"
-                case 2: "복잡한 코드말고 자연어로\n언제 어디서든 가볍게!"
-                default: "다시보고 싶은 문제는\n저장하고 나중에 확인해요"
-                }
+        private var title: String {
+            switch page {
+            case 1: LocalizedText.Onboarding.Tutorial.Page.First.title
+            case 2: LocalizedText.Onboarding.Tutorial.Page.Second.title
+            default: LocalizedText.Onboarding.Tutorial.Page.Third.title
             }
         }
 

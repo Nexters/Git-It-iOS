@@ -12,8 +12,7 @@ struct SizeConfigurableTests {
         #expect(size(of: ActionButton(title: "계속하기")) == ActionButton.Size.large)
         #expect(size(of: TagBadge(text: "완료")) == TagBadge.Size.regular)
         #expect(size(of: IconGlassButton(
-            icon: .bookmark,
-            label: "저장하기",
+            icon: .bookmark
         )) == IconGlassButton.Size.small)
         #expect(size(of: ContinuousProgressBar(progress: 0.5)) == ContinuousProgressBar.Height.row)
     }
@@ -23,8 +22,7 @@ struct SizeConfigurableTests {
         let button = ActionButton(title: "계속하기").style(.secondary).size(.small)
         let badge = TagBadge(text: "완료").style(.muted).size(.compact)
         let glassButton = IconGlassButton(
-            icon: .bookmark,
-            label: "저장하기",
+            icon: .bookmark
         ).style(.accent).size(.medium)
         let progressBar = ContinuousProgressBar(progress: 0.5).size(.detail)
 

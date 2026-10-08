@@ -43,7 +43,6 @@ public struct LearningSetRow: View {
                     maxWidth: .infinity,
                     alignment: .leading,
                 )
-                .accessibilityElement(children: .combine)
 
                 startButton
             }
@@ -69,7 +68,6 @@ public struct LearningSetRow: View {
                     lineWidth: CGFloat(BorderToken.default.width),
                 )
         }
-        .accessibilityElement(children: .contain)
     }
 
     // MARK: Internal
@@ -135,7 +133,6 @@ public struct LearningSetRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(displayModel.label) \(displayModel.title) 학습 시작")
     }
 
 }

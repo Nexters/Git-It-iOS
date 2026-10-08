@@ -118,8 +118,17 @@ rg -q '작업=build 시도=5 성공=4 실패=1' "$work/out"
 rg -q 'project-build.scheme-failed' "$work/err"
 
 rm "$projects/Fail/xcshareddata/xcschemes/Fail.xcscheme"
+# 이전 build가 남긴 읽기 전용 module map을 compile 전에 쓰기 가능으로 되돌리는지 확인합니다.
+module_map="$EXPECTED_DERIVED_ROOT/TestSchemes/Tests/Build/Products/Debug-iphonesimulator/Firebase/Firebase.framework/Modules/module.modulemap"
+mkdir -p "$(dirname -- "$module_map")"
+printf 'module Firebase {}\n' >"$module_map"
+chmod 444 "$module_map"
 : >"$PROJECT_ACTION_LOG"
 run_stage compile >"$work/out" 2>"$work/err"
+[ -w "$module_map" ] || {
+	printf 'FAIL: compile 전에 module map 쓰기 권한을 복구하지 않음\n' >&2
+	exit 1
+}
 [ "$(wc -l <"$PROJECT_ACTION_LOG" | tr -d ' ')" -eq 1 ]
 rg -q '^build-for-testing[[:space:]]+Tests$' "$PROJECT_ACTION_LOG"
 rg -q '작업=compile 시도=1 성공=1 실패=0' "$work/out"

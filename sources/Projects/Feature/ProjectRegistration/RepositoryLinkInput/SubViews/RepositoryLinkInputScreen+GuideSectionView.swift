@@ -16,7 +16,7 @@ extension RepositoryLinkInputScreen {
                     isGuideExpanded.toggle()
                 } label: {
                     HStack(spacing: 0) {
-                        StyledText(text: "불러오기 방법")
+                        StyledText(text: LocalizedText.ProjectRegistration.GuideSection.title)
                             .textStyle(.body2)
                             .foregroundColorToken(.blue100)
                         Spacer(minLength: 0)
@@ -39,9 +39,6 @@ extension RepositoryLinkInputScreen {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("불러오기 방법")
-                .accessibilityAddTraits(.isButton)
-                .accessibilityValue(isGuideExpanded ? "펼쳐짐" : "접힘")
 
                 if isGuideExpanded {
                     VStack(
@@ -49,7 +46,7 @@ extension RepositoryLinkInputScreen {
                         spacing: Constant.guideStepSpacing,
                     ) {
                         ForEach(
-                            Array(Constant.guideSteps.enumerated()),
+                            Array(guideSteps.enumerated()),
                             id: \.offset,
                         ) { index, text in
                             HStack(
@@ -91,16 +88,19 @@ extension RepositoryLinkInputScreen {
             static let chevronSize: CGFloat = 16
             static let chevronBoxSize: CGFloat = 36
             static let bodyVerticalPadding: CGFloat = 10
-            static let guideSteps = [
-                "학습하고싶은 레포지토리를 발견하셨나요?",
-                "GitHub 리포지토리 페이지로 이동합니다.",
-                "우측 상단의 [Code] 버튼을 클릭합니다.",
-                "HTTPS 탭에서 주소 옆 복사 아이콘을 누릅니다.",
-                "복사한 주소를 위에 입력해주세요.",
-            ]
         }
 
         @State private var isGuideExpanded = false
+
+        private var guideSteps: [String] {
+            [
+                LocalizedText.ProjectRegistration.GuideSection.First.step,
+                LocalizedText.ProjectRegistration.GuideSection.Second.step,
+                LocalizedText.ProjectRegistration.GuideSection.Third.step,
+                LocalizedText.ProjectRegistration.GuideSection.Fourth.step,
+                LocalizedText.ProjectRegistration.GuideSection.Fifth.step,
+            ]
+        }
 
     }
 }

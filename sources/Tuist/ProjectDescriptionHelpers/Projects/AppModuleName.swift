@@ -58,6 +58,7 @@ extension AppModuleName {
                 sources: ["\(sourceDirectory)/**"],
                 resources: [
                     "\(sourceDirectory)/Resources/**",
+                    "\(sourceDirectory)/Localization/**/*.xcstrings",
                     "Config/GoogleService-Info.plist",
                 ],
                 entitlements: .file(path: "GitIt.entitlements"),
@@ -89,7 +90,8 @@ extension AppModuleName {
                         "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "YES",
                         "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "NO",
                         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
-                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+                        "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
+                        "SWIFT_EMIT_LOC_STRINGS": "NO",
                         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
                         "SWIFT_VERSION": "5.0",
                         "TARGETED_DEVICE_FAMILY": "1",
@@ -141,6 +143,7 @@ extension AppModuleName {
                         "CODE_SIGN_STYLE": "Automatic",
                         "DEVELOPMENT_TEAM": "6924CABL23",
                         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
                         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
                         "SWIFT_VERSION": "5.0",
                     ]
@@ -180,8 +183,14 @@ extension AppModuleName {
                         "TARGETED_DEVICE_FAMILY": "1",
                     ],
                     configurations: [
-                        .debug(name: "Debug", xcconfig: "Config/debug.xcconfig"),
-                        .release(name: "Release", xcconfig: "Config/release.xcconfig"),
+                        .debug(
+                            name: "Debug",
+                            xcconfig: "Config/debug.xcconfig",
+                        ),
+                        .release(
+                            name: "Release",
+                            xcconfig: "Config/release.xcconfig",
+                        ),
                     ],
                 ),
             )
@@ -190,7 +199,7 @@ extension AppModuleName {
 
     // MARK: Private
 
-    private static let buildVersion = "7"
+    private static let buildVersion = "8"
     private static let marketingVersion = "1.0.0"
 
 }

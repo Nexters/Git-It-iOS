@@ -18,21 +18,19 @@ extension HomeScreen {
                     alignment: .leading,
                     spacing: 5,
                 ) {
-                    StyledText(text: "프로젝트 문제 생성")
+                    StyledText(text: LocalizedText.Home.RegistrationPanel.caption)
                         .textStyle(.caption1)
                         .foregroundColorToken(.grey400)
                     VStack(
                         alignment: .leading,
                         spacing: 0,
                     ) {
-                        StyledText(text: "오픈소스를 불러오고")
+                        StyledText(text: LocalizedText.Home.RegistrationPanel.Title.First.line)
                             .textStyle(.subtitle3)
-                        StyledText(text: "문제로 익혀보세요")
+                        StyledText(text: LocalizedText.Home.RegistrationPanel.Title.Second.line)
                             .textStyle(.subtitle3)
                     }
                 }
-
-                Spacer(minLength: 12)
 
                 HStack {
                     Spacer()
@@ -41,22 +39,22 @@ extension HomeScreen {
                         generationInProgressLabel
                     } else {
                         Button(action: onRegister) {
-                            StyledText(text: "지금 불러오기")
+                            StyledText(text: LocalizedText.Home.RegistrationPanel.Register.buttonTitle)
                                 .textStyle(.body2)
                                 .foregroundColorToken(.grey700)
                                 .frame(
-                                    width: 104,
-                                    height: 37,
+                                    width: Constant.registerButtonWidth,
+                                    height: Constant.actionSurfaceHeight,
                                 )
                                 .background(
                                     Color(designSystem: .blue100),
                                     in: RoundedRectangle(designSystem: .medium),
                                 )
-                                .frame(minHeight: 44)
+                                .padding(.vertical, Constant.touchAreaOutset)
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(Constant.registrationLabel)
+                        .padding(.vertical, -Constant.touchAreaOutset)
                     }
                 }
             }
@@ -79,8 +77,9 @@ extension HomeScreen {
         // MARK: Private
 
         private enum Constant {
-            static let registrationLabel = "프로젝트 지금 불러오기"
-            static let generationInProgressLabel = "문제 생성 중"
+            static let registerButtonWidth: CGFloat = 104
+            static let actionSurfaceHeight: CGFloat = 37
+            static let touchAreaOutset: CGFloat = (44 - actionSurfaceHeight) / 2
             static let progressLabelSpacing: CGFloat = 8
             static let progressIndicatorSize: CGFloat = 20
             static let progressLabelHorizontalPadding: CGFloat = 12
@@ -93,19 +92,16 @@ extension HomeScreen {
                         width: Constant.progressIndicatorSize,
                         height: Constant.progressIndicatorSize,
                     )
-                StyledText(text: Constant.generationInProgressLabel)
+                StyledText(text: LocalizedText.Home.RegistrationPanel.GenerationInProgress.label)
                     .textStyle(.body2)
                     .foregroundColorToken(.grey300)
             }
             .padding(.horizontal, Constant.progressLabelHorizontalPadding)
-            .frame(height: 37)
+            .frame(height: Constant.actionSurfaceHeight)
             .background(
                 Color(designSystem: .grey500),
                 in: RoundedRectangle(designSystem: .medium),
             )
-            .frame(minHeight: 44)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(Constant.generationInProgressLabel)
         }
 
     }

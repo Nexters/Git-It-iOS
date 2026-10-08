@@ -9,11 +9,9 @@ public struct IconGlassButton: View {
 
     public init(
         icon: Icon,
-        label: String,
         action: @escaping () -> Void = { },
     ) {
         self.icon = icon
-        self.label = label
         self.action = action
     }
 
@@ -101,13 +99,11 @@ public struct IconGlassButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(label)
     }
 
     // MARK: Private
 
     private let icon: Icon
-    private let label: String
     private var style = Style.neutral
     private var size = Size.small
     private let action: () -> Void
@@ -138,28 +134,23 @@ extension IconGlassButton: SizeConfigurable {
     VStack(spacing: LayoutToken.margin) {
         HStack(spacing: LayoutToken.gutter) {
             IconGlassButton(
-                icon: .chevronLeft,
-                label: "뒤로 가기",
+                icon: .chevronLeft
             )
             IconGlassButton(
-                icon: .bookmark,
-                label: "저장하기",
+                icon: .bookmark
             )
             .style(.accent)
             IconGlassButton(
-                icon: .minus,
-                label: "삭제하기",
+                icon: .minus
             )
             .style(.destructive)
         }
         HStack(spacing: LayoutToken.gutter) {
             IconGlassButton(
-                icon: .chevronLeft,
-                label: "뒤로 가기",
+                icon: .chevronLeft
             )
             IconGlassButton(
-                icon: .bookmark,
-                label: "저장하기",
+                icon: .bookmark
             )
             .style(.accent)
             .size(.medium)

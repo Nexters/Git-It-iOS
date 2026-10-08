@@ -122,61 +122,32 @@ public struct SignInFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .input(.prepareConsent):
-                guard state.legalAgreement.requiredDocuments.isEmpty else { return .none }
-                return .send(.legalAgreement(.input(.load)))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .input(.start):
-                guard state.canStart else { return .none }
-                state.phase = .checkingConsent
-                guard !state.legalAgreement.requiredDocuments.isEmpty else {
-                    return .send(.legalAgreement(.input(.load)))
-                }
-                return proceedAfterConsentCheck(&state)
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .legalAgreement(.effect(.statusLoaded)):
-                guard state.phase == .checkingConsent else { return .none }
-                return proceedAfterConsentCheck(&state)
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
-            case .legalAgreement(.delegate(.consentCompleted)):
-                guard state.phase == .agreeingToPolicies else { return .none }
-                return startSignIn(&state)
+            case .delegate:
+                .none
 
-            case .legalAgreement(.delegate(.cancelled)):
-                guard state.phase == .agreeingToPolicies else { return .none }
-                state.phase = .idle
-                return .send(.delegate(.consentCancelled))
-
-            case .view(.legalAgreementDismissed):
-                return .send(.legalAgreement(.view(.cancelTapped)))
-
-            case .view(.legalDocumentSheetDismissed):
-                return .send(.legalAgreement(.view(.documentSheetDismissed)))
-
-            case .view(.failureDismissed):
-                guard state.phase == .failed else { return .none }
-                state.phase = .idle
-                return .none
-
-            case .effect(.signInFinished(let requestID, let result)):
-                guard requestID == state.requestID, state.phase == .signingIn else { return .none }
-                switch result {
-                case .signedIn(let account):
-                    state.phase = .idle
-                    return .send(.delegate(.signedIn(needsCuration: account.needsCuration)))
-
-                case .cancelled:
-                    state.phase = .cancelled
-                    return .send(.delegate(.signInCancelled))
-
-                case .retryableFailure:
-                    state.phase = .failed
-                    return .none
-                }
-
-            case .legalAgreement,
-                 .delegate:
-                return .none
+            case .legalAgreement(let action):
+                reduce(
+                    into: &state,
+                    legalAgreement: action,
+                )
             }
         }
     }
@@ -190,6 +161,116 @@ public struct SignInFeature: Sendable {
     private let signIn: @Sendable (SignInMethod) async -> SignInResult
     private let policyConsentStatus: @Sendable () async throws -> PolicyConsentStatus
     private let consent: @Sendable ([PolicyDocumentID]) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .legalAgreementDismissed:
+            return .send(.legalAgreement(.view(.cancelTapped)))
+
+        case .legalDocumentSheetDismissed:
+            return .send(.legalAgreement(.view(.documentSheetDismissed)))
+
+        case .failureDismissed:
+            guard state.phase == .failed else { return .none }
+            state.phase = .idle
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .prepareConsent:
+            guard state.legalAgreement.requiredDocuments.isEmpty else { return .none }
+            return .send(.legalAgreement(.input(.load)))
+
+        case .start:
+            guard state.canStart else { return .none }
+            state.phase = .checkingConsent
+            guard !state.legalAgreement.requiredDocuments.isEmpty else {
+                return .send(.legalAgreement(.input(.load)))
+            }
+            return proceedAfterConsentCheck(&state)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .signInFinished(let requestID, let result):
+            guard requestID == state.requestID, state.phase == .signingIn else { return .none }
+            switch result {
+            case .signedIn(let account):
+                state.phase = .idle
+                return .send(.delegate(.signedIn(needsCuration: account.needsCuration)))
+
+            case .cancelled:
+                state.phase = .cancelled
+                return .send(.delegate(.signInCancelled))
+
+            case .retryableFailure:
+                state.phase = .failed
+                return .none
+            }
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        legalAgreement action: LegalAgreementFeature.Action,
+    ) -> Effect<Action> {
+        switch action {
+        case .effect(let event):
+            reduce(
+                into: &state,
+                legalAgreementEffect: event,
+            )
+
+        case .delegate(let action):
+            reduce(
+                into: &state,
+                legalAgreementDelegate: action,
+            )
+
+        case .view,
+             .input:
+            .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        legalAgreementEffect event: LegalAgreementFeature.Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .statusLoaded:
+            guard state.phase == .checkingConsent else { return .none }
+            return proceedAfterConsentCheck(&state)
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        legalAgreementDelegate action: LegalAgreementFeature.Action.Delegate,
+    ) -> Effect<Action> {
+        switch action {
+        case .consentCompleted:
+            guard state.phase == .agreeingToPolicies else { return .none }
+            return startSignIn(&state)
+
+        case .cancelled:
+            guard state.phase == .agreeingToPolicies else { return .none }
+            state.phase = .idle
+            return .send(.delegate(.consentCancelled))
+        }
+    }
 
     private func proceedAfterConsentCheck(_ state: inout State) -> Effect<Action> {
         guard state.legalAgreement.isStoredConsentValid else {

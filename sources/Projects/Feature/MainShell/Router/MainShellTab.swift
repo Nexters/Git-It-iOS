@@ -14,10 +14,10 @@ public enum MainShellTab: String, CaseIterable, Hashable, Identifiable, Sendable
 
     public var tabTitle: String {
         switch self {
-        case .home: "Home"
-        case .projects: "프로젝트"
-        case .saved: "저장"
-        case .settings: "마이"
+        case .home: LocalizedText.MainShell.Tab.Home.title
+        case .projects: LocalizedText.MainShell.Tab.Projects.title
+        case .saved: LocalizedText.MainShell.Tab.Saved.title
+        case .settings: LocalizedText.MainShell.Tab.Settings.title
         }
     }
 

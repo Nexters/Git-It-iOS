@@ -78,59 +78,20 @@ public struct SingleQuestionEntryFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.questionRequested(let setID, let questionID)):
-                guard !state.isPreparing else { return .none }
-                state.preparation = .loading(questionID: questionID)
-                let projectID = state.projectID
-                return .run { send in
-                    do {
-                        let set = try await fetchQuizSet(setID, projectID)
-                        await send(.effect(.setLoadFinished(
-                            questionID: questionID,
-                            result: .success(set),
-                        )))
-                    } catch {
-                        let mapped = error as? QuizDetailError ?? .unexpected
-                        await send(.effect(.setLoadFinished(
-                            questionID: questionID,
-                            result: .failure(mapped),
-                        )))
-                    }
-                }
-                .cancellable(
-                    id: CancelID.load,
-                    cancelInFlight: true,
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .input(.failureDismissed):
-                state.preparation = .idle
-                return .none
-
-            case .effect(.setLoadFinished(let questionID, let result)):
-                guard
-                    case .loading(let pendingQuestionID) = state.preparation,
-                    pendingQuestionID == questionID
-                else { return .none }
-
-                switch result {
-                case .success(let set):
-                    guard let quiz = set.quizzes.first(where: { $0.id == questionID }) else {
-                        state.preparation = .failed(.quizUnavailable)
-                        return .send(.delegate(.preparationFailed(.quizUnavailable)))
-                    }
-                    state.preparation = .idle
-                    return .send(.delegate(.questionPrepared(
-                        question: quiz,
-                        projectID: state.projectID,
-                    )))
-
-                case .failure(let error):
-                    state.preparation = .failed(error)
-                    return .send(.delegate(.preparationFailed(error)))
-                }
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -142,5 +103,70 @@ public struct SingleQuestionEntryFeature: Sendable {
     }
 
     private let fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .questionRequested(let setID, let questionID):
+            guard !state.isPreparing else { return .none }
+            state.preparation = .loading(questionID: questionID)
+            let projectID = state.projectID
+            return .run { send in
+                do {
+                    let set = try await fetchQuizSet(setID, projectID)
+                    await send(.effect(.setLoadFinished(
+                        questionID: questionID,
+                        result: .success(set),
+                    )))
+                } catch {
+                    let mapped = error as? QuizDetailError ?? .unexpected
+                    await send(.effect(.setLoadFinished(
+                        questionID: questionID,
+                        result: .failure(mapped),
+                    )))
+                }
+            }
+            .cancellable(
+                id: CancelID.load,
+                cancelInFlight: true,
+            )
+
+        case .failureDismissed:
+            state.preparation = .idle
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .setLoadFinished(let questionID, let result):
+            guard
+                case .loading(let pendingQuestionID) = state.preparation,
+                pendingQuestionID == questionID
+            else { return .none }
+
+            switch result {
+            case .success(let set):
+                guard let quiz = set.quizzes.first(where: { $0.id == questionID }) else {
+                    state.preparation = .failed(.quizUnavailable)
+                    return .send(.delegate(.preparationFailed(.quizUnavailable)))
+                }
+                state.preparation = .idle
+                return .send(.delegate(.questionPrepared(
+                    question: quiz,
+                    projectID: state.projectID,
+                )))
+
+            case .failure(let error):
+                state.preparation = .failed(error)
+                return .send(.delegate(.preparationFailed(error)))
+            }
+        }
+    }
 
 }

@@ -10,7 +10,6 @@ extension TutorialScreen {
         let currentPage: Int
         let totalPages: Int
         let bundleVersion: String
-        let isHintVisible: Bool
         let onAppleSignIn: () -> Void
         let onGuestAccess: () -> Void
 
@@ -22,28 +21,23 @@ extension TutorialScreen {
                 ))
                 .padding(Constant.indicatorPadding)
 
-                StyledText(text: Constant.hintTitle)
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.Hint.title)
                     .textStyle(.caption1)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
-                    .opacity(isHintVisible ? 1 : 0)
-                    .accessibilityHidden(!isHintVisible)
                     .padding(.bottom, LayoutToken.compactSpacing)
 
                 AppleSignInButton(action: onAppleSignIn)
 
                 FeedbackActionButton(
-                    title: Constant.guestAccessTitle,
+                    title: LocalizedText.Onboarding.Tutorial.SignIn.GuestAccess.buttonTitle,
                     action: onGuestAccess,
                 )
-                .enabled(isHintVisible)
                 .style(.text)
                 .size(.small)
-                .opacity(isHintVisible ? 1 : 0)
-                .accessibilityHidden(!isHintVisible)
                 .padding(.top, LayoutToken.compactSpacing)
 
-                StyledText(text: "버전 \(bundleVersion)")
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.version(version: bundleVersion))
                     .textStyle(.body2)
                     .foregroundColorToken(.grey500)
                     .multilineTextAlignment(.center)
@@ -56,8 +50,6 @@ extension TutorialScreen {
         // MARK: Private
 
         private enum Constant {
-            static let hintTitle = "3초만에 가입하기"
-            static let guestAccessTitle = "로그인 없이 둘러보기"
             static let indicatorPadding: CGFloat = 12
             static let versionTopSpacing: CGFloat = 21
             static let bottomInset: CGFloat = 29

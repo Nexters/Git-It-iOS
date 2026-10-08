@@ -76,7 +76,6 @@ public struct ProjectRow<Thumbnail: View>: View {
         )
         .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: Private
@@ -139,7 +138,6 @@ public struct ProjectRow<Thumbnail: View>: View {
         if isDeleting {
             IconGlassButton(
                 icon: .minus,
-                label: "\(displayModel.name) 삭제",
                 action: onAccessoryTap,
             )
             .style(.destructive)
@@ -148,7 +146,6 @@ public struct ProjectRow<Thumbnail: View>: View {
         } else {
             IconPlainButton(
                 icon: .play,
-                label: "\(displayModel.name) 학습 시작",
                 action: onAccessoryTap,
             )
         }

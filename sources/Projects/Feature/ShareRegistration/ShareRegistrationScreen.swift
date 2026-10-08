@@ -31,44 +31,44 @@ public struct ShareRegistrationScreen: View {
     private var content: some View {
         switch store.registration.phase {
         case .validating:
-            Self.LoadingView(message: Constant.lookupMessage)
+            Self.LoadingView(message: LocalizedText.ShareRegistration.Lookup.message)
 
         case .submitting:
-            Self.LoadingView(message: Constant.submittingMessage)
+            Self.LoadingView(message: LocalizedText.ShareRegistration.Submitting.message)
 
         case .ready:
             stepContent
 
         case .invalidURL(let reason):
             guidance(
-                title: Constant.invalidURLTitle,
+                title: LocalizedText.ShareRegistration.InvalidLink.title,
                 message: reason,
             )
 
         case .signInRequired:
             guidance(
-                title: Constant.signInTitle,
-                message: Constant.signInGuidance,
+                title: LocalizedText.ShareRegistration.SignInRequired.title,
+                message: LocalizedText.ShareRegistration.SignInRequired.message,
             )
 
         case .appLaunchRequired:
             guidance(
-                title: Constant.appLaunchTitle,
-                message: Constant.appLaunchGuidance,
+                title: LocalizedText.ShareRegistration.AppLaunchRequired.title,
+                message: LocalizedText.ShareRegistration.AppLaunchRequired.message,
             )
 
         case .succeeded:
             guidance(
-                title: Constant.successTitle,
-                message: Constant.successGuidance,
+                title: LocalizedText.ShareRegistration.Success.title,
+                message: LocalizedText.ShareRegistration.Success.message,
             )
 
         case .failed(let reason, _):
             Self.GuidanceView(
-                title: Constant.failureTitle,
+                title: LocalizedText.ShareRegistration.Failure.title,
                 message: reason,
-                retryTitle: Constant.retryTitle,
-                dismissTitle: Constant.dismissTitle,
+                retryTitle: LocalizedText.ShareRegistration.Retry.buttonTitle,
+                dismissTitle: LocalizedText.ShareRegistration.Dismiss.buttonTitle,
                 onRetry: { send(.retryTapped) },
                 onDismiss: { send(.dismissTapped) },
             )
@@ -112,34 +112,10 @@ public struct ShareRegistrationScreen: View {
             title: title,
             message: message,
             retryTitle: nil,
-            dismissTitle: Constant.dismissTitle,
+            dismissTitle: LocalizedText.ShareRegistration.Dismiss.buttonTitle,
             onRetry: { },
             onDismiss: { send(.dismissTapped) },
         )
     }
 
-}
-
-// MARK: ShareRegistrationScreen.Constant
-
-extension ShareRegistrationScreen {
-    fileprivate enum Constant {
-        static let lookupMessage = "저장소 정보를 불러오는 중이에요."
-        static let submittingMessage = "학습 세트 생성을 요청하고 있어요."
-
-        static let invalidURLTitle = "등록할 수 없는 링크예요"
-
-        static let signInTitle = "로그인이 필요해요"
-        static let signInGuidance = "Git-It 앱에서 로그인한 뒤 다시 공유해 주세요."
-
-        static let appLaunchTitle = "앱을 한 번 실행해 주세요"
-        static let appLaunchGuidance = "Git-It 앱을 한 번 실행한 뒤 다시 공유해 주세요."
-
-        static let successTitle = "등록을 접수했어요"
-        static let successGuidance = "결과는 Git-It 앱에서 확인할 수 있어요."
-
-        static let failureTitle = "등록하지 못했어요"
-        static let retryTitle = "다시 시도하기"
-        static let dismissTitle = "닫기"
-    }
 }

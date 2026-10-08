@@ -99,59 +99,20 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .input(.validate(let sharedURL)):
-                state.sharedURL = sharedURL
-                return validate(&state)
-
-            case .input(.submit(let repository, let quizLevel)):
-                guard !state.isSubmitting else { return .none }
-                state.submission = Submission(
-                    repository: repository,
-                    quizLevel: quizLevel,
-                )
-                return submit(&state)
-
-            case .input(.retry):
-                guard case .failed(_, let retry) = state.phase else { return .none }
-                return switch retry {
-                case .lookup: validate(&state)
-                case .registration: submit(&state)
-                }
-
-            case .input(.cancel):
-                return .merge(
-                    .cancel(id: CancelID.registration),
-                    .cancel(id: CancelID.validation),
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
                 )
 
-            case .effect(.validationFinished(let phase)):
-                state.phase = phase
-                return .none
-
-            case .effect(.repositoryResolved(let repository)):
-                state.phase = .ready(repository)
-                return .send(.delegate(.repositoryResolved(repository)))
-
-            case .effect(.registrationFinished(.success)):
-                state.phase = .succeeded
-                recordDiagnostic(.registrationSucceeded)
-                return .none
-
-            case .effect(.registrationFinished(.failure(let error))):
-                if error == .unauthorized {
-                    state.phase = .signInRequired
-                    recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
-                } else {
-                    state.phase = .failed(
-                        reason: Self.registrationFailureReason(for: error),
-                        retry: .registration,
-                    )
-                    recordDiagnostic(.registrationFailed(reason: String(describing: error)))
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -163,9 +124,6 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
         case registration
     }
 
-    private static let sharedItemUnavailableReason = "공유한 항목에서 링크를 찾지 못했어요."
-    private static let invalidLinkReason = "GitHub 저장소 주소가 아니에요."
-
     private let parseRepositoryLink: any ExternalRepositoryLocator
     private let externalRepository: any ExternalRepositoryUseCase
     private let projectGeneration: any ProjectGenerationUseCase
@@ -175,38 +133,106 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
     private static func registrationFailureReason(for error: ProjectGenerationError) -> String {
         switch error {
         case .invalidRequest:
-            "등록할 수 없는 저장소예요. 앱에서 다시 확인해 주세요."
+            LocalizedText.ShareRegistration.InvalidRequest.reason
 
         case .duplicateRequest:
-            "이미 등록 중인 저장소예요."
+            LocalizedText.ShareRegistration.DuplicateRequest.reason
 
         case .temporarilyUnavailable:
-            "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요."
+            LocalizedText.ShareRegistration.TemporarilyUnavailable.reason
 
         default:
-            "등록에 실패했어요. 잠시 후 다시 시도해 주세요."
+            LocalizedText.ShareRegistration.RegistrationFailure.reason
         }
     }
 
     private static func lookupFailureReason(for error: ExternalRepositoryError) -> String {
         switch error {
         case .offline:
-            "네트워크에 연결할 수 없어요."
+            LocalizedText.ShareRegistration.Offline.reason
 
         default:
-            "저장소 정보를 가져오지 못했어요."
+            LocalizedText.ShareRegistration.Lookup.Failure.reason
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .validate(let sharedURL):
+            state.sharedURL = sharedURL
+            return validate(&state)
+
+        case .submit(let repository, let quizLevel):
+            guard !state.isSubmitting else { return .none }
+            state.submission = Submission(
+                repository: repository,
+                quizLevel: quizLevel,
+            )
+            return submit(&state)
+
+        case .retry:
+            guard case .failed(_, let retry) = state.phase else { return .none }
+            return switch retry {
+            case .lookup: validate(&state)
+            case .registration: submit(&state)
+            }
+
+        case .cancel:
+            return .merge(
+                .cancel(id: CancelID.registration),
+                .cancel(id: CancelID.validation),
+            )
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .validationFinished(let phase):
+            state.phase = phase
+            return .none
+
+        case .repositoryResolved(let repository):
+            state.phase = .ready(repository)
+            return .send(.delegate(.repositoryResolved(repository)))
+
+        case .registrationFinished(let result):
+            switch result {
+            case .success:
+                state.phase = .succeeded
+                recordDiagnostic(.registrationSucceeded)
+                return .none
+
+            case .failure(let error):
+                if error == .unauthorized {
+                    state.phase = .signInRequired
+                    recordDiagnostic(.signInAvailabilityResolved(.signInRequired))
+                } else {
+                    state.phase = .failed(
+                        reason: Self.registrationFailureReason(for: error),
+                        retry: .registration,
+                    )
+                    recordDiagnostic(.registrationFailed(reason: String(describing: error)))
+                }
+                return .none
+            }
         }
     }
 
     private func validate(_ state: inout State) -> Effect<Action> {
         state.phase = .validating
         guard let sharedURL = state.sharedURL else {
-            state.phase = .invalidURL(reason: Self.sharedItemUnavailableReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.SharedItemUnavailable.reason)
             recordDiagnostic(.sharedItemUnavailable)
             return .none
         }
         guard parseRepositoryLink.location(from: sharedURL) != nil else {
-            state.phase = .invalidURL(reason: Self.invalidLinkReason)
+            state.phase = .invalidURL(reason: LocalizedText.ShareRegistration.InvalidLink.reason)
             recordDiagnostic(.repositoryLinkRejected)
             return .none
         }
@@ -233,7 +259,8 @@ public struct SharedRepositoryRegistrationFeature: Sendable {
             } catch let error as ExternalRepositoryError {
                 if error == .invalidURLFormat {
                     recordDiagnostic(.repositoryLinkRejected)
-                    await send(.effect(.validationFinished(.invalidURL(reason: Self.invalidLinkReason))))
+                    await send(.effect(.validationFinished(.invalidURL(reason: LocalizedText.ShareRegistration.InvalidLink
+                            .reason))))
                 } else {
                     recordDiagnostic(.repositoryLookupFailed(reason: String(describing: error)))
                     await send(.effect(.validationFinished(.failed(

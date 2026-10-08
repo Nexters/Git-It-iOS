@@ -27,23 +27,6 @@ public struct PageIndicator: View {
                     )
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("페이지 안내")
-        .accessibilityValue(
-            Self.accessibilityValue(
-                currentPage: displayModel.currentPage,
-                totalPages: displayModel.totalPages,
-            )
-        )
-    }
-
-    // MARK: Internal
-
-    static func accessibilityValue(
-        currentPage: Int,
-        totalPages: Int,
-    ) -> String {
-        "전체 \(totalPages)페이지 중 \(currentPage + 1)번째"
     }
 
     // MARK: Private

@@ -14,7 +14,6 @@ extension HomeScreen {
                 StyledText(text: "Let’s Git -it-!")
                     .textStyle(.headline1)
             }
-            .accessibilityElement(children: .combine)
         }
     }
 }

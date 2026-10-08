@@ -31,7 +31,6 @@ struct TutorialScreen: View {
                     currentPage: store.pageProgress.currentPage,
                     totalPages: store.pageProgress.totalPages,
                     bundleVersion: store.bundleVersion,
-                    isHintVisible: isLastPage,
                     onAppleSignIn: { send(.appleSignInTapped) },
                     onGuestAccess: { send(.guestAccessTapped) },
                 )
@@ -41,10 +40,6 @@ struct TutorialScreen: View {
     }
 
     // MARK: Private
-
-    private var isLastPage: Bool {
-        store.page == store.pageProgress.totalPages
-    }
 
     private var pageBinding: Binding<Int> {
         Binding(

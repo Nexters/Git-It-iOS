@@ -12,7 +12,6 @@ struct ChoiceAnswerOptionTests {
 
         #expect(state.fillToken == .correct)
         #expect(state.letterColor == .grey100)
-        #expect(state.accessibilitySuffix == "정답")
     }
 
     @Test
@@ -21,21 +20,18 @@ struct ChoiceAnswerOptionTests {
 
         #expect(state.fillToken == .incorrect)
         #expect(state.letterColor == .grey100)
-        #expect(state.accessibilitySuffix == "오답")
     }
 
     @Test
-    func `default 상태는 채움색이 없고 접근성 접미사가 없다`() {
+    func `default 상태는 채움색이 없고 파란 레터를 사용한다`() {
         #expect(ChoiceAnswerOption.State.default.fillToken == nil)
         #expect(ChoiceAnswerOption.State.default.letterColor == .blue200)
-        #expect(ChoiceAnswerOption.State.default.accessibilitySuffix == nil)
     }
 
     @Test
-    func `selected 상태는 채움색 없이 보더로 구별하고 접근성 접미사가 없다`() {
+    func `selected 상태는 채움색 없이 보더로 구별한다`() {
         #expect(ChoiceAnswerOption.State.selected.fillToken == nil)
         #expect(ChoiceAnswerOption.State.selected.borderToken == .focus)
-        #expect(ChoiceAnswerOption.State.selected.accessibilitySuffix == nil)
     }
 
     @Test

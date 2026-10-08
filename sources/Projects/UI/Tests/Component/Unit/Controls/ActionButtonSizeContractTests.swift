@@ -13,6 +13,13 @@ struct ActionButtonSizeContractTests {
     }
 
     @Test
+    func `LG MD SM 좌우 안쪽 여백은 각각 12 10 8pt다`() {
+        #expect(ActionButton.Size.large.horizontalPadding == 12)
+        #expect(ActionButton.Size.medium.horizontalPadding == 10)
+        #expect(ActionButton.Size.small.horizontalPadding == 8)
+    }
+
+    @Test
     func `모든 크기는 44pt 최소 터치 영역을 구성한다`() {
         let sizes: [ActionButton.Size] = [.large, .medium, .small]
 

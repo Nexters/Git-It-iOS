@@ -66,18 +66,6 @@ public struct ChoiceAnswerOption: View {
         var textColor: ColorToken {
             .grey100
         }
-
-        var accessibilitySuffix: String? {
-            switch self {
-            case .default,
-                 .selected:
-                nil
-            case .correct:
-                "정답"
-            case .incorrect:
-                "오답"
-            }
-        }
     }
 
     public enum ExpansionControl {
@@ -108,9 +96,6 @@ public struct ChoiceAnswerOption: View {
                 isExpanded: isExpanded,
                 reservesChevronSpace: false,
             )
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits(state == .selected ? .isSelected : [])
 
         case .toggleable(let isExpanded):
             card(
@@ -135,14 +120,9 @@ public struct ChoiceAnswerOption: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityHidden(true)
                 .padding(.trailing, Constant.horizontalPadding)
                 .padding(.top, Constant.topPadding)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits(state == .selected ? .isSelected : [])
-            .accessibilityAction(named: isExpanded.wrappedValue ? "선택지 접기" : "선택지 펼치기") { expansion.toggle() }
         }
     }
 
@@ -161,13 +141,6 @@ public struct ChoiceAnswerOption: View {
     private let state: State
     private let expansion: ExpansionControl
     private let onTap: () -> Void
-
-    private var accessibilityLabel: String {
-        guard let suffix = state.accessibilitySuffix else {
-            return "\(displayModel.letter), \(displayModel.text)"
-        }
-        return "\(displayModel.letter), \(displayModel.text), \(suffix)"
-    }
 
     private func card(
         isExpanded: Bool,

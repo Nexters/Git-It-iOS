@@ -24,8 +24,6 @@ public struct ProgressSegments: View {
                     .frame(height: Constant.segmentHeight)
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("전체 \(displayModel.total)문항 중 \(displayModel.completed)문항 완료")
     }
 
     // MARK: Private

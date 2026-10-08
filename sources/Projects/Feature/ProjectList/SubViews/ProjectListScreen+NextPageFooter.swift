@@ -20,13 +20,13 @@ extension ProjectListScreen {
 
             case .failed:
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText(text: "프로젝트를 더 불러오지 못했어요")
+                    StyledText(text: LocalizedText.ProjectList.NextPageFooter.Failure.message)
                         .textStyle(.body2)
                         .foregroundColorToken(.grey400)
                         .multilineTextAlignment(.center)
 
                     FeedbackActionButton(
-                        title: "다시 시도하기",
+                        title: LocalizedText.ProjectList.NextPageFooter.Retry.buttonTitle,
                         action: onRetry,
                     )
                     .style(.text)

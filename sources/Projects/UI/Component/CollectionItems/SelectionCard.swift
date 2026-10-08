@@ -68,8 +68,6 @@ public struct SelectionCard<Thumbnail: View>: View {
                     )
             }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Private

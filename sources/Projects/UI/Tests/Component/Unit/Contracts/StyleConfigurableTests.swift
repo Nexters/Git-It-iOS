@@ -13,8 +13,7 @@ struct StyleConfigurableTests {
         #expect(style(of: ActionButton(title: "계속하기")) == ActionButton.Style.primary)
         #expect(style(of: TagBadge(text: "완료")) == TagBadge.Style.neutral)
         #expect(style(of: IconGlassButton(
-            icon: .bookmark,
-            label: "저장하기",
+            icon: .bookmark
         )) == IconGlassButton.Style.neutral)
     }
 
@@ -23,8 +22,7 @@ struct StyleConfigurableTests {
         let button = ActionButton(title: "계속하기").size(.medium).style(.secondary)
         let badge = TagBadge(text: "완료").size(.compact).style(.accent)
         let glassButton = IconGlassButton(
-            icon: .bookmark,
-            label: "저장하기",
+            icon: .bookmark
         ).size(.medium).style(.destructive)
 
         #expect(style(of: button) == ActionButton.Style.secondary)
@@ -34,7 +32,7 @@ struct StyleConfigurableTests {
         #expect(Mirror(reflecting: badge).descendant("text") as? String == "완료")
         #expect(style(of: glassButton) == IconGlassButton.Style.destructive)
         #expect(size(of: glassButton) == IconGlassButton.Size.medium)
-        #expect(Mirror(reflecting: glassButton).descendant("label") as? String == "저장하기")
+        #expect(Mirror(reflecting: glassButton).descendant("icon") as? IconGlassButton.Icon == .bookmark)
     }
 
     @Test
@@ -42,8 +40,7 @@ struct StyleConfigurableTests {
         #expect(style(of: ActionButton(title: "계속하기").style(.text).style(.destructive)) == ActionButton.Style.destructive)
         #expect(style(of: TagBadge(text: "완료").style(.accent).style(.muted)) == TagBadge.Style.muted)
         let glassButton = IconGlassButton(
-            icon: .bookmark,
-            label: "저장하기",
+            icon: .bookmark
         ).style(.accent).style(.neutral)
         #expect(style(of: glassButton) == IconGlassButton.Style.neutral)
     }

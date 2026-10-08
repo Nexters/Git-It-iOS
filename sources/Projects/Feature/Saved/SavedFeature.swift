@@ -106,54 +106,20 @@ public struct SavedFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.task),
-                 .view(.retryTapped):
-                return load(&state)
-
-            case .view(.filterSelected(let projectID)):
-                guard state.selectedProjectID != projectID else { return .none }
-                state.selectedProjectID = projectID
-                return load(&state)
-
-            case .view(.solveTapped(let bookmark)):
-                return .send(.delegate(.questionSelected(bookmark)))
-
-            case .view(.bookmarkToggleTapped(let bookmark)):
-                return toggleBookmark(
-                    &state,
-                    bookmark: bookmark,
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .view(.backTapped):
-                guard state.isBackControlPresented else { return .none }
-                return .send(.delegate(.backRequested))
-
-            case .effect(.bookmarksLoadFinished(let requestID, let result)):
-                guard requestID == state.requestID else { return .none }
-                switch result {
-                case .success(let list):
-                    state.collection = list
-                    state.loadStatus = .loaded
-                    state.bookmarkOverrides = [:]
-
-                case .failure(let error):
-                    state.loadStatus = .failed(error)
-                }
-                return .none
-
-            case .effect(.bookmarkToggleFinished(let questionID, let result)):
-                switch result {
-                case .success(let bookmarkState):
-                    state.bookmarkOverrides[questionID] = bookmarkState.isBookmarked
-                    state.bookmarkMutations[questionID] = .idle
-
-                case .failure(let error):
-                    state.bookmarkMutations[questionID] = .failed(error)
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -167,6 +133,66 @@ public struct SavedFeature: Sendable {
 
     private let fetchBookmarks: @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList
     private let setBookmark: @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task,
+             .retryTapped:
+            return load(&state)
+
+        case .filterSelected(let projectID):
+            guard state.selectedProjectID != projectID else { return .none }
+            state.selectedProjectID = projectID
+            return load(&state)
+
+        case .solveTapped(let bookmark):
+            return .send(.delegate(.questionSelected(bookmark)))
+
+        case .bookmarkToggleTapped(let bookmark):
+            return toggleBookmark(
+                &state,
+                bookmark: bookmark,
+            )
+
+        case .backTapped:
+            guard state.isBackControlPresented else { return .none }
+            return .send(.delegate(.backRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .bookmarksLoadFinished(let requestID, let result):
+            guard requestID == state.requestID else { return .none }
+            switch result {
+            case .success(let list):
+                state.collection = list
+                state.loadStatus = .loaded
+                state.bookmarkOverrides = [:]
+
+            case .failure(let error):
+                state.loadStatus = .failed(error)
+            }
+            return .none
+
+        case .bookmarkToggleFinished(let questionID, let result):
+            switch result {
+            case .success(let bookmarkState):
+                state.bookmarkOverrides[questionID] = bookmarkState.isBookmarked
+                state.bookmarkMutations[questionID] = .idle
+
+            case .failure(let error):
+                state.bookmarkMutations[questionID] = .failed(error)
+            }
+            return .none
+        }
+    }
 
     private func load(_ state: inout State) -> Effect<Action> {
         state.requestID += 1

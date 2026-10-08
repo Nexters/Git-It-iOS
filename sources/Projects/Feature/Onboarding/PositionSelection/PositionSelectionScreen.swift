@@ -21,12 +21,12 @@ struct PositionSelectionScreen: View {
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText(text: Constant.title)
+                    StyledText(text: LocalizedText.Onboarding.PositionSelection.title)
                         .textStyle(.subtitle1)
                         .multilineTextAlignment(.center)
 
                     if store.exitStatus == .failed {
-                        StyledText(text: "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.Onboarding.PositionSelection.ExitFailure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                             .multilineTextAlignment(.center)
@@ -56,7 +56,7 @@ struct PositionSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 FeedbackActionButton(
-                    title: "다음",
+                    title: LocalizedText.Onboarding.PositionSelection.Next.buttonTitle,
                     action: { send(.nextTapped) },
                 )
                 .enabled(store.position != nil)
@@ -101,7 +101,6 @@ extension PositionSelectionScreen {
 
 extension PositionSelectionScreen {
     fileprivate enum Constant {
-        static let title = "어떤 분야의 코드를\n학습하고 싶나요?"
         static let titleToOptionsSpacing: CGFloat = 64
     }
 }

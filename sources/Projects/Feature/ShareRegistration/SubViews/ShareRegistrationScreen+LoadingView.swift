@@ -28,7 +28,6 @@ extension ShareRegistrationScreen {
                 Spacer(minLength: 0)
             }
             .designSystemScreenMargin()
-            .accessibilityElement(children: .combine)
         }
 
         // MARK: Private

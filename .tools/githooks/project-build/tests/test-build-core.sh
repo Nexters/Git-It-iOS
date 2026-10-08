@@ -54,4 +54,29 @@ project_run_all fake_workspace fake_xcodebuild /tmp/project-observed.$$ /tmp/pro
 assert_equal 'observe
 execute' "$(cat "$call_log")" 'workspace/xcodebuild port 호출'
 rm -f /tmp/project-observed.$$ /tmp/project-targets.$$ /tmp/project-results.$$ "$call_log"
+
+# 읽기 전용 module map만 쓰기 가능으로 되돌리는지 공백·한글·개행 경로로 확인합니다.
+. "$module/core/xcodebuild.sh"
+module_map_work=$(mktemp -d "${TMPDIR:-/tmp}/project-build-module-map.XXXXXX")
+trap 'rm -rf "$module_map_work"' EXIT HUP INT TERM
+module_map_derived="$module_map_work/파생 $(printf 'Line\nBreak')"
+module_map_modules="$module_map_derived/Build/Products/Debug-iphonesimulator/Promises/FBLPromises.framework/Modules"
+mkdir -p "$module_map_modules"
+printf 'module FBLPromises {}\n' >"$module_map_modules/module.modulemap"
+printf 'other\n' >"$module_map_modules/other.modulemap"
+chmod 444 "$module_map_modules/module.modulemap" "$module_map_modules/other.modulemap"
+project_xcodebuild_restore_module_maps "$module_map_derived"
+[ -w "$module_map_modules/module.modulemap" ] || {
+	printf 'FAIL: 읽기 전용 module map 권한을 복구하지 않음\n' >&2
+	exit 1
+}
+[ ! -w "$module_map_modules/other.modulemap" ] || {
+	printf 'FAIL: module map 외 파일 권한을 변경함\n' >&2
+	exit 1
+}
+project_xcodebuild_restore_module_maps "$module_map_work/missing" || {
+	printf 'FAIL: 빌드 산출물이 없는 DerivedData를 실패로 처리함\n' >&2
+	exit 1
+}
+chmod 644 "$module_map_modules/other.modulemap"
 printf 'PASS: project-build core\n'

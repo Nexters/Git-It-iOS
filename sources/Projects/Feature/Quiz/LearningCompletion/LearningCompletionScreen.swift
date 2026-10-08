@@ -36,19 +36,16 @@ struct LearningCompletionScreen: View {
                         width: Constant.animationSize,
                         height: Constant.animationSize,
                     )
-                    .accessibilityHidden(true)
 
-                StyledText(text: "학습을 마쳤어요")
+                StyledText(text: LocalizedText.Quiz.LearningCompletion.title)
                     .textStyle(.subtitle1)
                     .multilineTextAlignment(.center)
 
-                if let scoreLabel = store.scoreAccessibilityLabel {
+                if store.isScorePresented {
                     scoreView
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(scoreLabel)
                 }
 
-                StyledText(text: Constant.message)
+                StyledText(text: LocalizedText.Quiz.LearningCompletion.message)
                     .foregroundColorToken(.grey400)
                     .multilineTextAlignment(.center)
             }
@@ -57,7 +54,7 @@ struct LearningCompletionScreen: View {
             Spacer(minLength: 0)
 
             FeedbackActionButton(
-                title: "확인",
+                title: LocalizedText.Quiz.LearningCompletion.Confirm.buttonTitle,
                 action: { send(.primaryActionTapped) },
             )
             .designSystemScreenMargin()
@@ -96,6 +93,5 @@ extension LearningCompletionScreen {
         static let scoreDividerWidth: CGFloat = 1
         static let scoreDividerHeight: CGFloat = 22
         static let bottomButtonPadding: CGFloat = 24
-        static let message = "다음 세트에서 이어서 학습해 보세요."
     }
 }

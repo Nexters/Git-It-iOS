@@ -50,7 +50,6 @@ public struct RubricView: View {
         )
         .designSystemBackground(.grey600)
         .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: Private

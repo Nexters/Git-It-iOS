@@ -33,7 +33,6 @@ public struct ScreenEdgeScrim: View {
         LinearGradient(designSystem: edge.gradientToken)
             .frame(height: height)
             .allowsHitTesting(Constant.allowsHitTesting)
-            .accessibilityHidden(true)
     }
 
     // MARK: Internal

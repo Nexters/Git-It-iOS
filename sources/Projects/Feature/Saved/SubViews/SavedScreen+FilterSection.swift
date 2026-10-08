@@ -22,7 +22,7 @@ extension SavedScreen {
                 ScrollView(.horizontal) {
                     HStack(spacing: LayoutToken.compactSpacing) {
                         Chip(
-                            label: Constant.allLabel,
+                            label: LocalizedText.Saved.Filter.All.label,
                             isSelected: Binding(
                                 get: { selectedProjectID == nil },
                                 set: { _ in onSelect(nil) },
@@ -40,7 +40,7 @@ extension SavedScreen {
                     }
                 }
                 .scrollIndicators(.hidden)
-                StyledText(text: "\(count)개")
+                StyledText(text: LocalizedText.Saved.Filter.count(count: count))
                     .textStyle(.body2)
                     .foregroundColorToken(.grey400)
             }
@@ -51,7 +51,6 @@ extension SavedScreen {
 
         private enum Constant {
             static let rowVerticalPadding: CGFloat = 10
-            static let allLabel = "전체"
         }
 
     }

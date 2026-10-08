@@ -61,8 +61,6 @@ public struct SavedQuestionCard: View {
     private var bookmarkButton: some View {
         let icon: ResourceImage.Asset.Icon = isBookmarked ? .bookmarkFilled : .bookmark
         let tint: ColorToken = isBookmarked ? .blue100 : .grey300
-        let accessibilityLabel = isBookmarked ? "저장 해제하기" : "저장하기"
-        let accessibilityTraits: AccessibilityTraits = isBookmarked ? [.isButton, .isSelected] : .isButton
 
         return Button(action: { toggleBookmark() }) {
             ResourceImage(
@@ -81,8 +79,6 @@ public struct SavedQuestionCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityAddTraits(accessibilityTraits)
     }
 
     private var actionButton: some View {

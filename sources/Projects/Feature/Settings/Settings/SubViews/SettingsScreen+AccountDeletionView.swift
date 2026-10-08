@@ -23,7 +23,6 @@ extension SettingsScreen {
                     ) {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.deleteAccountCancelled) },
                         )
                         .size(.medium)
@@ -35,7 +34,7 @@ extension SettingsScreen {
                         alignment: .top,
                     )
 
-                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.AccountDeletion.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
                 .frame(
@@ -49,14 +48,14 @@ extension SettingsScreen {
                     spacing: Constant.paragraphSpacing,
                 ) {
                     ForEach(
-                        Constant.paragraphs,
+                        paragraphs,
                         id: \.self,
                     ) { paragraph in
                         StyledText(text: paragraph)
                     }
 
                     if case .failed = store.accountAction.accountAction {
-                        StyledText(text: Constant.failureMessage)
+                        StyledText(text: LocalizedText.Settings.AccountDeletion.Failure.message)
                             .textStyle(.caption1)
                             .foregroundColorToken(.error)
                     }
@@ -70,7 +69,7 @@ extension SettingsScreen {
             } footer: {
                 BottomActionBar {
                     FeedbackActionButton(
-                        styledText: StyledText(text: Constant.confirmTitle)
+                        styledText: StyledText(text: LocalizedText.Settings.AccountDeletion.Confirm.buttonTitle)
                             .foregroundColorToken(.error),
                         action: { send(.deleteAccountConfirmed) },
                     )
@@ -89,20 +88,20 @@ extension SettingsScreen {
         // MARK: Private
 
         private enum Constant {
-            static let title = "계정 삭제"
-            static let confirmTitle = "계정 삭제"
-            static let paragraphs = [
-                "계속 진행하면 깃잇에 저장된 모든 개인정보가 삭제됩니다. 학습 진도와 제작한 문제 또한 잃게 되니 주의하세요. 이 절차가 완료된 후에는 다시 되돌릴 수 없습니다.",
-                "개인정보 삭제는 최대 30일까지 소요될 수 있습니다. 계정 비활성화 절차를 취소하고 계정을 복구하길 원하시면 서비스 메일로 문의해주세요.",
-                "주의하세요.\n아래 “계정 삭제”를 클릭하면 즉시 삭제됩니다.",
-            ]
-            static let failureMessage = "계정을 삭제하지 못했어요. 다시 시도해 주세요."
             static let paragraphSpacing: CGFloat = 24
             static let contentTopPadding: CGFloat = 8
             static let headerControlRowHeight: CGFloat = 40
             static let headerTitleSpacing: CGFloat = 16
             static let headerBottomPadding: CGFloat = 10
             static let headerHeight: CGFloat = 99
+        }
+
+        private var paragraphs: [String] {
+            [
+                LocalizedText.Settings.AccountDeletion.First.paragraph,
+                LocalizedText.Settings.AccountDeletion.Second.paragraph,
+                LocalizedText.Settings.AccountDeletion.Third.paragraph,
+            ]
         }
 
     }

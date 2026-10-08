@@ -30,8 +30,6 @@ public struct HomeProjectCard: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(displayModel.title), \(displayModel.currentSetLabel), 프로젝트 상세 보기")
 
             startButton
                 .padding(.trailing, Constant.startTrailingPadding)
@@ -43,7 +41,6 @@ public struct HomeProjectCard: View {
         )
         .background(Color(designSystem: style.cardColor))
         .designSystemCornerRadius(.large)
-        .accessibilityElement(children: .contain)
     }
 
     // MARK: Internal
@@ -163,8 +160,6 @@ public struct HomeProjectCard: View {
         }
         .buttonStyle(.plain)
         .disabled(!isLearningEnabled)
-        .accessibilityLabel("\(displayModel.title) 학습 시작")
-        .accessibilityHint(isLearningEnabled ? "다음 학습을 시작합니다" : "다음 학습 위치가 없습니다")
     }
 
     private var progressBar: some View {

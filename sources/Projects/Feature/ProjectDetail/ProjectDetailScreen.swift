@@ -27,7 +27,6 @@ struct ProjectDetailScreen: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .ignoresSafeArea()
-                    .accessibilityHidden(true)
                     .onTapGesture { send(.menuDismissed) }
             }
         }
@@ -57,10 +56,10 @@ struct ProjectDetailScreen: View {
                 ConfirmationSheet(
                     displayModel: .init(
                         imageURL: store.detailLoad.detail?.repository.imageURL,
-                        title: "프로젝트를 삭제할까요?",
-                        message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
-                        confirmTitle: "삭제",
-                        cancelTitle: "취소",
+                        title: LocalizedText.ProjectDetail.Deletion.Dialog.title,
+                        message: LocalizedText.ProjectDetail.Deletion.Dialog.message,
+                        confirmTitle: LocalizedText.ProjectDetail.Deletion.DialogConfirm.buttonTitle,
+                        cancelTitle: LocalizedText.ProjectDetail.Deletion.DialogCancel.buttonTitle,
                     ),
                     onConfirmTap: { send(.deletionConfirmed) },
                     onCancelTap: { send(.deletionCancelled) },
@@ -94,7 +93,13 @@ struct ProjectDetailScreen: View {
 
     private var header: some View {
         ScreenControlBar(
-            displayModel: .init(trailing: isFailed ? nil : Constant.menuControl),
+            displayModel: .init(
+                trailing: isFailed
+                    ? nil
+                    : ScreenControlBar.Control(
+                        icon: .menu
+                    )
+            ),
             onLeadingTap: { send(.backTapped) },
             onTrailingTap: { send(.menuTapped) },
         )
@@ -134,7 +139,7 @@ struct ProjectDetailScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: "다시 시도하기",
+                title: LocalizedText.ProjectDetail.Retry.buttonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()
@@ -152,28 +157,24 @@ struct ProjectDetailScreen: View {
     private var heroBackground: some View {
         LinearGradient(designSystem: Constant.heroGradient)
             .frame(height: Constant.heroGradientHeight)
-            .accessibilityHidden(true)
     }
 
     private var menuItems: [ActionMenu.Item] {
         [
             .init(
                 id: Constant.MenuItemID.savedQuestions,
-                title: "저장한 문제",
-                accessibilityLabel: "저장한 문제 보기",
+                title: LocalizedText.ProjectDetail.SavedQuestionsMenuItem.title,
                 onSelect: { send(.savedQuestionsTapped) },
             ),
             .init(
                 id: Constant.MenuItemID.repositoryLink,
-                title: "GitHub에서 보기",
-                accessibilityLabel: "GitHub에서 보기",
+                title: LocalizedText.ProjectDetail.RepositoryLinkMenuItem.title,
                 onSelect: { send(.repositoryLinkTapped) },
             ),
             .init(
                 id: Constant.MenuItemID.delete,
-                title: "삭제하기",
+                title: LocalizedText.ProjectDetail.Deletion.MenuItem.title,
                 role: .destructive,
-                accessibilityLabel: "프로젝트 삭제",
                 onSelect: { send(.deleteTapped) },
             ),
         ]
@@ -192,10 +193,6 @@ extension ProjectDetailScreen {
         }
 
         static let summaryTopSpacing: CGFloat = 27
-        static let menuControl = ScreenControlBar.Control(
-            icon: .menu,
-            label: "메뉴 열기",
-        )
 
         static let setListTopSpacing: CGFloat = 53
         static let contentBottomPadding: CGFloat = 16

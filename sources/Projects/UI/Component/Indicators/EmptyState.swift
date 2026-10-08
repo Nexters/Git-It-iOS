@@ -38,7 +38,6 @@ public struct EmptyState<Illustration: View>: View {
             .frame(maxWidth: Constant.textMaxWidth)
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: Private

@@ -10,12 +10,10 @@ public struct LabeledTextField: View {
     public init(
         displayModel: DisplayModel,
         text: Binding<String>,
-        accessibilityLabel: String? = nil,
         focus: FocusState<Bool>.Binding? = nil,
     ) {
         self.displayModel = displayModel
         _text = text
-        self.accessibilityLabel = accessibilityLabel ?? displayModel.label
         self.focus = focus
     }
 
@@ -38,7 +36,6 @@ public struct LabeledTextField: View {
                         prompt: Text(displayModel.placeholder).foregroundStyle(Color(designSystem: .white30)),
                     )
                     .designSystemForeground(.grey100)
-                    .accessibilityLabel(accessibilityLabel)
                     .focused(focus ?? $unboundFocus)
                 }
 
@@ -60,7 +57,6 @@ public struct LabeledTextField: View {
                         width: Constant.clearButtonTouchSize,
                         height: Constant.clearButtonTouchSize,
                     )
-                    .accessibilityLabel("입력 지우기")
                 }
             }
             .frame(height: Constant.fieldHeight)
@@ -89,7 +85,6 @@ public struct LabeledTextField: View {
 
     private let displayModel: DisplayModel
     private var isError = false
-    private let accessibilityLabel: String
     private let focus: FocusState<Bool>.Binding?
 
     private var accentColor: ColorToken {

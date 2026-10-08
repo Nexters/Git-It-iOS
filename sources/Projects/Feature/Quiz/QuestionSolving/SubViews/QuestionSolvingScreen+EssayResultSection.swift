@@ -14,14 +14,18 @@ extension QuestionSolvingScreen {
                 alignment: .leading,
                 spacing: LayoutToken.margin,
             ) {
-                LabeledCard(displayModel: .init(
-                    label: "나의 답안",
-                    text: myAnswer,
-                ))
-                LabeledCard(displayModel: .init(
-                    label: "AI 해설",
-                    text: aiAnswer,
-                ))
+                LabeledCard(
+                    displayModel: .init(
+                        label: LocalizedText.Quiz.EssayResultSection.MyAnswer.label,
+                        text: myAnswer,
+                    )
+                )
+                LabeledCard(
+                    displayModel: .init(
+                        label: LocalizedText.Quiz.EssayResultSection.Explanation.label,
+                        text: aiAnswer,
+                    )
+                )
                 .style(.accent)
             }
         }

@@ -28,7 +28,6 @@ public struct WebSheet: View {
 
                     IconGlassButton(
                         icon: .close,
-                        label: "닫기",
                         action: onDismiss,
                     )
                 }

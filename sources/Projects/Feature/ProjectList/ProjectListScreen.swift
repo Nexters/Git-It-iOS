@@ -32,7 +32,6 @@ public struct ProjectListScreen: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .ignoresSafeArea()
-                    .accessibilityHidden(true)
                     .onTapGesture { send(.menuDismissed) }
             }
         }
@@ -63,10 +62,10 @@ public struct ProjectListScreen: View {
                 ConfirmationSheet(
                     displayModel: .init(
                         imageURL: deletionTarget?.imageURL,
-                        title: "프로젝트를 삭제할까요?",
-                        message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
-                        confirmTitle: "삭제",
-                        cancelTitle: "취소",
+                        title: LocalizedText.ProjectList.Deletion.Dialog.title,
+                        message: LocalizedText.ProjectList.Deletion.Dialog.message,
+                        confirmTitle: LocalizedText.ProjectList.Deletion.DialogConfirm.buttonTitle,
+                        cancelTitle: LocalizedText.ProjectList.Deletion.DialogCancel.buttonTitle,
                     ),
                     onConfirmTap: { send(.deletionConfirmed) },
                     onCancelTap: { send(.deletionCancelled) },
@@ -110,7 +109,6 @@ public struct ProjectListScreen: View {
                 if let headerLeading {
                     IconGlassButton(
                         icon: headerLeading.icon,
-                        label: headerLeading.label,
                         action: headerLeadingTapped,
                     )
                     .size(.medium)
@@ -127,7 +125,6 @@ public struct ProjectListScreen: View {
             if let headerTrailing, !isFailed, !projects.isEmpty {
                 IconGlassButton(
                     icon: headerTrailing.icon,
-                    label: headerTrailing.label,
                     action: headerTrailingTapped,
                 )
                 .size(.medium)
@@ -158,7 +155,7 @@ public struct ProjectListScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: "다시 시도하기",
+                title: LocalizedText.ProjectList.Retry.buttonTitle,
                 action: { send(.refreshRequested) },
             )
             .designSystemScreenMargin()
@@ -179,7 +176,7 @@ public struct ProjectListScreen: View {
     }
 
     private var headerTitle: String {
-        store.mode == .deleting ? "프로젝트 삭제" : "프로젝트"
+        store.mode == .deleting ? LocalizedText.ProjectList.DeletingMode.title : LocalizedText.ProjectList.title
     }
 
     private var headerLeading: ScreenControlBar.Control? {
@@ -187,15 +184,18 @@ public struct ProjectListScreen: View {
     }
 
     private var headerTrailing: ScreenControlBar.Control? {
-        store.mode == .deleting ? nil : Constant.menuControl
+        store.mode == .deleting
+            ? nil
+            : ScreenControlBar.Control(
+                icon: .menu
+            )
     }
 
     private var menuItems: [ActionMenu.Item] {
         [
             .init(
                 id: "delete",
-                title: "프로젝트 삭제",
-                accessibilityLabel: "프로젝트 삭제 화면 열기",
+                title: LocalizedText.ProjectList.Deletion.MenuItem.title,
                 onSelect: { send(.deletionMenuItemTapped) },
             )
         ]
@@ -251,10 +251,6 @@ public struct ProjectListScreen: View {
 extension ProjectListScreen {
     fileprivate enum Constant {
         static let footerBottomPadding: CGFloat = 24
-        static let menuControl = ScreenControlBar.Control(
-            icon: .menu,
-            label: "메뉴 열기",
-        )
         static let menuTopOffset: CGFloat = 50
         static let menuTransitionDuration = 0.2
         static let headerControlRowHeight: CGFloat = 40

@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-21 (표시 값 모델·시각 속성 계약 반영, 표시 값 묶음 타입 금지 제약 삭제)
+**최종 수정일**: 2026-09-24 (현지화 컨벤션 연결)
 
 ## 설명
 
@@ -72,6 +72,7 @@ target의 의존 대상이 되어서는 안 됩니다.
   [View 컨벤션](../conventions/view.md)을 따릅니다.
 - 테스트 이름, Test Double, 파일과 target 구성은
   [테스트 컨벤션](../conventions/test.md)을 따릅니다.
+- 사용자 노출 문구의 소유와 조회는 [현지화 컨벤션](../conventions/localization.md)을 따릅니다.
 - Figma 노드와 코드 컴포넌트의 대응은
   [컴포넌트 인덱스](../../.agents/skills/implement-figma-ui/references/component-index.md)에서
   추적합니다.

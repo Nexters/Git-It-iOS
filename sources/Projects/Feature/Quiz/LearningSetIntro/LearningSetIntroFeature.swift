@@ -120,60 +120,26 @@ public struct LearningSetIntroFeature: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .view(.task):
-                return .merge(loadSet(&state), loadBookmarks(&state))
-
-            case .view(.retryTapped):
-                return loadSet(&state)
-
-            case .view(.startTapped):
-                guard
-                    let set = state.learningSet,
-                    !state.isEmptySetReported,
-                    !state.autoStartsOnLoad
-                else { return .none }
-                state.autoStartsOnLoad = true
-                return startEffect(
-                    set: set,
-                    state: state,
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
                 )
 
-            case .view(.backTapped):
-                return .send(.delegate(.backRequested))
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .input(.emptySetReported):
-                state.isEmptySetReported = true
-                return .none
-
-            case .effect(.setLoadFinished(let requestID, let result)):
-                guard requestID == state.loadRequestID else { return .none }
-                switch result {
-                case .success(let set):
-                    state.setLoad = .loaded(set)
-                    guard state.autoStartsOnLoad else { return .none }
-                    state.autoStartsOnLoad = false
-                    return startEffect(
-                        set: set,
-                        state: state,
-                    )
-
-                case .failure(let error):
-                    state.setLoad = .failed(error)
-                    return .none
-                }
-
-            case .effect(.bookmarksLoadFinished(let result)):
-                switch result {
-                case .success(let list):
-                    state.bookmarkLoad = .loaded(Set(list.bookmarks.map(\.quizID)))
-
-                case .failure(let error):
-                    state.bookmarkLoad = .failed(error)
-                }
-                return .none
+            case .effect(let event):
+                reduce(
+                    into: &state,
+                    effect: event,
+                )
 
             case .delegate:
-                return .none
+                .none
             }
         }
     }
@@ -187,6 +153,79 @@ public struct LearningSetIntroFeature: Sendable {
 
     private let fetchQuizSet: @Sendable (QuizSetID, ProjectID) async throws -> QuizSet
     private let fetchBookmarks: @Sendable (QuizBookmarkFilter) async throws -> QuizBookmarkList
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task:
+            return .merge(loadSet(&state), loadBookmarks(&state))
+
+        case .retryTapped:
+            return loadSet(&state)
+
+        case .startTapped:
+            guard
+                let set = state.learningSet,
+                !state.isEmptySetReported,
+                !state.autoStartsOnLoad
+            else { return .none }
+            state.autoStartsOnLoad = true
+            return startEffect(
+                set: set,
+                state: state,
+            )
+
+        case .backTapped:
+            return .send(.delegate(.backRequested))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .emptySetReported:
+            state.isEmptySetReported = true
+            return .none
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        effect event: Action.EffectEvent,
+    ) -> Effect<Action> {
+        switch event {
+        case .setLoadFinished(let requestID, let result):
+            guard requestID == state.loadRequestID else { return .none }
+            switch result {
+            case .success(let set):
+                state.setLoad = .loaded(set)
+                guard state.autoStartsOnLoad else { return .none }
+                state.autoStartsOnLoad = false
+                return startEffect(
+                    set: set,
+                    state: state,
+                )
+
+            case .failure(let error):
+                state.setLoad = .failed(error)
+                return .none
+            }
+
+        case .bookmarksLoadFinished(let result):
+            switch result {
+            case .success(let list):
+                state.bookmarkLoad = .loaded(Set(list.bookmarks.map(\.quizID)))
+
+            case .failure(let error):
+                state.bookmarkLoad = .failed(error)
+            }
+            return .none
+        }
+    }
 
     private func startEffect(
         set: QuizSet,

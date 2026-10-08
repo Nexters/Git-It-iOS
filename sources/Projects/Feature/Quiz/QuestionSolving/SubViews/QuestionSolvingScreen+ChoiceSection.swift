@@ -26,7 +26,6 @@ extension QuestionSolvingScreen {
                         onTap: { onSelect(option.id) },
                     )
                     .allowsHitTesting(isGraded || isEnabled)
-                    .accessibilityLabel(option.accessibilityLabel)
                 }
             }
             .onAppear(perform: syncEmphasizedExpansion)

@@ -27,8 +27,6 @@ extension QuizGenerationProgressScreen {
                     )
                 }
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("학습 세트 생성 진행 체크리스트")
         }
 
         // MARK: Private
@@ -54,8 +52,6 @@ extension QuizGenerationProgressScreen {
                     .foregroundColorToken(status == .pending ? .grey400 : .grey100)
                     .lineLimit(1)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title), \(status.accessibilityDescription)")
         }
 
         private func status(for stage: Stage) -> ChecklistStatus {
@@ -83,11 +79,11 @@ extension QuizGenerationProgressScreen {
 
         var title: String {
             switch self {
-            case .repositoryInfo: "프로젝트 정보 확인"
-            case .codeStructureAnalysis: "코드 구조 분석"
-            case .learningOutlineComposition: "학습 개념 구성"
-            case .quizGeneration: "문제 생성"
-            case .verification: "세트 검증"
+            case .repositoryInfo: LocalizedText.ProjectRegistration.Checklist.RepositoryInfo.title
+            case .codeStructureAnalysis: LocalizedText.ProjectRegistration.Checklist.CodeStructureAnalysis.title
+            case .learningOutlineComposition: LocalizedText.ProjectRegistration.Checklist.LearningOutlineComposition.title
+            case .quizGeneration: LocalizedText.ProjectRegistration.Checklist.QuizGeneration.title
+            case .verification: LocalizedText.ProjectRegistration.Checklist.Verification.title
             }
         }
 
@@ -115,14 +111,6 @@ extension QuizGenerationProgressScreen {
             case .done: ResourceImage(asset: .icon(.statusCheck))
             case .active: ResourceAnimation(asset: .generalLoading)
             case .pending: ResourceImage(asset: .icon(.statusLoadingDisabled))
-            }
-        }
-
-        var accessibilityDescription: String {
-            switch self {
-            case .done: "완료"
-            case .active: "진행 중"
-            case .pending: "대기 중"
             }
         }
     }

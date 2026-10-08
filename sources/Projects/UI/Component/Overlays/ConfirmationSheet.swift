@@ -81,7 +81,6 @@ public struct ConfirmationSheet: View {
                 height: Constant.thumbnailSize,
             )
             .designSystemCornerRadius(.small)
-            .accessibilityHidden(true)
         } else {
             Color(designSystem: .grey500)
                 .frame(
@@ -89,7 +88,6 @@ public struct ConfirmationSheet: View {
                     height: Constant.thumbnailSize,
                 )
                 .designSystemCornerRadius(.small)
-                .accessibilityHidden(true)
         }
     }
 

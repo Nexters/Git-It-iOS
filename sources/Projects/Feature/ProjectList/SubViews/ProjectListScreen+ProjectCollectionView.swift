@@ -26,10 +26,10 @@ extension ProjectListScreen {
             case (true, _):
                 centered {
                     VStack(spacing: Constant.failureTextSpacing) {
-                        StyledText(text: "프로젝트를 불러오지 못했어요")
+                        StyledText(text: LocalizedText.ProjectList.ProjectCollection.LoadFailure.title)
                             .textStyle(.subtitle1)
                             .multilineTextAlignment(.center)
-                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                        StyledText(text: LocalizedText.ProjectList.ProjectCollection.LoadFailure.message)
                             .textStyle(.body2)
                             .foregroundColorToken(.grey400)
                             .multilineTextAlignment(.center)
@@ -40,8 +40,8 @@ extension ProjectListScreen {
                 centered {
                     EmptyState(
                         displayModel: .init(
-                            title: "projects = []",
-                            message: "아직 등록한 프로젝트가 없어요.\n관심 있는 오픈소스를 가져와 문제로 만들어보세요.",
+                            title: LocalizedText.ProjectList.ProjectCollection.Empty.title,
+                            message: LocalizedText.ProjectList.ProjectCollection.Empty.message,
                         )
                     ) {
                         ResourceAnimation(asset: .projectEmpty)

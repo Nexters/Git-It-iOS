@@ -16,7 +16,7 @@ extension QuestionSolvingScreen {
                 spacing: Constant.contentSpacing,
             ) {
                 if let questionNumber {
-                    TagBadge(text: "문제 \(questionNumber)")
+                    TagBadge(text: LocalizedText.Quiz.QuestionPrompt.Number.badge(questionNumber: questionNumber))
                         .style(.accent)
                 }
 
@@ -27,7 +27,6 @@ extension QuestionSolvingScreen {
                 maxWidth: .infinity,
                 alignment: .leading,
             )
-            .accessibilityElement(children: .combine)
         }
 
         // MARK: Private

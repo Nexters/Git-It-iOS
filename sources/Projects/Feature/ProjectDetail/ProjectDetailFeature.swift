@@ -96,67 +96,27 @@ public struct ProjectDetailFeature: Sendable {
         }
         Reduce { state, action in
             switch action {
-            case .view(.task),
-                 .view(.retryTapped),
-                 .input(.refreshRequested):
-                return .send(.detailLoad(.input(.load)))
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
 
-            case .view(.setStartTapped(let setID)):
-                guard let progress = state.detailLoad.detail?.sets.first(where: { $0.setID == setID }) else { return .none }
-                return .send(.delegate(.setStartRequested(
-                    projectID: state.projectID,
-                    setID: progress.setID,
-                    label: progress.label,
-                )))
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
 
-            case .view(.resumeTapped):
-                guard let progress = state.detailLoad.firstIncompleteSet else { return .none }
-                return .send(.delegate(.setStartRequested(
-                    projectID: state.projectID,
-                    setID: progress.setID,
-                    label: progress.label,
-                )))
+            case .delegate,
+                 .detailLoad:
+                .none
 
-            case .view(.menuTapped):
-                state.isMenuPresented = true
-                return .none
-
-            case .view(.menuDismissed):
-                state.isMenuPresented = false
-                return .none
-
-            case .view(.savedQuestionsTapped):
-                state.isMenuPresented = false
-                return .send(.delegate(.savedQuestionsRequested(projectID: state.projectID)))
-
-            case .view(.repositoryLinkTapped):
-                guard
-                    let repositoryURL = state.detailLoad.detail?.repository.url,
-                    let url = URL(string: repositoryURL)
-                else { return .none }
-                state.isMenuPresented = false
-                return .send(.delegate(.externalURLRequested(url)))
-
-            case .view(.deleteTapped):
-                state.isMenuPresented = false
-                return .send(.deletion(.input(.request(state.projectID))))
-
-            case .view(.deletionCancelled):
-                return .send(.deletion(.input(.cancel)))
-
-            case .view(.deletionConfirmed):
-                return .send(.deletion(.input(.confirm)))
-
-            case .deletion(.delegate(.deleted(let projectID))):
-                return .send(.delegate(.projectDeleted(projectID: projectID)))
-
-            case .view(.backTapped):
-                return .send(.delegate(.dismissRequested))
-
-            case .detailLoad,
-                 .deletion,
-                 .delegate:
-                return .none
+            case .deletion(let action):
+                reduce(
+                    into: &state,
+                    deletion: action,
+                )
             }
         }
     }
@@ -165,5 +125,86 @@ public struct ProjectDetailFeature: Sendable {
 
     private let projectDetail: @Sendable (ProjectID) async throws -> ProjectDetail
     private let deleteProject: @Sendable (ProjectID) async throws -> Void
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> Effect<Action> {
+        switch action {
+        case .task,
+             .retryTapped:
+            return .send(.detailLoad(.input(.load)))
+
+        case .setStartTapped(let setID):
+            guard let progress = state.detailLoad.detail?.sets.first(where: { $0.setID == setID }) else { return .none }
+            return .send(.delegate(.setStartRequested(
+                projectID: state.projectID,
+                setID: progress.setID,
+                label: progress.label,
+            )))
+
+        case .resumeTapped:
+            guard let progress = state.detailLoad.firstIncompleteSet else { return .none }
+            return .send(.delegate(.setStartRequested(
+                projectID: state.projectID,
+                setID: progress.setID,
+                label: progress.label,
+            )))
+
+        case .menuTapped:
+            state.isMenuPresented = true
+            return .none
+
+        case .menuDismissed:
+            state.isMenuPresented = false
+            return .none
+
+        case .savedQuestionsTapped:
+            state.isMenuPresented = false
+            return .send(.delegate(.savedQuestionsRequested(projectID: state.projectID)))
+
+        case .repositoryLinkTapped:
+            guard
+                let repositoryURL = state.detailLoad.detail?.repository.url,
+                let url = URL(string: repositoryURL)
+            else { return .none }
+            state.isMenuPresented = false
+            return .send(.delegate(.externalURLRequested(url)))
+
+        case .deleteTapped:
+            state.isMenuPresented = false
+            return .send(.deletion(.input(.request(state.projectID))))
+
+        case .deletionCancelled:
+            return .send(.deletion(.input(.cancel)))
+
+        case .deletionConfirmed:
+            return .send(.deletion(.input(.confirm)))
+
+        case .backTapped:
+            return .send(.delegate(.dismissRequested))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        input action: Action.Input,
+    ) -> Effect<Action> {
+        switch action {
+        case .refreshRequested:
+            .send(.detailLoad(.input(.load)))
+        }
+    }
+
+    private func reduce(
+        into _: inout State,
+        deletion action: ProjectDeletionFeature.Action,
+    ) -> Effect<Action> {
+        guard case .delegate(let action) = action else { return .none }
+        switch action {
+        case .deleted(let projectID):
+            return .send(.delegate(.projectDeleted(projectID: projectID)))
+        }
+    }
 
 }

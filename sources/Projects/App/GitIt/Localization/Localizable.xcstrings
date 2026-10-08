@@ -1,0 +1,54 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "GenerationReminder.Completed.body" : {
+      "comment" : "학습 세트 생성이 완료됐을 때 보내는 로컬 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트 생성이 완료됐어요. 지금 확인해보세요."
+          }
+        }
+      }
+    },
+    "GenerationReminder.Completed.title" : {
+      "comment" : "학습 세트 생성이 완료됐을 때 보내는 로컬 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 생성 완료"
+          }
+        }
+      }
+    },
+    "GenerationReminder.Failed.body" : {
+      "comment" : "학습 세트 생성에 실패했을 때 보내는 로컬 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트를 만들지 못했어요. 앱에서 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "GenerationReminder.Failed.title" : {
+      "comment" : "학습 세트 생성에 실패했을 때 보내는 로컬 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 생성 실패"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

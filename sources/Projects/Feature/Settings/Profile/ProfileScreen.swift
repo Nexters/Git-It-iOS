@@ -38,14 +38,13 @@ public struct ProfileScreen: View {
             alignment: .top,
             spacing: LayoutToken.gutter,
         ) {
-            ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+            ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Settings.Profile.title))
                 .frame(height: Constant.headerControlRowHeight)
 
             Spacer()
 
             IconGlassButton(
-                icon: Constant.settingsControl.icon,
-                label: Constant.settingsControl.label,
+                icon: .setting,
                 action: { send(.settingsTapped) },
             )
             .size(.medium)
@@ -57,7 +56,7 @@ public struct ProfileScreen: View {
     private var content: some View {
         Self.ProfileContentView(
             display: display,
-            statisticsSectionTitle: Constant.statisticsSectionTitle,
+            statisticsSectionTitle: LocalizedText.Settings.Profile.StatisticsSection.title,
             onRetry: { send(.retryTapped) },
         )
     }
@@ -68,12 +67,6 @@ public struct ProfileScreen: View {
 
 extension ProfileScreen {
     fileprivate enum Constant {
-        static let title = "마이"
-        static let statisticsSectionTitle = "학습 현황"
-        static let settingsControl = ScreenControlBar.Control(
-            icon: .setting,
-            label: "설정",
-        )
         static let headerControlRowHeight: CGFloat = 40
         static let headerBottomPadding: CGFloat = 10
     }

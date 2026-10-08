@@ -49,13 +49,12 @@ struct SavedScreen: View {
                     if store.isBackControlPresented {
                         IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
-                            label: ScreenControlBar.Control.back.label,
                             action: { send(.backTapped) },
                         )
                         .size(.medium)
                         .frame(height: Constant.headerRowHeight)
                     }
-                    ScreenHeaderTitle(displayModel: .init(title: "저장한 문제"))
+                    ScreenHeaderTitle(displayModel: .init(title: LocalizedText.Saved.title))
                         .frame(height: Constant.headerRowHeight)
                 }
 
@@ -92,7 +91,7 @@ struct SavedScreen: View {
     private var footer: some View {
         if isFailed {
             FeedbackActionButton(
-                title: "다시 시도하기",
+                title: LocalizedText.Saved.Retry.buttonTitle,
                 action: { send(.retryTapped) },
             )
             .designSystemScreenMargin()

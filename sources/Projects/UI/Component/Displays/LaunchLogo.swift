@@ -21,7 +21,6 @@ public struct LaunchLogo: View {
             )
             .opacity(isVisible ? 1 : 0)
             .scaleEffect(isVisible ? 1 : Constant.initialScale)
-            .accessibilityHidden(true)
             .task { await runIntroSequence() }
     }
 
