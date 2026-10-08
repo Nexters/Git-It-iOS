@@ -46,7 +46,10 @@ public struct AnswerRemote: Sendable {
         request: SubmitChoiceAnswerRequestDTO,
     ) async throws -> SubmitChoiceAnswerResponseDTO {
         try await executor.send(
-            AnswerEndpoint.choice(projectID: projectID, questionID: questionID).request,
+            AnswerEndpoint.choice(
+                projectID: projectID,
+                questionID: questionID,
+            ).request,
             body: request,
             expecting: SubmitChoiceAnswerResponseDTO.self,
         )
@@ -58,7 +61,10 @@ public struct AnswerRemote: Sendable {
         request: SubmitEssayAnswerRequestDTO,
     ) async throws -> SubmitEssayAnswerResponseDTO {
         try await executor.send(
-            AnswerEndpoint.essay(projectID: projectID, questionID: questionID).request,
+            AnswerEndpoint.essay(
+                projectID: projectID,
+                questionID: questionID,
+            ).request,
             body: request,
             expecting: SubmitEssayAnswerResponseDTO.self,
         )

@@ -6,13 +6,13 @@
 파일 안에서는 `extension`으로 선언합니다.
 
 ```swift
-// Controls/ScreenControlBar/ScreenControlBar+Control.swift
-extension ScreenControlBar {
-    public struct Control { ... }
+// Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift
+extension QuestionSolvingScreen {
+    struct ChoiceSection: View { ... }
 }
 ```
 
-화면 전용 서브뷰도 같은 규칙을 씁니다 —
+다른 화면 전용 서브뷰도 같은 규칙을 씁니다 —
 `ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen+ThumbnailView.swift`.
 `Constant`는 예외로 파일을 나누지 않고 소유 View와 같은 파일에 둡니다
 ([View 내부 선언 컨벤션 — `Constant`](../view-declarations/constant.md)).
@@ -20,4 +20,5 @@ extension ScreenControlBar {
 중첩할지 여부 자체는
 [View 내부 선언 컨벤션 — View 내부 선언](../view-declarations/internal-declarations.md)가, 화면 전용
 서브뷰를 만드는 기준은 [View 컨벤션 — 화면 전용 서브뷰](../view/screen-subview.md)이 정합니다.
-이 문서는 나눈 파일의 이름과 위치만 정합니다.
+이 문서는 나눈 파일의 이름과 위치만 정합니다. UIComponent는 중첩 타입을 파일로 나누지
+않습니다([UIComponent 컨벤션 — 폴더와 파일](../ui-component/folder-file.md)).

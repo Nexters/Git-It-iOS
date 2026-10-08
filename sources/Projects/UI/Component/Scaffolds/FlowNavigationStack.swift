@@ -33,7 +33,10 @@ public struct FlowNavigationStack<Screen: Hashable, Root: View, Destination: Vie
 
     private func flowScreen(_ content: some View) -> some View {
         content
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(
+                .hidden,
+                for: .navigationBar,
+            )
             .navigationBarBackButtonHidden()
     }
 
@@ -41,8 +44,12 @@ public struct FlowNavigationStack<Screen: Hashable, Root: View, Destination: Vie
 
 #Preview("Flow Navigation Stack") {
     FlowNavigationStack(path: ["두 번째"]) {
-        StyledText.subtitle1("첫 번째", alignment: .center)
+        StyledText(text: "첫 번째")
+            .textStyle(.subtitle1)
+            .multilineTextAlignment(.center)
     } destination: { screen in
-        StyledText.subtitle1(screen, alignment: .center)
+        StyledText(text: screen)
+            .textStyle(.subtitle1)
+            .multilineTextAlignment(.center)
     }
 }

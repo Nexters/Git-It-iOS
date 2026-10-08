@@ -23,7 +23,7 @@ struct LearningCompletionScreen: View {
     private var screen: some View {
         VStack(spacing: 0) {
             ScreenControlBar(
-                leading: .close,
+                displayModel: .init(leading: .close),
                 onLeadingTap: { send(.closeTapped) },
             )
             .designSystemScreenMargin()
@@ -31,11 +31,16 @@ struct LearningCompletionScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.contentSpacing) {
-                ResourceAnimation(asset: .complete, isLooping: false)
-                    .frame(width: Constant.animationSize, height: Constant.animationSize)
+                ResourceAnimation(asset: .complete).looping(false)
+                    .frame(
+                        width: Constant.animationSize,
+                        height: Constant.animationSize,
+                    )
                     .accessibilityHidden(true)
 
-                StyledText.subtitle1("학습을 마쳤어요", alignment: .center)
+                StyledText(text: "학습을 마쳤어요")
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
 
                 if let scoreLabel = store.scoreAccessibilityLabel {
                     scoreView
@@ -43,27 +48,39 @@ struct LearningCompletionScreen: View {
                         .accessibilityLabel(scoreLabel)
                 }
 
-                StyledText.body1(Constant.message, color: .grey400, alignment: .center)
+                StyledText(text: Constant.message)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
             }
             .designSystemScreenMargin()
 
             Spacer(minLength: 0)
 
-            ActionButton.primary("확인", action: { send(.primaryActionTapped) })
-                .designSystemScreenMargin()
-                .padding(.bottom, Constant.bottomButtonPadding)
+            FeedbackActionButton(
+                title: "확인",
+                action: { send(.primaryActionTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomButtonPadding)
         }
     }
 
     private var scoreView: some View {
         HStack(spacing: Constant.scoreSpacing) {
-            StyledText.subtitle1("\(store.correctChoiceCount)", color: .blue200)
+            StyledText(text: "\(store.correctChoiceCount)")
+                .textStyle(.subtitle1)
+                .foregroundColorToken(.blue200)
 
             Rectangle()
                 .fill(Color(designSystem: .grey400))
-                .frame(width: Constant.scoreDividerWidth, height: Constant.scoreDividerHeight)
+                .frame(
+                    width: Constant.scoreDividerWidth,
+                    height: Constant.scoreDividerHeight,
+                )
 
-            StyledText.subtitle1("\(store.choiceQuestionCount)", color: .grey400)
+            StyledText(text: "\(store.choiceQuestionCount)")
+                .textStyle(.subtitle1)
+                .foregroundColorToken(.grey400)
         }
     }
 

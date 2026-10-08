@@ -35,7 +35,6 @@ public struct OnboardingRouterFeature: Sendable {
 
         public enum Guide: Hashable, Sendable {
             case tutorial
-            case legalAgreement
         }
 
         public enum Curation: Hashable, Sendable {
@@ -58,6 +57,7 @@ public struct OnboardingRouterFeature: Sendable {
         public init(
             startingAt entryPoint: OnboardingEntryPoint,
             bundleVersion: String,
+            curationExit: CurationExit = .returnToTutorial,
         ) {
             switch entryPoint {
             case .guide:
@@ -67,16 +67,17 @@ public struct OnboardingRouterFeature: Sendable {
                 activeScreen = .curation(.positionSelection)
             }
             tutorial = TutorialFeature.State(bundleVersion: bundleVersion)
+            self.curationExit = curationExit
         }
 
         // MARK: Public
 
         public internal(set) var activeScreen: ActiveScreen
         public var tutorial: TutorialFeature.State
-        public var legalAgreement = LegalAgreementFeature.State()
         public var positionSelection = PositionSelectionFeature.State()
         public var careerSelection = CareerSelectionFeature.State()
         public var exit = OnboardingExitFeature.State()
+        public let curationExit: CurationExit
         public internal(set) var transitionLog = [ScreenTransitionEvent]()
 
     }
@@ -84,11 +85,12 @@ public struct OnboardingRouterFeature: Sendable {
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case tutorial(TutorialFeature.Action)
-        case legalAgreement(LegalAgreementFeature.Action)
         case positionSelection(PositionSelectionFeature.Action)
         case careerSelection(CareerSelectionFeature.Action)
         case exit(OnboardingExitFeature.Action)
         case delegate(Delegate)
+
+        // MARK: Public
 
         @CasePathable
         public enum View: Sendable, Equatable {
@@ -100,27 +102,40 @@ public struct OnboardingRouterFeature: Sendable {
         @CasePathable
         public enum Delegate: Sendable, Equatable {
             case mainShellRequested
+            case guestAccessRequested
+            case curationAbandoned
         }
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.tutorial, action: \.tutorial) {
+        Scope(
+            state: \.tutorial,
+            action: \.tutorial,
+        ) {
             TutorialFeature(
                 signIn: signIn,
+                policyConsentStatus: policyConsentStatus,
+                consent: consent,
                 withdraw: withdraw,
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
         }
-        Scope(state: \.legalAgreement, action: \.legalAgreement) {
-            LegalAgreementFeature(policyConsentStatus: policyConsentStatus, consent: consent)
-        }
-        Scope(state: \.positionSelection, action: \.positionSelection) {
+        Scope(
+            state: \.positionSelection,
+            action: \.positionSelection,
+        ) {
             PositionSelectionFeature(signOut: signOut)
         }
-        Scope(state: \.careerSelection, action: \.careerSelection) {
+        Scope(
+            state: \.careerSelection,
+            action: \.careerSelection,
+        ) {
             CareerSelectionFeature(updateCuration: updateCuration)
         }
-        Scope(state: \.exit, action: \.exit) {
+        Scope(
+            state: \.exit,
+            action: \.exit,
+        ) {
             OnboardingExitFeature()
         }
         Reduce { state, action in
@@ -128,37 +143,30 @@ public struct OnboardingRouterFeature: Sendable {
             var effect = Effect<Action>.none
 
             switch action {
-            case .tutorial(.delegate(.appeared)):
-                effect = .send(.legalAgreement(.input(.load)))
-
-            case .tutorial(.delegate(.signInRequested)):
-                if state.legalAgreement.isStoredConsentValid {
-                    effect = .send(.tutorial(.input(.startSignIn)))
-                } else {
-                    state.activeScreen = .guide(.legalAgreement)
-                    effect = .send(.legalAgreement(.input(.prepare)))
-                }
+            case .tutorial(.delegate(.guestAccessRequested)):
+                effect = .send(.delegate(.guestAccessRequested))
 
             case .tutorial(.delegate(.signInSucceeded(let needsCuration))):
-                effect = advanceAfterSignIn(needsCuration: needsCuration, state: &state)
-
-            case .legalAgreement(.delegate(.consentCompleted)):
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.startSignIn)))
-
-            case .legalAgreement(.delegate(.cancelled)):
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.returnToLastPage)))
+                effect = advanceAfterSignIn(
+                    needsCuration: needsCuration,
+                    state: &state,
+                )
 
             case .positionSelection(.delegate(.confirmed(let position))):
-                state.careerSelection.position = position
                 state.activeScreen = .curation(.careerSelection)
+                effect = .send(.careerSelection(.input(.positionProvided(position))))
 
             case .positionSelection(.delegate(.exitRequested)):
                 state.positionSelection = PositionSelectionFeature.State()
                 state.careerSelection = CareerSelectionFeature.State()
-                state.activeScreen = .guide(.tutorial)
-                effect = .send(.tutorial(.input(.returnToLastPage)))
+                switch state.curationExit {
+                case .returnToTutorial:
+                    state.activeScreen = .guide(.tutorial)
+                    effect = .send(.tutorial(.input(.returnToLastPage)))
+
+                case .returnToCaller:
+                    effect = .send(.delegate(.curationAbandoned))
+                }
 
             case .careerSelection(.delegate(.backRequested)):
                 state.activeScreen = .curation(.positionSelection)
@@ -169,18 +177,17 @@ public struct OnboardingRouterFeature: Sendable {
             case .exit(.delegate(.shouldExit)):
                 state.activeScreen = .curationSplash
 
-            case .view(.legalAgreementDismissed):
-                effect = .send(.legalAgreement(.view(.cancelTapped)))
-
-            case .view(.legalDocumentSheetDismissed):
-                effect = .send(.legalAgreement(.view(.documentSheetDismissed)))
-
             case .view(.curationSplashFinished):
                 guard state.activeScreen == .curationSplash else { break }
                 effect = .send(.delegate(.mainShellRequested))
 
+            case .view(.legalAgreementDismissed):
+                effect = .send(.tutorial(.signIn(.view(.legalAgreementDismissed))))
+
+            case .view(.legalDocumentSheetDismissed):
+                effect = .send(.tutorial(.signIn(.view(.legalDocumentSheetDismissed))))
+
             case .tutorial,
-                 .legalAgreement,
                  .positionSelection,
                  .careerSelection,
                  .exit,
@@ -190,7 +197,11 @@ public struct OnboardingRouterFeature: Sendable {
 
             if state.activeScreen != before {
                 state.transitionLog.append(
-                    ScreenTransitionEvent(from: before, to: state.activeScreen, trigger: String(describing: action))
+                    ScreenTransitionEvent(
+                        from: before,
+                        to: state.activeScreen,
+                        trigger: String(describing: action),
+                    )
                 )
             }
 

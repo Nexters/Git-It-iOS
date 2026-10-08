@@ -18,27 +18,36 @@ struct RepositoryLinkInputScreen: View {
     @Bindable var store: StoreOf<RepositoryLinkInputFeature>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             ScreenControlBar(
                 onLeadingTap: { send(.dismissTapped) }
             )
             .designSystemScreenMargin()
 
-            VStack(alignment: .leading, spacing: Constant.titleFieldSpacing) {
-                StyledText.subtitle1("GitHub 레포지토리\n링크를 붙여넣어 주세요")
+            VStack(
+                alignment: .leading,
+                spacing: Constant.titleFieldSpacing,
+            ) {
+                StyledText(text: "GitHub 레포지토리\n링크를 붙여넣어 주세요")
+                    .textStyle(.subtitle1)
 
                 LabeledTextField(
-                    label: "링크",
-                    placeholder: "https://github.com",
+                    displayModel: .init(
+                        label: "링크",
+                        placeholder: "https://github.com",
+                        supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
+                    ),
                     text: repositoryURLInput,
-                    supportingText: store.isValidationFailed ? "올바른 GitHub 레포지토리 링크를 입력해 주세요." : nil,
-                    isError: store.isValidationFailed,
-                    keyboardType: .URL,
-                    textInputAutocapitalization: .never,
-                    autocorrectionDisabled: true,
                     accessibilityLabel: "GitHub 레포지토리 링크",
                     focus: $isLinkFieldFocused,
                 )
+                .error(store.isValidationFailed)
+                .keyboardType(.URL)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
             }
             .designSystemScreenMargin()
             .padding(.top, Constant.headerContentSpacing)
@@ -49,16 +58,19 @@ struct RepositoryLinkInputScreen: View {
 
             Spacer(minLength: 0)
 
-            ActionButton.primary(
-                store.validateButtonTitle,
-                isEnabled: store.canValidate,
+            FeedbackActionButton(
+                title: store.validateButtonTitle,
                 action: { send(.validateTapped) },
             )
+            .enabled(store.canValidate)
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)
         }
         .background(Self.KeyboardDismissLayer(onTap: { isLinkFieldFocused = false }))
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .ignoresSafeArea(
+            .keyboard,
+            edges: .bottom,
+        )
     }
 
     // MARK: Private

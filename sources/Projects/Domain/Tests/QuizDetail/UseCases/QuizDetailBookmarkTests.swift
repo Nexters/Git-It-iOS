@@ -13,8 +13,20 @@ struct QuizDetailBookmarkTests {
         let bookmarks = SpyBookmarkRepository()
         let quizDetail = Self.makeQuizDetail(bookmarks: bookmarks)
 
-        #expect(try await quizDetail.bookmark("q1", in: "p1") == QuizBookmarkState(quizID: "q1", isBookmarked: true))
-        #expect(try await quizDetail.unbookmark("q1", in: "p1") == QuizBookmarkState(quizID: "q1", isBookmarked: false))
+        #expect(try await quizDetail.bookmark(
+            "q1",
+            in: "p1",
+        ) == QuizBookmarkState(
+            quizID: "q1",
+            isBookmarked: true,
+        ))
+        #expect(try await quizDetail.unbookmark(
+            "q1",
+            in: "p1",
+        ) == QuizBookmarkState(
+            quizID: "q1",
+            isBookmarked: false,
+        ))
     }
 
     @Test
@@ -22,9 +34,15 @@ struct QuizDetailBookmarkTests {
         let bookmarks = SpyBookmarkRepository(holdsFirstRequest: true)
         let quizDetail = Self.makeQuizDetail(bookmarks: bookmarks)
 
-        let bookmark = Task { try await quizDetail.bookmark("q1", in: "p1") }
+        let bookmark = Task { try await quizDetail.bookmark(
+            "q1",
+            in: "p1",
+        ) }
         await Self.settle { await bookmarks.events == ["true:start"] }
-        let unbookmark = Task { try await quizDetail.unbookmark("q1", in: "p1") }
+        let unbookmark = Task { try await quizDetail.unbookmark(
+            "q1",
+            in: "p1",
+        ) }
         for _ in 0 ..< 50 {
             await Task.yield()
         }
@@ -53,7 +71,12 @@ struct QuizDetailBookmarkTests {
     private static func makeQuizDetail(bookmarks: SpyBookmarkRepository) -> QuizDetail {
         QuizDetail(
             quizSetRepository: StubQuizSetRepository(
-                quizSet: QuizSet(id: "s1", title: "", description: "", quizzes: [])
+                quizSet: QuizSet(
+                    id: "s1",
+                    title: "",
+                    description: "",
+                    quizzes: [],
+                )
             ),
             answerRepository: SpyAnswerRepository(),
             bookmarkRepository: bookmarks,

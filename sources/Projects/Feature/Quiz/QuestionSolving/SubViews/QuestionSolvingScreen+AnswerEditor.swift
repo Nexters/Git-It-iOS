@@ -16,16 +16,24 @@ extension QuestionSolvingScreen {
         let isDisabled: Bool
 
         var body: some View {
-            VStack(alignment: .trailing, spacing: LayoutToken.compactSpacing) {
+            VStack(
+                alignment: .trailing,
+                spacing: LayoutToken.compactSpacing,
+            ) {
                 ZStack(alignment: .topLeading) {
                     if text.isEmpty {
-                        StyledText.body1(placeholder, color: .grey400)
+                        StyledText(text: placeholder)
+                            .foregroundColorToken(.grey400)
                             .allowsHitTesting(false)
                     }
 
                     TextEditor(text: $text)
                         .scrollContentBackground(.hidden)
-                        .contentMargins(.all, 0, for: .scrollContent)
+                        .contentMargins(
+                            .all,
+                            0,
+                            for: .scrollContent,
+                        )
                         .font(Font.designSystem(Constant.textStyle))
                         .designSystemLineSpacing(Constant.textStyle)
                         .focused(isFocused)
@@ -33,7 +41,11 @@ extension QuestionSolvingScreen {
                         .disabled(isDisabled)
                 }
                 .padding(Constant.textInset)
-                .frame(minHeight: Constant.minimumHeight, maxHeight: Constant.maximumHeight, alignment: .top)
+                .frame(
+                    minHeight: Constant.minimumHeight,
+                    maxHeight: Constant.maximumHeight,
+                    alignment: .top,
+                )
                 .designSystemBackground(.grey600)
                 .designSystemCornerRadius(.small)
                 .overlay {
@@ -44,7 +56,9 @@ extension QuestionSolvingScreen {
                         )
                 }
 
-                StyledText.caption2("\(text.count) / \(characterLimit)", color: .grey400)
+                StyledText(text: "\(text.count) / \(characterLimit)")
+                    .textStyle(.caption2)
+                    .foregroundColorToken(.grey400)
             }
         }
 

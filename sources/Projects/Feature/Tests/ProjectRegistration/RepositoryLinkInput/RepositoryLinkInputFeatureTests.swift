@@ -23,6 +23,17 @@ struct RepositoryLinkInputFeatureTests {
     }
 
     @Test
+    func `validationReset 입력은 검증 결과를 idle로 되돌린다`() async {
+        var state = RepositoryLinkInputFeature.State()
+        state.validation = .validated(sampleRepository)
+        let store = makeRepositoryLinkInputStore(state: state)
+
+        await store.send(.input(.validationReset)) {
+            $0.validation = .idle
+        }
+    }
+
+    @Test
     func `validateTapped 성공은 validation을 validated로 전이하고 repositoryValidated를 위임한다`() async {
         let externalRepository = ExternalRepositoryUseCaseStub(results: [.success(sampleRepository)])
         let store = makeRepositoryLinkInputStore(externalRepository: externalRepository)
@@ -34,7 +45,10 @@ struct RepositoryLinkInputFeatureTests {
             $0.validation = .validating
             $0.validationRequestID = 1
         }
-        await store.receive(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository)))) {
+        await store.receive(.effect(.validationFinished(
+            requestID: 1,
+            result: .success(sampleRepository),
+        ))) {
             $0.validation = .validated(sampleRepository)
         }
         await store.receive(.delegate(.repositoryValidated(sampleRepository)))
@@ -54,7 +68,10 @@ struct RepositoryLinkInputFeatureTests {
             $0.validation = .validating
             $0.validationRequestID = 1
         }
-        await store.receive(.effect(.validationFinished(requestID: 1, result: .failure(.invalidURLFormat)))) {
+        await store.receive(.effect(.validationFinished(
+            requestID: 1,
+            result: .failure(.invalidURLFormat),
+        ))) {
             $0.validation = .failed
         }
         #expect(store.state.isValidationFailed)
@@ -85,7 +102,10 @@ struct RepositoryLinkInputFeatureTests {
         await store.send(.view(.validateTapped)) {
             $0.validationRequestID = 2
         }
-        await store.send(.effect(.validationFinished(requestID: 1, result: .success(sampleRepository))))
+        await store.send(.effect(.validationFinished(
+            requestID: 1,
+            result: .success(sampleRepository),
+        )))
 
         #expect(store.state.validation == .validating)
 
@@ -144,7 +164,10 @@ private struct RepositoryLinkInputHostFeature {
 
     var body: some ReducerOf<Self> {
         Reduce { _, _ in .none }
-            .ifLet(\.$child, action: \.child) {
+            .ifLet(
+                \.$child,
+                action: \.child,
+            ) {
                 RepositoryLinkInputFeature(repository: { [externalRepository] in
                     try await externalRepository.repository(at: $0)
                 })

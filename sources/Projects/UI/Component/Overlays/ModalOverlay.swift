@@ -8,12 +8,10 @@ public struct ModalOverlay<Content: View>: View {
     // MARK: Lifecycle
 
     public init(
-        isPresented: Bool,
-        onDismiss: @escaping () -> Void = { },
+        isPresented: Binding<Bool>,
         @ViewBuilder content: () -> Content,
     ) {
-        self.isPresented = isPresented
-        self.onDismiss = onDismiss
+        _isPresented = isPresented
         self.content = content()
     }
 
@@ -27,13 +25,22 @@ public struct ModalOverlay<Content: View>: View {
                     .ignoresSafeArea()
                     .transition(.opacity)
                     .accessibilityHidden(true)
-                    .onTapGesture(perform: onDismiss)
+                    .onTapGesture { dismiss() }
 
                 content
                     .transition(.move(edge: .bottom))
             }
         }
-        .animation(.easeInOut(duration: Constant.transitionDuration), value: isPresented)
+        .animation(
+            .easeInOut(duration: Constant.transitionDuration),
+            value: isPresented,
+        )
+    }
+
+    // MARK: Internal
+
+    func dismiss() {
+        isPresented = false
     }
 
     // MARK: Private
@@ -44,8 +51,8 @@ public struct ModalOverlay<Content: View>: View {
         }
     }
 
-    private let isPresented: Bool
-    private let onDismiss: () -> Void
+    @Binding private var isPresented: Bool
+
     private let content: Content
 
 }
@@ -54,14 +61,17 @@ public struct ModalOverlay<Content: View>: View {
     ZStack {
         Color(designSystem: .grey700)
 
-        ModalOverlay(isPresented: true) {
+        ModalOverlay(isPresented: .constant(true)) {
             VStack {
-                StyledText.body1("모달 콘텐츠")
+                StyledText(text: "모달 콘텐츠")
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)
             .designSystemBackground(.grey600)
         }
     }
-    .frame(width: 390, height: 700)
+    .frame(
+        width: 390,
+        height: 700,
+    )
 }

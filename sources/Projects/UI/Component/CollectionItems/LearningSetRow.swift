@@ -8,43 +8,58 @@ public struct LearningSetRow: View {
     // MARK: Lifecycle
 
     public init(
-        label: String,
-        title: String,
-        questionCount: Int,
-        completedCount: Int,
+        displayModel: DisplayModel,
         onStart: @escaping () -> Void = { },
     ) {
-        self.label = label
-        self.title = title
-        self.questionCount = questionCount
-        self.completedCount = completedCount
+        self.displayModel = displayModel
         self.onStart = onStart
     }
 
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Constant.contentSpacing) {
-            HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                VStack(alignment: .leading, spacing: Constant.titleSpacing) {
-                    StyledText.subtitle3(label, color: .blue100)
+        VStack(
+            alignment: .leading,
+            spacing: Constant.contentSpacing,
+        ) {
+            HStack(
+                alignment: .top,
+                spacing: LayoutToken.gutter,
+            ) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.titleSpacing,
+                ) {
+                    StyledText(text: displayModel.label)
+                        .textStyle(.subtitle3)
+                        .foregroundColorToken(.blue100)
 
-                    StyledText.body1(title)
+                    StyledText(text: displayModel.title)
                         .lineLimit(1)
 
                     Spacer(minLength: 0)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
                 .accessibilityElement(children: .combine)
 
                 startButton
             }
 
-            ProgressSegments(completed: clampedCompletedCount, total: questionCount)
+            ProgressSegments(displayModel: .init(
+                completed: clampedCompletedCount,
+                total: displayModel.questionCount,
+            ))
         }
         .padding(.horizontal, Constant.horizontalPadding)
         .padding(.vertical, Constant.verticalPadding)
-        .frame(maxWidth: .infinity, minHeight: Constant.height, alignment: .topLeading)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: Constant.height,
+            alignment: .topLeading,
+        )
         .designSystemBackground(.grey700)
         .designSystemCornerRadius(.large)
         .overlay {
@@ -87,45 +102,84 @@ public struct LearningSetRow: View {
         static let startTouchSize: CGFloat = 44
     }
 
-    private let label: String
-    private let title: String
-    private let questionCount: Int
-    private let completedCount: Int
+    private let displayModel: DisplayModel
     private let onStart: () -> Void
 
     private var clampedCompletedCount: Int {
-        Self.clampedCompletedCount(completed: completedCount, total: questionCount)
+        Self.clampedCompletedCount(
+            completed: displayModel.completedCount,
+            total: displayModel.questionCount,
+        )
     }
 
     private var startButton: some View {
         Button(action: onStart) {
             Image(systemName: "play.fill")
-                .font(.system(size: Constant.startSymbolSize, weight: .bold))
+                .font(.system(
+                    size: Constant.startSymbolSize,
+                    weight: .bold,
+                ))
                 .designSystemForeground(.blue100)
-                .frame(width: Constant.startSurfaceSize, height: Constant.startSurfaceSize)
-                .background(Color(designSystem: .blue400), in: Circle())
-                .frame(width: Constant.startTouchSize, height: Constant.startTouchSize)
+                .frame(
+                    width: Constant.startSurfaceSize,
+                    height: Constant.startSurfaceSize,
+                )
+                .background(
+                    Color(designSystem: .blue400),
+                    in: Circle(),
+                )
+                .frame(
+                    width: Constant.startTouchSize,
+                    height: Constant.startTouchSize,
+                )
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(label) \(title) 학습 시작")
+        .accessibilityLabel("\(displayModel.label) \(displayModel.title) 학습 시작")
     }
 
+}
+
+// MARK: LearningSetRow.DisplayModel
+
+extension LearningSetRow {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            label: String,
+            title: String,
+            questionCount: Int,
+            completedCount: Int,
+        ) {
+            self.label = label
+            self.title = title
+            self.questionCount = questionCount
+            self.completedCount = completedCount
+        }
+
+        public let label: String
+        public let title: String
+        public let questionCount: Int
+        public let completedCount: Int
+    }
 }
 
 #Preview("Learning Set Row") {
     VStack(spacing: LayoutToken.gutter) {
         LearningSetRow(
-            label: "Set 1",
-            title: "아이디어 PT 핵심 내용 확인하기",
-            questionCount: 7,
-            completedCount: 0,
+            displayModel: .init(
+                label: "Set 1",
+                title: "아이디어 PT 핵심 내용 확인하기",
+                questionCount: 7,
+                completedCount: 0,
+            )
         )
         LearningSetRow(
-            label: "Set 2",
-            title: "서비스 문제와 타깃 알아보기",
-            questionCount: 2,
-            completedCount: 2,
+            displayModel: .init(
+                label: "Set 2",
+                title: "서비스 문제와 타깃 알아보기",
+                questionCount: 2,
+                completedCount: 2,
+            )
         )
     }
     .designSystemScreenMargin()

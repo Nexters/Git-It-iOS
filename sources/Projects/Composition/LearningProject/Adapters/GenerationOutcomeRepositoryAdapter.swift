@@ -33,10 +33,16 @@ public struct GenerationOutcomeRepositoryAdapter: GenerationOutcomeRepository {
     private func outcome(from dto: QuizGenerationOutcomeDTO) -> GenerationOutcome {
         switch dto.status {
         case .completed:
-            GenerationOutcome(projectID: dto.projectID, status: .completed)
+            GenerationOutcome(
+                projectID: dto.projectID,
+                status: .completed,
+            )
 
         case .failed:
-            GenerationOutcome(projectID: dto.projectID, status: .failed)
+            GenerationOutcome(
+                projectID: dto.projectID,
+                status: .failed,
+            )
         }
     }
 

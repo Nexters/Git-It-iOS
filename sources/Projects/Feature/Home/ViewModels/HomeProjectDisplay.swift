@@ -16,7 +16,7 @@ struct HomeProjectDisplay: Equatable, Sendable {
         progress = Double(project.progressPercent) / 100
         currentSetLabel = project.currentSet.label
         setTitle = project.currentSet.title
-        variant = Self.variants[index % Self.variants.count]
+        style = Self.styles[index % Self.styles.count]
         isLearningEnabled = project.next?.quizID != nil
     }
 
@@ -28,11 +28,11 @@ struct HomeProjectDisplay: Equatable, Sendable {
     let progress: Double
     let currentSetLabel: String
     let setTitle: String
-    let variant: HomeProjectCard.Variant
+    let style: HomeProjectCard.Style
     let isLearningEnabled: Bool
 
     // MARK: Private
 
-    private static let variants: [HomeProjectCard.Variant] = [.purple, .lightBlue, .darkBlue]
+    private static let styles: [HomeProjectCard.Style] = [.purple, .lightBlue, .darkBlue]
 
 }

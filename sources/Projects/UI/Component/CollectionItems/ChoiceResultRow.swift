@@ -8,17 +8,13 @@ public struct ChoiceResultRow: View {
     // MARK: Lifecycle
 
     public init(
+        displayModel: DisplayModel,
         judgement: Judgement,
-        isExpanded: Bool,
-        text: String,
-        explanation: String,
-        onTap: @escaping () -> Void,
+        isExpanded: Binding<Bool>,
     ) {
+        self.displayModel = displayModel
         self.judgement = judgement
-        self.isExpanded = isExpanded
-        self.text = text
-        self.explanation = explanation
-        self.onTap = onTap
+        _isExpanded = isExpanded
     }
 
     // MARK: Public
@@ -49,18 +45,28 @@ public struct ChoiceResultRow: View {
     }
 
     public var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: LayoutToken.tightSpacing) {
-                StyledText.body1(text, color: .grey100)
+        Button(action: { toggle() }) {
+            VStack(
+                alignment: .leading,
+                spacing: LayoutToken.tightSpacing,
+            ) {
+                StyledText(text: displayModel.text)
                     .lineLimit(1)
 
                 if isExpanded {
-                    StyledText.body3(explanation, color: .grey100)
+                    StyledText(text: displayModel.explanation)
+                        .textStyle(.body3)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
             .padding(.horizontal, Constant.horizontalPadding)
-            .frame(height: height, alignment: .top)
+            .frame(
+                height: height,
+                alignment: .top,
+            )
             .padding(.top, LayoutToken.compactSpacing)
             .designSystemBackground(judgement.backgroundColor)
             .designSystemCornerRadius(.large)
@@ -80,6 +86,10 @@ public struct ChoiceResultRow: View {
         "\(text), \(judgement.accessibilitySuffix)"
     }
 
+    func toggle() {
+        isExpanded.toggle()
+    }
+
     // MARK: Private
 
     private enum Constant {
@@ -88,37 +98,60 @@ public struct ChoiceResultRow: View {
         static let horizontalPadding: CGFloat = 16
     }
 
+    @Binding private var isExpanded: Bool
+
+    private let displayModel: DisplayModel
     private let judgement: Judgement
-    private let isExpanded: Bool
-    private let text: String
-    private let explanation: String
-    private let onTap: () -> Void
 
     private var height: CGFloat {
         isExpanded ? Constant.expandedHeight : Constant.collapsedHeight
     }
 
     private var accessibilityLabel: String {
-        Self.accessibilityLabel(text: text, judgement: judgement)
+        Self.accessibilityLabel(
+            text: displayModel.text,
+            judgement: judgement,
+        )
     }
 
+}
+
+// MARK: ChoiceResultRow.DisplayModel
+
+extension ChoiceResultRow {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            text: String,
+            explanation: String,
+        ) {
+            self.text = text
+            self.explanation = explanation
+        }
+
+        public let text: String
+        public let explanation: String
+    }
 }
 
 #Preview("Choice Result Row") {
     VStack(spacing: LayoutToken.gutter) {
         ChoiceResultRow(
+            displayModel: .init(
+                text: "State는 값 타입 소유에 쓴다",
+                explanation: "뷰가 소유하는 단일 진실 원천입니다.",
+            ),
             judgement: .correct,
-            isExpanded: false,
-            text: "State는 값 타입 소유에 쓴다",
-            explanation: "뷰가 소유하는 단일 진실 원천입니다.",
-        ) { }
+            isExpanded: .constant(false),
+        )
 
         ChoiceResultRow(
+            displayModel: .init(
+                text: "Binding은 값을 소유한다",
+                explanation: "Binding은 소유하지 않고 참조만 전달합니다.",
+            ),
             judgement: .incorrect,
-            isExpanded: true,
-            text: "Binding은 값을 소유한다",
-            explanation: "Binding은 소유하지 않고 참조만 전달합니다.",
-        ) { }
+            isExpanded: .constant(true),
+        )
     }
     .padding(LayoutToken.margin)
     .designSystemBackground(.grey700)

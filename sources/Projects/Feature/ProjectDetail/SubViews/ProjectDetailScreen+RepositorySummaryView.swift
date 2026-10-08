@@ -17,13 +17,26 @@ extension ProjectDetailScreen {
         let onResumeTap: () -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.bannerToContentSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.bannerToContentSpacing,
+            ) {
                 banner
 
-                VStack(alignment: .leading, spacing: Constant.contentSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                        VStack(alignment: .leading, spacing: Constant.textSpacing) {
-                            StyledText.headline2(repositoryName)
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.contentSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
+                        VStack(
+                            alignment: .leading,
+                            spacing: Constant.textSpacing,
+                        ) {
+                            StyledText(text: repositoryName)
+                                .textStyle(.headline2)
                             metaRow
                         }
 
@@ -33,14 +46,19 @@ extension ProjectDetailScreen {
                     }
 
                     LabeledProgressBar(
-                        label: "전체 진행률",
-                        progress: Double(overallProgressPercent) / 100,
-                        valueText: "\(overallProgressPercent)%",
-                        valueColor: .blue100,
+                        displayModel: .init(
+                            label: "전체 진행률",
+                            progress: Double(overallProgressPercent) / 100,
+                            valueText: "\(overallProgressPercent)%",
+                        )
                     )
+                    .foregroundColorToken(.blue100)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
         }
 
         // MARK: Private
@@ -67,12 +85,18 @@ extension ProjectDetailScreen {
                 } placeholder: {
                     Color(designSystem: .grey500)
                 }
-                .frame(width: Constant.bannerSize, height: Constant.bannerSize)
+                .frame(
+                    width: Constant.bannerSize,
+                    height: Constant.bannerSize,
+                )
                 .designSystemCornerRadius(.medium)
                 .accessibilityHidden(true)
             } else {
                 Color(designSystem: .grey500)
-                    .frame(width: Constant.bannerSize, height: Constant.bannerSize)
+                    .frame(
+                        width: Constant.bannerSize,
+                        height: Constant.bannerSize,
+                    )
                     .designSystemCornerRadius(.medium)
                     .accessibilityHidden(true)
             }
@@ -82,16 +106,26 @@ extension ProjectDetailScreen {
             HStack(spacing: Constant.metaSpacing) {
                 HStack(spacing: Constant.starSpacing) {
                     ResourceImage(asset: .icon(.star))
-                        .frame(width: Constant.starSize, height: Constant.starSize)
-                    StyledText.caption1(formattedStarCount, color: .blue100)
+                        .frame(
+                            width: Constant.starSize,
+                            height: Constant.starSize,
+                        )
+                    StyledText(text: formattedStarCount)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.blue100)
                 }
 
                 if !techStack.isEmpty {
                     Rectangle()
                         .fill(Color(designSystem: .grey500))
-                        .frame(width: 1, height: Constant.dividerHeight)
+                        .frame(
+                            width: 1,
+                            height: Constant.dividerHeight,
+                        )
 
-                    StyledText.caption1(techStack.joined(separator: " · "), color: .blue100)
+                    StyledText(text: techStack.joined(separator: " · "))
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.blue100)
                         .lineLimit(1)
                 }
             }
@@ -101,10 +135,16 @@ extension ProjectDetailScreen {
         private var formattedStarCount: String {
             switch starCount {
             case 1_000_000...:
-                "\(abbreviatedUnit(starCount, divisor: 1_000_000))m"
+                abbreviatedUnit(
+                    starCount,
+                    divisor: 1_000_000,
+                ) + "m"
 
             case 1_000...:
-                "\(abbreviatedUnit(starCount, divisor: 1_000))k"
+                abbreviatedUnit(
+                    starCount,
+                    divisor: 1_000,
+                ) + "k"
 
             default:
                 "\(starCount)"
@@ -114,9 +154,15 @@ extension ProjectDetailScreen {
         private var resumeButton: some View {
             Button(action: onResumeTap) {
                 ResourceImage(asset: .icon(.playSmall))
-                    .frame(width: Constant.resumeSurfaceSize, height: Constant.resumeSurfaceSize)
+                    .frame(
+                        width: Constant.resumeSurfaceSize,
+                        height: Constant.resumeSurfaceSize,
+                    )
                     .opacity(isResumeEnabled ? 1 : Constant.disabledOpacity)
-                    .frame(width: Constant.resumeTouchSize, height: Constant.resumeTouchSize)
+                    .frame(
+                        width: Constant.resumeTouchSize,
+                        height: Constant.resumeTouchSize,
+                    )
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -130,8 +176,14 @@ extension ProjectDetailScreen {
         ) -> String {
             let scaled = (Double(count) / Double(divisor) * 10).rounded(.down) / 10
             return scaled.truncatingRemainder(dividingBy: 1) == 0
-                ? String(format: "%.0f", scaled)
-                : String(format: "%.1f", scaled)
+                ? String(
+                    format: "%.0f",
+                    scaled,
+                )
+                : String(
+                    format: "%.1f",
+                    scaled,
+                )
         }
 
     }

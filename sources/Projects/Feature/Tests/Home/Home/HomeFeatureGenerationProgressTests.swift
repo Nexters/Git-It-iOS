@@ -47,15 +47,19 @@ struct HomeFeatureGenerationProgressTests {
     func `진행 중에도 카드 본문과 전체 보기 동작은 달라지지 않는다`() async {
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
-        state.projectLoad = .loaded(HomeTestFixture.manyProjectsPage)
+        state.projectSummaries.load = .loaded(HomeTestFixture.manyProjectsPage)
         let store = makeStore(state: state)
 
         await store.send(.view(.showAllProjectsTapped))
+        await store.receive(.delegate(.allProjectsRequested))
         await store.send(.view(.projectCardTapped(projectID: "project-1")))
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
         await store.send(.view(.learningTapped(projectID: "project-1")))
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -64,17 +68,24 @@ struct HomeFeatureGenerationProgressTests {
         let profile = UserInfoUseCaseSuspendableProfileMock(results: [.success(HomeTestFixture.profileWithBoth)])
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
-        state.profileLoad = .failed(.temporarilyUnavailable)
-        let store = makeStore(profile: profile, state: state)
+        state.profile.load = .failed(.temporarilyUnavailable)
+        let store = makeStore(
+            profile: profile,
+            state: state,
+        )
 
-        await store.send(.view(.profileRetryTapped)) {
-            $0.profileLoad = .loading
-            $0.profileRequestID = 1
+        await store.send(.view(.profileRetryTapped))
+        await store.receive(.profile(.input(.load))) {
+            $0.profile.load = .loading
+            $0.profile.requestID = 1
         }
         await store.receive(
-            .effect(.profileLoadFinished(requestID: 1, result: .success(HomeTestFixture.profileWithBoth)))
+            .profile(.effect(.profileLoadFinished(
+                requestID: 1,
+                result: .success(HomeTestFixture.profileWithBoth),
+            )))
         ) {
-            $0.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+            $0.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         }
 
         #expect(store.state.isGenerationInProgress)
@@ -86,14 +97,21 @@ struct HomeFeatureGenerationProgressTests {
         let projects = ProjectUseCaseMock(initialList: HomeTestFixture.oneProjectPage)
         var state = HomeFeature.State()
         state.isGenerationInProgress = true
-        state.projectLoad = .failed(.temporarilyUnavailable)
-        let store = makeStore(projects: projects, state: state)
+        state.projectSummaries.load = .failed(.temporarilyUnavailable)
+        let store = makeStore(
+            projects: projects,
+            state: state,
+        )
 
-        await store.send(.view(.projectRetryTapped)) {
-            $0.projectLoad = .loading
-            $0.projectRequestID = 1
+        await store.send(.view(.projectRetryTapped))
+        await store.receive(.projectSummaries(.input(.refresh))) {
+            $0.projectSummaries.load = .loading
+            $0.projectSummaries.requestID = 1
         }
-        await store.receive(.effect(.refreshFinished(requestID: 1, error: nil)))
+        await store.receive(.projectSummaries(.effect(.refreshFinished(
+            requestID: 1,
+            error: nil,
+        ))))
 
         #expect(await projects.snapshot().refreshCallCount == 1)
     }

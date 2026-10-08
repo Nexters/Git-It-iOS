@@ -26,7 +26,10 @@ struct ExternalRepositoryRemoteNoAuthorizationTests {
         )
         let remote = ExternalRepositoryRemote(client: client)
 
-        _ = try await remote.repository(GitHubRepositoryRequest(owner: "owner", repository: "repo"))
+        _ = try await remote.repository(GitHubRepositoryRequest(
+            owner: "owner",
+            repository: "repo",
+        ))
 
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.headers["Authorization"] == nil)

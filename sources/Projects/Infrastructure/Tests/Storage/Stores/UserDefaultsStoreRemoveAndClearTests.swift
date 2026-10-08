@@ -10,8 +10,14 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
-        await store.store(Data("V".utf8), forKey: "A")
+        let store = UserDefaultsStore(
+            namespace: "test",
+            userDefaults: userDefaults,
+        )
+        await store.store(
+            Data("V".utf8),
+            forKey: "A",
+        )
 
         await store.removeValue(forKey: "A")
 
@@ -23,9 +29,18 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
-        await store.store(Data("V1".utf8), forKey: "A")
-        await store.store(Data("V2".utf8), forKey: "B")
+        let store = UserDefaultsStore(
+            namespace: "test",
+            userDefaults: userDefaults,
+        )
+        await store.store(
+            Data("V1".utf8),
+            forKey: "A",
+        )
+        await store.store(
+            Data("V2".utf8),
+            forKey: "B",
+        )
 
         await store.removeAll()
 
@@ -38,10 +53,22 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let storeA = UserDefaultsStore(namespace: "namespaceA", userDefaults: userDefaults)
-        let storeB = UserDefaultsStore(namespace: "namespaceB", userDefaults: userDefaults)
-        await storeA.store(Data("A값".utf8), forKey: "키")
-        await storeB.store(Data("B값".utf8), forKey: "키")
+        let storeA = UserDefaultsStore(
+            namespace: "namespaceA",
+            userDefaults: userDefaults,
+        )
+        let storeB = UserDefaultsStore(
+            namespace: "namespaceB",
+            userDefaults: userDefaults,
+        )
+        await storeA.store(
+            Data("A값".utf8),
+            forKey: "키",
+        )
+        await storeB.store(
+            Data("B값".utf8),
+            forKey: "키",
+        )
 
         await storeA.removeAll()
 
@@ -54,7 +81,10 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(
+            namespace: "test",
+            userDefaults: userDefaults,
+        )
 
         await store.removeValue(forKey: "존재하지-않는-키")
 
@@ -66,7 +96,10 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
+        let store = UserDefaultsStore(
+            namespace: "test",
+            userDefaults: userDefaults,
+        )
 
         #expect(await store.value(forKey: "저장된-적-없는-키") == nil)
     }
@@ -76,8 +109,14 @@ struct UserDefaultsStoreRemoveAndClearTests {
         let suiteName = "UserDefaultsStoreTests.\(UUID().uuidString)"
         let userDefaults = try #require(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
-        let store = UserDefaultsStore(namespace: "test", userDefaults: userDefaults)
-        userDefaults.set(Data([0xFF, 0x00, 0xAB]), forKey: "test.원시-키")
+        let store = UserDefaultsStore(
+            namespace: "test",
+            userDefaults: userDefaults,
+        )
+        userDefaults.set(
+            Data([0xFF, 0x00, 0xAB]),
+            forKey: "test.원시-키",
+        )
 
         #expect(await store.value(forKey: "원시-키") == Data([0xFF, 0x00, 0xAB]))
     }

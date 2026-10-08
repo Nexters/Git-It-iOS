@@ -6,7 +6,10 @@ actor StubAuthenticationRepository: AuthenticationRepository {
 
     init(
         authenticateResult: Result<AuthenticationGrant, AccountError> = .success(
-            AuthenticationGrant(id: "grant-1", method: .apple)
+            AuthenticationGrant(
+                id: "grant-1",
+                method: .apple,
+            )
         ),
         authorizationResult: Result<SignInVerification, AccountError> = .success(.valid),
     ) {

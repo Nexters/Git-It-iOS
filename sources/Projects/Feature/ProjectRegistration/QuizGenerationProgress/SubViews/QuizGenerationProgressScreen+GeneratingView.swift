@@ -11,7 +11,10 @@ extension QuizGenerationProgressScreen {
         let onWaitAtHome: () -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 ResourceAnimation(asset: .setCreationLoading)
                     .frame(
                         width: Constant.loadingGraphicSize,
@@ -21,8 +24,13 @@ extension QuizGenerationProgressScreen {
                     .padding(.vertical, 30)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText.subtitle1("학습세트를 만들고 있어요", alignment: .center)
-                    StyledText.body2("약 5분의 시간이 소요돼요", color: .grey400, alignment: .center)
+                    StyledText(text: "학습세트를 만들고 있어요")
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
+                    StyledText(text: "약 5분의 시간이 소요돼요")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
                 }
 
                 QuizGenerationProgressScreen.ChecklistView(progress: progress)
@@ -32,9 +40,13 @@ extension QuizGenerationProgressScreen {
             .padding(.vertical)
             .designSystemScreenMargin()
             .safeAreaInset(edge: .bottom) {
-                ActionButton.primaryText("홈에서 기다리기", action: onWaitAtHome)
-                    .designSystemScreenMargin()
-                    .padding(.vertical, Constant.bottomButtonPadding)
+                FeedbackActionButton(
+                    title: "홈에서 기다리기",
+                    action: onWaitAtHome,
+                )
+                .style(.primaryText)
+                .designSystemScreenMargin()
+                .padding(.vertical, Constant.bottomButtonPadding)
             }
             .designSystemBackground(.backgroundGradient)
             .task { await runSimulatedProgress() }

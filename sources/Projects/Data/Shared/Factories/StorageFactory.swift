@@ -12,14 +12,20 @@ public enum StorageFactory {
         namespace: String,
         location: StorageLocation,
     ) -> any KeyValueStorage {
-        keyValueStorage(store: userDefaultsStore(namespace: namespace, location: location))
+        keyValueStorage(store: userDefaultsStore(
+            namespace: namespace,
+            location: location,
+        ))
     }
 
     public static func secureValueStorage(
         namespace: String,
         location: StorageLocation,
     ) -> any SecureValueStorage {
-        LocalSecureValueStorage(namespace: namespace, keychainStore: keychainStore(for: location))
+        LocalSecureValueStorage(
+            namespace: namespace,
+            keychainStore: keychainStore(for: location),
+        )
     }
 
     // MARK: Internal
@@ -47,7 +53,10 @@ public enum StorageFactory {
         switch location {
         case .appGroup:
             AppGroupUserDefaults.makeShared().map {
-                UserDefaultsStore(namespace: namespace, userDefaults: $0)
+                UserDefaultsStore(
+                    namespace: namespace,
+                    userDefaults: $0,
+                )
             }
 
         case .device:

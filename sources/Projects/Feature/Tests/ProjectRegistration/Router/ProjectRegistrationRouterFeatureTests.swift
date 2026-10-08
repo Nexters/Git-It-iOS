@@ -15,9 +15,14 @@ struct ProjectRegistrationRouterFeatureTests {
         #expect(store.state.activeScreen == .repositoryLinkInput)
 
         await store.send(.repositoryLinkInput(.delegate(.repositoryValidated(sampleRepository)))) {
-            $0.repositoryConfirmation.repository = sampleRepository
             $0.activeScreen = .repositoryConfirmation
-            $0.screenTransitions = [.init(from: .repositoryLinkInput, to: .repositoryConfirmation)]
+            $0.screenTransitions = [.init(
+                from: .repositoryLinkInput,
+                to: .repositoryConfirmation,
+            )]
+        }
+        await store.receive(.repositoryConfirmation(.input(.repositoryProvided(sampleRepository)))) {
+            $0.repositoryConfirmation.repository = sampleRepository
         }
     }
 
@@ -64,6 +69,8 @@ struct ProjectRegistrationRouterFeatureTests {
 
         await store.send(.repositoryConfirmation(.view(.rejectTapped)))
         await store.receive(.repositoryConfirmation(.delegate(.rejected)))
+        await store.receive(.repositoryLinkInput(.input(.validationReset)))
+        await store.receive(.repositoryConfirmation(.input(.cleared)))
 
         #expect(store.state.activeScreen == .repositoryLinkInput)
         #expect(store.state.repositoryLinkInput.validation == .idle)
@@ -81,19 +88,28 @@ struct ProjectRegistrationRouterFeatureTests {
         state.activeScreen = .quizGenerationConfirmation
         state.repositoryConfirmation.repository = sampleRepository
         state.quizLevelSelection.quizLevel = .l2
-        let store = makeProjectRegistrationRouterStore(projectGeneration: projectGeneration, state: state)
+        let store = makeProjectRegistrationRouterStore(
+            projectGeneration: projectGeneration,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.view(.startTapped)))
         await store.receive(.quizGenerationConfirmation(.delegate(.submitRequested)))
-        await store.receive(.quizGenerationProgress(.submit(repository: sampleRepository, quizLevel: .l2)))
+        await store.receive(.quizGenerationProgress(.submit(
+            repository: sampleRepository,
+            quizLevel: .l2,
+        )))
 
         #expect(store.state.activeScreen == .quizGenerationProgress)
 
         await store.receive(.quizGenerationProgress(.effect(.submissionFinished(.success(sampleReceipt)))))
         #expect(
             await projectGeneration.recordedRequests() == [
-                ProjectGenerationRequest(repositoryURL: sampleRepository.canonicalURL, quizLevel: .l2)
+                ProjectGenerationRequest(
+                    repositoryURL: sampleRepository.canonicalURL,
+                    quizLevel: .l2,
+                )
             ]
         )
 
@@ -107,7 +123,10 @@ struct ProjectRegistrationRouterFeatureTests {
         let projectGeneration = ProjectGenerationUseCaseStub(results: [.success(sampleReceipt)])
         var state = ProjectRegistrationRouterFeature.State()
         state.activeScreen = .quizGenerationConfirmation
-        let store = makeProjectRegistrationRouterStore(projectGeneration: projectGeneration, state: state)
+        let store = makeProjectRegistrationRouterStore(
+            projectGeneration: projectGeneration,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.quizGenerationConfirmation(.view(.startTapped)))

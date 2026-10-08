@@ -45,7 +45,10 @@ public struct LearningSetRemote: Sendable {
         setID: String,
     ) async throws -> LearningSetResponseDTO {
         try await executor.send(
-            LearningSetEndpoint.detail(projectID: projectID, setID: setID).request,
+            LearningSetEndpoint.detail(
+                projectID: projectID,
+                setID: setID,
+            ).request,
             expecting: LearningSetResponseDTO.self,
         )
     }

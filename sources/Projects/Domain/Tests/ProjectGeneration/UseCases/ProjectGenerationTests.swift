@@ -35,12 +35,18 @@ struct ProjectGenerationTests {
         let fixture = Fixture()
 
         let receipt = try await fixture.generation.request(Self.request)
-        fixture.outcomes.emit(GenerationOutcome(projectID: receipt.projectID, status: .completed))
+        fixture.outcomes.emit(GenerationOutcome(
+            projectID: receipt.projectID,
+            status: .completed,
+        ))
         for _ in 0 ..< 50 {
             await Task.yield()
         }
 
-        #expect(receipt == ProjectGenerationReceipt(projectID: "p1", quizLevel: .l2))
+        #expect(receipt == ProjectGenerationReceipt(
+            projectID: "p1",
+            quizLevel: .l2,
+        ))
         #expect(await fixture.pendingGenerations.subscriberCount == 0)
         #expect(await fixture.pendingGenerations.finishedProjectIDs.isEmpty)
         #expect(await fixture.pendingGenerations.reminderProjectIDs == ["p1"])
@@ -57,7 +63,10 @@ struct ProjectGenerationTests {
         #expect(inProgress?.preparingProjectIDs == ["p1"])
 
         fixture.sleeper.advance(by: 10)
-        fixture.outcomes.emit(GenerationOutcome(projectID: "p1", status: .completed))
+        fixture.outcomes.emit(GenerationOutcome(
+            projectID: "p1",
+            status: .completed,
+        ))
         let preparing = await Self.next(&states) { $0.requests.first?.phase == .preparing(readyAt: Self.readyAt) }
         #expect(preparing?.preparingProjectIDs == ["p1"])
 
@@ -74,11 +83,20 @@ struct ProjectGenerationTests {
         var states = await fixture.generation.states().makeAsyncIterator()
         _ = await states.next()
 
-        fixture.outcomes.emit(GenerationOutcome(projectID: "p1", status: .completed))
+        fixture.outcomes.emit(GenerationOutcome(
+            projectID: "p1",
+            status: .completed,
+        ))
         _ = await Self.next(&states) { $0.requests.first?.phase == .preparing(readyAt: Self.readyAt) }
 
         #expect(await fixture.scheduler.scheduledReminders == [
-            .init(reminder: GenerationReminder(projectID: "p1", kind: .completed), date: Self.readyAt)
+            .init(
+                reminder: GenerationReminder(
+                    projectID: "p1",
+                    kind: .completed,
+                ),
+                date: Self.readyAt,
+            )
         ])
     }
 
@@ -89,12 +107,21 @@ struct ProjectGenerationTests {
         var states = await fixture.generation.states().makeAsyncIterator()
         _ = await states.next()
 
-        fixture.outcomes.emit(GenerationOutcome(projectID: "p1", status: .failed))
+        fixture.outcomes.emit(GenerationOutcome(
+            projectID: "p1",
+            status: .failed,
+        ))
         let failed = await Self.next(&states) { $0.requests.first?.phase == .failed }
 
         #expect(failed?.preparingProjectIDs.isEmpty == true)
         #expect(await fixture.scheduler.scheduledReminders == [
-            .init(reminder: GenerationReminder(projectID: "p1", kind: .failed), date: Self.requestedAt)
+            .init(
+                reminder: GenerationReminder(
+                    projectID: "p1",
+                    kind: .failed,
+                ),
+                date: Self.requestedAt,
+            )
         ])
     }
 
@@ -105,7 +132,10 @@ struct ProjectGenerationTests {
         var states = await fixture.generation.states().makeAsyncIterator()
         _ = await states.next()
 
-        fixture.outcomes.emit(GenerationOutcome(projectID: "p1", status: .failed))
+        fixture.outcomes.emit(GenerationOutcome(
+            projectID: "p1",
+            status: .failed,
+        ))
         _ = await Self.next(&states) { $0.requests.first?.phase == .failed }
 
         #expect(await fixture.scheduler.scheduledReminders.isEmpty)
@@ -184,7 +214,10 @@ struct ProjectGenerationTests {
 
     }
 
-    private static let request = ProjectGenerationRequest(repositoryURL: "https://github.com/owner/repo", quizLevel: .l2)
+    private static let request = ProjectGenerationRequest(
+        repositoryURL: "https://github.com/owner/repo",
+        quizLevel: .l2,
+    )
     private static let requestedAt = Date(timeIntervalSince1970: 10_000)
     private static let readyAt = requestedAt.addingTimeInterval(300)
 

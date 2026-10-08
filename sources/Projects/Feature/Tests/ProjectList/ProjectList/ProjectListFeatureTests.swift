@@ -17,9 +17,9 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         let task = await store.send(.view(.task))
-        await store.receive(\.effect.projectsReceived)
+        await store.receive(\.projectSummaries.effect.projectsReceived)
 
-        #expect(store.state.initialLoad == .loaded)
+        #expect(store.state.projectSummaries.load == .loaded(HomeTestFixture.manyProjectsPage))
         #expect(store.state.projects.count == HomeTestFixture.manyProjectsPage.summaries.count)
         #expect(store.state.hasNextPage)
 
@@ -34,24 +34,25 @@ struct ProjectListFeatureTests {
         store.exhaustivity = .off
 
         let task = await store.send(.view(.task))
-        await store.receive(\.effect.refreshFinished)
+        await store.receive(\.projectSummaries.effect.refreshFinished)
 
-        #expect(store.state.initialLoad == .failed(.temporarilyUnavailable))
+        #expect(store.state.projectSummaries.load == .failed(.temporarilyUnavailable))
 
         await projects.finish()
         await task.cancel()
     }
 
     @Test
-    func `아직 적재되지 않은 목록은 반영하지 않는다`() async {
-        let store = makeStore()
+    func `목록이 갱신되면 페이지네이션을 다시 설정한다`() async {
+        var state = loadedState(list: HomeTestFixture.oneProjectPage)
+        state.pagination.pagination = .failed(.temporarilyUnavailable)
+        let store = makeStore(state: state)
 
-        await store.send(.effect(.projectsReceived(
-            ProjectList(summaries: [], hasNextPage: false, isLoaded: false)
-        )))
-
-        #expect(store.state.initialLoad == .idle)
-        #expect(store.state.projects.isEmpty)
+        await store.send(.projectSummaries(.delegate(.listUpdated(HomeTestFixture.manyProjectsPage))))
+        await store.receive(.pagination(.input(.listReplaced(hasNextPage: true)))) {
+            $0.pagination.hasNextPage = true
+            $0.pagination.pagination = .idle
+        }
     }
 
     @Test
@@ -67,13 +68,19 @@ struct ProjectListFeatureTests {
         let store = makeStore(state: loadedState())
 
         await store.send(.view(.learningTapped(projectID: "project-1")))
-        await store.receive(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+        await store.receive(.delegate(.learningRequested(
+            projectID: "project-1",
+            nextSetID: "set-1",
+        )))
     }
 
     @Test
     func `다음 문제가 없는 프로젝트는 이어하기를 요청하지 않는다`() async {
         let list = ProjectList(
-            summaries: [HomeTestFixture.project(index: 0, hasLearningIDs: false)],
+            summaries: [HomeTestFixture.project(
+                index: 0,
+                hasLearningIDs: false,
+            )],
             hasNextPage: false,
             isLoaded: true,
         )
@@ -123,6 +130,7 @@ struct ProjectListFeatureTests {
         await store.send(.view(.backTapped)) {
             $0.mode = .browsing
         }
+        await store.receive(.deletion(.input(.cancel)))
     }
 
     @Test
@@ -143,26 +151,47 @@ struct ProjectListFeatureTests {
     }
 
     @Test
-    func `삭제를 확인하기 전에는 삭제를 요청하지 않는다`() async {
+    func `삭제 모드의 삭제 버튼은 삭제에 request를 보내고 확인 전에는 삭제를 요청하지 않는다`() async {
         let deleteProject = ProjectUseCaseDeletionStub()
-        let store = makeStore(deleteProject: deleteProject, state: state(mode: .deleting))
+        let store = makeStore(
+            deleteProject: deleteProject,
+            state: state(mode: .deleting),
+        )
 
-        await store.send(.view(.deleteButtonTapped(projectID: "project-0"))) {
-            $0.deletion = .confirming(projectID: "project-0")
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
 
         #expect(await deleteProject.callCount == 0)
     }
 
     @Test
-    func `삭제를 취소하면 확인 상태를 벗어난다`() async {
+    func `삭제 취소는 삭제에 cancel을 보낸다`() async {
         let store = makeStore(state: state(mode: .deleting))
 
-        await store.send(.view(.deleteButtonTapped(projectID: "project-0"))) {
-            $0.deletion = .confirming(projectID: "project-0")
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
-        await store.send(.view(.deletionCancelled)) {
-            $0.deletion = .idle
+        await store.send(.view(.deletionCancelled))
+        await store.receive(.deletion(.input(.cancel))) {
+            $0.deletion.deletion = .idle
+        }
+    }
+
+    @Test
+    func `삭제 실패 뒤에도 다시 삭제를 요청할 수 있다`() async {
+        var state = loadedState(mode: .deleting)
+        state.deletion.deletion = .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        )
+        let store = makeStore(state: state)
+
+        await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
+        await store.receive(.deletion(.input(.request("project-0")))) {
+            $0.deletion.deletion = .confirming(projectID: "project-0")
         }
     }
 
@@ -176,11 +205,11 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
         await store.receive(.delegate(.projectDeleted))
 
         #expect(!store.state.projects.contains { $0.id == "project-0" })
-        #expect(store.state.deletion == .idle)
+        #expect(store.state.deletion.deletion == .idle)
         #expect(store.state.mode == .deleting)
     }
 
@@ -194,10 +223,11 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-1")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
+        await store.receive(\.projectSummaries.delegate.listUpdated)
 
         #expect(!store.state.projects.contains { $0.id == "project-1" })
-        #expect(store.state.deletion == .idle)
+        #expect(store.state.deletion.deletion == .idle)
     }
 
     @Test
@@ -211,7 +241,8 @@ struct ProjectListFeatureTests {
         for projectID in store.state.projects.map(\.id) {
             await store.send(.view(.deleteButtonTapped(projectID: projectID)))
             await store.send(.view(.deletionConfirmed))
-            await store.receive(\.effect.deletionFinished)
+            await store.receive(\.deletion.effect.deletionFinished)
+            await store.receive(\.projectSummaries.delegate.listUpdated)
         }
 
         #expect(store.state.projects.isEmpty)
@@ -228,11 +259,14 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
         #expect(store.state.projects.contains { $0.id == "project-0" })
         #expect(store.state.mode == .deleting)
-        #expect(store.state.deletion == .failed(projectID: "project-0", error: .temporarilyUnavailable))
+        #expect(store.state.deletion.deletion == .failed(
+            projectID: "project-0",
+            error: .temporarilyUnavailable,
+        ))
     }
 
     @Test
@@ -245,47 +279,44 @@ struct ProjectListFeatureTests {
 
         await store.send(.view(.deleteButtonTapped(projectID: "project-0")))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
         await store.send(.view(.backTapped)) {
             $0.mode = .browsing
-            $0.deletion = .idle
+        }
+        await store.receive(.deletion(.input(.cancel))) {
+            $0.deletion.deletion = .idle
         }
     }
 
     @Test
     func `목록 끝에 닿으면 다음 페이지를 한 번 요청한다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
-        await store.receive(\.effect.nextPageFinished)
+        await store.receive(.pagination(.input(.nextPageRequested)))
+        await store.receive(\.pagination.effect.nextPageFinished)
 
-        #expect(store.state.pagination == .idle)
+        #expect(store.state.pagination.pagination == .idle)
         #expect(await projects.snapshot().nextPageCallCount == 1)
     }
 
     @Test
     func `다음 페이지가 없으면 목록 끝에 닿아도 요청하지 않는다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState(list: HomeTestFixture.oneProjectPage))
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(list: HomeTestFixture.oneProjectPage),
+        )
 
         await store.send(.view(.listBottomReached))
 
-        #expect(store.state.pagination == .exhausted)
-        #expect(await projects.snapshot().nextPageCallCount == 0)
-    }
-
-    @Test
-    func `다음 페이지를 불러오는 중에는 같은 요청을 반복하지 않는다`() async {
-        let projects = ProjectUseCaseMock()
-        var state = loadedState()
-        state.pagination = .loading
-        let store = makeStore(projects: projects, state: state)
-
-        await store.send(.view(.listBottomReached))
-
+        #expect(store.state.pagination.pagination == .exhausted)
         #expect(await projects.snapshot().nextPageCallCount == 0)
     }
 
@@ -304,30 +335,38 @@ struct ProjectListFeatureTests {
         let projects = ProjectUseCaseMock(
             nextPageResults: [.failure(.temporarilyUnavailable), .success(())]
         )
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.listBottomReached))
-        await store.receive(\.effect.nextPageFinished)
-        #expect(store.state.pagination == .failed(.temporarilyUnavailable))
+        await store.receive(\.pagination.effect.nextPageFinished)
+        #expect(store.state.pagination.pagination == .failed(.temporarilyUnavailable))
 
         await store.send(.view(.nextPageRetryTapped))
-        await store.receive(\.effect.nextPageFinished)
+        await store.receive(.pagination(.input(.retry)))
+        await store.receive(\.pagination.effect.nextPageFinished)
 
-        #expect(store.state.pagination == .idle)
+        #expect(store.state.pagination.pagination == .idle)
         #expect(await projects.snapshot().nextPageCallCount == 2)
     }
 
     @Test
-    func `새로고침 입력은 목록 갱신을 다시 요청한다`() async {
+    func `새로고침 입력은 목록에 refresh를 보낸다`() async {
         let projects = ProjectUseCaseMock()
-        let store = makeStore(projects: projects, state: loadedState())
+        let store = makeStore(
+            projects: projects,
+            state: loadedState(),
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.refreshRequested))
-        await store.receive(\.effect.refreshFinished)
+        await store.receive(.pagination(.input(.refreshStarted)))
+        await store.receive(\.projectSummaries.effect.refreshFinished)
 
-        #expect(store.state.requestID == 1)
+        #expect(store.state.projectSummaries.requestID == 1)
         #expect(await projects.snapshot().refreshCallCount == 1)
     }
 
@@ -344,10 +383,11 @@ struct ProjectListFeatureTests {
         mode: ProjectListFeature.Mode = .browsing,
     ) -> ProjectListFeature.State {
         var state = ProjectListFeature.State()
-        state.projects = list.summaries
-        state.hasNextPage = list.hasNextPage
-        state.initialLoad = .loaded
-        state.pagination = list.hasNextPage ? .idle : .exhausted
+        state.projectSummaries.load = .loaded(list)
+        state.pagination = ProjectListPaginationFeature.State(
+            pagination: list.hasNextPage ? .idle : .exhausted,
+            hasNextPage: list.hasNextPage,
+        )
         state.mode = mode
         return state
     }

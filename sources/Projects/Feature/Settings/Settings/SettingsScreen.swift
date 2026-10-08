@@ -20,31 +20,49 @@ public struct SettingsScreen: View {
 
     public var body: some View {
         OverlayContainer {
-            VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                    IconGlassButton.neutral(
+            VStack(
+                alignment: .leading,
+                spacing: Constant.headerTitleSpacing,
+            ) {
+                HStack(
+                    alignment: .top,
+                    spacing: LayoutToken.gutter,
+                ) {
+                    IconGlassButton(
                         icon: ScreenControlBar.Control.back.icon,
                         label: ScreenControlBar.Control.back.label,
-                        size: .medium,
                         action: { send(.backTapped) },
                     )
+                    .size(.medium)
 
                     Spacer(minLength: 0)
                 }
-                .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerControlRowHeight,
+                    alignment: .top,
+                )
 
-                ScreenHeaderTitle(title: Constant.title)
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                ScreenHeaderTitle(displayModel: .init(title: Constant.title))
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
             }
             .padding(.bottom, Constant.headerBottomPadding)
             .designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(
+                alignment: .leading,
+                spacing: 10,
+            ) {
                 Self.SectionView(title: Constant.learningSectionTitle) {
                     SettingRow(
                         value: PositionDisplay.settingValue(for: store.profile?.curation?.position),
                         content: {
-                            Self.SettingRowContent(icon: .settingDevelop, title: Constant.positionTitle)
+                            Self.SettingRowContent(
+                                icon: .settingDevelop,
+                                title: Constant.positionTitle,
+                            )
                         },
                         onTap: {
                             send(.positionRowTapped)
@@ -53,7 +71,10 @@ public struct SettingsScreen: View {
                     SettingRow(
                         value: CareerLevelDisplay.settingValue(for: store.profile?.curation?.careerLevel),
                         content: {
-                            Self.SettingRowContent(icon: .settingLevel, title: Constant.careerLevelTitle)
+                            Self.SettingRowContent(
+                                icon: .settingLevel,
+                                title: Constant.careerLevelTitle,
+                            )
                         },
                         onTap: { send(.careerLevelRowTapped) },
                     )
@@ -63,7 +84,10 @@ public struct SettingsScreen: View {
                     SettingRow(
                         value: notificationValue,
                         content: {
-                            Self.SettingRowContent(icon: .settingAlert, title: Constant.notificationTitle)
+                            Self.SettingRowContent(
+                                icon: .settingAlert,
+                                title: Constant.notificationTitle,
+                            )
                         },
                         onTap: {
                             send(.notificationRowTapped)
@@ -74,7 +98,10 @@ public struct SettingsScreen: View {
                 Self.SectionView(title: Constant.generalSectionTitle) {
                     SettingRow(
                         content: {
-                            Self.SettingRowContent(icon: .settingPolicy, title: Constant.termsTitle)
+                            Self.SettingRowContent(
+                                icon: .settingPolicy,
+                                title: Constant.termsTitle,
+                            )
                         },
                         onTap: { send(.termsTapped) },
                     )
@@ -82,8 +109,13 @@ public struct SettingsScreen: View {
                         content: {
                             HStack(spacing: 10) {
                                 ResourceImage(asset: .icon(.settingLogout))
-                                    .frame(width: 16, height: 16)
-                                StyledText.body2(Constant.signOutTitle, color: .error)
+                                    .frame(
+                                        width: 16,
+                                        height: 16,
+                                    )
+                                StyledText(text: Constant.signOutTitle)
+                                    .textStyle(.body2)
+                                    .foregroundColorToken(.error)
                             }
                         },
                         onTap: {
@@ -92,7 +124,9 @@ public struct SettingsScreen: View {
                     )
                     SettingRow(
                         content: {
-                            StyledText.body2(Constant.deleteAccountTitle, color: .grey400)
+                            StyledText(text: Constant.deleteAccountTitle)
+                                .textStyle(.body2)
+                                .foregroundColorToken(.grey400)
                         },
                         onTap: {
                             send(.deleteAccountTapped)
@@ -101,7 +135,9 @@ public struct SettingsScreen: View {
                 }
 
                 if let failureMessage {
-                    StyledText.caption1(failureMessage, color: .error)
+                    StyledText(text: failureMessage)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.error)
                         .padding(.top, Constant.failureTopPadding)
                 }
             }
@@ -113,7 +149,10 @@ public struct SettingsScreen: View {
             guard newPhase == .active else { return }
             send(.applicationBecameActive)
         }
-        .toolbar(.hidden, for: .tabBar)
+        .toolbar(
+            .hidden,
+            for: .tabBar,
+        )
     }
 
     // MARK: Private
@@ -127,7 +166,7 @@ public struct SettingsScreen: View {
     }
 
     private var failureMessage: String? {
-        switch store.accountAction {
+        switch store.accountAction.accountAction {
         case .failed:
             Constant.accountActionFailureMessage
 
@@ -140,12 +179,12 @@ public struct SettingsScreen: View {
     }
 
     private var profileFailureMessage: String? {
-        guard case .failed = store.profileLoad, store.profile == nil else { return nil }
+        guard case .failed = store.userProfile.load else { return nil }
         return Constant.profileFailureMessage
     }
 
     private var notificationValue: String? {
-        switch store.notificationStatus {
+        switch store.notificationPermission.notificationStatus {
         case .idle:
             nil
 

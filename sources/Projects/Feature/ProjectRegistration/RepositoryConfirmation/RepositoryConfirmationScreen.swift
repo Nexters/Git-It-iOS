@@ -22,14 +22,22 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: Constant.textSetSpacing) {
-                StyledText.subtitle1("이 레포지토리가 맞으면\n학습 설정을 진행할게요", alignment: .center)
+                StyledText(text: "이 레포지토리가 맞으면\n학습 설정을 진행할게요")
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
 
                 HStack(spacing: Constant.thumbnailSpacing) {
                     Self.ThumbnailView(avatarURL: avatarURL)
 
-                    VStack(alignment: .leading, spacing: 0) {
-                        StyledText.body2(store.repository?.ownerName ?? "", color: .white70)
-                        StyledText.subtitle3(store.repository?.repositoryName ?? "")
+                    VStack(
+                        alignment: .leading,
+                        spacing: 0,
+                    ) {
+                        StyledText(text: store.repository?.ownerName ?? "")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.white70)
+                        StyledText(text: store.repository?.repositoryName ?? "")
+                            .textStyle(.subtitle3)
                     }
                 }
                 .padding(.top, Constant.thumbnailTopPadding)
@@ -40,8 +48,15 @@ struct RepositoryConfirmationScreen: View {
             Spacer(minLength: 0)
 
             VStack(spacing: LayoutToken.compactSpacing) {
-                ActionButton.primary("다음", action: { send(.confirmTapped) })
-                ActionButton.secondary("이 레포지토리가 아니에요", action: { send(.rejectTapped) })
+                FeedbackActionButton(
+                    title: "다음",
+                    action: { send(.confirmTapped) },
+                )
+                FeedbackActionButton(
+                    title: "이 레포지토리가 아니에요",
+                    action: { send(.rejectTapped) },
+                )
+                .style(.secondary)
             }
             .designSystemScreenMargin()
             .padding(.bottom, Constant.bottomButtonPadding)

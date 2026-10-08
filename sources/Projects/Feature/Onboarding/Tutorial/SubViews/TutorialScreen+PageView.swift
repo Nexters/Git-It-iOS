@@ -11,14 +11,19 @@ extension TutorialScreen {
 
         var body: some View {
             VStack(spacing: 0) {
-                StyledText.subtitle1(Constant.title(for: page), alignment: .center)
+                StyledText(text: Constant.title(for: page))
+                    .textStyle(.subtitle1)
+                    .multilineTextAlignment(.center)
                     .padding(.top, Constant.titleTopInset)
 
                 Spacer(minLength: LayoutToken.margin)
 
                 OnboardingMockup(page: page)
                     .frame(width: Constant.mockupWidth)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                    )
             }
             .designSystemScreenMargin()
         }

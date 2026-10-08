@@ -37,60 +37,24 @@ public struct SettingsFeature: Sendable {
     public struct State: Equatable, Sendable {
         public init() { }
 
-        public var profile: UserProfile?
-        public var profileLoad = ProfileLoad.idle
-        public var positionMutation = MutationStatus.idle
-        public var careerLevelMutation = MutationStatus.idle
-        public var accountAction = AccountAction.idle
-        public var notificationStatus = NotificationStatus.idle
-    }
+        public var userProfile = UserProfileLoadFeature.State()
+        public var curationUpdate = CurationUpdateFeature.State()
+        public var accountAction = AccountActionFeature.State()
+        public var notificationPermission = NotificationPermissionFeature.State()
 
-    public enum ProfileLoad: Equatable, Sendable {
-        case idle
-        case loading
-        case loaded
-        case failed(UserInfoError)
-    }
-
-    public enum MutationStatus: Equatable, Sendable {
-        case idle
-        case committing
-        case failed(UserInfoError)
-    }
-
-    public enum AccountAction: Equatable, Sendable {
-        case idle
-        case signingOut
-        case confirmingDeletion
-        case deletingAccount
-        case failed(UserInfoError)
-
-        // MARK: Fileprivate
-
-        fileprivate var canStartAccountAction: Bool {
-            switch self {
-            case .idle,
-                 .failed:
-                true
-
-            case .signingOut,
-                 .confirmingDeletion,
-                 .deletingAccount:
-                false
-            }
+        public var profile: UserProfile? {
+            userProfile.profile
         }
-    }
-
-    public enum NotificationStatus: Equatable, Sendable {
-        case idle
-        case allowed
-        case denied
     }
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
-        case effect(EffectEvent)
+        case input(Input)
         case delegate(Delegate)
+        case userProfile(UserProfileLoadFeature.Action)
+        case curationUpdate(CurationUpdateFeature.Action)
+        case accountAction(AccountActionFeature.Action)
+        case notificationPermission(NotificationPermissionFeature.Action)
 
         // MARK: Public
 
@@ -112,13 +76,8 @@ public struct SettingsFeature: Sendable {
         }
 
         @CasePathable
-        public enum EffectEvent: Sendable, Equatable {
-            case profileLoadFinished(Result<UserProfile, UserInfoError>)
-            case notificationAuthorizationChecked(NotificationAuthorizationStatus)
-            case positionUpdateFinished(MemberPosition, UserInfoError?)
-            case careerLevelUpdateFinished(CareerLevel, UserInfoError?)
-            case signOutFinished(SignOutResult)
-            case deleteAccountFinished(UserInfoError?)
+        public enum Input: Sendable, Equatable {
+            case profileProvided(UserProfile)
         }
 
         @CasePathable
@@ -135,25 +94,55 @@ public struct SettingsFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(
+            state: \.userProfile,
+            action: \.userProfile,
+        ) {
+            UserProfileLoadFeature(profile: profile)
+        }
+        Scope(
+            state: \.curationUpdate,
+            action: \.curationUpdate,
+        ) {
+            CurationUpdateFeature(
+                updatePosition: updatePosition,
+                updateCareerLevel: updateCareerLevel,
+            )
+        }
+        Scope(
+            state: \.accountAction,
+            action: \.accountAction,
+        ) {
+            AccountActionFeature(
+                signOut: signOut,
+                withdraw: withdraw,
+            )
+        }
+        Scope(
+            state: \.notificationPermission,
+            action: \.notificationPermission,
+        ) {
+            NotificationPermissionFeature(
+                notificationAuthorization: notificationAuthorization,
+                requestNotificationAuthorization: requestNotificationAuthorization,
+                openNotificationSettings: openNotificationSettings,
+            )
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
-                state.profileLoad = .loading
+                let profileInput: UserProfileLoadFeature.Action.Input =
+                    state.profile == nil ? .load : .reload
                 return .merge(
-                    .run { send in
-                        do {
-                            let profile = try await profile()
-                            await send(.effect(.profileLoadFinished(.success(profile))))
-                        } catch {
-                            let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                            await send(.effect(.profileLoadFinished(.failure(mapped))))
-                        }
-                    },
-                    checkNotificationAuthorization(),
+                    .send(.userProfile(.input(profileInput))),
+                    .send(.notificationPermission(.input(.refresh))),
                 )
 
+            case .input(.profileProvided(let profile)):
+                return .send(.userProfile(.input(.replace(profile))))
+
             case .view(.applicationBecameActive):
-                return checkNotificationAuthorization()
+                return .send(.notificationPermission(.input(.refresh)))
 
             case .view(.backTapped):
                 return .send(.delegate(.backRequested))
@@ -165,165 +154,61 @@ public struct SettingsFeature: Sendable {
                 return .send(.delegate(.careerLevelSelectionRequested))
 
             case .view(.notificationRowTapped):
-                return .run { [notificationAuthorization, requestNotificationAuthorization, openNotificationSettings] send in
-                    switch await notificationAuthorization() {
-                    case .notDetermined:
-                        let status = await requestNotificationAuthorization()
-                        await send(.effect(.notificationAuthorizationChecked(status)))
-
-                    case .authorized,
-                         .denied:
-                        await openNotificationSettings()
-                    }
-                }
+                return .send(.notificationPermission(.input(.rowTapped)))
 
             case .view(.termsTapped):
                 guard let url = Constant.servicePolicyURL else { return .none }
                 return .send(.delegate(.externalURLRequested(url)))
 
             case .view(.positionSelected(let position)):
-                guard state.positionMutation != .committing else { return .none }
-                state.positionMutation = .committing
-                return .run { send in
-                    do {
-                        try await updatePosition(position)
-                        await send(.effect(.positionUpdateFinished(position, nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.positionUpdateFinished(position, mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.positionMutation)
+                return .send(.curationUpdate(.input(.positionSelected(position))))
 
             case .view(.careerLevelSelected(let careerLevel)):
-                guard state.careerLevelMutation != .committing else { return .none }
-                state.careerLevelMutation = .committing
-                return .run { send in
-                    do {
-                        try await updateCareerLevel(careerLevel)
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.careerLevelUpdateFinished(careerLevel, mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.careerLevelMutation)
+                return .send(.curationUpdate(.input(.careerLevelSelected(careerLevel))))
 
             case .view(.signOutTapped):
-                guard state.accountAction.canStartAccountAction else { return .none }
-                state.accountAction = .signingOut
-                return .run { send in
-                    let result = await signOut()
-                    await send(.effect(.signOutFinished(result)))
-                }
-                .cancellable(id: CancelID.accountAction)
+                return .send(.accountAction(.input(.signOutRequested)))
 
             case .view(.deleteAccountTapped):
-                guard state.accountAction.canStartAccountAction else { return .none }
-                state.accountAction = .confirmingDeletion
-                return .send(.delegate(.accountDeletionRequested))
+                return .send(.accountAction(.input(.deletionRequested)))
 
             case .view(.deleteAccountCancelled):
-                switch state.accountAction {
-                case .confirmingDeletion,
-                     .failed:
-                    state.accountAction = .idle
-
-                case .idle,
-                     .signingOut,
-                     .deletingAccount:
-                    break
-                }
-                return .send(.delegate(.accountDeletionCancelled))
+                return .send(.accountAction(.input(.deletionCancelled)))
 
             case .view(.deleteAccountConfirmed):
-                switch state.accountAction {
-                case .confirmingDeletion,
-                     .failed:
-                    break
+                return .send(.accountAction(.input(.deletionConfirmed)))
 
-                case .idle,
-                     .signingOut,
-                     .deletingAccount:
-                    return .none
-                }
-                state.accountAction = .deletingAccount
-                return .run { send in
-                    do {
-                        try await withdraw()
-                        await send(.effect(.deleteAccountFinished(nil)))
-                    } catch {
-                        let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                        await send(.effect(.deleteAccountFinished(mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.accountAction)
+            case .curationUpdate(.delegate(.positionUpdated(let position))):
+                guard let profile = state.profile?.replacing(position: position) else { return .none }
+                return .send(.userProfile(.input(.replace(profile))))
 
-            case .effect(.profileLoadFinished(let result)):
-                switch result {
-                case .success(let profile):
-                    state.profile = profile
-                    state.profileLoad = .loaded
+            case .curationUpdate(.delegate(.careerLevelUpdated(let careerLevel))):
+                guard let profile = state.profile?.replacing(careerLevel: careerLevel) else { return .none }
+                return .send(.userProfile(.input(.replace(profile))))
 
-                case .failure(let error):
-                    state.profileLoad = .failed(error)
-                }
-                return .none
+            case .accountAction(.delegate(.signedOut)):
+                return .send(.delegate(.signedOut))
 
-            case .effect(.notificationAuthorizationChecked(let status)):
-                state.notificationStatus = status == .authorized ? .allowed : .denied
-                return .none
-
-            case .effect(.positionUpdateFinished(let position, nil)):
-                state.positionMutation = .idle
-                state.profile = state.profile?.replacing(position: position)
-                return .none
-
-            case .effect(.positionUpdateFinished(_, .some(let error))):
-                state.positionMutation = .failed(error)
-                return .none
-
-            case .effect(.careerLevelUpdateFinished(let careerLevel, nil)):
-                state.careerLevelMutation = .idle
-                state.profile = state.profile?.replacing(careerLevel: careerLevel)
-                return .none
-
-            case .effect(.careerLevelUpdateFinished(_, .some(let error))):
-                state.careerLevelMutation = .failed(error)
-                return .none
-
-            case .effect(.signOutFinished(let result)):
-                switch result {
-                case .signedOut:
-                    state.accountAction = .idle
-                    return .send(.delegate(.signedOut))
-
-                case .retryableFailure:
-                    state.accountAction = .failed(.temporarilyUnavailable)
-                    return .none
-                }
-
-            case .effect(.deleteAccountFinished(nil)):
-                state.accountAction = .idle
+            case .accountAction(.delegate(.accountDeleted)):
                 return .send(.delegate(.accountDeleted))
 
-            case .effect(.deleteAccountFinished(.some(let error))):
-                state.accountAction = .failed(error)
-                return .none
+            case .accountAction(.delegate(.deletionConfirmationRequested)):
+                return .send(.delegate(.accountDeletionRequested))
 
-            case .delegate:
+            case .accountAction(.delegate(.deletionCancelled)):
+                return .send(.delegate(.accountDeletionCancelled))
+
+            case .userProfile,
+                 .curationUpdate,
+                 .accountAction,
+                 .notificationPermission,
+                 .delegate:
                 return .none
             }
         }
     }
 
     // MARK: Private
-
-    private enum CancelID: Hashable {
-        case positionMutation
-        case careerLevelMutation
-        case accountAction
-    }
 
     private enum Constant {
         static let servicePolicyURL = URL(
@@ -340,12 +225,6 @@ public struct SettingsFeature: Sendable {
     private let requestNotificationAuthorization: @Sendable () async -> NotificationAuthorizationStatus
     private let openNotificationSettings: @MainActor @Sendable () async -> Void
 
-    private func checkNotificationAuthorization() -> Effect<Action> {
-        .run { [notificationAuthorization] send in
-            await send(.effect(.notificationAuthorizationChecked(notificationAuthorization())))
-        }
-    }
-
 }
 
 extension UserProfile {
@@ -361,7 +240,10 @@ extension UserProfile {
         }
         return UserProfile(
             detail: detail,
-            curation: Curation(position: position, careerLevel: careerLevel),
+            curation: Curation(
+                position: position,
+                careerLevel: careerLevel,
+            ),
         )
     }
 }

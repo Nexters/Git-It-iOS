@@ -119,7 +119,10 @@ public struct SavedFeature: Sendable {
                 return .send(.delegate(.questionSelected(bookmark)))
 
             case .view(.bookmarkToggleTapped(let bookmark)):
-                return toggleBookmark(&state, bookmark: bookmark)
+                return toggleBookmark(
+                    &state,
+                    bookmark: bookmark,
+                )
 
             case .view(.backTapped):
                 guard state.isBackControlPresented else { return .none }
@@ -173,13 +176,22 @@ public struct SavedFeature: Sendable {
         return .run { send in
             do {
                 let list = try await fetchBookmarks(filter)
-                await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .success(list))))
+                await send(.effect(.bookmarksLoadFinished(
+                    requestID: currentRequestID,
+                    result: .success(list),
+                )))
             } catch {
                 let mapped = error as? QuizDetailError ?? .unexpected
-                await send(.effect(.bookmarksLoadFinished(requestID: currentRequestID, result: .failure(mapped))))
+                await send(.effect(.bookmarksLoadFinished(
+                    requestID: currentRequestID,
+                    result: .failure(mapped),
+                )))
             }
         }
-        .cancellable(id: CancelID.load, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.load,
+            cancelInFlight: true,
+        )
     }
 
     private func toggleBookmark(
@@ -194,13 +206,22 @@ public struct SavedFeature: Sendable {
         return .run { send in
             do {
                 let bookmarkState = try await setBookmark(questionID, projectID, bookmarked)
-                await send(.effect(.bookmarkToggleFinished(questionID: questionID, result: .success(bookmarkState))))
+                await send(.effect(.bookmarkToggleFinished(
+                    questionID: questionID,
+                    result: .success(bookmarkState),
+                )))
             } catch {
                 let mapped = error as? QuizDetailError ?? .unexpected
-                await send(.effect(.bookmarkToggleFinished(questionID: questionID, result: .failure(mapped))))
+                await send(.effect(.bookmarkToggleFinished(
+                    questionID: questionID,
+                    result: .failure(mapped),
+                )))
             }
         }
-        .cancellable(id: CancelID.bookmarkToggle(questionID), cancelInFlight: true)
+        .cancellable(
+            id: CancelID.bookmarkToggle(questionID),
+            cancelInFlight: true,
+        )
     }
 
 }

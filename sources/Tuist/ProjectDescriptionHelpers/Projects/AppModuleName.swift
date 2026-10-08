@@ -120,6 +120,7 @@ extension AppModuleName {
                 sources: [
                     "\(sourceDirectory)/**",
                     "\(AppModuleName.ShareExtension.sourceDirectory)/SharedItemURLResolver.swift",
+                    "\(AppModuleName.ShareExtension.sourceDirectory)/SharedItemAttachment.swift",
                 ],
                 dependencies: [
                     .target(name: AppModuleName.GitIt.rawValue),

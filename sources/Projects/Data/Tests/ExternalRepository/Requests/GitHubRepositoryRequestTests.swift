@@ -6,7 +6,10 @@ import Testing
 struct GitHubRepositoryRequestTests {
     @Test
     func `공개 Repository endpoint와 필수 헤더를 고정한다`() {
-        let request = GitHubRepositoryRequest(owner: "facebook", repository: "react")
+        let request = GitHubRepositoryRequest(
+            owner: "facebook",
+            repository: "react",
+        )
 
         #expect(request.scheme == "https")
         #expect(request.host == "api.github.com")
@@ -19,7 +22,10 @@ struct GitHubRepositoryRequestTests {
 
     @Test
     func `Authorization과 Git It 및 Apple credential을 포함하지 않는다`() {
-        let request = GitHubRepositoryRequest(owner: "facebook", repository: "react")
+        let request = GitHubRepositoryRequest(
+            owner: "facebook",
+            repository: "react",
+        )
         let serializedHeaders = request.headers.description.lowercased()
 
         #expect(request.headers["Authorization"] == nil)

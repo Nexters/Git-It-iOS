@@ -24,7 +24,11 @@ actor QuizDetailUseCaseBookmarkStub {
     private(set) var invocations = [Invocation]()
 
     nonisolated var setBookmark: @Sendable (QuizID, ProjectID, Bool) async throws -> QuizBookmarkState {
-        { try await self(quizID: $0, projectID: $1, isBookmarked: $2) }
+        { try await self(
+            quizID: $0,
+            projectID: $1,
+            isBookmarked: $2,
+        ) }
     }
 
     func callAsFunction(
@@ -33,7 +37,11 @@ actor QuizDetailUseCaseBookmarkStub {
         isBookmarked: Bool,
     ) async throws -> QuizBookmarkState {
         invocations.append(
-            Invocation(quizID: quizID, projectID: projectID, isBookmarked: isBookmarked)
+            Invocation(
+                quizID: quizID,
+                projectID: projectID,
+                isBookmarked: isBookmarked,
+            )
         )
         let result = nextResult()
         guard suspendsRequests else { return try result.get() }

@@ -9,8 +9,11 @@ struct HomeProfileDisplayTests {
     func `역할 문구는 큐레이션 연차를 Developer 앞에 붙인다`() {
         #expect(HomeProfileDisplay(.loaded(HomeTestFixture.profileWithBoth)).role == "Junior Developer")
         #expect(
-            HomeProfileDisplay(.loaded(HomeTestFixture.profile(position: .backend, careerLevel: .senior)))
-                .role == "Senior Developer"
+            HomeProfileDisplay(.loaded(HomeTestFixture.profile(
+                position: .backend,
+                careerLevel: .senior,
+            )))
+            .role == "Senior Developer"
         )
     }
 

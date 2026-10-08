@@ -84,12 +84,7 @@ public struct QuizRouterFeature: Sendable {
         public var learningSetIntro: LearningSetIntroFeature.State
         public var questionSolving: QuestionSolvingFeature.State?
         public var learningCompletion: LearningCompletionFeature.State
-
-        public internal(set) var learningSet: QuizSet?
-        public internal(set) var currentQuestionIndex = 0
-        public internal(set) var resumption: LearningSetResumption?
-        public internal(set) var sessionCorrectChoiceCount = 0
-        public internal(set) var bookmarkedQuestionIDs = Set<QuizID>()
+        public var session = LearningSessionFeature.State()
 
     }
 
@@ -97,6 +92,7 @@ public struct QuizRouterFeature: Sendable {
         case learningSetIntro(LearningSetIntroFeature.Action)
         case questionSolving(QuestionSolvingFeature.Action)
         case learningCompletion(LearningCompletionFeature.Action)
+        case session(LearningSessionFeature.Action)
         case delegate(Delegate)
 
         // MARK: Public
@@ -112,36 +108,72 @@ public struct QuizRouterFeature: Sendable {
     public static let completeActionTitle = "학습 완료"
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.learningSetIntro, action: \.learningSetIntro) {
+        Scope(
+            state: \.learningSetIntro,
+            action: \.learningSetIntro,
+        ) {
             LearningSetIntroFeature(
                 fetchQuizSet: { [quizDetail] setID, projectID in
-                    try await quizDetail.quizSet(setID, in: projectID)
+                    try await quizDetail.quizSet(
+                        setID,
+                        in: projectID,
+                    )
                 },
                 fetchBookmarks: { [quizDetail] filter in try await quizDetail.bookmarks(filter) },
             )
         }
-        Scope(state: \.learningCompletion, action: \.learningCompletion) {
+        Scope(
+            state: \.learningCompletion,
+            action: \.learningCompletion,
+        ) {
             LearningCompletionFeature()
+        }
+        Scope(
+            state: \.session,
+            action: \.session,
+        ) {
+            LearningSessionFeature()
         }
         Reduce { state, action in
             switch action {
             case .learningSetIntro(.delegate(.startRequested(let set, let resumption, let bookmarkedQuestionIDs))):
-                state.learningSet = set
-                state.resumption = resumption
-                state.bookmarkedQuestionIDs = bookmarkedQuestionIDs
+                let started = Effect<Action>.send(.session(.input(.started(
+                    set: set,
+                    resumption: resumption,
+                    bookmarkedQuestionIDs: bookmarkedQuestionIDs,
+                ))))
+                guard state.questionSolving != nil else { return started }
+                return .merge(started, activate(
+                    .questionSolving,
+                    cause: .startRequested,
+                    state: &state,
+                ))
 
-                if state.questionSolving != nil {
-                    return activate(.questionSolving, cause: .startRequested, state: &state)
-                }
+            case .session(.delegate(.questionReady(let question, let number, let isBookmarked, let isLast))):
+                state.questionSolving = QuestionSolvingFeature.State(
+                    projectID: state.projectID,
+                    question: question,
+                    questionNumber: number,
+                    advanceActionTitle: isLast ? Self.completeActionTitle : Self.nextQuestionActionTitle,
+                    isBookmarked: isBookmarked,
+                )
+                return activate(
+                    .questionSolving,
+                    cause: .startRequested,
+                    state: &state,
+                )
 
-                guard set.quizzes.indices.contains(resumption.startIndex) else {
-                    return .send(.learningSetIntro(.input(.emptySetReported)))
-                }
+            case .session(.delegate(.emptySetDetected)):
+                return .send(.learningSetIntro(.input(.emptySetReported)))
 
-                state.currentQuestionIndex = resumption.startIndex
-                state.sessionCorrectChoiceCount = 0
-                state.questionSolving = questionSolvingState(state: state)
-                return activate(.questionSolving, cause: .startRequested, state: &state)
+            case .session(.delegate(.completed(let correctChoiceCount, let choiceQuestionCount))):
+                state.learningCompletion.choiceQuestionCount = choiceQuestionCount
+                state.learningCompletion.correctChoiceCount = correctChoiceCount
+                return activate(
+                    .learningCompletion,
+                    cause: .advancedToCompletion,
+                    state: &state,
+                )
 
             case .learningSetIntro(.delegate(.backRequested)):
                 return .send(.delegate(.dismissRequested(projectID: state.projectID)))
@@ -150,24 +182,10 @@ public struct QuizRouterFeature: Sendable {
                 return .send(.delegate(.dismissRequested(projectID: state.projectID)))
 
             case .questionSolving(.delegate(.answerSubmitted(_, let choiceCorrect))):
-                if choiceCorrect == true {
-                    state.sessionCorrectChoiceCount += 1
-                }
-                return .none
+                return .send(.session(.input(.answerRecorded(choiceCorrect: choiceCorrect))))
 
             case .questionSolving(.delegate(.advanceRequested)):
-                let nextIndex = state.currentQuestionIndex + 1
-                guard let set = state.learningSet, set.quizzes.indices.contains(nextIndex) else {
-                    let resumption = state.resumption
-                    state.learningCompletion.choiceQuestionCount = resumption?.choiceQuestionCount ?? 0
-                    state.learningCompletion.correctChoiceCount =
-                        (resumption?.skippedCorrectChoiceCount ?? 0) + state.sessionCorrectChoiceCount
-                    return activate(.learningCompletion, cause: .advancedToCompletion, state: &state)
-                }
-
-                state.currentQuestionIndex = nextIndex
-                state.questionSolving = questionSolvingState(state: state)
-                return .none
+                return .send(.session(.input(.advanced)))
 
             case .questionSolving(.delegate(.externalURLRequested(let url))):
                 return .send(.delegate(.externalURLRequested(url)))
@@ -178,18 +196,28 @@ public struct QuizRouterFeature: Sendable {
             case .learningSetIntro,
                  .questionSolving,
                  .learningCompletion,
+                 .session,
                  .delegate:
                 return .none
             }
         }
-        .ifLet(\.questionSolving, action: \.questionSolving) {
+        .ifLet(
+            \.questionSolving,
+            action: \.questionSolving,
+        ) {
             QuestionSolvingFeature(
                 gradeChoiceAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
                 gradeEssayAnswer: { [quizDetail] answer in try await quizDetail.grade(answer) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
@@ -199,23 +227,6 @@ public struct QuizRouterFeature: Sendable {
 
     private let quizDetail: any QuizDetailUseCase
 
-    private func questionSolvingState(state: State) -> QuestionSolvingFeature.State? {
-        guard
-            let set = state.learningSet,
-            set.quizzes.indices.contains(state.currentQuestionIndex)
-        else { return nil }
-
-        let quiz = set.quizzes[state.currentQuestionIndex]
-        let isLastQuestion = state.currentQuestionIndex == set.quizzes.count - 1
-        return QuestionSolvingFeature.State(
-            projectID: state.projectID,
-            question: quiz,
-            questionNumber: state.currentQuestionIndex + 1,
-            advanceActionTitle: isLastQuestion ? Self.completeActionTitle : Self.nextQuestionActionTitle,
-            isBookmarked: state.bookmarkedQuestionIDs.contains(quiz.id),
-        )
-    }
-
     private func activate(
         _ screen: ActiveScreen,
         cause: ScreenTransition.Cause,
@@ -223,7 +234,11 @@ public struct QuizRouterFeature: Sendable {
     ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
         state.screenTransitions.append(
-            ScreenTransition(from: state.activeScreen, to: screen, cause: cause)
+            ScreenTransition(
+                from: state.activeScreen,
+                to: screen,
+                cause: cause,
+            )
         )
         state.activeScreen = screen
         return .none

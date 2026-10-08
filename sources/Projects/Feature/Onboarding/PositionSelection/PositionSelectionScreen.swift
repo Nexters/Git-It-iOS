@@ -14,21 +14,22 @@ struct PositionSelectionScreen: View {
     var body: some View {
         OverlayContainer {
             ScreenControlBar(
-                leading: .close,
+                displayModel: .init(leading: .close),
                 onLeadingTap: { send(.backTapped) },
             )
             .designSystemScreenMargin()
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText.subtitle1(Constant.title, alignment: .center)
+                    StyledText(text: Constant.title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
 
                     if store.exitStatus == .failed {
-                        StyledText.caption1(
-                            "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요.",
-                            color: .error,
-                            alignment: .center,
-                        )
+                        StyledText(text: "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요.")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
                 }
 
@@ -36,27 +37,29 @@ struct PositionSelectionScreen: View {
                     items: Display.orderedPositions.map { position in
                         .init(
                             id: Display.identifier(for: position),
-                            title: Display.title(for: position),
-                            isSelected: store.position == position,
+                            displayModel: .init(title: Display.title(for: position)),
                         )
                     },
-                    style: .compact,
-                    onSelect: { identifier in
-                        if let position = Display.position(forIdentifier: identifier) {
-                            send(.positionSelected(position))
-                        }
-                    },
+                    selection: Binding(
+                        get: { store.position.map(Display.identifier(for:)) },
+                        set: { identifier in
+                            if let identifier, let position = Display.position(forIdentifier: identifier) {
+                                send(.positionSelected(position))
+                            }
+                        },
+                    ),
                 )
+                .style(.compact)
             }
             .designSystemScreenMargin()
             .padding(.top, LayoutToken.margin)
         } footer: {
             BottomActionBar {
-                ActionButton.primary(
-                    "다음",
-                    isEnabled: store.position != nil,
+                FeedbackActionButton(
+                    title: "다음",
                     action: { send(.nextTapped) },
                 )
+                .enabled(store.position != nil)
                 .designSystemScreenMargin()
             }
         }

@@ -13,9 +13,18 @@ extension QuizGenerationProgressScreen {
         let progress: Double
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.rowSpacing) {
-                ForEach(Stage.allCases, id: \.self) { stage in
-                    checklistRow(title: stage.title, status: status(for: stage))
+            VStack(
+                alignment: .leading,
+                spacing: Constant.rowSpacing,
+            ) {
+                ForEach(
+                    Stage.allCases,
+                    id: \.self,
+                ) { stage in
+                    checklistRow(
+                        title: stage.title,
+                        status: status(for: stage),
+                    )
                 }
             }
             .accessibilityElement(children: .combine)
@@ -40,7 +49,10 @@ extension QuizGenerationProgressScreen {
                         width: Constant.iconSize,
                         height: Constant.iconSize,
                     )
-                StyledText.body2(title, color: status == .pending ? .grey400 : .grey100).lineLimit(1)
+                StyledText(text: title)
+                    .textStyle(.body2)
+                    .foregroundColorToken(status == .pending ? .grey400 : .grey100)
+                    .lineLimit(1)
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(title), \(status.accessibilityDescription)")
@@ -101,7 +113,7 @@ extension QuizGenerationProgressScreen {
         var icon: some View {
             switch self {
             case .done: ResourceImage(asset: .icon(.statusCheck))
-            case .active: ResourceAnimation(asset: .generalLoading, isLooping: true)
+            case .active: ResourceAnimation(asset: .generalLoading)
             case .pending: ResourceImage(asset: .icon(.statusLoadingDisabled))
             }
         }

@@ -30,7 +30,11 @@ struct SharedSessionStateMarkerCodingTests {
     func `schemaVersion이 1이 아닌 값은 nil로 조회한다`() async {
         let storage = InMemoryKeyValueStorage()
         await storage.setValue(
-            UnknownMarker(schemaVersion: 2, isSignedIn: true, updatedAt: Date()),
+            UnknownMarker(
+                schemaVersion: 2,
+                isSignedIn: true,
+                updatedAt: Date(),
+            ),
             forKey: SharedSessionStateMarkerCoding.stateMarkerKey,
         )
         let coding = SharedSessionStateMarkerCoding(storage: storage)

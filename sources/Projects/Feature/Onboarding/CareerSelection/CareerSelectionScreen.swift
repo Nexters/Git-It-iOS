@@ -14,21 +14,22 @@ struct CareerSelectionScreen: View {
     var body: some View {
         OverlayContainer {
             ScreenControlBar(
-                leading: .back,
+                displayModel: .init(leading: .back),
                 onLeadingTap: { send(.backTapped) },
             )
             .designSystemScreenMargin()
         } content: {
             VStack(spacing: Constant.titleToOptionsSpacing) {
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    StyledText.subtitle1(Constant.title, alignment: .center)
+                    StyledText(text: Constant.title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
 
                     if store.submission == .failed {
-                        StyledText.caption1(
-                            "제출에 실패했어요. 다시 시도해 주세요.",
-                            color: .error,
-                            alignment: .center,
-                        )
+                        StyledText(text: "제출에 실패했어요. 다시 시도해 주세요.")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
                 }
 
@@ -36,17 +37,21 @@ struct CareerSelectionScreen: View {
                     items: Display.orderedLevels.map { level in
                         .init(
                             id: Display.identifier(for: level),
-                            title: Display.title(for: level),
-                            supportingText: Display.description(for: level),
-                            illust: Display.illust(for: level),
-                            isSelected: store.careerLevel == level,
+                            displayModel: .init(
+                                title: Display.title(for: level),
+                                supportingText: Display.description(for: level),
+                                illust: Display.illust(for: level),
+                            ),
                         )
                     },
-                    onSelect: { identifier in
-                        if let level = Display.level(forIdentifier: identifier) {
-                            send(.careerLevelSelected(level))
-                        }
-                    },
+                    selection: Binding(
+                        get: { store.careerLevel.map(Display.identifier(for:)) },
+                        set: { identifier in
+                            if let identifier, let level = Display.level(forIdentifier: identifier) {
+                                send(.careerLevelSelected(level))
+                            }
+                        },
+                    ),
                 )
             }
             .designSystemScreenMargin()
@@ -54,13 +59,16 @@ struct CareerSelectionScreen: View {
         } footer: {
             BottomActionBar {
                 VStack(spacing: LayoutToken.gutter) {
-                    StyledText.caption1(Constant.guidance, color: .grey400, alignment: .center)
+                    StyledText(text: Constant.guidance)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
 
-                    ActionButton.primary(
-                        "다음",
-                        isEnabled: store.careerLevel != nil && store.submission != .submitting,
+                    FeedbackActionButton(
+                        title: "다음",
                         action: { send(.submitTapped) },
                     )
+                    .enabled(store.careerLevel != nil && store.submission != .submitting)
                 }
                 .designSystemScreenMargin()
             }

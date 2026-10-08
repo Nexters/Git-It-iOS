@@ -3,13 +3,6 @@ import DomainAccount
 import DomainUserInfo
 import Foundation
 
-// MARK: - OnboardingEntryPoint
-
-public enum OnboardingEntryPoint: Equatable, Sendable {
-    case guide
-    case curation
-}
-
 // MARK: - AppEntryFeature
 
 @Reducer
@@ -115,17 +108,29 @@ public struct AppEntryFeature: Sendable {
                     return .run { send in
                         do {
                             let curation = try await curation()
-                            await send(.effect(.curationFetchFinished(requestID: requestID, result: .success(curation))))
+                            await send(.effect(.curationFetchFinished(
+                                requestID: requestID,
+                                result: .success(curation),
+                            )))
                         } catch {
                             let mapped = error as? UserInfoError ?? .temporarilyUnavailable
-                            await send(.effect(.curationFetchFinished(requestID: requestID, result: .failure(mapped))))
+                            await send(.effect(.curationFetchFinished(
+                                requestID: requestID,
+                                result: .failure(mapped),
+                            )))
                         }
                     }
-                    .cancellable(id: CancelID.profile, cancelInFlight: true)
+                    .cancellable(
+                        id: CancelID.profile,
+                        cancelInFlight: true,
+                    )
 
                 case .signedOut:
                     state.authentication = .idle
-                    return decideDestination(.onboarding(startingAt: .guide), state: &state)
+                    return decideDestination(
+                        .onboarding(startingAt: .guide),
+                        state: &state,
+                    )
 
                 case .temporarilyUnavailable:
                     return retryAutomaticallyOrFail(&state)
@@ -136,17 +141,29 @@ public struct AppEntryFeature: Sendable {
                 switch result {
                 case .success(let curation):
                     if curation != nil {
-                        return decideDestination(.mainShell, state: &state)
+                        return decideDestination(
+                            .mainShell,
+                            state: &state,
+                        )
                     } else {
-                        return decideDestination(.onboarding(startingAt: .curation), state: &state)
+                        return decideDestination(
+                            .onboarding(startingAt: .curation),
+                            state: &state,
+                        )
                     }
 
                 case .failure(.memberUnavailable):
                     return .run { send in
                         let result = await signOut()
-                        await send(.effect(.localCleanupFinished(requestID: requestID, result: result)))
+                        await send(.effect(.localCleanupFinished(
+                            requestID: requestID,
+                            result: result,
+                        )))
                     }
-                    .cancellable(id: CancelID.cleanup, cancelInFlight: true)
+                    .cancellable(
+                        id: CancelID.cleanup,
+                        cancelInFlight: true,
+                    )
 
                 case .failure(.unauthorized):
                     state.authentication = .retryableFailure
@@ -161,7 +178,10 @@ public struct AppEntryFeature: Sendable {
                 switch result {
                 case .signedOut:
                     state.authentication = .idle
-                    return decideDestination(.onboarding(startingAt: .guide), state: &state)
+                    return decideDestination(
+                        .onboarding(startingAt: .guide),
+                        state: &state,
+                    )
 
                 case .retryableFailure:
                     return retryAutomaticallyOrFail(&state)
@@ -196,9 +216,15 @@ public struct AppEntryFeature: Sendable {
         let requestID = state.requestID
         return .run { send in
             let result = await restoreSignIn()
-            await send(.effect(.restoreSignInFinished(requestID: requestID, result: result)))
+            await send(.effect(.restoreSignInFinished(
+                requestID: requestID,
+                result: result,
+            )))
         }
-        .cancellable(id: CancelID.restore, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.restore,
+            cancelInFlight: true,
+        )
     }
 
     private func retryAutomaticallyOrFail(_ state: inout State) -> Effect<Action> {

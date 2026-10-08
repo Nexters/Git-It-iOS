@@ -14,7 +14,10 @@ struct TutorialScreen: View {
         ScreenContainer {
             VStack(spacing: 0) {
                 TabView(selection: pageBinding) {
-                    ForEach(1...store.pageProgress.totalPages, id: \.self) { page in
+                    ForEach(
+                        1...store.pageProgress.totalPages,
+                        id: \.self,
+                    ) { page in
                         Self.PageView(page: page)
                             .tag(page)
                     }
@@ -30,6 +33,7 @@ struct TutorialScreen: View {
                     bundleVersion: store.bundleVersion,
                     isHintVisible: isLastPage,
                     onAppleSignIn: { send(.appleSignInTapped) },
+                    onGuestAccess: { send(.guestAccessTapped) },
                 )
             }
         }

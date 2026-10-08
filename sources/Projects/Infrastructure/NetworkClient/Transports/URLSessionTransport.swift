@@ -19,7 +19,10 @@ struct URLSessionTransport: HTTPTransport {
         urlRequest.httpBody = request.body
         urlRequest.timeoutInterval = request.responseTimeout.timeInterval
         for (name, value) in request.headers.all {
-            urlRequest.setValue(value, forHTTPHeaderField: name)
+            urlRequest.setValue(
+                value,
+                forHTTPHeaderField: name,
+            )
         }
 
         do {

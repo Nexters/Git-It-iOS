@@ -23,7 +23,10 @@ public struct GitHubRepositoryURLParser: Sendable {
         }
 
         let segments = components.path
-            .split(separator: "/", omittingEmptySubsequences: true)
+            .split(
+                separator: "/",
+                omittingEmptySubsequences: true,
+            )
             .map(String.init)
 
         guard
@@ -41,7 +44,10 @@ public struct GitHubRepositoryURLParser: Sendable {
             return nil
         }
 
-        return ExternalRepositoryLocation(owner: owner, name: name)
+        return ExternalRepositoryLocation(
+            owner: owner,
+            name: name,
+        )
     }
 
     // MARK: Private

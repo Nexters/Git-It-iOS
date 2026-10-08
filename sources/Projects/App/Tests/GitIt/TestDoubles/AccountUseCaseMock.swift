@@ -51,7 +51,11 @@ actor AccountUseCaseMock: AccountUseCase {
     }
 
     func policyConsentStatus() async throws -> PolicyConsentStatus {
-        PolicyConsentStatus(documents: [], consents: [], isSatisfied: true)
+        PolicyConsentStatus(
+            documents: [],
+            consents: [],
+            isSatisfied: true,
+        )
     }
 
     func consent(to _: [PolicyDocumentID]) async throws { }

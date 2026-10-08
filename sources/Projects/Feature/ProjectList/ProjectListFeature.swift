@@ -28,27 +28,18 @@ public struct ProjectListFeature: Sendable {
     public struct State: Equatable, Sendable {
         public init() { }
 
-        public var projects = [ProjectSummary]()
-        public var hasNextPage = false
-        public var initialLoad = InitialLoad.idle
-        public var pagination = Pagination.idle
+        public var projectSummaries = ProjectSummaryListFeature.State()
+        public var pagination = ProjectListPaginationFeature.State()
         public var mode = Mode.browsing
-        public var deletion = Deletion.idle
-        public var requestID = 0
-    }
+        public var deletion = ProjectDeletionFeature.State()
 
-    public enum InitialLoad: Equatable, Sendable {
-        case idle
-        case loading
-        case loaded
-        case failed(ProjectError)
-    }
+        public var projects: [ProjectSummary] {
+            projectSummaries.list?.summaries ?? []
+        }
 
-    public enum Pagination: Equatable, Sendable {
-        case idle
-        case loading
-        case failed(ProjectError)
-        case exhausted
+        public var hasNextPage: Bool {
+            projectSummaries.list?.hasNextPage ?? false
+        }
     }
 
     public enum Mode: Equatable, Sendable {
@@ -57,18 +48,13 @@ public struct ProjectListFeature: Sendable {
         case deleting
     }
 
-    public enum Deletion: Equatable, Sendable {
-        case idle
-        case confirming(projectID: ProjectID)
-        case committing(projectID: ProjectID)
-        case failed(projectID: ProjectID, error: ProjectError)
-    }
-
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
         case input(Input)
-        case effect(EffectEvent)
         case delegate(Delegate)
+        case projectSummaries(ProjectSummaryListFeature.Action)
+        case deletion(ProjectDeletionFeature.Action)
+        case pagination(ProjectListPaginationFeature.Action)
 
         // MARK: Public
 
@@ -95,14 +81,6 @@ public struct ProjectListFeature: Sendable {
         }
 
         @CasePathable
-        public enum EffectEvent: Sendable, Equatable {
-            case projectsReceived(ProjectList)
-            case refreshFinished(requestID: Int, error: ProjectError?)
-            case nextPageFinished(error: ProjectError?)
-            case deletionFinished(projectID: ProjectID, error: ProjectError?)
-        }
-
-        @CasePathable
         public enum Delegate: Sendable, Equatable {
             case projectSelected(projectID: ProjectID)
             case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
@@ -111,29 +89,51 @@ public struct ProjectListFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(
+            state: \.projectSummaries,
+            action: \.projectSummaries,
+        ) {
+            ProjectSummaryListFeature(
+                projects: projects,
+                refreshProjects: refreshProjects,
+            )
+        }
+        Scope(
+            state: \.deletion,
+            action: \.deletion,
+        ) {
+            ProjectDeletionFeature(deleteProject: deleteProject)
+        }
+        Scope(
+            state: \.pagination,
+            action: \.pagination,
+        ) {
+            ProjectListPaginationFeature(requestNextPage: requestNextPage)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
                 return .merge(
-                    observeProjects(),
-                    startRefresh(state: &state),
+                    .send(.pagination(.input(.refreshStarted))),
+                    .send(.projectSummaries(.input(.start))),
                 )
 
             case .view(.refreshRequested),
                  .input(.learningProjectsReloadRequested):
-                return startRefresh(state: &state)
+                return .merge(
+                    .send(.pagination(.input(.refreshStarted))),
+                    .send(.projectSummaries(.input(.refresh))),
+                )
 
             case .view(.listBottomReached):
                 guard
-                    state.initialLoad == .loaded,
-                    state.hasNextPage,
-                    state.pagination == .idle
+                    state.projectSummaries.load.isLoaded,
+                    state.hasNextPage
                 else { return .none }
-                return startNextPageLoad(state: &state)
+                return .send(.pagination(.input(.nextPageRequested)))
 
             case .view(.nextPageRetryTapped):
-                guard case .failed = state.pagination else { return .none }
-                return startNextPageLoad(state: &state)
+                return .send(.pagination(.input(.retry)))
 
             case .view(.projectRowTapped(let projectID)):
                 guard state.mode != .deleting else { return .none }
@@ -146,7 +146,10 @@ public struct ProjectListFeature: Sendable {
                     let next = summary.next,
                     next.quizID != nil
                 else { return .none }
-                return .send(.delegate(.learningRequested(projectID: projectID, nextSetID: next.setID)))
+                return .send(.delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: next.setID,
+                )))
 
             case .view(.menuTapped):
                 guard state.mode == .browsing else { return .none }
@@ -166,74 +169,34 @@ public struct ProjectListFeature: Sendable {
             case .view(.backTapped):
                 guard state.mode == .deleting else { return .none }
                 state.mode = .browsing
-                state.deletion = .idle
-                return .none
+                return .send(.deletion(.input(.cancel)))
 
             case .view(.deleteButtonTapped(let projectID)):
-                guard state.mode == .deleting, case .idle = state.deletion else { return .none }
-                state.deletion = .confirming(projectID: projectID)
-                return .none
+                guard state.mode == .deleting else { return .none }
+                return .send(.deletion(.input(.request(projectID))))
 
             case .view(.deletionCancelled):
-                if case .confirming = state.deletion {
-                    state.deletion = .idle
-                }
-                return .none
+                return .send(.deletion(.input(.cancel)))
 
             case .view(.deletionConfirmed):
-                guard case .confirming(let projectID) = state.deletion else { return .none }
-                state.deletion = .committing(projectID: projectID)
-                return .run { send in
-                    do {
-                        try await deleteProject(projectID)
-                        await send(.effect(.deletionFinished(projectID: projectID, error: nil)))
-                    } catch {
-                        let mapped = error as? ProjectError ?? .unexpected
-                        await send(.effect(.deletionFinished(projectID: projectID, error: mapped)))
-                    }
-                }
-                .cancellable(id: CancelID.deletion)
+                return .send(.deletion(.input(.confirm)))
 
-            case .effect(.projectsReceived(let list)):
-                guard list.isLoaded else { return .none }
-                state.projects = list.summaries
-                state.hasNextPage = list.hasNextPage
-                state.initialLoad = .loaded
-                state.pagination = list.hasNextPage ? .idle : .exhausted
-                if state.projects.isEmpty, state.mode == .deleting {
+            case .deletion(.delegate(.deleted(let projectID))):
+                return .merge(
+                    .send(.projectSummaries(.input(.projectRemoved(projectID)))),
+                    .send(.delegate(.projectDeleted)),
+                )
+
+            case .projectSummaries(.delegate(.listUpdated(let list))):
+                if list.summaries.isEmpty, state.mode == .deleting {
                     state.mode = .browsing
                 }
-                return .none
+                return .send(.pagination(.input(.listReplaced(hasNextPage: list.hasNextPage))))
 
-            case .effect(.refreshFinished(let requestID, let error)):
-                guard requestID == state.requestID else { return .none }
-                guard let error, state.initialLoad != .loaded else { return .none }
-                state.initialLoad = .failed(error)
-                return .none
-
-            case .effect(.nextPageFinished(let error)):
-                guard case .loading = state.pagination else { return .none }
-                if let error {
-                    state.pagination = .failed(error)
-                } else {
-                    state.pagination = state.hasNextPage ? .idle : .exhausted
-                }
-                return .none
-
-            case .effect(.deletionFinished(let projectID, nil)),
-                 .effect(.deletionFinished(let projectID, .some(.notFound))):
-                state.projects.removeAll { $0.id == projectID }
-                state.deletion = .idle
-                if state.projects.isEmpty {
-                    state.mode = .browsing
-                }
-                return .send(.delegate(.projectDeleted))
-
-            case .effect(.deletionFinished(let projectID, .some(let error))):
-                state.deletion = .failed(projectID: projectID, error: error)
-                return .none
-
-            case .delegate:
+            case .projectSummaries,
+                 .deletion,
+                 .pagination,
+                 .delegate:
                 return .none
             }
         }
@@ -241,65 +204,9 @@ public struct ProjectListFeature: Sendable {
 
     // MARK: Private
 
-    private enum CancelID: Hashable {
-        case projects
-        case refresh
-        case nextPage
-        case deletion
-    }
-
     private let projects: @Sendable () async -> AsyncStream<ProjectList>
     private let refreshProjects: @Sendable () async throws -> Void
     private let requestNextPage: @Sendable () async throws -> Void
     private let deleteProject: @Sendable (ProjectID) async throws -> Void
-
-    private func observeProjects() -> ComposableArchitecture.Effect<Action> {
-        let projects = projects
-        return .run { send in
-            for await list in await projects() {
-                await send(.effect(.projectsReceived(list)))
-            }
-        }
-        .cancellable(id: CancelID.projects, cancelInFlight: true)
-    }
-
-    private func startRefresh(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.requestID += 1
-        if state.projects.isEmpty {
-            state.initialLoad = .loading
-        }
-        let requestID = state.requestID
-        let refreshProjects = refreshProjects
-
-        return .merge(
-            .cancel(id: CancelID.nextPage),
-            .run { send in
-                do {
-                    try await refreshProjects()
-                    await send(.effect(.refreshFinished(requestID: requestID, error: nil)))
-                } catch {
-                    let mapped = error as? ProjectError ?? .unexpected
-                    await send(.effect(.refreshFinished(requestID: requestID, error: mapped)))
-                }
-            }
-            .cancellable(id: CancelID.refresh, cancelInFlight: true),
-        )
-    }
-
-    private func startNextPageLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
-        state.pagination = .loading
-        let requestNextPage = requestNextPage
-
-        return .run { send in
-            do {
-                try await requestNextPage()
-                await send(.effect(.nextPageFinished(error: nil)))
-            } catch {
-                let mapped = error as? ProjectError ?? .unexpected
-                await send(.effect(.nextPageFinished(error: mapped)))
-            }
-        }
-        .cancellable(id: CancelID.nextPage, cancelInFlight: true)
-    }
 
 }

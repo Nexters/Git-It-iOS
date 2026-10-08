@@ -37,7 +37,10 @@ struct ProjectDetailRouterFeatureTests {
         let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
         await store.send(.savedQuestions(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
+            .singleQuestionEntry(.input(.questionRequested(
+                setID: "set-0",
+                questionID: "quiz-0",
+            )))
         )
 
         #expect(store.state.activeScreen == .savedQuestions)
@@ -153,6 +156,15 @@ struct ProjectDetailRouterFeatureTests {
 
         await store.send(.projectDetail(.delegate(.dismissRequested)))
         await store.receive(.delegate(.dismissRequested))
+    }
+
+    @Test
+    func `단일 문제 준비 실패 알림을 닫으면 준비 흐름에 실패 닫기를 전달한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+
+        await store.send(.view(.singleQuestionFailureDismissed))
+        await store.receive(.singleQuestionEntry(.input(.failureDismissed)))
     }
 
     // MARK: Private

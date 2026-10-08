@@ -26,7 +26,11 @@ struct QuizAnswerRepositoryAdapterTests {
             selectedIndex: 1,
         ))
 
-        #expect(grading == ChoiceGrading(isCorrect: true, correctIndex: 1, explanation: "설명"))
+        #expect(grading == ChoiceGrading(
+            isCorrect: true,
+            correctIndex: 1,
+            explanation: "설명",
+        ))
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/choice")
     }
@@ -45,13 +49,19 @@ struct QuizAnswerRepositoryAdapterTests {
             text: "내 답",
         ))
 
-        #expect(grading == EssayGrading(explanation: "설명", rubric: ["good"]))
+        #expect(grading == EssayGrading(
+            explanation: "설명",
+            rubric: ["good"],
+        ))
     }
 
     @Test
     func `Data 오류를 Domain 오류로 변환한다`() async {
         let adapter = Self.makeAdapter(transport: RecordingRequestTransport(results: [
-            Self.errorResponse(statusCode: 404, code: "QUIZ-005")
+            Self.errorResponse(
+                statusCode: 404,
+                code: "QUIZ-005",
+            )
         ]))
 
         await #expect(throws: QuizDetailError.quizUnavailable) {

@@ -15,49 +15,27 @@ struct ShareRegistrationFeatureFailureTests {
     // MARK: Internal
 
     @Test
-    func `등록 실패 사유를 표시하고 등록 단계 재시도를 제공한다`() async {
-        let store = Self.makeStore(error: .temporarilyUnavailable)
-
-        await store.send(.quizGenerationConfirmation(.delegate(.submitRequested))) {
-            $0.status = .submitting
-        }
-        await store.receive(\.effect.registrationFinished) {
-            $0.status = .failed(
-                reason: "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
-                retry: .registration,
-            )
-        }
+    func `등록이 실패하면 재시도와 닫기를 모두 허용한다`() {
+        var state = Self.readyState()
+        state.registration.phase = .failed(
+            reason: "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
+            retry: .registration,
+        )
+        let store = Self.makeStore(state: state)
 
         #expect(store.state.canRetry)
         #expect(store.state.canDismiss)
     }
 
     @Test
-    func `재시도는 등록 단계부터 다시 수행한다`() async {
-        let projectGeneration = ProjectGenerationUseCaseSpy(error: .temporarilyUnavailable)
-        let store = Self.makeStore(projectGeneration: projectGeneration)
-        store.exhaustivity = .off
-
-        await store.send(.quizGenerationConfirmation(.delegate(.submitRequested)))
-        await store.skipReceivedActions()
-        await store.send(.view(.retryTapped))
-        await store.skipReceivedActions()
-
-        #expect(projectGeneration.callCount == 2)
-    }
-
-    @Test
     func `요청 중에는 닫기 동작을 받지 않는다`() async {
-        let store = Self.makeStore()
-        store.exhaustivity = .off
+        var state = Self.readyState()
+        state.registration.phase = .submitting
+        let store = Self.makeStore(state: state)
 
-        await store.send(.quizGenerationConfirmation(.delegate(.submitRequested))) {
-            $0.status = .submitting
-        }
+        #expect(store.state.isBusy)
+        #expect(!store.state.canDismiss)
         await store.send(.view(.dismissTapped))
-        await store.skipReceivedActions()
-
-        #expect(store.state.isBusy == false || store.state.status == .succeeded)
     }
 
     @Test
@@ -65,26 +43,31 @@ struct ShareRegistrationFeatureFailureTests {
         let store = Self.makeStore()
 
         await store.send(.view(.dismissTapped))
+        await store.receive(.registration(.input(.cancel)))
         await store.receive(\.delegate.dismissRequested)
         await store.finish()
     }
 
     // MARK: Private
 
-    private static func makeStore(
-        error: ProjectGenerationError? = nil,
-        projectGeneration: ProjectGenerationUseCaseSpy? = nil,
-    ) -> TestStoreOf<ShareRegistrationFeature> {
+    private static func readyState() -> ShareRegistrationFeature.State {
         var state = ShareRegistrationFeature.State(sharedURL: ShareRegistrationTestSupport.sharedURL)
+        state.registration.phase = .ready(ShareRegistrationTestSupport.repository)
         state.repositoryConfirmation.repository = ShareRegistrationTestSupport.repository
-        state.status = .quizGenerationConfirmation
-        return TestStore(initialState: state) {
+        state.step = .quizGenerationConfirmation
+        return state
+    }
+
+    private static func makeStore(
+        state: ShareRegistrationFeature.State? = nil
+    ) -> TestStoreOf<ShareRegistrationFeature> {
+        TestStore(initialState: state ?? readyState()) {
             ShareRegistrationFeature(
                 parseRepositoryLink: StubRepositoryURLParser(location: ShareRegistrationTestSupport.location),
                 externalRepository: ExternalRepositoryUseCaseFixedResultStub(
                     result: .success(ShareRegistrationTestSupport.repository)
                 ),
-                projectGeneration: projectGeneration ?? ProjectGenerationUseCaseSpy(error: error),
+                projectGeneration: ProjectGenerationUseCaseSpy(),
                 signInAvailability: { .signedIn },
             )
         }

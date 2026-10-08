@@ -30,7 +30,10 @@ public struct GenerationWaitPolicy: Equatable, Sendable {
         _ record: GenerationRecord,
         now: Date,
     ) -> Bool {
-        record.isExpired(now: now, retentionLimit: retentionLimit)
+        record.isExpired(
+            now: now,
+            retentionLimit: retentionLimit,
+        )
     }
 
 }

@@ -34,7 +34,7 @@ jobs:
 
       - name: Classify changes
         id: classify
-        run: ./tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+        run: ./.tools/ci/bin/classify-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
 
   script-quality:
     name: script quality
@@ -50,7 +50,7 @@ jobs:
           submodules: recursive
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Install script test dependency
         run: brew install ripgrep
@@ -62,8 +62,8 @@ jobs:
         id: script-tools-cache
         uses: actions/cache@v4
         with:
-          path: tools/script-verification/.build
-          key: ${{ runner.os }}-${{ runner.arch }}-script-tools-${{ hashFiles('tools/script-verification/dependencies/tools.lock') }}
+          path: .tools/script-verification/.build
+          key: ${{ runner.os }}-${{ runner.arch }}-script-tools-${{ hashFiles('.tools/script-verification/dependencies/tools.lock') }}
 
       - name: Prepare script verification tools
         if: ${{ steps.script-tools-cache.outputs.cache-hit != 'true' }}
@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Check package dependencies
         run: "$GIT_IT_PACKAGE_DEPENDENCY_RUNNER"
@@ -108,7 +108,7 @@ jobs:
           submodules: recursive
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Cache Swift style dependencies
         uses: actions/cache@v4
@@ -120,7 +120,7 @@ jobs:
 
       - name: Lint Swift style
         run: |
-          ./tools/ci/bin/lint-changed-swift.sh \
+          ./.tools/ci/bin/lint-changed-swift.sh \
             "${{ github.event.pull_request.base.sha }}" \
             "${{ github.event.pull_request.head.sha }}"
 
@@ -140,7 +140,7 @@ jobs:
           submodules: recursive
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Install Tuist
         uses: jdx/mise-action@v3
@@ -199,7 +199,7 @@ jobs:
           submodules: recursive
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Install Tuist
         uses: jdx/mise-action@v3
@@ -284,7 +284,7 @@ jobs:
           submodules: recursive
 
       - name: Load repository paths
-        run: ./tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
+        run: ./.tools/repository-paths/bin/repository-paths.sh >> "$GITHUB_ENV"
 
       - name: Install Tuist
         uses: jdx/mise-action@v3
@@ -353,7 +353,7 @@ jobs:
 
       - name: Evaluate gate
         run: |
-          ./tools/ci/bin/gate-evaluate.sh \
+          ./.tools/ci/bin/gate-evaluate.sh \
             "${{ needs.changes.result }}" \
             "${{ needs.script-quality.result }}" \
             "${{ needs.package-dependencies.result }}" \

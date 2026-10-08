@@ -15,27 +15,23 @@
 public struct ActionButton: View {
     public init(
         title: String,
-        style: Style,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void,
+        action: @escaping () -> Void = { },
     ) {
         self.title = title
-        self.style = style
-        self.isEnabled = isEnabled
         self.action = action
     }
 
-    public enum Style {
+    public enum Style: Sendable, Equatable {
         case primary
-        case neutral
+        case secondary
         case destructive
 
         func titleColor(isEnabled: Bool) -> ColorToken {
-            guard isEnabled else { return .grey400 }
+            guard isEnabled else { return .white30 }
 
             switch self {
-            case .primary, .destructive: return .grey900
-            case .neutral: return .grey100
+            case .primary: return .grey700
+            case .secondary, .destructive: return .grey100
             }
         }
     }
@@ -50,16 +46,31 @@ public struct ActionButton: View {
     }
 
     private let title: String
-    private let style: Style
-    private let isEnabled: Bool
+    private var style = Style.primary
+    private var isEnabled = true
     private let action: () -> Void
 
     private enum Constant {
         static let controlHeight: CGFloat = 54
     }
 }
+
+extension ActionButton: StyleConfigurable {
+    public func style(_ style: Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// 호출부
+ActionButton(title: "삭제") { store.send(.deleteTapped) }
+    .style(.destructive)
 ```
 
-`Style`은 상태 wrapper가 아니며 시각 변형만 소유합니다. 호출부는
-[View 컨벤션 — 공개 생성 경로](../view/component-init.md)의 시각
-변형 팩토리를 기본 선택 수단으로 사용합니다.
+`Style`은 상태를 담지 않으며 시각 변형만 소유합니다. 호출부는 `Style`을 생성 시점에
+넘기지 않고, `StyleConfigurable`의 `style(_:)` 메서드로 변형을 선택합니다. 컴포넌트는
+`Style`을 기본값이 있는 `private var`로 저장하고, `style(_:)`은 그 값을 바꾼 복사본을
+반환합니다. 여러 번 호출하면 마지막 호출이 적용됩니다. 초기화 메서드 구성과 시각 속성
+계약의 전체 규칙은 [View 컨벤션 — 컴포넌트의 공개 생성 경로](../view/component-init.md)를
+따릅니다.

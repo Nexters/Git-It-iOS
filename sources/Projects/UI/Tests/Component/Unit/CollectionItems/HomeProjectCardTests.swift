@@ -10,12 +10,13 @@ struct HomeProjectCardTests {
     @Test
     func `currentSetLabel은 원문을 손실 없이 유지한다`() {
         let card = HomeProjectCard(
-            title: "Git It iOS",
-            technologies: "Swift · SwiftUI",
-            progress: 0.4,
-            currentSetLabel: "Sprint Beta",
-            setTitle: "Presentation 구조",
-            variant: .purple,
+            displayModel: .init(
+                title: "Git It iOS",
+                technologies: "Swift · SwiftUI",
+                progress: 0.4,
+                currentSetLabel: "Sprint Beta",
+                setTitle: "Presentation 구조",
+            )
         )
 
         #expect(card.displayedCurrentSetLabel == "Sprint Beta")
@@ -23,10 +24,10 @@ struct HomeProjectCardTests {
 
     @Test
     func `Domain 순서 index는 세 색 variant를 순환한다`() {
-        #expect(HomeProjectCard.Variant(index: 0) == .purple)
-        #expect(HomeProjectCard.Variant(index: 1) == .lightBlue)
-        #expect(HomeProjectCard.Variant(index: 2) == .darkBlue)
-        #expect(HomeProjectCard.Variant(index: 3) == .purple)
+        #expect(HomeProjectCard.Style(index: 0) == .purple)
+        #expect(HomeProjectCard.Style(index: 1) == .lightBlue)
+        #expect(HomeProjectCard.Style(index: 2) == .darkBlue)
+        #expect(HomeProjectCard.Style(index: 3) == .purple)
     }
 
     @Test
@@ -68,6 +69,11 @@ struct HomeProjectCardTests {
     }
 
     @Test
+    func `학습 가능 여부를 선언하지 않으면 학습을 시작할 수 있다`() {
+        #expect(Mirror(reflecting: makeCard()).descendant("isLearningEnabled") as? Bool == true)
+    }
+
+    @Test
     func `본문과 학습 control은 44pt 최소 터치 영역을 갖는다`() {
         #expect(HomeProjectCard.minimumTouchArea == 44)
     }
@@ -80,16 +86,17 @@ struct HomeProjectCardTests {
         onStart: @escaping () -> Void = { },
     ) -> HomeProjectCard {
         HomeProjectCard(
-            title: "Git It iOS",
-            technologies: "Swift · SwiftUI",
-            progress: 0.4,
-            currentSetLabel: "Set 1",
-            setTitle: "Presentation 구조",
-            variant: .purple,
-            isLearningEnabled: isLearningEnabled,
+            displayModel: .init(
+                title: "Git It iOS",
+                technologies: "Swift · SwiftUI",
+                progress: 0.4,
+                currentSetLabel: "Set 1",
+                setTitle: "Presentation 구조",
+            ),
             onSelect: onSelect,
             onStart: onStart,
         )
+        .learningEnabled(isLearningEnabled)
     }
 
 }

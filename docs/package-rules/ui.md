@@ -4,13 +4,15 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-13 (의미 토큰 언급 제거)
+**최종 수정일**: 2026-09-21 (표시 값 모델·시각 속성 계약 반영, 표시 값 묶음 타입 금지 제약 삭제)
 
 ## 설명
 
 UI는 시각 언어와 화면에서 독립된 재사용 UI 구성요소를 담당하는 표현 경계입니다.
-DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현 타입과 분리된 표시
-값·SwiftUI `Binding`·콜백 기반 컴포넌트를 제공합니다.
+DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현 타입과 분리된
+컴포넌트를 제공합니다. 컴포넌트는 표시 값 모델(`DisplayModel`)·SwiftUI `Binding`·콜백을
+초기화 인자로 받고, 스타일·크기·색 같은 시각 속성은 `StyleConfigurable` 같은 시각 속성
+계약의 메서드로 선택받습니다.
 
 이 문서는 UI 패키지가 소유하는 책임과 허용 의존성을 정의합니다. 컴포넌트의 역할 분류,
 공개 입력과 자산 구성은 [UIComponent 컨벤션](../conventions/ui-component.md), 폴더와
@@ -82,7 +84,6 @@ target의 의존 대상이 되어서는 안 됩니다.
 - Domain 모델이나 비즈니스 규칙을 참조해서는 안 됩니다.
 - Data DTO, 서버 API, 네트워크, 저장소 또는 Composition 로직을 참조해서는 안 됩니다.
 - 외형만 같고 공개 입력의 의미가 다른 UI를 하나의 컴포넌트로 통합해서는 안 됩니다.
-- 표시 상태를 묶는 ViewModel, State 또는 동등한 wrapper 타입을 정의해서는 안 됩니다.
 - DesignSystem 밖에 공통 시각 어휘를 정의해서는 안 됩니다.
 - 검토 전용 UI를 `UIComponent`가 소유해서는 안 됩니다. `UIComponentPreviewApp`
   target에 둡니다.

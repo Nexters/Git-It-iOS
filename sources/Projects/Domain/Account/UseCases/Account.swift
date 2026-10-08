@@ -155,7 +155,11 @@ public actor Account: AccountUseCase {
         let consentedAt = now()
         let consents = policyDocuments
             .filter { documentIDs.contains($0.id) }
-            .map { PolicyConsent(documentID: $0.id, version: $0.version, consentedAt: consentedAt) }
+            .map { PolicyConsent(
+                documentID: $0.id,
+                version: $0.version,
+                consentedAt: consentedAt,
+            ) }
         try await policyConsentRepository.record(consents)
     }
 

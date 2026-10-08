@@ -1,144 +1,92 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - StyledText
+
 public struct StyledText: View, Sendable, Equatable {
 
     // MARK: Lifecycle
 
-    public init(
-        text: String,
-        style: TextStyleToken,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) {
+    public init(text: String) {
         self.text = text
-        self.style = style
-        self.color = color
-        self.alignment = alignment
     }
 
     // MARK: Public
 
     public let text: String
-    public let style: TextStyleToken
-    public let color: ColorToken
-    public let alignment: TextAlignment
 
     public var body: some View {
-        Text.designSystemStyled(text, style: style)
-            .designSystemLineSpacing(style)
-            .designSystemForeground(color)
-            .multilineTextAlignment(alignment)
-            .fixedSize(horizontal: false, vertical: true)
-    }
-
-    public static func headline1(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .headline1, color: color, alignment: alignment)
-    }
-
-    public static func headline2(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .headline2, color: color, alignment: alignment)
-    }
-
-    public static func subtitle1(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .subtitle1, color: color, alignment: alignment)
-    }
-
-    public static func subtitle2(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .subtitle2, color: color, alignment: alignment)
-    }
-
-    public static func subtitle3(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .subtitle3, color: color, alignment: alignment)
-    }
-
-    public static func body1(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .body1, color: color, alignment: alignment)
-    }
-
-    public static func body2(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .body2, color: color, alignment: alignment)
-    }
-
-    public static func body3(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .body3, color: color, alignment: alignment)
-    }
-
-    public static func caption1(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .caption1, color: color, alignment: alignment)
-    }
-
-    public static func caption2(
-        _ text: String,
-        color: ColorToken = .grey100,
-        alignment: TextAlignment = .leading,
-    ) -> Self {
-        styled(text, style: .caption2, color: color, alignment: alignment)
+        Text.designSystemStyled(
+            text,
+            style: textStyle,
+        )
+        .designSystemLineSpacing(textStyle)
+        .designSystemForeground(foregroundColor)
+        .fixedSize(
+            horizontal: false,
+            vertical: true,
+        )
     }
 
     // MARK: Private
 
-    private static func styled(
-        _ text: String,
-        style: TextStyleToken,
-        color: ColorToken,
-        alignment: TextAlignment,
-    ) -> Self {
-        Self(text: text, style: style, color: color, alignment: alignment)
-    }
+    private var textStyle = TextStyleToken.body1
+    private var foregroundColor = ColorToken.grey100
 
 }
 
-#Preview("Styled Text") {
-    VStack(alignment: .leading, spacing: LayoutToken.gutter) {
-        StyledText.headline1("Headline 1")
-        StyledText.headline2("Headline 2")
-        StyledText.subtitle1("Subtitle 1", color: .blue100)
-        StyledText.subtitle2("Subtitle 2")
-        StyledText.subtitle3("Subtitle 3")
-        StyledText.body1("Body 1")
-        StyledText.body2("본문 텍스트는 여러 줄에서도 지정된 행간과 정렬을 유지합니다.")
-        StyledText.body3("Body 3")
-        StyledText.caption1("Caption 1", color: .grey400)
-        StyledText.caption2("Caption 2", color: .grey400)
+// MARK: TextStyleConfigurable
+
+extension StyledText: TextStyleConfigurable {
+    public func textStyle(_ textStyle: TextStyleToken) -> Self {
+        var copy = self
+        copy.textStyle = textStyle
+        return copy
     }
-    .frame(width: 320, alignment: .leading)
+}
+
+// MARK: ForegroundColorConfigurable
+
+extension StyledText: ForegroundColorConfigurable {
+    public func foregroundColorToken(_ color: ColorToken) -> Self {
+        var copy = self
+        copy.foregroundColor = color
+        return copy
+    }
+}
+
+#Preview("Styled Text") {
+    VStack(
+        alignment: .leading,
+        spacing: LayoutToken.gutter,
+    ) {
+        StyledText(text: "Headline 1")
+            .textStyle(.headline1)
+        StyledText(text: "Headline 2")
+            .textStyle(.headline2)
+        StyledText(text: "Subtitle 1")
+            .textStyle(.subtitle1)
+            .foregroundColorToken(.blue100)
+        StyledText(text: "Subtitle 2")
+            .textStyle(.subtitle2)
+        StyledText(text: "Subtitle 3")
+            .textStyle(.subtitle3)
+        StyledText(text: "Body 1")
+        StyledText(text: "본문 텍스트는 여러 줄에서도 지정된 행간과 정렬을 유지합니다.")
+            .textStyle(.body2)
+        StyledText(text: "Body 3")
+            .textStyle(.body3)
+        StyledText(text: "Caption 1")
+            .textStyle(.caption1)
+            .foregroundColorToken(.grey400)
+        StyledText(text: "Caption 2")
+            .textStyle(.caption2)
+            .foregroundColorToken(.grey400)
+    }
+    .frame(
+        width: 320,
+        alignment: .leading,
+    )
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
     .designSystemBackground(.grey700)

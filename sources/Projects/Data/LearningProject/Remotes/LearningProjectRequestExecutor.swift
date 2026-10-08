@@ -17,7 +17,10 @@ struct LearningProjectRequestExecutor: Sendable {
         expecting _: Payload.Type,
     ) async throws -> Payload {
         do {
-            let response = try await client.send(try await httpRequest(for: request), expecting: APIResponseDTO<Payload>.self)
+            let response = try await client.send(
+                try await httpRequest(for: request),
+                expecting: APIResponseDTO<Payload>.self,
+            )
             return try await payload(from: response)
         } catch let error as HTTPClientError {
             throw try dataError(for: error)
@@ -47,7 +50,10 @@ struct LearningProjectRequestExecutor: Sendable {
         try await HTTPRequest(
             method: request.transportMethod,
             path: request.path,
-            queryItems: request.queryItems.map { HTTPRequest.QueryItem(name: $0.key, value: $0.value) },
+            queryItems: request.queryItems.map { HTTPRequest.QueryItem(
+                name: $0.key,
+                value: $0.value,
+            ) },
             headers: authorizedHeaders(),
         )
     }
@@ -76,7 +82,10 @@ struct LearningProjectRequestExecutor: Sendable {
             throw LearningProjectServiceError.unexpectedStatus
 
         case .raw(let data):
-            let error = LearningProjectServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            let error = LearningProjectServiceError(from: try serverError(
+                statusCode: response.statusCode,
+                data: data,
+            ))
             if error == .unauthorized {
                 await credentialRejected()
             }
@@ -92,7 +101,10 @@ struct LearningProjectRequestExecutor: Sendable {
         data: Data,
     ) throws -> ServerAPIError {
         do {
-            let envelope = try JSONDecoder().decode(APIResponseDTO<EmptyResponseData>.self, from: data)
+            let envelope = try JSONDecoder().decode(
+                APIResponseDTO<EmptyResponseData>.self,
+                from: data,
+            )
             return ServerAPIError(
                 httpStatus: statusCode,
                 code: envelope.code,

@@ -11,13 +11,19 @@ struct ServerAPIErrorTests {
             httpStatus: 404,
             code: "MEMBER-001",
             message: "not found",
-            fieldErrors: [FieldErrorDTO(field: "memberId", message: "unknown")],
+            fieldErrors: [FieldErrorDTO(
+                field: "memberId",
+                message: "unknown",
+            )],
         )
 
         #expect(error.httpStatus == 404)
         #expect(error.code == "MEMBER-001")
         #expect(error.message == "not found")
-        #expect(error.fieldErrors == [FieldErrorDTO(field: "memberId", message: "unknown")])
+        #expect(error.fieldErrors == [FieldErrorDTO(
+            field: "memberId",
+            message: "unknown",
+        )])
     }
 
 }

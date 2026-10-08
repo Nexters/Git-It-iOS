@@ -11,8 +11,16 @@ struct LocalPolicyConsentStoreTests {
     @Test
     func `저장한 문서별 기록을 그대로 조회한다`() async {
         let store = makeStore()
-        let privacy = PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
-        let terms = PolicyConsentRecordDTO(documentIdentifier: "terms-of-service", version: "1", acceptedAt: Date())
+        let privacy = PolicyConsentRecordDTO(
+            documentIdentifier: "privacy-policy",
+            version: "1",
+            acceptedAt: Date(),
+        )
+        let terms = PolicyConsentRecordDTO(
+            documentIdentifier: "terms-of-service",
+            version: "1",
+            acceptedAt: Date(),
+        )
 
         await store.saveRecord(privacy)
         await store.saveRecord(terms)
@@ -24,12 +32,24 @@ struct LocalPolicyConsentStoreTests {
     @Test
     func `같은 문서 ID를 다시 저장하면 이전 기록을 교체하고 다른 문서 기록에는 영향이 없다`() async {
         let store = makeStore()
-        let firstVersion = PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date())
-        let terms = PolicyConsentRecordDTO(documentIdentifier: "terms-of-service", version: "1", acceptedAt: Date())
+        let firstVersion = PolicyConsentRecordDTO(
+            documentIdentifier: "privacy-policy",
+            version: "1",
+            acceptedAt: Date(),
+        )
+        let terms = PolicyConsentRecordDTO(
+            documentIdentifier: "terms-of-service",
+            version: "1",
+            acceptedAt: Date(),
+        )
         await store.saveRecord(firstVersion)
         await store.saveRecord(terms)
 
-        let secondVersion = PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "2", acceptedAt: Date())
+        let secondVersion = PolicyConsentRecordDTO(
+            documentIdentifier: "privacy-policy",
+            version: "2",
+            acceptedAt: Date(),
+        )
         await store.saveRecord(secondVersion)
 
         let records = await store.records()
@@ -62,7 +82,11 @@ struct LocalPolicyConsentStoreTests {
         let storage = InMemoryKeyValueStorage()
 
         let store = LocalPolicyConsentStore(storage: storage)
-        await store.saveRecord(PolicyConsentRecordDTO(documentIdentifier: "privacy-policy", version: "1", acceptedAt: Date()))
+        await store.saveRecord(PolicyConsentRecordDTO(
+            documentIdentifier: "privacy-policy",
+            version: "1",
+            acceptedAt: Date(),
+        ))
 
         let afterLogout = LocalPolicyConsentStore(storage: storage)
         #expect(await afterLogout.records().isEmpty == false)

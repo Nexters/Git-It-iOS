@@ -18,7 +18,10 @@ private enum SettingsPreviewFixture {
                     weeklyCounts: [],
                 ),
             ),
-            curation: Self.curation(position: position, careerLevel: careerLevel),
+            curation: Self.curation(
+                position: position,
+                careerLevel: careerLevel,
+            ),
         )
     }
 
@@ -27,22 +30,27 @@ private enum SettingsPreviewFixture {
         careerLevel: CareerLevel?,
     ) -> Curation? {
         guard let position, let careerLevel else { return nil }
-        return Curation(position: position, careerLevel: careerLevel)
+        return Curation(
+            position: position,
+            careerLevel: careerLevel,
+        )
     }
 
     @MainActor
     static func store(
-        profile: UserProfile? = SettingsPreviewFixture.profile(position: .backend, careerLevel: .entry),
-        accountAction: SettingsFeature.AccountAction = .idle,
-        positionMutation: SettingsFeature.MutationStatus = .idle,
+        profile: UserProfile? = SettingsPreviewFixture.profile(
+            position: .backend,
+            careerLevel: .entry,
+        ),
+        accountAction: AccountActionFeature.State.AccountAction = .idle,
+        positionMutation: CurationUpdateFeature.State.MutationStatus = .idle,
     ) -> StoreOf<SettingsFeature> {
         Store(
             initialState: {
                 var state = SettingsFeature.State()
-                state.profile = profile
-                state.profileLoad = profile == nil ? .failed(.temporarilyUnavailable) : .loaded
-                state.accountAction = accountAction
-                state.positionMutation = positionMutation
+                state.userProfile.load = profile.map { .loaded($0) } ?? .failed(.temporarilyUnavailable)
+                state.accountAction.accountAction = accountAction
+                state.curationUpdate.positionMutation = positionMutation
                 return state
             }()
         ) { EmptyReducer() }
@@ -55,7 +63,10 @@ private enum SettingsPreviewFixture {
 
 #Preview("Settings - 직군·연차 미설정(선택 안 함) - 1465:19689") {
     SettingsScreen(
-        store: SettingsPreviewFixture.store(profile: SettingsPreviewFixture.profile(position: nil, careerLevel: nil))
+        store: SettingsPreviewFixture.store(profile: SettingsPreviewFixture.profile(
+            position: nil,
+            careerLevel: nil,
+        ))
     )
 }
 

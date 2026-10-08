@@ -74,6 +74,27 @@ sources/Projects/Feature/ProjectRegistration/
   컨벤션 §2.3이 정합니다.
 - `Shared/`는 여러 화면이 함께 쓰는 선언만 담습니다. 한 화면만 쓰는 선언을 여기에 두지
   않습니다. `Shared/` 아래에서는 §4.2의 형태 폴더 규칙을 그대로 적용합니다.
+- **기능 Feature는 그것을 합성하는 범위로 자리를 정합니다.** 한 화면만 합성하면 그 화면
+  폴더 루트, 한 전환 계층(Router·Shell)만 합성하면 그 흐름의 `Router/`, 같은 흐름의 둘 이상
+  화면이 합성하면 `<흐름>/Shared/Reducers/`, 둘 이상 흐름이 합성하면 `Feature/Shared/Reducers/`에
+  둡니다. 둘 이상 흐름이 쓰는 값 타입은 `Feature/Shared/Models/`에 둡니다. 한 파일을 넘는 기능
+  Feature는 [타입 패밀리 규칙](./type-family-rules.md)에 따라 타입 패밀리 폴더를 만듭니다.
+
+  | 합성 범위 | 자리 |
+  | --- | --- |
+  | 한 화면 | `Feature/<흐름>/<화면>/` |
+  | 한 전환 계층 | `Feature/<흐름>/Router/` |
+  | 같은 흐름의 둘 이상 화면 | `Feature/<흐름>/Shared/Reducers/` |
+  | 둘 이상 흐름 | `Feature/Shared/Reducers/` |
+
+- **참조 방향은 전환 계층 → 화면 → 공용의 한 방향입니다.** `Feature/Shared/**`는 흐름
+  디렉터리의 타입을 참조하지 않고, `Shared/Reducers/`에는 View를 두지 않습니다. 기능 상태를
+  렌더링하는 View는 그 기능 Feature를 합성하거나 관찰하는 화면 폴더에 남습니다.
+- **화면 폴더의 Screen은 공용 기능 Feature를 직접 관찰할 수 있습니다.** 관심사가 하나뿐인
+  화면은 화면 합성 Feature 없이 공용 기능 Feature의 store를 받아 렌더링하며, 이때 그 화면
+  폴더에는 Feature 파일이 없을 수 있습니다(`Onboarding/LegalAgreement/`는
+  `Feature/Shared/Reducers/LegalAgreementFeature.swift`를 관찰하는 `LegalAgreementScreen`만
+  둡니다).
 - **프리뷰는 언제나 `Previews/` 폴더로 분리합니다.** 한 화면의 프리뷰는 그 화면 폴더의
   `Previews/`에, 여러 화면의 프리뷰가 함께 쓰는 프리뷰 전용 지원 타입은 흐름 1뎁스의
   `Previews/`에 둡니다. 프리뷰는 구현이 아니라 검토용 산출물이고 화면 하나가 상태

@@ -8,16 +8,30 @@ extension RepositoryLinkInputScreen {
         // MARK: Internal
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
                 Button {
                     isGuideExpanded.toggle()
                 } label: {
                     HStack(spacing: 0) {
-                        StyledText.body2("불러오기 방법", color: .blue100)
+                        StyledText(text: "불러오기 방법")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.blue100)
                         Spacer(minLength: 0)
-                        ResourceImage(asset: .icon(isGuideExpanded ? .chevronUp : .chevronDown), contentMode: .fit)
-                            .frame(width: Constant.chevronSize, height: Constant.chevronSize)
-                            .frame(width: Constant.chevronBoxSize, height: Constant.chevronBoxSize)
+                        ResourceImage(
+                            asset: .icon(isGuideExpanded ? .chevronUp : .chevronDown),
+                            contentMode: .fit,
+                        )
+                        .frame(
+                            width: Constant.chevronSize,
+                            height: Constant.chevronSize,
+                        )
+                        .frame(
+                            width: Constant.chevronBoxSize,
+                            height: Constant.chevronBoxSize,
+                        )
                     }
                     .padding(.leading, LayoutToken.margin)
                     .padding(.trailing, Constant.headerTrailingPadding)
@@ -30,16 +44,31 @@ extension RepositoryLinkInputScreen {
                 .accessibilityValue(isGuideExpanded ? "펼쳐짐" : "접힘")
 
                 if isGuideExpanded {
-                    VStack(alignment: .leading, spacing: Constant.guideStepSpacing) {
-                        ForEach(Array(Constant.guideSteps.enumerated()), id: \.offset) { index, text in
-                            HStack(alignment: .top, spacing: LayoutToken.gutter) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: Constant.guideStepSpacing,
+                    ) {
+                        ForEach(
+                            Array(Constant.guideSteps.enumerated()),
+                            id: \.offset,
+                        ) { index, text in
+                            HStack(
+                                alignment: .top,
+                                spacing: LayoutToken.gutter,
+                            ) {
                                 ZStack {
                                     Circle()
                                         .fill(Color(designSystem: .grey500))
-                                        .frame(width: 16, height: 16)
-                                    StyledText.caption2("\(index + 1)", color: .grey300)
+                                        .frame(
+                                            width: 16,
+                                            height: 16,
+                                        )
+                                    StyledText(text: "\(index + 1)")
+                                        .textStyle(.caption2)
+                                        .foregroundColorToken(.grey300)
                                 }
-                                StyledText.caption1(text, color: .grey100)
+                                StyledText(text: text)
+                                    .textStyle(.caption1)
                             }
                         }
                     }
@@ -47,7 +76,10 @@ extension RepositoryLinkInputScreen {
                     .padding(.bottom, Constant.bodyVerticalPadding)
                 }
             }
-            .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+            .background(
+                Color(designSystem: .grey600),
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
         // MARK: Private

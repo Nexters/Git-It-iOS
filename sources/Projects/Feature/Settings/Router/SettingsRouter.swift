@@ -14,7 +14,10 @@ public struct SettingsRouter: View {
 
     public var body: some View {
         FlowNavigationStack(path: pushedScreens) {
-            ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
+            ProfileScreen(store: store.scope(
+                state: \.profile,
+                action: \.profile,
+            ))
         } destination: { screen in
             pushedScreen(screen)
         }
@@ -25,7 +28,10 @@ public struct SettingsRouter: View {
     @Bindable private var store: StoreOf<SettingsRouterFeature>
 
     private var settingsStore: StoreOf<SettingsFeature> {
-        store.scope(state: \.settings, action: \.settings)
+        store.scope(
+            state: \.settings,
+            action: \.settings,
+        )
     }
 
     private var pushedScreens: [SettingsRouterFeature.State.ActiveScreen] {

@@ -58,7 +58,10 @@ struct AuthenticationRemoteTests {
                 envelope: #"{"success":true,"data":{},"code":null,"message":null,"errors":null}"#,
             ))
         ])
-        let remote = makeRemote(transport: transport, accessToken: "stored-token")
+        let remote = makeRemote(
+            transport: transport,
+            accessToken: "stored-token",
+        )
 
         try await remote.verifyAccessToken()
 
@@ -75,7 +78,10 @@ struct AuthenticationRemoteTests {
                 envelope: #"{"success":false,"data":null,"code":null,"message":"unauthorized","errors":null}"#,
             ))
         ])
-        let remote = makeRemote(transport: transport, accessToken: "expired-token")
+        let remote = makeRemote(
+            transport: transport,
+            accessToken: "expired-token",
+        )
 
         await #expect(throws: AuthenticationServiceError.unauthorized) {
             try await remote.verifyAccessToken()
@@ -85,7 +91,11 @@ struct AuthenticationRemoteTests {
     @Test
     func `응답 디코딩 실패를 unexpectedStatus 오류로 변환한다`() async throws {
         let transport = StubHTTPTransport(results: [
-            .response(HTTPTransportResponse(statusCode: 200, headers: [:], body: Data("not-json".utf8)))
+            .response(HTTPTransportResponse(
+                statusCode: 200,
+                headers: [:],
+                body: Data("not-json".utf8),
+            ))
         ])
         let remote = makeRemote(transport: transport)
 
@@ -126,6 +136,10 @@ extension AuthenticationRemoteTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 }

@@ -14,7 +14,11 @@ private func previewState(
     setLoad: LearningSetIntroFeature.SetLoad,
     isEmptySetReported: Bool = false,
 ) -> LearningSetIntroFeature.State {
-    var state = LearningSetIntroFeature.State(projectID: "project-1", setID: "set-1", label: "CHAPTER 1")
+    var state = LearningSetIntroFeature.State(
+        projectID: "project-1",
+        setID: "set-1",
+        label: "CHAPTER 1",
+    )
     state.setLoad = setLoad
     state.isEmptySetReported = isEmptySetReported
     return state
@@ -41,7 +45,10 @@ private func previewState(
 #Preview("세트 소개 · 문제 없음") {
     LearningSetIntroScreen(
         store: Store(
-            initialState: previewState(setLoad: .loaded(previewSet), isEmptySetReported: true)
+            initialState: previewState(
+                setLoad: .loaded(previewSet),
+                isEmptySetReported: true,
+            )
         ) { EmptyReducer() }
     )
 }

@@ -58,7 +58,10 @@ actor ProjectGenerationStateStreamStub {
 
     // MARK: Private
 
-    private var current = ProjectGenerationState(requests: [], preparingProjectIDs: [])
+    private var current = ProjectGenerationState(
+        requests: [],
+        preparingProjectIDs: [],
+    )
     private var continuations = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var subscriptionCount = 0
 

@@ -17,7 +17,10 @@ actor StubProjectGenerationRepository: ProjectGenerationRepository {
         if let error {
             throw error
         }
-        return ProjectGenerationReceipt(projectID: "p\(requests.count)", quizLevel: request.quizLevel)
+        return ProjectGenerationReceipt(
+            projectID: "p\(requests.count)",
+            quizLevel: request.quizLevel,
+        )
     }
 
     // MARK: Private

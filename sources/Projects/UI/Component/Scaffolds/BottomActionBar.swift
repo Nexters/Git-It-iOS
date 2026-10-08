@@ -19,7 +19,7 @@ public struct BottomActionBar<Content: View>: View {
         content
             .frame(maxWidth: .infinity)
             .padding(.top, Constant.topPadding)
-            .padding(.bottom, max(safeAreaBottomInset, Constant.minimumBottomInset))
+            .padding(.bottom, Constant.minimumBottomInset)
     }
 
     // MARK: Private
@@ -29,16 +29,10 @@ public struct BottomActionBar<Content: View>: View {
             4
         }
 
-        static var bottomPadding: CGFloat {
-            24
-        }
-
         static var minimumBottomInset: CGFloat {
             24
         }
     }
-
-    @State private var safeAreaBottomInset: CGFloat = 0
 
     private let content: Content
 
@@ -49,10 +43,13 @@ public struct BottomActionBar<Content: View>: View {
         Spacer()
 
         BottomActionBar {
-            ActionButton.primary("계속하기")
+            ActionButton(title: "계속하기")
         }
         .designSystemBackground(.grey600)
     }
-    .frame(width: 390, height: 240)
+    .frame(
+        width: 390,
+        height: 240,
+    )
     .designSystemBackground(.grey700)
 }

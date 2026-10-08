@@ -57,7 +57,10 @@ struct AnswerRemoteTests {
             request: SubmitEssayAnswerRequestDTO(text: "내 답"),
         )
 
-        #expect(result.rubric.criteria == [RubricCriterionResponseDTO(text: "good", points: 80)])
+        #expect(result.rubric.criteria == [RubricCriterionResponseDTO(
+            text: "good",
+            points: 80,
+        )])
         #expect(result.rubric.keyPoints == ["핵심 포인트"])
         let request = try #require(await transport.recordedRequests.first)
         #expect(request.url.path == "/api/v1/projects/project-1/questions/question-1/answers/essay")
@@ -105,6 +108,10 @@ extension AnswerRemoteTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 }

@@ -16,7 +16,10 @@ public struct ExternalRepositoryLocatorAdapter: DomainExternalRepository.Externa
 
     public func location(from url: ExternalRepositoryURL) -> DomainExternalRepository.ExternalRepositoryLocation? {
         parser.location(from: url).map {
-            DomainExternalRepository.ExternalRepositoryLocation(owner: $0.owner, name: $0.name)
+            DomainExternalRepository.ExternalRepositoryLocation(
+                owner: $0.owner,
+                name: $0.name,
+            )
         }
     }
 

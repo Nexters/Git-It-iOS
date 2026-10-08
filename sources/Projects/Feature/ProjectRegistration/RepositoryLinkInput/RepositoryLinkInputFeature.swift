@@ -52,6 +52,7 @@ public struct RepositoryLinkInputFeature: Sendable {
 
     public enum Action: ViewAction, Sendable, Equatable {
         case view(View)
+        case input(Input)
         case effect(EffectEvent)
         case delegate(Delegate)
 
@@ -62,6 +63,11 @@ public struct RepositoryLinkInputFeature: Sendable {
             case repositoryURLChanged(String)
             case validateTapped
             case dismissTapped
+        }
+
+        @CasePathable
+        public enum Input: Sendable, Equatable {
+            case validationReset
         }
 
         @CasePathable
@@ -86,6 +92,10 @@ public struct RepositoryLinkInputFeature: Sendable {
 
             case .view(.validateTapped):
                 return startValidation(&state)
+
+            case .input(.validationReset):
+                state.validation = .idle
+                return .none
 
             case .view(.dismissTapped):
                 return .send(.delegate(.dismissRequested))
@@ -125,13 +135,22 @@ public struct RepositoryLinkInputFeature: Sendable {
         return .run { send in
             do {
                 let resolved = try await repository(url)
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .success(resolved))))
+                await send(.effect(.validationFinished(
+                    requestID: currentRequestID,
+                    result: .success(resolved),
+                )))
             } catch {
                 let mapped = error as? ExternalRepositoryError ?? .other
-                await send(.effect(.validationFinished(requestID: currentRequestID, result: .failure(mapped))))
+                await send(.effect(.validationFinished(
+                    requestID: currentRequestID,
+                    result: .failure(mapped),
+                )))
             }
         }
-        .cancellable(id: CancelID.validation, cancelInFlight: true)
+        .cancellable(
+            id: CancelID.validation,
+            cancelInFlight: true,
+        )
     }
 
 }

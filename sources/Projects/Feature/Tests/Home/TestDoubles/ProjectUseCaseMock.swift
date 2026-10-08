@@ -7,7 +7,11 @@ actor ProjectUseCaseMock: ProjectUseCase {
     // MARK: Lifecycle
 
     init(
-        initialList: ProjectList = ProjectList(summaries: [], hasNextPage: false, isLoaded: false),
+        initialList: ProjectList = ProjectList(
+            summaries: [],
+            hasNextPage: false,
+            isLoaded: false,
+        ),
         refreshResults: [Result<Void, ProjectError>] = [.success(())],
         nextPageResults: [Result<Void, ProjectError>] = [.success(())],
         detailResults: [Result<ProjectDetail, ProjectError>] = [.failure(.notFound)],

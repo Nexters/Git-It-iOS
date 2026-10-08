@@ -9,36 +9,62 @@ extension ProfileScreen {
         let display: ProfileDisplay
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.headerToChartSpacing) {
-                VStack(alignment: .leading, spacing: Constant.headerSpacing) {
-                    StyledText.body3(Constant.sectionLabel, color: .grey400)
-                    StyledText.subtitle3(display.weeklyTitle)
+            VStack(
+                alignment: .leading,
+                spacing: Constant.headerToChartSpacing,
+            ) {
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerSpacing,
+                ) {
+                    StyledText(text: Constant.sectionLabel)
+                        .textStyle(.body3)
+                        .foregroundColorToken(.grey400)
+                    StyledText(text: display.weeklyTitle)
+                        .textStyle(.subtitle3)
                 }
 
                 VStack(spacing: Constant.barsToLabelsSpacing) {
-                    HStack(alignment: .bottom, spacing: Constant.barSpacing) {
+                    HStack(
+                        alignment: .bottom,
+                        spacing: Constant.barSpacing,
+                    ) {
                         ForEach(display.weeklyBars) { bar in
                             barColumn(bar)
                         }
                     }
-                    .frame(height: Constant.barsHeight, alignment: .bottom)
+                    .frame(
+                        height: Constant.barsHeight,
+                        alignment: .bottom,
+                    )
 
                     HStack(spacing: Constant.barSpacing) {
                         ForEach(display.weeklyBars) { bar in
-                            StyledText.caption2(bar.dayLabel, alignment: .center)
+                            StyledText(text: bar.dayLabel)
+                                .textStyle(.caption2)
+                                .multilineTextAlignment(.center)
                                 .frame(maxWidth: .infinity)
                         }
                     }
                     .frame(height: Constant.labelRowHeight)
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: Constant.chartHeight, alignment: .bottom)
+                .frame(
+                    height: Constant.chartHeight,
+                    alignment: .bottom,
+                )
             }
             .padding(.horizontal, Constant.horizontalPadding)
             .padding(.vertical, Constant.verticalPadding)
             .frame(maxWidth: .infinity)
-            .frame(height: Constant.cardHeight, alignment: .top)
-            .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .large))
+            .frame(
+                height: Constant.cardHeight,
+                alignment: .top,
+            )
+            .background(
+                Color(designSystem: .grey600),
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
         // MARK: Private
@@ -66,12 +92,11 @@ extension ProfileScreen {
 
         private func barColumn(_ bar: ProfileDisplay.WeeklyBar) -> some View {
             VStack(spacing: Constant.countToBarSpacing) {
-                StyledText.caption2(
-                    "\(bar.count)",
-                    color: bar.isHighlighted ? .grey200 : .grey300,
-                    alignment: .center,
-                )
-                .frame(height: Constant.labelRowHeight)
+                StyledText(text: "\(bar.count)")
+                    .textStyle(.caption2)
+                    .foregroundColorToken(bar.isHighlighted ? .grey200 : .grey300)
+                    .multilineTextAlignment(.center)
+                    .frame(height: Constant.labelRowHeight)
 
                 LinearGradient(designSystem: bar.isHighlighted ? .gradient3 : .gradient1)
                     .frame(height: barHeight(for: bar.count))

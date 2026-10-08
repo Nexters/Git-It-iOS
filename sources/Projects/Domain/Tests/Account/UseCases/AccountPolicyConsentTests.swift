@@ -11,8 +11,16 @@ struct AccountPolicyConsentTests {
     @Test
     func `필수 약관마다 같은 버전의 동의가 있으면 충족한다`() async throws {
         let consents = [
-            PolicyConsent(documentID: "terms", version: "1", consentedAt: Self.consentedAt),
-            PolicyConsent(documentID: "privacy", version: "1", consentedAt: Self.consentedAt),
+            PolicyConsent(
+                documentID: "terms",
+                version: "1",
+                consentedAt: Self.consentedAt,
+            ),
+            PolicyConsent(
+                documentID: "privacy",
+                version: "1",
+                consentedAt: Self.consentedAt,
+            ),
         ]
         let account = Self.makeAccount(policyConsentRepository: InMemoryPolicyConsentRepository(consents: consents))
 
@@ -26,8 +34,16 @@ struct AccountPolicyConsentTests {
     @Test
     func `필수 약관 버전이 바뀌면 이전 동의로는 충족하지 않는다`() async throws {
         let consents = [
-            PolicyConsent(documentID: "terms", version: "1", consentedAt: Self.consentedAt),
-            PolicyConsent(documentID: "privacy", version: "0", consentedAt: Self.consentedAt),
+            PolicyConsent(
+                documentID: "terms",
+                version: "1",
+                consentedAt: Self.consentedAt,
+            ),
+            PolicyConsent(
+                documentID: "privacy",
+                version: "0",
+                consentedAt: Self.consentedAt,
+            ),
         ]
         let account = Self.makeAccount(policyConsentRepository: InMemoryPolicyConsentRepository(consents: consents))
 
@@ -42,15 +58,27 @@ struct AccountPolicyConsentTests {
         try await account.consent(to: ["terms", "marketing"])
 
         #expect(await repository.storedConsents == [
-            PolicyConsent(documentID: "terms", version: "1", consentedAt: Self.consentedAt),
-            PolicyConsent(documentID: "marketing", version: "2", consentedAt: Self.consentedAt),
+            PolicyConsent(
+                documentID: "terms",
+                version: "1",
+                consentedAt: Self.consentedAt,
+            ),
+            PolicyConsent(
+                documentID: "marketing",
+                version: "2",
+                consentedAt: Self.consentedAt,
+            ),
         ])
     }
 
     @Test
     func `탈퇴하면 동의 기록을 지우고 signedOut 상태를 방출한다`() async throws {
         let repository = InMemoryPolicyConsentRepository(consents: [
-            PolicyConsent(documentID: "terms", version: "1", consentedAt: Self.consentedAt)
+            PolicyConsent(
+                documentID: "terms",
+                version: "1",
+                consentedAt: Self.consentedAt,
+            )
         ])
         let account = Self.makeAccount(policyConsentRepository: repository)
         var states = await account.signInStates().makeAsyncIterator()

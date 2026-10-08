@@ -12,9 +12,13 @@ struct LegalAgreementScreen: View {
     @Bindable var store: StoreOf<LegalAgreementFeature>
 
     var body: some View {
-        SheetSurface(isScrollable: true) {
-            VStack(alignment: .leading, spacing: 0) {
-                StyledText.subtitle1("약관 동의")
+        SheetSurface {
+            VStack(
+                alignment: .leading,
+                spacing: 0,
+            ) {
+                StyledText(text: "약관 동의")
+                    .textStyle(.subtitle1)
                     .padding(.top, LayoutToken.gutter)
                     .padding(.bottom, Constant.titleBottomSpacing)
 
@@ -23,13 +27,23 @@ struct LegalAgreementScreen: View {
                     onToggle: { send(.allDocumentsToggled) },
                 )
 
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(store.requiredDocuments, id: \.id) { document in
+                VStack(
+                    alignment: .leading,
+                    spacing: 0,
+                ) {
+                    ForEach(
+                        store.requiredDocuments,
+                        id: \.id,
+                    ) { document in
                         PolicyAgreementRow(
-                            title: document.displayName,
-                            isRequired: document.isRequired,
-                            isSelected: store.selectedDocumentIDs.contains(document.id),
-                            onToggle: { send(.documentToggled(documentID: document.id)) },
+                            displayModel: .init(
+                                title: document.displayName,
+                                isRequired: document.isRequired,
+                            ),
+                            isSelected: Binding(
+                                get: { store.selectedDocumentIDs.contains(document.id) },
+                                set: { _ in send(.documentToggled(documentID: document.id)) },
+                            ),
                             onOpenLink: { send(.documentLinkTapped(documentID: document.id)) },
                         )
                         .padding(.leading, Constant.documentRowLeadingPadding)
@@ -38,17 +52,22 @@ struct LegalAgreementScreen: View {
                 .padding(.top, Constant.documentsTopSpacing)
 
                 HStack(spacing: LayoutToken.compactSpacing) {
-                    ActionButton.secondary("취소", action: { send(.cancelTapped) })
+                    FeedbackActionButton(
+                        title: "취소",
+                        action: { send(.cancelTapped) },
+                    )
+                    .style(.secondary)
 
-                    ActionButton.primary(
-                        "다음",
-                        isEnabled: store.canContinue,
+                    FeedbackActionButton(
+                        title: "다음",
                         action: { send(.continueTapped) },
                     )
+                    .enabled(store.canContinue)
                 }
                 .padding(.top, Constant.actionsTopSpacing)
             }
         }
+        .scrollable(true)
     }
 
 }

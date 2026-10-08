@@ -39,27 +39,49 @@ public struct MemberRemote: Sendable {
     // MARK: Public
 
     public func fetchProfile() async throws -> MemberProfileResponseDTO {
-        try await send(.fetchProfile, expecting: MemberProfileResponseDTO.self)
+        try await send(
+            .fetchProfile,
+            expecting: MemberProfileResponseDTO.self,
+        )
     }
 
     public func registerDeviceInfo(_ request: DeviceInfoRequestDTO) async throws {
-        _ = try await send(.registerDeviceInfo, body: request, expecting: EmptyResponseData.self)
+        _ = try await send(
+            .registerDeviceInfo,
+            body: request,
+            expecting: EmptyResponseData.self,
+        )
     }
 
     public func curateMember(_ request: CurationRequestDTO) async throws {
-        _ = try await send(.curateMember, body: request, expecting: EmptyResponseData.self)
+        _ = try await send(
+            .curateMember,
+            body: request,
+            expecting: EmptyResponseData.self,
+        )
     }
 
     public func updatePosition(_ request: PositionRequestDTO) async throws {
-        _ = try await send(.updatePosition, body: request, expecting: EmptyResponseData.self)
+        _ = try await send(
+            .updatePosition,
+            body: request,
+            expecting: EmptyResponseData.self,
+        )
     }
 
     public func updateCareerLevel(_ request: CareerLevelRequestDTO) async throws {
-        _ = try await send(.updateCareerLevel, body: request, expecting: EmptyResponseData.self)
+        _ = try await send(
+            .updateCareerLevel,
+            body: request,
+            expecting: EmptyResponseData.self,
+        )
     }
 
     public func withdrawMember() async throws {
-        _ = try await send(.withdrawMember, expecting: EmptyResponseData.self)
+        _ = try await send(
+            .withdrawMember,
+            expecting: EmptyResponseData.self,
+        )
     }
 
     // MARK: Private
@@ -128,7 +150,10 @@ public struct MemberRemote: Sendable {
             throw MemberServiceError.unexpectedStatus
 
         case .raw(let data):
-            let error = MemberServiceError(from: try serverError(statusCode: response.statusCode, data: data))
+            let error = MemberServiceError(from: try serverError(
+                statusCode: response.statusCode,
+                data: data,
+            ))
             if error == .unauthorized {
                 await credentialRejected()
             }
@@ -144,7 +169,10 @@ public struct MemberRemote: Sendable {
         data: Data,
     ) throws -> ServerAPIError {
         do {
-            let envelope = try JSONDecoder().decode(APIResponseDTO<EmptyResponseData>.self, from: data)
+            let envelope = try JSONDecoder().decode(
+                APIResponseDTO<EmptyResponseData>.self,
+                from: data,
+            )
             return ServerAPIError(
                 httpStatus: statusCode,
                 code: envelope.code,

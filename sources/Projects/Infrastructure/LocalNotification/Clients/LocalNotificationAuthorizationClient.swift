@@ -80,7 +80,10 @@ public final class LocalNotificationAuthorizationClient: NotificationAuthorizati
 
     public func present(_ request: LocalNotificationRequest) {
         Self.logger.debug("로컬 알림 발송: identifier=\(request.identifier, privacy: .public)")
-        add(request, trigger: nil)
+        add(
+            request,
+            trigger: nil,
+        )
     }
 
     public func schedule(
@@ -94,10 +97,19 @@ public final class LocalNotificationAuthorizationClient: NotificationAuthorizati
 
         cancel(identifier: request.identifier)
         guard delay > 0 else {
-            add(request, trigger: nil)
+            add(
+                request,
+                trigger: nil,
+            )
             return
         }
-        add(request, trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
+        add(
+            request,
+            trigger: UNTimeIntervalNotificationTrigger(
+                timeInterval: delay,
+                repeats: false,
+            ),
+        )
     }
 
     public func cancel(identifier: String) {

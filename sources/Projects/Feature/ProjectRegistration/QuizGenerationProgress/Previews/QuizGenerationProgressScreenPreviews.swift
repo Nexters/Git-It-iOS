@@ -31,5 +31,8 @@ extension QuizGenerationProgressFeature.State {
 }
 
 #Preview("알림 옵션 시트 · 824:12149") {
-    QuizGenerationProgressScreen.GenerationReminderSheet(onAccept: { }, onDecline: { })
+    QuizGenerationProgressScreen.GenerationReminderSheet(
+        onAccept: { },
+        onDecline: { },
+    )
 }

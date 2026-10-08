@@ -19,11 +19,19 @@ struct HTTPClientAuthorizationHeaderTests {
         )
 
         _ = try await client.send(
-            HTTPRequest(method: .get, path: "me", headers: ["Authorization": "Bearer first-token"]),
+            HTTPRequest(
+                method: .get,
+                path: "me",
+                headers: ["Authorization": "Bearer first-token"],
+            ),
             expecting: TestPayload.self,
         )
         _ = try await client.send(
-            HTTPRequest(method: .get, path: "me", headers: ["Authorization": "Bearer second-token"]),
+            HTTPRequest(
+                method: .get,
+                path: "me",
+                headers: ["Authorization": "Bearer second-token"],
+            ),
             expecting: TestPayload.self,
         )
 
@@ -39,7 +47,10 @@ struct HTTPClientAuthorizationHeaderTests {
         HTTPTransportResponse(
             statusCode: 200,
             headers: [:],
-            body: try! JSONEncoder().encode(TestPayload(id: 1, name: "응답")),
+            body: try! JSONEncoder().encode(TestPayload(
+                id: 1,
+                name: "응답",
+            )),
         )
     }
 

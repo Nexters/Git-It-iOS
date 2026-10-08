@@ -22,7 +22,10 @@ struct LearningProjectRequestExecutorTests {
         )
 
         await #expect(throws: LearningProjectServiceError.unauthorized) {
-            _ = try await remote.fetchProjects(page: 0, size: 10)
+            _ = try await remote.fetchProjects(
+                page: 0,
+                size: 10,
+            )
         }
         #expect(await transport.recordedRequests.isEmpty)
         #expect(rejections.withLock { $0 } == 0)
@@ -44,7 +47,10 @@ struct LearningProjectRequestExecutorTests {
         )
 
         await #expect(throws: LearningProjectServiceError.unauthorized) {
-            _ = try await remote.fetchProjects(page: 0, size: 10)
+            _ = try await remote.fetchProjects(
+                page: 0,
+                size: 10,
+            )
         }
         #expect(await transport.recordedRequests.count == 1)
         #expect(rejections.withLock { $0 } == 1)
@@ -72,7 +78,11 @@ struct LearningProjectRequestExecutorTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 
 }

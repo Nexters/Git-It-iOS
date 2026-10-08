@@ -24,7 +24,11 @@ enum OnboardingTestFixture {
     static let satisfiedConsentStatus = PolicyConsentStatus(
         documents: requiredDocuments,
         consents: requiredDocuments.map {
-            PolicyConsent(documentID: $0.id, version: $0.version, consentedAt: Date())
+            PolicyConsent(
+                documentID: $0.id,
+                version: $0.version,
+                consentedAt: Date(),
+            )
         },
         isSatisfied: true,
     )
@@ -36,7 +40,11 @@ enum OnboardingTestFixture {
     )
 
     static func signedInAccount(needsCuration: Bool) -> SignedInAccount {
-        SignedInAccount(id: "member-1", displayName: "테스터", needsCuration: needsCuration)
+        SignedInAccount(
+            id: "member-1",
+            displayName: "테스터",
+            needsCuration: needsCuration,
+        )
     }
 
     static func profile(
@@ -45,7 +53,10 @@ enum OnboardingTestFixture {
     ) -> UserProfile {
         let curation: Curation? =
             if let position, let careerLevel {
-                Curation(position: position, careerLevel: careerLevel)
+                Curation(
+                    position: position,
+                    careerLevel: careerLevel,
+                )
             } else {
                 nil
             }

@@ -66,10 +66,16 @@ public struct SettingsRouterFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.profile, action: \.profile) {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
             ProfileFeature(profile: { [userInfo] in try await Self.profile(from: userInfo) })
         }
-        Scope(state: \.settings, action: \.settings) {
+        Scope(
+            state: \.settings,
+            action: \.settings,
+        ) {
             SettingsFeature(
                 signOut: { [account] in await account.signOut() },
                 profile: { [userInfo] in try await Self.profile(from: userInfo) },
@@ -86,20 +92,16 @@ public struct SettingsRouterFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .profile(.delegate(.settingsRequested)):
-                if case .loaded(let profile) = state.profile.profileLoad {
-                    state.settings.profile = profile
-                    state.settings.profileLoad = .loaded
-                }
                 state.activeScreen = .settings(.list)
-                return .none
+                guard let profile = state.profile.profile.profile else { return .none }
+                return .send(.settings(.input(.profileProvided(profile))))
 
             case .settings(.delegate(.backRequested)):
                 switch state.activeScreen {
                 case .settings(.list):
-                    if let profile = state.settings.profile {
-                        state.profile.profileLoad = .loaded(profile)
-                    }
                     state.activeScreen = .profile
+                    guard let profile = state.settings.profile else { return .none }
+                    return .send(.profile(.profile(.input(.replace(profile)))))
 
                 case .settings(.positionSelection),
                      .settings(.careerLevelSelection),
@@ -154,7 +156,10 @@ public struct SettingsRouterFeature: Sendable {
     private static func profile(from userInfo: any UserInfoUseCase) async throws -> UserProfile {
         async let detail = userInfo.detail()
         async let curation = userInfo.curation()
-        return try await UserProfile(detail: detail, curation: curation)
+        return try await UserProfile(
+            detail: detail,
+            curation: curation,
+        )
     }
 
 }

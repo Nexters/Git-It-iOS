@@ -27,7 +27,10 @@ struct QuizSetRepositoryAdapterTests {
         #expect(quizSet.title == "제목")
         #expect(quizSet.quizzes.map(\.id) == ["question-1", "question-2"])
         #expect(quizSet.quizzes[0].prompt == "질문")
-        #expect(quizSet.quizzes[0].content == .choice(options: ["A", "B"], submitted: nil))
+        #expect(quizSet.quizzes[0].content == .choice(
+            options: ["A", "B"],
+            submitted: nil,
+        ))
         #expect(quizSet.quizzes[1].content == .essay(submitted: nil))
     }
 
@@ -68,7 +71,10 @@ struct QuizSetRepositoryAdapterTests {
 
         #expect(quizSet.quizzes[0].content == .choice(
             options: ["A", "B", "C"],
-            submitted: ChoiceSubmission(selectedIndex: 1, isCorrect: true),
+            submitted: ChoiceSubmission(
+                selectedIndex: 1,
+                isCorrect: true,
+            ),
         ))
     }
 
@@ -83,7 +89,10 @@ struct QuizSetRepositoryAdapterTests {
     func `기존 답변이 없는 문제는 제출 기록을 비운다`() async throws {
         let quizSet = try await Self.fetchQuizSet(payload: Self.fixturePayload)
 
-        #expect(quizSet.quizzes[2].content == .choice(options: ["A", "B"], submitted: nil))
+        #expect(quizSet.quizzes[2].content == .choice(
+            options: ["A", "B"],
+            submitted: nil,
+        ))
     }
 
     @Test
@@ -94,7 +103,10 @@ struct QuizSetRepositoryAdapterTests {
             "myAnswer":{"selectedIndex":1,"text":null,"correct":null,"answeredAt":"1970-01-01T00:00:00Z"}}]}
             """#)
 
-        #expect(quizSet.quizzes[0].content == .choice(options: ["A", "B"], submitted: nil))
+        #expect(quizSet.quizzes[0].content == .choice(
+            options: ["A", "B"],
+            submitted: nil,
+        ))
     }
 
     @Test
@@ -114,7 +126,10 @@ struct QuizSetRepositoryAdapterTests {
         ])
 
         await #expect(throws: QuizDetailError.quizSetUnavailable) {
-            _ = try await adapter.quizSet("missing", in: "project-1")
+            _ = try await adapter.quizSet(
+                "missing",
+                in: "project-1",
+            )
         }
     }
 
@@ -139,7 +154,10 @@ struct QuizSetRepositoryAdapterTests {
                 body: Data(#"{"success":true,"data":\#(payload),"code":null,"message":null,"errors":null}"#.utf8),
             )
         ])
-        return try await adapter.quizSet("set-1", in: "project-1")
+        return try await adapter.quizSet(
+            "set-1",
+            in: "project-1",
+        )
     }
 
     private static func makeAdapter(results: [TransportResponse]) -> QuizSetRepositoryAdapter {

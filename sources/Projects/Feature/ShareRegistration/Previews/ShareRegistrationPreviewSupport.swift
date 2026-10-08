@@ -11,9 +11,13 @@ enum ShareRegistrationPreviewSupport {
 
     // MARK: Internal
 
-    static func store(status: ShareRegistrationFeature.Status) -> StoreOf<ShareRegistrationFeature> {
+    static func store(
+        phase: SharedRepositoryRegistrationFeature.State.Phase? = nil,
+        step: ShareRegistrationFeature.Step = .repositoryConfirmation,
+    ) -> StoreOf<ShareRegistrationFeature> {
         var state = ShareRegistrationFeature.State(sharedURL: "https://github.com/apple/swift")
-        state.status = status
+        state.registration.phase = phase ?? .ready(sampleRepository)
+        state.step = step
         state.repositoryConfirmation.repository = sampleRepository
         return Store(initialState: state) {
             ShareRegistrationFeature(
@@ -29,7 +33,10 @@ enum ShareRegistrationPreviewSupport {
 
     private struct PreviewRepositoryLocator: ExternalRepositoryLocator {
         func location(from _: ExternalRepositoryURL) -> ExternalRepositoryLocation? {
-            ExternalRepositoryLocation(owner: "apple", name: "swift")
+            ExternalRepositoryLocation(
+                owner: "apple",
+                name: "swift",
+            )
         }
     }
 
@@ -41,7 +48,10 @@ enum ShareRegistrationPreviewSupport {
 
     private struct PreviewProjectGeneration: ProjectGenerationUseCase {
         func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
-            ProjectGenerationReceipt(projectID: "preview-project", quizLevel: request.quizLevel)
+            ProjectGenerationReceipt(
+                projectID: "preview-project",
+                quizLevel: request.quizLevel,
+            )
         }
 
         func states() async -> AsyncStream<ProjectGenerationState> {

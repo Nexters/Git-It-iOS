@@ -22,7 +22,11 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
     // MARK: Public
 
     public func pendingState() async -> GenerationState {
-        Self.purged(Self.state(from: await store.state()), waitPolicy: waitPolicy, now: now())
+        Self.purged(
+            Self.state(from: await store.state()),
+            waitPolicy: waitPolicy,
+            now: now(),
+        )
     }
 
     public func pendingStateChanges() async -> AsyncStream<GenerationState> {
@@ -32,7 +36,11 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         return AsyncStream { continuation in
             let task = Task {
                 for await dto in changes {
-                    continuation.yield(Self.purged(Self.state(from: dto), waitPolicy: waitPolicy, now: now()))
+                    continuation.yield(Self.purged(
+                        Self.state(from: dto),
+                        waitPolicy: waitPolicy,
+                        now: now(),
+                    ))
                 }
                 continuation.finish()
             }
@@ -46,14 +54,20 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         repositoryURL: ExternalRepositoryURL,
         requestedAt: Date,
     ) async -> Bool {
-        await modify { $0.beginning(repositoryURL: repositoryURL, requestedAt: requestedAt) }
+        await modify { $0.beginning(
+            repositoryURL: repositoryURL,
+            requestedAt: requestedAt,
+        ) }
     }
 
     public func attachProjectID(
         _ projectID: ProjectID,
         toRepositoryURL repositoryURL: ExternalRepositoryURL,
     ) async {
-        await modify { $0.attachingProjectID(projectID, toRepositoryURL: repositoryURL) }
+        await modify { $0.attachingProjectID(
+            projectID,
+            toRepositoryURL: repositoryURL,
+        ) }
     }
 
     public func finishGeneration(
@@ -61,7 +75,11 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         status: GenerationRecord.Status,
         finishedAt: Date,
     ) async {
-        await modify { $0.finishing(projectID: projectID, status: status, at: finishedAt) }
+        await modify { $0.finishing(
+            projectID: projectID,
+            status: status,
+            at: finishedAt,
+        ) }
     }
 
     public func releaseGeneration(repositoryURL: ExternalRepositoryURL) async {
@@ -77,7 +95,10 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
     }
 
     public func enqueueReminder(projectID: ProjectID) async {
-        await store.appendReminder(projectID: projectID, requestedAt: now())
+        await store.appendReminder(
+            projectID: projectID,
+            requestedAt: now(),
+        )
     }
 
     public func drainReminderProjectIDs() async -> [ProjectID] {
@@ -99,7 +120,10 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         waitPolicy: GenerationWaitPolicy,
         now: Date,
     ) -> GenerationState {
-        state.purgingExpired(now: now, retentionLimit: waitPolicy.retentionLimit)
+        state.purgingExpired(
+            now: now,
+            retentionLimit: waitPolicy.retentionLimit,
+        )
     }
 
     private static func state(from dto: GenerationStateDTO) -> GenerationState {
@@ -165,7 +189,11 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         let waitPolicy = waitPolicy
         let now = now()
         let written = await store.modifyState { dto in
-            let current = Self.purged(Self.state(from: dto), waitPolicy: waitPolicy, now: now)
+            let current = Self.purged(
+                Self.state(from: dto),
+                waitPolicy: waitPolicy,
+                now: now,
+            )
             return transition(current).map(Self.dto(from:))
         }
         return written != nil

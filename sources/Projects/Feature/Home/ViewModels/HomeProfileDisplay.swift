@@ -4,7 +4,7 @@ struct HomeProfileDisplay: Equatable, Sendable {
 
     // MARK: Lifecycle
 
-    init(_ profileLoad: HomeFeature.State.ProfileLoad) {
+    init(_ profileLoad: UserProfileLoadFeature.State.Load) {
         switch profileLoad {
         case .loaded(let profile):
             name = profile.detail.name

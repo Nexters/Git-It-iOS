@@ -39,7 +39,10 @@ public struct GenerationState: Equatable, Sendable {
         let key = GenerationRecord.normalizedURL(repositoryURL)
         let remaining = records.filter { $0.repositoryURL != key }
         return GenerationState(
-            records: remaining + [GenerationRecord(repositoryURL: key, requestedAt: requestedAt)]
+            records: remaining + [GenerationRecord(
+                repositoryURL: key,
+                requestedAt: requestedAt,
+            )]
         )
     }
 
@@ -64,7 +67,10 @@ public struct GenerationState: Equatable, Sendable {
         GenerationState(
             records: records.map { record in
                 record.projectID == projectID
-                    ? record.finishing(status: status, at: finishedAt)
+                    ? record.finishing(
+                        status: status,
+                        at: finishedAt,
+                    )
                     : record
             }
         )
@@ -84,7 +90,10 @@ public struct GenerationState: Equatable, Sendable {
         retentionLimit: TimeInterval,
     ) -> GenerationState {
         GenerationState(
-            records: records.filter { !$0.isExpired(now: now, retentionLimit: retentionLimit) }
+            records: records.filter { !$0.isExpired(
+                now: now,
+                retentionLimit: retentionLimit,
+            ) }
         )
     }
 

@@ -11,7 +11,10 @@ struct AppSettingTests {
     @Test
     func `현재 알림 권한과 요청 결과를 그대로 전달한다`() async {
         let appSetting = Self.makeAppSetting(
-            authorization: StubNotificationAuthorization(currentStatus: .notDetermined, requestedStatus: .denied)
+            authorization: StubNotificationAuthorization(
+                currentStatus: .notDetermined,
+                requestedStatus: .denied,
+            )
         )
 
         #expect(await appSetting.notificationAuthorization() == .notDetermined)
@@ -21,7 +24,10 @@ struct AppSettingTests {
     @Test
     func `기기를 등록하면 기기 정보와 현재 토큰으로 등록 정보를 만든다`() async throws {
         let repository = SpyDeviceRegistrationRepository()
-        let appSetting = Self.makeAppSetting(repository: repository, deviceToken: { "token-1" })
+        let appSetting = Self.makeAppSetting(
+            repository: repository,
+            deviceToken: { "token-1" },
+        )
 
         try await appSetting.registerDevice()
 

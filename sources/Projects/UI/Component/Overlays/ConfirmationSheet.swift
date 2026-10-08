@@ -2,24 +2,18 @@ import DesignSystem
 import Foundation
 import SwiftUI
 
+// MARK: - ConfirmationSheet
+
 public struct ConfirmationSheet: View {
 
     // MARK: Lifecycle
 
     public init(
-        imageURL: String?,
-        title: String,
-        message: String,
-        confirmTitle: String,
-        cancelTitle: String,
+        displayModel: DisplayModel,
         onConfirmTap: @escaping () -> Void = { },
         onCancelTap: @escaping () -> Void = { },
     ) {
-        self.imageURL = imageURL
-        self.title = title
-        self.message = message
-        self.confirmTitle = confirmTitle
-        self.cancelTitle = cancelTitle
+        self.displayModel = displayModel
         self.onConfirmTap = onConfirmTap
         self.onCancelTap = onCancelTap
     }
@@ -33,14 +27,27 @@ public struct ConfirmationSheet: View {
                     .padding(.top, Constant.thumbnailTopPadding)
 
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText.subtitle1(title, alignment: .center)
-                    StyledText.body2(message, color: .grey400, alignment: .center)
+                    StyledText(text: displayModel.title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
+                    StyledText(text: displayModel.message)
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.top, Constant.textSetTopPadding)
 
                 VStack(spacing: LayoutToken.compactSpacing) {
-                    ActionButton.destructive(confirmTitle, action: onConfirmTap)
-                    ActionButton.text(cancelTitle, action: onCancelTap)
+                    ActionButton(
+                        title: displayModel.confirmTitle,
+                        action: onConfirmTap,
+                    )
+                    .style(.destructive)
+                    ActionButton(
+                        title: displayModel.cancelTitle,
+                        action: onCancelTap,
+                    )
+                    .style(.text)
                 }
                 .padding(.top, Constant.buttonsTopPadding)
             }
@@ -57,28 +64,30 @@ public struct ConfirmationSheet: View {
         static let buttonsTopPadding: CGFloat = 26
     }
 
-    private let imageURL: String?
-    private let title: String
-    private let message: String
-    private let confirmTitle: String
-    private let cancelTitle: String
+    private let displayModel: DisplayModel
     private let onConfirmTap: () -> Void
     private let onCancelTap: () -> Void
 
     @ViewBuilder
     private var thumbnail: some View {
-        if let imageURL, let url = URL(string: imageURL) {
+        if let imageURL = displayModel.imageURL, let url = URL(string: imageURL) {
             AsyncImage(url: url) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 Color(designSystem: .grey500)
             }
-            .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+            .frame(
+                width: Constant.thumbnailSize,
+                height: Constant.thumbnailSize,
+            )
             .designSystemCornerRadius(.small)
             .accessibilityHidden(true)
         } else {
             Color(designSystem: .grey500)
-                .frame(width: Constant.thumbnailSize, height: Constant.thumbnailSize)
+                .frame(
+                    width: Constant.thumbnailSize,
+                    height: Constant.thumbnailSize,
+                )
                 .designSystemCornerRadius(.small)
                 .accessibilityHidden(true)
         }
@@ -86,19 +95,50 @@ public struct ConfirmationSheet: View {
 
 }
 
+// MARK: ConfirmationSheet.DisplayModel
+
+extension ConfirmationSheet {
+    public struct DisplayModel: Sendable, Equatable {
+        public init(
+            imageURL: String?,
+            title: String,
+            message: String,
+            confirmTitle: String,
+            cancelTitle: String,
+        ) {
+            self.imageURL = imageURL
+            self.title = title
+            self.message = message
+            self.confirmTitle = confirmTitle
+            self.cancelTitle = cancelTitle
+        }
+
+        public let imageURL: String?
+        public let title: String
+        public let message: String
+        public let confirmTitle: String
+        public let cancelTitle: String
+    }
+}
+
 #Preview("Confirmation Sheet") {
     ZStack {
         Color(designSystem: .grey700)
 
-        ModalOverlay(isPresented: true) {
+        ModalOverlay(isPresented: .constant(true)) {
             ConfirmationSheet(
-                imageURL: nil,
-                title: "프로젝트를 삭제할까요?",
-                message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
-                confirmTitle: "삭제",
-                cancelTitle: "취소",
+                displayModel: .init(
+                    imageURL: nil,
+                    title: "프로젝트를 삭제할까요?",
+                    message: "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다.",
+                    confirmTitle: "삭제",
+                    cancelTitle: "취소",
+                )
             )
         }
     }
-    .frame(width: 390, height: 844)
+    .frame(
+        width: 390,
+        height: 844,
+    )
 }

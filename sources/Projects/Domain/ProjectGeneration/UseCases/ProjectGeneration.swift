@@ -29,7 +29,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     public func request(_ request: ProjectGenerationRequest) async throws -> ProjectGenerationReceipt {
         guard
-            await pendingGenerations.beginGeneration(repositoryURL: request.repositoryURL, requestedAt: now())
+            await pendingGenerations.beginGeneration(
+                repositoryURL: request.repositoryURL,
+                requestedAt: now(),
+            )
         else {
             throw ProjectGenerationError.duplicateRequest
         }
@@ -42,7 +45,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             throw error
         }
 
-        await pendingGenerations.attachProjectID(receipt.projectID, toRepositoryURL: request.repositoryURL)
+        await pendingGenerations.attachProjectID(
+            receipt.projectID,
+            toRepositoryURL: request.repositoryURL,
+        )
         await pendingGenerations.enqueueReminder(projectID: receipt.projectID)
         return receipt
     }
@@ -114,7 +120,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
     private func purgeExpiredRecords() async {
         let current = now()
         for record in await pendingGenerations.pendingState().records
-            where waitPolicy.isExpired(record, now: current)
+            where waitPolicy.isExpired(
+                record,
+                now: current,
+            )
         {
             if let projectID = record.projectID {
                 await pendingGenerations.releaseGeneration(projectID: projectID)
@@ -136,7 +145,11 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             case .completed: .completed
             case .failed: .failed
             }
-        await pendingGenerations.finishGeneration(projectID: outcome.projectID, status: status, finishedAt: now())
+        await pendingGenerations.finishGeneration(
+            projectID: outcome.projectID,
+            status: status,
+            finishedAt: now(),
+        )
     }
 
     private func releaseAll() async {
@@ -165,13 +178,19 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         switch record.status {
         case .completed:
             await reminderScheduler.schedule(
-                GenerationReminder(projectID: projectID, kind: .completed),
+                GenerationReminder(
+                    projectID: projectID,
+                    kind: .completed,
+                ),
                 at: waitPolicy.readyDate(for: record),
             )
 
         case .failed:
             await reminderScheduler.schedule(
-                GenerationReminder(projectID: projectID, kind: .failed),
+                GenerationReminder(
+                    projectID: projectID,
+                    kind: .failed,
+                ),
                 at: now(),
             )
 
@@ -187,7 +206,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
                 repositoryURL: record.repositoryURL,
                 projectID: record.projectID,
                 requestedAt: record.requestedAt,
-                phase: phase(of: record, now: current),
+                phase: phase(
+                    of: record,
+                    now: current,
+                ),
             )
         }
         let preparingProjectIDs = requests.reduce(into: Set<ProjectID>()) { projectIDs, request in
@@ -203,7 +225,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
                 break
             }
         }
-        return ProjectGenerationState(requests: requests, preparingProjectIDs: preparingProjectIDs)
+        return ProjectGenerationState(
+            requests: requests,
+            preparingProjectIDs: preparingProjectIDs,
+        )
     }
 
     private func phase(

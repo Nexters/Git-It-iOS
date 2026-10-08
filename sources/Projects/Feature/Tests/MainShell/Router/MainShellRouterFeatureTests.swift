@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import DomainAccount
 import DomainAppSetting
 import Testing
 
@@ -24,9 +23,13 @@ struct MainShellRouterFeatureTests {
         let userInfo = UserInfoUseCaseMock()
         let projects = ProjectUseCaseMock()
         var state = MainShellRouterFeature.State()
-        state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
-        state.home.projectLoad = .loaded(HomeTestFixture.oneProjectPage)
-        let store = makeStore(state: state, projects: projects, userInfo: userInfo)
+        state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
+        state.home.projectSummaries.load = .loaded(HomeTestFixture.oneProjectPage)
+        let store = makeStore(
+            state: state,
+            projects: projects,
+            userInfo: userInfo,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.tabSelected(.projects))) { $0.selectedTab = .projects }
@@ -34,7 +37,7 @@ struct MainShellRouterFeatureTests {
         await store.finish()
 
         #expect(await projects.snapshot().refreshCallCount > 0)
-        #expect(store.state.home.projectLoad == .loaded(HomeTestFixture.oneProjectPage))
+        #expect(store.state.home.projectSummaries.load == .loaded(HomeTestFixture.oneProjectPage))
     }
 
     @Test
@@ -42,7 +45,7 @@ struct MainShellRouterFeatureTests {
         let store = makeStore()
         store.exhaustivity = .off
 
-        await store.send(.home(.view(.showAllProjectsTapped))) {
+        await store.send(.home(.delegate(.allProjectsRequested))) {
             $0.selectedTab = .projects
         }
         await store.finish()
@@ -57,10 +60,16 @@ struct MainShellRouterFeatureTests {
         await store.send(.home(.delegate(.projectDetailRequested(projectID: "project-1"))))
         await store.receive(.delegate(.projectDetailRequested(projectID: "project-1")))
         await store.send(
-            .home(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+            .home(.delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            )))
         )
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -70,7 +79,7 @@ struct MainShellRouterFeatureTests {
     ) async {
         var state = MainShellRouterFeature.State()
         state.selectedTab = .settings
-        state.home.profileLoad = .loaded(HomeTestFixture.profileWithBoth)
+        state.home.profile.load = .loaded(HomeTestFixture.profileWithBoth)
         let store = makeStore(state: state)
 
         await store.send(.settings(.delegate(delegate))) {
@@ -84,10 +93,16 @@ struct MainShellRouterFeatureTests {
         let store = makeStore()
 
         await store.send(
-            .projectList(.delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1")))
+            .projectList(.delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            )))
         )
         await store.receive(
-            .delegate(.learningRequested(projectID: "project-1", nextSetID: "set-1"))
+            .delegate(.learningRequested(
+                projectID: "project-1",
+                nextSetID: "set-1",
+            ))
         )
     }
 
@@ -99,7 +114,10 @@ struct MainShellRouterFeatureTests {
 
         await store.send(.saved(.delegate(.questionSelected(bookmark))))
         await store.receive(
-            .singleQuestionEntry(.input(.questionRequested(setID: "set-0", questionID: "quiz-0")))
+            .singleQuestionEntry(.input(.questionRequested(
+                setID: "set-0",
+                questionID: "quiz-0",
+            )))
         )
 
         #expect(store.state.singleQuestionEntry?.projectID == bookmark.projectID)
@@ -144,6 +162,17 @@ struct MainShellRouterFeatureTests {
         #expect(store.state.selectedTab == .saved)
     }
 
+    @Test
+    func `단일 문제 준비 실패 알림을 닫으면 준비 흐름에 실패 닫기를 전달한다`() async {
+        let store = makeStore()
+        store.exhaustivity = .off
+        let bookmark = ProjectDetailTestFixture.savedQuizList.bookmarks[0]
+
+        await store.send(.saved(.delegate(.questionSelected(bookmark))))
+        await store.send(.view(.singleQuestionFailureDismissed))
+        await store.receive(.singleQuestionEntry(.input(.failureDismissed)))
+    }
+
     // MARK: Private
 
     private func makeStore(
@@ -161,47 +190,6 @@ struct MainShellRouterFeatureTests {
             )
         }
     }
-
-}
-
-// MARK: - MainShellAccountUseCaseStub
-
-private struct MainShellAccountUseCaseStub: AccountUseCase {
-
-    func signIn(with method: SignInMethod) async -> SignInResult {
-        _ = method
-        return .retryableFailure
-    }
-
-    func signOut() async -> SignOutResult {
-        .signedOut
-    }
-
-    func signInStates() async -> AsyncStream<SignInState> {
-        AsyncStream { $0.finish() }
-    }
-
-    func restoreSignIn() async -> SignInRestoration {
-        .signedOut
-    }
-
-    func verifySignIn() async -> SignInVerification {
-        .valid
-    }
-
-    func signInAvailability() async -> SignInAvailability {
-        .signedIn
-    }
-
-    func policyConsentStatus() async throws -> PolicyConsentStatus {
-        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
-    }
-
-    func consent(to documentIDs: [PolicyDocumentID]) async throws {
-        _ = documentIDs
-    }
-
-    func withdraw() async throws { }
 
 }
 

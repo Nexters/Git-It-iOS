@@ -71,7 +71,10 @@ public struct PositionSelectionFeature: Sendable {
                     let result = await signOut()
                     await send(.effect(.signOutFinished(result)))
                 }
-                .cancellable(id: CancelID.exit, cancelInFlight: true)
+                .cancellable(
+                    id: CancelID.exit,
+                    cancelInFlight: true,
+                )
 
             case .effect(.signOutFinished(let result)):
                 switch result {

@@ -9,30 +9,54 @@ extension ProfileScreen {
         let display: ProfileDisplay
 
         var body: some View {
-            HStack(alignment: .top, spacing: Constant.avatarSpacing) {
-                ResourceImage(asset: .icon(.profile), contentMode: .fill)
-                    .frame(width: Constant.avatarSize, height: Constant.avatarSize)
-                    .clipShape(Circle())
-                    .accessibilityHidden(true)
+            HStack(
+                alignment: .top,
+                spacing: Constant.avatarSpacing,
+            ) {
+                ResourceImage(
+                    asset: .icon(.profile),
+                    contentMode: .fill,
+                )
+                .frame(
+                    width: Constant.avatarSize,
+                    height: Constant.avatarSize,
+                )
+                .clipShape(Circle())
+                .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: Constant.infoSpacing) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        StyledText.subtitle2(display.name ?? "")
-                        StyledText.caption1(display.email ?? "", color: .grey400)
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.infoSpacing,
+                ) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: 0,
+                    ) {
+                        StyledText(text: display.name ?? "")
+                            .textStyle(.subtitle2)
+                        StyledText(text: display.email ?? "")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.grey400)
                     }
 
                     if display.hasBadges {
                         HStack(spacing: Constant.badgeSpacing) {
                             if let position = display.positionBadgeText {
-                                TagBadge.accent(position, size: .compact)
+                                TagBadge(text: position)
+                                    .style(.accent)
+                                    .size(.compact)
                             }
                             if let careerLevel = display.careerLevelBadgeText {
-                                TagBadge.neutral(careerLevel, size: .compact)
+                                TagBadge(text: careerLevel)
+                                    .size(.compact)
                             }
                         }
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
             }
             .accessibilityElement(children: .combine)
         }

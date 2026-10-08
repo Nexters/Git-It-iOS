@@ -2,21 +2,17 @@ import DesignSystem
 import Lottie
 import SwiftUI
 
+// MARK: - ResourceAnimation
+
 public struct ResourceAnimation: View {
 
     // MARK: Lifecycle
 
     public init(
         asset: Asset,
-        isLooping: Bool = true,
-        speed: Double = 1,
-        contentMode: ContentMode = .fit,
         onCompletion: ((Bool) -> Void)? = nil,
     ) {
         self.asset = asset
-        self.isLooping = isLooping
-        self.speed = speed
-        self.contentMode = contentMode
         self.onCompletion = onCompletion
     }
 
@@ -31,7 +27,10 @@ public struct ResourceAnimation: View {
         case storageEmpty = "storage-empty"
 
         var animation: LottieAnimation? {
-            .named(rawValue, bundle: .module)
+            .named(
+                rawValue,
+                bundle: .module,
+            )
         }
     }
 
@@ -47,23 +46,56 @@ public struct ResourceAnimation: View {
     // MARK: Private
 
     private let asset: Asset
-    private let isLooping: Bool
-    private let speed: Double
-    private let contentMode: ContentMode
+    private var isLooping = true
+    private var speed: Double = 1
+    private var contentMode = ContentMode.fit
     private let onCompletion: ((Bool) -> Void)?
 
+}
+
+// MARK: ResourceAnimation 상태 선언
+
+extension ResourceAnimation {
+    public func looping(_ isLooping: Bool) -> Self {
+        var copy = self
+        copy.isLooping = isLooping
+        return copy
+    }
+
+    public func speed(_ speed: Double) -> Self {
+        var copy = self
+        copy.speed = speed
+        return copy
+    }
+
+    public func contentMode(_ contentMode: ContentMode) -> Self {
+        var copy = self
+        copy.contentMode = contentMode
+        return copy
+    }
 }
 
 #Preview("Resource Animation") {
     VStack(spacing: LayoutToken.gutter) {
         ResourceAnimation(asset: .generalLoading)
-            .frame(width: 128, height: 128)
+            .frame(
+                width: 128,
+                height: 128,
+            )
 
-        ResourceAnimation(asset: .notification, isLooping: false)
-            .frame(width: 128, height: 128)
+        ResourceAnimation(asset: .notification)
+            .looping(false)
+            .frame(
+                width: 128,
+                height: 128,
+            )
 
-        ResourceAnimation(asset: .storageEmpty, isLooping: false)
-            .frame(width: 128, height: 128)
+        ResourceAnimation(asset: .storageEmpty)
+            .looping(false)
+            .frame(
+                width: 128,
+                height: 128,
+            )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)
@@ -72,11 +104,19 @@ public struct ResourceAnimation: View {
 
 #Preview("Resource Animation 2") {
     VStack(spacing: LayoutToken.gutter) {
-        ResourceAnimation(asset: .setCreationLoading, speed: 1.5)
-            .frame(width: 250, height: 250)
+        ResourceAnimation(asset: .setCreationLoading)
+            .speed(1.5)
+            .frame(
+                width: 250,
+                height: 250,
+            )
 
-        ResourceAnimation(asset: .complete, isLooping: false)
-            .frame(width: 200, height: 200)
+        ResourceAnimation(asset: .complete)
+            .looping(false)
+            .frame(
+                width: 200,
+                height: 200,
+            )
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

@@ -7,7 +7,10 @@ public struct RubricResponseDTO: Decodable, Equatable, Sendable {
         feedback: String,
     ) {
         self.init(
-            criteria: [RubricCriterionResponseDTO(text: feedback, points: score)],
+            criteria: [RubricCriterionResponseDTO(
+                text: feedback,
+                points: score,
+            )],
             keyPoints: [],
             fullMarkExample: "",
             partialExample: "",

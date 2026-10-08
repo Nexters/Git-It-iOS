@@ -13,11 +13,18 @@ struct RequestTransportBridgeTests {
 
     @Test
     func `요청의 URL과 헤더와 본문을 주입한 전송에 전달한다`() async throws {
-        let transport = StubRequestTransport(result: .success(TransportResponse(statusCode: 200, body: Data("{}".utf8))))
+        let transport = StubRequestTransport(result: .success(TransportResponse(
+            statusCode: 200,
+            body: Data("{}".utf8),
+        )))
         let client = Self.makeClient(transport: transport)
 
         _ = try await client.send(
-            HTTPRequest(method: .post, path: "/api/v1/items", headers: ["Authorization": "Bearer token"]),
+            HTTPRequest(
+                method: .post,
+                path: "/api/v1/items",
+                headers: ["Authorization": "Bearer token"],
+            ),
             body: ["name": "value"],
             expecting: EmptyBody.self,
         )
@@ -26,7 +33,10 @@ struct RequestTransportBridgeTests {
         #expect(request.url.absoluteString == "https://api.example.com/api/v1/items")
         #expect(request.headerFields["authorization"] == "Bearer token")
         let body = try #require(request.body)
-        #expect(try JSONDecoder().decode([String: String].self, from: body) == ["name": "value"])
+        #expect(try JSONDecoder().decode(
+            [String: String].self,
+            from: body,
+        ) == ["name": "value"])
     }
 
     @Test
@@ -37,7 +47,13 @@ struct RequestTransportBridgeTests {
         )))
         let client = Self.makeClient(transport: transport)
 
-        let response = try await client.send(HTTPRequest(method: .get, path: "/items"), expecting: [String: String].self)
+        let response = try await client.send(
+            HTTPRequest(
+                method: .get,
+                path: "/items",
+            ),
+            expecting: [String: String].self,
+        )
 
         #expect(response.statusCode == 200)
         guard case .decoded(let decoded) = response.body else {

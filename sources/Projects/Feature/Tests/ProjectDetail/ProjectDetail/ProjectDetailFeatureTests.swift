@@ -17,12 +17,26 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        let displays = ProjectDetailSetDisplay.list(sets: store.state.detail?.sets ?? [])
+        let displays = ProjectDetailSetDisplay.list(sets: store.state.detailLoad.detail?.sets ?? [])
         #expect(displays.map(\.label) == ["CHAPTER 1", "CHAPTER 2", "CHAPTER 3"])
         #expect(displays.map(\.completedCount) == [5, 2, 0])
         #expect(displays.map(\.questionCount) == [5, 4, 3])
+    }
+
+    @Test(arguments: [
+        ProjectDetailFeature.Action.view(.task),
+        .view(.retryTapped),
+        .input(.refreshRequested),
+    ])
+    func `진입·재시도·갱신 요청은 상세 조회에 load를 보낸다`(action: ProjectDetailFeature.Action) async {
+        let store = makeStore()
+        store.exhaustivity = .off
+
+        await store.send(action)
+        await store.receive(.detailLoad(.input(.load)))
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
     }
 
     @Test
@@ -41,7 +55,7 @@ struct ProjectDetailFeatureTests {
     func `저장소 시작 컨트롤은 첫 미완료 세트로 같은 의도를 만든다`() async {
         let store = loadedStore()
 
-        #expect(store.state.isResumeEnabled)
+        #expect(store.state.detailLoad.isResumeEnabled)
 
         await store.send(.view(.resumeTapped))
         await store.receive(.delegate(.setStartRequested(
@@ -55,7 +69,7 @@ struct ProjectDetailFeatureTests {
     func `미완료 세트가 없으면 시작 컨트롤이 비활성이고 입력이 아무 일도 하지 않는다`() async {
         let store = loadedStore(detail: ProjectDetailTestFixture.completedDetail)
 
-        #expect(!store.state.isResumeEnabled)
+        #expect(!store.state.detailLoad.isResumeEnabled)
 
         await store.send(.view(.resumeTapped))
     }
@@ -82,19 +96,27 @@ struct ProjectDetailFeatureTests {
     }
 
     @Test
-    func `삭제는 확인 단계를 거치고 취소하면 아무 것도 삭제하지 않는다`() async {
+    func `삭제는 메뉴를 닫고 삭제에 request를 보내며 취소하면 아무 것도 삭제하지 않는다`() async {
         let deleteProject = ProjectUseCaseDeletionStub()
         let store = loadedStore(deleteProject: deleteProject)
 
-        await store.send(.view(.deleteTapped)) { $0.deletion = .confirming }
-        await store.send(.view(.deletionCancelled)) { $0.deletion = .idle }
+        await store.send(.view(.menuTapped)) { $0.isMenuPresented = true }
+        await store.send(.view(.deleteTapped)) { $0.isMenuPresented = false }
+        await store.receive(.deletion(.input(.request(ProjectDetailTestFixture.projectID)))) {
+            $0.deletion.deletion = .confirming(projectID: ProjectDetailTestFixture.projectID)
+        }
+        await store.send(.view(.deletionCancelled))
+        await store.receive(.deletion(.input(.cancel))) { $0.deletion.deletion = .idle }
 
         #expect(await deleteProject.callCount == 0)
     }
 
     @Test
     func `삭제 중에는 재입력을 무시하고 성공하면 삭제 완료를 알린다`() async {
-        let deleteProject = ProjectUseCaseDeletionStub(results: [.success(())], suspendsRequests: true)
+        let deleteProject = ProjectUseCaseDeletionStub(
+            results: [.success(())],
+            suspendsRequests: true,
+        )
         let store = loadedStore(deleteProject: deleteProject)
         store.exhaustivity = .off
 
@@ -102,7 +124,7 @@ struct ProjectDetailFeatureTests {
         await store.send(.view(.deletionConfirmed))
         await store.send(.view(.deletionConfirmed))
         await deleteProject.resumeOldest()
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
         await store.receive(.delegate(.projectDeleted(projectID: ProjectDetailTestFixture.projectID)))
 
         #expect(await deleteProject.callCount == 1)
@@ -117,9 +139,28 @@ struct ProjectDetailFeatureTests {
 
         await store.send(.view(.deleteTapped))
         await store.send(.view(.deletionConfirmed))
-        await store.receive(\.effect.deletionFinished)
+        await store.receive(\.deletion.effect.deletionFinished)
 
-        #expect(store.state.deletion == .failed(.temporarilyUnavailable))
+        #expect(
+            store.state.deletion.deletion
+                == .failed(
+                    projectID: ProjectDetailTestFixture.projectID,
+                    error: .temporarilyUnavailable,
+                )
+        )
+    }
+
+    @Test
+    func `이미 사라진 프로젝트를 삭제하면 삭제 완료를 알린다`() async {
+        let store = loadedStore(deleteProject: ProjectUseCaseDeletionStub(results: [.failure(.notFound)]))
+        store.exhaustivity = .off
+
+        await store.send(.view(.deleteTapped))
+        await store.send(.view(.deletionConfirmed))
+        await store.receive(\.deletion.effect.deletionFinished)
+        await store.receive(.delegate(.projectDeleted(projectID: ProjectDetailTestFixture.projectID)))
+
+        #expect(store.state.deletion.deletion == .idle)
     }
 
     @Test
@@ -132,12 +173,12 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
         await store.send(.input(.refreshRequested))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        #expect(store.state.detail == ProjectDetailTestFixture.completedDetail)
+        #expect(store.state.detailLoad.detail == ProjectDetailTestFixture.completedDetail)
         #expect(await projectDetail.callCount == 2)
     }
 
@@ -149,9 +190,9 @@ struct ProjectDetailFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.task))
-        await store.receive(\.effect.detailLoadFinished)
+        await store.receive(\.detailLoad.effect.detailLoadFinished)
 
-        #expect(store.state.loadStatus == .failed(.temporarilyUnavailable))
+        #expect(store.state.detailLoad.loadStatus == .failed(.temporarilyUnavailable))
     }
 
     // MARK: Private
@@ -161,9 +202,12 @@ struct ProjectDetailFeatureTests {
         deleteProject: ProjectUseCaseDeletionStub = ProjectUseCaseDeletionStub(),
     ) -> TestStoreOf<ProjectDetailFeature> {
         var state = ProjectDetailFeature.State(projectID: ProjectDetailTestFixture.projectID)
-        state.detail = detail
-        state.loadStatus = .loaded
-        return makeStore(deleteProject: deleteProject, state: state)
+        state.detailLoad.detail = detail
+        state.detailLoad.loadStatus = .loaded
+        return makeStore(
+            deleteProject: deleteProject,
+            state: state,
+        )
     }
 
     private func makeStore(

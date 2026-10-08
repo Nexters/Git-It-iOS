@@ -21,16 +21,19 @@ struct SettingsRouterFeatureTests {
     }
 
     @Test
-    func `설정 아이콘을 탭하면 프로필 값을 설정에 넘기고 설정 목록으로 전환한다`() async {
+    func `설정 아이콘을 탭하면 설정 목록으로 전환하고 프로필 값을 input으로 설정에 넘긴다`() async {
         var state = SettingsRouterFeature.State()
-        state.profile.profileLoad = .loaded(profile)
+        state.profile.profile.load = .loaded(profile)
         let store = makeStore(state: state)
 
         await store.send(.profile(.view(.settingsTapped)))
         await store.receive(.profile(.delegate(.settingsRequested))) {
-            $0.settings.profile = profile
-            $0.settings.profileLoad = .loaded
             $0.activeScreen = .settings(.list)
+        }
+        await store.receive(.settings(.input(.profileProvided(profile))))
+        await store.receive(.settings(.userProfile(.input(.replace(profile))))) {
+            $0.settings.userProfile.load = .loaded(profile)
+            $0.settings.userProfile.requestID = 1
         }
     }
 
@@ -59,18 +62,20 @@ struct SettingsRouterFeatureTests {
     }
 
     @Test
-    func `설정 목록에서 뒤로가기는 변경된 프로필을 프로필 화면에 반영하고 돌아간다`() async {
+    func `설정 목록에서 뒤로가기는 프로필 화면으로 돌아가고 변경된 프로필을 input으로 반영한다`() async {
         var state = SettingsRouterFeature.State()
         state.activeScreen = .settings(.list)
-        state.profile.profileLoad = .loaded(profile)
-        state.settings.profile = updatedProfile
-        state.settings.profileLoad = .loaded
+        state.profile.profile.load = .loaded(profile)
+        state.settings.userProfile.load = .loaded(updatedProfile)
         let store = makeStore(state: state)
 
         await store.send(.settings(.view(.backTapped)))
         await store.receive(.settings(.delegate(.backRequested))) {
-            $0.profile.profileLoad = .loaded(updatedProfile)
             $0.activeScreen = .profile
+        }
+        await store.receive(.profile(.profile(.input(.replace(updatedProfile))))) {
+            $0.profile.profile.load = .loaded(updatedProfile)
+            $0.profile.profile.requestID = 1
         }
     }
 
@@ -80,16 +85,20 @@ struct SettingsRouterFeatureTests {
         state.activeScreen = .settings(.list)
         let store = makeStore(state: state)
 
-        await store.send(.settings(.view(.deleteAccountTapped))) {
-            $0.settings.accountAction = .confirmingDeletion
+        await store.send(.settings(.view(.deleteAccountTapped)))
+        await store.receive(.settings(.accountAction(.input(.deletionRequested)))) {
+            $0.settings.accountAction.accountAction = .confirmingDeletion
         }
+        await store.receive(.settings(.accountAction(.delegate(.deletionConfirmationRequested))))
         await store.receive(.settings(.delegate(.accountDeletionRequested))) {
             $0.activeScreen = .settings(.accountDeletion)
         }
 
-        await store.send(.settings(.view(.deleteAccountCancelled))) {
-            $0.settings.accountAction = .idle
+        await store.send(.settings(.view(.deleteAccountCancelled)))
+        await store.receive(.settings(.accountAction(.input(.deletionCancelled)))) {
+            $0.settings.accountAction.accountAction = .idle
         }
+        await store.receive(.settings(.accountAction(.delegate(.deletionCancelled))))
         await store.receive(.settings(.delegate(.accountDeletionCancelled))) {
             $0.activeScreen = .settings(.list)
         }
@@ -130,9 +139,15 @@ struct SettingsRouterFeatureTests {
 
     // MARK: Private
 
-    private let profile = SettingsTestFixture.profile(position: .backend, careerLevel: .entry)
+    private let profile = SettingsTestFixture.profile(
+        position: .backend,
+        careerLevel: .entry,
+    )
 
-    private let updatedProfile = SettingsTestFixture.profile(position: .ios, careerLevel: .senior)
+    private let updatedProfile = SettingsTestFixture.profile(
+        position: .ios,
+        careerLevel: .senior,
+    )
 
     private func makeStore(
         state: SettingsRouterFeature.State = .init()
@@ -178,7 +193,11 @@ private struct SettingsRouterAccountUseCaseStub: AccountUseCase {
     }
 
     func policyConsentStatus() async throws -> PolicyConsentStatus {
-        PolicyConsentStatus(documents: [], consents: [], isSatisfied: false)
+        PolicyConsentStatus(
+            documents: [],
+            consents: [],
+            isSatisfied: false,
+        )
     }
 
     func consent(to documentIDs: [PolicyDocumentID]) async throws {

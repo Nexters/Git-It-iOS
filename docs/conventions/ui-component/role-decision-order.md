@@ -15,7 +15,7 @@
 | 6 | `Displays/` | 위에 해당하지 않는 읽기 전용 표시인가? |
 
 `Controls/`의 판정 질문은 "표시 값을 모두 지웠을 때 무엇이 남는가"로 읽습니다.
-`AccountActionRow`는 title을 지우면 동작을 실행하는 행이 남으므로 `Controls/`이고,
+`SelectableSettingRow`는 title을 지우면 선택을 바꾸는 행이 남으므로 `Controls/`이고,
 `SettingRow`는 title과 value를 지우면 남는 것이 없으므로 `CollectionItems/`입니다.
 같은 목록에 놓이는 두 행이 서로 다른 폴더에 있는 이유는 **정보 표시가 계약의
 중심인지, 조작이 계약의 중심인지**가 다르기 때문입니다.

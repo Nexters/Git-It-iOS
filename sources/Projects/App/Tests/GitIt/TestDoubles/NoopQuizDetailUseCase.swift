@@ -34,7 +34,11 @@ struct NoopQuizDetailUseCase: QuizDetailUseCase {
     }
 
     func bookmarks(_: QuizBookmarkFilter) async throws -> QuizBookmarkList {
-        QuizBookmarkList(totalCount: 0, projects: [], bookmarks: [])
+        QuizBookmarkList(
+            totalCount: 0,
+            projects: [],
+            bookmarks: [],
+        )
     }
 
 }

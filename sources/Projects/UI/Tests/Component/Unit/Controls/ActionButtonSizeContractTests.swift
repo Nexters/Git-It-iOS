@@ -21,16 +21,13 @@ struct ActionButtonSizeContractTests {
 
     @Test
     func `String과 StyledText 생성 경로를 모두 보존한다`() {
-        let styledText = StyledText(
-            text: "서식 라벨",
-            style: .subtitle2,
-            color: .grey100,
-            alignment: .center,
-        )
+        let styledText = StyledText(text: "서식 라벨")
+            .textStyle(.subtitle2)
 
-        _ = ActionButton(title: "문자열 라벨", style: .primary, size: .medium)
-        _ = ActionButton(styledText: styledText, style: .secondary, size: .small)
-        _ = ActionButton.primary("문자열 라벨", size: .medium)
-        _ = ActionButton.primary(styledText: styledText, size: .small)
+        _ = ActionButton(title: "문자열 라벨")
+            .size(.medium)
+        _ = ActionButton(styledText: styledText)
+            .style(.secondary)
+            .size(.small)
     }
 }

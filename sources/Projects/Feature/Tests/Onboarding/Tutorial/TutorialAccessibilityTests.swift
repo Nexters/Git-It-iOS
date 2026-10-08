@@ -10,24 +10,30 @@ struct TutorialAccessibilityTests {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
 
         state.page = 1
-        #expect(state.pageProgress == .init(currentPage: 0, totalPages: 3))
+        #expect(state.pageProgress == .init(
+            currentPage: 0,
+            totalPages: 3,
+        ))
 
         state.page = 3
-        #expect(state.pageProgress == .init(currentPage: 2, totalPages: 3))
+        #expect(state.pageProgress == .init(
+            currentPage: 2,
+            totalPages: 3,
+        ))
     }
 
     @Test
-    func `TutorialFeature의 재시도 가능한 오류는 retryableFailure와 cancelled를 모두 포함한다`() {
+    func `TutorialFeature의 재시도 가능한 오류는 로그인 실패와 취소를 모두 포함한다`() {
         var state = TutorialFeature.State(bundleVersion: "1.0.0")
         #expect(!state.isShowingRecoverableError)
 
-        state.authentication = .retryableFailure
+        state.signIn.phase = .failed
         #expect(state.isShowingRecoverableError)
 
-        state.authentication = .cancelled
+        state.signIn.phase = .cancelled
         #expect(state.isShowingRecoverableError)
 
-        state.authentication = .idle
+        state.signIn.phase = .idle
         #expect(!state.isShowingRecoverableError)
     }
 

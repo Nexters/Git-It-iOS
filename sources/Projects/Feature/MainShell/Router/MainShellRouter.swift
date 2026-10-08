@@ -19,19 +19,46 @@ public struct MainShellRouter: View {
     @Bindable public var store: StoreOf<MainShellRouterFeature>
 
     public var body: some View {
-        TabShell(selected: selectedTab) { tab in
+        TabShell(
+            selected: selectedTab,
+            isEnabled: isTabEnabled,
+        ) { tab in
             switch tab {
             case .home:
-                HomeScreen(store: store.scope(state: \.home, action: \.home))
+                HomeScreen(store: store.scope(
+                    state: \.home,
+                    action: \.home,
+                ))
 
             case .projects:
-                ProjectListScreen(store: store.scope(state: \.projectList, action: \.projectList))
+                if store.access == .member {
+                    ProjectListScreen(store: store.scope(
+                        state: \.projectList,
+                        action: \.projectList,
+                    ))
+                } else {
+                    ScreenContainer { EmptyView() }
+                }
 
             case .saved:
-                SavedScreen(store: store.scope(state: \.saved, action: \.saved))
+                if store.access == .member {
+                    SavedScreen(store: store.scope(
+                        state: \.saved,
+                        action: \.saved,
+                    ))
+                } else {
+                    ScreenContainer { EmptyView() }
+                }
 
             case .settings:
-                SettingsRouter(store: store.scope(state: \.settings, action: \.settings))
+                if store.access == .member {
+                    SettingsRouter(store: store.scope(
+                        state: \.settings,
+                        action: \.settings,
+                    ))
+                } else {
+                    Self.SignInPromptView(onSignIn: { send(.signInTapped) })
+                }
             }
         }
         .overlay {
@@ -39,17 +66,43 @@ public struct MainShellRouter: View {
                 entryOverlay
             }
         }
-        .alert("문제를 불러오지 못했어요", isPresented: entryFailureBinding) {
-            Button("확인", role: .cancel) {
-                store.send(.singleQuestionEntry(.input(.failureDismissed)))
+        .alert(
+            "문제를 불러오지 못했어요",
+            isPresented: entryFailureBinding,
+        ) {
+            Button(
+                "확인",
+                role: .cancel,
+            ) {
+                send(.singleQuestionFailureDismissed)
             }
         } message: {
             Text("잠시 후 다시 시도해 주세요.")
         }
         .overlay { singleQuestionOverlay }
+        .overlay { guestLegalAgreementOverlay }
+        .overlay { guestLegalDocumentOverlay }
+        .alert(
+            "로그인하지 못했어요",
+            isPresented: signInFailureBinding,
+        ) {
+            Button(
+                "확인",
+                role: .cancel,
+            ) {
+                send(.signInFailureDismissed)
+            }
+        } message: {
+            Text("잠시 후 다시 시도해 주세요.")
+        }
     }
 
     // MARK: Private
+
+    private var isTabEnabled: (MainShellTab) -> Bool {
+        let access = store.access
+        return { access == .member || ($0 != .projects && $0 != .saved) }
+    }
 
     private var selectedTab: Binding<MainShellTab> {
         Binding(
@@ -58,12 +111,65 @@ public struct MainShellRouter: View {
         )
     }
 
+    private var signInFailureBinding: Binding<Bool> {
+        Binding(
+            get: { store.signIn.isFailed },
+            set: { isPresented in
+                guard !isPresented else { return }
+                send(.signInFailureDismissed)
+            },
+        )
+    }
+
+    private var guestLegalAgreementOverlay: some View {
+        ModalOverlay(
+            isPresented: Binding(
+                get: { store.signIn.isLegalAgreementPresented },
+                set: { isPresented in
+                    if !isPresented {
+                        send(.legalAgreementDismissed)
+                    }
+                },
+            )
+        ) {
+            LegalAgreementScreen(
+                store: store.scope(
+                    state: \.signIn.legalAgreement,
+                    action: \.signIn.legalAgreement,
+                )
+            )
+        }
+    }
+
+    private var guestLegalDocumentOverlay: some View {
+        ModalOverlay(
+            isPresented: Binding(
+                get: { store.signIn.legalAgreement.presentedDocument != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        send(.legalDocumentSheetDismissed)
+                    }
+                },
+            )
+        ) {
+            if let document = store.signIn.legalAgreement.presentedDocument {
+                WebSheet(
+                    displayModel: .init(
+                        title: document.displayName,
+                        url: document.approvedURL,
+                    ),
+                    onDismiss: { send(.legalDocumentSheetDismissed) },
+                )
+            }
+        }
+    }
+
     private var entryFailureBinding: Binding<Bool> {
         Binding(
             get: { store.singleQuestionEntry?.preparationError != nil },
             set: { isPresented in
                 guard !isPresented else { return }
-                store.send(.singleQuestionEntry(.input(.failureDismissed)))
+                send(.singleQuestionFailureDismissed)
             },
         )
     }
@@ -81,15 +187,19 @@ public struct MainShellRouter: View {
     }
 
     private var singleQuestionStore: StoreOf<QuestionSolvingFeature>? {
-        store.scope(state: \.singleQuestion, action: \.singleQuestion.presented)
+        store.scope(
+            state: \.singleQuestion,
+            action: \.singleQuestion.presented,
+        )
     }
 
     private var singleQuestionOverlay: some View {
-        PushedScreenOverlay(isPresented: store.singleQuestion != nil) {
+        PushedScreenOverlay {
             if let singleQuestionStore {
                 QuestionSolvingScreen(store: singleQuestionStore)
             }
         }
+        .presented(store.singleQuestion != nil)
     }
 
 }

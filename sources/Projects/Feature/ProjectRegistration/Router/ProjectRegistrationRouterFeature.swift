@@ -68,21 +68,36 @@ public struct ProjectRegistrationRouterFeature: Sendable {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.repositoryLinkInput, action: \.repositoryLinkInput) {
+        Scope(
+            state: \.repositoryLinkInput,
+            action: \.repositoryLinkInput,
+        ) {
             RepositoryLinkInputFeature(
                 repository: { [externalRepository] in try await externalRepository.repository(at: $0) }
             )
         }
-        Scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation) {
+        Scope(
+            state: \.repositoryConfirmation,
+            action: \.repositoryConfirmation,
+        ) {
             RepositoryConfirmationFeature()
         }
-        Scope(state: \.quizLevelSelection, action: \.quizLevelSelection) {
+        Scope(
+            state: \.quizLevelSelection,
+            action: \.quizLevelSelection,
+        ) {
             QuizLevelSelectionFeature()
         }
-        Scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation) {
+        Scope(
+            state: \.quizGenerationConfirmation,
+            action: \.quizGenerationConfirmation,
+        ) {
             QuizGenerationConfirmationFeature()
         }
-        Scope(state: \.quizGenerationProgress, action: \.quizGenerationProgress) {
+        Scope(
+            state: \.quizGenerationProgress,
+            action: \.quizGenerationProgress,
+        ) {
             QuizGenerationProgressFeature(
                 requestGeneration: { [projectGeneration] in try await projectGeneration.request($0) },
                 generationStates: { [projectGeneration] in await projectGeneration.states() },
@@ -96,36 +111,64 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .repositoryLinkInput(.delegate(.repositoryValidated(let repository))):
-                state.repositoryConfirmation.repository = repository
-                return activate(.repositoryConfirmation, state: &state)
+                return .merge(
+                    .send(.repositoryConfirmation(.input(.repositoryProvided(repository)))),
+                    activate(
+                        .repositoryConfirmation,
+                        state: &state,
+                    ),
+                )
 
             case .repositoryLinkInput(.delegate(.dismissRequested)):
                 return .send(.delegate(.dismissRequested))
 
             case .repositoryConfirmation(.delegate(.confirmed)):
-                return activate(.quizLevelSelection, state: &state)
+                return activate(
+                    .quizLevelSelection,
+                    state: &state,
+                )
 
             case .repositoryConfirmation(.delegate(.rejected)):
-                state.repositoryLinkInput.validation = .idle
-                state.repositoryConfirmation.repository = nil
-                return activate(.repositoryLinkInput, state: &state)
+                return .merge(
+                    .send(.repositoryLinkInput(.input(.validationReset))),
+                    .send(.repositoryConfirmation(.input(.cleared))),
+                    activate(
+                        .repositoryLinkInput,
+                        state: &state,
+                    ),
+                )
 
             case .quizLevelSelection(.delegate(.confirmed)):
-                return activate(.quizGenerationConfirmation, state: &state)
+                return activate(
+                    .quizGenerationConfirmation,
+                    state: &state,
+                )
 
             case .quizLevelSelection(.delegate(.backRequested)):
-                return activate(.repositoryConfirmation, state: &state)
+                return activate(
+                    .repositoryConfirmation,
+                    state: &state,
+                )
 
             case .quizGenerationConfirmation(.delegate(.submitRequested)):
                 guard let repository = state.repositoryConfirmation.repository else { return .none }
                 let quizLevel = state.quizLevelSelection.quizLevel
                 return .merge(
-                    activate(.quizGenerationProgress, state: &state),
-                    .send(.quizGenerationProgress(.submit(repository: repository, quizLevel: quizLevel))),
+                    activate(
+                        .quizGenerationProgress,
+                        state: &state,
+                    ),
+                    .send(.quizGenerationProgress(.submit(
+                        repository: repository,
+                        quizLevel: quizLevel,
+                    ))),
                 )
 
             case .quizGenerationConfirmation(.delegate(.backRequested)):
-                return activate(.quizLevelSelection, state: &state)
+                return activate(
+                    .quizLevelSelection,
+                    state: &state,
+                )
 
             case .quizGenerationProgress(.delegate(.projectRegistered(let receipt))):
                 return .send(.delegate(.projectRegistered(receipt)))
@@ -159,7 +202,10 @@ public struct ProjectRegistrationRouterFeature: Sendable {
         state: inout State,
     ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
-        state.screenTransitions.append(ScreenTransition(from: state.activeScreen, to: screen))
+        state.screenTransitions.append(ScreenTransition(
+            from: state.activeScreen,
+            to: screen,
+        ))
         state.activeScreen = screen
         return .none
     }

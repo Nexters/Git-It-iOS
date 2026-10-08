@@ -21,7 +21,10 @@ struct LearningSetRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let set = try await remote.fetchLearningSet(projectID: "project-1", setID: "set-1")
+        let set = try await remote.fetchLearningSet(
+            projectID: "project-1",
+            setID: "set-1",
+        )
 
         #expect(set.setID == "set-1")
         #expect(set.title == "제목")
@@ -44,7 +47,10 @@ struct LearningSetRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let set = try await remote.fetchLearningSet(projectID: "project-1", setID: "set-1")
+        let set = try await remote.fetchLearningSet(
+            projectID: "project-1",
+            setID: "set-1",
+        )
 
         let question = try #require(set.questions.first)
         #expect(question.choices == ["A", "B", "C"])
@@ -64,7 +70,10 @@ struct LearningSetRemoteTests {
         ])
         let remote = makeRemote(transport: transport)
 
-        let set = try await remote.fetchLearningSet(projectID: "project-1", setID: "set-1")
+        let set = try await remote.fetchLearningSet(
+            projectID: "project-1",
+            setID: "set-1",
+        )
 
         let question = try #require(set.questions.first)
         #expect(question.myAnswer == nil)
@@ -81,7 +90,10 @@ struct LearningSetRemoteTests {
         let remote = makeRemote(transport: transport)
 
         await #expect(throws: LearningProjectServiceError.learningSetUnavailable) {
-            try await remote.fetchLearningSet(projectID: "project-1", setID: "missing")
+            try await remote.fetchLearningSet(
+                projectID: "project-1",
+                setID: "missing",
+            )
         }
     }
 
@@ -105,6 +117,10 @@ extension LearningSetRemoteTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 }

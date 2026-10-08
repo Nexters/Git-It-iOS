@@ -20,8 +20,15 @@ actor StubSignInRepository: SignInRepository {
 
     // MARK: Internal
 
-    static let account = SignedInAccount(id: "account-1", displayName: "Git It", needsCuration: true)
-    static let availableRecord = SignInRecord(account: account, isAccountAvailable: true)
+    static let account = SignedInAccount(
+        id: "account-1",
+        displayName: "Git It",
+        needsCuration: true,
+    )
+    static let availableRecord = SignInRecord(
+        account: account,
+        isAccountAvailable: true,
+    )
 
     private(set) var signOutCount = 0
 

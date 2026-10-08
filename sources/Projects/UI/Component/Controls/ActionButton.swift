@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
-import UIKit
+
+// MARK: - ActionButton
 
 public struct ActionButton: View {
 
@@ -8,29 +9,17 @@ public struct ActionButton: View {
 
     public init(
         title: String,
-        style: Style = .primary,
-        size: Size = .large,
-        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .title(title)
-        self.style = style
-        self.size = size
-        self.isEnabled = isEnabled
         self.action = action
     }
 
     public init(
         styledText: StyledText,
-        style: Style = .primary,
-        size: Size = .large,
-        isEnabled: Bool = true,
         action: @escaping () -> Void = { },
     ) {
         label = .styled(styledText)
-        self.style = style
-        self.size = size
-        self.isEnabled = isEnabled
         self.action = action
     }
 
@@ -108,10 +97,7 @@ public struct ActionButton: View {
     }
 
     public var body: some View {
-        Button(action: {
-            Self.hapticGenerator.impactOccurred()
-            action()
-        }) {
+        Button(action: action) {
             ZStack {
                 content
                     .frame(maxWidth: .infinity)
@@ -128,141 +114,6 @@ public struct ActionButton: View {
         )
     }
 
-    public static func primary(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .primary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func primary(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .primary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func secondary(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .secondary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func secondary(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .secondary,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func destructive(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .destructive,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func destructive(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .destructive,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func text(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .text,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func text(
-        styledText: StyledText,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            styledText: styledText,
-            style: .text,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
-    public static func primaryText(
-        _ title: String,
-        size: Size = .large,
-        isEnabled: Bool = true,
-        action: @escaping () -> Void = { },
-    ) -> Self {
-        Self(
-            title: title,
-            style: .primaryText,
-            size: size,
-            isEnabled: isEnabled,
-            action: action,
-        )
-    }
-
     // MARK: Private
 
     private enum Label: Sendable, Equatable {
@@ -270,23 +121,27 @@ public struct ActionButton: View {
         case styled(StyledText)
     }
 
-    private static let hapticGenerator = UIImpactFeedbackGenerator(style: .light)
-
     private let label: Label
-    private let style: Style
-    private let size: Size
-    private let isEnabled: Bool
+    private var style = Style.primary
+    private var size = Size.large
+    private var isEnabled = true
     private let action: () -> Void
 
     @ViewBuilder
     private var content: some View {
         switch label {
         case .title(let title):
-            Text.designSystemStyled(title, style: .body1)
-                .designSystemLineSpacing(.body1)
-                .designSystemForeground(style.titleColor(isEnabled: isEnabled))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            Text.designSystemStyled(
+                title,
+                style: .body1,
+            )
+            .designSystemLineSpacing(.body1)
+            .designSystemForeground(style.titleColor(isEnabled: isEnabled))
+            .multilineTextAlignment(.center)
+            .fixedSize(
+                horizontal: false,
+                vertical: true,
+            )
 
         case .styled(let styledText):
             styledText
@@ -295,14 +150,50 @@ public struct ActionButton: View {
 
 }
 
+// MARK: StyleConfigurable
+
+extension ActionButton: StyleConfigurable {
+    public func style(_ style: Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// MARK: SizeConfigurable
+
+extension ActionButton: SizeConfigurable {
+    public func size(_ size: Size) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
+}
+
+// MARK: ActionButton 상태 선언
+
+extension ActionButton {
+    public func enabled(_ isEnabled: Bool) -> Self {
+        var copy = self
+        copy.isEnabled = isEnabled
+        return copy
+    }
+}
+
 #Preview("Action Button") {
     VStack(spacing: LayoutToken.gutter) {
-        ActionButton.primary("Primary")
-        ActionButton.secondary("Secondary")
-        ActionButton.destructive("Destructive")
-        ActionButton.text("Text")
-        ActionButton.primary("Disabled", isEnabled: false)
-        ActionButton.text("Disabled Text", isEnabled: false)
+        ActionButton(title: "Primary")
+        ActionButton(title: "Secondary")
+            .style(.secondary)
+        ActionButton(title: "Destructive")
+            .style(.destructive)
+        ActionButton(title: "Text")
+            .style(.text)
+        ActionButton(title: "Disabled")
+            .enabled(false)
+        ActionButton(title: "Disabled Text")
+            .enabled(false)
+            .style(.text)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

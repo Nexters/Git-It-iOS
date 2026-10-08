@@ -26,7 +26,10 @@ struct ArrayOrderPreservationTests {
             }
             """#.utf8)
 
-        let detail = try JSONDecoder().decode(ProjectDetailResponseDTO.self, from: json)
+        let detail = try JSONDecoder().decode(
+            ProjectDetailResponseDTO.self,
+            from: json,
+        )
 
         #expect(detail.sets.map(\.setID) == ["set-3", "set-1", "set-2"])
     }
@@ -61,7 +64,10 @@ struct ArrayOrderPreservationTests {
             }
             """#.utf8)
 
-        let set = try JSONDecoder().decode(LearningSetResponseDTO.self, from: json)
+        let set = try JSONDecoder().decode(
+            LearningSetResponseDTO.self,
+            from: json,
+        )
 
         #expect(set.questions.map(\.questionID) == ["question-2", "question-1"])
         #expect(set.questions[0].choices == ["C", "A", "B"])

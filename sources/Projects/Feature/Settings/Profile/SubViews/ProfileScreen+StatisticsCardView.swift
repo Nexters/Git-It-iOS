@@ -10,13 +10,25 @@ extension ProfileScreen {
 
         var body: some View {
             HStack(spacing: 0) {
-                column(label: Constant.thisWeekLabel, value: "\(display.thisWeekSolvedCount)\(Constant.countUnit)")
-                column(label: Constant.thisMonthLabel, value: "\(display.thisMonthSolvedCount)\(Constant.countUnit)")
-                column(label: Constant.streakLabel, value: "\(display.streakDays)\(Constant.dayUnit)")
+                column(
+                    label: Constant.thisWeekLabel,
+                    value: "\(display.thisWeekSolvedCount)\(Constant.countUnit)",
+                )
+                column(
+                    label: Constant.thisMonthLabel,
+                    value: "\(display.thisMonthSolvedCount)\(Constant.countUnit)",
+                )
+                column(
+                    label: Constant.streakLabel,
+                    value: "\(display.streakDays)\(Constant.dayUnit)",
+                )
             }
             .frame(maxWidth: .infinity)
             .frame(height: Constant.height)
-            .background(cardGradient, in: RoundedRectangle(designSystem: .large))
+            .background(
+                cardGradient,
+                in: RoundedRectangle(designSystem: .large),
+            )
         }
 
         // MARK: Private
@@ -48,8 +60,14 @@ extension ProfileScreen {
             value: String,
         ) -> some View {
             VStack(spacing: Constant.columnSpacing) {
-                StyledText.caption2(label, color: .grey300, alignment: .center)
-                StyledText.subtitle2(value, color: .blue100, alignment: .center)
+                StyledText(text: label)
+                    .textStyle(.caption2)
+                    .foregroundColorToken(.grey300)
+                    .multilineTextAlignment(.center)
+                StyledText(text: value)
+                    .textStyle(.subtitle2)
+                    .foregroundColorToken(.blue100)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .combine)

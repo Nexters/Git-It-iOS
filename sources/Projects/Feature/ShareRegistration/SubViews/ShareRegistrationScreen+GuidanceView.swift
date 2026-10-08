@@ -23,8 +23,13 @@ extension ShareRegistrationScreen {
                 Spacer(minLength: 0)
 
                 VStack(spacing: Constant.textSetSpacing) {
-                    StyledText.subtitle1(title, alignment: .center)
-                    StyledText.body2(message, color: .grey400, alignment: .center)
+                    StyledText(text: title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
+                    StyledText(text: message)
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
                 }
                 .designSystemScreenMargin()
                 .accessibilityElement(children: .combine)
@@ -33,9 +38,16 @@ extension ShareRegistrationScreen {
 
                 VStack(spacing: LayoutToken.compactSpacing) {
                     if let retryTitle {
-                        ActionButton.primary(retryTitle, action: onRetry)
+                        FeedbackActionButton(
+                            title: retryTitle,
+                            action: onRetry,
+                        )
                     }
-                    ActionButton.secondary(dismissTitle, action: onDismiss)
+                    FeedbackActionButton(
+                        title: dismissTitle,
+                        action: onDismiss,
+                    )
+                    .style(.secondary)
                 }
                 .designSystemScreenMargin()
                 .padding(.bottom, Constant.bottomButtonPadding)

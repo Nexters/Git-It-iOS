@@ -37,7 +37,10 @@ private let previewDetail = ProjectDetail(
 
 private let previewBookmarks = QuizBookmarkList(
     totalCount: 1,
-    projects: [QuizBookmarkProject(id: "project-1", name: "owner/repo")],
+    projects: [QuizBookmarkProject(
+        id: "project-1",
+        name: "owner/repo",
+    )],
     bookmarks: [
         QuizBookmark(
             projectID: "project-1",
@@ -56,8 +59,8 @@ private func previewState(
     preparation: SingleQuestionEntryFeature.Preparation = .idle,
 ) -> ProjectDetailRouterFeature.State {
     var state = ProjectDetailRouterFeature.State(projectID: "project-1")
-    state.projectDetail.detail = previewDetail
-    state.projectDetail.loadStatus = .loaded
+    state.projectDetail.detailLoad.detail = previewDetail
+    state.projectDetail.detailLoad.loadStatus = .loaded
     state.savedQuestions.collection = previewBookmarks
     state.savedQuestions.loadStatus = .loaded
     state.singleQuestion = QuestionSolvingFeature.State(

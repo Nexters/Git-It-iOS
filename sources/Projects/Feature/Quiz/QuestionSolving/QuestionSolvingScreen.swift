@@ -19,8 +19,14 @@ struct QuestionSolvingScreen: View {
             .onTapGesture { isEssayFieldFocused = false }
             .overlay {
                 ModalOverlay(
-                    isPresented: store.isSourceSheetPresented,
-                    onDismiss: { send(.sourceSheetDismissed) },
+                    isPresented: Binding(
+                        get: { store.isSourceSheetPresented },
+                        set: { isPresented in
+                            if !isPresented {
+                                send(.sourceSheetDismissed)
+                            }
+                        },
+                    )
                 ) {
                     SourceSheet(
                         questionNumber: store.questionNumber,
@@ -42,7 +48,10 @@ struct QuestionSolvingScreen: View {
                 onLeadingTap: { send(.backTapped) }
             ).designSystemScreenMargin()
         } content: {
-            VStack(alignment: .leading, spacing: Constant.sectionSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.sectionSpacing,
+            ) {
                 QuestionPrompt(
                     questionNumber: store.questionNumber,
                     prompt: store.question.prompt,
@@ -79,18 +88,32 @@ struct QuestionSolvingScreen: View {
     private var sourceButton: some View {
         Button(action: { send(.sourceTapped) }) {
             HStack(spacing: Constant.sourceButtonSpacing) {
-                StyledText.body2("출처", color: .blue100)
+                StyledText(text: "출처")
+                    .textStyle(.body2)
+                    .foregroundColorToken(.blue100)
 
-                ResourceImage(asset: .icon(.chevronRight), contentMode: .fit)
-                    .designSystemForeground(.blue100)
-                    .frame(width: Constant.sourceButtonChevronGlyphSize, height: Constant.sourceButtonChevronGlyphSize)
-                    .frame(width: Constant.sourceButtonChevronSize, height: Constant.sourceButtonChevronSize)
+                ResourceImage(
+                    asset: .icon(.chevronRight),
+                    contentMode: .fit,
+                )
+                .designSystemForeground(.blue100)
+                .frame(
+                    width: Constant.sourceButtonChevronGlyphSize,
+                    height: Constant.sourceButtonChevronGlyphSize,
+                )
+                .frame(
+                    width: Constant.sourceButtonChevronSize,
+                    height: Constant.sourceButtonChevronSize,
+                )
             }
             .padding(.leading, Constant.sourceButtonLeadingPadding)
             .padding(.trailing, Constant.sourceButtonTrailingPadding)
             .padding(.vertical, Constant.sourceButtonVerticalPadding)
         }
-        .background(Color(designSystem: .grey600), in: RoundedRectangle(designSystem: .small))
+        .background(
+            Color(designSystem: .grey600),
+            in: RoundedRectangle(designSystem: .small),
+        )
         .buttonStyle(.plain)
         .accessibilityLabel("출처 보기")
     }
@@ -108,7 +131,11 @@ struct QuestionSolvingScreen: View {
             )
 
             if case .choice(let grading) = store.answerOutcome {
-                LabeledCard.accent(label: "AI 해설", text: grading.explanation)
+                LabeledCard(displayModel: .init(
+                    label: "AI 해설",
+                    text: grading.explanation,
+                ))
+                .style(.accent)
             }
 
         case .essay:
@@ -133,7 +160,10 @@ struct QuestionSolvingScreen: View {
     private var choiceOptions: [ChoiceOptionDisplay] {
         guard case .choice(let choices, _) = store.question.content else { return [] }
         guard case .choice(let grading) = store.answerOutcome else {
-            return ChoiceOptionDisplay.editing(choices: choices, selectedIndex: store.draftChoiceIndex)
+            return ChoiceOptionDisplay.editing(
+                choices: choices,
+                selectedIndex: store.draftChoiceIndex,
+            )
         }
         return ChoiceOptionDisplay.answered(
             choices: choices,
@@ -145,30 +175,34 @@ struct QuestionSolvingScreen: View {
     @ViewBuilder
     private var primaryAction: some View {
         if store.answerOutcome == nil {
-            ActionButton.primary(
-                store.submissionError == nil ? "제출하기" : "다시 제출하기",
-                isEnabled: store.isSubmitEnabled,
+            FeedbackActionButton(
+                title: store.submissionError == nil ? "제출하기" : "다시 제출하기",
                 action: { send(.submitAnswerTapped) },
             )
+            .enabled(store.isSubmitEnabled)
         } else {
-            ActionButton.primary(
-                store.advanceActionTitle,
+            FeedbackActionButton(
+                title: store.advanceActionTitle,
                 action: { send(.advanceTapped) },
             )
         }
     }
 
     private var submissionFailureNotice: some View {
-        StyledText.body2(Constant.submissionFailureMessage, color: .grey400)
+        StyledText(text: Constant.submissionFailureMessage)
+            .textStyle(.body2)
+            .foregroundColorToken(.grey400)
     }
 
     private var bottomActions: some View {
         BottomActionBar {
             HStack(spacing: LayoutToken.compactSpacing) {
                 BookmarkButton(
-                    isSaved: store.isBookmarked,
+                    isSaved: Binding(
+                        get: { store.isBookmarked },
+                        set: { _ in send(.bookmarkToggleTapped) },
+                    ),
                     accessibilityLabel: store.isBookmarked ? "저장 해제하기" : "저장하기",
-                    onTap: { send(.bookmarkToggleTapped) },
                 )
 
                 primaryAction

@@ -37,11 +37,17 @@ public actor AppleSignInSource {
         }
         guard
             let tokenData = credential.identityToken,
-            let identityToken = String(data: tokenData, encoding: .utf8)
+            let identityToken = String(
+                data: tokenData,
+                encoding: .utf8,
+            )
         else {
             throw AppleSignInError.unavailable
         }
-        return AppleSignInCredential(userID: credential.userID, identityToken: identityToken)
+        return AppleSignInCredential(
+            userID: credential.userID,
+            identityToken: identityToken,
+        )
     }
 
     public func state(forUserID userID: String) async -> AppleSignInState {

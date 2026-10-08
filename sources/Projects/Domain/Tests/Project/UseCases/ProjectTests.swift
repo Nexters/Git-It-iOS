@@ -10,7 +10,10 @@ struct ProjectTests {
 
     @Test
     func `구독자 둘이 같은 목록을 받는다`() async {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1")], hasNextPage: false)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+        )])
 
         var first = await fixture.project.projects().makeAsyncIterator()
         var second = await fixture.project.projects().makeAsyncIterator()
@@ -24,7 +27,10 @@ struct ProjectTests {
     @Test
     func `첫 로드와 새로고침이 동시에 일어나면 첫 페이지를 한 번만 요청한다`() async throws {
         let fixture = Fixture(
-            pages: [0: ProjectPage(summaries: [Self.summary("p1")], hasNextPage: false)],
+            pages: [0: ProjectPage(
+                summaries: [Self.summary("p1")],
+                hasNextPage: false,
+            )],
             holdsFirstRequest: true,
         )
 
@@ -45,8 +51,14 @@ struct ProjectTests {
     @Test
     func `다음 페이지를 중복 없이 이어 붙인다`() async throws {
         let fixture = Fixture(pages: [
-            0: ProjectPage(summaries: [Self.summary("p1"), Self.summary("p2")], hasNextPage: true),
-            1: ProjectPage(summaries: [Self.summary("p2"), Self.summary("p3")], hasNextPage: false),
+            0: ProjectPage(
+                summaries: [Self.summary("p1"), Self.summary("p2")],
+                hasNextPage: true,
+            ),
+            1: ProjectPage(
+                summaries: [Self.summary("p2"), Self.summary("p3")],
+                hasNextPage: false,
+            ),
         ])
 
         try await fixture.project.refresh()
@@ -62,7 +74,10 @@ struct ProjectTests {
 
     @Test
     func `준비 중인 프로젝트는 재요청 없이 목록에서 뺀다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1"), Self.summary("p2")], hasNextPage: false)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1"), Self.summary("p2")],
+            hasNextPage: false,
+        )])
         try await fixture.project.refresh()
         var lists = await fixture.project.projects().makeAsyncIterator()
         _ = await lists.next()
@@ -76,7 +91,10 @@ struct ProjectTests {
 
     @Test
     func `준비 목록에서 빠진 프로젝트가 생기면 첫 페이지를 새로고침한다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1")], hasNextPage: false)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+        )])
         try await fixture.project.refresh()
         var lists = await fixture.project.projects().makeAsyncIterator()
         _ = await lists.next()
@@ -84,7 +102,10 @@ struct ProjectTests {
         _ = await Self.next(&lists) { _ in true }
 
         await fixture.repository.setPage(
-            ProjectPage(summaries: [Self.summary("p2"), Self.summary("p1")], hasNextPage: false),
+            ProjectPage(
+                summaries: [Self.summary("p2"), Self.summary("p1")],
+                hasNextPage: false,
+            ),
             at: 0,
         )
         fixture.preparingContinuation.yield([])
@@ -96,7 +117,10 @@ struct ProjectTests {
 
     @Test
     func `삭제에 성공하면 목록에서 제거한다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1"), Self.summary("p2")], hasNextPage: false)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1"), Self.summary("p2")],
+            hasNextPage: false,
+        )])
         try await fixture.project.refresh()
 
         try await fixture.project.delete("p1")
@@ -109,7 +133,10 @@ struct ProjectTests {
 
     @Test
     func `로그아웃하면 목록을 비우고 로드 전 상태로 되돌린다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1")], hasNextPage: true)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1")],
+            hasNextPage: true,
+        )])
         try await fixture.project.refresh()
         var lists = await fixture.project.projects().makeAsyncIterator()
         _ = await lists.next()
@@ -117,12 +144,19 @@ struct ProjectTests {
         fixture.signedOutContinuation.yield(())
 
         let list = await Self.next(&lists) { !$0.isLoaded }
-        #expect(list == ProjectList(summaries: [], hasNextPage: false, isLoaded: false))
+        #expect(list == ProjectList(
+            summaries: [],
+            hasNextPage: false,
+            isLoaded: false,
+        ))
     }
 
     @Test
     func `새로고침이 실패하면 오류를 전달하고 마지막 목록을 유지한다`() async throws {
-        let fixture = Fixture(pages: [0: ProjectPage(summaries: [Self.summary("p1")], hasNextPage: false)])
+        let fixture = Fixture(pages: [0: ProjectPage(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+        )])
         try await fixture.project.refresh()
         await fixture.repository.setFailure(.temporarilyUnavailable)
 
@@ -132,7 +166,11 @@ struct ProjectTests {
 
         var lists = await fixture.project.projects().makeAsyncIterator()
         let list = await lists.next()
-        #expect(list == ProjectList(summaries: [Self.summary("p1")], hasNextPage: false, isLoaded: true))
+        #expect(list == ProjectList(
+            summaries: [Self.summary("p1")],
+            hasNextPage: false,
+            isLoaded: true,
+        ))
     }
 
     // MARK: Private
@@ -145,7 +183,10 @@ struct ProjectTests {
             pages: [Int: ProjectPage],
             holdsFirstRequest: Bool = false,
         ) {
-            let repository = StubProjectRepository(pages: pages, holdsFirstRequest: holdsFirstRequest)
+            let repository = StubProjectRepository(
+                pages: pages,
+                holdsFirstRequest: holdsFirstRequest,
+            )
             let (preparing, preparingContinuation) = AsyncStream<Set<String>>.makeStream()
             let (signedOut, signedOutContinuation) = AsyncStream<Void>.makeStream()
             self.repository = repository
@@ -173,8 +214,14 @@ struct ProjectTests {
             repositoryName: "repo-\(id)",
             repositoryImageURL: nil,
             techStack: ["Swift"],
-            currentSet: ProjectSetLabel(label: "L1", title: "세트"),
-            next: ProjectNextQuiz(setID: "s1", quizID: nil),
+            currentSet: ProjectSetLabel(
+                label: "L1",
+                title: "세트",
+            ),
+            next: ProjectNextQuiz(
+                setID: "s1",
+                quizID: nil,
+            ),
             progressPercent: 0,
         )
     }

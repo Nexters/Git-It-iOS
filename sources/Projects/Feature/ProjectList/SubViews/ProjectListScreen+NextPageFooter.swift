@@ -7,7 +7,7 @@ extension ProjectListScreen {
 
         // MARK: Internal
 
-        let pagination: ProjectListFeature.Pagination
+        let pagination: ProjectListPaginationFeature.State.Pagination
         let onRetry: () -> Void
 
         var body: some View {
@@ -20,9 +20,17 @@ extension ProjectListScreen {
 
             case .failed:
                 VStack(spacing: Constant.textSpacing) {
-                    StyledText.body2("프로젝트를 더 불러오지 못했어요", color: .grey400, alignment: .center)
+                    StyledText(text: "프로젝트를 더 불러오지 못했어요")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.grey400)
+                        .multilineTextAlignment(.center)
 
-                    ActionButton.text("다시 시도하기", size: .small, action: onRetry)
+                    FeedbackActionButton(
+                        title: "다시 시도하기",
+                        action: onRetry,
+                    )
+                    .style(.text)
+                    .size(.small)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Constant.verticalPadding)

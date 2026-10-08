@@ -5,12 +5,28 @@ enum HomeTestFixture {
 
     // MARK: Internal
 
-    static let profileWithBoth = profile(position: .ios, careerLevel: .junior)
-    static let profileWithPosition = profile(position: .backend, careerLevel: nil)
-    static let profileWithCareer = profile(position: nil, careerLevel: .middle)
-    static let profileWithNameOnly = profile(position: nil, careerLevel: nil)
+    static let profileWithBoth = profile(
+        position: .ios,
+        careerLevel: .junior,
+    )
+    static let profileWithPosition = profile(
+        position: .backend,
+        careerLevel: nil,
+    )
+    static let profileWithCareer = profile(
+        position: nil,
+        careerLevel: .middle,
+    )
+    static let profileWithNameOnly = profile(
+        position: nil,
+        careerLevel: nil,
+    )
 
-    static let emptyPage = ProjectList(summaries: [], hasNextPage: false, isLoaded: true)
+    static let emptyPage = ProjectList(
+        summaries: [],
+        hasNextPage: false,
+        isLoaded: true,
+    )
     static let oneProjectPage = ProjectList(
         summaries: [project(index: 0)],
         hasNextPage: false,
@@ -38,7 +54,10 @@ enum HomeTestFixture {
                     weeklyCounts: [],
                 ),
             ),
-            curation: curation(position: position, careerLevel: careerLevel),
+            curation: curation(
+                position: position,
+                careerLevel: careerLevel,
+            ),
         )
     }
 
@@ -56,7 +75,10 @@ enum HomeTestFixture {
                 title: "Presentation 구조 \(index)",
             ),
             next: hasLearningIDs
-                ? ProjectNextQuiz(setID: "set-\(index)", quizID: "quiz-\(index)")
+                ? ProjectNextQuiz(
+                    setID: "set-\(index)",
+                    quizID: "quiz-\(index)",
+                )
                 : nil,
             progressPercent: index == 3 ? 140 : index * 25,
         )
@@ -69,7 +91,10 @@ enum HomeTestFixture {
         careerLevel: CareerLevel?,
     ) -> Curation? {
         guard let position, let careerLevel else { return nil }
-        return Curation(position: position, careerLevel: careerLevel)
+        return Curation(
+            position: position,
+            careerLevel: careerLevel,
+        )
     }
 
 }

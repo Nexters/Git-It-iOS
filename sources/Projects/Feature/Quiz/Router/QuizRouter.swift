@@ -16,7 +16,10 @@ public struct QuizRouter: View {
     public var body: some View {
         FlowNavigationStack(path: pushedScreens) {
             LearningSetIntroScreen(
-                store: store.scope(state: \.learningSetIntro, action: \.learningSetIntro)
+                store: store.scope(
+                    state: \.learningSetIntro,
+                    action: \.learningSetIntro,
+                )
             )
         } destination: { screen in
             pushedScreen(screen)
@@ -47,13 +50,21 @@ public struct QuizRouter: View {
             EmptyView()
 
         case .questionSolving:
-            if let questionSolvingStore = store.scope(state: \.questionSolving, action: \.questionSolving) {
+            if
+                let questionSolvingStore = store.scope(
+                    state: \.questionSolving,
+                    action: \.questionSolving,
+                )
+            {
                 QuestionSolvingScreen(store: questionSolvingStore)
             }
 
         case .learningCompletion:
             LearningCompletionScreen(
-                store: store.scope(state: \.learningCompletion, action: \.learningCompletion)
+                store: store.scope(
+                    state: \.learningCompletion,
+                    action: \.learningCompletion,
+                )
             )
         }
     }

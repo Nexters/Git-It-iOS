@@ -33,7 +33,7 @@ metadata:
 4. 다음 공개 경로 판독기로 runner를 구하고, 선택한 각 파일을 별도 argv로 전달한다.
 
    ```sh
-   swift_format_runner=$(./tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_SWIFT_FORMAT_RUNNER)
+   swift_format_runner=$(./.tools/repository-paths/bin/repository-paths.sh --absolute GIT_IT_SWIFT_FORMAT_RUNNER)
    "$swift_format_runner" format <현재-변경-Swift-파일-경로>...
    ```
 
@@ -45,5 +45,5 @@ metadata:
 
 ## 금지 사항
 
-- `tools/githooks/swift-format/core/**` 또는 `tools/swift-style/**` 내부 구현을 직접 호출하지 않는다.
+- `.tools/githooks/swift-format/core/**` 또는 `.tools/swift-style/**` 내부 구현을 직접 호출하지 않는다.
 - `git add`, `git commit` 또는 다른 Git index 변경을 실행하지 않는다.

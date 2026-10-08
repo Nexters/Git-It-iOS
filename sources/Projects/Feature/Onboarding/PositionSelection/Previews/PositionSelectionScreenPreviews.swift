@@ -24,6 +24,9 @@ extension PositionSelectionFeature.State {
 
 #Preview("Position Selection - 뒤로 가기 실패") {
     PositionSelectionScreen(
-        store: Store(initialState: .preview(position: .ios, exitStatus: .failed)) { EmptyReducer() }
+        store: Store(initialState: .preview(
+            position: .ios,
+            exitStatus: .failed,
+        )) { EmptyReducer() }
     )
 }

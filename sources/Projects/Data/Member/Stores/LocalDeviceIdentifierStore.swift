@@ -19,12 +19,18 @@ public struct LocalDeviceIdentifierStore: Sendable {
     public func loadOrCreate() -> String {
         if
             let data = try? storage.data(forKey: Self.key),
-            let existing = String(data: data, encoding: .utf8)
+            let existing = String(
+                data: data,
+                encoding: .utf8,
+            )
         {
             return existing
         }
         let newDeviceID = UUID().uuidString
-        try? storage.setData(Data(newDeviceID.utf8), forKey: Self.key)
+        try? storage.setData(
+            Data(newDeviceID.utf8),
+            forKey: Self.key,
+        )
         return newDeviceID
     }
 

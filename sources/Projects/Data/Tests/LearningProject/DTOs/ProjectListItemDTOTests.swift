@@ -22,7 +22,10 @@ struct ProjectListItemDTOTests {
             }
             """#.utf8)
 
-        let item = try JSONDecoder().decode(ProjectListItemDTO.self, from: json)
+        let item = try JSONDecoder().decode(
+            ProjectListItemDTO.self,
+            from: json,
+        )
 
         #expect(item.repositoryImageURL == nil)
         #expect(item.nextSetID == nil)

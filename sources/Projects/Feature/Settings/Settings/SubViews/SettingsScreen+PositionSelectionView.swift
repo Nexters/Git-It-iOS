@@ -13,50 +13,70 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                        IconGlassButton.neutral(
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
+                        IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.backTapped) },
                         )
+                        .size(.medium)
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
-                    ScreenHeaderTitle(title: Constant.title)
+                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
-                    if case .failed = store.positionMutation {
-                        StyledText.caption1(Constant.failureMessage, color: .error, alignment: .center)
+                    if case .failed = store.curationUpdate.positionMutation {
+                        StyledText(text: Constant.failureMessage)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
 
                     SelectionCardList(
                         items: PositionDisplay.orderedPositions.map { position in
                             .init(
                                 id: PositionDisplay.identifier(for: position),
-                                title: PositionDisplay.title(for: position),
-                                isSelected: store.profile?.curation?.position == position,
+                                displayModel: .init(title: PositionDisplay.title(for: position)),
                             )
                         },
-                        style: .compact,
-                        onSelect: { identifier in
-                            if let position = PositionDisplay.position(forIdentifier: identifier) {
-                                send(.positionSelected(position))
-                            }
-                        },
+                        selection: Binding(
+                            get: { (store.profile?.curation?.position).map(PositionDisplay.identifier(for:)) },
+                            set: { identifier in
+                                if let identifier, let position = PositionDisplay.position(forIdentifier: identifier) {
+                                    send(.positionSelected(position))
+                                }
+                            },
+                        ),
                     )
+                    .style(.compact)
                 }
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             }
-            .toolbar(.hidden, for: .tabBar)
+            .toolbar(
+                .hidden,
+                for: .tabBar,
+            )
         }
 
         // MARK: Private

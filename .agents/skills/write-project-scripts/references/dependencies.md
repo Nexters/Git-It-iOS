@@ -1,19 +1,19 @@
 # 스크립트 검증 도구 의존성
 
-ShellCheck와 shfmt는 애플리케이션 런타임이 아니라 저장소 셸 자동화를 검증하는 개발 도구다. 정확한 version, 지원 macOS artifact URL과 SHA-256은 `tools/script-verification/dependencies/tools.lock`만 정의하고, 검사 옵션과 대상은 `tools/script-verification/config/verification.conf`만 정의한다.
+ShellCheck와 shfmt는 애플리케이션 런타임이 아니라 저장소 셸 자동화를 검증하는 개발 도구다. 정확한 version, 지원 macOS artifact URL과 SHA-256은 `.tools/script-verification/dependencies/tools.lock`만 정의하고, 검사 옵션과 대상은 `.tools/script-verification/config/verification.conf`만 정의한다.
 
 ## 준비와 검증 분리
 
 도구 준비는 네트워크와 `.build/` 쓰기가 허용된 명시적 명령에서만 수행한다.
 
 ```sh
-./tools/script-verification/bin/prepare-tools.sh
+./.tools/script-verification/bin/prepare-tools.sh
 ```
 
-준비된 실행 파일, 다운로드 파일, 압축 해제 파일과 cache는 모두 `tools/script-verification/.build/` 안에 두며 Git에서 추적하지 않는다. 공용 검증은 이 경계를 읽기만 하고 도구를 자동으로 내려받거나 교체하지 않는다.
+준비된 실행 파일, 다운로드 파일, 압축 해제 파일과 cache는 모두 `.tools/script-verification/.build/` 안에 두며 Git에서 추적하지 않는다. 공용 검증은 이 경계를 읽기만 하고 도구를 자동으로 내려받거나 교체하지 않는다.
 
 ```sh
-./tools/script-verification/bin/run.sh
+./.tools/script-verification/bin/run.sh
 ```
 
 도구가 없거나 version 또는 checksum이 lock과 다르면 검증은 실패하며 준비 명령을 복구 조치로 안내한다.

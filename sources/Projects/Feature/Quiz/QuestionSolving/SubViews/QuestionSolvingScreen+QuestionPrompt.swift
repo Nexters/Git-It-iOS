@@ -11,14 +11,22 @@ extension QuestionSolvingScreen {
         let prompt: String
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.contentSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.contentSpacing,
+            ) {
                 if let questionNumber {
-                    TagBadge(text: "문제 \(questionNumber)", style: .accent)
+                    TagBadge(text: "문제 \(questionNumber)")
+                        .style(.accent)
                 }
 
-                StyledText.subtitle3(prompt)
+                StyledText(text: prompt)
+                    .textStyle(.subtitle3)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                maxWidth: .infinity,
+                alignment: .leading,
+            )
             .accessibilityElement(children: .combine)
         }
 

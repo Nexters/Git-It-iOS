@@ -1,18 +1,14 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - TagBadge
+
 public struct TagBadge: View {
 
     // MARK: Lifecycle
 
-    public init(
-        text: String,
-        style: Style = .neutral,
-        size: Size = .regular,
-    ) {
+    public init(text: String) {
         self.text = text
-        self.style = style
-        self.size = size
     }
 
     // MARK: Public
@@ -59,44 +55,19 @@ public struct TagBadge: View {
     }
 
     public var body: some View {
-        Text.designSystemStyled(text, style: size.textStyle)
-            .designSystemLineSpacing(size.textStyle)
-            .designSystemForeground(style.textColor)
-            .padding(.horizontal, Constant.horizontalPadding)
-            .padding(.top, Constant.topPadding)
-            .padding(.bottom, Constant.bottomPadding)
-            .background(
-                Color(designSystem: style.backgroundColor),
-                in: RoundedRectangle(designSystem: .small),
-            )
-    }
-
-    public static func neutral(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .neutral, size: size)
-    }
-
-    public static func accent(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .accent, size: size)
-    }
-
-    public static func selected(
-        _ text: String,
-        size: Size = .regular,
-    ) -> Self {
-        Self(text: text, style: .selected, size: size)
-    }
-
-    public static func muted(
-        _ text: String,
-        size: Size = .compact,
-    ) -> Self {
-        Self(text: text, style: .muted, size: size)
+        Text.designSystemStyled(
+            text,
+            style: size.textStyle,
+        )
+        .designSystemLineSpacing(size.textStyle)
+        .designSystemForeground(style.textColor)
+        .padding(.horizontal, Constant.horizontalPadding)
+        .padding(.top, Constant.topPadding)
+        .padding(.bottom, Constant.bottomPadding)
+        .background(
+            Color(designSystem: style.backgroundColor),
+            in: RoundedRectangle(designSystem: .small),
+        )
     }
 
     // MARK: Private
@@ -108,16 +79,38 @@ public struct TagBadge: View {
     }
 
     private let text: String
-    private let style: Style
-    private let size: Size
+    private var style = Style.neutral
+    private var size = Size.regular
 
+}
+
+// MARK: StyleConfigurable
+
+extension TagBadge: StyleConfigurable {
+    public func style(_ style: Style) -> Self {
+        var copy = self
+        copy.style = style
+        return copy
+    }
+}
+
+// MARK: SizeConfigurable
+
+extension TagBadge: SizeConfigurable {
+    public func size(_ size: Size) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
 }
 
 #Preview("Tag Badge") {
     HStack(spacing: LayoutToken.gutter) {
-        TagBadge.neutral("Neutral")
-        TagBadge.accent("Accent")
-        TagBadge.selected("Selected")
+        TagBadge(text: "Neutral")
+        TagBadge(text: "Accent")
+            .style(.accent)
+        TagBadge(text: "Selected")
+            .style(.selected)
     }
     .designSystemScreenMargin()
     .padding(.vertical, LayoutToken.margin)

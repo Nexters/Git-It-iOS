@@ -31,7 +31,10 @@ public struct UserInfoRepositoryAdapter: UserInfoRepository {
                         thisMonthSolvedCount: response.thisMonthSolvedCount,
                         streakDays: response.streakDays,
                         weeklyCounts: response.weeklyChart.map {
-                            WeeklyLearningCount(dayLabel: $0.dayLabel, count: $0.count)
+                            WeeklyLearningCount(
+                                dayLabel: $0.dayLabel,
+                                count: $0.count,
+                            )
                         },
                     ),
                 ),
@@ -99,7 +102,10 @@ public struct UserInfoRepositoryAdapter: UserInfoRepository {
             let position = try domainPosition(position),
             let careerLevel = try domainCareerLevel(careerLevel)
         else { return nil }
-        return Curation(position: position, careerLevel: careerLevel)
+        return Curation(
+            position: position,
+            careerLevel: careerLevel,
+        )
     }
 
     private func dtoPosition(_ position: MemberPosition) -> PositionDTO {

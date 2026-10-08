@@ -1,16 +1,14 @@
 import DesignSystem
 import SwiftUI
 
+// MARK: - ContinuousProgressBar
+
 public struct ContinuousProgressBar: View {
 
     // MARK: Lifecycle
 
-    public init(
-        progress: Double,
-        height: Height = .row,
-    ) {
+    public init(progress: Double) {
         self.progress = Self.clampedProgress(progress)
-        self.height = height
     }
 
     // MARK: Public
@@ -42,7 +40,7 @@ public struct ContinuousProgressBar: View {
                     .frame(width: proxy.size.width * progress)
             }
         }
-        .frame(height: height.value)
+        .frame(height: size.value)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("학습 진행률")
         .accessibilityValue("\(Int((progress * 100).rounded()))퍼센트")
@@ -78,8 +76,18 @@ public struct ContinuousProgressBar: View {
     }
 
     private let progress: Double
-    private let height: Height
+    private var size = Height.row
 
+}
+
+// MARK: SizeConfigurable
+
+extension ContinuousProgressBar: SizeConfigurable {
+    public func size(_ size: Height) -> Self {
+        var copy = self
+        copy.size = size
+        return copy
+    }
 }
 
 #Preview("Continuous Progress Bar") {

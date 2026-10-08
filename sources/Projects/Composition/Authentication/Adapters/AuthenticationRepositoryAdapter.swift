@@ -25,7 +25,10 @@ public actor AuthenticationRepositoryAdapter: DomainAccount.AuthenticationReposi
             do {
                 let credential = try await appleSignInSource.authorize()
                 try? appleIdentityStore.save(credential.userID)
-                return AuthenticationGrant(id: credential.identityToken, method: .apple)
+                return AuthenticationGrant(
+                    id: credential.identityToken,
+                    method: .apple,
+                )
             } catch let error as AppleSignInError {
                 throw domainError(for: error)
             }

@@ -64,7 +64,10 @@ public struct ProjectDetailRouterFeature: Sendable {
         public init(projectID: ProjectID) {
             self.projectID = projectID
             projectDetail = ProjectDetailFeature.State(projectID: projectID)
-            savedQuestions = SavedFeature.State(initialProjectFilter: projectID, isBackControlPresented: true)
+            savedQuestions = SavedFeature.State(
+                initialProjectFilter: projectID,
+                isBackControlPresented: true,
+            )
             singleQuestionEntry = SingleQuestionEntryFeature.State(projectID: projectID)
         }
 
@@ -82,7 +85,8 @@ public struct ProjectDetailRouterFeature: Sendable {
 
     }
 
-    public enum Action: Sendable, Equatable {
+    public enum Action: ViewAction, Sendable, Equatable {
+        case view(View)
         case projectDetail(ProjectDetailFeature.Action)
         case savedQuestions(SavedFeature.Action)
         case singleQuestion(QuestionSolvingFeature.Action)
@@ -90,6 +94,11 @@ public struct ProjectDetailRouterFeature: Sendable {
         case delegate(Delegate)
 
         // MARK: Public
+
+        @CasePathable
+        public enum View: Sendable, Equatable {
+            case singleQuestionFailureDismissed
+        }
 
         @CasePathable
         public enum Delegate: Sendable, Equatable {
@@ -103,32 +112,58 @@ public struct ProjectDetailRouterFeature: Sendable {
     public static let singleQuestionAdvanceActionTitle = "완료"
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.projectDetail, action: \.projectDetail) {
+        Scope(
+            state: \.projectDetail,
+            action: \.projectDetail,
+        ) {
             ProjectDetailFeature(
                 projectDetail: { [project] in try await project.detail(of: $0) },
                 deleteProject: { [project] in try await project.delete($0) },
             )
         }
-        Scope(state: \.savedQuestions, action: \.savedQuestions) {
+        Scope(
+            state: \.savedQuestions,
+            action: \.savedQuestions,
+        ) {
             SavedFeature(
                 fetchBookmarks: { [quizDetail] in try await quizDetail.bookmarks($0) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
-        Scope(state: \.singleQuestionEntry, action: \.singleQuestionEntry) {
-            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet($0, in: $1) })
+        Scope(
+            state: \.singleQuestionEntry,
+            action: \.singleQuestionEntry,
+        ) {
+            SingleQuestionEntryFeature(fetchQuizSet: { [quizDetail] in try await quizDetail.quizSet(
+                $0,
+                in: $1,
+            ) })
         }
         Reduce { state, action in
             switch action {
             case .projectDetail(.delegate(.setStartRequested(let projectID, let setID, let label))):
-                return .send(.delegate(.learningSetRequested(projectID: projectID, setID: setID, label: label)))
+                return .send(.delegate(.learningSetRequested(
+                    projectID: projectID,
+                    setID: setID,
+                    label: label,
+                )))
 
             case .projectDetail(.delegate(.savedQuestionsRequested)):
-                return activate(.savedQuestions, cause: .savedQuestionsRequested, state: &state)
+                return activate(
+                    .savedQuestions,
+                    cause: .savedQuestionsRequested,
+                    state: &state,
+                )
 
             case .projectDetail(.delegate(.externalURLRequested(let url))),
                  .singleQuestion(.delegate(.externalURLRequested(let url))):
@@ -147,7 +182,11 @@ public struct ProjectDetailRouterFeature: Sendable {
                 ))))
 
             case .savedQuestions(.delegate(.backRequested)):
-                return activate(.projectDetail, cause: .backRequested, state: &state)
+                return activate(
+                    .projectDetail,
+                    cause: .backRequested,
+                    state: &state,
+                )
 
             case .singleQuestionEntry(.delegate(.questionPrepared(let question, let projectID))):
                 state.singleQuestion = QuestionSolvingFeature.State(
@@ -165,10 +204,17 @@ public struct ProjectDetailRouterFeature: Sendable {
             case .singleQuestionEntry(.delegate(.preparationFailed)):
                 return .none
 
+            case .view(.singleQuestionFailureDismissed):
+                return .send(.singleQuestionEntry(.input(.failureDismissed)))
+
             case .singleQuestion(.delegate(.advanceRequested)),
                  .singleQuestion(.delegate(.backRequested)):
                 state.singleQuestion = nil
-                return activate(.savedQuestions, cause: .singleQuestionFinished, state: &state)
+                return activate(
+                    .savedQuestions,
+                    cause: .singleQuestionFinished,
+                    state: &state,
+                )
 
             case .projectDetail,
                  .savedQuestions,
@@ -178,14 +224,23 @@ public struct ProjectDetailRouterFeature: Sendable {
                 return .none
             }
         }
-        .ifLet(\.singleQuestion, action: \.singleQuestion) {
+        .ifLet(
+            \.singleQuestion,
+            action: \.singleQuestion,
+        ) {
             QuestionSolvingFeature(
                 gradeChoiceAnswer: { [quizDetail] in try await quizDetail.grade($0) },
                 gradeEssayAnswer: { [quizDetail] in try await quizDetail.grade($0) },
                 setBookmark: { [quizDetail] quizID, projectID, isBookmarked in
                     isBookmarked
-                        ? try await quizDetail.bookmark(quizID, in: projectID)
-                        : try await quizDetail.unbookmark(quizID, in: projectID)
+                        ? try await quizDetail.bookmark(
+                            quizID,
+                            in: projectID,
+                        )
+                        : try await quizDetail.unbookmark(
+                            quizID,
+                            in: projectID,
+                        )
                 },
             )
         }
@@ -203,7 +258,11 @@ public struct ProjectDetailRouterFeature: Sendable {
     ) -> Effect<Action> {
         guard state.activeScreen != screen else { return .none }
         state.screenTransitions.append(
-            ScreenTransition(from: state.activeScreen, to: screen, cause: cause)
+            ScreenTransition(
+                from: state.activeScreen,
+                to: screen,
+                cause: cause,
+            )
         )
         state.activeScreen = screen
         return .none

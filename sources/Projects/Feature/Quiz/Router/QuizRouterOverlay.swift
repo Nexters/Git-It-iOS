@@ -13,11 +13,12 @@ public struct QuizRouterOverlay: View {
     // MARK: Public
 
     public var body: some View {
-        PushedScreenOverlay(isPresented: store != nil) {
+        PushedScreenOverlay {
             if let store {
                 QuizRouter(store: store)
             }
         }
+        .presented(store != nil)
     }
 
     // MARK: Private

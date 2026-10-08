@@ -10,13 +10,27 @@ extension ProfileScreen {
 
         var body: some View {
             HStack {
-                VStack(alignment: .leading, spacing: Constant.messageSpacing) {
-                    StyledText.subtitle3(Constant.title)
-                    StyledText.caption1(Constant.message, color: .grey400)
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.messageSpacing,
+                ) {
+                    StyledText(text: Constant.title)
+                        .textStyle(.subtitle3)
+                    StyledText(text: Constant.message)
+                        .textStyle(.caption1)
+                        .foregroundColorToken(.grey400)
                 }
                 Spacer()
-                ActionButton.secondary(Constant.retryTitle, size: .small, action: onRetry)
-                    .fixedSize(horizontal: true, vertical: false)
+                FeedbackActionButton(
+                    title: Constant.retryTitle,
+                    action: onRetry,
+                )
+                .style(.secondary)
+                .size(.small)
+                .fixedSize(
+                    horizontal: true,
+                    vertical: false,
+                )
             }
             .frame(minHeight: Constant.minHeight)
         }

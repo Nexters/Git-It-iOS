@@ -43,7 +43,10 @@ public final class PushQuizGenerationOutcomeSource: QuizGenerationOutcomeSource,
         var continuations = [UUID: AsyncStream<QuizGenerationOutcomeDTO>.Continuation]()
     }
 
-    private static let logger = Logger(subsystem: "com.nexters.hytime.gitit", category: "PushQuizGenerationOutcomeSource")
+    private static let logger = Logger(
+        subsystem: "com.nexters.hytime.gitit",
+        category: "PushQuizGenerationOutcomeSource",
+    )
 
     private let state = Mutex(State())
 

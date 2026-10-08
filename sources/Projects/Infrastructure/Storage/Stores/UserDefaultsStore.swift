@@ -18,7 +18,10 @@ public actor UserDefaultsStore {
         _ data: Data,
         forKey key: String,
     ) {
-        userDefaults.set(data, forKey: storageKey(for: key))
+        userDefaults.set(
+            data,
+            forKey: storageKey(for: key),
+        )
     }
 
     public func value(forKey key: String) -> Data? {

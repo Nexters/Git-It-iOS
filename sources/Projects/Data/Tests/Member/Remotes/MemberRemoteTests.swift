@@ -172,6 +172,10 @@ extension MemberRemoteTests {
         statusCode: Int,
         envelope: String,
     ) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: statusCode, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: statusCode,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 }

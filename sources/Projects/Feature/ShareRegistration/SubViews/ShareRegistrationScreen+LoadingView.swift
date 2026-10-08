@@ -14,10 +14,16 @@ extension ShareRegistrationScreen {
             VStack(spacing: Constant.textSetSpacing) {
                 Spacer(minLength: 0)
 
-                ResourceAnimation(asset: .generalLoading, isLooping: true)
-                    .frame(width: Constant.indicatorSize, height: Constant.indicatorSize)
+                ResourceAnimation(asset: .generalLoading)
+                    .frame(
+                        width: Constant.indicatorSize,
+                        height: Constant.indicatorSize,
+                    )
 
-                StyledText.body2(message, color: .grey400, alignment: .center)
+                StyledText(text: message)
+                    .textStyle(.body2)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
 
                 Spacer(minLength: 0)
             }

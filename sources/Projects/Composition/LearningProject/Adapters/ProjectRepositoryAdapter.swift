@@ -19,7 +19,10 @@ public struct ProjectRepositoryAdapter: ProjectRepository {
         size: Int,
     ) async throws -> ProjectPage {
         do {
-            let response = try await remote.fetchProjects(page: index, size: size)
+            let response = try await remote.fetchProjects(
+                page: index,
+                size: size,
+            )
             return ProjectPage(
                 summaries: response.items.map(summary(from:)),
                 hasNextPage: response.hasNext,
@@ -52,7 +55,10 @@ public struct ProjectRepositoryAdapter: ProjectRepository {
                 ),
                 progressPercent: response.overallProgressPercent,
                 sets: sets,
-                next: next(in: sets, quizID: response.nextQuestionID),
+                next: next(
+                    in: sets,
+                    quizID: response.nextQuestionID,
+                ),
             )
         } catch let error as LearningProjectServiceError {
             throw domainError(for: error)
@@ -77,8 +83,14 @@ public struct ProjectRepositoryAdapter: ProjectRepository {
             repositoryName: dto.repositoryName,
             repositoryImageURL: dto.repositoryImageURL,
             techStack: dto.techStack,
-            currentSet: ProjectSetLabel(label: dto.currentSetLabel, title: dto.currentSetTitle),
-            next: dto.nextSetID.map { ProjectNextQuiz(setID: $0, quizID: dto.nextQuestionID) },
+            currentSet: ProjectSetLabel(
+                label: dto.currentSetLabel,
+                title: dto.currentSetTitle,
+            ),
+            next: dto.nextSetID.map { ProjectNextQuiz(
+                setID: $0,
+                quizID: dto.nextQuestionID,
+            ) },
             progressPercent: dto.overallProgressPercent,
         )
     }
@@ -89,7 +101,10 @@ public struct ProjectRepositoryAdapter: ProjectRepository {
     ) -> ProjectNextQuiz? {
         let incomplete = sets.first { $0.completedCount < $0.quizCount }
         guard let target = incomplete ?? sets.first else { return nil }
-        return ProjectNextQuiz(setID: target.setID, quizID: quizID)
+        return ProjectNextQuiz(
+            setID: target.setID,
+            quizID: quizID,
+        )
     }
 
     private func domainError(for error: LearningProjectServiceError) -> ProjectError {

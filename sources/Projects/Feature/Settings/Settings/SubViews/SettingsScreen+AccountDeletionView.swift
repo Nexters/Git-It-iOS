@@ -13,48 +13,77 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                        IconGlassButton.neutral(
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
+                        IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.deleteAccountCancelled) },
                         )
+                        .size(.medium)
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
-                    ScreenHeaderTitle(title: Constant.title)
+                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
             } content: {
-                VStack(alignment: .leading, spacing: Constant.paragraphSpacing) {
-                    ForEach(Constant.paragraphs, id: \.self) { paragraph in
-                        StyledText.body1(paragraph)
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.paragraphSpacing,
+                ) {
+                    ForEach(
+                        Constant.paragraphs,
+                        id: \.self,
+                    ) { paragraph in
+                        StyledText(text: paragraph)
                     }
 
-                    if case .failed = store.accountAction {
-                        StyledText.caption1(Constant.failureMessage, color: .error)
+                    if case .failed = store.accountAction.accountAction {
+                        StyledText(text: Constant.failureMessage)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading,
+                )
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             } footer: {
                 BottomActionBar {
-                    ActionButton.text(
-                        styledText: StyledText.body1(Constant.confirmTitle, color: .error, alignment: .center),
-                        isEnabled: store.accountAction != .deletingAccount,
+                    FeedbackActionButton(
+                        styledText: StyledText(text: Constant.confirmTitle)
+                            .foregroundColorToken(.error),
                         action: { send(.deleteAccountConfirmed) },
                     )
+                    .enabled(store.accountAction.accountAction != .deletingAccount)
+                    .style(.text)
+                    .multilineTextAlignment(.center)
                     .designSystemScreenMargin()
                 }
             }
-            .toolbar(.hidden, for: .tabBar)
+            .toolbar(
+                .hidden,
+                for: .tabBar,
+            )
         }
 
         // MARK: Private

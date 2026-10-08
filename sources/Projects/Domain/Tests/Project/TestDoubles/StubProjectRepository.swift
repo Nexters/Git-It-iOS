@@ -28,7 +28,10 @@ actor StubProjectRepository: ProjectRepository {
         if let failure {
             throw failure
         }
-        return pages[index] ?? ProjectPage(summaries: [], hasNextPage: false)
+        return pages[index] ?? ProjectPage(
+            summaries: [],
+            hasNextPage: false,
+        )
     }
 
     func detail(of _: String) async throws -> ProjectDetail {

@@ -13,8 +13,15 @@ struct SensitiveValueExposureTests {
 
         let values: [Any] = [
             AppleLoginRequestDTO(idToken: idTokenMarker),
-            LoginResponseDTO(accessToken: accessMarker, refreshToken: refreshMarker, needsCuration: false),
-            AppleSignInCredential(userID: "apple-user-1", identityToken: idTokenMarker),
+            LoginResponseDTO(
+                accessToken: accessMarker,
+                refreshToken: refreshMarker,
+                needsCuration: false,
+            ),
+            AppleSignInCredential(
+                userID: "apple-user-1",
+                identityToken: idTokenMarker,
+            ),
         ]
 
         for value in values {

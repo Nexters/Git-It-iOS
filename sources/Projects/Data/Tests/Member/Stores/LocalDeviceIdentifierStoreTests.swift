@@ -26,7 +26,10 @@ struct LocalDeviceIdentifierStoreTests {
 
         #expect(LocalDeviceIdentifierStore.namespace == "com.nexters.hytime.gitit.device")
         let stored = try #require(storage.storedData(forKey: "deviceID"))
-        #expect(String(data: stored, encoding: .utf8) == deviceID)
+        #expect(String(
+            data: stored,
+            encoding: .utf8,
+        ) == deviceID)
     }
 
 }

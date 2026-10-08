@@ -23,12 +23,19 @@ actor SpyBookmarkRepository: BookmarkRepository {
             await withCheckedContinuation { waiter = $0 }
         }
         events.append("\(isBookmarked):end")
-        return QuizBookmarkState(quizID: quizID, isBookmarked: isBookmarked)
+        return QuizBookmarkState(
+            quizID: quizID,
+            isBookmarked: isBookmarked,
+        )
     }
 
     func bookmarks(_ filter: QuizBookmarkFilter) async throws -> QuizBookmarkList {
         requestedFilters.append(filter)
-        return QuizBookmarkList(totalCount: 0, projects: [], bookmarks: [])
+        return QuizBookmarkList(
+            totalCount: 0,
+            projects: [],
+            bookmarks: [],
+        )
     }
 
     func release() {

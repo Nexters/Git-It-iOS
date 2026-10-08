@@ -13,51 +13,73 @@ extension SettingsScreen {
 
         var body: some View {
             OverlayContainer {
-                VStack(alignment: .leading, spacing: Constant.headerTitleSpacing) {
-                    HStack(alignment: .top, spacing: LayoutToken.gutter) {
-                        IconGlassButton.neutral(
+                VStack(
+                    alignment: .leading,
+                    spacing: Constant.headerTitleSpacing,
+                ) {
+                    HStack(
+                        alignment: .top,
+                        spacing: LayoutToken.gutter,
+                    ) {
+                        IconGlassButton(
                             icon: ScreenControlBar.Control.back.icon,
                             label: ScreenControlBar.Control.back.label,
-                            size: .medium,
                             action: { send(.backTapped) },
                         )
+                        .size(.medium)
 
                         Spacer(minLength: 0)
                     }
-                    .frame(height: Constant.headerControlRowHeight, alignment: .top)
+                    .frame(
+                        height: Constant.headerControlRowHeight,
+                        alignment: .top,
+                    )
 
-                    ScreenHeaderTitle(title: Constant.title)
+                    ScreenHeaderTitle(displayModel: .init(title: Constant.title))
                 }
                 .padding(.bottom, Constant.headerBottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
                 .designSystemScreenMargin()
             } content: {
                 VStack(spacing: Constant.messageSpacing) {
-                    if case .failed = store.careerLevelMutation {
-                        StyledText.caption1(Constant.failureMessage, color: .error, alignment: .center)
+                    if case .failed = store.curationUpdate.careerLevelMutation {
+                        StyledText(text: Constant.failureMessage)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
                     }
 
                     SelectionCardList(
                         items: CareerLevelDisplay.orderedLevels.map { level in
                             .init(
                                 id: CareerLevelDisplay.identifier(for: level),
-                                title: CareerLevelDisplay.title(for: level),
-                                supportingText: CareerLevelDisplay.description(for: level),
-                                illust: CareerLevelDisplay.illust(for: level),
-                                isSelected: store.profile?.curation?.careerLevel == level,
+                                displayModel: .init(
+                                    title: CareerLevelDisplay.title(for: level),
+                                    supportingText: CareerLevelDisplay.description(for: level),
+                                    illust: CareerLevelDisplay.illust(for: level),
+                                ),
                             )
                         },
-                        onSelect: { identifier in
-                            if let level = CareerLevelDisplay.level(forIdentifier: identifier) {
-                                send(.careerLevelSelected(level))
-                            }
-                        },
+                        selection: Binding(
+                            get: { (store.profile?.curation?.careerLevel).map(CareerLevelDisplay.identifier(for:)) },
+                            set: { identifier in
+                                if let identifier, let level = CareerLevelDisplay.level(forIdentifier: identifier) {
+                                    send(.careerLevelSelected(level))
+                                }
+                            },
+                        ),
                     )
                 }
                 .designSystemScreenMargin()
                 .padding(.top, Constant.contentTopPadding)
             }
-            .toolbar(.hidden, for: .tabBar)
+            .toolbar(
+                .hidden,
+                for: .tabBar,
+            )
         }
 
         // MARK: Private

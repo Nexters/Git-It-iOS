@@ -19,7 +19,10 @@ public struct QuizSetRepositoryAdapter: QuizSetRepository {
         in projectID: ProjectID,
     ) async throws -> QuizSet {
         do {
-            let response = try await remote.fetchLearningSet(projectID: projectID, setID: setID)
+            let response = try await remote.fetchLearningSet(
+                projectID: projectID,
+                setID: setID,
+            )
             return QuizSet(
                 id: response.setID,
                 title: response.title,
@@ -63,7 +66,10 @@ public struct QuizSetRepositoryAdapter: QuizSetRepository {
             let selectedIndex = dto.selectedIndex,
             let isCorrect = dto.correct
         else { return nil }
-        return ChoiceSubmission(selectedIndex: selectedIndex, isCorrect: isCorrect)
+        return ChoiceSubmission(
+            selectedIndex: selectedIndex,
+            isCorrect: isCorrect,
+        )
     }
 
     private func source(from dto: SourceResponseDTO) -> QuizSource {

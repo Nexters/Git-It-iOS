@@ -33,10 +33,17 @@ public struct ExternalRepositoryRemote: Sendable {
         for (name, value) in request.headers {
             headers[name] = value
         }
-        let httpRequest = HTTPRequest(method: .get, path: request.path, headers: headers)
+        let httpRequest = HTTPRequest(
+            method: .get,
+            path: request.path,
+            headers: headers,
+        )
 
         do {
-            let response = try await client.send(httpRequest, expecting: GitHubRepositoryResponseDTO.self)
+            let response = try await client.send(
+                httpRequest,
+                expecting: GitHubRepositoryResponseDTO.self,
+            )
             switch response.body {
             case .decoded(let dto):
                 return dto

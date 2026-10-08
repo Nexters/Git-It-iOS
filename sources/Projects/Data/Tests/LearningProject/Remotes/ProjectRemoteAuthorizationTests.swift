@@ -32,9 +32,15 @@ struct ProjectRemoteAuthorizationTests {
             credentialRejected: { },
         )
 
-        _ = try await remote.fetchProjects(page: 0, size: 10)
+        _ = try await remote.fetchProjects(
+            page: 0,
+            size: 10,
+        )
         currentToken.withLock { $0 = "second-token" }
-        _ = try await remote.fetchProjects(page: 0, size: 10)
+        _ = try await remote.fetchProjects(
+            page: 0,
+            size: 10,
+        )
 
         let requests = await transport.recordedRequests
         #expect(requests[0].headers["Authorization"] == "Bearer first-token")
@@ -44,7 +50,11 @@ struct ProjectRemoteAuthorizationTests {
     // MARK: Private
 
     private func jsonResponse(_ envelope: String) -> HTTPTransportResponse {
-        HTTPTransportResponse(statusCode: 200, headers: [:], body: Data(envelope.utf8))
+        HTTPTransportResponse(
+            statusCode: 200,
+            headers: [:],
+            body: Data(envelope.utf8),
+        )
     }
 
 }

@@ -12,30 +12,40 @@ struct QuizLevelSelectionScreen: View {
     @Bindable var store: StoreOf<QuizLevelSelectionFeature>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
             ScreenControlBar(onLeadingTap: { send(.backTapped) })
                 .designSystemScreenMargin()
 
-            StyledText.subtitle1("이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?")
+            StyledText(text: "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?")
+                .textStyle(.subtitle1)
                 .designSystemScreenMargin()
                 .padding(.top, Constant.titleTopPadding)
 
             SelectionCardList(
                 items: levelItems,
-                onSelect: { identifier in
-                    guard let level = Self.levels.first(where: { $0.level.identifier == identifier })?.level
-                    else { return }
-                    send(.levelSelected(level))
-                },
+                selection: Binding(
+                    get: { store.quizLevel.identifier },
+                    set: { identifier in
+                        guard let level = Self.levels.first(where: { $0.level.identifier == identifier })?.level
+                        else { return }
+                        send(.levelSelected(level))
+                    },
+                ),
             )
             .designSystemScreenMargin()
             .padding(.top, Constant.listTopPadding)
 
             Spacer(minLength: 0)
 
-            ActionButton.primary("다음", action: { send(.nextTapped) })
-                .designSystemScreenMargin()
-                .padding(.bottom, Constant.bottomButtonPadding)
+            FeedbackActionButton(
+                title: "다음",
+                action: { send(.nextTapped) },
+            )
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomButtonPadding)
         }
     }
 
@@ -67,10 +77,11 @@ extension QuizLevelSelectionScreen {
         Self.levels.map { level, title, supportingText, illust in
             SelectionCardList.Item(
                 id: level.identifier,
-                title: title,
-                supportingText: supportingText,
-                illust: illust,
-                isSelected: store.quizLevel == level,
+                displayModel: .init(
+                    title: title,
+                    supportingText: supportingText,
+                    illust: illust,
+                ),
             )
         }
     }

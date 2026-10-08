@@ -17,17 +17,33 @@ extension QuizGenerationProgressScreen {
                 SheetSurface {
                     VStack(spacing: Constant.contentSpacing) {
                         ResourceAnimation(asset: .notification)
-                            .frame(width: Constant.bellSize, height: Constant.bellSize)
+                            .frame(
+                                width: Constant.bellSize,
+                                height: Constant.bellSize,
+                            )
 
                         VStack(spacing: Constant.textSetSpacing) {
-                            StyledText.subtitle1("세트 생성이 완료되면\n리마인드 알림을 보내드려요.", alignment: .center)
-                            StyledText.caption1("프로필 설정페이지에서 언제든 설정할 수 있어요.", color: .grey400, alignment: .center)
+                            StyledText(text: "세트 생성이 완료되면\n리마인드 알림을 보내드려요.")
+                                .textStyle(.subtitle1)
+                                .multilineTextAlignment(.center)
+                            StyledText(text: "프로필 설정페이지에서 언제든 설정할 수 있어요.")
+                                .textStyle(.caption1)
+                                .foregroundColorToken(.grey400)
+                                .multilineTextAlignment(.center)
                         }
 
                         VStack(spacing: LayoutToken.compactSpacing) {
-                            ActionButton.primary("리마인드 알림 설정하기", size: .large, action: onAccept)
+                            FeedbackActionButton(
+                                title: "리마인드 알림 설정하기",
+                                action: onAccept,
+                            )
 
-                            ActionButton.text("다시 보지 않기", size: .small, action: onDecline)
+                            FeedbackActionButton(
+                                title: "다시 보지 않기",
+                                action: onDecline,
+                            )
+                            .style(.text)
+                            .size(.small)
                         }
                     }
                     .padding(.top, Constant.contentTopPadding)

@@ -21,22 +21,14 @@ public struct ProfileFeature: Sendable {
 
         // MARK: Public
 
-        public enum ProfileLoad: Equatable, Sendable {
-            case idle
-            case loading
-            case loaded(UserProfile)
-            case failed(UserInfoError)
-        }
-
-        public var profileLoad = ProfileLoad.idle
-        public var profileRequestID = 0
+        public var profile = UserProfileLoadFeature.State()
 
     }
 
     public enum Action: ViewAction, Equatable, Sendable {
         case view(View)
-        case effect(EffectEvent)
         case delegate(Delegate)
+        case profile(UserProfileLoadFeature.Action)
 
         // MARK: Public
 
@@ -48,54 +40,42 @@ public struct ProfileFeature: Sendable {
         }
 
         @CasePathable
-        public enum EffectEvent: Equatable, Sendable {
-            case profileLoadFinished(requestID: Int, result: Result<UserProfile, UserInfoError>)
-        }
-
-        @CasePathable
         public enum Delegate: Equatable, Sendable {
             case settingsRequested
         }
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
+            UserProfileLoadFeature(profile: profile)
+        }
         Reduce { state, action in
             switch action {
             case .view(.task):
-                switch state.profileLoad {
+                switch state.profile.load {
                 case .idle,
                      .failed:
-                    return startProfileLoad(state: &state, showsLoading: true)
+                    return .send(.profile(.input(.load)))
 
                 case .loaded:
-                    return startProfileLoad(state: &state, showsLoading: false)
+                    return .send(.profile(.input(.reload)))
 
                 case .loading:
                     return .none
                 }
 
             case .view(.retryTapped):
-                guard case .failed = state.profileLoad else { return .none }
-                return startProfileLoad(state: &state, showsLoading: true)
+                guard case .failed = state.profile.load else { return .none }
+                return .send(.profile(.input(.load)))
 
             case .view(.settingsTapped):
                 return .send(.delegate(.settingsRequested))
 
-            case .effect(.profileLoadFinished(let requestID, let result)):
-                guard requestID == state.profileRequestID else { return .none }
-                switch result {
-                case .success(let profile):
-                    state.profileLoad = .loaded(profile)
-
-                case .failure(let error):
-                    if case .loaded = state.profileLoad {
-                        return .none
-                    }
-                    state.profileLoad = .failed(error)
-                }
-                return .none
-
-            case .delegate:
+            case .profile,
+                 .delegate:
                 return .none
             }
         }
@@ -103,39 +83,6 @@ public struct ProfileFeature: Sendable {
 
     // MARK: Private
 
-    private enum CancelID {
-        case profile
-    }
-
     private let profile: @Sendable () async throws -> UserProfile
-
-    private func startProfileLoad(
-        state: inout State,
-        showsLoading: Bool,
-    ) -> ComposableArchitecture.Effect<Action> {
-        state.profileRequestID += 1
-        if showsLoading {
-            state.profileLoad = .loading
-        }
-        let requestID = state.profileRequestID
-        let profile = profile
-
-        return .run { send in
-            do {
-                await send(.effect(.profileLoadFinished(
-                    requestID: requestID,
-                    result: .success(try await profile()),
-                )))
-            } catch let error as UserInfoError {
-                await send(.effect(.profileLoadFinished(requestID: requestID, result: .failure(error))))
-            } catch {
-                await send(.effect(.profileLoadFinished(
-                    requestID: requestID,
-                    result: .failure(.temporarilyUnavailable),
-                )))
-            }
-        }
-        .cancellable(id: CancelID.profile, cancelInFlight: true)
-    }
 
 }

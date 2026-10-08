@@ -62,7 +62,10 @@ nonisolated struct AppRootFeature: Sendable {
     struct State: Equatable, Sendable {
         init(bundleVersion: String) {
             appEntry = AppEntryFeature.State()
-            onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)
+            onboarding = OnboardingRouterFeature.State(
+                startingAt: .guide,
+                bundleVersion: bundleVersion,
+            )
         }
 
         var route = Route.restoring
@@ -105,14 +108,20 @@ nonisolated struct AppRootFeature: Sendable {
     }
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.appEntry, action: \.appEntry) {
+        Scope(
+            state: \.appEntry,
+            action: \.appEntry,
+        ) {
             AppEntryFeature(
                 restoreSignIn: { [account] in await account.restoreSignIn() },
                 curation: { [userInfo] in try await userInfo.curation() },
                 signOut: { [account] in await account.signOut() },
             )
         }
-        Scope(state: \.onboarding, action: \.onboarding) {
+        Scope(
+            state: \.onboarding,
+            action: \.onboarding,
+        ) {
             OnboardingRouterFeature(
                 signIn: { [account] in await account.signIn(with: $0) },
                 signOut: { [account] in await account.signOut() },
@@ -123,7 +132,10 @@ nonisolated struct AppRootFeature: Sendable {
                 deletesCompletedAccountOnSignIn: deletesCompletedAccountOnSignIn,
             )
         }
-        Scope(state: \.mainShell, action: \.mainShell) {
+        Scope(
+            state: \.mainShell,
+            action: \.mainShell,
+        ) {
             MainShellRouterFeature(
                 project: project,
                 quizDetail: quizDetail,
@@ -161,7 +173,10 @@ nonisolated struct AppRootFeature: Sendable {
 
                 case .onboarding(let entryPoint):
                     let bundleVersion = state.onboarding.tutorial.bundleVersion
-                    state.onboarding = OnboardingRouterFeature.State(startingAt: entryPoint, bundleVersion: bundleVersion)
+                    state.onboarding = OnboardingRouterFeature.State(
+                        startingAt: entryPoint,
+                        bundleVersion: bundleVersion,
+                    )
                     state.route = .onboarding
                     return .none
                 }
@@ -170,7 +185,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .effect(.signInVerified(.reauthenticationRequired)):
-                guard state.route == .mainShell else { return .none }
+                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
                 return returnToOnboarding(&state)
 
             case .effect(.signInVerified):
@@ -178,12 +193,42 @@ nonisolated struct AppRootFeature: Sendable {
 
             case .onboarding(.delegate(.mainShellRequested)):
                 state.route = .mainShell
-                return registerDeviceIfNeeded(&state)
+                guard state.mainShell.access == .guest else { return registerDeviceIfNeeded(&state) }
+                return .merge(
+                    .send(.mainShell(.input(.memberAccessGranted))),
+                    registerDeviceIfNeeded(&state),
+                )
+
+            case .onboarding(.delegate(.guestAccessRequested)):
+                state.mainShell = MainShellRouterFeature.State(access: .guest)
+                state.route = .mainShell
+                return .none
+
+            case .onboarding(.delegate(.curationAbandoned)):
+                state.route = .mainShell
+                return .none
+
+            case .mainShell(.delegate(.signInSucceeded(let needsCuration))):
+                guard needsCuration else {
+                    return .merge(
+                        .send(.mainShell(.input(.memberAccessGranted))),
+                        registerDeviceIfNeeded(&state),
+                    )
+                }
+                let bundleVersion = state.onboarding.tutorial.bundleVersion
+                state.onboarding = OnboardingRouterFeature.State(
+                    startingAt: .curation,
+                    bundleVersion: bundleVersion,
+                    curationExit: .returnToCaller,
+                )
+                state.route = .onboarding
+                return .none
 
             case .mainShell(.delegate(.loggedOut)):
                 return returnToOnboarding(&state)
 
             case .view(.applicationBecameActive):
+                guard state.mainShell.access == .member else { return .none }
                 var effects: [Effect<Action>] = [
                     .run { [account] send in
                         await send(.effect(.signInVerified(account.verifySignIn())))
@@ -198,7 +243,7 @@ nonisolated struct AppRootFeature: Sendable {
                 return .merge(effects)
 
             case .effect(.deviceTokenRefreshed(let token)):
-                guard state.route == .mainShell else { return .none }
+                guard state.route == .mainShell, state.mainShell.access == .member else { return .none }
                 return .merge(
                     .run { [appSetting] _ in try? await appSetting.updateDeviceToken(token) },
                     registerDeviceIfNeeded(&state),
@@ -221,7 +266,12 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .mainShell(.delegate(.learningRequested(let projectID, let nextSetID))):
-                guard let summary = loadedProject(projectID: projectID, state: state) else { return .none }
+                guard
+                    let summary = loadedProject(
+                        projectID: projectID,
+                        state: state,
+                    )
+                else { return .none }
                 state.projectDetail = ProjectDetailRouterFeature.State(projectID: projectID)
                 state.quiz = QuizRouterFeature.State(
                     projectID: projectID,
@@ -232,7 +282,11 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .projectDetail(.presented(.delegate(.learningSetRequested(let projectID, let setID, let label)))):
-                state.quiz = QuizRouterFeature.State(projectID: projectID, setID: setID, setLabel: label)
+                state.quiz = QuizRouterFeature.State(
+                    projectID: projectID,
+                    setID: setID,
+                    setLabel: label,
+                )
                 return .none
 
             case .mainShell(.delegate(.externalURLRequested(let url))),
@@ -265,7 +319,10 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
 
             case .effect(.generationStateChanged(let generationState)):
-                return applyGenerationState(generationState, state: &state)
+                return applyGenerationState(
+                    generationState,
+                    state: &state,
+                )
 
             case .projectRegistration(.presented(.delegate(.projectRegistered(_)))):
                 state.projectRegistration = nil
@@ -286,7 +343,10 @@ nonisolated struct AppRootFeature: Sendable {
                 return .none
             }
         }
-        .ifLet(\.$projectRegistration, action: \.projectRegistration) {
+        .ifLet(
+            \.$projectRegistration,
+            action: \.projectRegistration,
+        ) {
             ProjectRegistrationRouterFeature(
                 externalRepository: externalRepository,
                 projectGeneration: projectGeneration,
@@ -294,10 +354,19 @@ nonisolated struct AppRootFeature: Sendable {
                 openNotificationSettings: openNotificationSettings,
             )
         }
-        .ifLet(\.$projectDetail, action: \.projectDetail) {
-            ProjectDetailRouterFeature(project: project, quizDetail: quizDetail)
+        .ifLet(
+            \.$projectDetail,
+            action: \.projectDetail,
+        ) {
+            ProjectDetailRouterFeature(
+                project: project,
+                quizDetail: quizDetail,
+            )
         }
-        .ifLet(\.$quiz, action: \.quiz) {
+        .ifLet(
+            \.$quiz,
+            action: \.quiz,
+        ) {
             QuizRouterFeature(quizDetail: quizDetail)
         }
     }
@@ -327,7 +396,7 @@ nonisolated struct AppRootFeature: Sendable {
         state: State,
     ) -> ProjectSummary? {
         if
-            case .loaded(let list) = state.mainShell.home.projectLoad,
+            case .loaded(let list) = state.mainShell.home.projectSummaries.load,
             let summary = list.summaries.first(where: { $0.id == projectID })
         {
             return summary
@@ -370,7 +439,10 @@ nonisolated struct AppRootFeature: Sendable {
 
     private func returnToOnboarding(_ state: inout State) -> Effect<Action> {
         let bundleVersion = state.onboarding.tutorial.bundleVersion
-        state.onboarding = OnboardingRouterFeature.State(startingAt: .guide, bundleVersion: bundleVersion)
+        state.onboarding = OnboardingRouterFeature.State(
+            startingAt: .guide,
+            bundleVersion: bundleVersion,
+        )
         state.mainShell = MainShellRouterFeature.State()
         state.projectRegistration = nil
         state.projectDetail = nil

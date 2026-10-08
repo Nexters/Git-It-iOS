@@ -56,7 +56,11 @@ actor QuizDetailUseCaseMock: QuizDetailUseCase {
         in projectID: ProjectID,
     ) async throws -> QuizBookmarkState {
         bookmarkInvocations.append(
-            BookmarkInvocation(quizID: quizID, projectID: projectID, isBookmarked: true)
+            BookmarkInvocation(
+                quizID: quizID,
+                projectID: projectID,
+                isBookmarked: true,
+            )
         )
         return try Self.next(&bookmarkStateResults).get()
     }
@@ -66,7 +70,11 @@ actor QuizDetailUseCaseMock: QuizDetailUseCase {
         in projectID: ProjectID,
     ) async throws -> QuizBookmarkState {
         bookmarkInvocations.append(
-            BookmarkInvocation(quizID: quizID, projectID: projectID, isBookmarked: false)
+            BookmarkInvocation(
+                quizID: quizID,
+                projectID: projectID,
+                isBookmarked: false,
+            )
         )
         return try Self.next(&bookmarkStateResults).get()
     }

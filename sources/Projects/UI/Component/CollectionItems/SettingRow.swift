@@ -24,15 +24,23 @@ public struct SettingRow<Content: View>: View {
             HStack {
                 content
                 Spacer()
-                HStack(spacing: 6) {
+                HStack(spacing: LayoutToken.iconSpacing) {
                     if let value {
-                        StyledText.body2(value, color: .grey400)
+                        StyledText(text: value)
+                            .textStyle(.body2)
+                            .foregroundColorToken(.grey400)
                     }
                     ResourceImage(asset: .icon(.settingChevron))
-                        .frame(width: Constant.chevronSize, height: Constant.chevronSize)
+                        .frame(
+                            width: Constant.chevronSize,
+                            height: Constant.chevronSize,
+                        )
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: Constant.minimumHeight)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: Constant.minimumHeight,
+            )
             .padding(.vertical, Constant.verticalPadding)
             .padding(.horizontal, Constant.horizontalPadding)
             .contentShape(Rectangle())

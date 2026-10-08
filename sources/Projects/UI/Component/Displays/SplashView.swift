@@ -14,20 +14,40 @@ public struct SplashView: View {
     // MARK: Public
 
     public var body: some View {
-        VStack(alignment: .center, spacing: Constant.lineSpacing) {
+        VStack(
+            alignment: .center,
+            spacing: Constant.lineSpacing,
+        ) {
             HStack(spacing: 0) {
-                Text.designSystemStyled(hello, style: Constant.subtitleText)
-                    .foregroundStyle(Color(designSystem: .grey400))
-                cursorBar(style: Constant.subtitleText, color: .grey400, state: cursor1)
+                Text.designSystemStyled(
+                    hello,
+                    style: Constant.subtitleText,
+                )
+                .foregroundStyle(Color(designSystem: .grey400))
+                cursorBar(
+                    style: Constant.subtitleText,
+                    color: .grey400,
+                    state: cursor1,
+                )
             }
             .frame(alignment: .leading)
 
             HStack(spacing: 0) {
-                Text.designSystemStyled(lets, style: Constant.titleText)
-                    .foregroundStyle(Color(designSystem: .grey100))
-                Text.designSystemStyled(git, style: Constant.titleText)
-                    .foregroundStyle(Color(designSystem: .blue100))
-                cursorBar(style: Constant.titleText, color: .blue100, state: cursor2)
+                Text.designSystemStyled(
+                    lets,
+                    style: Constant.titleText,
+                )
+                .foregroundStyle(Color(designSystem: .grey100))
+                Text.designSystemStyled(
+                    git,
+                    style: Constant.titleText,
+                )
+                .foregroundStyle(Color(designSystem: .blue100))
+                cursorBar(
+                    style: Constant.titleText,
+                    color: .blue100,
+                    state: cursor2,
+                )
             }
             .frame(alignment: .leading)
         }
@@ -79,7 +99,10 @@ public struct SplashView: View {
     ) -> some View {
         RoundedRectangle(cornerRadius: 1)
             .fill(Color(designSystem: color))
-            .frame(width: style.size * 0.075, height: style.size * 0.92)
+            .frame(
+                width: style.size * 0.075,
+                height: style.size * 0.92,
+            )
             .opacity(state.opacity)
     }
 
@@ -87,13 +110,22 @@ public struct SplashView: View {
         cursor1 = .solid
         try? await Task.sleep(for: Constant.initialDelay)
 
-        await type("Hello World", interval: Constant.typingInterval1) { hello = $0 }
+        await type(
+            "Hello World",
+            interval: Constant.typingInterval1,
+        ) { hello = $0 }
         await blink(for: Constant.cursorHandoffBlinkDuration) { cursor1 = $0 }
         cursor1 = .hidden
         cursor2 = .solid
 
-        await type("Let’s ", interval: Constant.typingInterval2) { lets = $0 }
-        await type("Git-it!", interval: Constant.typingInterval2) { git = $0 }
+        await type(
+            "Let’s ",
+            interval: Constant.typingInterval2,
+        ) { lets = $0 }
+        await type(
+            "Git-it!",
+            interval: Constant.typingInterval2,
+        ) { git = $0 }
 
         try? await Task.sleep(for: Constant.fadeInterval)
 

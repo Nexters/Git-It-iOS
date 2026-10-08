@@ -86,19 +86,30 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `늦게 도착한 이전 요청 결과는 requestID가 달라 반영하지 않는다`() async {
-        var state = LearningSetIntroFeature.State(projectID: "project-1", setID: "set-1", label: "CHAPTER 1")
+        var state = LearningSetIntroFeature.State(
+            projectID: "project-1",
+            setID: "set-1",
+            label: "CHAPTER 1",
+        )
         state.loadRequestID = 2
         state.setLoad = .loading(requestID: 2)
         let store = makeStore(state: state)
 
-        await store.send(.effect(.setLoadFinished(requestID: 1, result: .success(QuizTestFixture.unansweredSet))))
+        await store.send(.effect(.setLoadFinished(
+            requestID: 1,
+            result: .success(QuizTestFixture.unansweredSet),
+        )))
 
         #expect(store.state.setLoad == .loading(requestID: 2))
     }
 
     @Test
     func `조회 중에는 시작 입력이 아무 일도 하지 않는다`() async {
-        var state = LearningSetIntroFeature.State(projectID: "project-1", setID: "set-1", label: "CHAPTER 1")
+        var state = LearningSetIntroFeature.State(
+            projectID: "project-1",
+            setID: "set-1",
+            label: "CHAPTER 1",
+        )
         state.setLoad = .loading(requestID: 1)
         let store = makeStore(state: state)
 
@@ -109,7 +120,11 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `문제 없음이 보고되면 시작 입력을 막는다`() async {
-        var state = LearningSetIntroFeature.State(projectID: "project-1", setID: "set-1", label: "CHAPTER 1")
+        var state = LearningSetIntroFeature.State(
+            projectID: "project-1",
+            setID: "set-1",
+            label: "CHAPTER 1",
+        )
         state.setLoad = .loaded(QuizTestFixture.emptySet)
         let store = makeStore(state: state)
 
@@ -123,7 +138,11 @@ struct LearningSetIntroFeatureTests {
 
     @Test
     func `시작하면 세트와 이어풀기 정보와 북마크 목록을 함께 전달한다`() async {
-        var state = LearningSetIntroFeature.State(projectID: "project-1", setID: "set-1", label: "CHAPTER 1")
+        var state = LearningSetIntroFeature.State(
+            projectID: "project-1",
+            setID: "set-1",
+            label: "CHAPTER 1",
+        )
         state.setLoad = .loaded(QuizTestFixture.partiallyAnsweredSet)
         state.bookmarkLoad = .loaded(["quiz-0"])
         let store = makeStore(state: state)

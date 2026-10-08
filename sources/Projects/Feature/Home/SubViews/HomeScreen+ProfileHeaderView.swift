@@ -12,30 +12,59 @@ extension HomeScreen {
         var body: some View {
             if display.isFailed {
                 HStack {
-                    VStack(alignment: .leading, spacing: Constant.messageSpacing) {
-                        StyledText.subtitle3("프로필을 불러오지 못했어요")
-                        StyledText.caption1("잠시 후 다시 시도해 주세요.", color: .grey400)
+                    VStack(
+                        alignment: .leading,
+                        spacing: Constant.messageSpacing,
+                    ) {
+                        StyledText(text: "프로필을 불러오지 못했어요")
+                            .textStyle(.subtitle3)
+                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.grey400)
                     }
                     Spacer()
-                    ActionButton.secondary("다시 시도", size: .small, action: onRetry)
-                        .fixedSize(horizontal: true, vertical: false)
+                    FeedbackActionButton(
+                        title: "다시 시도",
+                        action: onRetry,
+                    )
+                    .style(.secondary)
+                    .size(.small)
+                    .fixedSize(
+                        horizontal: true,
+                        vertical: false,
+                    )
                 }
                 .frame(minHeight: Constant.failureMinHeight)
             } else if let name = display.name {
                 HStack(spacing: Constant.userProfileSpacing) {
-                    ResourceImage(asset: .icon(.profile), contentMode: .fill)
-                        .frame(width: Constant.avatarSize, height: Constant.avatarSize)
-                        .clipShape(Circle())
+                    ResourceImage(
+                        asset: .icon(.profile),
+                        contentMode: .fill,
+                    )
+                    .frame(
+                        width: Constant.avatarSize,
+                        height: Constant.avatarSize,
+                    )
+                    .clipShape(Circle())
 
-                    VStack(alignment: .leading, spacing: 0) {
-                        StyledText.subtitle3(name)
-                        StyledText.body3(display.role, color: .grey400)
+                    VStack(
+                        alignment: .leading,
+                        spacing: 0,
+                    ) {
+                        StyledText(text: name)
+                            .textStyle(.subtitle3)
+                        StyledText(text: display.role)
+                            .textStyle(.body3)
+                            .foregroundColorToken(.grey400)
                     }
                 }
                 .accessibilityElement(children: .combine)
                 .padding(.top, Constant.topPadding)
                 .padding(.bottom, Constant.bottomPadding)
-                .frame(height: Constant.headerHeight, alignment: .top)
+                .frame(
+                    height: Constant.headerHeight,
+                    alignment: .top,
+                )
             } else {
                 Color.clear
                     .frame(height: Constant.headerHeight)

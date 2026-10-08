@@ -37,7 +37,10 @@ struct AppCompositionTests {
             transport: transport,
         )
 
-        try await composition.userInfo.updateCuration(Curation(position: .ios, careerLevel: .junior))
+        try await composition.userInfo.updateCuration(Curation(
+            position: .ios,
+            careerLevel: .junior,
+        ))
 
         let requests = await transport.recordedRequests
         #expect(requests.count == 1)

@@ -7,7 +7,8 @@ extension HomeScreen {
 
         // MARK: Internal
 
-        let state: HomeProjectSectionState
+        let state: HomeScreen.ProjectSectionState
+        let isShowAllEnabled: Bool
 
         @Binding var cardListLeadingX: CGFloat?
 
@@ -17,19 +18,29 @@ extension HomeScreen {
         let onLearningTapped: (String) -> Void
 
         var body: some View {
-            VStack(alignment: .leading, spacing: Constant.sectionHeaderSpacing) {
+            VStack(
+                alignment: .leading,
+                spacing: Constant.sectionHeaderSpacing,
+            ) {
                 HStack {
-                    StyledText.subtitle3("학습 중인 레포지토리")
+                    StyledText(text: "학습 중인 레포지토리")
+                        .textStyle(.subtitle3)
                     Spacer()
                     Button(action: onShowAllTapped) {
                         HStack(spacing: 8) {
-                            StyledText.body2("전체 보기", color: .blue100)
+                            StyledText(text: "전체 보기")
+                                .textStyle(.body2)
+                                .foregroundColorToken(showAllColor)
                             ResourceImage(asset: .icon(.chevronRight))
-                                .frame(width: Constant.chevronSize, height: Constant.chevronSize)
-                                .designSystemForeground(.blue100)
+                                .frame(
+                                    width: Constant.chevronSize,
+                                    height: Constant.chevronSize,
+                                )
+                                .designSystemForeground(showAllColor)
                         }
                     }
                     .buttonStyle(.plain)
+                    .disabled(!isShowAllEnabled)
                     .padding(8)
                     .accessibilityLabel(Constant.showAllLabel)
                 }
@@ -112,6 +123,10 @@ extension HomeScreen {
             Constant.sectionHeight(cardWidth: cardWidth)
         }
 
+        private var showAllColor: ColorToken {
+            isShowAllEnabled ? .blue100 : .grey400
+        }
+
         private var emptyProjectCards: some View {
             let shape = emptyDeckShape
 
@@ -140,19 +155,39 @@ extension HomeScreen {
 
             case .loading:
                 emptyProjects {
-                    ResourceAnimation(asset: .generalLoading).frame(width: 20, height: 20)
+                    ResourceAnimation(asset: .generalLoading).frame(
+                        width: 20,
+                        height: 20,
+                    )
                 }
 
             case .empty:
                 emptyProjects {
-                    StyledText.body2("아직 등록된 프로젝트가 없어요.", color: .purple200)
+                    StyledText(text: "아직 등록된 프로젝트가 없어요.")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.purple200)
+                }
+
+            case .signInRequired:
+                emptyProjects {
+                    StyledText(text: "로그인하면 학습 중인 레포지토리를 볼 수 있어요.")
+                        .textStyle(.body2)
+                        .foregroundColorToken(.purple200)
                 }
 
             case .failed:
                 emptyProjects {
                     VStack(spacing: Constant.retryMessageSpacing) {
-                        StyledText.body2("잠시 후 다시 시도해 주세요.", color: .grey400, alignment: .center)
-                        ActionButton.secondary("다시 시도", size: .small, action: onProjectRetryTapped)
+                        StyledText(text: "잠시 후 다시 시도해 주세요.")
+                            .textStyle(.body2)
+                            .foregroundColorToken(.grey400)
+                            .multilineTextAlignment(.center)
+                        FeedbackActionButton(
+                            title: "다시 시도",
+                            action: onProjectRetryTapped,
+                        )
+                        .style(.secondary)
+                        .size(.small)
                     }
                     .designSystemScreenMargin()
                 }
@@ -164,7 +199,10 @@ extension HomeScreen {
                 .fill(Color(designSystem: .blue500))
                 .overlay {
                     shape
-                        .stroke(Color(designSystem: .blue300), lineWidth: Constant.strokeWidth * 2)
+                        .stroke(
+                            Color(designSystem: .blue300),
+                            lineWidth: Constant.strokeWidth * 2,
+                        )
                         .clipShape(shape)
                 }
         }
@@ -193,18 +231,23 @@ extension HomeScreen {
 
             return ScrollView(.horizontal) {
                 LazyHStack(spacing: Constant.cardSpacing) {
-                    ForEach(Array(projects.enumerated()), id: \.element.projectID) { _, project in
+                    ForEach(
+                        Array(projects.enumerated()),
+                        id: \.element.projectID,
+                    ) { _, project in
                         HomeProjectCard(
-                            title: project.title,
-                            technologies: project.technologies,
-                            progress: project.progress,
-                            currentSetLabel: project.currentSetLabel,
-                            setTitle: project.setTitle,
-                            variant: project.variant,
-                            isLearningEnabled: project.isLearningEnabled,
+                            displayModel: .init(
+                                title: project.title,
+                                technologies: project.technologies,
+                                progress: project.progress,
+                                currentSetLabel: project.currentSetLabel,
+                                setTitle: project.setTitle,
+                            ),
                             onSelect: { onProjectCardTapped(String(project.projectID)) },
                             onStart: { onLearningTapped(String(project.projectID)) },
                         )
+                        .learningEnabled(project.isLearningEnabled)
+                        .style(project.style)
                         .visualEffect { content, proxy in
                             content.rotationEffect(
                                 .degrees(
@@ -218,7 +261,10 @@ extension HomeScreen {
                 }
                 .background(alignment: .leading) {
                     Color.clear
-                        .frame(width: 0, height: 0)
+                        .frame(
+                            width: 0,
+                            height: 0,
+                        )
                         .onGeometryChange(for: CGFloat.self) { proxy in
                             proxy.frame(in: .scrollView(axis: .horizontal)).minX
                         } action: { minX in
@@ -232,7 +278,10 @@ extension HomeScreen {
             .safeAreaPadding(.leading, Constant.screenMargin)
             .safeAreaPadding(.trailing, Constant.trailingInset)
             .scrollIndicators(.hidden)
-            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne, anchor: .leading))
+            .scrollTargetBehavior(.viewAligned(
+                limitBehavior: .alwaysByOne,
+                anchor: .leading,
+            ))
         }
 
     }

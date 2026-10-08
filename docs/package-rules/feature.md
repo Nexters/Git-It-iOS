@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-07
 
-**최종 수정일**: 2026-09-13 (아키텍처 결정 기록의 Feature 주입 규범을 제약조건으로 이관)
+**최종 수정일**: 2026-09-21 (컴포넌트 표시 값 모델 매핑과 상태 `Binding` 연결 규칙 추가)
 
 ## 설명
 
@@ -39,6 +39,13 @@ Navigation은 Feature의 범위가 아닙니다.
 - 재사용 UI는 UI가 제공하는 공개 API로 사용합니다.
 - Feature는 자신의 State와 업무 모델을 UIComponent의 표시 값과 SwiftUI `Binding`으로
   연결하고, 컴포넌트 콜백을 Feature Action으로 해석합니다.
+- Feature View는 컴포넌트 호출 지점에서 State와 업무 모델을 컴포넌트의 표시 값 모델
+  (`DisplayModel`)로 매핑합니다. 예를 들어 홈 화면은 `HomeProjectDisplay`에서
+  `HomeProjectCard.DisplayModel`을 만들어 넘깁니다.
+- 화면 View는 컴포넌트가 스스로 바꾸는 상태의 `Binding`을 호출 지점이나 View의 계산
+  프로퍼티에서 `Binding(get:set:)`으로 만듭니다. getter는 State에서 값을 읽고, setter는
+  기존 View Action을 보냅니다(예: `set: { _ in send(.bookmarkToggleTapped) }`).
+  닫기만 쓰는 상태는 `false`를 받을 때만 닫기 Action을 보냅니다.
 - Feature 바깥의 Navigation은 App이 해석할 delegate 또는 navigation intent로
   출력합니다.
 - 프로젝트 내부 의존성은 아키텍처가 허용한 Domain과 UI로 한정합니다.
@@ -73,6 +80,12 @@ UI 내부 자산을 공개 계약에 포함하지 않습니다.
 - Domain의 비즈니스 규칙을 Feature에 다시 구현해서는 안 됩니다.
 - 재사용 가능한 UI 컴포넌트를 소유해서는 안 됩니다.
 - Feature State, Action 또는 업무 모델을 UIComponent 공개 API에 노출해서는 안 됩니다.
+- Feature State, Reducer와 State에 담기는 표시 모델(`ViewModels/` 타입)은 UI 컴포넌트의
+  `DisplayModel`이나 SwiftUI `Binding`을 보유해서는 안 됩니다. 두 값은 화면 View에서만
+  만듭니다.
+- 컴포넌트 상태 연결을 위해 `BindableAction`이나 `BindingReducer`를 도입해서는 안 됩니다.
+  상태 변경은 기존 View Action을 거치며 Action·Reducer는 컴포넌트 연결 방식 때문에 바뀌지
+  않습니다.
 - DesignSystem 밖에 시각 어휘를 정의해서는 안 됩니다.
 - 화면 타입에 중첩하지 않은 View 타입을 화면 파일에 정의해서는 안 됩니다. 화면 전용
   서브뷰는 화면 타입에 중첩하며 그 기준은

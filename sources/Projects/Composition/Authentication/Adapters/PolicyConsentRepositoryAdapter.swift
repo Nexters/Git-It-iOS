@@ -16,7 +16,11 @@ public struct PolicyConsentRepositoryAdapter: PolicyConsentRepository {
 
     public func consents() async throws -> [PolicyConsent] {
         await store.records().map {
-            PolicyConsent(documentID: $0.documentIdentifier, version: $0.version, consentedAt: $0.acceptedAt)
+            PolicyConsent(
+                documentID: $0.documentIdentifier,
+                version: $0.version,
+                consentedAt: $0.acceptedAt,
+            )
         }
     }
 

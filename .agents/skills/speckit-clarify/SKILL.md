@@ -158,13 +158,20 @@ Execution steps:
        - `## 명확화` 섹션이 있는지 확인한다(없으면 명세 템플릿의 최상위 맥락/개요 섹션 바로 뒤에 만든다).
        - 그 아래에 오늘 날짜의 `### 세션 YYYY-MM-DD` 하위 제목을 만든다(없으면 생성).
     - 답변을 수락하면 즉시 `- 질문: <질문> → 답변: <최종 답변>` 형식의 항목을 추가한다.
-    - Then immediately apply the clarification to the most appropriate section(s):
-       - Functional ambiguity → Update or add a bullet in Functional Requirements.
-       - Stakeholder interaction / actor distinction → Update Change Scenarios or Actors subsection (if present) with clarified role, constraint, or scenario.
-       - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
-       - Non-functional constraint → Add/modify measurable criteria in Success Criteria > Measurable Outcomes (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
-       - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
+    - 그다음 즉시 명세의 알맞은 섹션에 반영한다. 섹션 제목은 명세 파일에 실제로 있는
+      제목을 그대로 사용하며, 아래 대응은 현재 명세 템플릿 기준이다. 대상 섹션이 없으면
+      템플릿이 정의한 한국어 제목으로만 만들고 영어 제목을 새로 만들지 않는다.
+       - 기능 동작의 모호성 → `### 기능 요구사항`의 항목을 갱신하거나 추가한다.
+       - 이해관계자·행위자 구분 → `## 변경 시나리오와 테스트`의 해당 시나리오(주요 행위자,
+         수용 시나리오)를 갱신한다.
+       - 데이터 형태·엔터티 → `### 핵심 엔터티`에 필드, 타입, 관계를 순서를 유지해 추가하고
+         제약을 간결히 적는다.
+       - 비기능 제약 → `### 측정 가능한 결과`에 측정 가능한 기준을 추가하거나 수정한다
+         (모호한 형용사를 지표나 명시적 목표로 바꾼다).
+       - 예외·실패 흐름 → `### 예외·경계 사례`에 항목을 추가한다.
+       - 용어 충돌 → 명세 전체에서 용어를 통일한다. 필요한 경우에만 한 번
+         `(이전 표기: "X")`를 덧붙인다.
+       - 기존 명세가 위 제목 대신 다른 제목을 쓰고 있으면 그 명세의 기존 제목을 따른다.
     - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
     - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
     - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.

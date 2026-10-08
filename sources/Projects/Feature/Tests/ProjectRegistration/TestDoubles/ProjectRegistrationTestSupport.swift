@@ -83,15 +83,3 @@ func waitUntil(
         try? await Task.sleep(for: .milliseconds(1))
     }
 }
-
-// MARK: - OpenNotificationSettingsSpy
-
-actor OpenNotificationSettingsSpy {
-
-    private(set) var callCount = 0
-
-    func callAsFunction() {
-        callCount += 1
-    }
-
-}

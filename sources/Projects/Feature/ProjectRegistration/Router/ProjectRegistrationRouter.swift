@@ -16,7 +16,10 @@ public struct ProjectRegistrationRouter: View {
         ScreenContainer {
             FlowNavigationStack(path: pushedScreens) {
                 RepositoryLinkInputScreen(
-                    store: store.scope(state: \.repositoryLinkInput, action: \.repositoryLinkInput)
+                    store: store.scope(
+                        state: \.repositoryLinkInput,
+                        action: \.repositoryLinkInput,
+                    )
                 )
             } destination: { screen in
                 pushedScreen(screen)
@@ -60,22 +63,34 @@ public struct ProjectRegistrationRouter: View {
 
         case .repositoryConfirmation:
             RepositoryConfirmationScreen(
-                store: store.scope(state: \.repositoryConfirmation, action: \.repositoryConfirmation)
+                store: store.scope(
+                    state: \.repositoryConfirmation,
+                    action: \.repositoryConfirmation,
+                )
             )
 
         case .quizLevelSelection:
             QuizLevelSelectionScreen(
-                store: store.scope(state: \.quizLevelSelection, action: \.quizLevelSelection)
+                store: store.scope(
+                    state: \.quizLevelSelection,
+                    action: \.quizLevelSelection,
+                )
             )
 
         case .quizGenerationConfirmation:
             QuizGenerationConfirmationScreen(
-                store: store.scope(state: \.quizGenerationConfirmation, action: \.quizGenerationConfirmation)
+                store: store.scope(
+                    state: \.quizGenerationConfirmation,
+                    action: \.quizGenerationConfirmation,
+                )
             )
 
         case .quizGenerationProgress:
             QuizGenerationProgressScreen(
-                store: store.scope(state: \.quizGenerationProgress, action: \.quizGenerationProgress)
+                store: store.scope(
+                    state: \.quizGenerationProgress,
+                    action: \.quizGenerationProgress,
+                )
             )
         }
     }

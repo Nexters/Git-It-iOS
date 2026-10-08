@@ -19,7 +19,10 @@ struct AppleSignInSourceTests {
 
         let credential = try await source.authorize()
 
-        #expect(credential == AppleSignInCredential(userID: "apple-user-1", identityToken: "id-token-1"))
+        #expect(credential == AppleSignInCredential(
+            userID: "apple-user-1",
+            identityToken: "id-token-1",
+        ))
     }
 
     @Test

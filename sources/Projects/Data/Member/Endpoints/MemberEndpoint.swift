@@ -14,17 +14,35 @@ public struct MemberEndpoint: Equatable, Sendable {
 
     // MARK: Public
 
-    public static let fetchProfile = Self(transportMethod: .get, path: "/api/v1/members/me")
+    public static let fetchProfile = Self(
+        transportMethod: .get,
+        path: "/api/v1/members/me",
+    )
 
-    public static let registerDeviceInfo = Self(transportMethod: .post, path: "/api/v1/members/me/device")
+    public static let registerDeviceInfo = Self(
+        transportMethod: .post,
+        path: "/api/v1/members/me/device",
+    )
 
-    public static let curateMember = Self(transportMethod: .post, path: "/api/v1/members/me/curation")
+    public static let curateMember = Self(
+        transportMethod: .post,
+        path: "/api/v1/members/me/curation",
+    )
 
-    public static let updatePosition = Self(transportMethod: .post, path: "/api/v1/members/me/position")
+    public static let updatePosition = Self(
+        transportMethod: .post,
+        path: "/api/v1/members/me/position",
+    )
 
-    public static let updateCareerLevel = Self(transportMethod: .post, path: "/api/v1/members/me/career-level")
+    public static let updateCareerLevel = Self(
+        transportMethod: .post,
+        path: "/api/v1/members/me/career-level",
+    )
 
-    public static let withdrawMember = Self(transportMethod: .delete, path: "/api/v1/members/me")
+    public static let withdrawMember = Self(
+        transportMethod: .delete,
+        path: "/api/v1/members/me",
+    )
 
     public let path: String
 
