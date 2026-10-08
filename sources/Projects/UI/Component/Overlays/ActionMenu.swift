@@ -1,0 +1,178 @@
+import DesignSystem
+import SwiftUI
+
+// MARK: - ActionMenu
+
+public struct ActionMenu: View {
+
+    // MARK: Lifecycle
+
+    public init(items: [Item]) {
+        self.items = items
+    }
+
+    // MARK: Public
+
+    public var body: some View {
+        VStack(
+            alignment: .leading,
+            spacing: 0,
+        ) {
+            ForEach(items) { item in
+                Button {
+                    item.onSelect()
+                } label: {
+                    StyledText(text: item.title)
+                        .textStyle(.body2)
+                        .foregroundColorToken(item.role.titleColor)
+                        .padding(.horizontal, Constant.rowHorizontalPadding)
+                        .padding(.top, Constant.rowTopPadding)
+                        .padding(.bottom, Constant.rowBottomPadding)
+                        .frame(
+                            maxWidth: .infinity,
+                            alignment: .leading,
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .designSystemCornerRadius(.large)
+            }
+        }
+        .padding(Constant.containerPadding)
+        .frame(
+            width: Constant.menuWidth,
+            alignment: .leading,
+        )
+        .glassEffect(
+            .regular.tint(Color(designSystem: .white5)),
+            in: RoundedRectangle(designSystem: .large),
+        )
+    }
+
+    // MARK: Internal
+
+    static var menuWidth: CGFloat {
+        Constant.menuWidth
+    }
+
+    static var containerPadding: CGFloat {
+        Constant.containerPadding
+    }
+
+    static var rowHorizontalPadding: CGFloat {
+        Constant.rowHorizontalPadding
+    }
+
+    static var rowTopPadding: CGFloat {
+        Constant.rowTopPadding
+    }
+
+    static var rowBottomPadding: CGFloat {
+        Constant.rowBottomPadding
+    }
+
+    // MARK: Private
+
+    private let items: [Item]
+
+}
+
+// MARK: ActionMenu.Constant
+
+extension ActionMenu {
+    fileprivate enum Constant {
+        static let menuWidth: CGFloat = 160
+        static let containerPadding: CGFloat = 4
+        static let rowHorizontalPadding: CGFloat = 10
+        static let rowTopPadding: CGFloat = 9
+        static let rowBottomPadding: CGFloat = 10
+    }
+}
+
+// MARK: ActionMenu.Item
+
+extension ActionMenu {
+    public struct Item: Identifiable {
+
+        // MARK: Lifecycle
+
+        public init(
+            id: String,
+            title: String,
+            role: Role = .normal,
+            onSelect: @escaping () -> Void = { },
+        ) {
+            self.id = id
+            self.title = title
+            self.role = role
+            self.onSelect = onSelect
+        }
+
+        // MARK: Public
+
+        public enum Role: Sendable, Equatable {
+            case normal
+            case destructive
+
+            // MARK: Internal
+
+            var titleColor: ColorToken {
+                switch self {
+                case .normal: .grey100
+                case .destructive: .error
+                }
+            }
+        }
+
+        public let id: String
+        public let title: String
+        public let role: Role
+        public let onSelect: () -> Void
+
+    }
+}
+
+#Preview("Action Menu") {
+    ActionMenu(
+        items: [
+            .init(
+                id: "delete",
+                title: "프로젝트 삭제",
+            )
+        ]
+    )
+    .designSystemScreenMargin()
+    .padding(.vertical, LayoutToken.margin)
+    .frame(
+        maxWidth: .infinity,
+        maxHeight: .infinity,
+    )
+    .designSystemBackground(.grey700)
+}
+
+#Preview("Action Menu · 파괴적 행 포함") {
+    ActionMenu(
+        items: [
+            .init(
+                id: "savedQuestions",
+                title: "저장한 문제",
+            ),
+            .init(
+                id: "repositoryLink",
+                title: "GitHub에서 보기",
+            ),
+            .init(
+                id: "delete",
+                title: "삭제하기",
+                role: .destructive,
+            ),
+        ]
+    )
+    .designSystemScreenMargin()
+    .padding(.vertical, LayoutToken.margin)
+    .frame(
+        maxWidth: .infinity,
+        maxHeight: .infinity,
+    )
+    .designSystemBackground(.grey700)
+}

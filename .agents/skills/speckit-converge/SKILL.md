@@ -1,0 +1,249 @@
+---
+name: "speckit-converge"
+description: "Assess the current codebase against the feature's spec, plan, and tasks, then append any remaining unbuilt work as new tasks to tasks.md so implement can complete it."
+compatibility: "Requires spec-kit project structure with .specify/ directory"
+metadata:
+  author: "github-spec-kit"
+  source: "templates/commands/converge.md"
+---
+
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+## 공통 규칙
+
+이 스킬은 [Spec Kit 스킬 공통 규칙](../../../.specify/memory/speckit-common-rules.md)의
+산출물 언어, 세션 지식 기록 위임, 인자 이스케이프 규칙을 그대로 따른다.
+
+## Pre-Execution Checks
+
+**Check for extension hooks (before convergence)**: [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)을
+따르되 훅 키는 `hooks.before_converge`, 필수 훅의 "Wait for..." 대상 섹션은 "the Goal"이다.
+
+## Goal
+
+Close the gap between what a feature's specification, plan, and tasks call for and what the
+codebase currently implements. Read `spec.md`, `plan.md`, and `tasks.md` as the **sole
+source of intent** (with the constitution as governing constraints), assess the current
+state of the code, determine which requirements, acceptance criteria, plan decisions, and
+existing tasks are unmet, incomplete, or only partially satisfied, and **append each piece
+of remaining work as a new, traceable task** at the bottom of `tasks.md` so that
+`/speckit-implement` can complete it. This command MUST run only after
+`/speckit-implement` has run on the current `tasks.md`, and after `/speckit-tasks` has produced a complete `tasks.md`.
+
+This is **not** a diff tool and does **not** track changes. It assesses the present state
+of the code relative to the feature's artifacts — no git, no branch comparison, no history.
+
+## Operating Constraints
+
+**APPEND-ONLY, NEVER REWRITE**: The command's **only** write is appending a new
+`## 단계 N: 수렴` 섹션을 `tasks.md` 끝에 추가한다. 이 스킬은 다음을 해서는 안 된다.
+
+- modify `spec.md` or `plan.md` in any way;
+- rewrite, renumber, reorder, or delete any existing task (including tasks from a prior
+  Convergence phase);
+- modify, create, or delete any application code — completing the appended tasks is the
+  job of `/speckit-implement`;
+- append tasks that create or update `docs/spec-kit/<feature>/trouble-shooting.md` or
+  `docs/spec-kit/<feature>/tacit-knowledge.md` — those event-driven records belong only
+  to their dedicated skills.
+
+When the codebase already satisfies everything, the command MUST leave `tasks.md`
+**byte-for-byte unchanged** (no empty Convergence header) and report a clean result.
+
+## Allowed Write Paths
+
+이 스킬은 활성 기능의 `specs/<feature>/tasks.md`에 새 `## 단계 N: 수렴` 섹션 하나만
+추가할 수 있다. 작업 체크박스, 명세, 계획, 소스 파일, 설정을 포함한 그 밖의 파일을
+수정할 권한은 없다.
+
+**Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is
+**non-negotiable**. Code that violates a MUST principle is the highest-severity finding and
+produces a corresponding remediation task. If the constitution is an unfilled template,
+skip constitution checks gracefully rather than failing.
+
+## Execution Steps
+
+### 1. Initialize Convergence Context
+
+Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
+
+- SPEC = FEATURE_DIR/spec.md
+- PLAN = FEATURE_DIR/plan.md
+- TASKS = FEATURE_DIR/tasks.md
+- CONSTITUTION = `.specify/memory/constitution.md` (if present)
+- CONVENTIONS = Constitution 원칙 11이 요구하는 근거 문서. `GIT_IT_DOCS_ROOT` 판독 결과 아래의
+  `docs/conventions/README.md`와 이번 수렴에 해당하는 인덱스·구체 명시 문서, 영향받는 패키지의
+  `docs/package-rules/<패키지>.md`, `docs/architecture.md`, 그리고 `plan.md`의 "적용 컨벤션".
+  구 경로 `sources/docs/**`는 사용하지 않는다
+If `spec.md`, `plan.md`, or `tasks.md` is missing, STOP with a clear, actionable message naming the
+prerequisite command to run (`/speckit-specify` for a missing spec, `/speckit-plan` for a missing plan,
+`/speckit-tasks` for missing tasks). Do not produce partial output.
+For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+
+### 2. Load Artifacts (Progressive Disclosure)
+
+Load only the minimal necessary context from each artifact:
+
+**From spec.md:**
+
+- Functional Requirements (FR-###)
+- Success Criteria (SC-###) — include only items requiring buildable work; exclude
+  post-launch outcome metrics and business KPIs
+- Change Scenarios and their Acceptance Criteria, including internal stakeholder or system scenarios
+- Edge Cases (if present)
+
+**From plan.md:**
+
+- Architecture/stack choices and technical decisions
+- Data Model references
+- Phases and named touch-points (files/components the plan says will be created or edited)
+- Technical constraints
+
+**From tasks.md:**
+
+- Task IDs (to compute the next ID and next phase number)
+- Descriptions, phase grouping, and referenced file paths
+
+**From constitution (if not an unfilled template):**
+
+- Principle names and MUST/SHOULD normative statements
+
+### 3. Build the Intent Inventory
+
+Create an internal model (do not echo raw artifacts):
+
+- **Requirements inventory**: one stable key per FR-### / SC-### / change-scenario acceptance
+  criterion (e.g. `S1/AC2` or legacy `US1/AC2`), plus the plan decisions and constitution principles that
+  impose buildable obligations.
+- **Code-scope map**: from the file paths named in `plan.md` and `tasks.md`, plus a keyword
+  search for the concepts each requirement describes, derive the set of source files and
+  components in scope for assessment. Bound the assessment to these — do **not** infer
+  scope beyond what the artifacts define.
+
+### 4. Assess the Codebase and Classify Findings
+
+For each item in the intent inventory, inspect the current code in scope and produce a
+`Finding` only where there is a gap. Classify every finding by **gap type**:
+
+- **`missing`**: the required work is absent from the code entirely.
+- **`partial`**: the work exists but does not yet fully satisfy the requirement /
+  acceptance criterion / plan decision.
+- **`contradicts`**: the code does something that conflicts with stated intent or a
+  constitution MUST principle.
+- **`unrequested`**: the code contains work not called for by the spec, plan, or tasks
+  (surfaced for awareness — converge does **not** delete code, it only appends a task to
+  review/justify or remove it).
+
+Each `Finding` records: a stable id, the `source-ref` it traces to, the `gap-type`, a
+severity, and a short human-readable description with the evidence (the file/area observed).
+
+**Edge cases:**
+
+- **Little or no code yet**: treat the entire specified scope as `missing` remaining work
+  rather than failing.
+- **Nothing remains**: produce zero findings and follow the converged branch in Step 7.
+
+### 5. Assign Severity
+
+- **CRITICAL**: violates a constitution MUST principle, or a `missing`/`contradicts` gap
+  that blocks the baseline outcome of a P1 change scenario.
+- **HIGH**: a `missing` or `partial` gap on a core functional requirement or acceptance
+  criterion.
+- **MEDIUM**: a `partial` gap on a secondary requirement, or an `unrequested` addition with
+  unclear justification.
+- **LOW**: minor partial gaps, polish, or low-risk `unrequested` additions.
+
+### 6. Present the In-Session Findings Summary
+
+Before appending anything, output a compact, severity-graded summary (no file writes yet):
+
+## 수렴 점검 결과
+
+| ID | 누락 유형 | 심각도 | 출처 | 근거 | 남은 작업 |
+|----|-----------|--------|------|------|----------|
+| F1 | 누락 | 높음 | FR-008 | 예: tasks.md 작성 시 path/to/module.py에 append-only 보호가 없음 | append-only 강제 추가 |
+
+**요약 지표:**
+
+- 점검한 요구사항 / 수용 기준
+- 점검한 계획 결정
+- 점검한 헌법 원칙(또는 "생략 — 템플릿")
+- 누락 유형별 발견 사항(누락 / 부분 구현 / 모순 / 범위 외)
+- 심각도별 발견 사항
+
+### 7. Append Convergence Tasks (or report converged)
+
+**If there are one or more actionable findings** (`tasks_appended` outcome):
+
+Append to the **end** of `tasks.md`, per the append contract:
+
+1. Scan all existing task IDs; let `M` be the maximum. Determine the next phase number `N`
+   (highest existing phase + 1).
+2. 새 섹션 제목 `## 단계 N: 수렴` 하나를 작성한다.
+3. Emit one checklist item per actionable finding, ordered CRITICAL/HIGH first, assigning
+   zero-padded IDs `T{M+1:03d}, T{M+2:03d}, …`:
+
+   ```markdown
+   - [ ] T042 <imperative description> per <source-ref> (<gap-type>)
+   ```
+
+   `<source-ref>` traces the task to its origin: e.g. `FR-003`, `SC-002`,
+   `S1/AC2`, legacy `US1/AC2`, `plan: storage decision`, `Constitution II`.
+
+   `<gap-type>` is one of `missing`, `partial`, `contradicts`, `unrequested`.
+
+   각 파일 변경 task는 부분 완료 없이 검증할 수 있는 하나의 원자적 목적과 정확한 저장소
+   상대경로 하나를 포함해야 한다. 새 경로, 새로 만들거나 바꾸는 공개 이름과 테스트 배치는
+   Constitution 원칙 11에 따라 CONVENTIONS로 확인한 값만 사용한다. 컨벤션으로 확인할 수 없으면
+   그 task를 append하지 않고 근거 부족을 보고한다. 하나의 finding이 여러 파일 변경을 요구하면 같은
+   `<source-ref>`와 `<gap-type>`을 유지한 별도 task로 분리한다. Commit 제목이나 그룹은
+   append하지 않으며 `/speckit-implement`가 실행 시점에 논리적 단위를 설계한다.
+
+   Constitution-violation tasks MUST be emitted first and described as
+   `CRITICAL`.
+   추가하는 파일 변경 작업을 책임 패키지에 배정하고 의존성 위상 순서로 작업을 묶는다. 분리하면
+   compile되지 않는 공개 API 이전·공용 manifest·migration은 불가분한 다중 패키지 integration
+   unit으로 배정하고 분리 불가 근거, 정확한 경로와 통합 검증을 기록한다. 공개 선언 제거만 하는
+   작업은 원칙 7의 제거 예외로 사용처부터 역위상 순서로 묶을 수 있다.
+   각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위 또는 읽기 전용 전체
+   검증을 위한 승인 게이트는 추가하지 않는다. 새 권한이 필요한 경우에만 승인 작업을 append한다.
+   `## 단계 N: 수렴` 아래에 `### 실행 단위: <PackageName>` 또는
+   `### 실행 단위: <이름> (integration unit: <패키지 목록>)` 하위 섹션을 활성 tasks.md가
+   확정한 의존성 위상 순서로 만들고 각 파일 변경 작업의 패키지 소유권을 섹션으로 명시한다.
+   공용 파일 변경은 분리 가능한 경우 패키지별 작업으로 나누고, 불가분하면 integration unit에
+   배치한다. 책임 단위나 검증을 결정할 수 없으면 append하지 않고 사용자에게 경계 결정을 요청한다.
+   마지막 package subsection 뒤에는 `### 전체 수렴 완료 검증`을 append하고 새 ID의
+   `[no-write]` tasks로 (1) 활성 plan/tasks가 요구하는 전체 build·compile·test와 (2) 영향받은
+   변경 시나리오 수용 기준을 다시 검증하도록 한다. 기존 완료된 전체 검증 checkbox를 재사용하지
+   않는다. 이 global tasks는 `/speckit-implement`가 마지막 실행 단위의 `FINALIZATION_TASKS`로
+   매핑해 반복 승인 없이 필수 after hook과 함께 최종 commit 전에 실행한다.
+4. Never reuse or renumber existing IDs. If a prior Convergence phase exists, add a new,
+   separately-numbered one below it — do not touch the old one.
+
+**If there are no actionable findings** (`converged` outcome):
+
+- Do **not** modify `tasks.md` at all — no empty phase header.
+- 보고: **"✅ 수렴 완료 — 구현이 명세, 계획, 작업을 충족합니다."**
+- Include the summary counts of what was checked.
+
+### 8. 다음 작업 제시(인계)
+
+- On `tasks_appended`: state how many tasks were appended under which phase. Explain that
+  `/speckit-implement` captures the tasks.md blob hash and full diff as its baseline; a separate
+  baseline commit is optional. Include the newly appended whole convergence-validation task count.
+- On `converged`: recommend proceeding to review / opening a PR. No further implement pass
+  is needed for this feature's specified scope.
+
+### 9. Check for extension hooks
+
+After producing the result, report the convergence outcome (`converged` or `tasks_appended`)
+in-session before listing any hooks, so users can decide whether to run optional follow-up
+commands. Then apply the [공통 확장 훅 프로토콜](../../../.specify/memory/speckit-common-rules.md#확장-훅extension-hooks-프로토콜)
+with hook key `hooks.after_converge`.

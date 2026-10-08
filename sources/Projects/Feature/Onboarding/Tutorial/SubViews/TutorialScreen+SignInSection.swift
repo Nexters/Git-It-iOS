@@ -1,0 +1,59 @@
+import DesignSystem
+import SwiftUI
+import UIComponent
+
+extension TutorialScreen {
+    struct SignInSection: View {
+
+        // MARK: Internal
+
+        let currentPage: Int
+        let totalPages: Int
+        let bundleVersion: String
+        let onAppleSignIn: () -> Void
+        let onGuestAccess: () -> Void
+
+        var body: some View {
+            VStack {
+                PageIndicator(displayModel: .init(
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                ))
+                .padding(Constant.indicatorPadding)
+
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.Hint.title)
+                    .textStyle(.caption1)
+                    .foregroundColorToken(.grey400)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, LayoutToken.compactSpacing)
+
+                AppleSignInButton(action: onAppleSignIn)
+
+                FeedbackActionButton(
+                    title: LocalizedText.Onboarding.Tutorial.SignIn.GuestAccess.buttonTitle,
+                    action: onGuestAccess,
+                )
+                .style(.text)
+                .size(.small)
+                .padding(.top, LayoutToken.compactSpacing)
+
+                StyledText(text: LocalizedText.Onboarding.Tutorial.SignIn.version(version: bundleVersion))
+                    .textStyle(.body2)
+                    .foregroundColorToken(.grey500)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, Constant.versionTopSpacing)
+            }
+            .designSystemScreenMargin()
+            .padding(.bottom, Constant.bottomInset)
+        }
+
+        // MARK: Private
+
+        private enum Constant {
+            static let indicatorPadding: CGFloat = 12
+            static let versionTopSpacing: CGFloat = 21
+            static let bottomInset: CGFloat = 29
+        }
+
+    }
+}

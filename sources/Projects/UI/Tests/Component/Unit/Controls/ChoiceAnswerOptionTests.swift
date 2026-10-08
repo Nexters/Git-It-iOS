@@ -1,0 +1,63 @@
+import DesignSystem
+import SwiftUI
+import Testing
+
+@testable import UIComponent
+
+@Suite("ChoiceAnswerOption 계약")
+struct ChoiceAnswerOptionTests {
+    @Test
+    func `correct 상태는 정답 토큰과 흰색 레터를 사용한다`() {
+        let state = ChoiceAnswerOption.State.correct
+
+        #expect(state.fillToken == .correct)
+        #expect(state.letterColor == .grey100)
+    }
+
+    @Test
+    func `incorrect 상태는 오답 토큰과 흰색 레터를 사용한다`() {
+        let state = ChoiceAnswerOption.State.incorrect
+
+        #expect(state.fillToken == .incorrect)
+        #expect(state.letterColor == .grey100)
+    }
+
+    @Test
+    func `default 상태는 채움색이 없고 파란 레터를 사용한다`() {
+        #expect(ChoiceAnswerOption.State.default.fillToken == nil)
+        #expect(ChoiceAnswerOption.State.default.letterColor == .blue200)
+    }
+
+    @Test
+    func `selected 상태는 채움색 없이 보더로 구별한다`() {
+        #expect(ChoiceAnswerOption.State.selected.fillToken == nil)
+        #expect(ChoiceAnswerOption.State.selected.borderToken == .focus)
+    }
+
+    @Test
+    func `표시 값을 직접 받아 생성한다`() {
+        _ = ChoiceAnswerOption(
+            displayModel: .init(
+                letter: "A",
+                text: "State",
+            ),
+            state: .selected,
+        )
+    }
+
+    @Test
+    func `펼침 토글은 펼침 여부 Binding을 반전한다`() {
+        var isExpanded = false
+        let expansion = ChoiceAnswerOption.ExpansionControl.toggleable(
+            isExpanded: Binding(
+                get: { isExpanded },
+                set: { isExpanded = $0 },
+            )
+        )
+
+        expansion.toggle()
+
+        #expect(isExpanded)
+        #expect(expansion.isExpanded)
+    }
+}

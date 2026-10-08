@@ -1,0 +1,59 @@
+import AuthenticationServices
+import DesignSystem
+import SwiftUI
+
+// MARK: - AppleSignInButton
+
+public struct AppleSignInButton: View {
+
+    // MARK: Lifecycle
+
+    public init(
+        action: @escaping () -> Void = { }
+    ) {
+        self.action = action
+    }
+
+    // MARK: Public
+
+    public var body: some View {
+        Button(action: action) {
+            HStack(
+                alignment: .center,
+                spacing: Constant.horizontalSpacing,
+            ) {
+                Image(systemName: "applelogo")
+                    .font(.system(
+                        size: Constant.fontSize,
+                        weight: .semibold,
+                    ))
+                    .designSystemForeground(.black)
+                StyledText(text: LocalizedText.AppleSignInButton.title)
+                    .foregroundColorToken(.black)
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(height: Constant.surfaceHeight)
+        .frame(maxWidth: .infinity)
+        .designSystemBackground(.white)
+        .designSystemCornerRadius(.large)
+    }
+
+    // MARK: Private
+
+    private enum Constant {
+        static let horizontalSpacing: CGFloat = 5
+        static let surfaceHeight: CGFloat = 54
+        static let fontSize: CGFloat = 19
+    }
+
+    private let action: () -> Void
+
+}
+
+#Preview("Apple Sign In Button") {
+    ZStack {
+        Rectangle().designSystemBackground(.black)
+        AppleSignInButton().padding(20)
+    }
+}

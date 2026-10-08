@@ -1,0 +1,386 @@
+# Git It iOS 아키텍처
+
+**상태**: 초안
+
+**작성일**: 2026-08-07
+
+이 문서는 프로젝트의 패키지 책임, 컴파일 타임 의존성 방향, 의존성 조립 방식과 패키지 경계를 통과하는 제어 흐름을 정의합니다. 패키지 내부의 세부 구현 구조와 개별 기능 설계는 각 패키지 및 기능 문서에서 정의합니다. 프로젝트가 소유하는 공개 API와 경계 값의 이름은 [네이밍 컨벤션](./conventions/naming.md)을 정본으로 따릅니다.
+
+## 1. 설계 설명
+
+현재 아키텍처는 변경 가능성이 높은 Domain과 Data에 높은 테스트 독립성과 변경 격리를 제공합니다. Domain, Data, Infrastructure는 각각 독립적인 경계를 형성합니다. Infrastructure를 직접 사용하는 패키지는 Data뿐이며, Composition은 Domain↔Data Adapter와 Data 생성 진입점이 만드는 실행 환경별 구현을 조립합니다.
+
+Feature는 TCA를 이용해 사용자 기능의 상태와 상호작용을 표현합니다. App은 Feature와 Composition을 연결하고 Feature 간 Navigation과 애플리케이션 전체 화면 흐름을 조정합니다. UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구성요소를 제공합니다.
+
+의존성은 생성자 또는 명시적인 초기화 인자를 통해 전달합니다. 이 방식은 각 타입이 요구하는 의존성을 선언부에서 드러내고 테스트에서 필요한 구현을 직접 구성할 수 있도록 합니다.
+
+## 2. 패키지 책임
+
+| 패키지 | 책임 |
+|---|---|
+| App | Feature와 Composition의 연결, 애플리케이션 전체 Navigation과 화면 흐름 조정 |
+| Composition | Domain↔Data Adapter 구현, Data 생성 진입점과 Data 계약 대체 구현을 이용한 실행 환경별 구현 선택, 객체 생성과 수명 관리 |
+| Feature | TCA 기반 상태 관리, 사용자 상호작용, 화면 구성과 Presentation 흐름 |
+| Domain | 비즈니스 모델, 정책, 비즈니스 로직과 외부 기능에 대한 Domain 계약 |
+| Data | 데이터 획득·저장·캐시·동기화의 실행 역할과 Data 소유 모델·DTO |
+| Infrastructure | 외부 라이브러리·프레임워크·플랫폼 기능을 프로젝트 내부 기술 API로 변환 |
+| UI | 여러 Feature가 공유하는 디자인 시스템과 재사용 가능한 UI 구성요소 |
+
+### App
+
+App은 **Coordination Layer**로서 Feature가 표현하는 사용자 흐름과 Composition이 제공하는 실행 가능한 Domain 기능을 연결합니다. 또한 Feature 간 Navigation, 애플리케이션 수준의 화면 흐름, 플랫폼 생명주기와 실행 진입점을 담당합니다.
+
+### Composition
+
+Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data 사이의 Adapter를 구현하고, Data가 공개하는 생성 진입점과 역할 계약을 이용해 실행 환경에 맞는 구현을 선택하고 객체 생성 순서와 수명을 결정합니다. Composition은 Infrastructure에 의존하지 않습니다.
+
+### Feature
+
+Feature는 사용자가 인지하는 기능의 Presentation 경계입니다. TCA 기반 State, Action, Reducer와 화면을 구성하고 사용자 상호작용을 Domain 기능 호출과 Presentation 상태 변화로 연결합니다.
+
+### Domain
+
+Domain은 프로젝트의 비즈니스 언어와 규칙을 표현하는 핵심 경계입니다. 도메인 모델, Value Object, 정책, Use Case와 비즈니스 기능이 요구하는 외부 기능 계약을 소유합니다. Domain의 공개 선언은 비즈니스 로직의 관심사를 기준으로 정의하며, Data의 형태나 특정 API에 의존하지 않고 사용자·서비스 관점의 역할을 표현합니다. 계약 접미어와 연산 이름의 판정 기준은 [D-ARCH-004](#9-아키텍처-결정-기록)가 소유합니다.
+
+### Data
+
+Data는 데이터의 획득, 저장, 캐시와 동기화를 담당하는 데이터 경계입니다. 서비스 API와 DTO, Data 모델과 데이터 처리 정책을 자신의 언어로 표현합니다. Data의 공개 선언(타입·프로토콜·연산·initializer·프로퍼티 이름과 시그니처)은 HTTP, Keychain, UserDefaults, URLSession 같은 기술이나 라이브러리·프레임워크에 종속된 형태로 정의하지 않고 실행하는 역할만 표현합니다. 기술은 Infrastructure가 모두 담당하며, Data는 내부 구현에서 Infrastructure를 사용하더라도 그 기술을 Data 밖으로 노출하지 않습니다. 판정 기준은 [D-ARCH-004](#9-아키텍처-결정-기록)가 소유합니다.
+
+### Infrastructure
+
+Infrastructure는 외부 라이브러리, 플랫폼 기능과 기술 API를 프로젝트가 소유한 범용 기술 API로 변환하는 기술 경계입니다. 외부 기술의 타입과 오류를 프로젝트 내부 기술 타입과 오류로 변환합니다. 프로젝트가 사용하는 기술은 모두 이 경계가 담당하며, 기술·플랫폼·공급자 명칭은 이 경계의 공개 API에만 둡니다.
+
+### UI
+
+UI는 여러 Feature가 공유하는 시각 언어와 재사용 가능한 UI 구성요소를 담당하는 표현 경계입니다. 디자인 토큰, Typography, Color, Icon과 범용 UI Component를 제공합니다.
+
+## 3. 아키텍처 정책
+
+### 3.1 프로젝트 내부 패키지 의존성
+
+`A → B`는 A 패키지가 B 패키지를 빌드 의존성으로 참조한다는 의미입니다.
+
+| 패키지 | 허용 의존성 |
+|---|---|
+| App | Feature, Composition, Domain |
+| Composition | Domain, Data |
+| Feature | Domain, UI |
+| Domain | — |
+| Data | Infrastructure |
+| Infrastructure | — |
+| UI | — |
+
+각 패키지는 실제 구현에 필요한 최소 의존성만 선언합니다.
+
+![Git It iOS 패키지 컴파일 타임 의존성 그래프](./assets/package-dependency-graph.svg)
+
+Domain, Data, Infrastructure는 가장 엄격한 의존성 경계로 관리합니다. App, Feature, Composition은 실제 애플리케이션 조립과 사용자 흐름 구현에 필요한 범위에서 직접 연결합니다.
+
+### 3.2 명시적 의존성 주입
+
+Feature가 요구하는 dependency는 initializer 또는 명시적인 초기화 인자로 선언합니다.
+
+```swift
+@Reducer
+public struct ExampleFeature {
+    private let getExample: GetExample
+    private let updateExample: UpdateExample
+
+    public init(
+        getExample: GetExample,
+        updateExample: UpdateExample
+    ) {
+        self.getExample = getExample
+        self.updateExample = updateExample
+    }
+}
+```
+
+Composition은 production 실행에 필요한 객체를 구성하고 App에 제공합니다.
+
+```swift
+public struct ExampleComposition {
+    public let getExample: GetExample
+    public let updateExample: UpdateExample
+}
+```
+
+App은 Composition이 제공한 dependency를 Feature에 주입합니다.
+
+```swift
+let composition = ExampleComposition.live()
+
+let exampleFeature = ExampleFeature(
+    getExample: composition.getExample,
+    updateExample: composition.updateExample
+)
+```
+
+Feature initializer는 Feature가 요구하는 dependency contract의 역할을 담당합니다. App은 이 contract와 Composition이 제공하는 실행 객체를 직접 연결합니다.
+
+### 3.3 Adapter 경계
+
+Adapter는 독립적인 패키지 경계 사이의 요청, 응답, 모델과 오류를 변환하는 Composition 구현입니다.
+
+#### Domain ↔ Data
+
+Domain은 외부 데이터 기능에 필요한 계약을 Domain의 언어로 정의합니다.
+
+```swift
+public protocol ExampleRepository: Sendable {
+    func example(id: ExampleID) async throws -> Example
+}
+```
+
+Composition의 Domain↔Data Adapter는 Domain 계약을 구현하고 Data API에 작업을 위임합니다.
+
+```text
+Domain ExampleRepository
+        ↑
+        │ implements
+Composition Domain↔Data Adapter
+        │ delegates
+        ↓
+Data ExampleRemote
+```
+
+Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
+
+#### Data ↔ Infrastructure
+
+Data는 획득·저장 같은 실행 역할을 자신의 언어로 정의한 concrete 타입으로 소유하고, 그 내부 구현에서만 Infrastructure 기술 API를 사용합니다. 이 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당하며, 기술 이름은 Data 공개 선언에 나타나지 않습니다.
+
+Composition이 Infrastructure에 의존할 수 없으므로 Data는 저장·전송·알림 같은 기술 능력을 기술 이름 없는 역할 계약과 실제 구현을 만드는 생성 진입점(`Factories/`)으로 공개합니다. Composition은 생성 진입점으로 실제 구현을 얻고, 테스트는 역할 계약의 대체 구현을 주입합니다. Data target 사이에서 Infrastructure 타입을 주고받아야 하면 `package` 접근 수준으로만 공개합니다. Data 안에 프로토콜을 둘지는 [추상화 컨벤션](./conventions/abstraction.md)의 근거를 따릅니다.
+
+```swift
+public struct ExampleRemote: Sendable {
+    // Composition은 baseURL과 선택적 전송 대체 구현만 전달한다
+    public init(baseURL: URL, transport: (any ExampleTransport)?, responseTimeout: Duration)
+
+    public func example(id: String) async throws -> ExampleResponseDTO {
+        // 내부에서 Infrastructure 기술 API로 Data 소유 요청 값을 보내고,
+        // 응답을 ExampleResponseDTO로 디코딩하며 기술 오류를 Data 오류로 변환한다.
+    }
+}
+```
+
+```text
+Composition ── baseURL, (any ExampleTransport)? ──→ Data ExampleRemote
+                                                      │ 내부 구현에서 사용
+                                                      ↓
+                                           Infrastructure 기술 API
+```
+
+`ExampleRemote`는 Data 소유 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
+
+### 3.4 Navigation과 화면 흐름
+
+Feature는 사용자 기능 내부의 Presentation 흐름을 관리합니다. Feature 바깥의 화면 흐름이 필요한 경우 App이 해석할 수 있는 delegate 또는 navigation intent를 출력합니다.
+
+App은 해당 intent를 애플리케이션 수준의 Navigation과 Feature 전환으로 연결합니다.
+
+```text
+Feature A
+   │ delegate / navigation intent
+   ▼
+  App
+   │ application flow coordination
+   ▼
+Feature B
+```
+
+이 구조에서 Feature는 사용자 기능의 결과와 의도를 표현하고 App은 여러 Feature 사이의 애플리케이션 흐름을 조정합니다.
+
+## 4. 패키지 제어 흐름
+
+![Git It iOS 패키지 제어 흐름 그래프](./assets/package-control-flow-graph.svg)
+
+일반적인 사용자 요청은 다음 경계를 순서대로 통과합니다.
+
+```text
+User
+ ↓
+Feature
+ ↓
+Domain
+ ↓
+Composition · Domain↔Data Adapter
+ ↓
+Data
+ ↓
+Infrastructure
+ ↓
+External System
+```
+
+응답은 각 경계가 소유한 타입으로 순차 변환되어 Feature 상태와 UI 렌더링으로 전달됩니다.
+
+```text
+External System
+ ↓
+Infrastructure result
+ ↓
+Data model / DTO
+ ↓
+Composition · Domain↔Data Adapter
+ ↓
+Domain model / error
+ ↓
+Feature state
+ ↓
+UI rendering
+```
+
+App은 Feature가 출력한 애플리케이션 수준의 navigation intent를 다른 Feature의 화면 흐름과 연결합니다.
+
+## 5. 테스트 정책
+
+### Domain
+
+- 비즈니스 모델, 정책, Use Case와 상태 전이를 단위 테스트의 중심으로 둡니다.
+- Repository와 외부 기능은 Domain 계약을 구현한 Test Double로 주입합니다.
+- Domain target은 독립적인 테스트 실행 단위를 구성합니다.
+
+### Data
+
+- 데이터 획득, 캐시, 저장, 동기화, DTO와 오류 처리 정책을 테스트합니다.
+- Data 계약과 Infrastructure API 사이의 요청 구성, 응답 변환과 오류 변환을 테스트합니다.
+- 외부 기술 기능은 Data 계약을 구현한 Test Double로 주입합니다.
+- Data target은 독립적인 테스트 실행 단위를 구성합니다.
+
+### Composition Adapter
+
+- Data 모델과 Domain 모델 사이의 변환을 테스트합니다.
+- Adapter 테스트는 경계 변환과 위임 관계를 중심으로 구성합니다.
+
+### Feature
+
+- TCA State 변화, Effect와 사용자 상호작용 흐름을 테스트합니다.
+- 필요한 Domain dependency는 initializer를 통해 Test Double 또는 테스트 구현으로 주입합니다.
+- Feature target은 Presentation과 Domain interaction을 독립적으로 검증할 수 있는 테스트 단위를 구성합니다.
+
+## 6. 외부 패키지 의존성 정책
+
+| 패키지 | 외부 패키지 의존성 | 정책 |
+|---|---|---|
+| App | 제한적 허용 | 애플리케이션 실행과 Navigation에 필요한 프레임워크를 사용합니다. |
+| Composition | 제한적 허용 | 조립과 Adapter 구현에 필요한 프로젝트 내부 패키지를 중심으로 구성하고 외부 기술은 Data 생성 진입점과 역할 계약을 통해서만 사용합니다. |
+| Feature | 제한적 허용 | TCA와 Presentation 구현에 필요한 의존성을 사용합니다. |
+| Domain | Swift Standard Library | 비즈니스 의미와 계약을 Swift 언어 수준의 타입으로 표현합니다. |
+| Data | Swift Standard Library | 데이터 경계의 모델, 정책과 기술 계약을 프로젝트 소유 타입으로 표현합니다. |
+| Infrastructure | 허용 | 담당 기술 기능 구현에 필요한 외부 라이브러리를 사용합니다. |
+| UI | 제한적 허용 | UI 구현에 필요한 플랫폼 UI 프레임워크와 디자인 관련 기술을 사용합니다. |
+
+## 7. 제약조건
+
+### 7.1 패키지 의존성 제약
+
+다음 프로젝트 내부 패키지 의존성은 허용하지 않습니다.
+
+```text
+Domain → Data
+Domain → Infrastructure
+Domain → Feature
+Domain → UI
+
+Data → Domain
+Data → Feature
+Data → UI
+
+Feature → Data
+Feature → Infrastructure
+Feature → Composition
+
+App → Infrastructure
+
+Composition → Infrastructure
+
+Infrastructure → Domain
+Infrastructure → Data
+Infrastructure → Feature
+
+UI → Domain
+UI → Data
+UI → Feature
+```
+
+### 7.2 의존성 조립 제약
+
+- TCA Dependencies의 `@Dependency`와 의존성 접근 키를 production dependency 전달 수단으로 사용하지 않습니다.
+- Service Locator를 사용하지 않습니다.
+- 전역 mutable dependency container를 사용하지 않습니다.
+- Feature와 Composition을 연결하기 위한 별도의 Provider 또는 lookup 계층을 기본 구조로 추가하지 않습니다.
+
+### 7.3 책임 경계 제약
+
+각 패키지가 소유하지 않는 책임의 목록은 해당 [패키지 규칙](./package-rules)의 제약조건이 소유합니다. App이 Feature와 Composition을 직접 연결하는 것은 이 아키텍처의 의도된 조립 방식입니다.
+
+## 8. 패키지별 규칙
+
+- [App 패키지 규칙](./package-rules/app.md)
+- [Composition 패키지 규칙](./package-rules/composition.md)
+- [Feature 패키지 규칙](./package-rules/feature.md)
+- [Data 패키지 규칙](./package-rules/data.md)
+- [UI 패키지 규칙](./package-rules/ui.md)
+- [Domain 패키지 규칙](./package-rules/domain.md)
+- [Infrastructure 패키지 규칙](./package-rules/infrastructure.md)
+
+## 9. 아키텍처 결정 기록
+
+### D-ARCH-003 — Feature → Domain UseCase 의존과 App 소유 의존성 주입
+
+`specs/013-feature-usecase-app-di/spec.md`가 확정한 결정입니다. 이 문서의 3.1·3.3·7.1·7.2와
+4장·5장이 그 결과를 반영하며, 패키지별 규범은 [Feature](./package-rules/feature.md) ·
+[App](./package-rules/app.md) · [Composition](./package-rules/composition.md) ·
+[Data](./package-rules/data.md) 패키지 규칙이 소유합니다.
+
+- Feature는 Domain UseCase Protocol에만 의존하고, App이 production Composition을 정확히
+  1회 생성해 각 Feature가 실제로 사용하는 UseCase만 주입합니다.
+- Composition은 Domain UseCase Protocol 타입의 실행 객체만 노출하고 Feature·App·UI를
+  알지 않습니다.
+- Data↔Infrastructure 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당합니다
+  (`Data → Infrastructure` 허용).
+
+### D-ARCH-004 — Domain·Data·Infrastructure 관심사 경계
+
+`specs/035-domain-data-infra-design-review/spec.md`(FR-017·FR-020과 명확화 1~6)가 확정한
+결정입니다. 이 문서의 2장과 3.3이 원칙을 반영하며,
+[Domain](./package-rules/domain.md) · [Data](./package-rules/data.md) ·
+[Infrastructure](./package-rules/infrastructure.md) 패키지 규칙과
+[네이밍 컨벤션 4장](./conventions/naming.md#4-패키지-문맥)은 이 기록을 참조하고 판정 기준을
+다시 서술하지 않습니다.
+
+- Data의 공개 선언(타입·프로토콜·연산·initializer·프로퍼티 이름과 시그니처)은 HTTP,
+  Keychain, UserDefaults, URLSession 같은 기술이나 라이브러리·프레임워크에 종속된 형태로
+  정의하지 않고 실행하는 역할만 표현합니다. 기술은 Infrastructure가 모두 담당하며, Data는
+  내부 구현에서 Infrastructure를 사용하더라도 그 기술을 Data 밖으로 노출하지 않습니다.
+- Domain의 공개 선언은 비즈니스 로직의 관심사를 기준으로 정의하며, Data의 형태나 특정
+  API에 의존하지 않고 사용자·서비스 관점의 역할을 표현합니다.
+- Domain 계약 이름에서 `Repository`는 외부 기능 계약의 역할 어휘로 허용합니다. `Store`,
+  `Registry`, `Gateway`, `Parser`처럼 저장 매체·형식·접근 방식을 드러내는 접미어와
+  `load`/`save`처럼 저장소 연산을 그대로 드러내는 연산 이름은 허용하지 않습니다. 연산 이름
+  변경이 계약 시그니처(인자·반환 타입)를 바꾸지 않으면 rename으로 처리합니다.
+- Data 공개 타입·프로토콜 이름의 전송·저장 기술 용어(HTTP, Keychain, UserDefaults,
+  URLSession)는 위반입니다. 외부 서비스·공급자 이름(GitHub, Apple)은 그 서비스가 해당
+  선언의 역할 대상일 때만 허용합니다. 외부 고정 명칭 보존은 직렬화 key·서버 필드·플랫폼
+  API 값에만 적용합니다.
+- Domain과 Data 사이의 관심사 중복 객체는 (1) 책임과 연산이 완전히 1:1로 대응, (2) Domain에
+  비즈니스 로직이 없고 Data 구현을 그대로 감쌈, (3) 이름과 필드가 완전히 같음 중 하나라도
+  해당하면 기록 대상이며, 제거·병합은 별도 명세가 다룹니다.
+- 위반 중 이름만 바꾸면 원칙을 충족하는 항목은 rename으로 해소합니다. 기술 타입의
+  Infrastructure 이동·제거, 공개 API에서 Infrastructure 타입 숨기기, Data target 사이 반복
+  타입 정리처럼 선언의 구성이나 시그니처를 바꿔야 하는 항목은 후속 설계 변경으로
+  기록합니다. Data 공개 initializer가 Infrastructure 기술 타입을 인자로 받는 구성은 Data
+  역할 계약과 생성 진입점으로 대체합니다.
+- Infrastructure 공개 이름은 직접 감싸는 기술·플랫폼·공급자 명칭을 보존합니다.
+
+## 문서 변경 기준
+
+이 문서는 패키지 책임, 의존 방향, 의존성 조립 방식 또는 패키지 경계를 통과하는 제어 흐름이 변경될 때 수정합니다. 패키지별 구현 정책과 제약조건은 해당 패키지 규칙 문서에서 관리합니다.
+
+두 그래프는 `docs/assets`의 동명 `.dot` 파일에서 생성합니다. 의존 방향을 수정할 때는 `.dot`을 먼저 고치고, 저장소 루트에서 아래 명령으로 SVG를 다시 생성합니다.
+
+```sh
+dot -Tsvg -o docs/assets/package-dependency-graph.svg docs/assets/package-dependency-graph.dot
+dot -Tsvg -o docs/assets/package-control-flow-graph.svg docs/assets/package-control-flow-graph.dot
+```
