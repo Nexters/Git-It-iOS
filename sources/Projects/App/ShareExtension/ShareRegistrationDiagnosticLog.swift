@@ -42,6 +42,12 @@ struct ShareRegistrationDiagnosticLog: Sendable {
 
         case .registrationSucceeded:
             "registrationSucceeded"
+
+        case .generationInProgressBlocked:
+            "generationInProgressBlocked"
+
+        case .generationStateUnverified:
+            "generationStateUnverified"
         }
     }
 

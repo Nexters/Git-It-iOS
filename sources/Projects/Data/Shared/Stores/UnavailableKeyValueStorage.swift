@@ -8,6 +8,13 @@ struct UnavailableKeyValueStorage: KeyValueStorage {
         nil
     }
 
+    func verifiedValue<Value: Codable & Sendable>(
+        _: Value.Type,
+        forKey _: String,
+    ) async throws(KeyValueStorageError) -> Value? {
+        throw .unavailable
+    }
+
     func setValue(
         _: some Codable & Sendable,
         forKey _: String,

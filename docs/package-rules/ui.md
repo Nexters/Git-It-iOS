@@ -11,8 +11,8 @@
 UI는 시각 언어와 화면에서 독립된 재사용 UI 구성요소를 담당하는 표현 경계입니다.
 DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현 타입과 분리된
 컴포넌트를 제공합니다. 컴포넌트는 표시 값 모델(`DisplayModel`)·SwiftUI `Binding`·콜백을
-초기화 인자로 받고, 스타일·크기·색 같은 시각 속성은 `StyleConfigurable` 같은 시각 속성
-계약의 메서드로 선택받습니다.
+초기화 인자로 받고, 스타일·크기·색 같은 시각 속성은 시각 속성 계약의
+메서드로 선택받습니다.
 
 이 문서는 UI 패키지가 소유하는 책임과 허용 의존성을 정의합니다. 컴포넌트의 역할 분류,
 공개 입력과 자산 구성은 [UIComponent 컨벤션](../conventions/ui-component.md), 폴더와
@@ -23,7 +23,7 @@ DesignSystem은 디자인 토큰과 적용 API를, UIComponent는 Feature 구현
 
 - `DesignSystem`: 토큰, Typography, 색상·효과·레이아웃 적용 API와 폰트 등록
 - `UIComponent`: 화면에서 독립적으로 해석 가능한 역할별 재사용 컴포넌트와 해당 자산
-- `UIComponentLayoutHarness`와 UI 자동화 target: 제품 API가 아닌 레이아웃 계약 검토
+- 컴포넌트 프리뷰·레이아웃 검토 target과 UI 자동화 target: 제품 API가 아닌 레이아웃 계약 검토
 
 Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가 아닙니다.
 
@@ -54,7 +54,7 @@ Feature 화면 상태, 화면 흐름과 Feature 전용 조립은 UI의 범위가
 
 ### 검토·테스트 Target
 
-`UIComponentPreview`는 모든 public component의 variant·size·state와 환경 fixture를
+컴포넌트 프리뷰 target은 모든 public component의 variant·size·state와 환경 fixture를
 local data로 탐색하는 실행 환경입니다. UI 자동화 target은 Preview route, 레이아웃,
 상호작용과 접근성 계약을 판정합니다. 두 target 모두 제품 API를 제공하거나 production
 target의 의존 대상이 되어서는 안 됩니다.
@@ -86,7 +86,7 @@ target의 의존 대상이 되어서는 안 됩니다.
 - Data DTO, 서버 API, 네트워크, 저장소 또는 Composition 로직을 참조해서는 안 됩니다.
 - 외형만 같고 공개 입력의 의미가 다른 UI를 하나의 컴포넌트로 통합해서는 안 됩니다.
 - DesignSystem 밖에 공통 시각 어휘를 정의해서는 안 됩니다.
-- 검토 전용 UI를 `UIComponent`가 소유해서는 안 됩니다. `UIComponentPreviewApp`
-  target에 둡니다.
-- production target이 UIComponentLayoutHarness 또는 UI 자동화 target에 의존해서는 안
+- 검토 전용 UI를 `UIComponent`가 소유해서는 안 됩니다. 컴포넌트 프리뷰 target에
+  둡니다.
+- production target이 레이아웃 검토 target 또는 UI 자동화 target에 의존해서는 안
   됩니다.

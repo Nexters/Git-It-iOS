@@ -12,4 +12,4 @@
 | `Displays/` | 텍스트·이미지·본문의 토큰 기반 렌더링 | 표시할 값의 결정 |
 
 검토 전용 UI의 표현 예외는 [View 컨벤션 — 표현 계층](../view/debug-component.md)이
-소유하며, 그 UI는 `UIComponentPreviewApp` target에 둡니다.
+소유하며, 그 UI는 컴포넌트 검토용 프리뷰 앱 target에 둡니다.

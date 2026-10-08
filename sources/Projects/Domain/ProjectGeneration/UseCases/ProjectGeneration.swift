@@ -9,7 +9,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         repository: any ProjectGenerationRepository,
         pendingGenerations: any PendingGenerationRepository,
         outcomes: any GenerationOutcomeRepository,
-        reminderScheduler: any GenerationReminderScheduler,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
         waitPolicy: GenerationWaitPolicy = .standard,
         now: @escaping @Sendable () -> Date = { Date() },
@@ -18,7 +17,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         self.repository = repository
         self.pendingGenerations = pendingGenerations
         self.outcomes = outcomes
-        self.reminderScheduler = reminderScheduler
         self.signedOutEvents = signedOutEvents
         self.waitPolicy = waitPolicy
         self.now = now
@@ -49,7 +47,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
             receipt.projectID,
             toRepositoryURL: request.repositoryURL,
         )
-        await pendingGenerations.enqueueReminder(projectID: receipt.projectID)
         return receipt
     }
 
@@ -61,27 +58,97 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         continuation.onTermination = { [weak self] _ in
             Task { await self?.removeSubscriber(subscriberID) }
         }
-        continuation.yield(projectedState())
+        continuation.yield(projectedState(of: generationState))
         return stream
+    }
+
+    public func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
+        do {
+            return try await projectedState(of: pendingGenerations.confirmedPendingState())
+        } catch let error as ProjectGenerationError {
+            throw error
+        } catch {
+            throw .stateUnavailable
+        }
+    }
+
+    public func outcomeArrivals() async -> AsyncStream<ProjectID> {
+        await startObserving()
+        let (stream, continuation) = AsyncStream<ProjectID>.makeStream()
+        let subscriberID = UUID()
+        arrivalSubscribers[subscriberID] = continuation
+        continuation.onTermination = { [weak self] _ in
+            Task { await self?.removeArrivalSubscriber(subscriberID) }
+        }
+        return stream
+    }
+
+    public func synchronize() async {
+        if let startTask {
+            await startTask.value
+            await purgeExpiredRecords()
+            await apply(pendingGenerations.pendingState())
+        } else {
+            await startObserving()
+        }
+        await absorbDeliveredOutcomes()
+    }
+
+    public func release(_ projectID: ProjectID) async {
+        preservedOutcomes.removeAll { $0.projectID == projectID }
+        await pendingGenerations.releaseGeneration(projectID: projectID)
+        guard let startTask else { return }
+        await startTask.value
+        await apply(pendingGenerations.pendingState())
+    }
+
+    public func confirmCompletion(of projectIDs: [ProjectID]) async {
+        guard !projectIDs.isEmpty else { return }
+        let listedProjectIDs = Set(projectIDs)
+        let finishedAt = now()
+        var hasRecordedCompletion = false
+        for record in await pendingGenerations.pendingState().records where record.status == .inProgress {
+            guard
+                let projectID = record.projectID,
+                listedProjectIDs.contains(projectID)
+            else { continue }
+            if
+                await pendingGenerations.finishGeneration(
+                    projectID: projectID,
+                    status: .completed,
+                    finishedAt: finishedAt,
+                )
+            {
+                hasRecordedCompletion = true
+            }
+        }
+        guard hasRecordedCompletion, let startTask else { return }
+        await startTask.value
+        await apply(pendingGenerations.pendingState())
     }
 
     // MARK: Private
 
+    private static let preservedOutcomeLimit = 16
+    private static let recentArrivalLimit = 32
+    private static let expiryTimerMargin: TimeInterval = 1
+
     private let repository: any ProjectGenerationRepository
     private let pendingGenerations: any PendingGenerationRepository
     private let outcomes: any GenerationOutcomeRepository
-    private let reminderScheduler: any GenerationReminderScheduler
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
     private let waitPolicy: GenerationWaitPolicy
     private let now: @Sendable () -> Date
     private let sleep: @Sendable (TimeInterval) async throws -> Void
 
     private var generationState = GenerationState()
-    private var reminderProjectIDs = Set<ProjectID>()
+    private var preservedOutcomes = [GenerationOutcome]()
     private var subscribers = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
+    private var arrivalSubscribers = [UUID: AsyncStream<ProjectID>.Continuation]()
+    private var recentArrivals = [GenerationOutcome]()
     private var startTask: Task<Void, Never>?
     private var observationTasks = [Task<Void, Never>]()
-    private var readyTimerTask: Task<Void, Never>?
+    private var deadlineTimerTask: Task<Void, Never>?
 
     private func startObserving() async {
         if startTask == nil {
@@ -92,7 +159,6 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     private func start() async {
         await purgeExpiredRecords()
-        await absorbPendingReminders()
         await apply(pendingGenerations.pendingState())
 
         let outcomeStream = await outcomes.outcomes()
@@ -101,7 +167,7 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         observationTasks = [
             Task { [weak self] in
                 for await outcome in outcomeStream {
-                    await self?.finish(outcome)
+                    await self?.receive(outcome)
                 }
             },
             Task { [weak self] in
@@ -133,151 +199,166 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
         }
     }
 
-    private func absorbPendingReminders() async {
-        for projectID in await pendingGenerations.drainReminderProjectIDs() {
-            reminderProjectIDs.insert(projectID)
+    private func receive(_ outcome: GenerationOutcome) async {
+        if await finish(outcome) {
+            await apply(pendingGenerations.pendingState())
+        }
+        announceArrival(of: outcome)
+    }
+
+    private func absorbDeliveredOutcomes() async {
+        var hasRecordedOutcome = false
+        for outcome in await outcomes.deliveredOutcomes() {
+            if await finish(outcome) {
+                hasRecordedOutcome = true
+            }
+            recordArrival(of: outcome)
+        }
+        if hasRecordedOutcome {
+            await apply(pendingGenerations.pendingState())
         }
     }
 
-    private func finish(_ outcome: GenerationOutcome) async {
+    private func announceArrival(of outcome: GenerationOutcome) {
+        guard recordArrival(of: outcome) else { return }
+        for continuation in arrivalSubscribers.values {
+            continuation.yield(outcome.projectID)
+        }
+    }
+
+    @discardableResult
+    private func recordArrival(of outcome: GenerationOutcome) -> Bool {
+        let current = now()
+        let isDuplicate = recentArrivals.contains { arrival in
+            arrival.projectID == outcome.projectID
+                && arrival.status == outcome.status
+                && current.timeIntervalSince(arrival.arrivedAt) <= waitPolicy.retentionLimit
+        }
+        guard !isDuplicate else { return false }
+        recentArrivals.append(outcome)
+        if recentArrivals.count > Self.recentArrivalLimit {
+            recentArrivals.removeFirst(recentArrivals.count - Self.recentArrivalLimit)
+        }
+        return true
+    }
+
+    @discardableResult
+    private func finish(_ outcome: GenerationOutcome) async -> Bool {
         let status: GenerationRecord.Status =
             switch outcome.status {
             case .completed: .completed
             case .failed: .failed
             }
-        await pendingGenerations.finishGeneration(
+        let isRecorded = await pendingGenerations.finishGeneration(
             projectID: outcome.projectID,
             status: status,
-            finishedAt: now(),
+            finishedAt: outcome.arrivedAt,
         )
+        if !isRecorded {
+            preserve(outcome)
+        }
+        return isRecorded
+    }
+
+    private func preserve(_ outcome: GenerationOutcome) {
+        guard
+            !isExpired(
+                outcome,
+                now: now(),
+            ),
+            !preservedOutcomes.contains(where: { $0.projectID == outcome.projectID })
+        else { return }
+        preservedOutcomes.append(outcome)
+        if preservedOutcomes.count > Self.preservedOutcomeLimit {
+            preservedOutcomes.removeFirst(preservedOutcomes.count - Self.preservedOutcomeLimit)
+        }
+    }
+
+    private func retryPreservedOutcomes() async {
+        let current = now()
+        preservedOutcomes.removeAll { isExpired(
+            $0,
+            now: current,
+        ) }
+        let recordedProjectIDs = Set(generationState.records.compactMap(\.projectID))
+        let retryingOutcomes = preservedOutcomes.filter { recordedProjectIDs.contains($0.projectID) }
+        guard !retryingOutcomes.isEmpty else { return }
+        preservedOutcomes.removeAll { recordedProjectIDs.contains($0.projectID) }
+        for outcome in retryingOutcomes {
+            await finish(outcome)
+        }
+    }
+
+    private func isExpired(
+        _ outcome: GenerationOutcome,
+        now: Date,
+    ) -> Bool {
+        now.timeIntervalSince(outcome.arrivedAt) > waitPolicy.retentionLimit
     }
 
     private func releaseAll() async {
-        reminderProjectIDs.removeAll()
+        preservedOutcomes.removeAll()
+        recentArrivals.removeAll()
         await pendingGenerations.releaseAll()
         await apply(pendingGenerations.pendingState())
     }
 
     private func apply(_ state: GenerationState) async {
         generationState = state
-        await absorbPendingReminders()
-        for record in state.records where record.status != .inProgress {
-            await scheduleReminderIfRegistered(for: record)
-        }
         emit()
-        resetReadyTimer()
+        resetDeadlineTimer()
+        await retryPreservedOutcomes()
     }
 
-    private func scheduleReminderIfRegistered(for record: GenerationRecord) async {
-        guard
-            let projectID = record.projectID,
-            reminderProjectIDs.remove(projectID) != nil,
-            await reminderScheduler.isAuthorized()
-        else { return }
-
-        switch record.status {
-        case .completed:
-            await reminderScheduler.schedule(
-                GenerationReminder(
-                    projectID: projectID,
-                    kind: .completed,
-                ),
-                at: waitPolicy.readyDate(for: record),
-            )
-
-        case .failed:
-            await reminderScheduler.schedule(
-                GenerationReminder(
-                    projectID: projectID,
-                    kind: .failed,
-                ),
-                at: now(),
-            )
-
-        case .inProgress:
-            break
-        }
-    }
-
-    private func projectedState() -> ProjectGenerationState {
-        let current = now()
-        let requests = generationState.records.map { record in
-            ProjectGenerationRequestState(
-                repositoryURL: record.repositoryURL,
-                projectID: record.projectID,
-                requestedAt: record.requestedAt,
-                phase: phase(
-                    of: record,
-                    now: current,
-                ),
-            )
-        }
-        let preparingProjectIDs = requests.reduce(into: Set<ProjectID>()) { projectIDs, request in
-            switch request.phase {
-            case .inProgress,
-                 .preparing:
-                if let projectID = request.projectID {
-                    projectIDs.insert(projectID)
-                }
-
-            case .ready,
-                 .failed:
-                break
+    private func projectedState(of state: GenerationState) -> ProjectGenerationState {
+        ProjectGenerationState(
+            requests: state.records.map { record in
+                ProjectGenerationRequestState(
+                    repositoryURL: record.repositoryURL,
+                    projectID: record.projectID,
+                    requestedAt: record.requestedAt,
+                    phase: phase(of: record),
+                )
             }
-        }
-        return ProjectGenerationState(
-            requests: requests,
-            preparingProjectIDs: preparingProjectIDs,
         )
     }
 
-    private func phase(
-        of record: GenerationRecord,
-        now: Date,
-    ) -> ProjectGenerationPhase {
-        let readyAt = waitPolicy.readyDate(for: record)
+    private func phase(of record: GenerationRecord) -> ProjectGenerationPhase {
         switch record.status {
-        case .inProgress:
-            return .inProgress(readyAt: readyAt)
-
-        case .completed:
-            return now < readyAt ? .preparing(readyAt: readyAt) : .ready
-
-        case .failed:
-            return .failed
+        case .inProgress: .inProgress
+        case .completed: .ready
+        case .failed: .failed
         }
     }
 
-    private func resetReadyTimer() {
-        readyTimerTask?.cancel()
-        readyTimerTask = nil
+    private func resetDeadlineTimer() {
+        deadlineTimerTask?.cancel()
+        deadlineTimerTask = nil
         let current = now()
-        let earliestReadyAt = generationState.records
-            .filter { $0.status == .completed }
-            .map { waitPolicy.readyDate(for: $0) }
+        let earliestDeadline = generationState.records
+            .map { waitPolicy.expiryDate(for: $0).addingTimeInterval(Self.expiryTimerMargin) }
             .filter { current < $0 }
             .min()
-        guard let earliestReadyAt else { return }
+        guard let earliestDeadline else { return }
         let sleep = sleep
-        let delay = earliestReadyAt.timeIntervalSince(current)
-        readyTimerTask = Task { [weak self] in
+        let delay = earliestDeadline.timeIntervalSince(current)
+        deadlineTimerTask = Task { [weak self] in
             do {
                 try await sleep(delay)
             } catch {
                 return
             }
-            guard !Task.isCancelled else { return }
-            await self?.readyTimerFired()
+            await self?.deadlineTimerFired()
         }
     }
 
-    private func readyTimerFired() {
-        emit()
-        resetReadyTimer()
+    private func deadlineTimerFired() async {
+        await purgeExpiredRecords()
+        await apply(pendingGenerations.pendingState())
     }
 
     private func emit() {
-        let state = projectedState()
+        let state = projectedState(of: generationState)
         for continuation in subscribers.values {
             continuation.yield(state)
         }
@@ -285,6 +366,10 @@ public actor ProjectGeneration: ProjectGenerationUseCase {
 
     private func removeSubscriber(_ subscriberID: UUID) {
         subscribers.removeValue(forKey: subscriberID)
+    }
+
+    private func removeArrivalSubscriber(_ subscriberID: UUID) {
+        arrivalSubscribers.removeValue(forKey: subscriberID)
     }
 
 }

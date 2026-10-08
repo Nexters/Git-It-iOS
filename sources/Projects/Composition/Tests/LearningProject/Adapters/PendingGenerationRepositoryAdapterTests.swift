@@ -1,3 +1,4 @@
+import DataShared
 import Foundation
 import Synchronization
 import Testing
@@ -29,19 +30,7 @@ struct PendingGenerationRepositoryAdapterTests {
 
         let state = await app.pendingState()
         #expect(state.isCreating(repositoryURL: Self.url))
-        #expect(state.activeProjectIDs == ["project-1"])
-    }
-
-    @Test
-    func `같은 저장소를 공유하면 한쪽이 남긴 알림 대기를 다른 쪽이 흡수한다`() async {
-        let storage = InMemoryKeyValueStorage()
-        let shareExtension = Self.makeAdapter(storage: storage)
-        let app = Self.makeAdapter(storage: storage)
-
-        await shareExtension.enqueueReminder(projectID: "project-1")
-
-        #expect(await app.drainReminderProjectIDs() == ["project-1"])
-        #expect(await shareExtension.drainReminderProjectIDs().isEmpty)
+        #expect(state.record(repositoryURL: Self.url)?.projectID == "project-1")
     }
 
     @Test
@@ -85,6 +74,39 @@ struct PendingGenerationRepositoryAdapterTests {
     }
 
     @Test
+    func `확인된 대기 상태는 저장 기록을 Domain 모델로 바꾸고 보존 기간이 지난 기록을 뺀다`() async throws {
+        let clock = Clock(now: Self.requestedAt)
+        let adapter = Self.makeAdapter(
+            storage: InMemoryKeyValueStorage(),
+            now: { clock.current() },
+        )
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        await adapter.attachProjectID(
+            "project-1",
+            toRepositoryURL: Self.url,
+        )
+
+        let current = try await adapter.confirmedPendingState()
+        clock.advance(to: Self.requestedAt.addingTimeInterval(Self.retentionLimit + 1))
+        let expired = try await adapter.confirmedPendingState()
+
+        #expect(current.record(projectID: "project-1")?.status == .inProgress)
+        #expect(expired.records.isEmpty)
+    }
+
+    @Test(arguments: [KeyValueStorageError.unavailable, .unreadable])
+    func `확인된 대기 상태 조회는 저장소 판독 실패를 stateUnavailable로 바꿔 던진다`(failure: KeyValueStorageError) async {
+        let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage(verificationFailure: failure))
+
+        await #expect(throws: ProjectGenerationError.stateUnavailable) {
+            try await adapter.confirmedPendingState()
+        }
+    }
+
+    @Test
     func `상태 변화 스트림은 저장 값을 Domain 모델로 바꿔 전달한다`() async {
         let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage())
         _ = await adapter.beginGeneration(
@@ -98,7 +120,7 @@ struct PendingGenerationRepositoryAdapterTests {
 
         var iterator = await adapter.pendingStateChanges().makeAsyncIterator()
         let first = await iterator.next()
-        await adapter.finishGeneration(
+        _ = await adapter.finishGeneration(
             projectID: "project-1",
             status: .completed,
             finishedAt: Self.requestedAt,
@@ -107,6 +129,48 @@ struct PendingGenerationRepositoryAdapterTests {
 
         #expect(first?.record(projectID: "project-1")?.status == .inProgress)
         #expect(second?.record(projectID: "project-1")?.status == .completed)
+    }
+
+    @Test
+    func `기록이 있는 프로젝트의 결과 반영은 true를 돌려준다`() async {
+        let adapter = Self.makeAdapter(storage: InMemoryKeyValueStorage())
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        await adapter.attachProjectID(
+            "project-1",
+            toRepositoryURL: Self.url,
+        )
+
+        let isRecorded = await adapter.finishGeneration(
+            projectID: "project-1",
+            status: .completed,
+            finishedAt: Self.requestedAt,
+        )
+
+        #expect(isRecorded)
+        #expect(await adapter.pendingState().record(projectID: "project-1")?.status == .completed)
+    }
+
+    @Test
+    func `기록이 없는 프로젝트의 결과 반영은 false를 돌려주고 저장소를 바꾸지 않는다`() async {
+        let storage = InMemoryKeyValueStorage()
+        let adapter = Self.makeAdapter(storage: storage)
+        _ = await adapter.beginGeneration(
+            repositoryURL: Self.url,
+            requestedAt: Self.requestedAt,
+        )
+        let before = await adapter.pendingState()
+
+        let isRecorded = await adapter.finishGeneration(
+            projectID: "project-unknown",
+            status: .completed,
+            finishedAt: Self.requestedAt,
+        )
+
+        #expect(!isRecorded)
+        #expect(await adapter.pendingState() == before)
     }
 
     // MARK: Private
@@ -145,10 +209,7 @@ struct PendingGenerationRepositoryAdapterTests {
     ) -> PendingGenerationRepositoryAdapter {
         PendingGenerationRepositoryAdapter(
             store: LocalPendingGenerationStore(storage: storage),
-            waitPolicy: GenerationWaitPolicy(
-                minimumWait: 300,
-                retentionLimit: retentionLimit,
-            ),
+            waitPolicy: GenerationWaitPolicy(retentionLimit: retentionLimit),
             now: now,
         )
     }

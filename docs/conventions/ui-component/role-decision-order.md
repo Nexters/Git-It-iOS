@@ -15,14 +15,14 @@
 | 6 | `Displays/` | 위에 해당하지 않는 읽기 전용 표시인가? |
 
 `Controls/`의 판정 질문은 "표시 값을 모두 지웠을 때 무엇이 남는가"로 읽습니다.
-`SelectableSettingRow`는 title을 지우면 선택을 바꾸는 행이 남으므로 `Controls/`이고,
-`SettingRow`는 title과 value를 지우면 남는 것이 없으므로 `CollectionItems/`입니다.
+제목과 선택 표시를 가진 행은 제목을 지우면 선택을 바꾸는 행이 남으므로 `Controls/`이고,
+제목과 값만 보여 주는 행은 둘을 지우면 남는 것이 없으므로 `CollectionItems/`입니다.
 같은 목록에 놓이는 두 행이 서로 다른 폴더에 있는 이유는 **정보 표시가 계약의
 중심인지, 조작이 계약의 중심인지**가 다르기 때문입니다.
 
 컬렉션 전체를 그리면서 선택을 소유하는 컴포넌트는 항목이 아니라 조작 단위이므로
-`Controls/`에 둡니다(`SelectionCardList`).
+`Controls/`에 둡니다.
 
 **UIComponent에는 제품 컴포넌트만 둡니다.** 레이아웃 카탈로그나 TestFlight 검토
-제어처럼 제품 화면에서 쓰지 않는 UI는 역할 폴더를 갖지 않고 `UIComponentPreviewApp`
-target이 소유합니다.
+제어처럼 제품 화면에서 쓰지 않는 UI는 역할 폴더를 갖지 않고 컴포넌트 검토용 프리뷰
+앱 target이 소유합니다.

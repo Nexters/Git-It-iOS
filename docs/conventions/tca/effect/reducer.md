@@ -14,7 +14,7 @@
 
 **`body`의 `Reduce`는 `Action`의 최상위 case만 분기합니다.** 각 case는 연관값을 한 단계만
 벗겨 그 연관값 전용 `private func reduce(into:<case>:)`로 넘깁니다. `.view(.task)`,
-`.home(.delegate(.signInRequired))`처럼 여러 단계를 한 패턴에 중첩하지 않습니다.
+`.child(.delegate(.closeRequested))`처럼 여러 단계를 한 패턴에 중첩하지 않습니다.
 
 ```swift
 Reduce { state, action in
@@ -31,10 +31,10 @@ Reduce { state, action in
             effect: event,
         )
 
-    case .home(let action):
+    case .child(let action):
         reduce(
             into: &state,
-            home: action,
+            child: action,
         )
 
     case .delegate:
@@ -53,8 +53,8 @@ Reduce { state, action in
   `switch`합니다. `PresentationAction`은 `.presented`와 `.delegate`를 `guard`의 조건 두 개로 한
   단계씩 벗깁니다.
 - 부모가 하위 Action의 `delegate` 외 case도 해석하면 하위 Action을 한 단계 `switch`하고, 각 case를
-  `<하위 case><하위 Action case>` 레이블의 분기 함수로 넘깁니다 → `reduce(into:legalAgreementEffect:)`,
-  `reduce(into:legalAgreementDelegate:)`.
+  `<하위 case><하위 Action case>` 레이블의 분기 함수로 넘깁니다 → `reduce(into:childEffect:)`,
+  `reduce(into:childDelegate:)`.
 - 자기 `delegate` case에서 할 일이 있으면(예: `dismiss()`) 다른 case와 같이 `reduce(into:delegate:)`로
   넘깁니다.
 - 연관값 `switch`는 `default` 없이 모든 case를 나열합니다. 무시하는 case도 `.none`을 반환하는

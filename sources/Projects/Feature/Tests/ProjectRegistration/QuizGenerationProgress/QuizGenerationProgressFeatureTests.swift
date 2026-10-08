@@ -106,7 +106,6 @@ struct QuizGenerationProgressFeatureTests {
 
         await store.send(.view(.waitAtHomeTapped))
         await store.receive(.effect(.waitAtHomeAuthorizationChecked(.authorized)))
-        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
 
         #expect(!store.state.isGenerationReminderSheetPresented)
@@ -128,7 +127,7 @@ struct QuizGenerationProgressFeatureTests {
     }
 
     @Test
-    func `알림 수락은 권한을 요청하고 리마인드 사용을 알린 뒤 등록을 알린다`() async {
+    func `알림 수락은 권한을 요청한 뒤 등록을 알린다`() async {
         let appSetting = AppSettingUseCaseStub(
             statuses: [.notDetermined],
             requestedStatuses: [.authorized],
@@ -146,7 +145,6 @@ struct QuizGenerationProgressFeatureTests {
         await store.send(.view(.generationReminderAccepted)) {
             $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
         await store.finish()
 
@@ -171,7 +169,6 @@ struct QuizGenerationProgressFeatureTests {
         store.exhaustivity = .off
 
         await store.send(.view(.generationReminderAccepted))
-        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: true)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
         await store.finish()
         await waitUntil { await openNotificationSettings.callCount == 1 }
@@ -180,21 +177,30 @@ struct QuizGenerationProgressFeatureTests {
     }
 
     @Test
-    func `알림 거절은 리마인드 미사용을 알리고 등록을 알린다`() async {
+    func `알림 거절은 권한 요청 없이 등록을 알린다`() async {
+        let appSetting = AppSettingUseCaseStub(statuses: [.notDetermined])
+        let openNotificationSettings = OpenNotificationSettingsSpy()
         var state = awaitingState()
         state.isGenerationReminderSheetPresented = true
-        let store = makeQuizGenerationProgressStore(state: state)
+        let store = makeQuizGenerationProgressStore(
+            appSetting: appSetting,
+            openNotificationSettings: openNotificationSettings,
+            state: state,
+        )
         store.exhaustivity = .off
 
         await store.send(.view(.generationReminderDeclined)) {
             $0.isGenerationReminderSheetPresented = false
         }
-        await store.receive(.delegate(.generationReminderPreferenceSelected(isEnabled: false)))
         await store.receive(.delegate(.projectRegistered(sampleReceipt)))
+        await store.finish()
+
+        #expect(await appSetting.snapshot().authorizationRequestCount == 0)
+        #expect(await openNotificationSettings.callCount == 0)
     }
 
     @Test
-    func `ready 단계를 받으면 리마인드 선택 없이 등록을 알린다`() async {
+    func `ready 단계를 받으면 등록을 알린다`() async {
         let store = makeQuizGenerationProgressStore(state: awaitingState())
         store.exhaustivity = .off
 
@@ -206,8 +212,7 @@ struct QuizGenerationProgressFeatureTests {
     func `진행 중 단계는 상태를 바꾸지 않는다`() async {
         let store = makeQuizGenerationProgressStore(state: awaitingState())
 
-        await store.send(.effect(.generationPhaseReceived(.inProgress(readyAt: .distantFuture))))
-        await store.send(.effect(.generationPhaseReceived(.preparing(readyAt: .distantFuture))))
+        await store.send(.effect(.generationPhaseReceived(.inProgress)))
 
         #expect(store.state.progress == .awaitingOutcome(sampleReceipt))
     }

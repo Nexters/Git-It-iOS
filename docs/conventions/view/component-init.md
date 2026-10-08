@@ -17,17 +17,11 @@
 ## 시각 속성은 계약 메서드로 선언합니다
 
 스타일·크기·텍스트 스타일·전경색·배경색 같은 시각 속성은 초기화 인자로 받지 않습니다. 속성 종류마다
-`sources/Projects/UI/Component/Contracts/`의 계약을 채택하고, 계약이 정한 `Self` 반환 메서드로
-선언합니다.
+UI 패키지가 정의한 시각 속성 계약을 채택하고, 계약이 정한 `Self` 반환 메서드로 선언합니다.
 
-| 계약 | 메서드 |
-|---|---|
-| `StyleConfigurable` | `style(_:)` — 컴포넌트의 `Style` |
-| `SizeConfigurable` | `size(_:)` — 컴포넌트의 `Size` |
-| `TextStyleConfigurable` | `textStyle(_:)` — `TextStyleToken` |
-| `ForegroundColorConfigurable` | `foregroundColorToken(_:)` — `ColorToken` |
-| `BackgroundColorConfigurable` | `backgroundColorToken(_:)` — `ColorToken` |
-
+- 계약은 속성 종류 하나에 메서드 하나를 정합니다. 메서드 이름은 속성 이름을 따르고
+  (`style(_:)`, `size(_:)`, `textStyle(_:)`, `foregroundColorToken(_:)`, `backgroundColorToken(_:)`),
+  인자는 컴포넌트에 중첩한 `Style`·`Size` 또는 해당 종류의 디자인 토큰(타이포그래피 토큰, 색 토큰)입니다.
 - 시각 속성은 `private var style = Style.neutral`처럼 기본값을 가진 저장 프로퍼티로 둡니다. 모든 시각
   속성은 기본값을 가지며, 기본값은 호출부 최빈값이 아니라 디자인 시스템의 중립·기본 값(텍스트는 본문
   스타일, enum은 기본 case)으로 고릅니다.
@@ -44,24 +38,24 @@
 
 ```swift
 // Feature 호출부의 정본: store는 UI 컴포넌트 내부가 아니라 호출부에만 존재합니다.
-StyledText(text: "제목")
-    .textStyle(.subtitle1)
-    .foregroundColorToken(.grey400)
+ExampleText(text: "제목")
+    .textStyle(.title)
+    .foregroundColorToken(.secondary)
     .multilineTextAlignment(.center)
-ActionButton(title: "계속하기") { send(.continueTapped) }
+ExampleButton(title: "계속하기") { send(.continueTapped) }
     .style(.secondary)
     .size(.medium)
-LabeledCard(displayModel: .init(label: "AI 해설", text: explanation))
+ExampleCard(displayModel: .init(label: "라벨", text: text))
     .style(.accent)
-BookmarkButton(
-    isSaved: Binding(get: { store.isBookmarked }, set: { _ in send(.bookmarkToggleTapped) }),
+ExampleToggleButton(
+    isOn: Binding(get: { store.isOn }, set: { _ in send(.toggleTapped) }),
     accessibilityLabel: label,
 )
 
 // 사용하지 않습니다
-ProjectRow(project: project)
-ActionButton(title: "계속하기", style: .secondary, size: .medium) { send(.continueTapped) }
-BookmarkButton(isSaved: store.isBookmarked, accessibilityLabel: label, onTap: { send(.bookmarkToggleTapped) })
+ExampleRow(item: item)
+ExampleButton(title: "계속하기", style: .secondary, size: .medium) { send(.continueTapped) }
+ExampleToggleButton(isOn: store.isOn, accessibilityLabel: label, onTap: { send(.toggleTapped) })
 ```
 
 초기화 메서드는 Feature 모델을 그대로 받지 않습니다. 기본값과 인자 순서는 초기화 메서드와 시각 속성

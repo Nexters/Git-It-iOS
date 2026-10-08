@@ -6,14 +6,14 @@
 파일 안에서는 `extension`으로 선언합니다.
 
 ```swift
-// Quiz/QuestionSolving/SubViews/QuestionSolvingScreen+ChoiceSection.swift
-extension QuestionSolvingScreen {
-    struct ChoiceSection: View { ... }
+// Example/ExampleDetail/SubViews/ExampleDetailScreen+SummaryView.swift
+extension ExampleDetailScreen {
+    struct SummaryView: View { ... }
 }
 ```
 
-다른 화면 전용 서브뷰도 같은 규칙을 씁니다 —
-`ProjectRegistration/RepositoryConfirmation/RepositoryConfirmationScreen+ThumbnailView.swift`.
+모든 화면 전용 서브뷰가 같은 규칙을 씁니다 —
+`<흐름>/<화면>/SubViews/<화면>Screen+<서브뷰>.swift`.
 `Constant`는 예외로 파일을 나누지 않고 소유 View와 같은 파일에 둡니다
 ([View 내부 선언 컨벤션 — `Constant`](../view-declarations/constant.md)).
 

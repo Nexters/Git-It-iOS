@@ -32,7 +32,7 @@ App은 **Coordination Layer**로서 Feature가 표현하는 사용자 흐름과 
 
 ### Composition
 
-Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data 사이의 Adapter를 구현하고, Data가 공개하는 생성 진입점(`StorageFactory`, `NotificationFactory` 등)과 역할 계약(`KeyValueStorage`, `RequestTransport` 등)을 이용해 실행 환경에 맞는 구현을 선택하고 객체 생성 순서와 수명을 결정합니다. Composition은 Infrastructure에 의존하지 않습니다.
+Composition은 production dependency graph를 구성하는 조립 경계입니다. Domain과 Data 사이의 Adapter를 구현하고, Data가 공개하는 생성 진입점과 역할 계약을 이용해 실행 환경에 맞는 구현을 선택하고 객체 생성 순서와 수명을 결정합니다. Composition은 Infrastructure에 의존하지 않습니다.
 
 ### Feature
 
@@ -82,16 +82,16 @@ Feature가 요구하는 dependency는 initializer 또는 명시적인 초기화 
 
 ```swift
 @Reducer
-public struct ProfileFeature {
-    private let getProfile: GetProfile
-    private let updateProfile: UpdateProfile
+public struct ExampleFeature {
+    private let getExample: GetExample
+    private let updateExample: UpdateExample
 
     public init(
-        getProfile: GetProfile,
-        updateProfile: UpdateProfile
+        getExample: GetExample,
+        updateExample: UpdateExample
     ) {
-        self.getProfile = getProfile
-        self.updateProfile = updateProfile
+        self.getExample = getExample
+        self.updateExample = updateExample
     }
 }
 ```
@@ -99,20 +99,20 @@ public struct ProfileFeature {
 Composition은 production 실행에 필요한 객체를 구성하고 App에 제공합니다.
 
 ```swift
-public struct AppComposition {
-    public let getProfile: GetProfile
-    public let updateProfile: UpdateProfile
+public struct ExampleComposition {
+    public let getExample: GetExample
+    public let updateExample: UpdateExample
 }
 ```
 
 App은 Composition이 제공한 dependency를 Feature에 주입합니다.
 
 ```swift
-let composition = AppComposition.live()
+let composition = ExampleComposition.live()
 
-let profileFeature = ProfileFeature(
-    getProfile: composition.getProfile,
-    updateProfile: composition.updateProfile
+let exampleFeature = ExampleFeature(
+    getExample: composition.getExample,
+    updateExample: composition.updateExample
 )
 ```
 
@@ -127,21 +127,21 @@ Adapter는 독립적인 패키지 경계 사이의 요청, 응답, 모델과 오
 Domain은 외부 데이터 기능에 필요한 계약을 Domain의 언어로 정의합니다.
 
 ```swift
-public protocol UserRepository: Sendable {
-    func user(id: UserID) async throws -> User
+public protocol ExampleRepository: Sendable {
+    func example(id: ExampleID) async throws -> Example
 }
 ```
 
 Composition의 Domain↔Data Adapter는 Domain 계약을 구현하고 Data API에 작업을 위임합니다.
 
 ```text
-Domain UserRepository
+Domain ExampleRepository
         ↑
         │ implements
-Composition DomainDataAdapter
+Composition Domain↔Data Adapter
         │ delegates
         ↓
-Data UserDataStore
+Data ExampleRemote
 ```
 
 Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
@@ -150,28 +150,28 @@ Adapter는 Data 모델·DTO·오류를 Domain 모델·오류로 변환합니다.
 
 Data는 획득·저장 같은 실행 역할을 자신의 언어로 정의한 concrete 타입으로 소유하고, 그 내부 구현에서만 Infrastructure 기술 API를 사용합니다. 이 변환은 Composition Adapter가 아니라 Data 내부 구현이 담당하며, 기술 이름은 Data 공개 선언에 나타나지 않습니다.
 
-Composition이 Infrastructure에 의존할 수 없으므로 Data는 기술 능력을 역할 계약(`KeyValueStorage`, `SecureValueStorage`, `RequestTransport`, `LocalReminderNotifier`, `RemoteMessageReceiver`)과 생성 진입점(`StorageFactory`, `RequestClientFactory`, `NotificationFactory`)으로 공개합니다. Composition은 생성 진입점으로 실제 구현을 얻고, 테스트는 역할 계약의 대체 구현을 주입합니다. Data target 사이에서 Infrastructure 타입을 주고받아야 하면 `package` 접근 수준으로만 공개합니다. Data 안에 프로토콜을 둘지는 [추상화 컨벤션](./conventions/abstraction.md)의 근거를 따릅니다.
+Composition이 Infrastructure에 의존할 수 없으므로 Data는 저장·전송·알림 같은 기술 능력을 기술 이름 없는 역할 계약과 실제 구현을 만드는 생성 진입점(`Factories/`)으로 공개합니다. Composition은 생성 진입점으로 실제 구현을 얻고, 테스트는 역할 계약의 대체 구현을 주입합니다. Data target 사이에서 Infrastructure 타입을 주고받아야 하면 `package` 접근 수준으로만 공개합니다. Data 안에 프로토콜을 둘지는 [추상화 컨벤션](./conventions/abstraction.md)의 근거를 따릅니다.
 
 ```swift
-public struct UserRemote: Sendable {
+public struct ExampleRemote: Sendable {
     // Composition은 baseURL과 선택적 전송 대체 구현만 전달한다
-    public init(baseURL: URL, transport: (any RequestTransport)?, responseTimeout: Duration)
+    public init(baseURL: URL, transport: (any ExampleTransport)?, responseTimeout: Duration)
 
-    public func user(id: String) async throws -> UserResponseDTO {
-        // 내부 HTTPClient로 Data 소유 요청 값을 보내고,
-        // 응답을 UserResponseDTO로 디코딩하며 기술 오류를 Data 오류로 변환한다.
+    public func example(id: String) async throws -> ExampleResponseDTO {
+        // 내부에서 Infrastructure 기술 API로 Data 소유 요청 값을 보내고,
+        // 응답을 ExampleResponseDTO로 디코딩하며 기술 오류를 Data 오류로 변환한다.
     }
 }
 ```
 
 ```text
-Composition ── baseURL, (any RequestTransport)? ──→ Data UserRemote
+Composition ── baseURL, (any ExampleTransport)? ──→ Data ExampleRemote
                                                       │ 내부 구현에서 사용
                                                       ↓
-                                               Infrastructure HTTPClient
+                                           Infrastructure 기술 API
 ```
 
-`UserRemote`는 Data 소유 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
+`ExampleRemote`는 Data 소유 요청·응답과 Infrastructure의 기술 API 사이를 변환하고, 기술 오류를 Data가 소유한 오류 타입으로 정규화합니다.
 
 ### 3.4 Navigation과 화면 흐름
 
@@ -204,7 +204,7 @@ Feature
  ↓
 Domain
  ↓
-Composition · DomainDataAdapter
+Composition · Domain↔Data Adapter
  ↓
 Data
  ↓
@@ -222,7 +222,7 @@ Infrastructure result
  ↓
 Data model / DTO
  ↓
-Composition · DomainDataAdapter
+Composition · Domain↔Data Adapter
  ↓
 Domain model / error
  ↓
@@ -370,10 +370,8 @@ UI → Feature
 - 위반 중 이름만 바꾸면 원칙을 충족하는 항목은 rename으로 해소합니다. 기술 타입의
   Infrastructure 이동·제거, 공개 API에서 Infrastructure 타입 숨기기, Data target 사이 반복
   타입 정리처럼 선언의 구성이나 시그니처를 바꿔야 하는 항목은 후속 설계 변경으로
-  기록합니다. Data 공개 initializer가 `HTTPClient`·`KeychainStore`·`UserDefaultsStore`를
-  인자로 받던 [설계 점검 결과](./review/domain-data-infra-design-review.md)의 DS-06은 명세
-  036에서 Data 역할 계약(`KeyValueStorage`·`SecureValueStorage`·`RequestTransport`)과 생성
-  진입점으로 해소했습니다.
+  기록합니다. Data 공개 initializer가 Infrastructure 기술 타입을 인자로 받는 구성은 Data
+  역할 계약과 생성 진입점으로 대체합니다.
 - Infrastructure 공개 이름은 직접 감싸는 기술·플랫폼·공급자 명칭을 보존합니다.
 
 ## 문서 변경 기준

@@ -12,11 +12,11 @@
 참조를 막기 위한 것입니다.
 
 ```swift
-struct RepositoryLinkInputScreen: View {
+struct ExampleScreen: View {
     var body: some View { ... }
 }
 
-private extension RepositoryLinkInputScreen {
+private extension ExampleScreen {
     enum Constant {
         static let titleFieldSpacing: CGFloat = 16
         static let bottomButtonPadding: CGFloat = 34
@@ -32,8 +32,8 @@ extension으로 다시 꺼내면 `화면.서브뷰` 전체 경로를 반복해�
 [View 컨벤션 — 화면 전용 서브뷰](../view/screen-subview.md)이 소유합니다.
 
 ```swift
-extension RepositoryLinkInputScreen {
-    struct GuideSectionView: View {
+extension ExampleScreen {
+    struct BannerView: View {
         var body: some View { ... }
 
         private enum Constant {
@@ -43,8 +43,8 @@ extension RepositoryLinkInputScreen {
 }
 ```
 
-**그 View 안에서만 참조하는 디자인 토큰 값도 같은 방식으로 정의합니다.** `ColorToken`,
-`TextStyleToken`처럼
+**그 View 안에서만 참조하는 디자인 토큰 값도 같은 방식으로 정의합니다.** 색 토큰,
+타이포그래피 토큰처럼
 [View 토큰 컨벤션 §2](../view-tokens.md#2-디자인-토큰)의 토큰 카탈로그를 참조하는
 값이라도 한 View 안에서만 쓰이면 `body`에 리터럴로 흩어 두지 않고 `Constant`의
 `static` 멤버로 모읍니다. `body`를 읽을 때 그 값이 어떤 역할인지 이름으로 드러내고,
@@ -52,8 +52,8 @@ extension RepositoryLinkInputScreen {
 
 ```swift
 private enum Constant {
-    static let borderColor: ColorToken = .blue200
-    static let titleStyle: TextStyleToken = .subtitle3
+    static let borderColor: <색 토큰> = .<테두리 색>
+    static let titleStyle: <타이포그래피 토큰> = .<제목 스타일>
 }
 ```
 
@@ -63,12 +63,12 @@ DesignSystem 토큰으로 승격합니다. `Constant`는 그 View 하나에서�
 참조만 소유합니다.
 
 **제네릭 View는 `static var` 연산 프로퍼티로 정의합니다.** Swift는 제네릭 타입에
-`static` 저장 프로퍼티를 허용하지 않으므로 `SheetSurface<Content>`처럼 제네릭
+`static` 저장 프로퍼티를 허용하지 않으므로 `ExampleSurface<Content>`처럼 제네릭
 파라미터를 갖는 View에서는 `static let`이 컴파일되지 않습니다. 이때 `Constant`를 파일
 최상위로 꺼내지 않고 리터럴을 반환하는 `static var`로 형태만 바꿔 View 안에 둡니다.
 
 ```swift
-public struct SheetSurface<Content: View>: View {
+public struct ExampleSurface<Content: View>: View {
     private enum Constant {
         static var grabberWidth: CGFloat { 48 }
         static var grabberHeight: CGFloat { 4 }

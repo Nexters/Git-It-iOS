@@ -5,7 +5,6 @@ import Testing
 @testable import CompositionShareExtension
 @testable import DataAuthentication
 @testable import DataLearningProject
-@testable import DataNotification
 @testable import DomainAccount
 @testable import DomainProjectGeneration
 
@@ -45,7 +44,7 @@ struct ShareExtensionCompositionTests {
     }
 
     @Test
-    func `생성 요청이 실패하면 진행 중 기록과 알림 대기열을 남기지 않는다`() async throws {
+    func `생성 요청이 실패하면 진행 중 기록을 남기지 않는다`() async throws {
         let context = try Context()
         await context.markerCoding.save(isSignedIn: true)
         try context.saveSession(accessToken: "shared-token")
@@ -63,7 +62,6 @@ struct ShareExtensionCompositionTests {
             store: LocalPendingGenerationStore(storage: context.sharedStorage)
         )
         #expect(await pendingGenerations.pendingState().records.isEmpty)
-        #expect(await pendingGenerations.drainReminderProjectIDs().isEmpty)
     }
 
     @Test
@@ -72,7 +70,6 @@ struct ShareExtensionCompositionTests {
             try Context.environment(),
             secureStorage: InMemorySecureValueStorage(),
             sharedStorage: nil,
-            reminderNotifier: SpyLocalReminderNotifier(isAuthorized: false),
         )
 
         #expect(await composition.signInAvailability() == .appLaunchRequired)
@@ -89,13 +86,10 @@ struct ShareExtensionCompositionTests {
             let sharedStorage = InMemoryKeyValueStorage()
             self.sharedStorage = sharedStorage
             markerCoding = SharedSessionStateMarkerCoding(storage: sharedStorage)
-            let reminderNotifier = SpyLocalReminderNotifier(isAuthorized: false)
-            self.reminderNotifier = reminderNotifier
             composition = ShareExtensionComposition.live(
                 try Self.environment(),
                 secureStorage: secureStorage,
                 sharedStorage: sharedStorage,
-                reminderNotifier: reminderNotifier,
             )
         }
 
@@ -104,7 +98,6 @@ struct ShareExtensionCompositionTests {
         let sharedStorage: InMemoryKeyValueStorage
         let secureStorage: InMemorySecureValueStorage
         let markerCoding: SharedSessionStateMarkerCoding
-        let reminderNotifier: SpyLocalReminderNotifier
         let composition: ShareExtensionComposition
 
         static func environment() throws -> ShareExtensionComposition.Environment {

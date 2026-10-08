@@ -14,7 +14,7 @@
 
 핵심 구분은 **Action은 이미 일어난 일이고, Effect는 앞으로 실행할 일**이라는
 것입니다. 사용자 사건인 `retryTapped`를 받은 Reducer가 현재 상태를 해석해 조회
-Effect를 반환하며, 앞으로 할 일을 그대로 명령하는 `fetchProjects` 같은 View Action을
+Effect를 반환하며, 앞으로 할 일을 그대로 명령하는 `fetchItems` 같은 View Action을
 만들지 않습니다. Effect 자체의 작성 방식은 [Effect 컨벤션](./effect.md)을 따릅니다.
 
 문서 우선순위, 문서 구조와 문서 간 참조 규칙은

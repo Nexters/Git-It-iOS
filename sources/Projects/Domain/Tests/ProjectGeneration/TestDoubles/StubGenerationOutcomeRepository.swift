@@ -17,6 +17,14 @@ final class StubGenerationOutcomeRepository: GenerationOutcomeRepository, Sendab
         }
     }
 
+    func deliveredOutcomes() async -> [GenerationOutcome] {
+        delivered.withLock { $0 }
+    }
+
+    func setDeliveredOutcomes(_ outcomes: [GenerationOutcome]) {
+        delivered.withLock { $0 = outcomes }
+    }
+
     func emit(_ outcome: GenerationOutcome) {
         let targets = continuations.withLock { Array($0.values) }
         for continuation in targets {
@@ -27,5 +35,6 @@ final class StubGenerationOutcomeRepository: GenerationOutcomeRepository, Sendab
     // MARK: Private
 
     private let continuations = Mutex([UUID: AsyncStream<GenerationOutcome>.Continuation]())
+    private let delivered = Mutex([GenerationOutcome]())
 
 }

@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-31
 
-**최종 수정일**: 2026-09-13 (`SemanticColorToken` 폐기, 색상은 `ColorToken`만 참조)
+**최종 수정일**: 2026-09-27 (구체 토큰·컴포넌트 타입 이름을 역할 서술로 교체)
 
 ## 목적
 
@@ -33,7 +33,7 @@
 
 ### 2.1 색상 어휘는 DesignSystem이 소유합니다
 
-색상은 `ColorToken`으로만 참조하고, Feature와 UIComponent는 `extension Color`로 자체 색상 이름을 정의하지 않습니다.
+색상은 DesignSystem의 색 토큰으로만 참조하고, Feature와 UIComponent는 `extension Color`로 자체 색상 이름을 정의하지 않습니다.
 
 → [색상 어휘 소유](./view-tokens/color-ownership.md)
 
@@ -51,7 +51,7 @@
 
 ### 2.4 Typography
 
-문자열 렌더링은 `Text`를 직접 구성하지 않고 `StyledText` 초기화에 `TextStyleToken`을 넘깁니다.
+문자열 렌더링은 `Text`를 직접 구성하지 않고 공용 텍스트 컴포넌트에 타이포그래피 토큰을 지정해 그립니다.
 
 → [Typography](./view-tokens/typography.md)
 
@@ -60,7 +60,7 @@
 - [ ] 토큰 밖 색상 리터럴이 없는가?
 - [ ] `extension Color`로 패키지 로컬 색상 이름을 추가하지 않았는가?
 - [ ] 여러 곳이 공유하는 수치를 토큰으로 승격했는가?
-- [ ] 문자열이 `TextStyleToken`을 받는 `StyledText` 초기화를 통과하는가?
+- [ ] 문자열이 타이포그래피 토큰을 지정한 공용 텍스트 컴포넌트를 통과하는가?
 - [ ] 한 View 안에서만 쓰는 토큰 참조가 `body`에 흩어지지 않고 `Constant`의
       `static` 멤버로 모여 있는가?
 

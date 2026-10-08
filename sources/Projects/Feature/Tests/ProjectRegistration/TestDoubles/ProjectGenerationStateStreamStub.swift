@@ -35,8 +35,7 @@ actor ProjectGenerationStateStreamStub {
                 projectID: projectID,
                 requestedAt: requestedAt,
                 phase: phase,
-            )],
-            preparingProjectIDs: [],
+            )]
         )
         yieldCurrent()
     }
@@ -58,10 +57,7 @@ actor ProjectGenerationStateStreamStub {
 
     // MARK: Private
 
-    private var current = ProjectGenerationState(
-        requests: [],
-        preparingProjectIDs: [],
-    )
+    private var current = ProjectGenerationState(requests: [])
     private var continuations = [UUID: AsyncStream<ProjectGenerationState>.Continuation]()
     private var subscriptionCount = 0
 

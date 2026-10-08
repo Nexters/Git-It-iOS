@@ -5,6 +5,10 @@ public protocol KeyValueStorage: Sendable {
         _ type: Value.Type,
         forKey key: String,
     ) async -> Value?
+    func verifiedValue<Value: Codable & Sendable>(
+        _ type: Value.Type,
+        forKey key: String,
+    ) async throws(KeyValueStorageError) -> Value?
     func setValue(
         _ value: some Codable & Sendable,
         forKey key: String,

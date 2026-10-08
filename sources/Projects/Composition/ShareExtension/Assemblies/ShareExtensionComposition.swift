@@ -1,7 +1,6 @@
 import CompositionAuthentication
 import CompositionLearningProject
 import DataAuthentication
-import DataNotification
 import DataShared
 import DomainAccount
 import DomainExternalRepository
@@ -58,7 +57,6 @@ public struct ShareExtensionComposition: Sendable {
             namespace: SessionStorageLayout.sharedSessionNamespace,
             location: .appGroup,
         ),
-        reminderNotifier: (any LocalReminderNotifier)? = nil,
         transport: (any RequestTransport)? = nil,
     ) -> ShareExtensionComposition {
         let sessionAvailability = SessionAvailabilityAssembly(
@@ -76,7 +74,6 @@ public struct ShareExtensionComposition: Sendable {
                 baseURL: environment.apiBaseURL,
                 credential: { await requestCredentialProvider.credential() },
                 credentialRejected: { await requestCredentialProvider.credentialRejected() },
-                reminderNotifier: reminderNotifier,
                 transport: transport,
                 sharedStorage: sharedStorage,
             ),

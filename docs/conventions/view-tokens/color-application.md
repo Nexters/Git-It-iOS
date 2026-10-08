@@ -8,4 +8,4 @@
 - 도형 채우기나 `in:` 인자처럼 `Color` 값이 필요한 위치: `Color(designSystem:)`
 - `Color(red:green:blue:)`, `Color(hex:)` 등 토큰 밖 색상 리터럴: 사용하지 않습니다.
 
-세 API 모두 `ColorToken`을 받습니다.
+세 API 모두 DesignSystem의 색 토큰을 받습니다.

@@ -15,8 +15,8 @@
   `Self` 반환 상태 선언 메서드로 받습니다([표시 값, Binding과 콜백](../view/display-value-binding-callback.md#상태-선언-메서드)).
 
 ```swift
-// Controls/Chip/Chip.swift
-public struct Chip: View {
+// Controls/ExampleChip.swift
+public struct ExampleChip: View {
     public init(
         label: String,
         isSelected: Binding<Bool>,
@@ -27,7 +27,7 @@ public struct Chip: View {
 
     public var body: some View {
         Button(action: { isSelected.toggle() }) {
-            StyledText(text: label)
+            ExampleText(text: label)
         }
     }
 
@@ -37,8 +37,8 @@ public struct Chip: View {
 }
 
 // 호출부
-Chip(label: "SwiftUI", isSelected: $isSwiftUISelected)
+ExampleChip(label: "라벨", isSelected: $isSelected)
 
 // 사용하지 않습니다
-Chip(label: "SwiftUI", isSelected: isSwiftUISelected, onToggle: { ... })
+ExampleChip(label: "라벨", isSelected: isSelected, onToggle: { ... })
 ```

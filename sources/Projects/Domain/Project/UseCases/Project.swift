@@ -7,13 +7,15 @@ public actor Project: ProjectUseCase {
 
     public init(
         repository: any ProjectRepository,
-        preparingProjectIDs: @escaping @Sendable () async -> AsyncStream<Set<ProjectID>>,
         signedOutEvents: @escaping @Sendable () async -> AsyncStream<Void>,
+        projectDeleted: @escaping @Sendable (ProjectID) async -> Void,
+        projectsListed: @escaping @Sendable ([ProjectID]) async -> Void,
         pageSize: Int = 20,
     ) {
         self.repository = repository
-        self.preparingProjectIDs = preparingProjectIDs
         self.signedOutEvents = signedOutEvents
+        self.projectDeleted = projectDeleted
+        self.projectsListed = projectsListed
         self.pageSize = pageSize
     }
 
@@ -39,10 +41,23 @@ public actor Project: ProjectUseCase {
         try await requestFirstPage()
     }
 
+    public func refreshReplacingInFlightRequest() async throws {
+        startObserving()
+        epoch += 1
+        firstPageTask?.cancel()
+        firstPageTask = nil
+        nextPageTask?.cancel()
+        nextPageTask = nil
+        try await requestFirstPage()
+    }
+
     public func requestNextPage() async throws {
         startObserving()
         if let nextPageTask {
-            try await nextPageTask.value
+            try await awaitNextPage(
+                nextPageTask,
+                epoch: epoch,
+            )
             return
         }
         guard hasNextPage else { return }
@@ -55,14 +70,20 @@ public actor Project: ProjectUseCase {
                 index,
                 size: size,
             )
-            self.appendPage(
-                page,
-                epoch: epoch,
-            )
+            guard
+                self.appendPage(
+                    page,
+                    epoch: epoch,
+                )
+            else { return }
+            await self.projectsListed(page.summaries.map(\.id))
         }
         nextPageTask = task
         defer { clearNextPageTask(epoch: epoch) }
-        try await task.value
+        try await awaitNextPage(
+            task,
+            epoch: epoch,
+        )
     }
 
     public func detail(of projectID: ProjectID) async throws -> ProjectDetail {
@@ -75,21 +96,23 @@ public actor Project: ProjectUseCase {
         try await repository.delete(projectID)
         loaded.removeAll { $0.id == projectID }
         emit()
+        await projectDeleted(projectID)
     }
 
     // MARK: Private
 
     private let repository: any ProjectRepository
-    private let preparingProjectIDs: @Sendable () async -> AsyncStream<Set<ProjectID>>
     private let signedOutEvents: @Sendable () async -> AsyncStream<Void>
+    private let projectDeleted: @Sendable (ProjectID) async -> Void
+    private let projectsListed: @Sendable ([ProjectID]) async -> Void
     private let pageSize: Int
 
     private var loaded = [ProjectSummary]()
     private var nextPageIndex = 0
     private var hasNextPage = false
     private var isLoaded = false
-    private var excludedIDs = Set<ProjectID>()
     private var epoch = 0
+    private var resetEpoch = 0
     private var firstPageTask: Task<Void, Error>?
     private var nextPageTask: Task<Void, Error>?
     private var subscribers = [UUID: AsyncStream<ProjectList>.Continuation]()
@@ -97,7 +120,7 @@ public actor Project: ProjectUseCase {
 
     private var currentList: ProjectList {
         ProjectList(
-            summaries: loaded.filter { !excludedIDs.contains($0.id) },
+            summaries: loaded,
             hasNextPage: hasNextPage,
             isLoaded: isLoaded,
         )
@@ -105,25 +128,22 @@ public actor Project: ProjectUseCase {
 
     private func startObserving() {
         guard observationTasks.isEmpty else { return }
-        let preparingProjectIDs = preparingProjectIDs
         let signedOutEvents = signedOutEvents
         observationTasks = [
-            Task { [weak self] in
-                for await projectIDs in await preparingProjectIDs() {
-                    await self?.exclude(projectIDs)
-                }
-            },
             Task { [weak self] in
                 for await _ in await signedOutEvents() {
                     await self?.reset()
                 }
-            },
+            }
         ]
     }
 
     private func requestFirstPage() async throws {
         if let firstPageTask {
-            try await firstPageTask.value
+            try await awaitFirstPage(
+                firstPageTask,
+                epoch: epoch,
+            )
             return
         }
         let repository = repository
@@ -134,38 +154,77 @@ public actor Project: ProjectUseCase {
                 0,
                 size: size,
             )
-            self.replaceWithFirstPage(
-                page,
-                epoch: epoch,
-            )
+            guard
+                self.replaceWithFirstPage(
+                    page,
+                    epoch: epoch,
+                )
+            else { return }
+            await self.projectsListed(page.summaries.map(\.id))
         }
         firstPageTask = task
         defer { clearFirstPageTask(epoch: epoch) }
-        try await task.value
+        try await awaitFirstPage(
+            task,
+            epoch: epoch,
+        )
+    }
+
+    private func awaitFirstPage(
+        _ task: Task<Void, Error>,
+        epoch requestEpoch: Int,
+    ) async throws {
+        do {
+            try await task.value
+        } catch {
+            guard isReplaced(requestEpoch) else { throw error }
+        }
+        guard isReplaced(requestEpoch), let firstPageTask else { return }
+        try await awaitFirstPage(
+            firstPageTask,
+            epoch: epoch,
+        )
+    }
+
+    private func awaitNextPage(
+        _ task: Task<Void, Error>,
+        epoch requestEpoch: Int,
+    ) async throws {
+        do {
+            try await task.value
+        } catch {
+            guard isReplaced(requestEpoch) else { throw error }
+        }
+    }
+
+    private func isReplaced(_ requestEpoch: Int) -> Bool {
+        requestEpoch != epoch && resetEpoch <= requestEpoch
     }
 
     private func replaceWithFirstPage(
         _ page: ProjectPage,
         epoch: Int,
-    ) {
-        guard epoch == self.epoch else { return }
+    ) -> Bool {
+        guard epoch == self.epoch else { return false }
         loaded = page.summaries
         nextPageIndex = 1
         hasNextPage = page.hasNextPage
         isLoaded = true
         emit()
+        return true
     }
 
     private func appendPage(
         _ page: ProjectPage,
         epoch: Int,
-    ) {
-        guard epoch == self.epoch else { return }
+    ) -> Bool {
+        guard epoch == self.epoch else { return false }
         let loadedIDs = Set(loaded.map(\.id))
         loaded += page.summaries.filter { !loadedIDs.contains($0.id) }
         nextPageIndex += 1
         hasNextPage = page.hasNextPage
         emit()
+        return true
     }
 
     private func clearFirstPageTask(epoch: Int) {
@@ -178,16 +237,9 @@ public actor Project: ProjectUseCase {
         nextPageTask = nil
     }
 
-    private func exclude(_ projectIDs: Set<ProjectID>) async {
-        let released = excludedIDs.subtracting(projectIDs)
-        excludedIDs = projectIDs
-        emit()
-        guard !released.isEmpty, isLoaded else { return }
-        try? await requestFirstPage()
-    }
-
     private func reset() {
         epoch += 1
+        resetEpoch = epoch
         firstPageTask = nil
         nextPageTask = nil
         loaded = []

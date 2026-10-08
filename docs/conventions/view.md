@@ -4,7 +4,7 @@
 
 **작성일**: 2026-08-17
 
-**최종 수정일**: 2026-09-22 (값으로 받는 상태·동작 설정을 `Self` 반환 상태 선언 메서드로 선언하는 규칙 반영)
+**최종 수정일**: 2026-09-27 (구체 컴포넌트·토큰 타입 이름을 역할 서술과 중립 예시로 교체)
 
 ## 목적
 
@@ -128,7 +128,7 @@ UIComponent가 지원하지 않는 표현이면서 한 화면에서만 쓰는 �
 - [ ] 서브뷰 파일의 `import`가 SwiftUI·DesignSystem·UIComponent로 한정되는가?
 - [ ] 서브뷰 입력에 `Store`·Feature `State`·Domain 모델이 없는가?
 - [ ] 화면이 `preferredColorScheme`을 다시 지정하지 않는가?
-- [ ] 검토 전용 UI가 `UIComponentPreviewApp` target에 있는가?
+- [ ] 검토 전용 UI가 `UIComponent`가 아니라 컴포넌트 검토용 프리뷰 앱 target에 있는가?
 - [ ] 컴포넌트 프리뷰가 모든 시각 변형을 포함하는가?
 - [ ] 화면 프리뷰가 그 화면 폴더의 `Previews/` 안 `<화면 타입 이름>Previews.swift`에 있는가?
 

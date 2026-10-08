@@ -12,13 +12,13 @@
 
 ```swift
 // Domain이 소유하고 Composition Adapter가 채택한다
-public protocol LearningProjectRepository: Sendable { ... }
+public protocol ExampleRepository: Sendable { ... }
 
 // Infrastructure가 소유하고 Data가 사용한다
-public protocol HTTPTransport: Sendable { ... }
+public protocol ExampleHTTPTransport: Sendable { ... }
 
 // Data가 소유하고 Composition·테스트가 대체 구현을 주입한다
-public protocol KeyValueStorage: Sendable { ... }
+public protocol ExampleStorage: Sendable { ... }
 ```
 
 Composition은 Infrastructure에 의존할 수 없습니다. 그래서 Composition이나 테스트가 저장·전송·알림
@@ -48,12 +48,9 @@ Data의 구체 타입을 직접 받는 것은 아키텍처가 허용하는 방�
 
 ## 예시
 
-| 타입 | 판정 | 근거 |
+| 타입의 역할 | 판정 | 근거 |
 | --- | --- | --- |
-| `HTTPTransport` | 둔다 | 근거 A — Infrastructure가 소유하고 Data가 사용한다 |
-| `KeyValueStorage`, `SecureValueStorage` | 둔다 | 근거 A — Data가 소유하고 Composition이 저장 위치별 구현을 고르며 테스트가 메모리 더블을 주입한다 |
-| `RequestTransport` | 둔다 | 근거 A — Data가 소유하고 Composition 테스트가 요청 기록 더블을 주입한다 |
-| `LocalReminderNotifier`, `RemoteMessageReceiver` | 둔다 | 근거 A — Data가 소유하고 Composition이 생성 진입점 구현이나 대체 구현을 주입한다 |
-| `LearningProjectRepository` | 둔다 | 근거 A — Domain이 소유하고 Composition이 채택한다 |
-| `ProjectRemote` | 두지 않는다 | Data 안에서만 쓰이고 구현이 하나다. Composition은 이 구체 타입을 직접 받는다 |
-| `LocalPolicyConsentStore` | 두지 않는다 | 같음 |
+| Infrastructure가 소유하고 Data가 사용하는 기술 계약 | 둔다 | 근거 A |
+| Data가 소유하고 Composition이 생성 진입점 구현이나 대체 구현을 고르는 저장·전송·알림 역할 계약 | 둔다 | 근거 A |
+| Domain이 소유하고 Composition Adapter가 채택하는 외부 기능 계약 | 둔다 | 근거 A |
+| Data 안에서만 쓰이고 구현이 하나인 Remote·Store | 두지 않는다 | Composition은 이 구체 타입을 직접 받는다 |

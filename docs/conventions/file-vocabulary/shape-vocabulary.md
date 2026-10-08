@@ -36,7 +36,7 @@
 | | `Models/` | 요청·응답·설정 값 타입 |
 | | `Errors/` | 기술 오류 타입 |
 | | `AppDelegates/` | 플랫폼 생명주기 delegate 타입 |
-| `Composition/Adapter/` | `Adapters/` | Domain 계약을 구현하는 Adapter |
+| `Composition/<관심사>/` | `Adapters/` | Domain 계약을 구현하는 Adapter |
 | | `Assemblies/` | 조립 진입 타입과 객체 수명 선택 |
 | | `Codings/` | 경계 간 인코딩·디코딩 |
 | | `Layouts/` | 저장소 키 배치 |
@@ -56,16 +56,16 @@
 | | `Models/` | 둘 이상의 흐름이 함께 쓰는 값 타입 |
 | | `Reducers/` | 둘 이상의 흐름이 합성하는 기능 Feature — View를 두지 않습니다 |
 | | `Localization/` | 모듈 문구 전용 타입 `LocalizedText`와 흐름별 확장, 모듈 문구 카탈로그 `Localizable.xcstrings` ([현지화 §3.1·§4.1](../localization.md#31-string-catalog)) |
-| `UI/DesignSystem/` | `Tokens/` | 원시·의미 디자인 토큰 |
+| `UI/<디자인 토큰 target 소스 루트>/` | `Tokens/` | 원시·의미 디자인 토큰 |
 | | `Layout/` | 화면 크기에서 파생하는 런타임 레이아웃 변수 |
 | | `Extensions/` | 토큰 적용 API와 폰트 등록 |
 | | `Resources/` | 폰트 자산 |
-| `UI/Component/` | 역할 폴더 | [UIComponent 컨벤션 — 컴포넌트 역할 분류](../ui-component.md#3-컴포넌트-역할-분류)이 소유 |
+| `UI/<UIComponent 소스 루트>/` | 역할 폴더 | [UIComponent 컨벤션 — 컴포넌트 역할 분류](../ui-component.md#3-컴포넌트-역할-분류)이 소유 |
 | | `Contracts/` | 여러 역할 폴더가 채택하는 시각 속성 계약 프로토콜 |
 | | `Resources/` | 이미지·애니메이션 자산 |
 | | `Localization/` | 모듈 문구 전용 타입 `LocalizedText`와 문구 카탈로그 `Localizable.xcstrings` ([현지화 §3.1·§4.1](../localization.md#31-string-catalog)) |
-| `UI/ComponentPreviewApp/` | `Catalogs/` | 레이아웃 계약 검토 카탈로그 |
-| `App/GitIt/` | `Reducers/` · `Screens/` | 앱 루트 Feature와 화면 |
+| `UI/<컴포넌트 프리뷰 앱 소스 루트>/` | `Catalogs/` | 레이아웃 계약 검토 카탈로그 |
+| `App/<앱 소스 루트>/` | `Reducers/` · `Screens/` | 앱 루트 Feature와 화면 |
 | | `Configurations/` | 실행 환경과 번들 설정 |
 | | `Loaders/` | 번들 리소스 해석 |
 | | `Resources/` | 앱 자산과 정책 문서 |

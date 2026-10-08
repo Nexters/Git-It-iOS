@@ -57,31 +57,6 @@ struct GenerationStateTests {
     }
 
     @Test
-    func `진행 중이고 식별자가 부여된 기록만 활성 프로젝트로 센다`() {
-        let state = GenerationState()
-            .beginning(
-                repositoryURL: Self.url,
-                requestedAt: Self.requestedAt,
-            )?
-            .beginning(
-                repositoryURL: Self.otherURL,
-                requestedAt: Self.requestedAt,
-            )?
-            .attachingProjectID(
-                "p1",
-                toRepositoryURL: Self.url,
-            )
-        #expect(state?.activeProjectIDs == ["p1"])
-
-        let completed = state?.finishing(
-            projectID: "p1",
-            status: .completed,
-            at: Self.finishedAt,
-        )
-        #expect(completed?.activeProjectIDs.isEmpty == true)
-    }
-
-    @Test
     func `같은 프로젝트 식별자를 가진 기록은 하나만 남는다`() {
         let state = GenerationState()
             .beginning(
@@ -256,12 +231,7 @@ struct GenerationStateTests {
     }
 
     @Test
-    func `준비 완료 시각은 요청 시각에 최소 대기 시간을 더한 값이다`() {
-        let record = GenerationRecord(
-            repositoryURL: Self.url,
-            requestedAt: Self.requestedAt,
-        )
-        #expect(GenerationWaitPolicy.standard.readyDate(for: record) == Self.requestedAt.addingTimeInterval(300))
+    func `표준 정책의 보관 기간은 1시간이다`() {
         #expect(GenerationWaitPolicy.standard.retentionLimit == 3_600)
     }
 

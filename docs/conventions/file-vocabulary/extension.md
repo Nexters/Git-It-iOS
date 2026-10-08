@@ -6,8 +6,8 @@
 사용합니다.
 
 ```text
-Extensions/View+ColorToken.swift
-Models/HTTPRequest+QueryItem.swift
+Extensions/View+ExampleStyle.swift
+Models/ExampleRequest+Validation.swift
 ```
 
 `+` 뒤에는 그 파일이 추가하는 개념을 씁니다. `Extension`, `Helper`, `Utils` 같은

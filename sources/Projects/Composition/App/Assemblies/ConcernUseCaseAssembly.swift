@@ -30,12 +30,12 @@ public struct ConcernUseCaseAssembly: Sendable {
         policyDocuments: [PolicyDocument],
         appVersion: String,
         osVersion: String,
-        generationReminder: GenerationReminderContent,
         requestCredentialProvider: RequestCredentialProvider,
         secureStorage: (any SecureValueStorage)?,
         sharedStorage: (any KeyValueStorage)?,
-        reminderNotifier: (any LocalReminderNotifier)? = nil,
+        notificationPermissionRequester: (any NotificationPermissionRequester)? = nil,
         generationOutcomeSource: PushQuizGenerationOutcomeSource = PushQuizGenerationOutcomeSource(),
+        deliveredRemoteMessageReader: (any DeliveredRemoteMessageReader)? = nil,
         transport: (any RequestTransport)? = nil,
         responseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
         memberResponseTimeout: Duration = RequestClientFactory.defaultResponseTimeout,
@@ -106,9 +106,9 @@ public struct ConcernUseCaseAssembly: Sendable {
                 sessionStorage: sessionStorage,
             )
         )
-        let notifier = reminderNotifier ?? NotificationFactory.localReminderNotifier()
+        let permissionRequester = notificationPermissionRequester ?? NotificationFactory.notificationPermissionRequester()
         appSetting = AppSetting(
-            notificationAuthorization: NotificationAuthorizationAdapter(reminderNotifier: notifier),
+            notificationAuthorization: NotificationAuthorizationAdapter(permissionRequester: permissionRequester),
             deviceRegistrationRepository: DeviceRegistrationRepositoryAdapter(remote: memberRemote),
             deviceIdentifierRepository: DeviceIdentifierRepositoryAdapter(
                 secureStorage: secureStorage ?? StorageFactory.secureValueStorage(
@@ -162,13 +162,9 @@ public struct ConcernUseCaseAssembly: Sendable {
                     )
                 )
             ),
-            outcomes: GenerationOutcomeRepositoryAdapter(source: generationOutcomeSource),
-            reminderScheduler: GenerationReminderSchedulerAdapter(
-                reminderNotifier: notifier,
-                completedTitle: generationReminder.completedTitle,
-                completedBody: generationReminder.completedBody,
-                failedTitle: generationReminder.failedTitle,
-                failedBody: generationReminder.failedBody,
+            outcomes: GenerationOutcomeRepositoryAdapter(
+                source: generationOutcomeSource,
+                deliveredMessages: deliveredRemoteMessageReader ?? NotificationFactory.deliveredRemoteMessageReader(),
             ),
             signedOutEvents: signedOutEvents,
         )
@@ -176,39 +172,13 @@ public struct ConcernUseCaseAssembly: Sendable {
 
         project = Project(
             repository: ProjectRepositoryAdapter(remote: projectRemote),
-            preparingProjectIDs: {
-                await Self.preparingProjectIDs(from: projectGeneration.states())
-            },
             signedOutEvents: signedOutEvents,
+            projectDeleted: { await projectGeneration.release($0) },
+            projectsListed: { await projectGeneration.confirmCompletion(of: $0) },
         )
     }
 
     // MARK: Public
-
-    public struct GenerationReminderContent: Sendable {
-
-        // MARK: Lifecycle
-
-        public init(
-            completedTitle: String,
-            completedBody: String,
-            failedTitle: String,
-            failedBody: String,
-        ) {
-            self.completedTitle = completedTitle
-            self.completedBody = completedBody
-            self.failedTitle = failedTitle
-            self.failedBody = failedBody
-        }
-
-        // MARK: Public
-
-        public let completedTitle: String
-        public let completedBody: String
-        public let failedTitle: String
-        public let failedBody: String
-
-    }
 
     public let account: any AccountUseCase
     public let userInfo: any UserInfoUseCase
@@ -240,20 +210,6 @@ public struct ConcernUseCaseAssembly: Sendable {
             let task = Task {
                 for await state in states where state == .signedOut {
                     continuation.yield(())
-                }
-                continuation.finish()
-            }
-            continuation.onTermination = { _ in task.cancel() }
-        }
-    }
-
-    public static func preparingProjectIDs(
-        from states: AsyncStream<ProjectGenerationState>
-    ) -> AsyncStream<Set<ProjectID>> {
-        AsyncStream { continuation in
-            let task = Task {
-                for await state in states {
-                    continuation.yield(state.preparingProjectIDs)
                 }
                 continuation.finish()
             }

@@ -17,8 +17,8 @@ Data는 획득·저장·캐시·동기화의 실행 역할을 자신의 언어�
 - 서비스가 정의한 요청과 응답 형식은 Data가 소유한 DTO로 표현해야 합니다.
 - 데이터 획득 결과는 Data가 소유한 타입으로 반환해야 합니다.
 - 외부 기술 기능이 필요한 경우 Data가 소유한 실행 역할 타입의 내부 구현에서 Infrastructure 기술 API를 사용해야 하며, 그 타입의 공개 선언(이름·시그니처)에 기술을 노출해서는 안 됩니다.
-- Composition이나 테스트가 기술 능력을 선택·대체해야 하면 Data가 기술 이름 없는 역할 계약(`KeyValueStorage`, `SecureValueStorage`, `RequestTransport`, `LocalReminderNotifier`, `RemoteMessageReceiver`)과 실제 구현을 만드는 생성 진입점(`Factories/`)을 공개해야 합니다.
-- Data target 사이에서 Infrastructure 타입을 주고받아야 하면 `package` 접근 수준으로만 공개해야 하며, 모든 Data target은 같은 package 이름(`GitItData`)으로 빌드합니다.
+- Composition이나 테스트가 기술 능력을 선택·대체해야 하면 Data가 기술 이름 없는 역할 계약과 실제 구현을 만드는 생성 진입점(`Factories/`)을 공개해야 합니다.
+- Data target 사이에서 Infrastructure 타입을 주고받아야 하면 `package` 접근 수준으로만 공개해야 하며, 모든 Data target은 같은 package 이름으로 빌드합니다.
 - 외부 시스템의 기술 오류는 Data가 소유한 오류 타입으로 변환해야 합니다.
 - 외부 기술 계약은 Test Double로 대체할 수 있는 형태로 설계해야 하며, Data 저장·전송 타입 테스트는 Infrastructure 실제 구현 대신 Data 역할 계약 더블을 주입합니다.
 - Data target은 독립적인 테스트 실행 단위를 구성해야 하며, 요청 구성·응답 변환·오류 변환을 검증해야 합니다.

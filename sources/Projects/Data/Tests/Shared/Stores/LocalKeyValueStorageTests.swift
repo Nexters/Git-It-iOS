@@ -69,6 +69,56 @@ struct LocalKeyValueStorageTests {
     }
 
     @Test
+    func `확인 조회는 저장된 값이 없으면 nil을 반환한다`() async throws {
+        let (storage, _) = try makeStorage(namespace: "test.namespace")
+
+        let value = try await storage.verifiedValue(
+            Sample.self,
+            forKey: "sample",
+        )
+
+        #expect(value == nil)
+    }
+
+    @Test
+    func `확인 조회는 저장한 값을 같은 타입으로 반환한다`() async throws {
+        let (storage, _) = try makeStorage(namespace: "test.namespace")
+        await storage.setValue(
+            Sample(
+                name: "value",
+                count: 3,
+            ),
+            forKey: "sample",
+        )
+
+        let value = try await storage.verifiedValue(
+            Sample.self,
+            forKey: "sample",
+        )
+
+        #expect(value == Sample(
+            name: "value",
+            count: 3,
+        ))
+    }
+
+    @Test
+    func `확인 조회는 저장된 바이트를 요청한 타입으로 해석할 수 없으면 unreadable을 던진다`() async throws {
+        let (storage, store) = try makeStorage(namespace: "test.namespace")
+        await store.store(
+            Data([0xFF, 0x00, 0xAB]),
+            forKey: "sample",
+        )
+
+        await #expect(throws: KeyValueStorageError.unreadable) {
+            try await storage.verifiedValue(
+                Sample.self,
+                forKey: "sample",
+            )
+        }
+    }
+
+    @Test
     func `값을 삭제하면 조회 결과가 없다`() async throws {
         let (storage, _) = try makeStorage(namespace: "test.namespace")
         await storage.setValue(

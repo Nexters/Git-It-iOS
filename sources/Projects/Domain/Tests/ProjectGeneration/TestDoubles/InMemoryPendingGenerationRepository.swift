@@ -6,14 +6,21 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
 
     // MARK: Lifecycle
 
-    init(state: GenerationState = GenerationState()) {
+    init(
+        state: GenerationState = GenerationState(),
+        confirmationFailure: (any Error)? = nil,
+        retentionLimit: TimeInterval = GenerationWaitPolicy.standard.retentionLimit,
+        now: @escaping @Sendable () -> Date,
+    ) {
         self.state = state
+        self.confirmationFailure = confirmationFailure
+        self.retentionLimit = retentionLimit
+        self.now = now
     }
 
     // MARK: Internal
 
     private(set) var state: GenerationState
-    private(set) var reminderProjectIDs = [String]()
     private(set) var finishedProjectIDs = [String]()
 
     var subscriberCount: Int {
@@ -21,7 +28,14 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
     }
 
     func pendingState() async -> GenerationState {
-        state
+        visibleState()
+    }
+
+    func confirmedPendingState() async throws -> GenerationState {
+        if let confirmationFailure {
+            throw confirmationFailure
+        }
+        return visibleState()
     }
 
     func pendingStateChanges() async -> AsyncStream<GenerationState> {
@@ -31,7 +45,7 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         continuation.onTermination = { [weak self] _ in
             Task { await self?.removeSubscriber(subscriberID) }
         }
-        continuation.yield(state)
+        continuation.yield(visibleState())
         return stream
     }
 
@@ -63,13 +77,15 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
         projectID: String,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async {
+    ) async -> Bool {
         finishedProjectIDs.append(projectID)
+        guard visibleState().records.contains(where: { $0.projectID == projectID }) else { return false }
         update(state.finishing(
             projectID: projectID,
             status: status,
             at: finishedAt,
         ))
+        return true
     }
 
     func releaseGeneration(repositoryURL: String) async {
@@ -81,28 +97,32 @@ actor InMemoryPendingGenerationRepository: PendingGenerationRepository {
     }
 
     func releaseAll() async {
-        reminderProjectIDs.removeAll()
         update(GenerationState())
     }
 
-    func enqueueReminder(projectID: String) async {
-        guard !reminderProjectIDs.contains(projectID) else { return }
-        reminderProjectIDs.append(projectID)
-    }
-
-    func drainReminderProjectIDs() async -> [String] {
-        defer { reminderProjectIDs.removeAll() }
-        return reminderProjectIDs
+    func replaceStateSilently(_ next: GenerationState) {
+        state = next
     }
 
     // MARK: Private
 
+    private let confirmationFailure: (any Error)?
+    private let retentionLimit: TimeInterval
+    private let now: @Sendable () -> Date
     private var subscribers = [UUID: AsyncStream<GenerationState>.Continuation]()
+
+    private func visibleState() -> GenerationState {
+        state.purgingExpired(
+            now: now(),
+            retentionLimit: retentionLimit,
+        )
+    }
 
     private func update(_ next: GenerationState) {
         state = next
+        let visible = visibleState()
         for continuation in subscribers.values {
-            continuation.yield(next)
+            continuation.yield(visible)
         }
     }
 

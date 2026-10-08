@@ -3,6 +3,7 @@ import Foundation
 
 public protocol PendingGenerationRepository: Sendable {
     func pendingState() async -> GenerationState
+    func confirmedPendingState() async throws -> GenerationState
     func pendingStateChanges() async -> AsyncStream<GenerationState>
     func beginGeneration(
         repositoryURL: ExternalRepositoryURL,
@@ -16,10 +17,8 @@ public protocol PendingGenerationRepository: Sendable {
         projectID: ProjectID,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async
+    ) async -> Bool
     func releaseGeneration(repositoryURL: ExternalRepositoryURL) async
     func releaseGeneration(projectID: ProjectID) async
     func releaseAll() async
-    func enqueueReminder(projectID: ProjectID) async
-    func drainReminderProjectIDs() async -> [ProjectID]
 }

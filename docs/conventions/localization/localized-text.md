@@ -4,24 +4,23 @@
 
 **문구를 쓰는 target마다 case와 인스턴스 멤버가 없는 `internal enum LocalizedText` 하나를 둡니다.**
 
-| target | 위치 | 중첩 구조 |
-| --- | --- | --- |
-| `Feature` | 루트 `Feature/Shared/Localization/LocalizedText.swift`, 흐름마다 `LocalizedText+<흐름>.swift` | 흐름 > 화면·서브뷰 |
-| `UIComponent` | `UI/Component/Localization/LocalizedText.swift` 한 파일 | 컴포넌트 |
-| `GitIt` | `App/GitIt/Localization/LocalizedText.swift` 한 파일 | 기능 |
+- 위치는 그 target 소스 루트의 `Localization/LocalizedText.swift`입니다.
+- 여러 흐름을 한 target에 담는 `Feature` 패키지는 루트를 `Feature/Shared/Localization/LocalizedText.swift`에
+  두고, 흐름마다 `LocalizedText+<흐름>.swift` 확장 파일을 둡니다. 중첩 구조는 흐름 > 화면·서브뷰입니다.
+- 흐름이 없는 target은 `LocalizedText.swift` 한 파일에 둡니다.
 
 ## 중첩 규칙 (`Feature`)
 
 - 흐름 enum 이름은 `Feature/<흐름>/` 폴더 이름과 같습니다.
-- 흐름 화면 자체의 문구는 흐름 enum 아래에 둡니다 → `LocalizedText.Settings.title`.
+- 흐름 화면 자체의 문구는 흐름 enum 아래에 둡니다 → `LocalizedText.Example.title`.
 - 흐름 안 화면·서브뷰의 문구는 그 이름의 중첩 enum 아래에 둡니다 →
-  `LocalizedText.Settings.Profile.title`, `LocalizedText.Settings.StatisticsCard.ThisWeek.label`.
-- 흐름 enum에 직접 둘 멤버가 없으면 이름공간으로만 둡니다(`enum Quiz { }`).
+  `LocalizedText.Example.Detail.title`, `LocalizedText.Example.SummaryCard.LastWeek.label`.
+- 흐름 enum에 직접 둘 멤버가 없으면 이름공간으로만 둡니다(`enum <흐름> { }`).
 - 흐름 파일 하나가 `extension LocalizedText { enum <흐름> { … } }`로 그 흐름의 화면 enum까지 모두
   중첩해 선언합니다. 화면마다 파일을 나누지 않습니다. 흐름 enum 안의 순서는 흐름 자체 멤버, 흐름의
   주제 enum, 화면 enum입니다.
-- `UIComponent`는 컴포넌트 이름, `GitIt`은 기능 이름 enum 아래에 둡니다 →
-  `LocalizedText.AppleSignInButton.title`, `LocalizedText.GenerationReminder.Completed.title`.
+- 흐름이 없는 target은 컴포넌트 또는 기능 이름 enum 아래에 둡니다 →
+  `LocalizedText.ExampleButton.title`, `LocalizedText.ExampleReminder.Done.title`.
 
 ## 주제·요소·용도 분할
 
@@ -40,18 +39,19 @@
 
 | 문구 | 경로 |
 | --- | --- |
-| 단일 문제 실패 제목 | `LocalizedText.MainShell.SingleQuestion.Failure.title` |
-| 단일 문제 실패 확인 버튼 | `LocalizedText.MainShell.SingleQuestion.FailureConfirm.buttonTitle` |
-| 로그인 필요 알림 제목 | `LocalizedText.MainShell.SignInRequired.title` |
-| 홈 탭 제목 | `LocalizedText.MainShell.Tab.Home.title` |
-| 저장 화면 재시도 버튼 | `LocalizedText.Saved.Retry.buttonTitle` |
-| 저장 화면 제목 | `LocalizedText.Saved.title` |
+| 상세 화면 오류 제목 | `LocalizedText.Example.Detail.Error.title` |
+| 상세 화면 오류 확인 버튼 | `LocalizedText.Example.Detail.ErrorDismiss.buttonTitle` |
+| 권한 필요 알림 제목 | `LocalizedText.Example.PermissionRequired.title` |
+| 요약 탭 제목 | `LocalizedText.Example.Pane.Summary.title` |
+| 목록 화면 다시 불러오기 버튼 | `LocalizedText.ExampleList.Reload.buttonTitle` |
+| 목록 화면 제목 | `LocalizedText.ExampleList.title` |
 
-- 공통 접두어가 의미 단위를 쪼개면 의미 단위를 주제로 씁니다. 예: `thisWeekLabel`·`thisMonthLabel`은
-  `This.Week`가 아니라 `ThisWeek.label`·`ThisMonth.label`입니다.
-- 주제·요소 enum 이름이 같은 흐름의 화면 enum과 같으면 그 화면 enum에 합칩니다. 예: Settings 화면의
-  개발 분야 행 제목은 `LocalizedText.Settings.Position.title`로 `Position` 화면 enum에 둡니다.
-- 주제·요소 enum은 소속 흐름 파일(Feature) 또는 `LocalizedText.swift`(UIComponent·GitIt) 안에
+- 공통 접두어가 의미 단위를 쪼개면 의미 단위를 주제로 씁니다. 예: `lastWeekLabel`·`lastMonthLabel`은
+  `Last.Week`가 아니라 `LastWeek.label`·`LastMonth.label`입니다.
+- 주제·요소 enum 이름이 같은 흐름의 화면 enum과 같으면 그 화면 enum에 합칩니다. 예: `Example` 흐름
+  화면의 상세 행 레이블(`detailLabel`)은 주제 `Detail`이 같은 흐름의 `Detail` 화면 enum과 같으므로
+  `LocalizedText.Example.Detail.label`로 그 화면 enum에 둡니다.
+- 주제·요소 enum은 소속 흐름 파일(Feature) 또는 `LocalizedText.swift`(흐름이 없는 target) 안에
   중첩하며 파일로 나누지 않습니다.
 
 ## 멤버
@@ -65,22 +65,22 @@
 `static let`을 쓰지 않고 호출 시점에 조회합니다.
 
 ```swift
-// Feature/Shared/Localization/LocalizedText+Settings.swift
+// Feature/Shared/Localization/LocalizedText+Example.swift
 extension LocalizedText {
-    enum Settings {
+    enum Example {
         static var title: String {
-            String(localized: .settingsTitle)
+            String(localized: .exampleTitle)
         }
 
-        enum Profile {
+        enum Detail {
             static var title: String {
-                String(localized: .settingsProfileTitle)
+                String(localized: .exampleDetailTitle)
             }
 
-            enum Weekly {
-                enum Solved {
+            enum Summary {
+                enum Done {
                     static func title(count: Int) -> String {
-                        String(localized: .settingsProfileWeeklySolvedTitle(count: count))
+                        String(localized: .exampleDetailSummaryDoneTitle(count: count))
                     }
                 }
             }

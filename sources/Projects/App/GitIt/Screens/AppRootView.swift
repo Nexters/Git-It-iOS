@@ -228,6 +228,10 @@ private enum AppRootPreviewSupport {
             throw CancellationError()
         }
 
+        func refreshReplacingInFlightRequest() async throws {
+            throw CancellationError()
+        }
+
         func requestNextPage() async throws {
             throw CancellationError()
         }
@@ -249,6 +253,18 @@ private enum AppRootPreviewSupport {
         func states() async -> AsyncStream<ProjectGenerationState> {
             AsyncStream { $0.finish() }
         }
+
+        func currentState() async throws(ProjectGenerationError) -> ProjectGenerationState {
+            ProjectGenerationState(requests: [])
+        }
+
+        func outcomeArrivals() async -> AsyncStream<ProjectID> {
+            AsyncStream { $0.finish() }
+        }
+
+        func synchronize() async { }
+
+        func release(_: ProjectID) async { }
     }
 
     static func store(route: AppRootFeature.Route) -> StoreOf<AppRootFeature> {

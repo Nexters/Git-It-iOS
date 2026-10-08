@@ -13,7 +13,7 @@
 
 ```sh
 grep -rn '"[^"]*[가-힣]' --include='*.swift' \
-  sources/Projects/UI/Component sources/Projects/Feature sources/Projects/App/GitIt \
+  sources/Projects/UI sources/Projects/Feature sources/Projects/App \
   | grep -v '/Tests/' | grep -v '/Previews/' | grep -v '/Derived/'
 ```
 

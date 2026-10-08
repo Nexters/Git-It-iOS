@@ -3,5 +3,6 @@ public enum ProjectGenerationError: CaseIterable, Equatable, Error, Sendable {
     case invalidRequest
     case unauthorized
     case temporarilyUnavailable
+    case stateUnavailable
     case unexpected
 }

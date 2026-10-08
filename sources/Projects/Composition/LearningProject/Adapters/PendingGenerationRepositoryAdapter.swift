@@ -29,6 +29,20 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         )
     }
 
+    public func confirmedPendingState() async throws -> GenerationState {
+        let dto: GenerationStateDTO
+        do {
+            dto = try await store.verifiedState()
+        } catch {
+            throw ProjectGenerationError.stateUnavailable
+        }
+        return Self.purged(
+            Self.state(from: dto),
+            waitPolicy: waitPolicy,
+            now: now(),
+        )
+    }
+
     public func pendingStateChanges() async -> AsyncStream<GenerationState> {
         let changes = await store.stateChanges()
         let waitPolicy = waitPolicy
@@ -74,12 +88,15 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
         projectID: ProjectID,
         status: GenerationRecord.Status,
         finishedAt: Date,
-    ) async {
-        await modify { $0.finishing(
-            projectID: projectID,
-            status: status,
-            at: finishedAt,
-        ) }
+    ) async -> Bool {
+        await modify { state in
+            guard state.record(projectID: projectID) != nil else { return nil }
+            return state.finishing(
+                projectID: projectID,
+                status: status,
+                at: finishedAt,
+            )
+        }
     }
 
     public func releaseGeneration(repositoryURL: ExternalRepositoryURL) async {
@@ -92,17 +109,6 @@ public struct PendingGenerationRepositoryAdapter: PendingGenerationRepository {
 
     public func releaseAll() async {
         await modify { _ in GenerationState() }
-    }
-
-    public func enqueueReminder(projectID: ProjectID) async {
-        await store.appendReminder(
-            projectID: projectID,
-            requestedAt: now(),
-        )
-    }
-
-    public func drainReminderProjectIDs() async -> [ProjectID] {
-        await store.drainReminderProjectIDs()
     }
 
     // MARK: Private

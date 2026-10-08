@@ -7,12 +7,11 @@
 쓰지 않습니다.
 
 ```swift
-StyledText(text: LocalizedText.Settings.title)
-    .textStyle(.title2)
+ExampleText(text: LocalizedText.Example.title)
 
-StyledText(text: LocalizedText.Settings.Profile.title)
+ExampleText(text: LocalizedText.Example.Detail.title)
 
-ActionButton(title: LocalizedText.MainShell.SingleQuestion.FailureConfirm.buttonTitle)
+ExampleButton(title: LocalizedText.Example.Detail.ErrorDismiss.buttonTitle)
 ```
 
 - View `Constant`는 현지화 문구를 소유하지 않습니다. 한 View에서만 쓰는 문구라도 `LocalizedText`에

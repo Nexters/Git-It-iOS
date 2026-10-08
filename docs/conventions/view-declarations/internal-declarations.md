@@ -20,12 +20,12 @@
 | `enum Style` | UI 컴포넌트에 시각 변형이 존재할 때 | 필요한 최소 수준 |
 | `struct DisplayModel` | UI 컴포넌트가 표시 값을 2개 이상 받을 때 | `public` |
 
-`Item`, `Control`처럼 View가 소유하는 그 밖의 보조 타입도 같은 규칙으로 중첩합니다.
+`Item`처럼 View가 소유하는 그 밖의 보조 타입도 같은 규칙으로 중첩합니다.
 Feature 화면에는 `Constant`와 화면 전용 렌더링 보조 선언만 둘 수 있으며, 상태·Action을
 다시 표현하는 보조 모델은 만들지 않습니다([View 컨벤션 — 공개 생성 경로](../view/display-value-binding-callback.md)).
 소유 View가 이름에 문맥을 제공하므로 타입 이름에 View 이름을 반복하지 않습니다.
-`ActionButtonStyle`이 아니라 `ActionButton.Style`, `SelectionCardListItem`이 아니라
-`SelectionCardList.Item`으로 부릅니다.
+`ExampleButtonStyle`이 아니라 `ExampleButton.Style`, `ExampleListItem`이 아니라
+`ExampleList.Item`으로 부릅니다.
 
 한 View의 렌더링 규칙을 읽는 데 필요한 비상태 선언을 한 파일에 모으기 위한 규칙입니다.
 `Constant`는 `body`의 수치가 어디서 오는지, `Style`은 변형마다 무엇이 달라지는지를
@@ -38,8 +38,8 @@ Feature 화면에는 `Constant`와 화면 전용 렌더링 보조 선언만 둘 
 소유합니다.
 
 ```swift
-// Displays/LabeledCard.swift
-public struct LabeledCard: View {
+// Displays/ExampleCard.swift
+public struct ExampleCard: View {
     public init(displayModel: DisplayModel) {
         self.displayModel = displayModel
     }
@@ -48,9 +48,9 @@ public struct LabeledCard: View {
     private var style = Style.neutral
 }
 
-// MARK: LabeledCard.DisplayModel
+// MARK: ExampleCard.DisplayModel
 
-extension LabeledCard {
+extension ExampleCard {
     public struct DisplayModel: Sendable, Equatable {
         public init(label: String, text: String) {
             self.label = label

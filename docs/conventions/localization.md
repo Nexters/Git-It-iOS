@@ -18,8 +18,8 @@
 
 ## 1. 적용 범위
 
-- `sources/Projects/UI/Component/**`, `sources/Projects/Feature/**`, `sources/Projects/App/GitIt/**`의
-  production 소스와 `Localization/Localizable.xcstrings`
+- `sources/Projects/UI/**`, `sources/Projects/Feature/**`, `sources/Projects/App/**` 중 사용자 노출
+  문구를 소유하는 target의 production 소스와 `Localization/Localizable.xcstrings`
 - 위 target의 표시 문구를 검증하는 테스트
 
 Domain·Data·Infrastructure·Composition은 사용자 노출 문구를 소유하지 않으므로 대상이 아닙니다.

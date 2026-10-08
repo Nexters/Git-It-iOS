@@ -417,7 +417,6 @@ struct AppRootFeatureTests {
         }
 
         deviceTokenRefreshes.finish()
-        await store.skipReceivedActions()
         await store.finish()
     }
 
@@ -493,57 +492,6 @@ struct AppRootFeatureTests {
         }
 
         #expect(await appSetting.registerDeviceCallCount == 2)
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `mainShell 표시 중 앱이 활성화되면 프로젝트 목록을 다시 조회한다`() async {
-        let store = makeAppRootStore(state: AppRootTestFixture.mainShellState())
-        store.exhaustivity = .off
-
-        await store.send(.view(.applicationBecameActive))
-        await store.receive(.mainShell(.input(.learningProjectsReloadRequested)))
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `onboarding 표시 중 앱이 활성화되면 프로젝트 목록을 조회하지 않는다`() async {
-        var state = AppRootFeature.State(bundleVersion: "1.0.0")
-        state.route = .onboarding
-        let store = makeAppRootStore(state: state)
-        store.exhaustivity = .off
-
-        await store.send(.view(.applicationBecameActive))
-
-        #expect(store.state.mainShell.home.projectSummaries.load == .idle)
-
-        await store.skipReceivedActions()
-        await store.finish()
-    }
-
-    @Test
-    func `포그라운드 목록 갱신이 실패해도 mainShell 화면을 유지한다`() async {
-        let project = ProjectUseCaseMock(refreshError: .unexpected)
-        let store = makeAppRootStore(
-            project: project,
-            state: AppRootTestFixture.mainShellState(),
-        )
-        store.exhaustivity = .off
-
-        await store.send(.view(.applicationBecameActive))
-        await store.receive(.mainShell(.input(.learningProjectsReloadRequested)))
-        await store.receive(.mainShell(.home(.projectSummaries(.effect(.refreshFinished(
-            requestID: 1,
-            error: .unexpected,
-        ))))))
-
-        #expect(store.state.route == .mainShell)
-        #expect(store.state.mainShell.home.projectSummaries.load == .failed(.unexpected))
-
-        await store.skipReceivedActions(strict: false)
         await store.finish()
     }
 
@@ -658,7 +606,7 @@ struct AppRootFeatureTests {
         )
 
         await projectGeneration.emit(
-            AppRootTestFixture.generationState(phase: .inProgress(readyAt: Date(timeIntervalSince1970: 2_000)))
+            AppRootTestFixture.generationState(phase: .inProgress)
         )
         await store.receive(
             \.effect.generationStateChanged,
@@ -674,11 +622,35 @@ struct AppRootFeatureTests {
         await store.finish()
     }
 
+    @Test(arguments: [
+        [ProjectGenerationPhase.ready, .inProgress],
+        [.ready],
+        [.failed],
+        [],
+    ])
+    func `홈 잠금 여부는 생성 상태의 생성 중 판정과 같다`(phases: [ProjectGenerationPhase]) async {
+        let generationState = ProjectGenerationState(requests: phases.enumerated().map { index, phase in
+            ProjectGenerationRequestState(
+                repositoryURL: "https://github.com/owner/repo\(index)",
+                projectID: "project-\(index)",
+                requestedAt: Date(timeIntervalSince1970: 1_000),
+                phase: phase,
+            )
+        })
+        let store = makeAppRootStore()
+        store.exhaustivity = .off
+
+        await store.send(.effect(.generationStateChanged(generationState)))
+        await store.skipReceivedActions(strict: false)
+
+        #expect(store.state.mainShell.home.isGenerationInProgress == generationState.hasRequestInProgress)
+    }
+
     @Test
     func `생성이 끝난 요청만 남으면 홈의 진행 중 표시를 해제한다`() async {
         let projectGeneration = ProjectGenerationUseCaseMock(
             stored: AppRootTestFixture.generationState(
-                phase: .inProgress(readyAt: Date(timeIntervalSince1970: 2_000))
+                phase: .inProgress
             ),
             keepsObservationOpen: true,
         )
@@ -846,6 +818,35 @@ struct AppRootLearningFlowTests {
 
         await store.skipReceivedActions()
         await store.finish()
+    }
+
+    @Test
+    func `회원 상태에서 앱이 활성화되면 생성 상태를 동기화한다`() async {
+        let projectGeneration = ProjectGenerationUseCaseMock()
+        let store = makeAppRootStore(projectGeneration: projectGeneration)
+        store.exhaustivity = .off
+
+        await store.send(.view(.applicationBecameActive))
+        await store.skipReceivedActions()
+        await store.finish()
+
+        #expect(await projectGeneration.synchronizeCount == 1)
+    }
+
+    @Test
+    func `게스트 상태에서 앱이 활성화되면 생성 상태를 동기화하지 않는다`() async {
+        let projectGeneration = ProjectGenerationUseCaseMock()
+        var state = AppRootFeature.State(bundleVersion: "1.0.0")
+        state.mainShell = MainShellRouterFeature.State(access: .guest)
+        let store = makeAppRootStore(
+            projectGeneration: projectGeneration,
+            state: state,
+        )
+
+        await store.send(.view(.applicationBecameActive))
+        await store.finish()
+
+        #expect(await projectGeneration.synchronizeCount == 0)
     }
 
     // MARK: Private

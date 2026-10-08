@@ -8,7 +8,7 @@
 씁니다.
 
 **동적 값이 들어가는 문구는 이름 있는 위치 지정자를 씁니다.** 수량은 `%1$(count)lld`, 문자열은
-`%1$(projectName)@` 형식이며, 주석에 `인자이름: 의미`를 인자마다 적습니다. 지정자의 이름은 생성
+`%1$(name)@` 형식이며, 주석에 `인자이름: 의미`를 인자마다 적습니다. 지정자의 이름은 생성
 심볼의 인자 레이블이 되고, 인자 순서는 지정자의 위치 번호를 따릅니다.
 
 - 문장을 여러 항목으로 쪼개 코드에서 이어 붙이지 않습니다. 한 문장은 한 항목입니다.
@@ -18,12 +18,12 @@
 고정 문구 항목은 다음 형태입니다.
 
 ```json
-"Settings.title" : {
-  "comment" : "설정 화면 상단 제목",
+"Example.title" : {
+  "comment" : "예시 화면 상단 제목",
   "extractionState" : "manual",
   "localizations" : {
     "ko" : {
-      "stringUnit" : { "state" : "translated", "value" : "설정" }
+      "stringUnit" : { "state" : "translated", "value" : "예시" }
     }
   }
 }
@@ -32,12 +32,12 @@
 보간 항목은 다음 형태입니다.
 
 ```json
-"Settings.Profile.Weekly.Solved.title" : {
-  "comment" : "마이 화면 주간 학습 영역의 제목. count: 이번 주에 푼 문제 수",
+"Example.Detail.Summary.Done.title" : {
+  "comment" : "예시 상세 화면 요약 영역의 완료 제목. count: 완료한 항목 수",
   "extractionState" : "manual",
   "localizations" : {
     "ko" : {
-      "stringUnit" : { "state" : "translated", "value" : "이번 주 %1$(count)lld문제를 풀었어요" }
+      "stringUnit" : { "state" : "translated", "value" : "%1$(count)lld개 항목을 완료했어요" }
     }
   }
 }

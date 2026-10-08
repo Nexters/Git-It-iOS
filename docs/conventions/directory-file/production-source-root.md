@@ -6,5 +6,4 @@
 sources/Projects/<패키지>/<역할>/
 ```
 
-`DomainAccount` target의 소스 루트는 `Domain/Account/`, `UIComponent`
-target의 소스 루트는 `UI/Component/`입니다.
+예를 들어 `DomainExample` target의 소스 루트는 `Domain/Example/`입니다.

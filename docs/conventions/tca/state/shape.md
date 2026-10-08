@@ -17,14 +17,14 @@
 ```swift
 public enum Deletion: Sendable, Equatable {
     case idle
-    case confirming(projectID: String)
-    case committing(projectID: String, requestID: Int)
-    case failed(projectID: String, error: LearningProjectError)
+    case confirming(itemID: String)
+    case committing(itemID: String, requestID: Int)
+    case failed(itemID: String, error: ExampleError)
 }
 
 @ObservableState
 public struct State: Sendable, Equatable {
-    public var projects: [LearningProjectSummary] = []
+    public var items: [ExampleItem] = []
     public var initialLoad: InitialLoad = .idle
     public var pagination: Pagination = .idle
     public var deletion: Deletion = .idle

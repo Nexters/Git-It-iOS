@@ -73,7 +73,8 @@ cache는 허용하되 실행 전후 Git 상태를 비교하고 추적 파일 변
    - Validate task completeness (each change scenario has all needed tasks and is independently testable)
    - 파일 변경 작업을 책임 패키지에 배정하고 의존성 위상 순서로 실행 단위를 구성. 단일
      패키지 단위를 기본으로 하되 분리하면 compile되지 않는 공개 API 이전, 공용 manifest와
-     migration은 불가분한 다중 패키지 integration unit으로 표시하고 근거와 통합 검증을 명시
+     migration은 불가분한 다중 패키지 integration unit으로 표시하고 근거와 통합 검증을 명시.
+     공개 선언 제거만 하는 단위는 plan.md가 기록한 원칙 7 제거 예외에 한해 역위상 순서로 배치
    - 각 실행 단위 끝에 검증과 결과 보고를 두되 같은 기능 범위의 다음 단위나 읽기 전용 전체
      검증을 위한 승인 게이트는 생성하지 않음. 새 범위·파괴적 작업·외부 상태 변경·새 제품
      결정처럼 새로운 권한이 필요한 경우에만 승인 작업을 둠
@@ -175,7 +176,7 @@ Every task MUST strictly follow this format:
 
 1. **실행 단위 소유권 — PRIMARY ORGANIZATION**:
    - 명세가 변경하는 패키지만 의존성 위상 순서의 최상위 단계로 생성. 피의존 패키지를 먼저
-     두고, 채택한 순서와 근거를 tasks.md에 남긴다
+     두고, 채택한 순서와 근거를 tasks.md에 남긴다. 원칙 7 제거 예외 단위는 사용처를 먼저 둘 수 있다
    - 파일 변경 작업은 책임 패키지 단계에 배치하는 것을 기본으로 함
    - 공용 파일이나 공개 API 이전을 분리하면 중간 상태가 compile되지 않는 경우에는 관련
      패키지를 포함한 integration unit을 만들고 분리 불가 근거와 통합 검증을 기록

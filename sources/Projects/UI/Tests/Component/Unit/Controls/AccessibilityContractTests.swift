@@ -23,6 +23,6 @@ struct AccessibilityContractTests {
     @Test
     func `탭 항목은 선택 여부에 따라 색 토큰을 바꾼다`() {
         #expect(TabShellPreviewItem.tabColor(isSelected: true) == ColorToken.blue100)
-        #expect(TabShellPreviewItem.tabColor(isSelected: false) == ColorToken.grey400)
+        #expect(TabShellPreviewItem.tabColor(isSelected: false) == ColorToken.white)
     }
 }

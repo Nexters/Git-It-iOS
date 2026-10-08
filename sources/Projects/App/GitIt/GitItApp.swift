@@ -21,10 +21,6 @@ struct GitItApp: App {
                 externalRepositoryBaseURL: AppEndpointHost.externalRepository.url,
                 appVersion: bundleVersion,
                 osVersion: ProcessInfo.processInfo.operatingSystemVersionString,
-                generationReminderTitle: LocalizedText.GenerationReminder.Completed.title,
-                generationReminderBody: LocalizedText.GenerationReminder.Completed.body,
-                generationFailureReminderTitle: LocalizedText.GenerationReminder.Failed.title,
-                generationFailureReminderBody: LocalizedText.GenerationReminder.Failed.body,
                 policyDocuments: policyDocuments,
             )
         )
@@ -71,8 +67,19 @@ struct GitItApp: App {
                     )()
                 }
                 .onChange(of: scenePhase) { _, newPhase in
-                    guard newPhase == .active else { return }
-                    rootStore.send(.view(.applicationBecameActive))
+                    switch newPhase {
+                    case .active:
+                        rootStore.send(.view(.applicationBecameActive))
+
+                    case .background:
+                        rootStore.send(.view(.applicationEnteredBackground))
+
+                    case .inactive:
+                        break
+
+                    @unknown default:
+                        break
+                    }
                 }
         }
     }

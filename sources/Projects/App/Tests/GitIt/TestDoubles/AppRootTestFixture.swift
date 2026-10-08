@@ -121,8 +121,7 @@ nonisolated enum AppRootTestFixture {
                     requestedAt: requestedAt,
                     phase: phase,
                 )
-            ],
-            preparingProjectIDs: [],
+            ]
         )
     }
 

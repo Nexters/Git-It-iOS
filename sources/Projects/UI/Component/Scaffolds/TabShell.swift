@@ -30,6 +30,7 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                         item.tabSystemImage,
                         bundle: .module,
                     )
+                    .renderingMode(.template)
                     .padding(.bottom, LayoutToken.tightSpacing)
                     Text.designSystemStyled(
                         item.tabTitle,
@@ -39,9 +40,9 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
                 .disabled(!isEnabled(item))
             }
         }
-        .tint(Color(designSystem: .blue100))
+        .tint(Self.selectedColor)
         .onAppear {
-            UITabBar.appearance().unselectedItemTintColor = UIColor(Color(designSystem: .blue100))
+            UITabBar.appearance().unselectedItemTintColor = UIColor(Self.unselectedColor)
         }
     }
 
@@ -50,6 +51,14 @@ public struct TabShell<Item: TabShellItem, Content: View>: View where Item.AllCa
     let isEnabled: (Item) -> Bool
 
     // MARK: Private
+
+    private static var selectedColor: Color {
+        Color(designSystem: Item.tabColor(isSelected: true))
+    }
+
+    private static var unselectedColor: Color {
+        Color(designSystem: Item.tabColor(isSelected: false))
+    }
 
     @Binding private var selected: Item
 
@@ -67,7 +76,7 @@ public protocol TabShellItem: CaseIterable, Hashable, Identifiable, Sendable {
 extension TabShellItem {
 
     public static func tabColor(isSelected: Bool) -> ColorToken {
-        isSelected ? .blue100 : .grey400
+        isSelected ? .blue100 : .white
     }
 
 }
