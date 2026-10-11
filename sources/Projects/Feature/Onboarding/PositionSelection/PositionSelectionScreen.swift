@@ -1,0 +1,106 @@
+import ComposableArchitecture
+import DesignSystem
+import DomainUseCaseInterface
+import SwiftUI
+import UIComponent
+
+// MARK: - PositionSelectionScreen
+
+@ViewAction(for: PositionSelectionFeature.self)
+struct PositionSelectionScreen: View {
+
+    @Bindable var store: StoreOf<PositionSelectionFeature>
+
+    var body: some View {
+        OverlayContainer {
+            ScreenControlBar(
+                displayModel: .init(leading: .close),
+                onLeadingTap: { send(.backTapped) },
+            )
+            .designSystemScreenMargin()
+        } content: {
+            VStack(spacing: Constant.titleToOptionsSpacing) {
+                VStack(spacing: LayoutToken.compactSpacing) {
+                    StyledText(text: LocalizedText.Onboarding.PositionSelection.title)
+                        .textStyle(.subtitle1)
+                        .multilineTextAlignment(.center)
+
+                    if store.exitStatus == .failed {
+                        StyledText(text: LocalizedText.Onboarding.PositionSelection.ExitFailure.message)
+                            .textStyle(.caption1)
+                            .foregroundColorToken(.error)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+
+                SelectionCardList(
+                    items: Display.orderedPositions.map { position in
+                        .init(
+                            id: Display.identifier(for: position),
+                            displayModel: .init(title: Display.title(for: position)),
+                        )
+                    },
+                    selection: Binding(
+                        get: { store.position.map(Display.identifier(for:)) },
+                        set: { identifier in
+                            if let identifier, let position = Display.position(forIdentifier: identifier) {
+                                send(.positionSelected(position))
+                            }
+                        },
+                    ),
+                )
+                .style(.compact)
+            }
+            .designSystemScreenMargin()
+            .padding(.top, LayoutToken.margin)
+        } footer: {
+            BottomActionBar {
+                FeedbackActionButton(
+                    title: LocalizedText.Onboarding.PositionSelection.Next.buttonTitle,
+                    action: { send(.nextTapped) },
+                )
+                .enabled(store.position != nil)
+                .designSystemScreenMargin()
+            }
+        }
+    }
+
+}
+
+// MARK: PositionSelectionScreen.Display
+
+extension PositionSelectionScreen {
+    fileprivate enum Display {
+        static let orderedPositions: [MemberPosition] = [.frontend, .backend, .ios, .android]
+
+        static func identifier(for position: MemberPosition) -> String {
+            switch position {
+            case .ios: "ios"
+            case .android: "android"
+            case .backend: "backend"
+            case .frontend: "frontend"
+            }
+        }
+
+        static func position(forIdentifier identifier: String) -> MemberPosition? {
+            orderedPositions.first { Self.identifier(for: $0) == identifier }
+        }
+
+        static func title(for position: MemberPosition) -> String {
+            switch position {
+            case .ios: "iOS"
+            case .android: "Android"
+            case .backend: "Back-end"
+            case .frontend: "Front-end"
+            }
+        }
+    }
+}
+
+// MARK: PositionSelectionScreen.Constant
+
+extension PositionSelectionScreen {
+    fileprivate enum Constant {
+        static let titleToOptionsSpacing: CGFloat = 64
+    }
+}

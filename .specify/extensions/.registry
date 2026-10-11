@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "swift-format": {
+      "version": "2.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:4975acd3fa5283f2662b31c0e86bd5789dc4fffbc7604161ce62cb44c04646a0",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.swift-format.run"
+        ],
+        "codex": [
+          "speckit.swift-format.run"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-08-20T18:59:30.252757+00:00"
+    }
+  }
+}

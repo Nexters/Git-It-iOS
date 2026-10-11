@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "AppleSignInButton.title" : {
+      "comment" : "Apple 로그인 버튼의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple로 시작하기"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

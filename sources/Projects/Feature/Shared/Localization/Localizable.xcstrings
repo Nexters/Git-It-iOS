@@ -1,0 +1,2922 @@
+{
+  "sourceLanguage" : "ko",
+  "strings" : {
+    "AppEntry.RecoverableError.message" : {
+      "comment" : "앱 시작 화면에서 세션 확인에 실패했을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "네트워크 상태를 확인한 뒤\n다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "AppEntry.RecoverableError.title" : {
+      "comment" : "앱 시작 화면에서 세션 확인에 실패했을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세션을 확인하지 못했어요"
+          }
+        }
+      }
+    },
+    "AppEntry.Retry.buttonTitle" : {
+      "comment" : "앱 시작 화면의 세션 확인 실패 알림에 있는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "Home.ProfileHeader.LoadFailure.message" : {
+      "comment" : "홈 화면 프로필 영역에서 프로필 불러오기에 실패했을 때 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Home.ProfileHeader.LoadFailure.title" : {
+      "comment" : "홈 화면 프로필 영역에서 프로필 불러오기에 실패했을 때 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필을 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "Home.ProfileHeader.Retry.buttonTitle" : {
+      "comment" : "홈 화면 프로필 영역의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.Empty.message" : {
+      "comment" : "홈 화면 프로젝트 영역에 등록된 프로젝트가 없을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 등록된 프로젝트가 없어요."
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.LoadFailure.message" : {
+      "comment" : "홈 화면 프로젝트 영역에서 프로젝트 불러오기에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.Retry.buttonTitle" : {
+      "comment" : "홈 화면 프로젝트 영역의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.ShowAll.buttonTitle" : {
+      "comment" : "홈 화면 프로젝트 영역의 전체 보기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 보기"
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.SignInRequired.message" : {
+      "comment" : "홈 화면 프로젝트 영역에서 로그인하지 않았을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하면 학습 중인 레포지토리를 볼 수 있어요."
+          }
+        }
+      }
+    },
+    "Home.ProjectSection.title" : {
+      "comment" : "홈 화면 프로젝트 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중인 레포지토리"
+          }
+        }
+      }
+    },
+    "Home.RegistrationPanel.GenerationInProgress.label" : {
+      "comment" : "홈 화면 프로젝트 등록 패널에서 문제를 생성하는 동안 보이는 진행 문구와 접근성 레이블",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 중"
+          }
+        }
+      }
+    },
+    "Home.RegistrationPanel.Register.buttonTitle" : {
+      "comment" : "홈 화면 프로젝트 등록 패널의 불러오기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 불러오기"
+          }
+        }
+      }
+    },
+    "Home.RegistrationPanel.Title.First.line" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 제목의 첫 줄(두 줄을 각각 다른 텍스트로 표시)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오픈소스를 불러오고"
+          }
+        }
+      }
+    },
+    "Home.RegistrationPanel.Title.Second.line" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 제목의 둘째 줄(두 줄을 각각 다른 텍스트로 표시)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제로 익혀보세요"
+          }
+        }
+      }
+    },
+    "Home.RegistrationPanel.caption" : {
+      "comment" : "홈 화면 프로젝트 등록 패널 상단의 작은 안내 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 문제 생성"
+          }
+        }
+      }
+    },
+    "Home.SignInSection.SignIn.buttonTitle" : {
+      "comment" : "홈 화면 로그인 안내 영역의 로그인 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인"
+          }
+        }
+      }
+    },
+    "Home.SignInSection.caption" : {
+      "comment" : "홈 화면 로그인 안내 영역의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하고 나만의 학습을 시작해 보세요."
+          }
+        }
+      }
+    },
+    "Home.SignInSection.title" : {
+      "comment" : "홈 화면 로그인 안내 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인이 필요해요"
+          }
+        }
+      }
+    },
+    "MainShell.SignInRequired.Close.buttonTitle" : {
+      "comment" : "로그인 필요 알림을 닫는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
+          }
+        }
+      }
+    },
+    "MainShell.SignInRequired.SignIn.buttonTitle" : {
+      "comment" : "로그인 필요 알림에서 온보딩 로그인 화면으로 이동하는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인"
+          }
+        }
+      }
+    },
+    "MainShell.SignInRequired.message" : {
+      "comment" : "비로그인 사용자가 로그인이 필요한 기능을 눌렀을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하고 나만의 학습을 시작해 보세요."
+          }
+        }
+      }
+    },
+    "MainShell.SignInRequired.title" : {
+      "comment" : "비로그인 사용자가 로그인이 필요한 기능을 눌렀을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인이 필요해요"
+          }
+        }
+      }
+    },
+    "MainShell.SingleQuestion.Advance.buttonTitle" : {
+      "comment" : "메인 화면에서 연 단일 문제 풀이의 마지막 진행 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
+    },
+    "MainShell.SingleQuestion.Failure.message" : {
+      "comment" : "메인 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "MainShell.SingleQuestion.Failure.title" : {
+      "comment" : "메인 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "MainShell.SingleQuestion.FailureConfirm.buttonTitle" : {
+      "comment" : "메인 화면의 단일 문제 불러오기 실패 알림을 닫는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
+    },
+    "MainShell.Tab.Home.title" : {
+      "comment" : "메인 탭 바의 홈 탭 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "MainShell.Tab.Projects.title" : {
+      "comment" : "메인 탭 바의 프로젝트 탭 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트"
+          }
+        }
+      }
+    },
+    "MainShell.Tab.Saved.title" : {
+      "comment" : "메인 탭 바의 저장 탭 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장"
+          }
+        }
+      }
+    },
+    "MainShell.Tab.Settings.title" : {
+      "comment" : "메인 탭 바의 마이(설정) 탭 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이"
+          }
+        }
+      }
+    },
+    "Onboarding.AllAgreementRow.title" : {
+      "comment" : "약관 동의 화면의 전체 동의 행 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 동의"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Entry.description" : {
+      "comment" : "연차 선택 화면의 입문 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 코드를 처음 살펴봐요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Entry.title" : {
+      "comment" : "연차 선택 화면의 입문 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "입문"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Junior.description" : {
+      "comment" : "연차 선택 화면의 주니어 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "작은 기능 단위로 코드를 이해할 수 있어요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Junior.title" : {
+      "comment" : "연차 선택 화면의 주니어 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주니어"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Middle.description" : {
+      "comment" : "연차 선택 화면의 미들 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 구조와 흐름을 함께 살펴봐요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Middle.title" : {
+      "comment" : "연차 선택 화면의 미들 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미들"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Next.buttonTitle" : {
+      "comment" : "연차 선택 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Senior.description" : {
+      "comment" : "연차 선택 화면의 시니어 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설계 의도와 변경 영향을 분석할 수 있어요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.Senior.title" : {
+      "comment" : "연차 선택 화면의 시니어 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시니어"
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.SubmissionFailure.message" : {
+      "comment" : "연차 선택 화면에서 선택 제출에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제출에 실패했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.guidance" : {
+      "comment" : "연차 선택 화면 하단의 선택 안내 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정답은 없어요. 현재 가장 가까운 수준을 선택해주세요."
+          }
+        }
+      }
+    },
+    "Onboarding.CareerSelection.title" : {
+      "comment" : "연차 선택 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실제 프로젝트 코드를\n어느 정도 이해할 수 있나요?"
+          }
+        }
+      }
+    },
+    "Onboarding.LegalAgreement.Cancel.buttonTitle" : {
+      "comment" : "약관 동의 화면의 취소 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
+    },
+    "Onboarding.LegalAgreement.Next.buttonTitle" : {
+      "comment" : "약관 동의 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "Onboarding.LegalAgreement.title" : {
+      "comment" : "약관 동의 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "약관 동의"
+          }
+        }
+      }
+    },
+    "Onboarding.PositionSelection.ExitFailure.message" : {
+      "comment" : "분야 선택 화면에서 이전 화면으로 돌아가기에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 화면으로 돌아가지 못했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Onboarding.PositionSelection.Next.buttonTitle" : {
+      "comment" : "분야 선택 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "Onboarding.PositionSelection.title" : {
+      "comment" : "분야 선택 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어떤 분야의 코드를\n학습하고 싶나요?"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.Page.First.title" : {
+      "comment" : "튜토리얼 첫 번째 페이지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오픈소스를 문제화하고\n나만의 덱으로 만들어보세요"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.Page.Second.title" : {
+      "comment" : "튜토리얼 두 번째 페이지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복잡한 코드말고 자연어로\n언제 어디서든 가볍게!"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.Page.Third.title" : {
+      "comment" : "튜토리얼 세 번째 페이지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시보고 싶은 문제는\n저장하고 나중에 확인해요"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.SignIn.GuestAccess.buttonTitle" : {
+      "comment" : "튜토리얼 하단 로그인 영역의 게스트 둘러보기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 없이 둘러보기"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.SignIn.Hint.title" : {
+      "comment" : "튜토리얼 하단 로그인 영역의 가입 안내 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3초만에 가입하기"
+          }
+        }
+      }
+    },
+    "Onboarding.Tutorial.SignIn.version" : {
+      "comment" : "튜토리얼 하단에 보이는 앱 버전 표기. version: 앱 번들 버전 문자열",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 %1$(version)@"
+          }
+        }
+      }
+    },
+    "ProjectDetail.Deletion.Dialog.message" : {
+      "comment" : "프로젝트 상세 화면의 삭제 확인 대화상자 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다."
+          }
+        }
+      }
+    },
+    "ProjectDetail.Deletion.Dialog.title" : {
+      "comment" : "프로젝트 상세 화면의 삭제 확인 대화상자 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 삭제할까요?"
+          }
+        }
+      }
+    },
+    "ProjectDetail.Deletion.DialogCancel.buttonTitle" : {
+      "comment" : "프로젝트 상세 화면 삭제 확인 대화상자의 취소 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
+    },
+    "ProjectDetail.Deletion.DialogConfirm.buttonTitle" : {
+      "comment" : "프로젝트 상세 화면 삭제 확인 대화상자의 삭제 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        }
+      }
+    },
+    "ProjectDetail.Deletion.MenuItem.title" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 삭제 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제하기"
+          }
+        }
+      }
+    },
+    "ProjectDetail.DetailContent.LoadFailure.message" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 가운데 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ProjectDetail.DetailContent.LoadFailure.title" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 가운데 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "ProjectDetail.RepositoryLinkMenuItem.title" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장소 링크 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub에서 보기"
+          }
+        }
+      }
+    },
+    "ProjectDetail.RepositorySummary.OverallProgress.label" : {
+      "comment" : "프로젝트 상세 저장소 요약의 전체 진행률 막대 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 진행률"
+          }
+        }
+      }
+    },
+    "ProjectDetail.Retry.buttonTitle" : {
+      "comment" : "프로젝트 상세 불러오기에 실패했을 때 하단에 보이는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SavedQuestionsMenuItem.title" : {
+      "comment" : "프로젝트 상세 화면 메뉴의 저장한 문제 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 문제"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SetListSection.Empty.message" : {
+      "comment" : "학습 세트가 없을 때 보이는 빈 상태 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 만들어진 학습 세트가 없습니다."
+          }
+        }
+      }
+    },
+    "ProjectDetail.SetListSection.Empty.title" : {
+      "comment" : "학습 세트가 없을 때 보이는 빈 상태 제목(코드 표기 형태의 장식 문구)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sets = []"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SetListSection.title" : {
+      "comment" : "프로젝트 상세 화면 학습 세트 목록의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SingleQuestion.Advance.buttonTitle" : {
+      "comment" : "프로젝트 상세 화면에서 연 단일 문제 풀이의 마지막 진행 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SingleQuestion.Failure.message" : {
+      "comment" : "프로젝트 상세 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ProjectDetail.SingleQuestion.Failure.title" : {
+      "comment" : "프로젝트 상세 화면에서 단일 문제를 불러오지 못했을 때 보이는 알림의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "ProjectDetail.SingleQuestion.FailureConfirm.buttonTitle" : {
+      "comment" : "프로젝트 상세 화면의 단일 문제 불러오기 실패 알림을 닫는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
+    },
+    "ProjectList.DeletingMode.title" : {
+      "comment" : "프로젝트 목록 화면이 삭제 모드일 때의 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 삭제"
+          }
+        }
+      }
+    },
+    "ProjectList.Deletion.Dialog.message" : {
+      "comment" : "프로젝트 삭제 확인 대화상자의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 문제와 진도가 모두 삭제되며,\n이 작업은 취소할 수 없습니다."
+          }
+        }
+      }
+    },
+    "ProjectList.Deletion.Dialog.title" : {
+      "comment" : "프로젝트 삭제 확인 대화상자의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 삭제할까요?"
+          }
+        }
+      }
+    },
+    "ProjectList.Deletion.DialogCancel.buttonTitle" : {
+      "comment" : "프로젝트 삭제 확인 대화상자의 취소 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
+    },
+    "ProjectList.Deletion.DialogConfirm.buttonTitle" : {
+      "comment" : "프로젝트 삭제 확인 대화상자의 삭제 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        }
+      }
+    },
+    "ProjectList.Deletion.MenuItem.title" : {
+      "comment" : "프로젝트 목록 화면 메뉴의 프로젝트 삭제 항목 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 삭제"
+          }
+        }
+      }
+    },
+    "ProjectList.NextPageFooter.Failure.message" : {
+      "comment" : "프로젝트 목록 하단에서 다음 페이지 불러오기에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 더 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "ProjectList.NextPageFooter.Retry.buttonTitle" : {
+      "comment" : "프로젝트 목록 하단의 다음 페이지 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "ProjectList.ProjectCollection.Empty.message" : {
+      "comment" : "등록한 프로젝트가 없을 때 보이는 빈 상태 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 등록한 프로젝트가 없어요.\n관심 있는 오픈소스를 가져와 문제로 만들어보세요."
+          }
+        }
+      }
+    },
+    "ProjectList.ProjectCollection.Empty.title" : {
+      "comment" : "등록한 프로젝트가 없을 때 보이는 빈 상태 제목(코드 표기 형태의 장식 문구)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "projects = []"
+          }
+        }
+      }
+    },
+    "ProjectList.ProjectCollection.LoadFailure.message" : {
+      "comment" : "프로젝트 목록 불러오기에 실패했을 때 가운데 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ProjectList.ProjectCollection.LoadFailure.title" : {
+      "comment" : "프로젝트 목록 불러오기에 실패했을 때 가운데 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "ProjectList.Retry.buttonTitle" : {
+      "comment" : "프로젝트 목록 불러오기에 실패했을 때 하단에 보이는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "ProjectList.title" : {
+      "comment" : "프로젝트 목록 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.Checklist.CodeStructureAnalysis.title" : {
+      "comment" : "학습 세트 생성 체크리스트의 코드 구조 분석 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코드 구조 분석"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.Checklist.LearningOutlineComposition.title" : {
+      "comment" : "학습 세트 생성 체크리스트의 학습 개념 구성 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 개념 구성"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.Checklist.QuizGeneration.title" : {
+      "comment" : "학습 세트 생성 체크리스트의 문제 생성 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.Checklist.RepositoryInfo.title" : {
+      "comment" : "학습 세트 생성 체크리스트의 프로젝트 정보 확인 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 정보 확인"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.Checklist.Verification.title" : {
+      "comment" : "학습 세트 생성 체크리스트의 세트 검증 단계 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 검증"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GenerationReminderSheet.Dismiss.buttonTitle" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 다시 보지 않기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 보지 않기"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GenerationReminderSheet.Enable.buttonTitle" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 알림 설정 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리마인드 알림 설정하기"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GenerationReminderSheet.message" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필 설정페이지에서 언제든 설정할 수 있어요."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GenerationReminderSheet.title" : {
+      "comment" : "학습 세트 생성 리마인드 알림 안내 시트의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 생성이 완료되면\n리마인드 알림을 보내드려요."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.Fifth.step" : {
+      "comment" : "저장소 링크 입력 화면 안내의 다섯 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복사한 주소를 위에 입력해주세요."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.First.step" : {
+      "comment" : "저장소 링크 입력 화면 안내의 첫 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습하고싶은 레포지토리를 발견하셨나요?"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.Fourth.step" : {
+      "comment" : "저장소 링크 입력 화면 안내의 네 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTPS 탭에서 주소 옆 복사 아이콘을 누릅니다."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.Second.step" : {
+      "comment" : "저장소 링크 입력 화면 안내의 두 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 리포지토리 페이지로 이동합니다."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.Third.step" : {
+      "comment" : "저장소 링크 입력 화면 안내의 세 번째 단계",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우측 상단의 [Code] 버튼을 클릭합니다."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.GuideSection.title" : {
+      "comment" : "저장소 링크 입력 화면 안내 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "불러오기 방법"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationConfirmation.Duration.message" : {
+      "comment" : "학습 세트 생성 확인 화면의 소요 시간 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1~5분의 시간이 소요돼요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationConfirmation.Start.buttonTitle" : {
+      "comment" : "학습 세트 생성 확인 화면의 생성 시작 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationConfirmation.title" : {
+      "comment" : "학습 세트 생성 확인 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "입력해주신 정보로\n학습 세트를 만들게요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationFailure.Retry.buttonTitle" : {
+      "comment" : "학습 세트 생성 진행 화면의 생성 실패 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationFailure.message" : {
+      "comment" : "학습 세트 생성 진행 화면에서 생성에 실패했을 때 보이는 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationFailure.title" : {
+      "comment" : "학습 세트 생성 진행 화면에서 생성에 실패했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트를 만들지 못했어요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationProgress.Duration.message" : {
+      "comment" : "학습 세트 생성 진행 화면의 소요 시간 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "약 5분의 시간이 소요돼요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationProgress.WaitAtHome.buttonTitle" : {
+      "comment" : "학습 세트 생성 진행 화면의 홈으로 돌아가 기다리는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홈에서 기다리기"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizGenerationProgress.title" : {
+      "comment" : "학습 세트 생성 진행 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습세트를 만들고 있어요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Advanced.description" : {
+      "comment" : "학습 수준 선택 화면의 세 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "심화 문제와 서술형 비중 확대"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Advanced.title" : {
+      "comment" : "학습 수준 선택 화면의 세 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유사 프로젝트 경험이 있어요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Basic.description" : {
+      "comment" : "학습 수준 선택 화면의 첫 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실제 코드 작동 방식을 흐름 중심으로 학습"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Basic.title" : {
+      "comment" : "학습 수준 선택 화면의 첫 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기술 개념은 알아요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Intermediate.description" : {
+      "comment" : "학습 수준 선택 화면의 두 번째 수준 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구현 의도와 연결 영향까지 포함"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Intermediate.title" : {
+      "comment" : "학습 수준 선택 화면의 두 번째 수준 선택지 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일부 코드를 봤어요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.Next.buttonTitle" : {
+      "comment" : "학습 수준 선택 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.QuizLevelSelection.title" : {
+      "comment" : "학습 수준 선택 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리와 사용 기술을\n어느 정도 알고 있나요?"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryConfirmation.Next.buttonTitle" : {
+      "comment" : "저장소 확인 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryConfirmation.Reject.buttonTitle" : {
+      "comment" : "저장소 확인 화면에서 다른 저장소임을 알리는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리가 아니에요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryConfirmation.title" : {
+      "comment" : "저장소 확인 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 레포지토리가 맞으면\n학습 설정을 진행할게요"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryLinkInput.Field.label" : {
+      "comment" : "저장소 링크 입력 화면 입력란의 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryLinkInput.Next.buttonTitle" : {
+      "comment" : "저장소 링크 입력 화면의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryLinkInput.Validating.buttonTitle" : {
+      "comment" : "저장소 링크 입력 화면에서 링크를 확인하는 동안의 다음 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인 중…"
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryLinkInput.ValidationError.message" : {
+      "comment" : "저장소 링크 입력 화면에서 링크 검증에 실패했을 때 입력란 아래 보이는 오류 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "올바른 GitHub 레포지토리 링크를 입력해 주세요."
+          }
+        }
+      }
+    },
+    "ProjectRegistration.RepositoryLinkInput.title" : {
+      "comment" : "저장소 링크 입력 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 레포지토리\n링크를 붙여넣어 주세요"
+          }
+        }
+      }
+    },
+    "Quiz.EssayResultSection.Explanation.label" : {
+      "comment" : "서술형 채점 결과에서 해설 카드의 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 해설"
+          }
+        }
+      }
+    },
+    "Quiz.EssayResultSection.MyAnswer.label" : {
+      "comment" : "서술형 채점 결과에서 내가 쓴 답안 카드의 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나의 답안"
+          }
+        }
+      }
+    },
+    "Quiz.IntroContent.LoadFailure.message" : {
+      "comment" : "학습 세트 소개 화면에서 세트 불러오기에 실패했을 때 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Quiz.IntroContent.LoadFailure.title" : {
+      "comment" : "학습 세트 소개 화면에서 세트 불러오기에 실패했을 때 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "Quiz.LearningCompletion.Confirm.buttonTitle" : {
+      "comment" : "학습 완료 화면의 확인 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
+    },
+    "Quiz.LearningCompletion.message" : {
+      "comment" : "학습 완료 화면의 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 세트에서 이어서 학습해 보세요."
+          }
+        }
+      }
+    },
+    "Quiz.LearningCompletion.title" : {
+      "comment" : "학습 완료 화면의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습을 마쳤어요"
+          }
+        }
+      }
+    },
+    "Quiz.LearningSetIntro.Empty.message" : {
+      "comment" : "학습 세트 소개 화면에서 풀 수 있는 문제가 없을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 풀 수 있는 문제가 없어요."
+          }
+        }
+      }
+    },
+    "Quiz.LearningSetIntro.Retry.buttonTitle" : {
+      "comment" : "학습 세트 소개 화면에서 불러오기에 실패했을 때 보이는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "Quiz.LearningSetIntro.Start.buttonTitle" : {
+      "comment" : "학습 세트 소개 화면의 학습 시작 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작하기"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionPrompt.Number.badge" : {
+      "comment" : "문제 풀이 화면 문제 위의 문제 번호 배지. questionNumber: 세트 안의 문제 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 %1$(questionNumber)lld"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.ChoiceExplanation.label" : {
+      "comment" : "문제 풀이 화면에서 객관식 채점 뒤 보이는 해설 카드의 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 해설"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.Complete.buttonTitle" : {
+      "comment" : "문제 풀이 화면의 마지막 문제에서 학습을 마치는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 완료"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.Essay.placeholder" : {
+      "comment" : "문제 풀이 화면 서술형 답안 입력란의 placeholder",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "답안을 서술해주세요"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.NextQuestion.buttonTitle" : {
+      "comment" : "문제 풀이 화면에서 다음 문제로 넘어가는 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 문제"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.Resubmit.buttonTitle" : {
+      "comment" : "문제 풀이 화면에서 제출에 실패한 뒤 보이는 답안 제출 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 제출하기"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.Source.buttonTitle" : {
+      "comment" : "문제 풀이 화면의 출처 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "출처"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.SubmissionFailure.message" : {
+      "comment" : "문제 풀이 화면에서 답안 제출에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "답안을 제출하지 못했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSolving.Submit.buttonTitle" : {
+      "comment" : "문제 풀이 화면의 답안 제출 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제출하기"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSource.Default.title" : {
+      "comment" : "파일 경로·심볼·링크·요약이 모두 없을 때 문제 출처 항목의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "출처"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSource.End.line" : {
+      "comment" : "문제 출처 항목에 끝 줄만 있을 때의 줄 표기. end: 끝 줄 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(end)lld행"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSource.Line.range" : {
+      "comment" : "문제 출처 항목의 코드 줄 범위. start: 시작 줄 번호, end: 끝 줄 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(start)lld–%2$(end)lld행"
+          }
+        }
+      }
+    },
+    "Quiz.QuestionSource.Start.line" : {
+      "comment" : "문제 출처 항목에 시작 줄만 있을 때의 줄 표기. start: 시작 줄 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(start)lld행"
+          }
+        }
+      }
+    },
+    "Quiz.SourceSheet.Close.buttonTitle" : {
+      "comment" : "문제 출처 시트의 닫기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
+          }
+        }
+      }
+    },
+    "Quiz.SourceSheet.Numbered.title" : {
+      "comment" : "문제 출처 시트의 제목. questionNumber: 세트 안의 문제 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 %1$(questionNumber)lld 출처"
+          }
+        }
+      }
+    },
+    "Quiz.SourceSheet.title" : {
+      "comment" : "문제 번호가 없을 때 문제 출처 시트의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "출처"
+          }
+        }
+      }
+    },
+    "Saved.Empty.message" : {
+      "comment" : "저장 화면에 저장한 문제가 없을 때 보이는 빈 상태 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 저장한 문제가 없네요!\n다시 확인하고 싶은 문제를 저장해 보세요."
+          }
+        }
+      }
+    },
+    "Saved.Empty.title" : {
+      "comment" : "저장 화면에 저장한 문제가 없을 때 보이는 빈 상태 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing saved yet."
+          }
+        }
+      }
+    },
+    "Saved.Filter.All.label" : {
+      "comment" : "저장 화면 프로젝트 필터의 전체 칩 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체"
+          }
+        }
+      }
+    },
+    "Saved.Filter.count" : {
+      "comment" : "저장 화면 프로젝트 필터 오른쪽의 문제 수. count: 현재 필터에 속한 저장 문제 수",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(count)lld개"
+          }
+        }
+      }
+    },
+    "Saved.LoadFailure.message" : {
+      "comment" : "저장 화면에서 목록 불러오기에 실패했을 때 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Saved.LoadFailure.title" : {
+      "comment" : "저장 화면에서 목록 불러오기에 실패했을 때 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 문제를 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "Saved.Question.Action.title" : {
+      "comment" : "저장한 문제 카드의 문제 풀기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제풀기"
+          }
+        }
+      }
+    },
+    "Saved.Question.metadata" : {
+      "comment" : "저장한 문제 카드 상단의 출처 정보. projectName: 프로젝트 이름, setLabel: 학습 세트 표기, problemNumber: 세트 안의 문제 번호",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(projectName)@ · %2$(setLabel)@ · 문제 %3$(problemNumber)lld"
+          }
+        }
+      }
+    },
+    "Saved.Retry.buttonTitle" : {
+      "comment" : "저장 화면에서 목록 불러오기에 실패했을 때 하단에 보이는 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "Saved.title" : {
+      "comment" : "저장 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 문제"
+          }
+        }
+      }
+    },
+    "Settings.AccountActionFailure.message" : {
+      "comment" : "설정 화면에서 로그아웃 등 계정 요청에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "요청을 처리하지 못했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.Confirm.buttonTitle" : {
+      "comment" : "계정 삭제 화면 하단의 삭제 확정 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계정 삭제"
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.Failure.message" : {
+      "comment" : "계정 삭제 화면에서 삭제에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계정을 삭제하지 못했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.First.paragraph" : {
+      "comment" : "계정 삭제 화면 안내의 첫 번째 문단",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속 진행하면 깃잇에 저장된 모든 개인정보가 삭제됩니다. 학습 진도와 제작한 문제 또한 잃게 되니 주의하세요. 이 절차가 완료된 후에는 다시 되돌릴 수 없습니다."
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.Second.paragraph" : {
+      "comment" : "계정 삭제 화면 안내의 두 번째 문단",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보 삭제는 최대 30일까지 소요될 수 있습니다. 계정 비활성화 절차를 취소하고 계정을 복구하길 원하시면 서비스 메일로 문의해주세요."
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.Third.paragraph" : {
+      "comment" : "계정 삭제 화면 안내의 세 번째 문단",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주의하세요.\n아래 “계정 삭제”를 클릭하면 즉시 삭제됩니다."
+          }
+        }
+      }
+    },
+    "Settings.AccountDeletion.title" : {
+      "comment" : "계정 삭제 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계정 삭제"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Entry.description" : {
+      "comment" : "설정의 개발 수준 변경 화면 입문 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 코드를 처음 살펴봐요."
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Entry.title" : {
+      "comment" : "설정의 개발 수준 선택지와 값에 쓰는 입문 수준 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "입문"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Junior.description" : {
+      "comment" : "설정의 개발 수준 변경 화면 주니어 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "작은 기능 단위로 코드를 이해할 수 있어요."
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Junior.title" : {
+      "comment" : "설정의 개발 수준 선택지와 값에 쓰는 주니어 수준 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주니어"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Middle.description" : {
+      "comment" : "설정의 개발 수준 변경 화면 미들 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 구조와 흐름을 함께 살펴봐요."
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Middle.title" : {
+      "comment" : "설정의 개발 수준 선택지와 값에 쓰는 미들 수준 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미들"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Senior.description" : {
+      "comment" : "설정의 개발 수준 변경 화면 시니어 선택지 설명",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설계 의도와 변경 영향을 분석할 수 있어요."
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Senior.title" : {
+      "comment" : "설정의 개발 수준 선택지와 값에 쓰는 시니어 수준 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시니어"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.Unselected.title" : {
+      "comment" : "설정 화면 개발 수준 행에서 수준을 선택하지 않았을 때의 값",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 안 함"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevel.title" : {
+      "comment" : "설정 화면 학습 설정 영역의 개발 수준 행 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개발 수준"
+          }
+        }
+      }
+    },
+    "Settings.CareerLevelSelection.Failure.message" : {
+      "comment" : "설정의 개발 수준 변경 화면에서 변경에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "변경에 실패했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.CareerLevelSelection.title" : {
+      "comment" : "설정의 개발 수준 변경 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개발 수준"
+          }
+        }
+      }
+    },
+    "Settings.DeleteAccount.buttonTitle" : {
+      "comment" : "설정 화면의 계정 삭제 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계정 삭제"
+          }
+        }
+      }
+    },
+    "Settings.GeneralSection.title" : {
+      "comment" : "설정 화면 일반 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일반"
+          }
+        }
+      }
+    },
+    "Settings.LearningSection.title" : {
+      "comment" : "설정 화면 학습 설정 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 설정"
+          }
+        }
+      }
+    },
+    "Settings.Notification.Off.value" : {
+      "comment" : "설정 화면 세트 생성 완료 알림 행의 꺼짐 상태 표기",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "꺼짐"
+          }
+        }
+      }
+    },
+    "Settings.Notification.On.value" : {
+      "comment" : "설정 화면 세트 생성 완료 알림 행의 켜짐 상태 표기",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "켜짐"
+          }
+        }
+      }
+    },
+    "Settings.Notification.title" : {
+      "comment" : "설정 화면 알림 영역의 세트 생성 완료 알림 행 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세트 생성 완료 알림"
+          }
+        }
+      }
+    },
+    "Settings.NotificationSection.title" : {
+      "comment" : "설정 화면 알림 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알림"
+          }
+        }
+      }
+    },
+    "Settings.Position.Unselected.title" : {
+      "comment" : "설정 화면 개발 분야 행에서 분야를 선택하지 않았을 때의 값",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 안 함"
+          }
+        }
+      }
+    },
+    "Settings.Position.title" : {
+      "comment" : "설정 화면 학습 설정 영역의 개발 분야 행 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개발 분야"
+          }
+        }
+      }
+    },
+    "Settings.PositionSelection.Failure.message" : {
+      "comment" : "설정의 개발 분야 변경 화면에서 변경에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "변경에 실패했어요. 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.PositionSelection.title" : {
+      "comment" : "설정의 개발 분야 변경 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개발 분야"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Friday.label" : {
+      "comment" : "마이 화면 주간 차트의 금요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "금"
+          }
+        }
+      }
+    },
+    "Settings.Profile.LoadFailure.Retry.buttonTitle" : {
+      "comment" : "마이 화면 프로필 불러오기 실패 안내의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        }
+      }
+    },
+    "Settings.Profile.LoadFailure.message" : {
+      "comment" : "마이 화면에서 프로필 불러오기에 실패했을 때 보이는 안내 본문",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.Profile.LoadFailure.title" : {
+      "comment" : "마이 화면에서 프로필 불러오기에 실패했을 때 보이는 안내 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필을 불러오지 못했어요"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Monday.label" : {
+      "comment" : "마이 화면 주간 차트의 월요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "월"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Saturday.label" : {
+      "comment" : "마이 화면 주간 차트의 토요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "토"
+          }
+        }
+      }
+    },
+    "Settings.Profile.StatisticsSection.title" : {
+      "comment" : "마이 화면 학습 현황 영역의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 현황"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Sunday.label" : {
+      "comment" : "마이 화면 주간 차트의 일요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Thursday.label" : {
+      "comment" : "마이 화면 주간 차트의 목요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "목"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Tuesday.label" : {
+      "comment" : "마이 화면 주간 차트의 화요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Wednesday.label" : {
+      "comment" : "마이 화면 주간 차트의 수요일 축 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Weekly.Empty.title" : {
+      "comment" : "마이 화면 주간 학습 영역에서 이번 주 푼 문제가 없을 때의 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 주 첫 문제를 풀어볼까요?"
+          }
+        }
+      }
+    },
+    "Settings.Profile.Weekly.Solved.title" : {
+      "comment" : "마이 화면 주간 학습 영역의 제목. count: 이번 주에 푼 문제 수",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 주 %1$(count)lld문제를 풀었어요"
+          }
+        }
+      }
+    },
+    "Settings.Profile.title" : {
+      "comment" : "마이 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이"
+          }
+        }
+      }
+    },
+    "Settings.ProfileFailure.message" : {
+      "comment" : "설정 화면에서 프로필 불러오기에 실패했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필을 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "Settings.SignOut.buttonTitle" : {
+      "comment" : "설정 화면의 로그아웃 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그아웃"
+          }
+        }
+      }
+    },
+    "Settings.StatisticsCard.SolvedCount.value" : {
+      "comment" : "마이 화면 학습 현황 카드의 푼 문제 수 값. count: 기간 안에 푼 문제 수",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(count)lld문제"
+          }
+        }
+      }
+    },
+    "Settings.StatisticsCard.Streak.Days.value" : {
+      "comment" : "마이 화면 학습 현황 카드의 연속 학습 일수 값. days: 연속으로 학습한 날 수",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(days)lld일"
+          }
+        }
+      }
+    },
+    "Settings.StatisticsCard.Streak.label" : {
+      "comment" : "마이 화면 학습 현황 카드의 연속 학습 항목 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연속 학습"
+          }
+        }
+      }
+    },
+    "Settings.StatisticsCard.ThisMonth.label" : {
+      "comment" : "마이 화면 학습 현황 카드의 이번 달 항목 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 달"
+          }
+        }
+      }
+    },
+    "Settings.StatisticsCard.ThisWeek.label" : {
+      "comment" : "마이 화면 학습 현황 카드의 이번 주 항목 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 주"
+          }
+        }
+      }
+    },
+    "Settings.Terms.title" : {
+      "comment" : "설정 화면 일반 영역의 약관 및 정책 행 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 약관 및 정책"
+          }
+        }
+      }
+    },
+    "Settings.WeeklyChart.Section.label" : {
+      "comment" : "마이 화면 주간 차트의 접근성 영역 이름",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주간 문제 풀이량"
+          }
+        }
+      }
+    },
+    "Settings.title" : {
+      "comment" : "설정 화면 상단 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
+          }
+        }
+      }
+    },
+    "ShareRegistration.AppLaunchRequired.message" : {
+      "comment" : "공유 등록 화면에서 앱을 먼저 실행해야 할 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Git-It 앱을 한 번 실행한 뒤 다시 공유해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.AppLaunchRequired.title" : {
+      "comment" : "공유 등록 화면에서 앱을 먼저 실행해야 할 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱을 한 번 실행해 주세요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.Dismiss.buttonTitle" : {
+      "comment" : "공유 등록 화면의 닫기 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
+          }
+        }
+      }
+    },
+    "ShareRegistration.DuplicateRequest.reason" : {
+      "comment" : "공유 등록 화면에서 이미 등록 중인 저장소를 공유했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 등록 중인 저장소예요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Failure.title" : {
+      "comment" : "공유 등록 화면에서 등록에 실패했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록하지 못했어요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationInProgress.message" : {
+      "comment" : "공유 등록 화면에서 이미 진행 중인 문제 생성이 있어 등록할 수 없을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 문제를 생성하고 있어요. 생성이 끝난 뒤 다시 공유해 주세요. Git-It 앱을 열면 최신 생성 상태가 반영돼요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationInProgress.title" : {
+      "comment" : "공유 등록 화면에서 이미 진행 중인 문제 생성이 있을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 중"
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationUnverified.reason" : {
+      "comment" : "공유 등록 화면에서 문제 생성 상태를 확인하지 못했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제 생성 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.GenerationUnverified.title" : {
+      "comment" : "공유 등록 화면에서 문제 생성 상태를 확인하지 못했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생성 상태를 확인하지 못했어요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.InvalidLink.reason" : {
+      "comment" : "공유 등록 화면에서 공유한 링크가 GitHub 저장소 주소가 아닐 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 저장소 주소가 아니에요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.InvalidLink.title" : {
+      "comment" : "공유 등록 화면에서 공유한 링크를 등록할 수 없을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록할 수 없는 링크예요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.InvalidRequest.reason" : {
+      "comment" : "공유 등록 화면에서 서버가 등록 요청을 거절했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록할 수 없는 저장소예요. 앱에서 다시 확인해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Lookup.Failure.reason" : {
+      "comment" : "공유 등록 화면에서 저장소 정보를 가져오지 못했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장소 정보를 가져오지 못했어요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Lookup.message" : {
+      "comment" : "공유 등록 화면에서 저장소 정보를 확인하는 동안 보이는 진행 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장소 정보를 불러오는 중이에요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Offline.reason" : {
+      "comment" : "공유 등록 화면에서 저장소 확인 중 네트워크에 연결할 수 없을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "네트워크에 연결할 수 없어요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.RegistrationFailure.reason" : {
+      "comment" : "공유 등록 화면에서 그 밖의 이유로 등록에 실패했을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록에 실패했어요. 잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Retry.buttonTitle" : {
+      "comment" : "공유 등록 화면의 다시 시도 버튼 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하기"
+          }
+        }
+      }
+    },
+    "ShareRegistration.SharedItemUnavailable.reason" : {
+      "comment" : "공유 등록 화면에서 공유한 항목에 링크가 없을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공유한 항목에서 링크를 찾지 못했어요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.SignInRequired.message" : {
+      "comment" : "공유 등록 화면에서 로그인이 필요할 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Git-It 앱에서 로그인한 뒤 다시 공유해 주세요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.SignInRequired.title" : {
+      "comment" : "공유 등록 화면에서 로그인이 필요할 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인이 필요해요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.Submitting.message" : {
+      "comment" : "공유 등록 화면에서 학습 세트 생성을 요청하는 동안 보이는 진행 문구",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 세트 생성을 요청하고 있어요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Success.message" : {
+      "comment" : "공유 등록 화면에서 등록 요청을 접수했을 때 보이는 안내",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결과는 Git-It 앱에서 확인할 수 있어요."
+          }
+        }
+      }
+    },
+    "ShareRegistration.Success.title" : {
+      "comment" : "공유 등록 화면에서 등록 요청을 접수했을 때 보이는 제목",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록을 접수했어요"
+          }
+        }
+      }
+    },
+    "ShareRegistration.TemporarilyUnavailable.reason" : {
+      "comment" : "공유 등록 화면에서 서버에 일시적으로 연결할 수 없을 때 보이는 사유",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금은 연결할 수 없어요. 잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

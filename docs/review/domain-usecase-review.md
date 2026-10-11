@@ -1,0 +1,1065 @@
+# Domain UseCase 의도 점검표
+
+**목적** — [UseCase 카탈로그](https://claude.ai/artifact/DDN15syWbLSnpzH3TnZZeU)에 기록된 각 UseCase의 **책임·기능·테스트**가 개발자가 의도한 것과 같은지 판정하고, 다른 부분을 **추가 구현 / 리팩터링 / 테스트 보강** 작업으로 확정합니다.
+
+**점검 대상은 카탈로그의 기록입니다.** 코드를 다시 읽고 버그를 찾는 문서가 아니라, "지금 이 UseCase가 하고 있다고 기록된 일이 내가 시키려던 일인가"를 묻는 문서입니다. 기록과 코드가 다르다면 그 자체가 불일치 항목입니다.
+
+**대상** `sources/Projects/Domain` UseCase 26개 · **근거 시점** branch `feature/screen-type-refactor`, commit `bee2388`
+
+> **현재 상태 (2026-09-17)** — 점검 도중 기준 브랜치가 `feature/pending-repository-legacy-cleanup` @ `760e1e3`으로 바뀌었고, 명세 `033-usecase-consolidation` 적용으로 UseCase 프로토콜이 **26개 → 20개**가 되었습니다. 이후 논의에서 UseCase 전체를 다시 설계하기로 했으므로 이 문서의 역할을 다음과 같이 나눕니다.
+>
+> - **이 문서** — 지금까지의 판정·결정·미결 사항의 기록 (아래 [리뷰 진행 기록](#리뷰-진행-기록))
+> - **[UseCase 재설계 문서](domain-usecase-redesign.md)** — 현재 20개 인벤토리, 결정에서 도출한 설계 원칙, 모듈별 목표 구성안과 판정 대기 질문
+>
+> 개별 섹션 1–26과 테스트 보강 갭 1·2는 `bee2388` 구조 기준이라 현재 코드와 대상 타입이 다릅니다. 새 판정은 재설계 문서에서 진행합니다.
+
+## 리뷰 진행 기록
+
+| 일자 | 점검 | 결과 | 상세 |
+| --- | --- | --- | --- |
+| 2026-09-17 | 유형 A. 위임 9개 | **결정 확인** — 위임은 모듈 능력 단위 통합 계약으로 흡수 (명세 033으로 이미 구현). 9개 모두 처리 확인 | [A](#a-위임-9개) |
+| 2026-09-17 | 유형 A 부수 점검 | 불일치 4건 — A-1 `리팩터링`, A-4 `기록수정`, A-2·A-3 **판정 대기** | [A](#a-위임-9개) |
+| 2026-09-17 | H. Generation 책임 | **개발자 결정 D1–D8** — `QuizGenerationUseCase` 단일화, 알림 권한 분리, 알림 항상 등록, `states()` 단일화, 초기화 시 만료 정리, 확장 앱 동일 구현, `QuizGenerationReceipt`, `NotificationAuthorizationOutcome` 교정 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| 2026-09-17 | H 불일치 도출 | 14건 (P1 1건: 권한 허용 시에만 알림 등록) · 미결 H-Q5–Q9 · 교정안 승인 대기 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| 2026-09-17 | 전체 재설계 착수 | D1의 "비즈니스 개념 단위 단일 UseCase" 결정을 다른 모듈에도 적용할지 판정하기 위해 재설계 문서 작성 | [재설계 문서](domain-usecase-redesign.md) |
+
+### 판정 대기 목록
+
+| ID | 질문 | 출처 |
+| --- | --- | --- |
+| A-2 | 프로젝트 삭제가 조회 성격의 `LearningLibraryUseCase`에 있는 것이 의도인가 | [A](#a-위임-9개) |
+| A-3 | `completeCuration`이 필드 수정과 다른 직렬화 키를 써서 같은 필드를 두고 동시에 실행될 수 있는 것이 의도인가 | [A](#a-위임-9개) |
+| D8 | `NotificationAuthorizationStatus` 교정안 승인 | [H](#notificationauthorizationoutcome-교정안) |
+| H-Q5 | 목록 필터가 생성 상태를 저장소에서 직접 읽는 구조를 유지할지 | [H](#미결-사항) |
+| H-Q6 | 탈퇴 시 생성 기록 전체 정리 경로 | [H](#미결-사항) |
+| H-Q7 | 대기 화면 종료 후 기록 해제가 비즈니스 규칙인지, 실행 중 만료 기록 처리 | [H](#미결-사항) |
+| H-Q8 | 알림 권한 UseCase 소속 모듈 | [H](#미결-사항) |
+| H-Q9 | 알림 예약 직전 권한 확인 제거 여부 | [H](#미결-사항) |
+
+## 사용법
+
+1. 각 UseCase 섹션의 **기록** 블록을 읽습니다 — 카탈로그에 적힌 책임 한 문장, 계약, 테스트가 보장한다고 적힌 것.
+2. **의도 점검**의 G1–G6과 개별 질문에 답합니다. 판정은 `[o]` 의도대로 / `[x]` 의도와 다름 / `[?]` 판단 보류.
+3. `[x]`나 `[?]`가 나온 항목을 **불일치** 표에 한 줄씩 적습니다. 각 줄은 반드시 **작업 구분**을 가집니다.
+4. 문서 끝 [후속 작업 집계](#후속-작업-집계)로 옮겨 우선순위를 매기고, 그때부터 코드를 엽니다.
+
+## 작업 구분
+
+| 구분 | 의미 | 결과물 |
+| --- | --- | --- |
+| `추가구현` | 의도한 동작이 기록에 없음 | 새 분기·새 메서드·새 계약 |
+| `리팩터링` | 동작은 맞지만 구조·배치가 의도와 다름 | 책임 이동, 타입 분해·병합 |
+| `이름변경` | 이름이 책임을 잘못 말함 | rename |
+| `책임이동` | 이 책임이 Domain UseCase에 있으면 안 됨 | Feature·Data·Model로 이동 |
+| `테스트보강` | 책임은 맞는데 테스트가 증명하지 못함 | 테스트 추가 |
+| `제거` | 의도하지 않은 동작·계층 | 코드 삭제, 호출부가 직접 사용 |
+| `기록수정` | 의도는 맞는데 카탈로그 기술이 틀림 | 카탈로그 갱신 |
+
+## 공통 의도 점검 기준
+
+| ID | 질문 | `[x]`일 때 기본 작업 구분 |
+| --- | --- | --- |
+| G1 | 기록된 **책임 한 문장**이 이 UseCase에 부여하려던 책임과 같은가 | `리팩터링` 또는 `기록수정` |
+| G2 | 기록된 **기능**에 의도한 동작이 빠짐없이 있는가 | `추가구현` |
+| G3 | 기록된 **기능**에 의도하지 않은 동작이 섞여 있지 않은가 | `책임이동` 또는 `제거` |
+| G4 | 이 책임이 **Domain UseCase 계층**에 있는 것이 맞는가 | `책임이동` 또는 `제거` |
+| G5 | 기록된 **테스트**가 그 책임을 증명하는가 | `테스트보강` |
+| G6 | 타입·메서드 **이름**이 책임을 그대로 말하는가 | `이름변경` |
+
+## 판정 매트릭스
+
+`[o]` 의도대로 · `[x]` 의도와 다름 · `[?]` 보류 · `[ ]` 미점검
+
+| # | UseCase | 유형 | G1 | G2 | G3 | G4 | G5 | G6 | 종합 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | SignIn | 조율·보상 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 2 | SignOut | 조율·보상 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 3 | RestoreSession | 조율·보상 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 4 | AuthenticationOutcomes | 조율·보상 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 5 | RefreshSession | 동시성 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 6 | VerifyAccessToken | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 7 | PolicyConsent | 상태 수명 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 8 | FetchMemberProfile | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 9 | CompleteCuration | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 10 | UpdateMemberPosition | 동시성 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 11 | UpdateMemberCareerLevel | 동시성 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 12 | RegisterMemberDevice | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 13 | DeleteMemberAccount | 조율·보상 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 14 | CreateLearningProject | 상태 수명 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 15 | FetchLearningProjects | 조건부 효과 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 16 | FetchLearningProjectDetail | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 17 | DeleteLearningProject | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 18 | FetchExternalRepository | 사전 검증 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 19 | FetchLearningSet | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 20 | SubmitChoiceAnswer | 사전 검증 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 21 | SubmitEssayAnswer | 사전 검증 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 22 | SetQuestionBookmark | 동시성 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 23 | FetchBookmarkedQuestions | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 24 | TrackGenerationProgress | 상태 수명 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 25 | ObserveGenerationOutcomes | 위임 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+| 26 | RequestGenerationReminder | 조건부 효과 | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` | |
+
+---
+
+# 1. Authentication
+
+## 1. SignIn
+
+**기록**
+- 책임 — 외부 인증과 서버 세션 시작을 한 로그인 트랜잭션으로 묶고, 세션 시작 실패 시 인증 참조를 되돌린다
+- 기능 — `callAsFunction(_ method:) -> SignInResult` · 인증 → 세션 시작 → `needsCuration` 조회 · 취소와 재시도 가능 실패를 구분 · 세션 시작 실패 시 인증 참조 정리
+- 테스트 5건 — 순서·needsCuration 전달·취소 구분·보상 실행
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 로그인을 **인증과 세션 시작 두 단계의 트랜잭션**으로 보는 것이 의도인가, 한 단계로 보여야 하는가
+- [ ] 세션 시작 실패 시 인증 참조를 되돌리는 **보상이 이 UseCase의 책임**인가
+- [ ] `needsCuration`을 로그인 결과에 실어 보내는 것이 의도인가, 온보딩 판단은 별도 조회여야 하는가
+- [ ] 취소를 실패와 구분해 돌려주는 것이 호출부에 실제로 필요한 구분인가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 2. SignOut
+
+**기록**
+- 책임 — 서버 세션과 로컬 인증 참조를 모두 정리하고, 한쪽이라도 실패하면 성공으로 위장하지 않는다
+- 기능 — `callAsFunction() -> SignOutResult` · 세션 정리 → 인증 참조 정리 순차 · 단계 실패 시 즉시 재시도 가능 실패
+- 테스트 3건 — 전체 성공, 각 단계 실패의 비은폐
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 첫 단계가 실패하면 두 번째 정리를 **하지 않고 중단**하는 것이 의도인가, 끝까지 정리하고 실패를 보고해야 하는가
+- [ ] 로그아웃이 정리해야 할 범위가 세션·인증 참조 **둘뿐**인가 (생성 중 상태·진행 상태·동의 기록은 대상이 아닌가)
+- [ ] 두 단계의 실패를 한 결과값으로 합치는 것이 의도인가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 3. RestoreSession
+
+**기록**
+- 책임 — 저장된 세션의 복원 가능 여부를 판정하고, 일시 장애와 영구 무효를 구분해 영구 무효일 때만 저장 상태를 지운다
+- 기능 — `callAsFunction() -> RestoreSessionResult` · 세션 없음/사용 불가/재인증 필요 → 미인증 · 일시 장애 → 회복 가능 실패(상태 보존)
+- 테스트 7건 — 분기별 복원과 정리 순서, 별개 결과 타입 유지
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **일시 장애에는 저장 상태를 보존한다**는 정책이 의도인가 (오프라인 실행 경험과 직결)
+- [ ] `RestoreSessionResult`를 `AuthenticationOutcome`과 **별개 타입으로 유지**하는 것이 여전히 의도인가 (테스트로까지 고정되어 있음)
+- [ ] 이 UseCase와 4번이 같은 복원 판정을 각자 갖는 중복이 의도인가, 하나로 합쳐야 하는가
+- [ ] 자동 복원 실패를 사용자에게 알릴지 조용히 로그인 화면으로 보낼지가 결과 타입에 표현되어 있는가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 4. AuthenticationOutcomes
+
+**기록**
+- 책임 — authorization 상태 변경 스트림을 인증 결과 스트림으로 변환하고, 구독 종료 시 내부 Task를 취소한다
+- 기능 — `callAsFunction() -> AsyncStream<AuthenticationOutcome>` · 허용 시에만 세션 복원, 무효 세션은 정리 후 미인증 방출
+- 테스트 1건 — 상태 변경이 저장 정리와 인증 결과로 수렴
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 외부 authorization 변경을 **앱이 상시 구독**하는 것이 의도인가 (3번의 1회성 복원만으로 충분하지 않은가)
+- [ ] 스트림 소비자가 **하나뿐**이라는 전제가 의도인가
+- [ ] 3번과 중복된 복원·정리 분기를 공유 정책으로 뽑는 리팩터링이 필요한가
+- [ ] 테스트 1건으로 이 책임이 충분히 고정되었다고 보는가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 5. RefreshSession
+
+**기록**
+- 책임 — token 갱신을 single-flight로 보장하고 새 token pair를 원자적으로 교체한다
+- 기능 — `callAsFunction() -> SessionRefreshOutcome` · 갱신 → 교체 · 거부·만료·미인증은 거부, 그 외는 일시 장애
+- 테스트 4건 — 원자적 교체, 거부 시 credential 보존, 일시 실패, **동시 호출 합류**
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] single-flight 보장의 **범위**가 앱 전체인가 (UseCase 인스턴스마다 coordinator가 따로면 의도가 깨진다 — Composition 조립을 함께 확인)
+- [ ] 갱신 거부 시 credential을 지우지 않고 **호출부에 판단을 넘기는** 것이 의도인가
+- [ ] 갱신 실패를 회복 가능/불가 둘로만 나누는 것이 충분한가
+- [ ] 갱신 트리거(401 응답, 만료 임박, 포그라운드 진입)가 어디의 책임인지 정해져 있는가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 6. VerifyAccessToken
+
+**기록**
+- 책임 — token 유효성 확인을 위임하고 오류를 무가공 전파한다. 부수효과 없음
+- 기능 — `callAsFunction() async throws` 단일 위임
+- 테스트 3건 — 성공 시 온보딩 상태 미변경, 401 전파, 일시 실패 전파
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 위임만 하는 이 UseCase를 **계층으로 유지**하는 것이 의도인가, 호출부가 계약을 직접 쓰는 편이 나은가 → [유형 점검 A](#a-위임-9개)
+- [ ] "부수효과 없음"이 이 UseCase의 **약속**인가, 단지 현재 구현이 그런 것인가
+- [ ] 5번과의 역할 분담(확인 vs 갱신)이 호출부에서 혼동 없이 선택되는가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 7. PolicyConsent
+
+**기록**
+- 책임 — 필수 약관 manifest 보유와 동의 기록 저장소 접근을 한 경계로 묶고, 유효성 판정은 모델에 위임한다
+- 기능 — 메서드 5개(`requiredDocuments` / `storedConsentRecords` / `saveConsentRecords` / `clearConsentRecords` / `isConsentValid`)
+- 테스트 5건 — manifest 반환, ID+version 일치 판정, 저장소 위임 3종
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 메서드 5개를 **한 UseCase**에 묶은 것이 의도인가, 조회·저장·판정으로 나뉘어야 하는가 → `리팩터링` 후보
+- [ ] 필수 약관 목록을 **코드에 주입된 manifest**로 가지는 것이 의도인가, 서버에서 받아야 하는가 → `추가구현` 후보
+- [ ] 판정 규칙(ID와 version 모두 일치)이 의도한 재동의 조건과 같은가
+- [ ] 다른 UseCase와 달리 `callAsFunction`이 아닌 이유가 의도적인가 → [유형 점검 F](#f-호출-형태)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+# 2. Member
+
+## 8. FetchMemberProfile
+
+**기록**
+- 책임 — 프로필 조회 위임, 통계 포함 무손실 전달
+- 기능 — `callAsFunction() -> MemberProfile`
+- 테스트 2건 — 무손실 전달, 오류 전파
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 위임 계층 유지 여부 → [유형 점검 A](#a-위임-9개)
+- [ ] 매 호출이 서버 요청인 것이 의도인가, 캐시·갱신 정책이 필요한가 → `추가구현` 후보
+- [ ] 프로필과 학습 통계를 **한 응답**으로 받는 것이 의도인가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 9. CompleteCuration
+
+**기록**
+- 책임 — 온보딩 큐레이션의 position·careerLevel을 단일 제출로 확정한다
+- 기능 — `callAsFunction(position:careerLevel:)`
+- 테스트 4건 — 값 전달, 실패 전파, `CareerLevel` 4개 고정, 전 조합 단일 제출
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 큐레이션 완료가 10·11번의 부분 수정과 **다른 행위**인 것이 의도인가, 같은 수정의 특수 경우인가
+- [ ] 10·11번은 직렬화를 거치는데 이 UseCase는 거치지 않는 차이가 의도인가 → `리팩터링` 후보
+- [ ] 큐레이션 완료가 온보딩 상태 전환까지 책임져야 하는가, 제출만으로 끝인가 → `추가구현` 후보
+- [ ] `CareerLevel` 4단계가 제품이 확정한 값인가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 10. UpdateMemberPosition
+
+**기록**
+- 책임 — position만 부분 수정하며 같은 필드의 동시 수정을 FIFO로 직렬화한다
+- 기능 — `callAsFunction(_ position:)` · key `"position"`
+- 테스트 2건 — 필드 격리, 실패 시 이전 상태 무영향
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 필드별로 UseCase를 나눈 것이 의도인가, 하나의 부분 수정 UseCase여야 하는가 → [유형 점검 D](#d-동시성-4개)
+- [ ] 직렬화 보장 범위가 앱 전체인가 (직렬화기가 인스턴스마다 따로면 의도가 깨진다 — Composition 조립 확인)
+- [ ] 마지막 요청이 이기는 FIFO가 의도인가, 이전 요청을 취소해야 하는가
+- [ ] 실패 시 화면 표시를 되돌리는 책임이 정해져 있는가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 11. UpdateMemberCareerLevel
+
+**기록**
+- 책임 — careerLevel만 부분 수정하며 `"careerLevel"` key로 직렬화한다
+- 기능 — `callAsFunction(_ careerLevel:)`
+- 테스트 1건 — 필드 격리
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 10번과 **같은 구조인데 테스트가 1:2로 비대칭**인 것이 의도인가 → `테스트보강` ([갭 1](#갭-1-updatemembercareerlevel-실패-경로))
+- [ ] 10번과 병합할지 분리 유지할지 → [유형 점검 D](#d-동시성-4개)
+- [ ] position과 careerLevel을 동시에 바꾸는 화면이 있는가 (있다면 두 요청이 맞는가)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 12. RegisterMemberDevice
+
+**기록**
+- 책임 — 푸시 디바이스 등록 정보를 전달한다. 알림 권한이 없는 nil token도 유효한 입력
+- 기능 — `callAsFunction(_ device: MemberDeviceInfo)`
+- 테스트 2건 — 필드 전달, nil token 허용
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **권한이 없어도 디바이스를 등록한다**는 정책이 의도인가
+- [ ] 등록 시점(로그인 직후 / 권한 변경 시 / 앱 실행마다)이 정해져 있는가 → `추가구현` 후보
+- [ ] 26번의 알림 권한 요청과 이 등록이 연결되어야 하는가 (지금은 서로 모름)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 13. DeleteMemberAccount
+
+**기록**
+- 책임 — 계정 삭제가 성공한 이후에만 주입된 로컬 상태 정리를 실행한다
+- 기능 — `callAsFunction()` · 삭제 → 로컬 정리 · 정리 동작은 생성자 주입 클로저, 기본값 no-op
+- 테스트 2건 — 1회 요청, 오류 전파
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 로컬 정리를 **이름 없는 클로저**로 주입받는 것이 의도인가, 정리 대상이 계약으로 드러나야 하는가 → `리팩터링` 후보
+- [ ] 기본값 no-op이 주입 누락을 조용히 통과시키는데, 그 허용이 의도인가 → `제거` 후보
+- [ ] 탈퇴가 정리해야 할 대상 목록(세션·동의 기록·생성 상태·북마크)이 확정되어 있는가 → `추가구현` 후보
+- [ ] 실패 시 로컬을 지우지 않는다는 보장이 테스트로 필요한가 → `테스트보강` ([갭 3](#갭-3-deletememberaccount-실패-시-로컬-정리))
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+# 3. LearningProject
+
+## 14. CreateLearningProject
+
+**기록**
+- 책임 — 같은 레포지토리의 중복 생성을 서버 요청 전에 차단하고 생성 중 상태의 수명을 관리한다
+- 기능 — `callAsFunction(githubRepoURL:quizLevel:) -> ProjectRegistrationReceipt` · 진행 중이면 중복 오류 · 성공 시 projectID 연결 · 실패 시 상태 해제
+- 테스트 8건 — 중복 차단, 상태 해제, 재등록·복원 응답 무구분 반환
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 중복 차단 기준이 **레포지토리 URL**인 것이 의도인가 (같은 레포를 다른 난이도로 두 번 만들 수 없다)
+- [ ] 신규 등록·재등록·삭제 후 복원을 **호출부가 구분하지 못하게** 하는 것이 의도인가
+- [ ] 생성 중 상태를 **해제하는 주체**(생성 완료 수신)가 이 UseCase 밖에 있는 설계가 의도인가 → `추가구현` 후보
+- [ ] 앱이 강제 종료돼 상태가 남는 경우의 복구가 필요한가 → `추가구현` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 15. FetchLearningProjects
+
+**기록**
+- 책임 — 고정 페이지 크기(20)를 적용하고 생성 중인 프로젝트를 목록에서 제외한다
+- 기능 — `callAsFunction(page:) -> LearningProjectPage` · 생성 중 항목 필터 · 없으면 응답 그대로
+- 테스트 6건 — 제외 로직, 페이지 전달, 무손실 전달, 재필터링 금지
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 생성 중 프로젝트를 **목록에서 감추는** 것이 의도인가, 생성 중 상태로 보여주는 것이 의도인가 → 방향이 다르면 `추가구현`
+- [ ] 필터링으로 **페이지 항목 수가 줄어드는데** `hasNext`를 그대로 전달하는 것이 의도인가
+- [ ] 페이지 크기 20을 **Domain이 소유**하는 것이 의도인가 → [유형 점검 E](#e-도메인이-소유한-상수)
+- [ ] 목록 표현 규칙(제외)이 Domain 책임인가 화면 책임인가 → `책임이동` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 16. FetchLearningProjectDetail
+
+**기록**
+- 책임 — 상세 조회 위임. 다음 세트 계산 규칙은 `LearningProjectDetail` 모델의 책임
+- 기능 — `callAsFunction(projectID:) -> LearningProjectDetail`
+- 테스트 4건 — 진행 중 세트, 전부 완료 시 첫 세트 replay, 빈 세트, 미존재 오류
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **전부 완료하면 첫 세트로 되돌아가 replay**하는 규칙이 제품 의도와 같은가
+- [ ] 다음 세트 계산을 모델이 갖는 것이 의도인가
+- [ ] 그 모델 규칙을 UseCase 테스트가 검증하는 배치가 의도인가 → `테스트보강`/`리팩터링` 후보
+- [ ] 위임 계층 유지 여부 → [유형 점검 A](#a-위임-9개)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 17. DeleteLearningProject
+
+**기록**
+- 책임 — 프로젝트 삭제 위임
+- 기능 — `callAsFunction(projectID:)`
+- 테스트 2건 — 성공, 미존재 오류 전파
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 삭제가 **서버 요청만**으로 끝나는 것이 의도인가 (생성 중 상태·진행 상태·북마크 정리는?) → `추가구현` 후보
+- [ ] 14번의 "삭제 후 복원"과 이 삭제가 같은 의미의 삭제인가
+- [ ] 위임 계층 유지 여부 → [유형 점검 A](#a-위임-9개)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 18. FetchExternalRepository
+
+**기록**
+- 책임 — URL을 `owner/name`으로 해석한 뒤에만 외부 조회를 수행한다 (형식 검증을 네트워크 앞단에 둠)
+- 기능 — `callAsFunction(url:) -> ExternalRepository` · 해석 실패 시 URL 형식 오류
+- 테스트 4건 — 해석 성공·실패, 오프라인·기타 오류 전파
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] URL 해석을 **Domain 계약(파서)** 으로 두는 것이 의도인가, Data 책임인가 → `책임이동` 후보
+- [ ] 표기 변형(대소문자, 끝 슬래시, `.git`)을 어디까지 허용할지 정해져 있는가 → `추가구현` 후보
+- [ ] 형식 오류와 조회 실패를 사용자에게 다르게 보여주는 것이 의도인가
+- [ ] `ExternalRepository`라는 공급자 중립 이름이 실제로 GitHub 외를 지원할 계획을 반영하는가 → [유형 점검 G](#g-공급자-중립-경계)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 19. FetchLearningSet
+
+**기록**
+- 책임 — 세트 조회 위임, 서버 순서·형식 무가공 전달
+- 기능 — `callAsFunction(projectID:setID:) -> LearningSet`
+- 테스트 3건 — 순서·형식 전달, 제출 전 `myAnswer` 미노출, 미존재 오류
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 문제 **순서를 서버가 정한다**는 것이 의도인가 (섞기·난이도 정렬을 클라이언트가 하지 않는가)
+- [ ] 제출 전 정답·내 답안이 내려오지 않는 것이 **서버 계약으로 보장된 약속**인가
+- [ ] 위임 계층 유지 여부 → [유형 점검 A](#a-위임-9개)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 20. SubmitChoiceAnswer
+
+**기록**
+- 책임 — 선택지 인덱스를 도메인에서 먼저 검증해 음수 인덱스는 서버로 보내지 않는다
+- 기능 — `callAsFunction(projectID:questionID:selectedIndex:) -> ChoiceAnswerResult` · `selectedIndex >= 0` 위반 시 잘못된 요청 오류
+- 테스트 3건 — 음수 차단, 정확히 1회 요청, 채점·해설 보존
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 사전 검증 범위가 **하한뿐**인 것이 의도인가, 선택지 개수 상한도 막아야 하는가 → `추가구현` 후보
+- [ ] 상한 검증에 필요한 문항 정보가 없다면, 검증 위치가 여기가 맞는가 → `책임이동` 후보
+- [ ] 같은 문항 재제출 허용 여부가 정해져 있는가 → `추가구현` 후보
+- [ ] 21번과 검증 강도가 다른 것(하한 1개 vs 공백·길이 2개)이 의도인가
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 21. SubmitEssayAnswer
+
+**기록**
+- 책임 — trim 후 공백 전용·2000자 초과를 차단하고 trim된 텍스트를 전송한다
+- 기능 — `callAsFunction(projectID:questionID:text:) -> EssayAnswerResult` · 위반 시 잘못된 요청 오류
+- 테스트 4건 — 공백 차단, 초과 차단, 2000자 경계 허용, 해설·rubric 보존
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **2000자**가 제품이 정한 값인가, 서버 계약에서 온 값인가 → [유형 점검 E](#e-도메인이-소유한-상수)
+- [ ] 사용자가 입력한 원문이 아니라 **trim된 텍스트를 저장**하는 것이 의도인가
+- [ ] 길이 초과를 제출 시점에 오류로 막는 것이 의도인가, 입력 시점에 막아야 하는가 → `책임이동` 후보
+- [ ] 최소 길이 제약이 없는 것이 의도인가 → `추가구현` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 22. SetQuestionBookmark
+
+**기록**
+- 책임 — 질문 단위(`questionID`)로 북마크 토글을 직렬화해 서버 최종 응답을 정본으로 만든다
+- 기능 — `callAsFunction(projectID:questionID:bookmarked:) -> BookmarkState` · 원하는 값을 그대로 전송(토글 계산 안 함)
+- 테스트 3건 — 값 전달, 정본 반영, 동시 호출 직렬화
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **서버 응답이 정본**이라는 정책이 의도인가 (낙관적 UI를 쓴다면 롤백 주체가 정해져 있는가)
+- [ ] 직렬화 단위가 `questionID`뿐인 것이 의도인가 — 프로젝트가 달라도 같은 ID면 같은 줄에 선다 → `리팩터링` 후보
+- [ ] 토글 계산을 호출부가 하는 계약이 의도인가
+- [ ] 직렬화 보장 범위가 앱 전체인가 (Composition 조립 확인)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 23. FetchBookmarkedQuestions
+
+**기록**
+- 책임 — 북마크 목록 조회 위임 (`projectID: nil`이면 전체). 필터와 무관하게 선택 가능한 프로젝트 목록은 전체 유지
+- 기능 — `callAsFunction(projectID: String?) -> BookmarkedQuestionCollection`
+- 테스트 2건 — 전체 목록 유지, 식별자 보존
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] `nil` = 전체라는 **암묵 규약**이 의도인가, 타입으로 드러나야 하는가 → `리팩터링` 후보
+- [ ] 필터 선택지를 응답에 함께 싣는 것이 의도인가 → `책임이동` 후보
+- [ ] 페이지네이션 없이 전량 조회하는 것이 의도인가 → `추가구현` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 24. TrackGenerationProgress
+
+**기록**
+- 책임 — 생성 진행 상태를 단일 레코드로 저장·조회·해제한다
+- 기능 — `begin(projectID:requestedAt:)` / `current()` / `end()`
+- 테스트 4건 — 저장·조회, 두 번 begin 시 1건만, 해제 후 nil, 미기록 시 nil
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **동시에 한 건만** 생성 중일 수 있다는 전제가 의도인가 — 14번은 서로 다른 레포의 동시 생성을 허용한다 → 충돌이면 `추가구현`
+- [ ] `requestedAt`을 호출부가 주입하는 것이 의도인가
+- [ ] 해제되지 못한 진행 상태의 만료 판정이 필요한가 → `추가구현` 후보
+- [ ] `callAsFunction`이 아닌 3-메서드 형태가 의도인가 → [유형 점검 F](#f-호출-형태)
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 25. ObserveGenerationOutcomes
+
+**기록**
+- 책임 — 생성 완료 결과 스트림을 변환 없이 위임한다
+- 기능 — `callAsFunction() -> AsyncStream<GenerationOutcome>`
+- 테스트 1건 — 위임
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] 변환이 **전혀 없는** 위임 UseCase를 유지하는 것이 의도인가 → [유형 점검 A](#a-위임-9개)
+- [ ] 앱이 실행 중이 아닐 때 완료된 결과를 받는 경로가 따로 있는가 → `추가구현` 후보
+- [ ] 이 스트림이 14·24번의 생성 중 상태를 해제하는 트리거인가 (기록상 연결이 드러나지 않음) → `추가구현` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+## 26. RequestGenerationReminder
+
+**기록**
+- 책임 — 알림 권한 요청 결과가 허용일 때만 해당 프로젝트를 리마인드 대상으로 등록한다
+- 기능 — `callAsFunction(projectID:)` / `requestAuthorization()` / `isAuthorized()`
+- 테스트 4건 — 허용 시 등록, 방금 거부·기존 거부 시 미등록, 권한 상태 조회
+
+**의도 점검** · G1 `[ ]` G2 `[ ]` G3 `[ ]` G4 `[ ]` G5 `[ ]` G6 `[ ]`
+
+- [ ] **권한 요청과 리마인드 등록을 한 호출**로 묶은 것이 의도인가
+- [ ] 메서드 3개 중 하나만 등록 효과를 갖는데, 이름이 그 차이를 말해주는가 → `이름변경` 후보
+- [ ] 이미 허용된 사용자가 재요청 없이 등록되는 경로가 있는가 → `추가구현` 후보
+- [ ] 12번(디바이스 등록)과 권한 흐름이 이어져야 하는가 → `추가구현` 후보
+
+**불일치**
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| | | | | |
+
+**메모**
+
+-
+
+---
+
+# 4. 유형 단위 점검
+
+개별 UseCase가 아니라 **분류 전체에 대한 정책 결정**입니다. 여기서 내린 결론이 위 26개 판정을 한꺼번에 바꿉니다.
+
+## A. 위임 9개
+
+`VerifyAccessToken` · `FetchMemberProfile` · `CompleteCuration` · `RegisterMemberDevice` · `DeleteLearningProject` · `FetchLearningProjectDetail` · `FetchLearningSet` · `FetchBookmarkedQuestions` · `ObserveGenerationOutcomes`
+
+- [ ] 변환도 검증도 없는 위임 UseCase를 **전부 유지**한다 — 이유:
+- [ ] **전부 걷어내고** 호출부가 Repository 계약을 직접 쓴다 — 영향 범위:
+- [o] 기준을 세워 일부만 남긴다 — 기준: [domain.md「UseCase 분해 기준」](../package-rules/domain.md#usecase-분해-기준) (명세 `033-usecase-consolidation`)
+
+**결정** (점검일 2026-09-17, 기준 브랜치 `feature/pending-repository-legacy-cleanup` @ `760e1e3`):
+판단·조율·보상·동시성 제어가 없고 계약 하나만 호출하는 위임은 독립 UseCase로 두지 않고, 같은 모듈의 **능력 단위 통합 계약**에 메서드로 흡수한다. 이 결정은 이미 명세 033으로 구현되어 있다.
+
+**9개 처리 결과 — 결정 대비 구현 일치 확인**
+
+| 카탈로그 UseCase | 현재 처리 | 결정과 일치 |
+| --- | --- | --- |
+| `FetchLearningProjectDetail` | `LearningLibraryUseCase.project(id:)` | `[o]` |
+| `DeleteLearningProject` | `LearningLibraryUseCase.deleteProject(id:)` | `[?]` A-2 |
+| `FetchLearningSet` | `LearningLibraryUseCase.learningSet(projectID:setID:)` | `[o]` |
+| `FetchBookmarkedQuestions` | `LearningLibraryUseCase.bookmarkedQuestions(projectID:)` | `[o]` |
+| `FetchMemberProfile` | `MemberAccountUseCase.profile()` | `[o]` |
+| `CompleteCuration` | `MemberAccountUseCase.completeCuration(...)` — key `"curation"`로 직렬화 | `[?]` A-3 |
+| `VerifyAccessToken` | 제거 (프로덕션 소비자 없음) | `[o]` |
+| `RegisterMemberDevice` | `RegisterCurrentDeviceUseCase`가 등록 정보 구성까지 맡아 흡수 | `[o]` |
+| `ObserveGenerationOutcomes` | `TrackGenerationUseCase.states()`로 흡수 | `[o]` |
+
+**점검 A에서 나온 불일치**
+
+| # | 기록된 동작 | 의도(결정 문서) | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| A-1 | `RefreshSession`이 `SingleFlightCoordinator`를 **public 생성자 인자**로 받는다 (기본값 새 인스턴스). 같은 명세에서 `SetQuestionBookmark`·`MemberAccount`의 직렬화기는 내부 상태로 흡수됨 | "실행 보장은 구현 내부 상태로 두고 직렬화 전용 타입을 생성자로 주입하지 않는다" | `리팩터링` | P3 |
+| A-2 | 삭제(변경)가 `LearningLibrary` 조회 능력 계약 안에 있다 | 판정 대기 | 판정 대기 | |
+| A-3 | `completeCuration`이 `"curation"` 키로 직렬화되어 `updatePosition`·`updateCareerLevel`과 같은 필드를 두고 동시에 실행될 수 있다 | 판정 대기 | 판정 대기 | |
+| A-4 | domain.md가 `SubmitChoiceAnswer`·`SubmitEssayAnswer`의 독립 유지 근거를 "제출 결과 **판정**을 수행한다"로 적었으나, 실제로는 제출 **전 입력 검증**만 하고 채점은 서버가 한다 (명세 033 `data-model.md`도 "제출 전 사전 검증"으로 기록) | 근거는 "제출 전 입력을 검증해 요청 여부를 판단한다" | `기록수정` | P3 |
+
+**부수 발견** — 이 점검표와 카탈로그는 commit `bee2388` 기준(UseCase 26개)이고, 현재 브랜치는 명세 033 적용 후 **프로토콜 20개**다. 개별 섹션 1–26은 재작성 전까지 구조가 현재와 다르다.
+
+## B. 사전 검증 3개
+
+`SubmitChoiceAnswer` · `SubmitEssayAnswer` · `FetchExternalRepository`
+
+- [ ] 입력 검증을 Domain UseCase가 갖는 것이 원칙인가, 입력 화면(Feature)이 갖는 것이 원칙인가
+- [ ] 검증 강도가 UseCase마다 다른 것(하한만 / 공백+길이 / 형식)이 의도인가
+- [ ] 검증 실패 오류를 서버 오류와 같은 타입으로 표현하는 것이 의도인가
+
+**결정**:
+
+## C. 조율·보상 6개
+
+`SignIn` · `SignOut` · `RestoreSession` · `AuthenticationOutcomes` · `CreateLearningProject` · `DeleteMemberAccount`
+
+- [ ] 실패 시 보상(되돌리기) 정책이 6개에서 **같은 규칙**을 따르는가
+- [ ] 정리 순서(세션 → 인증 참조)가 모든 인증 UseCase에서 동일한가
+- [ ] 정리 실패를 침묵시키는 정책이 의도인가, 진단 신호가 필요한가 → `추가구현` 후보
+
+**결정**:
+
+## D. 동시성 4개
+
+`RefreshSession` · `SetQuestionBookmark` · `UpdateMemberPosition` · `UpdateMemberCareerLevel`
+
+- [ ] 동시성 보장(single-flight, FIFO 직렬화)의 **범위가 앱 전체**여야 하는가 — 그렇다면 조정자·직렬화기가 Composition에서 단일 인스턴스로 공유되는지 확인이 필요하다
+- [ ] `MemberMutationSerializer`와 `QuestionMutationSerializer`가 반환 타입만 다른 같은 구현인데 **하나로 합칠지** → `리팩터링` 후보
+- [ ] 필드별 Update UseCase 분리를 유지할지 병합할지
+- [ ] 동시성 보장은 4개 모두 테스트로 고정되어야 하는가 → [갭 2](#갭-2-membermutationserializer-동시성-테스트)
+
+**결정**:
+
+## E. 도메인이 소유한 상수
+
+`pageSize = 20` (15번) · `maximumLength = 2000` (21번) · `CareerLevel` 4단계 (9번)
+
+- [ ] 이 값들의 **출처**가 제품 결정인가 서버 계약인가
+- [ ] Domain이 소유하는 것이 맞는가, 서버에서 받아야 하는가 → `추가구현` 후보
+- [ ] 서버와 어긋났을 때 감지할 방법이 있는가
+
+**결정**:
+
+## F. 호출 형태
+
+`callAsFunction` 단일 진입 23개 vs 명명 메서드 3개(`PolicyConsent`, `TrackGenerationProgress`, `RequestGenerationReminder`)
+
+- [ ] 메서드 여러 개를 가진 UseCase를 허용하는가, 하나의 행위 = 하나의 UseCase가 원칙인가
+- [ ] 허용한다면 그 기준을 컨벤션 문서에 남길 것인가 → `기록수정` 후보
+- [ ] 26번처럼 일부 메서드만 부수효과를 갖는 형태를 허용하는가
+
+**결정**:
+
+## G. 공급자 중립 경계
+
+`ExternalRepository` · `ExternalRepositoryLookup` · `ExternalRepositoryURLParser` — 이름은 공급자 중립이지만 실제 대상은 GitHub
+
+- [ ] 중립 이름을 유지하는 것이 의도인가 (다른 공급자 지원 계획이 있는가)
+- [ ] 계약의 입력이 `githubRepoURL`처럼 공급자 이름을 노출하는 곳이 있는가 → `이름변경` 후보
+
+**결정**:
+
+## H. QuizGeneration 책임 단일화 — 개발자 결정
+
+관련 개별 점검: 14 `CreateLearningProject` · 24 `TrackGenerationProgress` · 25 `ObserveGenerationOutcomes` · 26 `RequestGenerationReminder`
+기준 브랜치 `feature/pending-repository-legacy-cleanup` @ `760e1e3`
+
+### 결정 (2026-09-17)
+
+| # | 결정 |
+| --- | --- |
+| D1 | Generation 비즈니스 로직은 **`QuizGenerationUseCase` 하나**가 책임진다. 지원 범위는 요청, 상태 추적, 알림 등록 |
+| D2 | **알림 권한은 별도 UseCase**가 책임진다. `QuizGenerationUseCase`는 권한을 요청하지도 확인하지도 않는다 |
+| D3 | 알림은 요청 성공 시 `request` **내부에서 항상 등록**한다. 알림 등록을 위한 별도 공개 호출은 없다 |
+| D4 | 상태는 `states()` 하나로 제공한다. `current()`는 `states()`의 첫 값과 중복이므로 두지 않는다 |
+| D5 | 오래된 상태의 검증·정리는 UseCase 내부 책임이다. **초기화 시** 만료된 기록을 검증하고 정리한다 |
+| D6 | 확장 앱은 메인 앱과 **같은 구현**을 쓴다. 차이는 알림 설정 안내 시트를 띄우지 않는다는 화면 동작뿐이다 |
+| D7 | 요청 결과 타입 `ProjectRegistrationReceipt` → **`QuizGenerationReceipt`** |
+| D8 | `NotificationAuthorizationOutcome`은 교정한다 — [교정안](#notificationauthorizationoutcome-교정안) |
+
+### 목표 계약
+
+```swift
+public protocol QuizGenerationUseCase: Sendable {
+    func request(githubRepoURL: String, quizLevel: QuizLevel) async throws -> QuizGenerationReceipt
+    func states() async -> AsyncStream<GenerationState>
+}
+```
+
+**계약이 보장하는 것**
+
+- `request` — 같은 레포지토리가 진행 중이면 서버 요청 없이 중복 오류를 던진다. 성공하면 기록에 projectID를 연결하고 알림 대상으로 등록한 뒤 영수증을 반환한다. 실패하면 기록을 해제하고 오류를 그대로 던진다
+- `states` — 구독 즉시 **현재 상태를 첫 값으로** 방출하고 이후 변경을 방출한다 (D4의 전제)
+
+**내부 책임** (공개하지 않음)
+
+| 책임 | 현재 위치 | 목표 |
+| --- | --- | --- |
+| 기록 시작·projectID 연결·해제 | `CreateLearningProject`, `TrackGeneration` 공개 메서드 | `request` 내부 단계 |
+| 결과 수신 → 완료·실패 반영 | `GenerationStateCoordinator` | 그대로 내부, 최초 사용 시 시작 |
+| 알림 대상 보관 | `ScheduleGenerationReminder` 메모리 집합 + 확장 앱 대기열 | 한 가지 방식으로 기록 — 확장 앱과 메인 앱이 같은 구현을 쓰므로(D6) 프로세스를 넘어 유지되어야 함 |
+| 완료 시 알림 예약 | `ScheduleGenerationReminder` (Composition이 관찰 시작) | 내부, 최초 사용 시 관찰 시작 |
+| 만료 기록 정리 | `AppRootFeature`(만료 판정) + `PendingGenerationRepositoryAdapter`(purge) | 초기화 시 내부에서 검증·정리 (D5) |
+
+### NotificationAuthorizationOutcome 교정안
+
+**문제**
+
+1. **소속** — `DomainLearningProject`에 있지만 학습 프로젝트 개념이 아니다. D2로 권한 책임이 분리되면 이 모듈에 남을 이유가 없다
+2. **의미 혼합** — `declined`(방금 거부)와 `previouslyDenied`(이미 거부)는 같은 "거부" 상태를 요청 시점 기준으로 쪼갠 것이다. 호출부 2곳(`SettingsFeature`, `QuizGenerationProgressFeature`)은 `.previouslyDenied`만 검사해 설정 이동 시트를 띄운다
+3. **중복 표현** — 같은 권한을 요청 결과는 3-case enum으로, 조회는 `isAuthorized() -> Bool`로 말한다
+
+**교정안**
+
+```swift
+public enum NotificationAuthorizationStatus: Equatable, Sendable {
+    case notDetermined
+    case authorized
+    case denied
+}
+
+public protocol NotificationAuthorizationUseCase: Sendable {
+    func status() async -> NotificationAuthorizationStatus
+    func request() async -> NotificationAuthorizationStatus
+}
+```
+
+| 현재 | 교정 후 |
+| --- | --- |
+| `isAuthorized() -> Bool` | `status() == .authorized` |
+| `requestAuthorization()` → `.authorized` | `request()` → `.authorized` |
+| `requestAuthorization()` → `.declined` | `status()`가 `.notDetermined`였고 `request()` → `.denied` |
+| `requestAuthorization()` → `.previouslyDenied` | `status()`가 이미 `.denied` → 요청하지 않고 설정 이동 안내 |
+
+- [ ] 교정안 승인
+- [ ] 수정 의견:
+
+### 현재 분산 지도
+
+| 책임 | 현재 담당 | 형태 |
+| --- | --- | --- |
+| 요청 | `CreateLearningProject` | 독립 UseCase. 저장소를 **직접** 호출해 시작·연결·해제 |
+| 상태 추적 | `TrackGeneration` (+ 내부 `GenerationStateCoordinator`) | 시작·연결·해제·`current`·`states`를 **공개** |
+| 알림 권한 + 등록 | `RequestGenerationReminder` | **권한 허용일 때만** 등록 |
+| 알림 보관·예약 | `ScheduleGenerationReminder` (actor) | `TrackGeneration`을 인자로 받아 관찰 |
+| 관찰 시작 | `GenerationReminderAssembly` | **Composition**이 두 UseCase를 연결 |
+| 요청 후 알림 등록 호출 | `QuizGenerationProgressFeature` | **Feature**가 요청 성공 뒤 별도 호출 |
+| 확장 앱 알림 등록 | `ShareRegistrationFeature` + `ShareExtensionComposition` | **Feature**가 권한 확인 후, **Composition**이 저장소 대기열에 직접 기록 |
+| 만료 판정·정리 | `AppRootFeature` | **App**이 `waitPolicy.isExpired`로 판정해 `end(githubRepoURL:)` 호출 |
+| 대기 화면 종료 후 해제 | `AppRootFeature` `generationReleased` | **App**이 `end(githubRepoURL:)` 호출 |
+| 탈퇴 시 전체 정리 | `AppComposition` → `MemberAssembly` | **Composition**이 `current()`를 돌며 `end` 호출 |
+
+### 결정 대비 불일치
+
+| # | 기록된 동작 | 의도한 동작 | 작업 구분 | 우선순위 |
+| --- | --- | --- | --- | --- |
+| H-1 | Generation 책임이 UseCase 4개에 나뉘어 있다 | `QuizGenerationUseCase` 1개 (D1) | `리팩터링` | P2 |
+| H-2 | 요청과 추적이 같은 저장소의 시작·연결·해제를 각자 호출한다 | `request` 내부 단계 | `리팩터링` | P2 |
+| H-3 | `begin`·`attachProjectID`·`end`×2·`current`가 공개되어 있다 | 공개는 `request`·`states`뿐 (D1, D4) | `제거` | P2 |
+| H-4 | 알림 관찰 시작을 Composition이 수행한다 | 내부에서 최초 사용 시 시작 | `책임이동` | P2 |
+| H-5 | 알림은 **권한 허용일 때만** 등록된다 (`RequestGenerationReminder`, `ShareRegistrationFeature`) | 요청 성공 시 **항상** 등록 (D3) | `리팩터링` (동작 변경) | P1 |
+| H-6 | Feature가 요청 뒤 알림 등록을 따로 호출한다 | `request` 내부에서 등록 (D3) | `제거` | P2 |
+| H-7 | 확장 앱은 Feature 권한 확인 + Composition 대기열 기록이라는 **다른 경로**를 쓴다 | 메인 앱과 같은 구현, 시트만 생략 (D6) | `책임이동` | P2 |
+| H-8 | App이 만료를 판정하고 정리한다 | 초기화 시 UseCase 내부에서 정리 (D5) | `책임이동` | P2 |
+| H-9 | `current()`와 `states()`가 공존한다 | `states()`만, 첫 값으로 현재 상태 (D4) | `제거` | P3 |
+| H-10 | `ProjectRegistrationReceipt` | `QuizGenerationReceipt` (D7) | `이름변경` | P3 |
+| H-11 | 권한 요청·조회가 `RequestGenerationReminder`에 있다 | `NotificationAuthorizationUseCase` (D2) | `책임이동` | P2 |
+| H-12 | `NotificationAuthorizationOutcome`의 소속·의미 혼합·중복 표현 | 교정안 (D8) | `리팩터링` | P2 |
+| H-13 | `GenerationReminderRegistration` 연결 계약 | 불필요 | `제거` | P3 |
+| H-14 | domain.md「독립 유지 18개」에 네 UseCase가 개별 기록 | `QuizGenerationUseCase`, `NotificationAuthorizationUseCase`로 기록 | `기록수정` | P3 |
+
+### 미결 사항
+
+- [ ] **H-Q5 목록 필터** — `FetchLearningProjects`는 생성 중 목록을 저장소에서 직접 읽는다. `QuizGenerationUseCase.states()`를 쓰게 할지, Generation 책임 밖(목록 조회 판단)으로 둘지
+- [ ] **H-Q6 탈퇴 시 전체 정리** — 공개 동작이 `request`·`states`뿐이면 탈퇴 정리 경로가 사라진다. 제안: 비즈니스 판단이 없는 로컬 데이터 삭제이므로 **탈퇴 정리에 주입되는 저장소 정리**로 처리
+- [ ] **H-Q7 대기 화면 종료 후 해제** — App이 대기 화면을 닫을 때 기록을 해제한다. 이것이 비즈니스 규칙(확인한 기록은 지운다)인지 화면 규칙인지. 초기화 시에만 정리하면(D5) **앱 실행 중 만료된 기록이 대기 표시로 남을 수 있다** — `states()`가 만료 기록을 제외하고 방출할지 함께 판정
+- [ ] **H-Q8 권한 UseCase 소속 모듈** — 제안: 알림 권한은 학습 프로젝트·회원·인증 어디에도 속하지 않으므로 새 Domain target
+- [ ] **H-Q9 예약 시점 권한 확인** — 현재 예약기는 예약 직전 권한을 확인한다. D2를 엄격히 적용하면 이 확인도 없애고 OS가 미허용 알림을 표시하지 않는 동작에 맡긴다
+
+### 영향 범위
+
+- Domain: `CreateLearningProject`, `TrackGeneration`, `RequestGenerationReminder`, `ScheduleGenerationReminder`, `GenerationReminderRegistration` → `QuizGenerationUseCase` · `NotificationAuthorizationUseCase` · `NotificationAuthorizationStatus` · `QuizGenerationReceipt`, 각 테스트
+- Composition: `LearningProjectAssembly`, `GenerationReminderAssembly`, `AppComposition`, `ShareExtensionComposition`, `NotificationAuthorizationAdapter`, `PendingGenerationRepositoryAdapter`
+- Feature: `QuizGenerationProgressFeature`, `ProjectRegistrationRouterFeature`, `ShareRegistrationFeature`, `HomeFeature`, `MainShellRouterFeature`, `SettingsFeature`, `SettingsRouterFeature` 및 Test Double
+- App: `AppRootFeature`, `AppRootView` 및 Test Double
+- 문서: domain.md「통합 후 남은 UseCase」
+
+---
+
+# 5. 테스트 보강 후보 (확정된 갭)
+
+## 갭 1: UpdateMemberCareerLevel 실패 경로
+
+- [ ] 조치 완료 · 제안 테스트명 `실패하면 이전 상태에 영향을 주지 않는다`
+- 대칭 UseCase `UpdateMemberPosition`에는 있고 이쪽에는 없음. **먼저 판정할 것**: 두 UseCase를 유지하기로 했는가([유형 점검 D](#d-동시성-4개)) — 병합한다면 이 갭은 사라진다
+- 담당 / 링크:
+
+## 갭 2: MemberMutationSerializer 동시성 테스트
+
+- [ ] 조치 완료 · 제안 테스트명 `같은 필드의 동시 호출은 직렬화된다`
+- 같은 구조의 `SetQuestionBookmark`에는 동시성 테스트가 있으나 Member 쪽에는 없음. **먼저 판정할 것**: 직렬화 보장을 계약으로 볼 것인가 구현 세부로 볼 것인가
+- 담당 / 링크:
+
+## 갭 3: DeleteMemberAccount 실패 시 로컬 정리
+
+- [ ] 조치 완료 · 제안 테스트명 `삭제가 실패하면 로컬 상태를 지우지 않는다`
+- **먼저 판정할 것**: 로컬 정리를 클로저 주입으로 유지할 것인가(13번 리팩터링 판정)
+- 담당 / 링크:
+
+---
+
+# 후속 작업 집계
+
+점검이 끝난 뒤 위 불일치 표의 내용을 여기로 모읍니다. 이 표가 다음 구현·리팩터링 작업의 입력입니다.
+
+| # | 대상 UseCase | 불일치 요지 | 작업 구분 | 우선순위 | 상태 | 링크 |
+| --- | --- | --- | --- | --- | --- | --- |
+| H-1 | Generation 4개 | `QuizGenerationUseCase` 1개로 통합 | `리팩터링` | P2 | 미결 H-Q5–Q9 판정 대기 | [H](#h-quizgeneration-책임-단일화--개발자-결정) |
+| H-2 | `CreateLearningProject`, `TrackGeneration` | 시작·연결·해제를 `request` 내부로 | `리팩터링` | P2 | H-1에 포함 | |
+| H-3 | `TrackGeneration` | 공개 메서드를 `request`·`states`로 축소 | `제거` | P2 | H-1에 포함 | |
+| H-4 | `GenerationReminderAssembly` | 알림 관찰 시작을 UseCase 내부로 | `책임이동` | P2 | H-1에 포함 | |
+| H-5 | `RequestGenerationReminder`, `ShareRegistrationFeature` | 권한과 무관하게 요청 성공 시 항상 알림 등록 | `리팩터링` | P1 | H-Q9 판정 대기 | |
+| H-6 | `QuizGenerationProgressFeature` | 요청 뒤 별도 알림 등록 호출 제거 | `제거` | P2 | H-1에 포함 | |
+| H-7 | `ShareRegistrationFeature`, `ShareExtensionComposition` | 확장 앱을 메인 앱과 같은 구현으로, 시트만 생략 | `책임이동` | P2 | H-1에 포함 | |
+| H-8 | `AppRootFeature` | 만료 판정·정리를 초기화 시 내부로 | `책임이동` | P2 | H-Q7 판정 대기 | |
+| H-9 | `TrackGeneration` | `current()` 제거, `states()` 첫 값 보장 | `제거` | P3 | H-1에 포함 | |
+| H-10 | `ProjectRegistrationReceipt` | `QuizGenerationReceipt`로 이름 변경 | `이름변경` | P3 | | |
+| H-11 | `RequestGenerationReminder` | 권한 요청·조회를 `NotificationAuthorizationUseCase`로 | `책임이동` | P2 | H-Q8 판정 대기 | |
+| H-12 | `NotificationAuthorizationOutcome` | `NotificationAuthorizationStatus`로 교정 | `리팩터링` | P2 | 교정안 승인 대기 | |
+| H-13 | `GenerationReminderRegistration` | 연결 계약 제거 | `제거` | P3 | H-1에 포함 | |
+| H-14 | domain.md | 독립 유지 목록 갱신 | `기록수정` | P3 | 구현 후 | |
+| A-1 | `RefreshSession` | `SingleFlightCoordinator` 생성자 주입을 내부 상태로 | `리팩터링` | P3 | 재설계 Q-A3에 포함 | |
+| A-2 | `LearningLibraryUseCase` | 조회 계약 안의 프로젝트 삭제 배치 | 판정 대기 | | 재설계 Q-L1에 포함 | |
+| A-3 | `MemberAccountUseCase` | 큐레이션 완료와 필드 수정의 직렬화 키 분리 | 판정 대기 | | 재설계 Q-M1에 포함 | |
+| A-4 | domain.md | Submit 2종의 독립 유지 근거 문구 교정 | `기록수정` | P3 | | |
+
+**우선순위 기준** — P1: 사용자에게 잘못된 결과가 나가는 것 · P2: 의도한 기능이 없는 것 · P3: 구조·이름·문서
+
+## 점검 요약
+
+| 항목 | 값 |
+| --- | --- |
+| 점검 기간 | |
+| 리뷰어 | |
+| 판정 완료 | 0 / 26 |
+| `[x]` 불일치 건수 | |
+| 추가구현 / 리팩터링 / 테스트보강 | 0 / 0 / 0 |
+
+**총평**
+
+-

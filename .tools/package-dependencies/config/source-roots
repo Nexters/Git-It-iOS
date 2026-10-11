@@ -1,0 +1,59 @@
+# target과 소스 루트의 대응표입니다. 루트는 GIT_IT_PROJECTS_ROOT 기준 상대경로입니다.
+#
+# 형식: <target> <루트>
+# manifest의 target과 1:1이어야 하며 Swift 파일은 접두어가 일치하는 가장 긴 루트에 속합니다.
+# target을 추가하거나 이름을 바꾸면 이 표도 같은 변경에서 갱신합니다.
+
+GitIt App/GitIt
+GitItTests App/Tests/GitIt
+ShareExtension App/ShareExtension
+
+CompositionAuthentication Composition/Authentication
+CompositionAuthenticationTests Composition/Tests/Authentication
+CompositionLearningProject Composition/LearningProject
+CompositionLearningProjectTests Composition/Tests/LearningProject
+CompositionMember Composition/Member
+CompositionMemberTests Composition/Tests/Member
+CompositionApp Composition/App
+CompositionAppTests Composition/Tests/App
+CompositionShareExtension Composition/ShareExtension
+CompositionShareExtensionTests Composition/Tests/ShareExtension
+
+Feature Feature
+FeatureTests Feature/Tests
+
+DomainUseCaseInterface Domain/UseCaseInterface
+DomainUseCaseDependency Domain/UseCaseDependency
+DomainUseCaseImplementation Domain/UseCaseImplementation
+DomainTests Domain/Tests
+
+DataAuthentication Data/Authentication
+DataAuthenticationTests Data/Tests/Authentication
+DataExternalRepository Data/ExternalRepository
+DataExternalRepositoryTests Data/Tests/ExternalRepository
+DataLearningProject Data/LearningProject
+DataLearningProjectTests Data/Tests/LearningProject
+DataLegalConsent Data/LegalConsent
+DataLegalConsentTests Data/Tests/LegalConsent
+DataMember Data/Member
+DataMemberTests Data/Tests/Member
+DataNotification Data/Notification
+DataNotificationTests Data/Tests/Notification
+DataShared Data/Shared
+DataSharedTests Data/Tests/Shared
+
+InfrastructureAuthentication Infrastructure/Authentication
+InfrastructureAuthenticationTests Infrastructure/Tests/Authentication
+InfrastructureCache Infrastructure/Cache
+InfrastructureCacheTests Infrastructure/Tests/Cache
+InfrastructureLocalNotification Infrastructure/LocalNotification
+InfrastructureNetworkClient Infrastructure/NetworkClient
+InfrastructureNetworkClientTests Infrastructure/Tests/NetworkClient
+InfrastructurePushMessaging Infrastructure/PushMessaging
+InfrastructureStorage Infrastructure/Storage
+InfrastructureStorageTests Infrastructure/Tests/Storage
+
+DesignSystem UI/DesignSystem
+DesignSystemTests UI/Tests/DesignSystem/Unit
+UIComponent UI/Component
+UIComponentTests UI/Tests/Component/Unit

@@ -1,0 +1,156 @@
+import ProjectDescription
+
+extension Target {
+
+    // MARK: Internal
+
+    static func module(
+        name: String,
+        sourceDirectory: String,
+        packageName: String? = nil,
+        sourceExcludes: [Path] = [],
+        resources: ResourceFileElements? = nil,
+        dependencies: [TargetDependency] = [],
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .framework,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: [.glob(
+                "\(sourceDirectory)/**",
+                excluding: sourceExcludes,
+            )],
+            resources: resources,
+            dependencies: dependencies,
+            settings: .settings(
+                base: packageNameSettings(packageName).merging([
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "NO",
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SKIP_INSTALL": "YES",
+                    "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
+                    "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
+                    "SWIFT_EMIT_LOC_STRINGS": "NO",
+                    "SWIFT_VERSION": "5.0",
+                ]) { current, _ in current }
+            ),
+        )
+    }
+
+    static func internalStaticModule(
+        name: String,
+        sourceDirectory: String,
+        dependencies: [TargetDependency] = [],
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .staticFramework,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["\(sourceDirectory)/**"],
+            dependencies: dependencies,
+            settings: .settings(
+                base: [
+                    "BUILD_LIBRARY_FOR_DISTRIBUTION": "NO",
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SKIP_INSTALL": "YES",
+                    "SWIFT_DEFAULT_ACTOR_ISOLATION": "nonisolated",
+                    "SWIFT_VERSION": "5.0",
+                ]
+            ),
+        )
+    }
+
+    static func testModule(
+        name: String,
+        sourceDirectory: String,
+        packageName: String? = nil,
+        productionTarget: TargetDependency,
+        additionalDependencies: [TargetDependency] = [],
+    ) -> Self {
+        let testSourceDirectory = sourceDirectory.isEmpty
+            ? "Tests"
+            : "Tests/\(sourceDirectory)"
+        return .target(
+            name: name,
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["\(testSourceDirectory)/**"],
+            dependencies: [productionTarget] + additionalDependencies,
+            settings: .settings(
+                base: packageNameSettings(packageName).merging([
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SWIFT_VERSION": "5.0",
+                ]) { current, _ in current }
+            ),
+        )
+    }
+
+    static func resourceBundle(
+        name: String,
+        resources: ResourceFileElements,
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .bundle,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            resources: resources,
+            settings: .settings(
+                base: [
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "SKIP_INSTALL": "YES",
+                ]
+            ),
+        )
+    }
+
+    static func testModule(
+        name: String,
+        sourceDirectory: String,
+        dependencies: [TargetDependency] = [],
+    ) -> Self {
+        .target(
+            name: name,
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.nexters.hytime.gitit.\(name.lowercased())",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["\(sourceDirectory)/**"],
+            dependencies: dependencies,
+            settings: .settings(
+                base: [
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": "6924CABL23",
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+                    "SWIFT_VERSION": "5.0",
+                ]
+            ),
+        )
+    }
+
+    // MARK: Private
+
+    private static func packageNameSettings(_ packageName: String?) -> SettingsDictionary {
+        guard let packageName else { return [:] }
+        return ["OTHER_SWIFT_FLAGS": "$(inherited) -package-name \(packageName)"]
+    }
+
+}

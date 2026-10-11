@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #141414; }
+  * { text-wrap: pretty; }
+  a { color: #B9D6FE; text-decoration: none; }
+  a:hover { color: #8BB5EF; text-decoration: underline; }
+  ::selection { background: #B9D6FE; color: #141414; }
+</style>
+</helmet>
+
+<div style="background:#141414;color:#FFFFFF;font-family:'Noto Sans KR','Plus Jakarta Sans',sans-serif;min-height:100vh;padding:0 0 120px 0">
+
+  <div style="position:sticky;top:0;z-index:50;background:rgba(20,20,20,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #3B3B3B">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;line-height:1.2;color:#B9D6FE">Git-It Hierarchy</span>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#BCBCBC">
+        <a href="#rules">계층 규칙</a>
+        <a href="#screens">Screen 인벤토리</a>
+        <a href="#subviews">Sub View 카탈로그</a>
+        <a href="#repeats">List와 Stack</a>
+        <a href="#states">상태와 액션</a>
+        <a href="#ownership">상태 소유</a>
+        <a href="#open">미결</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1240px;margin:0 auto;padding:56px 32px 0 32px">
+    <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;letter-spacing:0.08em;text-transform:uppercase;color:#7E94BB;margin-bottom:18px">Screen · Sub View · State · Action</div>
+    <h1 style="margin:0 0 18px 0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:44px;line-height:1.24;letter-spacing:-0.02em;color:#FFFFFF;max-width:820px">화면 계층 스펙</h1>
+    <p style="margin:0 0 40px 0;font-size:16px;line-height:1.6;color:#BCBCBC;max-width:760px">Figma 정본에 그려진 20개 화면을 <span style="color:#FFFFFF">Screen</span>과 <span style="color:#FFFFFF">Sub View</span> 두 계층으로 나누고, 각 단위가 어떤 상태를 갖고 어떤 액션에 반응하는지 정의합니다. 값은 모두 규격 문서의 토큰 이름과 UI·UX 가이드의 규칙을 참조하며, 새 수치를 만들지 않았습니다.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:72px">
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">20</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">Screen — 네비게이션 목적지</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">21</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">Sub View — 화면 안의 구성 단위</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#B9D6FE">3</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">계층 — Screen · Sub View · Component</div>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:20px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#ECBD23">9</div>
+        <div style="font-size:13px;line-height:1.5;color:#919191;margin-top:6px">정본에 없어 확인이 필요한 액션</div>
+      </div>
+    </div>
+
+    <div id="rules" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">01</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">계층 규칙</h2>
+      </div>
+      <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:760px">세 계층을 가르는 기준은 <span style="color:#FFFFFF">무엇을 소유하는가</span>입니다. 화면 골격을 소유하면 Screen, 화면의 한 영역과 그 영역의 상태를 소유하면 Sub View, 값만 받아 그리면 Component입니다.</p>
+      <div style="display:grid;gap:12px;margin-bottom:32px">
+        <sc-for list="{{ layers }}" as="l" hint-placeholder-count="3">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:22px 26px">
+            <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+              <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;line-height:1.3;color:#B9D6FE">{{ l.name }}</span>
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;color:#7E94BB">{{ l.suffix }}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:7px 16px;font-size:12.5px;line-height:1.55">
+              <span style="color:#7E94BB">소유</span><span style="color:#ECECEC">{{ l.owns }}</span>
+              <span style="color:#7E94BB">받는 것</span><span style="color:#ECECEC">{{ l.takes }}</span>
+              <span style="color:#7E94BB">금지</span><span style="color:#919191">{{ l.forbidden }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#0E0E0E;border-radius:8px;padding:16px 18px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.8;color:#BCBCBC;white-space:pre;overflow-x:auto;margin-bottom:16px">HomeScreen                       Screen    — 골격·네비게이션·데이터 로딩
+└─ ScreenContainer               Scaffold
+   ├─ ContinueLearningSection    Sub View  — "이어서 학습하기" 영역 + 더보기
+   │  └─ HomeProjectCard ×2      Component — 값만 받음
+   ├─ RecentSetSection           Sub View  — "최근 학습세트" 영역
+   │  └─ LearningSetRow ×n       Component
+   └─ TabShell                   Scaffold  — 선택 상태는 Screen이 소유</div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC;margin-bottom:80px"><span style="color:#FFFFFF;font-weight:700">Sub View를 만드는 기준 —</span> 한 영역이 <span style="color:#FFFFFF">자기만의 상태를 갖거나</span>(펼침, 선택, 필터) <span style="color:#FFFFFF">두 화면 이상에서 같은 모습으로 반복될 때</span>만 Sub View로 올립니다. 그 둘 다 아니면 Screen 본문에 그대로 둡니다. 화면 하나가 400줄인 것은 정상이고, 상태 없는 영역을 파일로 쪼개면 추적만 어려워집니다.</div>
+    </div>
+
+    <div id="screens" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">02</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">Screen 인벤토리</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#919191;max-width:760px">헤더 타입·탭바·스크림은 <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#B9D6FE">ScreenContainer</span>에 넘기는 값입니다. UI·UX 가이드 §6.1의 골격을 그대로 씁니다.</p>
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:80px">
+        <div style="display:grid;grid-template-columns:1.35fr 1.1fr 62px 78px 1.75fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">Screen</div>
+          <div style="padding:11px 14px">헤더</div>
+          <div style="padding:11px 14px">탭바</div>
+          <div style="padding:11px 14px">스크림</div>
+          <div style="padding:11px 14px">Sub View</div>
+        </div>
+        <sc-for list="{{ screenRows }}" as="r" hint-placeholder-count="20">
+          <div style="display:grid;grid-template-columns:1.35fr 1.1fr 62px 78px 1.75fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ r.name }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#ECECEC;overflow-wrap:anywhere">{{ r.header }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#919191">{{ r.tab }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#919191">{{ r.scrim }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#BCBCBC">{{ r.subs }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="subviews" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">03</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">Sub View 카탈로그</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#919191;max-width:760px">각 Sub View가 소유하는 상태와, 그것이 쓰이는 화면입니다. 상태가 <span style="color:#FFFFFF">없음</span>인 항목은 재사용 때문에 올라온 것입니다.</p>
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:80px">
+        <div style="display:grid;grid-template-columns:1.3fr 1.35fr 1.25fr 1.6fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">Sub View</div>
+          <div style="padding:11px 14px">소유 상태</div>
+          <div style="padding:11px 14px">쓰이는 화면</div>
+          <div style="padding:11px 14px">구성 Component</div>
+        </div>
+        <sc-for list="{{ subViewRows }}" as="r" hint-placeholder-count="21">
+          <div style="display:grid;grid-template-columns:1.3fr 1.35fr 1.25fr 1.6fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ r.name }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:{{ r.stateColor }};overflow-wrap:anywhere">{{ r.state }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#919191">{{ r.used }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#BCBCBC">{{ r.parts }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="repeats" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">04</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">반복 구조 — List와 Stack</h2>
+      </div>
+      <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#BCBCBC;max-width:780px">같아 보이는 반복이라도 <span style="color:#FFFFFF">개수를 데이터가 정하는가</span>와 <span style="color:#FFFFFF">스크롤로 넘치는가</span>에 따라 구현이 완전히 달라집니다. 이 둘을 섞으면 항목이 늘었을 때 화면 밖으로 밀리거나, 반대로 고정 개수에 불필요한 지연 로딩이 붙습니다.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:32px">
+        <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:22px 26px">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;line-height:1.3;color:#B9D6FE;margin-bottom:10px">List</div>
+          <p style="margin:0 0 12px 0;font-size:13px;line-height:1.65;color:#BCBCBC"><span style="color:#FFFFFF">개수를 데이터가 정하고, 넘치면 스크롤합니다.</span> 항목마다 안정적인 id가 필요하고, 0개일 때 무엇을 보여줄지 반드시 정의해야 합니다.</p>
+          <div style="background:#0E0E0E;border-radius:8px;padding:12px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.75;color:#BCBCBC;white-space:pre;overflow-x:auto">LazyVStack(spacing: LayoutToken.gutter) {
+    ForEach(projects) { ProjectRow($0) }
+}
+// 0개 → EmptyState</div>
+        </div>
+        <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:22px 26px">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;line-height:1.3;color:#ECECEC;margin-bottom:10px">Stack</div>
+          <p style="margin:0 0 12px 0;font-size:13px;line-height:1.65;color:#BCBCBC"><span style="color:#FFFFFF">개수가 설계 시점에 정해지거나, 주어진 폭을 나눠 갖습니다.</span> 스크롤하지 않으므로 빈 상태도, 지연 로딩도 필요 없습니다.</p>
+          <div style="background:#0E0E0E;border-radius:8px;padding:12px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.75;color:#BCBCBC;white-space:pre;overflow-x:auto">HStack(spacing: LayoutToken.tightSpacing) {
+    ForEach(0..&lt;total) { i in
+        Segment(filled: i &lt; done)
+            .frame(maxWidth: .infinity)
+    }
+}</div>
+        </div>
+      </div>
+
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#BCBCBC;margin-bottom:28px"><span style="color:#FFFFFF;font-weight:700">ForEach가 있다고 List는 아닙니다 —</span> <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#B9D6FE">ProgressSegments</span>는 칸 수를 총 문제 수가 정하지만, 넘치지 않고 <span style="color:#FFFFFF">주어진 폭을 균등하게 나눠 갖습니다</span>. 그래서 Stack입니다. 문제 수가 20개가 되면 칸이 좁아질 뿐 화면 밖으로 나가지 않아야 하므로, 각 칸에 고정 폭을 주지 않고 <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#B9D6FE">maxWidth: .infinity</span>로 둡니다. 같은 이유로 요일 7칸과 차트 바 7개도 Stack입니다.</div>
+
+      <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1.35fr 1.25fr 90px 70px 1.05fr 1.5fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+          <div style="padding:11px 14px">반복 구조</div>
+          <div style="padding:11px 14px">반복 단위</div>
+          <div style="padding:11px 14px">개수</div>
+          <div style="padding:11px 14px">분류</div>
+          <div style="padding:11px 14px">간격</div>
+          <div style="padding:11px 14px">비고</div>
+        </div>
+        <sc-for list="{{ repeatRows }}" as="r" hint-placeholder-count="16">
+          <div style="display:grid;grid-template-columns:1.35fr 1.25fr 90px 70px 1.05fr 1.5fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ r.name }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#ECECEC;overflow-wrap:anywhere">{{ r.unit }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#BCBCBC">{{ r.count }}</div>
+            <div style="padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:12px;line-height:1.5;color:{{ r.kindColor }}">{{ r.kind }}</div>
+            <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#BCBCBC">{{ r.spacing }}</div>
+            <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:{{ r.noteColor }}">{{ r.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:22px 26px;margin-bottom:80px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;line-height:1.3;color:#7E94BB;margin-bottom:10px">HScroll — 세 번째 분류</div>
+        <p style="margin:0 0 14px 0;font-size:13.5px;line-height:1.7;color:#BCBCBC">칩은 글자 길이만큼 폭을 요구해 균등 분할이 불가능하고, 정본에서 이미 콘텐츠 폭을 넘어 잘려 있습니다. <span style="color:#FFFFFF">가로 스크롤 한 줄 · 단일 선택</span>으로 확정합니다. 세로 리스트와 달리 스크롤 방향이 화면과 직각이므로, 좌우 여백을 컨테이너가 아니라 <span style="color:#FFFFFF">콘텐츠 인셋</span>으로 줘야 첫·마지막 칩이 화면 가장자리에서 잘리지 않고 끝까지 스크롤됩니다.</p>
+        <div style="background:#0E0E0E;border-radius:8px;padding:14px 16px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.75;color:#BCBCBC;white-space:pre;overflow-x:auto;margin-bottom:14px">ScrollView(.horizontal, showsIndicators: false) {
+    HStack(spacing: LayoutToken.compactSpacing) {
+        ForEach(filters) { Chip($0, isSelected: $0 == active) { … } }
+    }
+    .padding(.horizontal, LayoutToken.margin)   // 컨테이너가 아니라 콘텐츠에
+}
+.scrollClipDisabled()        // 칩이 여백 밖까지 흘러가게
+
+// 단일 선택 — 옵셔널이 아니라 값 하나를 들고 간다
+@State private var active: SavedFilter = .all
+// 같은 칩을 다시 눌러도 해제되지 않는다: active = filter (토글 아님)</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:7px 16px;font-size:12.5px;line-height:1.55">
+          <span style="color:#7E94BB">줄 수</span><span style="color:#ECECEC">1줄 고정 — 줄바꿈 없음, 칩 라벨은 Body 2 1줄 고정</span>
+          <span style="color:#7E94BB">여백</span><span style="color:#ECECEC">콘텐츠 인셋 margin (20) · 컨테이너는 화면 폭 전체</span>
+          <span style="color:#7E94BB">스크롤 표시</span><span style="color:#ECECEC">숨김 — 정본에 스크롤바가 없음</span>
+          <span style="color:#7E94BB">선택 유지</span><span style="color:#ECECEC">선택된 칩이 화면 밖이면 진입 시 보이도록 스크롤</span>
+          <span style="color:#7E94BB">선택 규칙</span><span style="color:#ECECEC">단일 선택 · 항상 하나가 선택됨 — 해제 없음</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="states" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">05</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">상태와 액션</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#919191;max-width:760px">누름 표현(<span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#B9D6FE">white30</span> 오버레이)과 최소 터치 44는 전 항목 공통이라 표에 적지 않았습니다. UI·UX 가이드 §05를 따릅니다. <span style="color:#ECBD23">노란 결과</span>는 정본에 대상 화면이나 값이 없어 확인이 필요한 것입니다.</p>
+      <sc-for list="{{ actionGroups }}" as="g" hint-placeholder-count="7">
+        <div style="margin-bottom:26px">
+          <div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB;margin-bottom:10px">{{ g.title }}</div>
+          <div style="border:1px solid #3B3B3B;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.25fr 1.15fr 1.3fr 1.6fr;gap:0;background:#1A1A1A;border-bottom:1px solid #3B3B3B;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#7E94BB">
+              <div style="padding:10px 14px">대상</div>
+              <div style="padding:10px 14px">상태</div>
+              <div style="padding:10px 14px">액션</div>
+              <div style="padding:10px 14px">결과</div>
+            </div>
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:1.25fr 1.15fr 1.3fr 1.6fr;gap:0;border-bottom:1px solid #2C2C2D;align-items:start;background:#242425">
+                <div style="padding:9px 14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;line-height:1.5;color:#B9D6FE;overflow-wrap:anywhere">{{ r.target }}</div>
+                <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#ECECEC">{{ r.state }}</div>
+                <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:#ECECEC">{{ r.action }}</div>
+                <div style="padding:9px 14px;font-size:12px;line-height:1.5;color:{{ r.color }}">{{ r.result }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+      <div style="height:54px"></div>
+    </div>
+
+    <div id="ownership" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">06</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">상태 소유 규칙</h2>
+      </div>
+      <div style="display:grid;gap:10px;margin-bottom:80px">
+        <sc-for list="{{ ownership }}" as="o" hint-placeholder-count="6">
+          <div style="background:#242425;border:1px solid #3B3B3B;border-radius:12px;padding:18px 22px;display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:start">
+            <span style="font-size:13.5px;font-weight:700;line-height:1.5;color:#FFFFFF">{{ o.name }}</span>
+            <div style="font-size:13.5px;line-height:1.65;color:#BCBCBC">{{ o.detail }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="open" style="scroll-margin-top:80px">
+      <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #3B3B3B;padding-bottom:14px;margin-bottom:32px">
+        <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#7E94BB">07</span>
+        <h2 style="margin:0;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#FFFFFF">확정 사항</h2>
+      </div>
+      <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#919191;max-width:760px">정본에 값이 없던 항목을 전부 확정했습니다. 남은 미결은 없습니다.</p>
+      <div style="background:#152015;border:1px solid #2A4A26;border-radius:12px;padding:20px 24px;margin-bottom:20px">
+        <div style="font-size:14px;font-weight:700;line-height:1.5;color:#8FD07A;margin-bottom:12px">정본에 없던 값 — 확정 완료</div>
+        <div style="display:grid;gap:9px">
+          <sc-for list="{{ decidedRows }}" as="d" hint-placeholder-count="9">
+            <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start">
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.55;color:#8FD07A;overflow-wrap:anywhere">{{ d.where }}</span>
+              <div style="font-size:13px;line-height:1.65;color:#BCBCBC">{{ d.detail }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-bottom:40px"></div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240}}">
+const LAYERS = [
+  ["Screen", "*Screen.swift", "화면 골격(ScreenContainer), 네비게이션 목적지, 데이터 로딩, 탭 선택",
+   "라우팅 파라미터 (프로젝트 id, 세트 id 등)", "다른 Screen을 직접 그리는 것 — 이동은 네비게이션으로만"],
+  ["Sub View", "*Section.swift · *Sheet.swift", "자기 영역의 상태(펼침·선택·필터·입력값)와 그 영역의 레이아웃",
+   "표시할 데이터와 콜백", "화면 여백(LayoutToken.margin) — 여백은 Screen이 붙임"],
+  ["Component", "Component/ 폴더", "아무 상태도 소유하지 않음. 그리기만 함",
+   "값과 콜백 전부", "데이터 조회, 네비게이션, 자체 상태 보관"],
+];
+
+const S = (name, header, tab, scrim, subs) => ({ name, header, tab, scrim, subs });
+const SCREENS = [
+  S("OnboardingScreen", "없음", "—", "—", "FeatureCarousel · PolicyAgreementSheet"),
+  S("TutorialBridgeScreen", "없음", "—", "—", "없음 — 정적 화면"),
+  S("SplashScreen", "없음", "—", "—", "없음 — 2단계 전환만"),
+  S("LevelSelectScreen", "plain / largeTitle", "—", "—", "SelectionCardList"),
+  S("ConceptSelectScreen", "plain", "—", "—", "SelectionCardList"),
+  S("ProjectRegisterScreen", "plain", "—", "—", "RepoInputForm"),
+  S("RepoConfirmScreen", "plain", "—", "—", "없음 — 확인만"),
+  S("SetCreatingScreen", "없음", "—", "—", "SetCreatingSheet"),
+  S("HomeScreen", "inlineUser", "있음", "하단", "ContinueLearningSection · RecentSetSection"),
+  S("ProjectListScreen", "inlineTitle", "있음", "상·하단", "ProjectList · DeleteModeBar"),
+  S("EmptyStateScreen", "inlineTitle", "있음", "—", "EmptyState (프로젝트 · 저장 2종)"),
+  S("DeleteConfirmScreen", "inlineTitle", "있음", "—", "ActionMenu · DeleteConfirmSheet"),
+  S("ProjectDetailScreen", "plain", "—", "상·하단", "SetProgressHeader · LearningSetList"),
+  S("QuizChoiceScreen", "없음", "—", "상단", "QuestionPrompt · ChoiceOptionList"),
+  S("QuizWrittenScreen", "없음", "—", "상단", "QuestionPrompt · AnswerEditor · GradingResultPanel"),
+  S("QuizCompleteScreen", "plain", "—", "—", "없음 — 결과 표시만"),
+  S("SavedQuestionScreen", "inlineTitle", "있음", "상·하단", "SavedFilterBar · SavedQuestionList"),
+  S("MyScreen", "largeTitle", "있음", "—", "StreakCalendar · LearningStatsPanel"),
+  S("SettingListScreen", "largeTitle", "있음", "—", "SettingSectionList"),
+  S("FieldSelectScreen", "largeTitle", "—", "—", "SelectionCardList"),
+];
+
+const V = (name, state, used, parts, warn) => ({
+  name, state, used, parts,
+  stateColor: warn ? "#ECBD23" : (state === "없음" ? "#919191" : "#B9D6FE"),
+});
+const SUBVIEWS = [
+  V("FeatureCarousel", "currentPage: Int", "온보딩", "PageIndicator · 기기 목업 이미지"),
+  V("PolicyAgreementSheet", "agreed: Set<PolicyKind>", "온보딩", "SheetSurface · PolicyAgreementRow ×3 · ActionButton"),
+  V("SelectionCardList", "selected: Int?", "레벨 · 개념 · 개발 분야", "SelectionCard ×n"),
+  V("RepoInputForm", "url: String · validation: Result", "프로젝트 등록", "TextField · ActionButton"),
+  V("SetCreatingSheet", "step: Int · isComplete: Bool", "세트 생성", "SheetSurface · ResourceAnimation · StepRow ×4"),
+  V("ContinueLearningSection", "없음", "홈", "SectionHeader · HomeProjectCard ×2"),
+  V("RecentSetSection", "없음", "홈", "SectionHeader · LearningSetRow ×n"),
+  V("ProjectList", "없음", "프로젝트", "ProjectRow ×n"),
+  V("DeleteModeBar", "isDeleteMode · selected: Set<ID>", "프로젝트", "ActionMenu · ActionButton.error"),
+  V("DeleteConfirmSheet", "없음 — Screen이 대상 소유", "프로젝트 삭제", "SheetSurface · ActionButton ×2"),
+  V("SetProgressHeader", "없음", "프로젝트 상세", "LabeledProgressBar · TagBadge"),
+  V("LearningSetList", "selectedSet: ID?", "프로젝트 상세", "LearningSetRow ×n · ProgressSegments"),
+  V("QuestionPrompt", "없음", "객관식 · 서술형", "ProgressSegments · Text"),
+  V("ChoiceOptionList", "selected: Int?", "객관식", "ChoiceAnswerOption ×4"),
+  V("AnswerEditor", "text: String · isFocused", "서술형", "TextEditor · 글자 수 카운터 · ActionButton", true),
+  V("GradingResultPanel", "expanded: Set<Int>", "서술형", "ChoiceResultRow ×n"),
+  V("SavedFilterBar", "activeFilter: Filter", "저장 문제", "Chip ×7"),
+  V("SavedQuestionList", "bookmarked: Set<ID>", "저장 문제", "SavedQuestionCard ×n"),
+  V("StreakCalendar", "없음", "마이", "요일 셀 ×7"),
+  V("LearningStatsPanel", "없음", "마이", "차트 바 ×7 · 수치 텍스트"),
+  V("SettingSectionList", "없음", "설정 목록", "SettingRow ×n"),
+];
+
+const REP = (name, unit, count, kind, spacing, note, warn) => ({
+  name, unit, count, kind, spacing, note,
+  kindColor: kind === "List" ? "#B9D6FE" : (kind === "Grid" ? "#8BB5EF" : (kind === "HScroll" ? "#7E94BB" : "#ECECEC")),
+  noteColor: warn ? "#ECBD23" : "#919191",
+});
+
+const REPEATS = [
+  REP("ProjectList", "ProjectRow", "데이터", "List", "gutter (12)", "빈 상태 = EmptyState.project"),
+  REP("SavedQuestionList", "SavedQuestionCard", "데이터", "List", "gutter (12)", "빈 상태 = EmptyState.savedQuestion"),
+  REP("LearningSetList", "LearningSetRow", "데이터", "List", "gutter (12)", "빈 상태가 정본에 없음", true),
+  REP("RecentSetSection", "LearningSetRow", "데이터", "List", "gutter (12)", "홈에서는 상한을 두는지 미정", true),
+  REP("GradingResultPanel", "ChoiceResultRow", "데이터", "List", "compactSpacing (8)", "행 높이가 펼침에 따라 변함"),
+  REP("SettingSectionList", "SettingRow", "데이터", "List", "0 — 행이 맞닿음", "섹션 사이만 margin (20)"),
+  REP("SelectionCardList", "SelectionCard", "데이터", "List", "compactSpacing (8)", "레벨·개념은 4, 분야는 8"),
+  REP("ContinueLearningSection", "HomeProjectCard", "데이터 · 2열", "Grid", "gutter (12)", "GridItem(.flexible()) ×2"),
+  REP("ChoiceOptionList", "ChoiceAnswerOption", "고정 4", "Stack", "compactSpacing (8)", "4지선다 고정"),
+  REP("PolicyAgreementSheet", "PolicyAgreementRow", "고정 3", "Stack", "compactSpacing (8)", "전체 동의 1 + 필수 2"),
+  REP("SetCreatingSheet", "StepRow", "고정 4", "Stack", "gutter (12)", "단계는 설계 시점에 정해짐"),
+  REP("FeatureCarousel", "PageIndicator dot", "고정 3", "Stack", "tightSpacing (4)", "가로"),
+  REP("SavedFilterBar", "Chip", "고정 7", "HScroll", "compactSpacing (8)", "가로 스크롤 한 줄 · 단일 선택 · 좌우 여백은 콘텐츠 인셋"),
+  REP("StreakCalendar", "요일 셀", "고정 7", "Stack", "균등 분할", "가로 · 폭을 7등분"),
+  REP("LearningStatsPanel", "차트 바", "고정 7", "Stack", "균등 분할", "가로 · 폭을 7등분"),
+  REP("ProgressSegments", "세그먼트", "데이터", "Stack", "tightSpacing (4)", "개수는 데이터지만 폭을 나눠 가짐"),
+];
+
+const A = (target, state, action, result, warn) =>
+  ({ target, state, action, result, color: warn ? "#ECBD23" : "#919191" });
+
+const ACTION_GROUPS = [
+  ["온보딩 · 세트 생성", [
+    A("FeatureCarousel", "currentPage 0…2", "스와이프", "페이지 전환 · PageIndicator dot 갱신"),
+    A("Google 로그인 버튼", "기본", "탭", "OAuth → PolicyAgreementSheet 표시", true),
+    A("PolicyAgreementRow", "미동의 / 동의", "탭", "해당 항목 토글. 전체 동의는 3개 일괄"),
+    A("동의 완료 버튼", "필수 미동의 → disabled", "탭", "LevelSelectScreen으로 이동"),
+    A("SelectionCard", "미선택 / 선택", "탭", "단일 선택. focus 테두리 + selectedSurface 겹침"),
+    A("RepoInputForm", "빈 값 → disabled", "제출", "URL 검증 → RepoConfirmScreen"),
+    A("RepoConfirm 긍정 버튼", "기본", "탭", "SetCreatingScreen 진입", true),
+    A("SetCreatingSheet", "step 0…3", "자동 진행", "완료 시 .success 햅틱 → HomeScreen"),
+  ]],
+  ["홈 · 프로젝트", [
+    A("HomeProjectCard 재생", "기본", "탭", "해당 세트의 QuizChoiceScreen 진입"),
+    A("SectionHeader chevron", "기본", "탭", "ProjectListScreen 이동 (이어서 학습하기만 보유)"),
+    A("LearningSetRow 재생", "기본", "탭", "해당 세트 문제 풀이 진입"),
+    A("ProjectRow", "기본", "탭", "ProjectDetailScreen 진입"),
+    A("ActionMenu", "닫힘 / 열림", "헤더 우측 탭", "메뉴 표시 → 삭제 모드 진입"),
+    A("DeleteModeBar 삭제", "선택 0개 → disabled", "탭", "DeleteConfirmSheet 표시"),
+    A("DeleteConfirmSheet 확정", "기본", "탭", ".warning 햅틱 → 목록 갱신"),
+    A("TabShell.Item", "선택 / 비선택", "탭", "탭 전환. 같은 탭 재탭의 동작은 미정", true),
+  ]],
+  ["문제 풀이", [
+    A("ChoiceAnswerOption", "미선택 / 선택", "탭", "단일 선택. 외곽 focus 링"),
+    A("객관식 제출", "미선택 → disabled", "탭", "채점 → .success/.error 햅틱 → 결과 표시"),
+    A("AnswerEditor", "빈 값 / 입력 중", "타이핑", "글자 수 갱신. 상한값은 정본에 없음", true),
+    A("서술형 제출", "빈 값 → disabled", "탭", "채점 → GradingResultPanel 표시"),
+    A("ChoiceResultRow", "접힘 / 펼침", "탭", "해설 펼침. 햅틱 없음 — 판정 시점에만 울림"),
+    A("BookmarkButton", "해제 / 저장", "탭", "저장 목록에 추가·제거"),
+    A("학습 완료 버튼", "기본", "탭", "도착지 미정 — 라벨이 \"Label\"", true),
+  ]],
+  ["저장 · 설정", [
+    A("SavedFilterBar Chip", "선택 / 비선택", "탭", "목록 필터. 다중 선택 여부 미정", true),
+    A("SavedQuestionCard 다시 풀기", "기본", "탭", "해당 문제 풀이 진입"),
+    A("SettingRow", "기본", "탭", "하위 설정 화면 이동. 3행 라벨이 모두 같음", true),
+    A("마이 → 설정 진입", "—", "—", "정본에 진입 아이콘이 꺼져 있음 — 경로 미정", true),
+  ]],
+];
+
+const OWNERSHIP = [
+  ["선택은 목록이 갖는다", "SelectionCardList·ChoiceOptionList처럼 \"여럿 중 하나\"인 상태는 개별 카드가 아니라 목록이 갖습니다. 카드는 isSelected를 값으로 받기만 합니다. 카드가 각자 갖고 있으면 두 개가 동시에 선택되는 상태를 막을 수 없습니다."],
+  ["펼침은 행이 아니라 패널이 갖는다", "GradingResultPanel이 expanded: Set<Int>를 갖습니다. 여러 개를 동시에 펼칠지 하나만 펼칠지의 규칙이 한 곳에 모입니다."],
+  ["탭 선택은 Screen이 갖는다", "TabShell은 Binding만 받습니다. 탭 전환이 네비게이션이기 때문이며, Sub View가 네비게이션 상태를 갖지 않는다는 규칙과 같습니다."],
+  ["햅틱은 Screen이 붙인다", "판정·완료·삭제 세 지점 모두 Screen에서 designSystemGradingFeedback 계열 모디파이어로 붙입니다. Sub View나 Component는 햅틱을 소유하지 않습니다 — 펼침처럼 판정이 아닌 동작에 잘못 울리는 것을 막기 위해서입니다."],
+  ["여백은 Screen이 붙인다", "Sub View는 자기 내부 간격만 알고, 화면 좌우 여백(LayoutToken.margin)은 ScreenContainer가 한 번 붙입니다. 같은 Sub View가 시트 안에 들어갈 때 여백이 두 번 붙는 것을 막습니다."],
+  ["입력값은 폼이 갖고 검증은 Screen이 한다", "RepoInputForm이 텍스트를 갖고, 그 값이 유효한 저장소인지는 Screen이 판단해 errorMessage로 되돌려 줍니다. 네트워크 조회는 Sub View의 일이 아닙니다."],
+];
+
+const DECIDED = [
+  ["로그인 수단", "Apple 로그인만 씁니다. 정본에 그려진 Google 버튼은 폐기하고, 아이콘 라이브러리에서도 Icon/Google을 뺍니다."],
+  ["학습 완료 버튼", "\"프로젝트로 돌아가기\" · ProjectDetailScreen으로 pop. 다시 풀기·다음 세트는 두지 않습니다."],
+  ["학습 완료 조건", "오답이 있어도 세트를 끝까지 풀면 학습 완료입니다. 완료 화면의 정답 수/총 문제 수는 결과를 알리는 값일 뿐 통과 조건이 아닙니다."],
+  ["서술형 글자 수 상한", "400자. 상한 도달 시 입력을 막습니다 — 초과 상태를 만들지 않으므로 카운터에 오류 색을 쓰지 않습니다."],
+  ["같은 탭 재탭", "해당 탭의 스크롤을 맨 위로 올립니다. 이미 맨 위면 아무 일도 일어나지 않습니다."],
+  ["마이 → 설정 경로", "탭바로만 이동합니다. 마이 화면에 설정 진입점을 만들지 않으므로, 정본에서 헤더 버튼이 꺼져 있는 것이 의도된 상태입니다."],
+  ["저장 필터 선택", "단일 선택 · 항상 하나가 선택된 상태를 유지하며 해제되지 않습니다."],
+  ["RepoConfirm 두 버튼", "primary \"다음\" → 학습 설정으로 진행. secondary \"이 레포지토리가 아니예요\" → 홈으로 이동. 부정이 등록 화면으로 되돌아가지 않고 흐름을 빠져나가므로 루트까지 pop합니다."],
+  ["설정 일반 섹션 라벨", "서비스 약관 및 정책 · 로그아웃 · 계정 삭제 3행. 계정 삭제는 되돌릴 수 없으므로 error 색과 확인 시트를 붙입니다."],
+];
+
+const OPEN_ITEMS = [];
+
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      layers: LAYERS.map(([name, suffix, owns, takes, forbidden]) => ({ name, suffix, owns, takes, forbidden })),
+      screenRows: SCREENS,
+      subViewRows: SUBVIEWS,
+      repeatRows: REPEATS,
+      actionGroups: ACTION_GROUPS.map(([title, rows]) => ({ title, rows })),
+      ownership: OWNERSHIP.map(([name, detail]) => ({ name, detail })),
+      decidedRows: DECIDED.map(([w, detail]) => ({ where: w, detail })),
+    };
+  }
+}
+</script>
+</body>
+</html>

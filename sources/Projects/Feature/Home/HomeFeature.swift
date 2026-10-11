@@ -1,0 +1,200 @@
+import ComposableArchitecture
+import DomainUseCaseInterface
+
+@Reducer
+public struct HomeFeature: Sendable {
+
+    // MARK: Lifecycle
+
+    public init(
+        projects: @escaping @Sendable () async -> AsyncStream<ProjectList>,
+        refreshProjects: @escaping @Sendable () async throws -> Void,
+        profile: @escaping @Sendable () async throws -> UserProfile,
+    ) {
+        self.projects = projects
+        self.refreshProjects = refreshProjects
+        self.profile = profile
+    }
+
+    // MARK: Public
+
+    @ObservableState
+    public struct State: Equatable, Sendable {
+
+        // MARK: Lifecycle
+
+        public init() { }
+
+        // MARK: Public
+
+        public var profile = UserProfileLoadFeature.State()
+        public var projectSummaries = ProjectSummaryListFeature.State()
+
+        public var isGenerationInProgress = false
+
+        public var access = MainShellAccess.member
+
+    }
+
+    public enum Action: ViewAction, Equatable, Sendable {
+        case view(View)
+        case input(Input)
+        case delegate(Delegate)
+        case profile(UserProfileLoadFeature.Action)
+        case projectSummaries(ProjectSummaryListFeature.Action)
+
+        // MARK: Public
+
+        @CasePathable
+        public enum View: Equatable, Sendable {
+            case task
+            case profileRetryTapped
+            case projectRetryTapped
+            case projectRegistrationTapped
+            case showAllProjectsTapped
+            case projectCardTapped(projectID: ProjectID)
+            case learningTapped(projectID: ProjectID)
+            case signInTapped
+        }
+
+        @CasePathable
+        public enum Input: Equatable, Sendable {
+            case learningProjectsReloadRequested
+            case generationProgressChanged(isInProgress: Bool)
+            case accessChanged(MainShellAccess)
+        }
+
+        @CasePathable
+        public enum Delegate: Equatable, Sendable {
+            case projectRegistrationRequested
+            case projectDetailRequested(projectID: ProjectID)
+            case learningRequested(projectID: ProjectID, nextSetID: QuizSetID)
+            case signInRequired
+            case allProjectsRequested
+        }
+    }
+
+    public var body: some ReducerOf<Self> {
+        Scope(
+            state: \.profile,
+            action: \.profile,
+        ) {
+            UserProfileLoadFeature(profile: profile)
+        }
+        Scope(
+            state: \.projectSummaries,
+            action: \.projectSummaries,
+        ) {
+            ProjectSummaryListFeature(
+                projects: projects,
+                refreshProjects: refreshProjects,
+            )
+        }
+        Reduce { state, action in
+            switch action {
+            case .view(let action):
+                reduce(
+                    into: &state,
+                    view: action,
+                )
+
+            case .input(let action):
+                reduce(
+                    into: &state,
+                    input: action,
+                )
+
+            case .delegate,
+                 .profile,
+                 .projectSummaries:
+                .none
+            }
+        }
+    }
+
+    // MARK: Private
+
+    private let projects: @Sendable () async -> AsyncStream<ProjectList>
+    private let refreshProjects: @Sendable () async throws -> Void
+    private let profile: @Sendable () async throws -> UserProfile
+
+    private func reduce(
+        into state: inout State,
+        view action: Action.View,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .task:
+            guard state.access == .member else { return .none }
+            return startAccountLoad(state: &state)
+
+        case .profileRetryTapped:
+            guard state.access == .member, case .failed = state.profile.load else { return .none }
+            return .send(.profile(.input(.load)))
+
+        case .projectRetryTapped:
+            guard state.access == .member, case .failed = state.projectSummaries.load else { return .none }
+            return .send(.projectSummaries(.input(.refresh)))
+
+        case .projectRegistrationTapped:
+            guard state.access == .member else { return .send(.delegate(.signInRequired)) }
+            guard !state.isGenerationInProgress else { return .none }
+            return .send(.delegate(.projectRegistrationRequested))
+
+        case .showAllProjectsTapped:
+            guard state.access == .member else { return .send(.delegate(.signInRequired)) }
+            return .send(.delegate(.allProjectsRequested))
+
+        case .projectCardTapped(let projectID):
+            return .send(.delegate(.projectDetailRequested(projectID: projectID)))
+
+        case .learningTapped(let projectID):
+            guard
+                case .loaded(let list) = state.projectSummaries.load,
+                let summary = list.summaries.first(where: { $0.id == projectID }),
+                let next = summary.next,
+                next.quizID != nil
+            else { return .none }
+            return .send(
+                .delegate(.learningRequested(
+                    projectID: projectID,
+                    nextSetID: next.setID,
+                ))
+            )
+
+        case .signInTapped:
+            guard state.access == .guest else { return .none }
+            return .send(.delegate(.signInRequired))
+        }
+    }
+
+    private func reduce(
+        into state: inout State,
+        input action: Action.Input,
+    ) -> ComposableArchitecture.Effect<Action> {
+        switch action {
+        case .learningProjectsReloadRequested:
+            guard state.access == .member else { return .none }
+            return .send(.projectSummaries(.input(.refresh)))
+
+        case .generationProgressChanged(let isInProgress):
+            state.isGenerationInProgress = isInProgress
+            return .none
+
+        case .accessChanged(let access):
+            let previousAccess = state.access
+            state.access = access
+            guard previousAccess == .guest, access == .member else { return .none }
+            return startAccountLoad(state: &state)
+        }
+    }
+
+    private func startAccountLoad(state: inout State) -> ComposableArchitecture.Effect<Action> {
+        var effects = [ComposableArchitecture.Effect<Action>]()
+        if state.profile.load == .idle {
+            effects.append(.send(.profile(.input(.load))))
+        }
+        effects.append(.send(.projectSummaries(.input(.start))))
+        return .merge(effects)
+    }
+
+}
