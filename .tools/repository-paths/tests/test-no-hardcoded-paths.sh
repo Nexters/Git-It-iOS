@@ -29,7 +29,10 @@ for key in \
 	GIT_IT_SCRIPT_TEST_RUNNER \
 	GIT_IT_SCRIPT_VERIFICATION_RUNNER \
 	GIT_IT_DESIGN_RULE_RUNNER \
-	GIT_IT_PACKAGE_DEPENDENCY_RUNNER; do
+	GIT_IT_PACKAGE_DEPENDENCY_RUNNER \
+	GIT_IT_ISSUE_TEMPLATE_ROOT \
+	GIT_IT_WORKFLOW_LABEL_DOC \
+	GIT_IT_WORKFLOW_LANE_DOC; do
 	value=$("$paths" "$key")
 	if rg -n -F --hidden --glob '!.git/**' --glob '!**/DerivedData/**' \
 		--glob '!**/.build/**' \

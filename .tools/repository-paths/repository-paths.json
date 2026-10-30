@@ -26,5 +26,8 @@
   "GIT_IT_SCRIPT_TEST_RUNNER": ".tools/script-tests/bin/run.sh",
   "GIT_IT_SCRIPT_VERIFICATION_RUNNER": ".tools/script-verification/bin/run.sh",
   "GIT_IT_DESIGN_RULE_RUNNER": ".tools/design-rules/bin/run.sh",
-  "GIT_IT_PACKAGE_DEPENDENCY_RUNNER": ".tools/package-dependencies/bin/run.sh"
+  "GIT_IT_PACKAGE_DEPENDENCY_RUNNER": ".tools/package-dependencies/bin/run.sh",
+  "GIT_IT_ISSUE_TEMPLATE_ROOT": ".github/ISSUE_TEMPLATE",
+  "GIT_IT_WORKFLOW_LABEL_DOC": "docs/conventions/workflow/label.md",
+  "GIT_IT_WORKFLOW_LANE_DOC": "docs/conventions/workflow/lane.md"
 }

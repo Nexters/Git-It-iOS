@@ -6,7 +6,7 @@ source되는 공개 함수는 `name() ( ... )` 형태의 subshell 함수로 작�
 
 ## 경로와 Git 상태
 
-Git 경로 collection은 `-z` 결과를 NUL 파일로 유지하고 `xargs -0`에서 각 경로를 argv로 복원한다. 경로 목록을 command substitution이나 줄 단위 문자열로 저장하지 않는다. 실제 파일은 물리 경로로 정규화한 뒤 `shared/core/path-policy.sh`의 포함 관계로 허용 경계를 판정한다.
+Git 경로 collection은 `-z` 결과를 NUL 파일로 유지하고 `xargs -0`에서 각 경로를 argv로 복원한다. 경로 목록을 command substitution이나 줄 단위 문자열로 저장하지 않는다. 실제 파일은 물리 경로로 정규화한 뒤 `shared/core/path-policy.sh`의 포함 관계로 허용 경계를 판정한다. macOS의 `/bin/sh`에서 `pwd -P`는 상속한 `PWD`에 따라 한글 경로의 유니코드 정규화가 달라질 수 있으므로, 경로끼리 비교할 때는 양쪽을 같은 명령으로 정규화한다.
 
 성공 여부가 중요한 생산 명령은 pipeline 앞에 두지 않는다. 결과를 호출별 임시 디렉터리에 기록하고 생산자 상태를 확인한 다음 소비한다. pipeline이 불가피한 읽기 전용 표시 작업은 앞 단계 실패가 결과 안전성에 영향을 주지 않는 경우에만 사용한다.
 
