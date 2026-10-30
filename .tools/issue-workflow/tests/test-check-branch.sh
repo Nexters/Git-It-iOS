@@ -100,6 +100,13 @@ FAKE_ISSUE_STATE=MISSING
 assert_blocked "$repository/AGENTS.md" issue-missing
 unset FAKE_ISSUE_STATE
 
+# PR 번호는 열려 있어도 issue가 아니므로 막습니다.
+reset_cache
+FAKE_ISSUE_KIND=pull
+export FAKE_ISSUE_KIND
+assert_blocked "$repository/AGENTS.md" issue-missing
+unset FAKE_ISSUE_KIND
+
 # gh가 실패하면 막지 않지만 레인 위반은 그대로 막습니다.
 reset_cache
 FAKE_GH_FAIL=true

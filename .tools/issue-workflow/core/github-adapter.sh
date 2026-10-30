@@ -6,13 +6,14 @@ github_adapter_issue_state() (
 	github_adapter_number=$1
 	github_adapter_work=$2
 
-	if gh issue view "$github_adapter_number" --json state -q .state \
+	# gh는 PR 번호도 조회하므로 URL로 구분해 PR은 issue가 없는 것으로 봅니다.
+	if gh issue view "$github_adapter_number" --json state,url -q '.state + " " + .url' \
 		>"$github_adapter_work/issue-state" 2>"$github_adapter_work/issue-error"; then
-		if [ "$(cat "$github_adapter_work/issue-state")" = OPEN ]; then
-			printf 'OPEN\n'
-		else
-			printf 'CLOSED\n'
-		fi
+		case "$(cat "$github_adapter_work/issue-state")" in
+		*/pull/*) printf 'MISSING\n' ;;
+		'OPEN '*) printf 'OPEN\n' ;;
+		*) printf 'CLOSED\n' ;;
+		esac
 		return 0
 	fi
 

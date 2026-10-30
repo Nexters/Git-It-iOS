@@ -31,7 +31,7 @@ case "$1 $2" in
 		printf 'GraphQL: Could not resolve to an issue or pull request with the number of 9.\n' >&2
 		exit 1
 	}
-	printf '%s\n' "${FAKE_ISSUE_STATE:-OPEN}"
+	printf '%s https://github.com/example/repository/%s/9\n' "${FAKE_ISSUE_STATE:-OPEN}" "${FAKE_ISSUE_KIND:-issues}"
 	;;
 'issue create')
 	while [ "$#" -gt 0 ]; do

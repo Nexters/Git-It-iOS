@@ -58,6 +58,13 @@ assert_rejected issue-missing 9 --domain ios --topic home
 FAKE_ISSUE_STATE=CLOSED
 assert_rejected issue-closed 9 --domain ios --topic home
 unset FAKE_ISSUE_STATE
+
+# PR 번호는 열려 있어도 issue가 아니므로 브랜치를 내지 않습니다.
+FAKE_ISSUE_KIND=pull
+export FAKE_ISSUE_KIND
+assert_rejected issue-missing 9 --domain ios --topic home
+unset FAKE_ISSUE_KIND
+
 FAKE_GH_FAIL=true
 export FAKE_GH_FAIL
 assert_rejected issue-state-unavailable 9 --domain ios --topic home
