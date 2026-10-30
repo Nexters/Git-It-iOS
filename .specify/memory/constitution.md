@@ -1,30 +1,32 @@
 <!--
 Sync Impact Report
-- Version change: 7.2.0 → 7.3.0
-- Modified principles: 7. 위험 기반 실행 단위 — 공개 선언을 제거하는 변경에 한해 사용처(상위
-  패키지)부터 역위상 순서로 구현하는 예외를 추가하고, 예외 단위는 제거만 포함하며 plan.md에
-  적용 단위와 근거를 기록하도록 규정
+- Version change: 7.3.0 → 8.0.0
+- Modified principles: 8. Git-flow 브랜치 네임스페이스 — 일반 기능 브랜치를 열린 issue에서 낸
+  `feature/<issue 번호>-<도메인>-<내용>`으로 재정의하고, `/speckit-specify`가 `feature` 브랜치를
+  생성하지 않고 이 형식의 현재 브랜치를 재사용하도록 변경. `hotfix`·`release`, 기능 식별과
+  기존 브랜치 비소급 원칙은 유지
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/plan-template.md (실행 단위 진행에 제거 예외 반영);
-  ✅ .specify/templates/tasks-template.md (구성·실행 단위 순서에 제거 예외 반영);
-  ✅ .specify/templates/spec-template.md (변경 불필요);
+- Templates requiring updates: ✅ .specify/templates/spec-template.md (변경 불필요, 자리표시자는
+  create-new-feature.sh가 치환);
+  ✅ .specify/templates/plan-template.md (변경 불필요, 자리표시자는 create-new-feature.sh가 치환);
+  ✅ .specify/templates/tasks-template.md (변경 불필요);
   ✅ .specify/templates/checklist-template.md (변경 불필요);
   ✅ .specify/templates/constitution-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-plan/SKILL.md;
-  ✅ .agents/skills/speckit-tasks/SKILL.md; ✅ .agents/skills/speckit-converge/SKILL.md
-- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md) 변경 불필요;
-  ✅ docs/architecture.md 검토 완료(의존성 표 자체는 변경 없음)
-- Evidence records: specs/048-generation-outcome-payload 분석(D1), research.md R10
-- Follow-up TODO: 없음
+- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md
+- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md) 작업 시작 절 추가;
+  ✅ README.md 작업 시작 안내 추가; ✅ docs/conventions/workflow.md 신설
+- Evidence records: Nexters/Git-It-iOS#44
+- Follow-up TODO: `speckit-taskstoissues`는 작업을 issue로 1:1 변환해 "issue 하나는 결과 하나"
+  규칙과 맞지 않으므로 기본 흐름에서 제외했습니다. 스킬의 유지·폐기는 원칙 5 표 개정이 필요합니다.
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 7.3.0<br>
+**버전**: 8.0.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-09-30
+**최종 수정일**: 2026-10-30
 
 ## 원칙
 
@@ -228,16 +230,20 @@ Sync Impact Report
   경로, `..`, 중첩 경로와 symlink escape는 읽기·쓰기 후보에서 제외합니다.
 
 - `/speckit-specify`는 기능 설명과 브랜치 유형을 검증한 직후, extension hook이나 명세
-  디렉터리·파일을 처리하기 전에 현재 HEAD에서 로컬 기능 브랜치를 직접 생성하고 그 브랜치로
-  전환해야 합니다. 브랜치 생성 또는 전환에 실패하면 어떤 명세 산출물도 생성하거나 수정하지
-  않습니다.
+  디렉터리·파일을 처리하기 전에 기능 브랜치를 확정해야 합니다. `hotfix`와 `release`는 현재
+  HEAD에서 로컬 브랜치를 직접 생성하고 그 브랜치로 전환합니다. `feature`는 브랜치를 생성하지
+  않고 아래 형식의 현재 브랜치를 재사용하며, 현재 브랜치가 이 형식이 아니면 `/start-work`로
+  issue 브랜치를 내도록 안내하고 중단합니다. 브랜치 확정에 실패하면 어떤 명세 산출물도
+  생성하거나 수정하지 않습니다.
 - 성공한 브랜치 상태는 symbolic branch 이름이 검증된 이름과 같고 해당 local ref가 실제
   commit으로 해석되는 경우만 인정합니다. Unborn·dangling ref는 생성, 재사용 또는 hook 이후
   검증을 통과하지 못합니다. 최초 검증한 commit을 기준으로 저장하고 이후 hook과 명세 처리
   동안 HEAD 또는 대상 ref가 이동하면 완료하지 않습니다.
-- 새 브랜치 이름은 정확히 하나의 Git-flow 네임스페이스로 시작해야 합니다. 일반 기능은
-  `feature/<short-name>`, 운영 중인 배포본의 긴급 수정은 `hotfix/<short-name>`, 배포 준비와
-  안정화는 `release/<version-or-short-name>`을 사용합니다.
+- 새 브랜치 이름은 정확히 하나의 Git-flow 네임스페이스로 시작해야 합니다. 일반 기능은 열린
+  issue에서 낸 `feature/<issue 번호>-<도메인>-<내용>`, 운영 중인 배포본의 긴급 수정은
+  `hotfix/<short-name>`, 배포 준비와 안정화는 `release/<version-or-short-name>`을 사용합니다.
+  `feature` 접미사의 구성과 issue 흐름은
+  [작업 흐름 컨벤션](../../docs/conventions/workflow.md)이 소유합니다.
 - 사용자가 유형을 명시하면 그 값을 사용합니다. 명시하지 않은 경우 배포본의 긴급 수정은
   `hotfix`, 배포 준비와 안정화는 `release`, 그 밖의 변경은 `feature`를 기본값으로
   결정합니다. 서로 충돌하는 유형이 입력되면 브랜치를 생성하지 않고 충돌을 먼저 해소합니다.

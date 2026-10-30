@@ -65,6 +65,15 @@ destination은 `platform=iOS Simulator,name=iPhone 17 Pro`이며
 pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬에서 실패를 미리 잡을 수
 있습니다. 훅을 우회하지 마세요(`--no-verify` 금지).
 
+## 작업 시작
+
+작업은 열린 issue에서 시작합니다. 결과 하나를 목적 한 문장(50자)·범위·완료 조건으로 issue에
+정의하고, 그 issue에서 `feature/<번호>-<도메인>-<내용>` 브랜치를 낸 뒤 시작합니다(`/start-work`).
+같은 결과의 열린 issue가 있으면 새로 만들지 않고 항목으로 더합니다. 지금 PR이 맡은 항목만 하고,
+진행 중 발견한 다른 문제는 고치지 않고 issue 항목으로 남깁니다. 레인은 `project`·`ios`이며 한 PR에
+하나만 담습니다. 규칙의 정본은 [작업 흐름 컨벤션](docs/conventions/workflow.md)이고, 편집 전
+hook이 브랜치와 레인을 검사합니다.
+
 ## 코딩 규칙
 
 - **의존성 방향을 지킵니다.** 특히 Domain/Data/Core는 서로 및 App/Feature/UI에
@@ -125,7 +134,8 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 기능의 canonical identity는 Git-flow branch이고 `specs/<NNN>-<slug>`의 숫자는 생성 순서일
 뿐입니다. `.specify/feature.json`은 삭제 가능한 활성 pointer이며 branch metadata와 충돌하면
 신뢰하지 않습니다. 공용 판독·검증은 `.tools/spec-kit/bin/resolve-feature.sh`와
-`.tools/spec-kit/bin/validate.sh`를 사용합니다.
+`.tools/spec-kit/bin/validate.sh`를 사용합니다. 일반 기능의 `$speckit-specify`는 브랜치를 만들지
+않으므로 `/start-work`로 낸 issue 브랜치에서 실행합니다.
 
 각 스킬의 허용 수정 경로 정본은
 [Constitution 원칙 5 — Spec-Kit 범위](.specify/memory/constitution.md)의 표입니다. 이
@@ -153,7 +163,8 @@ Constitution을 개정합니다.
 PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 따릅니다. 실제로 실행한 검증만 기록하고, 수행하지 않은 검증을 수행한 것처럼
 작성하지 않습니다. 원칙의 예외를 적용했다면 이유·영향·미검증 범위를 PR에 남깁니다
-(Constitution 원칙 3).
+(Constitution 원칙 3). issue 연결과 머지 방식은
+[PR 작성과 머지](docs/conventions/workflow/pull-request.md)를 따릅니다.
 
 ## 저장소 구조
 
@@ -164,9 +175,10 @@ PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 ├── .specify/           # Spec Kit 설정과 Constitution
 ├── .agents/skills/     # 프로젝트 전용 에이전트 스킬 (Spec-Kit, 셸 스크립트)
 ├── specs/              # 기능 명세 (speckit-specify 산출물)
-├── .github/            # CI, 커밋 컨벤션, PR 템플릿
+├── .github/            # CI, 커밋 컨벤션, issue·PR 템플릿
 └── .tools/
     ├── githooks/            # Git Hook 및 저장소 자동화
+    ├── issue-workflow/      # issue 생성, 브랜치 시작, 편집 전 브랜치 검사
     ├── project-setup/       # 에이전트 링크와 개발 workspace 초기화
     ├── repository-paths/    # 저장소 공용 경로 관리
     ├── script-tests/        # 프로젝트 셸 회귀 테스트 실행
