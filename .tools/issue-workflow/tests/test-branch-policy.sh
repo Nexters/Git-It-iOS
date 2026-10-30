@@ -46,6 +46,15 @@ for invalid in \
 	assert_parse_fails "$invalid"
 done
 
+# 도메인은 목록의 값과 정확히 같아야 합니다.
+branch_policy_has_domain ios "$domains"
+for unknown in '' i android; do
+	if branch_policy_has_domain "$unknown" "$domains"; then
+		printf "FAIL: '%s'는 없는 도메인이어야 합니다\n" "$unknown" >&2
+		exit 1
+	fi
+done
+
 # 폴더는 접두어로, 파일은 전체로 맞추고 가장 긴 경로가 이깁니다.
 assert_equal "$(branch_policy_lane_of AGENTS.md "$lanes")" project
 assert_equal "$(branch_policy_lane_of app-code/Projects/App.swift "$lanes")" ios

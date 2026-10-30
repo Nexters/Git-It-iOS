@@ -4,7 +4,7 @@
 
 set -eu
 
-# 정책 token을 stderr 진단으로 옮깁니다.
+# 유스케이스의 token을 stderr 진단으로 옮깁니다.
 check_branch_report() (
 	check_branch_verdict=$1
 	check_branch_name=$2
@@ -12,6 +12,14 @@ check_branch_report() (
 	check_branch_lane_doc=$4
 
 	case "$check_branch_verdict" in
+	missing-lane-table)
+		printf '오류[issue-workflow.missing-lane-table]: %s에서 레인 표를 읽을 수 없습니다\n조치: 레인 표를 복원하세요\n' "$check_branch_lane_doc" >&2
+		return 0
+		;;
+	issue-state-unavailable)
+		printf '경고[issue-workflow.issue-state-unavailable]: issue 상태를 확인하지 못해 막지 않습니다\n' >&2
+		return 0
+		;;
 	detached)
 		printf '오류[issue-workflow.detached-head]: HEAD가 브랜치에 있지 않습니다\n' >&2
 		;;
@@ -46,6 +54,7 @@ check_branch_main() (
 	. "$check_branch_suite/core/convention-reader.sh"
 	. "$check_branch_suite/core/repository-adapter.sh"
 	. "$check_branch_suite/core/github-adapter.sh"
+	. "$check_branch_suite/core/check-branch.sh"
 
 	# 손으로 돌릴 때만 인자를 받고, hook은 stdin JSON으로 대상을 넘깁니다.
 	check_branch_name=''
@@ -86,41 +95,12 @@ check_branch_main() (
 		check_branch_file=$(repository_adapter_tool_file "$check_branch_work/input") || check_branch_file=''
 	fi
 	cd -- "$check_branch_root"
-
-	# 저장소 밖과 Git이 무시하는 파일은 규칙 대상이 아닙니다.
-	check_branch_relative=''
-	if [ -n "$check_branch_file" ]; then
-		check_branch_relative=$(repository_adapter_relative_path "$check_branch_root" "$check_branch_file") || return 0
-		if repository_adapter_is_ignored "$check_branch_relative"; then
-			return 0
-		fi
-	fi
-
 	check_branch_lane_doc=$("$check_branch_paths" GIT_IT_WORKFLOW_LANE_DOC) || return 1
-	check_branch_lanes=$(convention_reader_lanes "$check_branch_lane_doc") || {
-		printf '오류[issue-workflow.missing-lane-table]: %s에서 레인 표를 읽을 수 없습니다\n조치: 레인 표를 복원하세요\n' "$check_branch_lane_doc" >&2
-		return 1
-	}
-	if [ "$check_branch_name_given" = false ]; then
-		check_branch_name=$(repository_adapter_current_branch) || return 1
-	fi
 
-	# gh가 실패해도 편집을 멈추지 않도록 상태를 UNKNOWN으로 두고 레인만 검사합니다.
-	check_branch_state=''
-	check_branch_domains=$(branch_policy_domains "$check_branch_lanes")
-	if check_branch_parsed=$(branch_policy_parse "$check_branch_name" "$check_branch_domains"); then
-		check_branch_state=$(github_adapter_cached_issue_state "$check_branch_root" "$check_branch_name" \
-			"${check_branch_parsed%% *}" "$check_branch_work") || {
-			printf '경고[issue-workflow.issue-state-unavailable]: issue 상태를 확인하지 못해 막지 않습니다\n' >&2
-			check_branch_state=UNKNOWN
-		}
-	fi
-
-	check_branch_verdict=$(branch_policy_decide "$check_branch_name" "$check_branch_lanes" \
-		"$check_branch_state" "$check_branch_relative")
-	[ "$check_branch_verdict" != allow ] || return 0
-	check_branch_report "$check_branch_verdict" "$check_branch_name" "$check_branch_relative" "$check_branch_lane_doc"
-	return 2
+	check_branch_run "$check_branch_root" "$check_branch_work" "$check_branch_file" \
+		"$check_branch_name_given" "$check_branch_name" "$check_branch_lane_doc" \
+		repository_adapter_relative_path repository_adapter_is_ignored convention_reader_lanes \
+		repository_adapter_current_branch github_adapter_cached_issue_state check_branch_report
 )
 
 check_branch_main "$@"

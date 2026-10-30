@@ -14,6 +14,14 @@ branch_policy_domains() (
 	printf '%s\n' "$1" | cut -f1 | sort -u
 )
 
+# 도메인이 목록에 있는지 판정합니다.
+branch_policy_has_domain() (
+	for branch_policy_domain in $2; do
+		[ "$branch_policy_domain" != "$1" ] || return 0
+	done
+	return 1
+)
+
 # feature/<번호>-<도메인>-<내용>을 "번호 도메인 내용"으로 나눕니다.
 branch_policy_parse() (
 	branch_policy_name=$1
