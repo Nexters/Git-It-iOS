@@ -1,7 +1,7 @@
 # Spec Kit 스킬 공통 규칙
 
 이 문서는 `.agents/skills/speckit-*/SKILL.md` 워크플로 스킬(analyze, checklist, clarify,
-constitution, converge, implement, plan, specify, tasks, taskstoissues)이 공유하는 규칙을
+constitution, converge, implement, plan, specify, tasks)이 공유하는 규칙을
 한 곳에 모은 것이다. 각 스킬 파일은 아래 규칙을 직접 반복하지 않고 이 문서를 참조한다.
 `speckit-troubleshooting`과 `speckit-tacit-knowledge`는 별도의 기록 전용 규약을 따르며 이
 문서의 대상이 아니다.
@@ -44,7 +44,7 @@ $ARGUMENTS
 모든 워크플로 스킬은 실행 전(`before_<phase>`)과 실행 후(`after_<phase>`) 두 시점에
 동일한 방식으로 `.specify/extensions.yml`의 확장 훅을 확인한다. `<phase>`는 스킬마다
 다른 값(`analyze`, `checklist`, `clarify`, `constitution`, `converge`, `implement`,
-`plan`, `specify`, `tasks`, `taskstoissues`)을 쓴다.
+`plan`, `specify`, `tasks`)을 쓴다.
 
 **탐지 및 필터링**:
 

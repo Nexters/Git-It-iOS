@@ -1,32 +1,28 @@
 <!--
 Sync Impact Report
-- Version change: 7.3.0 → 8.0.0
-- Modified principles: 8. Git-flow 브랜치 네임스페이스 — 일반 기능 브랜치를 열린 issue에서 낸
-  `feature/<issue 번호>-<도메인>-<내용>`으로 재정의하고, `/speckit-specify`가 `feature` 브랜치를
-  생성하지 않고 이 형식의 현재 브랜치를 재사용하도록 변경. `hotfix`·`release`, 기능 식별과
-  기존 브랜치 비소급 원칙은 유지
+- Version change: 8.0.0 → 9.0.0
+- Modified principles: 5. Spec-Kit 범위 — 표에서 `speckit-taskstoissues` 행을 삭제해 이 스킬의
+  GitHub issue 생성 허용을 폐지. 이전에 허용되던 실행이 더는 허용되지 않으므로 MAJOR
 - Added sections: 없음
 - Removed sections: 없음
-- Templates requiring updates: ✅ .specify/templates/spec-template.md (변경 불필요, 자리표시자는
-  create-new-feature.sh가 치환);
-  ✅ .specify/templates/plan-template.md (변경 불필요, 자리표시자는 create-new-feature.sh가 치환);
+- Templates requiring updates: ✅ .specify/templates/spec-template.md (변경 불필요);
+  ✅ .specify/templates/plan-template.md (변경 불필요);
   ✅ .specify/templates/tasks-template.md (변경 불필요);
   ✅ .specify/templates/checklist-template.md (변경 불필요);
   ✅ .specify/templates/constitution-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md
-- Runtime guidance requiring updates: ✅ AGENTS.md(CLAUDE.md) 작업 시작 절 추가;
-  ✅ README.md 작업 시작 안내 추가; ✅ docs/conventions/workflow.md 신설
-- Evidence records: Nexters/Git-It-iOS#44
-- Follow-up TODO: `speckit-taskstoissues`는 작업을 issue로 1:1 변환해 "issue 하나는 결과 하나"
-  규칙과 맞지 않으므로 기본 흐름에서 제외했습니다. 스킬의 유지·폐기는 원칙 5 표 개정이 필요합니다.
+- Commands requiring updates: ✅ .agents/skills/speckit-taskstoissues/ 삭제
+- Runtime guidance requiring updates: ✅ .specify/memory/speckit-common-rules.md 스킬·phase 목록;
+  ✅ .specify/integrations/codex.manifest.json 항목; ✅ docs/conventions/workflow/spec-kit.md
+- Evidence records: Nexters/Git-It-iOS#47
+- Follow-up TODO: 없음. 8.0.0의 `speckit-taskstoissues` 유지·폐기 TODO를 폐기로 해소
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 8.0.0<br>
+**버전**: 9.0.0<br>
 **비준일**: 2026-08-08<br>
-**최종 수정일**: 2026-10-30
+**최종 수정일**: 2026-11-01
 
 ## 원칙
 
@@ -109,7 +105,6 @@ Sync Impact Report
 | `speckit-analyze` | 없음(읽기 전용) |
 | `speckit-converge` | `specs/<feature>/tasks.md` 끝에 새 Convergence 단계 추가만 |
 | `speckit-implement` | 활성 `tasks.md`에 정확히 적힌 파일(`docs/**`도 파일 단위만), `specs/<feature>/tasks.md`의 완료 표시 |
-| `speckit-taskstoissues` | 로컬 파일 없음; 확인된 원격 저장소의 GitHub 이슈 생성만 |
 | `speckit-constitution` | `.specify/memory/constitution.md`, 연동 템플릿, `.agents/skills/speckit-*/SKILL.md` |
 | `speckit-swift-format-run` | 현재 작업 트리에서 추가 또는 수정된 Swift 파일만 포맷 |
 | `speckit-troubleshooting` | `docs/spec-kit/<feature>/trouble-shooting.md` 생성 또는 파일 끝에 새 항목 추가만 |
