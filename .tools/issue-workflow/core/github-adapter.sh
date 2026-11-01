@@ -57,6 +57,12 @@ github_adapter_linked_branches() (
 	cut -f1 "$2/linked-branches"
 )
 
+# Spec Kit 단계가 읽을 번호, 제목, 라벨과 본문을 출력합니다.
+github_adapter_issue_context() (
+	gh issue view "$1" --json number,title,labels,body \
+		-q '"#\(.number) \(.title)\n라벨: \([.labels[].name] | join(", "))\n\n\(.body)"'
+)
+
 # issue를 만들고 그 URL을 출력합니다.
 github_adapter_create_issue() (
 	github_adapter_title=$1

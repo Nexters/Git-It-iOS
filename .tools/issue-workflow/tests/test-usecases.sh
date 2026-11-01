@@ -10,6 +10,7 @@ module=$(CDPATH='' cd -- "$test_dir/.." && pwd -P)
 . "$module/core/check-branch.sh"
 . "$module/core/create-issue.sh"
 . "$module/core/start-branch.sh"
+. "$module/core/read-issue.sh"
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/issue-workflow-usecase-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -122,6 +123,12 @@ fake_develop() {
 	[ "$develop_result" != FAIL ] || return 1
 }
 
+fake_context() {
+	log_call context "$1"
+	[ "$context_result" != FAIL ] || return 1
+	printf 'issue 문맥\n'
+}
+
 run_check() {
 	: >"$calls"
 	run_status=0
@@ -141,6 +148,13 @@ run_start() {
 	run_status=0
 	start_branch_run "$1" "$2" "$3" lane.md "$work" \
 		fake_lanes fake_state fake_labels fake_linked fake_develop fake_report >"$work/stdout" || run_status=$?
+}
+
+run_read() {
+	: >"$calls"
+	run_status=0
+	read_issue_run "$1" "$2" lane.md "$work" \
+		fake_lanes fake_branch fake_state fake_labels fake_context fake_report >"$work/stdout" || run_status=$?
 }
 
 relative_result=.tools/a.sh
@@ -399,5 +413,67 @@ develop 9 feature/9-ios-home'
 	printf 'FAIL: 브랜치 이름을 출력해야 합니다\n' >&2
 	exit 1
 }
+
+context_result=ok
+
+# 레인 표를 못 읽으면 브랜치와 issue를 읽지 않습니다.
+lanes_result=FAIL
+run_read false ''
+assert_run 1 'lanes lane.md
+report missing-lane-table'
+lanes_result=$lanes
+
+# issue 브랜치가 아니면 issue를 조회하지 않습니다.
+branch_result=develop
+run_read false ''
+assert_run 2 'lanes lane.md
+branch
+report invalid-branch-name'
+branch_result=feature/44-project-tool
+
+# 현재 브랜치의 번호로 상태, 라벨, 문맥 순서로 읽습니다.
+run_read false ''
+assert_run 0 'lanes lane.md
+branch
+state 44
+labels 44
+context 44'
+[ "$(cat "$work/stdout")" = 'issue 문맥' ] || {
+	printf 'FAIL: issue 문맥을 출력해야 합니다\n' >&2
+	exit 1
+}
+
+# 지정한 브랜치는 현재 브랜치를 읽지 않습니다.
+run_read true feature/9-ios-home
+assert_run 0 'lanes lane.md
+state 9
+labels 9
+context 9'
+
+# 닫혔거나 status: 라벨이 달린 issue는 문맥을 내지 않습니다.
+state_result=CLOSED
+run_read true feature/9-ios-home
+assert_run 2 'lanes lane.md
+state 9
+report issue-closed'
+state_result=OPEN
+
+labels_result='status: blocked'
+run_read true feature/9-ios-home
+assert_run 2 'lanes lane.md
+state 9
+labels 9
+report issue-held'
+labels_result='type: bug'
+
+# 문맥을 읽지 못하면 실패합니다.
+context_result=FAIL
+run_read true feature/9-ios-home
+assert_run 1 'lanes lane.md
+state 9
+labels 9
+context 9
+report issue-state-unavailable'
+context_result=ok
 
 printf 'PASS: issue-workflow 유스케이스 순서 회귀\n'

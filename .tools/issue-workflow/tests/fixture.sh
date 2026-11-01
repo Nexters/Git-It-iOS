@@ -40,6 +40,10 @@ case "$1 $2" in
 		printf '%s\n' "${FAKE_ISSUE_LABELS:-type: tooling}"
 		exit 0
 		;;
+	*'--json number,title,labels,body '*)
+		printf '#%s 목적 문장\n라벨: type: tooling\n\n## 목적\n' "$3"
+		exit 0
+		;;
 	esac
 	printf '%s https://github.com/example/repository/%s/9\n' "${FAKE_ISSUE_STATE:-OPEN}" "${FAKE_ISSUE_KIND:-issues}"
 	;;
