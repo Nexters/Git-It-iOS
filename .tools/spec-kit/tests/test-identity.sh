@@ -66,6 +66,12 @@ assert_fails_with stale_safe_pointer 'speckit.identity.stale-pointer' env SPEC_K
 printf '{"feature_directory":"../../outside"}\n' >"$fixture/.specify/feature.json"
 assert_fails_with unsafe_pointer 'speckit.identity.stale-pointer' env SPEC_KIT_REPO_ROOT="$fixture" /bin/sh "$validator"
 
+# spec.md가 없는 폴더를 가리키는 pointer도 도구 오류가 아니라 stale로 진단합니다.
+mkdir -p "$fixture/specs/003-empty"
+printf '{"feature_directory":"specs/003-empty"}\n' >"$fixture/.specify/feature.json"
+assert_fails_with missing_spec_pointer 'speckit.identity.stale-pointer' env SPEC_KIT_REPO_ROOT="$fixture" /bin/sh "$validator"
+rmdir "$fixture/specs/003-empty"
+
 # JSON처럼 보이는 문자열이 아니라 완전한 단일 JSON 문서만 pointer로 허용합니다.
 printf '{"feature_directory":"specs/001-one"} trailing-garbage\n' >"$fixture/.specify/feature.json"
 assert_fails_with malformed_pointer 'speckit.identity.stale-pointer' env SPEC_KIT_REPO_ROOT="$fixture" /bin/sh "$validator"
