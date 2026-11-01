@@ -68,7 +68,7 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 ## 작업 시작
 
 작업은 열린 issue에서 시작합니다. 결과 하나를 목적 한 문장(50자)·범위·완료 조건으로 issue에
-정의하고, 그 issue에서 `feature/<번호>-<도메인>-<내용>` 브랜치를 낸 뒤 시작합니다(`/start-work`).
+정의하고, 그 issue에서 `feature/<번호>-<도메인>-<내용>` 브랜치를 낸 뒤 시작합니다(`/write-issue`).
 같은 결과의 열린 issue가 있으면 새로 만들지 않고 항목으로 더합니다. 지금 PR이 맡은 항목만 하고,
 진행 중 발견한 다른 문제는 고치지 않고 issue 항목으로 남깁니다. 레인은 `project`·`ios`이며 한 PR에
 하나만 담습니다. 규칙의 정본은 [작업 흐름 컨벤션](docs/conventions/workflow.md)이고, 편집 전
@@ -135,7 +135,7 @@ hook이 브랜치와 레인을 검사합니다.
 뿐입니다. `.specify/feature.json`은 삭제 가능한 활성 pointer이며 branch metadata와 충돌하면
 신뢰하지 않습니다. 공용 판독·검증은 `.tools/spec-kit/bin/resolve-feature.sh`와
 `.tools/spec-kit/bin/validate.sh`를 사용합니다. 일반 기능의 `$speckit-specify`는 브랜치를 만들지
-않으므로 `/start-work`로 낸 issue 브랜치에서 실행합니다.
+않으므로 `/write-issue`로 낸 issue 브랜치에서 실행합니다.
 
 각 스킬의 허용 수정 경로 정본은
 [Constitution 원칙 5 — Spec-Kit 범위](.specify/memory/constitution.md)의 표입니다. 이

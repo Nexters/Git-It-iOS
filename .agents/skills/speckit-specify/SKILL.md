@@ -38,7 +38,7 @@ You **MUST** consider the user input before proceeding (if not empty).
   workflow tool creates them. Set `GIT_BRANCH_NAME` to the current branch and run
   `.tools/issue-workflow/bin/check-branch.sh --branch "$GIT_BRANCH_NAME"`. If the current branch is not
   in the `feature` namespace or the check exits non-zero, stop before any hook or specification file
-  operation, show its diagnostic, and tell the user to run `/start-work` first.
+  operation, show its diagnostic, and tell the user to run `/write-issue` first.
 - For `hotfix` or `release`, construct `GIT_BRANCH_NAME` as `hotfix/<short-name>` or
   `release/<version-or-short-name>`. Use lowercase kebab-case for hotfix suffixes; a release
   suffix may instead be a version identifier such as `v1.2.3`. A suffix MUST be non-empty and MUST
@@ -75,7 +75,7 @@ You **MUST** consider the user input before proceeding (if not empty).
     This check does not fetch or mutate a remote.
   - Only when neither a local target nor a matching remote-tracking ref exists, run
     `git switch -c "$GIT_BRANCH_NAME"` from the current HEAD and set `BRANCH_STATUS` to `생성`. For
-    `feature`, do not create it: stop and tell the user to run `/start-work` first.
+    `feature`, do not create it: stop and tell the user to run `/write-issue` first.
   - Recheck the full branch invariant. After an existing-branch switch, also require the previously
     listed carry-over paths and index state to remain exactly accounted for. If creation, switching, or
     verification fails, stop before dispatching hooks or creating/updating specification artifacts.

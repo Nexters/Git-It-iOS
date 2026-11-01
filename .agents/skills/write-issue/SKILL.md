@@ -1,9 +1,9 @@
 ---
-name: start-work
+name: write-issue
 description: 작업을 시작할 때 쓴다. 목적 문장으로 issue를 찾거나 만들고, 그 issue에서 feature 브랜치를 낸다. 규칙은 다시 적지 않고 순서와 명령만 적는다.
 ---
 
-# 작업 시작
+# issue 작성
 
 규칙의 정본은 [작업 흐름 컨벤션](../../../docs/conventions/workflow.md)이다. 이 스킬은 순서만 적는다.
 

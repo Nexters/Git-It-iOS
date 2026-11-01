@@ -3,7 +3,7 @@
 [Git It iOS 작업 흐름 컨벤션](../workflow.md)의 규칙 문서입니다.
 
 **issue 생성과 브랜치 시작은 `.tools/issue-workflow/bin/`의 공개 명령으로 합니다.** 에이전트는 이 순서를
-담은 `/start-work` 스킬을 씁니다. 모든 명령은 `gh` 인증이 필요합니다.
+담은 `/write-issue` 스킬을 씁니다. 모든 명령은 `gh` 인증이 필요합니다.
 
 | 하는 일 | 명령 |
 | --- | --- |

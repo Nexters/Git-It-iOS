@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report
-- Version change: 8.0.0 → 9.0.0
-- Modified principles: 5. Spec-Kit 범위 — 표에서 `speckit-taskstoissues` 행을 삭제해 이 스킬의
-  GitHub issue 생성 허용을 폐지. 이전에 허용되던 실행이 더는 허용되지 않으므로 MAJOR
+- Version change: 9.0.0 → 9.0.1
+- Modified principles: 8 — `/speckit-specify` 항목의 스킬 이름 `/start-work`를
+  `/write-issue`로 교체. 규칙의 의미는 그대로이고 이름만 바뀌므로 PATCH
 - Added sections: 없음
 - Removed sections: 없음
 - Templates requiring updates: ✅ .specify/templates/spec-template.md (변경 불필요);
@@ -10,17 +10,17 @@ Sync Impact Report
   ✅ .specify/templates/tasks-template.md (변경 불필요);
   ✅ .specify/templates/checklist-template.md (변경 불필요);
   ✅ .specify/templates/constitution-template.md (변경 불필요)
-- Commands requiring updates: ✅ .agents/skills/speckit-taskstoissues/ 삭제
-- Runtime guidance requiring updates: ✅ .specify/memory/speckit-common-rules.md 스킬·phase 목록;
-  ✅ .specify/integrations/codex.manifest.json 항목; ✅ docs/conventions/workflow/spec-kit.md
-- Evidence records: Nexters/Git-It-iOS#47
-- Follow-up TODO: 없음. 8.0.0의 `speckit-taskstoissues` 유지·폐기 TODO를 폐기로 해소
+- Commands requiring updates: ✅ .agents/skills/speckit-specify/SKILL.md 스킬 이름
+- Runtime guidance requiring updates: ✅ AGENTS.md; ✅ docs/conventions/workflow/tooling.md;
+  ✅ .tools/issue-workflow/bin/check-branch.sh·read-issue.sh 진단 문구
+- Evidence records: Nexters/Git-It-iOS#51
+- Follow-up TODO: 없음
 -->
 
 # Git-It Constitution
 
 **상태**: Ratified<br>
-**버전**: 9.0.0<br>
+**버전**: 9.0.1<br>
 **비준일**: 2026-08-08<br>
 **최종 수정일**: 2026-11-01
 
@@ -227,7 +227,7 @@ Sync Impact Report
 - `/speckit-specify`는 기능 설명과 브랜치 유형을 검증한 직후, extension hook이나 명세
   디렉터리·파일을 처리하기 전에 기능 브랜치를 확정해야 합니다. `hotfix`와 `release`는 현재
   HEAD에서 로컬 브랜치를 직접 생성하고 그 브랜치로 전환합니다. `feature`는 브랜치를 생성하지
-  않고 아래 형식의 현재 브랜치를 재사용하며, 현재 브랜치가 이 형식이 아니면 `/start-work`로
+  않고 아래 형식의 현재 브랜치를 재사용하며, 현재 브랜치가 이 형식이 아니면 `/write-issue`로
   issue 브랜치를 내도록 안내하고 중단합니다. 브랜치 확정에 실패하면 어떤 명세 산출물도
   생성하거나 수정하지 않습니다.
 - 성공한 브랜치 상태는 symbolic branch 이름이 검증된 이름과 같고 해당 local ref가 실제
