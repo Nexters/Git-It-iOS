@@ -238,6 +238,8 @@ permission does not expand the file write allowlist above.
      요청한다.
    - 각 단위에 `단위 ID`, 하나의 논리적 `목적`, 포함 `작업 ID`, 정확한 `파일 경로`, 실행할
      `검증`, `.github/COMMIT_CONVENTION.md`를 따르는 `[Tag] Message`를 명시한다.
+     spec.md의 `연결 issue`가 `#<번호>`이면 커밋 Footer에 `Refs: #<번호>`를 넣는다. issue를
+     닫는 것은 커밋이 아니라 PR이 정한다.
    - 하나의 단위는 독립적으로 리뷰하고 되돌릴 수 있어야 한다. 단일 패키지가 기본이지만,
      tasks.md가 분리 불가 근거와 통합 검증을 명시한 integration unit은 여러 패키지를 포함할
      수 있다. 직접 관련된 production 코드와 테스트는 함께 둘 수 있지만 독립적인 기능, refactor, rename,

@@ -66,6 +66,11 @@ Load only the minimal necessary context from each artifact:
 - Change Scenarios (including user, developer, operator, or integrating-system scenarios)
 - Edge Cases (if present)
 
+**From the linked issue (`feature/` branches only):**
+
+- Run `.tools/issue-workflow/bin/read-issue.sh` and load `범위(경로)` and `완료 조건`. On a non-zero exit,
+  note its diagnostic in the report and continue without this source.
+
 **From plan.md:**
 
 - Architecture/stack choices
@@ -135,6 +140,8 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Requirements with zero associated tasks
 - Tasks with no mapped requirement/change scenario
 - Success Criteria requiring buildable work (performance, security, availability) not reflected in tasks
+- Issue `완료 조건` items with no associated requirement or task
+- Requirements or tasks outside the issue's `범위(경로)` or `완료 조건`
 
 #### F. Inconsistency
 

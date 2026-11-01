@@ -24,9 +24,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Pre-Execution Checks
 
 **Create the Git-flow branch before dispatching `before_specify` hooks**:
-- Require a non-empty feature description before deriving a name or changing Git state. If it is
-  empty, stop with `기능 설명이 제공되지 않았습니다` and do not create a branch.
-- Derive `SHORT_NAME` from the feature description using the short-name rules in step 1 below.
+- Require a non-empty feature description before deriving a name or changing Git state. On a `feature`
+  issue branch an empty description falls back to the issue's `목적` read below. Otherwise stop with
+  `기능 설명이 제공되지 않았습니다` and do not create a branch.
+- Derive `SHORT_NAME` from the feature description using the short-name rules in step 1 below. When
+  the description falls back to the issue, derive it after reading `ISSUE_CONTEXT`.
 - Determine `BRANCH_NAMESPACE` before branch creation:
   - Use the user's explicit `feature`, `hotfix`, or `release` type when provided.
   - Use `hotfix` only for an urgent fix to a production release.
@@ -38,7 +40,10 @@ You **MUST** consider the user input before proceeding (if not empty).
   workflow tool creates them. Set `GIT_BRANCH_NAME` to the current branch and run
   `.tools/issue-workflow/bin/check-branch.sh --branch "$GIT_BRANCH_NAME"`. If the current branch is not
   in the `feature` namespace or the check exits non-zero, stop before any hook or specification file
-  operation, show its diagnostic, and tell the user to run `/write-issue` first.
+  operation, show its diagnostic, and tell the user to run `/write-issue` first. Then run
+  `.tools/issue-workflow/bin/read-issue.sh --branch "$GIT_BRANCH_NAME"` and keep its output as
+  `ISSUE_CONTEXT`. It rejects a closed issue and one with a `status:` label; on a non-zero exit stop the
+  same way and show its diagnostic without changing the issue.
 - For `hotfix` or `release`, construct `GIT_BRANCH_NAME` as `hotfix/<short-name>` or
   `release/<version-or-short-name>`. Use lowercase kebab-case for hotfix suffixes; a release
   suffix may instead be a version identifier such as `v1.2.3`. A suffix MUST be non-empty and MUST
@@ -186,7 +191,7 @@ Given that feature description, do this:
    - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
      before creating a new directory, so template-resolution failure leaves no orphan directory.
    - Record whether the target directory and spec existed. For a new spec, treat target setup, template
-     rendering, verified Git-flow type/branch/status association, and final installation as one atomic
+     rendering, verified Git-flow type/branch/status/issue association, and final installation as one atomic
      transaction: build and validate the associated spec at a unique temporary path, then expose it as
      `SPECIFY_FEATURE_DIRECTORY/spec.md` only by an atomic no-clobber install. Never expose a placeholder
      or partially associated spec at the final path.
@@ -210,7 +215,9 @@ Given that feature description, do this:
 
 6. Follow this execution flow:
     1. Parse user description from arguments
-       If empty: ERROR "기능 설명이 제공되지 않았습니다"
+       If empty: use the `목적` of `ISSUE_CONTEXT`; without `ISSUE_CONTEXT`: ERROR "기능 설명이 제공되지 않았습니다"
+       With `ISSUE_CONTEXT`, its `범위(경로)` bounds the spec and every `완료 조건` item needs a requirement
+       or success criterion. Do not add work outside them; report it for the issue instead.
     2. Extract key concepts from description
        Identify: stakeholders/actors, actions or system conditions, data, constraints
     3. For unclear aspects:
@@ -241,7 +248,8 @@ Given that feature description, do this:
    concrete details derived from the feature description (arguments) while preserving section order
    and headings. Fill `Git-flow 유형` with `BRANCH_NAMESPACE` and `기능 브랜치` with the verified
    active `GIT_BRANCH_NAME`. Record `BRANCH_STATUS` separately as `생성` or `재사용`; never write a
-   planned or uncreated branch as the feature branch.
+   planned or uncreated branch as the feature branch. Fill `연결 issue` with the `#<번호>` of
+   `ISSUE_CONTEXT`, or `해당 없음` for `hotfix` and `release`.
    - For a reused spec, treat its current contents as the merge baseline instead of regenerating the
      file. Apply only the requested delta and necessary validation corrections. Preserve requirement
      IDs, prior clarification answers, manual notes, unknown sections, and content not contradicted by
@@ -383,6 +391,7 @@ Report completion to the user with:
 - `SPEC_FILE` — the spec file path
 - `BRANCH_NAMESPACE` and `GIT_BRANCH_NAME` — the selected Git-flow type and validated branch name
 - Branch status — whether this invocation created the branch or explicitly reused an existing branch
+- Linked issue, plus any requested work left out because it falls outside the issue's scope
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
@@ -458,6 +467,7 @@ Success criteria must be:
 - [ ] Specification written to `SPEC_FILE` and validated against quality checklist
 - [ ] Git-flow branch created or resumed directly and verified before any specification artifact write
 - [ ] Git-flow namespace, active branch, and `생성`/`재사용` status recorded accurately
+- [ ] A `feature` spec records its issue and stays inside that issue's scope and completion criteria
 - [ ] Feature directory is a canonical direct child of `specs/` and feature.json was updated only after validation state was recorded
 - [ ] Reused spec and checklist content merged without unintended truncation
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above

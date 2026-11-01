@@ -239,7 +239,9 @@ Append to the **end** of `tasks.md`, per the append contract:
   `/speckit-implement` captures the tasks.md blob hash and full diff as its baseline; a separate
   baseline commit is optional. Include the newly appended whole convergence-validation task count.
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
-  is needed for this feature's specified scope.
+  is needed for this feature's specified scope. When `연결 issue` in spec.md is `#<번호>`, say whether
+  the PR should use `Closes` or `Refs` under [PR 작성과 머지](../../../docs/conventions/workflow/pull-request.md):
+  `Closes` only if this PR finishes every remaining `완료 조건` item.
 
 ### 9. Check for extension hooks
 
