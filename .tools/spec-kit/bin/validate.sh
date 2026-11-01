@@ -59,6 +59,11 @@ spec_kit_validate_main() (
 			printf '오류[speckit.identity.stale-pointer]: feature.json이 안전한 specs 직계 하위를 가리키지 않습니다\n관련 경로: .specify/feature.json\n조치: pointer를 삭제한 뒤 branch metadata에서 재생성하세요\n' >&2
 			return 2
 		}
+		# metadata를 읽기 전에 대상 spec.md가 있는지 확인해 도구 오류로 끝나지 않게 합니다.
+		[ -f "$spec_kit_root/$spec_kit_pointer/spec.md" ] || {
+			printf '오류[speckit.identity.stale-pointer]: feature.json 대상 폴더에 spec.md가 없습니다\n관련 경로: %s/spec.md\n조치: pointer를 삭제한 뒤 현재 branch metadata에서 재생성하세요\n' "$spec_kit_pointer" >&2
+			return 2
+		}
 		spec_kit_pointer_branch=$(spec_kit_read_branch "$spec_kit_root/$spec_kit_pointer/spec.md")
 		[ "$spec_kit_pointer_branch" = "$spec_kit_current_branch" ] || {
 			printf '오류[speckit.identity.stale-pointer]: feature.json 대상 metadata가 현재 branch와 다릅니다\n관련 경로: %s/spec.md\n조치: pointer를 삭제한 뒤 현재 branch metadata에서 재생성하세요\n' "$spec_kit_pointer" >&2
