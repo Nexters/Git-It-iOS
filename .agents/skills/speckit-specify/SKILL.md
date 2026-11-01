@@ -1,6 +1,6 @@
 ---
 name: "speckit-specify"
-description: "Create a validated Git-flow branch immediately, then create or update the feature specification from a natural language feature description."
+description: "Create or update the feature specification from a natural language feature description on the current issue branch, creating a validated branch only for hotfix or release work."
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
