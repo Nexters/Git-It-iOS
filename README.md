@@ -26,6 +26,10 @@ Spec-Kit 기능은 `feature/`, `hotfix/`, `release/` Git-flow branch 이름으�
 활성 pointer입니다. 현재 branch의 artifact는 `.tools/spec-kit/bin/resolve-feature.sh`, 전체
 identity 충돌과 pointer 안전성은 `.tools/spec-kit/bin/validate.sh`로 읽기 전용 검증합니다.
 
+작업은 GitHub issue에서 시작합니다. `.tools/issue-workflow/bin/create-issue.sh`로 issue를 만들고
+`.tools/issue-workflow/bin/start-branch.sh`로 그 issue의 브랜치를 냅니다. 규칙은
+[작업 흐름 컨벤션](docs/conventions/workflow.md)을 따릅니다.
+
 `make hooks`는 커밋 메시지 형식 검사와 검증 훅을 설치합니다. 현재는 빌드·컴파일·테스트·린트·포맷 검증을 기본 비활성화했습니다.
 커밋 전 검증은 `.tools/githooks/pre-commit.d/enabled`에서 필요한 단계의 주석을 풀어 다시 켭니다.
 push 전 검증은 `GIT_IT_PRE_PUSH_VALIDATION_ENABLED=true git push`로 다시 켤 수 있습니다.
@@ -52,6 +56,6 @@ Tuist 설정 변경일 때만 모든 공유 scheme을 먼저 빌드하고, 이�
 ├── specs/              # 기능 명세 및 계획 산출물 (Spec Kit)
 ├── .specify/           # Spec Kit 설정과 상위 원칙(Constitution)
 ├── .agents/            # 프로젝트 전용 에이전트 스킬 (커스텀 툴)
-├── .github/            # GitHub CI/CD 및 커밋·PR 규칙
+├── .github/            # GitHub CI/CD 및 커밋·issue·PR 규칙
 └── .tools/              # 저장소 자동화 도구
 ```

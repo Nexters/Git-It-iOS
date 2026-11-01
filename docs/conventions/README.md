@@ -18,6 +18,7 @@
 | [UIComponent](./ui-component.md) | 컴포넌트 경계, 공개 입력, 파일·자산 구성과 검증 |
 | [현지화](./localization.md) | 사용자 노출 문구의 카탈로그, 키, `LocalizedText` 조회 진입점과 제외 대상 |
 | [TCA](./tca/README.md) | TCA 핵심 용어, 제약조건과 하위 문서 안내 |
+| [작업 흐름](./workflow.md) | issue 단위·본문·라벨, 브랜치 이름과 레인, PR 작성·머지, Spec Kit 연결 |
 
 ## 문서 구조
 

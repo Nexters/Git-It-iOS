@@ -33,12 +33,19 @@ You **MUST** consider the user input before proceeding (if not empty).
   - Use `release` for release preparation or stabilization.
   - Otherwise default to `feature`, including ordinary defect work that is not a production hotfix.
   - If explicit inputs indicate conflicting types, stop before creating a branch and resolve the conflict.
-- Construct `GIT_BRANCH_NAME` as `feature/<short-name>`, `hotfix/<short-name>`, or
-  `release/<version-or-short-name>`. Use lowercase kebab-case for feature/hotfix suffixes; a release
+- For `feature`, do not derive a new branch name: this skill never creates a `feature` branch. Ordinary
+  feature branches are issue branches named `feature/<issue number>-<domain>-<topic>` and only the
+  workflow tool creates them. Set `GIT_BRANCH_NAME` to the current branch and run
+  `.tools/issue-workflow/bin/check-branch.sh --branch "$GIT_BRANCH_NAME"`. If the current branch is not
+  in the `feature` namespace or the check exits non-zero, stop before any hook or specification file
+  operation, show its diagnostic, and tell the user to run `/start-work` first.
+- For `hotfix` or `release`, construct `GIT_BRANCH_NAME` as `hotfix/<short-name>` or
+  `release/<version-or-short-name>`. Use lowercase kebab-case for hotfix suffixes; a release
   suffix may instead be a version identifier such as `v1.2.3`. A suffix MUST be non-empty and MUST
   NOT contain another `/` or a repeated namespace.
 - If the user explicitly provided `GIT_BRANCH_NAME`, do not rewrite it. Validate that it has exactly
-  one allowed namespace and a valid suffix. An invalid explicit name is an error, not a policy bypass.
+  one allowed namespace and a valid suffix. An explicit `feature` name MUST also pass the
+  `check-branch.sh --branch` check above. An invalid explicit name is an error, not a policy bypass.
 - Run `git check-ref-format --branch "$GIT_BRANCH_NAME"` after the policy validation. Both checks
   MUST pass before the branch can be created or reused.
 - Verify that the repository is a Git worktree and resolve the current symbolic branch. A detached
@@ -67,7 +74,8 @@ You **MUST** consider the user input before proceeding (if not empty).
     `재사용`; otherwise stop and report the candidate refs so the user can choose or switch manually.
     This check does not fetch or mutate a remote.
   - Only when neither a local target nor a matching remote-tracking ref exists, run
-    `git switch -c "$GIT_BRANCH_NAME"` from the current HEAD and set `BRANCH_STATUS` to `생성`.
+    `git switch -c "$GIT_BRANCH_NAME"` from the current HEAD and set `BRANCH_STATUS` to `생성`. For
+    `feature`, do not create it: stop and tell the user to run `/start-work` first.
   - Recheck the full branch invariant. After an existing-branch switch, also require the previously
     listed carry-over paths and index state to remain exactly accounted for. If creation, switching, or
     verification fails, stop before dispatching hooks or creating/updating specification artifacts.
