@@ -69,7 +69,8 @@ pre-commit 훅이 위 검증을 순서대로 실행하므로 커밋 전 로컬�
 
 작업은 열린 issue에서 시작합니다. 결과 하나를 목적 한 문장(50자)·범위·완료 조건으로 issue에
 정의하고, 그 issue에서 `feature/<번호>-<도메인>-<내용>` 브랜치를 낸 뒤 시작합니다(`/write-issue`).
-같은 결과의 열린 issue가 있으면 새로 만들지 않고 항목으로 더합니다. 지금 PR이 맡은 항목만 하고,
+같은 결과의 열린 issue가 있으면 새로 만들지 않고 항목으로 더합니다. `status:` 라벨이 달렸거나 같은
+레인의 브랜치가 남은 issue에서는 새로 시작하지 않습니다. 지금 PR이 맡은 항목만 하고,
 진행 중 발견한 다른 문제는 고치지 않고 issue 항목으로 남깁니다. 레인은 `project`·`ios`이며 한 PR에
 하나만 담습니다. 규칙의 정본은 [작업 흐름 컨벤션](docs/conventions/workflow.md)이고, 편집 전
 hook이 브랜치와 레인을 검사합니다.
@@ -155,7 +156,7 @@ Constitution을 개정합니다.
 - Spec Kit으로 만드는 헌법, 기능 명세, 구현 계획, 조사 문서, 데이터 모델, 계약 설명, 빠른 시작, 작업 목록을 한국어로 작성한다.
 - 코드 식별자, 명령어, 파일 경로, 프로토콜 이름, 외부 API의 고유 명칭은 원문을 유지한다.
 - 요구사항은 검증 가능한 문장으로 작성하고, 모호한 번역보다 기술적 정확성을 우선한다.
-- `$speckit-constitution` → `$speckit-specify` → `$speckit-plan` → `$speckit-tasks` → `$speckit-implement` 순서를 기본 워크플로로 사용한다.
+- `/write-issue` → `$speckit-constitution` → `$speckit-specify` → `$speckit-plan` → `$speckit-tasks` → `$speckit-implement` 순서를 기본 워크플로로 사용한다.
 <!-- init-speckit-ko:end -->
 
 ## PR 작성
@@ -178,7 +179,7 @@ PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 ├── .github/            # CI, 커밋 컨벤션, issue·PR 템플릿
 └── .tools/
     ├── githooks/            # Git Hook 및 저장소 자동화
-    ├── issue-workflow/      # issue 생성, 브랜치 시작, 편집 전 브랜치 검사
+    ├── issue-workflow/      # issue 생성, 브랜치 시작, issue 문맥 조회, 편집 전 브랜치 검사
     ├── project-setup/       # 에이전트 링크와 개발 workspace 초기화
     ├── repository-paths/    # 저장소 공용 경로 관리
     ├── script-tests/        # 프로젝트 셸 회귀 테스트 실행
