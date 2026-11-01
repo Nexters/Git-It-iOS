@@ -45,3 +45,11 @@ type: chore
 priority: low')" duplicate:type:
 assert_equal "$(issue_policy_check_labels "$known" 'type: bug')" missing:priority:
 assert_equal "$(issue_policy_check_labels "$known" '')" missing:type:
+
+# status: 라벨만 시작을 막고 없으면 아무것도 출력하지 않습니다.
+assert_equal "$(issue_policy_hold_label 'type: bug
+status: on-hold
+priority: low')" 'status: on-hold'
+assert_equal "$(issue_policy_hold_label 'type: bug
+priority: low')" ''
+assert_equal "$(issue_policy_hold_label '')" ''

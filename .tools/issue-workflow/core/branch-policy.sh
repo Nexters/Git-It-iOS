@@ -51,6 +51,27 @@ branch_policy_parse() (
 	return 1
 )
 
+# 연결 브랜치 중 같은 레인에서 진행 중인 첫 브랜치를 출력합니다. 없으면 아무것도 출력하지 않습니다.
+branch_policy_active_branch() (
+	branch_policy_linked=$1
+	branch_policy_own=$2
+	branch_policy_domain_list=$3
+
+	while IFS= read -r branch_policy_branch; do
+		[ -n "$branch_policy_branch" ] || continue
+
+		# 이름을 해석할 수 없으면 레인을 알 수 없으므로 같은 레인으로 봅니다.
+		if branch_policy_parsed=$(branch_policy_parse "$branch_policy_branch" "$branch_policy_domain_list"); then
+			branch_policy_domain=${branch_policy_parsed#* }
+			[ "${branch_policy_domain%% *}" = "$branch_policy_own" ] || continue
+		fi
+		printf '%s\n' "$branch_policy_branch"
+		return 0
+	done <<EOF
+$branch_policy_linked
+EOF
+)
+
 # 파일이 속한 레인의 도메인을 출력합니다. 여러 경로에 걸리면 가장 긴 경로가 이깁니다.
 branch_policy_lane_of() (
 	branch_policy_file=$1

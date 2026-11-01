@@ -33,7 +33,7 @@ assert_rejected() {
 		cat "$work/stderr" >&2
 		exit 1
 	}
-	if grep -q 'issue develop' "$FAKE_GH_LOG"; then
+	if grep -q 'issue develop .*--name' "$FAKE_GH_LOG"; then
 		printf 'FAIL: 검사 실패 시 브랜치를 내면 안 됩니다\n' >&2
 		exit 1
 	fi
@@ -69,6 +69,36 @@ FAKE_GH_FAIL=true
 export FAKE_GH_FAIL
 assert_rejected issue-state-unavailable 9 --domain ios --topic home
 unset FAKE_GH_FAIL
+
+# status: 라벨이 달린 issue에서는 그 라벨을 알리고 브랜치를 내지 않습니다.
+FAKE_ISSUE_LABELS='type: tooling
+status: blocked'
+export FAKE_ISSUE_LABELS
+assert_rejected issue-held 9 --domain ios --topic home
+grep -q 'status: blocked' "$work/stderr"
+unset FAKE_ISSUE_LABELS
+
+# 같은 레인의 연결 브랜치가 남아 있으면 그 브랜치를 알리고 브랜치를 내지 않습니다.
+FAKE_LINKED_BRANCHES='feature/9-ios-other'
+export FAKE_LINKED_BRANCHES
+assert_rejected issue-in-progress 9 --domain ios --topic home
+grep -q 'feature/9-ios-other' "$work/stderr"
+
+# 다른 레인의 연결 브랜치는 경로가 겹치지 않으므로 막지 않습니다.
+: >"$FAKE_GH_LOG"
+"$starter" 9 --domain project --topic home >"$work/stdout"
+grep -q -- '^issue develop 9 --name feature/9-project-home --base develop --checkout$' "$FAKE_GH_LOG"
+unset FAKE_LINKED_BRANCHES
+
+# 라벨이나 연결 브랜치를 읽지 못하면 상태를 모르므로 브랜치를 내지 않습니다.
+FAKE_LABELS_FAIL=true
+export FAKE_LABELS_FAIL
+assert_rejected issue-state-unavailable 9 --domain ios --topic home
+unset FAKE_LABELS_FAIL
+FAKE_LINKED_FAIL=true
+export FAKE_LINKED_FAIL
+assert_rejected issue-state-unavailable 9 --domain ios --topic home
+unset FAKE_LINKED_FAIL
 
 # 열린 issue에서 issue에 연결된 브랜치를 develop 기준으로 냅니다.
 : >"$FAKE_GH_LOG"

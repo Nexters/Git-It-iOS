@@ -1,6 +1,6 @@
 #!/bin/sh
 # shellcheck disable=SC1090,SC1091
-# 열린 issue에서 feature/<번호>-<도메인>-<내용> 브랜치를 내고 전환합니다.
+# 시작할 수 있는 issue에서 feature/<번호>-<도메인>-<내용> 브랜치를 내고 전환합니다.
 
 set -eu
 
@@ -29,10 +29,18 @@ start_branch_report() (
 		printf '오류[issue-workflow.issue-state-unavailable]: issue #%s의 상태를 확인할 수 없습니다\n조치: gh 인증과 네트워크를 확인하세요\n' "$start_branch_value" >&2
 		;;
 	issue-missing)
-		printf '오류[issue-workflow.issue-missing]: issue #%s가 없습니다\n' "$start_branch_value" >&2
+		printf '오류[issue-workflow.issue-missing]: issue #%s가 없습니다\n조치: 번호를 확인하세요\n' "$start_branch_value" >&2
 		;;
 	issue-closed)
 		printf '오류[issue-workflow.issue-closed]: issue #%s는 닫혔습니다\n조치: 열린 issue에서 브랜치를 내세요\n' "$start_branch_value" >&2
+		;;
+	issue-held)
+		printf "오류[issue-workflow.issue-held]: issue #%s에 '%s' 라벨이 있습니다\n조치: 지금 시작할 일이면 라벨을 뗀 뒤 다시 실행하세요\n" \
+			"$start_branch_value" "$start_branch_detail" >&2
+		;;
+	issue-in-progress)
+		printf "오류[issue-workflow.issue-in-progress]: issue #%s의 같은 레인 브랜치 '%s'가 남아 있습니다\n조치: 그 브랜치에서 이어 가거나, 머지되거나 지워진 뒤 다시 실행하세요\n" \
+			"$start_branch_value" "$start_branch_detail" >&2
 		;;
 	esac
 )
@@ -43,8 +51,10 @@ start_branch_main() (
 	start_branch_root=$(CDPATH='' cd -- "$start_branch_suite/../.." && pwd -P)
 	start_branch_paths="$start_branch_root/.tools/repository-paths/bin/repository-paths.sh"
 	. "$start_branch_suite/core/branch-policy.sh"
+	. "$start_branch_suite/core/issue-policy.sh"
 	. "$start_branch_suite/core/convention-reader.sh"
 	. "$start_branch_suite/core/github-adapter.sh"
+	. "$start_branch_suite/core/issue-gate.sh"
 	. "$start_branch_suite/core/start-branch.sh"
 
 	start_branch_number=''
@@ -94,7 +104,8 @@ start_branch_main() (
 
 	start_branch_run "$start_branch_number" "$start_branch_domain" "$start_branch_topic" \
 		"$start_branch_lane_doc" "$start_branch_work" \
-		convention_reader_lanes github_adapter_issue_state github_adapter_develop_branch start_branch_report
+		convention_reader_lanes github_adapter_issue_state github_adapter_issue_labels \
+		github_adapter_linked_branches github_adapter_develop_branch start_branch_report
 )
 
 start_branch_main "$@"

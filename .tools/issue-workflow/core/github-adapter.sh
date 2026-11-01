@@ -46,6 +46,17 @@ github_adapter_cached_issue_state() (
 	printf '%s\n' "$github_adapter_state"
 )
 
+# issue의 라벨을 한 줄에 하나씩 출력합니다.
+github_adapter_issue_labels() (
+	gh issue view "$1" --json labels -q '.labels[].name'
+)
+
+# issue에 연결된 브랜치를 한 줄에 하나씩 출력합니다. 머지로 지워진 브랜치는 나오지 않습니다.
+github_adapter_linked_branches() (
+	gh issue develop --list "$1" >"$2/linked-branches" || return 1
+	cut -f1 "$2/linked-branches"
+)
+
 # issue를 만들고 그 URL을 출력합니다.
 github_adapter_create_issue() (
 	github_adapter_title=$1
