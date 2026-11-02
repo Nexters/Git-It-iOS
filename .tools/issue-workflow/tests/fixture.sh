@@ -23,7 +23,7 @@ fixture_create() {
 printf '%s\n' "$*" >>"$FAKE_GH_LOG"
 case "$1 $2" in
 'issue view')
-	[ "${FAKE_GH_FAIL:-false}" != true ] && [ "${GH_TOKEN:-}" != invalid ] || {
+	[ "${FAKE_GH_FAIL:-false}" != true ] || {
 		printf 'HTTP 503\n' >&2
 		exit 1
 	}
@@ -37,10 +37,6 @@ case "$1 $2" in
 			printf 'HTTP 503\n' >&2
 			exit 1
 		}
-		if [ -f "${FAKE_LABEL_FILE:-/nonexistent}" ]; then
-			cat "$FAKE_LABEL_FILE"
-			exit 0
-		fi
 		printf '%s\n' "${FAKE_ISSUE_LABELS:-type: tooling}"
 		exit 0
 		;;
@@ -63,26 +59,14 @@ case "$1 $2" in
 'issue develop')
 	printf 'github.com/example/repository/tree/branch\n'
 	;;
-'api repos/'* | 'api --method')
-	case "$*" in
-	*matching-refs*)
-		[ "${FAKE_BRANCHES_FAIL:-false}" != true ] || {
-			printf 'HTTP 503\n' >&2
-			exit 1
-		}
-		for fake_branch in ${FAKE_ISSUE_BRANCHES:-}; do
-			printf '%s\n' "$fake_branch"
-		done
-		;;
-	*'--method DELETE'*)
-		[ "${FAKE_LABEL_REMOVE_FAIL:-false}" != true ] || exit 1
-		rm -f "$FAKE_LABEL_FILE"
-		;;
-	*/labels*)
-		[ "${FAKE_LABEL_ADD_FAIL:-false}" != true ] || exit 1
-		printf 'status: on-hold\n' >"$FAKE_LABEL_FILE"
-		;;
-	esac
+'api repos/'*)
+	[ "${FAKE_BRANCHES_FAIL:-false}" != true ] || {
+		printf 'HTTP 503\n' >&2
+		exit 1
+	}
+	for fake_branch in ${FAKE_ISSUE_BRANCHES:-}; do
+		printf '%s\n' "$fake_branch"
+	done
 	;;
 esac
 EOF

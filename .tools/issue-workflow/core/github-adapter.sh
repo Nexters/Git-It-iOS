@@ -57,17 +57,6 @@ github_adapter_issue_branches() (
 	gh api "repos/{owner}/{repo}/git/matching-refs/heads/feature/$1-" --jq '.[].ref | ltrimstr("refs/heads/")'
 )
 
-# issue에 라벨을 답니다.
-github_adapter_add_label() (
-	gh api "repos/{owner}/{repo}/issues/$1/labels" -f "labels[]=$2" --silent
-)
-
-# issue에서 라벨을 뗍니다. 라벨을 URL 경로에 넣으려고 콜론과 공백을 인코딩합니다.
-github_adapter_remove_label() (
-	github_adapter_encoded=$(printf '%s' "$2" | sed -e 's/:/%3A/g' -e 's/ /%20/g')
-	gh api --method DELETE "repos/{owner}/{repo}/issues/$1/labels/$github_adapter_encoded" --silent
-)
-
 # Spec Kit 단계가 읽을 번호, 제목, 라벨과 본문을 출력합니다.
 github_adapter_issue_context() (
 	gh issue view "$1" --json number,title,labels,body \

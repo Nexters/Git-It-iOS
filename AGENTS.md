@@ -179,7 +179,7 @@ PR은 [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) 형식을
 ├── .github/            # CI, 커밋 컨벤션, issue·PR 템플릿
 └── .tools/
     ├── githooks/            # Git Hook 및 저장소 자동화
-    ├── issue-workflow/      # issue 생성, 브랜치 시작, issue 문맥 조회, 편집 전 브랜치 검사, 실제 흐름 측정
+    ├── issue-workflow/      # issue 생성, 브랜치 시작, issue 문맥 조회, 편집 전 브랜치 검사
     ├── project-setup/       # 에이전트 링크와 개발 workspace 초기화
     ├── repository-paths/    # 저장소 공용 경로 관리
     ├── script-tests/        # 프로젝트 셸 회귀 테스트 실행
