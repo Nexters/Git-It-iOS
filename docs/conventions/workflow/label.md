@@ -19,5 +19,6 @@
 | `status:` (회색, 선택) | `status: on-hold` | 지금 하지 않습니다 |
 | | `status: blocked` | 선행 issue가 끝나야 합니다. 본문에 그 번호를 적습니다 |
 
+- `status:` 라벨이 달린 issue는 시작하지 않습니다. 시작할 때가 되면 라벨을 먼저 뗍니다.
 - GitHub 기본 라벨은 쓰지 않습니다. `duplicate`·`question`·`wontfix`만 닫는 사유로 씁니다.
 - 영역(레인) 라벨은 두지 않습니다. 레인은 본문의 `범위(경로)`와 브랜치 이름이 말합니다.

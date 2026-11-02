@@ -1,5 +1,5 @@
 #!/bin/sh
-# issue 제목 길이와 라벨 조합을 판정하는 순수 정책입니다.
+# issue 제목 길이, 라벨 조합과 시작 가능 여부를 판정하는 순수 정책입니다.
 
 # UTF-8 후속 바이트를 빼서 locale과 무관하게 글자 수를 셉니다.
 issue_policy_title_length() (
@@ -67,4 +67,9 @@ EOF
 $issue_policy_known
 EOF
 	printf 'ok\n'
+)
+
+# 지금 시작하면 안 되는 issue의 status: 라벨을 출력합니다. 없으면 아무것도 출력하지 않습니다.
+issue_policy_hold_label() (
+	printf '%s\n' "$1" | awk '/^status: / { print; exit }'
 )

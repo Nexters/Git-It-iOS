@@ -55,6 +55,13 @@ for unknown in '' i android; do
 	fi
 done
 
+# issue의 브랜치 중 같은 레인의 것을 찾고, 레인을 알 수 없는 이름은 같은 레인으로 봅니다.
+assert_equal "$(branch_policy_active_branch '' ios "$domains")" ''
+assert_equal "$(branch_policy_active_branch 'feature/9-project-tool' ios "$domains")" ''
+assert_equal "$(branch_policy_active_branch 'feature/9-project-tool
+feature/9-ios-home' ios "$domains")" feature/9-ios-home
+assert_equal "$(branch_policy_active_branch 'hand-made-branch' ios "$domains")" hand-made-branch
+
 # 폴더는 접두어로, 파일은 전체로 맞추고 가장 긴 경로가 이깁니다.
 assert_equal "$(branch_policy_lane_of AGENTS.md "$lanes")" project
 assert_equal "$(branch_policy_lane_of app-code/Projects/App.swift "$lanes")" ios

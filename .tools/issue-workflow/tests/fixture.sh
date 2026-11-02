@@ -31,6 +31,20 @@ case "$1 $2" in
 		printf 'GraphQL: Could not resolve to an issue or pull request with the number of 9.\n' >&2
 		exit 1
 	}
+	case "$*" in
+	*'--json labels '*)
+		[ "${FAKE_LABELS_FAIL:-false}" != true ] || {
+			printf 'HTTP 503\n' >&2
+			exit 1
+		}
+		printf '%s\n' "${FAKE_ISSUE_LABELS:-type: tooling}"
+		exit 0
+		;;
+	*'--json number,title,labels,body '*)
+		printf '#%s 목적 문장\n라벨: type: tooling\n\n## 목적\n' "$3"
+		exit 0
+		;;
+	esac
 	printf '%s https://github.com/example/repository/%s/9\n' "${FAKE_ISSUE_STATE:-OPEN}" "${FAKE_ISSUE_KIND:-issues}"
 	;;
 'issue create')
@@ -44,6 +58,15 @@ case "$1 $2" in
 	;;
 'issue develop')
 	printf 'github.com/example/repository/tree/branch\n'
+	;;
+'api repos/'*)
+	[ "${FAKE_BRANCHES_FAIL:-false}" != true ] || {
+		printf 'HTTP 503\n' >&2
+		exit 1
+	}
+	for fake_branch in ${FAKE_ISSUE_BRANCHES:-}; do
+		printf '%s\n' "$fake_branch"
+	done
 	;;
 esac
 EOF

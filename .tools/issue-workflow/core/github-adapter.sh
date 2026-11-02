@@ -46,6 +46,23 @@ github_adapter_cached_issue_state() (
 	printf '%s\n' "$github_adapter_state"
 )
 
+# issue의 라벨을 한 줄에 하나씩 출력합니다.
+github_adapter_issue_labels() (
+	gh issue view "$1" --json labels -q '.labels[].name'
+)
+
+# issue 번호로 시작하는 원격 feature 브랜치를 한 줄에 하나씩 출력합니다. 머지로 지워진 브랜치는 나오지 않습니다.
+# issue의 연결 목록은 PR을 연 브랜치를 빼므로 브랜치 이름으로 찾습니다.
+github_adapter_issue_branches() (
+	gh api "repos/{owner}/{repo}/git/matching-refs/heads/feature/$1-" --jq '.[].ref | ltrimstr("refs/heads/")'
+)
+
+# Spec Kit 단계가 읽을 번호, 제목, 라벨과 본문을 출력합니다.
+github_adapter_issue_context() (
+	gh issue view "$1" --json number,title,labels,body \
+		-q '"#\(.number) \(.title)\n라벨: \([.labels[].name] | join(", "))\n\n\(.body)"'
+)
+
 # issue를 만들고 그 URL을 출력합니다.
 github_adapter_create_issue() (
 	github_adapter_title=$1

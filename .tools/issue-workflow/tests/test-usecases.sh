@@ -6,9 +6,11 @@ test_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 module=$(CDPATH='' cd -- "$test_dir/.." && pwd -P)
 . "$module/core/branch-policy.sh"
 . "$module/core/issue-policy.sh"
+. "$module/core/issue-gate.sh"
 . "$module/core/check-branch.sh"
 . "$module/core/create-issue.sh"
 . "$module/core/start-branch.sh"
+. "$module/core/read-issue.sh"
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/issue-workflow-usecase-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -104,9 +106,27 @@ fake_state() {
 	printf '%s\n' "$state_result"
 }
 
+fake_labels() {
+	log_call labels "$1"
+	[ "$labels_result" != FAIL ] || return 1
+	printf '%s\n' "$labels_result"
+}
+
+fake_branches() {
+	log_call branches "$1"
+	[ "$branches_result" != FAIL ] || return 1
+	printf '%s\n' "$branches_result"
+}
+
 fake_develop() {
 	log_call develop "$1" "$2"
 	[ "$develop_result" != FAIL ] || return 1
+}
+
+fake_context() {
+	log_call context "$1"
+	[ "$context_result" != FAIL ] || return 1
+	printf 'issue 문맥\n'
 }
 
 run_check() {
@@ -127,7 +147,14 @@ run_start() {
 	: >"$calls"
 	run_status=0
 	start_branch_run "$1" "$2" "$3" lane.md "$work" \
-		fake_lanes fake_state fake_develop fake_report >"$work/stdout" || run_status=$?
+		fake_lanes fake_state fake_labels fake_branches fake_develop fake_report >"$work/stdout" || run_status=$?
+}
+
+run_read() {
+	: >"$calls"
+	run_status=0
+	read_issue_run "$1" "$2" lane.md "$work" \
+		fake_lanes fake_branch fake_state fake_labels fake_context fake_report >"$work/stdout" || run_status=$?
 }
 
 relative_result=.tools/a.sh
@@ -310,11 +337,54 @@ state 9
 report issue-closed'
 state_result=OPEN
 
+labels_result='type: bug'
+branches_result=''
+
+# status: 라벨이 달린 issue는 브랜치 목록을 읽기 전에 막습니다.
+labels_result='type: bug
+status: on-hold'
+run_start 9 ios home
+assert_run 2 'lanes lane.md
+state 9
+labels 9
+report issue-held'
+labels_result='type: bug'
+
+# 같은 레인의 브랜치가 남아 있으면 브랜치를 내지 않습니다.
+branches_result=feature/9-ios-other
+run_start 9 ios home
+assert_run 2 'lanes lane.md
+state 9
+labels 9
+branches 9
+report issue-in-progress'
+branches_result=''
+
+# 라벨이나 브랜치 목록을 읽지 못하면 브랜치를 내지 않습니다.
+labels_result=FAIL
+run_start 9 ios home
+assert_run 1 'lanes lane.md
+state 9
+labels 9
+report issue-state-unavailable'
+labels_result='type: bug'
+
+branches_result=FAIL
+run_start 9 ios home
+assert_run 1 'lanes lane.md
+state 9
+labels 9
+branches 9
+report issue-state-unavailable'
+branches_result=''
+
 # 브랜치를 내지 못하면 이름을 출력하지 않습니다.
 develop_result=FAIL
 run_start 9 ios home
 assert_run 1 'lanes lane.md
 state 9
+labels 9
+branches 9
 develop 9 feature/9-ios-home'
 [ ! -s "$work/stdout" ] || {
 	printf 'FAIL: 실패한 브랜치 이름을 출력하면 안 됩니다\n' >&2
@@ -322,14 +392,88 @@ develop 9 feature/9-ios-home'
 }
 develop_result=ok
 
+# 다른 레인의 브랜치는 막지 않습니다.
+branches_result=feature/9-project-tool
+run_start 9 ios home
+assert_run 0 'lanes lane.md
+state 9
+labels 9
+branches 9
+develop 9 feature/9-ios-home'
+branches_result=''
+
 # 열린 issue에서 브랜치를 내고 그 이름을 출력합니다.
 run_start 9 ios home
 assert_run 0 'lanes lane.md
 state 9
+labels 9
+branches 9
 develop 9 feature/9-ios-home'
 [ "$(cat "$work/stdout")" = feature/9-ios-home ] || {
 	printf 'FAIL: 브랜치 이름을 출력해야 합니다\n' >&2
 	exit 1
 }
+
+context_result=ok
+
+# 레인 표를 못 읽으면 브랜치와 issue를 읽지 않습니다.
+lanes_result=FAIL
+run_read false ''
+assert_run 1 'lanes lane.md
+report missing-lane-table'
+lanes_result=$lanes
+
+# issue 브랜치가 아니면 issue를 조회하지 않습니다.
+branch_result=develop
+run_read false ''
+assert_run 2 'lanes lane.md
+branch
+report invalid-branch-name'
+branch_result=feature/44-project-tool
+
+# 현재 브랜치의 번호로 상태, 라벨, 문맥 순서로 읽습니다.
+run_read false ''
+assert_run 0 'lanes lane.md
+branch
+state 44
+labels 44
+context 44'
+[ "$(cat "$work/stdout")" = 'issue 문맥' ] || {
+	printf 'FAIL: issue 문맥을 출력해야 합니다\n' >&2
+	exit 1
+}
+
+# 지정한 브랜치는 현재 브랜치를 읽지 않습니다.
+run_read true feature/9-ios-home
+assert_run 0 'lanes lane.md
+state 9
+labels 9
+context 9'
+
+# 닫혔거나 status: 라벨이 달린 issue는 문맥을 내지 않습니다.
+state_result=CLOSED
+run_read true feature/9-ios-home
+assert_run 2 'lanes lane.md
+state 9
+report issue-closed'
+state_result=OPEN
+
+labels_result='status: blocked'
+run_read true feature/9-ios-home
+assert_run 2 'lanes lane.md
+state 9
+labels 9
+report issue-held'
+labels_result='type: bug'
+
+# 문맥을 읽지 못하면 실패합니다.
+context_result=FAIL
+run_read true feature/9-ios-home
+assert_run 1 'lanes lane.md
+state 9
+labels 9
+context 9
+report issue-state-unavailable'
+context_result=ok
 
 printf 'PASS: issue-workflow 유스케이스 순서 회귀\n'

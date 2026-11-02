@@ -42,7 +42,7 @@ check_branch_report() (
 		return 0
 		;;
 	esac
-	printf '조치: 열린 issue에서 브랜치를 내세요(/start-work 또는 start-branch.sh <번호> --domain <도메인> --topic <내용>)\n' >&2
+	printf '조치: 열린 issue에서 브랜치를 내세요(/write-issue 또는 start-branch.sh <번호> --domain <도메인> --topic <내용>)\n' >&2
 )
 
 check_branch_main() (
