@@ -112,10 +112,10 @@ fake_labels() {
 	printf '%s\n' "$labels_result"
 }
 
-fake_linked() {
-	log_call linked "$1"
-	[ "$linked_result" != FAIL ] || return 1
-	printf '%s\n' "$linked_result"
+fake_branches() {
+	log_call branches "$1"
+	[ "$branches_result" != FAIL ] || return 1
+	printf '%s\n' "$branches_result"
 }
 
 fake_develop() {
@@ -147,7 +147,7 @@ run_start() {
 	: >"$calls"
 	run_status=0
 	start_branch_run "$1" "$2" "$3" lane.md "$work" \
-		fake_lanes fake_state fake_labels fake_linked fake_develop fake_report >"$work/stdout" || run_status=$?
+		fake_lanes fake_state fake_labels fake_branches fake_develop fake_report >"$work/stdout" || run_status=$?
 }
 
 run_read() {
@@ -338,9 +338,9 @@ report issue-closed'
 state_result=OPEN
 
 labels_result='type: bug'
-linked_result=''
+branches_result=''
 
-# status: 라벨이 달린 issue는 연결 브랜치를 읽기 전에 막습니다.
+# status: 라벨이 달린 issue는 브랜치 목록을 읽기 전에 막습니다.
 labels_result='type: bug
 status: on-hold'
 run_start 9 ios home
@@ -350,17 +350,17 @@ labels 9
 report issue-held'
 labels_result='type: bug'
 
-# 같은 레인의 연결 브랜치가 남아 있으면 브랜치를 내지 않습니다.
-linked_result=feature/9-ios-other
+# 같은 레인의 브랜치가 남아 있으면 브랜치를 내지 않습니다.
+branches_result=feature/9-ios-other
 run_start 9 ios home
 assert_run 2 'lanes lane.md
 state 9
 labels 9
-linked 9
+branches 9
 report issue-in-progress'
-linked_result=''
+branches_result=''
 
-# 라벨이나 연결 브랜치를 읽지 못하면 브랜치를 내지 않습니다.
+# 라벨이나 브랜치 목록을 읽지 못하면 브랜치를 내지 않습니다.
 labels_result=FAIL
 run_start 9 ios home
 assert_run 1 'lanes lane.md
@@ -369,14 +369,14 @@ labels 9
 report issue-state-unavailable'
 labels_result='type: bug'
 
-linked_result=FAIL
+branches_result=FAIL
 run_start 9 ios home
 assert_run 1 'lanes lane.md
 state 9
 labels 9
-linked 9
+branches 9
 report issue-state-unavailable'
-linked_result=''
+branches_result=''
 
 # 브랜치를 내지 못하면 이름을 출력하지 않습니다.
 develop_result=FAIL
@@ -384,7 +384,7 @@ run_start 9 ios home
 assert_run 1 'lanes lane.md
 state 9
 labels 9
-linked 9
+branches 9
 develop 9 feature/9-ios-home'
 [ ! -s "$work/stdout" ] || {
 	printf 'FAIL: 실패한 브랜치 이름을 출력하면 안 됩니다\n' >&2
@@ -392,22 +392,22 @@ develop 9 feature/9-ios-home'
 }
 develop_result=ok
 
-# 다른 레인의 연결 브랜치는 막지 않습니다.
-linked_result=feature/9-project-tool
+# 다른 레인의 브랜치는 막지 않습니다.
+branches_result=feature/9-project-tool
 run_start 9 ios home
 assert_run 0 'lanes lane.md
 state 9
 labels 9
-linked 9
+branches 9
 develop 9 feature/9-ios-home'
-linked_result=''
+branches_result=''
 
 # 열린 issue에서 브랜치를 내고 그 이름을 출력합니다.
 run_start 9 ios home
 assert_run 0 'lanes lane.md
 state 9
 labels 9
-linked 9
+branches 9
 develop 9 feature/9-ios-home'
 [ "$(cat "$work/stdout")" = feature/9-ios-home ] || {
 	printf 'FAIL: 브랜치 이름을 출력해야 합니다\n' >&2

@@ -78,30 +78,48 @@ assert_rejected issue-held 9 --domain ios --topic home
 grep -q 'status: blocked' "$work/stderr"
 unset FAKE_ISSUE_LABELS
 
-# 같은 레인의 연결 브랜치가 남아 있으면 그 브랜치를 알리고 브랜치를 내지 않습니다.
-FAKE_LINKED_BRANCHES='feature/9-ios-other'
-export FAKE_LINKED_BRANCHES
+# 같은 레인의 브랜치가 남아 있으면 그 브랜치를 알리고 브랜치를 내지 않습니다.
+# PR을 연 브랜치는 issue의 연결 목록에서 빠지므로 번호로 시작하는 브랜치를 찾습니다.
+FAKE_ISSUE_BRANCHES='feature/9-ios-other'
+export FAKE_ISSUE_BRANCHES
 assert_rejected issue-in-progress 9 --domain ios --topic home
 grep -q 'feature/9-ios-other' "$work/stderr"
+grep -q 'git/matching-refs/heads/feature/9-' "$FAKE_GH_LOG"
+if grep -q 'issue develop' "$FAKE_GH_LOG"; then
+	printf 'FAIL: 연결 목록에 기대면 PR을 연 브랜치를 놓칩니다\n' >&2
+	exit 1
+fi
 
-# 다른 레인의 연결 브랜치는 경로가 겹치지 않으므로 막지 않습니다.
+# --check도 같은 기준으로 막습니다.
+assert_rejected issue-in-progress 9 --domain ios --topic home --check
+
+# 다른 레인의 브랜치는 경로가 겹치지 않으므로 막지 않습니다.
 : >"$FAKE_GH_LOG"
 "$starter" 9 --domain project --topic home >"$work/stdout"
 grep -q -- '^issue develop 9 --name feature/9-project-home --base develop --checkout$' "$FAKE_GH_LOG"
-unset FAKE_LINKED_BRANCHES
+unset FAKE_ISSUE_BRANCHES
 
-# 라벨이나 연결 브랜치를 읽지 못하면 상태를 모르므로 브랜치를 내지 않습니다.
+# 라벨이나 브랜치 목록을 읽지 못하면 상태를 모르므로 브랜치를 내지 않습니다.
 FAKE_LABELS_FAIL=true
 export FAKE_LABELS_FAIL
 assert_rejected issue-state-unavailable 9 --domain ios --topic home
 unset FAKE_LABELS_FAIL
-FAKE_LINKED_FAIL=true
-export FAKE_LINKED_FAIL
+FAKE_BRANCHES_FAIL=true
+export FAKE_BRANCHES_FAIL
 assert_rejected issue-state-unavailable 9 --domain ios --topic home
-unset FAKE_LINKED_FAIL
+unset FAKE_BRANCHES_FAIL
 
 # 열린 issue에서 issue에 연결된 브랜치를 develop 기준으로 냅니다.
 : >"$FAKE_GH_LOG"
 "$starter" 9 --domain ios --topic home-screen >"$work/stdout"
 grep -q -- '^issue develop 9 --name feature/9-ios-home-screen --base develop --checkout$' "$FAKE_GH_LOG"
 tail -n 1 "$work/stdout" | grep -qx 'feature/9-ios-home-screen'
+
+# --check는 판정만 하고 브랜치를 내지 않습니다.
+: >"$FAKE_GH_LOG"
+"$starter" 9 --domain ios --topic home --check >"$work/stdout"
+tail -n 1 "$work/stdout" | grep -qx 'feature/9-ios-home'
+if grep -q 'issue develop' "$FAKE_GH_LOG"; then
+	printf 'FAIL: --check는 브랜치를 내면 안 됩니다\n' >&2
+	exit 1
+fi

@@ -51,10 +51,10 @@ github_adapter_issue_labels() (
 	gh issue view "$1" --json labels -q '.labels[].name'
 )
 
-# issue에 연결된 브랜치를 한 줄에 하나씩 출력합니다. 머지로 지워진 브랜치는 나오지 않습니다.
-github_adapter_linked_branches() (
-	gh issue develop --list "$1" >"$2/linked-branches" || return 1
-	cut -f1 "$2/linked-branches"
+# issue 번호로 시작하는 원격 feature 브랜치를 한 줄에 하나씩 출력합니다. 머지로 지워진 브랜치는 나오지 않습니다.
+# issue의 연결 목록은 PR을 연 브랜치를 빼므로 브랜치 이름으로 찾습니다.
+github_adapter_issue_branches() (
+	gh api "repos/{owner}/{repo}/git/matching-refs/heads/feature/$1-" --jq '.[].ref | ltrimstr("refs/heads/")'
 )
 
 # Spec Kit 단계가 읽을 번호, 제목, 라벨과 본문을 출력합니다.

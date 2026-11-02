@@ -1,11 +1,17 @@
 #!/bin/sh
 # shellcheck disable=SC1090,SC1091
 # 시작할 수 있는 issue에서 feature/<번호>-<도메인>-<내용> 브랜치를 내고 전환합니다.
+# --check는 같은 기준으로 판정만 하고 브랜치를 내지 않습니다.
 
 set -eu
 
 start_branch_usage() (
-	printf '조치: start-branch.sh <번호> --domain <도메인> --topic <내용> 형식으로 실행하세요\n' >&2
+	printf '조치: start-branch.sh <번호> --domain <도메인> --topic <내용> [--check] 형식으로 실행하세요\n' >&2
+)
+
+# --check에서 브랜치를 내는 port를 대신합니다.
+start_branch_skip_develop() (
+	:
 )
 
 # 유스케이스의 token을 stderr 진단으로 옮깁니다.
@@ -60,8 +66,13 @@ start_branch_main() (
 	start_branch_number=''
 	start_branch_domain=''
 	start_branch_topic=''
+	start_branch_develop=github_adapter_develop_branch
 	while [ "$#" -gt 0 ]; do
 		case "$1" in
+		--check)
+			start_branch_develop=start_branch_skip_develop
+			shift
+			;;
 		--domain | --topic)
 			[ "$#" -ge 2 ] || {
 				printf '오류[issue-workflow.invalid-input]: %s에 값이 필요합니다\n' "$1" >&2
@@ -105,7 +116,7 @@ start_branch_main() (
 	start_branch_run "$start_branch_number" "$start_branch_domain" "$start_branch_topic" \
 		"$start_branch_lane_doc" "$start_branch_work" \
 		convention_reader_lanes github_adapter_issue_state github_adapter_issue_labels \
-		github_adapter_linked_branches github_adapter_develop_branch start_branch_report
+		github_adapter_issue_branches "$start_branch_develop" start_branch_report
 )
 
 start_branch_main "$@"

@@ -55,7 +55,7 @@ for unknown in '' i android; do
 	fi
 done
 
-# 연결 브랜치 중 같은 레인의 것을 찾고, 레인을 알 수 없는 이름은 같은 레인으로 봅니다.
+# issue의 브랜치 중 같은 레인의 것을 찾고, 레인을 알 수 없는 이름은 같은 레인으로 봅니다.
 assert_equal "$(branch_policy_active_branch '' ios "$domains")" ''
 assert_equal "$(branch_policy_active_branch 'feature/9-project-tool' ios "$domains")" ''
 assert_equal "$(branch_policy_active_branch 'feature/9-project-tool

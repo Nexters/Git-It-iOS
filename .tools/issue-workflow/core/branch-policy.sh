@@ -51,9 +51,9 @@ branch_policy_parse() (
 	return 1
 )
 
-# 연결 브랜치 중 같은 레인에서 진행 중인 첫 브랜치를 출력합니다. 없으면 아무것도 출력하지 않습니다.
+# issue의 브랜치 중 같은 레인에서 진행 중인 첫 브랜치를 출력합니다. 없으면 아무것도 출력하지 않습니다.
 branch_policy_active_branch() (
-	branch_policy_linked=$1
+	branch_policy_branches=$1
 	branch_policy_own=$2
 	branch_policy_domain_list=$3
 
@@ -68,7 +68,7 @@ branch_policy_active_branch() (
 		printf '%s\n' "$branch_policy_branch"
 		return 0
 	done <<EOF
-$branch_policy_linked
+$branch_policy_branches
 EOF
 )
 

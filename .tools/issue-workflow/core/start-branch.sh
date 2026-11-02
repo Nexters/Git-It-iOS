@@ -11,7 +11,7 @@ start_branch_run() (
 	start_branch_lanes_port=$6
 	start_branch_issue_state_port=$7
 	start_branch_labels_port=$8
-	start_branch_linked_port=$9
+	start_branch_branches_port=$9
 	shift 9
 	start_branch_develop_port=$1
 	start_branch_report_port=$2
@@ -36,11 +36,11 @@ start_branch_run() (
 		"$start_branch_labels_port" "$start_branch_report_port" || return $?
 
 	# 같은 레인의 브랜치가 남아 있으면 같은 일을 두 번 시작하는 것이므로 막습니다.
-	start_branch_linked=$("$start_branch_linked_port" "$start_branch_number" "$start_branch_work") || {
+	start_branch_branches=$("$start_branch_branches_port" "$start_branch_number") || {
 		"$start_branch_report_port" issue-state-unavailable "$start_branch_number"
 		return 1
 	}
-	start_branch_active=$(branch_policy_active_branch "$start_branch_linked" "$start_branch_domain" "$start_branch_domains")
+	start_branch_active=$(branch_policy_active_branch "$start_branch_branches" "$start_branch_domain" "$start_branch_domains")
 	[ -z "$start_branch_active" ] || {
 		"$start_branch_report_port" issue-in-progress "$start_branch_number" "$start_branch_active"
 		return 2
